@@ -1,17 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NavigableSet;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
-
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -19,6 +11,11 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 public class CarapaceBoss extends BossAbilityGroup {
 
@@ -133,14 +130,7 @@ public class CarapaceBoss extends BossAbilityGroup {
 
 			int duration = PERIOD - mBoss.getTicksLived() + reactivateTick;
 
-			NavigableSet<Effect> effects = EffectManager.getInstance().getEffects(mBoss, SPEED_EFFECT_NAME);
-			if (effects == null) {
-				if (mSpeedEffect > 0) {
-					EffectManager.getInstance().addEffect(mBoss, SPEED_EFFECT_NAME, new PercentSpeed(duration, mSpeedEffect, SPEED_EFFECT_NAME));
-				}
-			} else {
-				effects.last().setDuration(duration);
-			}
+			EffectManager.getInstance().addEffect(mBoss, SPEED_EFFECT_NAME, new PercentSpeed(duration, mSpeedEffect, SPEED_EFFECT_NAME));
 		}
 	}
 

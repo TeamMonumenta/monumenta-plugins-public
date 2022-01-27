@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.events;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.scriptedquests.Plugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.LivingEntity;
@@ -17,10 +15,11 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
-import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.scriptedquests.Plugin;
+import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 public class DamageEvent extends Event implements Cancellable {
 
@@ -224,15 +223,15 @@ public class DamageEvent extends Event implements Cancellable {
 		return mSource;
 	}
 
-	public @Nullable boolean getBoolean(String key) {
+	public Boolean getBoolean(String key) {
 		return mBooleans.get(key);
 	}
 
-	public @Nullable int getInteger(String key) {
+	public Integer getInteger(String key) {
 		return mIntegers.get(key);
 	}
 
-	public @Nullable double getDouble(String key) {
+	public Double getDouble(String key) {
 		return mDoubles.get(key);
 	}
 
@@ -240,15 +239,15 @@ public class DamageEvent extends Event implements Cancellable {
 		return mStrings.get(key);
 	}
 
-	public @Nullable boolean removeBoolean(String key) {
+	public Boolean removeBoolean(String key) {
 		return mBooleans.remove(key);
 	}
 
-	public @Nullable int removeInteger(String key) {
+	public Integer removeInteger(String key) {
 		return mIntegers.remove(key);
 	}
 
-	public @Nullable double removeDouble(String key) {
+	public Double removeDouble(String key) {
 		return mDoubles.remove(key);
 	}
 

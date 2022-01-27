@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -32,8 +31,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -96,7 +95,7 @@ public class Panacea extends Ability {
 
 		putOnCooldown();
 
-		FixedMetadataValue playerItemStats = new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer)));
+		FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
 
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getEyeLocation();

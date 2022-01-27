@@ -43,7 +43,7 @@ public class TwoHanded implements Enchantment {
 	}
 
 	@Override
-	public void onEquipmentUpdate(Plugin plugin, Player player, double value) {
+	public void onEquipmentUpdate(Plugin plugin, Player player) {
 		if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TWO_HANDED) == 0) {
 			plugin.mEffectManager.clearEffects(player, PERCENT_SPEED_EFFECT_NAME);
 			return;

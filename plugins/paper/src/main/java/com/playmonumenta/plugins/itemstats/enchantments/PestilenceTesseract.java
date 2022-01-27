@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
@@ -52,7 +53,7 @@ public class PestilenceTesseract implements Enchantment {
 				ParticleUtils.explodingRingEffect(plugin, item.getLocation().add(0, 0.5, 0), EFFECT_RADIUS, PARTICLE_RING_HEIGHT, TICK_PERIOD, PARTICLES);
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(item.getLocation(), EFFECT_RADIUS)) {
-					if (!(mob instanceof Player)) {
+					if (!(mob instanceof Player) && !ZoneUtils.hasZoneProperty(mob.getLocation(), ZoneUtils.ZoneProperty.RESIST_5)) {
 						plugin.mEffectManager.addEffect(mob, Decay.DOT_EFFECT_NAME, new CustomDamageOverTime(600, 1, 10, null, null, Particle.SQUID_INK));
 						EntityUtils.applySlow(plugin, 600, 0.2, mob);
 					}

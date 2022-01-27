@@ -1,7 +1,15 @@
 package com.playmonumenta.plugins.abilities;
 
-import java.util.Collection;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
+import com.playmonumenta.plugins.itemstats.infusions.Epoch;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.AbstractArrow;
@@ -24,19 +32,9 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+
 import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
-import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
-import com.playmonumenta.plugins.itemstats.infusions.Epoch;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import net.kyori.adventure.text.Component;
+import java.util.Collection;
 
 
 public abstract class Ability {
@@ -219,10 +217,6 @@ public abstract class Ability {
 	}
 
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-
-	}
-
-	public void playerItemHeldEvent(ItemStack mainHand, ItemStack offHand) {
 
 	}
 

@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Bukkit;
@@ -82,7 +81,7 @@ public class FireworkBlast extends DepthsAbility {
 		Bukkit.getPluginManager().callEvent(event);
 		rocket.setVelocity(rocket.getVelocity().multiply(2));
 
-		FixedMetadataValue playerItemStats = new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer)));
+		FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
 
 		new BukkitRunnable() {
 			@Override

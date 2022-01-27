@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Infusion;
@@ -16,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 import java.util.EnumSet;
-import java.util.NavigableSet;
 
 public class Execution implements Infusion {
 
@@ -25,7 +23,10 @@ public class Execution implements Infusion {
 	private static final String PERCENT_DAMAGE_EFFECT_NAME = "ExecutionPercentDamageEffect";
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
 			DamageType.MELEE,
+			DamageType.MELEE_ENCH,
+			DamageType.MELEE_SKILL,
 			DamageType.PROJECTILE,
+			DamageType.PROJECTILE_SKILL,
 			DamageType.MAGIC
 	);
 
@@ -48,19 +49,7 @@ public class Execution implements Infusion {
 		World world = player.getWorld();
 		world.spawnParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 3,
 		                    (enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, fallingDustData);
-		NavigableSet<Effect> damageEffects = plugin.mEffectManager.getEffects(player, PERCENT_DAMAGE_EFFECT_NAME);
-		if (damageEffects != null) {
-			for (Effect effect : damageEffects) {
-				if (effect.getMagnitude() == percentDamage) {
-					effect.setDuration(DURATION);
-				} else {
-					effect.setDuration(1);
-					plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME, new PercentDamageDealt(DURATION, percentDamage, AFFECTED_DAMAGE_TYPES));
-				}
-			}
-		} else {
-			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME, new PercentDamageDealt(DURATION, percentDamage, AFFECTED_DAMAGE_TYPES));
-		}
+		plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME, new PercentDamageDealt(DURATION, percentDamage, AFFECTED_DAMAGE_TYPES));
 	}
 
 }

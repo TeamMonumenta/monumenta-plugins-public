@@ -1,10 +1,30 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.logging.Level;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,35 +39,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+
 import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
-import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.logging.Level;
 
 /*
  * Handles giving potions and the direct damage aspect
@@ -185,7 +182,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			return;
 		}
 
-		potion.setMetadata("AlchemistPotion", new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer))));
+		potion.setMetadata("AlchemistPotion", mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer));
 		if (mGruesomeMode) {
 			potion.setMetadata("GruesomeAlchemistPotion", new FixedMetadataValue(mPlugin, 0));
 		}

@@ -1,5 +1,18 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.CustomRegeneration;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,22 +28,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+
 import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.CustomRegeneration;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 
 public class Bezoar extends Ability {
 	private static final int FREQUENCY = 5;
@@ -129,10 +128,6 @@ public class Bezoar extends Ability {
 		}
 
 		double maxHealth = EntityUtils.getMaxHealth(player);
-		//if the player has the effect refresh the duration
-		if (mPlugin.mEffectManager.hasEffect(player, "BezoarHealing")) {
-			mPlugin.mEffectManager.clearEffects(player, "BezoarHealing");
-		}
 		mPlugin.mEffectManager.addEffect(player, "BezoarHealing", new CustomRegeneration(HEAL_DURATION, maxHealth * HEAL_PERCENT, mPlayer, mPlugin));
 
 		if (getAbilityScore() > 1) {

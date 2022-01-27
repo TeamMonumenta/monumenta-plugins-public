@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.listeners;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.overrides.FirmamentOverride;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,17 +30,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
-import com.playmonumenta.plugins.overrides.FirmamentOverride;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
+import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
 
 public class ShulkerEquipmentListener implements Listener {
 	private static final String LOCK_STRING = "AdminEquipmentTool";
@@ -96,7 +95,7 @@ public class ShulkerEquipmentListener implements Listener {
 			return;
 		}
 
-		Player player = (Player)event.getWhoClicked();
+		Player player = (Player) event.getWhoClicked();
 
 		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
 			player.sendMessage(ChatColor.RED + "You can't use this here");
@@ -197,6 +196,8 @@ public class ShulkerEquipmentListener implements Listener {
 	private void swapItem(Inventory from, Inventory to, int fromSlot, int toSlot) {
 		ItemStack tmp = from.getItem(fromSlot);
 		from.setItem(fromSlot, to.getItem(toSlot));
+		ItemStatUtils.generateItemStats(tmp);
+		ItemStatUtils.generateItemStats(to.getItem(toSlot));
 		to.setItem(toSlot, tmp);
 	}
 

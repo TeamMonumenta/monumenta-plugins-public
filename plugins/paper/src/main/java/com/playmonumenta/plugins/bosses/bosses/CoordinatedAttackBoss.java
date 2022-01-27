@@ -1,16 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import com.playmonumenta.plugins.abilities.delves.DelveModifier;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -23,6 +18,10 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class CoordinatedAttackBoss extends BossAbilityGroup {
 
@@ -82,13 +81,13 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 					Collections.shuffle(mobs);
 
 					int i = 0;
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(locTarget, TARGET_RADIUS)) {
-						if (mob instanceof Mob && mob.hasLineOfSight(mTarget)) {
+					for (LivingEntity le : EntityUtils.getNearbyMobs(locTarget, TARGET_RADIUS)) {
+						if (le instanceof Mob mob && mob.hasLineOfSight(mTarget)) {
 							if (!AbilityUtils.isStealthed(mTarget)) {
 								Set<String> tags = mob.getScoreboardTags();
 								// Don't set target of mobs with this ability, or else infinite loop
 								if (tags == null || (!tags.contains(identityTag) && !tags.contains(DelveModifier.AVOID_MODIFIERS))) {
-									((Mob) mob).setTarget(mTarget);
+									mob.setTarget(mTarget);
 
 									EffectManager.getInstance().addEffect(mob, PERCENT_SPEED_EFFECT_NAME,
 											new PercentSpeed(PERCENT_SPEED_DURATION, PERCENT_SPEED_EFFECT,

@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -16,8 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -75,7 +72,7 @@ public class Quake implements Enchantment {
 					EntityUtils.applyFire(plugin, 80 * fire, mob, player);
 				}
 				if (ice > 0) {
-					PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.SLOW, 100, ice - 1, false, true));
+					EntityUtils.applySlow(plugin, IceAspect.ICE_ASPECT_DURATION, ice * 0.1, mob);
 				}
 				if (thunder > 0) {
 					EntityUtils.applyStun(plugin, 10 * thunder, mob);

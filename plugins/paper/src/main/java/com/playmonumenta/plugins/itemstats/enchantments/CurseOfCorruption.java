@@ -10,12 +10,16 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CurseOfCorruption implements Enchantment {
 
+	private static List<Player> mCorruptionPlayers = new ArrayList<>();
+
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Curse of Corruption";
 	}
 
@@ -25,16 +29,16 @@ public class CurseOfCorruption implements Enchantment {
 	}
 
 	@Override
-	public void onEquipmentUpdate(Plugin plugin, Player player, double value) {
+	public void onEquipmentUpdate(Plugin plugin, Player player) {
 		if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CURSE_OF_CORRUPTION) > 1) {
 			if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
+				mCorruptionPlayers.add(player);
 				if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 					plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 0, true, false));
 				}
 				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW, 1000000, (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CURSE_OF_CORRUPTION) - 2, true, false));
 			}
-
-		} else {
+		} else if (mCorruptionPlayers.remove(player)) {
 			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.BLINDNESS);
 			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.SLOW);
 		}

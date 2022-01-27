@@ -1,9 +1,16 @@
 package com.playmonumenta.plugins.depths.abilities.dawnbringer;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -21,18 +28,9 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class LightningBottle extends DepthsAbility {
 	public static final String ABILITY_NAME = "Lightning Bottle";
@@ -59,7 +57,7 @@ public class LightningBottle extends DepthsAbility {
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		if (mPlayer != null && InventoryUtils.testForItemWithName(potion.getItem(), POTION_NAME)) {
 			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.SPELL);
-			potion.setMetadata(POTION_META_DATA, new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer))));
+			potion.setMetadata(POTION_META_DATA, mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer));
 		}
 
 		return true;

@@ -156,10 +156,6 @@ public class HauntingShades extends Ability {
 					if (getAbilityScore() > 1) {
 						for (Player p : affectedPlayers) {
 							double maxHealth = EntityUtils.getMaxHealth(p);
-							//if the player has the effect refresh the duration
-							if (mPlugin.mEffectManager.hasEffect(p, ATTR_NAME)) {
-								mPlugin.mEffectManager.clearEffects(p, ATTR_NAME);
-							}
 							mPlugin.mEffectManager.addEffect(p, ATTR_NAME, new CustomRegeneration(EFFECT_DURATION, maxHealth * HEAL_PERCENT, mPlayer, mPlugin));
 
 							mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, EFFECT_DURATION, EFFECT_LEVEL, true, false));

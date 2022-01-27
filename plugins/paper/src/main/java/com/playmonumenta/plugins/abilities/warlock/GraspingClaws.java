@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -26,8 +25,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.logging.Level;
 
 
@@ -76,7 +75,7 @@ public class GraspingClaws extends Ability {
 			mArrow.setDamage(0);
 			mArrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
 			mPlugin.mProjectileEffectTimers.addEntity(mArrow, Particle.SPELL_WITCH);
-			FixedMetadataValue playerItemStats = new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer)));
+			FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
 			mArrow.setMetadata(ITEMSTATS_METAKEY, playerItemStats);
 			putOnCooldown();
 		}

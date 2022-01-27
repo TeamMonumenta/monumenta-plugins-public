@@ -14,6 +14,7 @@ import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 public class AshesOfEternity implements Enchantment {
@@ -29,7 +30,7 @@ public class AshesOfEternity implements Enchantment {
 	}
 
 	@Override
-	public void onHurtFatal(@NotNull Plugin plugin, @NotNull Player player, double value, @NotNull DamageEvent event) {
+	public void onHurtFatal(Plugin plugin, Player player, double value, DamageEvent event) {
 		if (!event.isCancelled()) {
 			// Void tether didn't cancel the event - so this player would die
 			// They definitely aren't in the void at this point
@@ -38,6 +39,7 @@ public class AshesOfEternity implements Enchantment {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			ItemStatUtils.removeEnchantment(item, EnchantmentType.ASHES_OF_ETERNITY);
 			ItemStatUtils.generateItemStats(item);
+			plugin.mItemStatManager.getPlayerItemStats(player).updateStats(true);
 
 			plugin.mPotionManager.clearAllPotions(player);
 
@@ -51,7 +53,12 @@ public class AshesOfEternity implements Enchantment {
 
 				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 40, 0, true, true));
 				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.REGENERATION, 20 * 45, 1, true, true));
-				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.ABSORPTION, 20 * 5, 1, true, true));
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.ABSORPTION, 20 * 5, 1, true, true));
+					}
+				}.runTaskLater(plugin, 1);
 
 				player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 0.5f, 1);
 				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PHANTOM_DEATH, 2, 2);

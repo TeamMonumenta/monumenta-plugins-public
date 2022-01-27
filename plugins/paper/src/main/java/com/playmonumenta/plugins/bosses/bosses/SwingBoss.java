@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
@@ -12,7 +9,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -20,6 +16,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 
 public class SwingBoss extends BossAbilityGroup {

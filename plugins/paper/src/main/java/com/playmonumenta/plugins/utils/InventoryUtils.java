@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -23,17 +22,15 @@ import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
-import javax.annotation.Nullable;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
-import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import javax.annotation.Nullable;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 
 
@@ -48,10 +45,6 @@ public class InventoryUtils {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				final ItemStack mainHand = player.getInventory().getItemInMainHand();
-				final ItemStack offHand = player.getInventory().getItemInOffHand();
-
-				AbilityManager.getManager().playerItemHeldEvent(player, mainHand, offHand);
 				plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player, event);
 			}
 		}.runTaskLater(plugin, 0);
@@ -62,10 +55,6 @@ public class InventoryUtils {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				final ItemStack mainHand = player.getInventory().getItemInMainHand();
-				final ItemStack offHand = player.getInventory().getItemInOffHand();
-
-				AbilityManager.getManager().playerItemHeldEvent(player, mainHand, offHand);
 				plugin.mTrackingManager.mPlayers.updateItemSlotProperties(player, slot);
 			}
 		}.runTaskLater(plugin, 0);

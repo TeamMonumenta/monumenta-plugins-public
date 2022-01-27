@@ -98,8 +98,8 @@ public class PlayerInventoryManager {
 			} else {
 				updateItemSlotProperties(plugin, player, invClickEvent.getSlot());
 			}
-		} else if (event instanceof InventoryDragEvent) {
-			for (int i : ((InventoryDragEvent) event).getInventorySlots()) {
+		} else if (event instanceof InventoryDragEvent inventoryDragEvent) {
+			for (int i : inventoryDragEvent.getInventorySlots()) {
 				updateItemSlotProperties(plugin, player, i);
 			}
 		} else if (event instanceof PlayerInteractEvent || event instanceof BlockDispenseArmorEvent) {
@@ -120,12 +120,12 @@ public class PlayerInventoryManager {
 		} else if (event instanceof PlayerSwapHandItemsEvent) {
 			updateItemSlotProperties(plugin, player, player.getInventory().getHeldItemSlot());
 			updateItemSlotProperties(plugin, player, 40);
-		} else if (event instanceof PlayerDropItemEvent) {
+		} else if (event instanceof PlayerDropItemEvent playerDropItemEvent) {
 			int heldItemSlot = player.getInventory().getHeldItemSlot();
 			if (hasSlotChanged(player, heldItemSlot)) {
 				updateItemSlotProperties(plugin, player, heldItemSlot);
 			} else {
-				int droppedSlot = getDroppedSlotId((PlayerDropItemEvent) event);
+				int droppedSlot = getDroppedSlotId(playerDropItemEvent);
 				updateItemSlotProperties(plugin, player, droppedSlot);
 			}
 		} else if (!mNeedsUpdate && event instanceof InventoryCloseEvent) {

@@ -1,5 +1,20 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,24 +30,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import javax.annotation.Nullable;
 
 public class UnstableAmalgam extends Ability {
 
@@ -95,7 +94,7 @@ public class UnstableAmalgam extends Ability {
 			return;
 		}
 
-		FixedMetadataValue playerItemStats = new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer)));
+		FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
 
 		World world = loc.getWorld();
 		Entity e = LibraryOfSoulsIntegration.summon(loc, "UnstableAmalgam");

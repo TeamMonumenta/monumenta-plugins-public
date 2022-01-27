@@ -187,7 +187,10 @@ public class Constants {
 			Material.NETHERITE_HELMET,
 			Material.NETHERITE_CHESTPLATE,
 			Material.NETHERITE_LEGGINGS,
-			Material.NETHERITE_BOOTS
+			Material.NETHERITE_BOOTS,
+
+			Material.TURTLE_HELMET,
+			Material.ELYTRA
 		);
 
 		// ARMOR is added in static {}

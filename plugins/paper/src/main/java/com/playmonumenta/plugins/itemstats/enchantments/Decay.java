@@ -1,12 +1,5 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
-import java.util.EnumSet;
-
-import org.bukkit.Particle;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -14,6 +7,12 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
+
+import java.util.EnumSet;
 
 public class Decay implements Enchantment {
 
@@ -51,6 +50,6 @@ public class Decay implements Enchantment {
 	}
 
 	public static void apply(Plugin plugin, LivingEntity enemy, int duration, int decayLevel, Player player) {
-		plugin.mEffectManager.addEffect(enemy, DOT_EFFECT_NAME, new CustomDamageOverTime((int)(DURATION * player.getCooledAttackStrength(0)), 1, 40 / decayLevel, player, null, Particle.SQUID_INK));
+		plugin.mEffectManager.addEffect(enemy, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40 / decayLevel, player, null, Particle.SQUID_INK));
 	}
 }

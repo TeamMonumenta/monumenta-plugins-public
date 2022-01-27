@@ -36,7 +36,7 @@ public class Festive implements Infusion {
 	}
 
 	@Override
-	public void onEquipmentUpdate(Plugin plugin, Player player, double value) {
+	public void onEquipmentUpdate(Plugin plugin, Player player) {
 		if (player.getScoreboardTags().contains("noSelfParticles")) {
 			NO_SELF_PARTICLES.add(player.getUniqueId());
 		} else {

@@ -1,5 +1,14 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -10,17 +19,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
+import javax.annotation.Nullable;
 
 public class EscapeDeath extends Ability {
 
@@ -28,7 +28,7 @@ public class EscapeDeath extends Ability {
 	private static final int RANGE = 5;
 	private static final int STUN_DURATION = 20 * 3;
 	private static final int BUFF_DURATION = 20 * 8;
-	private static final int ABSORPTION_AMPLIFIER = 1;
+	private static final int ABSORPTION_HEALTH = 8;
 	private static final double SPEED_PERCENT = 0.3;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "EscapeDeathPercentSpeedEffect";
 	private static final int JUMP_BOOST_AMPLIFIER = 2;
@@ -40,7 +40,7 @@ public class EscapeDeath extends Ability {
 		mInfo.mScoreboardId = "EscapeDeath";
 		mInfo.mShorthandName = "ED";
 		mInfo.mDescriptions.add("When taking damage from a mob leaves you below 5 hearts, throw a paralyzing grenade that stuns all enemies within 5 blocks for 3 seconds. Cooldown: 90s.");
-		mInfo.mDescriptions.add("When this skill is triggered, also gain 8 seconds of Absorption II, 30% Speed, and Jump Boost III. If damage taken would kill you but could have been prevented by this skill it will instead do so.");
+		mInfo.mDescriptions.add("When this skill is triggered, also gain 4 Absorption hearts for 8 seconds, 30% Speed, and Jump Boost III. If damage taken would kill you but could have been prevented by this skill it will instead do so.");
 		mInfo.mCooldown = COOLDOWN;
 		mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
 	}
@@ -61,8 +61,7 @@ public class EscapeDeath extends Ability {
 				}
 
 				if (getAbilityScore() > 1) {
-					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-							new PotionEffect(PotionEffectType.ABSORPTION, BUFF_DURATION, ABSORPTION_AMPLIFIER, true, true));
+					AbsorptionUtils.addAbsorption(mPlayer, ABSORPTION_HEALTH, ABSORPTION_HEALTH, BUFF_DURATION);
 					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(BUFF_DURATION, SPEED_PERCENT, PERCENT_SPEED_EFFECT_NAME));
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 							new PotionEffect(PotionEffectType.JUMP, BUFF_DURATION, JUMP_BOOST_AMPLIFIER, true, true));

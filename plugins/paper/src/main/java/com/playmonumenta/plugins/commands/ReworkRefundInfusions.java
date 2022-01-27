@@ -1,7 +1,14 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.Collection;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InfusionUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -12,16 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InfusionUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.Collection;
 
 public class ReworkRefundInfusions extends GenericCommand {
 	public static void register() {
@@ -55,7 +53,13 @@ public class ReworkRefundInfusions extends GenericCommand {
 			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/lich/materials/ancestral_effigy"), 6);
 			ItemStatUtils.removeInfusion(item, InfusionType.COLOSSAL);
 		}
+		// Locked
+		if (ItemStatUtils.getInfusionLevel(item, InfusionType.LOCKED) > 0) {
+			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/hyper_experience"), 3);
+			ItemStatUtils.removeInfusion(item, InfusionType.LOCKED);
+		}
 		ItemStatUtils.generateItemStats(player.getInventory().getItemInMainHand());
+		Plugin.getInstance().mItemStatManager.getPlayerItemStats(player).updateStats(true);
 	}
 
 	private static void giveMaterials(Player player, NamespacedKey key, int refundMaterials) throws WrapperCommandSyntaxException {

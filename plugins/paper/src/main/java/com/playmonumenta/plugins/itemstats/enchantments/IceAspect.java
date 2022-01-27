@@ -16,7 +16,7 @@ import org.bukkit.entity.Trident;
 import java.util.EnumSet;
 
 public class IceAspect implements Enchantment {
-	private static final int ICE_ASPECT_DURATION = 20 * 5;
+	public static final int ICE_ASPECT_DURATION = 20 * 5;
 	public static final String LEVEL_METAKEY = "IceAspectLevelMetakey";
 
 	@Override

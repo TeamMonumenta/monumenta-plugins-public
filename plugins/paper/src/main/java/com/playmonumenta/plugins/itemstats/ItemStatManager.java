@@ -1,16 +1,19 @@
 package com.playmonumenta.plugins.itemstats;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.ItemStat.ItemStatPrioritySort;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTCompoundList;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -46,24 +49,20 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+
 import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.itemstats.ItemStat.ItemStatPrioritySort;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
-
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTCompoundList;
-import de.tr7zw.nbtapi.NBTItem;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
 
 public class ItemStatManager implements Listener {
 
@@ -150,18 +149,20 @@ public class ItemStatManager implements Listener {
 						continue;
 					}
 
+					if (slot.equals(Slot.OFFHAND) && ItemUtils.isArmorOrWearable(item) && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)) {
+						continue;
+					}
+
 					NBTItem nbt = new NBTItem(item);
 					NBTCompound enchantments = ItemStatUtils.getEnchantments(nbt);
 					NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 					NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
 					for (ItemStat stat : ITEM_STATS) {
-						if (stat instanceof Attribute) {
-							Attribute attribute = (Attribute) stat;
+						if (stat instanceof Attribute attribute) {
 							newArmorAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, slot));
 							newArmorMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, slot));
-						} else if (stat instanceof Enchantment) {
-							Enchantment enchantment = (Enchantment) stat;
+						} else if (stat instanceof Enchantment enchantment) {
 							if (enchantment.getName().equals("MainhandOffhandDisable") && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
 								break;
 							}
@@ -171,8 +172,7 @@ public class ItemStatManager implements Listener {
 							if (enchantment.getName().equals("RegionScalingDamageTaken") && (ItemStatUtils.getRegion(item) == ItemStatUtils.Region.ISLES || ItemStatUtils.getRegion(item) == ItemStatUtils.Region.RING)) {
 								newArmorAddStats.add(stat, 1);
 							}
-						} else if (stat instanceof Infusion) {
-							Infusion infusion = (Infusion) stat;
+						} else if (stat instanceof Infusion infusion) {
 							newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()));
 						}
 					}
@@ -182,27 +182,24 @@ public class ItemStatManager implements Listener {
 				newArmorMultiplyStats = mArmorMultiplyStats;
 			}
 
-			if (mainhand != null && mainhand.getType() != Material.AIR) {
+			if (mainhand != null && mainhand.getType() != Material.AIR && !ItemUtils.isArmorOrWearable(mainhand)) {
 				NBTItem nbt = new NBTItem(mainhand);
 				NBTCompound enchantments = ItemStatUtils.getEnchantments(nbt);
 				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 				NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
 				for (ItemStat stat : ITEM_STATS) {
-					if (stat instanceof Attribute) {
-						Attribute attribute = (Attribute) stat;
+					if (stat instanceof Attribute attribute) {
 						newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND));
 						newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND));
-					} else if (stat instanceof Enchantment) {
-						Enchantment enchantment = (Enchantment) stat;
+					} else if (stat instanceof Enchantment enchantment) {
 						if (enchantment.getName().equals("OffhandMainhandDisable") && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
 							break;
 						}
 						if (enchantment.getSlots().contains(Slot.MAINHAND)) {
 							newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()));
 						}
-					} else if (stat instanceof Infusion) {
-						Infusion infusion = (Infusion) stat;
+					} else if (stat instanceof Infusion infusion) {
 						newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()));
 					}
 				}
@@ -227,6 +224,12 @@ public class ItemStatManager implements Listener {
 			mArmorAddStats = newArmorAddStats;
 			mArmorMultiplyStats = newArmorMultiplyStats;
 			mStats = newStats;
+
+			//Tell the ItemStats that there has been an update\
+			Plugin plugin = Plugin.getInstance();
+			for (ItemStat stat : ITEM_STATS) {
+				stat.onEquipmentUpdate(plugin, mPlayer);
+			}
 		}
 
 		public void print() {
@@ -327,45 +330,14 @@ public class ItemStatManager implements Listener {
 		updateStatsDelayed(event.getPlayer());
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		if (event.useItemInHand() == Result.DENY) {
 			return;
 		}
 
-		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			switch (event.getMaterial()) {
-			case LEATHER_HELMET:
-			case GOLDEN_HELMET:
-			case CHAINMAIL_HELMET:
-			case IRON_HELMET:
-			case DIAMOND_HELMET:
-			case NETHERITE_HELMET:
-			case TURTLE_HELMET:
-			case LEATHER_CHESTPLATE:
-			case GOLDEN_CHESTPLATE:
-			case CHAINMAIL_CHESTPLATE:
-			case IRON_CHESTPLATE:
-			case DIAMOND_CHESTPLATE:
-			case NETHERITE_CHESTPLATE:
-			case ELYTRA:
-			case LEATHER_LEGGINGS:
-			case GOLDEN_LEGGINGS:
-			case CHAINMAIL_LEGGINGS:
-			case IRON_LEGGINGS:
-			case DIAMOND_LEGGINGS:
-			case NETHERITE_LEGGINGS:
-			case LEATHER_BOOTS:
-			case GOLDEN_BOOTS:
-			case CHAINMAIL_BOOTS:
-			case IRON_BOOTS:
-			case DIAMOND_BOOTS:
-			case NETHERITE_BOOTS:
-				updateStatsDelayed(event.getPlayer());
-				break;
-			default:
-				break;
-			}
+		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && ItemUtils.isArmor(event.getItem())) {
+			updateStatsDelayed(event.getPlayer());
 		}
 	}
 
@@ -396,24 +368,24 @@ public class ItemStatManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityPickupItemEvent(EntityPickupItemEvent event) {
 		Entity entity = event.getEntity();
-		if (!event.isCancelled() && entity instanceof Player) {
-			updateStatsDelayed((Player) entity);
+		if (!event.isCancelled() && entity instanceof Player player) {
+			updateStatsDelayed(player);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		HumanEntity human = event.getWhoClicked();
-		if (human instanceof Player) {
-			updateStatsDelayed((Player) human);
+		if (human instanceof Player player) {
+			updateStatsDelayed(player);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void inventoryDragEvent(InventoryDragEvent event) {
 		HumanEntity human = event.getWhoClicked();
-		if (human instanceof Player) {
-			updateStatsDelayed((Player) human);
+		if (human instanceof Player player) {
+			updateStatsDelayed(player);
 		}
 	}
 
@@ -445,7 +417,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void tick(@NotNull Plugin plugin, @NotNull Player player, boolean twoHz, boolean oneHz) {
+	public void tick(Plugin plugin, Player player, boolean twoHz, boolean oneHz) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().tick(plugin, player, entry.getValue(), twoHz, oneHz);
@@ -453,19 +425,19 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onDamage(@NotNull Plugin plugin, @NotNull Player player, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
+	public void onDamage(Plugin plugin, Player player, DamageEvent event, LivingEntity enemy) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			onDamage(plugin, player, mPlayerItemStatsMappings.get(player.getUniqueId()), event, enemy);
 		}
 	}
 
-	public void onDamage(@NotNull Plugin plugin, @NotNull Player player, @NotNull PlayerItemStats stats, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
+	public void onDamage(Plugin plugin, Player player, PlayerItemStats stats, DamageEvent event, LivingEntity enemy) {
 		for (Entry<ItemStat, Double> entry : stats.getItemStats()) {
 			entry.getKey().onDamage(plugin, player, entry.getValue(), event, enemy);
 		}
 	}
 
-	public void onHurt(@NotNull Plugin plugin, @NotNull Player player, @NotNull DamageEvent event) {
+	public void onHurt(Plugin plugin, Player player, DamageEvent event) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onHurt(plugin, player, entry.getValue(), event);
@@ -473,7 +445,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onHurtByEntity(@NotNull Plugin plugin, @NotNull Player player, @NotNull DamageEvent event, @NotNull Entity damager) {
+	public void onHurtByEntity(Plugin plugin, Player player, DamageEvent event, Entity damager) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onHurtByEntity(plugin, player, entry.getValue(), event, damager);
@@ -481,7 +453,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onHurtByEntityWithSource(@NotNull Plugin plugin, @NotNull Player player, @NotNull DamageEvent event, @NotNull Entity damager, @NotNull LivingEntity source) {
+	public void onHurtByEntityWithSource(Plugin plugin, Player player, DamageEvent event, Entity damager, LivingEntity source) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onHurtByEntityWithSource(plugin, player, entry.getValue(), event, damager, source);
@@ -489,7 +461,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onHurtFatal(@NotNull Plugin plugin, @NotNull Player player, @NotNull DamageEvent event) {
+	public void onHurtFatal(Plugin plugin, Player player, DamageEvent event) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onHurtFatal(plugin, player, entry.getValue(), event);
@@ -497,7 +469,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onLaunchProjectile(@NotNull Plugin plugin, @NotNull Player player, @NotNull ProjectileLaunchEvent event, @NotNull Projectile projectile) {
+	public void onLaunchProjectile(Plugin plugin, Player player, ProjectileLaunchEvent event, Projectile projectile) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onLaunchProjectile(plugin, player, entry.getValue(), event, projectile);
@@ -505,7 +477,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onKill(@NotNull Plugin plugin, @NotNull Player player, @NotNull EntityDeathEvent event, @NotNull LivingEntity enemy) {
+	public void onKill(Plugin plugin, Player player, EntityDeathEvent event, LivingEntity enemy) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onKill(plugin, player, entry.getValue(), event, enemy);
@@ -513,7 +485,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onBlockBreak(@NotNull Plugin plugin, @NotNull Player player, @NotNull BlockBreakEvent event) {
+	public void onBlockBreak(Plugin plugin, Player player, BlockBreakEvent event) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onBlockBreak(plugin, player, entry.getValue(), event);
@@ -521,7 +493,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onPlayerInteract(@NotNull Plugin plugin, @NotNull Player player, @NotNull PlayerInteractEvent event) {
+	public void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onPlayerInteract(plugin, player, entry.getValue(), event);
@@ -529,7 +501,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onConsume(@NotNull Plugin plugin, @NotNull Player player, @NotNull PlayerItemConsumeEvent event) {
+	public void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onConsume(plugin, player, entry.getValue(), event);
@@ -537,7 +509,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onRegain(@NotNull Plugin plugin, @NotNull Player player, @NotNull EntityRegainHealthEvent event) {
+	public void onRegain(Plugin plugin, Player player, EntityRegainHealthEvent event) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onRegain(plugin, player, entry.getValue(), event);
@@ -545,7 +517,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onItemDamage(@NotNull Plugin plugin, @NotNull Player player, @NotNull PlayerItemDamageEvent event) {
+	public void onItemDamage(Plugin plugin, Player player, PlayerItemDamageEvent event) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onItemDamage(plugin, player, entry.getValue(), event);
@@ -553,7 +525,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onExpChange(@NotNull Plugin plugin, @NotNull Player player, @NotNull PlayerExpChangeEvent event) {
+	public void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onExpChange(plugin, player, entry.getValue(), event);
@@ -561,15 +533,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onEquipmentUpdate(@NotNull Plugin plugin, @NotNull Player player) {
-		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
-				entry.getKey().onEquipmentUpdate(plugin, player, entry.getValue());
-			}
-		}
-	}
-
-	public void onDeath(@NotNull Plugin plugin, @NotNull Player player, @NotNull PlayerDeathEvent event) {
+	public void onDeath(Plugin plugin, Player player, PlayerDeathEvent event) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onDeath(plugin, player, entry.getValue(), event);
@@ -623,5 +587,9 @@ public class ItemStatManager implements Listener {
 				}
 			}
 		}
+	}
+
+	public FixedMetadataValue getPlayerItemStatsMetadata(Player player) {
+		return new FixedMetadataValue(mPlugin, new PlayerItemStats(getPlayerItemStats(player)));
 	}
 }

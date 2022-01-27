@@ -90,20 +90,14 @@ public class WindBomb extends Ability {
 			}.runTaskTimer(mPlugin, 0, 1);
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						if (!EntityUtils.isBoss(mob)) {
-							mob.setVelocity(new Vector(0.f, 1.2f, 0.f));
-							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, DURATION, SLOW_FALL_EFFECT, true, false));
-						}
-						EntityUtils.applyWeaken(mPlugin, DURATION, WEAKEN_EFFECT, mob);
-						if (getAbilityScore() > 1) {
-							mPlugin.mEffectManager.addEffect(mob, "WindBombAirTag", new WindBombAirTag(DURATION * 2, MIDAIR_DAMAGE_BONUS, mPlayer));
-						}
-						this.cancel();
-					}
-				}.runTaskTimer(mPlugin, 0, 1);
+				if (!EntityUtils.isBoss(mob)) {
+					mob.setVelocity(new Vector(0.f, 1.2f, 0.f));
+					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, DURATION, SLOW_FALL_EFFECT, true, false));
+				}
+				EntityUtils.applyWeaken(mPlugin, DURATION, WEAKEN_EFFECT, mob);
+				if (getAbilityScore() > 1) {
+					mPlugin.mEffectManager.addEffect(mob, "WindBombAirTag", new WindBombAirTag(DURATION * 2, MIDAIR_DAMAGE_BONUS, mPlayer));
+				}
 			}
 
 			proj.remove();

@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -14,8 +13,6 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
-
-import java.util.NavigableSet;
 
 public class Adrenaline implements Enchantment {
 
@@ -40,15 +37,7 @@ public class Adrenaline implements Enchantment {
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
 			player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
-			NavigableSet<Effect> speedEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
-			if (speedEffects != null) {
-				for (Effect effect : speedEffects) {
-					effect.setDuration(DURATION);
-				}
-			} else {
-				double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADRENALINE);
-				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, PERCENT_SPEED_PER_LEVEL * level, PERCENT_SPEED_EFFECT_NAME));
-			}
+			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, PERCENT_SPEED_PER_LEVEL * value, PERCENT_SPEED_EFFECT_NAME));
 		}
 	}
 
@@ -56,15 +45,7 @@ public class Adrenaline implements Enchantment {
 	public void onBlockBreak(Plugin plugin, Player player, double value, BlockBreakEvent event) {
 		if (ItemUtils.isPickaxe(player.getItemInHand()) && event.getBlock().getType() == Material.SPAWNER) {
 			player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
-			NavigableSet<Effect> speedEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
-			if (speedEffects != null) {
-				for (Effect effect : speedEffects) {
-					effect.setDuration(SPAWNER_DURATION);
-				}
-			} else {
-				double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADRENALINE);
-				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, PERCENT_SPEED_PER_LEVEL * level * 0.5, PERCENT_SPEED_EFFECT_NAME));
-			}
+			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(SPAWNER_DURATION, PERCENT_SPEED_PER_LEVEL * value * 0.5, PERCENT_SPEED_EFFECT_NAME));
 		}
 	}
 }

@@ -1,16 +1,19 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Darksight implements Enchantment {
 
+	private static List<Player> mDarksightPlayers = new ArrayList<>();
 	private static final String DARKSIGHT_DISABLED_TAG = "DarksightDisabled";
 
 	@Override
@@ -24,11 +27,12 @@ public class Darksight implements Enchantment {
 	}
 
 	@Override
-	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
-		if (oneHz) {
-			if (!player.getScoreboardTags().contains(DARKSIGHT_DISABLED_TAG)) {
-				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.NIGHT_VISION, 20 * 10, 0, true, false));
-			}
+	public void onEquipmentUpdate(Plugin plugin, Player player) {
+		if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.DARKSIGHT) > 0 && !player.getScoreboardTags().contains(DARKSIGHT_DISABLED_TAG)) {
+			mDarksightPlayers.add(player);
+			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.NIGHT_VISION, 10000000, 0, true, false));
+		} else if (mDarksightPlayers.remove(player)) {
+			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.NIGHT_VISION);
 		}
 	}
 }

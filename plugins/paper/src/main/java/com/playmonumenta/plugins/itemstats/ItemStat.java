@@ -237,9 +237,8 @@ public interface ItemStat {
 	 *
 	 * @param plugin monumenta plugin
 	 * @param player the Player changing equipment
-	 * @param value  the value of ItemStat possessed by the Player
 	 */
-	default void onEquipmentUpdate(Plugin plugin, Player player, double value) {
+	default void onEquipmentUpdate(Plugin plugin, Player player) {
 
 	}
 

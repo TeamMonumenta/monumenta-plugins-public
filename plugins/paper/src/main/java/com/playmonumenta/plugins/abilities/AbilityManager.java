@@ -1,42 +1,5 @@
 package com.playmonumenta.plugins.abilities;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityCombustByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
-
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
@@ -187,6 +150,41 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class AbilityManager {
 
@@ -584,14 +582,14 @@ public class AbilityManager {
 		return collection;
 	}
 
-	public <T extends Ability> @Nullable T getPlayerAbility(@Nullable Player player, Class<T> cls) {
+	public @Nullable <T extends Ability> T getPlayerAbility(@Nullable Player player, Class<T> cls) {
 		if (player == null) {
 			return null;
 		}
 		return getPlayerAbilities(player).getAbility(cls);
 	}
 
-	public <T extends Ability> @Nullable T getPlayerAbilityIgnoringSilence(@Nullable Player player, Class<T> cls) {
+	public @Nullable <T extends Ability> T getPlayerAbilityIgnoringSilence(@Nullable Player player, Class<T> cls) {
 		if (player == null) {
 			return null;
 		}
@@ -754,10 +752,6 @@ public class AbilityManager {
 				ability.entityDeathRadiusEvent(event, shouldGenDrops);
 			}
 		});
-	}
-
-	public void playerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		conditionalCast(player, (ability) -> ability.playerItemHeldEvent(mainHand, offHand));
 	}
 
 	public void projectileHitEvent(Player player, ProjectileHitEvent event, Projectile proj) {

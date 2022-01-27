@@ -136,6 +136,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Understanding;
 import com.playmonumenta.plugins.itemstats.infusions.Usurper;
 import com.playmonumenta.plugins.itemstats.infusions.Vigor;
 import com.playmonumenta.plugins.itemstats.infusions.Vitality;
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
@@ -637,7 +638,7 @@ public class ItemStatUtils {
 		PERSPICACITY(new Perspicacity(), "", true, false, false),
 		REFLECTION(new Reflection(), "", true, false, false),
 		TENACITY(new Tenacity(), "", true, false, false),
-		UNDERSTANDING(new Understanding(), "", false, false, false),
+		UNDERSTANDING(new Understanding(), "", true, false, false),
 		USURPER(new Usurper(), "", true, false, false),
 		VIGOR(new Vigor(), "", true, false, false),
 		VITALITY(new Vitality(), "", true, false, false),
@@ -735,6 +736,17 @@ public class ItemStatUtils {
 				} else {
 					return Component.text(name + " " + toRomanNumerals(level), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + type.getMessage() + " by " + infuser + ")", NamedTextColor.DARK_GRAY));
 				}
+			}
+		}
+
+		public static Component getDisplay(String name, int level) {
+			InfusionType type = getInfusionType(name);
+			if (NO_LEVEL_INFUSIONS.contains(name)) {
+				return Component.text(name, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+			} else if (STAT_TRACK_OPTIONS.contains(type)) {
+				return Component.text(name + ": " + Integer.toString(level - 1), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
+			} else {
+				return Component.text(name + " " + toRomanNumerals(level), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
 			}
 		}
 
@@ -1212,6 +1224,17 @@ public class ItemStatUtils {
 		return stock.getCompoundList(AttributeType.KEY);
 	}
 
+	public static boolean hasAttributeInSlot(final ItemStack itemStack, final Slot slot) {
+		NBTItem nbt = new NBTItem(itemStack);
+		NBTCompoundList attributes = getAttributes(nbt);
+		for (NBTListCompound attribute : attributes) {
+			if (attribute.getString(Slot.KEY).equals(slot.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static double getAttributeAmount(final NBTCompoundList attributes, final AttributeType type, final Operation operation, final Slot slot) {
 		if (attributes == null) {
 			return 0;
@@ -1512,11 +1535,13 @@ public class ItemStatUtils {
 				NBTCompound infusion = infusions.getCompound(type.getName());
 				if (infusion != null) {
 					if (InfusionType.STAT_TRACK_OPTIONS.contains(type) || type.getName().equals("Stat Track")) {
-						statTrackLater.add(InfusionType.getDisplay(type.getName(), infusion.getInteger(LEVEL_KEY), Bukkit.getPlayer(infusion.getObject(INFUSER_KEY, UUID.class)).getName()));
+						lore.add(InfusionType.getDisplay(type.getName(), infusion.getInteger(LEVEL_KEY)));
 					} else if (!type.getMessage().equals("") && !type.getMessage().equals("Tracked")) {
-						infusionTagsLater.add(InfusionType.getDisplay(type.getName(), infusion.getInteger(LEVEL_KEY), Bukkit.getPlayer(infusion.getObject(INFUSER_KEY, UUID.class)).getName()));
+						infusionTagsLater.add(InfusionType.getDisplay(type.getName(), infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncAPI.cachedUuidToName(infusion.getObject(INFUSER_KEY, UUID.class))));
+					} else if (type.getMessage().equals("")) {
+						lore.add(InfusionType.getDisplay(type.getName(), infusion.getInteger(LEVEL_KEY)));
 					} else {
-						lore.add(InfusionType.getDisplay(type.getName(), infusion.getInteger(LEVEL_KEY), Bukkit.getPlayer(infusion.getObject(INFUSER_KEY, UUID.class)).getName()));
+						lore.add(InfusionType.getDisplay(type.getName(), infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncAPI.cachedUuidToName(infusion.getObject(INFUSER_KEY, UUID.class))));
 					}
 				}
 			}
@@ -1929,5 +1954,4 @@ public class ItemStatUtils {
 			generateItemStats(item);
 		}).register();
 	}
-
 }

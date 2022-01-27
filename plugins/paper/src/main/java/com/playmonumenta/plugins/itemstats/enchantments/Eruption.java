@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
@@ -11,7 +10,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -20,12 +18,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.NavigableSet;
 
 public class Eruption implements Enchantment {
 
@@ -78,7 +73,7 @@ public class Eruption implements Enchantment {
 					EntityUtils.applyFire(plugin, 80 * fire, mob, player);
 				}
 				if (ice > 0) {
-					PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.SLOW, 100, ice - 1, false, true));
+					EntityUtils.applySlow(plugin, IceAspect.ICE_ASPECT_DURATION, ice * 0.1, mob);
 				}
 				if (thunder > 0) {
 					EntityUtils.applyStun(plugin, 10 * thunder, mob);
@@ -112,15 +107,7 @@ public class Eruption implements Enchantment {
 						continue;
 					}
 					p.getWorld().spawnParticle(Particle.REDSTONE, p.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
-					NavigableSet<Effect> speedEffects = plugin.mEffectManager.getEffects(p, PERCENT_SPEED_EFFECT_NAME);
-					if (speedEffects != null) {
-						for (Effect effect : speedEffects) {
-							effect.setDuration(SPEED_DURATION);
-						}
-					} else {
-						double adrenalineLevel = plugin.mItemStatManager.getEnchantmentLevel(p, EnchantmentType.ADRENALINE);
-						plugin.mEffectManager.addEffect(p, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(SPEED_DURATION, PERCENT_SPEED_PER_LEVEL * adrenalineLevel * 0.5, PERCENT_SPEED_EFFECT_NAME));
-					}
+					plugin.mEffectManager.addEffect(p, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(SPEED_DURATION, PERCENT_SPEED_PER_LEVEL * adrenaline * 0.5, PERCENT_SPEED_EFFECT_NAME));
 				}
 			}
 

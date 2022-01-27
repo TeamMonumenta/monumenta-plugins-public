@@ -47,6 +47,12 @@ public class Armor implements Attribute {
 				valueMod += Reflexes.applyReflexes(event, plugin, player);
 				valueMod += Evasion.applyEvasion(event, plugin, player);
 				valueMod += Ethereal.applyEthereal(event, plugin, player);
+			} else if ((plugin.mItemStatManager.getAttributeAmount(player, AttributeType.ARMOR) < plugin.mItemStatManager.getAttributeAmount(player, AttributeType.AGILITY)) &&
+				(plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADAPTABILITY) > 0)) {
+				agilValueMod += Shielding.applyShielding(event, plugin, player);
+				agilValueMod += Inure.applyInure(event, plugin, player);
+				agilValueMod += Steadfast.applySteadfast(event, plugin, player);
+				agilValueMod += Poise.applyPoise(event, plugin, player);
 			} else if (plugin.mItemStatManager.getAttributeAmount(player, AttributeType.AGILITY) > 0) {
 				agilValueMod += Tempo.applyTempo(event, plugin, player);
 				agilValueMod += Reflexes.applyReflexes(event, plugin, player);

@@ -517,15 +517,7 @@ public class PlayerListener implements Listener {
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		Inventory inventory = event.getInventory();
 		InventoryHolder holder = inventory.getHolder();
-		if (holder != null && holder instanceof Player) {
-			Player player = (Player) holder;
-
-			ItemStack mainHand = player.getInventory().getItemInMainHand();
-			ItemStack offHand = player.getInventory().getItemInOffHand();
-
-			mPlugin.mAbilityManager.playerItemHeldEvent(player, mainHand, offHand);
-		} else if (holder instanceof Chest) {
-			Chest chest = (Chest) holder;
+		if (holder != null && holder instanceof Chest chest) {
 			// Break empty graves or halloween creeper chests in safe zones automatically when closed
 			if (ChestUtils.isEmpty(chest) && (chest.getCustomName() != null && chest.getCustomName().contains("Creeperween Chest"))) {
 				chest.getBlock().breakNaturally();
@@ -649,10 +641,6 @@ public class PlayerListener implements Listener {
 					mPlugin.mPotionManager.clearAllPotions(player);
 					mPlugin.mAbilityManager.updatePlayerAbilities(player);
 
-					ItemStack mainHand = player.getInventory().getItemInMainHand();
-					ItemStack offHand = player.getInventory().getItemInOffHand();
-
-					mPlugin.mAbilityManager.playerItemHeldEvent(player, mainHand, offHand);
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 				}
 			}

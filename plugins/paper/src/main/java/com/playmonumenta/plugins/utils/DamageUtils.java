@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.utils;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.util.Vector;
+
+import javax.annotation.Nullable;
 
 public class DamageUtils {
 
@@ -107,7 +107,7 @@ public class DamageUtils {
 
 		int originalAttackCooldown = 0;
 		if (damager != null) {
-			NmsUtils.getVersionAdapter().getAttackCooldown(damager);
+			originalAttackCooldown = NmsUtils.getVersionAdapter().getAttackCooldown(damager);
 		}
 
 		Bukkit.getPluginManager().callEvent(event);

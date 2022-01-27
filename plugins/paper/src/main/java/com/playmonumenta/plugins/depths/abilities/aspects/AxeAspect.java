@@ -34,7 +34,7 @@ public class AxeAspect extends WeaponAspectDepthsAbility {
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mPlayer != null && ItemUtils.isAxe(mPlayer.getInventory().getItemInMainHand())) {
 			mPlugin.mEffectManager.addEffect(mPlayer, ABILITY_NAME,
-			                                 new PercentAttackSpeed(40, ATTACK_SPEED, ABILITY_NAME));
+			                                 new PercentAttackSpeed(6, ATTACK_SPEED, ABILITY_NAME));
 		}
 	}
 

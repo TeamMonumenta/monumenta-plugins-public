@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -22,25 +22,23 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class Bodyguard extends Ability {
 	private static final int COOLDOWN = 30 * 20;
 	private static final int RANGE = 25;
 	private static final int RADIUS = 4;
-	private static final int ABSORPTION_AMPLIFIER_1 = 1;
-	private static final int ABSORPTION_AMPLIFIER_2 = 2;
+	private static final int ABSORPTION_HEALTH_1 = 8;
+	private static final int ABSORPTION_HEALTH_2 = 12;
 	private static final int BUFF_DURATION = 20 * 10;
 	private static final int STUN_DURATION = 20 * 3;
 
-	private final int mAbsorptionAmplifier;
+	private final int mAbsorptionHealth;
 
 	private int mLeftClicks = 0;
 
@@ -48,14 +46,14 @@ public class Bodyguard extends Ability {
 		super(plugin, player, "Bodyguard");
 		mInfo.mScoreboardId = "Bodyguard";
 		mInfo.mShorthandName = "Bg";
-		mInfo.mDescriptions.add("Left-click the air twice while looking directly at another player within 25 blocks to charge to them (cannot be used in safezones). Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain Absorption II for 10 seconds. Left-click twice while looking down to cast on yourself. Cooldown: 30s.");
-		mInfo.mDescriptions.add("Absorption increased to III. Additionally, affected mobs are stunned for 3 seconds.");
+		mInfo.mDescriptions.add("Left-click the air twice while looking directly at another player within 25 blocks to charge to them (cannot be used in safezones). Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain 4 Absorption hearts for 10 seconds. Left-click twice while looking down to cast on yourself. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Absorption increased to 6 hearts. Additionally, affected mobs are stunned for 3 seconds.");
 		mInfo.mLinkedSpell = ClassAbility.BODYGUARD;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.IRON_CHESTPLATE, 1);
-		mAbsorptionAmplifier = getAbilityScore() == 1 ? ABSORPTION_AMPLIFIER_1 : ABSORPTION_AMPLIFIER_2;
+		mAbsorptionHealth = getAbilityScore() == 1 ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2;
 	}
 
 	@Override
@@ -156,8 +154,7 @@ public class Bodyguard extends Ability {
 					world.playSound(targetLoc, Sound.ENTITY_BLAZE_SHOOT, 0.75f, 0.75f);
 					world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.75f, 0.9f);
 
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
-							new PotionEffect(PotionEffectType.ABSORPTION, BUFF_DURATION, mAbsorptionAmplifier, false, true));
+					AbsorptionUtils.addAbsorption(player, mAbsorptionHealth, mAbsorptionHealth, BUFF_DURATION);
 				}
 			}
 		}
@@ -172,8 +169,7 @@ public class Bodyguard extends Ability {
 		world.playSound(oLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
 		world.spawnParticle(Particle.FLAME, oLoc.add(0, 0.15, 0), 25, 0.2, 0, 0.2, 0.1);
 
-		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-				new PotionEffect(PotionEffectType.ABSORPTION, BUFF_DURATION, mAbsorptionAmplifier, false, true));
+		AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, BUFF_DURATION);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS)) {
 			MovementUtils.knockAway(mPlayer, mob, 0.45f, true);

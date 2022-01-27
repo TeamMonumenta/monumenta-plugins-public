@@ -946,7 +946,10 @@ public class ItemUtils {
 		} else {
 			return false;
 		}
+	}
 
+	public static boolean isArmorOrWearable(@Nullable ItemStack itemStack) {
+		return isWearable(itemStack) || isArmor(itemStack);
 	}
 
 	public static boolean isShatteredWearable(@Nullable ItemStack itemStack) {

@@ -1,7 +1,20 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,24 +31,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
-import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class Metalmancy extends DepthsAbility {
 
@@ -86,7 +84,7 @@ public class Metalmancy extends DepthsAbility {
 				if (abilities != null) {
 					for (BossAbilityGroup ability : abilities) {
 						if (ability instanceof MetalmancyBoss metalmancyBoss) {
-							FixedMetadataValue playerItemStats = new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer)));
+							FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
 
 							metalmancyBoss.spawn(mPlayer, DAMAGE[mRarity - 1], playerItemStats);
 							break;

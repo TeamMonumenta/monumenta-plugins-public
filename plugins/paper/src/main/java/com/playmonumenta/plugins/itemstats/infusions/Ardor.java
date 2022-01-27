@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
@@ -12,8 +11,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.NavigableSet;
 
 public class Ardor implements Infusion {
 
@@ -43,23 +40,9 @@ public class Ardor implements Infusion {
 		        int currAir = player.getRemainingAir();
 		        player.setRemainingAir(Math.min(300, currAir + (AIR_INCREASE * (int) DelveInfusionUtils.getModifiedLevel(plugin, player, level))));
 		    } else {
-				NavigableSet<Effect> speedEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
-				if (speedEffects != null) {
-					for (Effect effect : speedEffects) {
-						if (effect.getMagnitude() == PERCENT_SPEED_PER_LEVEL * DelveInfusionUtils.getModifiedLevel(plugin, player, level)) {
-							effect.setDuration(DURATION);
-						} else {
-							effect.setDuration(1);
-							plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME,
-									new PercentSpeed(DURATION, PERCENT_SPEED_PER_LEVEL * DelveInfusionUtils.getModifiedLevel(plugin, player, level),
-											PERCENT_SPEED_EFFECT_NAME));
-						}
-					}
-				} else {
-					plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME,
-							new PercentSpeed(DURATION, PERCENT_SPEED_PER_LEVEL * DelveInfusionUtils.getModifiedLevel(plugin, player, level),
-									PERCENT_SPEED_EFFECT_NAME));
-				}
+				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME,
+					new PercentSpeed(DURATION, PERCENT_SPEED_PER_LEVEL * DelveInfusionUtils.getModifiedLevel(plugin, player, level),
+						PERCENT_SPEED_EFFECT_NAME));
 		    }
 		}
 	}
