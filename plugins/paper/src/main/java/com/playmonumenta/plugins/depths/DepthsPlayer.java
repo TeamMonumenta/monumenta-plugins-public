@@ -55,6 +55,8 @@ public class DepthsPlayer {
 
 		mEarnedRewards = new ConcurrentLinkedQueue<>();
 
+		ScoreboardUtils.setScoreboardValue(p, "DDDelve1", 0);
+		ScoreboardUtils.setScoreboardValue(p, "DDDelve2", 0);
 	}
 
 	public List<DepthsTree> initTrees(Player player) {

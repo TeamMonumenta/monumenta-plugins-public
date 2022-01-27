@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -37,10 +38,12 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class DepthsListener implements Listener {
@@ -272,6 +275,28 @@ public class DepthsListener implements Listener {
 			DepthsPlayer dp = manager.mPlayers.get(event.getPlayer().getUniqueId());
 			if (manager.getPartyFromId(dp).getRoomNumber() % 10 == 0) {
 				event.setCancelled(true);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+	public void playerJoinEvent(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+		DepthsManager manager = DepthsManager.getInstance();
+		if (manager.isInSystem(player)) {
+			DepthsPlayer dp = manager.mPlayers.get(event.getPlayer().getUniqueId());
+			DepthsParty party = manager.getPartyFromId(dp);
+			if (party != null) {
+				Map<DelvesUtils.Modifier, Integer> delvePointsForParty = party.mDelveModifiers;
+				DelvesUtils.DelveInfo playerInfo = DelvesUtils.getDelveInfo(player);
+				for (DelvesUtils.Modifier m : DelvesUtils.Modifier.values()) {
+					if (delvePointsForParty.get(m) != null) {
+						playerInfo.setRank(m, delvePointsForParty.get(m).intValue());
+					} else {
+						playerInfo.setRank(m, 0);
+					}
+					playerInfo.storeDelveScore(player);
+				}
 			}
 		}
 	}

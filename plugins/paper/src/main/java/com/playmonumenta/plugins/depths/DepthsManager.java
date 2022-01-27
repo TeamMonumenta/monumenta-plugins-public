@@ -831,8 +831,11 @@ public class DepthsManager {
 	// Tells us when a player in the system broke a spawner so we can track their progress
 	public void playerBrokeSpawner(Player p, Location l) {
 		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
-		if (dp != null && getPartyFromId(dp) != null) {
-			getPartyFromId(dp).partyBrokeSpawner(l);
+		if (dp != null) {
+			DepthsParty party = getPartyFromId(dp);
+			if (party != null && l.getX() >= party.getRoomX()) {
+				getPartyFromId(dp).partyBrokeSpawner(l);
+			}
 		}
 	}
 

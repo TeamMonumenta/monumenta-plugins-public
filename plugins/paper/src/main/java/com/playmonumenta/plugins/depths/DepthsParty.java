@@ -90,7 +90,8 @@ public class DepthsParty {
 	public boolean mTwistedThisFloor = false;
 	//Write the 4 players that started the party
 	public transient ArrayList<String> mInitialPlayers = new ArrayList<>();
-	//Whether or not the reward chest has been spawned for this room already
+	//The X value of the start side of the current room
+	public int mRoomStartX;
 
 	/**
 	 * Creates a new depths party with the given players
@@ -139,6 +140,7 @@ public class DepthsParty {
 
 		}.runTaskLater(Plugin.getInstance(), 5);
 
+
 		mRoomNumber = 0;
 		mSpawnersToBreak = 0;
 		mHasAtLeastOneAbility = false;
@@ -146,6 +148,7 @@ public class DepthsParty {
 		mLootRoomLocations = new ArrayList<Vector>();
 		mDelveModifiers = new HashMap<>();
 		mSpawnedReward = false;
+		mRoomStartX = loc.getBlockX();
 
 		//Attempt to set locations for the next floor lobby to load
 		World world = Plugin.getInstance().mWorld;
@@ -471,5 +474,13 @@ public class DepthsParty {
 				mPlayersInParty.remove(dp);
 			}
 		}
+	}
+
+	public int getRoomX() {
+		return mRoomStartX;
+	}
+
+	public void setRoomX(int x) {
+		mRoomStartX = x;
 	}
 }

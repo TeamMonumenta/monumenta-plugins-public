@@ -239,6 +239,8 @@ public class DepthsRoomRepository {
 			}
 		}
 
+		party.setRoomX(spawn.getBlockX());
+
 		Plugin.getInstance().getLogger().info("Summoning structure " + room.mLoadPath);
 		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure \"" + room.mLoadPath + "\" " + spawn.getX() + " " + spawn.getY() + " " + spawn.getZ() + " true");
 		return room;

@@ -71,7 +71,7 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 				NamedTextColor.LIGHT_PURPLE,
 				"A non-combat room with a random other benefit.")));
 		ROOM_LOCATIONS.add(new RoomChoice(13, DepthsRoomType.TWISTED,
-			createBasicItem(Material.ENDER_CHEST, ChatColor.MAGIC + "XXXXXX",
+			createBasicItem(Material.BLACK_CONCRETE, ChatColor.MAGIC + "XXXXXX",
 				TextColor.color(LEVELSIX), "")));
 	}
 

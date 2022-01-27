@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -193,7 +194,7 @@ public class HuntingCompanion extends Ability {
 					if ((target == null || target.isDead() || target.getHealth() <= 0) && mTicksElapsed >= TICK_INTERVAL * 2) {
 						Location foxLoc = mFox.getLocation();
 						List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(foxLoc, DETECTION_RANGE, mFox);
-						nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+						nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) || mob.isInvulnerable());
 						LivingEntity nearestMob = EntityUtils.getNearestMob(foxLoc, nearbyMobs);
 						if (nearestMob != null) {
 							mFox.setTarget(nearestMob);

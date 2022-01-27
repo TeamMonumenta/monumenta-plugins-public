@@ -79,6 +79,9 @@ public class RapidFire extends DepthsAbility {
 						arrow.removeMetadata(Skyhook.META_DATA_TAG, mPlugin);
 					}
 					mCount++;
+				} else {
+					this.cancel();
+					return;
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 3);
