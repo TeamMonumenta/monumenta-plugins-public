@@ -176,7 +176,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 				ItemMeta meta = item.getItemMeta();
 				meta.setDisplayName(GRAY + "Disabled");
 				meta.setLore(List.of(AQUA + "Will not convert ",
-				                     WHITE + "" + region.getDisplay() + tier.getDisplay() + AQUA + " items."));
+					WHITE + "" + region.getPlainDisplay() + tier.getPlainDisplay() + AQUA + " items."));
 				item.setItemMeta(meta);
 				mInventory.setItem(offset + 1 + i, item);
 			} else {
@@ -214,7 +214,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 				ItemMeta meta = item.getItemMeta();
 				meta.setDisplayName(WHITE + "Convert to " + GOLD + conversion.getName());
 				List<String> lore = new ArrayList<>();
-				lore.add(AQUA + "Will convert " + WHITE + region.getDisplay() + tier.getDisplay());
+				lore.add(AQUA + "Will convert " + WHITE + region.getPlainDisplay() + tier.getPlainDisplay());
 				lore.add(AQUA + "items to " + GOLD + (rawAmount < 0 ? "" : item.getAmount() + " ") + (rawAmount > 0 && item.getAmount() == 1 ? conversionResult.getNameSingular() : conversionResult.getName()) + AQUA + ".");
 				if (rawAmount < 0) {
 					lore.add("" + GRAY + ITALIC + "This conversion is not available");

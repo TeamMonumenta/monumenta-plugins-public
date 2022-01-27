@@ -1,5 +1,21 @@
 package com.playmonumenta.plugins.utils;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.attributes.Agility;
 import com.playmonumenta.plugins.itemstats.attributes.Armor;
@@ -13,130 +29,23 @@ import com.playmonumenta.plugins.itemstats.attributes.ProjectileSpeed;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.itemstats.attributes.ThornsDamage;
 import com.playmonumenta.plugins.itemstats.attributes.ThrowRate;
-import com.playmonumenta.plugins.itemstats.enchantments.Abyssal;
-import com.playmonumenta.plugins.itemstats.enchantments.Adaptability;
-import com.playmonumenta.plugins.itemstats.enchantments.Adrenaline;
-import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
-import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
-import com.playmonumenta.plugins.itemstats.enchantments.ArcaneThrust;
-import com.playmonumenta.plugins.itemstats.enchantments.AshesOfEternity;
-import com.playmonumenta.plugins.itemstats.enchantments.Baaing;
-import com.playmonumenta.plugins.itemstats.enchantments.BlastProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.Bleeding;
-import com.playmonumenta.plugins.itemstats.enchantments.Chaotic;
-import com.playmonumenta.plugins.itemstats.enchantments.Clucking;
-import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfAnemia;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfCorruption;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfCrippling;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfIrreparability;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfShrapnel;
-import com.playmonumenta.plugins.itemstats.enchantments.Darksight;
-import com.playmonumenta.plugins.itemstats.enchantments.Decay;
-import com.playmonumenta.plugins.itemstats.enchantments.DivineAura;
-import com.playmonumenta.plugins.itemstats.enchantments.Duelist;
-import com.playmonumenta.plugins.itemstats.enchantments.Eruption;
-import com.playmonumenta.plugins.itemstats.enchantments.Ethereal;
-import com.playmonumenta.plugins.itemstats.enchantments.Evasion;
-import com.playmonumenta.plugins.itemstats.enchantments.FeatherFalling;
-import com.playmonumenta.plugins.itemstats.enchantments.Festive;
-import com.playmonumenta.plugins.itemstats.enchantments.FireAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.Flame;
-import com.playmonumenta.plugins.itemstats.enchantments.Frost;
-import com.playmonumenta.plugins.itemstats.enchantments.Gilded;
-import com.playmonumenta.plugins.itemstats.enchantments.Gills;
-import com.playmonumenta.plugins.itemstats.enchantments.HexEater;
-import com.playmonumenta.plugins.itemstats.enchantments.HideAttributes;
-import com.playmonumenta.plugins.itemstats.enchantments.HideEnchants;
-import com.playmonumenta.plugins.itemstats.enchantments.HideInfo;
-import com.playmonumenta.plugins.itemstats.enchantments.IceAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.Ineptitude;
-import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
-import com.playmonumenta.plugins.itemstats.enchantments.InstantDrink;
-import com.playmonumenta.plugins.itemstats.enchantments.Intuition;
-import com.playmonumenta.plugins.itemstats.enchantments.Inure;
-import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
-import com.playmonumenta.plugins.itemstats.enchantments.LifeDrain;
-import com.playmonumenta.plugins.itemstats.enchantments.MagicProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.MainhandOffhandDisable;
-import com.playmonumenta.plugins.itemstats.enchantments.MaterialEnch;
-import com.playmonumenta.plugins.itemstats.enchantments.MeleeProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
-import com.playmonumenta.plugins.itemstats.enchantments.OffhandMainhandDisable;
-import com.playmonumenta.plugins.itemstats.enchantments.Oinking;
-import com.playmonumenta.plugins.itemstats.enchantments.PestilenceTesseract;
-import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
-import com.playmonumenta.plugins.itemstats.enchantments.Poise;
-import com.playmonumenta.plugins.itemstats.enchantments.ProjectileProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheDepths;
-import com.playmonumenta.plugins.itemstats.enchantments.Quake;
-import com.playmonumenta.plugins.itemstats.enchantments.Radiant;
-import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
-import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
-import com.playmonumenta.plugins.itemstats.enchantments.Reflexes;
-import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
-import com.playmonumenta.plugins.itemstats.enchantments.Regicide;
-import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
-import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken;
-import com.playmonumenta.plugins.itemstats.enchantments.Resurrection;
-import com.playmonumenta.plugins.itemstats.enchantments.Retrieval;
-import com.playmonumenta.plugins.itemstats.enchantments.Sapper;
-import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
-import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
-import com.playmonumenta.plugins.itemstats.enchantments.Slayer;
-import com.playmonumenta.plugins.itemstats.enchantments.Smite;
-import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
-import com.playmonumenta.plugins.itemstats.enchantments.Spark;
-import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
-import com.playmonumenta.plugins.itemstats.enchantments.Steadfast;
-import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
-import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
-import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
-import com.playmonumenta.plugins.itemstats.enchantments.Tempo;
-import com.playmonumenta.plugins.itemstats.enchantments.ThrowingKnife;
-import com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.Triage;
-import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
-import com.playmonumenta.plugins.itemstats.enchantments.VoidTether;
-import com.playmonumenta.plugins.itemstats.enchantments.Weightless;
-import com.playmonumenta.plugins.itemstats.infusions.Acumen;
-import com.playmonumenta.plugins.itemstats.infusions.Ardor;
-import com.playmonumenta.plugins.itemstats.infusions.Aura;
-import com.playmonumenta.plugins.itemstats.infusions.Barking;
-import com.playmonumenta.plugins.itemstats.infusions.Carapace;
-import com.playmonumenta.plugins.itemstats.infusions.Choler;
-import com.playmonumenta.plugins.itemstats.infusions.Colossal;
-import com.playmonumenta.plugins.itemstats.infusions.Debarking;
-import com.playmonumenta.plugins.itemstats.infusions.Empowered;
-import com.playmonumenta.plugins.itemstats.infusions.Epoch;
-import com.playmonumenta.plugins.itemstats.infusions.Execution;
-import com.playmonumenta.plugins.itemstats.infusions.Expedite;
-import com.playmonumenta.plugins.itemstats.infusions.Focus;
-import com.playmonumenta.plugins.itemstats.infusions.Hope;
-import com.playmonumenta.plugins.itemstats.infusions.Locked;
-import com.playmonumenta.plugins.itemstats.infusions.Mitosis;
-import com.playmonumenta.plugins.itemstats.infusions.Natant;
-import com.playmonumenta.plugins.itemstats.infusions.Nutriment;
-import com.playmonumenta.plugins.itemstats.infusions.Pennate;
-import com.playmonumenta.plugins.itemstats.infusions.Perspicacity;
-import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
-import com.playmonumenta.plugins.itemstats.infusions.Reflection;
-import com.playmonumenta.plugins.itemstats.infusions.Soulbound;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrack;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackBlocks;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackBoss;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackConsumed;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackKills;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackMelee;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackSpawners;
-import com.playmonumenta.plugins.itemstats.infusions.Tenacity;
-import com.playmonumenta.plugins.itemstats.infusions.Understanding;
-import com.playmonumenta.plugins.itemstats.infusions.Usurper;
-import com.playmonumenta.plugins.itemstats.infusions.Vigor;
-import com.playmonumenta.plugins.itemstats.infusions.Vitality;
+import com.playmonumenta.plugins.itemstats.enchantments.*;
+import com.playmonumenta.plugins.itemstats.infusions.*;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
+
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
@@ -156,34 +65,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
 
 public class ItemStatUtils {
 
@@ -214,10 +95,12 @@ public class ItemStatUtils {
 
 		final String mName;
 		final Component mDisplay;
+		final String mPlainDisplay;
 
 		Region(String name, Component display) {
 			mName = name;
 			mDisplay = display;
+			mPlainDisplay = MessagingUtils.plainText(display);
 		}
 
 		public String getName() {
@@ -226,6 +109,10 @@ public class ItemStatUtils {
 
 		public Component getDisplay() {
 			return mDisplay;
+		}
+
+		public String getPlainDisplay() {
+			return mPlainDisplay;
 		}
 
 		public static Region getRegion(String name) {
@@ -266,10 +153,12 @@ public class ItemStatUtils {
 
 		final String mName;
 		final Component mDisplay;
+		final String mPlainDisplay;
 
 		Tier(String name, Component display) {
 			mName = name;
 			mDisplay = display;
+			mPlainDisplay = MessagingUtils.plainText(display);
 		}
 
 		public String getName() {
@@ -278,6 +167,10 @@ public class ItemStatUtils {
 
 		public Component getDisplay() {
 			return mDisplay;
+		}
+
+		public String getPlainDisplay() {
+			return mPlainDisplay;
 		}
 
 		public static Tier getTier(String name) {

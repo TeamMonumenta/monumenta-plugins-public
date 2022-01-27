@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
@@ -105,7 +106,7 @@ public abstract class ExperiencinatorUtils {
 
 			Map<Region, Integer> totalSellValue = new HashMap<>();
 
-			@Nullable ItemStack[] inventory = player.getInventory().getStorageContents();
+			ItemStack[] inventory = player.getInventory().getStorageContents();
 			for (int i = 9; i < inventory.length; i++) {
 				ItemStack item = inventory[i];
 				if (item == null) {
@@ -178,7 +179,7 @@ public abstract class ExperiencinatorUtils {
 	}
 
 	/**
-	 * Gives result items to the player, including compressing them if enabled,a dn sends a chat message of the total amount given if desired.
+	 * Gives result items to the player, including compressing them if enabled, and sends a chat message of the total amount given if desired.
 	 */
 	private static void giveResults(int sellValue, ExperiencinatorConfig.Conversion conversion, Player player, Region region, boolean chatMessage) {
 		int totalValue = sellValue;
@@ -190,9 +191,11 @@ public abstract class ExperiencinatorUtils {
 			conversionResults.sort(Comparator.comparingInt(ExperiencinatorConfig.ConversionResult::getValue));
 
 			// If compressing result items is enabled, first remove existing uncompressed result items from the player and add their value to the totalValue counter
+			List<Integer> existingSlots = new ArrayList<>();
 			if (conversion.getCompressExistingResults()) {
-				@Nullable ItemStack[] inv = player.getInventory().getContents();
+				ItemStack[] inv = player.getInventory().getContents();
 				for (int i = 0; i < conversionResults.size() - 1; i++) { // all but the most valuable one - that one cannot be compressed further
+					existingSlots.add(-1);
 					ExperiencinatorConfig.ConversionResult conversionResult = conversionResults.get(i);
 					ItemStack resultItem = conversionResult.getItem();
 					for (int j = 0; j < inv.length; j++) {
@@ -200,6 +203,7 @@ public abstract class ExperiencinatorUtils {
 						if (invItem != null && resultItem.isSimilar(invItem)) {
 							totalValue += invItem.getAmount() * conversionResult.getValue();
 							inv[j] = null;
+							existingSlots.set(i, j);
 						}
 					}
 				}
@@ -216,12 +220,17 @@ public abstract class ExperiencinatorUtils {
 
 					ItemStack resultStack = conversionResult.getItem();
 					resultStack.setAmount(given);
-					InventoryUtils.giveItem(player, resultStack);
+					if (existingSlots.size() > i && existingSlots.get(i) >= 0 && ItemUtils.isNullOrAir(player.getInventory().getItem(existingSlots.get(i)))) {
+						player.getInventory().setItem(existingSlots.get(i), resultStack);
+					} else {
+						InventoryUtils.giveItem(player, resultStack);
+					}
 				}
 			}
 			if (remainingValue != 0) {
 				// this should never happen, as a result with value 1 must exist (and this is checked when the config is loaded)
 				player.sendRawMessage(ChatColor.RED + "Unable to give you " + remainingValue + " remaining items! Please contact a moderator.");
+				Plugin.getInstance().getLogger().severe("Unable to give " + remainingValue + " remaining Experiencinator result items to " + player.getName() + ".");
 			}
 
 			if (chatMessage) {
@@ -249,7 +258,7 @@ public abstract class ExperiencinatorUtils {
 			}
 		} catch (Throwable t) {
 			player.sendRawMessage(ChatColor.RED + "Error while giving you " + remainingValue + " remaining items from a total of " + totalValue + "! Please contact a moderator.");
-			Plugin.getInstance().getLogger().severe("Error while giving Experiencinator result items. Initial sell value: " + sellValue + ", totalValue: " + totalValue + ", remainingValue: " + remainingValue + "");
+			Plugin.getInstance().getLogger().severe("Error while giving Experiencinator result items to " + player.getName() + ". Initial sell value: " + sellValue + ", totalValue: " + totalValue + ", remainingValue: " + remainingValue);
 			throw t;
 		}
 	}

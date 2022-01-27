@@ -12,6 +12,7 @@ import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTList;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
@@ -31,7 +32,6 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -360,6 +360,10 @@ public class ItemUtils {
 			}
 		}
 		return null;
+	}
+
+	public static boolean isNullOrAir(@Nullable ItemStack itemStack) {
+		return itemStack == null || itemStack.getType() == Material.AIR;
 	}
 
 	public enum ItemDeathResult {
