@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.events;
+package com.playmonumenta.plugins.seasonalevents;
 
 import javax.annotation.Nullable;
 
@@ -24,7 +24,7 @@ public enum MonumentaContent {
 	TEAL("teal", ContentType.DUNGEON, 2),
 	FORUM("forum", ContentType.DUNGEON, 2),
 	SHIFTING("shifting", ContentType.DUNGEON, 2),
-	DEPTHS("depths", ContentType.DUNGEON, 2),
+	DEPTHS("depths", ContentType.DUNGEON, 2), // Called from depths party in plugin
 	MIST("mist", ContentType.STRIKE, 2),
 	REMORSE("remorse", ContentType.STRIKE, 2),
 	HORSEMAN("horseman", ContentType.BOSS, 2),

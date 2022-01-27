@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
 
-import com.playmonumenta.plugins.events.MonumentaContent;
+import com.playmonumenta.plugins.seasonalevents.MonumentaContent;
 import com.playmonumenta.plugins.events.MonumentaEvent;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;

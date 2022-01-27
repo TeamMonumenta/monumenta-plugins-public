@@ -1,13 +1,14 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class GUIUtils {
 
@@ -43,6 +44,10 @@ public class GUIUtils {
 				inventory.setItem(i, filler.clone());
 			}
 		}
+	}
+
+	public static ChatColor namedTextColorToChatColor(NamedTextColor color) {
+		return ChatColor.of(color.toString());
 	}
 
 }

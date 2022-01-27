@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.integrations;
 
+import com.playmonumenta.plugins.cosmetics.Cosmetic;
+import com.playmonumenta.plugins.cosmetics.CosmeticType;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
 
 public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 	Plugin mPlugin;
@@ -79,6 +83,16 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			if (toCut.length() > mask.length()) {
 				String finalString = toCut.substring(mask.length(), toCut.length());
 				return finalString;
+			}
+		}
+
+		//Player equipped title
+		if (identifier.equalsIgnoreCase("title")) {
+			Cosmetic title = CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.TITLE);
+			if (title != null) {
+				return title.getName() + " ";
+			} else {
+				return "";
 			}
 		}
 

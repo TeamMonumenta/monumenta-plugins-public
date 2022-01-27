@@ -79,6 +79,8 @@ import com.playmonumenta.plugins.commands.UpTimeCommand;
 import com.playmonumenta.plugins.commands.UpdateHeldItem;
 import com.playmonumenta.plugins.commands.VirtualFirmament;
 import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorCommand;
+import com.playmonumenta.plugins.cosmetics.CosmeticsCommand;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.custominventories.CustomInventoryCommands;
 import com.playmonumenta.plugins.depths.DepthsCommand;
 import com.playmonumenta.plugins.depths.DepthsGUICommands;
@@ -138,6 +140,9 @@ import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.plots.ShopManager;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.protocollib.ProtocolLibIntegration;
+import com.playmonumenta.plugins.seasonalevents.SeasonalEventCommand;
+import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
+import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
@@ -147,8 +152,8 @@ import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 
 public class Plugin extends JavaPlugin {
@@ -172,6 +177,8 @@ public class Plugin extends JavaPlugin {
 	public SignUtils mSignUtils;
 	public DeathItemListener mDeathItemListener;
 	public ItemOverrides mItemOverrides;
+	public CosmeticsManager mCosmeticsManager;
+	public SeasonalEventManager mSeasonalEventManager;
 
 	// INSTANCE is set if the plugin is properly enabled
 	@SuppressWarnings("initialization.static.field.uninitialized")
@@ -264,6 +271,8 @@ public class Plugin extends JavaPlugin {
 		ExperiencinatorCommand.register();
 		EventCommand.register();
 		Eggify.register();
+		SeasonalEventCommand.register(this);
+		CosmeticsCommand.register(this);
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -319,6 +328,8 @@ public class Plugin extends JavaPlugin {
 		mItemStatManager = new ItemStatManager(this);
 		mChessManager = new ChessManager(this);
 		mSignUtils = new SignUtils(this);
+		mCosmeticsManager = CosmeticsManager.getInstance();
+		mSeasonalEventManager = new SeasonalEventManager();
 
 		new ClientModHandler(this);
 		DailyReset.startTimer(this);
@@ -381,6 +392,8 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new StasisListener(), this);
 		manager.registerEvents(new TradeListener(), this);
 		manager.registerEvents(new WitchListener(this), this);
+		manager.registerEvents(new SeasonalEventListener(), this);
+		manager.registerEvents(CosmeticsManager.getInstance(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")

@@ -10,6 +10,15 @@ import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.Plugin;
 import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.events.MonumentaEvent;
+import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,13 +33,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import javax.annotation.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * This class handles dynamic information about depths parties, including key information about the world like locations,
@@ -461,7 +463,9 @@ public class DepthsParty {
 				ScoreboardUtils.setScoreboardValue(p, "DepthsEndless", roomReached);
 				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getDisplayName() + " DepthsEndless");
 			}
+			SeasonalEventListener.playerCompletedDepths(p, roomReached);
 			if (victory) {
+				Bukkit.getPluginManager().callEvent(new MonumentaEvent(p, "depths"));
 				MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
 			}
 
