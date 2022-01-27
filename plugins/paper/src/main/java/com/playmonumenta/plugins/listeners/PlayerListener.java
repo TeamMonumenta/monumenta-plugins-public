@@ -17,10 +17,12 @@ import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -35,6 +37,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -110,12 +113,15 @@ import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.loot.LootContext;
+import org.bukkit.loot.LootTable;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -149,6 +155,16 @@ public class PlayerListener implements Listener {
 		Location loc = player.getLocation();
 		runTeleportRunnable(player, loc);
 
+		//TODO temporary for item rework
+		if (!ServerProperties.getShardName().equals("tutorial") && ScoreboardUtils.getScoreboardValue(player, "ItemReworkToken").orElse(0) == 0) {
+			NamespacedKey tokenKey = NamespacedKeyUtils.fromString("epic:legacy/r1/morning_lily");
+			LootTable tokenLootTable = Bukkit.getLootTable(tokenKey);
+			Collection<ItemStack> tokenLoot = tokenLootTable.populateLoot(FastUtils.RANDOM, new LootContext.Builder(player.getLocation()).build());
+			for (ItemStack item : tokenLoot) {
+				InventoryUtils.giveItem(player, item);
+			}
+			ScoreboardUtils.setScoreboardValue(player, "ItemReworkToken", 1);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
