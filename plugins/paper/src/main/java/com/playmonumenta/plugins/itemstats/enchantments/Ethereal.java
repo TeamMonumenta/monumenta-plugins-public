@@ -29,6 +29,9 @@ public class Ethereal implements Enchantment {
 
 	@Override
 	public void onHurt(@NotNull Plugin plugin, @NotNull Player player, double value, @NotNull DamageEvent event) {
+		if (plugin.mEffectManager.getEffects(player, ETHEREAL_EFFECT_NAME) != null) {
+			plugin.mEffectManager.clearEffects(player, ETHEREAL_EFFECT_NAME);
+		}
 		plugin.mEffectManager.addEffect(player, ETHEREAL_EFFECT_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME));
 	}
 
