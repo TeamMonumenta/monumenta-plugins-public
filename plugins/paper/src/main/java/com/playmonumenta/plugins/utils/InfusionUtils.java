@@ -1,21 +1,15 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.Collection;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.loot.LootContext;
-import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
 import javax.annotation.Nullable;
 
@@ -79,8 +73,8 @@ public class InfusionUtils {
 		// First level is free and we calculate based on the level below current.
 		int infuseLevel = getInfuseLevel(item) - 1;
 		int costMult = getCostMultiplierWithCheck(item);
-		while (infuseLevel >= 0) {
-			refundMaterials += (costMult * (int)Math.pow(2, infuseLevel));
+		while (infuseLevel > 0) {
+			refundMaterials += (costMult * (int)Math.pow(2, infuseLevel - 1));
 			infuseLevel--;
 		}
 
@@ -172,26 +166,19 @@ public class InfusionUtils {
 	}
 
 	private static void giveMaterials(Player player, Region region, int refundMaterials) throws WrapperCommandSyntaxException {
-		NamespacedKey key;
+		ItemStack stack;
 		if (region.equals(Region.VALLEY)) {
-			key = NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold");
+			stack = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
 		} else if (region.equals(Region.ISLES)) {
-			key = NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald");
+			stack = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
 		} else {
 			CommandAPI.fail("Item must have a Region tag!");
 			return;
 		}
-		LootTable lt = Bukkit.getLootTable(key);
-		if (lt != null) {
-			LootContext.Builder builder = new LootContext.Builder(player.getLocation());
-			LootContext context = builder.build();
-			Collection<ItemStack> items = lt.populateLoot(FastUtils.RANDOM, context);
-			if (items.size() > 0) {
-				ItemStack materials = items.iterator().next();
-				Item eItem = player.getWorld().dropItemNaturally(player.getLocation(), materials.add(refundMaterials - 1));
-				eItem.setPickupDelay(0);
-				return;
-			}
+		if (stack != null) {
+			Item eItem = player.getWorld().dropItemNaturally(player.getLocation(), stack.add(refundMaterials - 1));
+			eItem.setPickupDelay(0);
+			return;
 		}
 		CommandAPI.fail("ERROR while refunding infusion (failed to get loot table). Please contact a moderator if you see this message!");
 	}
@@ -223,7 +210,7 @@ public class InfusionUtils {
 		if (infuseLvl == -1) {
 			cost = 0;
 		} else if (infuseLvl <= 2) {
-			cost *= (int)Math.pow(2, infuseLvl);
+			cost *= (int)Math.pow(2, infuseLvl - 1);
 		} else {
 			cost = 99999999;
 			CommandAPI.fail("Items may only be infused 4 times!");
@@ -352,27 +339,27 @@ public class InfusionUtils {
 
 	public static InfusionSelection getCurrentInfusion(Plugin plugin, Player player, ItemStack item) {
 
-		if (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.ACUMEN) > 0) {
+		if (ItemStatUtils.getInfusionLevel(item, InfusionType.ACUMEN) > 0) {
 			return InfusionSelection.ACUMEN;
 		}
 
-		if (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.FOCUS) > 0) {
+		if (ItemStatUtils.getInfusionLevel(item, InfusionType.FOCUS) > 0) {
 			return InfusionSelection.FOCUS;
 		}
 
-		if (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.PERSPICACITY) > 0) {
+		if (ItemStatUtils.getInfusionLevel(item, InfusionType.PERSPICACITY) > 0) {
 			return InfusionSelection.PERSPICACITY;
 		}
 
-		if (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.TENACITY) > 0) {
+		if (ItemStatUtils.getInfusionLevel(item, InfusionType.TENACITY) > 0) {
 			return InfusionSelection.TENACITY;
 		}
 
-		if (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.VIGOR) > 0) {
+		if (ItemStatUtils.getInfusionLevel(item, InfusionType.VIGOR) > 0) {
 			return InfusionSelection.VIGOR;
 		}
 
-		if (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.VITALITY) > 0) {
+		if (ItemStatUtils.getInfusionLevel(item, InfusionType.VITALITY) > 0) {
 			return InfusionSelection.VITALITY;
 		}
 
