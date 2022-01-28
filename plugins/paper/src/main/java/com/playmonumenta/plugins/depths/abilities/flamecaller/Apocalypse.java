@@ -80,11 +80,12 @@ public class Apocalypse extends DepthsAbility {
 		world.spawnParticle(Particle.HEART, loc.clone().add(0, 1, 0), count * 7, 0.5, 0.5, 0.5);
 		world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.5f * count, 1.6f);
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Apocalypse has been activated!");
+		event.setCancelled(true);
 	}
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + RADIUS + " block radius. For each mob that is killed, heal " + (int) DepthsUtils.roundPercent(HEALING) + "% of your max health. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, ignore the hit and instead deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + RADIUS + " block radius. For each mob that is killed, heal " + (int) DepthsUtils.roundPercent(HEALING) + "% of your max health. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override
