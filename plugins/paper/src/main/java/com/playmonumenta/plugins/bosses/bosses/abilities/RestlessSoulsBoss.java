@@ -78,16 +78,22 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		if (mPlayer != null || mPlayerItemStats != null) {
-			event.setCancelled(true);
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.5f, 1.0f);
+		event.setCancelled(true);
+		attack(mMonPlugin, mPlayer, mPlayerItemStats, mBoss, damagee, mLevelOne, mDamage, mSilenceTime, mAbilities, mDuration);
+	}
+
+	public static void attack(com.playmonumenta.plugins.Plugin plugin, Player p, FixedMetadataValue playerItemStats,
+							  LivingEntity boss, LivingEntity damagee, boolean levelOne, double damage, int silenceTime,
+							  Ability[] abilities, int duration) {
+		if (p != null || playerItemStats != null) {
+			boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.5f, 1.0f);
 
 			// tag mob to prevent it from spawning more stuff
 			damagee.addScoreboardTag("TeneGhost");
 
-			DamageEvent damageEvent = new DamageEvent(damagee, mPlayer, mPlayer, DamageType.MAGIC, ClassAbility.RESTLESS_SOULS, mDamage);
+			DamageEvent damageEvent = new DamageEvent(damagee, p, p, DamageType.MAGIC, ClassAbility.RESTLESS_SOULS, damage);
 			damageEvent.setDelayed(true);
-			damageEvent.setPlayerItemStat(mPlayerItemStats);
+			damageEvent.setPlayerItemStat(playerItemStats);
 			DamageUtils.damage(damageEvent, true, true, null);
 
 			// remove tag if mob is not dead
@@ -96,39 +102,41 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 			}
 			// debuff
 			if (!EntityUtils.isBoss(damagee)) {
-				EntityUtils.applySilence(mMonPlugin, mSilenceTime, damagee);
+				EntityUtils.applySilence(plugin, silenceTime, damagee);
 			}
-			if (!mLevelOne) {
-				for (Ability ability : mAbilities) {
-					if (ability != null && mMonPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ability.getInfo().mLinkedSpell)) {
+			if (!levelOne) {
+				for (Ability ability : abilities) {
+					if (ability != null && plugin.mTimers.isAbilityOnCooldown(p.getUniqueId(), ability.getInfo().mLinkedSpell)) {
 						if (ability.getInfo().mLinkedSpell == ClassAbility.CHOLERIC_FLAMES) {
-							damagee.setFireTicks(mDuration);
+							damagee.setFireTicks(duration);
 							if (ability.getAbilityScore() == 2) {
-								PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.HUNGER, mDuration, 0, false, true));
+								PotionUtils.applyPotion(p, damagee, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true));
 							}
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.GRASPING_CLAWS) {
-							EntityUtils.applySlow(mMonPlugin, mDuration, 0.1, damagee);
+							EntityUtils.applySlow(plugin, duration, 0.1, damagee);
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.MELANCHOLIC_LAMENT) {
-							EntityUtils.applyWeaken(mMonPlugin, mDuration, 0.1, damagee);
+							EntityUtils.applyWeaken(plugin, duration, 0.1, damagee);
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.HAUNTING_SHADES) {
-							PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.UNLUCK, mDuration, 0, true, false));
+							PotionUtils.applyPotion(p, damagee, new PotionEffect(PotionEffectType.UNLUCK, duration, 0, true, false));
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.WITHERING_GAZE) {
-							mMonPlugin.mEffectManager.addEffect(damagee, DOT_EFFECT_NAME, new CustomDamageOverTime(mDuration, 1, 40, mPlayer, null, Particle.SQUID_INK));
+							plugin.mEffectManager.addEffect(damagee, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, null, Particle.SQUID_INK));
 						}
 					}
 				}
 			}
 			// kill vex
-			mBoss.remove();
+			boss.remove();
 		}
 	}
 
 	@Override
 	public void bossChangedTarget(EntityTargetEvent event) {
 		Entity target = event.getTarget();
-		Set<String> tags = target.getScoreboardTags();
-		if (!EntityUtils.isHostileMob(target) || (tags != null && tags.contains(AbilityUtils.IGNORE_TAG))) {
-			event.setCancelled(true);
+		if (target != null) {
+			Set<String> tags = target.getScoreboardTags();
+			if (!EntityUtils.isHostileMob(target) || (tags != null && tags.contains(AbilityUtils.IGNORE_TAG))) {
+				event.setCancelled(true);
+			}
 		}
 	}
 }

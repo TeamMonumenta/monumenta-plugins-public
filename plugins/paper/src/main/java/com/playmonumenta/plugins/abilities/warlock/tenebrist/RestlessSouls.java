@@ -2,6 +2,10 @@ package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
+import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
+import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
@@ -10,6 +14,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -29,6 +34,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class RestlessSouls extends Ability {
 	private static final int DAMAGE_1 = 8;
@@ -54,6 +60,7 @@ public class RestlessSouls extends Ability {
 	private List<Vex> mVexList = new ArrayList<Vex>();
 	private PartialParticle mParticle1;
 	private PartialParticle mParticle2;
+	private Ability[] mAbilities = {};
 
 	public RestlessSouls(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Restless Souls");
@@ -61,7 +68,7 @@ public class RestlessSouls extends Ability {
 		mInfo.mScoreboardId = "RestlessSouls";
 		mInfo.mShorthandName = "RS";
 		mInfo.mDescriptions.add("Whenever an enemy dies within " + RANGE + " blocks of you, a glowing invisible invulnerable vex spawns. The vex targets your enemies and possesses them, dealing " + DAMAGE_1 + " damage and silences the target for " + SILENCE_DURATION_1 / 20 + " seconds. Vex count is capped at " + VEX_CAP_1 + " and each lasts for " + VEX_DURATION_1 / 20 + " seconds. Each vex can only possess 1 enemy. Enemies killed by the vex will not spawn additional vexes.");
-		mInfo.mDescriptions.add("Damage is increased to " + DAMAGE_2 + " and silence duration increased to " + SILENCE_DURATION_2 + " seconds. Maximum vex count increased to " + VEX_CAP_2 + " and each vex lasts for " + VEX_DURATION_2 + " seconds. Additionally, the possessed mob is inflicted with a level 1 debuff of the corresponding active skill that is on cooldown for " + DEBUFF_DURATION + " seconds. Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > Hunger. Melancholic Lament > 10% Weaken. Withering Gaze > Wither. Haunting Shades > 5% Vulnerability.");
+		mInfo.mDescriptions.add("Damage is increased to " + DAMAGE_2 + " and silence duration increased to " + SILENCE_DURATION_2 / 20 + " seconds. Maximum vex count increased to " + VEX_CAP_2 + " and each vex lasts for " + VEX_DURATION_2 / 20 + " seconds. Additionally, the possessed mob is inflicted with a level 1 debuff of the corresponding active skill that is on cooldown for " + DEBUFF_DURATION / 20 + " seconds. Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > Hunger. Melancholic Lament > 10% Weaken. Withering Gaze > Wither. Haunting Shades > 5% Vulnerability.");
 		mInfo.mLinkedSpell = ClassAbility.RESTLESS_SOULS;
 		mDisplayItem = new ItemStack(Material.VEX_SPAWN_EGG, 1);
 
@@ -71,6 +78,14 @@ public class RestlessSouls extends Ability {
 		mSilenceTime = isLevelOne ? SILENCE_DURATION_1 : SILENCE_DURATION_2;
 		mVexTime = isLevelOne ? VEX_DURATION_1 : VEX_DURATION_2;
 		mVexCap = isLevelOne ? VEX_CAP_1 : VEX_CAP_2;
+
+		if (player != null) {
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				mAbilities = Stream.of(CholericFlames.class, GraspingClaws.class,
+						MelancholicLament.class, HauntingShades.class, WitheringGaze.class)
+					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
+			});
+		}
 	}
 
 	@Override
@@ -173,6 +188,16 @@ public class RestlessSouls extends Ability {
 									world.playSound(mBoss.getLocation(), Sound.ENTITY_VEX_AMBIENT, 1.5f, 1.0f);
 								}
 							}
+						}
+					}
+					// forced attack after charge
+					if (mBoss.isCharging()) {
+						// charge attack in progress, increase mob "hitbox" by 4 blocks
+						FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
+						LivingEntity damagee = mBoss.getTarget();
+						if (mBoss.getLocation().distance(damagee.getLocation().add(0, 1, 0)) <= 4) {
+							RestlessSoulsBoss.attack(mPlugin, mPlayer, playerItemStats, mBoss, damagee, mLevel, mDamage,
+								mSilenceTime, mAbilities, DEBUFF_DURATION);
 						}
 					}
 					mTicksElapsed += TICK_INTERVAL;
