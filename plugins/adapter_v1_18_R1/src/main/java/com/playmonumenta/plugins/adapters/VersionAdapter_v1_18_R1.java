@@ -1,9 +1,13 @@
 package com.playmonumenta.plugins.adapters;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
@@ -14,16 +18,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.EntityDamageSource;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
+import javax.annotation.Nullable;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 	public void resetPlayerIdleTimer(Player player) {
@@ -38,7 +37,7 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 		public CustomDamageSource(net.minecraft.world.entity.Entity damager, @Nullable String killedUsingMsg) {
 			super("custom", damager);
 
-			if (killedUsingMsg == null) {
+			if (killedUsingMsg == null || killedUsingMsg.isEmpty()) {
 				mKilledUsingMsg = "magic";
 			} else {
 				mKilledUsingMsg = killedUsingMsg;

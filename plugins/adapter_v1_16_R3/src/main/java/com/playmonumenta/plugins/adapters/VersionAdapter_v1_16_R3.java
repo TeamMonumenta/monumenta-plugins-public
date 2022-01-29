@@ -1,9 +1,13 @@
 package com.playmonumenta.plugins.adapters;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
+import net.minecraft.server.v1_16_R3.ChatMessage;
+import net.minecraft.server.v1_16_R3.DamageSource;
+import net.minecraft.server.v1_16_R3.EntityDamageSource;
+import net.minecraft.server.v1_16_R3.EntityLiving;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.v1_16_R3.IChatBaseComponent;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.Vec3D;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
@@ -14,16 +18,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
-import net.minecraft.server.v1_16_R3.ChatMessage;
-import net.minecraft.server.v1_16_R3.DamageSource;
-import net.minecraft.server.v1_16_R3.EntityDamageSource;
-import net.minecraft.server.v1_16_R3.EntityLiving;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
-import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
-import net.minecraft.server.v1_16_R3.Vec3D;
+import javax.annotation.Nullable;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	public void resetPlayerIdleTimer(Player player) {
@@ -38,7 +37,7 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 		public CustomDamageSource(net.minecraft.server.v1_16_R3.Entity damager, @Nullable String killedUsingMsg) {
 			super("custom", damager);
 
-			if (killedUsingMsg == null) {
+			if (killedUsingMsg == null || killedUsingMsg.isEmpty()) {
 				mKilledUsingMsg = "magic";
 			} else {
 				mKilledUsingMsg = killedUsingMsg;
