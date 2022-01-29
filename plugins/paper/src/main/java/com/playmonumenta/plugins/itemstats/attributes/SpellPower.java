@@ -1,17 +1,16 @@
 package com.playmonumenta.plugins.itemstats.attributes;
 
-import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Attribute;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
+import org.bukkit.entity.Player;
+
+import javax.annotation.Nullable;
 
 public class SpellPower implements Attribute {
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Spell Power";
 	}
 

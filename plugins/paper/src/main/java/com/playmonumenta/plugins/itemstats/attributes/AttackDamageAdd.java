@@ -13,7 +13,6 @@ import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class AttackDamageAdd implements Attribute {
 
@@ -33,7 +32,7 @@ public class AttackDamageAdd implements Attribute {
 	}
 
 	@Override
-	public void onDamage(@NotNull Plugin plugin, @NotNull Player player, double value, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
+	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
 			event.setDamage(event.getDamage() + value);
 		} else if (event.getType() == DamageType.MELEE_SKILL && player.getItemInHand().getType() != Material.AIR) {

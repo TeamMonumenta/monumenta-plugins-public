@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.itemstats.Attribute;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class ProjectileDamageMultiply implements Attribute {
 
@@ -27,8 +26,9 @@ public class ProjectileDamageMultiply implements Attribute {
 	}
 
 	@Override
-	public void onDamage(@NotNull Plugin plugin, @NotNull Player player, double value, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE) {
+	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+		DamageEvent.DamageType type = event.getType();
+		if (type.equals(DamageType.PROJECTILE) || type.equals(DamageType.PROJECTILE_SKILL)) {
 			event.setDamage(event.getDamage() * value);
 		}
 	}

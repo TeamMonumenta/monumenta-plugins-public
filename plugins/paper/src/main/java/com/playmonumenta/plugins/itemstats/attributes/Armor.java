@@ -16,12 +16,11 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class Armor implements Attribute {
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Armor";
 	}
 
@@ -31,7 +30,7 @@ public class Armor implements Attribute {
 	}
 
 	@Override
-	public void onHurt(@NotNull Plugin plugin, @NotNull Player player, double value, @NotNull DamageEvent event) {
+	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event) {
 		// When there is nonzero Armor, this method runs; otherwise, Agility runs.
 		if (value > 0 && event.getType().isDefendable()) {
 			double valueMod = 0;
