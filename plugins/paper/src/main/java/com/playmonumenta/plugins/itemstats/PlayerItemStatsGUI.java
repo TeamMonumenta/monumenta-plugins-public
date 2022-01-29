@@ -23,6 +23,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -239,20 +240,22 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	}
 
 	public enum OtherEquipment {
-		MAINHAND(52, "Main Hand"),
-		OFFHAND(25, "Off Hand"),
-		HEAD(26, "Head"),
-		CHEST(35, "Chest"),
-		LEGS(44, "Legs"),
-		FEET(53, "Feet");
+		MAINHAND(52, "Main Hand", EquipmentSlot.HAND),
+		OFFHAND(25, "Off Hand", EquipmentSlot.OFF_HAND),
+		HEAD(26, "Head", EquipmentSlot.HEAD),
+		CHEST(35, "Chest", EquipmentSlot.CHEST),
+		LEGS(44, "Legs", EquipmentSlot.LEGS),
+		FEET(53, "Feet", EquipmentSlot.FEET);
 
 		private final int mSlot;
 		private final String mName;
+		private final EquipmentSlot mEquipmentSlot;
 		private final ImmutableList<Component> mLore = ImmutableList.of(Component.text("Click here, then click an item to compare builds.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 
-		OtherEquipment(int slot, String name) {
+		OtherEquipment(int slot, String name, EquipmentSlot equipmentSlot) {
 			mSlot = slot;
 			mName = name;
+			mEquipmentSlot = equipmentSlot;
 		}
 
 		public int getSlot() {
@@ -334,82 +337,43 @@ public class PlayerItemStatsGUI extends CustomInventory {
 					return;
 				}
 			}
-		} else if (mSelected != null) {
+		} else {
 			ItemStack clickedItem = inv.getItem(slot);
 			if (clickedItem != null) {
-				ItemStack item = new ItemStack(event.getClickedInventory().getItem(slot));
-				for (OtherEquipment equipment : OtherEquipment.values()) {
-					if (mSelected == equipment && isValid(equipment, item.getType())) {
-						mOtherEquipment.put(equipment, item);
-						mSelected = null;
-						generateInventory();
-						return;
+				ItemStack item = new ItemStack(clickedItem);
+				OtherEquipment target = null;
+				if (mSelected != null) {
+					if (isValid(mSelected, item.getType())) {
+						target = mSelected;
 					}
+				} else if (event.getClick().isShiftClick()) {
+					for (OtherEquipment equipment : new OtherEquipment[] {OtherEquipment.HEAD, OtherEquipment.CHEST, OtherEquipment.LEGS, OtherEquipment.FEET}) {
+						if (isValid(equipment, item.getType())) {
+							target = equipment;
+							break;
+						}
+					}
+					if (target == null) {
+						if (ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)) {
+							target = OtherEquipment.OFFHAND;
+						} else {
+							target = OtherEquipment.MAINHAND;
+						}
+					}
+				}
+				if (target != null) {
+					mOtherEquipment.put(target, item);
+					mSelected = null;
+					generateInventory();
 				}
 			}
 		}
 	}
 
 	private boolean isValid(OtherEquipment equipment, Material material) {
-		if (equipment == OtherEquipment.HEAD) {
-			switch (material) {
-			case LEATHER_HELMET:
-			case GOLDEN_HELMET:
-			case CHAINMAIL_HELMET:
-			case IRON_HELMET:
-			case DIAMOND_HELMET:
-			case NETHERITE_HELMET:
-			case TURTLE_HELMET:
-			case SKELETON_SKULL:
-			case WITHER_SKELETON_SKULL:
-			case PLAYER_HEAD:
-			case ZOMBIE_HEAD:
-			case CREEPER_HEAD:
-			case DRAGON_HEAD:
-				return true;
-			default:
-				return false;
-			}
-		} else if (equipment == OtherEquipment.CHEST) {
-			switch (material) {
-			case LEATHER_CHESTPLATE:
-			case GOLDEN_CHESTPLATE:
-			case CHAINMAIL_CHESTPLATE:
-			case IRON_CHESTPLATE:
-			case DIAMOND_CHESTPLATE:
-			case NETHERITE_CHESTPLATE:
-			case ELYTRA:
-				return true;
-			default:
-				return false;
-			}
-		} else if (equipment == OtherEquipment.LEGS) {
-			switch (material) {
-			case LEATHER_LEGGINGS:
-			case GOLDEN_LEGGINGS:
-			case CHAINMAIL_LEGGINGS:
-			case IRON_LEGGINGS:
-			case DIAMOND_LEGGINGS:
-			case NETHERITE_LEGGINGS:
-				return true;
-			default:
-				return false;
-			}
-		} else if (equipment == OtherEquipment.FEET) {
-			switch (material) {
-			case LEATHER_BOOTS:
-			case GOLDEN_BOOTS:
-			case CHAINMAIL_BOOTS:
-			case IRON_BOOTS:
-			case DIAMOND_BOOTS:
-			case NETHERITE_BOOTS:
-				return true;
-			default:
-				return false;
-			}
-		}
-
-		return true;
+		return equipment == OtherEquipment.MAINHAND
+			       || equipment == OtherEquipment.OFFHAND
+			       || equipment.mEquipmentSlot == material.getEquipmentSlot();
 	}
 
 	private double getAttributeAmount(NBTCompoundList mainhandA, NBTCompoundList offhandA, NBTCompoundList headA, NBTCompoundList chestA, NBTCompoundList legsA, NBTCompoundList feetA, AttributeType type, Operation operation) {
