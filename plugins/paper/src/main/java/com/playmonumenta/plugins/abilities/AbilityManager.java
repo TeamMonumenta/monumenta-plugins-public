@@ -150,6 +150,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -177,7 +178,6 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -441,14 +441,19 @@ public class AbilityManager {
 
 		List<Ability> triggerLastAbilities = Arrays.asList(
 			new SanctifiedArmor(mPlugin, null),
-			new Rampage(mPlugin, null),
 			new PrismaticShield(mPlugin, null),
-			new EscapeDeath(mPlugin, null),
+			new EscapeDeath(mPlugin, null)
+		);
+		List<Ability> triggerLastSpecAbilities = Arrays.asList(
+			new Rampage(mPlugin, null),
 			new CoupDeGrace(mPlugin, null)
 		);
 		mReferenceAbilities.addAll(delveModifiers);
 		if (!ServerProperties.getShardName().contains("depths")) {
 			mReferenceAbilities.addAll(triggerLastAbilities);
+			if (ServerProperties.getClassSpecializationsEnabled()) {
+				mReferenceAbilities.addAll(triggerLastSpecAbilities);
+			}
 		}
 	}
 
