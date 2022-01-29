@@ -3,18 +3,17 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
-
-import javax.annotation.Nullable;
 
 public class DamageUtils {
 
 	public static double getDamageMultiplier(double armor, double agility, double epf, boolean environmental) {
 		double ar = Math.max(0, armor);
 		double ag = Math.max(0, agility);
-		double defense = ar + ag - 0.5 * ar * ag / (ar + ag);
+		double defense = ar + ag == 0 ? 0 : ar + ag - 0.5 * ar * ag / (ar + ag);
 		return environmental ? Math.pow(0.96, (defense / 2) + epf) : Math.pow(0.96, defense + epf);
 	}
 

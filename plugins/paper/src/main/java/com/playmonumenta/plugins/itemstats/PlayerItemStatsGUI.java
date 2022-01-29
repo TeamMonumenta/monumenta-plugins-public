@@ -1,20 +1,5 @@
 package com.playmonumenta.plugins.itemstats;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
-import javax.annotation.Nullable;
-
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
@@ -25,16 +10,29 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
-
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
 
 public class PlayerItemStatsGUI extends CustomInventory {
 
@@ -450,9 +448,19 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			}
 		}
 
+		double armor = stats.getItemStats().get(AttributeType.ARMOR.getItemStat());
+		double agility = stats.getItemStats().get(AttributeType.AGILITY.getItemStat());
 		// TODO: remove the magic number 0.2 (preferably link it to some constant declared in the enchantment classes themselves)
-		double armor = stats.getItemStats().get(AttributeType.ARMOR.getItemStat()) * (1 + 0.2 * armorBonus);
-		double agility = stats.getItemStats().get(AttributeType.AGILITY.getItemStat()) * (1 + 0.2 * agilityBonus);
+		if (stats.getItemStats().get(EnchantmentType.ADAPTABILITY.getItemStat()) > 0) {
+			if (armor > agility) {
+				armor *= 1 + 0.2 * (armorBonus + agilityBonus);
+			} else {
+				agility *= 1 + 0.2 * (armorBonus + agilityBonus);
+			}
+		} else {
+			armor *= 1 + 0.2 * armorBonus;
+			agility *= 1 + 0.2 * agilityBonus;
+		}
 
 		double melee = stats.getItemStats().get(EnchantmentType.MELEE_PROTECTION.getItemStat());
 		double projectile = stats.getItemStats().get(EnchantmentType.PROJECTILE_PROTECTION.getItemStat());
