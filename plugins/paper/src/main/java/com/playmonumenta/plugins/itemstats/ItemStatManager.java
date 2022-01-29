@@ -14,6 +14,7 @@ import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -317,7 +318,12 @@ public class ItemStatManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void playerJoinEvent(PlayerJoinEvent event) {
-		mPlayerItemStatsMappings.put(event.getPlayer().getUniqueId(), new PlayerItemStats(event.getPlayer()));
+		Player player = event.getPlayer();
+		PlayerItemStats playerItemStats = new PlayerItemStats(player);
+		mPlayerItemStatsMappings.put(player.getUniqueId(), playerItemStats);
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			playerItemStats.updateStats(true);
+		});
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)

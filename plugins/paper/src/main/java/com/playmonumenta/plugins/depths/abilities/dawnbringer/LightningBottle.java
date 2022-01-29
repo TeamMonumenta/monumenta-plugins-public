@@ -65,18 +65,16 @@ public class LightningBottle extends DepthsAbility {
 
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
-		if (mPlayer != null && potion.hasMetadata(POTION_META_DATA) && potion.getMetadata(POTION_META_DATA) instanceof FixedMetadataValue playerItemStats) {
-			if (affectedEntities != null && !affectedEntities.isEmpty()) {
-				for (LivingEntity entity : affectedEntities) {
-					if (EntityUtils.isHostileMob(entity)) {
-						DamageEvent damageEvent = new DamageEvent(entity, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, DAMAGE[mRarity - 1]);
-						damageEvent.setDelayed(true);
-						damageEvent.setPlayerItemStat(playerItemStats);
-						DamageUtils.damage(damageEvent, false, true, null);
+		if (mPlayer != null && potion.hasMetadata(POTION_META_DATA) && potion.getMetadata(POTION_META_DATA).get(0) instanceof FixedMetadataValue playerItemStats) {
+			for (LivingEntity entity : affectedEntities) {
+				if (EntityUtils.isHostileMob(entity)) {
+					DamageEvent damageEvent = new DamageEvent(entity, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, DAMAGE[mRarity - 1]);
+					damageEvent.setDelayed(true);
+					damageEvent.setPlayerItemStat(playerItemStats);
+					DamageUtils.damage(damageEvent, false, true, null);
 
-						EntityUtils.applyVulnerability(mPlugin, DURATION, VULNERABILITY[mRarity - 1], entity);
-						EntityUtils.applySlow(mPlugin, DURATION, SLOWNESS, entity);
-					}
+					EntityUtils.applyVulnerability(mPlugin, DURATION, VULNERABILITY[mRarity - 1], entity);
+					EntityUtils.applySlow(mPlugin, DURATION, SLOWNESS, entity);
 				}
 			}
 		}

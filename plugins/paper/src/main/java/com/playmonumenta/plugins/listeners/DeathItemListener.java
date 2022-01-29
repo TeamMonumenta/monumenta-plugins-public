@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.listeners;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.graves.GraveItem;
 import com.playmonumenta.plugins.graves.GraveManager;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -136,6 +137,10 @@ public class DeathItemListener implements Listener {
 			//Simulate item pickup
 			inventory.setItem(slot, item);
 			InventoryUtils.scheduleDelayedEquipmentSlotCheck(mPlugin, player, slot);
+			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStats(player);
+			if (playerItemStats != null) {
+				playerItemStats.updateStats(true);
+			}
 			simulatePickup(entity, player);
 
 			return true;
