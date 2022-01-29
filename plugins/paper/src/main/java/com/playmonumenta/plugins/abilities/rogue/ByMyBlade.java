@@ -1,17 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -22,6 +10,18 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import javax.annotation.Nullable;
 
 
 
@@ -41,7 +41,7 @@ public class ByMyBlade extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.BY_MY_BLADE;
 		mInfo.mScoreboardId = "ByMyBlade";
 		mInfo.mShorthandName = "BmB";
-		mInfo.mDescriptions.add("While holding two swords, attacking an enemy with a critical attack deals 10 more damage, and grants you Haste 2 for 4s. Cooldown: 10s.");
+		mInfo.mDescriptions.add("While holding two swords, attacking an enemy with a critical attack deals an extra 10 melee damage to that enemy, and grants you Haste 2 for 4s. Cooldown: 10s.");
 		mInfo.mDescriptions.add("Damage is increased from 10 to 20. Haste level is increased from 2 to 4.");
 		mInfo.mCooldown = BY_MY_BLADE_COOLDOWN;
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);

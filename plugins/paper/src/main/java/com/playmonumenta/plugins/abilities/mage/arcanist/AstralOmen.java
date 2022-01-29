@@ -55,7 +55,7 @@ public class AstralOmen extends Ability {
 		mInfo.mShorthandName = "AO";
 		mInfo.mDescriptions.add(
 				String.format(
-						"Dealing spell damage to an enemy marks its fate, giving it an astral omen. If an enemy hits %s omens, its fate is sealed, clearing its omens and causing a magical implosion that deals %s arcane damage to it and all enemies in a %s-block cube around it. It then takes %s%% more damage from you for %ss. An enemy loses all its omens after %ss of it not gaining another omen. That implosion's damage ignores iframes and itself cannot apply omens.",
+						"Dealing spell damage to an enemy marks its fate, giving it an astral omen. If an enemy hits %s omens, its fate is sealed, clearing its omens and causing a magical implosion that deals %s magic damage to it and all enemies in a %s-block cube around it. It then takes %s%% more damage from you for %ss. An enemy loses all its omens after %ss of it not gaining another omen. That implosion's damage ignores iframes and itself cannot apply omens.",
 						STACK_THRESHOLD,
 						DAMAGE,
 						SIZE,

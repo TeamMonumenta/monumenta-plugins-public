@@ -1,19 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -26,13 +12,27 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import javax.annotation.Nullable;
 
 
 
 public class VoodooBonds extends Ability {
 
 	private static final int COOLDOWN_1 = 25 * 20;
-	private static final int COOLDOWN_2 = 25 * 20;
+	private static final int COOLDOWN_2 = 15 * 20;
 	private static final int ACTIVE_RADIUS = 8;
 	private static final int PASSIVE_RADIUS = 3;
 	private static final double DAMAGE_1 = 0.2;
