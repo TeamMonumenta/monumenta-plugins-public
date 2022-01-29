@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -42,6 +43,12 @@ public class PointBlank implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity target) {
 		if (event.getType() == DamageType.PROJECTILE) {
+			if (event.getDamager() instanceof AbstractArrow arrow) {
+				if (!arrow.isCritical()) {
+					return;
+				}
+			}
+
 			Location loc = player.getLocation();
 
 			if (loc.distance(target.getLocation()) < DISTANCE) {
