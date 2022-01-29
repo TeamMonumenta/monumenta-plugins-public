@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 public class Shielding implements Enchantment {
 
 	private static final double ARMOR_BONUS_PER_LEVEL = 0.2;
-	private static final double DISTANCE = 2.5;
+	private static final double DISTANCE = 2;
 
 	@Override
 	public @NotNull String getName() {
