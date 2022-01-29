@@ -6,9 +6,11 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
+import com.playmonumenta.plugins.itemstats.enchantments.Ineptitude;
 import com.playmonumenta.plugins.itemstats.infusions.Epoch;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -33,7 +35,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 
 
@@ -110,6 +111,23 @@ public abstract class Ability {
 		return mPlayer != null && mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), spell);
 	}
 
+	public int getModifiedCooldown(int baseCooldown) {
+		//Epoch and Ability Enchantment implementation
+		//Percents are negative so (1 + percent) is between 0 and 1 in most cases
+		double epochPercent = Epoch.getCooldownPercentage(mPlugin, mPlayer);
+		double aptitudePercent = Aptitude.getCooldownPercentage(mPlugin, mPlayer);
+		double ineptitudePercent = Ineptitude.getCooldownPercentage(mPlugin, mPlayer);
+
+		return (int) (baseCooldown * (1 + epochPercent) * (1 + aptitudePercent + ineptitudePercent));
+	}
+
+	/**
+	 * This ability's cooldown modified by enchantments of items worn by the player
+	 */
+	public int getModifiedCooldown() {
+		return getModifiedCooldown(getInfo().mCooldown);
+	}
+
 	public void putOnCooldown() {
 		if (mPlayer == null) {
 			return;
@@ -117,15 +135,7 @@ public abstract class Ability {
 		AbilityInfo info = getInfo();
 		if (info.mLinkedSpell != null) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.mLinkedSpell)) {
-				//Epoch and Ability Enchantment implementation
-				//Percents are negative so (1 + percent) is between 0 and 1 in most cases
-				double epochPercent = Epoch.getCooldownPercentage(mPlugin, mPlayer);
-				double aptitudePercent = Aptitude.getCooldownPercentage(mPlugin, mPlayer);
-				double ineptitudePercent = Aptitude.getCooldownPercentage(mPlugin, mPlayer);
-
-				int cooldown = (int) (info.mCooldown * (1 + epochPercent) * (1 + aptitudePercent + ineptitudePercent));
-
-				mPlugin.mTimers.addCooldown(mPlayer, info.mLinkedSpell, cooldown);
+				mPlugin.mTimers.addCooldown(mPlayer, info.mLinkedSpell, getModifiedCooldown());
 				PlayerUtils.callAbilityCastEvent(mPlayer, info.mLinkedSpell);
 			}
 		}

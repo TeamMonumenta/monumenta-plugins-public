@@ -50,7 +50,6 @@ public class Sidearm extends DepthsAbility {
 			return;
 		}
 		putOnCooldown();
-		boolean hasReducedCooldown = false;
 		Location loc = mPlayer.getEyeLocation();
 		BoundingBox box = BoundingBox.of(loc, 0.75, 0.75, 0.75);
 		Vector dir = loc.getDirection();
@@ -76,9 +75,8 @@ public class Sidearm extends DepthsAbility {
 			for (LivingEntity mob : mobs) {
 				if (box.overlaps(mob.getBoundingBox())) {
 					DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
-					if ((mob == null || mob.isDead() || mob.getHealth() <= 0) && !hasReducedCooldown) {
-						mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, COOLDOWN - KILL_COOLDOWN_REDUCTION);
-						hasReducedCooldown = true;
+					if (mob.isDead() || mob.getHealth() <= 0) {
+						mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, getModifiedCooldown(COOLDOWN - KILL_COOLDOWN_REDUCTION));
 					}
 
 					mob.setVelocity(new Vector(0, 0, 0));

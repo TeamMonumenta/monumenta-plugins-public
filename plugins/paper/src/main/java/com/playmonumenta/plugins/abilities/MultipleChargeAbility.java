@@ -4,8 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
-import org.bukkit.entity.Player;
 import javax.annotation.Nullable;
+import org.bukkit.entity.Player;
 
 public abstract class MultipleChargeAbility extends Ability implements AbilityWithChargesOrStacks {
 
@@ -83,7 +83,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	@Override
 	public void putOnCooldown() {
 		if (mPlayer != null && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, mInfo.mCooldown);
+			mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, getModifiedCooldown());
 		}
 	}
 

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.infusions.Understanding;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
@@ -16,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -252,6 +252,9 @@ public class DelveInfusionUtils {
 
 	// Caps level at MAX_LEVEL, and then adds the forum infusion bonus
 	public static double getModifiedLevel(Plugin plugin, Player player, int level) {
+		if (level == 0) {
+			return 0;
+		}
 		return Math.min(MAX_LEVEL, level) + Math.min(plugin.mItemStatManager.getInfusionLevel(player, InfusionType.UNDERSTANDING), MAX_LEVEL) * Understanding.POINTS_PER_LEVEL;
 	}
 
