@@ -4,9 +4,9 @@ import java.util.Collections;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 
+import com.playmonumenta.plugins.events.DamageEvent;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 
 public class PlayerDamageOnlyBoss extends BossAbilityGroup {
@@ -22,8 +22,9 @@ public class PlayerDamageOnlyBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (!(event.getEntity() instanceof Player)) {
+	@Override
+	public void onHurt(DamageEvent event) {
+		if (!(event.getSource() instanceof Player)) {
 			event.setCancelled(true);
 		}
 	}
