@@ -37,7 +37,7 @@ public class Recoil implements Enchantment {
 	public void onLaunchProjectile(Plugin plugin, Player player, double level, ProjectileLaunchEvent event, Projectile proj) {
 		if (event.getEntity() instanceof AbstractArrow && !ItemUtils.isShootableItem(player.getInventory().getItemInOffHand())) {
 			if (player.isSneaking()) {
-				player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int)(20 * Math.sqrt(level)));
+				player.setCooldown(player.getInventory().getItemInMainHand().getType(), 10);
 			} else if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 				Vector velocity = NmsUtils.getVersionAdapter().getActualDirection(player).multiply(-0.5 * Math.sqrt(level));
 				velocity.setY(Math.max(0.1, velocity.getY()));
