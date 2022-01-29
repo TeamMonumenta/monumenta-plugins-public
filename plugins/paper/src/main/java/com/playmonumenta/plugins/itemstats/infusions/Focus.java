@@ -30,11 +30,11 @@ public class Focus implements Infusion {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() != DamageType.PROJECTILE) {
-			return;
+		DamageEvent.DamageType type = event.getType();
+		if (type.equals(DamageType.PROJECTILE) || type.equals(DamageType.PROJECTILE_SKILL)) {
+			double damageBuffPct = value * DAMAGE_PCT_PER_LEVEL;
+			event.setDamage(event.getDamage() * (1.0 + damageBuffPct));
 		}
-
-		event.setDamage(event.getDamage() * (1.0 + value * DAMAGE_PCT_PER_LEVEL));
 
 	}
 }
