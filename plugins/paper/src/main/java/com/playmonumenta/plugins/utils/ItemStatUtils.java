@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.attributes.Agility;
 import com.playmonumenta.plugins.itemstats.attributes.Armor;
@@ -13,129 +14,8 @@ import com.playmonumenta.plugins.itemstats.attributes.ProjectileSpeed;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.itemstats.attributes.ThornsDamage;
 import com.playmonumenta.plugins.itemstats.attributes.ThrowRate;
-import com.playmonumenta.plugins.itemstats.enchantments.Abyssal;
-import com.playmonumenta.plugins.itemstats.enchantments.Adaptability;
-import com.playmonumenta.plugins.itemstats.enchantments.Adrenaline;
-import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
-import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
-import com.playmonumenta.plugins.itemstats.enchantments.ArcaneThrust;
-import com.playmonumenta.plugins.itemstats.enchantments.AshesOfEternity;
-import com.playmonumenta.plugins.itemstats.enchantments.Baaing;
-import com.playmonumenta.plugins.itemstats.enchantments.BlastProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.Bleeding;
-import com.playmonumenta.plugins.itemstats.enchantments.Chaotic;
-import com.playmonumenta.plugins.itemstats.enchantments.Clucking;
-import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfAnemia;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfCorruption;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfCrippling;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfIrreparability;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfShrapnel;
-import com.playmonumenta.plugins.itemstats.enchantments.Darksight;
-import com.playmonumenta.plugins.itemstats.enchantments.Decay;
-import com.playmonumenta.plugins.itemstats.enchantments.DivineAura;
-import com.playmonumenta.plugins.itemstats.enchantments.Duelist;
-import com.playmonumenta.plugins.itemstats.enchantments.Eruption;
-import com.playmonumenta.plugins.itemstats.enchantments.Ethereal;
-import com.playmonumenta.plugins.itemstats.enchantments.Evasion;
-import com.playmonumenta.plugins.itemstats.enchantments.FeatherFalling;
-import com.playmonumenta.plugins.itemstats.enchantments.Festive;
-import com.playmonumenta.plugins.itemstats.enchantments.FireAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.Flame;
-import com.playmonumenta.plugins.itemstats.enchantments.Frost;
-import com.playmonumenta.plugins.itemstats.enchantments.Gilded;
-import com.playmonumenta.plugins.itemstats.enchantments.Gills;
-import com.playmonumenta.plugins.itemstats.enchantments.HexEater;
-import com.playmonumenta.plugins.itemstats.enchantments.HideAttributes;
-import com.playmonumenta.plugins.itemstats.enchantments.HideEnchants;
-import com.playmonumenta.plugins.itemstats.enchantments.HideInfo;
-import com.playmonumenta.plugins.itemstats.enchantments.IceAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.Ineptitude;
-import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
-import com.playmonumenta.plugins.itemstats.enchantments.InstantDrink;
-import com.playmonumenta.plugins.itemstats.enchantments.Intuition;
-import com.playmonumenta.plugins.itemstats.enchantments.Inure;
-import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
-import com.playmonumenta.plugins.itemstats.enchantments.LifeDrain;
-import com.playmonumenta.plugins.itemstats.enchantments.MagicProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.MainhandOffhandDisable;
-import com.playmonumenta.plugins.itemstats.enchantments.MaterialEnch;
-import com.playmonumenta.plugins.itemstats.enchantments.MeleeProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
-import com.playmonumenta.plugins.itemstats.enchantments.OffhandMainhandDisable;
-import com.playmonumenta.plugins.itemstats.enchantments.Oinking;
-import com.playmonumenta.plugins.itemstats.enchantments.PestilenceTesseract;
-import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
-import com.playmonumenta.plugins.itemstats.enchantments.Poise;
-import com.playmonumenta.plugins.itemstats.enchantments.ProjectileProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheDepths;
-import com.playmonumenta.plugins.itemstats.enchantments.Quake;
-import com.playmonumenta.plugins.itemstats.enchantments.Radiant;
-import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
-import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
-import com.playmonumenta.plugins.itemstats.enchantments.Reflexes;
-import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
-import com.playmonumenta.plugins.itemstats.enchantments.Regicide;
-import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
-import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken;
-import com.playmonumenta.plugins.itemstats.enchantments.Resurrection;
-import com.playmonumenta.plugins.itemstats.enchantments.Retrieval;
-import com.playmonumenta.plugins.itemstats.enchantments.Sapper;
-import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
-import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
-import com.playmonumenta.plugins.itemstats.enchantments.Slayer;
-import com.playmonumenta.plugins.itemstats.enchantments.Smite;
-import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
-import com.playmonumenta.plugins.itemstats.enchantments.Spark;
-import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
-import com.playmonumenta.plugins.itemstats.enchantments.Steadfast;
-import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
-import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
-import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
-import com.playmonumenta.plugins.itemstats.enchantments.Tempo;
-import com.playmonumenta.plugins.itemstats.enchantments.ThrowingKnife;
-import com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.Triage;
-import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
-import com.playmonumenta.plugins.itemstats.enchantments.VoidTether;
-import com.playmonumenta.plugins.itemstats.enchantments.Weightless;
-import com.playmonumenta.plugins.itemstats.infusions.Acumen;
-import com.playmonumenta.plugins.itemstats.infusions.Ardor;
-import com.playmonumenta.plugins.itemstats.infusions.Aura;
-import com.playmonumenta.plugins.itemstats.infusions.Barking;
-import com.playmonumenta.plugins.itemstats.infusions.Carapace;
-import com.playmonumenta.plugins.itemstats.infusions.Choler;
-import com.playmonumenta.plugins.itemstats.infusions.Colossal;
-import com.playmonumenta.plugins.itemstats.infusions.Debarking;
-import com.playmonumenta.plugins.itemstats.infusions.Empowered;
-import com.playmonumenta.plugins.itemstats.infusions.Epoch;
-import com.playmonumenta.plugins.itemstats.infusions.Execution;
-import com.playmonumenta.plugins.itemstats.infusions.Expedite;
-import com.playmonumenta.plugins.itemstats.infusions.Focus;
-import com.playmonumenta.plugins.itemstats.infusions.Hope;
-import com.playmonumenta.plugins.itemstats.infusions.Locked;
-import com.playmonumenta.plugins.itemstats.infusions.Mitosis;
-import com.playmonumenta.plugins.itemstats.infusions.Natant;
-import com.playmonumenta.plugins.itemstats.infusions.Nutriment;
-import com.playmonumenta.plugins.itemstats.infusions.Pennate;
-import com.playmonumenta.plugins.itemstats.infusions.Perspicacity;
-import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
-import com.playmonumenta.plugins.itemstats.infusions.Reflection;
-import com.playmonumenta.plugins.itemstats.infusions.Soulbound;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrack;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackBlocks;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackBoss;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackConsumed;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackKills;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackMelee;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackSpawners;
-import com.playmonumenta.plugins.itemstats.infusions.Tenacity;
-import com.playmonumenta.plugins.itemstats.infusions.Understanding;
-import com.playmonumenta.plugins.itemstats.infusions.Usurper;
-import com.playmonumenta.plugins.itemstats.infusions.Vigor;
-import com.playmonumenta.plugins.itemstats.infusions.Vitality;
+import com.playmonumenta.plugins.itemstats.enchantments.*;
+import com.playmonumenta.plugins.itemstats.infusions.*;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
@@ -152,6 +32,7 @@ import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -168,20 +49,19 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ItemStatUtils {
 
@@ -534,44 +414,12 @@ public class ItemStatUtils {
 		STRENGTH_APPLY(new StrengthApply(), false, false, false),
 		STRENGTH_CANCEL(new StrengthCancel(), false, false, false);
 
-		public static final Map<String, EnchantmentType> REVERSE_MAPPINGS = new HashMap<>();
-		static final Set<String> NO_LEVEL_ENCHANTMENTS = new HashSet<>();
-		static final Set<String> CURSES = new HashSet<>();
-		static final Set<String> ITEM_TYPE_ENCHANTMENTS = new HashSet<>();
-		static final Set<String> NO_SHOW = new HashSet<>();
-		public static final Set<String> SPAWNABLE_ENCHANTMENTS = new HashSet<>();
+		public static final Map<String, EnchantmentType> REVERSE_MAPPINGS = Arrays.stream(EnchantmentType.values())
+			.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
 
-		static {
-			for (EnchantmentType type : EnchantmentType.values()) {
-				REVERSE_MAPPINGS.put(type.getName().replace(" ", "").replace("'", ""), type);
-
-				if (!type.mUsesLevels) {
-					NO_LEVEL_ENCHANTMENTS.add(type.getName());
-				}
-
-				if (type.mIsCurse) {
-					CURSES.add(type.getName());
-				}
-
-				if (type.mIsSpawnable) {
-					SPAWNABLE_ENCHANTMENTS.add(type.getName().replace(" ", ""));
-				}
-
-				if (type.getName().equals("Magic Wand") || type.getName().equals("Alchemical Utensil")) {
-					ITEM_TYPE_ENCHANTMENTS.add(type.getName());
-				}
-
-				if (type.getName().equals("OffhandMainhandDisable") || type.getName().equals("MainhandOffhandDisable") || type.getName().equals("HideAttributes") || type.getName().equals("HideEnchants") || type.getName().equals("HideInfo")) {
-					NO_SHOW.add(type.getName());
-				}
-			}
-
-			Collections.unmodifiableCollection(NO_LEVEL_ENCHANTMENTS);
-			Collections.unmodifiableCollection(CURSES);
-			Collections.unmodifiableCollection(SPAWNABLE_ENCHANTMENTS);
-			Collections.unmodifiableCollection(ITEM_TYPE_ENCHANTMENTS);
-			Collections.unmodifiableCollection(NO_SHOW);
-		}
+		public static final Set<EnchantmentType> SPAWNABLE_ENCHANTMENTS = Arrays.stream(EnchantmentType.values())
+			.filter(type -> type.mIsSpawnable)
+			.collect(Collectors.toUnmodifiableSet());
 
 		static final String KEY = "Enchantments";
 
@@ -591,7 +439,7 @@ public class ItemStatUtils {
 			mIsSpawnable = isSpawnable;
 		}
 
-		EnchantmentType(@Nullable ItemStat itemStat, boolean usesLevels, boolean isCurse, boolean isSpawnable) {
+		EnchantmentType(ItemStat itemStat, boolean usesLevels, boolean isCurse, boolean isSpawnable) {
 			mEnchantment = null;
 			mItemStat = itemStat;
 			mName = itemStat.getName();
@@ -612,15 +460,28 @@ public class ItemStatUtils {
 			return mName;
 		}
 
-		public static Component getDisplay(String name, int level) {
-			if (name.equals(JUNGLES_NOURISHMENT.getName())) {
+		public boolean isItemTypeEnchantment() {
+			return this == MAGIC_WAND
+				       || this == ALCHEMICAL_ALEMBIC;
+		}
+
+		public boolean isHidden() {
+			return this == MAINHAND_OFFHAND_DISABLE
+				       || this == OFFHAND_MAINHAND_DISABLE
+				       || this == HIDE_ATTRIBUTES
+				       || this == HIDE_ENCHANTS
+				       || this == HIDE_INFO;
+		}
+
+		public Component getDisplay(int level) {
+			if (this == JUNGLES_NOURISHMENT) {
 				return Component.text("Jungle's Nourishment", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
-			} else if (ITEM_TYPE_ENCHANTMENTS.contains(name)) {
-				return Component.text("* " + name + " *", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
-			} else if (NO_LEVEL_ENCHANTMENTS.contains(name) && level == 1) {
-				return Component.text(name, CURSES.contains(name) ? NamedTextColor.RED : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+			} else if (isItemTypeEnchantment()) {
+				return Component.text("* " + mName + " *", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
+			} else if (!mUsesLevels && level == 1) {
+				return Component.text(mName, mIsCurse ? NamedTextColor.RED : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
 			} else {
-				return Component.text(name + " " + toRomanNumerals(level), CURSES.contains(name) ? NamedTextColor.RED : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+				return Component.text(mName + " " + toRomanNumerals(level), mIsCurse ? NamedTextColor.RED : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
 			}
 		}
 
@@ -671,32 +532,16 @@ public class ItemStatUtils {
 		STAT_TRACK_CONSUMED(new StatTrackConsumed(), "", true, false, true),
 		STAT_TRACK_BLOCKS(new StatTrackBlocks(), "", true, false, true);
 
-		public static final Map<String, InfusionType> REVERSE_MAPPINGS = new HashMap<>();
-		public static final Set<String> SPAWNABLE_INFUSIONS = new HashSet<>();
-		public static final Set<String> NO_LEVEL_INFUSIONS = new HashSet<>();
-		public static final Set<InfusionType> STAT_TRACK_OPTIONS = new HashSet<>();
+		public static final Map<String, InfusionType> REVERSE_MAPPINGS = Arrays.stream(InfusionType.values())
+			.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
 
-		static {
-			for (InfusionType type : InfusionType.values()) {
-				REVERSE_MAPPINGS.put(type.getName().replace(" ", ""), type);
+		public static final Set<InfusionType> STAT_TRACK_OPTIONS = Arrays.stream(InfusionType.values())
+			.filter(type -> type.mIsStatTrackOption)
+			.collect(Collectors.toUnmodifiableSet());
 
-				if (type.mIsSpawnable) {
-					SPAWNABLE_INFUSIONS.add(type.getName().replace(" ", ""));
-				}
-
-				if (!type.mHasLevels) {
-					NO_LEVEL_INFUSIONS.add(type.getName());
-				}
-
-				if (type.mIsStatTrackOption) {
-					STAT_TRACK_OPTIONS.add(type);
-				}
-			}
-
-			Collections.unmodifiableCollection(SPAWNABLE_INFUSIONS);
-			Collections.unmodifiableCollection(NO_LEVEL_INFUSIONS);
-			Collections.unmodifiableCollection(STAT_TRACK_OPTIONS);
-		}
+		public static final Set<InfusionType> SPAWNABLE_INFUSIONS = Arrays.stream(InfusionType.values())
+			.filter(type -> type.mIsSpawnable)
+			.collect(Collectors.toUnmodifiableSet());
 
 		static final String KEY = "Infusions";
 
@@ -728,39 +573,38 @@ public class ItemStatUtils {
 			return mMessage;
 		}
 
-		public static Component getDisplay(String name, int level, String infuser) {
-			InfusionType type = getInfusionType(name);
-			if (NO_LEVEL_INFUSIONS.contains(name)) {
-				if (type.getMessage().equals("")) {
-					return Component.text(name, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
-				} else if (type.getName().equals("Soulbound")) {
-					return Component.text(name, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + type.getMessage() + " to " + infuser + ")", NamedTextColor.DARK_GRAY));
+		public Component getDisplay(int level, String infuser) {
+			if (!mHasLevels) {
+				if (mMessage.isEmpty()) {
+					return Component.text(mName, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+				} else if (this == SOULBOUND) {
+					return Component.text(mName, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " to " + infuser + ")", NamedTextColor.DARK_GRAY));
 				} else {
-					return Component.text(name, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + type.getMessage() + " by " + infuser + ")", NamedTextColor.DARK_GRAY));
+					return Component.text(mName, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " by " + infuser + ")", NamedTextColor.DARK_GRAY));
 				}
-			} else if (STAT_TRACK_OPTIONS.contains(type)) {
-				return Component.text(name + ": " + Integer.toString(level - 1), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
+			} else if (mIsStatTrackOption) {
+				return Component.text(mName + ": " + (level - 1), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
 			} else {
-				if (type.getMessage().equals("")) {
-					return Component.text(name + " " + toRomanNumerals(level), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+				if (mMessage.isEmpty()) {
+					return Component.text(mName + " " + toRomanNumerals(level), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
 				} else {
-					return Component.text(name + " " + toRomanNumerals(level), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + type.getMessage() + " by " + infuser + ")", NamedTextColor.DARK_GRAY));
+					return Component.text(mName + " " + toRomanNumerals(level), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " by " + infuser + ")", NamedTextColor.DARK_GRAY));
 				}
 			}
 		}
 
-		public static Component getDisplay(String name, int level) {
-			InfusionType type = getInfusionType(name);
-			if (NO_LEVEL_INFUSIONS.contains(name)) {
-				return Component.text(name, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
-			} else if (STAT_TRACK_OPTIONS.contains(type)) {
-				return Component.text(name + ": " + Integer.toString(level - 1), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
+		public Component getDisplay(int level) {
+			if (!mHasLevels) {
+				return Component.text(mName, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+			} else if (mIsStatTrackOption) {
+				return Component.text(mName + ": " + (level - 1), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
 			} else {
-				return Component.text(name + " " + toRomanNumerals(level), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+				return Component.text(mName + " " + toRomanNumerals(level), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
 			}
 		}
 
-		public static @Nullable InfusionType getInfusionType(String name) {
+		public static @Nullable
+		InfusionType getInfusionType(String name) {
 			return REVERSE_MAPPINGS.get(name.replace(" ", ""));
 		}
 	}
@@ -783,20 +627,16 @@ public class ItemStatUtils {
 		KNOCKBACK_RESISTANCE(Attribute.GENERIC_KNOCKBACK_RESISTANCE, "Knockback Resistance"),
 		THORNS(new ThornsDamage());
 
-		static final Map<String, AttributeType> REVERSE_MAPPINGS = new HashMap<>();
-		static final List<String> MAINHAND_ATTRIBUTE_TYPES = Collections.unmodifiableList(List.of(
-				ATTACK_DAMAGE_ADD.getName(),
-				ATTACK_SPEED.getCodeName(),
-				PROJECTILE_DAMAGE_ADD.getName(),
-				PROJECTILE_SPEED.getName(),
-				THROW_RATE.getName()
-		));
+		static final Map<String, AttributeType> REVERSE_MAPPINGS = Arrays.stream(AttributeType.values())
+			.collect(Collectors.toUnmodifiableMap(AttributeType::getCodeName, type -> type));
 
-		static {
-			for (AttributeType type : AttributeType.values()) {
-				REVERSE_MAPPINGS.put(type.getCodeName(), type);
-			}
-		}
+		static final ImmutableList<String> MAINHAND_ATTRIBUTE_TYPES = ImmutableList.of(
+			ATTACK_DAMAGE_ADD.getName(),
+			ATTACK_SPEED.getCodeName(),
+			PROJECTILE_DAMAGE_ADD.getName(),
+			PROJECTILE_SPEED.getName(),
+			THROW_RATE.getName()
+		);
 
 		static final String KEY = "Attributes";
 
@@ -1203,7 +1043,7 @@ public class ItemStatUtils {
 		NBTItem nbt = new NBTItem(item);
 		NBTCompound infusion = nbt.addCompound(MONUMENTA_KEY).addCompound(PLAYER_MODIFIED_KEY).addCompound(InfusionType.KEY).addCompound(type.getName());
 		infusion.setInteger(LEVEL_KEY, level);
-		infusion.setObject(INFUSER_KEY, infuser);
+		infusion.setString(INFUSER_KEY, infuser.toString());
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
 	}
@@ -1237,6 +1077,9 @@ public class ItemStatUtils {
 	public static boolean hasAttributeInSlot(final ItemStack itemStack, final Slot slot) {
 		NBTItem nbt = new NBTItem(itemStack);
 		NBTCompoundList attributes = getAttributes(nbt);
+		if (attributes == null) {
+			return false;
+		}
 		for (NBTListCompound attribute : attributes) {
 			if (attribute.getString(Slot.KEY).equals(slot.getName())) {
 				return true;
@@ -1521,14 +1364,14 @@ public class ItemStatUtils {
 				for (EnchantmentType type : EnchantmentType.values()) {
 					NBTCompound enchantment = enchantments.getCompound(type.getName());
 					if (enchantment != null) {
-						if (EnchantmentType.ITEM_TYPE_ENCHANTMENTS.contains(type.getName())) {
-							tagsLater.add(EnchantmentType.getDisplay(type.getName(), enchantment.getInteger(LEVEL_KEY)));
+						if (type.isItemTypeEnchantment()) {
+							tagsLater.add(type.getDisplay(enchantment.getInteger(LEVEL_KEY)));
 						} else if (type.getName().equals("Mending") || type.getName().equals("Unbreaking") || type.getName().equals("Unbreakable")) {
-							unbreakingTags.add(EnchantmentType.getDisplay(type.getName(), enchantment.getInteger(LEVEL_KEY)));
-						} else if (EnchantmentType.NO_SHOW.contains(type.getName())) {
+							unbreakingTags.add(type.getDisplay(enchantment.getInteger(LEVEL_KEY)));
+						} else if (type.isHidden()) {
 							continue;
 						} else {
-							lore.add(EnchantmentType.getDisplay(type.getName(), enchantment.getInteger(LEVEL_KEY)));
+							lore.add(type.getDisplay(enchantment.getInteger(LEVEL_KEY)));
 						}
 					}
 				}
@@ -1545,37 +1388,29 @@ public class ItemStatUtils {
 				NBTCompound infusion = infusions.getCompound(type.getName());
 				if (infusion != null) {
 					if (InfusionType.STAT_TRACK_OPTIONS.contains(type) || type.getName().equals("Stat Track")) {
-						lore.add(InfusionType.getDisplay(type.getName(), infusion.getInteger(LEVEL_KEY)));
+						lore.add(type.getDisplay(infusion.getInteger(LEVEL_KEY)));
 					} else if (!type.getMessage().equals("") && !type.getMessage().equals("Tracked")) {
-						infusionTagsLater.add(InfusionType.getDisplay(type.getName(), infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncAPI.cachedUuidToName(infusion.getObject(INFUSER_KEY, UUID.class))));
+						infusionTagsLater.add(type.getDisplay(infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncAPI.cachedUuidToName(UUID.fromString(infusion.getString(INFUSER_KEY)))));
 					} else if (type.getMessage().equals("")) {
-						lore.add(InfusionType.getDisplay(type.getName(), infusion.getInteger(LEVEL_KEY)));
+						lore.add(type.getDisplay(infusion.getInteger(LEVEL_KEY)));
 					} else {
-						lore.add(InfusionType.getDisplay(type.getName(), infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncAPI.cachedUuidToName(infusion.getObject(INFUSER_KEY, UUID.class))));
+						lore.add(type.getDisplay(infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncAPI.cachedUuidToName(UUID.fromString(infusion.getString(INFUSER_KEY)))));
 					}
 				}
 			}
 		}
 
 		// Add unbreaking tags
-		for (Component tag : unbreakingTags) {
-			lore.add(tag);
-		}
+		lore.addAll(unbreakingTags);
 
 		// Add infusions with message
-		for (Component tag : infusionTagsLater) {
-			lore.add(tag);
-		}
+		lore.addAll(infusionTagsLater);
 
 		// Add stat tracking lore
-		for (Component tag : statTrackLater) {
-			lore.add(tag);
-		}
+		lore.addAll(statTrackLater);
 
 		// Add Magic Wand Tag *after* all other stats,
-		for (Component tag : tagsLater) {
-			lore.add(tag);
-		}
+		lore.addAll(tagsLater);
 
 		if (getEnchantmentLevel(item, EnchantmentType.HIDE_INFO) == 0) {
 			String regionString = monumenta.getString(Region.KEY);
@@ -1664,15 +1499,17 @@ public class ItemStatUtils {
 					}
 				}
 
-				for (AttributeType type : AttributeType.values()) {
-					String name = type.getName();
-					for (Operation operation : Operation.values()) {
-						for (NBTListCompound attribute : attributesBySlot) {
-							if (Operation.getOperation(attribute.getString(Operation.KEY)) == operation && name.equals(attribute.getString(ATTRIBUTE_NAME_KEY))) {
-								if (!lore.contains(AttributeType.getDisplay(name, attribute.getDouble(AMOUNT_KEY), Slot.getSlot(attribute.getString(Slot.KEY)), operation))) {
-									lore.add(AttributeType.getDisplay(name, attribute.getDouble(AMOUNT_KEY), Slot.getSlot(attribute.getString(Slot.KEY)), operation));
+				if (attributesBySlot != null) {
+					for (AttributeType type : AttributeType.values()) {
+						String name = type.getName();
+						for (Operation operation : Operation.values()) {
+							for (NBTListCompound attribute : attributesBySlot) {
+								if (Operation.getOperation(attribute.getString(Operation.KEY)) == operation && name.equals(attribute.getString(ATTRIBUTE_NAME_KEY))) {
+									if (!lore.contains(AttributeType.getDisplay(name, attribute.getDouble(AMOUNT_KEY), Slot.getSlot(attribute.getString(Slot.KEY)), operation))) {
+										lore.add(AttributeType.getDisplay(name, attribute.getDouble(AMOUNT_KEY), Slot.getSlot(attribute.getString(Slot.KEY)), operation));
+									}
+									break;
 								}
-								break;
 							}
 						}
 					}

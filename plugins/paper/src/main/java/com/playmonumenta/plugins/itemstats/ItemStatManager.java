@@ -14,6 +14,7 @@ import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -53,7 +54,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -573,25 +573,20 @@ public class ItemStatManager implements Listener {
 			if (stack != null) {
 				NBTItem nbt = new NBTItem(stack);
 				NBTCompound enchantments = ItemStatUtils.getEnchantments(nbt);
-				Map<String, ItemStatUtils.EnchantmentType> revMap = ItemStatUtils.EnchantmentType.REVERSE_MAPPINGS;
 
-				for (String ench : ItemStatUtils.EnchantmentType.SPAWNABLE_ENCHANTMENTS) {
-					EnchantmentType enchType = revMap.get(ench);
-					if (enchType != null) {
-						int level = ItemStatUtils.getEnchantmentLevel(enchantments, enchType);
-						if (level > 0) {
-							enchType.getItemStat().onSpawn(mPlugin, item, level);
-						}
+				for (ItemStatUtils.EnchantmentType ench : ItemStatUtils.EnchantmentType.SPAWNABLE_ENCHANTMENTS) {
+					int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
+					if (level > 0) {
+						ench.getItemStat().onSpawn(mPlugin, item, level);
 					}
 				}
 
 				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
-				Map<String, ItemStatUtils.InfusionType> revMapInfusions = ItemStatUtils.InfusionType.REVERSE_MAPPINGS;
 
-				for (String infusion : ItemStatUtils.InfusionType.SPAWNABLE_INFUSIONS) {
-					int level = ItemStatUtils.getInfusionLevel(infusions, revMapInfusions.get(infusion));
+				for (ItemStatUtils.InfusionType infusion : ItemStatUtils.InfusionType.SPAWNABLE_INFUSIONS) {
+					int level = ItemStatUtils.getInfusionLevel(infusions, infusion);
 					if (level > 0) {
-						revMapInfusions.get(infusion).getItemStat().onSpawn(mPlugin, item, level);
+						infusion.getItemStat().onSpawn(mPlugin, item, level);
 					}
 				}
 			}
