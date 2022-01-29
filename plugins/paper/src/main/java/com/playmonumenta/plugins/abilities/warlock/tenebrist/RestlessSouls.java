@@ -41,8 +41,7 @@ public class RestlessSouls extends Ability {
 	private static final int DAMAGE_2 = 12;
 	private static final int SILENCE_DURATION_1 = 2 * 20;
 	private static final int SILENCE_DURATION_2 = 3 * 20;
-	private static final int VEX_DURATION_1 = 10 * 20;
-	private static final int VEX_DURATION_2 = 15 * 20;
+	private static final int VEX_DURATION = 15 * 20;
 	private static final int VEX_CAP_1 = 3;
 	private static final int VEX_CAP_2 = 5;
 	private static final int DEBUFF_DURATION = 4 * 20;
@@ -54,7 +53,6 @@ public class RestlessSouls extends Ability {
 	private final boolean mLevel;
 	private final int mDamage;
 	private final int mSilenceTime;
-	private final int mVexTime;
 	private final int mVexCap;
 	private @Nullable Vex mVex;
 	private List<Vex> mVexList = new ArrayList<Vex>();
@@ -67,8 +65,8 @@ public class RestlessSouls extends Ability {
 		//TODO add scoreboard "RestlessSouls"
 		mInfo.mScoreboardId = "RestlessSouls";
 		mInfo.mShorthandName = "RS";
-		mInfo.mDescriptions.add("Whenever an enemy dies within " + RANGE + " blocks of you, a glowing invisible invulnerable vex spawns. The vex targets your enemies and possesses them, dealing " + DAMAGE_1 + " damage and silences the target for " + SILENCE_DURATION_1 / 20 + " seconds. Vex count is capped at " + VEX_CAP_1 + " and each lasts for " + VEX_DURATION_1 / 20 + " seconds. Each vex can only possess 1 enemy. Enemies killed by the vex will not spawn additional vexes.");
-		mInfo.mDescriptions.add("Damage is increased to " + DAMAGE_2 + " and silence duration increased to " + SILENCE_DURATION_2 / 20 + " seconds. Maximum vex count increased to " + VEX_CAP_2 + " and each vex lasts for " + VEX_DURATION_2 / 20 + " seconds. Additionally, the possessed mob is inflicted with a level 1 debuff of the corresponding active skill that is on cooldown for " + DEBUFF_DURATION / 20 + " seconds. Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > Hunger. Melancholic Lament > 10% Weaken. Withering Gaze > Wither. Haunting Shades > 5% Vulnerability.");
+		mInfo.mDescriptions.add("Whenever an enemy dies within " + RANGE + " blocks of you, a glowing invisible invulnerable vex spawns. The vex targets your enemies and possesses them, dealing " + DAMAGE_1 + " damage and silences the target for " + SILENCE_DURATION_1 / 20 + " seconds. Vex count is capped at " + VEX_CAP_1 + " and each lasts for " + VEX_DURATION / 20 + " seconds. Each vex can only possess 1 enemy. Enemies killed by the vex will not spawn additional vexes.");
+		mInfo.mDescriptions.add("Damage is increased to " + DAMAGE_2 + " and silence duration increased to " + SILENCE_DURATION_2 / 20 + " seconds. Maximum vex count increased to " + VEX_CAP_2 + ". Additionally, the possessed mob is inflicted with a level 1 debuff of the corresponding active skill that is on cooldown for " + DEBUFF_DURATION / 20 + " seconds. Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > Hunger. Melancholic Lament > 10% Weaken. Withering Gaze > Wither. Haunting Shades > 5% Vulnerability.");
 		mInfo.mLinkedSpell = ClassAbility.RESTLESS_SOULS;
 		mDisplayItem = new ItemStack(Material.VEX_SPAWN_EGG, 1);
 
@@ -76,7 +74,6 @@ public class RestlessSouls extends Ability {
 		mLevel = isLevelOne;
 		mDamage = isLevelOne ? DAMAGE_1 : DAMAGE_2;
 		mSilenceTime = isLevelOne ? SILENCE_DURATION_1 : SILENCE_DURATION_2;
-		mVexTime = isLevelOne ? VEX_DURATION_1 : VEX_DURATION_2;
 		mVexCap = isLevelOne ? VEX_CAP_1 : VEX_CAP_2;
 
 		if (player != null) {
@@ -150,7 +147,7 @@ public class RestlessSouls extends Ability {
 					mParticle1.location(loc).spawnAsPlayer(mPlayer);
 					mParticle2.location(loc).spawnAsPlayer(mPlayer);
 
-					boolean isOutOfTime = mTicksElapsed >= mVexTime;
+					boolean isOutOfTime = mTicksElapsed >= VEX_DURATION;
 					if (isOutOfTime || !mBoss.isValid()) {
 						if (isOutOfTime && mBoss.isValid()) {
 							Location vexLoc = mBoss.getLocation();
