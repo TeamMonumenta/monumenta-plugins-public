@@ -564,6 +564,13 @@ public class ItemUtils {
 		}
 	}
 
+	public static boolean doDropItemAfterSpawnerLimit(@Nullable ItemStack item) {
+		if (InventoryUtils.testForItemWithName(item, "Soul Thread")) {
+			return false;
+		}
+		return getItemDropChance(item) > 0;
+	}
+
 	public static @Nullable String getBookTitle(@Nullable ItemStack book) {
 		if (book == null) {
 			return null;

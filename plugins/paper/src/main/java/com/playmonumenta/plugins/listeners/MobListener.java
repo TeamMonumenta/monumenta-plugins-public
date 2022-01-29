@@ -279,12 +279,7 @@ public class MobListener implements Listener {
 				event.setDroppedExp(0);
 
 				// Remove all drops except special lore text items
-				ListIterator<ItemStack> iter = event.getDrops().listIterator();
-				while (iter.hasNext()) {
-					if (ItemUtils.getItemDropChance(iter.next()) < 0) {
-						iter.remove();
-					}
-				}
+				event.getDrops().removeIf(itemStack -> !ItemUtils.doDropItemAfterSpawnerLimit(itemStack));
 			}
 		}
 
