@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
-import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -317,10 +316,12 @@ public class InventoryUtils {
 		ItemStack mainhand = player.getInventory().getItemInMainHand();
 		ItemStack offhand = player.getInventory().getItemInOffHand();
 
-		boolean isMainhand = ItemUtils.isSword(mainhand);
-		boolean isOffhand = ItemUtils.isSword(offhand);
-		if ((isMainhand && isOffhand) || (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TWO_HANDED) > 0 && !TwoHanded.checkForOffhand(plugin, player))) {
-			return true;
+		if (ItemUtils.isSword(mainhand)) {
+			if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TWO_HANDED) > 0) {
+				return offhand == null || offhand.getType().isAir() || (ItemUtils.isSword(offhand) && plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WEIGHTLESS) > 0);
+			} else {
+				return ItemUtils.isSword(offhand);
+			}
 		}
 		return false;
 	}
