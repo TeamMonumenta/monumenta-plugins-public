@@ -4,9 +4,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class RegionScalingDamageTaken implements Enchantment {
 
@@ -34,7 +37,7 @@ public class RegionScalingDamageTaken implements Enchantment {
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event) {
 		if (!ServerProperties.getClassSpecializationsEnabled()) {
 			event.setDamage(event.getDamage() * DAMAGE_TAKEN_MULTIPLIER);
-			if (event.getType() == DamageEvent.DamageType.AILMENT) {
+			if (event.getType() == DamageEvent.DamageType.POISON) {
 				event.setDamage(Math.min(event.getDamage(), Math.max(player.getHealth() - 1, 0)));
 			}
 		}
@@ -44,6 +47,8 @@ public class RegionScalingDamageTaken implements Enchantment {
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		if (!ServerProperties.getClassSpecializationsEnabled()) {
 			plugin.mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(20, SPEED_EFFECT, SPEED_EFFECT_NAME));
+			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM,
+				new PotionEffect(PotionEffectType.BAD_OMEN, 20, 0, false, false, false));
 		}
 	}
 }
