@@ -32,7 +32,7 @@ public abstract class PotionAbility extends Ability {
 		}.runTaskLater(mPlugin, 1);
 	}
 
-	public void apply(LivingEntity mob, ThrownPotion potion, boolean isGruesome) {
+	public void apply(LivingEntity mob, boolean isGruesome) {
 
 	}
 

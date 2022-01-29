@@ -7,8 +7,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.ItemStack;
+
 import javax.annotation.Nullable;
 
 public class EsotericEnhancements extends PotionAbility {
@@ -28,7 +28,7 @@ public class EsotericEnhancements extends PotionAbility {
 	}
 
 	@Override
-	public void apply(LivingEntity mob, ThrownPotion potion, boolean isGruesome) {
+	public void apply(LivingEntity mob, boolean isGruesome) {
 		// Brutal effect handled in BrutalAlchemy
 		if (isGruesome) {
 			EntityUtils.paralyze(mPlugin, PARALYZE_DURATION, mob);

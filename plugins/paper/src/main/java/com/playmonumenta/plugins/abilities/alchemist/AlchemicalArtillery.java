@@ -1,16 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -20,8 +9,19 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.metadata.FixedMetadataValue;
+
+import javax.annotation.Nullable;
 
 
 
@@ -58,12 +58,13 @@ public class AlchemicalArtillery extends Ability {
 
 			double bownus = 0;
 			if (getAbilityScore() > 1) {
-				bownus = BOW_DAMAGE_MULTIPLIER * ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
-				double offhand = ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItem(45), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.OFFHAND);
-				double head = ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItem(5), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.HEAD);
-				double shoulders = ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItem(6), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.CHEST);
-				double knees = ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItem(7), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.LEGS);
-				double andToes = ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItem(8), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.FEET);
+				PlayerInventory inv = mPlayer.getInventory();
+				bownus = BOW_DAMAGE_MULTIPLIER * ItemStatUtils.getAttributeAmount(inv.getItemInMainHand(), AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
+				double offhand = ItemStatUtils.getAttributeAmount(inv.getItemInOffHand(), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.OFFHAND);
+				double head = ItemStatUtils.getAttributeAmount(inv.getHelmet(), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.HEAD);
+				double shoulders = ItemStatUtils.getAttributeAmount(inv.getChestplate(), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.CHEST);
+				double knees = ItemStatUtils.getAttributeAmount(inv.getLeggings(), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.LEGS);
+				double andToes = ItemStatUtils.getAttributeAmount(inv.getBoots(), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.FEET);
 				bownus = bownus * (1 + (offhand + head + shoulders + knees + andToes));
 			}
 

@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -136,22 +137,23 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 					}
 				}
 
-				for (Ability specAbility : specAbilities) {
-					if (specAbility != null) {
-						int abilityScore = specAbility.getAbilityScore();
-						mDamage += DAMAGE_PER_SPEC_POINT * abilityScore;
+				if (ServerProperties.getClassSpecializationsEnabled()) {
+					for (Ability specAbility : specAbilities) {
+						if (specAbility != null) {
+							int abilityScore = specAbility.getAbilityScore();
+							mDamage += DAMAGE_PER_SPEC_POINT * abilityScore;
 
-						if (specAbility instanceof PotionAbility potionAbility) {
-							mPotionAbilities.add(potionAbility);
-							mDamage += potionAbility.getDamage();
-						}
+							if (specAbility instanceof PotionAbility potionAbility) {
+								mPotionAbilities.add(potionAbility);
+								mDamage += potionAbility.getDamage();
+							}
 
-						if (specAbility instanceof EsotericEnhancements && abilityScore > 1) {
-							mMaxCharges += EsotericEnhancements.POTION_CAP_INCREASE_2;
+							if (specAbility instanceof EsotericEnhancements && abilityScore > 1) {
+								mMaxCharges += EsotericEnhancements.POTION_CAP_INCREASE_2;
+							}
 						}
 					}
 				}
-
 			}
 		}.runTaskLater(mPlugin, 5);
 
@@ -260,7 +262,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				DamageUtils.damage(damageEvent, false, true, null);
 
 				// Intentionally apply effects after damage
-				applyEffects(mob, potion, isGruesome);
+				applyEffects(mob, isGruesome);
 			} else {
 				mPlugin.getLogger().log(Level.WARNING, "Failed to retrieve PlayerItemStats in AlchemistPotion: " + mPlayer.getName());
 			}
@@ -275,10 +277,10 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 	}
 
-	public void applyEffects(LivingEntity mob, ThrownPotion potion, boolean isGruesome) {
+	public void applyEffects(LivingEntity mob, boolean isGruesome) {
 		//Apply potions effects but no damage
 		for (PotionAbility potionAbility : mPotionAbilities) {
-			potionAbility.apply(mob, potion, isGruesome);
+			potionAbility.apply(mob, isGruesome);
 		}
 	}
 

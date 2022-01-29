@@ -1,20 +1,19 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nullable;
 
 public class GruesomeAlchemy extends PotionAbility {
 	private static final int GRUESOME_ALCHEMY_DURATION = 8 * 20;
@@ -52,7 +51,7 @@ public class GruesomeAlchemy extends PotionAbility {
 	}
 
 	@Override
-	public void apply(LivingEntity mob, ThrownPotion potion, boolean isGruesome) {
+	public void apply(LivingEntity mob, boolean isGruesome) {
 		if (isGruesome) {
 			EntityUtils.applySlow(mPlugin, GRUESOME_ALCHEMY_DURATION, mSlownessAmount, mob);
 			EntityUtils.applyVulnerability(mPlugin, GRUESOME_ALCHEMY_DURATION, mVulnerabilityAmount, mob);

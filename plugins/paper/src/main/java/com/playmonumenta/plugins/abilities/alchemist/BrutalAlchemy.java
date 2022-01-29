@@ -1,19 +1,19 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nullable;
 
 public class BrutalAlchemy extends PotionAbility {
 	private static final int BRUTAL_ALCHEMY_1_DAMAGE = 1;
@@ -39,14 +39,14 @@ public class BrutalAlchemy extends PotionAbility {
 		mPeriod = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_1_PERIOD : BRUTAL_ALCHEMY_2_PERIOD;
 		mDOTDamage = BRUTAL_ALCHEMY_DOT_DAMAGE;
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			if (AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EsotericEnhancements.class) != null) {
+			if (ServerProperties.getClassSpecializationsEnabled() && AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EsotericEnhancements.class) != null) {
 				mDOTDamage = EsotericEnhancements.BRUTAL_DOT_DAMAGE;
 			}
 		});
 	}
 
 	@Override
-	public void apply(LivingEntity mob, ThrownPotion potion, boolean isGruesome) {
+	public void apply(LivingEntity mob, boolean isGruesome) {
 		if (!isGruesome) {
 			mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, new CustomDamageOverTime(BRUTAL_ALCHEMY_DURATION, mDOTDamage, mPeriod, mPlayer, mInfo.mLinkedSpell, Particle.SQUID_INK));
 		}
