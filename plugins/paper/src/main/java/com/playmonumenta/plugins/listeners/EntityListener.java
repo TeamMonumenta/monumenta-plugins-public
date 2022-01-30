@@ -641,16 +641,20 @@ public class EntityListener implements Listener {
 		List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
 		List<Player> affectedPlayers = new ArrayList<>();
 
+		if (effects != null) {
+			effects.removeIf(effect -> effect.getType().equals(PotionEffectType.INVISIBILITY));
+		}
+
 		// All affected players need to have the effect added to their potion manager.
 		for (LivingEntity entity : affectedEntities) {
-			if (entity instanceof Player) {
-				affectedPlayers.add((Player)entity);
+			if (entity instanceof Player player) {
+				affectedPlayers.add(player);
 				if (info != null) {
-					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, info);
+					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
 				}
 
 				if (effects != null) {
-					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, effects);
+					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
 				}
 			}
 		}
