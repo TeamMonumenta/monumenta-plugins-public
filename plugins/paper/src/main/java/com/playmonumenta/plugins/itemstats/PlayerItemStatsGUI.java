@@ -641,24 +641,4 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			}
 		}
 	}
-
-	public static void registerPlayerItemStatsGUICommand(Plugin plugin) {
-		CommandPermission perms = CommandPermission.fromString("monumenta.command.playerstats");
-
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new PlayerArgument("opener"));
-		arguments.add(new PlayerArgument("openee"));
-
-		new CommandAPICommand("playerstats").withPermission(perms).withArguments(arguments).executes((sender, args) -> {
-			Player opener = (Player) args[0];
-			Player openee = (Player) args[1];
-			new PlayerItemStatsGUI(openee).openInventory(opener, plugin);
-		}).register();
-
-		new CommandAPICommand("playerstats").withPermission(perms).executes((sender, args) -> {
-			if (sender instanceof Player player) {
-				new PlayerItemStatsGUI(player).openInventory(player, plugin);
-			}
-		}).register();
-	}
 }

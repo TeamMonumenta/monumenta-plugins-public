@@ -1,16 +1,5 @@
 package com.playmonumenta.plugins;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
@@ -52,6 +41,7 @@ import com.playmonumenta.plugins.commands.MonumentaReload;
 import com.playmonumenta.plugins.commands.OpenDelveModifierSelectionGUI;
 import com.playmonumenta.plugins.commands.PhylacteryifyHeldItem;
 import com.playmonumenta.plugins.commands.PickLevelAfterAnvils;
+import com.playmonumenta.plugins.commands.PlayerItemStatsGUICommand;
 import com.playmonumenta.plugins.commands.Portal1;
 import com.playmonumenta.plugins.commands.Portal2;
 import com.playmonumenta.plugins.commands.RedeemVoteRewards;
@@ -101,7 +91,6 @@ import com.playmonumenta.plugins.inventories.LootChestsInInventory;
 import com.playmonumenta.plugins.inventories.PlayerInventoryView;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
-import com.playmonumenta.plugins.itemstats.PlayerItemStatsGUI;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
 import com.playmonumenta.plugins.listeners.ArrowListener;
 import com.playmonumenta.plugins.listeners.AuditListener;
@@ -155,6 +144,16 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 public class Plugin extends JavaPlugin {
 	public CooldownTimers mTimers;
@@ -259,7 +258,7 @@ public class Plugin extends JavaPlugin {
 		ItemStatUtils.registerNameCommand();
 		ItemStatUtils.registerEnchCommand();
 		ItemStatUtils.registerAttrCommand();
-		PlayerItemStatsGUI.registerPlayerItemStatsGUICommand(this);
+		PlayerItemStatsGUICommand.register(this);
 		ReworkRefundInfusions.register();
 		AuditLogCommand.register();
 		PickLevelAfterAnvils.register();
