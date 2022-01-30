@@ -196,7 +196,10 @@ public class EntityListener implements Listener {
 
 			if (!mAbilities.playerCombustByEntityEvent(player, event)) {
 				event.setCancelled(true);
+				return;
 			}
+
+			mPlugin.mItemStatManager.onCombust(mPlugin, player, event);
 		}
 	}
 

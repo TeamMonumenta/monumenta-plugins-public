@@ -15,7 +15,7 @@ import java.util.NavigableSet;
 public class Inure implements Enchantment {
 
 	private static final double ARMOR_BONUS_PER_LEVEL = 0.2;
-	private static final int PAST_HIT_DURATION_TIME = 20 * 30;
+	private static final int PAST_HIT_DURATION_TIME = 20 * 60;
 	private static final String INURE_MELEE_NAME = "MeleeInureEffect";
 	private static final String INURE_PROJ_NAME = "ProjectileInureEffect";
 	private static final String INURE_MAGIC_NAME = "MagicInureEffect";

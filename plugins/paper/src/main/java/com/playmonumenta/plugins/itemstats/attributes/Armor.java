@@ -52,6 +52,10 @@ public class Armor implements Attribute {
 				agilValueMod += Inure.applyInure(event, plugin, player);
 				agilValueMod += Steadfast.applySteadfast(event, plugin, player);
 				agilValueMod += Poise.applyPoise(event, plugin, player);
+				agilValueMod += Tempo.applyTempo(event, plugin, player);
+				agilValueMod += Reflexes.applyReflexes(event, plugin, player);
+				agilValueMod += Evasion.applyEvasion(event, plugin, player);
+				agilValueMod += Ethereal.applyEthereal(event, plugin, player);
 			} else if (plugin.mItemStatManager.getAttributeAmount(player, AttributeType.AGILITY) > 0) {
 				agilValueMod += Tempo.applyTempo(event, plugin, player);
 				agilValueMod += Reflexes.applyReflexes(event, plugin, player);

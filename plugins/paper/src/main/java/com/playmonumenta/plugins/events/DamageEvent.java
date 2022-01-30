@@ -43,9 +43,10 @@ public class DamageEvent extends Event implements Cancellable {
 			switch (cause) {
 			case CONTACT:
 			case ENTITY_ATTACK:
-			case ENTITY_SWEEP_ATTACK:
 			case FALLING_BLOCK:
 				return DamageType.MELEE;
+			case ENTITY_SWEEP_ATTACK:
+				return DamageType.MELEE_ENCH;
 			case PROJECTILE:
 				return DamageType.PROJECTILE;
 			case DRAGON_BREATH:

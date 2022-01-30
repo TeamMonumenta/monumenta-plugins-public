@@ -8,6 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -263,6 +264,17 @@ public interface ItemStat {
 	 * @param value   the value of ItemStat possessed by the Item
 	 */
 	default void onSpawn(Plugin plugin, Item item, double value) {
+
+	}
+
+	/**
+	 * Called when an entity is ignited
+	 * @param plugin monumenta plugin
+	 * @param player the Player changing experience
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated PlayerExpChangeEvent
+	 */
+	default void onCombust(Plugin plugin, Player player, double value, EntityCombustEvent event) {
 
 	}
 }

@@ -27,6 +27,10 @@ public class PercentDamageReceived extends Effect {
 		return Math.abs(mAmount);
 	}
 
+	public EnumSet<DamageType> getAffectedDamageTypes() {
+		return mAffectedDamageTypes;
+	}
+
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {

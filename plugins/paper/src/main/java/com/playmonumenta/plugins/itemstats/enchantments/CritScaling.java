@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
@@ -8,6 +10,9 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import java.util.EnumSet;
+import java.util.NavigableSet;
 
 public class CritScaling implements Enchantment {
 
@@ -31,8 +36,21 @@ public class CritScaling implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
+			event.setDamage(event.getDamage() * player.getCooledAttackStrength(0));
+		}
 		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(player)) {
 			event.setDamage(event.getDamage() * CRIT_BONUS);
+		}
+		// Vulnerability
+		NavigableSet<Effect> vulns = plugin.mEffectManager.getEffects(enemy, "VulnerabilityEffect");
+		if (vulns != null) {
+			PercentDamageReceived vuln = (PercentDamageReceived) vulns.last();
+			double vulnMult = vuln.getMagnitude();
+			EnumSet<DamageType> damageTypes = vuln.getAffectedDamageTypes();
+			if (damageTypes == null || damageTypes.contains(event.getType())) {
+				event.setDamage(event.getDamage() * (1 + vulnMult));
+			}
 		}
 	}
 }

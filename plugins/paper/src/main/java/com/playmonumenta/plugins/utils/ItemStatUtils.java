@@ -514,13 +514,13 @@ public class ItemStatUtils {
 		VIGOR(new Vigor(), "", true, false, false),
 		VITALITY(new Vitality(), "", true, false, false),
 		// Other Added Tags
+		LOCKED(new Locked(), "", false, false, false),
+		BARKING(new Barking(), "", true, true, false),
+		DEBARKING(new Debarking(), "", false, false, false),
 		HOPE(new Hope(), "Hoped", false, true, false),
 		COLOSSAL(new Colossal(), "Reinforced", false, false, false),
 		PHYLACTERY(new Phylactery(), "Embalmed", false, false, false),
 		SOULBOUND(new Soulbound(), "Soulbound", false, false, false),
-		LOCKED(new Locked(), "Locked", false, false, false),
-		BARKING(new Barking(), "Barked", true, true, false),
-		DEBARKING(new Debarking(), "Debarked", false, false, false),
 		FESTIVE(new Festive(), "Decorated", false, true, false),
 		GILDED(new Gilded(), "Gilded", false, true, false),
 		// Stat tracking stuff
@@ -1292,7 +1292,7 @@ public class ItemStatUtils {
 		}
 		NBTItem nbt = new NBTItem(item);
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
+		if (monumenta == null || monumenta.getKeys().isEmpty()) {
 			return;
 		} else {
 			// There is probably a cleaner way to clean up unused NBT, not sure if recursion directly works due to the existence of both NBTCompounds and NBTCompoundLists
@@ -1388,7 +1388,7 @@ public class ItemStatUtils {
 				NBTCompound infusion = infusions.getCompound(type.getName());
 				if (infusion != null) {
 					if (InfusionType.STAT_TRACK_OPTIONS.contains(type) || type.getName().equals("Stat Track")) {
-						lore.add(type.getDisplay(infusion.getInteger(LEVEL_KEY)));
+						statTrackLater.add(type.getDisplay(infusion.getInteger(LEVEL_KEY)));
 					} else if (!type.getMessage().equals("") && !type.getMessage().equals("Tracked")) {
 						infusionTagsLater.add(type.getDisplay(infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncAPI.cachedUuidToName(UUID.fromString(infusion.getString(INFUSER_KEY)))));
 					} else if (type.getMessage().equals("")) {
@@ -1789,6 +1789,11 @@ public class ItemStatUtils {
 			}
 
 			if ((args[3] == "add" && attribute.contains("Multiply")) || (args[3] == "multiply" && attribute.contains("Add"))) {
+				return;
+			}
+
+			if (args[3] == "add" && attribute.contains("ProjectileSpeed")) {
+				player.sendMessage("You are using the wrong type of Proj Speed, do multiply");
 				return;
 			}
 
