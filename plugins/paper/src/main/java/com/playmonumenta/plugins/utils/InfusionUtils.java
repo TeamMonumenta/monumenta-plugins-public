@@ -204,12 +204,12 @@ public class InfusionUtils {
 
 	public static int calcInfuseCost(Plugin plugin, Player player, ItemStack item) throws WrapperCommandSyntaxException {
 		// First level is free
-		int infuseLvl = getInfuseLevel(item) - 1;
+		int infuseLvl = getInfuseLevel(item);
 		int cost = getCostMultiplierWithCheck(item);
 		// Special case for first level
-		if (infuseLvl == -1) {
+		if (infuseLvl == 0) {
 			cost = 0;
-		} else if (infuseLvl <= 2) {
+		} else if (infuseLvl <= 3) {
 			cost *= (int)Math.pow(2, infuseLvl - 1);
 		} else {
 			cost = 99999999;
