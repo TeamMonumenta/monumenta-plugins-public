@@ -39,13 +39,13 @@ public class DaggerThrow extends Ability {
 	private static final int DAGGER_THROW_1_DAMAGE = 4;
 	private static final int DAGGER_THROW_2_DAMAGE = 8;
 	private static final int DAGGER_THROW_DURATION = 10 * 20;
-	private static final int DAGGER_THROW_1_VULN = 3;
-	private static final int DAGGER_THROW_2_VULN = 7;
+	private static final double DAGGER_THROW_1_VULN = 0.2;
+	private static final double DAGGER_THROW_2_VULN = 0.4;
 	private static final double DAGGER_THROW_SPREAD = Math.toRadians(25);
 	private static final Particle.DustOptions DAGGER_THROW_COLOR = new Particle.DustOptions(Color.fromRGB(64, 64, 64), 1);
 
 	private final int mDamage;
-	private final int mVulnAmplifier;
+	private final double mVulnAmplifier;
 
 	public DaggerThrow(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Dagger Throw");
@@ -99,8 +99,9 @@ public class DaggerThrow extends Ability {
 						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
 
 						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell);
-						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, mVulnAmplifier, true, false));
+						EntityUtils.applyVulnerability(mPlugin, DAGGER_THROW_DURATION, mVulnAmplifier, mob);
 						break;
+
 					} else if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 						bLoc.subtract(newDir.clone().multiply(0.5));
 						world.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);

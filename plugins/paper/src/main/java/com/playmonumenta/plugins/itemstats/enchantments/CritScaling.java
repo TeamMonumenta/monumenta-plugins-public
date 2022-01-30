@@ -42,15 +42,5 @@ public class CritScaling implements Enchantment {
 		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(player)) {
 			event.setDamage(event.getDamage() * CRIT_BONUS);
 		}
-		// Vulnerability
-		NavigableSet<Effect> vulns = plugin.mEffectManager.getEffects(enemy, "VulnerabilityEffect");
-		if (vulns != null) {
-			PercentDamageReceived vuln = (PercentDamageReceived) vulns.last();
-			double vulnMult = vuln.getMagnitude();
-			EnumSet<DamageType> damageTypes = vuln.getAffectedDamageTypes();
-			if (damageTypes == null || damageTypes.contains(event.getType())) {
-				event.setDamage(event.getDamage() * (1 + vulnMult));
-			}
-		}
 	}
 }

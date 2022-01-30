@@ -649,15 +649,17 @@ public class EntityUtils {
 	}
 
 	public static double vulnerabilityMult(LivingEntity target) {
-		PotionEffect unluck = target.getPotionEffect(PotionEffectType.UNLUCK);
-		if (unluck != null) {
-			double vulnLevel = 1 + unluck.getAmplifier();
+		if (target instanceof Player) {
+			PotionEffect unluck = target.getPotionEffect(PotionEffectType.UNLUCK);
+			if (unluck != null) {
+				double vulnLevel = 1 + unluck.getAmplifier();
 
-			if (EntityUtils.isBoss(target)) {
-				vulnLevel = vulnLevel / 2;
+				if (EntityUtils.isBoss(target)) {
+					vulnLevel = vulnLevel / 2;
+				}
+
+				return 1 + 0.05 * vulnLevel;
 			}
-
-			return 1 + 0.05 * vulnLevel;
 		}
 
 		return 1;
@@ -684,6 +686,24 @@ public class EntityUtils {
 
 	public static void applyVulnerability(Plugin plugin, int ticks, double amount, LivingEntity mob) {
 		plugin.mEffectManager.addEffect(mob, VULNERABILITY_EFFECT_NAME, new PercentDamageReceived(ticks, amount));
+	}
+
+	public static boolean isVulnerable(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> vulns = plugin.mEffectManager.getEffects(mob, VULNERABILITY_EFFECT_NAME);
+		if (vulns != null) {
+			return true;
+		}
+		return false;
+	}
+
+	public static double getVulnAmount(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> vulns = plugin.mEffectManager.getEffects(mob, VULNERABILITY_EFFECT_NAME);
+		if (vulns != null) {
+			Effect vuln = vulns.last();
+			return vuln.getMagnitude();
+		} else {
+			return 0;
+		}
 	}
 
 	private static final String BLEED_EFFECT_NAME = "BleedEffect";

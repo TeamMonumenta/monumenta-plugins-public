@@ -42,7 +42,7 @@ public class HauntingShades extends Ability {
 
 	private static final int COOLDOWN = 10 * 20;
 	private static final int SHADES_DURATION = 7 * 20;
-	private static final int VULN = 1;
+	private static final double VULN = 0.1;
 	private static final double HEAL_PERCENT = 0.025;
 	private static final int EFFECT_LEVEL = 0;
 	private static final int EFFECT_DURATION = 20 * 1;
@@ -51,8 +51,6 @@ public class HauntingShades extends Ability {
 	private static final double HITBOX_LENGTH = 0.55;
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
-
-	private final int mVuln;
 
 	public HauntingShades(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Haunting Shades");
@@ -65,7 +63,6 @@ public class HauntingShades extends Ability {
 		mInfo.mTrigger = AbilityTrigger.ALL;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
-		mVuln = VULN;
 	}
 
 	@Override
@@ -166,7 +163,7 @@ public class HauntingShades extends Ability {
 					}
 
 				    for (LivingEntity m : affectedMobs) {
-						PotionUtils.applyPotion(mPlayer, m, new PotionEffect(PotionEffectType.UNLUCK, EFFECT_DURATION, mVuln, true, false));
+						EntityUtils.applyVulnerability(mPlugin, EFFECT_DURATION, VULN, m);
 				    }
 				}
 

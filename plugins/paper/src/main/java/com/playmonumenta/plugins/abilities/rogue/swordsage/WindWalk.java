@@ -34,7 +34,7 @@ public class WindWalk extends MultipleChargeAbility {
 	private static final int WIND_WALK_1_DURATION = 20 * 2;
 	private static final int WIND_WALK_2_DURATION = 20 * 4;
 	private static final int WIND_WALK_VULNERABILITY_DURATION_INCREASE = 20 * 3;
-	private static final int WIND_WALK_VULNERABILITY_AMPLIFIER = 5;
+	private static final double WIND_WALK_VULNERABILITY_AMPLIFIER = 0.3;
 	private static final int WIND_WALK_RADIUS = 3;
 	private static final double WIND_WALK_Y_VELOCITY = 0.2;
 	private static final double WIND_WALK_Y_VELOCITY_MULTIPLIER = 0.2;
@@ -131,7 +131,7 @@ public class WindWalk extends MultipleChargeAbility {
 
 							EntityUtils.applyStun(mPlugin, mDuration, mob);
 							if (getAbilityScore() > 1) {
-								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, mDuration + WIND_WALK_VULNERABILITY_DURATION_INCREASE, WIND_WALK_VULNERABILITY_AMPLIFIER, true, false));
+								EntityUtils.applyVulnerability(mPlugin, mDuration + WIND_WALK_VULNERABILITY_DURATION_INCREASE, WIND_WALK_VULNERABILITY_AMPLIFIER, mob);
 							}
 
 							if (EntityUtils.isElite(mob)) {

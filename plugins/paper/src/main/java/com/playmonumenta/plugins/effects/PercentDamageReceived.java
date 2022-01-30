@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.LivingEntity;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -34,7 +35,11 @@ public class PercentDamageReceived extends Effect {
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
-			event.setDamage(event.getDamage() * (1 + mAmount));
+			double amount = mAmount;
+			if (EntityUtils.isBoss(entity) && amount > 0) {
+				amount = amount / 2;
+			}
+			event.setDamage(event.getDamage() * (1 + amount));
 		}
 	}
 

@@ -27,7 +27,7 @@ public class ViciousCombos extends Ability {
 	private static final int VICIOUS_COMBOS_COOL_1 = 20;
 	private static final int VICIOUS_COMBOS_COOL_2 = 2 * 20;
 	private static final int VICIOUS_COMBOS_CRIPPLE_DURATION = 5 * 20;
-	private static final int VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL = 3;
+	private static final double VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL = 0.15;
 	private static final double VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL = 0.15;
 
 	public ViciousCombos(Plugin plugin, @Nullable Player player) {
@@ -65,7 +65,7 @@ public class ViciousCombos extends Ability {
 						if (viciousCombos > 1) {
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, VICIOUS_COMBOS_RANGE, mPlayer)) {
 								world.spawnParticle(Particle.SPELL_MOB, mob.getLocation().clone().add(0, 1, 0), 10, 0.35, 0.5, 0.35, 0);
-								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL, true, false));
+								EntityUtils.applyVulnerability(mPlugin, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL, mob);
 								EntityUtils.applyWeaken(mPlugin, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL, mob);
 							}
 						}

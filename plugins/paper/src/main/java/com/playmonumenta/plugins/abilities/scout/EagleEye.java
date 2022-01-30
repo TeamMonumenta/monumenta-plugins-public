@@ -29,8 +29,8 @@ public class EagleEye extends Ability {
 	private static final int EAGLE_EYE_EFFECT_LVL = 0;
 	private static final int EAGLE_EYE_DURATION = 10 * 20;
 	private static final int EAGLE_EYE_COOLDOWN = 24 * 20;
-	private static final int EAGLE_EYE_1_VULN_LEVEL = 3; // 20%
-	private static final int EAGLE_EYE_2_VULN_LEVEL = 6; // 35%
+	private static final double EAGLE_EYE_1_VULN_LEVEL = 0.2;
+	private static final double EAGLE_EYE_2_VULN_LEVEL = 0.35;
 	private static final int EAGLE_EYE_RADIUS = 20;
 
 	public EagleEye(Plugin plugin, @Nullable Player player) {
@@ -66,9 +66,8 @@ public class EagleEye extends Ability {
 			PotionUtils.applyPotion(mPlayer, mob,
 			                        new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
 
-			int eagleLevel = (eagleEye == 1) ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
-			PotionUtils.applyPotion(mPlayer, mob,
-			                        new PotionEffect(PotionEffectType.UNLUCK, EAGLE_EYE_DURATION, eagleLevel, true, false));
+			double eagleLevel = (eagleEye == 1) ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
+			EntityUtils.applyVulnerability(mPlugin, EAGLE_EYE_DURATION, eagleLevel, mob);
 
 			new BukkitRunnable() {
 				int mTicks = 0;

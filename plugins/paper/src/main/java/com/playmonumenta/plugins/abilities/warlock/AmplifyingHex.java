@@ -58,7 +58,6 @@ public class AmplifyingHex extends Ability {
 	                                                          PotionEffectType.WEAKNESS,
 	                                                          PotionEffectType.SLOW_DIGGING,
 	                                                          PotionEffectType.POISON,
-	                                                          PotionEffectType.UNLUCK,
 	                                                          PotionEffectType.BLINDNESS,
 	                                                          PotionEffectType.CONFUSION,
 	                                                          PotionEffectType.HUNGER
@@ -183,6 +182,13 @@ public class AmplifyingHex extends Ability {
 					debuffCount++;
 					double weakAmp = EntityUtils.getWeakenAmount(mPlugin, mob);
 					amplifierCount += Math.min(mAmplifierCap, Math.max((int) Math.floor(weakAmp * 10) - 1, 0));
+				}
+
+				//Custom vuln interaction
+				if (EntityUtils.isVulnerable(mPlugin, mob)) {
+					debuffCount++;
+					double vulnAmp = EntityUtils.getVulnAmount(mPlugin, mob);
+					amplifierCount += Math.min(mAmplifierCap, Math.max((int) Math.floor(vulnAmp * 10) - 1, 0));
 				}
 
 				//Custom DoT interaction

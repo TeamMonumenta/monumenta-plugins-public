@@ -117,7 +117,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.MELANCHOLIC_LAMENT) {
 							EntityUtils.applyWeaken(plugin, duration, 0.1, damagee);
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.HAUNTING_SHADES) {
-							PotionUtils.applyPotion(p, damagee, new PotionEffect(PotionEffectType.UNLUCK, duration, 0, true, false));
+							EntityUtils.applyVulnerability(plugin, duration, 0.1, damagee);
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.WITHERING_GAZE) {
 							plugin.mEffectManager.addEffect(damagee, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, null, Particle.SQUID_INK));
 						}
