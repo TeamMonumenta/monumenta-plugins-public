@@ -1,25 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout.hunter;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -31,6 +11,26 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
+import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
+
+import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 
 public class PredatorStrike extends Ability {
@@ -89,7 +89,7 @@ public class PredatorStrike extends Ability {
 
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (mPlayer != null && mActive && arrow.isCritical()) {
+		if (mPlayer != null && mActive && (arrow.isCritical() || arrow instanceof Trident)) {
 			putOnCooldown();
 			arrow.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);

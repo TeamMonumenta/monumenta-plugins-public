@@ -75,8 +75,8 @@ public class RapidFire extends DepthsAbility {
 					loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.45f);
 					ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
 					Bukkit.getPluginManager().callEvent(eventLaunch);
-					if (arrow.hasMetadata(Skyhook.META_DATA_TAG)) {
-						arrow.removeMetadata(Skyhook.META_DATA_TAG, mPlugin);
+					if (arrow.hasMetadata(Skyhook.SKYHOOK_ARROW_METADATA)) {
+						arrow.removeMetadata(Skyhook.SKYHOOK_ARROW_METADATA, mPlugin);
 					}
 					mCount++;
 				} else {

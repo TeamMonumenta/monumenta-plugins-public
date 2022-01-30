@@ -30,7 +30,7 @@ public class Skyhook extends DepthsAbility {
 	public static final String ABILITY_NAME = "Skyhook";
 	public static final int[] COOLDOWN = {16 * 20, 14 * 20, 12 * 20, 10 * 20, 8 * 20, 4 * 20};
 	public static final int MAX_TICKS = 20 * 20;
-	public static final String META_DATA_TAG = "SkyhookArrow";
+	public static final String SKYHOOK_ARROW_METADATA = "SkyhookArrow";
 
 	public Skyhook(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -43,8 +43,9 @@ public class Skyhook extends DepthsAbility {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(META_DATA_TAG)) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(SKYHOOK_ARROW_METADATA)) {
 			hook(arrow);
+			arrow.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
 		}
 	}
 
@@ -96,7 +97,7 @@ public class Skyhook extends DepthsAbility {
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
-			arrow.setMetadata(META_DATA_TAG, new FixedMetadataValue(mPlugin, 0));
+			arrow.setMetadata(SKYHOOK_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
 
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
 
@@ -106,7 +107,7 @@ public class Skyhook extends DepthsAbility {
 				public void run() {
 					if (arrow == null || mT > MAX_TICKS) {
 						mPlugin.mProjectileEffectTimers.removeEntity(arrow);
-						arrow.removeMetadata(META_DATA_TAG, mPlugin);
+						arrow.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
 						arrow.remove();
 						this.cancel();
 					}

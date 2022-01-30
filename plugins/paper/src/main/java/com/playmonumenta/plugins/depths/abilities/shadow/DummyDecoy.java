@@ -42,7 +42,7 @@ public class DummyDecoy extends DepthsAbility {
 	public static final int MAX_TICKS = 10 * 20;
 	public static final int AGGRO_RADIUS = 8;
 	public static final int STUN_RADIUS = 4;
-	public static final String META_DATA_TAG = "DummyDecoyArrow";
+	public static final String DUMMY_DECOY_ARROW_METADATA = "DummyDecoyArrow";
 
 	public DummyDecoy(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -62,7 +62,7 @@ public class DummyDecoy extends DepthsAbility {
 		arrow.setCritical(true);
 		arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 		arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
-		arrow.setMetadata(META_DATA_TAG, new FixedMetadataValue(mPlugin, 0));
+		arrow.setMetadata(DUMMY_DECOY_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
 
 		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SPELL_WITCH);
 
@@ -87,8 +87,9 @@ public class DummyDecoy extends DepthsAbility {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(META_DATA_TAG)) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(DUMMY_DECOY_ARROW_METADATA)) {
 			spawnDecoy(arrow, enemy.getLocation());
+			arrow.removeMetadata(DUMMY_DECOY_ARROW_METADATA, mPlugin);
 		}
 	}
 

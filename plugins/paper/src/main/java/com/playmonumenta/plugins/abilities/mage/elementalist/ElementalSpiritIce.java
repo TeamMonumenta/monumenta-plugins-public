@@ -33,8 +33,6 @@ import java.util.Set;
 
 
 public class ElementalSpiritIce extends Ability {
-	public static final ClassAbility ABILITY = ClassAbility.ELEMENTAL_SPIRIT_ICE;
-
 	public static final int DAMAGE_1 = 4;
 	public static final int DAMAGE_2 = 6;
 	public static final int SIZE = 3;
@@ -59,7 +57,7 @@ public class ElementalSpiritIce extends Ability {
 		 * This variant also does not have a description
 		 */
 		super(plugin, player, null);
-		mInfo.mLinkedSpell = ABILITY;
+		mInfo.mLinkedSpell = ClassAbility.ELEMENTAL_SPIRIT_ICE;
 
 		mInfo.mScoreboardId = "ElementalSpirit";
 		mInfo.mCooldown = COOLDOWN_TICKS;
@@ -77,8 +75,8 @@ public class ElementalSpiritIce extends Ability {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if ((event.getAbility() == ClassAbility.ELEMENTAL_ARROWS_ICE || event.getAbility() == ClassAbility.BLIZZARD || event.getAbility() == ClassAbility.FROST_NOVA)
-				&& !ABILITY.equals(event.getAbility())) {
+		ClassAbility ability = event.getAbility();
+		if (ability != null && (ability.equals(ClassAbility.ELEMENTAL_ARROWS_ICE) || ability.equals(ClassAbility.BLIZZARD) || ability.equals(ClassAbility.FROST_NOVA))) {
 			mEnemiesAffected.add(event.getDamagee());
 			if (mEnemiesAffectedProcessor == null) {
 				mEnemiesAffectedProcessor = new BukkitRunnable() {
@@ -117,13 +115,13 @@ public class ElementalSpiritIce extends Ability {
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(centre, SIZE)) {
 										double finalDamage = spellDamage;
 										if (
-											ClassAbility.ELEMENTAL_ARROWS_ICE.equals(event.getAbility())
+											ClassAbility.ELEMENTAL_ARROWS_ICE.equals(ability)
 											&& mElementalArrows != null
 										) {
 											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
 										}
 
-										DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, ABILITY, true);
+										DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.mLinkedSpell, true);
 										mob.setVelocity(new Vector()); // Wipe velocity, extreme local climate
 									}
 
@@ -166,7 +164,7 @@ public class ElementalSpiritIce extends Ability {
 				@Override
 				public void run() {
 					if (
-						isTimerActive(ABILITY)
+						isTimerActive()
 						|| !mPlayer.isValid() // Ensure player is not dead, is still online?
 						|| PremiumVanishIntegration.isInvisible(mPlayer)
 					) {

@@ -1,8 +1,18 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
-import java.util.List;
-import java.util.logging.Level;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -17,20 +27,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.listeners.DamageListener;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.List;
+import java.util.logging.Level;
 
 public class Pyroblast extends DepthsAbility {
 
@@ -40,7 +38,7 @@ public class Pyroblast extends DepthsAbility {
 	public static final int[] DAMAGE = {20, 25, 30, 35, 40, 50};
 	private static final int RADIUS = 4;
 	private static final int DURATION = 4 * 20;
-	public static final String META_DATA_TAG = "PyroblastArrow";
+	public static final String PYROBLAST_ARROW_METADATA = "PyroblastArrow";
 
 	public Pyroblast(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -54,8 +52,9 @@ public class Pyroblast extends DepthsAbility {
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity damager = event.getDamager();
-		if (event.getType() == DamageType.PROJECTILE && damager != null && damager instanceof AbstractArrow arrow && damager.hasMetadata(META_DATA_TAG)) {
+		if (event.getType() == DamageType.PROJECTILE && damager != null && damager instanceof AbstractArrow arrow && damager.hasMetadata(PYROBLAST_ARROW_METADATA)) {
 			explode(arrow, enemy.getLocation());
+			arrow.removeMetadata(PYROBLAST_ARROW_METADATA, mPlugin);
 		}
 	}
 
@@ -98,7 +97,7 @@ public class Pyroblast extends DepthsAbility {
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
-			arrow.setMetadata(META_DATA_TAG, new FixedMetadataValue(mPlugin, 0));
+			arrow.setMetadata(PYROBLAST_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
 
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SOUL_FIRE_FLAME);
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.CAMPFIRE_SIGNAL_SMOKE);

@@ -13,6 +13,7 @@ import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
 
 import java.util.EnumSet;
 
@@ -43,10 +44,8 @@ public class Sniper implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE) {
-			if (event.getDamager() instanceof AbstractArrow arrow) {
-				if (!arrow.isCritical()) {
-					return;
-				}
+			if (event.getDamager() instanceof AbstractArrow arrow && !(arrow instanceof Trident) && !arrow.isCritical()) {
+				return;
 			}
 
 			Location loca = player.getLocation();

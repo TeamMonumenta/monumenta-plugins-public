@@ -39,7 +39,6 @@ import java.util.Set;
 
 public class ElementalSpiritFire extends Ability {
 	public static final String NAME = "Elemental Spirits";
-	public static final ClassAbility ABILITY = ClassAbility.ELEMENTAL_SPIRIT_FIRE;
 
 	public static final int DAMAGE_1 = 10;
 	public static final int DAMAGE_2 = 15;
@@ -58,7 +57,7 @@ public class ElementalSpiritFire extends Ability {
 
 	public ElementalSpiritFire(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = ABILITY;
+		mInfo.mLinkedSpell = ClassAbility.ELEMENTAL_SPIRIT_FIRE;
 
 		mInfo.mScoreboardId = "ElementalSpirit";
 		mInfo.mShorthandName = "ES";
@@ -107,8 +106,8 @@ public class ElementalSpiritFire extends Ability {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if ((event.getAbility() == ClassAbility.ELEMENTAL_ARROWS_FIRE || event.getAbility() == ClassAbility.STARFALL || event.getAbility() == ClassAbility.MAGMA_SHIELD)
-				&& !ABILITY.equals(event.getAbility())) {
+		ClassAbility ability = event.getAbility();
+		if (ability != null && (ability.equals(ClassAbility.ELEMENTAL_ARROWS_FIRE) || ability.equals(ClassAbility.STARFALL) || ability.equals(ClassAbility.MAGMA_SHIELD))) {
 			mEnemiesAffected.add(event.getDamagee());
 			// 1 runnable processes everything 1 tick later, so all enemies to affect are in
 			if (mEnemiesAffectedProcessor == null) {
@@ -161,13 +160,13 @@ public class ElementalSpiritFire extends Ability {
 									if (potentialTarget.getBoundingBox().overlaps(movingSpiritBox)) {
 										double finalDamage = spellDamage;
 										if (
-											ClassAbility.ELEMENTAL_ARROWS_FIRE.equals(event.getAbility())
+											ClassAbility.ELEMENTAL_ARROWS_FIRE.equals(ability)
 											&& mElementalArrows != null
 										) {
 											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
 										}
 
-										DamageUtils.damage(mPlayer, potentialTarget, DamageType.MAGIC, finalDamage, ABILITY, true);
+										DamageUtils.damage(mPlayer, potentialTarget, DamageType.MAGIC, finalDamage, mInfo.mLinkedSpell, true);
 										iterator.remove();
 									}
 								}

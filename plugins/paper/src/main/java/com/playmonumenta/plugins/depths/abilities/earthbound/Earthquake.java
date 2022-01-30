@@ -40,7 +40,7 @@ public class Earthquake extends DepthsAbility {
 	public static final int RADIUS = 4;
 	public static final double KNOCKBACK = 0.8;
 	public static final int MAX_TICKS = 4 * 20;
-	public static final String META_DATA_TAG = "EarthquakeArrow";
+	public static final String EARTHQUAKE_ARROW_METADATA = "EarthquakeArrow";
 
 	public Earthquake(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -53,8 +53,9 @@ public class Earthquake extends DepthsAbility {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(META_DATA_TAG)) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(EARTHQUAKE_ARROW_METADATA)) {
 			quake(arrow, enemy.getLocation());
+			arrow.removeMetadata(EARTHQUAKE_ARROW_METADATA, mPlugin);
 		}
 	}
 
@@ -132,7 +133,7 @@ public class Earthquake extends DepthsAbility {
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
-			arrow.setMetadata(META_DATA_TAG, new FixedMetadataValue(mPlugin, 0));
+			arrow.setMetadata(EARTHQUAKE_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
 
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.LAVA);
 
