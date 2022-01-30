@@ -112,15 +112,14 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mActiveRunnable != null && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL)) {
+		if (mActiveRunnable != null && event.getType() == DamageType.MELEE) {
 			if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 				Vector playerDirVector = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RONDE_RADIUS)) {
 					Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 					if (playerDirVector.dot(toMobVector) > RONDE_DOT_COSINE) {
 						int damage = getAbilityScore() == 1 ? RONDE_1_DAMAGE : RONDE_2_DAMAGE;
-						mob.setNoDamageTicks(0);
-						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.mLinkedSpell);
+						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.mLinkedSpell, true);
 						MovementUtils.knockAway(mPlayer, mob, RONDE_KNOCKBACK_SPEED, true);
 					}
 				}
