@@ -1,11 +1,12 @@
 package com.playmonumenta.plugins.adapters;
 
+import javax.annotation.Nullable;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
 public interface VersionAdapter {
 	void resetPlayerIdleTimer(Player player);
@@ -44,4 +45,6 @@ public interface VersionAdapter {
 	void releaseActiveItem(LivingEntity entity, boolean clearActiveItem);
 
 	void stunShield(Player player, int ticks);
+
+	void cancelStrafe(Mob mob);
 }

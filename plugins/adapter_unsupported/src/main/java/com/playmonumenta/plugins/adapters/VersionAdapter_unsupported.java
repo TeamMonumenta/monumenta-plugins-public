@@ -1,11 +1,12 @@
 package com.playmonumenta.plugins.adapters;
 
+import javax.annotation.Nullable;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
 public class VersionAdapter_unsupported implements VersionAdapter {
 	public void resetPlayerIdleTimer(Player player) {
@@ -54,6 +55,11 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	public void stunShield(Player player, int ticks) {
+
+	}
+
+	@Override
+	public void cancelStrafe(Mob mob) {
 
 	}
 }

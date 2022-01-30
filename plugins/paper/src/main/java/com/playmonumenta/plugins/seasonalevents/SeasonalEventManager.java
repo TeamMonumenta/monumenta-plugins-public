@@ -16,6 +16,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -26,9 +29,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Location;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -55,8 +56,8 @@ public class SeasonalEventManager {
 	public static final String TREASURE_WHEEL_KEY = "epic:pass/treasure_wheel_token";
 	public static final String RELIC_WHEEL_KEY = "epic:pass/relic_wheel_token";
 	// Missions and rewards arrays
-	public static List<WeeklyMission> PASS_MISSIONS;
-	public static List<SeasonalReward> PASS_REWARDS;
+	public static List<WeeklyMission> PASS_MISSIONS = new ArrayList<>();
+	public static List<SeasonalReward> PASS_REWARDS = new ArrayList<>();
 
 	static {
 		try {
@@ -196,8 +197,8 @@ public class SeasonalEventManager {
 				}
 				missions.add(mission);
 			} catch (Exception e) {
-			e.printStackTrace();
-		}
+				e.printStackTrace();
+			}
 		}
 		return missions;
 	}

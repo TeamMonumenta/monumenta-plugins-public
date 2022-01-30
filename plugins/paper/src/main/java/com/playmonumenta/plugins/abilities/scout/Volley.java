@@ -1,7 +1,13 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,15 +26,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+import java.util.List;
 
 public class Volley extends Ability {
 
@@ -91,7 +90,7 @@ public class Volley extends Ability {
 					}
 				}
 
-				List<AbstractArrow> projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, arrowSpeed, 5, arrow.getClass());
+				List<AbstractArrow> projectiles = EntityUtils.spawnArrowVolley(mPlayer, numArrows, arrowSpeed, 5, arrow.getClass());
 
 				for (AbstractArrow proj : projectiles) {
 					proj.setPickupStatus(PickupStatus.CREATIVE_ONLY);

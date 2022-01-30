@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.timers;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -47,7 +46,7 @@ public class CombatLoggingTimers {
 					entityEntry.setValue(newTimer);
 				} else {
 					for (World world : Bukkit.getWorlds()) {
-						Entity entity = EntityUtils.getEntity(world, entityEntry.getKey());
+						Entity entity = world.getEntity(entityEntry.getKey());
 						if (entity != null) {
 							if (entity instanceof Monster) {
 								Monster mob = (Monster)entity;

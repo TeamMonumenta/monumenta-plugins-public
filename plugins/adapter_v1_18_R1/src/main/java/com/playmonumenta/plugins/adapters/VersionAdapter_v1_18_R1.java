@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.adapters;
 
+import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -13,13 +14,14 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -247,5 +249,11 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 		if (player.getActiveItem() != null && player.getActiveItem().getType() == Material.SHIELD) {
 			releaseActiveItem(player, true);
 		}
+	}
+
+	@Override
+	public void cancelStrafe(Mob mob) {
+		((CraftMob) mob).getHandle().setXxa(0);
+		((CraftMob) mob).getHandle().setZza(0);
 	}
 }

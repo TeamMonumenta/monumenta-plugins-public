@@ -16,10 +16,10 @@ import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attributable;
@@ -28,37 +28,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.block.Block;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.AreaEffectCloud;
-import org.bukkit.entity.Bee;
-import org.bukkit.entity.Blaze;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Flying;
-import org.bukkit.entity.Ghast;
-import org.bukkit.entity.Giant;
-import org.bukkit.entity.Hoglin;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.MagmaCube;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Phantom;
-import org.bukkit.entity.PigZombie;
-import org.bukkit.entity.Piglin;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.PolarBear;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.PufferFish;
-import org.bukkit.entity.Rabbit;
-import org.bukkit.entity.Shulker;
-import org.bukkit.entity.SkeletonHorse;
-import org.bukkit.entity.Slime;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.entity.Vex;
-import org.bukkit.entity.Wither;
-import org.bukkit.entity.WitherSkeleton;
-import org.bukkit.entity.Wolf;
-import org.bukkit.entity.ZombieHorse;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -68,9 +38,9 @@ import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,7 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
-import java.util.UUID;
 
 
 public class EntityUtils {
@@ -151,7 +120,6 @@ public class EntityUtils {
 			EntityType.PARROT,
 			EntityType.PIG,
 			EntityType.RABBIT,
-			EntityType.RAVAGER,
 			EntityType.SHEEP,
 			EntityType.DOLPHIN,
 			EntityType.GUARDIAN,
@@ -186,9 +154,9 @@ public class EntityUtils {
 	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";
 	private static final String STUN_ATTR_NAME = "StunSlownessAttr";
 	private static final String IGNORE_TAUNT_TAG = "taunt_ignore";
-	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<LivingEntity, Integer>();
-	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<LivingEntity, Integer>();
-	private static final Map<LivingEntity, Integer> SILENCED_MOBS = new HashMap<LivingEntity, Integer>();
+	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<>();
+	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<>();
+	private static final Map<LivingEntity, Integer> SILENCED_MOBS = new HashMap<>();
 	private static BukkitRunnable mobsTracker = null;
 
 	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
@@ -210,7 +178,7 @@ public class EntityUtils {
 				while (coolingIter.hasNext()) {
 					Map.Entry<LivingEntity, Integer> cooling = coolingIter.next();
 					LivingEntity mob = cooling.getKey();
-					COOLING_MOBS.put(mob, cooling.getValue() - 1);
+					cooling.setValue(cooling.getValue() - 1);
 
 					if (cooling.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
 						AttributeInstance ai = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
@@ -233,7 +201,7 @@ public class EntityUtils {
 				while (stunnedIter.hasNext()) {
 					Map.Entry<LivingEntity, Integer> stunned = stunnedIter.next();
 					LivingEntity mob = stunned.getKey();
-					STUNNED_MOBS.put(mob, stunned.getValue() - 1);
+					stunned.setValue(stunned.getValue() - 1);
 
 					if (mob instanceof Vex || mob instanceof Flying) {
 						mob.setVelocity(new Vector(0, 0, 0));
@@ -260,7 +228,7 @@ public class EntityUtils {
 				while (silencedIter.hasNext()) {
 					Map.Entry<LivingEntity, Integer> silenced = silencedIter.next();
 					LivingEntity mob = silenced.getKey();
-					SILENCED_MOBS.put(mob, silenced.getValue() - 1);
+					silenced.setValue(silenced.getValue() - 1);
 
 					double angle = Math.toRadians(mRotation);
 					Location l = mob.getLocation();
@@ -304,7 +272,7 @@ public class EntityUtils {
 
 	// Affected by Abyssal
 	public static boolean isInWater(LivingEntity mob) {
-		return mob.getLocation().getBlock().getType().equals(Material.WATER) || mob.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.WATER);
+		return LocationUtils.isLocationInWater(mob.getLocation()) || LocationUtils.isLocationInWater(mob.getLocation().subtract(0, 1, 0));
 	}
 
 	public static boolean isElite(Entity entity) {
@@ -364,7 +332,7 @@ public class EntityUtils {
 
 	public static @Nullable LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {
 		List<Entity> en = player.getNearbyEntities(range, range, range);
-		ArrayList<LivingEntity> entities = new ArrayList<LivingEntity>();
+		ArrayList<LivingEntity> entities = new ArrayList<>();
 		for (Entity e : en) {
 			//  Make sure to only get living entities.
 			if (e instanceof LivingEntity) {
@@ -422,7 +390,7 @@ public class EntityUtils {
 		return null;
 	}
 
-	public static Projectile spawnArrow(Plugin plugin, LivingEntity player, double yawOffset, double pitchOffset, Vector offset, float speed, Class<? extends AbstractArrow> arrowClass) {
+	public static AbstractArrow spawnArrow(LivingEntity player, double yawOffset, double pitchOffset, Vector offset, float speed, Class<? extends AbstractArrow> arrowClass) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
 
@@ -446,14 +414,13 @@ public class EntityUtils {
 		return arrow;
 	}
 
-	public static List<AbstractArrow> spawnArrowVolley(Plugin plugin, LivingEntity player, int numProjectiles, float speed, double spacing, Class<? extends AbstractArrow> arrowClass) {
-		List<AbstractArrow> projectiles = new ArrayList<AbstractArrow>();
+	public static List<AbstractArrow> spawnArrowVolley(LivingEntity player, int numProjectiles, float speed, double spacing, Class<? extends AbstractArrow> arrowClass) {
+		List<AbstractArrow> projectiles = new ArrayList<>();
 
-		for (double yaw = -spacing * (numProjectiles / 2); yaw < spacing * ((numProjectiles / 2) + 1); yaw += spacing) {
-			Projectile proj = spawnArrow(plugin, player, yaw, 0.0, new Vector(0, 0, 0), speed, arrowClass);
-			if (proj != null && proj instanceof AbstractArrow arrow) {
-				projectiles.add(arrow);
-			}
+		for (int i = 0; i < numProjectiles; i++) {
+			double yaw = spacing * (i - (numProjectiles - 1) / 2f);
+			AbstractArrow arrow = spawnArrow(player, yaw, 0.0, new Vector(0, 0, 0), speed, arrowClass);
+			projectiles.add(arrow);
 		}
 
 		return projectiles;
@@ -504,10 +471,10 @@ public class EntityUtils {
 	 * @return      List of LivingEntity objects of the specified type within the bounding box
 	 */
 	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz, EnumSet<EntityType> types) {
-		Collection<Entity> entities = loc.getWorld().getNearbyEntities(loc, rx, ry, rz);
+		Collection<LivingEntity> entities = loc.getWorld().getNearbyEntitiesByType(LivingEntity.class, loc, rx, ry, rz);
 
-		List<LivingEntity> mobs = new ArrayList<LivingEntity>(entities.size());
-		for (Entity entity : entities) {
+		List<LivingEntity> mobs = new ArrayList<>(entities.size());
+		for (LivingEntity entity : entities) {
 			if (entity.isDead() || !entity.isValid()) {
 				continue;
 			}
@@ -520,7 +487,7 @@ public class EntityUtils {
 				continue;
 			}
 
-			mobs.add((LivingEntity)entity);
+			mobs.add(entity);
 		}
 
 		return mobs;
@@ -545,8 +512,8 @@ public class EntityUtils {
 	}
 
 	public static List<LivingEntity> getMobsInLine(Location loc, Vector direction, double range, double halfHitboxLength) {
-		Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(getNearbyMobs(loc, range));
-		List<LivingEntity> mobsInLine = new ArrayList<LivingEntity>();
+		Set<LivingEntity> nearbyMobs = new HashSet<>(getNearbyMobs(loc, range));
+		List<LivingEntity> mobsInLine = new ArrayList<>();
 
 		Vector shift = direction.normalize().multiply(halfHitboxLength);
 		BoundingBox hitbox = BoundingBox.of(loc, halfHitboxLength * 2, halfHitboxLength * 2, halfHitboxLength * 2);
@@ -568,8 +535,8 @@ public class EntityUtils {
 	}
 
 	public static List<Player> getPlayersInLine(Location loc, Vector direction, double range, double halfHitboxLength, Player self) {
-		Set<Player> nearbyPlayers = new HashSet<Player>(PlayerUtils.playersInRange(loc, range, true));
-		List<Player> playersInLine = new ArrayList<Player>();
+		Set<Player> nearbyPlayers = new HashSet<>(PlayerUtils.playersInRange(loc, range, true));
+		List<Player> playersInLine = new ArrayList<>();
 
 		Vector shift = direction.normalize().multiply(halfHitboxLength);
 		BoundingBox hitbox = BoundingBox.of(loc, halfHitboxLength * 2, halfHitboxLength * 2, halfHitboxLength * 2);
@@ -603,49 +570,30 @@ public class EntityUtils {
 	}
 
 	public static @Nullable LivingEntity getNearestMob(Location loc, List<LivingEntity> nearbyMobs) {
-		LivingEntity nearest = null;
-		double nearestDistanceSquared = Double.POSITIVE_INFINITY;
-
-		for (LivingEntity mob : nearbyMobs) {
-			double distanceSquared = mob.getLocation().distanceSquared(loc);
-			if (distanceSquared < nearestDistanceSquared) {
-				nearest = mob;
-				nearestDistanceSquared = distanceSquared;
-			}
-		}
-
-		return nearest;
+		return nearbyMobs
+			.stream()
+			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			.orElse(null);
 	}
 
 	public static @Nullable Player getNearestPlayer(Location loc, double radius) {
-		List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, radius, true);
-		if (nearbyPlayers.size() == 0) {
-			return null;
-		}
-
-		nearbyPlayers.sort((e1, e2) -> e1.getLocation().distance(loc) <= e2.getLocation().distance(loc) ? 1 : -1);
-		return nearbyPlayers.get(0);
+		return PlayerUtils.playersInRange(loc, radius, true)
+			.stream()
+			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			.orElse(null);
 	}
 
-	// Gets players within radius of the location and sorts them by distance
-	// WARNING: Distance is sorted from furthest to closest
-	// i.e. The player 20 blocks away is closer to the front of the list than the player 10 blocks away
-	// If you want to find the closest players, use the end of the list, the farthest, use the beginning
+	/**
+	 * Gets players within radius of the location and sorts them by distance.
+	 * <p>
+	 * <b>WARNING: Distance is sorted from furthest to closest</b>,
+	 * i.e. The player 20 blocks away is closer to the front of the list than the player 10 blocks away.
+	 * If you want to find the closest players, use the end of the list, the farthest, use the beginning.
+	 */
 	public static List<Player> getNearestPlayers(Location loc, double radius) {
 		List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, radius, true);
-		nearbyPlayers.sort((e1, e2) -> e1.getLocation().distance(loc) <= e2.getLocation().distance(loc) ? 1 : -1);
+		nearbyPlayers.sort(Comparator.<Player>comparingDouble(e -> e.getLocation().distanceSquared(loc)).reversed());
 		return nearbyPlayers;
-	}
-
-	public static @Nullable Entity getEntity(World world, UUID entityUUID) {
-		List<Entity> entities = world.getEntities();
-		for (Entity entity : entities) {
-			if (entity.getUniqueId().equals(entityUUID)) {
-				return entity;
-			}
-		}
-
-		return null;
 	}
 
 	public static double vulnerabilityMult(LivingEntity target) {
@@ -666,20 +614,12 @@ public class EntityUtils {
 	}
 
 	public static @Nullable LivingEntity getNearestHostile(Player player, double range) {
-		LivingEntity target = null;
-		double maxDist = range;
-
-		for (Entity e : player.getNearbyEntities(range, range, range)) {
-			if (e instanceof LivingEntity && isHostileMob(e) && !e.isDead()) {
-				LivingEntity le = (LivingEntity) e;
-
-				if (le.getLocation().distance(player.getLocation()) < maxDist) {
-					maxDist = le.getLocation().distance(player.getLocation());
-					target = le;
-				}
-			}
-		}
-		return target;
+		Location loc = player.getLocation();
+		return loc.getNearbyEntitiesByType(LivingEntity.class, range, range, range)
+			.stream()
+			.filter(e -> e.isValid() && isHostileMob(e))
+			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			.orElse(null);
 	}
 
 	private static final String VULNERABILITY_EFFECT_NAME = "VulnerabilityEffect";
@@ -713,11 +653,7 @@ public class EntityUtils {
 	}
 
 	public static boolean isBleeding(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, BLEED_EFFECT_NAME);
-		if (bleeds != null) {
-			return true;
-		}
-		return false;
+		return plugin.mEffectManager.hasEffect(mob, BLEED_EFFECT_NAME);
 	}
 
 	public static int getBleedLevel(Plugin plugin, LivingEntity mob) {
@@ -748,18 +684,14 @@ public class EntityUtils {
 		}
 	}
 
-	private static final String SLOW_EFFECT_NAME = "SlowEffect";
+	public static final String SLOW_EFFECT_NAME = "SlowEffect";
 
 	public static void applySlow(Plugin plugin, int ticks, double amount, LivingEntity mob) {
 		plugin.mEffectManager.addEffect(mob, SLOW_EFFECT_NAME, new PercentSpeed(ticks, -amount, SLOW_EFFECT_NAME));
 	}
 
 	public static boolean isSlowed(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(mob, SLOW_EFFECT_NAME);
-		if (slows != null) {
-			return true;
-		}
-		return false;
+		return plugin.mEffectManager.hasEffect(mob, SLOW_EFFECT_NAME);
 	}
 
 	public static double getSlowAmount(Plugin plugin, LivingEntity mob) {
@@ -791,6 +723,7 @@ public class EntityUtils {
 	}
 
 	private static final String WEAKEN_EFFECT_NAME = "WeakenEffect";
+	private static final String WEAKEN_EFFECT_AESTHETICS_NAME = "WeakenEffectAesthetics";
 
 	private static final EnumSet<DamageType> WEAKEN_EFFECT_AFFECTED_DAMAGE_TYPES = EnumSet.of(
 			DamageType.MELEE,
@@ -799,7 +732,7 @@ public class EntityUtils {
 
 	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob) {
 		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_NAME, new PercentDamageDealt(ticks, -amount, WEAKEN_EFFECT_AFFECTED_DAMAGE_TYPES));
-		plugin.mEffectManager.addEffect(mob, "WeakenEffectAesthetics", new Aesthetics(ticks,
+		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_AESTHETICS_NAME, new Aesthetics(ticks,
 			(entity, fourHertz, twoHertz, oneHertz) -> {
 				if (fourHertz) {
 					if (!(mob instanceof Player)) {
@@ -819,11 +752,7 @@ public class EntityUtils {
 	}
 
 	public static boolean isWeakened(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> weaks = plugin.mEffectManager.getEffects(mob, WEAKEN_EFFECT_NAME);
-		if (weaks != null) {
-			return true;
-		}
-		return false;
+		return plugin.mEffectManager.hasEffect(mob, WEAKEN_EFFECT_NAME);
 	}
 
 	public static double getWeakenAmount(Plugin plugin, LivingEntity mob) {
@@ -848,7 +777,7 @@ public class EntityUtils {
 
 	public static void setWeakenTicks(Plugin plugin, LivingEntity mob, int ticks) {
 		NavigableSet<Effect> weaks = plugin.mEffectManager.getEffects(mob, WEAKEN_EFFECT_NAME);
-		NavigableSet<Effect> weaksAesthetics = plugin.mEffectManager.getEffects(mob, "WeakenEffectAesthetics");
+		NavigableSet<Effect> weaksAesthetics = plugin.mEffectManager.getEffects(mob, WEAKEN_EFFECT_AESTHETICS_NAME);
 		if (weaks != null) {
 			Effect weak = weaks.last();
 			weak.setDuration(ticks);
@@ -899,7 +828,7 @@ public class EntityUtils {
 		}
 	}
 
-	public static boolean isCooling(Entity mob) {
+	public static boolean isCooling(LivingEntity mob) {
 		return COOLING_MOBS.containsKey(mob);
 	}
 
@@ -961,6 +890,9 @@ public class EntityUtils {
 			AttributeInstance speed = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
 			AttributeModifier mod = new AttributeModifier(STUN_ATTR_NAME, -10, AttributeModifier.Operation.ADD_NUMBER);
 			speed.addModifier(mod);
+			if (mob instanceof Mob) {
+				NmsUtils.getVersionAdapter().cancelStrafe((Mob) mob);
+			}
 		}
 		if (t == null || t < ticks) {
 			STUNNED_MOBS.put(mob, ticks);
@@ -974,11 +906,7 @@ public class EntityUtils {
 	}
 
 	public static boolean hasArrowIframes(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> arrowIframes = plugin.mEffectManager.getEffects(mob, ARROW_IFRAMES_EFFECT_NAME);
-		if (arrowIframes != null) {
-			return true;
-		}
-		return false;
+		return plugin.mEffectManager.hasEffect(mob, ARROW_IFRAMES_EFFECT_NAME);
 	}
 
 	public static boolean isSilenced(Entity mob) {
@@ -1022,14 +950,11 @@ public class EntityUtils {
 		String cmd = "summon " + type.getName() + " " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + nbt;
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 
-		List<Entity> entities = new ArrayList<Entity>(loc.getNearbyEntities(1f, 1f, 1f));
-		entities.removeIf(e -> !e.getType().equals(type));
-		if (entities.size() <= 0) {
-			throw new Exception("Summoned mob but no mob appeared - " + cmd);
-		}
-
-		entities.sort((left, right) -> left.getLocation().distance(loc) >= right.getLocation().distance(loc) ? 1 : -1);
-		return entities.get(0);
+		return loc.getNearbyEntities(1f, 1f, 1f)
+			.stream()
+			.filter(e -> e.getType().equals(type))
+			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			.orElseThrow(() -> new Exception("Summoned mob but no mob appeared - " + cmd));
 	}
 
 	/*
@@ -1136,11 +1061,7 @@ public class EntityUtils {
 	}
 
 	public static boolean isParalyzed(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> paralyses = plugin.mEffectManager.getEffects(mob, PARALYZE_EFFECT_NAME);
-		if (paralyses != null) {
-			return true;
-		}
-		return false;
+		return plugin.mEffectManager.hasEffect(mob, PARALYZE_EFFECT_NAME);
 	}
 
 	public static void removeParalysis(Plugin plugin, LivingEntity mob) {

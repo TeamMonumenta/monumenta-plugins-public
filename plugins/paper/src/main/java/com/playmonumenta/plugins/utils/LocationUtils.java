@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -33,7 +34,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,35 +125,31 @@ public class LocationUtils {
 
 	public static boolean isLocationInWater(Location loc) {
 		Block block = loc.getBlock();
-		if (block.isLiquid() || containsWater(block) || block.getType() == Material.ICE || block.getType() == Material.BLUE_ICE || block.getType() == Material.PACKED_ICE) {
-			return true;
-		}
-
-		block = loc.subtract(0, 1, 0).getBlock();
-		if (block.isLiquid() || containsWater(block) || block.getType() == Material.ICE || block.getType() == Material.BLUE_ICE || block.getType() == Material.PACKED_ICE) {
-			return true;
-		}
-
-		return false;
+		return block.getType() == Material.WATER || containsWater(block);
 	}
 
 	public static boolean isValidBoatLocation(Location loc) {
-		if (isLocationInWater(loc)) {
-			return true;
-		}
-
 		/*
-		 * Check up to 50 blocks underneath the location. Stop when
-		 * a non-air block is hit. If it's a liquid, this is allowed, otherwise it's not
+		 * Check up to 50 blocks underneath the location.
+		 * Stop when a non-air block is hit (except for the first).
+		 * If it's a liquid or ice, this is allowed, otherwise it's not.
 		 */
 		loc = loc.clone();
-		for (int i = loc.getBlockY(); i > Math.max(0, loc.getBlockY() - 50); i--) {
-			loc.setY(i);
+		for (int i = 0; i < 50; i++) {
 			Block block = loc.getBlock();
-			if (block.isLiquid() || containsWater(block) || block.getType() == Material.ICE || block.getType() == Material.BLUE_ICE || block.getType() == Material.PACKED_ICE) {
+			if (block.isLiquid()
+				    || containsWater(block)
+				    || block.getType() == Material.ICE
+				    || block.getType() == Material.BLUE_ICE
+				    || block.getType() == Material.PACKED_ICE
+				    || block.getType() == Material.FROSTED_ICE) {
 				return true;
-			} else if (!block.isEmpty()) {
+			} else if (i > 0 && !block.isEmpty()) {
 				return false;
+			}
+			loc.subtract(0, 1, 0);
+			if (loc.getY() < 0) {
+				break;
 			}
 		}
 

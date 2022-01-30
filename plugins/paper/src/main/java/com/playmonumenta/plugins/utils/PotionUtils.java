@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -17,7 +18,6 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -395,7 +395,7 @@ public class PotionUtils {
 			}
 		}
 
-		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(le, "SlowEffect");
+		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(le, EntityUtils.SLOW_EFFECT_NAME);
 		if (slows != null && !types.contains(PotionEffectType.SLOW)) {
 			types.add(PotionEffectType.SLOW);
 		}

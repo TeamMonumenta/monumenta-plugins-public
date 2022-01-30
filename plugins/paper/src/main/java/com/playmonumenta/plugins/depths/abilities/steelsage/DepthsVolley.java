@@ -85,7 +85,7 @@ public class DepthsVolley extends DepthsAbility {
 					}
 				}
 
-				List<AbstractArrow> projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, ARROWS[mRarity - 1], arrowSpeed, 5, arrow.getClass());
+				List<AbstractArrow> projectiles = EntityUtils.spawnArrowVolley(mPlayer, ARROWS[mRarity - 1], arrowSpeed, 5, arrow.getClass());
 				for (AbstractArrow proj : projectiles) {
 					proj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 					if (fireticks > 0) {
