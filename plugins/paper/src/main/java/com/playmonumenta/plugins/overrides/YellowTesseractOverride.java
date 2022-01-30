@@ -18,6 +18,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -297,6 +298,7 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(CONFIGURED);
+		item.setItemMeta(meta);
 
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
@@ -305,6 +307,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		player.sendMessage(Component.text("The Tesseract of the Elements has stored your skills!", NamedTextColor.YELLOW));
 
 		ItemStatUtils.generateItemStats(item);
+		ItemUtils.setPlainTag(item);
 	}
 
 	private void clearTesseractLore(ItemStack item) {
