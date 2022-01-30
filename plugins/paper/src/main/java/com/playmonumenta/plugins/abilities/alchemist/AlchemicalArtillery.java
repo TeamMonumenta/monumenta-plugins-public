@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.alchemist;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
@@ -32,6 +33,7 @@ public class AlchemicalArtillery extends Ability {
 
 	private boolean mActive;
 	private @Nullable AlchemistPotions mAlchemistPotions;
+	private boolean mHasTaboo;
 
 	public AlchemicalArtillery(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Alchemical Artillery");
@@ -45,6 +47,7 @@ public class AlchemicalArtillery extends Ability {
 		mActive = false;
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+			mHasTaboo = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Taboo.class) != null;
 		});
 	}
 
@@ -79,7 +82,15 @@ public class AlchemicalArtillery extends Ability {
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
 
-		if (mPlayer != null && ItemUtils.isBowOrTrident(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer == null) {
+			return;
+		}
+
+		if (mHasTaboo && mActive && mPlayer.isSneaking()) {
+			return;
+		}
+
+		if (ItemUtils.isBowOrTrident(mPlayer.getInventory().getItemInMainHand())) {
 			mActive = !mActive;
 			String active = "";
 			if (mActive) {
@@ -92,5 +103,9 @@ public class AlchemicalArtillery extends Ability {
 			mPlayer.sendActionBar(ChatColor.YELLOW + "Alchemical Artillery has been " + active + "!");
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 0.9f, 1.2f);
 		}
+	}
+
+	public boolean isActive() {
+		return mActive;
 	}
 }

@@ -1,5 +1,17 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentKnockbackResist;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -9,19 +21,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.PercentKnockbackResist;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import javax.annotation.Nullable;
 
 
 public class Taboo extends Ability {
@@ -36,14 +37,16 @@ public class Taboo extends Ability {
 
 	private boolean mActive;
 	private double mMagicDamageIncrease;
+
 	private @Nullable AlchemistPotions mAlchemistPotions;
+	private @Nullable AlchemicalArtillery mAlchemicalArtillery;
 
 	public Taboo(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Taboo");
 		mInfo.mLinkedSpell = ClassAbility.TABOO;
 		mInfo.mScoreboardId = "Taboo";
 		mInfo.mShorthandName = "Tb";
-		mInfo.mDescriptions.add("Swap hands while sneaking and holding an Alchemist's Bag to drink a potion. Drinking the potion causes you to recharge potions 0.5s faster and deal +15% magic damage. However, you lose 5% of your health per second, which bypasses resistances and absorption, but cannot kill you. Swapping hands while sneaking and holding an Alchemist's Bag disables the effect.");
+		mInfo.mDescriptions.add("Swap hands while sneaking and holding an Alchemist's Bag to drink a potion. Drinking the potion causes you to recharge potions 0.5s faster and deal +15% magic damage. However, you lose 5% of your health per second, which bypasses resistances and absorption, but cannot kill you. Swapping hands while sneaking and holding an Alchemist's Bag disables the effect. Taboo can also be toggled by sneaking and swapping hands while holding a bow, crossbow, or trident while Alchemical Artillery is active.");
 		mInfo.mDescriptions.add("Extra magic damage increased to 25%. Additionally, while the effect is active, swap hands while looking down, sneaking, and holding an Alchemist's Bag to consume 2 potions and heal 20% of your health. This healing has a 5s cooldown.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
@@ -53,6 +56,7 @@ public class Taboo extends Ability {
 		mMagicDamageIncrease = getAbilityScore() == 1 ? MAGIC_DAMAGE_INCREASE_1 : MAGIC_DAMAGE_INCREASE_2;
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+			mAlchemicalArtillery = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
 		});
 	}
 
@@ -60,7 +64,7 @@ public class Taboo extends Ability {
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
 
-		if (mPlayer != null && mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && mAlchemistPotions != null) {
+		if (mPlayer != null && mPlayer.isSneaking() && mAlchemistPotions != null && (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) || (mAlchemicalArtillery != null && mAlchemicalArtillery.isActive() && ItemUtils.isBowOrTrident(mPlayer.getInventory().getItemInMainHand())))) {
 			World world = mPlayer.getWorld();
 			if (mActive) {
 				if (mPlayer.getLocation().getPitch() > 50 && getAbilityScore() > 1) {
