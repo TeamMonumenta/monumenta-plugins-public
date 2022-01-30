@@ -57,7 +57,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private static final int POTIONS_TIMER_TOWN = 1 * 20;
 
 	private static final double DAMAGE_PER_SKILL_POINT = 0.5;
-	private static final double DAMAGE_PER_SPEC_POINT = 3;
+	private static final double DAMAGE_PER_SPEC_POINT = 2.5;
 	private static final String POTION_SCOREBOARD = "StoredPotions";
 
 	private List<PotionAbility> mPotionAbilities = new ArrayList<PotionAbility>();

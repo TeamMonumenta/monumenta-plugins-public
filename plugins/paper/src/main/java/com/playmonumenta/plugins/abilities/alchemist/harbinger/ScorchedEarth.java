@@ -1,13 +1,16 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.ScorchedEarthDamage;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -39,7 +42,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	private static final int SCORCHED_EARTH_1_CHARGES = 1;
 	private static final int SCORCHED_EARTH_2_CHARGES = 2;
 	private static final int SCORCHED_EARTH_DURATION = 20 * 15;
-	public static final int SCORCHED_EARTH_BONUS_DAMAGE = 3;
+	public static final double SCORCHED_EARTH_DAMAGE_FRACTION = 0.25;
 	private static final double SCORCHED_EARTH_RADIUS = 5;
 	public static final Color SCORCHED_EARTH_COLOR_LIGHT = Color.fromRGB(230, 134, 0);
 	public static final Color SCORCHED_EARTH_COLOR_DARK = Color.fromRGB(140, 63, 0);
@@ -47,19 +50,23 @@ public class ScorchedEarth extends MultipleChargeAbility {
 
 	private Map<Location, Integer> mCenters;
 	private int mLastCastTicks = 0;
+	private @Nullable AlchemistPotions mAlchemistPotions;
 
 	public ScorchedEarth(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Scorched Earth");
 		mInfo.mLinkedSpell = ClassAbility.SCORCHED_EARTH;
 		mInfo.mScoreboardId = "ScorchedEarth";
 		mInfo.mShorthandName = "SE";
-		mInfo.mDescriptions.add("Shift right click with an Alchemist Potion to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. Mobs in this zone are dealt 3 extra damage whenever taking damage. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Shift right click while holding an Alchemist's Bag to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. Mobs in this zone are dealt 25% of your potion's damage extra whenever taking damage of types other than ailment or fire. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Cooldown reduced to 25s, and two charges of this ability can be stored at once.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? SCORCHED_EARTH_1_COOLDOWN : SCORCHED_EARTH_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BROWN_DYE, 1);
 		mMaxCharges = getAbilityScore() == 1 ? SCORCHED_EARTH_1_CHARGES : SCORCHED_EARTH_2_CHARGES;
 		mCenters = new HashMap<>();
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+		});
 	}
 
 	@Override
@@ -90,8 +97,9 @@ public class ScorchedEarth extends MultipleChargeAbility {
 					world.playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 0.5f);
 				}
 
+				double damage = mAlchemistPotions.getDamage() * SCORCHED_EARTH_DAMAGE_FRACTION;
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, SCORCHED_EARTH_RADIUS)) {
-					EffectManager.getInstance().addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10));
+					EffectManager.getInstance().addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage));
 				}
 			}
 		}

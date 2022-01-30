@@ -10,15 +10,18 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 
 public class ScorchedEarthDamage extends Effect {
-	public ScorchedEarthDamage(int duration) {
+	private double mBonusDamage;
+
+	public ScorchedEarthDamage(int duration, double damage) {
 		super(duration);
+		mBonusDamage = damage;
 	}
 
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
 		DamageType type = event.getType();
 		if (type != DamageType.AILMENT && type != DamageType.FIRE && type != DamageType.OTHER) {
-			event.setDamage(event.getDamage() + ScorchedEarth.SCORCHED_EARTH_BONUS_DAMAGE);
+			event.setDamage(event.getDamage() + mBonusDamage);
 			World world = entity.getWorld();
 			Location loc = entity.getLocation().clone().add(0, 1, 0);
 			world.spawnParticle(Particle.FLAME, loc, 5, 0.25, 0.5, 0.25, 0.05);
@@ -30,5 +33,10 @@ public class ScorchedEarthDamage extends Effect {
 	@Override
 	public String toString() {
 		return String.format("ScorchedEarthDamage duration=%d", this.getDuration());
+	}
+
+	@Override
+	public double getMagnitude() {
+		return mBonusDamage;
 	}
 }
