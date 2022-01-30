@@ -116,6 +116,8 @@ public class DamageEvent extends Event implements Cancellable {
 	private final Map<String, String> mStrings = new HashMap<>();
 
 	private double mDamage;
+	private final double mOriginalDamage;
+
 	private boolean mCancelled = false;
 	private boolean mIsDelayed = false;
 
@@ -134,6 +136,7 @@ public class DamageEvent extends Event implements Cancellable {
 		mDamager = event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent ? entityDamageByEntityEvent.getDamager() : null;
 		mAbility = ability;
 		mDamage = event.getDamage();
+		mOriginalDamage = event.getDamage();
 		mEvent = event;
 
 		if (type == null) {
@@ -166,6 +169,7 @@ public class DamageEvent extends Event implements Cancellable {
 		mType = type;
 		mAbility = ability;
 		mDamage = damage;
+		mOriginalDamage = damage;
 		mEvent = event;
 	}
 
@@ -176,11 +180,16 @@ public class DamageEvent extends Event implements Cancellable {
 		mType = type;
 		mAbility = ability;
 		mDamage = damage;
+		mOriginalDamage = damage;
 		mEvent = null;
 	}
 
 	public double getDamage() {
 		return mDamage;
+	}
+
+	public double getOriginalDamage() {
+		return mOriginalDamage;
 	}
 
 	public void setDamage(double damage) {

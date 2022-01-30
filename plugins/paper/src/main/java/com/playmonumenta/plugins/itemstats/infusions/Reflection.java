@@ -37,7 +37,7 @@ public class Reflection implements Infusion {
 	public void onHurtByEntity(Plugin plugin, Player player, double value, DamageEvent event, Entity damager) {
 		if (event.getType() == DamageType.MAGIC && !event.isBlocked()) {
 			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-			double reflectedDamage = modifiedLevel * REFLECT_PCT_PER_LEVEL * event.getDamage();
+			double reflectedDamage = modifiedLevel * REFLECT_PCT_PER_LEVEL * event.getOriginalDamage();
 			World world = player.getWorld();
 			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.6f);
 			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.4f);
