@@ -132,7 +132,7 @@ public class DepthsVolley extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting an arrow while sneaking shoots a volley consisting of " + DepthsUtils.getRarityColor(rarity) + ARROWS[rarity - 1] + ChatColor.WHITE + " arrows instead. Only one arrow is consumed, and each arrow's damage is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE_MULTIPLIER[rarity - 1] + ChatColor.WHITE + ". Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Shooting an arrow or trident while sneaking shoots a volley consisting of " + DepthsUtils.getRarityColor(rarity) + ARROWS[rarity - 1] + ChatColor.WHITE + " arrows instead. Only one arrow is consumed, and each arrow's damage is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE_MULTIPLIER[rarity - 1] + ChatColor.WHITE + ". Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override
