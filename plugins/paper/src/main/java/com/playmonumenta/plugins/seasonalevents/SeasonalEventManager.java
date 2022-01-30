@@ -42,7 +42,7 @@ public class SeasonalEventManager {
 	public static final int MP_PER_LEVEL = 75;
 	//Change this to the active pass name for each new pass
 	public static final String PASS_NAME = "Blackroot Pass";
-	public static final LocalDateTime PASS_START = LocalDateTime.of(2022, 1, 28, 4, 30);
+	public static final LocalDateTime PASS_START = LocalDateTime.of(2022, 2, 4, 4, 30);
 	public static final int NUMBER_OF_WEEKS = 12;
 	public static final int WEEKLY_MP = 225;
 	public static final String PASS_MP_SCOREBOARD = "SeasonalEventMP";
