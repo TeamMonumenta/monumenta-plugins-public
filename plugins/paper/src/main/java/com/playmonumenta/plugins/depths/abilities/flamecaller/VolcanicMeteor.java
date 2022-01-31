@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -19,7 +20,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -50,7 +50,7 @@ public class VolcanicMeteor extends DepthsAbility {
 		if (!isTimerActive()) {
 			putOnCooldown();
 
-			FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
+			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 			Location loc = mPlayer.getEyeLocation();
 			World world = mPlayer.getWorld();
@@ -73,7 +73,7 @@ public class VolcanicMeteor extends DepthsAbility {
 	}
 
 
-	private void launchMeteor(final Location loc, final FixedMetadataValue playerItemStats) {
+	private void launchMeteor(final Location loc, final ItemStatManager.PlayerItemStats playerItemStats) {
 		Location ogLoc = loc.clone();
 		loc.add(0, 30, 0);
 		new BukkitRunnable() {

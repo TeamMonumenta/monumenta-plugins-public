@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -24,10 +25,9 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import javax.annotation.Nullable;
-import java.util.logging.Level;
+import java.util.WeakHashMap;
 
 
 
@@ -42,11 +42,10 @@ public class GraspingClaws extends Ability {
 	private static final int DURATION = 8 * 20;
 	private static final int COOLDOWN_1 = 16 * 20;
 	private static final int COOLDOWN_2 = 12 * 20;
-	private static final String ITEMSTATS_METAKEY = "GraspingClawsMetakey";
 
 	private final double mAmplifier;
 	private final int mDamage;
-	private @Nullable Arrow mArrow = null;
+	private WeakHashMap<Arrow, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public GraspingClaws(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Grasping Claws");
@@ -61,6 +60,7 @@ public class GraspingClaws extends Ability {
 		mDisplayItem = new ItemStack(Material.BOW, 1);
 		mAmplifier = getAbilityScore() == 1 ? AMPLIFIER_1 : AMPLIFIER_2;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
 	@Override
@@ -70,21 +70,20 @@ public class GraspingClaws extends Ability {
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && ItemUtils.isBowOrTrident(inMainHand) && !ItemStatUtils.isShattered(inMainHand)) {
-			mArrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 1.5f, 0, Arrow.class);
-			mArrow.setShooter(mPlayer);
-			mArrow.setDamage(0);
-			mArrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
-			mPlugin.mProjectileEffectTimers.addEntity(mArrow, Particle.SPELL_WITCH);
-			FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
-			mArrow.setMetadata(ITEMSTATS_METAKEY, playerItemStats);
+			Arrow arrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 1.5f, 0, Arrow.class);
+			arrow.setShooter(mPlayer);
+			arrow.setDamage(0);
+			arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
+			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SPELL_WITCH);
+			mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 			putOnCooldown();
 		}
 	}
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (mPlayer != null && this.mArrow != null && this.mArrow == proj) {
-			this.mArrow = null;
+		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(proj);
+		if (mPlayer != null && playerItemStats != null) {
 			Location loc = proj.getLocation();
 			World world = proj.getWorld();
 
@@ -97,15 +96,10 @@ public class GraspingClaws extends Ability {
 			world.spawnParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, Material.ANVIL.createBlockData());
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
-				Object value = proj.getMetadata(ITEMSTATS_METAKEY).get(0);
-				if (value instanceof FixedMetadataValue playerItemStats) {
-					DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, mDamage);
-					damageEvent.setDelayed(true);
-					damageEvent.setPlayerItemStat(playerItemStats);
-					DamageUtils.damage(damageEvent, false, true, null);
-				} else {
-					mPlugin.getLogger().log(Level.WARNING, "Malformed ProjectileItemStats metadata detected (Grasping Claws)");
-				}
+				DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, mDamage);
+				damageEvent.setDelayed(true);
+				damageEvent.setPlayerItemStat(playerItemStats);
+				DamageUtils.damage(damageEvent, false, true, null);
 
 				MovementUtils.pullTowards(proj, mob, PULL_SPEED);
 				EntityUtils.applySlow(mPlugin, DURATION, mAmplifier, mob);

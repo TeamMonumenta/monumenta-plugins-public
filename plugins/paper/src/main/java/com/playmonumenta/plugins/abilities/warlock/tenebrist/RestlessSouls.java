@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -26,7 +27,6 @@ import org.bukkit.entity.Vex;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -126,7 +126,7 @@ public class RestlessSouls extends Ability {
 				if (abilities != null) {
 					for (BossAbilityGroup ability : abilities) {
 						if (ability instanceof RestlessSoulsBoss restlessSoulsBoss) {
-							FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
+							ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 							restlessSoulsBoss.spawn(mPlayer, mDamage, mSilenceTime, DEBUFF_DURATION, mLevel, playerItemStats);
 							break;
 						}
@@ -190,7 +190,7 @@ public class RestlessSouls extends Ability {
 					// forced attack after charge
 					if (mBoss.isCharging()) {
 						// charge attack in progress, increase mob "hitbox" by 4 blocks
-						FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
+						ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 						LivingEntity damagee = mBoss.getTarget();
 						if (mBoss.getLocation().distance(damagee.getLocation().add(0, 1, 0)) <= 4) {
 							RestlessSoulsBoss.attack(mPlugin, mPlayer, playerItemStats, mBoss, damagee, mLevel, mDamage,

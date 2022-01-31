@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -24,7 +25,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -44,7 +44,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 	private int mSilenceTime = 0;
 	private int mDuration = 0;
 	private boolean mLevelOne;
-	private @Nullable FixedMetadataValue mPlayerItemStats;
+	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 
 	private Ability[] mAbilities = {};
 	private static final String DOT_EFFECT_NAME = "RestlessSoulsDamageOverTimeEffect";
@@ -59,7 +59,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
-	public void spawn(Player player, double damage, int silenceTime, int duration, boolean levelone, FixedMetadataValue playerItemStats) {
+	public void spawn(Player player, double damage, int silenceTime, int duration, boolean levelone, ItemStatManager.PlayerItemStats playerItemStats) {
 		mPlayer = player;
 		mDamage = damage;
 		mSilenceTime = silenceTime;
@@ -82,7 +82,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		attack(mMonPlugin, mPlayer, mPlayerItemStats, mBoss, damagee, mLevelOne, mDamage, mSilenceTime, mAbilities, mDuration);
 	}
 
-	public static void attack(com.playmonumenta.plugins.Plugin plugin, Player p, FixedMetadataValue playerItemStats,
+	public static void attack(com.playmonumenta.plugins.Plugin plugin, Player p, ItemStatManager.PlayerItemStats playerItemStats,
 							  LivingEntity boss, LivingEntity damagee, boolean levelOne, double damage, int silenceTime,
 							  Ability[] abilities, int duration) {
 		if (p != null || playerItemStats != null) {

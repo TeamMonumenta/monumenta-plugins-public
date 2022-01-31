@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -24,8 +25,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.WeakHashMap;
 
 public class RapidFire extends DepthsAbility {
 
@@ -35,6 +37,8 @@ public class RapidFire extends DepthsAbility {
 	public static final int COOLDOWN = 18 * 20;
 	public static final String META_DATA_TAG = "RapidFireArrow";
 
+	private WeakHashMap<Arrow, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+
 	public RapidFire(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.REPEATER;
@@ -43,6 +47,7 @@ public class RapidFire extends DepthsAbility {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
+		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
 	@Override
@@ -65,9 +70,10 @@ public class RapidFire extends DepthsAbility {
 				if (ItemUtils.isSomeBow(inMainHand)) {
 					Arrow arrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 3.0f, 0, Arrow.class);
 					arrow.setCritical(true);
-					arrow.setMetadata(META_DATA_TAG, new FixedMetadataValue(mPlugin, 0));
 					arrow.setShooter(mPlayer);
 					arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+
+					mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 
 					mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.ASH);
 					Location loc = mPlayer.getLocation().add(0, 1, 0);
@@ -95,10 +101,16 @@ public class RapidFire extends DepthsAbility {
 	        return;
 	    }
 
-		if (event.getDamager() instanceof Arrow arrow && arrow.hasMetadata(RapidFire.META_DATA_TAG)) {
-			DamageUtils.damage(mPlayer, enemy, DamageType.PROJECTILE_SKILL, DAMAGE, mInfo.mLinkedSpell, true);
-			event.setCancelled(true);
-			arrow.remove();
+		if (event.getDamager() instanceof Arrow arrow) {
+			ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(arrow);
+			if (playerItemStats != null) {
+				DamageEvent damageEvent = new DamageEvent(enemy, mPlayer, mPlayer, DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, DAMAGE);
+				damageEvent.setDelayed(true);
+				damageEvent.setPlayerItemStat(playerItemStats);
+				DamageUtils.damage(damageEvent, true, true, null);
+				event.setCancelled(true);
+				arrow.remove();
+			}
 		}
 	}
 

@@ -30,7 +30,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -134,7 +133,7 @@ public class HuntingCompanion extends Ability {
 				if (abilities != null) {
 					for (BossAbilityGroup ability : abilities) {
 						if (ability instanceof HuntingCompanionBoss huntingCompanionBoss) {
-							FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
+							ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 							huntingCompanionBoss.spawn(mPlayer, damage, mStunTime, playerItemStats);
 							break;
 						}

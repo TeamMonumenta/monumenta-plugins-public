@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -27,7 +28,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -94,7 +94,7 @@ public class UnstableAmalgam extends Ability {
 			return;
 		}
 
-		FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
+		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 		World world = loc.getWorld();
 		Entity e = LibraryOfSoulsIntegration.summon(loc, "UnstableAmalgam");
@@ -134,7 +134,7 @@ public class UnstableAmalgam extends Ability {
 		}
 	}
 
-	private void explode(Location loc, FixedMetadataValue playerItemStats) {
+	private void explode(Location loc, ItemStatManager.PlayerItemStats playerItemStats) {
 		if (mPlayer == null || !mPlayer.isOnline() || mAlchemistPotions == null) {
 			return;
 		}

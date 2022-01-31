@@ -14,16 +14,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.logging.Level;
+import java.util.WeakHashMap;
 
 public class DamageListener implements Listener {
 
-	public static final String PROJECTILE_ITEM_STATS_METAKEY = "ProjectileItemStats";
-
 	private final Plugin mPlugin;
+
+	private static WeakHashMap<Projectile, PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
 
 	public DamageListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -54,12 +54,7 @@ public class DamageListener implements Listener {
 		Projectile projectile = event.getEntity();
 		ProjectileSource source = projectile.getShooter();
 		if (source instanceof Player player) {
-			PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStats(player);
-			if (playerItemStats != null) {
-				projectile.setMetadata(PROJECTILE_ITEM_STATS_METAKEY, new FixedMetadataValue(mPlugin, new PlayerItemStats(playerItemStats)));
-			} else {
-				mPlugin.getLogger().log(Level.WARNING, "Null PlayerItemStats attempted to be added to a projectile. Player: " + player.getName());
-			}
+			addProjectileItemStats(projectile, player);
 		}
 	}
 
@@ -95,24 +90,15 @@ public class DamageListener implements Listener {
 			if (source instanceof Player player) {
 				// Check if projectile
 				if (damager instanceof Projectile proj) {
-					if (proj.hasMetadata(PROJECTILE_ITEM_STATS_METAKEY)) {
-						Object value = proj.getMetadata(PROJECTILE_ITEM_STATS_METAKEY).get(0).value();
-						if (value instanceof PlayerItemStats) {
-							mPlugin.mItemStatManager.onDamage(mPlugin, player, (PlayerItemStats) value, event, damagee);
-							mPlugin.mAbilityManager.onDamage(player, event, damagee);
-						} else {
-							mPlugin.getLogger().log(Level.WARNING, "Malformed ProjectileItemStats metadata detected");
-						}
+					PlayerItemStats playerItemStats = mPlayerItemStatsMap.get(proj);
+					if (playerItemStats != null) {
+						mPlugin.mItemStatManager.onDamage(mPlugin, player, playerItemStats, event, damagee);
+						mPlugin.mAbilityManager.onDamage(player, event, damagee);
 					}
 				} else {
 					if (event.isDelayed()) {
-						Object value = event.getPlayerItemStat().value();
-						if (value instanceof PlayerItemStats) {
-							mPlugin.mItemStatManager.onDamage(mPlugin, player, (PlayerItemStats) value, event, damagee);
-							mPlugin.mAbilityManager.onDamage(player, event, damagee);
-						} else {
-							mPlugin.getLogger().log(Level.WARNING, "Malformed PlayerItemStats metadata detected");
-						}
+						mPlugin.mItemStatManager.onDamage(mPlugin, player, event.getPlayerItemStats(), event, damagee);
+						mPlugin.mAbilityManager.onDamage(player, event, damagee);
 					} else {
 						mPlugin.mItemStatManager.onDamage(mPlugin, player, event, damagee);
 						mPlugin.mAbilityManager.onDamage(player, event, damagee);
@@ -123,4 +109,15 @@ public class DamageListener implements Listener {
 		mPlugin.mEffectManager.damageEvent(event);
 	}
 
+	public static @Nullable PlayerItemStats getProjectileItemStats(Projectile proj) {
+		return mPlayerItemStatsMap.get(proj);
+	}
+
+	public static void addProjectileItemStats(Projectile proj, Player player) {
+		mPlayerItemStatsMap.put(proj, Plugin.getInstance().mItemStatManager.getPlayerItemStatsCopy(player));
+	}
+
+	public static void addProjectileItemStats(Projectile proj, PlayerItemStats playerItemStats) {
+		mPlayerItemStatsMap.put(proj, playerItemStats);
+	}
 }

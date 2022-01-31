@@ -9,7 +9,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -23,12 +23,10 @@ import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
-import java.util.logging.Level;
+import java.util.WeakHashMap;
 
 public class Pyroblast extends DepthsAbility {
 
@@ -38,7 +36,8 @@ public class Pyroblast extends DepthsAbility {
 	public static final int[] DAMAGE = {20, 25, 30, 35, 40, 50};
 	private static final int RADIUS = 4;
 	private static final int DURATION = 4 * 20;
-	public static final String PYROBLAST_ARROW_METADATA = "PyroblastArrow";
+
+	private WeakHashMap<AbstractArrow, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public Pyroblast(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -47,20 +46,20 @@ public class Pyroblast extends DepthsAbility {
 		mInfo.mLinkedSpell = ClassAbility.PYROBLAST;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
+		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity damager = event.getDamager();
-		if (event.getType() == DamageType.PROJECTILE && damager != null && damager instanceof AbstractArrow arrow && damager.hasMetadata(PYROBLAST_ARROW_METADATA)) {
+		if (event.getType() == DamageType.PROJECTILE && damager != null && damager instanceof AbstractArrow arrow && mPlayerItemStatsMap.containsKey(arrow)) {
 			explode(arrow, enemy.getLocation());
-			arrow.removeMetadata(PYROBLAST_ARROW_METADATA, mPlugin);
 		}
 	}
 
 	private void explode(AbstractArrow arrow, Location loc) {
-		MetadataValue value = arrow.getMetadata(DamageListener.PROJECTILE_ITEM_STATS_METAKEY).get(0);
-		if (mPlayer != null && value instanceof FixedMetadataValue playerItemStats) {
+		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(arrow);
+		if (mPlayer != null && playerItemStats != null) {
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, RADIUS);
 			for (LivingEntity mob : mobs) {
 				EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
@@ -69,16 +68,13 @@ public class Pyroblast extends DepthsAbility {
 				damageEvent.setPlayerItemStat(playerItemStats);
 				DamageUtils.damage(damageEvent, false, true, null);
 			}
-		} else {
-			mPlugin.getLogger().log(Level.WARNING, "Malformed ProjectileItemStats metadata detected (Pyroblast)");
+			World world = arrow.getWorld();
+			world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);
+			world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 40, 2, 2, 2, 0);
+			world.spawnParticle(Particle.FLAME, loc, 40, 2, 2, 2, 0);
+			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+			arrow.remove();
 		}
-
-		World world = arrow.getWorld();
-		world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);
-		world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 40, 2, 2, 2, 0);
-		world.spawnParticle(Particle.FLAME, loc, 40, 2, 2, 2, 0);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-		arrow.remove();
 	}
 
 	@Override
@@ -97,7 +93,8 @@ public class Pyroblast extends DepthsAbility {
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
-			arrow.setMetadata(PYROBLAST_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
+
+			mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SOUL_FIRE_FLAME);
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.CAMPFIRE_SIGNAL_SMOKE);
@@ -107,7 +104,7 @@ public class Pyroblast extends DepthsAbility {
 				@Override
 				public void run() {
 
-					if (arrow == null || mT > COOLDOWN) {
+					if (mT > COOLDOWN || !mPlayerItemStatsMap.containsKey(arrow)) {
 						arrow.remove();
 
 						this.cancel();

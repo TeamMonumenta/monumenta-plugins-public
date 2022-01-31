@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.events;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.scriptedquests.Plugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EvokerFangs;
@@ -121,7 +122,7 @@ public class DamageEvent extends Event implements Cancellable {
 	private boolean mCancelled = false;
 	private boolean mIsDelayed = false;
 
-	private FixedMetadataValue mPlayerItemStat;
+	private ItemStatManager.PlayerItemStats mPlayerItemStats;
 
 	public DamageEvent(EntityDamageEvent event, LivingEntity damagee) {
 		this(event, damagee, DamageType.getType(event.getCause()));
@@ -303,12 +304,19 @@ public class DamageEvent extends Event implements Cancellable {
 		return mIsDelayed;
 	}
 
-	public void setPlayerItemStat(FixedMetadataValue playerItemStat) {
-		mPlayerItemStat = playerItemStat;
+	public void setPlayerItemStat(FixedMetadataValue playerItemStatsMetadata) {
+		Object value = playerItemStatsMetadata.value();
+		if (value instanceof ItemStatManager.PlayerItemStats playerItemStats) {
+			mPlayerItemStats = playerItemStats;
+		}
 	}
 
-	public FixedMetadataValue getPlayerItemStat() {
-		return mPlayerItemStat;
+	public void setPlayerItemStat(ItemStatManager.PlayerItemStats playerItemStats) {
+		mPlayerItemStats = playerItemStats;
+	}
+
+	public ItemStatManager.PlayerItemStats getPlayerItemStats() {
+		return mPlayerItemStats;
 	}
 
 	public @Nullable EntityDamageEvent getEvent() {

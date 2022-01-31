@@ -14,7 +14,6 @@ import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -52,9 +51,9 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -602,7 +601,13 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public FixedMetadataValue getPlayerItemStatsMetadata(Player player) {
-		return new FixedMetadataValue(mPlugin, new PlayerItemStats(getPlayerItemStats(player)));
+	public PlayerItemStats getPlayerItemStatsCopy(Player player) {
+		PlayerItemStats stats = getPlayerItemStats(player);
+		// They should always have stats, but if they don't, make new ones and store them
+		if (stats == null) {
+			stats = new PlayerItemStats(player);
+			mPlayerItemStatsMappings.put(player.getUniqueId(), stats);
+		}
+		return new PlayerItemStats(stats);
 	}
 }

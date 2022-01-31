@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -45,7 +46,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.WeakHashMap;
 
 /*
  * Handles giving potions and the direct damage aspect
@@ -67,6 +68,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private int mMaxCharges;
 	private int mCharges;
 	private int mChargeTime;
+	private WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	private boolean mGruesomeMode;
 
@@ -90,6 +92,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		mCharges = ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0);
 		mChargeTime = POTIONS_TIMER_BASE;
 		mMaxCharges = MAX_CHARGES;
+
+		mPlayerItemStatsMap = new WeakHashMap<>();
 
 		// Scan hotbar for alch potion
 		PlayerInventory inv = player.getInventory();
@@ -184,7 +188,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			return;
 		}
 
-		potion.setMetadata("AlchemistPotion", mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer));
+		mPlayerItemStatsMap.put(potion, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 		if (mGruesomeMode) {
 			potion.setMetadata("GruesomeAlchemistPotion", new FixedMetadataValue(mPlugin, 0));
 		}
@@ -202,7 +206,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
-		if (potion.hasMetadata("AlchemistPotion")) {
+		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(potion);
+		if (playerItemStats != null) {
 			createAura(potion.getLocation());
 
 			if (potion.hasMetadata(TransmutationRing.TRANSMUTATION_POTION_TAG)) {
@@ -218,7 +223,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				boolean isGruesome = isGruesome(potion);
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity)) {
-						apply(entity, potion, isGruesome);
+						apply(entity, potion, isGruesome, playerItemStats);
 					}
 
 					if (entity instanceof Player player && player != mPlayer) {
@@ -243,7 +248,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 	}
 
-	public void apply(LivingEntity mob, ThrownPotion potion, boolean isGruesome) {
+	public void apply(LivingEntity mob, ThrownPotion potion, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {
 		if (mPlayer != null && MetadataUtils.checkOnceThisTick(mPlugin, mob, "AlchemistPotionApplying")) {
 			double damage = mDamage;
 
@@ -255,17 +260,13 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				damage += potion.getMetadata(AlchemicalArtillery.ARTILLERY_POTION_TAG).get(0).asDouble();
 			}
 
-			if (potion.hasMetadata("AlchemistPotion") && potion.getMetadata("AlchemistPotion").get(0) instanceof FixedMetadataValue playerItemStats) {
-				DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, damage);
-				damageEvent.setDelayed(true);
-				damageEvent.setPlayerItemStat(playerItemStats);
-				DamageUtils.damage(damageEvent, false, true, null);
+			DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, damage);
+			damageEvent.setDelayed(true);
+			damageEvent.setPlayerItemStat(playerItemStats);
+			DamageUtils.damage(damageEvent, false, true, null);
 
-				// Intentionally apply effects after damage
-				applyEffects(mob, isGruesome);
-			} else {
-				mPlugin.getLogger().log(Level.WARNING, "Failed to retrieve PlayerItemStats in AlchemistPotion: " + mPlayer.getName());
-			}
+			// Intentionally apply effects after damage
+			applyEffects(mob, isGruesome);
 		}
 	}
 

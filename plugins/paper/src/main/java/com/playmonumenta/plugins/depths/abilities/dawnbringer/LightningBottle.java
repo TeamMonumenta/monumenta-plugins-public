@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -24,13 +25,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.WeakHashMap;
 
 public class LightningBottle extends DepthsAbility {
 	public static final String ABILITY_NAME = "Lightning Bottle";
@@ -44,6 +45,8 @@ public class LightningBottle extends DepthsAbility {
 	public static final int DURATION = 3 * 20;
 	public static final int DEATH_RADIUS = 32;
 
+	private WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+
 	private int mCount = 0;
 
 	public LightningBottle(Plugin plugin, Player player) {
@@ -51,13 +54,14 @@ public class LightningBottle extends DepthsAbility {
 		mDisplayItem = Material.BREWING_STAND;
 		mInfo.mLinkedSpell = ClassAbility.LIGHTNING_BOTTLE;
 		mTree = DepthsTree.SUNLIGHT;
+		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		if (mPlayer != null && InventoryUtils.testForItemWithName(potion.getItem(), POTION_NAME)) {
 			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.SPELL);
-			potion.setMetadata(POTION_META_DATA, mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer));
+			mPlayerItemStatsMap.put(potion, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 		}
 
 		return true;
@@ -65,7 +69,8 @@ public class LightningBottle extends DepthsAbility {
 
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
-		if (mPlayer != null && potion.hasMetadata(POTION_META_DATA) && potion.getMetadata(POTION_META_DATA).get(0) instanceof FixedMetadataValue playerItemStats) {
+		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(potion);
+		if (mPlayer != null && playerItemStats != null) {
 			for (LivingEntity entity : affectedEntities) {
 				if (EntityUtils.isHostileMob(entity)) {
 					DamageEvent damageEvent = new DamageEvent(entity, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, DAMAGE[mRarity - 1]);

@@ -1,5 +1,13 @@
 package com.playmonumenta.plugins.itemstats.attributes;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.itemstats.Attribute;
+import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
+import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -12,17 +20,7 @@ import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.itemstats.Attribute;
-import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
-import com.playmonumenta.plugins.listeners.DamageListener;
-import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import com.playmonumenta.plugins.utils.NmsUtils;
 
 public class ThrowRate implements Attribute {
 
@@ -65,7 +63,7 @@ public class ThrowRate implements Attribute {
 
 				// Set a bunch of stuff that isn't caught by the entity duplication
 				newProj.setShooter(player);
-				newProj.setMetadata(DamageListener.PROJECTILE_ITEM_STATS_METAKEY, new FixedMetadataValue(plugin, plugin.mItemStatManager.getPlayerItemStats(player)));
+				DamageListener.addProjectileItemStats(newProj, player);
 
 				newProj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
@@ -79,7 +77,7 @@ public class ThrowRate implements Attribute {
 				Snowball snowball = (Snowball) player.getWorld().spawnEntity(proj.getLocation(), EntityType.SNOWBALL);
 				snowball.setShooter(player);
 				snowball.setVelocity(proj.getVelocity());
-				snowball.setMetadata(DamageListener.PROJECTILE_ITEM_STATS_METAKEY, new FixedMetadataValue(plugin, plugin.mItemStatManager.getPlayerItemStats(player)));
+				DamageListener.addProjectileItemStats(snowball, player);
 				player.playSound(player.getLocation(), Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 0.5f, 0.5f);
 
 				player.setCooldown(Material.SNOWBALL, (int)(20 / value));

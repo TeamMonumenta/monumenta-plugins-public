@@ -9,7 +9,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -24,12 +24,10 @@ import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.logging.Level;
+import java.util.WeakHashMap;
 
 public class Earthquake extends DepthsAbility {
 	public static final String ABILITY_NAME = "Earthquake";
@@ -42,6 +40,8 @@ public class Earthquake extends DepthsAbility {
 	public static final int MAX_TICKS = 4 * 20;
 	public static final String EARTHQUAKE_ARROW_METADATA = "EarthquakeArrow";
 
+	private WeakHashMap<AbstractArrow, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+
 	public Earthquake(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.COARSE_DIRT;
@@ -49,21 +49,21 @@ public class Earthquake extends DepthsAbility {
 		mInfo.mLinkedSpell = ClassAbility.EARTHQUAKE;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
+		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(EARTHQUAKE_ARROW_METADATA)) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && mPlayerItemStatsMap.containsKey(arrow)) {
 			quake(arrow, enemy.getLocation());
-			arrow.removeMetadata(EARTHQUAKE_ARROW_METADATA, mPlugin);
 		}
 	}
 
 	private void quake(AbstractArrow arrow, Location loc) {
 		World world = mPlayer.getWorld();
 
-		MetadataValue value = arrow.getMetadata(DamageListener.PROJECTILE_ITEM_STATS_METAKEY).get(0);
-		if (value instanceof FixedMetadataValue playerItemStats) {
+		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(arrow);
+		if (playerItemStats != null) {
 			new BukkitRunnable() {
 				int mTicks = 0;
 				@Override
@@ -105,9 +105,6 @@ public class Earthquake extends DepthsAbility {
 					mTicks += 5;
 				}
 			}.runTaskTimer(mPlugin, 0, 5);
-
-		} else {
-			mPlugin.getLogger().log(Level.WARNING, "Malformed ProjectileItemStats metadata detected (Earthquake)");
 		}
 
 		arrow.remove();
@@ -133,7 +130,8 @@ public class Earthquake extends DepthsAbility {
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
-			arrow.setMetadata(EARTHQUAKE_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
+
+			mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.LAVA);
 
@@ -141,7 +139,7 @@ public class Earthquake extends DepthsAbility {
 				int mT = 0;
 				@Override
 				public void run() {
-					if (arrow == null || mT > MAX_TICKS) {
+					if (mT > COOLDOWN || !mPlayerItemStatsMap.containsKey(arrow)) {
 						arrow.remove();
 
 						this.cancel();

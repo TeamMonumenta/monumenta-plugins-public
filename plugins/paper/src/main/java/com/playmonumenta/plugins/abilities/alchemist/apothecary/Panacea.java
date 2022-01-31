@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -26,7 +27,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -53,7 +53,6 @@ public class Panacea extends Ability {
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
 	private static final int COOLDOWN = 24 * 20;
 
-	private double mDamageFraction;
 	private final int mShield;
 	private int mSlowTicks;
 	private @Nullable AlchemistPotions mAlchemistPotions;
@@ -89,7 +88,7 @@ public class Panacea extends Ability {
 
 		putOnCooldown();
 
-		FixedMetadataValue playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsMetadata(mPlayer);
+		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 		if (mAlchemistPotions != null) {
 			double damage = mAlchemistPotions.getDamage() * PANACEA_DAMAGE_FRACTION;

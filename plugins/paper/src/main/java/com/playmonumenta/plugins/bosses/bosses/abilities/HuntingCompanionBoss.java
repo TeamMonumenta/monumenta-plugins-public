@@ -1,28 +1,27 @@
 package com.playmonumenta.plugins.bosses.bosses.abilities;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class HuntingCompanionBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_huntingcompanion";
@@ -33,7 +32,7 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 	private @Nullable Player mPlayer;
 	private double mDamage = 0;
 	private int mStunTime = 0;
-	private @Nullable FixedMetadataValue mPlayerItemStats;
+	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new HuntingCompanionBoss(plugin, boss);
@@ -48,7 +47,7 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
-	public void spawn(Player player, double damage, int stunTime, FixedMetadataValue playerItemStats) {
+	public void spawn(Player player, double damage, int stunTime, ItemStatManager.PlayerItemStats playerItemStats) {
 		mPlayer = player;
 		mDamage = damage;
 		mStunTime = stunTime;
