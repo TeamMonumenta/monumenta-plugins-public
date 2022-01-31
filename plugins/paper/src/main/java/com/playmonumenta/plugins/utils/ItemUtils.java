@@ -12,7 +12,6 @@ import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTList;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
@@ -33,6 +32,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -987,9 +987,10 @@ public class ItemUtils {
 		}
 	}
 
+	//Does not include riptide tridents
 	public static boolean isBowOrTrident(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			return Materials.BOWS.contains(itemStack.getType()) || itemStack.getType() == Material.TRIDENT;
+			return Materials.BOWS.contains(itemStack.getType()) || (itemStack.getType() == Material.TRIDENT && ItemStatUtils.getEnchantmentLevel(itemStack, EnchantmentType.RIPTIDE) == 0);
 		} else {
 			return false;
 		}
