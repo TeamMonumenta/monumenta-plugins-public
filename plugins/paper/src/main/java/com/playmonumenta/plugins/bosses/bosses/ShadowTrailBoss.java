@@ -1,13 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseTrail;
-import com.playmonumenta.plugins.utils.NmsUtils;
-
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,6 +12,9 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class ShadowTrailBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_shadowtrail";
@@ -46,7 +46,7 @@ public class ShadowTrailBoss extends BossAbilityGroup {
 					(World world, Player player, Location loc) -> {
 						world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, 1f, 0.5f);
 						world.spawnParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.25);
-						NmsUtils.getVersionAdapter().unblockableEntityDamageEntity(player, DAMAGE, boss);
+						DamageUtils.damage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE);
 					},
 					// Expire Action
 					(World world, Location loc) -> { })
