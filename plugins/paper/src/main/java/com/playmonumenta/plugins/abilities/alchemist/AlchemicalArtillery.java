@@ -59,6 +59,9 @@ public class AlchemicalArtillery extends Ability {
 			pot.setShooter(mPlayer);
 			mAlchemistPotions.setPotionToAlchemistPotion(pot);
 
+			arrow.remove();
+			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
+
 			double bownus = 0;
 			if (getAbilityScore() > 1) {
 				PlayerInventory inv = mPlayer.getInventory();
@@ -72,7 +75,6 @@ public class AlchemicalArtillery extends Ability {
 			}
 
 			pot.setMetadata(ARTILLERY_POTION_TAG, new FixedMetadataValue(mPlugin, bownus));
-			arrow.remove();
 		}
 
 		return true;
