@@ -23,44 +23,81 @@ public class CustomInventoryCommands {
 
 		new CommandAPICommand("openteleportergui")
 			.withPermission("monumenta.command.openteleportergui")
+			.executesPlayer((player, args) -> {
+				new OrinCustomInventory(player, -1).openInventory(player, plugin);
+			})
+			.register();
+		new CommandAPICommand("openteleportergui")
+			.withPermission("monumenta.command.openteleportergui")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
-				Player player = (Player)args[0];
+				Player player = (Player) args[0];
 				new OrinCustomInventory(player, -1).openInventory(player, plugin);
+			})
+			.register();
+
+		new CommandAPICommand("openPEB")
+			.withPermission("monumenta.command.openpeb")
+			.executesPlayer((player, args) -> {
+				new PEBCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
 		new CommandAPICommand("openPEB")
 			.withPermission("monumenta.command.openpeb")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
-				Player player = (Player)args[0];
+				Player player = (Player) args[0];
 				new PEBCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
 
 		new CommandAPICommand("openinfusiongui")
 			.withPermission("monumenta.command.openinfusiongui")
+			.executesPlayer((player, args) -> {
+				new InfusionCustomInventory(player).openInventory(player, plugin);
+			})
+			.register();
+		new CommandAPICommand("openinfusiongui")
+			.withPermission("monumenta.command.openinfusiongui")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
-				Player player = (Player)args[0];
+				Player player = (Player) args[0];
 				new InfusionCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
 
 		new CommandAPICommand("opendelveinfusiongui")
 			.withPermission("monumenta.command.opendelveinfusiongui")
+			.executesPlayer((player, args) -> {
+				new DelveInfusionCustomInventory(player).openInventory(player, plugin);
+			})
+			.register();
+		new CommandAPICommand("opendelveinfusiongui")
+			.withPermission("monumenta.command.opendelveinfusiongui")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
-				Player player = (Player)args[0];
+				Player player = (Player) args[0];
 				new DelveInfusionCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
 
 		new CommandAPICommand("openparrotgui")
 			.withPermission("monumenta.command.openparrotgui")
+			.executesPlayer((player, args) -> {
+				try {
+					new ParrotCustomInventory(player).openInventory(player, plugin);
+				} catch (Exception ex) {
+					String msg = "Failed to open Parrot GUI: " + ex.getMessage();
+					player.sendMessage(msg);
+					ex.printStackTrace();
+				}
+			})
+			.register();
+		new CommandAPICommand("openparrotgui")
+			.withPermission("monumenta.command.openparrotgui")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
-				Player player = (Player)args[0];
+				Player player = (Player) args[0];
 				try {
 					new ParrotCustomInventory(player).openInventory(player, plugin);
 				} catch (Exception ex) {
@@ -74,9 +111,15 @@ public class CustomInventoryCommands {
 
 		new CommandAPICommand("openclassgui")
 			.withPermission("monumenta.command.openclassgui")
+			.executesPlayer((player, args) -> {
+				new ClassSelectionCustomInventory(player).openInventory(player, plugin);
+			})
+			.register();
+		new CommandAPICommand("openclassgui")
+			.withPermission("monumenta.command.openclassgui")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
-				Player player = (Player)args[0];
+				Player player = (Player) args[0];
 				new ClassSelectionCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
