@@ -143,6 +143,7 @@ import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -156,6 +157,28 @@ import java.io.IOException;
 import java.util.UUID;
 
 public class Plugin extends JavaPlugin {
+	public static final boolean IS_PLAY_SERVER;
+
+	static {
+		/*
+		 * Reads the environment variable MONUMENTA_IS_PLAY to determine if this is the build or play server
+		 * If environment variable is not set or 0, build server. If set and nonzero, play server.
+		 * This is stored into the scoreboard '$IsPlay const' in the onEnable() event
+		 */
+		String shardName = System.getenv("MONUMENTA_IS_PLAY");
+		if (shardName == null || shardName.isEmpty()) {
+			IS_PLAY_SERVER = false;
+		} else {
+			boolean val;
+			try {
+				val = Integer.parseInt(shardName) != 0;
+			} catch (Exception ex) {
+				val = false;
+			}
+			IS_PLAY_SERVER = val;
+		}
+	}
+
 	public CooldownTimers mTimers;
 	public ProjectileEffectTimers mProjectileEffectTimers;
 	public CombatLoggingTimers mCombatLoggingTimers;
@@ -301,6 +324,16 @@ public class Plugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		INSTANCE = this;
+
+		/*
+		 * Set the score '$IsPlay const' to indicate whether this is the build (0) or play (1) server
+		 * This is sourced from the environment variable MONUMENTA_IS_PLAY in the static init section at load time
+		 * This is used by mechanisms to test if this is the build server or the play server, like:
+		 * /execute if score $IsPlay const matches 1 run ...
+		 */
+		ScoreboardUtils.setScoreboardValue("$IsPlay", "const", IS_PLAY_SERVER ? 1 : 0);
+		getLogger().info("Setting $IsPlay const = " + Integer.toString(IS_PLAY_SERVER ? 1 : 0) + " (" + (IS_PLAY_SERVER ? "play" : "build") + " server)");
+
 		PluginManager manager = getServer().getPluginManager();
 
 		if (mHttpManager != null) {
