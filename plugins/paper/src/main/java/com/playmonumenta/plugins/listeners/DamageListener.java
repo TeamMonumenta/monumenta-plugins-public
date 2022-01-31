@@ -35,11 +35,13 @@ public class DamageListener implements Listener {
 		 * Puts the wrapper DamageEvent on EntityDamageEvents not caused by the
 		 * plugin (DamageCause.CUSTOM), which should wrap events manually to
 		 * set the correct DamageType.
+		 * If the damage is <= 0 (blocked with a shield), don't do anything to make
+		 * sure the shield gets proper durability damage (and this also prevents knockback going through shields sometimes).
 		 */
-		if (event.getCause() != DamageCause.CUSTOM) {
-			if (event.getEntity() instanceof LivingEntity le) {
-				Bukkit.getPluginManager().callEvent(new DamageEvent(event, le));
-			}
+		if (event.getCause() != DamageCause.CUSTOM
+			    && event.getFinalDamage() > 0
+			    && event.getEntity() instanceof LivingEntity le) {
+			Bukkit.getPluginManager().callEvent(new DamageEvent(event, le));
 		}
 	}
 
