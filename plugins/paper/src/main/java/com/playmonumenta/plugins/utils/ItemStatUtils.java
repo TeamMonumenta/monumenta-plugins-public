@@ -1658,6 +1658,34 @@ public class ItemStatUtils {
 
 			generateItemStats(item);
 		}).register();
+
+		arguments.clear();
+		arguments.add(new PlayerArgument("player"));
+		arguments.add(new StringArgument("register"));
+
+		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executes((sender, args) -> {
+			if (((Player) sender).getGameMode() != GameMode.CREATIVE) {
+				return;
+			}
+			Player player = (Player) args[0];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item == null || item.getType() == Material.AIR) {
+				return;
+			}
+
+			List<Component> oldLore = item.lore();
+			if (oldLore == null || oldLore.isEmpty()) {
+				return;
+			}
+
+			int loreIdx = 0;
+			for (Component c : oldLore) {
+				addLore(item, loreIdx, c);
+				loreIdx++;
+			}
+
+			generateItemStats(item);
+		}).register();
 	}
 
 	public static void registerNameCommand() {
