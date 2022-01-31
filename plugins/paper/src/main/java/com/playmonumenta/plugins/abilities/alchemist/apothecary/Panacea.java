@@ -41,7 +41,7 @@ public class Panacea extends Ability {
 	private static final double PANACEA_DAMAGE_FRACTION = 0.6;
 	private static final int PANACEA_1_SHIELD = 2;
 	private static final int PANACEA_2_SHIELD = 4;
-	private static final int PANACEA_MAX_SHIELD = 12;
+	private static final int PANACEA_MAX_SHIELD = 16;
 	private static final int PANACEA_ABSORPTION_DURATION = 20 * 24;
 	// Calculate the range with MAX_DURATION * MOVE_SPEED
 	private static final int PANACEA_MAX_DURATION = 20 * 2;
@@ -62,7 +62,7 @@ public class Panacea extends Ability {
 		super(plugin, player, "Panacea");
 		mInfo.mScoreboardId = "Panacea";
 		mInfo.mShorthandName = "Pn";
-		mInfo.mDescriptions.add("Shift left click with a Bow to shoot a mixture that deals 60% of your potion damage and applies 100% Slow for 1.5s to every enemy touched and adds 2 absorption health to other players, lasting 24 seconds, maximum 12. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 24s.");
+		mInfo.mDescriptions.add("Shift left click with a Bow to shoot a mixture that deals 60% of your potion damage and applies 100% Slow for 1.5s to every enemy touched and adds 2 absorption health to other players, lasting 24 seconds, maximum 16. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 24s.");
 		mInfo.mDescriptions.add("Absorption health added is increased to 4, and Slow duration is increased to 2s.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.PANACEA;
