@@ -53,7 +53,7 @@ public class UnstableAmalgam extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.UNSTABLE_AMALGAM;
 		mInfo.mScoreboardId = "UnstableAmalgam";
 		mInfo.mShorthandName = "UA";
-		mInfo.mDescriptions.add("Shift left click while holding an Alchemist's Bag to consume a potion to place an Amalgam with 1 health at the location you are looking, up to 7 blocks away. When the Alamgam dies, or after 3 seconds, it explodes, dealing 12 magic damage to mobs in a 4 block radius and applying potion effects from all abilities. Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Shift left click while holding an Alchemist's Bag to consume a potion to place an Amalgam with 1 health at the location you are looking, up to 7 blocks away. When the Alamgam dies, or after 3 seconds, it explodes, dealing your Alchemist Potion's damage + 12 magic damage to mobs in a 4 block radius and applying potion effects from all abilities. Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion. Cooldown: 20s.");
 		mInfo.mDescriptions.add("The damage is increased to 20 and the cooldown is reduced to 16s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? UNSTABLE_AMALGAM_1_COOLDOWN : UNSTABLE_AMALGAM_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -140,7 +140,7 @@ public class UnstableAmalgam extends Ability {
 		}
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, UNSTABLE_AMALGAM_RADIUS, mPlayer)) {
-			DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, mDamage);
+			DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, mDamage + mAlchemistPotions.getDamage());
 			damageEvent.setDelayed(true);
 			damageEvent.setPlayerItemStat(playerItemStats);
 			DamageUtils.damage(damageEvent, false, true, null);
