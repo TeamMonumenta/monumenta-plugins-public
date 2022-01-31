@@ -286,11 +286,11 @@ public class DepthsUtils {
 	/**
 	 * Used for ability run checks for casting, rough estimate at whether they are holding a viable weapon
 	 * @param item Item to check for
-	 * @return if the item is an axe, sword, scythe or wand
+	 * @return if the item is an axe, sword, scythe, wand, or trident
 	 */
-	public static boolean isWeaponItem(ItemStack item) {
-		return (ItemUtils.isAxe(item) || ItemUtils.isSword(item) ||
-			ItemUtils.isWand(item) || ItemUtils.isHoe(item));
+	public static boolean isWeaponItem(@Nullable ItemStack item) {
+		return item != null && (ItemUtils.isAxe(item) || ItemUtils.isSword(item) ||
+			ItemUtils.isWand(item) || ItemUtils.isHoe(item) || item.getType() == Material.TRIDENT);
 	}
 
 	public static double roundDouble(double num) {
