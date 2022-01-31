@@ -33,7 +33,7 @@ public class Swiftness extends Ability {
 		mInfo.mScoreboardId = "Swiftness";
 		mInfo.mShorthandName = "Swf";
 		mInfo.mDescriptions.add("Gain +20% Speed when you are not inside a town.");
-		mInfo.mDescriptions.add("In addition, gain Jump Boost III when you are not inside a town. Swap hands looking up, not sneaking, and not holding a bow or crossbow to toggle the Jump Boost.");
+		mInfo.mDescriptions.add("In addition, gain Jump Boost III when you are not inside a town. Swap hands looking up, not sneaking, and not holding a bow, crossbow, or trident to toggle the Jump Boost.");
 		mDisplayItem = new ItemStack(Material.RABBIT_FOOT, 1);
 		if (player != null) {
 			addModifier(player);
@@ -68,7 +68,7 @@ public class Swiftness extends Ability {
 
 		event.setCancelled(true);
 
-		if (mPlayer.isSneaking() || mPlayer.getLocation().getPitch() >= -45 || ItemUtils.isSomeBow(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer.isSneaking() || mPlayer.getLocation().getPitch() >= -45 || ItemUtils.isBowOrTrident(mPlayer.getInventory().getItemInMainHand())) {
 			return;
 		}
 
