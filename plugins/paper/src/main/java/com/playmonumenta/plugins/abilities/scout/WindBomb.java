@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.WindBombAirTag;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -23,6 +24,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
 import javax.annotation.Nullable;
 
 public class WindBomb extends Ability {
@@ -43,7 +45,7 @@ public class WindBomb extends Ability {
 		mInfo.mScoreboardId = "WindBomb";
 		mInfo.mShorthandName = "WB";
 		mInfo.mLinkedSpell = ClassAbility.WIND_BOMB;
-		mInfo.mDescriptions.add("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, launches mobs in a 3 block radius into the air, giving them Slow Falling and 20% Weaken for 4s. Cooldown: 15s.");
+		mInfo.mDescriptions.add("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, launches mobs in a 3 block radius into the air, giving them Slow Falling and 20% Weaken for 4s. Cannot be used while holding a trident or snowball. Cooldown: 15s.");
 		mInfo.mDescriptions.add("The cooldown is reduced to 10s. Additionally, you deal 20% more damage to enemies made airborne by this skill, until they hit the ground.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mIgnoreCooldown = true;
@@ -53,6 +55,12 @@ public class WindBomb extends Ability {
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
+
+		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
+		if (mainhand != null && (mainhand.getType() == Material.TRIDENT || mainhand.getType() == Material.SNOWBALL)) {
+			return;
+		}
+
 		if (mPlayer.isSneaking()) {
 			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 				return;
@@ -62,6 +70,9 @@ public class WindBomb extends Ability {
 			mProj = mPlayer.launchProjectile(Snowball.class);
 			mProj.setVelocity(mProj.getVelocity().normalize().multiply(VELOCITY));
 			mPlugin.mProjectileEffectTimers.addEntity(mProj, Particle.CLOUD);
+			if (mProj.hasMetadata(DamageListener.PROJECTILE_ITEM_STATS_METAKEY)) {
+				mProj.removeMetadata(DamageListener.PROJECTILE_ITEM_STATS_METAKEY, mPlugin);
+			}
 			putOnCooldown();
 		}
 	}
