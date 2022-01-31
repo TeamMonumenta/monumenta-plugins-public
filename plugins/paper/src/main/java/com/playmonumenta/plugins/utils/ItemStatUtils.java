@@ -1661,7 +1661,7 @@ public class ItemStatUtils {
 
 		arguments.clear();
 		arguments.add(new PlayerArgument("player"));
-		arguments.add(new StringArgument("register"));
+		arguments.add(new MultiLiteralArgument("register"));
 
 		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executes((sender, args) -> {
 			if (((Player) sender).getGameMode() != GameMode.CREATIVE) {
