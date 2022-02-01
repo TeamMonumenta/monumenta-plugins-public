@@ -62,7 +62,10 @@ public class EnergizingElixir extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer != null && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && !(mUnstableAmalgam != null && mPlayer.isSneaking())) {
+		if (mPlayer != null
+			&& ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())
+			&& !(mUnstableAmalgam != null && mPlayer.isSneaking())
+			&& (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK)) {
 			if (mAlchemistPotions != null) {
 				if (!mAlchemistPotions.decrementCharge()) {
 					// If no charges, do not activate ability
