@@ -13,6 +13,7 @@ public class Pyromania extends DepthsAbility {
 	public static final String ABILITY_NAME = "Pyromania";
 	public static final double[] FIRE_BONUS_DAMAGE = {2, 2.5, 3, 3.5, 4, 6};
 	public static final int RADIUS = 20;
+	public static final String LAST_PYROMANIA_DAMAGE = "LastPyromaniaDamage";
 
 	public Pyromania(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

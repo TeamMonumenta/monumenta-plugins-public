@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
+import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -39,6 +40,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.io.File;
@@ -139,7 +141,7 @@ public class DepthsListener implements Listener {
 		LivingEntity source = event.getSource();
 
 		//Pyromania implementation handler
-		if (event.getType() == DamageType.FIRE && !(damagee instanceof Player)) {
+		if (event.getType() == DamageType.FIRE && !(damagee instanceof Player) && !MetadataUtils.happenedInRecentTicks(damagee, Pyromania.LAST_PYROMANIA_DAMAGE, 10)) {
 			List<Player> playersToCheck = PlayerUtils.playersInRange(damagee.getLocation(), Pyromania.RADIUS, true);
 			double addedDamage = 0;
 			for (Player p : playersToCheck) {
@@ -154,6 +156,7 @@ public class DepthsListener implements Listener {
 			}
 
 			if (addedDamage > 0) {
+				damagee.setMetadata(Pyromania.LAST_PYROMANIA_DAMAGE, new FixedMetadataValue(mPlugin, damagee.getTicksLived()));
 				event.setCancelled(true);
 				DamageUtils.damage(null, damagee, DamageType.OTHER, event.getDamage() + addedDamage, null, true, false);
 			}
