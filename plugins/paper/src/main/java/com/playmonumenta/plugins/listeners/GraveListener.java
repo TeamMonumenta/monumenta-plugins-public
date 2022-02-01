@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import de.tr7zw.nbtapi.NBTEntity;
+import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -43,6 +44,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class GraveListener implements Listener {
 	Plugin mPlugin;
@@ -178,7 +180,8 @@ public class GraveListener implements Listener {
 		if (gravesEnabled(player)) {
 			if (result == ItemUtils.ItemDeathResult.SHATTER || result == ItemUtils.ItemDeathResult.SHATTER_NOW
 				|| result == ItemUtils.ItemDeathResult.SAFE || result == ItemUtils.ItemDeathResult.KEEP) {
-				if (entity.getThrower().equals(player.getUniqueId())) {
+				@Nullable UUID thrower = entity.getThrower();
+				if (thrower != null && thrower.equals(player.getUniqueId())) {
 					GraveManager.onDropItem(player, entity);
 				} else {
 					new BukkitRunnable() {
