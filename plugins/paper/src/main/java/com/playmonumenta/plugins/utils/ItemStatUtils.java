@@ -65,6 +65,7 @@ import java.util.stream.Collectors;
 
 public class ItemStatUtils {
 
+	static final String MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME = "MMDummy";
 	static final String MONUMENTA_KEY = "Monumenta";
 	static final String LORE_KEY = "Lore";
 	static final String STOCK_KEY = "Stock";
@@ -1535,8 +1536,18 @@ public class ItemStatUtils {
 		if (item.getType().name().contains("PATTERN") || item.getType().name().contains("SHIELD")) {
 			meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		}
-		meta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
-		meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(new UUID(4962299719473579328L, 6604307008242803253L), "Dummy", 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+
+		boolean hasDummyArmorToughnessAttribute = false;
+		if (meta.hasAttributeModifiers()) {
+			Collection<AttributeModifier> toughnessAttrs = meta.getAttributeModifiers(Attribute.GENERIC_ARMOR_TOUGHNESS);
+			hasDummyArmorToughnessAttribute = toughnessAttrs.size() == 1 && toughnessAttrs.iterator().next().getName().equals(MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME);
+		}
+
+		if (!hasDummyArmorToughnessAttribute) {
+			meta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+			meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME, 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		}
+
 		if (item.getType() == Material.BOW || item.getType() == Material.CROSSBOW) {
 			meta.addEnchant(Enchantment.WATER_WORKER, 1, true);
 		} else {
