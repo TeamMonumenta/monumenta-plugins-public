@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -64,9 +63,6 @@ public class Updraft extends DepthsAbility {
 		mProj = mPlayer.launchProjectile(Snowball.class);
 		mProj.setVelocity(mProj.getVelocity().normalize().multiply(VELOCITY));
 		mPlugin.mProjectileEffectTimers.addEntity(mProj, Particle.CLOUD);
-		if (mProj.hasMetadata(DamageListener.PROJECTILE_ITEM_STATS_METAKEY)) {
-			mProj.removeMetadata(DamageListener.PROJECTILE_ITEM_STATS_METAKEY, mPlugin);
-		}
 		putOnCooldown();
 	}
 
