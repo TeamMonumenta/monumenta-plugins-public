@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -28,7 +27,39 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.AreaEffectCloud;
+import org.bukkit.entity.Bee;
+import org.bukkit.entity.Blaze;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Flying;
+import org.bukkit.entity.Ghast;
+import org.bukkit.entity.Giant;
+import org.bukkit.entity.Hoglin;
+import org.bukkit.entity.LargeFireball;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.MagmaCube;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.Phantom;
+import org.bukkit.entity.PigZombie;
+import org.bukkit.entity.Piglin;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.PolarBear;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.PufferFish;
+import org.bukkit.entity.Rabbit;
+import org.bukkit.entity.Shulker;
+import org.bukkit.entity.SkeletonHorse;
+import org.bukkit.entity.Slime;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.Vex;
+import org.bukkit.entity.Wither;
+import org.bukkit.entity.WitherSkeleton;
+import org.bukkit.entity.Wolf;
+import org.bukkit.entity.ZombieHorse;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -38,6 +69,7 @@ import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -1069,6 +1101,46 @@ public class EntityUtils {
 		if (paralyses != null) {
 			paralyses.last().setDuration(0);
 		}
+	}
+
+	public static double calculateCreeperExplosionDamage(Creeper creeper, LivingEntity entity, double originalDamage) {
+		double baseDamage = getAttributeBaseOrDefault(creeper, Attribute.GENERIC_ATTACK_DAMAGE, 0);
+
+		//Vanilla creepers have 2 attack damage for some reason - if we haven't intentionally set it, don't change the damage
+		if (baseDamage <= 2) {
+			return originalDamage;
+		}
+
+		double power = creeper.getExplosionRadius();
+		if (creeper.isPowered()) {
+			power *= 2;
+		}
+
+		return getAdjustedBlastDamage(power, originalDamage, baseDamage);
+	}
+
+	public static double calculateGhastExplosionDamage(Ghast ghast, LargeFireball largeFireball, LivingEntity entity, double originalDamage) {
+		//Ghasts have no attack damage attribute - we cannot even give them it as a dummy
+		//Use luck instead
+		double baseDamage = getAttributeBaseOrDefault(ghast, Attribute.GENERIC_LUCK, 0);
+
+		if (baseDamage <= 0) {
+			return originalDamage;
+		}
+
+		//double power = largeFireball.
+		double power = largeFireball.getYield();
+
+		return getAdjustedBlastDamage(power, originalDamage, baseDamage);
+	}
+
+	private static double getAdjustedBlastDamage(double power, double originalDamage, double baseDamage) {
+		//Vanilla formula for maximum damage taken
+		double maxOriginalDamage = 2 * 7 * power + 1;
+
+		//1 damage is constant and doesn't scale
+		double ratio = (originalDamage - 1) / (maxOriginalDamage - 1);
+		return ratio * (baseDamage - 1) + 1;
 	}
 
 }

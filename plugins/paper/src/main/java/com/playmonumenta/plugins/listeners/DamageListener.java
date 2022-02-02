@@ -4,14 +4,19 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Ghast;
+import org.bukkit.entity.LargeFireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -32,6 +37,19 @@ public class DamageListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
+
+		if (event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent
+				&& event.getCause().equals(DamageCause.ENTITY_EXPLOSION)
+				&& event.getEntity() instanceof LivingEntity le) {
+			Entity damager = entityDamageByEntityEvent.getDamager();
+			if (damager instanceof Creeper creeper) {
+				event.setDamage(EntityUtils.calculateCreeperExplosionDamage(creeper, le, event.getDamage()));
+			} else if (damager instanceof LargeFireball largeFireball && largeFireball.getShooter() instanceof Ghast ghast) {
+				event.setDamage(EntityUtils.calculateGhastExplosionDamage(ghast, largeFireball, le, event.getDamage()));
+			}
+
+		}
+
 		/*
 		 * Puts the wrapper DamageEvent on EntityDamageEvents not caused by the
 		 * plugin (DamageCause.CUSTOM), which should wrap events manually to
