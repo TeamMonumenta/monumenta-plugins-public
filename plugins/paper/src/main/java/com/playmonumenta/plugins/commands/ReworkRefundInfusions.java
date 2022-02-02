@@ -44,13 +44,13 @@ public class ReworkRefundInfusions extends GenericCommand {
 		}
 
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.PHYLACTERY) > 0) {
-			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"), 3);
+			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"), 2);
 			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/lich/materials/ancestral_effigy"), 6);
 			ItemStatUtils.removeInfusion(item, InfusionType.PHYLACTERY);
 		}
 
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.COLOSSAL) > 0) {
-			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"), 2);
+			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"), 3);
 			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/eldrask/materials/epic_material"), 9);
 			ItemStatUtils.removeInfusion(item, InfusionType.COLOSSAL);
 		}
