@@ -1,5 +1,15 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,17 +20,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
 
 
 public class SanctifiedArmor extends Ability {
@@ -53,8 +52,19 @@ public class SanctifiedArmor extends Ability {
 	}
 
 	@Override
-	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		if (mPlayer != null && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE) && Crusade.enemyTriggersAbilities(source, mCrusade) && !EntityUtils.isBoss(source) && !event.isCancelled() && !event.isBlocked()) {
+	public double getPriorityAmount() {
+		return 5000; // after all damage modifiers, but before lifelines, to get the proper final damage
+	}
+
+	@Override
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (mPlayer != null
+			    && source != null
+			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)
+			    && Crusade.enemyTriggersAbilities(source, mCrusade)
+			    && !EntityUtils.isBoss(source)
+			    && !event.isCancelled()
+			    && !event.isBlocked()) {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
 			world.spawnParticle(Particle.FIREWORKS_SPARK, loc.add(0, source.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125);

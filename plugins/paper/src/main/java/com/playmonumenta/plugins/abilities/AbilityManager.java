@@ -181,6 +181,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -205,20 +206,8 @@ public class AbilityManager {
 		mPlugin = plugin;
 		mManager = this;
 
-		mReferenceAbilities = new ArrayList<Ability>();
-		mDisabledAbilities = new ArrayList<Ability>();
-
-		List<Ability> specAbilitiesPriority = Arrays.asList(
-			// Damage multiplying skills must come before damage bonus skills
-			new RecklessSwing(mPlugin, null),
-			new DarkPact(mPlugin, null)
-		);
-
-		if (ServerProperties.getClassSpecializationsEnabled() && !ServerProperties.getShardName().contains("depths")) {
-			mReferenceAbilities.addAll(specAbilitiesPriority);
-		} else {
-			mDisabledAbilities.addAll(specAbilitiesPriority);
-		}
+		mReferenceAbilities = new ArrayList<>();
+		mDisabledAbilities = new ArrayList<>();
 
 		mReferenceAbilities.addAll(Arrays.asList(
 			// ALL (CLUCKING POTIONS)
@@ -253,6 +242,7 @@ public class AbilityManager {
 			new MagmaShield(mPlugin, null),
 			new ManaLance(mPlugin, null),
 			new Spellshock(mPlugin, null),
+			new PrismaticShield(mPlugin, null),
 
 			//********** ROGUE **********//
 			new AdvancingShadows(mPlugin, null),
@@ -263,6 +253,7 @@ public class AbilityManager {
 			new Smokescreen(mPlugin, null),
 			new ViciousCombos(mPlugin, null),
 			new Skirmisher(mPlugin, null),
+			new EscapeDeath(mPlugin, null),
 
 			//********** SCOUT **********//
 			new Agility(mPlugin, null),
@@ -359,6 +350,7 @@ public class AbilityManager {
 			// BERSERKER
 			new MeteorSlam(mPlugin, null),
 			new Rampage(mPlugin, null),
+			new RecklessSwing(mPlugin, null),
 
 			// GUARDIAN
 			new ShieldWall(mPlugin, null),
@@ -381,9 +373,10 @@ public class AbilityManager {
 			new ThuribleProcession(mPlugin, null),
 
 			//********** WARLOCK **********//
-            // REAPER
+			// REAPER
 			new JudgementChain(mPlugin, null),
 			new VoodooBonds(mPlugin, null),
+			new DarkPact(mPlugin, null),
 
 			// TENEBRIST
 			new WitheringGaze(mPlugin, null),
@@ -419,7 +412,6 @@ public class AbilityManager {
 		}
 
 
-		// These abilities should trigger after all event damage is calculated
 		List<Ability> delveModifiers = Arrays.asList(
 			//********** DELVES **********//
 			new StatMultiplier(mPlugin, null),
@@ -439,22 +431,8 @@ public class AbilityManager {
 			new Twisted(mPlugin, null)
 		);
 
-		List<Ability> triggerLastAbilities = Arrays.asList(
-			new SanctifiedArmor(mPlugin, null),
-			new PrismaticShield(mPlugin, null),
-			new EscapeDeath(mPlugin, null)
-		);
-		List<Ability> triggerLastSpecAbilities = Arrays.asList(
-			new Rampage(mPlugin, null),
-			new CoupDeGrace(mPlugin, null)
-		);
 		mReferenceAbilities.addAll(delveModifiers);
-		if (!ServerProperties.getShardName().contains("depths")) {
-			mReferenceAbilities.addAll(triggerLastAbilities);
-			if (ServerProperties.getClassSpecializationsEnabled()) {
-				mReferenceAbilities.addAll(triggerLastSpecAbilities);
-			}
-		}
+		mReferenceAbilities.sort(Comparator.comparingDouble(Ability::getPriorityAmount));
 	}
 
 	public static AbilityManager getManager() {
@@ -688,26 +666,24 @@ public class AbilityManager {
 		return true;
 	}
 
-	public void onHurt(Player player, DamageEvent event) {
+	public void onHurt(Player player, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (event.isCancelled()) {
+				return;
+			}
 			if (abil.canCast()) {
-				abil.onHurt(event);
+				abil.onHurt(event, damager, source);
 			}
 		}
 	}
 
-	public void onHurtByEntity(Player player, DamageEvent event, Entity damager) {
+	public void onHurtFatal(Player player, DamageEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.onHurtByEntity(event, damager);
+			if (event.isCancelled() || event.getDamage() < player.getHealth() + AbsorptionUtils.getAbsorption(player)) {
+				return;
 			}
-		}
-	}
-
-	public void onHurtByEntityWithSource(Player player, DamageEvent event, Entity damager, LivingEntity source) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.onHurtByEntityWithSource(event, damager, source);
+				abil.onHurtFatal(event);
 			}
 		}
 	}

@@ -1,16 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
-import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
@@ -24,8 +13,18 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
+import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+
+import java.util.List;
 
 public class Apocalypse extends DepthsAbility {
 	public static final String ABILITY_NAME = "Apocalypse";
@@ -44,7 +43,12 @@ public class Apocalypse extends DepthsAbility {
 	}
 
 	@Override
-	public void onHurt(@NotNull DamageEvent event) {
+	public double getPriorityAmount() {
+		return 10000;
+	}
+
+	@Override
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.isCancelled() || event.isBlocked() || mPlayer == null) {
 			return;
 		}
@@ -81,6 +85,11 @@ public class Apocalypse extends DepthsAbility {
 		world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.5f * count, 1.6f);
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Apocalypse has been activated!");
 		event.setCancelled(true);
+	}
+
+	@Override
+	public void onHurtFatal(DamageEvent event) {
+		onHurt(event, null, null);
 	}
 
 	@Override

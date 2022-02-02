@@ -1,5 +1,15 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -11,17 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
 
 
 
@@ -48,8 +47,13 @@ public class Riposte extends Ability {
 	}
 
 	@Override
-	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		if (!isTimerActive() && event.getType() == DamageType.MELEE && !event.isCancelled() && !event.isBlocked() && mPlayer != null) {
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (!isTimerActive()
+			    && source != null
+			    && event.getType() == DamageType.MELEE
+			    && !event.isCancelled()
+			    && !event.isBlocked()
+			    && mPlayer != null) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isAxe(mainHand) || ItemUtils.isSword(mainHand)) {
 				MovementUtils.knockAway(mPlayer, source, RIPOSTE_KNOCKBACK_SPEED, true);
@@ -58,6 +62,7 @@ public class Riposte extends Ability {
 						if (mSwordTimer == null) {
 							mSwordTimer = new BukkitRunnable() {
 								int mTimer = 0;
+
 								@Override
 								public void run() {
 									if (mTimer >= RIPOSTE_SWORD_DURATION) {

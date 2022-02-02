@@ -15,6 +15,9 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import javax.annotation.Nullable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class Agility implements Attribute {
@@ -30,7 +33,7 @@ public class Agility implements Attribute {
 	}
 
 	@Override
-	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event) {
+	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		// When there is zero Armor, this method runs; otherwise, Armor runs.
 		if (value > 0 && event.getType().isDefendable() && plugin.mItemStatManager.getAttributeAmount(player, AttributeType.ARMOR) <= 0) {
 			double valueMod = 0;
@@ -40,7 +43,7 @@ public class Agility implements Attribute {
 			valueMod += Ethereal.applyEthereal(event, plugin, player);
 
 			if ((plugin.mItemStatManager.getAttributeAmount(player, AttributeType.AGILITY) > plugin.mItemStatManager.getAttributeAmount(player, AttributeType.ARMOR)) &&
-					(plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADAPTABILITY) > 0)) {
+				    (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADAPTABILITY) > 0)) {
 				valueMod += Shielding.applyShielding(event, plugin, player);
 				valueMod += Inure.applyInure(event, plugin, player);
 				valueMod += Steadfast.applySteadfast(event, plugin, player);

@@ -8,13 +8,13 @@ import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import javax.annotation.Nullable;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
-import javax.annotation.Nullable;
 
 import java.util.EnumSet;
 
@@ -70,9 +70,9 @@ public class Chivalrous extends DelveModifier {
 	}
 
 	@Override
-	public void onHurtByEntity(DamageEvent event, Entity damager) {
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		// Can't make magma cubes do 0 damage in Vanilla using attributes or Weakness
-		if (MOUNT_NAMES[1].equals(damager.getCustomName())) {
+		if (damager != null && MOUNT_NAMES[1].equals(damager.getCustomName())) {
 			event.setCancelled(true);
 		}
 	}

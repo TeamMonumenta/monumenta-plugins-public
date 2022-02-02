@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,7 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
 
 import java.util.EnumSet;
 import java.util.NavigableSet;
@@ -74,6 +74,11 @@ public class DarkPact extends Ability {
 				mJudgementChain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, JudgementChain.class);
 			});
 		}
+	}
+
+	@Override
+	public double getPriorityAmount() {
+		return 950; // multiplicative damage before additive
 	}
 
 	@Override

@@ -24,8 +24,7 @@ public class StatTrackMelee implements Infusion {
 
 	@Override
 	public double getPriorityAmount() {
-		// Set priority to ABSOLUTE FINAL ItemStat event (even after crit scaling + region scaling)
-		return 10001;
+		return 6000; // after all damage modifiers
 	}
 
 	@Override

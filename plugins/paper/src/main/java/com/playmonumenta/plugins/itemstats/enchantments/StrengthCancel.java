@@ -26,8 +26,7 @@ public class StrengthCancel implements Enchantment {
 
 	@Override
 	public double getPriorityAmount() {
-		// Set priority to before any
-		return -1000;
+		return -10000; // very first damage modifier
 	}
 
 	@Override

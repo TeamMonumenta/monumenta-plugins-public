@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -13,7 +14,6 @@ import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import javax.annotation.Nullable;
 
 import java.util.Set;
 
@@ -50,6 +50,11 @@ public class DelveModifier extends Ability {
 	@Override
 	public boolean canUse(Player player) {
 		return canUse(player, mModifier);
+	}
+
+	@Override
+	public double getPriorityAmount() {
+		return 2000;
 	}
 
 	private boolean shouldApplyModifiers(Entity mob) {

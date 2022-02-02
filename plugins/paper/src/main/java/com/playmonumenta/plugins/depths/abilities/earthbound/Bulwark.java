@@ -1,5 +1,14 @@
 package com.playmonumenta.plugins.depths.abilities.earthbound;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import javax.annotation.Nullable;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -8,16 +17,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class Bulwark extends DepthsAbility {
 
@@ -33,8 +32,12 @@ public class Bulwark extends DepthsAbility {
 	}
 
 	@Override
-	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		if (mPlayer != null && event.getType() == DamageType.MELEE && !event.isCancelled() && !event.isBlocked()) {
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (mPlayer != null
+			    && source != null
+			    && event.getType() == DamageType.MELEE
+			    && !event.isCancelled()
+			    && !event.isBlocked()) {
 			Location loc = mPlayer.getLocation();
 			World world = mPlayer.getWorld();
 			Location particleLoc = loc.add(0, mPlayer.getHeight() / 2, 0);

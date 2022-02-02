@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
+import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -18,16 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 
-import java.util.Comparator;
-
 public interface ItemStat {
-
-	class ItemStatPrioritySort implements Comparator<ItemStat> {
-		@Override
-		public int compare(ItemStat a, ItemStat b) {
-			return (int) a.getPriorityAmount() - (int) b.getPriorityAmount();
-		}
-	}
 
 	/**
 	 * The plain text name of the ItemStat. Will be given standardized formatting when displayed on items.
@@ -37,12 +29,21 @@ public interface ItemStat {
 	String getName();
 
 	/**
-	 * Priority order in event handling, with lower values being handled earlier than higher ones. Defaults to 999.
+	 * Priority order in event handling, with lower values being handled earlier than higher ones.
+	 * <p>
+	 * Some references:
+	 * <ul>
+	 * <li>Stats that must run first are around -10000
+	 * <li>Most item stats with a very specific order are around 0-100
+	 * <li>Default is 1000
+	 * <li>Items needing final damage dealt/received are around 5000
+	 * <li>Resurrection and related are around 10000
+	 * </ul>
 	 *
-	 * @return the priorty order
+	 * @return the priority order
 	 */
 	default double getPriorityAmount() {
-		return 999;
+		return 1000;
 	}
 
 	/**
@@ -72,38 +73,7 @@ public interface ItemStat {
 	}
 
 	/**
-	 * Player received damage, which may or may not have been from an Entity (e.g. fall damage).
-	 * <br>
-	 * Only use one of onHurt(), onHurtByEntity(), onHurtByEntityWithSource() in a given class.
-	 *
-	 * @param plugin  monumenta plugin
-	 * @param player  the Player receiving damage
-	 * @param value   the value of ItemStat possessed by the Player
-	 * @param event   the associated DamageEvent
-	 */
-	default void onHurt(Plugin plugin, Player player, double value, DamageEvent event) {
-
-	}
-
-	/**
-	 * Player received damage from an Entity, which may or may not have had a LivingEntity source (e.g. an arrow shot by a dispenser).
-	 * <br>
-	 * Only use one of onHurt(), onHurtByEntity(), onHurtByEntityWithSource() in a given class.
-	 *
-	 * @param plugin  monumenta plugin
-	 * @param player  the Player receiving damage
-	 * @param value   the value of ItemStat possessed by the Player
-	 * @param event   the associated DamageEvent
-	 * @param damager the Entity directly dealing damage
-	 */
-	default void onHurtByEntity(Plugin plugin, Player player, double value, DamageEvent event, Entity damager) {
-
-	}
-
-	/**
-	 * Player received damage from an Entity, which had a LivingEntity source (e.g. the shooter of an arrow).
-	 * <br>
-	 * Only use one of onHurt(), onHurtByEntity(), onHurtByEntityWithSource() in a given class.
+	 * Player received damage.
 	 *
 	 * @param plugin  monumenta plugin
 	 * @param player  the Player receiving damage
@@ -112,11 +82,10 @@ public interface ItemStat {
 	 * @param damager the Entity directly dealing damage
 	 * @param source  the LivingEntity directly or indirectly dealing damage
 	 */
-	default void onHurtByEntityWithSource(Plugin plugin, Player player, double value, DamageEvent event, Entity damager, LivingEntity source) {
+	default void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 
 	}
 
-	// TODO: fix bug where this triggers when would be fatal damage is blocked.
 	/**
 	 * Player received damage which was fatal.
 	 * <br>

@@ -15,6 +15,9 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import javax.annotation.Nullable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class Armor implements Attribute {
@@ -30,7 +33,7 @@ public class Armor implements Attribute {
 	}
 
 	@Override
-	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event) {
+	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		// When there is nonzero Armor, this method runs; otherwise, Agility runs.
 		if (value > 0 && event.getType().isDefendable()) {
 			double valueMod = 0;

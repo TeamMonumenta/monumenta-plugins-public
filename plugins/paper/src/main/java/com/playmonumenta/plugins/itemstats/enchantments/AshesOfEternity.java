@@ -4,19 +4,14 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import org.bukkit.Bukkit;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.EnumSet;
 
 public class AshesOfEternity implements Enchantment {
 
@@ -30,14 +25,33 @@ public class AshesOfEternity implements Enchantment {
 		return EnchantmentType.ASHES_OF_ETERNITY;
 	}
 
+	@Override public EnumSet<ItemStatUtils.Slot> getSlots() {
+		return EnumSet.of(ItemStatUtils.Slot.MAINHAND, ItemStatUtils.Slot.OFFHAND);
+	}
+
+	@Override
+	public double getPriorityAmount() {
+		return 9980; // before Resurrection and Void Tether
+	}
+
+	@Override
+	public void tick(Plugin plugin, Player player, double level, boolean twoHz, boolean oneHz) {
+		VoidTether.tick(player);
+	}
+
 	@Override
 	public void onHurtFatal(Plugin plugin, Player player, double value, DamageEvent event) {
-		if (!event.isCancelled()) {
-			// Void tether didn't cancel the event - so this player would die
-			// They definitely aren't in the void at this point
+
+		if (VoidTether.execute(plugin, player, event, null)
+			    || Resurrection.execute(plugin, player, event, null)) {
+
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PHANTOM_DEATH, 2, 2);
 
 			// Remove Enchant
 			ItemStack item = player.getInventory().getItemInMainHand();
+			if (ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.ASHES_OF_ETERNITY) == 0) {
+				item = player.getInventory().getItemInOffHand();
+			}
 			ItemStatUtils.removeEnchantment(item, EnchantmentType.ASHES_OF_ETERNITY);
 			ItemStatUtils.generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = plugin.mItemStatManager.getPlayerItemStats(player);
@@ -45,29 +59,6 @@ public class AshesOfEternity implements Enchantment {
 				playerItemStats.updateStats(true);
 			}
 
-			plugin.mPotionManager.clearAllPotions(player);
-
-			// Simulate resurrecting the player
-			EntityResurrectEvent resEvent = new EntityResurrectEvent(player);
-			Bukkit.getPluginManager().callEvent(resEvent);
-			if (!resEvent.isCancelled()) {
-				// Act like a normal totem
-				event.setDamage(0.001);
-				player.setHealth(1);
-
-				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 40, 0, true, true));
-				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.REGENERATION, 20 * 45, 1, true, true));
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.ABSORPTION, 20 * 5, 1, true, true));
-					}
-				}.runTaskLater(plugin, 1);
-
-				player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 0.5f, 1);
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PHANTOM_DEATH, 2, 2);
-				player.getWorld().spawnParticle(Particle.TOTEM, player.getLocation().add(0, 1, 0), 100, 0, 0, 0, 1);
-			}
 		}
 	}
 }

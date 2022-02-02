@@ -9,18 +9,18 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import javax.annotation.Nullable;
 
 public class EscapeDeath extends Ability {
 
@@ -46,7 +46,12 @@ public class EscapeDeath extends Ability {
 	}
 
 	@Override
-	public void onHurt(DamageEvent event) {
+	public double getPriorityAmount() {
+		return 10000;
+	}
+
+	@Override
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (!event.isCancelled() && !event.isBlocked() && mPlayer != null) {
 			double newHealth = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - event.getDamage();
 			boolean dealDamageLater = newHealth < 0 && newHealth > -8 && getAbilityScore() > 1;
@@ -85,5 +90,11 @@ public class EscapeDeath extends Ability {
 				}
 			}
 		}
+	}
+
+	// this should not happen, but better play it safe
+	@Override
+	public void onHurtFatal(DamageEvent event) {
+		onHurt(event, null, null);
 	}
 }

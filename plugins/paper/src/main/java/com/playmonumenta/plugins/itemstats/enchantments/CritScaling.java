@@ -25,8 +25,7 @@ public class CritScaling implements Enchantment {
 
 	@Override
 	public double getPriorityAmount() {
-		// Set priority to ABSOLUTE FINAL ItemStat event
-		return 9999;
+		return 4999; // second to last damage dealt modifier, just before region scaling
 	}
 
 	@Override

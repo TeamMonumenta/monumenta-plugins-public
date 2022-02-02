@@ -15,9 +15,4 @@ public class OffhandMainhandDisable implements Enchantment {
 		return EnchantmentType.OFFHAND_MAINHAND_DISABLE;
 	}
 
-	@Override
-	public double getPriorityAmount() {
-		// Set priority to ABSOLUTE FIRST
-		return -10000;
-	}
 }

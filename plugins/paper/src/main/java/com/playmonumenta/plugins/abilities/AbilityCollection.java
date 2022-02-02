@@ -14,6 +14,7 @@ import java.util.Map;
 public class AbilityCollection {
 
 	// This map contains all abilities, including delve modifiers
+	// LinkedHashMap to preserve ordering
 	private final Map<Class<? extends Ability>, Ability> mAbilities = new LinkedHashMap<>();
 
 	/*

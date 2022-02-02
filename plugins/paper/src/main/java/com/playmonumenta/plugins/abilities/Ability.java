@@ -79,10 +79,28 @@ public abstract class Ability {
 
 	/**
 	 * A custom check if additional checks are needed. For example, if you need to check if a player is looking up or down.
+	 *
 	 * @return true or false
 	 */
 	public boolean runCheck() {
 		return true;
+	}
+
+	/**
+	 * Priority order in event handling, with lower values being handled earlier than higher ones.
+	 * <p>
+	 * Some references:
+	 * <ul>
+	 * <li>Default is 1000
+	 * <li>Delve modifiers are around 2000
+	 * <li>Abilities that need a final damage amount are around 5000
+	 * <li>Lifeline abilities are around 10000
+	 * </ul>
+	 *
+	 * @return the priority order
+	 */
+	public double getPriorityAmount() {
+		return 1000;
 	}
 
 	public boolean isOnCooldown() {
@@ -164,15 +182,11 @@ public abstract class Ability {
 
 	}
 
-	public void onHurt(DamageEvent event) {
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 
 	}
 
-	public void onHurtByEntity(DamageEvent event, Entity damager) {
-
-	}
-
-	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+	public void onHurtFatal(DamageEvent event) {
 
 	}
 

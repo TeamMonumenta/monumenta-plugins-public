@@ -1,14 +1,5 @@
 package com.playmonumenta.plugins.itemstats.infusions;
 
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -18,6 +9,15 @@ import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import javax.annotation.Nullable;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class Reflection implements Infusion {
 	private static final double REFLECT_PCT_PER_LEVEL = 0.06;
@@ -34,7 +34,7 @@ public class Reflection implements Infusion {
 	}
 
 	@Override
-	public void onHurtByEntity(Plugin plugin, Player player, double value, DamageEvent event, Entity damager) {
+	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.getType() == DamageType.MAGIC && !event.isBlocked()) {
 			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 			double reflectedDamage = modifiedLevel * REFLECT_PCT_PER_LEVEL * event.getOriginalDamage();

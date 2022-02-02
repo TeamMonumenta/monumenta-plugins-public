@@ -5,10 +5,12 @@ import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -62,8 +64,8 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 	}
 
 	@Override
-	public void onHurt(DamageEvent event) {
-		if (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (mPlayer != null && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(event.getDamage() * DAMAGE_MODIFIER);
 		}
 	}

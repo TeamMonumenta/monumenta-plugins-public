@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.listeners;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -70,20 +71,12 @@ public class DamageListener implements Listener {
 
 		// Player getting damaged
 		if (damagee instanceof Player player) {
-			mPlugin.mItemStatManager.onHurt(mPlugin, player, event);
-			mPlugin.mAbilityManager.onHurt(player, event);
+			mPlugin.mItemStatManager.onHurt(mPlugin, player, event, damager, source);
+			mPlugin.mAbilityManager.onHurt(player, event, damager, source);
 
-			if (damager != null) {
-				mPlugin.mItemStatManager.onHurtByEntity(mPlugin, player, event, damager);
-				mPlugin.mAbilityManager.onHurtByEntity(player, event, damager);
-
-				if (source != null) {
-					mPlugin.mItemStatManager.onHurtByEntityWithSource(mPlugin, player, event, damager, source);
-					mPlugin.mAbilityManager.onHurtByEntityWithSource(player, event, damager, source);
-				}
-			}
-
-			if (event.getDamage() > player.getHealth()) {
+			if (event.getDamage() >= player.getHealth() + AbsorptionUtils.getAbsorption(player)
+				    && !event.isCancelled()) {
+				mPlugin.mAbilityManager.onHurtFatal(player, event);
 				mPlugin.mItemStatManager.onHurtFatal(mPlugin, player, event);
 			}
 		} else {

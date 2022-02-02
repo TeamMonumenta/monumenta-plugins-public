@@ -24,7 +24,7 @@ public class StrengthApply implements Enchantment {
 
 	@Override
 	public double getPriorityAmount() {
-		return 1000;
+		return 1001; // after default item stats to multiply most damage
 	}
 
 	@Override

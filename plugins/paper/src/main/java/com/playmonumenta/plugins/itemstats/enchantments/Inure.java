@@ -7,6 +7,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import javax.annotation.Nullable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +35,7 @@ public class Inure implements Enchantment {
 	}
 
 	@Override
-	public void onHurt(@NotNull Plugin plugin, @NotNull Player player, double value, @NotNull DamageEvent event) {
+	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.getType() == DamageType.MELEE) {
 			clearInure(plugin, player);
 			plugin.mEffectManager.addEffect(player, INURE_MELEE_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME));

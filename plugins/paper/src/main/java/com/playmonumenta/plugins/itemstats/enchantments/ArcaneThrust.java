@@ -79,7 +79,6 @@ public class ArcaneThrust implements Enchantment {
 								MovementUtils.knockAway(player.getLocation(), mob, 0.25f, 0.25f);
 							}
 							iter.remove();
-							mobs.remove(mob);
 						}
 					}
 				}

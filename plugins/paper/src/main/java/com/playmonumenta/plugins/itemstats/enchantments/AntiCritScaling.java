@@ -25,8 +25,7 @@ public class AntiCritScaling implements Enchantment {
 
 	@Override
 	public double getPriorityAmount() {
-		// Set priority to ABSOLUTE FIRST ItemStat event
-		return -1;
+		return -9999; // second damage modifier just after strength cancel
 	}
 
 	@Override

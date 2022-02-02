@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -33,7 +34,6 @@ import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -73,16 +73,14 @@ public class Twisted extends DelveModifier {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		Set<String> tags = event.getDamagee().getScoreboardTags();
-		if (tags != null && tags.contains(SHADE_OF_CORRUPTION_TAG)) {
+		if (enemy.getScoreboardTags().contains(SHADE_OF_CORRUPTION_TAG)) {
 			event.setDamage(event.getDamage() * CORRUPTION_DAMAGE_RECEIVED_MULTIPLIER);
 		}
 	}
 
 	@Override
-	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		Set<String> tags = source.getScoreboardTags();
-		if (tags != null && tags.contains(SHADE_OF_CORRUPTION_TAG)) {
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (source != null && source.getScoreboardTags().contains(SHADE_OF_CORRUPTION_TAG)) {
 			event.setDamage(event.getDamage() * CORRUPTION_DAMAGE_DEALT_MULTIPLIER);
 		}
 	}

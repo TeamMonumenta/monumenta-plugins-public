@@ -8,15 +8,15 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 public class PrismaticShield extends Ability {
 
@@ -45,7 +45,12 @@ public class PrismaticShield extends Ability {
 	}
 
 	@Override
-	public void onHurt(DamageEvent event) {
+	public double getPriorityAmount() {
+		return 10000;
+	}
+
+	@Override
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (!event.isCancelled() && !event.isBlocked() && mPlayer != null) {
 			// Calculate whether this effect should not be run based on player health.
 			// It is intentional that Prismatic Shield saves you from death if you take a buttload of damage somehow.
@@ -85,5 +90,10 @@ public class PrismaticShield extends Ability {
 				AbsorptionUtils.subtractAbsorption(mPlayer, 1 - (float) healthRemaining);
 			}
 		}
+	}
+
+	@Override
+	public void onHurtFatal(DamageEvent event) {
+		onHurt(event, null, null);
 	}
 }

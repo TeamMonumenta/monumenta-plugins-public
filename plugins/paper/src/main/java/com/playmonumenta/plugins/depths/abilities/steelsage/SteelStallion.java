@@ -1,19 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Horse;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
@@ -24,8 +10,21 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-
+import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Horse;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class SteelStallion extends DepthsAbility {
 	public static final String ABILITY_NAME = "Steel Stallion";
@@ -49,7 +48,12 @@ public class SteelStallion extends DepthsAbility {
 	}
 
 	@Override
-	public void onHurt(DamageEvent event) {
+	public double getPriorityAmount() {
+		return 10000;
+	}
+
+	@Override
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.isCancelled() || event.isBlocked()) {
 			return;
 		}
@@ -63,6 +67,11 @@ public class SteelStallion extends DepthsAbility {
 		}
 
 		execute(event);
+	}
+
+	@Override
+	public void onHurtFatal(DamageEvent event) {
+		onHurt(event, null, null);
 	}
 
 	private void execute(DamageEvent event) {

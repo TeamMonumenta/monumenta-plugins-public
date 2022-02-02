@@ -6,6 +6,9 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+import javax.annotation.Nullable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.EnumSet;
@@ -30,8 +33,8 @@ public class ProtectionOfTheDepths implements Enchantment {
 	}
 
 	@Override
-	public void onHurt(Plugin plugin, Player player, double level, DamageEvent event) {
-		if (ServerProperties.getClassSpecializationsEnabled() == true) {
+	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (ServerProperties.getClassSpecializationsEnabled()) {
 			mReductionPct = .25; //25% reduction for region2
 		} else {
 			mReductionPct = .15; //15% reduction for region 1

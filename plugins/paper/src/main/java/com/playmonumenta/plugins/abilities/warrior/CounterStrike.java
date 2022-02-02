@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -16,8 +17,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 public class CounterStrike extends Ability {
 
@@ -43,8 +42,12 @@ public class CounterStrike extends Ability {
 	}
 
 	@Override
-	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		if (event.getType() == DamageType.MELEE && !event.isCancelled() && !event.isBlocked() && mPlayer != null) {
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (event.getType() == DamageType.MELEE
+			    && source != null
+			    && !event.isCancelled()
+			    && !event.isBlocked()
+			    && mPlayer != null) {
 			Location loc = mPlayer.getLocation().add(0, 1, 0);
 			World world = mPlayer.getWorld();
 			world.spawnParticle(Particle.SWEEP_ATTACK, loc, 6, 0.75, 0.5, 0.75, 0.001);

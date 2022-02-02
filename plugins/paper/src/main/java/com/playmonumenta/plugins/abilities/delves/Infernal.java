@@ -10,10 +10,11 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.FastUtils;
+import javax.annotation.Nullable;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
-import javax.annotation.Nullable;
 
 import java.util.EnumSet;
 
@@ -115,7 +116,7 @@ public class Infernal extends DelveModifier {
 	}
 
 	@Override
-	public void onHurt(DamageEvent event) {
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.getType() == DamageType.FIRE) {
 			event.setDamage(event.getDamage() * mBurningDamageTakenMultiplier);
 		} else if (ENVIRONMENTAL_DAMAGE_CAUSES.contains(event.getType())) {

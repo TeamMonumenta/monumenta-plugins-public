@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import javax.annotation.Nullable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 
 
@@ -25,7 +27,12 @@ public class SecondWind implements Enchantment {
 	}
 
 	@Override
-	public void onHurt(Plugin plugin, Player player, double level, DamageEvent event) {
+	public double getPriorityAmount() {
+		return 5000; // should be the final damage taken modifier
+	}
+
+	@Override
+	public void onHurt(Plugin plugin, Player player, double level, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		double currHealth = player.getHealth();
 		double maxHealth = EntityUtils.getMaxHealth(player);
 		double hpAfterHit = currHealth - event.getDamage();

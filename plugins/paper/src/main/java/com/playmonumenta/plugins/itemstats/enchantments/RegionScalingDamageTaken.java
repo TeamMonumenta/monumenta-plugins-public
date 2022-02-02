@@ -7,6 +7,9 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import javax.annotation.Nullable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -29,12 +32,11 @@ public class RegionScalingDamageTaken implements Enchantment {
 
 	@Override
 	public double getPriorityAmount() {
-		// Set priority to ABSOLUTE FINAL ItemStat event (even after crit scaling)
-		return 10000;
+		return 4999; // second to last damage taken modifier, just before second wind
 	}
 
 	@Override
-	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event) {
+	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (!ServerProperties.getClassSpecializationsEnabled()) {
 			event.setDamage(event.getDamage() * DAMAGE_TAKEN_MULTIPLIER);
 			if (event.getType() == DamageEvent.DamageType.POISON) {

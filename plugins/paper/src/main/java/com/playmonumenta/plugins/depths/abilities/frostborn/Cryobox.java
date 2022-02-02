@@ -1,13 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.frostborn;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
@@ -20,8 +12,16 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-
+import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class Cryobox extends DepthsAbility {
 
@@ -44,7 +44,12 @@ public class Cryobox extends DepthsAbility {
 	}
 
 	@Override
-	public void onHurt(DamageEvent event) {
+	public double getPriorityAmount() {
+		return 10000;
+	}
+
+	@Override
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.isCancelled() || event.isBlocked() || mPlayer == null) {
 			return;
 		}
@@ -110,11 +115,16 @@ public class Cryobox extends DepthsAbility {
 			//Top & Bottom
 			center.clone().add(0, 2, 0),
 			center.clone().add(0, -1, 0),
-		};
+			};
 
 		for (int i = 0; i < locs.length; i++) {
 			DepthsUtils.spawnIceTerrain(locs[i], ICE_DURATION, mPlayer);
 		}
+	}
+
+	@Override
+	public void onHurtFatal(DamageEvent event) {
+		onHurt(event, null, null);
 	}
 
 	@Override

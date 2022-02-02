@@ -5,14 +5,15 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 public class Toughness extends Ability {
 
@@ -41,7 +42,7 @@ public class Toughness extends Ability {
 	}
 
 	@Override
-	public void onHurt(DamageEvent event) {
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.getType() == DamageType.AILMENT || event.getType() == DamageType.POISON || event.getCause() == EntityDamageEvent.DamageCause.DROWNING) {
 			event.setDamage(event.getDamage() * (1 - mDoTDamageReduction));
 		}
