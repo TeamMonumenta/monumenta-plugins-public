@@ -1540,7 +1540,7 @@ public class ItemStatUtils {
 		boolean hasDummyArmorToughnessAttribute = false;
 		if (meta.hasAttributeModifiers()) {
 			Collection<AttributeModifier> toughnessAttrs = meta.getAttributeModifiers(Attribute.GENERIC_ARMOR_TOUGHNESS);
-			hasDummyArmorToughnessAttribute = toughnessAttrs.size() == 1 && toughnessAttrs.iterator().next().getName().equals(MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME);
+			hasDummyArmorToughnessAttribute = toughnessAttrs != null && toughnessAttrs.size() == 1 && toughnessAttrs.iterator().next().getName().equals(MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME);
 		}
 
 		if (!hasDummyArmorToughnessAttribute) {
