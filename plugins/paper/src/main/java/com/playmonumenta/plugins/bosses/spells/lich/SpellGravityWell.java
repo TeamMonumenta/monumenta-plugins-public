@@ -142,7 +142,7 @@ public class SpellGravityWell extends Spell {
 
 								if (mT % 10 == 0) {
 									if (player.getLocation().distance(mLoc) <= 4) {
-										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 30, null, false, true, "Gravity Well");
+										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 24, null, false, true, "Gravity Well");
 									}
 								}
 							}

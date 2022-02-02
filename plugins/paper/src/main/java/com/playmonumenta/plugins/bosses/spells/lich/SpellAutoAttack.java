@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -26,7 +26,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -261,36 +260,40 @@ public class SpellAutoAttack extends Spell {
 	}
 
 	private void damage(Player player, boolean melee) {
+		//TODO replace melee with this after dual type damage is fixed
+		/*
+		if (mPhase == 1) {
+				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 20, 0.75, "Death Sweep", mBoss.getLocation());
+			} else if (mPhase == 2) {
+				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 23, 0.75, "Death Sweep", mBoss.getLocation());
+				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+			} else if (mPhase == 3) {
+				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 26, 0.75, "Death Sweep", mBoss.getLocation());
+				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+				AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
+			} else {
+				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 29, 0.75, "Death Sweep", mBoss.getLocation());
+				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+				AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
+			}
+		 */
+		String cause = "Death Bolt";
 		if (melee) {
-			if (mPhase == 1) {
-				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 23, 0.75, "Death Bolt", mBoss.getLocation());
-			} else if (mPhase == 2) {
-				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 27, 0.75, "Death Bolt", mBoss.getLocation());
-				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-			} else if (mPhase == 3) {
-				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 31, 0.75, "Death Bolt", mBoss.getLocation());
-				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-				AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
-			} else {
-				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 35, 0.75, "Death Bolt", mBoss.getLocation());
-				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-				AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
-			}
+			cause = "Death Sweep";
+		}
+		if (mPhase == 1) {
+			BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, 21, cause, mBoss.getLocation());
+		} else if (mPhase == 2) {
+			BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, 24, cause, mBoss.getLocation());
+			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+		} else if (mPhase == 3) {
+			BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, 27, cause, mBoss.getLocation());
+			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+			AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
 		} else {
-			if (mPhase == 1) {
-				BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 22, "Death Bolt", mBoss.getLocation());
-			} else if (mPhase == 2) {
-				BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 26, "Death Bolt", mBoss.getLocation());
-				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-			} else if (mPhase == 3) {
-				BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 30, "Death Bolt", mBoss.getLocation());
-				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-				AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
-			} else {
-				BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 35, "Death Bolt", mBoss.getLocation());
-				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-				AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
-			}
+			BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, 30, cause, mBoss.getLocation());
+			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+			AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
 		}
 	}
 

@@ -124,7 +124,7 @@ public class SpellSoulShackle extends Spell {
 			p.sendMessage(ChatColor.AQUA
 	                   + "You got chained by Hekawt! Don't move outside of the ring!");
 
-			DamageUtils.damage(mBoss, p, DamageType.MAGIC, 30, null, false, true, "Soul Shackle");
+			DamageUtils.damage(mBoss, p, DamageType.MAGIC, 27, null, false, true, "Soul Shackle");
 			AbilityUtils.silencePlayer(p, 5 * 20);
 			mRod.location(pLoc).spawnAsBoss();
 			world.playSound(pLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.7f, 0.5f);

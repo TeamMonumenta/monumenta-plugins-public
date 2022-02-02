@@ -98,8 +98,8 @@ public class SpellDesecrate extends Spell {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 3, -10));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 10));
 						AbilityUtils.silencePlayer(player, 3 * 20);
-						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 20, null, false, true, "Desecrate");
-						MovementUtils.knockAway(mBoss.getLocation(), player, 0.2f, false);
+						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 15, null, false, true, "Desecrate");
+						MovementUtils.knockAway(mBoss.getLocation(), player, 0.1f, false);
 					}
 
 					BukkitRunnable runB = new BukkitRunnable() {
@@ -147,7 +147,7 @@ public class SpellDesecrate extends Spell {
 								}
 								//fail to escape
 								if (pHoriLoc.distance(mBossLoc) < mRadius) {
-									DamageUtils.damage(mBoss, p, DamageType.MAGIC, 70, null, false, true, "Desecrate");
+									DamageUtils.damage(mBoss, p, DamageType.MAGIC, 65, null, false, true, "Desecrate");
 									MovementUtils.knockAway(mBoss.getLocation(), p, 0.5f, false);
 									world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.75f);
 									world.playSound(mBossLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 0.5f);

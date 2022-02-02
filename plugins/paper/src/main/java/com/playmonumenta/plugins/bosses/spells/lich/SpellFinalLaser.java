@@ -159,7 +159,7 @@ public class SpellFinalLaser extends Spell {
 					mExpL.location(movingLaserBox.getCenter().toLocation(world)).spawnAsBoss();
 					breakBlocks(movingLaserBox.getCenter().toLocation(world));
 					if (movingLaserBox.overlaps(target.getBoundingBox())) {
-						BossUtils.blockableDamage(mBoss, target, DamageType.MAGIC, 55, "Death Laser", null);
+						BossUtils.blockableDamage(mBoss, target, DamageType.MAGIC, 50, "Death Laser", null);
 						MovementUtils.knockAway(mCenter, target, 3.2f, false);
 						Lich.cursePlayer(mPlugin, target);
 					}
