@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -46,6 +47,11 @@ public class Vitality implements Infusion {
 					maxHealth.addModifier(mod);
 				}
 			}
+		}
+
+		double maxHealth = EntityUtils.getMaxHealth(player);
+		if (player.getHealth() > maxHealth) {
+			player.setHealth(maxHealth);
 		}
 	}
 
