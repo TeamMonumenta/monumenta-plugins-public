@@ -29,14 +29,15 @@ import javax.annotation.Nullable;
 
 public class CloakAndDagger extends Ability implements KillTriggeredAbility, AbilityWithChargesOrStacks {
 
-	private static final double CLOAK_1_DAMAGE_MULTIPLIER = 1.25;
-	private static final double CLOAK_2_DAMAGE_MULTIPLIER = 1.75;
+	private static final double CLOAK_1_DAMAGE_MULTIPLIER = 1.5;
+	private static final double CLOAK_2_DAMAGE_MULTIPLIER = 2;
 	private static final int CLOAK_1_MAX_STACKS = 8;
 	private static final int CLOAK_2_MAX_STACKS = 12;
 	private static final int CLOAK_MIN_STACKS = 5;
-	private static final int CLOAK_STACKS_ON_ELITE_KILL = 5;
+	private static final int CLOAK_STACKS_ON_ELITE_KILL = 3;
 	public static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
 	public static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
+	private static final int STEALTH_DURATION = 50;
 
 	private final KillTriggeredAbilityTracker mTracker;
 
@@ -50,8 +51,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		super(plugin, player, "Cloak and Dagger");
 		mInfo.mScoreboardId = "CloakAndDagger";
 		mInfo.mShorthandName = "CnD";
-		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you five stacks. Stacks are capped at 8. When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain X seconds of Stealth and (1.25)(X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this.");
-		mInfo.mDescriptions.add("Cloak stacks are now capped at 12 and bonus damage is increased to (1.75)(X) where X is the number of stacks you have upon activating this skill.");
+		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you three stacks. Stacks are capped at 8. When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain 2.5 seconds of Stealth and (1.5)(X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this.");
+		mInfo.mDescriptions.add("Cloak stacks are now capped at 12 and bonus damage is increased to (2)(X) where X is the number of stacks you have upon activating this skill.");
 		mInfo.mLinkedSpell = ClassAbility.CLOAK_AND_DAGGER;
 		mInfo.mCooldown = 0;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -70,7 +71,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			mCloakOnActivation = mCloak;
 			mCloak = 0;
 			mActive = true;
-			AbilityUtils.applyStealth(mPlugin, mPlayer, 20 * mCloakOnActivation);
+			AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION);
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 			world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
