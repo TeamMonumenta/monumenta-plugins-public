@@ -113,4 +113,8 @@ public class DamageListener implements Listener {
 	public static void addProjectileItemStats(Projectile proj, PlayerItemStats playerItemStats) {
 		mPlayerItemStatsMap.put(proj, playerItemStats);
 	}
+
+	public static PlayerItemStats removeProjectileItemStats(Projectile proj) {
+		return mPlayerItemStatsMap.remove(proj);
+	}
 }

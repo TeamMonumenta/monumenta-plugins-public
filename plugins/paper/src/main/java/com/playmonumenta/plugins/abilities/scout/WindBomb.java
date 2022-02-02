@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.WindBombAirTag;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -69,6 +70,7 @@ public class WindBomb extends Ability {
 			mProj = mPlayer.launchProjectile(Snowball.class);
 			mProj.setVelocity(mProj.getVelocity().normalize().multiply(VELOCITY));
 			mPlugin.mProjectileEffectTimers.addEntity(mProj, Particle.CLOUD);
+			DamageListener.removeProjectileItemStats(mProj);
 			putOnCooldown();
 		}
 	}
