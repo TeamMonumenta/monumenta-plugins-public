@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.entity.Trident;
 
 public class FocusedCombos extends DepthsAbility {
 
@@ -36,7 +37,7 @@ public class FocusedCombos extends DepthsAbility {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getDamager() instanceof AbstractArrow proj && event.getType() == DamageType.PROJECTILE && proj != null && proj.isCritical()) {
+		if (event.getDamager() instanceof AbstractArrow proj && event.getType() == DamageType.PROJECTILE && proj != null && (proj.isCritical() || proj instanceof Trident)) {
 			mComboCount++;
 
 			if (mComboCount >= 3) {

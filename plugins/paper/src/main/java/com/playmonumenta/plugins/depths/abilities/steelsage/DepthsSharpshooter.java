@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
 
 public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChargesOrStacks {
 
@@ -38,7 +39,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 			event.setDamage(event.getDamage() * (1 + mStacks * DAMAGE_PER_STACK[mRarity - 1]));
 
 			// Critical arrow and mob is actually going to take damage
-			if (arrow.isCritical() && (enemy.getNoDamageTicks() <= 10 || enemy.getLastDamage() < event.getDamage()) && !arrow.hasMetadata("RapidFireArrow")) {
+			if ((arrow.isCritical() || arrow instanceof Trident) && (enemy.getNoDamageTicks() <= 10 || enemy.getLastDamage() < event.getDamage()) && !arrow.hasMetadata("RapidFireArrow")) {
 				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 
 				if (mStacks < MAX_STACKS) {
