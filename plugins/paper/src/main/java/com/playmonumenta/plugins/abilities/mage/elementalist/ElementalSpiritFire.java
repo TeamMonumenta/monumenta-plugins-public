@@ -194,7 +194,7 @@ public class ElementalSpiritFire extends Ability {
 							}
 						}
 					}
-				}.runTask(mPlugin);
+				}.runTaskLater(mPlugin, 2);
 			}
 		}
 	}

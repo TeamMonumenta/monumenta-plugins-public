@@ -149,7 +149,7 @@ public class ElementalSpiritIce extends Ability {
 							}.runTaskTimer(mPlugin, 0, PULSE_INTERVAL);
 						}
 					}
-				}.runTask(mPlugin);
+				}.runTaskLater(mPlugin, 2);
 			}
 		}
 	}
