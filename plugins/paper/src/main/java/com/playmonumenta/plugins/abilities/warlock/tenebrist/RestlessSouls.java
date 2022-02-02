@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class RestlessSouls extends Ability {
@@ -109,7 +110,8 @@ public class RestlessSouls extends Ability {
 			mVexList.removeIf(e -> !e.isValid() || e.isDead());
 		}
 
-		if (event.getEntity().getScoreboardTags().contains("TeneGhost")) {
+		Set<String> tags = event.getEntity().getScoreboardTags();
+		if (tags.contains("TeneGhost") || tags.contains(AbilityUtils.IGNORE_TAG)) {
 			return;
 		}
 
