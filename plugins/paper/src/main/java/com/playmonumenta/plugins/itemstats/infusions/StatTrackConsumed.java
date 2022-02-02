@@ -2,10 +2,10 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class StatTrackConsumed implements Infusion {
 
@@ -21,10 +21,11 @@ public class StatTrackConsumed implements Infusion {
 
 	@Override
 	public void onConsume(Plugin plugin, Player player, double value, PlayerItemConsumeEvent event) {
-		if (event.isCancelled()) {
+		if (event.isCancelled()
+			    // Rage of the Keter cancels the consume event, but should still be counted
+			    && ItemStatUtils.getEnchantmentLevel(event.getItem(), ItemStatUtils.EnchantmentType.RAGE_OF_THE_KETER) == 0) {
 			return;
 		}
-		ItemStack is = player.getInventory().getItemInMainHand();
-		StatTrackManager.incrementStat(is, player, InfusionType.STAT_TRACK_CONSUMED, 1);
+		StatTrackManager.incrementStat(event.getItem(), player, InfusionType.STAT_TRACK_CONSUMED, 1);
 	}
 }

@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -10,6 +10,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.EnumSet;
 
 public class Starvation implements Enchantment {
 
@@ -23,9 +25,13 @@ public class Starvation implements Enchantment {
 		return EnchantmentType.STARVATION;
 	}
 
+	@Override public EnumSet<ItemStatUtils.Slot> getSlots() {
+		return EnumSet.of(ItemStatUtils.Slot.MAINHAND, ItemStatUtils.Slot.OFFHAND);
+	}
+
 	@Override
 	public void onConsume(Plugin plugin, Player player, double level, PlayerItemConsumeEvent event) {
-		if (InventoryUtils.testForItemWithLore(event.getItem(), "Starvation")) {
+		if (ItemStatUtils.getEnchantmentLevel(event.getItem(), EnchantmentType.STARVATION) > 0) {
 			apply(player, level);
 		}
 	}

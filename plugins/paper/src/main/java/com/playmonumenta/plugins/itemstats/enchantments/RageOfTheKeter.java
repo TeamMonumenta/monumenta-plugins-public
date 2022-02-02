@@ -6,9 +6,10 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -16,7 +17,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.EnumSet;
 
@@ -55,7 +55,8 @@ public class RageOfTheKeter implements Enchantment {
 
 	@Override
 	public void onConsume(Plugin plugin, Player player, double level, PlayerItemConsumeEvent event) {
-		if (InventoryUtils.testForItemWithLore(event.getItem(), "Rage of the Keter")) {
+		if (ItemStatUtils.getEnchantmentLevel(event.getItem(), EnchantmentType.RAGE_OF_THE_KETER) > 0) {
+			event.setCancelled(true);
 			World world = player.getWorld();
 			plugin.mEffectManager.addEffect(player, "KeterExtraDamage", new PercentDamageDealt(DURATION, DAMAGE_PERCENT, AFFECTED_DAMAGE_TYPES));
 			plugin.mEffectManager.addEffect(player, "KeterExtraSpeed", new PercentSpeed(DURATION, SPEED_PERCENT, ATTR_NAME));
@@ -76,19 +77,14 @@ public class RageOfTheKeter implements Enchantment {
 				})
 			);
 
-			player.setFoodLevel(Math.min(20, player.getFoodLevel() + 2));
-			player.setSaturation(Math.min(player.getFoodLevel(), Math.min(player.getSaturation() + 3.6f, 12.8f)));
+			player.setFoodLevel(Math.min(20, player.getFoodLevel() + 6));
+			PlayerUtils.healPlayer(plugin, player, 2, player);
 
 			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1, OLIVE_COLOR);
 			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1, GREEN_COLOR);
 			world.playSound(player.getLocation(), Sound.ENTITY_STRIDER_EAT, 1, 0.85f);
 
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					player.setCooldown(event.getItem().getType(), COOLDOWN);
-				}
-			}.runTaskLater(plugin, 1);
+			player.setCooldown(event.getItem().getType(), COOLDOWN);
 		}
 	}
 }
