@@ -104,9 +104,10 @@ public class RejuvenationBoss extends BossAbilityGroup {
 					double hp = target.getHealth() + p.HEAL;
 					double max = target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 					if (hp >= max) {
-						int missing = (int) (hp - max);
 						target.setHealth(max);
-						AbsorptionUtils.addAbsorption(target, missing, p.HEAL, -1);
+						// TODO: Disable arcanic overheal until absorp near immortality is fixed
+						// int missing = (int) (hp - max);
+						// AbsorptionUtils.addAbsorption(target, missing, p.HEAL, -1);
 					} else {
 						target.setHealth(hp);
 					}
