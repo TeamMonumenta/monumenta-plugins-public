@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.events;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.scriptedquests.Plugin;
+import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.LivingEntity;
@@ -17,7 +18,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -332,7 +332,7 @@ public class DamageEvent extends Event implements Cancellable {
 	}
 
 	public boolean isBlocked() {
-		return (mEvent != null && mEvent.getFinalDamage() <= 0) || mDamage <= 0;
+		return (mEvent != null && mEvent.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0) || mDamage <= 0;
 	}
 
 	// Mandatory Event Methods (If you remove these, I'm 99% sure the event will break)

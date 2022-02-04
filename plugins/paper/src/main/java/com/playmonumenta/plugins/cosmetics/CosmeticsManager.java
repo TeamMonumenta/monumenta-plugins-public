@@ -3,8 +3,11 @@ package com.playmonumenta.plugins.cosmetics;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
@@ -16,17 +19,15 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
-import com.playmonumenta.redissync.event.PlayerSaveEvent;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class CosmeticsManager implements Listener {
 
@@ -227,13 +228,13 @@ public class CosmeticsManager implements Listener {
 		Entity damager = event.getDamager();
 		Entity damaged = event.getEntity();
 
-		if (damaged instanceof Mob && damager instanceof Player && EntityUtils.isElite(damaged)) {
-			Player player = (Player) damager;
-			Mob mob = (Mob) damaged;
-			double damage = event.getDamage();
-			if (mob.getHealth() - damage <= 0 && CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.ELITE_FINISHER) != null) {
-				EliteFinishers.activateFinisher(player, event.getEntity(), event.getEntity().getLocation(),
-					CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.ELITE_FINISHER).getName());
+		if (damaged instanceof Mob mob
+			    && damager instanceof Player player
+			    && EntityUtils.isElite(damaged)
+			    && event.getFinalDamage() >= mob.getHealth()) {
+			Cosmetic activeCosmetic = CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.ELITE_FINISHER);
+			if (activeCosmetic != null) {
+				EliteFinishers.activateFinisher(player, event.getEntity(), event.getEntity().getLocation(), activeCosmetic.getName());
 			}
 		}
 	}

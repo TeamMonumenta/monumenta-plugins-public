@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,7 +27,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -283,8 +283,9 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		if (damagee instanceof Player player) {
 			if (mOrigPlayerLocs.containsKey(player)) {
 				/* A player currently in judgement took damage */
-				if (event.getFinalDamage() > player.getHealth()) {
+				if (event.getFinalDamage() >= player.getHealth()) {
 					/* This would kill the player */
+					// note that this check is correct like this, as getFinalDamage returns only health damage done (damage - absorption)
 
 					fail(player);
 					event.setDamage(0.1);

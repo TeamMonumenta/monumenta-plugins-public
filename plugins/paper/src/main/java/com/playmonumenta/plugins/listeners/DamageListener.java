@@ -43,22 +43,21 @@ public class DamageListener implements Listener {
 				&& event.getEntity() instanceof LivingEntity le) {
 			Entity damager = entityDamageByEntityEvent.getDamager();
 			if (damager instanceof Creeper creeper) {
-				event.setDamage(EntityUtils.calculateCreeperExplosionDamage(creeper, le, event.getDamage()));
+				event.setDamage(EntityDamageEvent.DamageModifier.BASE, EntityUtils.calculateCreeperExplosionDamage(creeper, le, event.getDamage(EntityDamageEvent.DamageModifier.BASE)));
 			} else if (damager instanceof LargeFireball largeFireball && largeFireball.getShooter() instanceof Ghast ghast) {
-				event.setDamage(EntityUtils.calculateGhastExplosionDamage(ghast, largeFireball, le, event.getDamage()));
+				event.setDamage(EntityDamageEvent.DamageModifier.BASE, EntityUtils.calculateGhastExplosionDamage(ghast, largeFireball, le, event.getDamage(EntityDamageEvent.DamageModifier.BASE)));
 			}
-
 		}
 
 		/*
 		 * Puts the wrapper DamageEvent on EntityDamageEvents not caused by the
 		 * plugin (DamageCause.CUSTOM), which should wrap events manually to
 		 * set the correct DamageType.
-		 * If the damage is <= 0 (blocked with a shield), don't do anything to make
-		 * sure the shield gets proper durability damage (and this also prevents knockback going through shields sometimes).
+		 * If the damage is blocked, don't do anything to make sure the shield gets proper durability damage
+		 * (and this also prevents knockback going through shields sometimes).
 		 */
 		if (event.getCause() != DamageCause.CUSTOM
-			    && event.getFinalDamage() > 0
+			    && event.getOriginalDamage(EntityDamageEvent.DamageModifier.BLOCKING) == 0
 			    && event.getEntity() instanceof LivingEntity le) {
 			Bukkit.getPluginManager().callEvent(new DamageEvent(event, le));
 		}

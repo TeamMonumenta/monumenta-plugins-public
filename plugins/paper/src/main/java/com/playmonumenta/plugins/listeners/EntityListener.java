@@ -275,7 +275,7 @@ public class EntityListener implements Listener {
 		}
 
 		if (damagee instanceof LivingEntity mob) {
-			event.setDamage(event.getDamage() * EntityUtils.vulnerabilityMult(mob));
+			event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage(EntityDamageEvent.DamageModifier.BASE) * EntityUtils.vulnerabilityMult(mob));
 		}
 	}
 
