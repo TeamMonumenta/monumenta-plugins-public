@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.bosses.ChargerBoss;
 import com.playmonumenta.plugins.bosses.bosses.ProjectileBoss;
 import com.playmonumenta.plugins.bosses.bosses.RejuvenationBoss;
 import com.playmonumenta.plugins.bosses.bosses.TpBehindBoss;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -28,16 +29,19 @@ public class Arcanic extends DelveModifier {
 			0.42,
 	};
 
-	private static final List<List<String>> ABILITY_POOL;
+	private static final List<List<String>> ABILITY_POOL_R1;
+	private static final List<List<String>> ABILITY_POOL_R2;
 
 
 	static {
-		ABILITY_POOL = new ArrayList<>();
+		ABILITY_POOL_R1 = new ArrayList<>();
+		ABILITY_POOL_R2 = new ArrayList<>();
 
 		//RejuvenationBoss
 		List<String> rejuvenation = new ArrayList<>();
 		rejuvenation.add(RejuvenationBoss.identityTag);
-		ABILITY_POOL.add(rejuvenation);
+		ABILITY_POOL_R1.add(rejuvenation);
+		ABILITY_POOL_R2.add(rejuvenation);
 
 		//ProjectileBoss - tracking
 		List<String> trackingProjectile = new ArrayList<>();
@@ -45,19 +49,30 @@ public class Arcanic extends DelveModifier {
 		trackingProjectile.add(ProjectileBoss.identityTag + "[damage=30,speed=0.2,delay=20,cooldown=320,turnradius=3.141]");
 		trackingProjectile.add(ProjectileBoss.identityTag + "[soundstart=[(BLOCK_BEACON_POWER_SELECT,1,0.5)],soundlaunch=[(ENTITY_EVOKER_CAST_SPELL,1,0.5)],soundprojectile=[(BLOCK_BEACON_POWER_SELECT,0.4,0.5)],soundhit=[(BLOCK_BEACON_DEACTIVATE,1,0.5)]]");
 		trackingProjectile.add(ProjectileBoss.identityTag + "[particlelaunch=[(SPELL_WITCH,40,0,0,0,0.3)],particleprojectile=[(SPELL_WITCH,6,0,0,0,0.3),(SMOKE_LARGE,2,0.2,0.2,0.2,0)],particlehit=[(SPELL_WITCH,50,0,0,0,0.3)]]");
-		ABILITY_POOL.add(trackingProjectile);
+		ABILITY_POOL_R2.add(trackingProjectile);
+		trackingProjectile = new ArrayList<>();
+		trackingProjectile.add(ProjectileBoss.identityTag);
+		trackingProjectile.add(ProjectileBoss.identityTag + "[damage=15,speed=0.2,delay=20,cooldown=320,turnradius=3.141]");
+		trackingProjectile.add(ProjectileBoss.identityTag + "[soundstart=[(BLOCK_BEACON_POWER_SELECT,1,0.5)],soundlaunch=[(ENTITY_EVOKER_CAST_SPELL,1,0.5)],soundprojectile=[(BLOCK_BEACON_POWER_SELECT,0.4,0.5)],soundhit=[(BLOCK_BEACON_DEACTIVATE,1,0.5)]]");
+		trackingProjectile.add(ProjectileBoss.identityTag + "[particlelaunch=[(SPELL_WITCH,40,0,0,0,0.3)],particleprojectile=[(SPELL_WITCH,6,0,0,0,0.3),(SMOKE_LARGE,2,0.2,0.2,0.2,0)],particlehit=[(SPELL_WITCH,50,0,0,0,0.3)]]");
+		ABILITY_POOL_R1.add(trackingProjectile);
 
 		//TpBehindTargetedBoss
 		List<String> tpBehind = new ArrayList<>();
 		tpBehind.add(TpBehindBoss.identityTag);
 		tpBehind.add(TpBehindBoss.identityTag + "[range=50,random=false]");
-		ABILITY_POOL.add(tpBehind);
+		ABILITY_POOL_R1.add(tpBehind);
+		ABILITY_POOL_R2.add(tpBehind);
 
 		//ChargerStrongBoss
 		List<String> charger = new ArrayList<>();
 		charger.add(ChargerBoss.identityTag);
 		charger.add(ChargerBoss.identityTag + "[damage=30]");
-		ABILITY_POOL.add(charger);
+		ABILITY_POOL_R2.add(charger);
+		charger = new ArrayList<>();
+		charger.add(ChargerBoss.identityTag);
+		charger.add(ChargerBoss.identityTag + "[damage=15]");
+		ABILITY_POOL_R1.add(charger);
 
 		//ProjectileBoss - magic arrow
 		List<String> magicArrow = new ArrayList<>();
@@ -65,7 +80,13 @@ public class Arcanic extends DelveModifier {
 		magicArrow.add(ProjectileBoss.identityTag + "[damage=30,distance=32,speed=0.8,delay=20,cooldown=160,turnradius=0]");
 		magicArrow.add(ProjectileBoss.identityTag + "[soundstart=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1)],soundlaunch=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1.5)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,1.5)]]");
 		magicArrow.add(ProjectileBoss.identityTag + "[particlelaunch=[],particleprojectile=[(FIREWORKS_SPARK,5,0.1,0.1,0.1,0.05),(CRIT_MAGIC,20,0.2,0.2,0.2,0.1)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.25)]]");
-		ABILITY_POOL.add(magicArrow);
+		ABILITY_POOL_R2.add(magicArrow);
+		magicArrow = new ArrayList<>();
+		magicArrow.add(ProjectileBoss.identityTag);
+		magicArrow.add(ProjectileBoss.identityTag + "[damage=15,distance=32,speed=0.8,delay=20,cooldown=160,turnradius=0]");
+		magicArrow.add(ProjectileBoss.identityTag + "[soundstart=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1)],soundlaunch=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1.5)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,1.5)]]");
+		magicArrow.add(ProjectileBoss.identityTag + "[particlelaunch=[],particleprojectile=[(FIREWORKS_SPARK,5,0.1,0.1,0.1,0.05),(CRIT_MAGIC,20,0.2,0.2,0.2,0.1)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.25)]]");
+		ABILITY_POOL_R1.add(magicArrow);
 	}
 
 	public static final String DESCRIPTION = "Enemies gain magical abilities.";
@@ -105,7 +126,10 @@ public class Arcanic extends DelveModifier {
 	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
 		if (FastUtils.RANDOM.nextDouble() < mAbilityChance) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
-			List<String> ability = ABILITY_POOL.get(FastUtils.RANDOM.nextInt(ABILITY_POOL.size()));
+			List<String> ability = ABILITY_POOL_R1.get(FastUtils.RANDOM.nextInt(ABILITY_POOL_R1.size()));
+			if (ServerProperties.getClassSpecializationsEnabled()) {
+				ability = ABILITY_POOL_R2.get(FastUtils.RANDOM.nextInt(ABILITY_POOL_R2.size()));
+			}
 			for (String abilityTag: ability) {
 				mob.addScoreboardTag(abilityTag);
 			}
