@@ -1,11 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -25,7 +26,6 @@ public final class TpBehindBoss extends BossAbilityGroup {
 
 	}
 
-	public static final int detectionRange = 20;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new TpBehindBoss(plugin, boss);
@@ -36,11 +36,17 @@ public final class TpBehindBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellTpBehindPlayer(plugin, boss, p.COOLDOWN, p.RANGE, p.DELAY, p.STUN, p.RANDOM)
-		));
+		SpellManager activeSpells;
 
+		if (EntityUtils.isFlyingMob(mBoss)) {
+			//Flying mobs can't use this ability
+			activeSpells = SpellManager.EMPTY;
+		} else {
+			activeSpells = new SpellManager(List.of(
+				new SpellTpBehindPlayer(plugin, boss, p.COOLDOWN, p.RANGE, p.DELAY, p.STUN, p.RANDOM)
+			));
+		}
 
-		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
+		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null);
 	}
 }

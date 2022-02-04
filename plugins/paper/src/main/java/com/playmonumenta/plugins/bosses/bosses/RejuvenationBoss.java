@@ -37,6 +37,8 @@ public class RejuvenationBoss extends BossAbilityGroup {
 		public double PARTICLE_RADIUS = 15;
 		@BossParam(help = "not written")
 		public boolean CAN_MOVE = true;
+		@BossParam(help = "not written")
+		public boolean OVERHEAL = true;
 
 		@BossParam(help = "Targets of this spell")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET;
@@ -105,9 +107,10 @@ public class RejuvenationBoss extends BossAbilityGroup {
 					double max = target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 					if (hp >= max) {
 						target.setHealth(max);
-						// TODO: Disable arcanic overheal until absorp near immortality is fixed
-						// int missing = (int) (hp - max);
-						// AbsorptionUtils.addAbsorption(target, missing, p.HEAL, -1);
+						if (p.OVERHEAL) {
+							int missing = (int) (hp - max);
+							AbsorptionUtils.addAbsorption(target, missing, p.HEAL, -1);
+						}
 					} else {
 						target.setHealth(hp);
 					}

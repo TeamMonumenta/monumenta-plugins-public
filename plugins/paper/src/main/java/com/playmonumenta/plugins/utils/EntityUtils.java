@@ -183,6 +183,17 @@ public class EntityUtils {
 		EntityType.GIANT
 	);
 
+	private static final EnumSet<EntityType> FLYING_MOBS = EnumSet.of(
+		EntityType.BEE,
+		EntityType.BLAZE,
+		EntityType.BAT,
+		EntityType.WITHER,
+		EntityType.GHAST,
+		EntityType.PARROT,
+		EntityType.PHANTOM,
+		EntityType.VEX
+	);
+
 	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";
 	private static final String STUN_ATTR_NAME = "StunSlownessAttr";
 	private static final String IGNORE_TAUNT_TAG = "taunt_ignore";
@@ -300,6 +311,10 @@ public class EntityUtils {
 	// Affected by Duelist
 	public static boolean isHumanlike(LivingEntity mob) {
 		return HUMANLIKE_MOBS.contains(mob.getType());
+	}
+
+	public static boolean isFlyingMob(LivingEntity mob) {
+		return FLYING_MOBS.contains(mob.getType());
 	}
 
 	// Affected by Abyssal
@@ -1142,5 +1157,6 @@ public class EntityUtils {
 		double ratio = (originalDamage - 1) / (maxOriginalDamage - 1);
 		return ratio * (baseDamage - 1) + 1;
 	}
+
 
 }
