@@ -92,10 +92,14 @@ public class CosmeticsCommand extends GenericCommand {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
+				Player senderPlayer = null;
 				List<Cosmetic> cosmetics = CosmeticsManager.getInstance().getCosmetics(player);
-				if (cosmetics != null) {
+				if (sender instanceof Player) {
+					senderPlayer = (Player) sender;
+				}
+				if (cosmetics != null && senderPlayer != null) {
 					for (Cosmetic c : cosmetics) {
-						player.sendMessage("" + c.getType().getDisplayName() + " " + c.getName());
+						senderPlayer.sendMessage("" + c.getType().getDisplayName() + " " + c.getName());
 					}
 				}
 			}).register();

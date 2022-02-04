@@ -64,8 +64,13 @@ public class SeasonalEventCommand extends GenericCommand {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
-
-				player.sendMessage("" + SeasonalEventManager.getMP(player));
+				Player senderPlayer = null;
+				if (sender instanceof Player) {
+					senderPlayer = (Player) sender;
+				}
+				if (senderPlayer != null) {
+					senderPlayer.sendMessage("" + SeasonalEventManager.getMP(player));
+				}
 			})
 			.register();
 

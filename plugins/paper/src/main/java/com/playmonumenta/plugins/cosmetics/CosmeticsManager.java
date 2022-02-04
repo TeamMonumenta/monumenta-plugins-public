@@ -168,7 +168,9 @@ public class CosmeticsManager implements Listener {
 	public void onQuit(PlayerQuitEvent event) {
 		Player p = event.getPlayer();
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			mPlayerCosmetics.remove(p.getUniqueId());
+			if (!p.isOnline()) {
+				mPlayerCosmetics.remove(p.getUniqueId());
+			}
 		}, 100);
 	}
 
