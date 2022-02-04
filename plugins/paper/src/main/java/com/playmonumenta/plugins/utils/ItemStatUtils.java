@@ -30,7 +30,6 @@ import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.DoubleArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
-import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import javax.annotation.Nullable;
@@ -1650,7 +1649,7 @@ public class ItemStatUtils {
 		}).register();
 
 		arguments.clear();
-		arguments.add(new LiteralArgument("del"));
+		arguments.add(new MultiLiteralArgument("del"));
 		arguments.add(new IntegerArgument("index", 0));
 
 		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
@@ -1671,7 +1670,7 @@ public class ItemStatUtils {
 		}).register();
 
 		arguments.clear();
-		arguments.add(new LiteralArgument("register"));
+		arguments.add(new MultiLiteralArgument("register"));
 
 		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
 			if (player.getGameMode() != GameMode.CREATIVE) {
