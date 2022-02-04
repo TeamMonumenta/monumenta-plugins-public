@@ -29,13 +29,13 @@ public class Steadfast implements Enchantment {
 	@Override
 	public void tick(Plugin plugin, Player player, double level, boolean twoHertz, boolean oneHertz) {
 		double maxHealth = EntityUtils.getMaxHealth(player);
-		double healthMissing = 1 - (maxHealth - player.getHealth()) / maxHealth;
+		double healthMissing = 1.0 - player.getHealth() / maxHealth;
 		plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, Math.max(-0.1, SLOW_SCALING_RATE * healthMissing), PERCENT_SPEED_EFFECT_NAME));
 	}
 
 	public static double applySteadfast(DamageEvent event, Plugin plugin, Player player) {
 		double maxHealth = EntityUtils.getMaxHealth(player);
-		double healthMissing = 1 - (maxHealth - player.getHealth()) / maxHealth;
+		double healthMissing = 1.0 - player.getHealth() / maxHealth;
 		double armorBonus = Math.min(ARMOR_BONUS_PER_LEVEL, BONUS_SCALING_RATE * healthMissing);
 		return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.STEADFAST) * armorBonus;
 	}
