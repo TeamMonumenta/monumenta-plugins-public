@@ -87,7 +87,6 @@ public class InfusionUtils {
 			ItemStatUtils.removeInfusion(item, InfusionType.getInfusionType(sel.getEnchantName()));
 		}
 		ItemStatUtils.generateItemStats(item);
-		player.sendMessage("refunded " + Integer.toString(refundMaterials));
 		if (refundMaterials > 0 && region != null) {
 			giveMaterials(player, region, refundMaterials);
 		}
