@@ -96,7 +96,7 @@ public class Riposte extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && mPlayer != null) {
 			if (ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
 				if (mSwordTimer != null && !mSwordTimer.isCancelled()) {
@@ -106,6 +106,7 @@ public class Riposte extends Ability {
 				}
 			}
 		}
+		return false; // prevents multiple applications itself by clearing mSwordTimer
 	}
 
 }

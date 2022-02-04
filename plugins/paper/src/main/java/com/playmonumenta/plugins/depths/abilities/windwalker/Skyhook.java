@@ -42,11 +42,12 @@ public class Skyhook extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(SKYHOOK_ARROW_METADATA)) {
 			hook(arrow);
 			arrow.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
 		}
+		return false; // prevents multiple calls itself
 	}
 
 	private void hook(Entity arrow) {

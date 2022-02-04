@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -25,7 +26,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -88,7 +88,7 @@ public class HolyJavelin extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
 			double sharedPassiveDamage = 0;
 			if (mLuminousInfusion != null) {
@@ -103,6 +103,7 @@ public class HolyJavelin extends Ability {
 			}
 			execute(sharedPassiveDamage, enemy);
 		}
+		return false;
 	}
 
 	public void execute(

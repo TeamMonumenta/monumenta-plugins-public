@@ -178,8 +178,16 @@ public abstract class Ability {
 		return true;
 	}
 
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
-
+	/**
+	 * Called when any kind of damage is dealt.
+	 *
+	 * @param event The damage event
+	 * @param enemy The entity that was damaged
+	 * @return Whether this ability should no longer receive damage event in the same tick.
+	 * For abilities with no cooldown or ignoring cooldown, this should generally return true unless the code prevents recursion.
+	 */
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		return false;
 	}
 
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {

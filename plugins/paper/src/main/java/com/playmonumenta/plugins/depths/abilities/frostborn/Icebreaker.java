@@ -31,16 +31,15 @@ public class Icebreaker extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		event.setDamage(event.getDamage() * getMultiplier(enemy));
+		return false; // only changes event damage
 	}
 
 	private boolean isOnIce(LivingEntity entity) {
 		Location loc = entity.getLocation();
-		if (loc.getBlock().getRelative(BlockFace.DOWN).getType() == DepthsUtils.ICE_MATERIAL && DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation())) {
-			return true;
-		}
-		return false;
+		return loc.getBlock().getRelative(BlockFace.DOWN).getType() == DepthsUtils.ICE_MATERIAL
+			       && DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
 	}
 
 	private double getMultiplier(LivingEntity entity) {

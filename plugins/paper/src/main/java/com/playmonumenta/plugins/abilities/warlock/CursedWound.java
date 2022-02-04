@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -26,7 +27,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import javax.annotation.Nullable;
 
 import java.util.stream.Stream;
 
@@ -65,16 +65,16 @@ public class CursedWound extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
 			double cursedWoundCap = getAbilityScore() == 1 ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP;
 			BlockData fallingDustData = Material.ANVIL.createBlockData();
 			World world = mPlayer.getWorld();
 			if (EntityUtils.isHostileMob(enemy)) {
 				world.spawnParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 3,
-				                     (enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, fallingDustData);
+					(enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, fallingDustData);
 				world.spawnParticle(Particle.SPELL_MOB, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 6,
-				                     (enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, 0);
+					(enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, 0);
 
 				int cooldowns = 0;
 				for (Ability ability : mAbilities) {
@@ -118,7 +118,9 @@ public class CursedWound extends Ability {
 					}
 				}
 			}
+			return true;
 		}
+		return false;
 	}
 
 	@Override

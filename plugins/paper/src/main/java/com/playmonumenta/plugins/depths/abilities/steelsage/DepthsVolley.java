@@ -50,9 +50,14 @@ public class DepthsVolley extends DepthsAbility {
 	}
 
 	@Override
+	public double getPriorityAmount() {
+		return 900; // cancels damage events of volley arrows, so needs to run before other abilities
+	}
+
+	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		if (!mPlayer.isSneaking()
-		    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+			    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			/* This ability is actually on cooldown - event proceeds as normal */
 			return true;
 		}
@@ -118,7 +123,7 @@ public class DepthsVolley extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Arrow arrow && arrow.hasMetadata(VOLLEY_METAKEY)) {
 			if (MetadataUtils.checkOnceThisTick(mPlugin, enemy, VOLLEY_HIT_METAKEY)) {
 				double damageMultiplier = DAMAGE_MULTIPLIER[mRarity - 1];
@@ -128,6 +133,7 @@ public class DepthsVolley extends DepthsAbility {
 				event.setCancelled(true);
 			}
 		}
+		return false; // only changes event damage
 	}
 
 	@Override

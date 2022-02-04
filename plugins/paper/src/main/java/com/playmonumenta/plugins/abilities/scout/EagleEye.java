@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -20,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
 
 
@@ -93,10 +93,11 @@ public class EagleEye extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
-	    if (event.getType() == DamageType.MELEE) {
-	        cast(Action.LEFT_CLICK_AIR);
-	    }
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
+			cast(Action.LEFT_CLICK_AIR);
+		}
+		return false;
 	}
 
 	@Override

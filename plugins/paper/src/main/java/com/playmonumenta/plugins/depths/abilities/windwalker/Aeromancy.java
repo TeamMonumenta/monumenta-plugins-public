@@ -25,8 +25,9 @@ public class Aeromancy extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		event.setDamage(event.getDamage() * damageMultiplier(enemy));
+		return false; // only changes event damage
 	}
 
 	private double damageMultiplier(Entity damagee) {

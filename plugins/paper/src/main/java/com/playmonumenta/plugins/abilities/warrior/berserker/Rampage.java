@@ -75,7 +75,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		if (mStacks >= 10 && loc.getPitch() > 70) {
 			World world = mPlayer.getWorld();
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RAMPAGE_RADIUS)) {
-				DamageUtils.damage(mPlayer, mob, DamageType.MELEE, mStacks, mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mStacks, mInfo.mLinkedSpell);
 				world.spawnParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1);
 			}
 
@@ -117,14 +117,12 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if ((event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)
+			    && event.getAbility() != ClassAbility.RAMPAGE) {
 			damageDealt(event.getDamage());
 		}
-	}
-
-	public void customRecklessSwingInteraction(double swingDamage) {
-		damageDealt(swingDamage);
+		return false; // does not deal damage, just tallies the damage dealt
 	}
 
 	private void damageDealt(double damage) {

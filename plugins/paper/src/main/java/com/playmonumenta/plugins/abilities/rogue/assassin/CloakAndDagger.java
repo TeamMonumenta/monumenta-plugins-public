@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,7 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
 
 public class CloakAndDagger extends Ability implements KillTriggeredAbility, AbilityWithChargesOrStacks {
 
@@ -82,19 +82,18 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		mTracker.updateDamageDealtToBosses(event);
 		if (AbilityUtils.isStealthed(mPlayer) && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) && mActive) {
 			AbilityUtils.removeStealth(mPlugin, mPlayer, false);
 			if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
-				LivingEntity damagee = enemy;
 				double eliteScaling = 1.0;
-				if (EntityUtils.isElite(damagee)) {
+				if (EntityUtils.isElite(enemy)) {
 					eliteScaling = PASSIVE_DAMAGE_ELITE_MODIFIER;
-				} else if (EntityUtils.isBoss(damagee)) {
+				} else if (EntityUtils.isBoss(enemy)) {
 					eliteScaling = PASSIVE_DAMAGE_BOSS_MODIFIER;
 				}
-				DamageUtils.damage(mPlayer, damagee, DamageType.MELEE_SKILL, (mCloakOnActivation * mDamageMultiplier) * eliteScaling, mInfo.mLinkedSpell, true);
+				DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, (mCloakOnActivation * mDamageMultiplier) * eliteScaling, mInfo.mLinkedSpell, true);
 
 				Location loc = enemy.getLocation();
 				World world = mPlayer.getWorld();
@@ -105,6 +104,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 			mActive = false;
 		}
+		return false; // only tallies damage done
 	}
 
 	@Override

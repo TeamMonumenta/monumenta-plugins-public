@@ -30,9 +30,9 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer == null || !event.getType().equals(DamageEvent.DamageType.MELEE)) {
-			return;
+			return false;
 		}
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 		if (ItemUtils.isHoe(mainhand)) {
@@ -61,6 +61,7 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 				PlayerUtils.healPlayer(mPlugin, mPlayer, 0.5 / Math.sqrt(attackSpeed * multiplier) * mPlayer.getCooledAttackStrength(0));
 			}
 		}
+		return false;
 	}
 
 	@Override

@@ -86,11 +86,12 @@ public class DummyDecoy extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(DUMMY_DECOY_ARROW_METADATA)) {
 			spawnDecoy(arrow, enemy.getLocation());
 			arrow.removeMetadata(DUMMY_DECOY_ARROW_METADATA, mPlugin);
 		}
+		return false; // prevents multiple calls itself
 	}
 
 	private void spawnDecoy(Entity arrow, Location loc) {

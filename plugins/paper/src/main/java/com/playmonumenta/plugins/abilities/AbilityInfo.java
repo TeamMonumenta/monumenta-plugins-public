@@ -43,13 +43,6 @@ public class AbilityInfo {
 	 */
 	public boolean mIgnoreCooldown = false;
 
-	/*
-	 * If this is set to true, the LivingEntityDamagedByPlayerEvent will be allowed
-	 * to trigger multiple times per tick. Be very careful with this, as it can lead
-	 * to infinite damage loops if you aren't careful.
-	 */
-	public boolean mIgnoreTriggerCap = false;
-
 	public Component getFormattedDescription(int skillLevel) throws IndexOutOfBoundsException {
 		String strDescription = mDescriptions.get(skillLevel - 1);
 		if (strDescription == null) {

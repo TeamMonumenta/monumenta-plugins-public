@@ -72,10 +72,11 @@ public class Twisted extends DelveModifier {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (enemy.getScoreboardTags().contains(SHADE_OF_CORRUPTION_TAG)) {
 			event.setDamage(event.getDamage() * CORRUPTION_DAMAGE_RECEIVED_MULTIPLIER);
 		}
+		return false; // only changes event damage
 	}
 
 	@Override

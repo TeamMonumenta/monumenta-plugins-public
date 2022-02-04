@@ -219,7 +219,7 @@ public class EntityListener implements Listener {
 			}
 
 			// TODO: add a mob ability that does thorns based on DamageType instead of this janky check, which no longer works
-			if (event.getCause() == DamageCause.THORNS && MetadataUtils.happenedThisTick(mPlugin, damagee, "LastMagicUseTime", 0)) {
+			if (event.getCause() == DamageCause.THORNS && MetadataUtils.happenedThisTick(damagee, "LastMagicUseTime", 0)) {
 				// Check that thorns isn't being caused by 'magic'; if it is, cancel the damage
 				event.setCancelled(true);
 			}

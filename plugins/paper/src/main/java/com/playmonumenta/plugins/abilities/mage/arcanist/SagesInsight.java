@@ -1,7 +1,15 @@
 package com.playmonumenta.plugins.abilities.mage.arcanist;
 
-import java.util.HashMap;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,17 +20,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.utils.MessagingUtils;
+import java.util.HashMap;
 
 public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DECAY_TIMER = 20 * 4;
@@ -49,7 +48,6 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 		mInfo.mShorthandName = "SgI";
 		mInfo.mDescriptions.add("If an active spell hits an enemy, you gain an Arcane Insight. Insights stack up to 8, but decay every 4s of not gaining one. Once 8 Insights are revealed, the Arcanist gains 20% Speed for 8s and the cooldowns of the previous two spells cast are refreshed. This sets your Insights back to 0.");
 		mInfo.mDescriptions.add("Sage's Insight now grants 30% Speed and refreshes the cooldowns of your previous three spells upon activating.");
-		mInfo.mIgnoreTriggerCap = true;
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
 		mResetSize = getAbilityScore() == 1 ? ABILITIES_COUNT_1 : ABILITIES_COUNT_2;
 		mResets = new ClassAbility[mResetSize];
@@ -76,10 +74,10 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		ClassAbility ability = event.getAbility();
 		if (ability == null) {
-			return;
+			return false;
 		}
 		mTicksToStackDecay = DECAY_TIMER;
 		World world = mPlayer.getWorld();
@@ -117,6 +115,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
+		return false; // only used to check that an ability dealt damage, and does not cause more damage instances.
 	}
 
 	@Override

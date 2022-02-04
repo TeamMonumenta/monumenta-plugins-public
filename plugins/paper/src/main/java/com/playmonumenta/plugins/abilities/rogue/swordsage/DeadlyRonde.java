@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,7 +28,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
 
 /*
@@ -111,53 +111,55 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mActiveRunnable != null && event.getType() == DamageType.MELEE) {
-			if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
-				Vector playerDirVector = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RONDE_RADIUS)) {
-					Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
-					if (playerDirVector.dot(toMobVector) > RONDE_DOT_COSINE) {
-						int damage = getAbilityScore() == 1 ? RONDE_1_DAMAGE : RONDE_2_DAMAGE;
-						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.mLinkedSpell, true);
-						MovementUtils.knockAway(mPlayer, mob, RONDE_KNOCKBACK_SPEED, true);
-					}
-				}
-
-				Location particleLoc = mPlayer.getEyeLocation().add(mPlayer.getEyeLocation().getDirection().multiply(3));
-				World world = mPlayer.getWorld();
-				world.spawnParticle(Particle.SWEEP_ATTACK, particleLoc, 10, 1.5, 0.5, 1.5);
-				world.spawnParticle(Particle.CRIT, particleLoc, 50, 1.5, 0.5, 1.5, 0.2);
-				world.spawnParticle(Particle.CLOUD, particleLoc, 20, 1.5, 0.5, 1.5, 0.3);
-				world.spawnParticle(Particle.REDSTONE, particleLoc, 45, 1.5, 0.5, 1.5, SWORDSAGE_COLOR);
-
-				world.playSound(particleLoc, Sound.ITEM_TRIDENT_THROW, 1, 1.25f);
-				world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.8f, 0.75f);
-				world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.75f);
-				world.playSound(particleLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
-
-				mActiveRunnable.cancel();
-				mActiveRunnable = null;
-
-				mRondeStacks--;
-				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
-				ClientModHandler.updateAbility(mPlayer, this);
-				if (mRondeStacks > 0) {
-					mActiveRunnable = new BukkitRunnable() {
-
-						@Override
-						public void run() {
-							mActiveRunnable = null;
-							mRondeStacks = 0;
-							MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
-							ClientModHandler.updateAbility(mPlayer, DeadlyRonde.this);
-						}
-
-					};
-					mActiveRunnable.runTaskLater(mPlugin, 20 * 5);
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (mActiveRunnable != null
+			    && event.getType() == DamageType.MELEE
+			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
+			Vector playerDirVector = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RONDE_RADIUS)) {
+				Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
+				if (playerDirVector.dot(toMobVector) > RONDE_DOT_COSINE) {
+					int damage = getAbilityScore() == 1 ? RONDE_1_DAMAGE : RONDE_2_DAMAGE;
+					DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.mLinkedSpell, true);
+					MovementUtils.knockAway(mPlayer, mob, RONDE_KNOCKBACK_SPEED, true);
 				}
 			}
+
+			Location particleLoc = mPlayer.getEyeLocation().add(mPlayer.getEyeLocation().getDirection().multiply(3));
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.SWEEP_ATTACK, particleLoc, 10, 1.5, 0.5, 1.5);
+			world.spawnParticle(Particle.CRIT, particleLoc, 50, 1.5, 0.5, 1.5, 0.2);
+			world.spawnParticle(Particle.CLOUD, particleLoc, 20, 1.5, 0.5, 1.5, 0.3);
+			world.spawnParticle(Particle.REDSTONE, particleLoc, 45, 1.5, 0.5, 1.5, SWORDSAGE_COLOR);
+
+			world.playSound(particleLoc, Sound.ITEM_TRIDENT_THROW, 1, 1.25f);
+			world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.8f, 0.75f);
+			world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.75f);
+			world.playSound(particleLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
+
+			mActiveRunnable.cancel();
+			mActiveRunnable = null;
+
+			mRondeStacks--;
+			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
+			ClientModHandler.updateAbility(mPlayer, this);
+			if (mRondeStacks > 0) {
+				mActiveRunnable = new BukkitRunnable() {
+
+					@Override
+					public void run() {
+						mActiveRunnable = null;
+						mRondeStacks = 0;
+						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
+						ClientModHandler.updateAbility(mPlayer, DeadlyRonde.this);
+					}
+
+				};
+				mActiveRunnable.runTaskLater(mPlugin, 20 * 5);
+			}
+			return true; // only trigger once per attack
 		}
+		return false;
 	}
 
 	@Override

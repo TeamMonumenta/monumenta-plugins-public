@@ -25,12 +25,13 @@ public class Dethroner extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (EntityUtils.isBoss(enemy)) {
 			event.setDamage(event.getDamage() * BOSS_DAMAGE[mRarity - 1]);
 		} else if (EntityUtils.isElite(enemy)) {
 			event.setDamage(event.getDamage() * ELITE_DAMAGE[mRarity - 1]);
 		}
+		return false; // only changes event damage
 	}
 
 	@Override

@@ -1,15 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.NavigableSet;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
@@ -23,7 +13,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
-
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -33,6 +23,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.NavigableSet;
+import java.util.Set;
 
 
 public class Spellshock extends Ability {
@@ -69,9 +66,9 @@ public class Spellshock extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer == null) {
-			return;
+			return false;
 		}
 
 		if (event.getType() == DamageType.MELEE) {
@@ -83,7 +80,7 @@ public class Spellshock extends Ability {
 					e.clearEffect();
 				}
 			}
-		} else if (event.getAbility() != null && event.getAbility() != Blizzard.ABILITY && event.getAbility() != ArcaneStrike.ABILITY) {
+		} else if (event.getAbility() != null && event.getAbility() != Blizzard.ABILITY && event.getAbility() != ArcaneStrike.ABILITY && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
 			// Check if the mob has static, and trigger it if possible; otherwise, apply/refresh it
 			NavigableSet<Effect> effectGroupOriginal = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
 			if (effectGroupOriginal != null) {
@@ -109,6 +106,9 @@ public class Spellshock extends Ability {
 					List<LivingEntity> triggeredMobs = new ArrayList<LivingEntity>();
 					triggeredMobs.add(enemy);
 
+					// spellshock triggering other spellshocks propagates the damage at 100%
+					double spellShockDamage = event.getAbility() == mInfo.mLinkedSpell ? event.getDamage() : event.getDamage() * mLevelDamage;
+
 					/*
 					 * Loop through triggeredMobs, and check distances to each in nearbyMobs. If in range,
 					 * deal damage. If the mob can be triggered, trigger it, adding it before the iteration
@@ -130,7 +130,7 @@ public class Spellshock extends Ability {
 								if (nearbyMob.getLocation().distanceSquared(triggeredMob.getLocation()) < (SIZE * SIZE)) {
 									// Only damage a mob once per tick
 									if (MetadataUtils.checkOnceThisTick(mPlugin, nearbyMob, DAMAGED_THIS_TICK_METAKEY)) {
-										DamageUtils.damage(mPlayer, nearbyMob, DamageType.OTHER, event.getDamage() * mLevelDamage, mInfo.mLinkedSpell, true);
+										DamageUtils.damage(mPlayer, nearbyMob, DamageType.OTHER, spellShockDamage, mInfo.mLinkedSpell, true);
 									}
 
 									NavigableSet<Effect> effectGroup = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
@@ -163,6 +163,7 @@ public class Spellshock extends Ability {
 				}
 			}
 		}
+		return false; // Needs to apply to all damaged mobs. Uses an internal check to prevent recursion on dealing damage.
 	}
 
 	@Override

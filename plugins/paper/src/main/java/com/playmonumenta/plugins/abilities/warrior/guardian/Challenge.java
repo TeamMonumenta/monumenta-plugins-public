@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -19,7 +20,6 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -90,9 +90,10 @@ public class Challenge extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
-	    if (event.getType() == DamageType.MELEE) {
-	        cast(Action.LEFT_CLICK_AIR);
-	    }
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
+			cast(Action.LEFT_CLICK_AIR);
+		}
+		return false;
 	}
 }

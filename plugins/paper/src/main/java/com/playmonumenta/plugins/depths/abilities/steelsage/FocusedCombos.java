@@ -1,12 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.AntiRangeChivalrousBoss;
 import com.playmonumenta.plugins.depths.DepthsTree;
@@ -16,8 +9,13 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 
 public class FocusedCombos extends DepthsAbility {
@@ -36,7 +34,7 @@ public class FocusedCombos extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getDamager() instanceof AbstractArrow proj && event.getType() == DamageType.PROJECTILE && proj != null && (proj.isCritical() || proj instanceof Trident)) {
 			mComboCount++;
 
@@ -49,7 +47,9 @@ public class FocusedCombos extends DepthsAbility {
 				mPlayer.playSound(playerLoc, Sound.BLOCK_WEEPING_VINES_BREAK, 2, 0.8f);
 				mPlayer.playSound(playerLoc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 1.75f);
 			}
+			return true;
 		}
+		return false;
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,7 +33,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class Metalmancy extends DepthsAbility {
@@ -148,9 +148,9 @@ public class Metalmancy extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() != DamageType.PROJECTILE || mGolem == null || mGolem.getHealth() <= 0 || !(mTarget == null || mTarget.getHealth() <= 0) || enemy.getLocation().distance(mGolem.getLocation()) > DETECTION_RANGE) {
-			return;
+			return false;
 		}
 
 		World world = mPlayer.getWorld();
@@ -158,6 +158,7 @@ public class Metalmancy extends DepthsAbility {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
 		PotionUtils.applyPotion(mPlayer, mTarget, new PotionEffect(PotionEffectType.GLOWING, DURATION[mRarity - 1], 0, true, false));
 		world.spawnParticle(Particle.VILLAGER_ANGRY, mGolem.getEyeLocation(), 15);
+		return true; // only one retarget per tick
 	}
 
 	@Override

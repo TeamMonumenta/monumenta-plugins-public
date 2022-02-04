@@ -622,17 +622,15 @@ public class AbilityManager {
 			return;
 		}
 
-		int i = 0;
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			i++;
-			if (abil.canCast()) {
-				// Do not allow any skills with no cooldown to apply damage more than once
-				if (!abil.getInfo().mIgnoreTriggerCap
-					&& (abil.getInfo().mCooldown == 0 || abil.getInfo().mIgnoreCooldown)
-					&& !MetadataUtils.checkOnceThisTick(mPlugin, player, i + "LivingEntityDamagedByPlayerEventTickTriggered")) {
-					return;
+			if (event.isCancelled()) {
+				return;
+			}
+			String metaKey = "LastDamageTick_" + abil.getClass().getCanonicalName();
+			if (abil.canCast() && !MetadataUtils.happenedThisTick(player, metaKey)) {
+				if (abil.onDamage(event, enemy)) {
+					MetadataUtils.checkOnceThisTick(mPlugin, player, metaKey);
 				}
-				abil.onDamage(event, enemy);
 			}
 		}
 	}

@@ -1,9 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.aspects;
 
-import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
@@ -11,6 +7,9 @@ import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class AxeAspect extends WeaponAspectDepthsAbility {
 
@@ -24,10 +23,11 @@ public class AxeAspect extends WeaponAspectDepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer != null && event.getType() == DamageType.MELEE && ItemUtils.isAxe(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(event.getDamage() + DAMAGE);
 		}
+		return false; // only changes event damage
 	}
 
 	@Override

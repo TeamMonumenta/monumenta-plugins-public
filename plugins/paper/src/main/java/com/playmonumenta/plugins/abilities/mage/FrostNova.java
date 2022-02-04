@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -24,7 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
 
 
@@ -138,10 +138,11 @@ public class FrostNova extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
-	    if (event.getType() == DamageType.MELEE) {
-	        cast(Action.LEFT_CLICK_AIR);
-	    }
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
+			cast(Action.LEFT_CLICK_AIR);
+		}
+		return false;
 	}
 
 	@Override

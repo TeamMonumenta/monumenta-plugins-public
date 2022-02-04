@@ -14,6 +14,8 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -22,7 +24,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
 
 import java.util.NavigableSet;
 
@@ -32,6 +33,7 @@ public class AstralOmen extends Ability {
 	public static final String STACKS_SOURCE = "AstralOmenStacks";
 	public static final String BONUS_DAMAGE_SOURCE = "AstralOmenBonusDamage";
 	private static final Particle.DustOptions COLOR_PURPLE = AstralOmenStacks.COLOR_PURPLE;
+	public static final String DAMAGED_THIS_TICK_METAKEY = "AstralOmenDamagedThisTick";
 
 	public static final int DAMAGE = 6;
 	public static final int SIZE = 3;
@@ -81,13 +83,13 @@ public class AstralOmen extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getAbility() == null || event.getAbility() == mInfo.mLinkedSpell) {
-			return;
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getAbility() == null || event.getAbility() == mInfo.mLinkedSpell || event.getAbility() == ClassAbility.SPELLSHOCK) {
+			return false;
 		}
 
 		NavigableSet<Effect> stacks = mPlugin.mEffectManager.getEffects(enemy, STACKS_SOURCE);
-		int level = stacks == null ? 0 : (int)stacks.last().getMagnitude();
+		int level = stacks == null ? 0 : (int) stacks.last().getMagnitude();
 
 		if (stacks != null) {
 			mPlugin.mEffectManager.clearEffects(enemy, STACKS_SOURCE);
@@ -97,13 +99,15 @@ public class AstralOmen extends Ability {
 			World world = enemy.getWorld();
 			float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, DAMAGE);
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), SIZE)) {
-				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, spellDamage, mInfo.mLinkedSpell, true);
-				if (mDoPull) {
-					MovementUtils.pullTowards(enemy, mob, PULL_SPEED);
-					EntityUtils.applySlow(mPlugin, SLOW_TICKS, SLOW_MULTIPLIER, mob);
-				}
+				if (MetadataUtils.checkOnceThisTick(mPlugin, mob, DAMAGED_THIS_TICK_METAKEY)) {
+					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, spellDamage, mInfo.mLinkedSpell, true);
+					if (mDoPull) {
+						MovementUtils.pullTowards(enemy, mob, PULL_SPEED);
+						EntityUtils.applySlow(mPlugin, SLOW_TICKS, SLOW_MULTIPLIER, mob);
+					}
 
-				world.spawnParticle(Particle.REDSTONE, enemy.getLocation(), 10, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE);
+					world.spawnParticle(Particle.REDSTONE, enemy.getLocation(), 10, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE);
+				}
 			}
 
 			mPlugin.mEffectManager.addEffect(enemy, BONUS_DAMAGE_SOURCE, new AstralOmenBonusDamage(BONUS_TICKS, mLevelBonusMultiplier, mPlayer));
@@ -121,5 +125,6 @@ public class AstralOmen extends Ability {
 			// which will handle stack decay times appropriately & not have conflicting magnitudes
 			mPlugin.mEffectManager.addEffect(enemy, STACKS_SOURCE, new AstralOmenStacks(STACK_TICKS, ++level));
 		}
+		return false; // Needs to apply to all damaged mobs. Uses an internal check to prevent recursion on dealing damage.
 	}
 }

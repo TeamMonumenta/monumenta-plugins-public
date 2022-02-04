@@ -38,7 +38,7 @@ public class SoothingCombos extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (DepthsUtils.isValidComboAttack(event, mPlayer)) {
 			mComboCount++;
 
@@ -61,7 +61,9 @@ public class SoothingCombos extends DepthsAbility {
 				mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.6f);
 				mPlayer.getWorld().spawnParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
 			}
+			return true;
 		}
+		return false;
 	}
 
 	@Override

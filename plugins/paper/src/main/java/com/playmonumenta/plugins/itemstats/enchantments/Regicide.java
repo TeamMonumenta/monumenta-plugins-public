@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class Regicide implements Enchantment {
 
@@ -42,7 +41,10 @@ public class Regicide implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity target) {
-		if (event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.MELEE || event.getType() == DamageType.MAGIC) {
+		if (event.getType() != DamageType.AILMENT
+			    && event.getType() != DamageType.POISON
+			    && event.getType() != DamageType.FALL
+			    && event.getType() != DamageType.OTHER) {
 			event.setDamage(calculateDamage(level, target, event));
 		}
 	}

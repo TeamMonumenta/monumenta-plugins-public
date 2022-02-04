@@ -34,7 +34,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow) {
 			event.setDamage(event.getDamage() * (1 + mStacks * DAMAGE_PER_STACK[mRarity - 1]));
 
@@ -49,6 +49,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 				}
 			}
 		}
+		return false; // only changes event damage
 	}
 
 	@Override

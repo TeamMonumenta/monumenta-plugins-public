@@ -51,11 +51,11 @@ public class CoupDeGrace extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) {
 			for (PotionEffect effect : enemy.getActivePotionEffects()) {
 				if (effect.getType().equals(PotionEffectType.DAMAGE_RESISTANCE) && effect.getAmplifier() >= 4) {
-					return;
+					return false;
 				}
 			}
 
@@ -70,6 +70,7 @@ public class CoupDeGrace extends Ability {
 				}
 			}
 		}
+		return false; // only increases event damage, thus no recursion
 	}
 
 	private void execute(DamageEvent event) {

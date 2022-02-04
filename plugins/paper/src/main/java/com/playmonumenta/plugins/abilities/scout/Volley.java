@@ -52,10 +52,15 @@ public class Volley extends Ability {
 	}
 
 	@Override
+	public double getPriorityAmount() {
+		return 900; // cancels damage events of volley arrows, so needs to run before other abilities
+	}
+
+	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		if (mPlayer == null
-				|| !mPlayer.isSneaking()
-				|| mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+			    || !mPlayer.isSneaking()
+			    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			/* This ability is actually on cooldown - event proceeds as normal */
 			return true;
 		}
@@ -124,7 +129,7 @@ public class Volley extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity proj = event.getDamager();
 		if (event.getType() == DamageType.PROJECTILE && proj instanceof AbstractArrow && proj.hasMetadata(VOLLEY_METAKEY)) {
 			if (MetadataUtils.checkOnceThisTick(mPlugin, enemy, VOLLEY_HIT_METAKEY)) {
@@ -135,6 +140,7 @@ public class Volley extends Ability {
 				event.setCancelled(true);
 			}
 		}
+		return false; // only changes event damage
 	}
 
 }

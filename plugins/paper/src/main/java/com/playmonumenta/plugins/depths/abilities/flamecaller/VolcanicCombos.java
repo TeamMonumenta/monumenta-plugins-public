@@ -1,13 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -18,8 +10,14 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class VolcanicCombos extends DepthsAbility {
 	public static final String ABILITY_NAME = "Volcanic Combos";
@@ -36,7 +34,7 @@ public class VolcanicCombos extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer != null && DepthsUtils.isValidComboAttack(event, mPlayer)) {
 			mComboCount++;
 
@@ -57,7 +55,9 @@ public class VolcanicCombos extends DepthsAbility {
 				world.playSound(location, Sound.ITEM_FIRECHARGE_USE, 0.5f, 1);
 				mComboCount = 0;
 			}
+			return true;
 		}
+		return false;
 	}
 
 	@Override

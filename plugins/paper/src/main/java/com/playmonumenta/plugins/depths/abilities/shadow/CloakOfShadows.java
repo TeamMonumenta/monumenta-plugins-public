@@ -120,7 +120,7 @@ public class CloakOfShadows extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
 			if (mBonusDamage) {
 				event.setDamage(event.getDamage() + DAMAGE[mRarity - 1]);
@@ -129,6 +129,7 @@ public class CloakOfShadows extends DepthsAbility {
 				cast(Action.LEFT_CLICK_AIR);
 			}
 		}
+		return false; // only changes event damage
 	}
 
 	@Override

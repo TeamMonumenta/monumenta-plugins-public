@@ -65,10 +65,11 @@ public class RadiantBlessing extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
-	    if (event.getType() == DamageType.MELEE) {
-	        cast(Action.LEFT_CLICK_AIR);
-	    }
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
+			cast(Action.LEFT_CLICK_AIR);
+		}
+		return false;
 	}
 
 	@Override

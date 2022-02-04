@@ -1,13 +1,10 @@
 package com.playmonumenta.plugins.effects;
 
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.TreeSet;
-
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.DamageEvent;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -19,12 +16,14 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
 public final class EffectManager implements Listener {
 
@@ -455,6 +454,9 @@ public final class EffectManager implements Listener {
 
 	//@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void damageEvent(DamageEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		LivingEntity damagee = event.getDamagee();
 		LivingEntity source = event.getSource();
 
@@ -462,6 +464,9 @@ public final class EffectManager implements Listener {
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					if (event.isCancelled()) {
+						return;
+					}
 					effectGroup.last().onHurt(damagee, event);
 					Entity damager = event.getDamager();
 					if (damager != null) {
@@ -479,6 +484,9 @@ public final class EffectManager implements Listener {
 			if (sourceEffects != null) {
 				for (Map<String, NavigableSet<Effect>> priorityEffects : sourceEffects.mPriorityMap.values()) {
 					for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+						if (event.isCancelled()) {
+							return;
+						}
 						effectGroup.last().onDamage(source, event, damagee);
 					}
 				}

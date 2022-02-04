@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,10 +23,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
 import java.util.List;
 
@@ -145,17 +144,12 @@ public class ThunderStep extends Ability {
 					.toLocation(world)
 					.setDirection(vector);
 
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						if (mPlayer == null || mPlayer.isDead() || !mPlayer.isValid() || !playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)) {
-							return;
-						}
+				if (!playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)) {
+					return;
+				}
 
-						mPlayer.teleport(playerEndLocation);
-						doDamage(playerEndLocation, spellDamage, true);
-					}
-				}.runTaskLater(Plugin.getInstance(), 2);
+				mPlayer.teleport(playerEndLocation);
+				doDamage(playerEndLocation, spellDamage, true);
 			}
 		}
 	}

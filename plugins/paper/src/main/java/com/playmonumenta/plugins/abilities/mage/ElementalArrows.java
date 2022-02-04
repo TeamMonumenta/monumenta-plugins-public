@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.AbstractArrow;
@@ -17,7 +18,6 @@ import org.bukkit.entity.Stray;
 import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import javax.annotation.Nullable;
 
 
 public class ElementalArrows extends Ability {
@@ -47,9 +47,9 @@ public class ElementalArrows extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer == null || !(event.getDamager() instanceof AbstractArrow)) {
-			return;
+			return false;
 		}
 		AbstractArrow arrow = (AbstractArrow) event.getDamager();
 
@@ -84,6 +84,7 @@ public class ElementalArrows extends Ability {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, ABILITY_ICE);
 			mLastDamage = event.getDamage();
 		}
+		return true; // creates new damage instances
 	}
 
 	public double getLastDamage() {

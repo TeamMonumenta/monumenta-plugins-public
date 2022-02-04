@@ -40,7 +40,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && !arrow.hasMetadata(RapidFire.META_DATA_TAG) && EntityUtils.isHostileMob(enemy)) {
 			LivingEntity nearestMob = EntityUtils.getNearestMob(enemy.getLocation(), SPLIT_ARROW_CHAIN_RANGE, enemy);
 
@@ -72,6 +72,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 				}
 			}
 		}
+		return false; // applies damage of type OTHER for damage of type PROJECTILE, which should not cause recursion with any other ability (or itself)
 	}
 
 	@Override

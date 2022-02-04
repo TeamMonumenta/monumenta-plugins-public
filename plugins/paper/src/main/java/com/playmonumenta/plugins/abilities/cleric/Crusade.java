@@ -6,12 +6,12 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
 
 
 
@@ -45,9 +45,9 @@ public class Crusade extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getAbility() == null || mPlayer == null) {
-			return;
+			return false;
 		}
 
 		if (enemyTriggersAbilities(enemy)) {
@@ -67,6 +67,7 @@ public class Crusade extends Ability {
 				0
 			).spawnAsPlayer(mPlayer);
 		}
+		return false; // only increases event damage
 	}
 
 	private boolean enemyTriggersAbilities(

@@ -25,32 +25,30 @@ public class MetadataUtils {
 	 * be executed.
 	 */
 	public static boolean checkOnceThisTick(Plugin plugin, Entity entity, String metakey) {
-		if (entity.hasMetadata(metakey)
-		    && entity.getMetadata(metakey).get(0).asInt() == entity.getTicksLived()) {
+		if (happenedThisTick(entity, metakey)) {
 			return false;
 		}
-
 		entity.setMetadata(metakey, new FixedMetadataValue(plugin, entity.getTicksLived()));
 		return true;
 	}
 
 	/**
 	 * This is just another way to check if a certain metakey has been called.
-	 *
+	 * <p>
 	 * Comes with the ability to offset the tick amount being checked if ever needed (used for BukkitRunnables)
 	 *
-	 * @param plugin The class extending JavaPlugin
-	 * @param entity The entity being checked
-	 * @param metakey A unique key that will be checked
+	 * @param entity     The entity being checked
+	 * @param metakey    A unique key that will be checked
 	 * @param tickOffset Offsets the tick amount checked
 	 * @return A true/false. If true, this has been called already. If false, it has not been called.
 	 */
-	public static boolean happenedThisTick(Plugin plugin, Entity entity, String metakey, int tickOffset) {
-		if (entity.hasMetadata(metakey)
-		    && entity.getMetadata(metakey).get(0).asInt() == entity.getTicksLived() + tickOffset) {
-			return true;
-		}
-		return false;
+	public static boolean happenedThisTick(Entity entity, String metakey, int tickOffset) {
+		return entity.hasMetadata(metakey)
+			       && entity.getMetadata(metakey).get(0).asInt() == entity.getTicksLived() + tickOffset;
+	}
+
+	public static boolean happenedThisTick(Entity entity, String metakey) {
+		return happenedThisTick(entity, metakey, 0);
 	}
 
 	public static void removeAllMetadata(Plugin plugin) {

@@ -53,10 +53,11 @@ public class Earthquake extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && mPlayerItemStatsMap.containsKey(arrow)) {
 			quake(arrow, enemy.getLocation());
 		}
+		return false; // prevents multiple calls by removing the arrow (from the world and the player stats map)
 	}
 
 	private void quake(AbstractArrow arrow, Location loc) {

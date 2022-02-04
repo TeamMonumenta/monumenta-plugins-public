@@ -5,13 +5,13 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import javax.annotation.Nullable;
 
 public class Agility extends Ability {
 
@@ -30,7 +30,7 @@ public class Agility extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH || event.getType() == DamageType.MELEE_SKILL) {
 			if (getAbilityScore() > 1) {
 				event.setDamage((event.getDamage() + AGILITY_BONUS_DAMAGE) * (1 + SCALING_DAMAGE));
@@ -38,6 +38,7 @@ public class Agility extends Ability {
 				event.setDamage(event.getDamage() + AGILITY_BONUS_DAMAGE);
 			}
 		}
+		return false; // only changes event damage
 	}
 
 	@Override

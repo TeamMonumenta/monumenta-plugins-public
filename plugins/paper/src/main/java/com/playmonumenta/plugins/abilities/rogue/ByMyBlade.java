@@ -7,9 +7,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -20,8 +20,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import javax.annotation.Nullable;
 
 
 
@@ -49,21 +47,14 @@ public class ByMyBlade extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH || event.getType() == DamageType.MELEE_SKILL) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
 			int hasteAmplifier = getAbilityScore() == 1 ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER;
-			double extraDamage = mDamageBonus;
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-			                                 new PotionEffect(PotionEffectType.FAST_DIGGING, BY_MY_BLADE_HASTE_DURATION, hasteAmplifier, false, true));
+				new PotionEffect(PotionEffectType.FAST_DIGGING, BY_MY_BLADE_HASTE_DURATION, hasteAmplifier, false, true));
 
-			if (EntityUtils.isElite(enemy)) {
-				extraDamage *= RoguePassive.PASSIVE_DAMAGE_ELITE_MODIFIER;
-			} else if (EntityUtils.isBoss(enemy)) {
-				extraDamage *= RoguePassive.PASSIVE_DAMAGE_BOSS_MODIFIER;
-			}
-
-			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, extraDamage, mInfo.mLinkedSpell, true);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, mDamageBonus, mInfo.mLinkedSpell, true);
 
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
@@ -78,6 +69,7 @@ public class ByMyBlade extends Ability {
 			world.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 			putOnCooldown();
 		}
+		return false;
 	}
 
 	@Override

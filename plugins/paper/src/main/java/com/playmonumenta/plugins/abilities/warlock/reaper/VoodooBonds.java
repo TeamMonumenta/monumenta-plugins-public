@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,8 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import javax.annotation.Nullable;
 
 
 
@@ -105,7 +104,7 @@ public class VoodooBonds extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && mPlayer != null) {
 			EntityType type = enemy.getType();
 			Location loc = enemy.getLocation();
@@ -119,6 +118,8 @@ public class VoodooBonds extends Ability {
 					world.spawnParticle(Particle.REDSTONE, mLoc, 30, 0.5, 0.5, 0.5, 0, COLOR);
 				}
 			}
+			return true;
 		}
+		return false;
 	}
 }

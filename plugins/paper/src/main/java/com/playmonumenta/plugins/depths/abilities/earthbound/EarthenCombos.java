@@ -35,7 +35,7 @@ public class EarthenCombos extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (DepthsUtils.isValidComboAttack(event, mPlayer)) {
 			mComboCount++;
 
@@ -53,7 +53,9 @@ public class EarthenCombos extends DepthsAbility {
 				world.spawnParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData());
 				world.spawnParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData());
 			}
+			return true;
 		}
+		return false;
 	}
 
 	@Override

@@ -149,11 +149,12 @@ public class DarkPact extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
 			if (!ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 				event.setDamage(event.getDamage() / (1 + mPercentDamageDealt));
 			}
 		}
+		return false; // only changes event damage
 	}
 }

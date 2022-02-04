@@ -6,9 +6,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import javax.annotation.Nullable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
 
 public class RoguePassive extends Ability {
 
@@ -25,9 +25,9 @@ public class RoguePassive extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getAbility() == null) {
-			return;
+			return false;
 		}
 
 		if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
@@ -40,5 +40,6 @@ public class RoguePassive extends Ability {
 				}
 			}
 		}
+		return false; // increases event damage and does not cause another damage instance, so no recursion
 	}
 }

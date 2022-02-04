@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,7 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
 import java.util.List;
 
@@ -59,7 +59,6 @@ public class LuminousInfusion extends Ability {
 		mInfo.mDescriptions.add("Your melee attacks now passively deal 20% holy damage to undead enemies, and Divine Justice now passively deals 15% more total damage. Damaging an undead enemy now passively sets it on fire for 3s. That holy damage ignores iframes.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
-		mInfo.mIgnoreTriggerCap = true;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 
@@ -112,13 +111,13 @@ public class LuminousInfusion extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		// Divine Justice integration
 		if (mDoMultiplierAndFire && event.getAbility() == ClassAbility.DIVINE_JUSTICE) {
-				double originalDamage = event.getDamage();
-				mLastPassiveDJDamage = originalDamage * DAMAGE_MULTIPLIER_2;
-				event.setDamage(originalDamage + mLastPassiveDJDamage);
-				return;
+			double originalDamage = event.getDamage();
+			mLastPassiveDJDamage = originalDamage * DAMAGE_MULTIPLIER_2;
+			event.setDamage(originalDamage + mLastPassiveDJDamage);
+			return false;
 		}
 
 		boolean enemyTriggersAbilities = Crusade.enemyTriggersAbilities(enemy, mCrusade);
@@ -139,6 +138,7 @@ public class LuminousInfusion extends Ability {
 			mLastPassiveMeleeDamage = originalDamage * DAMAGE_MULTIPLIER_2;
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveMeleeDamage, mInfo.mLinkedSpell, true);
 		}
+		return false;
 	}
 
 	public void execute(LivingEntity damagee) {

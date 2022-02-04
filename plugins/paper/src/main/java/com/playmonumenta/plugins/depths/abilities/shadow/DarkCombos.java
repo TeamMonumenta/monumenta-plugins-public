@@ -1,14 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.shadow;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -17,8 +8,15 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class DarkCombos extends DepthsAbility {
 
@@ -35,7 +33,7 @@ public class DarkCombos extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer != null && DepthsUtils.isValidComboAttack(event, mPlayer)) {
 			mComboCount++;
 
@@ -49,7 +47,9 @@ public class DarkCombos extends DepthsAbility {
 				PotionUtils.applyPotion(mPlayer, enemy,
 					new PotionEffect(PotionEffectType.GLOWING, DURATION, 0, true, false));
 			}
+			return true;
 		}
+		return false;
 	}
 
 	@Override

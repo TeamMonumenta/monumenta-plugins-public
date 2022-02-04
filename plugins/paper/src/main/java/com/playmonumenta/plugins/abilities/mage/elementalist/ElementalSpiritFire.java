@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,7 +30,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -105,7 +105,7 @@ public class ElementalSpiritFire extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		ClassAbility ability = event.getAbility();
 		if (ability != null && (ability.equals(ClassAbility.ELEMENTAL_ARROWS_FIRE) || ability.equals(ClassAbility.STARFALL) || ability.equals(ClassAbility.MAGMA_SHIELD))) {
 			mEnemiesAffected.add(event.getDamagee());
@@ -197,6 +197,7 @@ public class ElementalSpiritFire extends Ability {
 				}.runTaskLater(mPlugin, 2);
 			}
 		}
+		return false;
 	}
 
 	@Override

@@ -22,10 +22,11 @@ public class PrimordialMastery extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getAbility() != null) {
 			event.setDamage(event.getDamage() * SPELL_MOD[mRarity - 1]);
 		}
+		return false; // only changes event damage
 	}
 
 	@Override

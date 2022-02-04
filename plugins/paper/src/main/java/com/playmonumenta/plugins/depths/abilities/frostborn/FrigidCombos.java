@@ -35,7 +35,7 @@ public class FrigidCombos extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (DepthsUtils.isValidComboAttack(event, mPlayer)) {
 			mComboCount++;
 
@@ -58,7 +58,9 @@ public class FrigidCombos extends DepthsAbility {
 				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, 0.8f, 0.45f);
 				world.spawnParticle(Particle.SNOW_SHOVEL, targetLoc, 25, .5, .2, .5, 0.65);
 			}
+			return true;
 		}
+		return false;
 	}
 
 	@Override

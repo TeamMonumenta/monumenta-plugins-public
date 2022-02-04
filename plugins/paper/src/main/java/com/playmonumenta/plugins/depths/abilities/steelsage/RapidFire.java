@@ -95,11 +95,11 @@ public class RapidFire extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
-	        cast(Action.LEFT_CLICK_AIR);
-	        return;
-	    }
+			cast(Action.LEFT_CLICK_AIR);
+			return false;
+		}
 
 		if (event.getDamager() instanceof Arrow arrow) {
 			ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(arrow);
@@ -112,6 +112,7 @@ public class RapidFire extends DepthsAbility {
 				arrow.remove();
 			}
 		}
+		return false; // prevents multiple calls itself
 	}
 
 	@Override

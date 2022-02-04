@@ -50,11 +50,12 @@ public class Pyroblast extends DepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity damager = event.getDamager();
 		if (event.getType() == DamageType.PROJECTILE && damager != null && damager instanceof AbstractArrow arrow && mPlayerItemStatsMap.containsKey(arrow)) {
 			explode(arrow, enemy.getLocation());
 		}
+		return false; // prevents multiple calls itself by removing the arrow
 	}
 
 	private void explode(AbstractArrow arrow, Location loc) {

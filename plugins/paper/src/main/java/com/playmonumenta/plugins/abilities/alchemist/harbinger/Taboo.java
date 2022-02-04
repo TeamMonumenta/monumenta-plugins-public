@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -21,8 +22,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 
 public class Taboo extends Ability {
@@ -107,9 +106,10 @@ public class Taboo extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity damgee) {
+	public boolean onDamage(DamageEvent event, LivingEntity damgee) {
 		if (mActive && event.getType() == DamageType.MAGIC) {
 			event.setDamage(event.getDamage() * (1 + mMagicDamageIncrease));
 		}
+		return false;
 	}
 }

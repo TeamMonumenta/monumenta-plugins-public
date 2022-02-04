@@ -61,13 +61,14 @@ public class RecklessSwing extends Ability {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
 			event.setDamage(computeDamageUsingHealth(event.getDamage()));
 			if (mPlayer.isSneaking()) {
 				cast(Action.LEFT_CLICK_AIR);
 			}
 		}
+		return false; // only changes event damage
 	}
 
 	@Override

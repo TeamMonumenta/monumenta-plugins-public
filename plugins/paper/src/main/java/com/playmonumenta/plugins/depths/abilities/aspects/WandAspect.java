@@ -1,15 +1,14 @@
 package com.playmonumenta.plugins.depths.abilities.aspects;
 
-import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class WandAspect extends WeaponAspectDepthsAbility {
 
@@ -23,7 +22,7 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer != null && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
 			if (event.getType() == DamageType.MELEE) {
 				event.setDamage(event.getDamage() + DAMAGE);
@@ -37,6 +36,7 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 				event.setDamage(initialDamage + ((fullDamage - initialDamage) * SPELL_MOD));
 			}
 		}
+		return false; // only changes event damage
 	}
 
 	@Override

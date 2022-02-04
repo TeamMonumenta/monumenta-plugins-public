@@ -443,6 +443,9 @@ public class ItemStatManager implements Listener {
 
 	public void onDamage(Plugin plugin, Player player, PlayerItemStats stats, DamageEvent event, LivingEntity enemy) {
 		for (Entry<ItemStat, Double> entry : stats.getItemStats()) {
+			if (event.isCancelled()) {
+				return;
+			}
 			entry.getKey().onDamage(plugin, player, entry.getValue(), event, enemy);
 		}
 	}
