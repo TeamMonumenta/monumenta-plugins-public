@@ -1049,6 +1049,9 @@ public class ItemStatUtils {
 	}
 
 	public static void removeInfusion(final ItemStack item, final InfusionType type) {
+		if (item.getType() == Material.AIR) {
+			return;
+		}
 		NBTItem nbt = new NBTItem(item);
 		NBTCompound infusions = getInfusions(nbt);
 		if (infusions == null || type == null) {
@@ -1074,7 +1077,10 @@ public class ItemStatUtils {
 		return stock.getCompoundList(AttributeType.KEY);
 	}
 
-	public static boolean hasAttributeInSlot(final ItemStack itemStack, final Slot slot) {
+	public static boolean hasAttributeInSlot(final @Nullable ItemStack itemStack, final Slot slot) {
+		if (itemStack == null || itemStack.getType() == Material.AIR) {
+			return false;
+		}
 		NBTItem nbt = new NBTItem(itemStack);
 		NBTCompoundList attributes = getAttributes(nbt);
 		if (attributes == null) {
@@ -1103,7 +1109,7 @@ public class ItemStatUtils {
 	}
 
 	public static double getAttributeAmount(final @Nullable ItemStack itemStack, final AttributeType type, final Operation operation, final Slot slot) {
-		if (itemStack == null) {
+		if (itemStack == null || itemStack.getType() == Material.AIR) {
 			return 0;
 		}
 		NBTItem nbt = new NBTItem(itemStack);

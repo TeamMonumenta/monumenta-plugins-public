@@ -48,15 +48,17 @@ public class ThrowRate implements Attribute {
 
 			// Only run Throw Rate if the Infinity enchantment is not on the trident
 			if (item.getEnchantmentLevel(Enchantment.ARROW_INFINITE) <= 0 && value > 0) {
+				event.setCancelled(true);
+
 				// Make trident unpickupable, set cooldown, damage trident based on Unbreaking enchant
 				player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 1);
-				player.setCooldown(item.getType(), (int)(20 / value));
+				player.setCooldown(item.getType(), (int) (20 / value));
 				new BukkitRunnable() {
 					@Override
 					public void run() {
 						player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 2.0f, 1);
 					}
-				}.runTaskLater(plugin, (int)(20 / value));
+				}.runTaskLater(plugin, (int) (20 / value));
 
 				// Duplicate the entity, then cancel the throw event so the trident doesn't leave inventory
 				Trident newProj = NmsUtils.getVersionAdapter().duplicateEntity(trident);
@@ -69,8 +71,6 @@ public class ThrowRate implements Attribute {
 				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 
 				AbilityManager.getManager().playerShotArrowEvent(player, newProj);
-
-				event.setCancelled(true);
 			}
 		} else if (proj instanceof Snowball) {
 			if (value > 0) {
