@@ -633,17 +633,16 @@ public class EntityListener implements Listener {
 		// Don't apply effects to dead entities
 		affectedEntities.removeIf(entity -> (entity.isDead() || entity.getHealth() <= 0));
 
-		//Don't apply slowness type lingering potions to players if a player dropped it
+		// Don't apply slowness type lingering potions to players if a player dropped it
 		affectedEntities.removeIf(entity -> (cloud.hasCustomEffect(PotionEffectType.SLOW) && entity instanceof Player && cloud.getSource() instanceof Player));
+
+		// Don't apply invisibility type lingering potions to players if created by an (invisible) creeper exploding
+		affectedEntities.removeIf(entity -> (cloud.hasCustomEffect(PotionEffectType.INVISIBILITY) && entity instanceof Player && cloud.getSource() instanceof Creeper));
 
 		PotionData data = cloud.getBasePotionData();
 		PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 4) : null;
 		List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
 		List<Player> affectedPlayers = new ArrayList<>();
-
-		if (effects != null) {
-			effects.removeIf(effect -> effect.getType().equals(PotionEffectType.INVISIBILITY));
-		}
 
 		// All affected players need to have the effect added to their potion manager.
 		for (LivingEntity entity : affectedEntities) {
