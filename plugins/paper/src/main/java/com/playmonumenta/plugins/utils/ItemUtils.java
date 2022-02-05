@@ -394,6 +394,8 @@ public class ItemUtils {
 				default:
 					return ItemDeathResult.KEEP;
 			}
+		} else if (isShulkerBox(item.getType())) {
+			return ItemDeathResult.SHATTER;
 		}
 		switch (Objects.requireNonNull(ItemStatUtils.getRegion(item))) {
 		case VALLEY:
