@@ -511,6 +511,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(FestiveTessUpgradeSnowmenBoss.identityTag, new FestiveTessUpgradeSnowmenBoss.Parameters());
 		mBossParameters.put(GrenadeLauncherBoss.identityTag, new GrenadeLauncherBoss.Parameters());
 		mBossParameters.put(SizeChangerBoss.identityTag, new SizeChangerBoss.Parameters());
+		mBossParameters.put(WrathBoss.identityTag, new WrathBoss.Parameters());
 	}
 
 	/********************************************************************************

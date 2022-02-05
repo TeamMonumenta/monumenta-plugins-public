@@ -27,26 +27,33 @@ import org.bukkit.util.Vector;
 
 public class WrathBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_wrath";
-	public static final int detectionRange = 32;
 
-	private static final int COOLDOWN = 20 * 3;
-	private static final int MIN_RANGE = 8;
-	private static final int RUN_DISTANCE = 2;
-	private static final int VELOCITY_MULTIPLIER = 1;
-	private static final double DAMAGE_RADIUS = 2.5;
-	private static final int DAMAGE = 18;
-	private static final int ULTIMATE_EYE_DISTANCE = 6;
-	private static final double DODGE_CHANCE = 0.3;
+	public static class Parameters extends BossParameters {
+		public int DETECTION = 32;
+
+		public int COOLDOWN = 20 * 3;
+		public int MIN_RANGE = 8;
+		public int RUN_DISTANCE = 2;
+		public int VELOCITY_MULTIPLIER = 1;
+		public double DAMAGE_RADIUS = 2.5;
+		public int DAMAGE = 18;
+		public int ULTIMATE_EYE_DISTANCE = 6;
+		public double DODGE_CHANCE = 0.3;
+	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new WrathBoss(plugin, boss);
 	}
 
+	private final Parameters mParams;
+
 	public WrathBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(new SpellBaseLeapAttack(plugin, boss, detectionRange,
-				MIN_RANGE, RUN_DISTANCE, COOLDOWN, VELOCITY_MULTIPLIER,
+		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
+
+		SpellManager activeSpells = new SpellManager(Arrays.asList(new SpellBaseLeapAttack(plugin, boss, mParams.DETECTION,
+			mParams.MIN_RANGE, mParams.RUN_DISTANCE, mParams.COOLDOWN, mParams.VELOCITY_MULTIPLIER,
 				// Initiate Aesthetic
 				(World world, Location loc) -> {
 					world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 10, 0.5, 0.5, 0.5, 0);
@@ -89,8 +96,8 @@ public class WrathBoss extends BossAbilityGroup {
 									mWorld.spawnParticle(Particle.CRIT_MAGIC, mLocation, 100, 2, 2, 2, 0);
 									mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
 									mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
-									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), DAMAGE_RADIUS, true)) {
-										BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, DAMAGE);
+									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), mParams.DAMAGE_RADIUS, true)) {
+										BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE);
 									}
 								}
 							} else if (mTime <= 10) {
@@ -108,9 +115,9 @@ public class WrathBoss extends BossAbilityGroup {
 									mWorld.spawnParticle(Particle.CRIT_MAGIC, mLocation, 200, 2, 2, 2, 0);
 									mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
 									mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
-									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), DAMAGE_RADIUS, true)) {
+									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), mParams.DAMAGE_RADIUS, true)) {
 										p.setNoDamageTicks(0);
-										BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, DAMAGE);
+										BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE);
 									}
 								}
 							} else {
@@ -118,7 +125,7 @@ public class WrathBoss extends BossAbilityGroup {
 							}
 						}
 					}.runTaskTimer(mPlugin, 0, 1);
-				}, null, null), new SpellDuelist(plugin, boss, COOLDOWN, DAMAGE)));
+				}, null, null), new SpellDuelist(plugin, boss, mParams.COOLDOWN, mParams.DAMAGE)));
 
 		new BukkitRunnable() {
 			@Override
@@ -127,18 +134,18 @@ public class WrathBoss extends BossAbilityGroup {
 			}
 		}.runTaskLater(plugin, 1);
 
-		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
+		super.constructBoss(activeSpells, Collections.emptyList(), mParams.DETECTION, null);
 	}
 
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		Location loc = mBoss.getLocation();
-		if (loc.distance(source.getLocation()) > ULTIMATE_EYE_DISTANCE) {
+		if (loc.distance(source.getLocation()) > mParams.ULTIMATE_EYE_DISTANCE) {
 			if (!EntityUtils.isStunned(mBoss)) {
 				dodge(event);
 			}
 		} else {
-			if (FastUtils.RANDOM.nextDouble() < DODGE_CHANCE) {
+			if (FastUtils.RANDOM.nextDouble() < mParams.DODGE_CHANCE) {
 				if (!EntityUtils.isStunned(mBoss)) {
 					dodge(event);
 				}
