@@ -5,7 +5,6 @@ import com.google.common.collect.Multimap;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
 import de.tr7zw.nbtapi.NBTCompound;
@@ -107,8 +106,8 @@ public class TradeListener implements Listener {
 					// Shulkers with contents are janky - the trades work, but the trades without contents work on them as well, clearing any content.
 					// Thus we don't allow trades with non-empty Shulkers
 					if (playerItem.getItemMeta() instanceof BlockStateMeta
-						    && ((BlockStateMeta) playerItem.getItemMeta()).getBlockState() instanceof ShulkerBox
-						    && !((ShulkerBox) ((BlockStateMeta) playerItem.getItemMeta()).getBlockState()).getInventory().isEmpty()) {
+						&& ((BlockStateMeta) playerItem.getItemMeta()).getBlockState() instanceof ShulkerBox
+						&& !((ShulkerBox) ((BlockStateMeta) playerItem.getItemMeta()).getBlockState()).getInventory().isEmpty()) {
 						continue;
 					}
 
@@ -118,22 +117,12 @@ public class TradeListener implements Listener {
 					// Modify the result item to carry over player modifications (infusions etc.)
 					NBTItem playerItemNbt = new NBTItem(playerItem);
 					NBTItem newResultNbt = new NBTItem(newResult);
-					ItemStatUtils.addPlayerModified(newResultNbt).mergeCompound(ItemStatUtils.getPlayerModified(playerItemNbt));
+					NBTCompound playerModified = ItemStatUtils.getPlayerModified(playerItemNbt);
+					if (playerModified == null) { // no modifications, skip this item
+						continue;
+					}
+					ItemStatUtils.addPlayerModified(newResultNbt).mergeCompound(playerModified);
 					newResult = newResultNbt.getItem();
-
-					// Kaul skins can add or remove Hope, so need to handle this specially to prevent incorrectly doubling/removing/retaining Hope
-					// TODO may need to be changed for item rework
-					/*if (CustomEnchantment.HOPE.getEnchantment().getItemLevel(source) == 0
-						&& CustomEnchantment.HOPE.getEnchantment().getItemLevel(result) > 0
-						&& CustomEnchantment.HOPE.getEnchantment().getItemLevel(playerItem) > 0) {
-						// reskin adds Hope and player item already has hope: remove the extra Hope line
-						extraLore.remove(CustomEnchantment.HOPE.getEnchantment().getProperty());
-					} else if (CustomEnchantment.HOPE.getEnchantment().getItemLevel(source) > 0
-						&& CustomEnchantment.HOPE.getEnchantment().getItemLevel(result) == 0
-						&& extraLore.stream().anyMatch(s -> ChatColor.stripColor(s).startsWith("Infused by "))) {
-						// reskin removes Hope and player item is manually hoped: add the missing Hope line
-						extraLore.add(0, CustomEnchantment.HOPE.getEnchantment().getProperty());
-					}*/
 
 					ItemStatUtils.generateItemStats(newResult);
 
@@ -190,26 +179,18 @@ public class TradeListener implements Listener {
 			return false;
 		}
 
-
 		// custom enchantments
 		// cannot compare NBT directly due to Divine Aura
 		NBTCompound enchantments1 = ItemStatUtils.getEnchantments(nbt1);
 		NBTCompound enchantments2 = ItemStatUtils.getEnchantments(nbt2);
 		for (EnchantmentType ench : EnchantmentType.values()) {
-			// Divine Aura is a bonus enchantment for Kaul reskins, si ignore it
+			// Divine Aura is a bonus enchantment for Kaul reskins, so ignore it
 			if (ench == EnchantmentType.DIVINE_AURA) {
 				continue;
 			}
 			if (ItemStatUtils.getEnchantmentLevel(enchantments1, ench) != ItemStatUtils.getEnchantmentLevel(enchantments2, ench)) {
 				return false;
 			}
-		}
-		// Check Hope
-		// If either item has Divine Aura, skip the Hope check completely, as Hope is added as a bonus during such trades
-		if (ItemStatUtils.getEnchantmentLevel(enchantments1, EnchantmentType.DIVINE_AURA) == 0
-			    && ItemStatUtils.getEnchantmentLevel(enchantments2, EnchantmentType.DIVINE_AURA) == 0
-			    && ItemStatUtils.getInfusionLevel(enchantments1, InfusionType.HOPE) != ItemStatUtils.getInfusionLevel(enchantments2, InfusionType.HOPE)) {
-			return false;
 		}
 
 		// vanilla attributes

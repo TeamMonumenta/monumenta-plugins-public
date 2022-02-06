@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -16,11 +17,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class HuntingCompanionBoss extends BossAbilityGroup {
@@ -76,8 +75,7 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 	@Override
 	public void bossChangedTarget(EntityTargetEvent event) {
 		Entity target = event.getTarget();
-		Set<String> tags = target.getScoreboardTags();
-		if (!EntityUtils.isHostileMob(target) || (tags != null && tags.contains(AbilityUtils.IGNORE_TAG))) {
+		if (!EntityUtils.isHostileMob(target) || (target != null && target.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))) {
 			event.setCancelled(true);
 		}
 	}

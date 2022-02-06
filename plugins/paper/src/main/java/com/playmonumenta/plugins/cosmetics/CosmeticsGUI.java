@@ -47,7 +47,7 @@ public class CosmeticsGUI extends CustomInventory {
 			//Attempt to switch page if clicked page
 			ItemStack item = event.getCurrentItem();
 			Player p = (Player) event.getWhoClicked();
-			if (item == null || item.getType() == null) {
+			if (item == null || item.getType() == Material.AIR) {
 				return;
 			}
 			// Main page filtering
@@ -61,7 +61,7 @@ public class CosmeticsGUI extends CustomInventory {
 				p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
 				setUpCosmetics(p);
 				return;
-			} else if (item.getType() == mDisplayPage.getDisplayItem() || item.getType() == Material.GREEN_CONCRETE) {
+			} else if (mDisplayPage != null && item.getType() == mDisplayPage.getDisplayItem() || item.getType() == Material.GREEN_CONCRETE) {
 				//Get the list of cosmetics back
 				// Note this only works for cosmetic types where only one cosmetic can be equipped at a time!
 				List<Cosmetic> playerCosmetics = CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical(p, mDisplayPage);
