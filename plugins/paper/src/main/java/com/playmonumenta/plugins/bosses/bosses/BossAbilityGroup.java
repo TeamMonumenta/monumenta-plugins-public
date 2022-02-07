@@ -1,11 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.logging.Level;
-
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.bosses.BossBarManager;
@@ -18,7 +12,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -34,7 +28,13 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.logging.Level;
 
 
 public abstract class BossAbilityGroup {
@@ -58,6 +58,8 @@ public abstract class BossAbilityGroup {
 		mBoss = boss;
 		mIdentityTag = identityTag;
 		mBoss.addScoreboardTag(mIdentityTag);
+		mActiveSpells = SpellManager.EMPTY;
+		mPassiveSpells = Collections.emptyList();
 	}
 
 	public void changePhase(SpellManager activeSpells,
