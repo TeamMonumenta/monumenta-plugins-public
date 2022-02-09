@@ -12,6 +12,8 @@ import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -77,6 +79,7 @@ public final class Grave {
 	private final HashMap<String, ItemStack> mEquipment;
 	HashSet<GraveItem> mItems;
 	private @Nullable ArmorStand mEntity;
+	private final HashSet<UUID> mGraveMessageCooldown = new HashSet<>();
 
 	boolean mAlertedSpawned = false;
 	boolean mAlertedLimbo = false;
@@ -496,10 +499,17 @@ public final class Grave {
 				.append(mPlayer.displayName().hoverEvent(mPlayer))
 				.append(Component.text("."))
 			);
-			mPlayer.sendMessage(Component.text("Your grave at ", NamedTextColor.AQUA)
-				.append(Component.text((int) mLocation.getX() + ", " + (int) mLocation.getY() + ", " + (int) mLocation.getZ(), NamedTextColor.AQUA))
-				.append(Component.text(" has been located by another player!", NamedTextColor.AQUA))
-			);
+			UUID graveUUID = getUniqueId();
+			if (graveUUID != null && !mGraveMessageCooldown.contains(graveUUID)) {
+				mPlayer.sendMessage(Component.text("Your grave at ", NamedTextColor.AQUA)
+					.append(Component.text((int) mLocation.getX() + ", " + (int) mLocation.getY() + ", " + (int) mLocation.getZ(), NamedTextColor.AQUA))
+					.append(Component.text(" has been located by another player!", NamedTextColor.AQUA))
+				);
+				mGraveMessageCooldown.add(graveUUID);
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+					mGraveMessageCooldown.remove(graveUUID);
+				}, 60);
+			}
 			if (dropped > 0) {
 				player.sendMessage(Component.text("There ", NamedTextColor.AQUA)
 					.append(Component.text(dropped == 1 ? "is 1 item" : "are " + dropped + " items"))
