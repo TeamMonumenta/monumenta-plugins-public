@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -29,7 +30,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -91,10 +91,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 			// tag mob to prevent it from spawning more stuff
 			damagee.addScoreboardTag("TeneGhost");
 
-			DamageEvent damageEvent = new DamageEvent(damagee, p, p, DamageType.MAGIC, ClassAbility.RESTLESS_SOULS, damage);
-			damageEvent.setDelayed(true);
-			damageEvent.setPlayerItemStat(playerItemStats);
-			DamageUtils.damage(damageEvent, true, true, null);
+			DamageUtils.damage(damagee, p, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.RESTLESS_SOULS, playerItemStats), damage, true, true, null);
 
 			// remove tag if mob is not dead
 			if (!damagee.isDead()) {

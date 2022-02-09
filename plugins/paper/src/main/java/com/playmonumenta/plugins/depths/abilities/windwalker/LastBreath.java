@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import javax.annotation.Nullable;
@@ -64,12 +63,12 @@ public class LastBreath extends DepthsAbility {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (event.isCancelled() || event.isBlocked() || mPlayer == null) {
+		if (event.isBlocked() || mPlayer == null) {
 			return;
 		}
 
 		// Calculate whether this effect should not be run based on player health.
-		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - event.getDamage();
+		double healthRemaining = mPlayer.getHealth() - event.getFinalDamage(true);
 
 		if (healthRemaining > EntityUtils.getMaxHealth(mPlayer) * TRIGGER_HEALTH) {
 			return;

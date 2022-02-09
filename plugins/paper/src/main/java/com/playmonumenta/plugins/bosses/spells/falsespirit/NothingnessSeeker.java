@@ -123,16 +123,14 @@ public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		//If player dies, no targetting for 60 seconds
-		if (damagee instanceof Player player) {
-			if (event.getDamage() > player.getHealth()) {
-				mNoTarget.add(player);
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						mNoTarget.remove(player);
-					}
-				}.runTaskLater(mPlugin, 20 * 60);
-			}
+		if (damagee instanceof Player player && event.getFinalDamage(true) > player.getHealth()) {
+			mNoTarget.add(player);
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					mNoTarget.remove(player);
+				}
+			}.runTaskLater(mPlugin, 20 * 60);
 		}
 	}
 }

@@ -41,7 +41,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 			event.setDamage(event.getDamage() * (1 + PERCENT_BASE_DAMAGE + mStacks * PERCENT_DAMAGE_PER_STACK));
 
 			// Critical arrow and mob is actually going to take damage
-			if (getAbilityScore() > 1 && (arrow.isCritical() || arrow instanceof Trident) && (enemy.getNoDamageTicks() <= 10 || enemy.getLastDamage() < event.getDamage())) {
+			if (getAbilityScore() > 1 && (arrow.isCritical() || arrow instanceof Trident) && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage())) {
 				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 
 				if (mStacks < MAX_STACKS) {

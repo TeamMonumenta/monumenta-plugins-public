@@ -52,8 +52,8 @@ public class EscapeDeath extends Ability {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (!event.isCancelled() && !event.isBlocked() && mPlayer != null) {
-			double newHealth = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - event.getDamage();
+		if (!event.isBlocked() && mPlayer != null) {
+			double newHealth = mPlayer.getHealth() - event.getFinalDamage(true);
 			boolean dealDamageLater = newHealth < 0 && newHealth > -8 && getAbilityScore() > 1;
 			if (newHealth <= TRIGGER_THRESHOLD_HEALTH && (newHealth > 0 || dealDamageLater)) {
 				if (dealDamageLater) {

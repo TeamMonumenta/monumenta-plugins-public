@@ -32,7 +32,7 @@ public class StatTrackMelee implements Infusion {
 		ItemStack is = player.getInventory().getItemInMainHand();
 
 		if (!isTrainingDummy(enemy)) {
-			StatTrackManager.incrementStat(is, player, InfusionType.STAT_TRACK_MELEE, (int) event.getDamage());
+			StatTrackManager.incrementStat(is, player, InfusionType.STAT_TRACK_MELEE, (int) event.getFinalDamage(false));
 		}
 	}
 

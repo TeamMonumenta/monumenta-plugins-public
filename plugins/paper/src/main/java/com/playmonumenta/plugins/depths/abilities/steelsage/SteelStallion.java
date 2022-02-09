@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
@@ -54,12 +53,12 @@ public class SteelStallion extends DepthsAbility {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (event.isCancelled() || event.isBlocked()) {
+		if (event.isBlocked()) {
 			return;
 		}
 
 		if (mHorse != null) {
-			mHorse.setHealth(Math.max(0, mHorse.getHealth() - event.getDamage()));
+			mHorse.setHealth(Math.max(0, mHorse.getHealth() - event.getFinalDamage(false)));
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_HURT, 0.8f, 1.0f);
 			event.setDamage(0);
 			event.setCancelled(true);
@@ -80,7 +79,7 @@ public class SteelStallion extends DepthsAbility {
 		}
 
 		// Calculate whether this effect should not be run based on player health.
-		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - event.getDamage();
+		double healthRemaining = mPlayer.getHealth() - event.getFinalDamage(true);
 
 		AttributeInstance maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 		if (healthRemaining > maxHealth.getValue() * TRIGGER_HEALTH) {
@@ -94,7 +93,7 @@ public class SteelStallion extends DepthsAbility {
 			mHorse = (Mob) horse;
 			mHorse.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(HEALTH[mRarity - 1]);
 			//Horse absorbs the damage from the hit that triggers it
-			mHorse.setHealth(Math.max(HEALTH[mRarity - 1] - event.getDamage(), 0));
+			mHorse.setHealth(Math.max(HEALTH[mRarity - 1] - event.getFinalDamage(false), 0));
 			mHorse.setInvulnerable(true);
 			event.setDamage(0);
 			event.setCancelled(true);

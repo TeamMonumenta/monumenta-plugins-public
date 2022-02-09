@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -22,8 +23,6 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import javax.annotation.Nullable;
 
 
 public class Starfall extends Ability {
@@ -133,10 +132,7 @@ public class Starfall extends Ability {
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, SIZE, mPlayer)) {
 								EntityUtils.applyFire(mPlugin, FIRE_TICKS, e, mPlayer);
-								DamageEvent damageEvent = new DamageEvent(e, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, damage);
-								damageEvent.setDelayed(true);
-								damageEvent.setPlayerItemStat(playerItemStats);
-								DamageUtils.damage(damageEvent, false, true, null);
+								DamageUtils.damage(e, mPlayer, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, false, true, null);
 								MovementUtils.knockAway(loc, e, KNOCKBACK, true);
 							}
 							break;

@@ -244,8 +244,8 @@ public class Hedera extends BossAbilityGroup {
 	public void onHurt(DamageEvent event) {
 		boolean plantsAlive = mPlants.values().size() > 0;
 
-		//Prevents bypassing plants if a single high damage hit is done
-		if (event.getDamage() >= mBoss.getHealth() && plantsAlive) {
+		//Prevents bypassing plants if a single high-damage hit is done
+		if (event.getFinalDamage(true) >= mBoss.getHealth() && plantsAlive) {
 			event.setDamage(1);
 			mBoss.setHealth(1);
 		}
@@ -259,10 +259,7 @@ public class Hedera extends BossAbilityGroup {
 			}
 
 			Collection<Location> plantsCollection = mPlants.keySet();
-			List<Location> plants = new ArrayList<>();
-			for (Location plant : plantsCollection) {
-				plants.add(plant);
-			}
+			List<Location> plants = new ArrayList<>(plantsCollection);
 			Collections.shuffle(plants);
 			Location unluckyPlant = plants.get(0);
 

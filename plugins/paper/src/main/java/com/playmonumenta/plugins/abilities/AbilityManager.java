@@ -677,7 +677,7 @@ public class AbilityManager {
 
 	public void onHurtFatal(Player player, DamageEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (event.isCancelled() || event.getDamage() < player.getHealth() + AbsorptionUtils.getAbsorption(player)) {
+			if (event.isCancelled() || event.getFinalDamage(true) < player.getHealth()) {
 				return;
 			}
 			if (abil.canCast()) {

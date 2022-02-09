@@ -273,10 +273,6 @@ public class EntityListener implements Listener {
 				return;
 			}
 		}
-
-		if (damagee instanceof LivingEntity mob) {
-			event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage(EntityDamageEvent.DamageModifier.BASE) * EntityUtils.vulnerabilityMult(mob));
-		}
 	}
 
 	// Entity Hurt Event.
@@ -293,17 +289,14 @@ public class EntityListener implements Listener {
 
 		if (damagee instanceof ItemFrame || damagee instanceof Painting) {
 			// Attempting to damage an item frame
-			if (event instanceof EntityDamageByEntityEvent) {
+			if (event instanceof EntityDamageByEntityEvent edbee) {
 				// This event is damage attributable to an entity
-				EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) event;
-				if (
-					// This damage is from an entity, but that entity is not a player
-						!(edbee.getDamager() instanceof Player) ||
+				if (// This damage is from an entity, but that entity is not a player
+					!(edbee.getDamager() instanceof Player player)
 						// OR The damage is from a player but the item frame/painting is invulnerable and the player is not in creative
-						(damagee.isInvulnerable() && !((Player)edbee.getDamager()).getGameMode().equals(GameMode.CREATIVE)) ||
+						|| (damagee.isInvulnerable() && !player.getGameMode().equals(GameMode.CREATIVE))
 						// OR the damage is from a player and they are in adventure mode
-						((Player)edbee.getDamager()).getGameMode().equals(GameMode.ADVENTURE)
-					) {
+						|| player.getGameMode().equals(GameMode.ADVENTURE)) {
 					// Don't allow it
 					event.setCancelled(true);
 				}
@@ -315,8 +308,7 @@ public class EntityListener implements Listener {
 			return;
 		}
 
-		if (damagee instanceof Player) {
-			Player player = (Player)damagee;
+		if (damagee instanceof Player player) {
 			World world = player.getWorld();
 
 			if (ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.RESIST_5)) {

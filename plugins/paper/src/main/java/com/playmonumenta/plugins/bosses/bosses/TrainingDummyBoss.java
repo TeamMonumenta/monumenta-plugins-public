@@ -1,20 +1,19 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Collections;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class TrainingDummyBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_training_dummy";
@@ -39,7 +38,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		double damage = event.getDamage();
+		double damage = event.getFinalDamage(false);
 
 		// Damage smaller than this is only meant to tag the mob as damaged by a player
 		if (damage < 0.01) {

@@ -64,10 +64,7 @@ public class Pyroblast extends DepthsAbility {
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, RADIUS);
 			for (LivingEntity mob : mobs) {
 				EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
-				DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, DAMAGE[mRarity - 1]);
-				damageEvent.setDelayed(true);
-				damageEvent.setPlayerItemStat(playerItemStats);
-				DamageUtils.damage(damageEvent, false, true, null);
+				DamageUtils.damage(mob, mPlayer, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, null);
 			}
 			World world = arrow.getWorld();
 			world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);

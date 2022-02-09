@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -16,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
 
@@ -51,10 +51,7 @@ public class MetalmancyBoss extends BossAbilityGroup {
 		if (mPlayer != null && mPlayerItemStats != null) {
 			event.setCancelled(true);
 
-			DamageEvent damageEvent = new DamageEvent(damagee, mPlayer, mPlayer, DamageType.PROJECTILE_SKILL, ClassAbility.METALMANCY, mDamage);
-			damageEvent.setDelayed(true);
-			damageEvent.setPlayerItemStat(mPlayerItemStats);
-			DamageUtils.damage(damageEvent, true, true, null);
+			DamageUtils.damage(damagee, mPlayer, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, ClassAbility.METALMANCY, mPlayerItemStats), mDamage, true, true, null);
 
 			if (damagee instanceof Mob mob) {
 				mob.setTarget(mBoss);

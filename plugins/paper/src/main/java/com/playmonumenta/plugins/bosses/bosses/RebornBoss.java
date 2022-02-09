@@ -1,11 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Collections;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -13,6 +10,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Collections;
 
 public class RebornBoss extends BossAbilityGroup {
 	private boolean mActivated = false;
@@ -31,7 +30,7 @@ public class RebornBoss extends BossAbilityGroup {
 
 	@Override
 	public void onHurt(DamageEvent event) {
-		if (!mActivated && mBoss.getHealth() - event.getDamage() <= 0) {
+		if (!mActivated && mBoss.getHealth() - event.getFinalDamage(true) <= 0) {
 			mActivated = true;
 			World world = mBoss.getWorld();
 			event.setCancelled(true);

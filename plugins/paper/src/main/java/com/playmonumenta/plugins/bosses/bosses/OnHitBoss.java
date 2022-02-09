@@ -1,18 +1,17 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Collections;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
-
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Collections;
 
 public class OnHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_onhit";
@@ -47,11 +46,9 @@ public class OnHitBoss extends BossAbilityGroup {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		if (mParams.CAN_BLOCK) {
-			if (event.getDamage() == 0) {
-				// Attack was blocked
-				return;
-			}
+		if (mParams.CAN_BLOCK && event.isBlockedByShield()) {
+			// Attack was blocked
+			return;
 		}
 
 		if (damagee instanceof Player player) {

@@ -104,10 +104,7 @@ public class RapidFire extends DepthsAbility {
 		if (event.getDamager() instanceof Arrow arrow) {
 			ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(arrow);
 			if (playerItemStats != null) {
-				DamageEvent damageEvent = new DamageEvent(enemy, mPlayer, mPlayer, DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, DAMAGE);
-				damageEvent.setDelayed(true);
-				damageEvent.setPlayerItemStat(playerItemStats);
-				DamageUtils.damage(damageEvent, true, true, null);
+				DamageUtils.damage(enemy, mPlayer, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, playerItemStats), DAMAGE, true, true, null);
 				event.setCancelled(true);
 				arrow.remove();
 			}

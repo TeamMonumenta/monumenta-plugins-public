@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -95,6 +94,11 @@ public class ItemStatManager implements Listener {
 			public double get(ItemStat stat) {
 				Double value = mMap.get(stat);
 				return value == null ? 0 : value;
+			}
+
+			public double get(ItemStat stat, double defaultValue) {
+				Double value = mMap.get(stat);
+				return value == null ? defaultValue : value;
 			}
 
 			@Override
@@ -464,7 +468,7 @@ public class ItemStatManager implements Listener {
 	public void onHurtFatal(Plugin plugin, Player player, DamageEvent event) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
-				if (event.isCancelled() || event.getDamage() < player.getHealth() + AbsorptionUtils.getAbsorption(player)) {
+				if (event.isCancelled() || event.getFinalDamage(true) < player.getHealth()) {
 					return;
 				}
 				entry.getKey().onHurtFatal(plugin, player, entry.getValue(), event);

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -18,8 +19,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-import javax.annotation.Nullable;
 
 public class VoodooBondsOtherPlayer extends Effect {
 
@@ -56,6 +55,10 @@ public class VoodooBondsOtherPlayer extends Effect {
 
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
+		if (event.isBlocked()) {
+			return;
+		}
+
 		int duration = mScore == 1 ? DURATION_1 : DURATION_2;
 		double damage = event.getDamage();
 		double maxHealth = EntityUtils.getMaxHealth(entity);

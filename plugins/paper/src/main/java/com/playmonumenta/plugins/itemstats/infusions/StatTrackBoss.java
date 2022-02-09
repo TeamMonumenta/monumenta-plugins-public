@@ -27,7 +27,7 @@ public class StatTrackBoss implements Infusion {
 
 		//Track damage dealt to bosses
 		if (EntityUtils.isBoss(enemy)) {
-			StatTrackManager.incrementStat(is, player, InfusionType.STAT_TRACK_BOSS, (int) event.getDamage());
+			StatTrackManager.incrementStat(is, player, InfusionType.STAT_TRACK_BOSS, (int) event.getFinalDamage(false));
 		}
 	}
 }

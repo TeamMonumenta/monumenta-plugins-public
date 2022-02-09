@@ -51,7 +51,6 @@ public class Riposte extends Ability {
 		if (!isTimerActive()
 			    && source != null
 			    && event.getType() == DamageType.MELEE
-			    && !event.isCancelled()
 			    && !event.isBlocked()
 			    && mPlayer != null) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();

@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.events;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
-import com.playmonumenta.scriptedquests.Plugin;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EvokerFangs;
@@ -15,11 +15,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 
 public class DamageEvent extends Event implements Cancellable {
@@ -103,26 +100,37 @@ public class DamageEvent extends Event implements Cancellable {
 		}
 	}
 
+	public static class Metadata {
+
+		private final DamageType mType;
+		private final @Nullable ClassAbility mAbility;
+		private final @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
+
+		public Metadata(DamageType type, @Nullable ClassAbility ability) {
+			this(type, ability, null);
+		}
+
+		public Metadata(DamageType type, @Nullable ClassAbility ability, @Nullable ItemStatManager.PlayerItemStats playerItemStats) {
+			if (type == null) {
+				mType = DamageType.OTHER;
+				Plugin.getInstance().getLogger().log(Level.WARNING, "Attempted to construct DamageEvent with null DamageType");
+			} else {
+				mType = type;
+			}
+			mAbility = ability;
+			mPlayerItemStats = playerItemStats;
+		}
+
+	}
+
 	private final LivingEntity mDamagee;
 	private final @Nullable Entity mDamager;
 	private final @Nullable LivingEntity mSource;
-	private final DamageType mType;
-	private final @Nullable ClassAbility mAbility;
-	private final @Nullable EntityDamageEvent mEvent;
+	private final EntityDamageEvent mEvent;
 
-	// Additional non-generic metadata about the DamageEvent
-	private final Map<String, Boolean> mBooleans = new HashMap<>();
-	private final Map<String, Integer> mIntegers = new HashMap<>();
-	private final Map<String, Double> mDoubles = new HashMap<>();
-	private final Map<String, String> mStrings = new HashMap<>();
+	private final Metadata mMetadata;
 
-	private double mDamage;
 	private final double mOriginalDamage;
-
-	private boolean mCancelled = false;
-	private boolean mIsDelayed = false;
-
-	private ItemStatManager.PlayerItemStats mPlayerItemStats;
 
 	public DamageEvent(EntityDamageEvent event, LivingEntity damagee) {
 		this(event, damagee, DamageType.getType(event.getCause()));
@@ -133,19 +141,15 @@ public class DamageEvent extends Event implements Cancellable {
 	}
 
 	public DamageEvent(EntityDamageEvent event, LivingEntity damagee, DamageType type, @Nullable ClassAbility ability) {
+		this(event, damagee, new Metadata(type, ability));
+	}
+
+	public DamageEvent(EntityDamageEvent event, LivingEntity damagee, Metadata metadata) {
 		mDamagee = damagee;
 		mDamager = event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent ? entityDamageByEntityEvent.getDamager() : null;
-		mAbility = ability;
-		mDamage = event.getDamage();
+		mMetadata = metadata;
 		mOriginalDamage = event.getDamage();
 		mEvent = event;
-
-		if (type == null) {
-			mType = DamageType.OTHER;
-			Plugin.getInstance().getLogger().log(Level.WARNING, "Attempted to construct DamageEvent with null DamageType");
-		} else {
-			mType = type;
-		}
 
 		if (mDamager instanceof Projectile proj) {
 			ProjectileSource source = proj.getShooter();
@@ -163,30 +167,25 @@ public class DamageEvent extends Event implements Cancellable {
 		}
 	}
 
-	public DamageEvent(@Nullable EntityDamageEvent event, LivingEntity damagee, @Nullable Entity damager, @Nullable LivingEntity source, DamageType type, @Nullable ClassAbility ability, double damage) {
-		mDamagee = damagee;
-		mDamager = damager;
-		mSource = source;
-		mType = type;
-		mAbility = ability;
-		mDamage = damage;
-		mOriginalDamage = damage;
-		mEvent = event;
-	}
-
-	public DamageEvent(LivingEntity damagee, Entity damager, @Nullable LivingEntity source, DamageType type, @Nullable ClassAbility ability, double damage) {
-		mDamagee = damagee;
-		mDamager = damager;
-		mSource = source;
-		mType = type;
-		mAbility = ability;
-		mDamage = damage;
-		mOriginalDamage = damage;
-		mEvent = null;
-	}
-
 	public double getDamage() {
-		return mDamage;
+		return mEvent.getDamage();
+	}
+
+	/**
+	 * Gets the final damage that will be dealt by this damage event, if the damage were to happen right now.
+	 * To make sure to get the actual final damage, set the priority the ability or attribute using this sufficiently high.
+	 * This also means that this method should not be used by low-priority handlers.
+	 *
+	 * @param includeAbsorption Whether to deduct existing absorption from the result (same behaviour as {@link EntityDamageEvent#getFinalDamage()}),
+	 *                          useful to check if an attack would be lethal
+	 * @return The final damage that will be dealt
+	 */
+	public double getFinalDamage(boolean includeAbsorption) {
+		if (includeAbsorption) {
+			return Math.max(0, mEvent.getFinalDamage());
+		} else {
+			return Math.max(0, mEvent.getFinalDamage() - mEvent.getDamage(EntityDamageEvent.DamageModifier.ABSORPTION));
+		}
 	}
 
 	public double getOriginalDamage() {
@@ -197,29 +196,19 @@ public class DamageEvent extends Event implements Cancellable {
 		// Never set damage above 1000000 (arbitrary high amount) so that it doesn't go over the limit of what can actually be dealt
 		damage = Math.min(damage, 1000000);
 
-		if (mEvent != null) {
-			if (mType == DamageType.POISON && mDamagee instanceof Player && mDamagee.getHealth() - damage <= 0) {
-				mEvent.setDamage(mDamagee.getHealth() - 1);
-				mDamage = mDamagee.getHealth() - 1;
-				return;
-			}
-			mEvent.setDamage(damage);
-			mDamage = damage;
-		} else {
-			if (mType == DamageType.POISON && mDamagee instanceof Player && mDamagee.getHealth() - damage <= 0) {
-				mDamage = mDamagee.getHealth() - 1;
-				return;
-			}
-			mDamage = damage;
+		if (mMetadata.mType == DamageType.POISON && mDamagee instanceof Player && mDamagee.getHealth() - damage <= 0) {
+			mEvent.setDamage(mDamagee.getHealth() - 1);
+			return;
 		}
+		mEvent.setDamage(damage);
 	}
 
 	public DamageType getType() {
-		return mType;
+		return mMetadata.mType;
 	}
 
 	public @Nullable ClassAbility getAbility() {
-		return mAbility;
+		return mMetadata.mAbility;
 	}
 
 	public LivingEntity getDamagee() {
@@ -234,108 +223,49 @@ public class DamageEvent extends Event implements Cancellable {
 		return mSource;
 	}
 
-	public Boolean getBoolean(String key) {
-		return mBooleans.get(key);
-	}
-
-	public Integer getInteger(String key) {
-		return mIntegers.get(key);
-	}
-
-	public Double getDouble(String key) {
-		return mDoubles.get(key);
-	}
-
-	public @Nullable String getString(String key) {
-		return mStrings.get(key);
-	}
-
-	public Boolean removeBoolean(String key) {
-		return mBooleans.remove(key);
-	}
-
-	public Integer removeInteger(String key) {
-		return mIntegers.remove(key);
-	}
-
-	public Double removeDouble(String key) {
-		return mDoubles.remove(key);
-	}
-
-	public @Nullable String removeString(String key) {
-		return mStrings.remove(key);
-	}
-
-	public void setBoolean(String key, boolean value) {
-		mBooleans.put(key, value);
-	}
-
-
-	public void setInteger(String key, int value) {
-		mIntegers.put(key, value);
-	}
-
-	public void setDouble(String key, double value) {
-		mDoubles.put(key, value);
-	}
-
-	public void setString(String key, String value) {
-		mStrings.put(key, value);
-	}
-
 	@Override
 	public boolean isCancelled() {
-		return mCancelled;
+		return mEvent.isCancelled();
 	}
 
 	@Override
 	public void setCancelled(boolean cancelled) {
-		mCancelled = cancelled;
-		if (mEvent != null) {
-			mEvent.setCancelled(cancelled);
-		}
+		mEvent.setCancelled(cancelled);
 	}
 
-	public void setDelayed(boolean delayed) {
-		mIsDelayed = delayed;
+	public @Nullable ItemStatManager.PlayerItemStats getPlayerItemStats() {
+		return mMetadata.mPlayerItemStats;
 	}
 
-	public boolean isDelayed() {
-		return mIsDelayed;
-	}
-
-	public void setPlayerItemStat(FixedMetadataValue playerItemStatsMetadata) {
-		Object value = playerItemStatsMetadata.value();
-		if (value instanceof ItemStatManager.PlayerItemStats playerItemStats) {
-			mPlayerItemStats = playerItemStats;
-		}
-	}
-
-	public void setPlayerItemStat(ItemStatManager.PlayerItemStats playerItemStats) {
-		mPlayerItemStats = playerItemStats;
-	}
-
-	public ItemStatManager.PlayerItemStats getPlayerItemStats() {
-		return mPlayerItemStats;
-	}
-
-	public @Nullable EntityDamageEvent getEvent() {
+	public EntityDamageEvent getEvent() {
 		return mEvent;
 	}
 
-	// Use getType() in most scenarios - this is just if differentiation is needed within the type
-	public @Nullable DamageCause getCause() {
-		if (mEvent == null) {
-			return null;
-		}
+	/**
+	 * Use getType() in most scenarios - this is just if differentiation is needed within the type.
+	 * This will return {@link DamageCause#CUSTOM} for any custom damage dealt (e.g. by abilities).
+	 *
+	 * @return The original damage cause of the {@link EntityDamageEvent}
+	 */
+	public DamageCause getCause() {
 		return mEvent.getCause();
 	}
 
+	/**
+	 * Returns whether the event deals 0 damage (e.g. blocked by a shield, iframes, resistance, etc.)
+	 */
 	public boolean isBlocked() {
-		return (mEvent != null && mEvent.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0) || mDamage <= 0;
+		return isBlockedByShield() || getFinalDamage(false) <= 0;
 	}
 
-	// Mandatory Event Methods (If you remove these, I'm 99% sure the event will break)
+	/**
+	 * Returns whether the damage is blocked by a shield
+	 */
+	public boolean isBlockedByShield() {
+		return mEvent.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0;
+	}
+
+	// Mandatory Event Methods
 	private static final HandlerList HANDLERS = new HandlerList();
 
 	@Override

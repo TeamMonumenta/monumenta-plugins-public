@@ -35,7 +35,6 @@ public class BrambleShell extends DepthsAbility {
 		if (mPlayer != null
 			    && source != null
 			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)
-			    && !event.isCancelled()
 			    && !event.isBlocked()) {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();

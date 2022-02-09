@@ -1,11 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Collections;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbilityUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -14,6 +11,8 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Collections;
 
 /**
  * @deprecated use boss_onhit instead, like this:
@@ -52,8 +51,7 @@ public class AbilitySilenceBoss extends BossAbilityGroup {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		// Attack was blocked
-		if (event.getDamage() == 0) {
+		if (event.isBlocked()) {
 			return;
 		}
 

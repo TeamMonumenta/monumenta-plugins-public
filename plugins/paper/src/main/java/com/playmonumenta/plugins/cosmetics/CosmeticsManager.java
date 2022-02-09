@@ -225,7 +225,7 @@ public class CosmeticsManager implements Listener {
 	}
 
 	// Elite Finisher handler
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerDamagedEntity(EntityDamageByEntityEvent event) {
 		Entity damager = event.getDamager();
 		Entity damaged = event.getEntity();

@@ -4,11 +4,15 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
 public class DamageUtils {
+
+	/**
+	 * To be used by {@link com.playmonumenta.plugins.listeners.DamageListener} to fill this info into the created {@link DamageEvent} on custom damage.
+	 */
+	public static @Nullable DamageEvent.Metadata nextEventMetadata = null;
 
 	public static double getDamageMultiplier(double armor, double agility, double epf, boolean environmental) {
 		double ar = Math.max(0, armor);
@@ -84,7 +88,7 @@ public class DamageUtils {
 	 * @param bossCause      string to pass for boss death messages
 	 */
 	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount, @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback, @Nullable String bossCause) {
-		damage(new DamageEvent(null, damagee, damager, damager, type, ability, amount), bypassIFrames, causeKnockback, bossCause);
+		damage(damager, damagee, new DamageEvent.Metadata(type, ability), amount, bypassIFrames, causeKnockback, bossCause);
 	}
 
 	/**
@@ -92,13 +96,14 @@ public class DamageUtils {
 	 * <br>
 	 * Use this method when additional metadata needs to be added to the DamageEvent before calling it.
 	 *
-	 * @param event          DamageEvent to be called
+	 * @param damager        LivingEntity dealing damage, pass null if not applicable
+	 * @param damagee        LivingEntity receiving damage
+	 * @param metadata       Metadata for the event
+	 * @param amount         amount of damage to be dealt
 	 * @param bypassIFrames  whether the damage should bypass IFrames
 	 * @param causeKnockback whether the damage should cause knockback
 	 */
-	public static void damage(DamageEvent event, boolean bypassIFrames, boolean causeKnockback, @Nullable String bossCause) {
-		LivingEntity damagee = event.getDamagee();
-		@Nullable LivingEntity damager = event.getSource();
+	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageEvent.Metadata metadata, double amount, boolean bypassIFrames, boolean causeKnockback, @Nullable String bossCause) {
 
 		if (!damagee.isValid() || damagee.isInvulnerable()) {
 			return;
@@ -109,11 +114,6 @@ public class DamageUtils {
 			originalAttackCooldown = NmsUtils.getVersionAdapter().getAttackCooldown(damager);
 		}
 
-		Bukkit.getPluginManager().callEvent(event);
-		if (event.isCancelled()) {
-			return;
-		}
-
 		int originalIFrames = damagee.getNoDamageTicks();
 		double originalLastDamage = damagee.getLastDamage();
 		Vector originalVelocity = damagee.getVelocity();
@@ -121,20 +121,24 @@ public class DamageUtils {
 			damagee.setNoDamageTicks(0);
 		}
 
-		double actualDamage = event.getDamage();
-		NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, actualDamage, bossCause);
+		DamageUtils.nextEventMetadata = metadata;
+		try {
+			NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, amount, bossCause);
+		} finally {
+			DamageUtils.nextEventMetadata = null;
 
-		if (bypassIFrames) {
-			damagee.setNoDamageTicks(originalIFrames);
-			damagee.setLastDamage(originalLastDamage);
-		}
+			if (bypassIFrames) {
+				damagee.setNoDamageTicks(originalIFrames);
+				damagee.setLastDamage(originalLastDamage);
+			}
 
-		if (!causeKnockback) {
-			damagee.setVelocity(originalVelocity);
-		}
+			if (!causeKnockback) {
+				damagee.setVelocity(originalVelocity);
+			}
 
-		if (damager != null) {
-			NmsUtils.getVersionAdapter().setAttackCooldown(damager, originalAttackCooldown);
+			if (damager != null) {
+				NmsUtils.getVersionAdapter().setAttackCooldown(damager, originalAttackCooldown);
+			}
 		}
 	}
 

@@ -61,11 +61,11 @@ public class CoupDeGrace extends Ability {
 
 			double maxHealth = EntityUtils.getMaxHealth(enemy);
 			if (EntityUtils.isElite(enemy)) {
-				if (enemy.getHealth() - (event.getDamage() * EntityUtils.vulnerabilityMult(enemy)) < maxHealth * mEliteThreshold) {
+				if (enemy.getHealth() - event.getFinalDamage(true) < maxHealth * mEliteThreshold) {
 					execute(event);
 				}
 			} else if (!EntityUtils.isBoss(enemy)) {
-				if (enemy.getHealth() - (event.getDamage() * EntityUtils.vulnerabilityMult(enemy)) < maxHealth * mNormalThreshold) {
+				if (enemy.getHealth() - event.getFinalDamage(true) < maxHealth * mNormalThreshold) {
 					execute(event);
 				}
 			}

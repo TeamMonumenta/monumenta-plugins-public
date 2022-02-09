@@ -25,7 +25,7 @@ public class KillTriggeredAbilityTracker {
 	}
 
 	public void updateDamageDealtToBosses(DamageEvent event) {
-		updateDamageDealtToBosses(event.getDamage(), event.getDamagee());
+		updateDamageDealtToBosses(event.getFinalDamage(false), event.getDamagee());
 	}
 
 	public void updateDamageDealtToBosses(double damage, LivingEntity mob) {

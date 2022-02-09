@@ -63,7 +63,7 @@ public class DepthsDodging extends DepthsAbility {
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		// See if we should dodge. If false, allow the event to proceed normally
-		if (event.getType() == DamageType.PROJECTILE && !event.isCancelled() && !event.isBlocked() && dodge()) {
+		if (event.getType() == DamageType.PROJECTILE && !event.isBlocked() && dodge()) {
 			event.setCancelled(true);
 		}
 	}

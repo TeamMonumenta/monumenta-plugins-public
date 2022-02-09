@@ -21,10 +21,8 @@ public class SpellShieldStun extends Spell {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		if (damagee instanceof Player player && event.getType() == DamageType.MELEE) {
-			if (player.isBlocking() || player.isHandRaised()) {
-				NmsUtils.getVersionAdapter().stunShield(player, mStunTicks);
-			}
+		if (damagee instanceof Player player && event.getType() == DamageType.MELEE && event.isBlockedByShield()) {
+			NmsUtils.getVersionAdapter().stunShield(player, mStunTicks);
 		}
 	}
 

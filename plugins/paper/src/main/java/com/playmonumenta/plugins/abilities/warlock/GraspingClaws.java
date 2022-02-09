@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -26,7 +27,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.WeakHashMap;
 
 
@@ -96,10 +96,7 @@ public class GraspingClaws extends Ability {
 			world.spawnParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, Material.ANVIL.createBlockData());
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
-				DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, mDamage);
-				damageEvent.setDelayed(true);
-				damageEvent.setPlayerItemStat(playerItemStats);
-				DamageUtils.damage(damageEvent, false, true, null);
+				DamageUtils.damage(mob, mPlayer, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), mDamage, false, true, null);
 
 				MovementUtils.pullTowards(proj, mob, PULL_SPEED);
 				EntityUtils.applySlow(mPlugin, DURATION, mAmplifier, mob);

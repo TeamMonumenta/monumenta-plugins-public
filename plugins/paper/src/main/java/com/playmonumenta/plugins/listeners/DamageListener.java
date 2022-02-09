@@ -3,8 +3,9 @@ package com.playmonumenta.plugins.listeners;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -29,7 +30,7 @@ public class DamageListener implements Listener {
 
 	private final Plugin mPlugin;
 
-	private static WeakHashMap<Projectile, PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
+	private static final WeakHashMap<Projectile, PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
 
 	public DamageListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -38,14 +39,30 @@ public class DamageListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
 
-		if (event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent
-				&& event.getCause().equals(DamageCause.ENTITY_EXPLOSION)
-				&& event.getEntity() instanceof LivingEntity le) {
-			Entity damager = entityDamageByEntityEvent.getDamager();
-			if (damager instanceof Creeper creeper) {
-				event.setDamage(EntityDamageEvent.DamageModifier.BASE, EntityUtils.calculateCreeperExplosionDamage(creeper, le, event.getDamage(EntityDamageEvent.DamageModifier.BASE)));
-			} else if (damager instanceof LargeFireball largeFireball && largeFireball.getShooter() instanceof Ghast ghast) {
-				event.setDamage(EntityDamageEvent.DamageModifier.BASE, EntityUtils.calculateGhastExplosionDamage(ghast, largeFireball, le, event.getDamage(EntityDamageEvent.DamageModifier.BASE)));
+		if (event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent) {
+			if (event.getCause().equals(DamageCause.ENTITY_EXPLOSION)
+				    && event.getEntity() instanceof LivingEntity le) {
+				Entity damager = entityDamageByEntityEvent.getDamager();
+				if (damager instanceof Creeper creeper) {
+					event.setDamage(EntityDamageEvent.DamageModifier.BASE, EntityUtils.calculateCreeperExplosionDamage(creeper, le, event.getDamage(EntityDamageEvent.DamageModifier.BASE)));
+				} else if (damager instanceof LargeFireball largeFireball && largeFireball.getShooter() instanceof Ghast ghast) {
+					event.setDamage(EntityDamageEvent.DamageModifier.BASE, EntityUtils.calculateGhastExplosionDamage(ghast, largeFireball, le, event.getDamage(EntityDamageEvent.DamageModifier.BASE)));
+				}
+			}
+
+			if (event.getEntity() instanceof LivingEntity mob) {
+				event.setDamage(event.getDamage() * EntityUtils.vulnerabilityMult(mob));
+			}
+
+			if (entityDamageByEntityEvent.getDamager() instanceof Player player
+				    && event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) {
+				PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStats(player);
+				double sweepingEdgeLevel = ItemStatUtils.getEnchantmentLevel(player.getInventory().getItemInMainHand(), ItemStatUtils.EnchantmentType.SWEEPING_EDGE);
+				if (playerItemStats != null && sweepingEdgeLevel > 0) {
+					double damage = (1 + playerItemStats.getItemStats().get(ItemStatUtils.AttributeType.ATTACK_DAMAGE_ADD.getItemStat()))
+						                * playerItemStats.getItemStats().get(ItemStatUtils.AttributeType.ATTACK_DAMAGE_MULTIPLY.getItemStat(), 1);
+					event.setDamage(1 + damage * (sweepingEdgeLevel / (sweepingEdgeLevel + 1)));
+				}
 			}
 		}
 
@@ -53,22 +70,24 @@ public class DamageListener implements Listener {
 		 * Puts the wrapper DamageEvent on EntityDamageEvents not caused by the
 		 * plugin (DamageCause.CUSTOM), which should wrap events manually to
 		 * set the correct DamageType.
-		 * If the damage is blocked, don't do anything to make sure the shield gets proper durability damage
-		 * (and this also prevents knockback going through shields sometimes).
 		 */
-		if (event.getCause() != DamageCause.CUSTOM
-			    && event.getOriginalDamage(EntityDamageEvent.DamageModifier.BLOCKING) == 0
-			    && event.getEntity() instanceof LivingEntity le) {
-			Bukkit.getPluginManager().callEvent(new DamageEvent(event, le));
+		double originalDamage = event.getDamage();
+		if (event.getEntity() instanceof LivingEntity le) {
+			if (event.getCause() != DamageCause.CUSTOM) {
+				Bukkit.getPluginManager().callEvent(new DamageEvent(event, le));
+			} else if (DamageUtils.nextEventMetadata != null) {
+				Bukkit.getPluginManager().callEvent(new DamageEvent(event, le, DamageUtils.nextEventMetadata));
+			}
+		}
+		// If the damage is blocked, revert to the initial damage to make sure the shield gets proper durability damage.
+		// This also prevents knockback going through shields sometimes for some reason.
+		if (event.getOriginalDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0) {
+			event.setDamage(originalDamage);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Projectile projectile = event.getEntity();
 		ProjectileSource source = projectile.getShooter();
 		if (source instanceof Player player) {
@@ -78,10 +97,6 @@ public class DamageListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void damageEvent(DamageEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		LivingEntity damagee = event.getDamagee();
 		Entity damager = event.getDamager();
 		LivingEntity source = event.getSource();
@@ -91,7 +106,7 @@ public class DamageListener implements Listener {
 			mPlugin.mItemStatManager.onHurt(mPlugin, player, event, damager, source);
 			mPlugin.mAbilityManager.onHurt(player, event, damager, source);
 
-			if (event.getDamage() >= player.getHealth() + AbsorptionUtils.getAbsorption(player)
+			if (event.getFinalDamage(true) >= player.getHealth()
 				    && !event.isCancelled()) {
 				mPlugin.mAbilityManager.onHurtFatal(player, event);
 				mPlugin.mItemStatManager.onHurtFatal(mPlugin, player, event);
@@ -106,8 +121,9 @@ public class DamageListener implements Listener {
 						mPlugin.mAbilityManager.onDamage(player, event, damagee);
 					}
 				} else {
-					if (event.isDelayed()) {
-						mPlugin.mItemStatManager.onDamage(mPlugin, player, event.getPlayerItemStats(), event, damagee);
+					PlayerItemStats eventPlayerItemStats = event.getPlayerItemStats();
+					if (eventPlayerItemStats != null) {
+						mPlugin.mItemStatManager.onDamage(mPlugin, player, eventPlayerItemStats, event, damagee);
 						mPlugin.mAbilityManager.onDamage(player, event, damagee);
 					} else {
 						mPlugin.mItemStatManager.onDamage(mPlugin, player, event, damagee);

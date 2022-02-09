@@ -1,21 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.earthbound;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -31,8 +15,23 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
 
 public class EarthenWrath extends DepthsAbility {
 
@@ -135,15 +134,13 @@ public class EarthenWrath extends DepthsAbility {
 
 		if (dp != null) {
 			EarthenWrath otherWrath = AbilityManager.getManager().getPlayerAbility(otherPlayer, EarthenWrath.class);
-			if (otherWrath != null) {
-				if (otherWrath.isWrathing()) {
-					return false;
-				}
+			if (otherWrath != null && otherWrath.isWrathing()) {
+				return false;
 			}
 		}
 
 		if (isWrathing() && !otherPlayer.equals(mPlayer)) {
-			mDamageAbsorbed += event.getDamage();
+			mDamageAbsorbed += event.getFinalDamage(false);
 
 			Vector velocity = mPlayer.getVelocity();
 
@@ -183,10 +180,7 @@ public class EarthenWrath extends DepthsAbility {
 		}
 
 		//Creates a new party list with random order without modifying the normal order of the party
-		List<DepthsPlayer> playersInParty = new ArrayList<DepthsPlayer>();
-		for (DepthsPlayer dp : party.mPlayersInParty) {
-			playersInParty.add(dp);
-		}
+		List<DepthsPlayer> playersInParty = new ArrayList<>(party.mPlayersInParty);
 		Collections.shuffle(playersInParty);
 
 		for (DepthsPlayer dp : playersInParty) {
@@ -203,7 +197,7 @@ public class EarthenWrath extends DepthsAbility {
 					}
 				}
 			} catch (Exception e) {
-				Plugin.getInstance().getLogger().info("Exception for depths on entity damage- earthen wrath");
+				Plugin.getInstance().getLogger().log(Level.INFO, "Exception for depths on entity damage- earthen wrath", e);
 			}
 		}
 	}

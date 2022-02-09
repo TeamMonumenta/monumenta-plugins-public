@@ -120,7 +120,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if ((event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)
 			    && event.getAbility() != ClassAbility.RAMPAGE) {
-			damageDealt(event.getDamage());
+			damageDealt(event.getFinalDamage(false));
 		}
 		return false; // does not deal damage, just tallies the damage dealt
 	}

@@ -1,15 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses.lich;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.lich.undeadplayers.SpellCrystalParticle;
 import com.playmonumenta.plugins.events.DamageEvent;
-
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -20,6 +16,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class LichShieldBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lichshield";
@@ -61,7 +60,7 @@ public class LichShieldBoss extends BossAbilityGroup {
 		if (event.getDamage() > 32) {
 			event.setDamage(32);
 		}
-		if (mBoss.getHealth() - event.getDamage() <= 0) {
+		if (mBoss.getHealth() - event.getFinalDamage(true) <= 0) {
 			event.setCancelled(true);
 			World world = mBoss.getWorld();
 			world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 5, 1.2f);

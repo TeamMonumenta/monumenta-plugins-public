@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -42,7 +43,6 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -260,10 +260,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				damage += potion.getMetadata(AlchemicalArtillery.ARTILLERY_POTION_TAG).get(0).asDouble();
 			}
 
-			DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, damage);
-			damageEvent.setDelayed(true);
-			damageEvent.setPlayerItemStat(playerItemStats);
-			DamageUtils.damage(damageEvent, false, true, null);
+			DamageUtils.damage(mob, mPlayer, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, false, true, null);
 
 			// Intentionally apply effects after damage
 			applyEffects(mob, isGruesome);

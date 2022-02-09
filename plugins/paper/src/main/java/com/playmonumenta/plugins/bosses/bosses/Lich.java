@@ -40,6 +40,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -82,7 +83,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -922,7 +922,7 @@ public final class Lich extends BossAbilityGroup {
 		mGotHit = true;
 
 		// ridiculous burst prevention, 1% above the next health action
-		double damage = event.getDamage();
+		double damage = event.getFinalDamage(true);
 		double maxHealth = EntityUtils.getMaxHealth(mBoss);
 		if (mPhase == 1 && mBoss.getHealth() - damage <= maxHealth * 0.51) {
 			event.setDamage(mBoss.getHealth() - maxHealth * 0.51);

@@ -63,14 +63,13 @@ public class SanctifiedArmor extends Ability {
 			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)
 			    && Crusade.enemyTriggersAbilities(source, mCrusade)
 			    && !EntityUtils.isBoss(source)
-			    && !event.isCancelled()
 			    && !event.isBlocked()) {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
 			world.spawnParticle(Particle.FIREWORKS_SPARK, loc.add(0, source.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125);
 			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
 
-			double damage = mPercentDamageReturned * event.getDamage();
+			double damage = mPercentDamageReturned * event.getFinalDamage(false);
 			MovementUtils.knockAway(mPlayer, source, KNOCKBACK_SPEED, KNOCKBACK_SPEED, true);
 			DamageUtils.damage(mPlayer, source, DamageType.MAGIC, damage, mInfo.mLinkedSpell);
 

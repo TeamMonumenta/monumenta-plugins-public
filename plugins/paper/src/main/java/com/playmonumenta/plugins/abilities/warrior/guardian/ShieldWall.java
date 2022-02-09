@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -30,7 +31,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,10 +121,7 @@ public class ShieldWall extends Ability {
 									mMobsAlreadyHit.add(le);
 									Vector v = le.getVelocity();
 
-									DamageEvent damageEvent = new DamageEvent(le, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, SHIELD_WALL_DAMAGE);
-									damageEvent.setDelayed(true);
-									damageEvent.setPlayerItemStat(playerItemStats);
-									DamageUtils.damage(damageEvent, false, true, null);
+									DamageUtils.damage(le, mPlayer, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), SHIELD_WALL_DAMAGE, false, true, null);
 
 									//Bosses should not be affected by slowness or knockback.
 									if (knockback && !e.getScoreboardTags().contains("Boss")) {

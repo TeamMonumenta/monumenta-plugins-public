@@ -45,7 +45,6 @@ public class CounterStrike extends Ability {
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.getType() == DamageType.MELEE
 			    && source != null
-			    && !event.isCancelled()
 			    && !event.isBlocked()
 			    && mPlayer != null) {
 			Location loc = mPlayer.getLocation().add(0, 1, 0);

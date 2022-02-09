@@ -36,7 +36,6 @@ public class Bulwark extends DepthsAbility {
 		if (mPlayer != null
 			    && source != null
 			    && event.getType() == DamageType.MELEE
-			    && !event.isCancelled()
 			    && !event.isBlocked()) {
 			Location loc = mPlayer.getLocation();
 			World world = mPlayer.getWorld();

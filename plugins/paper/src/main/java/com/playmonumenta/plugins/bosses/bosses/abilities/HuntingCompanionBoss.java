@@ -58,10 +58,7 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 		if (mPlayer != null && mPlayerItemStats != null) {
 			event.setCancelled(true);
 
-			DamageEvent damageEvent = new DamageEvent(damagee, mPlayer, mPlayer, DamageType.PROJECTILE_SKILL, ClassAbility.HUNTING_COMPANION, mDamage);
-			damageEvent.setDelayed(true);
-			damageEvent.setPlayerItemStat(mPlayerItemStats);
-			DamageUtils.damage(damageEvent, true, true, null);
+			DamageUtils.damage(damagee, mPlayer, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, ClassAbility.HUNTING_COMPANION, mPlayerItemStats), mDamage, true, true, null);
 
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_FOX_BITE, 1.5f, 1.0f);
 			UUID uuid = damagee.getUniqueId();
