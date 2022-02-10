@@ -71,14 +71,16 @@ public class DummyDecoy extends DepthsAbility {
 			@Override
 			public void run() {
 
-				if (arrow == null || mT > MAX_TICKS) {
+				if (mT > MAX_TICKS || !arrow.isValid() || !arrow.hasMetadata(DUMMY_DECOY_ARROW_METADATA)) {
 					arrow.remove();
 					this.cancel();
+					return;
 				}
 
 				if (arrow.getVelocity().length() < .05 || arrow.isOnGround()) {
 					spawnDecoy(arrow, arrow.getLocation());
 					this.cancel();
+					return;
 				}
 				mT++;
 			}
@@ -87,14 +89,16 @@ public class DummyDecoy extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(DUMMY_DECOY_ARROW_METADATA)) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.isValid() && arrow.hasMetadata(DUMMY_DECOY_ARROW_METADATA)) {
 			spawnDecoy(arrow, enemy.getLocation());
-			arrow.removeMetadata(DUMMY_DECOY_ARROW_METADATA, mPlugin);
 		}
 		return false; // prevents multiple calls itself
 	}
 
 	private void spawnDecoy(Entity arrow, Location loc) {
+		arrow.removeMetadata(DUMMY_DECOY_ARROW_METADATA, mPlugin);
+		arrow.remove();
+
 		LivingEntity e = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, DUMMY_NAME);
 		e.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(HEALTH[mRarity - 1]);
 		e.setHealth(HEALTH[mRarity - 1]);
@@ -120,8 +124,6 @@ public class DummyDecoy extends DepthsAbility {
 				}
 			}
 		}.runTaskLater(mPlugin, MAX_TICKS);
-
-		arrow.remove();
 	}
 
 	@Override
