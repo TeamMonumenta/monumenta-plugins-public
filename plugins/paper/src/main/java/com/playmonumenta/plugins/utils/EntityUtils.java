@@ -1134,21 +1134,6 @@ public class EntityUtils {
 		return getAdjustedBlastDamage(power, originalDamage, baseDamage);
 	}
 
-	public static double calculateGhastExplosionDamage(Ghast ghast, LargeFireball largeFireball, LivingEntity entity, double originalDamage) {
-		//Ghasts have no attack damage attribute - we cannot even give them it as a dummy
-		//Use luck instead
-		double baseDamage = getAttributeBaseOrDefault(ghast, Attribute.GENERIC_LUCK, 0);
-
-		if (baseDamage <= 0) {
-			return originalDamage;
-		}
-
-		//double power = largeFireball.
-		double power = largeFireball.getYield();
-
-		return getAdjustedBlastDamage(power, originalDamage, baseDamage);
-	}
-
 	private static double getAdjustedBlastDamage(double power, double originalDamage, double baseDamage) {
 		//Vanilla formula for maximum damage taken
 		double maxOriginalDamage = 2 * 7 * power + 1;

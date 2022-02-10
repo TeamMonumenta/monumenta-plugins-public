@@ -9,8 +9,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Ghast;
-import org.bukkit.entity.LargeFireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -45,8 +43,6 @@ public class DamageListener implements Listener {
 				Entity damager = entityDamageByEntityEvent.getDamager();
 				if (damager instanceof Creeper creeper) {
 					event.setDamage(EntityDamageEvent.DamageModifier.BASE, EntityUtils.calculateCreeperExplosionDamage(creeper, le, event.getDamage(EntityDamageEvent.DamageModifier.BASE)));
-				} else if (damager instanceof LargeFireball largeFireball && largeFireball.getShooter() instanceof Ghast ghast) {
-					event.setDamage(EntityDamageEvent.DamageModifier.BASE, EntityUtils.calculateGhastExplosionDamage(ghast, largeFireball, le, event.getDamage(EntityDamageEvent.DamageModifier.BASE)));
 				}
 			}
 
