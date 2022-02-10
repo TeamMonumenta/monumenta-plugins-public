@@ -971,9 +971,7 @@ public class FrostGiant extends BossAbilityGroup {
 	@Override
 	public void onHurt(DamageEvent event) {
 		LivingEntity source = event.getSource();
-		if (source == null || !(source instanceof Player)) {
-			event.setCancelled(true);
-		} else if (!mFrostArmorActive) {
+		if (!mFrostArmorActive) {
 			if (source instanceof Player player) {
 				player.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 5, 0.75f);
 			}
