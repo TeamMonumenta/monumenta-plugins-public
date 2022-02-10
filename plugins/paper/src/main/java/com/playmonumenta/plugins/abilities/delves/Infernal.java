@@ -81,13 +81,13 @@ public class Infernal extends DelveModifier {
 		List<String> flameNovaBoss = new ArrayList<>();
 		flameNovaBoss.add(NovaBoss.identityTag);
 		flameNovaBoss.add(NovaBoss.identityTag + "[damage=17,duration=70,detection=20,effects=[(fire,80)]]");
-		flameNovaBoss.add(NovaBoss.identityTag + "[soundCharge=BLOCK_FIRE_AMBIENT,soundcast=[(ENTITY_WITHER_SHOOT,1.5,0.65)]");
+		flameNovaBoss.add(NovaBoss.identityTag + "[soundcharge=BLOCK_FIRE_AMBIENT,soundcast=[(ENTITY_WITHER_SHOOT,1.5,0.65)]");
 		flameNovaBoss.add(NovaBoss.identityTag + "[particleair=[(lava,2,4.5,4.5,4.5,0.05)],particleload=[(flame,1,0.25,0.25,0.25,0.1)],particleexplode=[(flame,1,0.1,0.1,0.1,0.3),(smoke_normal,2,0.25,0.25,0.25,0.1)]]");
 		ABILITY_POOL_R2.add(flameNovaBoss);
 		flameNovaBoss = new ArrayList<>();
 		flameNovaBoss.add(NovaBoss.identityTag);
 		flameNovaBoss.add(NovaBoss.identityTag + "[damage=9,duration=70,detection=20,effects=[(fire,60)]]");
-		flameNovaBoss.add(NovaBoss.identityTag + "[soundCharge=BLOCK_FIRE_AMBIENT,soundcast=[(ENTITY_WITHER_SHOOT,1.5,0.65)]");
+		flameNovaBoss.add(NovaBoss.identityTag + "[soundcharge=BLOCK_FIRE_AMBIENT,soundcast=[(ENTITY_WITHER_SHOOT,1.5,0.65)]");
 		flameNovaBoss.add(NovaBoss.identityTag + "[particleair=[(lava,2,4.5,4.5,4.5,0.05)],particleload=[(flame,1,0.25,0.25,0.25,0.1)],particleexplode=[(flame,1,0.1,0.1,0.1,0.3),(smoke_normal,2,0.25,0.25,0.25,0.1)]]");
 		ABILITY_POOL_R1.add(flameNovaBoss);
 
