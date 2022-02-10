@@ -557,7 +557,7 @@ public class ItemUtils {
 	 * Items drop if they have lore that does not contain $$ and they are a Quest Item or Material
 	 */
 	public static float getItemDropChance(@Nullable ItemStack item) {
-		if (item != null && (item.hasItemMeta() && item.getItemMeta().hasLore()) && !InventoryUtils.testForItemWithLore(item, "$$") && (InventoryUtils.testForItemWithLore(item, "Quest Item") || ItemStatUtils.isMaterial(item))) {
+		if (item != null && (item.hasItemMeta() && item.getItemMeta().hasLore()) && !InventoryUtils.testForItemWithLore(item, "$$") && (InventoryUtils.testForItemWithLore(item, "Quest Item") || ItemStatUtils.isMaterial(item) || ItemStatUtils.getTier(item) == ItemStatUtils.Tier.KEYTIER)) {
 			return 100.0f;
 		} else {
 			return -200.0f;
