@@ -13,10 +13,8 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +29,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import javax.annotation.Nullable;
 
 public class UnstableAmalgam extends Ability {
 
@@ -52,7 +52,7 @@ public class UnstableAmalgam extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.UNSTABLE_AMALGAM;
 		mInfo.mScoreboardId = "UnstableAmalgam";
 		mInfo.mShorthandName = "UA";
-		mInfo.mDescriptions.add("Shift left click while holding an Alchemist's Bag to consume a potion to place an Amalgam with 1 health at the location you are looking, up to 7 blocks away. When the Alamgam dies, or after 3 seconds, it explodes, dealing your Alchemist Potion's damage + 12 magic damage to mobs in a 4 block radius and applying potion effects from all abilities. Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Shift left click while holding an Alchemist's Bag to consume a potion to place an Amalgam with 1 health at the location you are looking, up to 7 blocks away. When the Amalgam dies, or after 3 seconds, it explodes, dealing your Alchemist Potion's damage + 12 magic damage to mobs in a 4 block radius and applying potion effects from all abilities. Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion. Cooldown: 20s.");
 		mInfo.mDescriptions.add("The damage is increased to 20 and the cooldown is reduced to 16s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? UNSTABLE_AMALGAM_1_COOLDOWN : UNSTABLE_AMALGAM_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -72,12 +72,11 @@ public class UnstableAmalgam extends Ability {
 
 			Location loc = mPlayer.getEyeLocation();
 			Vector dir = loc.getDirection().normalize();
-			for (int i = 0; i < UNSTABLE_AMALGAM_CAST_RANGE; i++) {
+			for (double i = 0; i < UNSTABLE_AMALGAM_CAST_RANGE; i += 0.5) {
 				Location prevLoc = loc;
 				loc.add(dir);
 
 				if (loc.getBlock().getType().isSolid()) {
-					prevLoc.setY((int) prevLoc.getY());
 					spawnAmalgam(prevLoc);
 
 					return;
@@ -92,6 +91,8 @@ public class UnstableAmalgam extends Ability {
 		if (mPlayer == null || mAlchemistPotions == null) {
 			return;
 		}
+
+		loc.setY(loc.getBlockY() + 1);
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
@@ -138,22 +139,18 @@ public class UnstableAmalgam extends Ability {
 			return;
 		}
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, UNSTABLE_AMALGAM_RADIUS, mPlayer)) {
-			DamageUtils.damage(mob, mPlayer, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), mDamage + mAlchemistPotions.getDamage(), false, true, null);
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, UNSTABLE_AMALGAM_RADIUS, mAmalgam)) {
+			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), mDamage + mAlchemistPotions.getDamage(), false, true, null);
 
 			mAlchemistPotions.applyEffects(mob, false);
 			mAlchemistPotions.applyEffects(mob, true);
 
-			MovementUtils.knockAwayRealistic(loc, mob, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 0.5f);
+			MovementUtils.knockAwayRealistic(loc, mob, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 2f);
 			mAlchemistPotions.incrementCharge();
 		}
 
-		if (!ZoneUtils.hasZoneProperty(loc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			for (Player player : PlayerUtils.playersInRange(loc, UNSTABLE_AMALGAM_RADIUS, true)) {
-				if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-					MovementUtils.knockAwayRealistic(loc, player, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 0.5f);
-				}
-			}
+		if (loc.distance(mPlayer.getLocation()) <= UNSTABLE_AMALGAM_RADIUS && !ZoneUtils.hasZoneProperty(loc, ZoneProperty.NO_MOBILITY_ABILITIES) && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			MovementUtils.knockAwayRealistic(loc, mPlayer, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 2f);
 		}
 
 		World world = loc.getWorld();
