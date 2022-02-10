@@ -3,9 +3,11 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -21,6 +23,8 @@ import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import javax.annotation.Nullable;
@@ -182,7 +186,8 @@ public class SpellDiesIrae extends Spell {
 
 	private void attack() {
 		World world = mBoss.getWorld();
-		mCrystalDmg = Math.min(1.6, mCrystal.size() * 0.15 + 0.4);
+		mCrystalDmg = Math.min(1.2, mCrystal.size() * 0.15);
+		int debuffTicks = mCrystal.size() * 5 * 20;
 
 		mBreath3 = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), mCrystal.size() * 1000 + 7000, 42, 0, 42, 0.01);
 		mExpL2 = new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), mCrystal.size() * 125 + 1000, 42, 0.75, 42, 0);
@@ -254,6 +259,9 @@ public class SpellDiesIrae extends Spell {
 					players.removeIf(pl -> SpellDimensionDoor.getShadowed().contains(pl) || pl.getLocation().getY() >= mCenter.getY() + mCeiling);
 					for (Player p : players) {
 						BossUtils.bossDamagePercent(mBoss, p, mCrystalDmg, null, "Dies Irae");
+						AbilityUtils.increaseHealingPlayer(p, debuffTicks, -1.0, "Lich");
+						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.SLOW, debuffTicks, 0));
+						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.WEAKNESS, debuffTicks, 1));
 						world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.5f);
 					}
 				}

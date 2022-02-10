@@ -1,12 +1,13 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentHeal;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,17 +26,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+
 import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.AbilitySilence;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.effects.PercentHeal;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class AbilityUtils {
 
@@ -153,7 +151,11 @@ public class AbilityUtils {
 		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentHeal(duration, healBoost));
 		if (healBoost < 0) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, duration, -1));
-			player.sendActionBar(Component.text("You have reduced healing for " + duration / 20 + "s", NamedTextColor.DARK_RED));
+			if (healBoost <= -1.0) {
+				player.sendActionBar(Component.text("You cannot heal for " + duration / 20 + "s", NamedTextColor.RED));
+			} else {
+				player.sendActionBar(Component.text("You have reduced healing for " + duration / 20 + "s", NamedTextColor.DARK_RED));
+			}
 		}
 	}
 
