@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 /*
  * NOTICE!
@@ -19,8 +18,6 @@ public class HopeifyHeldItem extends GenericCommand {
 	}
 
 	public static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
-		ItemStack item = player.getItemInHand();
-		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.HOPE, 1, player.getUniqueId());
-		ItemStatUtils.generateItemStats(item);
+		ItemStatUtils.addInfusion(player.getInventory().getItemInMainHand(), ItemStatUtils.InfusionType.HOPE, 1, player.getUniqueId());
 	}
 }

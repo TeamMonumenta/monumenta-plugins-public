@@ -53,7 +53,7 @@ public class ClaimRaffle {
 		}
 
 		if (claimReward && eligible) {
-			ItemStatUtils.addInfusion(player.getItemInHand(), ItemStatUtils.InfusionType.GILDED, 1, player.getUniqueId());
+			ItemStatUtils.addInfusion(player.getInventory().getItemInMainHand(), ItemStatUtils.InfusionType.GILDED, 1, player.getUniqueId());
 		} else if (!claimReward && eligible) {
 			player.setMetadata(CONFIRMED_METAKEY, new FixedMetadataValue(Plugin.getInstance(), 0));
 			player.sendMessage(ChatColor.GREEN + "You have won the weekly voting raffle! Congratulations!");

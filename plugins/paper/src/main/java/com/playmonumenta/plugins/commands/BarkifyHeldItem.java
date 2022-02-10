@@ -1,14 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -16,6 +8,12 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  * NOTICE!
@@ -44,7 +42,7 @@ public class BarkifyHeldItem extends GenericCommand {
 	}
 
 	private static void run(Player player, String selection) throws WrapperCommandSyntaxException {
-		ItemStack is = player.getItemInHand();
+		ItemStack is = player.getInventory().getItemInMainHand();
 		if (selection.equals("Barking")) {
 			player.playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 1, 1f);
 			ItemStatUtils.addInfusion(is, ItemStatUtils.InfusionType.BARKING, 1, player.getUniqueId());
@@ -55,6 +53,5 @@ public class BarkifyHeldItem extends GenericCommand {
 			player.playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 1, 1f);
 			ItemStatUtils.addInfusion(is, ItemStatUtils.InfusionType.DEBARKING, 1, player.getUniqueId());
 		}
-		ItemStatUtils.generateItemStats(is);
 	}
 }

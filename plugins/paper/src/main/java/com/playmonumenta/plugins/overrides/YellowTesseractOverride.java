@@ -14,11 +14,11 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import de.tr7zw.nbtapi.NBTItem;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -30,7 +30,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import javax.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -294,7 +293,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			}
 		}
 
-		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.SOULBOUND, 1, player.getUniqueId());
+		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.SOULBOUND, 1, player.getUniqueId(), false);
 
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(CONFIGURED);
@@ -314,7 +313,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		NBTItem nbt = new NBTItem(item);
 		List<String> lore = ItemStatUtils.getPlainLore(nbt);
 
-		ItemStatUtils.removeInfusion(item, ItemStatUtils.InfusionType.SOULBOUND);
+		ItemStatUtils.removeInfusion(item, ItemStatUtils.InfusionType.SOULBOUND, false);
 		for (int i = lore.size() - 1; i >= 0; --i) {
 			String line = lore.get(i);
 			if (line.startsWith(CLASS_STR)

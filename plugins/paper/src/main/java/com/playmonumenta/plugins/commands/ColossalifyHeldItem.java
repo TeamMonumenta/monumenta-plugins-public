@@ -11,7 +11,6 @@ public class ColossalifyHeldItem extends GenericCommand {
 	}
 
 	public static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
-		ItemStatUtils.addInfusion(player.getItemInHand(), ItemStatUtils.InfusionType.COLOSSAL, 1, player.getUniqueId());
-		ItemStatUtils.generateItemStats(player.getItemInHand());
+		ItemStatUtils.addInfusion(player.getInventory().getItemInMainHand(), ItemStatUtils.InfusionType.COLOSSAL, 1, player.getUniqueId());
 	}
 }

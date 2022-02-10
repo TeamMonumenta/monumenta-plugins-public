@@ -60,7 +60,6 @@ public class GiveSoulbound extends GenericCommand {
 
 	private static void give(Player player, ItemStack stack) {
 		ItemStatUtils.addInfusion(stack, ItemStatUtils.InfusionType.SOULBOUND, 1, player.getUniqueId());
-		ItemStatUtils.generateItemStats(stack);
 		InventoryUtils.giveItem(player, stack);
 	}
 }

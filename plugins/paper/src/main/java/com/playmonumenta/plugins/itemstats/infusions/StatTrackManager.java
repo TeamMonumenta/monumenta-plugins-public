@@ -8,11 +8,11 @@ import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import javax.annotation.Nullable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -114,7 +114,6 @@ public class StatTrackManager {
 
 		//Replace the old line of lore with the new one
 		ItemStatUtils.addInfusion(item, enchant, stat, player.getUniqueId());
-		ItemStatUtils.generateItemStats(item);
 
 		//Remove the item from the system
 		mStatUpdates.remove(itemName, player.getUniqueId());

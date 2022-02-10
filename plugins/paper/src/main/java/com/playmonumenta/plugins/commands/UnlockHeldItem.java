@@ -11,6 +11,6 @@ public class UnlockHeldItem extends GenericCommand {
 	}
 
 	public static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
-		ItemStatUtils.removeInfusion(player.getItemInHand(), ItemStatUtils.InfusionType.LOCKED);
+		ItemStatUtils.removeInfusion(player.getInventory().getItemInMainHand(), ItemStatUtils.InfusionType.LOCKED);
 	}
 }

@@ -1043,6 +1043,10 @@ public class ItemStatUtils {
 	}
 
 	public static void addInfusion(final @Nullable ItemStack item, final InfusionType type, final int level, final UUID infuser) {
+		addInfusion(item, type, level, infuser, true);
+	}
+
+	public static void addInfusion(final @Nullable ItemStack item, final InfusionType type, final int level, final UUID infuser, boolean updateItem) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
 		}
@@ -1052,9 +1056,16 @@ public class ItemStatUtils {
 		infusion.setString(INFUSER_KEY, infuser.toString());
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
+		if (updateItem) {
+			generateItemStats(item);
+		}
 	}
 
 	public static void removeInfusion(final ItemStack item, final InfusionType type) {
+		removeInfusion(item, type, true);
+	}
+
+	public static void removeInfusion(final ItemStack item, final InfusionType type, boolean updateItem) {
 		if (item.getType() == Material.AIR) {
 			return;
 		}
@@ -1067,6 +1078,9 @@ public class ItemStatUtils {
 		infusions.removeKey(type.getName());
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
+		if (updateItem) {
+			generateItemStats(item);
+		}
 	}
 
 	public static NBTCompoundList getAttributes(final NBTItem nbt) {
@@ -1797,9 +1811,9 @@ public class ItemStatUtils {
 			InfusionType type2 = InfusionType.getInfusionType(enchantment);
 			if (type2 != null) {
 				if (level > 0) {
-					addInfusion(item, type2, level, player.getUniqueId());
+					addInfusion(item, type2, level, player.getUniqueId(), false);
 				} else {
-					removeInfusion(item, type2);
+					removeInfusion(item, type2, false);
 				}
 			}
 

@@ -98,10 +98,9 @@ public class DelveInfusionUtils {
 		//Assume the player has already paid for this infusion
 		int prevLvl = ItemStatUtils.getInfusionLevel(item, InfusionType.getInfusionType(selection.getEnchantName()));
 		if (prevLvl > 0) {
-			ItemStatUtils.removeInfusion(item, InfusionType.getInfusionType(selection.getEnchantName()));
+			ItemStatUtils.removeInfusion(item, InfusionType.getInfusionType(selection.getEnchantName()), false);
 		}
 		ItemStatUtils.addInfusion(item, InfusionType.getInfusionType(selection.getEnchantName()), prevLvl + 1, player.getUniqueId());
-		ItemStatUtils.generateItemStats(item);
 
 		animate(player);
 	}

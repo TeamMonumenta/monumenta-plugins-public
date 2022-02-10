@@ -1,5 +1,12 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
@@ -11,15 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.listeners.AuditListener;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
-
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class InfusionUtils {
 
@@ -84,7 +82,7 @@ public class InfusionUtils {
 
 		//Remove the infusion enchants from the item
 		for (InfusionSelection sel : InfusionSelection.values()) {
-			ItemStatUtils.removeInfusion(item, InfusionType.getInfusionType(sel.getEnchantName()));
+			ItemStatUtils.removeInfusion(item, InfusionType.getInfusionType(sel.getEnchantName()), false);
 		}
 		ItemStatUtils.generateItemStats(item);
 		if (refundMaterials > 0 && region != null) {
@@ -373,7 +371,6 @@ public class InfusionUtils {
 		int prevLvl = ItemStatUtils.getInfusionLevel(item, InfusionType.getInfusionType(selection.getEnchantName()));
 
 		ItemStatUtils.addInfusion(item, InfusionType.getInfusionType(selection.getEnchantName()), prevLvl + 1, player.getUniqueId());
-		ItemStatUtils.generateItemStats(item);
 
 		return true;
 	}

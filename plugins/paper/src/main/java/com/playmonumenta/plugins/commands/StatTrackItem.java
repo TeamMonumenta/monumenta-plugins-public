@@ -116,9 +116,8 @@ public class StatTrackItem extends GenericCommand {
 			return;
 		}
 		//Add the chosen stat tracking enchant to the item
-		ItemStatUtils.addInfusion(is, InfusionType.STAT_TRACK, 1, player.getUniqueId());
+		ItemStatUtils.addInfusion(is, InfusionType.STAT_TRACK, 1, player.getUniqueId(), false);
 		ItemStatUtils.addInfusion(is, option, 1, player.getUniqueId());
-		ItemStatUtils.generateItemStats(is);
 		animate(player);
 	}
 
@@ -160,9 +159,9 @@ public class StatTrackItem extends GenericCommand {
 		} else if (ItemStatUtils.getInfusionLevel(is, ItemStatUtils.InfusionType.STAT_TRACK) <= 0) {
 			player.sendMessage("This item is not infused with stat tracking!");
 		} else if (StatTrackManager.isPlayersItem(is, player)) {
-			ItemStatUtils.removeInfusion(is, ItemStatUtils.InfusionType.STAT_TRACK);
+			ItemStatUtils.removeInfusion(is, ItemStatUtils.InfusionType.STAT_TRACK, false);
 			for (InfusionType stat : InfusionType.STAT_TRACK_OPTIONS) {
-				ItemStatUtils.removeInfusion(is, stat);
+				ItemStatUtils.removeInfusion(is, stat, false);
 			}
 			ItemStatUtils.generateItemStats(is);
 			player.sendMessage("Removed Stat Tracking from your item!");

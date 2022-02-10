@@ -30,12 +30,10 @@ public class DeBarkifyHeldItem extends GenericCommand {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				if (args[0].equals("Barking")) {
-					ItemStatUtils.removeInfusion(((Player)args[1]).getItemInHand(), ItemStatUtils.InfusionType.BARKING);
-
+					ItemStatUtils.removeInfusion(((Player) args[1]).getInventory().getItemInMainHand(), ItemStatUtils.InfusionType.BARKING);
 				} else {
-					ItemStatUtils.removeInfusion(((Player)args[1]).getItemInHand(), ItemStatUtils.InfusionType.DEBARKING);
+					ItemStatUtils.removeInfusion(((Player) args[1]).getInventory().getItemInMainHand(), ItemStatUtils.InfusionType.DEBARKING);
 				}
-				ItemStatUtils.generateItemStats(((Player)args[1]).getItemInHand());
 			})
 			.register();
 	}

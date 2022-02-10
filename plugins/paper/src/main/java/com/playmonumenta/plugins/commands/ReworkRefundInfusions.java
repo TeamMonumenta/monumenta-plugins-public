@@ -40,24 +40,24 @@ public class ReworkRefundInfusions extends GenericCommand {
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.HOPE) > 0) {
 			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/hyper_experience"), 3);
 			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r1/kaul/crownshard"), 9);
-			ItemStatUtils.removeInfusion(item, InfusionType.HOPE);
+			ItemStatUtils.removeInfusion(item, InfusionType.HOPE, false);
 		}
 
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.PHYLACTERY) > 0) {
 			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"), 2);
 			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/lich/materials/ancestral_effigy"), 6);
-			ItemStatUtils.removeInfusion(item, InfusionType.PHYLACTERY);
+			ItemStatUtils.removeInfusion(item, InfusionType.PHYLACTERY, false);
 		}
 
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.COLOSSAL) > 0) {
 			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"), 3);
 			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/eldrask/materials/epic_material"), 9);
-			ItemStatUtils.removeInfusion(item, InfusionType.COLOSSAL);
+			ItemStatUtils.removeInfusion(item, InfusionType.COLOSSAL, false);
 		}
 		// Locked
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.LOCKED) > 0) {
 			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/hyper_experience"), 3);
-			ItemStatUtils.removeInfusion(item, InfusionType.LOCKED);
+			ItemStatUtils.removeInfusion(item, InfusionType.LOCKED, false);
 		}
 		ItemStatUtils.generateItemStats(player.getInventory().getItemInMainHand());
 		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
