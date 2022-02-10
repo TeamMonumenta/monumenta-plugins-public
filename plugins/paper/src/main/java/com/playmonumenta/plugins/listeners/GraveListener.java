@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import de.tr7zw.nbtapi.NBTEntity;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -40,6 +39,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -104,11 +104,9 @@ public class GraveListener implements Listener {
 	// handle cancelled events as we're only interested in the act of clicking/attacking the grave, and not whether the attack was successful
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	public void entityDamageByEntity(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Player && event.getEntityType() == EntityType.ARMOR_STAND) {
-			if (GraveManager.isGrave(event.getEntity())) {
-				GraveManager.onInteract((Player) event.getDamager(), event.getEntity());
-				event.setCancelled(true);
-			}
+		if (event.getDamager() instanceof Player player && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && GraveManager.isGrave(event.getEntity())) {
+			GraveManager.onInteract(player, event.getEntity());
+			event.setCancelled(true);
 		}
 	}
 

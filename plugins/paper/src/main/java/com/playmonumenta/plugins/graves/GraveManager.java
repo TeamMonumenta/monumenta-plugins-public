@@ -248,7 +248,7 @@ public class GraveManager {
 	}
 
 	public static boolean isGrave(Entity entity) {
-		return entity.getScoreboardTags().contains("Grave") || GRAVES.containsKey(entity.getUniqueId());
+		return entity instanceof ArmorStand && (entity.getScoreboardTags().contains("Grave") || GRAVES.containsKey(entity.getUniqueId()));
 	}
 
 	public static boolean isGraveItem(Entity entity) {
