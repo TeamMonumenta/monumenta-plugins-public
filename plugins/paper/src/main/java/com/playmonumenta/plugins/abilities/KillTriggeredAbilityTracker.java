@@ -20,8 +20,12 @@ public class KillTriggeredAbilityTracker {
 	private double mDamageDealtToBosses = 0;
 
 	public KillTriggeredAbilityTracker(KillTriggeredAbility linkedAbility) {
+		this(linkedAbility, ServerProperties.getClassSpecializationsEnabled() ? DAMAGE_DEALT_TO_R2_BOSSES_PER_KILL : DAMAGE_DEALT_TO_R1_BOSSES_PER_KILL);
+	}
+
+	public KillTriggeredAbilityTracker(KillTriggeredAbility linkedAbility, int damage) {
 		mLinkedAbility = linkedAbility;
-		mDamageDealtToBossesPerKill = ServerProperties.getClassSpecializationsEnabled() ? DAMAGE_DEALT_TO_R2_BOSSES_PER_KILL : DAMAGE_DEALT_TO_R1_BOSSES_PER_KILL;
+		mDamageDealtToBossesPerKill = damage;
 	}
 
 	public void updateDamageDealtToBosses(DamageEvent event) {

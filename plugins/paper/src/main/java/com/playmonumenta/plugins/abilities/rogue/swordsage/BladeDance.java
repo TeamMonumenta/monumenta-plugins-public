@@ -27,15 +27,15 @@ import javax.annotation.Nullable;
 
 public class BladeDance extends Ability {
 
-	private static final int DANCE_1_DAMAGE = 10;
-	private static final int DANCE_2_DAMAGE = 18;
+	private static final int DANCE_1_DAMAGE = 8;
+	private static final int DANCE_2_DAMAGE = 14;
 	private static final double SLOWNESS_AMPLIFIER = 0.4;
 	private static final double WEAKEN_AMP_1 = 0.5;
 	private static final double WEAKEN_AMP_2 = 0.7;
 	private static final int DURATION = 20 * 2;
 	private static final int DANCE_RADIUS = 4;
 	private static final float DANCE_KNOCKBACK_SPEED = 0.2f;
-	private static final int COOLDOWN = 16 * 20;
+	private static final int COOLDOWN = 18 * 20;
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 
 	private final double mWeakenAmp;
@@ -44,8 +44,8 @@ public class BladeDance extends Ability {
 		super(plugin, player, "Blade Dance");
 		mInfo.mScoreboardId = "BladeDance";
 		mInfo.mShorthandName = "BD";
-		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 10 melee damage to and afflicts 40% Slowness and 50% Weaken to all enemies in a 4 block radius for 2 seconds. Cooldown: 16s.");
-		mInfo.mDescriptions.add("The area attack now deals 18 damage and afflicts 70% Weaken.");
+		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 8 melee damage to and afflicts 40% Slowness and 50% Weaken to all enemies in a 4 block radius for 2 seconds. Cooldown: 18s.");
+		mInfo.mDescriptions.add("The area attack now deals 14 damage and afflicts 70% Weaken.");
 		mInfo.mLinkedSpell = ClassAbility.BLADE_DANCE;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
