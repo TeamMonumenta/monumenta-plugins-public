@@ -437,7 +437,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		defense.put(DefenseStat.MELEE, DamageUtils.getDamageMultiplier(armor, agility, melee * 2, false));
 		defense.put(DefenseStat.PROJECTILE, DamageUtils.getDamageMultiplier(armor, agility, projectile * 2, false));
 		defense.put(DefenseStat.MAGIC, DamageUtils.getDamageMultiplier(armor, agility, magic * 2, false));
-		defense.put(DefenseStat.BLAST, DamageUtils.getDamageMultiplier(armor, agility, blast * 2, true));
+		defense.put(DefenseStat.BLAST, DamageUtils.getDamageMultiplier(armor, agility, blast * 2, false));
 		defense.put(DefenseStat.FIRE, DamageUtils.getDamageMultiplier(armor, agility, fire * 2, true));
 		defense.put(DefenseStat.FALL, DamageUtils.getDamageMultiplier(armor, agility, feather * 3, true));
 

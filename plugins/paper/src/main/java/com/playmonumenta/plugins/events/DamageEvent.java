@@ -29,7 +29,7 @@ public class DamageEvent extends Event implements Cancellable {
 		PROJECTILE_SKILL(false, true),
 		MAGIC(false, true),
 		THORNS(false, true),
-		BLAST(true, true),
+		BLAST(false, true),
 		FIRE(true, true),
 		FALL(true, true),
 		AILMENT(false, false),
