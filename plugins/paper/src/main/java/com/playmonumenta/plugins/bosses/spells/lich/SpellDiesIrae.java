@@ -99,7 +99,10 @@ public class SpellDiesIrae extends Spell {
 		World world = mBoss.getWorld();
 		BossBar bar = Bukkit.getServer().createBossBar(null, BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
 		bar.setVisible(true);
-		Lich.spawnCrystal(mCrystalLoc, 4, mCrystalNBT);
+		//only spawn crystals if auto respawn didn't summon a wave 2 seconds before
+		if (!SpellCrystalRespawn.getmSpawned()) {
+			Lich.spawnCrystal(mCrystalLoc, 4, mCrystalNBT);
+		}
 
 		//tele lich to center + 10 blocks + invuln + no ai
 		mBoss.teleport(mCenter.clone().add(0, 10, 0));
@@ -186,7 +189,7 @@ public class SpellDiesIrae extends Spell {
 
 	private void attack() {
 		World world = mBoss.getWorld();
-		mCrystalDmg = Math.min(1.2, mCrystal.size() * 0.15);
+		mCrystalDmg = Math.min(1.2, mCrystal.size() * 0.2);
 		int debuffTicks = mCrystal.size() * 5 * 20;
 
 		mBreath3 = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), mCrystal.size() * 1000 + 7000, 42, 0, 42, 0.01);

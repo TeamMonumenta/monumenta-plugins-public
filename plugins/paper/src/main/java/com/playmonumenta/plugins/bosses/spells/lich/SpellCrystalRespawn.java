@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -25,6 +26,7 @@ public class SpellCrystalRespawn extends Spell {
 	private String mCrystalNBT;
 	private boolean mTrigger = false;
 	private List<Player> mPlayers = new ArrayList<Player>();
+	private static boolean mSpawned = false;
 
 	public SpellCrystalRespawn(Plugin plugin, Lich lich, Location loc, double range, List<Location> crystalLoc, String crystalnbt) {
 		mPlugin = plugin;
@@ -59,7 +61,16 @@ public class SpellCrystalRespawn extends Spell {
 			mT = mCooldown;
 			mInc = Math.min(5, mPlayers.size() / 5);
 			Lich.spawnCrystal(mLoc, mInc, mCrystalNBT);
+
+			mSpawned = true;
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				mSpawned = false;
+			}, 2 * 20);
 		}
+	}
+
+	public static boolean getmSpawned() {
+		return mSpawned;
 	}
 
 	@Override
