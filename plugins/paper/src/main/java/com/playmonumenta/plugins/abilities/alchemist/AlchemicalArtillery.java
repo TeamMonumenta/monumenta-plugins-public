@@ -10,6 +10,8 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -23,12 +25,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import javax.annotation.Nullable;
-
 
 
 public class AlchemicalArtillery extends Ability {
 	public static final String ARTILLERY_POTION_TAG = "ArtilleryPotion";
+	public static final String ACTIVE_TAG = "AlchArtActive";
 
 	private static final double BOW_DAMAGE_MULTIPLIER = 0.25;
 
@@ -45,7 +46,7 @@ public class AlchemicalArtillery extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.ALCHEMICAL_ARTILLERY;
 		mDisplayItem = new ItemStack(Material.CROSSBOW, 1);
 
-		mActive = false;
+		mActive = player != null && player.getScoreboardTags().contains(ACTIVE_TAG);
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 			mHasTaboo = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Taboo.class) != null;
@@ -94,8 +95,8 @@ public class AlchemicalArtillery extends Ability {
 		}
 
 		if (ItemUtils.isBowOrTrident(mPlayer.getInventory().getItemInMainHand())) {
-			mActive = !mActive;
-			String active = "";
+			mActive = ScoreboardUtils.toggleTag(mPlayer, ACTIVE_TAG);
+			String active;
 			if (mActive) {
 				active = "activated";
 				mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, 1, 1.25f);

@@ -296,8 +296,19 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			} else if (ItemUtils.isAlchemistItem(inventory.getItem(mSlot))) {
 				updateAlchemistItem(inventory.getItem(mSlot), mCharges);
 			} else {
-				// Cannot find alch bag
-				return false;
+				boolean found = false;
+				for (int i = 0; i < 9; i++) {
+					if (ItemUtils.isAlchemistItem(inventory.getItem(i))) {
+						mSlot = i;
+						updateAlchemistItem(inventory.getItem(i), mCharges);
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					// Cannot find alch bag
+					return false;
+				}
 			}
 
 
