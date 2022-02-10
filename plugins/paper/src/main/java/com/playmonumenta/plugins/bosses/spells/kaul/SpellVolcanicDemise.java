@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class SpellVolcanicDemise extends Spell {
 
-	private static final int DAMAGE = 36;
+	private static final int DAMAGE = 42;
 	private static final int METEOR_COUNT = 25;
 	private static final int METEOR_RATE = 10;
 

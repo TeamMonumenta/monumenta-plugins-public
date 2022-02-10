@@ -19,7 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SvalgotRisingBlackflame extends Spell {
-	private static final double DAMAGE = 32;
+	private static final double DAMAGE = 34;
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
@@ -64,7 +64,7 @@ public class SvalgotRisingBlackflame extends Spell {
 					world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 100, 3, 0.1, 3, 0.25);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25);
 					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
-						BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.FIRE, DAMAGE, 0.9, "Rising Blackflame", loc);
+						BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, DAMAGE, "Rising Blackflame", loc);
 						MovementUtils.knockAway(loc, player, 0.50f, 1f, false);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 					}

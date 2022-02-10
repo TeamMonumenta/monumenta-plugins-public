@@ -97,7 +97,7 @@ public class Infernal extends DelveModifier {
 		ABILITY_POOL_R2.add(flameTrailBoss);
 		flameTrailBoss = new ArrayList<>();
 		flameTrailBoss.add(FlameTrailBoss.identityTag);
-		flameTrailBoss.add(FlameTrailBoss.identityTag + "[damage=5]");
+		flameTrailBoss.add(FlameTrailBoss.identityTag + "[damage=9]");
 		ABILITY_POOL_R1.add(flameNovaBoss);
 
 		List<String> fireBombTossBoss = new ArrayList<>();
@@ -105,7 +105,7 @@ public class Infernal extends DelveModifier {
 		ABILITY_POOL_R2.add(fireBombTossBoss);
 		fireBombTossBoss = new ArrayList<>();
 		fireBombTossBoss.add(FireBombTossBoss.identityTag);
-		fireBombTossBoss.add(FireBombTossBoss.identityTag + "[damage=16]");
+		fireBombTossBoss.add(FireBombTossBoss.identityTag + "[damage=24]");
 		ABILITY_POOL_R1.add(flameNovaBoss);
 
 	}

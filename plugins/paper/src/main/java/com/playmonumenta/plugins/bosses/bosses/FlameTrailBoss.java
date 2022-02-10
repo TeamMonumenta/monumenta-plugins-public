@@ -26,7 +26,7 @@ public final class FlameTrailBoss extends BossAbilityGroup {
 		public int DELAY = 100;
 
 		@BossParam(help = "not written")
-		public int DAMAGE = 10;
+		public int DAMAGE = 15;
 
 		@BossParam(help = "not written")
 		public int TICK_RATE = 20;
@@ -73,7 +73,7 @@ public final class FlameTrailBoss extends BossAbilityGroup {
 					(World world, Player player, Location loc) -> {
 						world.playSound(loc, Sound.ENTITY_GENERIC_BURN, 0.5f, 1f);
 						player.setFireTicks(p.FIRE_DURATION);
-						DamageUtils.dualTypeDamage(boss, player, DamageType.MAGIC, DamageType.FIRE, p.DAMAGE, 0.5);
+						DamageUtils.damage(boss, player, DamageType.MAGIC, p.DAMAGE);
 					},
 					// Expire Action
 					(World world, Location loc) -> { })

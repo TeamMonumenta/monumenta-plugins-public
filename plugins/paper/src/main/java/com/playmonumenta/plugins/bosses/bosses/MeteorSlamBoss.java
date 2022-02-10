@@ -44,7 +44,7 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public double DAMAGE_RADIUS = 3;
 		@BossParam(help = "Damage dealt (blast)")
-		public double DAMAGE = 20;
+		public double DAMAGE = 30;
 		@BossParam(help = "Percent health damage dealt")
 		public double DAMAGE_PERCENT = 0;
 		@BossParam(help = "not written")

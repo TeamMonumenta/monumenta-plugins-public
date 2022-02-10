@@ -24,7 +24,7 @@ import java.util.List;
 public class GhalkorFlamingCharge extends SpellBaseCharge {
 
 	private static final int DAMAGE = 20;
-	private static final int GROUND_DAMAGE = 20;
+	private static final int GROUND_DAMAGE = 24;
 	private static final int FIRE_DURATION = 20 * 4;
 
 	private Ghalkor mBossClass;
@@ -91,7 +91,7 @@ public class GhalkorFlamingCharge extends SpellBaseCharge {
 								if (mHitbox.overlaps(player.getBoundingBox())) {
 									world.playSound(mParticleLoc, Sound.ENTITY_GENERIC_BURN, 0.5f, 1f);
 									player.setFireTicks(FIRE_DURATION);
-									DamageUtils.dualTypeDamage(boss, player, DamageType.MAGIC, DamageType.FIRE, GROUND_DAMAGE, 0.9, null, false, true, "Flaming Charge");
+									DamageUtils.damage(boss, player, DamageType.MAGIC, GROUND_DAMAGE, null, false, true, "Flaming Charge");
 								}
 							}
 

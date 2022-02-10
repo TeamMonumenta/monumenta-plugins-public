@@ -27,7 +27,7 @@ public class SpellKaulsFury extends Spell {
 	public static final int RADIUS = 3;
 	public static final double DAMAGE_RADIUS = 3.5;
 	public static final int HEIGHT = 8;
-	public static final double DAMAGE = 24;
+	public static final double DAMAGE = 28;
 
 	private LivingEntity mBoss;
 	private int mTicks;
@@ -123,7 +123,7 @@ public class SpellKaulsFury extends Spell {
 
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(mLocation, DAMAGE_RADIUS)) {
 							// No damager so that the mobs don't target the boss
-							DamageUtils.damage(null, mob, DamageType.BLAST, DAMAGE / 2, null, false, true, "Kaul's Fury");
+							DamageUtils.damage(null, mob, DamageType.BLAST, DAMAGE / 3, null, false, true, "Kaul's Fury");
 						}
 
 						world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);

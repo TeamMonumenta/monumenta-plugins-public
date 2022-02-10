@@ -1091,7 +1091,7 @@ public final class Lich extends BossAbilityGroup {
 								BoundingBox box = BoundingBox.of(pLoc, 0.3, 0.3, 0.3);
 								for (Player p : playersInRange(mBoss.getLocation(), detectionRange, true)) {
 									if (p.getBoundingBox().overlaps(box)) {
-										BossUtils.dualTypeBlockableDamage(mBoss, p, DamageType.MAGIC, DamageType.MELEE, 20, 0.75);
+										BossUtils.blockableDamage(mBoss, p, DamageType.MAGIC, 20);
 									}
 								}
 							}

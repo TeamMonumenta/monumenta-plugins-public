@@ -37,7 +37,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 	private static final double HITBOX_LENGTH = 2;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
 	private static final boolean LINGERS = true;
-	private static final int DAMAGE = 35;
+	private static final int DAMAGE = 42;
 
 	private Plugin mPlugin;
 	private Svalgot mBossClass;
@@ -132,7 +132,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 		world.spawnParticle(Particle.REDSTONE, loc, 40, 0.5, 0.5, 0.5, new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f));
 
 		for (Player p : PlayerUtils.playersInRange(loc, 6, true)) {
-			BossUtils.dualTypeBlockableDamage(mBoss, p, DamageType.MAGIC, DamageType.FIRE, DAMAGE, 0.6, "Orb of Bones", null);
+			BossUtils.blockableDamage(mBoss, p, DamageType.MAGIC, DAMAGE, "Orb of Bones", null);
 			p.setFireTicks(4 * 20);
 		}
 	}

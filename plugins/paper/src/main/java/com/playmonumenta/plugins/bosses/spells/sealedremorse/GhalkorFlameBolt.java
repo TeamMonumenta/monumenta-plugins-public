@@ -41,7 +41,7 @@ public class GhalkorFlameBolt extends Spell {
 	private static final double HITBOX_LENGTH = 0.5;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
 	private static final boolean LINGERS = true;
-	private static final int DAMAGE = 24;
+	private static final int DAMAGE = 26;
 
 	public GhalkorFlameBolt(LivingEntity boss, Plugin plugin, Ghalkor bossClass) {
 		mBoss = boss;
@@ -74,7 +74,7 @@ public class GhalkorFlameBolt extends Spell {
 					loc.getWorld().playSound(loc, Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 1, 2);
 					loc.getWorld().spawnParticle(Particle.FLAME, loc, 20, 0.5, 0.5, 0.5, 0.5);
 					if (player != null) {
-						BossUtils.dualTypeBlockableDamage(boss, player, DamageType.MAGIC, DamageType.FIRE, DAMAGE, 0.9, "Flame Bolt", boss.getLocation());
+						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Flame Bolt", boss.getLocation());
 						player.setFireTicks(4 * 20);
 					}
 				});

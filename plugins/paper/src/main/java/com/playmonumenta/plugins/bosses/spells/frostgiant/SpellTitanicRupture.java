@@ -158,7 +158,7 @@ public class SpellTitanicRupture extends Spell {
 					BoundingBox box = BoundingBox.of(loc, 4, 20, 4);
 					for (Player player : players) {
 						if (box.overlaps(player.getBoundingBox())) {
-							DamageUtils.damage(mBoss, player, DamageType.BLAST, 40, null, false, true, "Titanic Rupture");
+							DamageUtils.damage(mBoss, player, DamageType.BLAST, 60, null, false, true, "Titanic Rupture");
 						}
 					}
 					Location particleLoc = loc.clone();

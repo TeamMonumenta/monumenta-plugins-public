@@ -31,7 +31,7 @@ public class FlameLaserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flamelaser";
 
 	public static class Parameters extends BossParameters {
-		public int DAMAGE = 19;
+		public int DAMAGE = 20;
 		public int DELAY = 100;
 		public int DETECTION = 30;
 		public int COOLDOWN = 8 * 20;
@@ -69,7 +69,7 @@ public class FlameLaserBoss extends BossAbilityGroup {
 						loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
 						loc.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 300, 0.8, 0.8, 0.8, 0);
 						if (!blocked) {
-							BossUtils.dualTypeBlockableDamage(boss, target, DamageType.MAGIC, DamageType.FIRE, p.DAMAGE, 0.9);
+							BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE);
 							// Shields don't stop fire!
 							target.setFireTicks(p.FIRE_DURATION);
 						}

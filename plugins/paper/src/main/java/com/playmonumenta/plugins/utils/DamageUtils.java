@@ -141,7 +141,8 @@ public class DamageUtils {
 			}
 		}
 	}
-
+	/*
+	TODO - fix dualTypeDamage not working
 	public static void dualTypeDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type1, DamageType type2, double amount, double percentType1) {
 		dualTypeDamage(damager, damagee, type1, type2, amount, percentType1, null, false, true, null);
 	}
@@ -151,5 +152,5 @@ public class DamageUtils {
 		damage(damager, damagee, type1, amount * percentType1, ability, bypassIFrames, causeKnockback, bossCause);
 		damagee.setNoDamageTicks(originalIFrames);
 		damage(damager, damagee, type2, amount * (1 - percentType1), ability, bypassIFrames, causeKnockback, bossCause);
-	}
+	}*/
 }

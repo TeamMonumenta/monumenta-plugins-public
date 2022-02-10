@@ -74,7 +74,7 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 					}
 					if (!blocked) {
 						//TODO no official name for this ability yet so there's no death message
-						BossUtils.dualTypeBlockableDamage(boss, player, DamageType.BLAST, DamageType.MAGIC, 30, 0.5);
+						BossUtils.blockableDamage(boss, player, DamageType.BLAST, 37);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
 					} else {

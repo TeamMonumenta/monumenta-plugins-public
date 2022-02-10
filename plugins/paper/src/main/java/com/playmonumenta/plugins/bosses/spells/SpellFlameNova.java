@@ -34,7 +34,7 @@ public class SpellFlameNova extends SpellBaseAoE {
 			},
 			(Location loc) -> {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
-					BossUtils.dualTypeBlockableDamage(launcher, player, DamageType.MAGIC, DamageType.FIRE, damage, 0.9);
+					BossUtils.blockableDamage(launcher, player, DamageType.MAGIC, damage);
 					player.setFireTicks(fireTicks);
 				}
 			}

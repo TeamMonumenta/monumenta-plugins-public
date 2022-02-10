@@ -41,7 +41,7 @@ Negative Jump Boost, weakness 10, maybe putting bows on cooldown, you get the
 idea) for 2 seconds.
  */
 public class Shatter extends Spell {
-	private static final double DAMAGE = 20;
+	private static final double DAMAGE = 25;
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
@@ -187,7 +187,7 @@ public class Shatter extends Spell {
 						List<Player> hitPlayers = new ArrayList<>();
 						for (BoundingBox box : boxes) {
 							if (player.getBoundingBox().overlaps(box) && !hitPlayers.contains(player)) {
-								DamageUtils.dualTypeDamage(mBoss, player, DamageType.BLAST, DamageType.MELEE, DAMAGE, 0.5, null, true, true, "Shatter");
+								DamageUtils.damage(mBoss, player, DamageType.BLAST, DAMAGE, null, true, true, "Shatter");
 								MovementUtils.knockAway(loc, player, mKnockback, 0.5f, false);
 								AbilityUtils.silencePlayer(player, 20 * 5);
 								hitPlayers.add(player);

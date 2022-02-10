@@ -28,7 +28,7 @@ public class SpellForsakenLeap extends SpellBaseSlam {
 	public static final int RUN_DISTANCE = 0;
 	public static final double VELOCITY_MULTIPLIER = 0.5;
 	public static final double DAMAGE_RADIUS = 3;
-	public static final double DAMAGE = 17;
+	public static final double DAMAGE = 25;
 	public static final int JUMP_HEIGHT = 1;
 
 	public Plugin mPlugin;

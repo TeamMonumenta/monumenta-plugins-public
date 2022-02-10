@@ -59,7 +59,7 @@ public class ForcefulGrip extends SpellBaseSeekingProjectile {
 						world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
 						world.spawnParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {
-							BossUtils.dualTypeBlockableDamage(boss, player, DamageType.MAGIC, DamageType.PROJECTILE, DAMAGE, 0.5, "Forceful Grip", boss.getLocation());
+							BossUtils.blockableDamage(boss, player, DamageType.PROJECTILE, DAMAGE, "Forceful Grip", boss.getLocation());
 							MovementUtils.pullTowards(boss, player, 1);
 						}
 					});

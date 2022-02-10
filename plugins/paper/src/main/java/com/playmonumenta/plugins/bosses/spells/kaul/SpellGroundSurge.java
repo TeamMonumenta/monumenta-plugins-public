@@ -200,7 +200,7 @@ public class SpellGroundSurge extends Spell {
 															&& !surgePlayer.getUniqueId().equals(player.getUniqueId())
 															&& !mHit.contains(surgePlayer.getUniqueId())) {
 														mHit.add(surgePlayer.getUniqueId());
-														BossUtils.blockableDamage(mBoss, surgePlayer, DamageType.BLAST, 30, "Ground Surge", mBoss.getLocation());
+														BossUtils.blockableDamage(mBoss, surgePlayer, DamageType.BLAST, 40, "Ground Surge", mBoss.getLocation());
 														surgePlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
 														MovementUtils.knockAway(loc, player, 0.3f, 1f);
 														world.spawnParticle(Particle.SMOKE_LARGE, innerBoxLoc, 10, 0, 0, 0, 0.2);

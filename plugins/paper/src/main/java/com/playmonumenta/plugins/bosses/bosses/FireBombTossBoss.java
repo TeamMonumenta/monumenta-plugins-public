@@ -27,7 +27,7 @@ public class FireBombTossBoss extends BossAbilityGroup {
 		public int LOBS = 1;
 
 		@BossParam(help = "not written")
-		public int DAMAGE = 32;
+		public int DAMAGE = 48;
 
 		@BossParam(help = "not written")
 		public int DELAY = 100;
@@ -67,7 +67,7 @@ public class FireBombTossBoss extends BossAbilityGroup {
 						for (Player player : PlayerUtils.playersInRange(loc, p.RADIUS, true)) {
 							if (player.hasLineOfSight(tnt)) {
 								double multiplier = (p.RADIUS - player.getLocation().distance(loc)) / p.RADIUS;
-								BossUtils.dualTypeBlockableDamage(boss, player, DamageType.BLAST, DamageType.FIRE, p.DAMAGE * multiplier, 0.9);
+								BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE * multiplier);
 								player.setFireTicks((int)(p.FIRE_DURATION * multiplier));
 							}
 						}

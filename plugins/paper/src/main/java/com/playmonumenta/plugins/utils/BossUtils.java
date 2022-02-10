@@ -75,6 +75,8 @@ public class BossUtils {
 		}
 	}
 
+	/*
+	TODO - fix dualTypeDamage not working
 	public static void dualTypeBlockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type1, DamageType type2, double damage, double percentType1) {
 		Location location = null;
 		if (damager != null) {
@@ -102,7 +104,7 @@ public class BossUtils {
 		} else {
 			DamageUtils.dualTypeDamage(damager, damagee, type1, type2, damage, percentType1, null, bypassIFrames, causeKnockback, cause);
 		}
-	}
+	}*/
 
 	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, null);

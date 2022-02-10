@@ -84,7 +84,7 @@ public class WeakHookBoss extends BossAbilityGroup {
 						world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
 						world.spawnParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {
-							BossUtils.dualTypeBlockableDamage(boss, player, DamageType.MAGIC, DamageType.PROJECTILE, DAMAGE, 0.5);
+							BossUtils.blockableDamage(boss, player, DamageType.PROJECTILE, DAMAGE);
 							MovementUtils.pullTowardsByUnit(boss, player, p.MULTIPLIER);
 						}
 					}

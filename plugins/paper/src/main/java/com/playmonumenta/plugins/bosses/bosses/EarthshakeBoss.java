@@ -24,7 +24,7 @@ public class EarthshakeBoss extends BossAbilityGroup {
 		public int DELAY = 100;
 
 		@BossParam(help = "not written")
-		public int DAMAGE = 28;
+		public int DAMAGE = 40;
 
 		@BossParam(help = "not written")
 		public int COOLDOWN = 160;

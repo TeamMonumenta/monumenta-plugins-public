@@ -40,7 +40,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 	private static final double HITBOX_LENGTH = 2;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
 	private static final boolean LINGERS = true;
-	private static final double DAMAGE = 40;
+	private static final double DAMAGE = 48;
 
 	private boolean mOnCooldown = false;
 
@@ -75,7 +75,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 					world.spawnParticle(Particle.SMOKE_LARGE, loc, 40, 1, 1, 1, 0.5);
 
 					for (Player p : PlayerUtils.playersInRange(loc, 5, true)) {
-						DamageUtils.dualTypeDamage(boss, p, DamageType.MAGIC, DamageType.FIRE, DAMAGE, 0.6, null, false, true, "Blackflame Orb");
+						DamageUtils.damage(boss, p, DamageType.MAGIC, DAMAGE, null, false, true, "Blackflame Orb");
 						p.setFireTicks(4 * 20);
 					}
 				});

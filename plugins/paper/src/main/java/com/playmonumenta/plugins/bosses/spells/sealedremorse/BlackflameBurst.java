@@ -43,7 +43,7 @@ public class BlackflameBurst extends Spell {
 	private static final double HITBOX_LENGTH = 0.5;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
 	private static final boolean LINGERS = true;
-	private static final int DAMAGE = 24;
+	private static final int DAMAGE = 26;
 
 	public BlackflameBurst(LivingEntity boss, Plugin plugin, BeastOfTheBlackFlame bossClass) {
 		mBoss = boss;
@@ -76,7 +76,7 @@ public class BlackflameBurst extends Spell {
 					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 1, 0);
 					loc.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 20, 0.5, 0.5, 0.5, 0.5);
 					if (player != null) {
-						BossUtils.dualTypeBlockableDamage(boss, player, DamageType.MAGIC, DamageType.FIRE, DAMAGE, 0.9, "Blackflame Burst", mBoss.getLocation());
+						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Blackflame Burst", mBoss.getLocation());
 						player.setFireTicks(4 * 20);
 					}
 				});

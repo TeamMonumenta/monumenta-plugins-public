@@ -84,7 +84,7 @@ public class HookBoss extends BossAbilityGroup {
 						world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
 						world.spawnParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25);
 						if (target != null) {
-							BossUtils.dualTypeBlockableDamage(boss, target, DamageType.PROJECTILE, DamageType.MAGIC, p.DAMAGE, 0.5);
+							BossUtils.blockableDamage(boss, target, DamageType.PROJECTILE, p.DAMAGE);
 							MovementUtils.pullTowards(boss, target, 1);
 						}
 					}
