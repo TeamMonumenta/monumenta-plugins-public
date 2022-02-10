@@ -418,12 +418,10 @@ public class ItemUtils {
 			case PATRON:
 			case RARE:
 			case ARTIFACT:
-			case OBFUSCATED:
 			case EPIC:
 			case UNIQUE:
 			case EVENT:
 			case SHULKER_BOX:
-			case CURRENCY:
 				return ItemDeathResult.SHATTER;
 			case KEYTIER:
 				return ItemDeathResult.SAFE;
