@@ -162,7 +162,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack tealItem = new ItemStack(Material.CYAN_CONCRETE_POWDER);
 		ItemMeta tealMeta = tealItem.getItemMeta();
 		tealMeta.displayName(Component.text("Epoch", TextColor.fromCSSHexString("#47B6B5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(tealMeta, "Class abilities cooldowns are reduced by 1.25% per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(tealMeta, "Class abilities cooldowns are reduced by 1% per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		tealItem.setItemMeta(tealMeta);
 		mDelvePannelList.add(tealItem);
 
@@ -347,7 +347,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.CYAN_CONCRETE_POWDER, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Epoch level " + (i + 1), TextColor.fromCSSHexString("#47B6B5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Class abilities cooldowns are reduced by " + 1.25 * (i + 1) + "%.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Class abilities cooldowns are reduced by " + (i + 1) + "%.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			tealItems.add(pannel);
 		}
