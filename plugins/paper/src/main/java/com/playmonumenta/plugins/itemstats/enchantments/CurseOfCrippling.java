@@ -5,14 +5,14 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import javax.annotation.Nullable;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nullable;
 
 public class CurseOfCrippling implements Enchantment {
 	private static final int DURATION = 3 * 20;
@@ -20,7 +20,7 @@ public class CurseOfCrippling implements Enchantment {
 	private static final String PERCENT_SPEED_EFFECT_NAME = "CripplingPercentSpeedEffect";
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Curse of Crippling";
 	}
 
@@ -32,7 +32,7 @@ public class CurseOfCrippling implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (source == null) {
+		if (source == null || event.getType() != DamageEvent.DamageType.MELEE) {
 			return;
 		}
 		plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, PERCENT_SPEED, PERCENT_SPEED_EFFECT_NAME));
