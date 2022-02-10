@@ -67,7 +67,7 @@ public class Quake implements Enchantment {
 			*Need to cast it because the methods only take integers
 			*/
 			for (LivingEntity mob : mobs) {
-				DamageUtils.damage(player, mob, DamageType.OTHER, e.getDamage() * DAMAGE_MODIFIER_PER_LEVEL * level);
+				DamageUtils.damage(player, mob, DamageType.OTHER, e.getDamage() * DAMAGE_MODIFIER_PER_LEVEL * level, null, false, true);
 				if (fire > 0) {
 					EntityUtils.applyFire(plugin, 80 * fire, mob, player);
 				}
