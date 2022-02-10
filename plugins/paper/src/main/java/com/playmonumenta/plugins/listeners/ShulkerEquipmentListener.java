@@ -194,11 +194,12 @@ public class ShulkerEquipmentListener implements Listener {
 	}
 
 	private void swapItem(Inventory from, Inventory to, int fromSlot, int toSlot) {
-		ItemStack tmp = from.getItem(fromSlot);
-		from.setItem(fromSlot, to.getItem(toSlot));
-		ItemStatUtils.generateItemStats(tmp);
-		ItemStatUtils.generateItemStats(to.getItem(toSlot));
-		to.setItem(toSlot, tmp);
+		ItemStack fromItem = from.getItem(fromSlot);
+		ItemStack toItem = to.getItem(toSlot);
+		ItemStatUtils.generateItemStats(fromItem);
+		ItemStatUtils.generateItemStats(toItem);
+		from.setItem(fromSlot, toItem);
+		to.setItem(toSlot, fromItem);
 	}
 
 	//Set cooldown after swapping in RADIUS 24 blocks of boss
