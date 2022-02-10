@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -23,6 +22,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
+
 
 public class Taboo extends Ability {
 	private static final int CHARGE_TIME_REDUCTION = 10;
@@ -30,7 +31,7 @@ public class Taboo extends Ability {
 	private static final double PERCENT_KNOCKBACK_RESIST = 5;
 	private static final String KNOCKBACK_RESIST_EFFECT_NAME = "TabooKnockbackResistanceEffect";
 	private static final double MAGIC_DAMAGE_INCREASE_1 = 0.15;
-	private static final double MAGIC_DAMAGE_INCREASE_2 = 0.15;
+	private static final double MAGIC_DAMAGE_INCREASE_2 = 0.25;
 	private static final double PERCENT_HEALTH_HEALING = 0.2;
 	private static final int COOLDOWN = 5 * 20;
 
