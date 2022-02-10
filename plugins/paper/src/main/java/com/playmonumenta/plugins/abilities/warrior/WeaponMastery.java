@@ -5,15 +5,16 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 
-public class WeaponryMastery extends Ability {
+
+public class WeaponMastery extends Ability {
 
 	private static final double AXE_1_DAMAGE_FLAT = 2;
 	private static final double AXE_2_DAMAGE_FLAT = 4;
@@ -28,7 +29,7 @@ public class WeaponryMastery extends Ability {
 	private final double mDamageBonusAxe;
 	private final double mDamageBonusSword;
 
-	public WeaponryMastery(Plugin plugin, @Nullable Player player) {
+	public WeaponMastery(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Weapon Mastery");
 		mInfo.mScoreboardId = "WeaponMastery";
 		mInfo.mShorthandName = "WM";
@@ -43,7 +44,7 @@ public class WeaponryMastery extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) {
+		if (event.getType() == DamageType.MELEE) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isAxe(mainHand)) {
 				event.setDamage((event.getDamage() + mDamageBonusAxeFlat) * (1 + mDamageBonusAxe));

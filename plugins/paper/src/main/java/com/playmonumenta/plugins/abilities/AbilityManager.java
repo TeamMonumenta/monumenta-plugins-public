@@ -129,7 +129,7 @@ import com.playmonumenta.plugins.abilities.warrior.Riposte;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WarriorPassive;
-import com.playmonumenta.plugins.abilities.warrior.WeaponryMastery;
+import com.playmonumenta.plugins.abilities.warrior.WeaponMastery;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
 import com.playmonumenta.plugins.abilities.warrior.berserker.RecklessSwing;
@@ -274,7 +274,7 @@ public class AbilityManager {
 			new ShieldBash(mPlugin, null),
 			new Toughness(mPlugin, null),
 			new WarriorPassive(mPlugin, null),
-			new WeaponryMastery(mPlugin, null),
+			new WeaponMastery(mPlugin, null),
 			new BruteForce(mPlugin, null),
 
 			//********** CLERIC **********//

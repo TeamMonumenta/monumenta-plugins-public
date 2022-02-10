@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.abilities.warrior.Frenzy;
 import com.playmonumenta.plugins.abilities.warrior.Riposte;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
-import com.playmonumenta.plugins.abilities.warrior.WeaponryMastery;
+import com.playmonumenta.plugins.abilities.warrior.WeaponMastery;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
 import com.playmonumenta.plugins.abilities.warrior.berserker.RecklessSwing;
@@ -34,7 +34,7 @@ public class Warrior extends PlayerClass {
 		mAbilities.add(new Riposte(plugin, player));
 		mAbilities.add(new ShieldBash(plugin, player));
 		mAbilities.add(new Toughness(plugin, player));
-		mAbilities.add(new WeaponryMastery(plugin, player));
+		mAbilities.add(new WeaponMastery(plugin, player));
 		mClass = 2;
 		mClassName = "Warrior";
 		mClassColor = NamedTextColor.RED;
