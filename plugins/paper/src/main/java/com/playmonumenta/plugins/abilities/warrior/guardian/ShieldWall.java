@@ -121,7 +121,7 @@ public class ShieldWall extends Ability {
 									mMobsAlreadyHit.add(le);
 									Vector v = le.getVelocity();
 
-									DamageUtils.damage(le, mPlayer, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), SHIELD_WALL_DAMAGE, false, true, null);
+									DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), SHIELD_WALL_DAMAGE, false, true, null);
 
 									//Bosses should not be affected by slowness or knockback.
 									if (knockback && !e.getScoreboardTags().contains("Boss")) {

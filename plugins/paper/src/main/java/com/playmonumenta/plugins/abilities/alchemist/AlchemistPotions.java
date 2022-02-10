@@ -260,7 +260,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				damage += potion.getMetadata(AlchemicalArtillery.ARTILLERY_POTION_TAG).get(0).asDouble();
 			}
 
-			DamageUtils.damage(mob, mPlayer, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, false, true, null);
+			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, false, true, null);
 
 			// Intentionally apply effects after damage
 			applyEffects(mob, isGruesome);

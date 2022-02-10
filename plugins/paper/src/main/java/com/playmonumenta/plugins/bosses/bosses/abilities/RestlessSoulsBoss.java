@@ -91,7 +91,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 			// tag mob to prevent it from spawning more stuff
 			damagee.addScoreboardTag("TeneGhost");
 
-			DamageUtils.damage(damagee, p, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.RESTLESS_SOULS, playerItemStats), damage, true, true, null);
+			DamageUtils.damage(p, damagee, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.RESTLESS_SOULS, playerItemStats), damage, true, true, null);
 
 			// remove tag if mob is not dead
 			if (!damagee.isDead()) {

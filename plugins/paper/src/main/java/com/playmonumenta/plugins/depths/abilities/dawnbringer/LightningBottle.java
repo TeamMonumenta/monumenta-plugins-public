@@ -73,7 +73,7 @@ public class LightningBottle extends DepthsAbility {
 		if (mPlayer != null && playerItemStats != null) {
 			for (LivingEntity entity : affectedEntities) {
 				if (EntityUtils.isHostileMob(entity)) {
-					DamageUtils.damage(entity, mPlayer, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, null);
+					DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, null);
 
 					EntityUtils.applyVulnerability(mPlugin, DURATION, VULNERABILITY[mRarity - 1], entity);
 					EntityUtils.applySlow(mPlugin, DURATION, SLOWNESS, entity);

@@ -51,7 +51,7 @@ public class MetalmancyBoss extends BossAbilityGroup {
 		if (mPlayer != null && mPlayerItemStats != null) {
 			event.setCancelled(true);
 
-			DamageUtils.damage(damagee, mPlayer, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, ClassAbility.METALMANCY, mPlayerItemStats), mDamage, true, true, null);
+			DamageUtils.damage(mPlayer, damagee, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, ClassAbility.METALMANCY, mPlayerItemStats), mDamage, true, true, null);
 
 			if (damagee instanceof Mob mob) {
 				mob.setTarget(mBoss);

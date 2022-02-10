@@ -105,7 +105,7 @@ public class VolcanicMeteor extends DepthsAbility {
 								double mult = Math.min(Math.max(0, (6 - distance) / 4), 1);
 
 								EntityUtils.applyFire(mPlugin, FIRE_TICKS, e, mPlayer);
-								DamageUtils.damage(e, mPlayer, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage * mult, false, true, null);
+								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage * mult, false, true, null);
 							}
 							break;
 						}

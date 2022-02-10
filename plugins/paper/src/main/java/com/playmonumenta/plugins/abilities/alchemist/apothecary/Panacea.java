@@ -115,7 +115,7 @@ public class Panacea extends Ability {
 					while (mobIter.hasNext()) {
 						LivingEntity mob = mobIter.next();
 						if (mBox.overlaps(mob.getBoundingBox())) {
-							DamageUtils.damage(mob, mPlayer, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, null);
+							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, null);
 
 							EntityUtils.applySlow(mPlugin, mSlowTicks, 1, mob);
 							mobIter.remove();
