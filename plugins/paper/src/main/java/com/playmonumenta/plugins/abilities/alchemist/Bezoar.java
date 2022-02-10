@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -135,16 +136,16 @@ public class Bezoar extends Ability {
 		}
 	}
 
-	public void incrementKills() {
-		mKills++;
-	}
-
 	public boolean shouldDrop() {
 		return mKills >= FREQUENCY;
 	}
 
 	@Override
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		if (event.getEntity().getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+			return;
+		}
+
 		mKills++;
 		if (shouldDrop()) {
 			dropBezoar(event, shouldGenDrops);
