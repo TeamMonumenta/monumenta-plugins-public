@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -16,6 +15,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nullable;
 
 public class Skirmisher extends Ability {
 
@@ -33,7 +34,7 @@ public class Skirmisher extends Ability {
 		super(plugin, player, "Skirmisher");
 		mInfo.mScoreboardId = "Skirmisher";
 		mInfo.mShorthandName = "Sk";
-		mInfo.mDescriptions.add("When dealing melee damage to a mob that has at least one other mob within 2.5 blocks and is not targeting you, deal + 1 + 10% final damage.");
+		mInfo.mDescriptions.add("When dealing melee damage to a mob that has at least one other mob within 2.5 blocks, deal + 1 + 10% final damage.");
 		mInfo.mDescriptions.add("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased to 2 + 15% final damage done.");
 		mDisplayItem = new ItemStack(Material.BONE, 1);
 		mIsolatedPercentDamage = getAbilityScore() == 1 ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2;
