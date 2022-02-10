@@ -20,6 +20,6 @@ public class Aptitude implements Enchantment {
 	}
 
 	public static double getCooldownPercentage(Plugin plugin, Player player) {
-		return - COOLDOWN_REDUCTION_PER_LEVEL * plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.APTITUDE);
+		return Math.pow(1 - COOLDOWN_REDUCTION_PER_LEVEL, plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.APTITUDE)) - 1;
 	}
 }

@@ -20,6 +20,6 @@ public class Ineptitude implements Enchantment {
 	}
 
 	public static double getCooldownPercentage(Plugin plugin, Player player) {
-		return COOLDOWN_REDUCTION_PER_LEVEL * plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.INEPTITUDE);
+		return Math.pow(1 + COOLDOWN_REDUCTION_PER_LEVEL, plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.INEPTITUDE)) - 1;
 	}
 }
