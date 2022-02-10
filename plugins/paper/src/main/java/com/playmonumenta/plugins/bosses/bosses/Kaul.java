@@ -1037,10 +1037,11 @@ public class Kaul extends BossAbilityGroup {
 			hpDelta = hpDelta / 2 + 25;
 			playerCount--;
 		}
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		double finalHp = bossTargetHp * 1.1;
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, finalHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(bossTargetHp);
+		mBoss.setHealth(finalHp);
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			if (player.hasPotionEffect(PotionEffectType.GLOWING)) {
