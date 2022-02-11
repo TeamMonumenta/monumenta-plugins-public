@@ -62,7 +62,7 @@ public class ReworkRefundInfusions extends GenericCommand {
 		ItemStatUtils.generateItemStats(player.getInventory().getItemInMainHand());
 		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 		if (playerItemStats != null) {
-			playerItemStats.updateStats(true);
+			playerItemStats.updateStats(player, true);
 		}
 	}
 

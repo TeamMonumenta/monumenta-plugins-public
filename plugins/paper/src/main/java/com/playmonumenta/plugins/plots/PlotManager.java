@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.plots;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -14,6 +15,7 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -25,7 +27,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import javax.annotation.Nullable;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -70,8 +71,8 @@ public class PlotManager {
 					.withPermission(CommandPermission.fromString("monumenta.plot.info"))
 					.withArguments(new StringArgument("name"))
 					.executes((sender, args) -> {
-						String name = (String)args[0];
-						UUID uuid = MonumentaRedisSyncAPI.cachedNameToUuid(name);
+						String name = (String) args[0];
+						UUID uuid = MonumentaRedisSyncIntegration.cachedNameToUuid(name);
 						if (uuid == null) {
 							CommandAPI.fail("Can't find player '" + name + "' - perhaps incorrect capitalization or spelled wrong?");
 						}
@@ -274,9 +275,9 @@ public class PlotManager {
 
 			info.mOtherAccessToOwnerPlot.forEach((key, expiration) -> {
 				if (expiration <= 0) {
-					sender.sendMessage("  " + ChatColor.AQUA + MonumentaRedisSyncAPI.cachedUuidToName(key));
+					sender.sendMessage("  " + ChatColor.AQUA + MonumentaRedisSyncIntegration.cachedUuidToName(key));
 				} else {
-					sender.sendMessage("  " + ChatColor.AQUA + MonumentaRedisSyncAPI.cachedUuidToName(key) + ChatColor.GREEN + " Expires: " + ChatColor.AQUA + MessagingUtils.getTimeDifferencePretty(expiration));
+					sender.sendMessage("  " + ChatColor.AQUA + MonumentaRedisSyncIntegration.cachedUuidToName(key) + ChatColor.GREEN + " Expires: " + ChatColor.AQUA + MessagingUtils.getTimeDifferencePretty(expiration));
 				}
 			});
 		}
@@ -288,16 +289,16 @@ public class PlotManager {
 
 			info.mOwnerAccessToOtherPlots.forEach((key, other) -> {
 				if (other.mExpiration <= 0) {
-					sender.sendMessage("  " + ChatColor.AQUA + MonumentaRedisSyncAPI.cachedUuidToName(key) + ChatColor.GOLD + " (#" + other.mPlotId + ")");
+					sender.sendMessage("  " + ChatColor.AQUA + MonumentaRedisSyncIntegration.cachedUuidToName(key) + ChatColor.GOLD + " (#" + other.mPlotId + ")");
 				} else {
-					sender.sendMessage("  " + ChatColor.AQUA + MonumentaRedisSyncAPI.cachedUuidToName(key) + ChatColor.GOLD + " (#" + other.mPlotId + ")" + ChatColor.GREEN + " Expires: " + ChatColor.AQUA + MessagingUtils.getTimeDifferencePretty(other.mExpiration));
+					sender.sendMessage("  " + ChatColor.AQUA + MonumentaRedisSyncIntegration.cachedUuidToName(key) + ChatColor.GOLD + " (#" + other.mPlotId + ")" + ChatColor.GREEN + " Expires: " + ChatColor.AQUA + MessagingUtils.getTimeDifferencePretty(other.mExpiration));
 				}
 			});
 		}
 	}
 
 	private static void plotAccessAdd(Player owner, String addedName, @Nullable String duration) throws WrapperCommandSyntaxException {
-		UUID addedUUID = MonumentaRedisSyncAPI.cachedNameToUuid(addedName);
+		UUID addedUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(addedName);
 		if (addedUUID == null) {
 			CommandAPI.fail("Can't find player '" + addedName + "' - perhaps incorrect capitalization or spelled wrong?");
 		}
@@ -355,7 +356,7 @@ public class PlotManager {
 	/* Maybe when player joins, fetch their access and see if it's currently expired? And boot them to their own plot if so?  */
 
 	private static void plotAccessRemove(Player owner, String removedName) throws WrapperCommandSyntaxException {
-		UUID removedUUID = MonumentaRedisSyncAPI.cachedNameToUuid(removedName);
+		UUID removedUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(removedName);
 		if (removedUUID == null) {
 			CommandAPI.fail("Can't find player '" + removedName + "' - perhaps incorrect capitalization or spelled wrong?");
 		}
@@ -431,7 +432,7 @@ public class PlotManager {
 			for (Map.Entry<UUID, OtherAccessRecord> entry : mOwnerAccessToOtherPlots.entrySet()) {
 				UUID uuid = entry.getKey();
 				OtherAccessRecord rec = entry.getValue();
-				rec.mName = MonumentaRedisSyncAPI.cachedUuidToName(uuid);
+				rec.mName = MonumentaRedisSyncIntegration.cachedUuidToName(uuid);
 				rec.mProfile = Bukkit.getServer().createProfile(uuid, rec.mName);
 			}
 

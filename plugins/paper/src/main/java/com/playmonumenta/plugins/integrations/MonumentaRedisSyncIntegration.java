@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -16,10 +17,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.UUID;
 import java.util.logging.Logger;
 
 public class MonumentaRedisSyncIntegration implements Listener {
 	private static final String IDENTIFIER = "Monumenta";
+
+	private static boolean mEnabled = false;
 
 	private final Plugin mPlugin;
 	private final Logger mLogger;
@@ -27,7 +31,9 @@ public class MonumentaRedisSyncIntegration implements Listener {
 	public MonumentaRedisSyncIntegration(Plugin plugin) {
 		mPlugin = plugin;
 		mLogger = plugin.getLogger();
+
 		mLogger.info("Enabling MonumentaRedisSync integration");
+		mEnabled = true;
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -83,4 +89,21 @@ public class MonumentaRedisSyncIntegration implements Listener {
 			}
 		}, 5);
 	}
+
+	public static String cachedUuidToName(UUID uuid) {
+		if (mEnabled) {
+			return MonumentaRedisSyncAPI.cachedUuidToName(uuid);
+		} else {
+			return Bukkit.getOfflinePlayer(uuid).getName();
+		}
+	}
+
+	public static @Nullable UUID cachedNameToUuid(String name) {
+		if (mEnabled) {
+			return MonumentaRedisSyncAPI.cachedNameToUuid(name);
+		} else {
+			return null;
+		}
+	}
+
 }

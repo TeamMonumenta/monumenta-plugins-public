@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -26,7 +27,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
-import javax.annotation.Nullable;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -454,7 +454,7 @@ public final class Grave {
 
 			Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = Plugin.getInstance().mItemStatManager.getPlayerItemStatsMappings();
 			if (itemStatsMap.containsKey(player.getUniqueId())) {
-				itemStatsMap.get(player.getUniqueId()).updateStats(true);
+				itemStatsMap.get(player.getUniqueId()).updateStats(player, true);
 			}
 
 			if (collected > 0) {

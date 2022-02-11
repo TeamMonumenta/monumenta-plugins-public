@@ -14,7 +14,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.List;
 import java.util.UUID;
 
 
@@ -162,18 +161,11 @@ public class StatTrackManager {
 	 * @return whether the player owns the item's tracking
 	 */
 	public static boolean isPlayersItem(ItemStack item, Player player) {
-		if (player == null || item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
+		if (player == null || item == null) {
 			return false;
 		}
-		List<String> lore = item.getLore();
-		if (lore != null) {
-			for (String line : lore) {
-				if (line.contains("Tracked by") && line.contains(player.getName())) {
-					return true;
-				}
-			}
-		}
-		return false;
+		UUID infuser = ItemStatUtils.getInfuser(item, InfusionType.STAT_TRACK);
+		return player.getUniqueId().equals(infuser);
 	}
 
 	/**

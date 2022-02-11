@@ -12,7 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class LifeDrain implements Enchantment {
-	private static final double LIFE_DRAIN_CRIT_HEAL = 1;
+	public static final double LIFE_DRAIN_CRIT_HEAL = 1;
 	private static final double LIFE_DRAIN_NONCRIT_HEAL_MULTIPLIER = 0.5;
 
 	@Override

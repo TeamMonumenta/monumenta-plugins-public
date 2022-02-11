@@ -107,32 +107,33 @@ public class ItemStatManager implements Listener {
 			}
 		}
 
-		private final Player mPlayer;
 		private ItemStatsMap mArmorAddStats = new ItemStatsMap();
 		private ItemStatsMap mArmorMultiplyStats = new ItemStatsMap();
 		private ItemStatsMap mStats = new ItemStatsMap();
 
+		public PlayerItemStats() {
+		}
+
 		public PlayerItemStats(Player player) {
-			mPlayer = player;
-			updateStats(true);
+			updateStats(player, true);
 		}
 
 		public PlayerItemStats(PlayerItemStats playerItemStats) {
-			mPlayer = playerItemStats.getPlayer();
 			mStats = playerItemStats.getItemStats();
-		}
-
-		public Player getPlayer() {
-			return mPlayer;
 		}
 
 		public ItemStatsMap getItemStats() {
 			return mStats;
 		}
 
-		public void updateStats(boolean updateAll) {
-			PlayerInventory inventory = mPlayer.getInventory();
+		public void updateStats(Player player, boolean updateAll) {
+			PlayerInventory inventory = player.getInventory();
 			updateStats(inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(), updateAll);
+			// Tell the ItemStats that there has been an update
+			Plugin plugin = Plugin.getInstance();
+			for (ItemStat stat : ITEM_STATS) {
+				stat.onEquipmentUpdate(plugin, player);
+			}
 		}
 
 		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet, boolean updateAll) {
@@ -234,17 +235,12 @@ public class ItemStatManager implements Listener {
 			mArmorMultiplyStats = newArmorMultiplyStats;
 			mStats = newStats;
 
-			//Tell the ItemStats that there has been an update\
-			Plugin plugin = Plugin.getInstance();
-			for (ItemStat stat : ITEM_STATS) {
-				stat.onEquipmentUpdate(plugin, mPlayer);
-			}
 		}
 
-		public void print() {
-			MessagingUtils.sendRawMessage(mPlayer, "");
+		public void print(Player player) {
+			MessagingUtils.sendRawMessage(player, "");
 			for (Entry<ItemStat, Double> entry : mStats) {
-				MessagingUtils.sendRawMessage(mPlayer, String.format("%s: %f", entry.getKey().getName(), entry.getValue()));
+				MessagingUtils.sendRawMessage(player, String.format("%s: %f", entry.getKey().getName(), entry.getValue()));
 			}
 		}
 	}
@@ -291,11 +287,17 @@ public class ItemStatManager implements Listener {
 
 				try {
 					try {
-						for (Entry<UUID, PlayerItemStats> entry : mPlayerItemStatsMappings.entrySet()) {
-							Player player = entry.getValue().getPlayer();
-							tick(mPlugin, player, twoHertz, oneHertz);
+						Iterator<Entry<UUID, PlayerItemStats>> iterator = mPlayerItemStatsMappings.entrySet().iterator();
+						while (iterator.hasNext()) {
+							Entry<UUID, PlayerItemStats> entry = iterator.next();
+							Player player = Bukkit.getPlayer(entry.getKey());
+							if (player == null) {
+								iterator.remove();
+								continue;
+							}
+							tick(mPlugin, player, entry.getValue(), twoHertz, oneHertz);
 						}
-				} catch (Exception ex) {
+					} catch (Exception ex) {
 						Plugin.getInstance().getLogger().severe("Error in item stat manager tick: " + ex.getMessage());
 						ex.printStackTrace();
 					}
@@ -318,7 +320,7 @@ public class ItemStatManager implements Listener {
 			@Override
 			public void run() {
 				if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-					mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(true);
+					mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(player, true);
 				}
 			}
 		}.runTaskLater(mPlugin, 0);
@@ -330,7 +332,7 @@ public class ItemStatManager implements Listener {
 		PlayerItemStats playerItemStats = new PlayerItemStats(player);
 		mPlayerItemStatsMappings.put(player.getUniqueId(), playerItemStats);
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			playerItemStats.updateStats(true);
+			playerItemStats.updateStats(player, true);
 		});
 	}
 
@@ -361,6 +363,9 @@ public class ItemStatManager implements Listener {
 		Player player = event.getPlayer();
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(player.getInventory().getItem(event.getNewSlot()), null, null, null, null, null, false);
+			for (ItemStat stat : ITEM_STATS) {
+				stat.onEquipmentUpdate(mPlugin, player);
+			}
 		}
 	}
 
@@ -431,11 +436,9 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void tick(Plugin plugin, Player player, boolean twoHz, boolean oneHz) {
-		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
-				entry.getKey().tick(plugin, player, entry.getValue(), twoHz, oneHz);
-			}
+	public void tick(Plugin plugin, Player player, PlayerItemStats stats, boolean twoHz, boolean oneHz) {
+		for (Entry<ItemStat, Double> entry : stats.getItemStats()) {
+			entry.getKey().tick(plugin, player, entry.getValue(), twoHz, oneHz);
 		}
 	}
 

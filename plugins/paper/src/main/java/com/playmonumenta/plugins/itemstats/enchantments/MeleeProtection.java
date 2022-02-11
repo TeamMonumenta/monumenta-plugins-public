@@ -16,12 +16,12 @@ public class MeleeProtection extends Protection {
 	}
 
 	@Override
-	protected DamageType getType() {
+	public DamageType getType() {
 		return DamageType.MELEE;
 	}
 
 	@Override
-	protected int getEPF() {
+	public int getEPF() {
 		return 2;
 	}
 

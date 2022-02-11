@@ -17,12 +17,12 @@ public class BlastProtection extends Protection {
 	}
 
 	@Override
-	protected DamageType getType() {
+	public DamageType getType() {
 		return DamageType.BLAST;
 	}
 
 	@Override
-	protected int getEPF() {
+	public int getEPF() {
 		return 2;
 	}
 

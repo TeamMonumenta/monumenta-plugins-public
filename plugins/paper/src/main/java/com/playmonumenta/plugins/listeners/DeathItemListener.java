@@ -139,7 +139,7 @@ public class DeathItemListener implements Listener {
 			InventoryUtils.scheduleDelayedEquipmentSlotCheck(mPlugin, player, slot);
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(true);
+				playerItemStats.updateStats(player, true);
 			}
 			simulatePickup(entity, player);
 

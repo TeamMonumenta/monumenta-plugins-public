@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import org.bukkit.entity.Player;
 
 public class Ineptitude implements Enchantment {
-	public static final double COOLDOWN_REDUCTION_PER_LEVEL = 0.05;
+	public static final double COOLDOWN_INCREASE_PER_LEVEL = 0.05;
 
 	@Override
 	public String getName() {
@@ -20,6 +19,10 @@ public class Ineptitude implements Enchantment {
 	}
 
 	public static double getCooldownPercentage(Plugin plugin, Player player) {
-		return Math.pow(1 + COOLDOWN_REDUCTION_PER_LEVEL, plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.INEPTITUDE)) - 1;
+		return getCooldownPercentage(plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.INEPTITUDE));
+	}
+
+	public static double getCooldownPercentage(double level) {
+		return Math.pow(1 + COOLDOWN_INCREASE_PER_LEVEL, level) - 1;
 	}
 }

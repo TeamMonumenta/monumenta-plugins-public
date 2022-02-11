@@ -17,12 +17,12 @@ public class FeatherFalling extends Protection {
 	}
 
 	@Override
-	protected DamageType getType() {
+	public DamageType getType() {
 		return DamageType.FALL;
 	}
 
 	@Override
-	protected int getEPF() {
+	public int getEPF() {
 		return 3;
 	}
 

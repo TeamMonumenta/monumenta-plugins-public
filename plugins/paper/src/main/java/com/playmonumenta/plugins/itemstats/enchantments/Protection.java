@@ -13,9 +13,9 @@ public abstract class Protection implements Enchantment {
 
 	private static final double REDUCTION_PER_EPF = 0.96;
 
-	protected abstract DamageType getType();
+	public abstract DamageType getType();
 
-	protected abstract int getEPF();
+	public abstract int getEPF();
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {

@@ -16,12 +16,12 @@ public class ProjectileProtection extends Protection {
 	}
 
 	@Override
-	protected DamageType getType() {
+	public DamageType getType() {
 		return DamageType.PROJECTILE;
 	}
 
 	@Override
-	protected int getEPF() {
+	public int getEPF() {
 		return 2;
 	}
 

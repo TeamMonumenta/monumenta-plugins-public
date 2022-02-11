@@ -17,12 +17,12 @@ public class MagicProtection extends Protection {
 	}
 
 	@Override
-	protected DamageType getType() {
+	public DamageType getType() {
 		return DamageType.MAGIC;
 	}
 
 	@Override
-	protected int getEPF() {
+	public int getEPF() {
 		return 2;
 	}
 

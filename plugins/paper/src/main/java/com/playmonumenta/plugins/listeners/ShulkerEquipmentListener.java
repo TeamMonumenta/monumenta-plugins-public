@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,7 +32,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -135,7 +135,7 @@ public class ShulkerEquipmentListener implements Listener {
 					event.setCancelled(true);
 					Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = mPlugin.mItemStatManager.getPlayerItemStatsMappings();
 					if (itemStatsMap.containsKey(player.getUniqueId())) {
-						itemStatsMap.get(player.getUniqueId()).updateStats(true);
+						itemStatsMap.get(player.getUniqueId()).updateStats(player, true);
 					}
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
 				}

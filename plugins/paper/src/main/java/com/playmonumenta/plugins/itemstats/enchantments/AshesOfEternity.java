@@ -56,7 +56,7 @@ public class AshesOfEternity implements Enchantment {
 			ItemStatUtils.generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = plugin.mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(true);
+				playerItemStats.updateStats(player, true);
 			}
 
 		}

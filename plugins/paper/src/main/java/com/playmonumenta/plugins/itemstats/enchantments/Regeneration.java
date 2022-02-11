@@ -31,6 +31,11 @@ public class Regeneration implements Enchantment {
 
 	@Override
 	public void tick(Plugin plugin, Player player, double level, boolean twoHertz, boolean oneHertz) {
-		PlayerUtils.healPlayer(plugin, player, TICK_HEALING_1 * Math.sqrt(level));
+		PlayerUtils.healPlayer(plugin, player, healPer5Ticks(level));
 	}
+
+	public static double healPer5Ticks(double level) {
+		return TICK_HEALING_1 * Math.sqrt(level);
+	}
+
 }
