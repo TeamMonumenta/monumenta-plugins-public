@@ -222,7 +222,7 @@ public class SpellSpinDown extends Spell {
 					if ((player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)
 					    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE || player.getLocation().getBlock().getType() == Material.FROSTED_ICE)) {
 						Vector vel = player.getVelocity();
-						DamageUtils.damage(mBoss, player, DamageType.AILMENT, 18);
+						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, "Frosted Ice");
 						player.setVelocity(vel);
 					}
 				}

@@ -301,7 +301,7 @@ public class SpellGreatswordSlam extends Spell {
 					    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE || player.getLocation().getBlock().getType() == Material.FROSTED_ICE)) {
 						Vector vel = player.getVelocity();
 						//TODO don't call this greatsword slam since it's just standing on ice damage
-						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, "Greatsword Slam");
+						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, "Frosted Ice");
 						player.setVelocity(vel);
 					}
 				}
