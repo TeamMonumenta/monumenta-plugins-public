@@ -47,7 +47,7 @@ public class Eruption implements Enchantment {
 	}
 
 	@Override
-	public void onBlockBreak(Plugin plugin, Player player, double value, BlockBreakEvent event) {
+	public void onBlockBreak(@NotNull Plugin plugin, @NotNull Player player, double value, @NotNull BlockBreakEvent event) {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER) {
 			double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ERUPTION);
