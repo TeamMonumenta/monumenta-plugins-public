@@ -1070,38 +1070,53 @@ public class PlayerListener implements Listener {
 				&& !ZoneUtils.isInPlot(player)
 		);
 
+		//NOTE Once we update Paper version more,
+		// replace the event's generic failure message via
+		// event.cancelMessage(),
+		// instead of doing player.sendMessage() separately
 		if (GameMode.SURVIVAL.equals(newGameMode) && shouldBeAdventure) {
-			event.cancelMessage(
-				Component
-					.text("Set own game mode to ", Colors.GREENISH_BLUE)
-					.append(
-						Component.text("Adventure Mode ", Colors.GREENISH_BLUE_DARK)
-					)
-					.append(
-						Component.text(
-							"instead of Survival due to zone.",
-							Colors.GREENISH_BLUE
-						)
-					)
-			);
 			event.setCancelled(true);
 			player.setGameMode(GameMode.ADVENTURE);
-		} else if (GameMode.ADVENTURE.equals(newGameMode) && !shouldBeAdventure) {
-			event.cancelMessage(
-				Component
-					.text("Set own game mode to ", Colors.GREENISH_BLUE)
-					.append(
-						Component.text("Survival Mode ", Colors.GREENISH_BLUE_DARK)
-					)
-					.append(
-						Component.text(
-							"instead of Adventure due to zone.",
-							Colors.GREENISH_BLUE
+			// Op check since listener also catches mechanisms putting players
+			// into the wrong game mode for their zone, such as Frost Giant,
+			// and in that case we don't want to notify normal players who
+			// didn't choose to enter that game mode
+			// /who won't see vanilla "Set own game mode" messages.
+			// This check also won't be needed in the future once we're just
+			// replacing event.cancelMessage().
+			if (player.isOp()) {
+				player.sendMessage(
+					Component
+						.text("Set own game mode to ", Colors.GREENISH_BLUE)
+						.append(
+							Component.text("Adventure Mode ", Colors.GREENISH_BLUE_DARK)
 						)
-					)
-			);
+						.append(
+							Component.text(
+								"instead of Survival due to zone.",
+								Colors.GREENISH_BLUE
+							)
+						)
+				);
+			}
+		} else if (GameMode.ADVENTURE.equals(newGameMode) && !shouldBeAdventure) {
 			event.setCancelled(true);
 			player.setGameMode(GameMode.SURVIVAL);
+			if (player.isOp()) {
+				player.sendMessage(
+					Component
+						.text("Set own game mode to ", Colors.GREENISH_BLUE)
+						.append(
+							Component.text("Survival Mode ", Colors.GREENISH_BLUE_DARK)
+						)
+						.append(
+							Component.text(
+								"instead of Adventure due to zone.",
+								Colors.GREENISH_BLUE
+							)
+						)
+				);
+			}
 		}
 	}
 
