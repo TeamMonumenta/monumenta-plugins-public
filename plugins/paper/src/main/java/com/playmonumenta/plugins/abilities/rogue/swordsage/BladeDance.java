@@ -96,7 +96,7 @@ public class BladeDance extends Ability {
 
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DANCE_RADIUS)) {
 						mob.setNoDamageTicks(0);
-						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.mLinkedSpell);
+						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.mLinkedSpell, true);
 						MovementUtils.knockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED, true);
 
 						EntityUtils.applySlow(mPlugin, DURATION, SLOWNESS_AMPLIFIER, mob);

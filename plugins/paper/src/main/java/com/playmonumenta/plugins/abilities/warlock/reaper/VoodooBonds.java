@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,6 +24,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import javax.annotation.Nullable;
 
 
 
@@ -113,7 +114,7 @@ public class VoodooBonds extends Ability {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), PASSIVE_RADIUS, mPlayer)) {
 				if (mob.getType().equals(type) && mob != enemy) {
 					Location mLoc = mob.getLocation();
-					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, event.getDamage() * mDamage, mInfo.mLinkedSpell);
+					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, event.getDamage() * mDamage, mInfo.mLinkedSpell, true);
 					world.spawnParticle(Particle.SPELL_WITCH, mLoc, 30, 0.5, 0.5, 0.5, 0.001);
 					world.spawnParticle(Particle.REDSTONE, mLoc, 30, 0.5, 0.5, 0.5, 0, COLOR);
 				}

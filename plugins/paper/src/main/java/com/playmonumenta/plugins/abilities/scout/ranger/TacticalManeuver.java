@@ -107,7 +107,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 					}
 					for (LivingEntity le : EntityUtils.getNearbyMobs(loc, 2, mPlayer)) {
 						if (!le.isDead()) {
-							DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, TACTICAL_DASH_DAMAGE, mInfo.mLinkedSpell);
+							DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, TACTICAL_DASH_DAMAGE, mInfo.mLinkedSpell, true);
 							for (LivingEntity e : EntityUtils.getNearbyMobs(le.getLocation(), TACTICAL_MANEUVER_RADIUS)) {
 								EntityUtils.applyStun(mPlugin, TACTICAL_DASH_STUN_DURATION, e);
 							}
@@ -125,7 +125,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			// Needs the 5 tick delay since being close to the ground will cancel the runnable
 		} else {
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), TACTICAL_MANEUVER_RADIUS, mPlayer)) {
-				DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, TACTICAL_LEAP_DAMAGE, mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, TACTICAL_LEAP_DAMAGE, mInfo.mLinkedSpell, true);
 				MovementUtils.knockAway(mPlayer, le, TACTICAL_LEAP_KNOCKBACK_SPEED);
 			}
 

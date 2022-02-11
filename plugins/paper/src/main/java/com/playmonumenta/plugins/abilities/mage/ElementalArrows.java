@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.AbstractArrow;
@@ -18,6 +17,8 @@ import org.bukkit.entity.Stray;
 import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+
+import javax.annotation.Nullable;
 
 
 public class ElementalArrows extends Ability {
@@ -59,7 +60,7 @@ public class ElementalArrows extends Ability {
 			if (elementalArrows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), ELEMENTAL_ARROWS_RADIUS, enemy)) {
 					EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, mob, mPlayer);
-					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, ABILITY_FIRE);
+					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, ABILITY_FIRE, true);
 				}
 			}
 			if (enemy instanceof Stray) {
@@ -73,7 +74,7 @@ public class ElementalArrows extends Ability {
 			if (elementalArrows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), ELEMENTAL_ARROWS_RADIUS, enemy)) {
 					EntityUtils.applySlow(mPlugin, ELEMENTAL_ARROWS_DURATION, SLOW_AMPLIFIER, mob);
-					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, ABILITY_ICE);
+					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, ABILITY_ICE, true);
 				}
 			}
 			if (enemy instanceof Blaze) {

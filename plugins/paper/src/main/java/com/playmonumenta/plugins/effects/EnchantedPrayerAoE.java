@@ -1,16 +1,5 @@
 package com.playmonumenta.plugins.effects;
 
-import java.util.EnumSet;
-
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -18,6 +7,15 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+
+import java.util.EnumSet;
 
 public class EnchantedPrayerAoE extends Effect {
 
@@ -48,7 +46,7 @@ public class EnchantedPrayerAoE extends Effect {
 	}
 
 	@Override
-	public void onDamage(@NotNull LivingEntity entity, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
+	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			World world = entity.getWorld();
 			world.playSound(enemy.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.9f);

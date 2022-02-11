@@ -167,7 +167,7 @@ public class SpatialShatter extends Ability {
 				cdr = false;
 				updateCooldowns(mLevelReduction);
 			}
-			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.mLinkedSpell);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true);
 			MovementUtils.knockAway(loc, mob, KNOCKBACK, KNOCKBACK, true);
 		}
 	}

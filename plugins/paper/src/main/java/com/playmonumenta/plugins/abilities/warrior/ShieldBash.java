@@ -93,7 +93,7 @@ public class ShieldBash extends Ability {
 	}
 
 	private void bash(LivingEntity le) {
-		DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, SHIELD_BASH_DAMAGE, mInfo.mLinkedSpell, false, true);
+		DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, SHIELD_BASH_DAMAGE, mInfo.mLinkedSpell, true, true);
 		if (EntityUtils.isBoss(le) || EntityUtils.isElite(le)) {
 			EntityUtils.applySlow(mPlugin, SHIELD_BASH_STUN, .99, le);
 		} else {

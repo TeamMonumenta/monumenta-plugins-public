@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 
@@ -124,7 +124,7 @@ public class ThunderStep extends Ability {
 
 				Location playerStartLocation = mPlayer.getLocation();
 				float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-				doDamage(playerStartLocation, spellDamage, false);
+				doDamage(playerStartLocation, spellDamage);
 
 				World world = mPlayer.getWorld();
 				BoundingBox movingPlayerBox = mPlayer.getBoundingBox();
@@ -149,12 +149,12 @@ public class ThunderStep extends Ability {
 				}
 
 				mPlayer.teleport(playerEndLocation);
-				doDamage(playerEndLocation, spellDamage, true);
+				doDamage(playerEndLocation, spellDamage);
 			}
 		}
 	}
 
-	private void doDamage(Location location, float spellDamage, boolean bypassIFrames) {
+	private void doDamage(Location location, float spellDamage) {
 		World world = location.getWorld();
 		world.playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 1.5f);
 		world.spawnParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_YELLOW);
@@ -169,7 +169,7 @@ public class ThunderStep extends Ability {
 		);
 
 		for (LivingEntity enemy : enemies) {
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, spellDamage, ABILITY, bypassIFrames);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, spellDamage, ABILITY, true);
 			if (mDoStun && !EntityUtils.isBoss(enemy)) {
 				EntityUtils.applyStun(mPlugin, STUN_TICKS, enemy);
 			}

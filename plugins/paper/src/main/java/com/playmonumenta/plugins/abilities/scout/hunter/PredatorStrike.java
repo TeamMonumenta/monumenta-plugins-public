@@ -151,7 +151,7 @@ public class PredatorStrike extends Ability {
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, EXPLODE_RADIUS, mPlayer);
 		for (LivingEntity mob : mobs) {
 			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
-			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE, damage, mInfo.mLinkedSpell);
+			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE, damage, mInfo.mLinkedSpell, true);
 		}
 		Sharpshooter.addStacks(mPlugin, mPlayer, mobs.size());
 	}
