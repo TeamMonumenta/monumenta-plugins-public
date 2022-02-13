@@ -7,6 +7,7 @@ plugins {
 
 repositories {
     mavenLocal()
+    jcenter()
     maven {
         url = uri("https://papermc.io/repo/repository/maven-public/")
     }

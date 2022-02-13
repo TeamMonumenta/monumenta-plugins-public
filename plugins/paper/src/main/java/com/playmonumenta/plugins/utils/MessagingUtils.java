@@ -4,12 +4,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Duration;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.Plugin;
+
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -73,7 +73,7 @@ public class MessagingUtils {
 		player.sendMessage(formattedMessage);
 	}
 
-	public static void sendStackTrace(CommandSender sender, Exception e) {
+	public static void sendStackTrace(CommandSender sender, Throwable e) {
 		TextComponent formattedMessage;
 		String errorMessage = e.getLocalizedMessage();
 		if (errorMessage != null) {

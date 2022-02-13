@@ -38,6 +38,7 @@ import com.playmonumenta.plugins.commands.LockedHeldItem;
 import com.playmonumenta.plugins.commands.Magnetize;
 import com.playmonumenta.plugins.commands.MonumentaDebug;
 import com.playmonumenta.plugins.commands.MonumentaReload;
+import com.playmonumenta.plugins.commands.NameMCVerify;
 import com.playmonumenta.plugins.commands.OpenDelveModifierSelectionGUI;
 import com.playmonumenta.plugins.commands.PhylacteryifyHeldItem;
 import com.playmonumenta.plugins.commands.PickLevelAfterAnvils;
@@ -295,6 +296,7 @@ public class Plugin extends JavaPlugin {
 		Eggify.register();
 		SeasonalEventCommand.register(this);
 		CosmeticsCommand.register(this);
+		NameMCVerify.register(this);
 
 		try {
 			mHttpManager = new HttpManager(this);
