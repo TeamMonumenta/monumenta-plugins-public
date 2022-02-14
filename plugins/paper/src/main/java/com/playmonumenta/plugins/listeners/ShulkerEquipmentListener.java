@@ -163,6 +163,10 @@ public class ShulkerEquipmentListener implements Listener {
 		return false;
 	}
 
+	public static @Nullable Integer getShulkerSlot(int playerInventorySlot) {
+		return SWAP_SLOTS.get(playerInventorySlot);
+	}
+
 	private void swap(Player player, PlayerInventory pInv, ShulkerBox sbox) {
 		/* Prevent swapping/nesting shulkers */
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {

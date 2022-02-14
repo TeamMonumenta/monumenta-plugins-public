@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.ProjectileProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Protection;
 import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
 import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
+import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
@@ -27,6 +28,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -35,6 +37,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.text.DecimalFormat;
@@ -396,15 +399,16 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	}
 
 	private enum Equipment {
-		MAINHAND(46, 52, "Main Hand", EquipmentSlot.HAND, Slot.MAINHAND),
-		OFFHAND(19, 25, "Off Hand", EquipmentSlot.OFF_HAND, Slot.OFFHAND),
-		HEAD(18, 26, "Head", EquipmentSlot.HEAD, Slot.HEAD),
-		CHEST(27, 35, "Chest", EquipmentSlot.CHEST, Slot.CHEST),
-		LEGS(36, 44, "Legs", EquipmentSlot.LEGS, Slot.LEGS),
-		FEET(45, 53, "Feet", EquipmentSlot.FEET, Slot.FEET);
+		MAINHAND(46, 52, 0, "Main Hand", EquipmentSlot.HAND, Slot.MAINHAND),
+		OFFHAND(19, 25, 40, "Off Hand", EquipmentSlot.OFF_HAND, Slot.OFFHAND),
+		HEAD(18, 26, 39, "Head", EquipmentSlot.HEAD, Slot.HEAD),
+		CHEST(27, 35, 38, "Chest", EquipmentSlot.CHEST, Slot.CHEST),
+		LEGS(36, 44, 37, "Legs", EquipmentSlot.LEGS, Slot.LEGS),
+		FEET(45, 53, 36, "Feet", EquipmentSlot.FEET, Slot.FEET);
 
 		private final int mLeftSlot;
 		private final int mRightSlot;
+		private final int mPlayerInventorySlot;
 		private final String mName;
 		private final EquipmentSlot mEquipmentSlot;
 		private final Slot mSlot;
@@ -412,9 +416,10 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			Component.text("Click here, then click an item to compare builds.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false),
 			Component.text("Right click to restore the initial item.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 
-		Equipment(int leftSlot, int rightSlot, String name, EquipmentSlot equipmentSlot, Slot slot) {
+		Equipment(int leftSlot, int rightSlot, int playerInventorySlot, String name, EquipmentSlot equipmentSlot, Slot slot) {
 			mLeftSlot = leftSlot;
 			mRightSlot = rightSlot;
+			mPlayerInventorySlot = playerInventorySlot;
 			mName = name;
 			mEquipmentSlot = equipmentSlot;
 			mSlot = slot;
@@ -468,7 +473,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		stats.mEquipment.put(Equipment.CHEST, inventory.getChestplate());
 		stats.mEquipment.put(Equipment.LEGS, inventory.getLeggings());
 		stats.mEquipment.put(Equipment.FEET, inventory.getBoots());
-		stats.mEquipment.values().removeIf(item -> item.getType() == Material.AIR);
+		stats.mEquipment.values().removeIf(item -> item == null || item.getType() == Material.AIR);
 
 		originalEquipment.clear();
 		originalEquipment.putAll(stats.mEquipment);
@@ -500,6 +505,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 					if (!mLeftStats.mSecondaryStatEnabled.remove(stat)) {
 						mLeftStats.mSecondaryStatEnabled.add(stat);
 					}
+					mRightStats.mSecondaryStatEnabled.clear();
+					mRightStats.mSecondaryStatEnabled.addAll(mLeftStats.mSecondaryStatEnabled);
 					generateInventory();
 					return;
 				}
@@ -543,8 +550,34 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			}
 		} else {
 			ItemStack clickedItem = inv.getItem(slot);
-			if (clickedItem != null) {
+			if (clickedItem != null && clickedItem.getType() != Material.AIR) {
 				ItemStack item = new ItemStack(clickedItem);
+				if (ShulkerEquipmentListener.isEquipmentBox(item)
+					    && item.getItemMeta() instanceof BlockStateMeta meta
+					    && meta.getBlockState() instanceof ShulkerBox shulker) {
+					Stats stats;
+					if (mSelectedEquipmentsSlot != null) {
+						stats = mSelectedRightEquipmentSet ? mRightStats : mLeftStats;
+					} else if (event.getClick().isShiftClick()) {
+						stats = mRightStats;
+					} else {
+						return;
+					}
+					mSelectedEquipmentsSlot = null;
+
+					for (Equipment equipment : Equipment.values()) {
+						Integer shulkerSlot = ShulkerEquipmentListener.getShulkerSlot(equipment.mPlayerInventorySlot);
+						if (shulkerSlot == null) {
+							continue;
+						}
+						ItemStack shulkerItem = shulker.getInventory().getItem(shulkerSlot);
+						if (shulkerItem != null && shulkerItem.getType() != Material.AIR) {
+							stats.mEquipment.put(equipment, shulkerItem);
+						}
+					}
+					generateInventory();
+					return;
+				}
 				Equipment targetSlot = null;
 				boolean targetRightSet = false;
 				if (mSelectedEquipmentsSlot != null) {
