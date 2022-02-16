@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.Map;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.listeners.StasisListener;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,13 +13,31 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.listeners.StasisListener;
+import javax.annotation.Nullable;
+import java.util.Map;
 
 public class BossUtils {
+
+	/**
+	 * Returns boss health scaling coefficient.
+	 * Multiply base health to get final health.
+	 * Inverse the coefficient to get damage reduction.
+	 * Formula: coefficient = X ^ ((playerCount - 1) ^ Y)
+	 * @param playerCount Player amount for health scaling
+	 * @param x Base exponent, increase X to increase health scaling. range = [0 < X < 1]
+	 * @param y Player count exponent, decrease Y to increase health scaling. range = [0 < Y < 1]
+	 */
+	public static double healthScalingCoef(int playerCount, double x, double y) {
+		double scalingCoef = 0;
+		// calculates smallest scaling increase first. largest scaling increase last.
+		while (playerCount > 0) {
+			double iterCoef = Math.pow(x, Math.pow(playerCount - 1, y));
+			scalingCoef += iterCoef;
+			playerCount--;
+		}
+		return scalingCoef;
+	}
 
 	public static boolean bossDamageBlocked(Player player, @Nullable Location location) {
 		/*
