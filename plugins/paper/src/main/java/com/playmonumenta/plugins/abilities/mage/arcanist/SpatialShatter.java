@@ -39,14 +39,12 @@ public class SpatialShatter extends Ability {
 	public static final ClassAbility ABILITY = ClassAbility.SPATIAL_SHATTER;
 	public static final Particle.DustOptions COLOR_BLUE = new Particle.DustOptions(Color.fromRGB(16, 144, 192), 1.0f);
 
-	public static final int DAMAGE_1 = 9;
-	public static final int DAMAGE_2 = 15;
+	public static final int DAMAGE_1 = 8;
+	public static final int DAMAGE_2 = 13;
 	public static final int SIZE = 4;
 	public static final int DISTANCE = 8;
-	public static final double REDUCTION_MULTIPLIER_1 = 0.15;
-	public static final int CAP_TICKS_1 = (int)(1.5 * Constants.TICKS_PER_SECOND);
-	public static final double REDUCTION_MULTIPLIER_2 = 0.2;
-	public static final int CAP_TICKS_2 = 2 * Constants.TICKS_PER_SECOND;
+	public static final double REDUCTION_MULTIPLIER = 0.15;
+	public static final int CAP_TICKS = (int)(1.5 * Constants.TICKS_PER_SECOND);
 	public static final float KNOCKBACK = 0.3f;
 	public static final double HITBOX = 0.55;
 	public static final int COOLDOWN_TICKS = 6 * Constants.TICKS_PER_SECOND;
@@ -67,20 +65,16 @@ public class SpatialShatter extends Ability {
 				DISTANCE,
 				DAMAGE_1,
 				SIZE,
-				StringUtils.multiplierToPercentage(REDUCTION_MULTIPLIER_1),
-				StringUtils.ticksToSeconds(CAP_TICKS_1),
+				StringUtils.multiplierToPercentage(REDUCTION_MULTIPLIER),
+				StringUtils.ticksToSeconds(CAP_TICKS),
 				StringUtils.ticksToSeconds(COOLDOWN_TICKS)
 			)
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"Damage is increased from %s to %s. Cooldown reduction is increased from %s%% to %s%%, capped at %ss instead of %ss.",
+				"Damage is increased from %s to %s.",
 				DAMAGE_1,
-				DAMAGE_2,
-				StringUtils.multiplierToPercentage(REDUCTION_MULTIPLIER_1),
-				StringUtils.multiplierToPercentage(REDUCTION_MULTIPLIER_2),
-				StringUtils.ticksToSeconds(CAP_TICKS_2),
-				StringUtils.ticksToSeconds(CAP_TICKS_1)
+				DAMAGE_2
 			)
 		);
 		mInfo.mCooldown = COOLDOWN_TICKS;
@@ -89,8 +83,8 @@ public class SpatialShatter extends Ability {
 
 		boolean isUpgraded = getAbilityScore() == 2;
 		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
-		mLevelReduction = isUpgraded ? REDUCTION_MULTIPLIER_2 : REDUCTION_MULTIPLIER_1;
-		mLevelCap = isUpgraded ? CAP_TICKS_2 : CAP_TICKS_1;
+		mLevelReduction = REDUCTION_MULTIPLIER;
+		mLevelCap = CAP_TICKS;
 	}
 
 	@Override

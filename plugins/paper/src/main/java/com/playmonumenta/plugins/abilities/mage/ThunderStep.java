@@ -53,8 +53,8 @@ public class ThunderStep extends Ability {
 	public static final int DISTANCE_1 = 8;
 	public static final int DISTANCE_2 = 10;
 	public static final double CHECK_INCREMENT = 0.1;
-	public static final int STUN_SECONDS = 1;
-	public static final int STUN_TICKS = STUN_SECONDS * 20;
+	public static final double STUN_SECONDS = 0.5;
+	public static final int STUN_TICKS = (int) STUN_SECONDS * 20;
 	public static final int COOLDOWN_SECONDS = 22;
 	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
 
