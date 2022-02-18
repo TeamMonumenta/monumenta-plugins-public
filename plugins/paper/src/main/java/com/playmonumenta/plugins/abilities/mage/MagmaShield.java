@@ -2,16 +2,20 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -23,6 +27,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
 import javax.annotation.Nullable;
 
 
@@ -45,6 +50,8 @@ public class MagmaShield extends Ability {
 	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
 
 	private final int mLevelDamage;
+
+	private boolean mHasBlizzard;
 
 	public MagmaShield(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
@@ -73,6 +80,13 @@ public class MagmaShield extends Ability {
 		mDisplayItem = new ItemStack(Material.MAGMA_CREAM, 1);
 
 		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
+
+		mHasBlizzard = false;
+		if (ServerProperties.getClassSpecializationsEnabled()) {
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+				mHasBlizzard = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Blizzard.class) != null;
+			});
+		}
 	}
 
 	@Override
@@ -137,7 +151,7 @@ public class MagmaShield extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer != null && mPlayer.isSneaking() && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer != null && mPlayer.isSneaking() && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand()) && !(mHasBlizzard && mPlayer.getLocation().getPitch() < Blizzard.ANGLE)) {
 			return true;
 		}
 		return false;

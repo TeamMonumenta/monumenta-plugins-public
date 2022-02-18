@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -22,10 +21,11 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 
@@ -45,6 +45,7 @@ public class Blizzard extends Ability {
 	public static final int SLOW_TICKS = 5 * Constants.TICKS_PER_SECOND;
 	public static final int COOLDOWN_TICKS_1 = 30 * Constants.TICKS_PER_SECOND;
 	public static final int COOLDOWN_TICKS_2 = 25 * Constants.TICKS_PER_SECOND;
+	public static final int ANGLE = -45; // Looking straight up is -90. This is 45 degrees of pitch allowance
 
 	private final int mLevelDamage;
 	private final int mLevelSize;
@@ -56,7 +57,7 @@ public class Blizzard extends Ability {
 
 		mInfo.mScoreboardId = NAME;
 		mInfo.mShorthandName = "Bl";
-		mInfo.mDescriptions.add("Press the swap key while shifting, on the ground, and holding a wand to create a storm of ice and snow that follows the player, dealing 5 magic damage every 2s to all enemies in a 6 block radius around you. The blizzard last for 10s, and chills enemies within it, slowing them by 25%." +
+		mInfo.mDescriptions.add("Right click while sneaking, looking upwards, and holding a wand to create a storm of ice and snow that follows the player, dealing 5 magic damage every 2s to all enemies in a 6 block radius around you. The blizzard last for 10s, and chills enemies within it, slowing them by 25%." +
 			" Players in the blizzard are extinguished if they are on fire, and the ability's damage bypasses iframes. This ability does not interact with Spellshock. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Damage is increased from 5 to 10, aura size is increased from 6 to 8 blocks, slowness increased to 30%.");
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -73,61 +74,63 @@ public class Blizzard extends Ability {
 	private boolean mActive = false;
 
 	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer != null &&
-			ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())
-		) {
-			event.setCancelled(true);
+	public void cast(Action action) {
+		if (mPlayer != null) {
+			putOnCooldown();
+			mActive = true;
+			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
-			if (!isTimerActive() && !mActive && mPlayer.isSneaking() && mPlayer.isOnGround()) {
-				putOnCooldown();
-				mActive = true;
-				ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+			World world = mPlayer.getWorld();
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+			world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
 
-				World world = mPlayer.getWorld();
-				world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
-				world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
+			float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+			new BukkitRunnable() {
+				int mTicks = 0;
 
-				float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-				new BukkitRunnable() {
-					int mTicks = 0;
-
-					@Override
-					public void run() {
-						Location loc = mPlayer.getLocation();
-						List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mLevelSize, mPlayer);
-						mTicks++;
-						if (mTicks % SLOW_INTERVAL == 0) {
-							for (Player p : PlayerUtils.playersInRange(loc, mLevelSize, true)) {
-								if (p.getFireTicks() > 1) {
-									p.setFireTicks(1);
-								}
-							}
-							for (LivingEntity mob : mobs) {
-								EntityUtils.applySlow(mPlugin, SLOW_TICKS, mLevelSlowMultiplier, mob);
+				@Override
+				public void run() {
+					Location loc = mPlayer.getLocation();
+					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mLevelSize, mPlayer);
+					mTicks++;
+					if (mTicks % SLOW_INTERVAL == 0) {
+						for (Player p : PlayerUtils.playersInRange(loc, mLevelSize, true)) {
+							if (p.getFireTicks() > 1) {
+								p.setFireTicks(1);
 							}
 						}
-
-						if (mTicks % DAMAGE_INTERVAL == 0) {
-							for (LivingEntity mob : mobs) {
-								DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), spellDamage, false, true, null);
-							}
-						}
-
-						world.spawnParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1);
-						world.spawnParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05);
-						world.spawnParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15);
-						if (
-							mTicks >= DURATION_TICKS
-								|| AbilityManager.getManager().getPlayerAbility(mPlayer, Blizzard.class) == null
-								|| !mPlayer.isValid() // Ensure player is not dead, is still online?
-						) {
-							this.cancel();
-							mActive = false;
+						for (LivingEntity mob : mobs) {
+							EntityUtils.applySlow(mPlugin, SLOW_TICKS, mLevelSlowMultiplier, mob);
 						}
 					}
-				}.runTaskTimer(mPlugin, 0, 1);
-			}
+
+					if (mTicks % DAMAGE_INTERVAL == 0) {
+						for (LivingEntity mob : mobs) {
+							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), spellDamage, false, true, null);
+						}
+					}
+
+					world.spawnParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1);
+					world.spawnParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05);
+					world.spawnParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15);
+					if (
+						mTicks >= DURATION_TICKS
+							|| AbilityManager.getManager().getPlayerAbility(mPlayer, Blizzard.class) == null
+							|| !mPlayer.isValid() // Ensure player is not dead, is still online?
+					) {
+						this.cancel();
+						mActive = false;
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
 		}
+	}
+
+	@Override
+	public boolean runCheck() {
+		return mPlayer != null
+			&& ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())
+			&& mPlayer.isSneaking()
+			&& mPlayer.getLocation().getPitch() < ANGLE;
 	}
 }
