@@ -43,7 +43,6 @@ public class WindWalk extends MultipleChargeAbility {
 
 	private final int mDuration;
 
-	private int mLeftClicks = 0;
 	private int mLastCastTicks = 0;
 
 	public WindWalk(Plugin plugin, @Nullable Player player) {
@@ -61,6 +60,7 @@ public class WindWalk extends MultipleChargeAbility {
 		mMaxCharges = WIND_WALK_MAX_CHARGES;
 	}
 
+	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
 			|| !InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
@@ -68,6 +68,15 @@ public class WindWalk extends MultipleChargeAbility {
 		}
 
 		event.setCancelled(true);
+
+		int ticks = mPlayer.getTicksLived();
+		// Prevent double casting on accident
+		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
+			return;
+		}
+		mLastCastTicks = ticks;
+
+		putOnCooldown();
 
 		walk();
 	}
