@@ -53,7 +53,7 @@ public class PortalTeleportCheck extends BukkitRunnable {
 		EntityType.ZOMBIE_HORSE
 	);
 
-	private static final Map<UUID, Integer> mCooldowns = new HashMap<>();
+	private final Map<UUID, Integer> mCooldowns = new HashMap<>();
 
 	private List<Map<UUID, Vector>> mPastPlayerLocs = new ArrayList<>();
 
