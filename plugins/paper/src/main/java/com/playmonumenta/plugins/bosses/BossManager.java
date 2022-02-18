@@ -265,6 +265,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(HuntingCompanionBoss.identityTag, (Plugin p, LivingEntity e) -> new HuntingCompanionBoss(p, e));
 		mStatelessBosses.put(MetalmancyBoss.identityTag, (Plugin p, LivingEntity e) -> new MetalmancyBoss(p, e));
 		mStatelessBosses.put(RestlessSoulsBoss.identityTag, (Plugin p, LivingEntity e) -> new RestlessSoulsBoss(p, e));
+		mStatelessBosses.put(ThrowSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new ThrowSummonBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -477,6 +478,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(HuntingCompanionBoss.identityTag, (Plugin p, LivingEntity e) -> HuntingCompanionBoss.deserialize(p, e));
 		mBossDeserializers.put(MetalmancyBoss.identityTag, (Plugin p, LivingEntity e) -> MetalmancyBoss.deserialize(p, e));
 		mBossDeserializers.put(RestlessSoulsBoss.identityTag, (Plugin p, LivingEntity e) -> RestlessSoulsBoss.deserialize(p, e));
+		mBossDeserializers.put(ThrowSummonBoss.identityTag, (Plugin p, LivingEntity e) -> ThrowSummonBoss.deserialize(p, e));
 
 
 		/***************************************************
@@ -512,6 +514,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(GrenadeLauncherBoss.identityTag, new GrenadeLauncherBoss.Parameters());
 		mBossParameters.put(SizeChangerBoss.identityTag, new SizeChangerBoss.Parameters());
 		mBossParameters.put(WrathBoss.identityTag, new WrathBoss.Parameters());
+		mBossParameters.put(ThrowSummonBoss.identityTag, new WrathBoss.Parameters());
 	}
 
 	/********************************************************************************

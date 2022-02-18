@@ -43,7 +43,8 @@ public class SeasonalEventGUI extends CustomInventory {
 	public SeasonalEventGUI(Player requestingPlayer, Player targetPlayer, int week) {
 		super(requestingPlayer, 54, SeasonalEventManager.PASS_NAME);
 		SeasonalEventManager.updatePlayerPassProgress(targetPlayer);
-		mCurrentPage = 1;
+		int level = SeasonalEventManager.getLevelFromMP(SeasonalEventManager.getMP(targetPlayer));
+		mCurrentPage = Math.max(1, ((level - 1) / 5) + 1);
 		mWeek = week;
 		setUpPass(targetPlayer);
 	}

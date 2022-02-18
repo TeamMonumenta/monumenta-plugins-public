@@ -1,11 +1,15 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
 public class SpellSpawnMobs extends Spell {
+	public static final int MOB_DETECTION_RADIUS = 10;
+	public static final int MOB_CAP = 15;
+
 	private final int mSummonRange;
 	private final int mCooldownTicks;
 	private final String mSummonName;
@@ -30,6 +34,14 @@ public class SpellSpawnMobs extends Spell {
 			Location sLoc = loc.clone().add(x, 0.25, z);
 			LibraryOfSoulsIntegration.summon(sLoc, mSummonName);
 		}
+	}
+
+	@Override
+	public boolean canRun() {
+		if (EntityUtils.getNearbyMobs(mBoss.getLocation(), MOB_DETECTION_RADIUS).size() > MOB_CAP) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override

@@ -416,7 +416,7 @@ public class DepthsUtils {
 		for (Block b : blocks) {
 			if (Boolean.TRUE.equals(iceBarrier.get(b.getLocation()))) {
 				// Apply ice barrier slow passive effect to the mob
-				EntityUtils.applySlow(Plugin.getInstance(), 2 * 20, .5, (LivingEntity) event.getEntity());
+				EntityUtils.applySlow(Plugin.getInstance(), 2 * 20, .9, (LivingEntity) event.getEntity());
 				return;
 			}
 		}

@@ -36,23 +36,23 @@ public class StatMultiplier extends DelveModifier {
 	private static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
 
 	static {
-		STAT_COMPENSATION_MAPPINGS.put("white", 1.8);
-		STAT_COMPENSATION_MAPPINGS.put("orange", 1.6);
-		STAT_COMPENSATION_MAPPINGS.put("magenta", 1.5);
+		STAT_COMPENSATION_MAPPINGS.put("white", 1.7);
+		STAT_COMPENSATION_MAPPINGS.put("orange", 1.5);
+		STAT_COMPENSATION_MAPPINGS.put("magenta", 1.4);
 		STAT_COMPENSATION_MAPPINGS.put("lightblue", 1.2);
 		STAT_COMPENSATION_MAPPINGS.put("yellow", 1.1);
 		STAT_COMPENSATION_MAPPINGS.put("willows", 1.2);
 		STAT_COMPENSATION_MAPPINGS.put("reverie", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("lime", 1.7);
-		STAT_COMPENSATION_MAPPINGS.put("pink", 1.5);
-		STAT_COMPENSATION_MAPPINGS.put("gray", 1.5);
-		STAT_COMPENSATION_MAPPINGS.put("lightgray", 1.2);
-		STAT_COMPENSATION_MAPPINGS.put("cyan", 1.2);
+		STAT_COMPENSATION_MAPPINGS.put("lime", 1.6);
+		STAT_COMPENSATION_MAPPINGS.put("pink", 1.4);
+		STAT_COMPENSATION_MAPPINGS.put("gray", 1.4);
+		STAT_COMPENSATION_MAPPINGS.put("lightgray", 1.15);
+		STAT_COMPENSATION_MAPPINGS.put("cyan", 1.15);
 		STAT_COMPENSATION_MAPPINGS.put("purple", 1.1);
 		STAT_COMPENSATION_MAPPINGS.put("teal", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("forum", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("shiftingcity", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("depths", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("depths", 0.9);
 		STAT_COMPENSATION_MAPPINGS.put("dev1", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev2", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("mobs", 1.0);

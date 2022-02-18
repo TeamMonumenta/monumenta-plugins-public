@@ -888,7 +888,7 @@ public class DepthsManager {
 
 		//Roll chance for twisted room - 1.5% per room selection
 		boolean twisted = false;
-		if (mRandom.nextInt(200) < 3 && !party.mTwistedThisFloor) {
+		if (mRandom.nextInt(100) < 2 && !party.mTwistedThisFloor) {
 			twisted = true;
 		}
 
