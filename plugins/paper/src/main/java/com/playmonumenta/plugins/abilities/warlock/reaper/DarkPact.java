@@ -42,8 +42,8 @@ public class DarkPact extends Ability {
 	private static final String PERCENT_ATKS_EFFECT_NAME = "DarkPactPercentAtksEffect";
 	private static final int DURATION = 20 * 7;
 	private static final int DURATION_INCREASE_ON_KILL = 20 * 1;
-	private static final double PERCENT_DAMAGE_DEALT_1 = 0.4;
-	private static final double PERCENT_DAMAGE_DEALT_2 = 0.8;
+	private static final double PERCENT_DAMAGE_DEALT_1 = 0.3;
+	private static final double PERCENT_DAMAGE_DEALT_2 = 0.6;
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE);
 	private static final double PERCENT_ATKS_1 = 0.1;
 	private static final double PERCENT_ATKS_2 = 0.2;
@@ -60,8 +60,8 @@ public class DarkPact extends Ability {
 		super(plugin, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain 10% damage reduction, +10% attack speed, and deal +40% melee damage on your scythe attacks. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
-		mInfo.mDescriptions.add("You gain +20% attack speed and attacks with a scythe deal +80% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
+		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain 10% damage reduction, +10% attack speed, and deal +30% melee damage on your scythe attacks. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
+		mInfo.mDescriptions.add("You gain +20% attack speed and attacks with a scythe deal +60% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
 		mInfo.mIgnoreCooldown = true;
