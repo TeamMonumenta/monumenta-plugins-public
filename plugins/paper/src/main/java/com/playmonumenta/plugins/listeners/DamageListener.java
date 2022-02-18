@@ -42,7 +42,7 @@ public class DamageListener implements Listener {
 				    && event.getEntity() instanceof LivingEntity le) {
 				Entity damager = entityDamageByEntityEvent.getDamager();
 				if (damager instanceof Creeper creeper) {
-					event.setDamage(EntityDamageEvent.DamageModifier.BASE, EntityUtils.calculateCreeperExplosionDamage(creeper, le, event.getDamage(EntityDamageEvent.DamageModifier.BASE)));
+					event.setDamage(EntityUtils.calculateCreeperExplosionDamage(creeper, le, event.getDamage()));
 				}
 			}
 
