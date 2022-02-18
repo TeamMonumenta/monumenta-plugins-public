@@ -45,7 +45,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 /*
@@ -57,9 +60,11 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private static final int POTIONS_TIMER_BASE = 2 * 20;
 	private static final int POTIONS_TIMER_TOWN = 1 * 20;
 
+	private static final int IFRAME_BETWEEN_POT = 10;
 	private static final double DAMAGE_PER_SKILL_POINT = 0.5;
 	private static final double DAMAGE_PER_SPEC_POINT = 2.5;
 	private static final String POTION_SCOREBOARD = "StoredPotions";
+
 
 	private List<PotionAbility> mPotionAbilities = new ArrayList<PotionAbility>();
 	private double mDamage = 0;
@@ -69,6 +74,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private int mCharges;
 	private int mChargeTime;
 	private WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	private Map<UUID, Integer> mMobsIframeMap;
 
 	private boolean mGruesomeMode;
 
@@ -94,6 +100,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		mMaxCharges = MAX_CHARGES;
 
 		mPlayerItemStatsMap = new WeakHashMap<>();
+		mMobsIframeMap = new HashMap<>();
 
 		// Scan hotbar for alch potion
 		PlayerInventory inv = player.getInventory();
@@ -260,7 +267,15 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				damage += potion.getMetadata(AlchemicalArtillery.ARTILLERY_POTION_TAG).get(0).asDouble();
 			}
 
-			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, false, true, null);
+			mMobsIframeMap.values().removeIf(tick -> tick + IFRAME_BETWEEN_POT < mPlayer.getTicksLived());
+
+			if (mMobsIframeMap.containsKey(mob.getUniqueId())) {
+				applyEffects(mob, isGruesome);
+				return;
+			}
+
+			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, null);
+			mMobsIframeMap.put(mob.getUniqueId(), mPlayer.getTicksLived());
 
 			// Intentionally apply effects after damage
 			applyEffects(mob, isGruesome);
