@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,6 +25,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 
@@ -56,7 +56,7 @@ public class LuminousInfusion extends Ability {
 		mInfo.mScoreboardId = "LuminousInfusion";
 		mInfo.mShorthandName = "LI";
 		mInfo.mDescriptions.add("While sneaking, pressing the swap key charges your hands with holy light. The next time you damage an undead enemy, your attack is infused with explosive power, dealing 20 magic damage to it and all enemies in a 4-block cube around it, or 10 against non-undead, and knocking other enemies away from it. Cooldown: 14s.");
-		mInfo.mDescriptions.add("Your melee attacks now passively deal 20% holy damage to undead enemies, and Divine Justice now passively deals 15% more total damage. Damaging an undead enemy now passively sets it on fire for 3s. That holy damage ignores iframes.");
+		mInfo.mDescriptions.add("Your melee attacks now passively deal 15% magic damage to undead enemies, and Divine Justice now passively deals 15% more total damage. Damaging an undead enemy now passively sets it on fire for 3s.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -24,6 +23,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 
@@ -63,7 +63,7 @@ public class DivineJustice extends Ability {
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"Killing an undead enemy now passively heals %s%% of your max health and heals players within %s blocks of you for %s%% of their max health. Damage is increased from %s, to %s and then %s%%.",
+				"Killing an undead enemy now passively heals %s%% of your max health and heals players within %s blocks of you for %s%% of their max health. Damage is increased from %s, to %s and %s%% of your critical attack damage.",
 				StringUtils.multiplierToPercentage(HEALING_MULTIPLIER_OWN),
 				RADIUS,
 				StringUtils.multiplierToPercentage(HEALING_MULTIPLIER_OTHER),
@@ -90,7 +90,7 @@ public class DivineJustice extends Ability {
 			double damage = DAMAGE;
 			if (mDoHealingAndMultiplier) {
 				// Use the whole melee damage here
-				damage += (originalDamage + damage) * DAMAGE_MULTIPLIER;
+				damage += originalDamage * DAMAGE_MULTIPLIER;
 			}
 
 			mLastPassiveDamage = damage;
