@@ -200,7 +200,7 @@ public class Kaul extends BossAbilityGroup {
 		    Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mShrineMarker.getLocation().getY()),
 		                  new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mShrineMarker.getLocation()),
 		                  new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-		                  new SpellArachnopocolypse(mPlugin, mBoss, mShrineMarker.getLocation(), detectionRange)));
+		                  new SpellArachnopocolypse(mPlugin, mBoss, mShrineMarker.getLocation(), detectionRange, mSpawnLoc)));
 
 		Spell judgement = SpellKaulsJudgement.getInstance(mSpawnLoc);
 
@@ -208,7 +208,7 @@ public class Kaul extends BossAbilityGroup {
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mShrineMarker.getLocation()),
 			              new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
 			              new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mShrineMarker.getLocation().getY()),
-			              new SpellGroundSurge(mPlugin, mBoss, detectionRange),
+			              new SpellArachnopocolypse(mPlugin, mBoss, mShrineMarker.getLocation(), detectionRange, mSpawnLoc),
 			              judgement));
 
 		SpellManager phase3Spells = new SpellManager(
@@ -699,16 +699,6 @@ public class Kaul extends BossAbilityGroup {
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
 		events.put(25, mBoss -> {
 			forceCastSpell(SpellKaulsJudgement.class);
-		});
-
-
-		// Phase 3.5
-		//Summons another Immortal Elemental at 20% HP if players are more than 15.
-		events.put(20, mBoss -> {
-			List<Player> playersInRange = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-			if (playersInRange.size() >= 15) {
-				summonImmortal(plugin, world);
-			}
 		});
 
 		events.put(10, mBoss -> {

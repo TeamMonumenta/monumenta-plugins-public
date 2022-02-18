@@ -3,7 +3,8 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -11,13 +12,17 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Spider;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class SpellArachnopocolypse extends Spell {
@@ -26,13 +31,15 @@ public class SpellArachnopocolypse extends Spell {
 	private Location mLoc;
 	private double mDetectRange;
 	private boolean mCooldown = false;
+	private Location mSpawnLoc;
 	private ChargeUpManager mChargeUp;
 
-	public SpellArachnopocolypse(Plugin plugin, LivingEntity boss, Location loc, double detectRange) {
+	public SpellArachnopocolypse(Plugin plugin, LivingEntity boss, Location loc, double detectRange, Location spawnLoc) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mLoc = loc;
 		mDetectRange = detectRange;
+		mSpawnLoc = spawnLoc;
 		mChargeUp = new ChargeUpManager(mBoss, 45, ChatColor.GREEN + "Channeling " + ChatColor.DARK_GREEN + "Arachnopocalypse...",
 			BarColor.GREEN, BarStyle.SEGMENTED_10, 50);
 	}
@@ -54,58 +61,45 @@ public class SpellArachnopocolypse extends Spell {
 			}
 
 		}.runTaskLater(mPlugin, 20 * 60);
+
+		//30 ticks charge time
+		mChargeUp.setTime(15);
 		new BukkitRunnable() {
-
-			@Override
 			public void run() {
-				List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mDetectRange, true);
-				players.removeIf(p -> p.getLocation().getY() >= 61);
-				int amount = (int) (10 + (3.5 * players.size()));
-				if (players.size() == 1) {
-					amount = 18;
-				}
-				int a = amount;
-				mChargeUp.setChargeTime(a);
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 10, 1);
-				world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 50, 0.5, 0.25, 0.5, 0);
-				new BukkitRunnable() {
+				if (mChargeUp.nextTick()) {
+					List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, mDetectRange, true);
+					players.removeIf(p -> p.getLocation().getY() >= 61);
 
-					@Override
-					public void run() {
+					HashMap<String, Vector> spiderLocations = new HashMap<String, Vector>();
+					spiderLocations.put("EarthVassal", new Vector(-15, -8, -15));
+					spiderLocations.put("AirVassal", new Vector(-15, -8, 15));
+					spiderLocations.put("FireVassal", new Vector(15, -8, -15));
+					spiderLocations.put("WaterVassal", new Vector(15, -8, 15));
 
-						riseSpider(getRandomLocation(mLoc, 32));
-						if (mChargeUp.nextTick()) {
-							this.cancel();
-							mChargeUp.reset();
-						}
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 10, 1);
+					world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 50, 0.5, 0.25, 0.5, 0);
+
+					double health = 120 * BossUtils.healthScalingCoef(players.size(), 0.5, 0.7);
+
+					for (String los : spiderLocations.keySet()) {
+						riseSpider(mSpawnLoc.clone().add(spiderLocations.get(los)), los, (int) health);
 					}
 
-				}.runTaskTimer(mPlugin, 0, 2);
+					this.cancel();
+					return;
+				}
 			}
-
-		}.runTaskLater(mPlugin, 30);
+		}.runTaskTimer(mPlugin, 0, 2);
 
 	}
 
-	private static final String[] SPIDER_SUMMONS = {
-	        "BlackrootArachnid",
-	        "ShieldbreakerSpider",
-	        "BlackrootMonster"
-	};
-
-	public void riseSpider(Location loc) {
+	private void riseSpider(Location loc, String los, int health) {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
 		world.spawnParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData());
-		LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), SPIDER_SUMMONS[FastUtils.RANDOM.nextInt(SPIDER_SUMMONS.length)]);
-	}
-
-	private Location getRandomLocation(Location origin, double range) {
-		Location loc = origin.clone().add(FastUtils.randomDoubleInRange(-range, range), 0, FastUtils.randomDoubleInRange(-range, range));
-		while (loc.getBlock().getType().isSolid()) {
-			loc = origin.clone().add(FastUtils.randomDoubleInRange(-range, range), 0, FastUtils.randomDoubleInRange(-range, range));
-		}
-		return loc;
+		Spider spider = (Spider) LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), los);
+		EntityUtils.setAttributeBase(spider, Attribute.GENERIC_MAX_HEALTH, health);
+		spider.setHealth(health);
 	}
 
 	@Override
