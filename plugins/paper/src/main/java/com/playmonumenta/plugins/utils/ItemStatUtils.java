@@ -70,6 +70,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.MeleeProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.itemstats.enchantments.OffhandMainhandDisable;
 import com.playmonumenta.plugins.itemstats.enchantments.Oinking;
+import com.playmonumenta.plugins.itemstats.enchantments.Persistence;
 import com.playmonumenta.plugins.itemstats.enchantments.PestilenceTesseract;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Poise;
