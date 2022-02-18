@@ -15,6 +15,7 @@ public enum MonumentaContent {
 	VERDANT("verdant", ContentType.STRIKE, 1),
 	KAUL("kaul", ContentType.BOSS, 1),
 	AZACOR("azacor", ContentType.BOSS, 1),
+	SNOW_SPIRIT("snowspirit", ContentType.BOSS, 1),
 	ARENA("arena", ContentType.OTHER, 1),
 	LIME("lime", ContentType.DUNGEON, 2),
 	PINK("pink", ContentType.DUNGEON, 2),

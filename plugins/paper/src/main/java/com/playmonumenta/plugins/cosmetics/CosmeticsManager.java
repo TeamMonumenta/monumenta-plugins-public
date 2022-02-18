@@ -9,13 +9,12 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Mob;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -226,17 +225,14 @@ public class CosmeticsManager implements Listener {
 
 	// Elite Finisher handler
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void playerDamagedEntity(EntityDamageByEntityEvent event) {
-		Entity damager = event.getDamager();
-		Entity damaged = event.getEntity();
+	public void entityDeathEvent(EntityDeathEvent event) {
+		LivingEntity mob = event.getEntity();
+		Player player = mob.getKiller();
 
-		if (damaged instanceof Mob mob
-			    && damager instanceof Player player
-			    && EntityUtils.isElite(damaged)
-			    && event.getFinalDamage() >= mob.getHealth()) {
+		if (player != null && EntityUtils.isElite(mob)) {
 			Cosmetic activeCosmetic = CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.ELITE_FINISHER);
 			if (activeCosmetic != null) {
-				EliteFinishers.activateFinisher(player, event.getEntity(), event.getEntity().getLocation(), activeCosmetic.getName());
+				EliteFinishers.activateFinisher(player, mob, mob.getLocation(), activeCosmetic.getName());
 			}
 		}
 	}
