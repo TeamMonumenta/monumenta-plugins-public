@@ -57,17 +57,14 @@ public class DamageBlocker extends Spell {
 	@Override
 	public void bossHitByProjectile(ProjectileHitEvent event) {
 		Projectile proj = event.getEntity();
-		if (proj.getShooter() instanceof Player) {
-			Player player = (Player) proj.getShooter();
+		if (proj.getShooter() instanceof Player player) {
 			if (player.getLocation().distance(mBoss.getLocation()) > 7) {
 				//Do not do damage if farther than 7 blocks away
 				if (!(proj instanceof Trident)) {
 					Projectile deflected = (Projectile) mBoss.getWorld().spawnEntity(proj.getLocation().subtract(proj.getVelocity().normalize()), proj.getType());
 					deflected.setShooter(mBoss);
-					if (deflected instanceof Arrow && proj instanceof Arrow) {
-						Arrow arrow = (Arrow) deflected;
-						Arrow projec = (Arrow) proj;
-						((Arrow) deflected).setCritical(((Arrow) proj).isCritical());
+					if (deflected instanceof Arrow arrow && proj instanceof Arrow projec) {
+						arrow.setCritical(projec.isCritical());
 						if (projec.getBasePotionData() != null) {
 							arrow.setBasePotionData(projec.getBasePotionData());
 							for (PotionEffect effect : projec.getCustomEffects()) {
@@ -85,19 +82,22 @@ public class DamageBlocker extends Spell {
 
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		if (source instanceof Player) {
-			Player player = (Player) event.getDamager();
+		if (source instanceof Player player) {
 			if (player.getLocation().distance(mBoss.getLocation()) > 7 || mHell.checkPortals() || mCeilingHell.checkPortals()) {
-				if (!mWarned.contains(player) && (mHell.checkPortals() || mCeilingHell.checkPortals())) {
-					player.sendMessage(ChatColor.DARK_RED + "Foolish. I am made of nothing. Your attacks shall do nothing to me while my gates are powered.");
-					mWarned.add(player);
-				} else if (!mWarned.contains(player)) {
-					player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " You must get closer! It's turning your attacks to nothing!");
-					mWarned.add(player);
-				}
 				event.setCancelled(true);
-				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 2);
-				mBoss.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 10, 0, 0, 0, 0.1);
+
+				DamageEvent.DamageType type = event.getType();
+				if (type != DamageEvent.DamageType.FIRE && type != DamageEvent.DamageType.AILMENT) {
+					if (!mWarned.contains(player) && (mHell.checkPortals() || mCeilingHell.checkPortals())) {
+						player.sendMessage(ChatColor.DARK_RED + "Foolish. I am made of nothing. Your attacks shall do nothing to me while my gates are powered.");
+						mWarned.add(player);
+					} else if (!mWarned.contains(player)) {
+						player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " You must get closer! It's turning your attacks to nothing!");
+						mWarned.add(player);
+					}
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 2);
+					mBoss.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 10, 0, 0, 0, 0.1);
+				}
 			} else {
 				player.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 10, 1.5f);
 			}
