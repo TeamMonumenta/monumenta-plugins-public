@@ -533,6 +533,7 @@ public class ItemStatUtils {
 		ALCHEMICAL_ALEMBIC(null, "Alchemical Utensil", false, false, false),
 		//Random Stuff
 		PESTILENCE_TESSERACT(new PestilenceTesseract(), false, false, true),
+		PERSISTENCE(new Persistence(), false, false, false),
 		// Crit Calcs (defaults to value of 1, always active. DO NOT GIVE TO PLAYERS VIA ENCHANT)
 		HIDE_ATTRIBUTES(new HideAttributes(), false, false, false),
 		HIDE_ENCHANTS(new HideEnchants(), false, false, false),

@@ -394,6 +394,8 @@ public class ItemUtils {
 				default:
 					return ItemDeathResult.KEEP;
 			}
+		} else if (ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.PERSISTENCE) > 0) {
+			return ItemDeathResult.KEEP;
 		} else if (isShulkerBox(item.getType())) {
 			return ItemDeathResult.SHATTER;
 		}
