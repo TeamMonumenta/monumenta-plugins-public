@@ -29,6 +29,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ public final class Varcosa extends BossAbilityGroup {
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
+	private double mCoef;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -119,11 +121,25 @@ public final class Varcosa extends BossAbilityGroup {
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
+
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				if (mBoss.isDead() || !mBoss.isValid()) {
+					this.cancel();
+				}
+				int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+				mCoef = BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
+			}
+		}.runTaskTimer(mPlugin, 0, 100);
 	}
 
 	@Override
 	public void init() {
 		int bossTargetHp = 1650;
+		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+		mCoef = BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
 
@@ -144,34 +160,6 @@ public final class Varcosa extends BossAbilityGroup {
 	//Reduce damage taken for each player by a percent
 	@Override
 	public void onHurt(DamageEvent event) {
-		double damage = event.getDamage();
-		switch (BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange)) {
-			case 2:
-				damage *= .7; //2142 hp
-				break;
-			case 3:
-				damage *= .6; //2500 hp
-				break;
-			case 4:
-				damage *= .55; //2730 hp
-				break;
-			case 5:
-				damage *= .5; //3000 hp
-				break;
-			case 6:
-				damage *= .475; //3157 hp
-				break;
-			case 7:
-				damage *= .45; //3333 hp
-				break;
-			case 8:
-				damage *= .44; //3409 hp
-				break;
-			default:
-				damage *= 1;
-				break;
-		}
-		event.setDamage(damage);
-
+		event.setDamage(event.getDamage() / mCoef);
 	}
 }

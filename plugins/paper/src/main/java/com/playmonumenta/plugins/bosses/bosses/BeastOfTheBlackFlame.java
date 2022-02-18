@@ -46,7 +46,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 	public static final int detectionRange = 75;
 	public static final String losName = "BeastOfTheBlackFlame";
 
-	private static final int BASE_HEALTH = 2524;
+	private static final int BASE_HEALTH = 4000;
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
@@ -282,19 +282,8 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		double bossTargetHp = BASE_HEALTH * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
 
-		/*
-		 * New boss mechanic: The more players there are,
-		 * the less invulnerability frames/no damage ticks it has.
-		 * Note: A normal mob's maximum NoDamageTicks is 20, with 10 being when it can be damaged.
-		 * It's really weird, but regardless, remember that its base will always be 20.
-		 */
-		int noDamageTicksTake = playerCount / 3;
-		if (noDamageTicksTake > 5) {
-			noDamageTicksTake = 5;
-		}
-		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		int bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);

@@ -1029,15 +1029,9 @@ public class Kaul extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		int hpDelta = 2048;
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2 + 25;
-			playerCount--;
-		}
-		double finalHp = bossTargetHp * 1.1;
+		double finalHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, finalHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

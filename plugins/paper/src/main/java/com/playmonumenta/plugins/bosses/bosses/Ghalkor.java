@@ -42,7 +42,7 @@ public final class Ghalkor extends BossAbilityGroup {
 	public static final String identityTag = "boss_ghalkor";
 	public static final int detectionRange = 75;
 
-	private static final int BASE_HEALTH = 1524;
+	private static final int BASE_HEALTH = 2500;
 	private static final String duoTag = "svalgotthevoidwalker";
 
 	private final Location mSpawnLoc;
@@ -253,19 +253,8 @@ public final class Ghalkor extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		double bossTargetHp = BASE_HEALTH * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
 
-		/*
-		 * New boss mechanic: The more players there are,
-		 * the less invulnerability frames/no damage ticks it has.
-		 * Note: A normal mob's maximum NoDamageTicks is 20, with 10 being when it can be damaged.
-		 * It's really weird, but regardless, remember that its base will always be 20.
-		 */
-		int noDamageTicksTake = playerCount / 3;
-		if (noDamageTicksTake > 5) {
-			noDamageTicksTake = 5;
-		}
-		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		int bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1 / Math.E) * Math.log(playerCount)) * 1.1);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.bosses.spells.sealedremorse.SvalgotBoneSlam;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.SvalgotOrbOfBones;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.SvalgotRisingBlackflame;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -39,7 +40,7 @@ public final class Svalgot extends BossAbilityGroup {
 	public static final String identityTag = "boss_svalgot";
 	public static final int detectionRange = 75;
 
-	private static final int BASE_HEALTH = 1524;
+	private static final int BASE_HEALTH = 2500;
 	private static final String duoTag = "ghalkortheforgemaster";
 
 	private final Location mSpawnLoc;
@@ -208,19 +209,8 @@ public final class Svalgot extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		double bossTargetHp = BASE_HEALTH * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
 
-		/*
-		 * New boss mechanic: The more players there are,
-		 * the less invulnerability frames/no damage ticks it has.
-		 * Note: A normal mob's maximum NoDamageTicks is 20, with 10 being when it can be damaged.
-		 * It's really weird, but regardless, remember that its base will always be 20.
-		 */
-		int noDamageTicksTake = playerCount / 3;
-		if (noDamageTicksTake > 5) {
-			noDamageTicksTake = 5;
-		}
-		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		int bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1 / Math.E) * Math.log(playerCount)) * 1.1);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

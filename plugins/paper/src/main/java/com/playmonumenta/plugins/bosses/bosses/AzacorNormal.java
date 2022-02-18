@@ -140,16 +140,11 @@ public final class AzacorNormal extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hpDelta = 512;
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2;
-			playerCount--;
-		}
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
-		mBoss.setHealth(bossTargetHp);
+		int hpDelta = 625;
+		double finalHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, finalHp);
+		mBoss.setHealth(finalHp);
 
 		//launch event related spawn commands
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");

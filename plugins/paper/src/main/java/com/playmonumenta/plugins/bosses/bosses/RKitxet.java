@@ -1,13 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -28,7 +20,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -47,9 +39,15 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
-import net.md_5.bungee.api.ChatColor;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RKitxet extends BossAbilityGroup {
 	public static final String identityTag = "boss_rkitxet";
@@ -245,7 +243,7 @@ public class RKitxet extends BossAbilityGroup {
 					// Do health scaling here because players might not have been teleported in yet when init() would be run
 					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 					int playerCount = players.size();
-					int hp = (int) (RKITXET_HEALTH * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
+					double hp = RKITXET_HEALTH * BossUtils.healthScalingCoef(playerCount, 0.5, 0.35);
 					mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(hp);
 					mBoss.setHealth(hp);
 					mBoss.setInvulnerable(false);

@@ -275,10 +275,9 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	public void init() {
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
 		int hpDelta = 2500;
-
-		int bossTargetHp = (int) (hpDelta * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.setHealth(bossTargetHp);
+		double finalHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
+		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(finalHp);
+		mBoss.setHealth(finalHp);
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			if (player.hasPotionEffect(PotionEffectType.GLOWING)) {

@@ -1,12 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -24,7 +17,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -44,7 +37,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import net.md_5.bungee.api.ChatColor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SnowSpirit extends BossAbilityGroup {
 	public static final String identityTag = "boss_snowspirit";
@@ -272,7 +270,7 @@ public class SnowSpirit extends BossAbilityGroup {
 	public void init() {
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		int hpDel = 2500;
-		int bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
+		double bossTargetHp = hpDel * BossUtils.healthScalingCoef(playerCount, 0.5, 0.6);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
@@ -324,9 +322,9 @@ public class SnowSpirit extends BossAbilityGroup {
 			if (miniboss instanceof LivingEntity mini) {
 				int playerCount = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).size();
 				int hpDel = (int) mini.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-				int bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
-				EntityUtils.setAttributeBase(mini, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
-				mini.setHealth(bossTargetHp * 1.1);
+				double bossTargetHp = hpDel * BossUtils.healthScalingCoef(playerCount, 0.5, 0.6);
+				EntityUtils.setAttributeBase(mini, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+				mini.setHealth(bossTargetHp);
 			}
 		}
 	}

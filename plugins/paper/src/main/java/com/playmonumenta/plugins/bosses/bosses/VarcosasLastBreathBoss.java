@@ -1,12 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -28,7 +21,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -44,6 +36,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class VarcosasLastBreathBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_breath";
@@ -139,19 +138,14 @@ public final class VarcosasLastBreathBoss extends BossAbilityGroup {
 	@Override
 	public void init() {
 		mBoss.teleport(mCenter.clone().add(0, 1, 0));
-		int bossTargetHp = 0;
-		int bossHpDelta = 1200;
-		int playersInRange = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		while (playersInRange > 0) {
-			bossTargetHp += bossHpDelta;
-			bossHpDelta = (int) Math.floor(bossHpDelta / 1.8 + 100);
-			playersInRange--;
-		}
+		int hpDelta = 2000;
+		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+		double finalHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
 
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, finalHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(bossTargetHp * 1.1);
+		mBoss.setHealth(finalHp);
 
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(0, 0, 11.5));
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(0, 0, -11.5));

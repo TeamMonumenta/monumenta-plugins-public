@@ -151,19 +151,14 @@ public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 	@Override
 	public void init() {
 		mBoss.teleport(mSpawnLoc);
-		int bossTargetHp = 0;
-		int bossHpDelta = 1000;
-		int playersInRange = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		while (playersInRange > 0) {
-			bossTargetHp += bossHpDelta;
-			bossHpDelta = (int) Math.floor(bossHpDelta / 1.8 + 100);
-			playersInRange--;
-		}
+		int hpDelta = 2000;
+		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+		double finalHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
 
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, finalHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(bossTargetHp * 1.1);
+		mBoss.setHealth(finalHp);
 
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Lingering Will\",\"color\":\"dark_red\",\"bold\":true}]");

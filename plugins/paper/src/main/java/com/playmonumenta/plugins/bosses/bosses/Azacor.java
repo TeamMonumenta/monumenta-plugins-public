@@ -1,26 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -38,6 +17,26 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class Azacor extends BossAbilityGroup {
 	public static final String identityTag = "boss_azacor";
@@ -183,16 +182,11 @@ public final class Azacor extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hpDelta = 1024;
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2;
-			playerCount--;
-		}
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
-		mBoss.setHealth(bossTargetHp * 1.1);
+		int hpDelta = 1250;
+		double finalHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, finalHp);
+		mBoss.setHealth(finalHp);
 
 		//launch event related spawn commands
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "effect give @s minecraft:blindness 2 2");

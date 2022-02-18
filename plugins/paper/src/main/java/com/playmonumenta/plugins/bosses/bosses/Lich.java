@@ -20,7 +20,6 @@ import com.playmonumenta.plugins.bosses.spells.lich.SpellFinalParticle;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellFinalSwarm;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellGraspingHands;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellGravityWell;
-import com.playmonumenta.plugins.bosses.spells.lich.SpellHorseResist;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellMiasma;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellRaiseDead;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellSalientOfDecay;
@@ -40,7 +39,6 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -83,6 +81,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -381,7 +380,6 @@ public final class Lich extends BossAbilityGroup {
 				new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
 
 		List<Spell> phase3PassiveSpells = Arrays.asList(
-				new SpellHorseResist(mBoss, mStart.getLocation(), detectionRange),
 				new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
 				new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
 				new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
@@ -961,7 +959,6 @@ public final class Lich extends BossAbilityGroup {
 							));
 
 					List<Spell> phase3PassiveSpells = Arrays.asList(
-							new SpellHorseResist(mBoss, mStart.getLocation(), detectionRange),
 							new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
 							new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
 							new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
@@ -2071,7 +2068,7 @@ public final class Lich extends BossAbilityGroup {
 	public void init() {
 		int playercount = playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		double hpdel = 4250;
-		int bossTargetHp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.max(Math.log(playercount), 0)));
+		double bossTargetHp = hpdel * BossUtils.healthScalingCoef(playercount, 0.6, 0.35);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

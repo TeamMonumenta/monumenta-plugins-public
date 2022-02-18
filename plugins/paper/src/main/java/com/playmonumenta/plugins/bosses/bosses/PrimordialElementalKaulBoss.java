@@ -65,14 +65,9 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		mBoss.setRemoveWhenFarAway(false);
 		Location spawnLoc = mBoss.getLocation();
 		World world = mBoss.getWorld();
-		int bossTargetHp = 0;
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		int hpDelta = 768;
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2;
-			playerCount--;
-		}
+		double bossTargetHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

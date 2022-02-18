@@ -1,14 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -30,7 +21,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -59,6 +49,15 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 public final class FalseSpirit extends BossAbilityGroup {
 	public static final String identityTag = "boss_falsespirit";
 	public static final int detectionRange = 75;
@@ -71,6 +70,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 	private final Location mEndLoc;
 
 	private static final int HEALTH_HEALED = 100;
+	private double mCoef;
 
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
@@ -287,6 +287,8 @@ public final class FalseSpirit extends BossAbilityGroup {
 						p.spawnParticle(Particle.FLAME, p.getLocation(), 10, 0.5, 0.25, 0.5, 0.2);
 					}
 				}
+				int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+				mCoef = BossUtils.healthScalingCoef(playerCount, 0.5, 0.6);
 			}
 		}.runTaskTimer(mPlugin, 0, 20);
 
@@ -318,6 +320,13 @@ public final class FalseSpirit extends BossAbilityGroup {
 				event.setCancelled(true);
 			}
 		}
+
+	}
+
+	//Reduce damage taken for each player by a percent
+	@Override
+	public void onHurt(DamageEvent event) {
+		event.setDamage(event.getDamage() / mCoef);
 	}
 
 	@Override
@@ -415,25 +424,13 @@ public final class FalseSpirit extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
-		int hpDel = 3012;
-
-		/*
-		 * New boss mechanic: The more players there are,
-		 * the less invulnerability frames/no damage ticks it has.
-		 * Note: A normal mob's maximum NoDamageTicks is 20, with 10 being when it can be damaged.
-		 * It's really weird, but regardless, remember that its base will always be 20.
-		 */
-		int noDamageTicksTake = playerCount / 3;
-		if (noDamageTicksTake > 5) {
-			noDamageTicksTake = 5;
-		}
-		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		int bossTargetHp = (int) (hpDel * (1 + (1 - 1 / Math.E) * Math.log(playerCount)) * 1.1);
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		int hpDel = 3000;
+		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+		mCoef = BossUtils.healthScalingCoef(playerCount, 0.5, 0.6);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, hpDel);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(bossTargetHp);
+		mBoss.setHealth(hpDel);
 
 		mBoss.setPersistent(true);
 

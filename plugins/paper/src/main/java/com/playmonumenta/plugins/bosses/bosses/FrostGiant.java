@@ -1,14 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -32,13 +23,17 @@ import com.playmonumenta.plugins.bosses.spells.frostgiant.UltimateSeismicRuin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -71,12 +66,16 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /* WARNING: Basically all the spell info in the comments is outdated.
  * Please use the Frost Giant Formal Write-up for up to date spell descriptions.
@@ -1064,20 +1063,9 @@ public class FrostGiant extends BossAbilityGroup {
 	public void init() {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 		int playerCount = players.size();
-		int hpDel = 5012;
+		int hpDel = 5000;
 
-		/*
-		 * New boss mechanic: The more players there are,
-		 * the less invulnerability frames/no damage ticks it has.
-		 * Note: A normal mob's maximum NoDamageTicks is 20, with 10 being when it can be damaged.
-		 * It's really weird, but regardless, remember that its base will always be 20.
-		 */
-		int noDamageTicksTake = playerCount / 3;
-		if (noDamageTicksTake > 5) {
-			noDamageTicksTake = 5;
-		}
-		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		int bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
+		double bossTargetHp = hpDel * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);

@@ -1,25 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -38,6 +18,26 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CAxtal extends BossAbilityGroup {
 	public static final String identityTag = "boss_caxtal";
@@ -45,6 +45,7 @@ public class CAxtal extends BossAbilityGroup {
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
+	private double mCoef = 1;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -130,20 +131,32 @@ public class CAxtal extends BossAbilityGroup {
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
+
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				if (mBoss.isDead() || !mBoss.isValid()) {
+					this.cancel();
+				}
+				int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+				mCoef = BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
+			}
+		}.runTaskTimer(mPlugin, 0, 100);
+	}
+
+	@Override
+	public void onHurt(DamageEvent event) {
+		event.setDamage(event.getDamage() / mCoef);
 	}
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		int hpDelta = 1024;
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2;
-			playerCount--;
-		}
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
-		mBoss.setHealth(bossTargetHp * 1.1);
+		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+		mCoef = BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, hpDelta);
+		mBoss.setHealth(hpDelta);
 
 		//launch event related spawn commands
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
