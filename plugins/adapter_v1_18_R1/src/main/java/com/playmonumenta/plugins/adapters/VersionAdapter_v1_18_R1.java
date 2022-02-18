@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.adapters;
 
 import javax.annotation.Nullable;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -256,4 +257,10 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 		((CraftMob) mob).getHandle().setXxa(0);
 		((CraftMob) mob).getHandle().setZza(0);
 	}
+
+	@Override
+	public int getEntityTypeRegistryId(Entity entity) {
+		return Registry.ENTITY_TYPE.getId(((CraftEntity) entity).getHandle().getType());
+	}
+
 }

@@ -47,4 +47,7 @@ public interface VersionAdapter {
 	void stunShield(Player player, int ticks);
 
 	void cancelStrafe(Mob mob);
+
+	int getEntityTypeRegistryId(Entity entity);
+
 }

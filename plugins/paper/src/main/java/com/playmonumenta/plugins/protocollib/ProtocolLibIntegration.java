@@ -4,10 +4,13 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import org.bukkit.Bukkit;
 
 import java.util.logging.Logger;
 
 public class ProtocolLibIntegration {
+
+	private final PlayerTitlePacketAdapter mPlayerTitlePacketAdapter;
 
 	public ProtocolLibIntegration(Plugin plugin) {
 		Logger logger = plugin.getLogger();
@@ -28,6 +31,15 @@ public class ProtocolLibIntegration {
 		syncManager.addPacketListener(new FirmamentLagFix(plugin));
 		syncManager.addPacketListener(new EntityEquipmentReplacer(plugin));
 
+		mPlayerTitlePacketAdapter = new PlayerTitlePacketAdapter(syncManager, plugin);
+		syncManager.addPacketListener(mPlayerTitlePacketAdapter);
+
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::tick, 2, 2);
+	}
+
+	// called every 2 ticks
+	private void tick() {
+		mPlayerTitlePacketAdapter.tick();
 	}
 
 }

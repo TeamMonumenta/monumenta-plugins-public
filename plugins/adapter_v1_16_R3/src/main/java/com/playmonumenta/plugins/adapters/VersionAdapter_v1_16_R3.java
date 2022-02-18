@@ -7,6 +7,7 @@ import net.minecraft.server.v1_16_R3.EntityDamageSource;
 import net.minecraft.server.v1_16_R3.EntityLiving;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
+import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.Vec3D;
 import org.bukkit.Material;
@@ -255,4 +256,10 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 		((CraftMob) mob).getHandle().t(0);
 		((CraftMob) mob).getHandle().v(0);
 	}
+
+	@Override
+	public int getEntityTypeRegistryId(Entity entity) {
+		return IRegistry.ENTITY_TYPE.a(((CraftEntity) entity).getHandle().getEntityType());
+	}
+
 }

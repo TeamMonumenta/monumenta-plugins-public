@@ -62,4 +62,10 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	public void cancelStrafe(Mob mob) {
 
 	}
+
+	@Override
+	public int getEntityTypeRegistryId(Entity entity) {
+		throw new UnsupportedOperationException();
+	}
+
 }
