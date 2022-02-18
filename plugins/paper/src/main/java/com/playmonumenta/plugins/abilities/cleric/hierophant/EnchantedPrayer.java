@@ -53,8 +53,6 @@ public class EnchantedPrayer extends Ability {
 		mHeal = getAbilityScore() == 1 ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL;
 	}
 
-	public static final String ENCHANTED_PRAYER_METAKEY = "EnchantedPrayerMetakey";
-
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		if (mPlayer == null) {
