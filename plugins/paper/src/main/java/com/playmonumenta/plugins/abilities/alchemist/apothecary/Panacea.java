@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -32,6 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -117,7 +117,9 @@ public class Panacea extends Ability {
 						if (mBox.overlaps(mob.getBoundingBox())) {
 							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, null);
 
-							EntityUtils.applySlow(mPlugin, mSlowTicks, 1, mob);
+							if (!EntityUtils.isBoss(mob)) {
+								EntityUtils.applySlow(mPlugin, mSlowTicks, 1, mob);
+							}
 							mobIter.remove();
 						}
 					}
