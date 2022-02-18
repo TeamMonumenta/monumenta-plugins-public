@@ -291,8 +291,9 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				return;
 			}
 
-			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, null);
+			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, false, null);
 			mMobsIframeMap.put(mob.getUniqueId(), mPlayer.getTicksLived());
+
 
 			// Intentionally apply effects after damage
 			applyEffects(mob, isGruesome);

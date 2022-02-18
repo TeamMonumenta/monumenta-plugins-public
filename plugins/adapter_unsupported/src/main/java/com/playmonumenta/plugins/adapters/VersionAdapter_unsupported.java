@@ -13,19 +13,7 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 
 	}
 
-	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount) {
-		customDamageEntity(damager, damagee, amount, null);
-	}
-
-	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, @Nullable String killedUsingMsg) {
-		damagee.damage(amount, damager);
-	}
-
-	public void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager) {
-		damagee.damage(amount, damager);
-	}
-
-	public void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager, @Nullable String cause) {
+	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg) {
 		damagee.damage(amount, damager);
 	}
 

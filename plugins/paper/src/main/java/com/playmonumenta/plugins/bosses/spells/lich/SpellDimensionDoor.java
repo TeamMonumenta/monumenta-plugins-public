@@ -391,7 +391,6 @@ public class SpellDimensionDoor extends Spell {
 				}
 				//kill player if time runs out. show that they are dying extremely quickly
 				if (mT <= 0) {
-					p.setNoDamageTicks(0);
 					BossUtils.bossDamagePercent(mBoss, p, 0.1);
 				}
 

@@ -2,8 +2,8 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.listeners.StasisListener;
-import org.bukkit.GameMode;
+import com.playmonumenta.plugins.events.DamageEvent;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -11,7 +11,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
@@ -78,8 +77,7 @@ public class BossUtils {
 	}
 
 	public static void blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, int stunTicks, int durability) {
-		// If they have resistance 5 or are in stasis, do not deal damage or stun shield
-		if ((damagee.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE) && damagee.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() >= 4) || StasisListener.isInStasis(damagee)) {
+		if (DamageUtils.isImmuneToDamage(damagee)) {
 			return;
 		}
 
@@ -90,7 +88,7 @@ public class BossUtils {
 			}
 			ItemUtils.damageShield(player, durability);
 		} else {
-			DamageUtils.damage(damager, damagee, type, damage, null, bypassIFrames, causeKnockback, cause);
+			DamageUtils.damage(damager, damagee, new DamageEvent.Metadata(type, null), damage, bypassIFrames, causeKnockback, false, cause);
 		}
 	}
 
@@ -153,31 +151,11 @@ public class BossUtils {
 			return true;
 		}
 
-		if (target instanceof Player player) {
-			if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
-				return true;
-			}
-
-			// Do not damage players currently in stasis
-			if (StasisListener.isInStasis(player)) {
-				return true;
-			}
-		}
-
-		int resistance = 0;
-		if (target.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
-			resistance = target.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1;
-		}
-
-		// Resist 5 = no damage
-		if (resistance >= 5) {
+		if (DamageUtils.isImmuneToDamage(target)) {
 			return true;
 		}
 
-		double toTake = EntityUtils.getMaxHealth(target) * percentHealth;
-		if (raw) {
-			toTake = percentHealth;
-		}
+		double toTake = raw ? percentHealth : EntityUtils.getMaxHealth(target) * percentHealth;
 
 		if (target instanceof Player player && bossDamageBlocked(player, location)) {
 			/*
@@ -201,9 +179,11 @@ public class BossUtils {
 
 			if (adjustedHealth <= 0) {
 				// Kill the player, but allow totems to trigger
-				NmsUtils.getVersionAdapter().unblockableEntityDamageEntity(target, 1000, boss, cause);
+				target.setNoDamageTicks(0);
+				DamageUtils.damage(boss, target, new DamageEvent.Metadata(DamageType.OTHER, null), 1000, false, true, false, cause);
 				return false;
 			} else {
+				double originalDamage = toTake;
 				if (absorp > 0) {
 					if (absorp - toTake > 0) {
 						AbsorptionUtils.setAbsorption(target, (float) (absorp - toTake), -1);
@@ -220,9 +200,24 @@ public class BossUtils {
 						target.setHealth(Math.max(target.getHealth() - toTake, 1));
 					}
 				}
-				//TODO B#9334: test if this is doing more damage than the provided percentage - the intended amount
-				// Also test if iframes can eat this part of the damage and prevent events from triggering
-				NmsUtils.getVersionAdapter().unblockableEntityDamageEntity(target, 1, boss, cause);
+
+				// deal a small amount of damage for abilities to trigger and the hurt effect to play
+
+				double lastDamage = target.getLastDamage();
+				int noDamageTicks = target.getNoDamageTicks();
+				target.setNoDamageTicks(0);
+
+				DamageUtils.damage(boss, target, new DamageEvent.Metadata(DamageType.OTHER, null), 0.001, false, true, false, cause);
+
+				if (noDamageTicks <= target.getMaximumNoDamageTicks() / 2f) {
+					// had iframes: increase iframes by dealt damage, but keep length
+					target.setNoDamageTicks(noDamageTicks);
+					target.setLastDamage(lastDamage + originalDamage);
+				} else {
+					// had no iframes: add iframes for the damage dealt
+					target.setNoDamageTicks(target.getMaximumNoDamageTicks());
+					target.setLastDamage(originalDamage);
+				}
 			}
 		}
 

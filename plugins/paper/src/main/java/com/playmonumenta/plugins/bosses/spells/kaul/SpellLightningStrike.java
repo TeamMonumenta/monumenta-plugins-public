@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -23,7 +24,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -376,10 +376,6 @@ public class SpellLightningStrike extends Spell {
 
 			@Override
 			public void run() {
-				//TODO B#9334: true iframe bypass via edited bossDamagePercent(),
-				// similar to bypassIFrames in entity utils, instead of overwriting
-				// last damage to a small amount with every shock
-				player.setNoDamageTicks(0);
 				BossUtils.bossDamagePercent(mKaul.getBoss(), player, SHOCK_DAMAGE_MULTIPLIER, strikeLocation, "Lightning Strike");
 
 				if (mInitialLocationUsed) {
@@ -528,11 +524,6 @@ public class SpellLightningStrike extends Spell {
 					);
 					burnPlayers.forEach((Player player) -> {
 						player.setFireTicks(FIRE_ALIGHT_TICKS);
-
-						//TODO B#9334: true iframe bypass via edited bossDamagePercent(),
-						// similar to bypassIFrames in entity utils, instead of overwriting
-						// last damage to a small amount with every shock
-						player.setNoDamageTicks(0);
 						BossUtils.bossDamagePercent(mKaul.getBoss(), player, FIRE_DAMAGE_MULTIPLIER, fireLocation, "Lightning Strike");
 					});
 				}

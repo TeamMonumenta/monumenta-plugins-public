@@ -115,7 +115,7 @@ public class Panacea extends Ability {
 					while (mobIter.hasNext()) {
 						LivingEntity mob = mobIter.next();
 						if (mBox.overlaps(mob.getBoundingBox())) {
-							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, null);
+							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, false, null);
 
 							if (!EntityUtils.isBoss(mob)) {
 								EntityUtils.applySlow(mPlugin, mSlowTicks, 1, mob);

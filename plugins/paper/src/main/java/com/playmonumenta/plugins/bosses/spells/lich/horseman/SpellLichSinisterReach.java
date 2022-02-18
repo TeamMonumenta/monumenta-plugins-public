@@ -153,7 +153,6 @@ public class SpellLichSinisterReach extends Spell {
 
 	public void multiHit(Player p) {
 		BukkitRunnable runB = new BukkitRunnable() {
-			int mNDT = p.getNoDamageTicks();
 			int mInc = 0;
 			@Override
 			public void run() {
@@ -174,7 +173,6 @@ public class SpellLichSinisterReach extends Spell {
 					p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 10));
 				}
 				if (mInc >= 24) {
-					p.setNoDamageTicks(mNDT);
 					mBoss.setAI(true);
 					if (horse != null) {
 						horse.setAI(true);

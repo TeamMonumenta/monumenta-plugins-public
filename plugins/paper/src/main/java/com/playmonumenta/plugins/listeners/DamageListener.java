@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -72,12 +73,18 @@ public class DamageListener implements Listener {
 			if (event.getCause() != DamageCause.CUSTOM) {
 				Bukkit.getPluginManager().callEvent(new DamageEvent(event, le));
 			} else if (DamageUtils.nextEventMetadata != null) {
-				Bukkit.getPluginManager().callEvent(new DamageEvent(event, le, DamageUtils.nextEventMetadata));
+				DamageEvent.Metadata nextEventMetadata = DamageUtils.nextEventMetadata;
+				DamageUtils.nextEventMetadata = null;
+				Bukkit.getPluginManager().callEvent(new DamageEvent(event, le, nextEventMetadata));
 			}
 		}
 		// If the damage is blocked, revert to the initial damage to make sure the shield gets proper durability damage.
 		// This also prevents knockback going through shields sometimes for some reason.
-		if (event.getOriginalDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0) {
+		// Needs to check for holding a shield since the mob's attack may have disabled it.
+		if (event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0
+			    && event.getEntity() instanceof Player player
+			    && player.getActiveItem() != null
+			    && player.getActiveItem().getType() == Material.SHIELD) {
 			event.setDamage(originalDamage);
 		}
 	}

@@ -99,6 +99,7 @@ public class Blizzard extends Ability {
 								p.setFireTicks(1);
 							}
 						}
+
 						for (LivingEntity mob : mobs) {
 							EntityUtils.applySlow(mPlugin, SLOW_TICKS, mLevelSlowMultiplier, mob);
 						}
@@ -106,7 +107,7 @@ public class Blizzard extends Ability {
 
 					if (mTicks % DAMAGE_INTERVAL == 0) {
 						for (LivingEntity mob : mobs) {
-							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), spellDamage, false, true, null);
+							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), spellDamage, false, true, false, null);
 						}
 					}
 

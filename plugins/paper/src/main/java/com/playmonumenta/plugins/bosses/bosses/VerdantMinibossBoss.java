@@ -1,9 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Collection;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
@@ -21,7 +17,8 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
+import javax.annotation.Nullable;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -44,9 +41,10 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
-import net.md_5.bungee.api.ChatColor;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class VerdantMinibossBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_verdantmini";
@@ -200,8 +198,8 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 							// 5.0 because 5 ticks and impact time is in ticks, and to make it a double
 							mLocation = mLocation.subtract(0, (5.0 * HEIGHT) / IMPACT_TIME, 0);
 							world.spawnParticle(Particle.SPELL_WITCH, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0);
-							world.spawnParticle(Particle.FLAME, mLocation, 18, RADIUS / 2, RADIUS / 2, RADIUS / 2, 0);
-							world.spawnParticle(Particle.CLOUD, mLocation, 18, RADIUS / 2, RADIUS / 2, RADIUS / 2, 0);
+							world.spawnParticle(Particle.FLAME, mLocation, 18, RADIUS / 2.0, RADIUS / 2.0, RADIUS / 2.0, 0);
+							world.spawnParticle(Particle.CLOUD, mLocation, 18, RADIUS / 2.0, RADIUS / 2.0, RADIUS / 2.0, 0);
 							world.spawnParticle(Particle.SMOKE_LARGE, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0);
 							world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, mLocation, 1, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0);
 

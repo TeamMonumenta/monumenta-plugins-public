@@ -11,13 +11,7 @@ import org.bukkit.util.Vector;
 public interface VersionAdapter {
 	void resetPlayerIdleTimer(Player player);
 
-	void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount);
-
-	void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, @Nullable String killedUsingMsg);
-
-	void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager);
-
-	void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager, @Nullable String cause);
+	void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg);
 
 	<T extends Entity> T duplicateEntity(T entity);
 

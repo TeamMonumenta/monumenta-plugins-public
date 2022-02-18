@@ -35,57 +35,23 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	}
 
 	private static class CustomDamageSource extends EntityDamageSource {
-		String mKilledUsingMsg;
+		private final boolean mBlockable;
+		private final String mKilledUsingMsg;
 
-		public CustomDamageSource(net.minecraft.server.v1_16_R3.Entity damager, @Nullable String killedUsingMsg) {
+		public CustomDamageSource(net.minecraft.server.v1_16_R3.Entity damager, boolean blockable, @Nullable String killedUsingMsg) {
 			super("custom", damager);
-
+			mBlockable = blockable;
 			if (killedUsingMsg == null || killedUsingMsg.isEmpty()) {
-				mKilledUsingMsg = "magic";
-			} else {
-				mKilledUsingMsg = killedUsingMsg;
-			}
-		}
-
-		@Override
-		public IChatBaseComponent getLocalizedDeathMessage(EntityLiving entityliving) {
-			// death.attack.indirectMagic.item=%1$s was killed by %2$s using %3$s
-			String s = "death.attack.indirectMagic.item";
-			return new ChatMessage(s, new Object[] { entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName(), mKilledUsingMsg});
-		}
-	}
-
-	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount) {
-		customDamageEntity(damager, damagee, amount, null);
-	}
-
-	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, @Nullable String killedUsingMsg) {
-		DamageSource reason = new CustomDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle(), killedUsingMsg);
-
-		((CraftLivingEntity) damagee).getHandle().damageEntity(reason, (float) amount);
-	}
-
-	private static class UnblockableEntityDamageSource extends EntityDamageSource {
-		private final @Nullable String mKilledUsingMsg;
-
-		public UnblockableEntityDamageSource(net.minecraft.server.v1_16_R3.Entity entity) {
-			super("custom", entity);
-			mKilledUsingMsg = null;
-		}
-
-		public UnblockableEntityDamageSource(net.minecraft.server.v1_16_R3.Entity damager, @Nullable String killedUsingMsg) {
-			super("custom", damager);
-			if (killedUsingMsg == null || !killedUsingMsg.isEmpty()) {
-				mKilledUsingMsg = killedUsingMsg;
-			} else {
 				// We don't want to see "Player was killed by Mob using ", so just get rid of the message if it's nothing
 				mKilledUsingMsg = null;
+			} else {
+				mKilledUsingMsg = killedUsingMsg;
 			}
 		}
 
 		@Override
 		public @Nullable Vec3D w() {
-			return null;
+			return mBlockable ? super.w() : null;
 		}
 
 		@Override
@@ -100,26 +66,17 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 				return new ChatMessage(s, entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName(), mKilledUsingMsg);
 			}
 		}
-
 	}
 
-	public void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager) {
-		unblockableEntityDamageEntity(damagee, amount, damager, null);
-	}
+	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg) {
+		DamageSource reason = new CustomDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle(), blockable, killedUsingMsg);
 
-	public void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager, @Nullable String cause) {
-		// Don't damage invulnerable entities even though this is unblockable
-		if (damagee.isInvulnerable()) {
-			return;
-		}
-
-		DamageSource reason = new UnblockableEntityDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle(), cause);
 		((CraftLivingEntity) damagee).getHandle().damageEntity(reason, (float) amount);
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T extends Entity> T duplicateEntity(T entity) {
-		T newEntity = (T)entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+		T newEntity = (T) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
 
 		NBTTagCompound nbttagcompound = ((CraftEntity) entity).getHandle().save(new NBTTagCompound());
 		nbttagcompound.remove("UUID");

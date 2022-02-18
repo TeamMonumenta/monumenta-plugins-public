@@ -117,7 +117,7 @@ public class RingOfFlames extends DepthsAbility {
 								EntityUtils.applyFire(mPlugin, EFFECT_DURATION, e, mPlayer);
 								EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, 2, e);
 
-								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, null);
+								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false, null);
 
 								mobsHitThisTick++;
 							}

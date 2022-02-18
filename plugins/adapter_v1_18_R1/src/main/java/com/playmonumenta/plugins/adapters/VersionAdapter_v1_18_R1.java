@@ -35,57 +35,23 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 	}
 
 	private static class CustomDamageSource extends EntityDamageSource {
-		String mKilledUsingMsg;
+		private final boolean mBlockable;
+		private final String mKilledUsingMsg;
 
-		public CustomDamageSource(net.minecraft.world.entity.Entity damager, @Nullable String killedUsingMsg) {
+		public CustomDamageSource(net.minecraft.world.entity.Entity damager, boolean blockable, @Nullable String killedUsingMsg) {
 			super("custom", damager);
-
+			mBlockable = blockable;
 			if (killedUsingMsg == null || killedUsingMsg.isEmpty()) {
-				mKilledUsingMsg = "magic";
+				// We don't want to see "Player was killed by Mob using ", so just get rid of the message if it's nothing
+				mKilledUsingMsg = null;
 			} else {
 				mKilledUsingMsg = killedUsingMsg;
 			}
 		}
 
 		@Override
-		public Component getLocalizedDeathMessage(net.minecraft.world.entity.LivingEntity entityliving) {
-			// death.attack.indirectMagic.item=%1$s was killed by %2$s using %3$s
-			String s = "death.attack.indirectMagic.item";
-			return new TranslatableComponent(s, new Object[] { entityliving.getScoreboardName(), this.entity.getScoreboardName(), mKilledUsingMsg});
-		}
-	}
-
-	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount) {
-		customDamageEntity(damager, damagee, amount, null);
-	}
-
-	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, @Nullable String killedUsingMsg) {
-		DamageSource reason = new CustomDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle(), killedUsingMsg);
-
-		((CraftLivingEntity) damagee).getHandle().hurt(reason, (float) amount);
-	}
-
-	private static class UnblockableEntityDamageSource extends EntityDamageSource {
-		private final @Nullable String mKilledUsingMsg;
-
-		public UnblockableEntityDamageSource(net.minecraft.world.entity.Entity entity) {
-			super("custom", entity);
-			mKilledUsingMsg = null;
-		}
-
-		public UnblockableEntityDamageSource(net.minecraft.world.entity.Entity damager, @Nullable String killedUsingMsg) {
-			super("custom", damager);
-			if (killedUsingMsg == null || !killedUsingMsg.isEmpty()) {
-			    mKilledUsingMsg = killedUsingMsg;
-			} else {
-			    // We don't want to see "Player was killed by Mob using ", so just get rid of the message if it's nothing
-			    mKilledUsingMsg = null;
-			}
-		}
-
-		@Override
 		public @Nullable Vec3 getSourcePosition() {
-			return null;
+			return mBlockable ? super.getSourcePosition() : null;
 		}
 
 		@Override
@@ -100,26 +66,17 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 				return new TranslatableComponent(s, entityliving.getScoreboardName(), this.entity.getScoreboardName(), mKilledUsingMsg);
 			}
 		}
-
 	}
 
-	public void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager) {
-		unblockableEntityDamageEntity(damagee, amount, damager, null);
-	}
+	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg) {
+		DamageSource reason = new CustomDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle(), blockable, killedUsingMsg);
 
-	public void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager, @Nullable String cause) {
-		// Don't damage invulnerable entities even though this is unblockable
-		if (damagee.isInvulnerable()) {
-			return;
-		}
-
-		DamageSource reason = new UnblockableEntityDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle(), cause);
 		((CraftLivingEntity) damagee).getHandle().hurt(reason, (float) amount);
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T extends Entity> T duplicateEntity(T entity) {
-		T newEntity = (T)entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+		T newEntity = (T) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
 
 		CompoundTag nbttagcompound = ((CraftEntity) entity).getHandle().saveWithoutId(new CompoundTag());
 		nbttagcompound.remove("UUID");

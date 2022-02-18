@@ -160,11 +160,8 @@ public class SpellReaperOfLife extends Spell {
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, mCenter, 250, 21, 0.3, 21, 0.1);
 					for (Player player : PlayerUtils.playersInRange(mCenter, mRange, true)) {
 						if (mCenter.distance(player.getLocation()) < mRange) {
-							int mNDT = player.getNoDamageTicks();
-							player.setNoDamageTicks(0);
 							BossUtils.bossDamagePercent(mBoss, player, 0.85, (Location)null, "Reaper of Life");
 							player.setFireTicks(20 * 3);
-							player.setNoDamageTicks(mNDT);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, 20 * 10, 4));
 							player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 10, 2));
 						}
