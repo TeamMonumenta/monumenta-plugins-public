@@ -24,7 +24,7 @@ public class BruteForce extends Ability {
 
 	private static final float BRUTE_FORCE_RADIUS = 2.0f;
 	private static final int BRUTE_FORCE_DAMAGE = 2;
-	private static final double BRUTE_FORCE_2_DAMAGE = 4;
+	private static final double BRUTE_FORCE_2_MODIFIER = 0.1;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
 
 
@@ -34,14 +34,15 @@ public class BruteForce extends Ability {
 		mInfo.mScoreboardId = "BruteForce";
 		mInfo.mShorthandName = "BF";
 		mInfo.mDescriptions.add("Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2-block cube around it, and knocks all non-boss enemies away from you.");
-		mInfo.mDescriptions.add("Damage is increased from 2 to 4.");
+		mInfo.mDescriptions.add("Damage is increased from 2 to 10 percent of attack damage plus 2.");
 		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer != null && event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
-			double damageBonus = getAbilityScore() == 1 ? BRUTE_FORCE_DAMAGE : BRUTE_FORCE_2_DAMAGE;
+			double damageBonus = getAbilityScore() == 1 ? BRUTE_FORCE_DAMAGE : BRUTE_FORCE_DAMAGE
+				+ (event.getDamage() * BRUTE_FORCE_2_MODIFIER);
 
 			Location loc = enemy.getLocation().add(0, 0.75, 0);
 			World world = mPlayer.getWorld();

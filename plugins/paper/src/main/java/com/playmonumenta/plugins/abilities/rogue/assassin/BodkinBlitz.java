@@ -71,7 +71,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	@Override
 	public void cast(Action action) {
 		if (mPlayer == null || mTeleporting || !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-				|| !InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
+			|| !InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			return;
 		}
 
@@ -134,7 +134,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 					}
 
 					world.spawnParticle(Particle.FALLING_DUST, boxLoc, 5, 0.15, 0.45, 0.1,
-							Bukkit.createBlockData("gray_concrete"));
+						Bukkit.createBlockData("gray_concrete"));
 					world.spawnParticle(Particle.CRIT, boxLoc, 4, 0.25, 0.5, 0.25, 0);
 					world.spawnParticle(Particle.SMOKE_NORMAL, boxLoc, 5, 0.15, 0.45, 0.15, 0.01);
 
@@ -173,7 +173,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 					world.spawnParticle(Particle.CRIT, mTpLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.3);
 
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-							new PotionEffect(PotionEffectType.FAST_DIGGING, 5, 19, true, false));
+						new PotionEffect(PotionEffectType.FAST_DIGGING, 5, 19, true, false));
 
 					AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration);
 

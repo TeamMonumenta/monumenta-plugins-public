@@ -17,6 +17,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -50,7 +51,7 @@ public class WindWalk extends MultipleChargeAbility {
 		mInfo.mLinkedSpell = ClassAbility.WIND_WALK;
 		mInfo.mScoreboardId = "WindWalk";
 		mInfo.mShorthandName = "WW";
-		mInfo.mDescriptions.add("Left-click twice without hitting a mob while sprinting to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. Cooldown: 25s. Charges: 2.");
+		mInfo.mDescriptions.add("Press the swap key while holding two swords to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. Cooldown: 25s. Charges: 2.");
 		mInfo.mDescriptions.add("Now afflicts 30% Vulnerability; enemies are stunned and levitated for 4 seconds.");
 		mInfo.mCooldown = WIND_WALK_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
@@ -60,40 +61,19 @@ public class WindWalk extends MultipleChargeAbility {
 		mMaxCharges = WIND_WALK_MAX_CHARGES;
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (!mPlayer.isSprinting() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-				|| !InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
+			|| !InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			return;
 		}
 
+		event.setCancelled(true);
+
+		walk();
+	}
+
+	public void walk() {
 		Location loc = mPlayer.getLocation();
-		if (loc.getPitch() > 50) {
-			return;
-		}
-
-		mLeftClicks++;
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (mLeftClicks > 0) {
-					mLeftClicks--;
-				}
-				this.cancel();
-			}
-		}.runTaskLater(mPlugin, 5);
-		if (mLeftClicks < 2) {
-			return;
-		}
-		mLeftClicks = 0;
-
-		int ticks = mPlayer.getTicksLived();
-		// Prevent double casting on accident
-		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
-			return;
-		}
-		mLastCastTicks = ticks;
-
 		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1.75f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1, 1f);
