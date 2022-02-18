@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -45,10 +44,6 @@ public class TransmutationRing extends PotionAbility {
 	private static final String TRANSMUTATION_RING_RESISTANCE_EFFECT_NAME = "TransmutationRingResistanceEffect";
 	private static final double TRANSMUTATION_RING_1_DAMAGE_FRACTION = 0.3;
 	private static final double TRANSMUTATION_RING_2_DAMAGE_FRACTION = 0.5;
-	private static final double TRANSMUTATION_RING_2_ABSORPTION_CHANCE = 0.5;
-	private static final int TRANSMUTATION_RING_2_ABSORPTION_AMOUNT = 1;
-	private static final int TRANSMUTATION_RING_2_ABSORPTION_DURATION = 10 * 20;
-	private static final int TRANSMUTATION_RING_2_ABSORPTION_MAX = 6;
 
 	public static final String TRANSMUTATION_POTION_TAG = "TransmutationRingPotion";
 
@@ -62,7 +57,7 @@ public class TransmutationRing extends PotionAbility {
 		mInfo.mScoreboardId = "Transmutation";
 		mInfo.mShorthandName = "TR";
 		mInfo.mDescriptions.add("Right click while sneaking and holding an Alchemist's Bag to create a Transmutation Ring at your location that lasts for 10 seconds. The ring has a radius of 5 blocks. Players within this ring receive 10% damage reduction. Mobs that die within this ring spawn an Alchemist's Potion that deals 30% of your base potion damage, with no extra effects. Cooldown: 25s.");
-		mInfo.mDescriptions.add("Potions dropped from mob deaths within the ring now deal 50% of your base potion damage. Additionally, these potions have a 50% chance to add 1 absorption to all players affected. The absorption lasts for 10s and stacks up to 6. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Potions dropped from mob deaths within the ring now deal 50% of your base potion damage. Cooldown: 20s.");
 		mDisplayItem = new ItemStack(Material.GOLD_NUGGET, 1);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mCooldown = getAbilityScore() == 1 ? TRANSMUTATION_RING_1_COOLDOWN : TRANSMUTATION_RING_2_COOLDOWN;
@@ -167,16 +162,12 @@ public class TransmutationRing extends PotionAbility {
 			return;
 		}
 
-		boolean doAbsorption = getAbilityScore() > 1 && FastUtils.randomDoubleInRange(0, 1) > TRANSMUTATION_RING_2_ABSORPTION_CHANCE;
 		if (affectedEntities != null && !affectedEntities.isEmpty()) {
 			for (LivingEntity entity : affectedEntities) {
 				if (EntityUtils.isHostileMob(entity)) {
-					DamageUtils.damage(mPlayer, entity, DamageType.MAGIC, mDamageFraction * mAlchemistPotions.getDamage(), ClassAbility.ALCHEMIST_POTION, false, true);
+					DamageUtils.damage(mPlayer, entity, DamageType.AILMENT, mDamageFraction * mAlchemistPotions.getDamage(), ClassAbility.ALCHEMIST_POTION, false, true);
 				}
 
-				if (entity instanceof Player player && doAbsorption) {
-					AbsorptionUtils.addAbsorption(player, TRANSMUTATION_RING_2_ABSORPTION_AMOUNT, TRANSMUTATION_RING_2_ABSORPTION_MAX, TRANSMUTATION_RING_2_ABSORPTION_DURATION);
-				}
 			}
 		}
 	}

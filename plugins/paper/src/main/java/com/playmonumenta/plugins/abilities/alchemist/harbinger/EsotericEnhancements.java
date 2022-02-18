@@ -30,7 +30,7 @@ public class EsotericEnhancements extends PotionAbility {
 	@Override
 	public void apply(LivingEntity mob, boolean isGruesome) {
 		// Brutal effect handled in BrutalAlchemy
-		if (isGruesome) {
+		if (isGruesome && !EntityUtils.isBoss(mob)) {
 			EntityUtils.paralyze(mPlugin, PARALYZE_DURATION, mob);
 		}
 	}
