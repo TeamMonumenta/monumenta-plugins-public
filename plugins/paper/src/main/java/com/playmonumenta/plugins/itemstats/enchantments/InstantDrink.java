@@ -46,8 +46,7 @@ public class InstantDrink implements Enchantment {
 		Block block = event.getClickedBlock();
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || (event.getAction() == Action.RIGHT_CLICK_BLOCK && block != null && !ItemUtils.interactableBlocks.contains(block.getBlockData().getMaterial()))) {
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.POTION) {
-				PotionMeta meta = (PotionMeta) item.getItemMeta();
+			if (item.getType() == Material.POTION && item.getItemMeta() instanceof PotionMeta meta) {
 				if (meta.hasCustomEffects()) {
 					for (PotionEffect effect : meta.getCustomEffects()) {
 						if (effect.getType().equals(PotionEffectType.HEAL) || effect.getType().equals(PotionEffectType.HARM)) {
@@ -64,7 +63,7 @@ public class InstantDrink implements Enchantment {
 				}
 
 				//Apply Starvation if applicable
-				int starvation = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.STARVATION);
+				int starvation = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.STARVATION);
 				if (starvation > 0) {
 					Starvation.apply(player, starvation);
 				}
@@ -89,7 +88,6 @@ public class InstantDrink implements Enchantment {
 					event.setUseItemInHand(Result.DENY);
 				} else if (player.getGameMode() != GameMode.CREATIVE) {
 					item.setAmount(item.getAmount() - 1);
-					player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE));
 				}
 			}
 		}

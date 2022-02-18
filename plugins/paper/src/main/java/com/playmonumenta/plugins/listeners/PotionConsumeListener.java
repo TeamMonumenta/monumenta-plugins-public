@@ -1,11 +1,20 @@
 package com.playmonumenta.plugins.listeners;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -36,21 +45,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
-import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
-import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class PotionConsumeListener implements Listener {
 	private static final int DRINK_TICK_DELAY = 4; //How many ticks between each slurp sound
@@ -162,7 +161,7 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		int instantDrinkLevel = (int) mPlugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.INSTANT_DRINK);
+		int instantDrinkLevel = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.INSTANT_DRINK);
 
 		if (PotionUtils.isLuckPotion(meta)) {
 			Location loc = player.getLocation();
@@ -185,7 +184,7 @@ public class PotionConsumeListener implements Listener {
 			PotionUtils.applyPotion(mPlugin, player, meta);
 
 			//Apply Starvation if applicable
-			int starvation = (int) mPlugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.STARVATION);
+			int starvation = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.STARVATION);
 			if (starvation > 0) {
 				Starvation.apply(player, starvation);
 			}
