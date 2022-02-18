@@ -747,6 +747,11 @@ public class PlayerListener implements Listener {
 			newDamage = 0;
 		}
 
+		// Vanilla hoes and axes take 2 durability, we only want them to take 1
+		if (ItemUtils.isHoe(item) || ItemUtils.isAxe(item)) {
+			newDamage = oldDamage - 1;
+		}
+
 		event.setDamage(newDamage);
 		mPlugin.mItemStatManager.onItemDamage(mPlugin, player, event);
 
