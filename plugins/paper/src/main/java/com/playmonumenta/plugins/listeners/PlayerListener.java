@@ -156,14 +156,15 @@ public class PlayerListener implements Listener {
 		runTeleportRunnable(player, loc);
 
 		//TODO temporary for item rework
-		if (!ServerProperties.getShardName().equals("tutorial") && ScoreboardUtils.getScoreboardValue(player, "ItemReworkToken").orElse(0) == 0) {
+		if (!ServerProperties.getShardName().equals("tutorial") && ScoreboardUtils.getScoreboardValue(player, "ItemReworkToken").orElse(0) > 0) {
 			NamespacedKey tokenKey = NamespacedKeyUtils.fromString("epic:legacy/r1/morning_lily");
 			LootTable tokenLootTable = Bukkit.getLootTable(tokenKey);
 			Collection<ItemStack> tokenLoot = tokenLootTable.populateLoot(FastUtils.RANDOM, new LootContext.Builder(player.getLocation()).build());
 			for (ItemStack item : tokenLoot) {
+				item.setAmount(ScoreboardUtils.getScoreboardValue(player, "ItemReworkToken").orElse(0));
 				InventoryUtils.giveItem(player, item);
 			}
-			ScoreboardUtils.setScoreboardValue(player, "ItemReworkToken", 1);
+			ScoreboardUtils.setScoreboardValue(player, "ItemReworkToken", 0);
 		}
 	}
 
