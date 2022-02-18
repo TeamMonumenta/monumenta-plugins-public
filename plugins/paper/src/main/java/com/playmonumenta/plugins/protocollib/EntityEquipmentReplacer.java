@@ -8,7 +8,9 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.Pair;
 import com.playmonumenta.plugins.Plugin;
+import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBTType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -37,7 +39,10 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 			}
 			NBTItem nbtItem = new NBTItem(item);
 			nbtItem.removeKey("BlockEntityTag"); // most important one - shulker contents
-			nbtItem.removeKey("display"); // plain.display is still sent which is used by the RP
+			if (nbtItem.getType("display") == NBTType.NBTTagCompound) {
+				NBTCompound display = nbtItem.getCompound("display");
+				display.removeKey("Lore"); // plain.display.Lore is still sent which is used by the RP
+			}
 			nbtItem.removeKey("Monumenta"); // not needed
 			nbtItem.removeKey("AttributeModifiers"); // not needed
 			pair.setSecond(nbtItem.getItem());
