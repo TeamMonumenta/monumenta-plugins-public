@@ -78,7 +78,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	private boolean mGruesomeMode;
 
-	private static @Nullable ItemStack POTION = null;
+	private static @Nullable ItemStack GRUESOME_POTION = null;
+	private static @Nullable ItemStack BRUTAL_POTION = null;
 
 	public AlchemistPotions(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
@@ -200,12 +201,28 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			potion.setMetadata("GruesomeAlchemistPotion", new FixedMetadataValue(mPlugin, 0));
 		}
 
-		if (POTION == null) {
-			POTION = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKeyUtils.fromString("epic:r1/items/alchemists_potion"));
+		if (BRUTAL_POTION == null || GRUESOME_POTION == null) {
+			ItemStack basePotion = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKeyUtils.fromString("epic:r1/items/alchemists_potion"));
+			if (basePotion == null) {
+				mPlugin.getLogger().severe("Failed to get alchemist's potion from loot table!");
+				return;
+			}
+
+			BRUTAL_POTION = basePotion.clone();
+			PotionMeta meta = (PotionMeta) BRUTAL_POTION.getItemMeta();
+			meta.setColor(Color.BLACK);
+			BRUTAL_POTION.setItemMeta(meta);
+
+			GRUESOME_POTION = basePotion.clone();
+			PotionMeta meta2 = (PotionMeta) GRUESOME_POTION.getItemMeta();
+			meta2.setColor(Color.FUCHSIA);
+			GRUESOME_POTION.setItemMeta(meta2);
 		}
 
-		if (POTION != null) {
-			potion.setItem(POTION);
+		if (mGruesomeMode && GRUESOME_POTION != null) {
+			potion.setItem(GRUESOME_POTION);
+		} else if (!mGruesomeMode && BRUTAL_POTION != null) {
+			potion.setItem(BRUTAL_POTION);
 		} else {
 			mPlugin.getLogger().severe("Failed to get alchemist's potion from loot table!");
 		}
