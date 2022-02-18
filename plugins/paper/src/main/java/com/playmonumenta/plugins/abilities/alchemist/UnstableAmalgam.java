@@ -13,6 +13,8 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Bukkit;
@@ -149,8 +151,17 @@ public class UnstableAmalgam extends Ability {
 			mAlchemistPotions.incrementCharge();
 		}
 
-		if (loc.distance(mPlayer.getLocation()) <= UNSTABLE_AMALGAM_RADIUS && !ZoneUtils.hasZoneProperty(loc, ZoneProperty.NO_MOBILITY_ABILITIES) && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			MovementUtils.knockAwayRealistic(loc, mPlayer, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 2f);
+		if (!ZoneUtils.hasZoneProperty(loc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			for (Player player : PlayerUtils.playersInRange(loc, UNSTABLE_AMALGAM_RADIUS, true)) {
+				if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+					if (!player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(0) == 100) {
+						MovementUtils.knockAwayRealistic(loc, player, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 2f);
+					} else if (player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(1) > 0) {
+						//by default any Alch can use Rocket Jump with his UA
+						MovementUtils.knockAwayRealistic(loc, player, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 2f);
+					}
+				}
+			}
 		}
 
 		World world = loc.getWorld();

@@ -143,6 +143,9 @@ public class PEBCustomInventory extends CustomInventory {
 		PEB_ITEMS.add(new PebItem(3, 25, "Compass Particles",
 				"Click to toggle a trail of guiding particles when following the quest compass.", ChatColor.LIGHT_PURPLE,
 				Material.COMPASS, "clickable peb_comp_particles", false));
+		PEB_ITEMS.add(new PebItem(3, 29, "Rocket Jump",
+				"Click to enable or disable Rocket Jump", ChatColor.LIGHT_PURPLE,
+				Material.FIREWORK_ROCKET, "page 31", false));
 		PEB_ITEMS.add(new PebItem(3, 37, "Death Sort",
 				"Click to toggle death sorting, which attempts to return items dropped on death to the slot they were in prior to death.", ChatColor.LIGHT_PURPLE,
 				Material.CHEST, "clickable peb_toggle_dso", false));
@@ -329,6 +332,24 @@ public class PEBCustomInventory extends CustomInventory {
 		PEB_ITEMS.add(new PebItem(30, 40, "Disable All",
 				"Disable glowing for all entities.", ChatColor.LIGHT_PURPLE,
 				Material.DIRT, "glowing disable all", false));
+
+		//page 39: Rocket Jump Option
+		PEB_ITEMS.add(new PebItem(31, 0, "Back to Toggleable Options",
+			"", ChatColor.LIGHT_PURPLE,
+			Material.OBSERVER, "page 3", false));
+		PEB_ITEMS.add(new PebItem(31, 4, "Rocket Jump Settings",
+			"Choose how Unstable Amalgam should interact with you.", ChatColor.LIGHT_PURPLE,
+			Material.FIREWORK_ROCKET, "", false));
+		PEB_ITEMS.add(new PebItem(31, 20, "Enable All",
+			"Enable to rocket jump from ANY Unstable Amalgam.", ChatColor.LIGHT_PURPLE,
+			Material.FIREWORK_STAR, "scoreboard players set @S RocketJumper 100", false));
+		PEB_ITEMS.add(new PebItem(31, 22, "Enable your",
+			"Enable to rocket jump only from YOUR Unstable Amalgam.", ChatColor.LIGHT_PURPLE,
+			Material.CLAY_BALL, "scoreboard players set @S RocketJumper 1", false));
+		PEB_ITEMS.add(new PebItem(31, 24, "Disable all",
+			"Disable to rocket jump from ANY Unstable Amalgam.", ChatColor.LIGHT_PURPLE,
+			Material.SKELETON_SKULL, "scoreboard players set @S RocketJumper 0", false));
+
 
 	}
 
