@@ -3,30 +3,45 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.ObjectiveArgument;
 import dev.jorel.commandapi.arguments.ScoreHolderArgument;
 import dev.jorel.commandapi.arguments.ScoreHolderArgument.ScoreHolderType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
 
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 public class GetScoreCommand {
+	private static final List<String> SELECTORS = Arrays.asList(new String[] {"@a", "@e", "@p", "@r", "@s"});
 
 	@SuppressWarnings("unchecked")
-	public static void register(Plugin plugin) {
+	public static void register() {
 		new CommandAPICommand("getscore")
 		.withPermission(CommandPermission.fromString("monumenta.command.getscore"))
-		.withArguments(new ScoreHolderArgument("name", ScoreHolderType.MULTIPLE))
+		.withArguments(new ScoreHolderArgument("targets", ScoreHolderType.MULTIPLE).replaceSuggestions((info) -> {
+			// If ScoreHolderArgument's default suggestions get fixed, remove this override.
+			List<String> suggestions = new ArrayList<>(SELECTORS);
+			for (Player player : Bukkit.getOnlinePlayers()) {
+				suggestions.add(player.getName());
+			}
+			CommandSender sender = info.sender();
+			if (sender instanceof LivingEntity senderEntity) {
+				@Nullable Entity target = senderEntity.getTargetEntity(5);
+				if (target != null) {
+					suggestions.add(target.getUniqueId().toString());
+				}
+			}
+			return suggestions.toArray(new String[0]);
+		}))
 		.withArguments(new ObjectiveArgument("objective"))
 		.executes((sender, args) -> {
 			String objective = (String)args[1];

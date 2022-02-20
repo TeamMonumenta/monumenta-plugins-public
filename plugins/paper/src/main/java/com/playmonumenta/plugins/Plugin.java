@@ -268,7 +268,7 @@ public class Plugin extends JavaPlugin {
 		GetDepthPoints.register();
 		Magnetize.register();
 		UnsignBook.register();
-		GetScoreCommand.register(this);
+		GetScoreCommand.register();
 		Grave.register();
 		StatTrackItem.register();
 		LockedHeldItem.register();
