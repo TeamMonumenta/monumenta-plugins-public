@@ -43,7 +43,6 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 				NBTCompound display = nbtItem.getCompound("display");
 				display.removeKey("Lore"); // plain.display.Lore is still sent which is used by the RP
 			}
-			nbtItem.removeKey("Monumenta"); // not needed
 			nbtItem.removeKey("AttributeModifiers"); // not needed
 			pair.setSecond(nbtItem.getItem());
 		}
