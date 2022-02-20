@@ -209,14 +209,20 @@ public class SpellBaseSummon extends Spell {
 			Location loc = summonLoc.clone().add(offset);
 
 			//don't summon inside solid block
+			int attempts = 0;
 			while (loc.clone().add(0, 1, 0).getBlock().getType().isSolid() || loc.clone().add(0, 2, 0).getBlock().getType().isSolid() || !loc.clone().add(0, -1, 0).getBlock().getType().isSolid()) {
 				index = (index + 1 >= mLocationOffsets.size() ? 0 : index + 1);
 				loc = summonLoc.clone().add(mLocationOffsets.get(index));
+				attempts++;
+
+				//No valid location exists
+				if (attempts > mLocationOffsets.size()) {
+					return;
+				}
 			}
 
 			Entity entity = mSummon.run(loc.clone().subtract(0, mDeepness, 0), mTimes);
-			if (entity instanceof Mob) {
-				Mob mob = (Mob) entity;
+			if (entity instanceof Mob mob) {
 				mob.setAI(false);
 
 				//summoning
