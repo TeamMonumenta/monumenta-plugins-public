@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
-import com.playmonumenta.scriptedquests.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -41,13 +41,8 @@ public class PlayerInventoryView implements Listener {
 		}
 
 		Player player = event.getPlayer();
-		if (player == null) {
-			return;
-		}
-
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		if (mainHand != null
-		    && mainHand.getType().equals(Material.WRITTEN_BOOK)
+		if (mainHand.getType().equals(Material.WRITTEN_BOOK)
 		    && InventoryUtils.testForItemWithLore(mainHand, "Skin :")
 			&& InventoryUtils.testForItemWithLore(mainHand, "Soulbound to")
 			&& player.hasPermission(PERMISSION)) {
@@ -63,8 +58,7 @@ public class PlayerInventoryView implements Listener {
 			List<LivingEntity> entities = data.getEntities();
 			if (entities != null && !entities.isEmpty()) {
 				//Below if check is almost certainly not necessary, but always be careful
-				if (data.getEntities().get(0) instanceof Player) {
-					Player clickedPlayer = (Player)data.getEntities().get(0);
+				if (data.getEntities().get(0) instanceof Player clickedPlayer) {
 					if (!clickedPlayer.equals(player)) {
 						inventoryView(event.getPlayer(), clickedPlayer);
 					}
