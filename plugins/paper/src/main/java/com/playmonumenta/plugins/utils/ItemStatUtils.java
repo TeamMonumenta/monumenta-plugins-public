@@ -420,6 +420,8 @@ public class ItemStatUtils {
 	 */
 
 	public enum EnchantmentType {
+		// Void Tether - work in either hand regardless
+		VOID_TETHER(new VoidTether(), false, false, false),
 		// Region Scaling
 		OFFHAND_MAINHAND_DISABLE(new OffhandMainhandDisable(), false, false, false),
 		MAINHAND_OFFHAND_DISABLE(new MainhandOffhandDisable(), false, false, false),
@@ -507,7 +509,6 @@ public class ItemStatUtils {
 		WEIGHTLESS(new Weightless(), false, false, false),
 		THROWING_KNIFE(new ThrowingKnife(), false, false, false),
 		TRIAGE(new Triage(), true, false, false),
-		VOID_TETHER(new VoidTether(), false, false, false),
 		// Curses
 		CURSE_OF_ANEMIA(new CurseOfAnemia(), true, true, false),
 		CURSE_OF_BINDING(Enchantment.BINDING_CURSE, "Curse of Binding", false, true, false),
