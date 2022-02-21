@@ -27,6 +27,8 @@ public class BruteForce extends Ability {
 	private static final double BRUTE_FORCE_2_MODIFIER = 0.1;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
 
+	private double mMultiplier;
+
 
 	public BruteForce(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Brute Force");
@@ -34,23 +36,25 @@ public class BruteForce extends Ability {
 		mInfo.mScoreboardId = "BruteForce";
 		mInfo.mShorthandName = "BF";
 		mInfo.mDescriptions.add("Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2-block cube around it, and knocks all non-boss enemies away from you.");
-		mInfo.mDescriptions.add("Damage is increased from 2 to 10 percent of attack damage plus 2.");
+		mInfo.mDescriptions.add("Damage is increased to 10 percent of the attack's damage plus 2.");
 		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
+
+		mMultiplier = getAbilityScore() == 1 ? 0 : BRUTE_FORCE_2_MODIFIER;
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer != null && event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
-			double damageBonus = getAbilityScore() == 1 ? BRUTE_FORCE_DAMAGE : BRUTE_FORCE_DAMAGE
-				+ (event.getDamage() * BRUTE_FORCE_2_MODIFIER);
+			double damageBonus = BRUTE_FORCE_DAMAGE + event.getDamage() * mMultiplier;
+			event.setDamage(event.getDamage() + damageBonus);
 
 			Location loc = enemy.getLocation().add(0, 0.75, 0);
 			World world = mPlayer.getWorld();
 			world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 1);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.135);
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, BRUTE_FORCE_RADIUS, mPlayer)) {
-				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damageBonus, mInfo.mLinkedSpell, true);
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, BRUTE_FORCE_RADIUS, enemy)) {
+				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damageBonus, mInfo.mLinkedSpell, true);
 				if (!EntityUtils.isBoss(mob)) {
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, BRUTE_FORCE_KNOCKBACK_SPEED, BRUTE_FORCE_KNOCKBACK_SPEED / 2, true);
 				}
