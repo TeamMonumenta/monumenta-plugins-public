@@ -28,7 +28,7 @@ public class DarkCombos extends DepthsAbility {
 
 	public DarkCombos(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.FLINT;
+		mDisplayMaterial = Material.FLINT;
 		mTree = DepthsTree.SHADOWS;
 	}
 

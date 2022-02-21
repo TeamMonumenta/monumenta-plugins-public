@@ -36,7 +36,7 @@ public class Avalanche extends DepthsAbility {
 
 	public Avalanche(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.SNOW_BLOCK;
+		mDisplayMaterial = Material.SNOW_BLOCK;
 		mTree = DepthsTree.FROSTBORN;
 		mInfo.mCooldown = COOLDOWN_TICKS;
 		mInfo.mIgnoreCooldown = true;

@@ -35,7 +35,7 @@ public class RadiantBlessing extends DepthsAbility {
 
 	public RadiantBlessing(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.SUNFLOWER;
+		mDisplayMaterial = Material.SUNFLOWER;
 		mTree = DepthsTree.SUNLIGHT;
 		mInfo.mLinkedSpell = ClassAbility.RADIANT_BLESSING;
 		mInfo.mCooldown = COOLDOWN;

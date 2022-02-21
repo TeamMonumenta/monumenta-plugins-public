@@ -25,7 +25,7 @@ public class Bulwark extends DepthsAbility {
 
 	public Bulwark(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.NETHERITE_HELMET;
+		mDisplayMaterial = Material.NETHERITE_HELMET;
 		mTree = DepthsTree.EARTHBOUND;
 		mInfo.mLinkedSpell = ClassAbility.BULWARK;
 		mInfo.mCooldown = mRarity == 0 ? 18 * 20 : COOLDOWN[mRarity - 1];

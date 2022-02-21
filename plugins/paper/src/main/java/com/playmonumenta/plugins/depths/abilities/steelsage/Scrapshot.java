@@ -42,7 +42,7 @@ public class Scrapshot extends DepthsAbility {
 		super(plugin, player, ABILITY_NAME);
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.SCRAPSHOT;
-		mDisplayItem = Material.NETHERITE_SCRAP;
+		mDisplayMaterial = Material.NETHERITE_SCRAP;
 		mTree = DepthsTree.METALLIC;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 	}

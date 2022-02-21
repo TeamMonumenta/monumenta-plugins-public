@@ -20,7 +20,7 @@ public class Enlightenment extends DepthsAbility {
 
 	public Enlightenment(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.EXPERIENCE_BOTTLE;
+		mDisplayMaterial = Material.EXPERIENCE_BOTTLE;
 		mTree = DepthsTree.SUNLIGHT;
 	}
 

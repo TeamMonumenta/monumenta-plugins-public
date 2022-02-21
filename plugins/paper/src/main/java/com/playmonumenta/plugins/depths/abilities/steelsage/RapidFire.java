@@ -41,7 +41,7 @@ public class RapidFire extends DepthsAbility {
 
 	public RapidFire(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.REPEATER;
+		mDisplayMaterial = Material.REPEATER;
 		mInfo.mLinkedSpell = ClassAbility.RAPIDFIRE;
 		mTree = DepthsTree.METALLIC;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;

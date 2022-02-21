@@ -35,7 +35,7 @@ public class Apocalypse extends DepthsAbility {
 
 	public Apocalypse(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.ORANGE_DYE;
+		mDisplayMaterial = Material.ORANGE_DYE;
 		mTree = DepthsTree.FLAMECALLER;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.APOCALYPSE;

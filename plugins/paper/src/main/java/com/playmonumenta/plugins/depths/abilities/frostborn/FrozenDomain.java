@@ -32,7 +32,7 @@ public class FrozenDomain extends DepthsAbility {
 
 	public FrozenDomain(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.IRON_BOOTS;
+		mDisplayMaterial = Material.IRON_BOOTS;
 		mTree = DepthsTree.FROSTBORN;
 	}
 

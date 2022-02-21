@@ -35,7 +35,7 @@ public class CrushingEarth extends DepthsAbility {
 
 	public CrushingEarth(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.SHIELD;
+		mDisplayMaterial = Material.SHIELD;
 		mTree = DepthsTree.EARTHBOUND;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mCooldown = COOLDOWN;

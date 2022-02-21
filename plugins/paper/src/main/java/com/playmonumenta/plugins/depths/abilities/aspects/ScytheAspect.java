@@ -26,7 +26,7 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 
 	public ScytheAspect(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.IRON_HOE;
+		mDisplayMaterial = Material.IRON_HOE;
 	}
 
 	@Override

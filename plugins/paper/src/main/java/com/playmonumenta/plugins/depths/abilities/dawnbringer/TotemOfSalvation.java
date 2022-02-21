@@ -56,7 +56,7 @@ public class TotemOfSalvation extends DepthsAbility {
 
 	public TotemOfSalvation(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.TOTEM_OF_UNDYING;
+		mDisplayMaterial = Material.TOTEM_OF_UNDYING;
 		mTree = DepthsTree.SUNLIGHT;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.TOTEM_OF_SALVATION;

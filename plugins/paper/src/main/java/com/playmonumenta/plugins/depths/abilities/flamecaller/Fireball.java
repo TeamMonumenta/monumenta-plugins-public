@@ -34,7 +34,7 @@ public class Fireball extends DepthsAbility {
 		super(plugin, player, ABILITY_NAME);
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.FIREBALL;
-		mDisplayItem = Material.FIREWORK_STAR;
+		mDisplayMaterial = Material.FIREWORK_STAR;
 		mTree = DepthsTree.FLAMECALLER;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}

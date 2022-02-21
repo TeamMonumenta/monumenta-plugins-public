@@ -37,7 +37,7 @@ public class Cryobox extends DepthsAbility {
 
 	public Cryobox(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.GHAST_TEAR;
+		mDisplayMaterial = Material.GHAST_TEAR;
 		mTree = DepthsTree.FROSTBORN;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.CRYOBOX;

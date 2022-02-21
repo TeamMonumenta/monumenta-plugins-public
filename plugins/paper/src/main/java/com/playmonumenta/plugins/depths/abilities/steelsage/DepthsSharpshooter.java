@@ -29,7 +29,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 	public DepthsSharpshooter(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.TARGET;
+		mDisplayMaterial = Material.TARGET;
 		mTree = DepthsTree.METALLIC;
 	}
 

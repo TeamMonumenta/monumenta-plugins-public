@@ -29,7 +29,7 @@ public class Detonation extends DepthsAbility {
 
 	public Detonation(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.TNT;
+		mDisplayMaterial = Material.TNT;
 		mTree = DepthsTree.FLAMECALLER;
 	}
 

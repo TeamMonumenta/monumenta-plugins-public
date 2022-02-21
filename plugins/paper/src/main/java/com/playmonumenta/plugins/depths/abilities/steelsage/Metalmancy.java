@@ -52,7 +52,7 @@ public class Metalmancy extends DepthsAbility {
 
 	public Metalmancy(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.IRON_BLOCK;
+		mDisplayMaterial = Material.IRON_BLOCK;
 		mTree = DepthsTree.METALLIC;
 		mInfo.mLinkedSpell = ClassAbility.METALMANCY;
 		mInfo.mCooldown = COOLDOWN;

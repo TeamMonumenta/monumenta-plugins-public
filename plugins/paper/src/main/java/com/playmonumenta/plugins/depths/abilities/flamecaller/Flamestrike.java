@@ -38,7 +38,7 @@ public class Flamestrike extends DepthsAbility {
 		super(plugin, player, ABILITY_NAME);
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.FLAMESTRIKE;
-		mDisplayItem = Material.FLINT_AND_STEEL;
+		mDisplayMaterial = Material.FLINT_AND_STEEL;
 		mTree = DepthsTree.FLAMECALLER;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}

@@ -18,7 +18,7 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 
 	public WandAspect(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.STICK;
+		mDisplayMaterial = Material.STICK;
 	}
 
 	@Override

@@ -16,7 +16,7 @@ public class SwordAspect extends WeaponAspectDepthsAbility {
 
 	public SwordAspect(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.IRON_SWORD;
+		mDisplayMaterial = Material.IRON_SWORD;
 	}
 
 	@Override

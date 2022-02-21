@@ -39,7 +39,7 @@ public class SteelStallion extends DepthsAbility {
 
 	public SteelStallion(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.IRON_HORSE_ARMOR;
+		mDisplayMaterial = Material.IRON_HORSE_ARMOR;
 		mTree = DepthsTree.METALLIC;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.STEEL_STALLION;

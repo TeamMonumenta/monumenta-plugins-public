@@ -40,7 +40,7 @@ public class DepthsFrostNova extends DepthsAbility {
 
 	public DepthsFrostNova(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.ICE;
+		mDisplayMaterial = Material.ICE;
 		mTree = DepthsTree.FROSTBORN;
 		mInfo.mCooldown = COOLDOWN_TICKS;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;

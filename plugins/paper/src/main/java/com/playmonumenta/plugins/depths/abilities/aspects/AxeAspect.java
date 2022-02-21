@@ -19,7 +19,7 @@ public class AxeAspect extends WeaponAspectDepthsAbility {
 
 	public AxeAspect(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.IRON_AXE;
+		mDisplayMaterial = Material.IRON_AXE;
 	}
 
 	@Override

@@ -41,7 +41,7 @@ public class Pyroblast extends DepthsAbility {
 
 	public Pyroblast(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.TNT_MINECART;
+		mDisplayMaterial = Material.TNT_MINECART;
 		mTree = DepthsTree.FLAMECALLER;
 		mInfo.mLinkedSpell = ClassAbility.PYROBLAST;
 		mInfo.mCooldown = COOLDOWN;

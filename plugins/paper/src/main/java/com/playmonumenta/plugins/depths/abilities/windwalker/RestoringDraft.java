@@ -35,7 +35,7 @@ public final class RestoringDraft extends DepthsAbility {
 
 	public RestoringDraft(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.GOLDEN_BOOTS;
+		mDisplayMaterial = Material.GOLDEN_BOOTS;
 		mTree = DepthsTree.WINDWALKER;
 
 		mInfo.mIgnoreCooldown = true;

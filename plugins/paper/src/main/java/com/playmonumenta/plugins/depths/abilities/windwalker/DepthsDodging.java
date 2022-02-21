@@ -37,7 +37,7 @@ public class DepthsDodging extends DepthsAbility {
 
 	public DepthsDodging(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.COBWEB;
+		mDisplayMaterial = Material.COBWEB;
 		mTree = DepthsTree.WINDWALKER;
 		mInfo.mLinkedSpell = ClassAbility.DODGING;
 		mInfo.mIgnoreCooldown = true;

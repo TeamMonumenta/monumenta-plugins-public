@@ -34,7 +34,7 @@ public class WardOfLight extends DepthsAbility {
 
 	public WardOfLight(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.LANTERN;
+		mDisplayMaterial = Material.LANTERN;
 		mTree = DepthsTree.SUNLIGHT;
 		mInfo.mLinkedSpell = ClassAbility.WARD_OF_LIGHT;
 		mInfo.mCooldown = COOLDOWN;

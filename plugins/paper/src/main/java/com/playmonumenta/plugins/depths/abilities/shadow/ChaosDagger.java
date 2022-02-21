@@ -50,7 +50,7 @@ public class ChaosDagger extends DepthsAbility {
 
 	public ChaosDagger(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.ITEM_FRAME;
+		mDisplayMaterial = Material.ITEM_FRAME;
 		mTree = DepthsTree.SHADOWS;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mCooldown = COOLDOWN;

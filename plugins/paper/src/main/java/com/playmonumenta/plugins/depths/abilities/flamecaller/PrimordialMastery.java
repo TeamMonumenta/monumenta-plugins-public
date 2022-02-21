@@ -17,7 +17,7 @@ public class PrimordialMastery extends DepthsAbility {
 
 	public PrimordialMastery(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.FIRE_CORAL_FAN;
+		mDisplayMaterial = Material.FIRE_CORAL_FAN;
 		mTree = DepthsTree.FLAMECALLER;
 	}
 

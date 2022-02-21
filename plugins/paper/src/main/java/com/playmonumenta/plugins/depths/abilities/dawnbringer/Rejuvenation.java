@@ -30,7 +30,7 @@ public class Rejuvenation extends DepthsAbility {
 
 	public Rejuvenation(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.NETHER_STAR;
+		mDisplayMaterial = Material.NETHER_STAR;
 		mTree = DepthsTree.SUNLIGHT;
 	}
 

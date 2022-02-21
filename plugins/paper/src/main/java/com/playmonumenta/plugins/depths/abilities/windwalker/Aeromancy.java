@@ -20,7 +20,7 @@ public class Aeromancy extends DepthsAbility {
 
 	public Aeromancy(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.FEATHER;
+		mDisplayMaterial = Material.FEATHER;
 		mTree = DepthsTree.WINDWALKER;
 	}
 

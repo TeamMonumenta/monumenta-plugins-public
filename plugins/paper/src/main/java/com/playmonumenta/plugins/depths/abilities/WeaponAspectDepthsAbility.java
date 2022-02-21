@@ -43,7 +43,7 @@ public abstract class WeaponAspectDepthsAbility extends DepthsAbility {
 		DepthsAbilityItem item = new DepthsAbilityItem();
 		item.mRarity = rarity;
 		item.mAbility = mInfo.mDisplayName;
-		ItemStack stack = new ItemStack(mDisplayItem);
+		ItemStack stack = new ItemStack(mDisplayMaterial);
 		ItemMeta meta = stack.getItemMeta();
 		item.mTrigger = DepthsTrigger.WEAPON_ASPECT;
 		meta.setDisplayName("" + ChatColor.RESET + ChatColor.BOLD + mInfo.mDisplayName);

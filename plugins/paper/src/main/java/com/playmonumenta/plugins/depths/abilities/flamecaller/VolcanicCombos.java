@@ -29,7 +29,7 @@ public class VolcanicCombos extends DepthsAbility {
 
 	public VolcanicCombos(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.BLAZE_ROD;
+		mDisplayMaterial = Material.BLAZE_ROD;
 		mTree = DepthsTree.FLAMECALLER;
 	}
 

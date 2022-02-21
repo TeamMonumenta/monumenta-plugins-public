@@ -34,7 +34,7 @@ public class Skyhook extends DepthsAbility {
 
 	public Skyhook(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.FISHING_ROD;
+		mDisplayMaterial = Material.FISHING_ROD;
 		mTree = DepthsTree.WINDWALKER;
 		mInfo.mLinkedSpell = ClassAbility.SKYHOOK;
 		mInfo.mCooldown = getAbilityScore() == 0 ? COOLDOWN[0] : COOLDOWN[mRarity - 1];

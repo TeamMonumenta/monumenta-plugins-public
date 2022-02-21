@@ -35,7 +35,7 @@ public class BladeFlurry extends DepthsAbility {
 
 	public BladeFlurry(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.IRON_SWORD;
+		mDisplayMaterial = Material.IRON_SWORD;
 		mTree = DepthsTree.SHADOWS;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mCooldown = COOLDOWN;

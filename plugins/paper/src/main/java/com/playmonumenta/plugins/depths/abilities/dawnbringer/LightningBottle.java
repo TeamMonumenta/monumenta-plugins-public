@@ -51,7 +51,7 @@ public class LightningBottle extends DepthsAbility {
 
 	public LightningBottle(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.BREWING_STAND;
+		mDisplayMaterial = Material.BREWING_STAND;
 		mInfo.mLinkedSpell = ClassAbility.LIGHTNING_BOTTLE;
 		mTree = DepthsTree.SUNLIGHT;
 		mPlayerItemStatsMap = new WeakHashMap<>();

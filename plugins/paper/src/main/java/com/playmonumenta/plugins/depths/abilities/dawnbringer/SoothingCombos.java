@@ -33,7 +33,7 @@ public class SoothingCombos extends DepthsAbility {
 
 	public SoothingCombos(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.HONEYCOMB;
+		mDisplayMaterial = Material.HONEYCOMB;
 		mTree = DepthsTree.SUNLIGHT;
 	}
 

@@ -39,7 +39,7 @@ public class Sundrops extends DepthsAbility {
 
 	public Sundrops(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.HONEYCOMB_BLOCK;
+		mDisplayMaterial = Material.HONEYCOMB_BLOCK;
 		mTree = DepthsTree.SUNLIGHT;
 	}
 

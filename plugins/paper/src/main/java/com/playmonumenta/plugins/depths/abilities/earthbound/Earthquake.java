@@ -44,7 +44,7 @@ public class Earthquake extends DepthsAbility {
 
 	public Earthquake(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.COARSE_DIRT;
+		mDisplayMaterial = Material.COARSE_DIRT;
 		mTree = DepthsTree.EARTHBOUND;
 		mInfo.mLinkedSpell = ClassAbility.EARTHQUAKE;
 		mInfo.mCooldown = COOLDOWN;

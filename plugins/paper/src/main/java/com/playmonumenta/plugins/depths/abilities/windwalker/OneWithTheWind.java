@@ -21,7 +21,7 @@ public class OneWithTheWind extends DepthsAbility {
 
 	public OneWithTheWind(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.LIGHT_GRAY_BANNER;
+		mDisplayMaterial = Material.LIGHT_GRAY_BANNER;
 		mTree = DepthsTree.WINDWALKER;
 	}
 

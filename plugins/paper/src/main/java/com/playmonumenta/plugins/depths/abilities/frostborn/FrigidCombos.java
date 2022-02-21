@@ -30,7 +30,7 @@ public class FrigidCombos extends DepthsAbility {
 
 	public FrigidCombos(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.BLUE_DYE;
+		mDisplayMaterial = Material.BLUE_DYE;
 		mTree = DepthsTree.FROSTBORN;
 	}
 

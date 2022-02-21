@@ -20,7 +20,7 @@ public class Dethroner extends DepthsAbility {
 
 	public Dethroner(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.DRAGON_HEAD;
+		mDisplayMaterial = Material.DRAGON_HEAD;
 		mTree = DepthsTree.SHADOWS;
 	}
 

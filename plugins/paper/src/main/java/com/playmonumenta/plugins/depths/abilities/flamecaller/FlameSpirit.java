@@ -32,7 +32,7 @@ public class FlameSpirit extends DepthsAbility {
 
 	public FlameSpirit(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.SOUL_CAMPFIRE;
+		mDisplayMaterial = Material.SOUL_CAMPFIRE;
 		mTree = DepthsTree.FLAMECALLER;
 	}
 

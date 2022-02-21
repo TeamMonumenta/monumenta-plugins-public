@@ -29,7 +29,7 @@ public class FocusedCombos extends DepthsAbility {
 
 	public FocusedCombos(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.SPECTRAL_ARROW;
+		mDisplayMaterial = Material.SPECTRAL_ARROW;
 		mTree = DepthsTree.METALLIC;
 	}
 

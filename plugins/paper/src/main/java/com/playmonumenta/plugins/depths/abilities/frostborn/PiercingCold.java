@@ -44,7 +44,7 @@ public class PiercingCold extends DepthsAbility {
 
 	public PiercingCold(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.PRISMARINE_SHARD;
+		mDisplayMaterial = Material.PRISMARINE_SHARD;
 		mTree = DepthsTree.FROSTBORN;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.PIERCING_COLD;

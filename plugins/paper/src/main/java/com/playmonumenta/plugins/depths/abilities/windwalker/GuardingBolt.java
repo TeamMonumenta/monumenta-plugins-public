@@ -43,7 +43,7 @@ public class GuardingBolt extends DepthsAbility {
 
 	public GuardingBolt(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.HORN_CORAL;
+		mDisplayMaterial = Material.HORN_CORAL;
 		mTree = DepthsTree.WINDWALKER;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.GUARDING_BOLT;

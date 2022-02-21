@@ -19,7 +19,7 @@ public class DepthsToughness extends DepthsAbility {
 
 	public DepthsToughness(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.CRYING_OBSIDIAN;
+		mDisplayMaterial = Material.CRYING_OBSIDIAN;
 		mTree = DepthsTree.EARTHBOUND;
 
 		if (player != null) {

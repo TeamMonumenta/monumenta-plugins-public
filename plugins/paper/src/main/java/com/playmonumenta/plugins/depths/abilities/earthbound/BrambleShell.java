@@ -26,7 +26,7 @@ public class BrambleShell extends DepthsAbility {
 
 	public BrambleShell(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.SWEET_BERRIES;
+		mDisplayMaterial = Material.SWEET_BERRIES;
 		mTree = DepthsTree.EARTHBOUND;
 	}
 

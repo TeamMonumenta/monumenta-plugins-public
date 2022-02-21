@@ -35,7 +35,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 
 	public DepthsSplitArrow(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.CHAIN;
+		mDisplayMaterial = Material.CHAIN;
 		mTree = DepthsTree.METALLIC;
 	}
 

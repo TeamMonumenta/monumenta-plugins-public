@@ -46,7 +46,7 @@ public class DummyDecoy extends DepthsAbility {
 
 	public DummyDecoy(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.ARMOR_STAND;
+		mDisplayMaterial = Material.ARMOR_STAND;
 		mTree = DepthsTree.SHADOWS;
 		mInfo.mLinkedSpell = ClassAbility.DUMMY_DECOY;
 		mInfo.mCooldown = COOLDOWN;

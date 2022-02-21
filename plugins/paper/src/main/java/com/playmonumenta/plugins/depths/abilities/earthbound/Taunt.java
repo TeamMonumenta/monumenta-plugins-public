@@ -36,7 +36,7 @@ public class Taunt extends DepthsAbility {
 
 	public Taunt(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.GOLDEN_CHESTPLATE;
+		mDisplayMaterial = Material.GOLDEN_CHESTPLATE;
 		mTree = DepthsTree.EARTHBOUND;
 
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;

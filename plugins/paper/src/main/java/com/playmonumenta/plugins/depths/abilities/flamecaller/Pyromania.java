@@ -17,7 +17,7 @@ public class Pyromania extends DepthsAbility {
 
 	public Pyromania(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.CAMPFIRE;
+		mDisplayMaterial = Material.CAMPFIRE;
 		mTree = DepthsTree.FLAMECALLER;
 	}
 

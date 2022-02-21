@@ -37,7 +37,7 @@ public class VolcanicMeteor extends DepthsAbility {
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mLinkedSpell = ClassAbility.VOLCANIC_METEOR;
 		mTree = DepthsTree.FLAMECALLER;
-		mDisplayItem = Material.MAGMA_BLOCK;
+		mDisplayMaterial = Material.MAGMA_BLOCK;
 	}
 
 	@Override

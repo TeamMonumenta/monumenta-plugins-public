@@ -19,7 +19,7 @@ public class BowAspect extends WeaponAspectDepthsAbility {
 
 	public BowAspect(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.BOW;
+		mDisplayMaterial = Material.BOW;
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public class HowlingWinds extends DepthsAbility {
 
 	public HowlingWinds(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.HOPPER;
+		mDisplayMaterial = Material.HOPPER;
 		mTree = DepthsTree.WINDWALKER;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;

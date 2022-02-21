@@ -27,7 +27,7 @@ public class Brutalize extends DepthsAbility {
 
 	public Brutalize(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.STONE_SWORD;
+		mDisplayMaterial = Material.STONE_SWORD;
 		mTree = DepthsTree.SHADOWS;
 	}
 

@@ -28,7 +28,7 @@ public class Entrench extends DepthsAbility {
 
 	public Entrench(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.SOUL_SAND;
+		mDisplayMaterial = Material.SOUL_SAND;
 		mTree = DepthsTree.EARTHBOUND;
 	}
 

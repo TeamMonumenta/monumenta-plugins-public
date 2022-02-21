@@ -38,7 +38,7 @@ public class IceBarrier extends DepthsAbility {
 
 	public IceBarrier(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.PRISMARINE_WALL;
+		mDisplayMaterial = Material.PRISMARINE_WALL;
 		mTree = DepthsTree.FROSTBORN;
 		mInfo.mCooldown = (mRarity == 0) ? 20 * 20 : COOLDOWN[mRarity - 1];
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

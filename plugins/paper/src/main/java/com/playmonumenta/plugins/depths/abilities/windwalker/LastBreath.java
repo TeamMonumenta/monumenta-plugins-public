@@ -43,7 +43,7 @@ public class LastBreath extends DepthsAbility {
 
 	public LastBreath(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.DRAGON_BREATH;
+		mDisplayMaterial = Material.DRAGON_BREATH;
 		mTree = DepthsTree.WINDWALKER;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.LAST_BREATH;

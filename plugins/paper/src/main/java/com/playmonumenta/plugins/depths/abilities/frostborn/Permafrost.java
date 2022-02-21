@@ -23,7 +23,7 @@ public class Permafrost extends DepthsAbility {
 
 	public Permafrost(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.QUARTZ;
+		mDisplayMaterial = Material.QUARTZ;
 		mTree = DepthsTree.FROSTBORN;
 	}
 

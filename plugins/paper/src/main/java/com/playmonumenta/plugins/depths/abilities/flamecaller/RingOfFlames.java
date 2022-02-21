@@ -43,7 +43,7 @@ public class RingOfFlames extends DepthsAbility {
 		super(plugin, player, ABILITY_NAME);
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.RING_OF_FLAMES;
-		mDisplayItem = Material.BLAZE_POWDER;
+		mDisplayMaterial = Material.BLAZE_POWDER;
 		mTree = DepthsTree.FLAMECALLER;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 	}

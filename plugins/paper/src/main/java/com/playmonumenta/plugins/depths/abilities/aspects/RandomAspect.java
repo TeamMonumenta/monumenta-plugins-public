@@ -11,7 +11,7 @@ public class RandomAspect extends WeaponAspectDepthsAbility {
 
 	public RandomAspect(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.BARREL;
+		mDisplayMaterial = Material.BARREL;
 	}
 
 	@Override

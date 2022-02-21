@@ -42,7 +42,7 @@ public class IceLance extends DepthsAbility {
 
 	public IceLance(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.SNOWBALL;
+		mDisplayMaterial = Material.SNOWBALL;
 		mTree = DepthsTree.FROSTBORN;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.ICE_LANCE;

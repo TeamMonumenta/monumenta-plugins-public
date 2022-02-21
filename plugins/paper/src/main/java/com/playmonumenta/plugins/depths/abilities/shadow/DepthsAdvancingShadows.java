@@ -49,7 +49,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 
 	public DepthsAdvancingShadows(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.WITHER_SKELETON_SKULL;
+		mDisplayMaterial = Material.WITHER_SKELETON_SKULL;
 		mTree = DepthsTree.SHADOWS;
 		mInfo.mLinkedSpell = ClassAbility.ADVANCING_SHADOWS;
 		mInfo.mCooldown = COOLDOWN;

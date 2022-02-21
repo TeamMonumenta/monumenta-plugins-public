@@ -45,7 +45,7 @@ public class BottledSunlight extends DepthsAbility {
 
 	public BottledSunlight(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.HONEY_BOTTLE;
+		mDisplayMaterial = Material.HONEY_BOTTLE;
 		mTree = DepthsTree.SUNLIGHT;
 		mInfo.mLinkedSpell = ClassAbility.BOTTLED_SUNLIGHT;
 		mInfo.mCooldown = COOLDOWN;

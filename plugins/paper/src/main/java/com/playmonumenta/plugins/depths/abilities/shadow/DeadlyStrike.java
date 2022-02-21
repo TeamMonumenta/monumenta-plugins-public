@@ -19,7 +19,7 @@ public class DeadlyStrike extends DepthsAbility {
 
 	public DeadlyStrike(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.BLACK_CONCRETE_POWDER;
+		mDisplayMaterial = Material.BLACK_CONCRETE_POWDER;
 		mTree = DepthsTree.SHADOWS;
 	}
 

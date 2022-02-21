@@ -24,14 +24,12 @@ import java.util.List;
 public abstract class DepthsAbility extends Ability {
 
 	public int mRarity;
-	public Material mDisplayItem = Material.STICK;
+	public Material mDisplayMaterial = Material.STICK;
 	public @Nullable DepthsTree mTree = null;
-
 
 	public DepthsAbility(Plugin plugin, Player player, String displayName) {
 		super(plugin, player, displayName);
 		mRarity = DepthsManager.getInstance().getPlayerLevelInAbility(displayName, player);
-
 	}
 
 	/**
@@ -61,7 +59,7 @@ public abstract class DepthsAbility extends Ability {
 			item.mRarity = rarity;
 			item.mAbility = mInfo.mDisplayName;
 			item.mTrigger = getTrigger();
-			ItemStack stack = new ItemStack(mDisplayItem);
+			ItemStack stack = new ItemStack(mDisplayMaterial);
 			ItemMeta meta = stack.getItemMeta();
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			meta.displayName(Component.text("" + ChatColor.BOLD + mInfo.mDisplayName, DepthsUtils.getTreeColor(mTree)).decoration(TextDecoration.ITALIC, false));

@@ -26,7 +26,7 @@ public class Icebreaker extends DepthsAbility {
 
 	public Icebreaker(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.TUBE_CORAL_FAN;
+		mDisplayMaterial = Material.TUBE_CORAL_FAN;
 		mTree = DepthsTree.FROSTBORN;
 	}
 

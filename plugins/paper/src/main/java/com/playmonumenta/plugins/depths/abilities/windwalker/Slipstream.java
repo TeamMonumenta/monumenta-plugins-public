@@ -38,7 +38,7 @@ public class Slipstream extends DepthsAbility {
 
 	public Slipstream(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.PHANTOM_MEMBRANE;
+		mDisplayMaterial = Material.PHANTOM_MEMBRANE;
 		mTree = DepthsTree.WINDWALKER;
 		mInfo.mCooldown = (mRarity == 0) ? 16 * 20 : COOLDOWN[mRarity - 1] * 20;
 		mInfo.mLinkedSpell = ClassAbility.SLIPSTREAM;

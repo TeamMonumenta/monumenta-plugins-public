@@ -47,7 +47,7 @@ public class EarthenWrath extends DepthsAbility {
 
 	public EarthenWrath(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.TURTLE_HELMET;
+		mDisplayMaterial = Material.TURTLE_HELMET;
 		mTree = DepthsTree.EARTHBOUND;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.EARTHEN_WRATH;

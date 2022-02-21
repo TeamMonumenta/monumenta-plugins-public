@@ -46,7 +46,7 @@ public class Updraft extends DepthsAbility {
 
 	public Updraft(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.WHITE_DYE;
+		mDisplayMaterial = Material.WHITE_DYE;
 		mTree = DepthsTree.WINDWALKER;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.UPDRAFT;

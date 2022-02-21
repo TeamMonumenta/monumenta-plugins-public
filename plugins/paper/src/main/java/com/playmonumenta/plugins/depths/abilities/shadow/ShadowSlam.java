@@ -37,7 +37,7 @@ public final class ShadowSlam extends DepthsAbility {
 
 	public ShadowSlam(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.ANVIL;
+		mDisplayMaterial = Material.ANVIL;
 		mTree = DepthsTree.SHADOWS;
 
 		mInfo.mIgnoreCooldown = true;

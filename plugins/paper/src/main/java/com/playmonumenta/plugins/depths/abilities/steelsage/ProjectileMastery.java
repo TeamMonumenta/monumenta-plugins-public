@@ -18,7 +18,7 @@ public class ProjectileMastery extends DepthsAbility {
 
 	public ProjectileMastery(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.BOW;
+		mDisplayMaterial = Material.BOW;
 		mTree = DepthsTree.METALLIC;
 	}
 

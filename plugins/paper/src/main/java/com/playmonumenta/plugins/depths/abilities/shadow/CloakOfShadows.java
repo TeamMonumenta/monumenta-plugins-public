@@ -48,7 +48,7 @@ public class CloakOfShadows extends DepthsAbility {
 
 	public CloakOfShadows(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.BLACK_CONCRETE;
+		mDisplayMaterial = Material.BLACK_CONCRETE;
 		mTree = DepthsTree.SHADOWS;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mCooldown = COOLDOWN;

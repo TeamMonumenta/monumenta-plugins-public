@@ -30,7 +30,7 @@ public class EarthenCombos extends DepthsAbility {
 
 	public EarthenCombos(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.WOODEN_SWORD;
+		mDisplayMaterial = Material.WOODEN_SWORD;
 		mTree = DepthsTree.EARTHBOUND;
 	}
 

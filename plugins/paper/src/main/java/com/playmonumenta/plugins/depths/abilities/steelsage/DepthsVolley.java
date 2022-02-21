@@ -46,7 +46,7 @@ public class DepthsVolley extends DepthsAbility {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.VOLLEY;
 		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = Material.ARROW;
+		mDisplayMaterial = Material.ARROW;
 		mTree = DepthsTree.METALLIC;
 	}
 

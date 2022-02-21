@@ -31,7 +31,7 @@ public class StoneSkin extends DepthsAbility {
 
 	public StoneSkin(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.POLISHED_ANDESITE;
+		mDisplayMaterial = Material.POLISHED_ANDESITE;
 		mTree = DepthsTree.EARTHBOUND;
 
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

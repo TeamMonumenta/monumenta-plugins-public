@@ -31,7 +31,7 @@ public class Whirlwind extends DepthsAbility {
 
 	public Whirlwind(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
-		mDisplayItem = Material.IRON_PICKAXE;
+		mDisplayMaterial = Material.IRON_PICKAXE;
 		mTree = DepthsTree.WINDWALKER;
 	}
 
