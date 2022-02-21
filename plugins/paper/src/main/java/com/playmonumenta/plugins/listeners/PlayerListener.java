@@ -119,6 +119,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -128,14 +130,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-
-
 public class PlayerListener implements Listener {
+
+	private static final String PLAYERS_TEAM_NAME = "players";
 
 	private final Plugin mPlugin;
 
 	public PlayerListener(Plugin plugin) {
 		mPlugin = plugin;
+
+		// Delete the players team on startup to clear any lingering entries (and recreate it later with proper settings)
+		Team playersTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(PLAYERS_TEAM_NAME);
+		if (playersTeam != null) {
+			playersTeam.unregister();
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -154,6 +162,16 @@ public class PlayerListener implements Listener {
 		//This checks to make sure that when you login you aren't stuck in blocks, just in case the lag that causes you to fall also kicks you. You don't want to be stuck in dirt forever, right?
 		Location loc = player.getLocation();
 		runTeleportRunnable(player, loc);
+
+		// add player to the players team (and create the team if it doesn't exist already)
+		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+		Team playersTeam = scoreboard.getTeam(PLAYERS_TEAM_NAME);
+		if (playersTeam == null) {
+			playersTeam = scoreboard.registerNewTeam(PLAYERS_TEAM_NAME);
+			playersTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+			playersTeam.setCanSeeFriendlyInvisibles(false);
+		}
+		playersTeam.addEntry(player.getName());
 
 		//TODO temporary for item rework
 		if (!ServerProperties.getShardName().equals("tutorial") && ScoreboardUtils.getScoreboardValue(player, "ItemReworkToken").orElse(0) > 0) {
@@ -199,6 +217,11 @@ public class PlayerListener implements Listener {
 				mPlugin.mCombatLoggingTimers.addTimer(mob.getUniqueId(), Constants.TEN_MINUTES);
 				mob.setRemoveWhenFarAway(false);
 			}
+		}
+
+		Team playersTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(PLAYERS_TEAM_NAME);
+		if (playersTeam != null) {
+			playersTeam.removeEntry(player.getName());
 		}
 	}
 

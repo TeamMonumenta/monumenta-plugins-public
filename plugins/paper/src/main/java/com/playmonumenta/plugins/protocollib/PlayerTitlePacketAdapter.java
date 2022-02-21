@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import io.papermc.paper.adventure.AdventureComponent;
@@ -305,15 +306,27 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 
 	private static List<Component> getDisplay(Player player) {
 		List<Component> result = new ArrayList<>();
+
+		// lowest: optional title
 		Cosmetic title = CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.TITLE);
 		if (title != null) {
 			result.add(Component.text(title.mName, NamedTextColor.GRAY));
 		}
-		int health = (int) player.getHealth();
-		int maxHealth = (int) EntityUtils.getMaxHealth(player);
-		float redFactor = Math.max(0, 1.25f * health / maxHealth - 0.25f); // 100% red at 20% HP or below
-		result.add(Component.text(health + "/" + maxHealth + " \u2665", TextColor.color(1f, redFactor, redFactor)));
+
+		// middle: health
+		int health = (int) Math.round(player.getHealth());
+		int maxHealth = (int) Math.round(EntityUtils.getMaxHealth(player));
+		float redFactor = Math.max(0, Math.min(1, 1.25f * health / maxHealth - 0.25f)); // 100% red at 20% HP or below, white at full HP
+		Component healthLine = Component.text(health + "/" + maxHealth + " \u2665", TextColor.color(1f, redFactor, redFactor));
+		int absorption = (int) Math.round(AbsorptionUtils.getAbsorption(player));
+		if (absorption > 0) {
+			healthLine = healthLine.append(Component.text(" +" + absorption, NamedTextColor.YELLOW));
+		}
+		result.add(healthLine);
+
+		// top: name
 		result.add(Component.text(player.getName(), NamedTextColor.WHITE));
+
 		return result;
 	}
 
