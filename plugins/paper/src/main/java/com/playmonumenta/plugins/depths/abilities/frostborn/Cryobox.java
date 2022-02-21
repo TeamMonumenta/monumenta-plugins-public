@@ -91,7 +91,7 @@ public class Cryobox extends DepthsAbility {
 		world.spawnParticle(Particle.FIREWORKS_SPARK, center.clone().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
 		world.spawnParticle(Particle.SPELL_INSTANT, center.clone().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
 		world.playSound(center, Sound.ITEM_TOTEM_USE, 1, 1.35f);
-		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cryobox has been activated!");
+		MessagingUtils.sendActionBarMessage(mPlayer, "Cryobox has been activated!");
 
 		if (dealDamageLater) {
 			mPlayer.setHealth(1);

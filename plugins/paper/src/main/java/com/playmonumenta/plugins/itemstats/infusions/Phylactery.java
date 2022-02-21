@@ -4,7 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+import com.playmonumenta.worlds.paper.ScoreboardUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -30,7 +31,7 @@ public class Phylactery implements Infusion {
 		//Subtract 100 so that low levels can't gain xp by dying
 		int xp = (int) ((ExperienceUtils.getTotalExperience(player) - 100) * value * XP_KEPT);
 		if (xp > 0) {
-			int previousStorage = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD);
+			int previousStorage = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD).orElse(0);
 			if (previousStorage <= 0) {
 				previousStorage = 0;
 			}
@@ -41,7 +42,7 @@ public class Phylactery implements Infusion {
 
 	//Called when the final item in a grave is picked up or claimed
 	public static void giveStoredXP(Player player) {
-		int phylacteryXP = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD);
+		int phylacteryXP = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD).orElse(0);
 		if (phylacteryXP > 0) {
 			ExperienceUtils.addTotalExperience(player, phylacteryXP);
 			ScoreboardUtils.setScoreboardValue(player, SCOREBOARD, 0);

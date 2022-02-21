@@ -127,7 +127,7 @@ public class SteelStallion extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.5f);
 
-		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Steel Stallion has been activated!");
+		MessagingUtils.sendActionBarMessage(mPlayer, "Steel Stallion has been activated!");
 	}
 
 	public static boolean isSteelStallion(Entity entity) {

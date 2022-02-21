@@ -10,7 +10,7 @@ import java.util.List;
 
 import com.opencsv.CSVReader;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;

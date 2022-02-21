@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.guis;
 
 import com.playmonumenta.plugins.guis.singlepageguis.ExampleSinglePageGUI;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

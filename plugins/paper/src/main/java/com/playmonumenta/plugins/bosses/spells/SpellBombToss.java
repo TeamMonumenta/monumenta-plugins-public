@@ -125,6 +125,7 @@ public class SpellBombToss extends Spell {
 				e.remove();
 			}
 		}
+		mTNTList.clear();
 	}
 
 	public void launch(Player target) {

@@ -136,7 +136,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
 
-		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cloak stacks: " + mCloak);
+		MessagingUtils.sendActionBarMessage(mPlayer, "Cloak stacks: " + mCloak);
 	}
 
 	@Override

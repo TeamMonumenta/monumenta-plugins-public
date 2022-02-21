@@ -49,9 +49,9 @@ public class ChestUtils {
 			    player.getEquipment().getItemInMainHand() != null &&
 			    player.getEquipment().getItemInMainHand().getType() == Material.COMPASS) {
 				if (playerCount == 1) {
-					MessagingUtils.sendActionBarMessage(plugin, player, playerCount + " player in range!");
+					MessagingUtils.sendActionBarMessage(player, playerCount + " player in range!");
 				} else {
-					MessagingUtils.sendActionBarMessage(plugin, player, playerCount + " players in range!");
+					MessagingUtils.sendActionBarMessage(player, playerCount + " players in range!");
 				}
 			}
 		}

@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;

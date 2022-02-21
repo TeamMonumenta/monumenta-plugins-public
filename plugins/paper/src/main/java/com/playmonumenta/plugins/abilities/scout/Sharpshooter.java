@@ -46,7 +46,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 				if (mStacks < MAX_STACKS) {
 					mStacks++;
-					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
+					MessagingUtils.sendActionBarMessage(mPlayer, "Sharpshooter Stacks: " + mStacks);
 					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			}
@@ -65,17 +65,17 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 			if (mTicksToStackDecay <= 0) {
 				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 				mStacks--;
-				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
+				MessagingUtils.sendActionBarMessage(mPlayer, "Sharpshooter Stacks: " + mStacks);
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 	}
 
-	public static void addStacks(Plugin plugin, Player player, int stacks) {
+	public static void addStacks(Player player, int stacks) {
 		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
 		if (ss != null) {
 			ss.mStacks = Math.min(MAX_STACKS, ss.mStacks + stacks);
-			MessagingUtils.sendActionBarMessage(plugin, player, "Sharpshooter Stacks: " + ss.mStacks);
+			MessagingUtils.sendActionBarMessage(player, "Sharpshooter Stacks: " + ss.mStacks);
 			ClientModHandler.updateAbility(player, ss);
 		}
 	}

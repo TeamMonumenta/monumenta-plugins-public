@@ -400,7 +400,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ShulkerShortcutListener(this), this);
 		manager.registerEvents(new ShulkerEquipmentListener(this), this);
 		manager.registerEvents(new PortableEnderListener(), this);
-		manager.registerEvents(new ShatteredEquipmentListener(this), this);
+		manager.registerEvents(new ShatteredEquipmentListener(), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);
 		manager.registerEvents(mDeathItemListener, this);
 		manager.registerEvents(new ZoneListener(), this);

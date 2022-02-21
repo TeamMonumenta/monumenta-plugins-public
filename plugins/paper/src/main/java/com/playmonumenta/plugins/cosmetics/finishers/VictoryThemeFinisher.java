@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.scriptedquests.Plugin;
+import com.playmonumenta.plugins.Plugin;
 
 public class VictoryThemeFinisher {
 

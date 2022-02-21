@@ -82,7 +82,7 @@ public class Apocalypse extends DepthsAbility {
 
 		world.spawnParticle(Particle.HEART, loc.clone().add(0, 1, 0), count * 7, 0.5, 0.5, 0.5);
 		world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.5f * count, 1.6f);
-		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Apocalypse has been activated!");
+		MessagingUtils.sendActionBarMessage(mPlayer, "Apocalypse has been activated!");
 		event.setCancelled(true);
 	}
 

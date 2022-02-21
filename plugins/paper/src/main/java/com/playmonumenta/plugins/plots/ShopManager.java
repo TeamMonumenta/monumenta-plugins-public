@@ -2,10 +2,10 @@ package com.playmonumenta.plugins.plots;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.scriptedquests.quests.QuestNpc;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -708,7 +708,7 @@ public class ShopManager implements Listener {
 		/* This command was initiated by a player interacting with the NPC - check permissions */
 		if (shop.isGuildShop()) {
 			String guildName = LuckPermsIntegration.getGuildName(LuckPermsIntegration.getGuild(player));
-			if (guildName == null || !guildName.equalsIgnoreCase(shop.mOwnerGuildName) || ScoreboardUtils.getScoreboardValue(player, "Founder") != 1) {
+			if (guildName == null || !guildName.equalsIgnoreCase(shop.mOwnerGuildName) || ScoreboardUtils.getScoreboardValue(player, "Founder").orElse(0) != 1) {
 				String msg = "You must be a *founder* of the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
 				player.sendMessage(ChatColor.RED + msg);
 				CommandAPI.fail(msg);

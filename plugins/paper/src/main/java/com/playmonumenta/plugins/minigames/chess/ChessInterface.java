@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.minigames.chess;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.scriptedquests.Plugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;

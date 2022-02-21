@@ -1,6 +1,14 @@
 package com.playmonumenta.plugins.listeners;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import com.playmonumenta.plugins.Plugin;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -12,14 +20,6 @@ import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BlockVector;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 public class SpawnerListener implements Listener {
 
@@ -37,8 +37,12 @@ public class SpawnerListener implements Listener {
 	private static final int INACTIVITY_TIMER = 20 * 45;
 	private static final int CLEANER_INTERVAL = 20 * 30;
 
-	private final Map<UUID, MobInfo> mMobInfos = new HashMap<UUID, MobInfo>();
-	private final Map<BlockVector, List<MobInfo>> mSpawnerInfos = new HashMap<BlockVector, List<MobInfo>>();
+	private final Map<UUID, MobInfo> mMobInfos = new HashMap<>();
+	/*
+	 * Need to use the full spawner Location, not just x/y/z, to ensure that only this
+	 * specific spawner on this specific world is included
+	 */
+	private final Map<Location, List<MobInfo>> mSpawnerInfos = new HashMap<>();
 
 	private final BukkitRunnable mCleaner;
 
@@ -80,14 +84,9 @@ public class SpawnerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void spawnerSpawnEvent(SpawnerSpawnEvent event) {
-		BlockVector spawnerLoc = new BlockVector(event.getSpawner().getLocation().toVector());
 		Entity mob = event.getEntity();
 
-		List<MobInfo> spawnerInfo = mSpawnerInfos.get(spawnerLoc);
-		if (spawnerInfo == null) {
-			spawnerInfo = new ArrayList<MobInfo>();
-			mSpawnerInfos.put(spawnerLoc, spawnerInfo);
-		}
+		List<MobInfo> spawnerInfo = mSpawnerInfos.putIfAbsent(event.getSpawner().getLocation(), new ArrayList<>());
 
 		// Generate list of player locations a single time
 		List<Location> playerLocations = new ArrayList<Location>();

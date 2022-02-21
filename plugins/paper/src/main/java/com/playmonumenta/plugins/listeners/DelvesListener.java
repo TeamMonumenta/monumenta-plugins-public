@@ -7,7 +7,8 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.DelveModifierSelectionGUI;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;

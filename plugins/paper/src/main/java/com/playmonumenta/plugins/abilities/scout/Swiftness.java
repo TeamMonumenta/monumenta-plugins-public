@@ -75,12 +75,12 @@ public class Swiftness extends Ability {
 		if (mJumpBoost) {
 			mJumpBoost = false;
 			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.JUMP);
-			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Jump Boost has been turned off");
+			MessagingUtils.sendActionBarMessage(mPlayer, "Jump Boost has been turned off");
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 2.0f, 1.6f);
 		} else {
 			mJumpBoost = true;
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
-			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Jump Boost has been turned on");
+			MessagingUtils.sendActionBarMessage(mPlayer, "Jump Boost has been turned on");
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 1.6f);
 		}
 	}

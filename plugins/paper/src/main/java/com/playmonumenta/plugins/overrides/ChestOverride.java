@@ -122,7 +122,7 @@ public class ChestOverride extends BaseOverride {
 		} else if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		} else if (!breakable(block)) {
-			MessagingUtils.sendActionBarMessage(plugin, player, "This block can not be broken!");
+			MessagingUtils.sendActionBarMessage(player, "This block can not be broken!");
 			return false;
 		}
 

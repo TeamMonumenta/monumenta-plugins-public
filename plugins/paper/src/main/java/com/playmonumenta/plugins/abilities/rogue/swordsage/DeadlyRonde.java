@@ -103,7 +103,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
 
-		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
+		MessagingUtils.sendActionBarMessage(mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
 
 		return true;
 	}
@@ -139,7 +139,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			mActiveRunnable = null;
 
 			mRondeStacks--;
-			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
+			MessagingUtils.sendActionBarMessage(mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
 			ClientModHandler.updateAbility(mPlayer, this);
 			if (mRondeStacks > 0) {
 				mActiveRunnable = new BukkitRunnable() {
@@ -148,7 +148,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 					public void run() {
 						mActiveRunnable = null;
 						mRondeStacks = 0;
-						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
+						MessagingUtils.sendActionBarMessage(mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
 						ClientModHandler.updateAbility(mPlayer, DeadlyRonde.this);
 					}
 

@@ -2,8 +2,8 @@ package com.playmonumenta.plugins.abilities;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Player;
 

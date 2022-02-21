@@ -67,7 +67,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 			if (mTicksToStackDecay <= 0) {
 				mTicksToStackDecay = DECAY_TIMER;
 				mStacks--;
-				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sage's Insight Stacks: " + mStacks);
+				MessagingUtils.sendActionBarMessage(mPlayer, "Sage's Insight Stacks: " + mStacks);
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
@@ -110,7 +110,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 				} else {
 					world.spawnParticle(Particle.REDSTONE, locD, 15, 0.4, 0.4, 0.4, COLOR);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 15, 0, 0, 0, 0.2);
-					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sage's Insight Stacks: " + mStacks);
+					MessagingUtils.sendActionBarMessage(mPlayer, "Sage's Insight Stacks: " + mStacks);
 				}
 				ClientModHandler.updateAbility(mPlayer, this);
 			}

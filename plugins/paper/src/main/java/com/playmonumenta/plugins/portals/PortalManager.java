@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.portals;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.scriptedquests.Plugin;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;

@@ -6,7 +6,6 @@ import java.time.Duration;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.playmonumenta.plugins.Plugin;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -49,18 +48,18 @@ public class MessagingUtils {
 		return message.replaceAll("@S", player.getName());
 	}
 
-	public static void sendActionBarMessage(Plugin plugin, Player player, String message) {
-		sendActionBarMessage(plugin, player, message, NamedTextColor.YELLOW);
+	public static void sendActionBarMessage(Player player, String message) {
+		sendActionBarMessage(player, message, NamedTextColor.YELLOW);
 	}
 
-	public static void sendActionBarMessage(Plugin plugin, Player player, String message, NamedTextColor color) {
+	public static void sendActionBarMessage(Player player, String message, NamedTextColor color) {
 		message = translatePlayerName(player, message);
 		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message)
 			.color(color);
 		player.sendActionBar(formattedMessage);
 	}
 
-	public static void sendAbilityTriggeredMessage(Plugin plugin, Player player, String message) {
+	public static void sendAbilityTriggeredMessage(Player player, String message) {
 		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message)
 			.color(NamedTextColor.RED);
 		player.sendActionBar(formattedMessage);

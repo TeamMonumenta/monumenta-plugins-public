@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -8,7 +9,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.scriptedquests.Plugin;
 import net.md_5.bungee.api.ChatColor;
 import com.playmonumenta.plugins.events.MonumentaEvent;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
@@ -153,7 +153,7 @@ public class DepthsParty {
 		mRoomStartX = loc.getBlockX();
 
 		//Attempt to set locations for the next floor lobby to load
-		World world = Plugin.getInstance().mWorld;
+		World world = loc.getWorld();
 		Collection<ArmorStand> nearbyStands = world.getNearbyEntitiesByType(ArmorStand.class, loc, 60.0);
 		for (ArmorStand stand : nearbyStands) {
 			if (stand.getName().contains(DepthsManager.PLAYER_SPAWN_STAND_NAME)) {

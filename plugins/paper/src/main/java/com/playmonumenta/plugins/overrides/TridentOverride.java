@@ -17,7 +17,7 @@ public class TridentOverride extends BaseOverride {
 			return true;
 		}
 		if (ItemStatUtils.isShattered(event.getItem())) {
-			MessagingUtils.sendActionBarMessage(plugin, player, "Shattered items must be reforged before use");
+			MessagingUtils.sendActionBarMessage(player, "Shattered items must be reforged before use");
 			return false;
 		}
 		if (player.getInventory().getItemInMainHand().getType() != Material.TRIDENT &&

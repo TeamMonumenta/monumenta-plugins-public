@@ -112,7 +112,7 @@ public class LastBreath extends DepthsAbility {
 		world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 1.2f);
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 2.0f, 0.4f);
 
-		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Last Breath has been activated!");
+		MessagingUtils.sendActionBarMessage(mPlayer, "Last Breath has been activated!");
 
 	}
 

@@ -72,7 +72,7 @@ public class VoodooBondsReaper extends Effect {
 
 	@Override
 	public void entityGainEffect(Entity entity) {
-		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, MESSAGE);
+		MessagingUtils.sendActionBarMessage(mPlayer, MESSAGE);
 	}
 
 	@Override

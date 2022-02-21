@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.depths;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsRoom.RoomDirection;
-import com.playmonumenta.scriptedquests.Plugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;

@@ -136,8 +136,10 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private static final DecimalFormat PERCENT_CHANGE_FORMATTER = new DecimalFormat("+0.##%;-0.##%");
 
 	private static final DoubleFunction<String> PERCENT = PERCENT_FORMATTER::format;
+	@SuppressWarnings("UnnecessaryLambda")
 	private static final DoubleFunction<String> ONE_MINUS_PERCENT = d -> PERCENT_FORMATTER.format(1 - d);
 	private static final DoubleFunction<String> NUMBER = NUMBER_FORMATTER::format;
+	@SuppressWarnings("UnnecessaryLambda")
 	private static final DoubleFunction<String> DR_CHANGE_FORMAT = d -> PERCENT_CHANGE_FORMATTER.format(d) + " damage taken";
 
 	private enum Stat {

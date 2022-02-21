@@ -133,7 +133,7 @@ public class FestiveTesseractOverride extends BaseOverride {
 			PLAYERS_ON_COOLDOWN.remove(player.getUniqueId());
 
 			if (player.isOnline() && player.isValid()) {
-				MessagingUtils.sendActionBarMessage(plugin, player, "Your Tesseract of Festivity is off cooldown");
+				MessagingUtils.sendActionBarMessage(player, "Your Tesseract of Festivity is off cooldown");
 			}
 		}, COOLDOWN);
 

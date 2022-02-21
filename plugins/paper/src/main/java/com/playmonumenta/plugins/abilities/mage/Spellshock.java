@@ -12,7 +12,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;

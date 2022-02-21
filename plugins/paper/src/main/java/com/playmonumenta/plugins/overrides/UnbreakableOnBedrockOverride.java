@@ -20,7 +20,7 @@ public class UnbreakableOnBedrockOverride extends BaseOverride {
 			}
 			return true;
 		} else {
-			MessagingUtils.sendActionBarMessage(plugin, player, "This block can not be broken!");
+			MessagingUtils.sendActionBarMessage(player, "This block can not be broken!");
 		}
 		return false;
 	}

@@ -3,7 +3,8 @@ package com.playmonumenta.plugins.classes;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
@@ -34,9 +35,9 @@ public class PlayerClass {
 	}
 
 	public Boolean getSpecAccessToChoose(Player player, PlayerSpec spec) {
-		int specQuestReq = ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard);
-		int specClassReq = ScoreboardUtils.getScoreboardValue(player, "Class");
-		int specSpecReq = ScoreboardUtils.getScoreboardValue(player, "Specialization");
+		int specQuestReq = ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard).orElse(0);
+		int specClassReq = ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0);
+		int specSpecReq = ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0);
 		if (specQuestReq >= 100 && specClassReq == mClass && specSpecReq == 0) {
 			return true;
 		}
@@ -44,9 +45,9 @@ public class PlayerClass {
 	}
 
 	public Boolean getSpecAccessToChange(Player player, PlayerSpec spec) {
-		int specQuestReq = ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard);
-		int specClassReq = ScoreboardUtils.getScoreboardValue(player, "Class");
-		int specSpecReq = ScoreboardUtils.getScoreboardValue(player, "Specialization");
+		int specQuestReq = ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard).orElse(0);
+		int specClassReq = ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0);
+		int specSpecReq = ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0);
 		if (specQuestReq >= 100 && specClassReq == mClass && specSpecReq == spec.mSpecialization) {
 			return true;
 		}

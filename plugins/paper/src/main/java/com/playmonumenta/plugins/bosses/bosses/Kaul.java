@@ -200,7 +200,7 @@ public class Kaul extends BossAbilityGroup {
 		    Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mShrineMarker.getLocation().getY()),
 		                  new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mShrineMarker.getLocation()),
 		                  new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-		                  new SpellArachnopocolypse(mPlugin, mBoss, mShrineMarker.getLocation(), detectionRange, mSpawnLoc)));
+		                  new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc)));
 
 		Spell judgement = SpellKaulsJudgement.getInstance(mSpawnLoc);
 
@@ -208,7 +208,7 @@ public class Kaul extends BossAbilityGroup {
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mShrineMarker.getLocation()),
 			              new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
 			              new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mShrineMarker.getLocation().getY()),
-			              new SpellArachnopocolypse(mPlugin, mBoss, mShrineMarker.getLocation(), detectionRange, mSpawnLoc),
+			              new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc),
 			              judgement));
 
 		SpellManager phase3Spells = new SpellManager(

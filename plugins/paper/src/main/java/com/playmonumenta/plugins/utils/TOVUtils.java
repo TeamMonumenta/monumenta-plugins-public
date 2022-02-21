@@ -26,7 +26,7 @@ public class TOVUtils {
 		if (blockState instanceof Chest) {
 			String name = ((Chest) blockState).getCustomName();
 			if (UNOPENED_CACHE_NAME.equals(name) || OPENED_CACHE_NAME.equals(name)) {
-				MessagingUtils.sendActionBarMessage(plugin, player, "You cannot break Treasures of Viridia Caches.");
+				MessagingUtils.sendActionBarMessage(player, "You cannot break Treasures of Viridia Caches.");
 
 				return false;
 			}
@@ -63,7 +63,7 @@ public class TOVUtils {
 		if (counter.isPresent()) {
 			int value = counter.get();
 			if (value == ScoreboardUtils.getScoreboardValue(player, CACHE_COUNTER_SCORE).orElse(0)) {
-				MessagingUtils.sendActionBarMessage(plugin, player, "You cannot open more than 1 cache per spawn.");
+				MessagingUtils.sendActionBarMessage(player, "You cannot open more than 1 cache per spawn.");
 				new BukkitRunnable() {
 					@Override
 					public void run() {

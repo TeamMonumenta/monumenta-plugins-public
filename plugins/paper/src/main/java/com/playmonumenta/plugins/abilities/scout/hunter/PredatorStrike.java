@@ -153,6 +153,6 @@ public class PredatorStrike extends Ability {
 			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
 			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE, damage, mInfo.mLinkedSpell, true);
 		}
-		Sharpshooter.addStacks(mPlugin, mPlayer, mobs.size());
+		Sharpshooter.addStacks(mPlayer, mobs.size());
 	}
 }

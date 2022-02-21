@@ -2,7 +2,8 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class DepthsPlayer {
 	}
 
 	public List<DepthsTree> initTrees(Player player) {
-		int talismanScore = ScoreboardUtils.getScoreboardValue(player, "DDTalisman");
+		int talismanScore = ScoreboardUtils.getScoreboardValue(player, "DDTalisman").orElse(0);
 		if (0 < talismanScore && talismanScore <= DepthsUtils.TREES.length) {
 			double chance = 1;
 			if (player.getScoreboardTags().contains(DepthsManager.ENDLESS_MODE_STRING) && !player.getScoreboardTags().contains(DepthsManager.RIGGED_STRING)) {

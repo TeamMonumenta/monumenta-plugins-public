@@ -1,7 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
@@ -10,11 +16,6 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
 public abstract class Spell implements Cloneable {
 	protected final Set<BukkitRunnable> mActiveRunnables = new LinkedHashSet<BukkitRunnable>();
@@ -36,14 +37,16 @@ public abstract class Spell implements Cloneable {
 	 * and then remove them from mActiveRunnables when they are finished
 	 */
 	public void cancel() {
-		Iterator<BukkitRunnable> iterator = mActiveRunnables.iterator();
-		while (iterator.hasNext()) {
-			BukkitRunnable runnable = iterator.next();
+		/*
+		 * Iterate over a copy of mActiveRunnables and cancel each task that isn't already cancelled.
+		 * Need to iterate over a copy because some runnables remove themselves from mActiveRunnables when cancelled
+		 */
+		new ArrayList<>(mActiveRunnables).forEach((runnable) -> {
 			if (!runnable.isCancelled()) {
 				runnable.cancel();
 			}
-			iterator.remove();
-		}
+		});
+		mActiveRunnables.clear();
 	}
 
 	/**

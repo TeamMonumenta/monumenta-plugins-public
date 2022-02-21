@@ -88,7 +88,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, mStacks * 0.4f, 2);
 
 			mStacks = 0;
-			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);
+			MessagingUtils.sendActionBarMessage(mPlayer, "Rage: " + mStacks);
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
 	}
@@ -101,7 +101,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			if (mTimeToStackDecay >= RAMPAGE_STACK_DECAY_TIME) {
 				mTimeToStackDecay = 0;
 				mStacks--;
-				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);
+				MessagingUtils.sendActionBarMessage(mPlayer, "Rage: " + mStacks);
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
@@ -135,7 +135,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		if (newStacks > 0) {
 			int previousStacks = mStacks;
 			mStacks = Math.min(mStackLimit, mStacks + newStacks);
-			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);
+			MessagingUtils.sendActionBarMessage(mPlayer, "Rage: " + mStacks);
 			if (mStacks != previousStacks) {
 				ClientModHandler.updateAbility(mPlayer, this);
 			}

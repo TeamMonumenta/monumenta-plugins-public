@@ -28,16 +28,14 @@ import java.util.List;
 public class SpellArachnopocolypse extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
-	private Location mLoc;
 	private double mDetectRange;
 	private boolean mCooldown = false;
 	private Location mSpawnLoc;
 	private ChargeUpManager mChargeUp;
 
-	public SpellArachnopocolypse(Plugin plugin, LivingEntity boss, Location loc, double detectRange, Location spawnLoc) {
+	public SpellArachnopocolypse(Plugin plugin, LivingEntity boss, double detectRange, Location spawnLoc) {
 		mPlugin = plugin;
 		mBoss = boss;
-		mLoc = loc;
 		mDetectRange = detectRange;
 		mSpawnLoc = spawnLoc;
 		mChargeUp = new ChargeUpManager(mBoss, 45, ChatColor.GREEN + "Channeling " + ChatColor.DARK_GREEN + "Arachnopocalypse...",
@@ -65,6 +63,7 @@ public class SpellArachnopocolypse extends Spell {
 		//30 ticks charge time
 		mChargeUp.setTime(15);
 		new BukkitRunnable() {
+			@Override
 			public void run() {
 				if (mChargeUp.nextTick()) {
 					List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, mDetectRange, true);

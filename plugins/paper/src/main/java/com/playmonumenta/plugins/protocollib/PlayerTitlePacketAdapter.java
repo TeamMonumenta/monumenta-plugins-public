@@ -94,7 +94,7 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 
 	@Override
 	public void onPacketSending(PacketEvent event) {
-		if (event.getPacketType() == PacketType.Play.Server.NAMED_ENTITY_SPAWN) {
+		if (event.getPacketType().equals(PacketType.Play.Server.NAMED_ENTITY_SPAWN)) {
 			// doc: https://wiki.vg/Protocol#Spawn_Player
 
 			Entity targetEntity = event.getPacket().getEntityModifier(event).read(0);

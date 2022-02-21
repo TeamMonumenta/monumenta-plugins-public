@@ -82,7 +82,7 @@ public class LuminousInfusion extends Ability {
 			putOnCooldown();
 
 			mActive = true;
-			MessagingUtils.sendActionBarMessage(Plugin.getInstance(), mPlayer, "Holy energy radiates from your hands...");
+			MessagingUtils.sendActionBarMessage(mPlayer, "Holy energy radiates from your hands...");
 
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1);
@@ -100,7 +100,7 @@ public class LuminousInfusion extends Ability {
 					world.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
 					if (mT >= COOLDOWN || !mActive) {
 						if (mT >= COOLDOWN) {
-							MessagingUtils.sendActionBarMessage(Plugin.getInstance(), mPlayer, EXPIRATION_MESSAGE);
+							MessagingUtils.sendActionBarMessage(mPlayer, EXPIRATION_MESSAGE);
 						}
 						mActive = false;
 						this.cancel();
