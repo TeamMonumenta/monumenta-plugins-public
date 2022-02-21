@@ -46,6 +46,7 @@ public class SpellGraspingHands extends Spell {
 	private ChargeUpManager mChargeUp;
 	private boolean mCanRun = true;
 	private double mDuration = 20 * 7.0d;
+	private int mHealCap = 75;
 
 	public SpellGraspingHands(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
@@ -161,7 +162,10 @@ public class SpellGraspingHands extends Spell {
 									for (LivingEntity e : mobs) {
 										if (!(e.getType() == EntityType.PLAYER) && !e.isDead()) {
 											double maxHealth = EntityUtils.getMaxHealth(e);
-											double restore = e.getHealth() + maxHealth * 0.01 + 3;
+											double restore = e.getHealth() + maxHealth * 0.005 + 3;
+											if (restore >= mHealCap) {
+												restore = mHealCap;
+											}
 											if (restore >= maxHealth) {
 												e.setHealth(maxHealth);
 											} else {
