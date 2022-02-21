@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.falsespirit;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,13 +19,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TriplicateSlash extends Spell {
 
@@ -50,15 +49,15 @@ public class TriplicateSlash extends Spell {
 				Location loc = mBoss.getLocation();
 				loc.setDirection(dir);
 
-				if (mTicks % 30 == 0) {
+				if (mTicks > 0 && mTicks % 30 == 0) {
 					Vector vec;
-					List<BoundingBox> boxes = new ArrayList<BoundingBox>();
+					List<BoundingBox> boxes = new ArrayList<>();
 
 					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 3, 0.5f);
 
 					//Final particle show
 					for (double r = 0; r < 7; r++) {
-						for (int dir = 0 + mDirection; dir <= 270 + mDirection; dir += 120) {
+						for (int dir = mDirection; dir <= 270 + mDirection; dir += 120) {
 							for (double degree = 60; degree < 120; degree += 5) {
 								double radian1 = Math.toRadians(degree);
 								vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
@@ -74,7 +73,7 @@ public class TriplicateSlash extends Spell {
 						}
 					}
 
-					for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 10, true)) {
 						for (BoundingBox box : boxes) {
 							if (player.getBoundingBox().overlaps(box)) {
 								DamageUtils.damage(mBoss, player, DamageType.MAGIC, 30, null, false, true, "Triplicate Slash");
@@ -93,7 +92,7 @@ public class TriplicateSlash extends Spell {
 				} else {
 					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 2, 2f);
 
-					for (int dir = 0 + mDirection; dir <= 270 + mDirection; dir += 120) {
+					for (int dir = mDirection; dir <= 270 + mDirection; dir += 120) {
 						Vector vec;
 						//The degree range is 60 degrees for 30 blocks radius
 						for (double degree = 60; degree < 120; degree += 5) {
