@@ -673,14 +673,17 @@ public class ItemUtils {
 
 	public static void damageItem(ItemStack item, int damage, boolean canBreak) {
 		ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
-		if (meta != null && (meta instanceof Damageable)) {
+		if (meta instanceof Damageable dMeta) {
 			// This item can be damaged - remove some durability from it
-			Damageable dMeta = (Damageable) meta;
 			short maxDurability = item.getType().getMaxDurability();
 			int currentDamage = dMeta.getDamage();
 			int newDamage = currentDamage + damage;
 			if (canBreak && newDamage > maxDurability - 1) {
-				item.setAmount(0);
+				if (ItemStatUtils.getTier(item) != null) {
+					ItemStatUtils.shatter(item);
+				} else {
+					item.setAmount(0);
+				}
 			} else {
 				dMeta.setDamage(Math.min(maxDurability - 1, newDamage));
 				item.setItemMeta(meta);
@@ -690,14 +693,17 @@ public class ItemUtils {
 
 	public static void damageItemPercent(ItemStack item, double damagePercent, boolean canBreak) {
 		ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
-		if (meta != null && (meta instanceof Damageable)) {
+		if (meta instanceof Damageable dMeta) {
 			// This item can be damaged - remove some durability from it
-			Damageable dMeta = (Damageable)meta;
 			short maxDurability = item.getType().getMaxDurability();
 			int currentDamage = dMeta.getDamage();
 			int newDamage = (int) (currentDamage + (maxDurability * damagePercent) / 100);
 			if (canBreak && newDamage > maxDurability - 1) {
-				item.setAmount(0);
+				if (ItemStatUtils.getTier(item) != null) {
+					ItemStatUtils.shatter(item);
+				} else {
+					item.setAmount(0);
+				}
 			} else {
 				dMeta.setDamage(Math.min(maxDurability - 1, newDamage));
 				item.setItemMeta(meta);
@@ -708,11 +714,11 @@ public class ItemUtils {
 	public static void damageShield(Player player, int damage) {
 		PlayerInventory inv = player.getInventory();
 		ItemStack mainHand = inv.getItemInMainHand();
-		if (mainHand != null && mainHand.getType().equals(Material.SHIELD)) {
+		if (mainHand.getType().equals(Material.SHIELD)) {
 			damageItem(mainHand, damage / (mainHand.getEnchantmentLevel(Enchantment.DURABILITY) + 1), true);
 		} else {
 			ItemStack offHand = inv.getItemInMainHand();
-			if (offHand != null && offHand.getType().equals(Material.SHIELD)) {
+			if (offHand.getType().equals(Material.SHIELD)) {
 				damageItem(offHand, damage / (offHand.getEnchantmentLevel(Enchantment.DURABILITY) + 1), true);
 			}
 		}

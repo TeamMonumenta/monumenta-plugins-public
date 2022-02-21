@@ -749,8 +749,8 @@ public class PlayerListener implements Listener {
 		}
 
 		// Vanilla hoes and axes take 2 durability, we only want them to take 1
-		if (ItemUtils.isHoe(item) || ItemUtils.isAxe(item)) {
-			newDamage = oldDamage - 1;
+		if ((ItemUtils.isHoe(item) || ItemUtils.isAxe(item)) && oldDamage > 1) {
+			newDamage = oldDamage / 2;
 		}
 
 		event.setDamage(newDamage);
@@ -758,10 +758,9 @@ public class PlayerListener implements Listener {
 
 		// Low durability notification code
 		Material mat = item.getType();
-		if (item.getItemMeta() instanceof Damageable) {
-			Damageable dMeta = (Damageable) item.getItemMeta();
+		if (item.getItemMeta() instanceof Damageable dMeta) {
 			int itemDamage = dMeta.getDamage();
-			if (itemDamage > mat.getMaxDurability() * 0.1 && itemDamage + newDamage < mat.getMaxDurability() * 0.1) {
+			if (itemDamage < mat.getMaxDurability() * 0.9 && itemDamage + newDamage >= mat.getMaxDurability() * 0.9) {
 				World world = player.getWorld();
 				Location loc = player.getLocation();
 				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.45f);

@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.kyori.adventure.text.Component;
@@ -42,8 +43,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -290,7 +291,7 @@ public class DepthsUtils {
 	 */
 	public static boolean isWeaponItem(@Nullable ItemStack item) {
 		return item != null && (ItemUtils.isAxe(item) || ItemUtils.isSword(item) ||
-			ItemUtils.isWand(item) || ItemUtils.isHoe(item) || item.getType() == Material.TRIDENT);
+			ItemUtils.isWand(item) || ItemUtils.isHoe(item) || (item.getType() == Material.TRIDENT && ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RIPTIDE) == 0));
 	}
 
 	public static double roundDouble(double num) {
