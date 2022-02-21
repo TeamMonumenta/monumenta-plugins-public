@@ -7,10 +7,11 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import javax.annotation.Nullable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nullable;
 
 
 public class MagePassive extends Ability {
@@ -21,6 +22,11 @@ public class MagePassive extends Ability {
 
 	public MagePassive(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
+	}
+
+	@Override
+	public double getPriorityAmount() {
+		return 999;
 	}
 
 	@Override
