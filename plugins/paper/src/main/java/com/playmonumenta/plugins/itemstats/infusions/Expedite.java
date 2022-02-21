@@ -1,11 +1,5 @@
 package com.playmonumenta.plugins.itemstats.infusions;
 
-import java.util.NavigableSet;
-
-import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -14,6 +8,12 @@ import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
 public class Expedite implements Infusion {
 
@@ -41,9 +41,9 @@ public class Expedite implements Infusion {
 		if (MetadataUtils.checkOnceThisTick(plugin, player, CHECK_ONCE_THIS_TICK_METAKEY)) {
 			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 			double percentSpeed = PERCENT_SPEED_PER_LEVEL * modifiedLevel;
-			NavigableSet<Effect> speedEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
+			NavigableSet<Effect> speedEffects = new TreeSet<>(plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME));
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
-			if (speedEffects != null) {
+			if (!speedEffects.isEmpty()) {
 				for (Effect effect : speedEffects) {
 					double mag = effect.getMagnitude() / percentSpeed;
 					if (effect.getMagnitude() == percentSpeed * Math.min(5, mag + 1)) {
