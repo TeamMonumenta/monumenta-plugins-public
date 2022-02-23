@@ -207,9 +207,8 @@ public final class Lich extends BossAbilityGroup {
 			UUID keyUUID = mKey.getUniqueId();
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join lichphylactery " + keyUUID);
 			int playercount = playersInRange(mBoss.getLocation(), detectionRange, true).size();
-			double hpdel = 1500;
-			//some how ducc made it so ln(playercount) < 0, additional check
-			double hp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.max(Math.log(playercount) * 1.2, 0)));
+			double hpdel = 1800;
+			double hp = hpdel * BossUtils.healthScalingCoef(playercount, 0.7, 0.575);
 			EntityUtils.setAttributeBase(mKey, Attribute.GENERIC_MAX_HEALTH, hp);
 			mKey.setHealth(hp);
 		}
@@ -2067,8 +2066,9 @@ public final class Lich extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int playercount = playersInRange(mBoss.getLocation(), detectionRange, true).size();
-		double hpdel = 4250;
-		double bossTargetHp = hpdel * BossUtils.healthScalingCoef(playercount, 0.6, 0.35);
+		double hpdel = 4000;
+		// 25 player health = 30k when x = 0.7 y = 0.5758790007
+		double bossTargetHp = hpdel * BossUtils.healthScalingCoef(playercount, 0.7, 0.5758790007);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

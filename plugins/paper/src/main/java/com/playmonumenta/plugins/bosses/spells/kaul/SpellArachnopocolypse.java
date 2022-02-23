@@ -78,7 +78,7 @@ public class SpellArachnopocolypse extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 10, 1);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 50, 0.5, 0.25, 0.5, 0);
 
-					double health = 80 * BossUtils.healthScalingCoef(players.size(), 0.5, 0.7);
+					double health = 80 * BossUtils.healthScalingCoef(players.size(), 0.5, 0.5);
 
 					for (String los : spiderLocations.keySet()) {
 						riseSpider(mSpawnLoc.clone().add(spiderLocations.get(los)), los, (int) health);
