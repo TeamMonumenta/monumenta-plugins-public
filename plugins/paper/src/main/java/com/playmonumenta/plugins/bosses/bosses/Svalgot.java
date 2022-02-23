@@ -40,7 +40,7 @@ public final class Svalgot extends BossAbilityGroup {
 	public static final String identityTag = "boss_svalgot";
 	public static final int detectionRange = 75;
 
-	private static final int BASE_HEALTH = 2500;
+	private static final int BASE_HEALTH = 2000;
 	private static final String duoTag = "ghalkortheforgemaster";
 
 	private final Location mSpawnLoc;

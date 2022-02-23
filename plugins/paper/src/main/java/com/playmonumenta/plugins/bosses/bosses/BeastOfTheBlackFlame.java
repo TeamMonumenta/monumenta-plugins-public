@@ -46,7 +46,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 	public static final int detectionRange = 75;
 	public static final String losName = "BeastOfTheBlackFlame";
 
-	private static final int BASE_HEALTH = 4000;
+	private static final int BASE_HEALTH = 3333;
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;

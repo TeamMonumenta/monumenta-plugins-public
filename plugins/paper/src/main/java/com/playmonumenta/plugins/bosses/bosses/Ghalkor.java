@@ -42,7 +42,7 @@ public final class Ghalkor extends BossAbilityGroup {
 	public static final String identityTag = "boss_ghalkor";
 	public static final int detectionRange = 75;
 
-	private static final int BASE_HEALTH = 2500;
+	private static final int BASE_HEALTH = 2000;
 	private static final String duoTag = "svalgotthevoidwalker";
 
 	private final Location mSpawnLoc;
