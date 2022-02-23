@@ -37,7 +37,6 @@ public class DamageListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
-
 		if (event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent) {
 			if (event.getCause().equals(DamageCause.ENTITY_EXPLOSION)
 				    && event.getEntity() instanceof LivingEntity le) {
@@ -86,6 +85,11 @@ public class DamageListener implements Listener {
 			    && player.getActiveItem() != null
 			    && player.getActiveItem().getType() == Material.SHIELD) {
 			event.setDamage(originalDamage);
+		}
+
+		if (event.getDamage() < 0 || event.getFinalDamage() < 0) {
+			event.setDamage(0);
+			new Exception("negative damage dealt").printStackTrace();
 		}
 	}
 
