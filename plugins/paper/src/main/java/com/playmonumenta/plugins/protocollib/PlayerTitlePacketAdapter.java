@@ -6,7 +6,6 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.events.ScheduledPacket;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.playmonumenta.plugins.Plugin;
@@ -98,7 +97,7 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 
 			Entity targetEntity = event.getPacket().getEntityModifier(event).read(0);
 
-			// cancel packet created by spawning the entity for real
+			// cancel packets created by spawning the fake entities for real
 			int entityId = targetEntity.getEntityId();
 			if (METADATA.values().stream().anyMatch(md -> md.isMetadataEntity(entityId))) {
 				event.setCancelled(true);
@@ -109,22 +108,28 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 				return;
 			}
 
-			PlayerMetadata metadata = METADATA.computeIfAbsent(targetPlayer.getEntityId(), k -> createLines(targetPlayer, getDisplay(targetPlayer)));
+			// Run the rest outside of the packet code, as it modifies world state (creates new entities)
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				PlayerMetadata metadata = METADATA.computeIfAbsent(targetPlayer.getEntityId(), k -> createLines(targetPlayer, getDisplay(targetPlayer)));
 
-			List<PacketContainer> packets = getSpawnLinesPackets(targetPlayer, metadata, 0);
+				List<PacketContainer> packets = getSpawnLinesPackets(targetPlayer, metadata, 0);
 
-			for (PacketContainer packet : packets) {
-				if (!packet.getType().equals(PacketType.Play.Server.MOUNT)) {
-					event.schedule(ScheduledPacket.fromSilent(packet, event.getPlayer()));
+				for (PacketContainer packet : packets) {
+					if (!packet.getType().equals(PacketType.Play.Server.MOUNT)) {
+						try {
+							mProtocolManager.sendServerPacket(event.getPlayer(), packet, false);
+						} catch (InvocationTargetException e) {
+							e.printStackTrace();
+						}
+					}
 				}
-			}
 
-			scheduleMountPackets(packets, event.getPlayer(), false);
-
+				scheduleMountPackets(packets, event.getPlayer(), false);
+			});
 		} else { // ENTITY_DESTROY
 			// doc: https://wiki.vg/Protocol#Destroy_Entities
 
-			// Remove the armor stand along with the player
+			// Remove the fake entities along with the player
 			int[] originalEntityIds = event.getPacket().getIntegerArrays().read(0);
 			IntArrayList entityIds = new IntArrayList(originalEntityIds);
 			boolean changed = false;
@@ -137,7 +142,7 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 						changed = true;
 					}
 				}
-				// filter out the removal packet created by spawning the entity for real
+				// filter out the removal packets created by spawning the fake entities for real
 				if (METADATA.values().stream().anyMatch(md -> md.isMetadataEntity(eid))) {
 					entityIds.rem(eid);
 					changed = true;
