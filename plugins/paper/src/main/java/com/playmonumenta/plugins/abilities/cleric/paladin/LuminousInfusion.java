@@ -62,7 +62,7 @@ public class LuminousInfusion extends Ability {
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 
-		mDoMultiplierAndFire = getAbilityScore() == 2;
+		mDoMultiplierAndFire = isLevelTwo();
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {

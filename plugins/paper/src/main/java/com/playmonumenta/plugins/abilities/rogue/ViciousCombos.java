@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -16,9 +15,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+
 import javax.annotation.Nullable;
 
 public class ViciousCombos extends Ability {
@@ -47,7 +45,6 @@ public class ViciousCombos extends Ability {
 			    || e.getCause() == DamageCause.ENTITY_SWEEP_ATTACK
 			    || e.getCause() == DamageCause.CUSTOM)) {
 			LivingEntity killedEntity = event.getEntity();
-			int viciousCombos = getAbilityScore();
 
 			//Run the task 1 tick later to let everything go on cooldown (ex. BMB)
 			new BukkitRunnable() {
@@ -62,7 +59,7 @@ public class ViciousCombos extends Ability {
 						mPlugin.mTimers.removeAllCooldowns(mPlayer);
 						MessagingUtils.sendActionBarMessage(mPlayer, "All your cooldowns have been reset");
 
-						if (viciousCombos > 1) {
+						if (isLevelTwo()) {
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, VICIOUS_COMBOS_RANGE, mPlayer)) {
 								world.spawnParticle(Particle.SPELL_MOB, mob.getLocation().clone().add(0, 1, 0), 10, 0.35, 0.5, 0.35, 0);
 								EntityUtils.applyVulnerability(mPlugin, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL, mob);
@@ -76,7 +73,7 @@ public class ViciousCombos extends Ability {
 						world.spawnParticle(Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 						world.spawnParticle(Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 					} else if (EntityUtils.isHostileMob(killedEntity)) {
-						int timeReduction = (viciousCombos == 1) ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
+						int timeReduction = isLevelOne() ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
 						if (killedEntity instanceof Player) {
 							timeReduction *= 2;
 						}

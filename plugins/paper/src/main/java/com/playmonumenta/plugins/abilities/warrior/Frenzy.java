@@ -31,7 +31,7 @@ public class Frenzy extends Ability {
 		mInfo.mDescriptions.add("Gain +40% Attack Speed and +20% Speed for 5 seconds after killing a mob.");
 		mDisplayItem = new ItemStack(Material.FEATHER, 1);
 
-		mPercentAttackSpeedEffect = getAbilityScore() == 1 ? PERCENT_ATTACK_SPEED_EFFECT_1 : PERCENT_ATTACK_SPEED_EFFECT_2;
+		mPercentAttackSpeedEffect = isLevelOne() ? PERCENT_ATTACK_SPEED_EFFECT_1 : PERCENT_ATTACK_SPEED_EFFECT_2;
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class Frenzy extends Ability {
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_ATTACK_SPEED_EFFECT_NAME,
 				new PercentAttackSpeed(DURATION, mPercentAttackSpeedEffect, PERCENT_ATTACK_SPEED_EFFECT_NAME));
 
-		if (getAbilityScore() > 1) {
+		if (isLevelTwo()) {
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME,
 					new PercentSpeed(DURATION, PERCENT_SPEED, PERCENT_SPEED_EFFECT_NAME));
 		}

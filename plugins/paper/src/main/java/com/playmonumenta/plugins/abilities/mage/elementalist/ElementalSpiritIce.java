@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -27,6 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -62,9 +62,8 @@ public class ElementalSpiritIce extends Ability {
 		mInfo.mScoreboardId = "ElementalSpirit";
 		mInfo.mCooldown = COOLDOWN_TICKS;
 
-		boolean isUpgraded = getAbilityScore() == 2;
-		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
-		mLevelBowMultiplier = isUpgraded ? BOW_MULTIPLIER_2 : BOW_MULTIPLIER_1;
+		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mLevelBowMultiplier = isLevelOne() ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {

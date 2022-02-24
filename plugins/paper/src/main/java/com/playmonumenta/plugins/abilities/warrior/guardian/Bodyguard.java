@@ -53,7 +53,7 @@ public class Bodyguard extends Ability {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.IRON_CHESTPLATE, 1);
-		mAbsorptionHealth = getAbilityScore() == 1 ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2;
+		mAbsorptionHealth = isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2;
 	}
 
 	@Override
@@ -173,7 +173,7 @@ public class Bodyguard extends Ability {
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS)) {
 			MovementUtils.knockAway(mPlayer, mob, 0.45f, true);
-			if (getAbilityScore() > 1) {
+			if (isLevelTwo()) {
 				EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
 			}
 		}

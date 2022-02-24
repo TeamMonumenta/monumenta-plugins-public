@@ -5,13 +5,14 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import javax.annotation.Nullable;
 
 public class Agility extends Ability {
 
@@ -32,7 +33,7 @@ public class Agility extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH || event.getType() == DamageType.MELEE_SKILL) {
-			if (getAbilityScore() > 1) {
+			if (isLevelTwo()) {
 				event.setDamage((event.getDamage() + AGILITY_BONUS_DAMAGE) * (1 + SCALING_DAMAGE));
 			} else {
 				event.setDamage(event.getDamage() + AGILITY_BONUS_DAMAGE);
@@ -44,7 +45,7 @@ public class Agility extends Ability {
 	@Override
 	public void setupClassPotionEffects() {
 		if (mPlayer != null) {
-			int effectLevel = getAbilityScore() == 1 ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL;
+			int effectLevel = isLevelOne() ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL;
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLevel, true, false));
 		}

@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,6 +25,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import javax.annotation.Nullable;
 
 
 /*
@@ -117,7 +118,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RONDE_RADIUS)) {
 				Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 				if (playerDirVector.dot(toMobVector) > RONDE_DOT_COSINE) {
-					int damage = getAbilityScore() == 1 ? RONDE_1_DAMAGE : RONDE_2_DAMAGE;
+					int damage = isLevelOne() ? RONDE_1_DAMAGE : RONDE_2_DAMAGE;
 					DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.mLinkedSpell, true);
 					MovementUtils.knockAway(mPlayer, mob, RONDE_KNOCKBACK_SPEED, true);
 				}
@@ -167,7 +168,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
 	@Override
 	public int getMaxCharges() {
-		return getAbilityScore() == 1 ? RONDE_1_MAX_STACKS : RONDE_2_MAX_STACKS;
+		return isLevelOne() ? RONDE_1_MAX_STACKS : RONDE_2_MAX_STACKS;
 	}
 
 }

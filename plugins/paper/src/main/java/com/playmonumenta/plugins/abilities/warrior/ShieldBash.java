@@ -73,7 +73,7 @@ public class ShieldBash extends Ability {
 								world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, 1.5f, 1);
 								world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
 
-								if (getAbilityScore() == 1) {
+								if (isLevelOne()) {
 									bash(mob);
 								} else {
 									for (LivingEntity le : EntityUtils.getNearbyMobs(mob.getLocation(), SHIELD_BASH_2_RADIUS)) {

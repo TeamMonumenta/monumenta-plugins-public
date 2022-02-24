@@ -13,8 +13,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -24,6 +22,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -63,7 +62,7 @@ public class Spellshock extends Ability {
 		mInfo.mDescriptions.add("Damage is increased to 35% for spells and 20% for melee. Additionally, gain +20% speed for 2 seconds whenever a spellshock is triggered.");
 		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
 
-		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
+		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	@Override
@@ -90,7 +89,7 @@ public class Spellshock extends Ability {
 				if (!effectOriginal.isTriggered()) {
 					effectOriginal.trigger();
 
-					if (getAbilityScore() > 1) {
+					if (isLevelTwo()) {
 						mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION_TICKS, SPEED_MULTIPLIER, PERCENT_SPEED_EFFECT_NAME));
 					}
 

@@ -74,7 +74,7 @@ public class DivineJustice extends Ability {
 		);
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 
-		mDoHealingAndMultiplier = getAbilityScore() == 2;
+		mDoHealingAndMultiplier = isLevelTwo();
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {

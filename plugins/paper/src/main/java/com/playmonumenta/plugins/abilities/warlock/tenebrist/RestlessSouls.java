@@ -71,7 +71,7 @@ public class RestlessSouls extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.RESTLESS_SOULS;
 		mDisplayItem = new ItemStack(Material.VEX_SPAWN_EGG, 1);
 
-		boolean isLevelOne = getAbilityScore() == 1;
+		boolean isLevelOne = isLevelOne();
 		mLevel = isLevelOne;
 		mDamage = isLevelOne ? DAMAGE_1 : DAMAGE_2;
 		mSilenceTime = isLevelOne ? SILENCE_DURATION_1 : SILENCE_DURATION_2;

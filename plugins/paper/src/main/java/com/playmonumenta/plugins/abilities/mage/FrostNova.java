@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,6 +24,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import javax.annotation.Nullable;
 
 
 
@@ -75,9 +76,8 @@ public class FrostNova extends Ability {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.ICE, 1);
 
-		boolean isUpgraded = getAbilityScore() == 2;
-		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
-		mLevelSlowMultiplier = isUpgraded ? SLOW_MULTIPLIER_2 : SLOW_MULTIPLIER_1;
+		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mLevelSlowMultiplier = isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2;
 	}
 
 	@Override

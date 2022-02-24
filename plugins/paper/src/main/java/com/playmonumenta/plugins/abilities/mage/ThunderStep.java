@@ -91,10 +91,9 @@ public class ThunderStep extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.HORN_CORAL, 1);
 
-		boolean isUpgraded = getAbilityScore() == 2;
-		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
-		mLevelDistance = isUpgraded ? DISTANCE_2 : DISTANCE_1;
-		mDoStun = isUpgraded;
+		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mLevelDistance = isLevelOne() ? DISTANCE_1 : DISTANCE_2;
+		mDoStun = isLevelTwo();
 	}
 
 	/* NOTE

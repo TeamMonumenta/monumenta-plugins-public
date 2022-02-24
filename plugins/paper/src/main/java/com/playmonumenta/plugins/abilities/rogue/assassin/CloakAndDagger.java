@@ -58,8 +58,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		mInfo.mCooldown = 0;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
-		mDamageMultiplier = getAbilityScore() == 1 ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER;
-		mMaxStacks = getAbilityScore() == 1 ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS;
+		mDamageMultiplier = isLevelOne() ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER;
+		mMaxStacks = isLevelOne() ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS;
 		mTracker = new KillTriggeredAbilityTracker(this, 300);
 	}
 

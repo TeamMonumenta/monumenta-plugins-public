@@ -38,7 +38,7 @@ public class Smokescreen extends Ability {
 		mInfo.mCooldown = SMOKESCREEN_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.DEAD_TUBE_CORAL, 1);
-		mWeakenEffect = getAbilityScore() == 1 ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
+		mWeakenEffect = isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
 	}
 
 	@Override

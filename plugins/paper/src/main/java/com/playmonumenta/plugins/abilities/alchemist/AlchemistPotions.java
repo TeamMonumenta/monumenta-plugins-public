@@ -26,7 +26,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -43,6 +42,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -135,7 +135,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 				for (Ability classAbility : classAbilities) {
 					if (classAbility != null) {
-						int abilityScore = classAbility.getAbilityScore();
+						int abilityScore = classAbility.isLevelTwo() ? 2 : 1;
 						mDamage += DAMAGE_PER_SKILL_POINT * abilityScore;
 
 						if (classAbility instanceof PotionAbility potionAbility) {
@@ -143,7 +143,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 							mDamage += potionAbility.getDamage();
 						}
 
-						if (classAbility instanceof EmpoweringOdor && abilityScore > 1) {
+						if (classAbility instanceof EmpoweringOdor odor && odor.isLevelTwo()) {
 							mChargeTime -= EmpoweringOdor.POTION_RECHARGE_TIME_REDUCTION_2;
 						}
 					}
@@ -152,7 +152,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				if (ServerProperties.getClassSpecializationsEnabled()) {
 					for (Ability specAbility : specAbilities) {
 						if (specAbility != null) {
-							int abilityScore = specAbility.getAbilityScore();
+							int abilityScore = specAbility.isLevelTwo() ? 2 : 1;
 							mDamage += DAMAGE_PER_SPEC_POINT * abilityScore;
 
 							if (specAbility instanceof PotionAbility potionAbility) {
@@ -160,7 +160,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 								mDamage += potionAbility.getDamage();
 							}
 
-							if (specAbility instanceof EsotericEnhancements && abilityScore > 1) {
+							if (specAbility instanceof EsotericEnhancements esoteric && esoteric.isLevelTwo()) {
 								mMaxCharges += EsotericEnhancements.POTION_CAP_INCREASE_2;
 							}
 						}

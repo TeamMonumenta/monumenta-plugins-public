@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 
 public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
@@ -49,9 +49,9 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 		mInfo.mDescriptions.add("If an active spell hits an enemy, you gain an Arcane Insight. Insights stack up to 8, but decay every 4s of not gaining one. Once 8 Insights are revealed, the Arcanist gains 20% Speed for 8s and the cooldowns of the previous two spells cast are refreshed. This sets your Insights back to 0.");
 		mInfo.mDescriptions.add("Sage's Insight now grants 30% Speed and refreshes the cooldowns of your previous three spells upon activating.");
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
-		mResetSize = getAbilityScore() == 1 ? ABILITIES_COUNT_1 : ABILITIES_COUNT_2;
+		mResetSize = isLevelOne() ? ABILITIES_COUNT_1 : ABILITIES_COUNT_2;
 		mResets = new ClassAbility[mResetSize];
-		mSpeed = getAbilityScore() == 1 ? SPEED_1 : SPEED_2;
+		mSpeed = isLevelOne() ? SPEED_1 : SPEED_2;
 		mStacksMap = new HashMap<>();
 	}
 

@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -21,6 +20,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import javax.annotation.Nullable;
 
 
 
@@ -41,7 +42,7 @@ public class Riposte extends Ability {
 		mInfo.mShorthandName = "Rip";
 		mInfo.mDescriptions.add("While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: 15s.");
 		mInfo.mDescriptions.add("Cooldown lowered to 12s and if you block an attack with Riposte's effect while holding a sword, your next sword attack within 2s deals double damage. If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 3s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? RIPOSTE_1_COOLDOWN : RIPOSTE_2_COOLDOWN;
+		mInfo.mCooldown = isLevelOne() ? RIPOSTE_1_COOLDOWN : RIPOSTE_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 	}
@@ -56,7 +57,7 @@ public class Riposte extends Ability {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isAxe(mainHand) || ItemUtils.isSword(mainHand)) {
 				MovementUtils.knockAway(mPlayer, source, RIPOSTE_KNOCKBACK_SPEED, true);
-				if (getAbilityScore() > 1) {
+				if (isLevelTwo()) {
 					if (ItemUtils.isSword(mainHand)) {
 						if (mSwordTimer == null) {
 							mSwordTimer = new BukkitRunnable() {

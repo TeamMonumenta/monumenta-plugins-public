@@ -39,7 +39,7 @@ public class CleansingRain extends Ability {
 		mInfo.mShorthandName = "CR";
 		mInfo.mDescriptions.add("Right click while sneaking and looking upwards to summon a \"cleansing rain\" that follows you, removing negative effects from players within 4 blocks, including yourself, and lasts for 15 seconds. (Cooldown: 45 seconds)");
 		mInfo.mDescriptions.add("Additionally grants 20% Damage Reduction to all players in the radius. Cooldown: 30s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
+		mInfo.mCooldown = isLevelOne() ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
 	}
@@ -52,8 +52,6 @@ public class CleansingRain extends Ability {
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.45f, 0.8f);
 		putOnCooldown();
-
-		int cleansing = getAbilityScore();
 
 		// Run cleansing rain here until it finishes
 		new BukkitRunnable() {
@@ -80,7 +78,7 @@ public class CleansingRain extends Ability {
 						player.setFireTicks(1);
 					}
 
-					if (cleansing > 1) {
+					if (isLevelTwo()) {
 						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(CLEANSING_EFFECT_DURATION, PERCENT_DAMAGE_RESIST));
 					}
 				}

@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,6 +24,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -65,9 +65,9 @@ public class SanguineHarvest extends Ability {
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
-		mRadius = getAbilityScore() == 1 ? RADIUS_1 : RADIUS_2;
-		mHealPercent = getAbilityScore() == 1 ? HEAL_PERCENT_1 : HEAL_PERCENT_2;
-		mBleedLevel = getAbilityScore() == 1 ? BLEED_LEVEL_1 : BLEED_LEVEL_2;
+		mRadius = isLevelOne() ? RADIUS_1 : RADIUS_2;
+		mHealPercent = isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2;
+		mBleedLevel = isLevelOne() ? BLEED_LEVEL_1 : BLEED_LEVEL_2;
 	}
 
 	@Override

@@ -31,7 +31,7 @@ public class Rejuvenation extends Ability {
 		mInfo.mShorthandName = "Rjv";
 		mInfo.mDescriptions.add("You and all other players in a 12 block radius regenerate 5% of their max health every 5 seconds.");
 		mInfo.mDescriptions.add("You and all other players in a 12 block radius regenerate 5% of their max health every 3 seconds.");
-		mHealInterval = getAbilityScore() == 1 ? HEAL_INTERVAL_1 : HEAL_INTERVAL_2;
+		mHealInterval = isLevelOne() ? HEAL_INTERVAL_1 : HEAL_INTERVAL_2;
 	}
 
 	@Override

@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -18,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,8 +46,8 @@ public class PinningShot extends Ability {
 		mInfo.mDescriptions.add("Weaken increased to 60% and bonus damage increased to 20% max health.");
 		mDisplayItem = new ItemStack(Material.CROSSBOW, 1);
 
-		mDamageMultiplier = getAbilityScore() == 1 ? PINNING_SHOT_1_DAMAGE_MULTIPLIER : PINNING_SHOT_2_DAMAGE_MULTIPLIER;
-		mWeaken = getAbilityScore() == 1 ? PINNING_WEAKEN_1 : PINNING_WEAKEN_2;
+		mDamageMultiplier = isLevelOne() ? PINNING_SHOT_1_DAMAGE_MULTIPLIER : PINNING_SHOT_2_DAMAGE_MULTIPLIER;
+		mWeaken = isLevelOne() ? PINNING_WEAKEN_1 : PINNING_WEAKEN_2;
 	}
 
 	@Override

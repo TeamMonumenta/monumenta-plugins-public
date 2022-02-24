@@ -37,8 +37,8 @@ public class Skirmisher extends Ability {
 		mInfo.mDescriptions.add("When dealing melee damage to a mob that has at least one other mob within 2.5 blocks, deal + 1 + 10% final damage.");
 		mInfo.mDescriptions.add("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased to 2 + 15% final damage done.");
 		mDisplayItem = new ItemStack(Material.BONE, 1);
-		mIsolatedPercentDamage = getAbilityScore() == 1 ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2;
-		mIsolatedFlatDamage = getAbilityScore() == 1 ? GROUPED_FLAT_DAMAGE : GROUPED_FLAT_DAMAGE_2;
+		mIsolatedPercentDamage = isLevelOne() ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2;
+		mIsolatedFlatDamage = isLevelOne() ? GROUPED_FLAT_DAMAGE : GROUPED_FLAT_DAMAGE_2;
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class Skirmisher extends Ability {
 			Location loc = enemy.getLocation();
 
 			if (EntityUtils.getNearbyMobs(loc, SKIRMISHER_FRIENDLY_RADIUS, enemy).size() >= MOB_COUNT_CUTOFF
-				    || (getAbilityScore() > 1 && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
+				    || (isLevelTwo() && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
 				World world = mPlayer.getWorld();
 				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
 				world.playSound(loc, Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 0.5f);

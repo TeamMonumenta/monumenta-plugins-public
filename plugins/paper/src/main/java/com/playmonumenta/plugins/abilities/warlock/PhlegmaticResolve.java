@@ -39,7 +39,7 @@ public class PhlegmaticResolve extends Ability {
 		mInfo.mDescriptions.add("For each spell on cooldown, gain +2% Damage Reduction and +1 Knockback Resistance.");
 		mInfo.mDescriptions.add("Increase to +3% Damage Reduction per spell on cooldown, and players within 7 blocks are given 33% of your bonuses. (Does not stack with multiple Warlocks.)");
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
-		mPercentDamageResist = getAbilityScore() == 1 ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2;
+		mPercentDamageResist = isLevelOne() ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2;
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -69,7 +69,7 @@ public class PhlegmaticResolve extends Ability {
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(6, mPercentDamageResist * cooldowns));
 		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(6, PERCENT_KNOCKBACK_RESIST * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME));
 
-		if (getAbilityScore() > 1) {
+		if (isLevelTwo()) {
 			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, false)) {
 				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(6, mPercentDamageResist * cooldowns / 3.0));
 				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(6, PERCENT_KNOCKBACK_RESIST * cooldowns / 3.0, KNOCKBACK_RESIST_EFFECT_NAME));

@@ -46,7 +46,7 @@ public class VoodooBondsReaper extends Effect {
 		if (mPlayer != null) {
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
 				mVoodooBonds = AbilityManager.getManager().getPlayerAbility(mPlayer, VoodooBonds.class);
-				mScore = mVoodooBonds != null ? mVoodooBonds.getAbilityScore() : 0;
+				mScore = mVoodooBonds != null ? Math.min(mVoodooBonds.getAbilityScore(), 2) : 0;
 			});
 		}
 	}

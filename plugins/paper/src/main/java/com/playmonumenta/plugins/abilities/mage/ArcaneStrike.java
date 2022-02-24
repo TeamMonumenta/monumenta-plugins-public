@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,6 +25,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import javax.annotation.Nullable;
 
 
 public class ArcaneStrike extends Ability {
@@ -53,8 +54,8 @@ public class ArcaneStrike extends Ability {
 		mInfo.mDescriptions.add("The damage is increased to 7. Mobs that are on fire or slowed take 3 additional damage.");
 		mInfo.mCooldown = COOLDOWN;
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
-		mDamageBonus = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
-		mDamageBonusAffected = getAbilityScore() == 1 ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2;
+		mDamageBonus = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mDamageBonusAffected = isLevelOne() ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2;
 	}
 
 	@Override

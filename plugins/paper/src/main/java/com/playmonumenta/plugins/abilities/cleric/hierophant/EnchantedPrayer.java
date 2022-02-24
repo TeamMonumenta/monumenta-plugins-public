@@ -49,8 +49,8 @@ public class EnchantedPrayer extends Ability {
 		mInfo.mCooldown = ENCHANTED_PRAYER_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.CHORUS_FRUIT, 1);
-		mDamage = getAbilityScore() == 1 ? ENCHANTED_PRAYER_1_DAMAGE : ENCHANTED_PRAYER_2_DAMAGE;
-		mHeal = getAbilityScore() == 1 ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL;
+		mDamage = isLevelOne() ? ENCHANTED_PRAYER_1_DAMAGE : ENCHANTED_PRAYER_2_DAMAGE;
+		mHeal = isLevelOne() ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL;
 	}
 
 	@Override

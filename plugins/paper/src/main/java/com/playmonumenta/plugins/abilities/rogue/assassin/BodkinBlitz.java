@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +30,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+
+import javax.annotation.Nullable;
 
 public class BodkinBlitz extends MultipleChargeAbility {
 
@@ -58,14 +59,14 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mInfo.mShorthandName = "BB";
 		mInfo.mDescriptions.add("Sneak right click while holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. Upon teleporting, your next melee attack deals 7 bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: 20s. Charges: 2.");
 		mInfo.mDescriptions.add("Range increased to 14 blocks, Stealth increased to 1.5 seconds. Upon teleporting, your next melee attack deals 14 bonus damage if your target is not focused on you. Cooldown: 18s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? BODKINBLITZ_1_COOLDOWN : BODKINBLITZ_2_COOLDOWN;
+		mInfo.mCooldown = isLevelOne() ? BODKINBLITZ_1_COOLDOWN : BODKINBLITZ_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 		mMaxCharges = BODKINBLITZ_MAX_CHARGES;
 
-		mStealthDuration = getAbilityScore() == 1 ? BODKINBLITZ_1_STEALTH_DURATION : BODKINBLITZ_2_STEALTH_DURATION;
-		mBonusDmg = getAbilityScore() == 1 ? BODKINBLITZ_1_BONUS_DMG : BODKINBLITZ_2_BONUS_DMG;
+		mStealthDuration = isLevelOne() ? BODKINBLITZ_1_STEALTH_DURATION : BODKINBLITZ_2_STEALTH_DURATION;
+		mBonusDmg = isLevelOne() ? BODKINBLITZ_1_BONUS_DMG : BODKINBLITZ_2_BONUS_DMG;
 	}
 
 	@Override
@@ -96,7 +97,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 			final Vector mShiftVec = mPlayer.getLocation().getDirection().normalize().multiply(0.1);
 			final BoundingBox mPlayerBox = mPlayer.getBoundingBox();
 			int mTick = 0;
-			final int mStep = getAbilityScore() == 1 ? BODKINBLITZ_1_STEP : BODKINBLITZ_2_STEP;
+			final int mStep = isLevelOne() ? BODKINBLITZ_1_STEP : BODKINBLITZ_2_STEP;
 
 			@Override
 			public void run() {

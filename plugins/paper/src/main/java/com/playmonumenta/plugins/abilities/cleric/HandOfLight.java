@@ -71,15 +71,15 @@ public class HandOfLight extends Ability {
 		mInfo.mShorthandName = "HoL";
 		mInfo.mDescriptions.add("Right click while holding a weapon or tool to heal all other players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. If holding a shield, the trigger is changed to crouch + right click. Additionally, swap hands while looking up and not sneaking to change to damage mode. In damage mode, instead of healing players, damage all mobs in a 6 block radius in front of you magic damage equal to 2 times the number of undead mobs in the range, up to 8 damage. Cooldown: 14s.");
 		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health. In damage mode, deal 3 damage per undead mob, up to 9 damage. Cooldown: 10s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
+		mInfo.mCooldown = isLevelOne() ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.PINK_DYE, 1);
 		mInfo.mIgnoreCooldown = true;
 
-		mFlat = getAbilityScore() == 1 ? FLAT_1 : FLAT_2;
-		mPercent = getAbilityScore() == 1 ? PERCENT_1 : PERCENT_2;
-		mDamagePer = getAbilityScore() == 1 ? DAMAGE_PER_1 : DAMAGE_PER_2;
-		mDamageMax = getAbilityScore() == 1 ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
+		mFlat = isLevelOne() ? FLAT_1 : FLAT_2;
+		mPercent = isLevelOne() ? PERCENT_1 : PERCENT_2;
+		mDamagePer = isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2;
+		mDamageMax = isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
 
 		mDamageMode = player != null && player.getScoreboardTags().contains(DAMAGE_MODE_TAG);
 

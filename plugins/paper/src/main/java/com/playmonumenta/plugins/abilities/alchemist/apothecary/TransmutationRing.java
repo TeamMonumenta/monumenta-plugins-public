@@ -60,9 +60,9 @@ public class TransmutationRing extends PotionAbility {
 		mInfo.mDescriptions.add("Potions dropped from mob deaths within the ring now deal 50% of your base potion damage. Cooldown: 20s.");
 		mDisplayItem = new ItemStack(Material.GOLD_NUGGET, 1);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mCooldown = getAbilityScore() == 1 ? TRANSMUTATION_RING_1_COOLDOWN : TRANSMUTATION_RING_2_COOLDOWN;
+		mInfo.mCooldown = isLevelOne() ? TRANSMUTATION_RING_1_COOLDOWN : TRANSMUTATION_RING_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
-		mDamageFraction = getAbilityScore() == 1 ? TRANSMUTATION_RING_1_DAMAGE_FRACTION : TRANSMUTATION_RING_2_DAMAGE_FRACTION;
+		mDamageFraction = isLevelOne() ? TRANSMUTATION_RING_1_DAMAGE_FRACTION : TRANSMUTATION_RING_2_DAMAGE_FRACTION;
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 		});

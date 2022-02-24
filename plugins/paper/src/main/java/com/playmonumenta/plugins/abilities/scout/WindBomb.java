@@ -47,7 +47,7 @@ public class WindBomb extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.WIND_BOMB;
 		mInfo.mDescriptions.add("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, launches mobs in a 3 block radius into the air, giving them Slow Falling and 20% Weaken for 4s. Cannot be used while holding a trident or snowball. Cooldown: 15s.");
 		mInfo.mDescriptions.add("The cooldown is reduced to 10s. Additionally, you deal 20% more damage to enemies made airborne by this skill, until they hit the ground.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.TNT, 1);
 	}
@@ -104,7 +104,7 @@ public class WindBomb extends Ability {
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, DURATION, SLOW_FALL_EFFECT, true, false));
 				}
 				EntityUtils.applyWeaken(mPlugin, DURATION, WEAKEN_EFFECT, mob);
-				if (getAbilityScore() > 1) {
+				if (isLevelTwo()) {
 					mPlugin.mEffectManager.addEffect(mob, "WindBombAirTag", new WindBombAirTag(DURATION * 2, MIDAIR_DAMAGE_BONUS, mPlayer));
 				}
 			}

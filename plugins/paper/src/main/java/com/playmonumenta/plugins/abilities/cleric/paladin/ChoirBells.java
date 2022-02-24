@@ -54,9 +54,9 @@ public class ChoirBells extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BELL, 1);
-		mSlownessAmount = getAbilityScore() == 1 ? SLOWNESS_AMPLIFIER_1 : SLOWNESS_AMPLIFIER_2;
-		mWeakenEffect = getAbilityScore() == 1 ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
-		mVulnerabilityEffect = getAbilityScore() == 1 ? VULNERABILITY_EFFECT_1 : VULNERABILITY_EFFECT_2;
+		mSlownessAmount = isLevelOne() ? SLOWNESS_AMPLIFIER_1 : SLOWNESS_AMPLIFIER_2;
+		mWeakenEffect = isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
+		mVulnerabilityEffect = isLevelOne() ? VULNERABILITY_EFFECT_1 : VULNERABILITY_EFFECT_2;
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {

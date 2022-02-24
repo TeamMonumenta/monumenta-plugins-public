@@ -46,10 +46,10 @@ public class WitheringGaze extends Ability {
 		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given 30% Slowness instead) and dealt 1 damage every half second for 6 seconds. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Your damage over time lasts for 8 seconds. Cooldown: 20s.");
 		mInfo.mLinkedSpell = ClassAbility.WITHERING_GAZE;
-		mInfo.mCooldown = getAbilityScore() == 1 ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
+		mInfo.mCooldown = isLevelOne() ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.WITHER_ROSE, 1);
-		mDOTDuration = getAbilityScore() == 1 ? WITHERING_GAZE_DOT_DURATION_1 : WITHERING_GAZE_DOT_DURATION_2;
+		mDOTDuration = isLevelOne() ? WITHERING_GAZE_DOT_DURATION_1 : WITHERING_GAZE_DOT_DURATION_2;
 	}
 
 	@Override

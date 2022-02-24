@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -30,6 +29,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -106,7 +106,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 					if (ability != null && plugin.mTimers.isAbilityOnCooldown(p.getUniqueId(), ability.getInfo().mLinkedSpell)) {
 						if (ability.getInfo().mLinkedSpell == ClassAbility.CHOLERIC_FLAMES) {
 							damagee.setFireTicks(duration);
-							if (ability.getAbilityScore() == 2) {
+							if (ability.isLevelTwo()) {
 								PotionUtils.applyPotion(p, damagee, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true));
 							}
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.GRASPING_CLAWS) {

@@ -31,7 +31,7 @@ public class EmpoweringOdor extends PotionAbility {
 		mInfo.mDescriptions.add("The damage is increased to 15%. Your potion recharge rate is decreased by 0.5s.");
 		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
 
-		mDamageAmplifier = getAbilityScore() == 1 ? EMPOWERING_ODOR_1_DAMAGE_AMPLIFIER : EMPOWERING_ODOR_2_DAMAGE_AMPLIFIER;
+		mDamageAmplifier = isLevelOne() ? EMPOWERING_ODOR_1_DAMAGE_AMPLIFIER : EMPOWERING_ODOR_2_DAMAGE_AMPLIFIER;
 	}
 
 	@Override

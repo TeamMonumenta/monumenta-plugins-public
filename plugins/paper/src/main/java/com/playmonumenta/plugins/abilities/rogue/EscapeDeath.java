@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -21,6 +20,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import javax.annotation.Nullable;
 
 public class EscapeDeath extends Ability {
 
@@ -54,7 +55,7 @@ public class EscapeDeath extends Ability {
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (!event.isBlocked() && mPlayer != null) {
 			double newHealth = mPlayer.getHealth() - event.getFinalDamage(true);
-			boolean dealDamageLater = newHealth < 0 && newHealth > -8 && getAbilityScore() > 1;
+			boolean dealDamageLater = newHealth < 0 && newHealth > -8 && isLevelTwo();
 			if (newHealth <= TRIGGER_THRESHOLD_HEALTH && (newHealth > 0 || dealDamageLater)) {
 				if (dealDamageLater) {
 					event.setCancelled(true);
@@ -65,7 +66,7 @@ public class EscapeDeath extends Ability {
 					EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
 				}
 
-				if (getAbilityScore() > 1) {
+				if (isLevelTwo()) {
 					AbsorptionUtils.addAbsorption(mPlayer, ABSORPTION_HEALTH, ABSORPTION_HEALTH, BUFF_DURATION);
 					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(BUFF_DURATION, SPEED_PERCENT, PERCENT_SPEED_EFFECT_NAME));
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,

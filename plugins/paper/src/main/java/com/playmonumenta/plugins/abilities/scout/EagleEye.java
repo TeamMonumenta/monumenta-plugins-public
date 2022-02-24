@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -22,6 +21,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
+
 
 
 public class EagleEye extends Ability {
@@ -33,6 +34,8 @@ public class EagleEye extends Ability {
 	private static final double EAGLE_EYE_2_VULN_LEVEL = 0.35;
 	private static final int EAGLE_EYE_RADIUS = 20;
 
+	private double mVulnLevel;
+
 	public EagleEye(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Eagle Eye");
 		mInfo.mLinkedSpell = ClassAbility.EAGLE_EYE;
@@ -43,6 +46,8 @@ public class EagleEye extends Ability {
 		mInfo.mCooldown = EAGLE_EYE_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
+
+		mVulnLevel = isLevelOne() ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
 	}
 
 
@@ -52,7 +57,7 @@ public class EagleEye extends Ability {
 		if (player == null) {
 			return;
 		}
-		int eagleEye = getAbilityScore();
+
 		World world = player.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1.5f, 1.25f);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.25f);
@@ -65,9 +70,7 @@ public class EagleEye extends Ability {
 
 			PotionUtils.applyPotion(mPlayer, mob,
 			                        new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
-
-			double eagleLevel = (eagleEye == 1) ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
-			EntityUtils.applyVulnerability(mPlugin, EAGLE_EYE_DURATION, eagleLevel, mob);
+			EntityUtils.applyVulnerability(mPlugin, EAGLE_EYE_DURATION, mVulnLevel, mob);
 
 			new BukkitRunnable() {
 				int mTicks = 0;

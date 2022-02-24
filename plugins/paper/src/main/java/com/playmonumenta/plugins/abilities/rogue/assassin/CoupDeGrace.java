@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -16,6 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import javax.annotation.Nullable;
 
 /*
  * Coup De Grâce: If you melee attack a normal enemy and that attack
@@ -41,8 +42,8 @@ public class CoupDeGrace extends Ability {
 		mInfo.mDescriptions.add("If melee damage you deal brings a normal mob under 10% health, they die instantly. The threshold for elites is 20% health.");
 		mInfo.mDescriptions.add("The health threshold is increased to 15% for normal enemies and 30% for elites.");
 		mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
-		mNormalThreshold = getAbilityScore() == 1 ? COUP_1_NORMAL_THRESHOLD : COUP_2_NORMAL_THRESHOLD;
-		mEliteThreshold = getAbilityScore() == 1 ? COUP_1_ELITE_THRESHOLD : COUP_2_ELITE_THRESHOLD;
+		mNormalThreshold = isLevelOne() ? COUP_1_NORMAL_THRESHOLD : COUP_2_NORMAL_THRESHOLD;
+		mEliteThreshold = isLevelOne() ? COUP_1_ELITE_THRESHOLD : COUP_2_ELITE_THRESHOLD;
 	}
 
 	@Override
@@ -80,7 +81,7 @@ public class CoupDeGrace extends Ability {
 		world.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);
 		world.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.5f);
 		world.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_WIRE.createBlockData());
-		if (getAbilityScore() > 1) {
+		if (isLevelTwo()) {
 			world.spawnParticle(Particle.SPELL_WITCH, le.getLocation().add(0, le.getHeight() / 2, 0), 10, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65);
 			world.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_BLOCK.createBlockData());
 		}

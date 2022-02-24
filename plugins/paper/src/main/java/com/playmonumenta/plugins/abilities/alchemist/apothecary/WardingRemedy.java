@@ -34,7 +34,7 @@ public class WardingRemedy extends Ability {
 		super(plugin, player, "Warding Remedy");
 		mInfo.mScoreboardId = "WardingRemedy";
 		mInfo.mLinkedSpell = ClassAbility.WARDING_REMEDY;
-		mInfo.mCooldown = getAbilityScore() == 1 ? WARDING_REMEDY_1_COOLDOWN : WARDING_REMEDY_2_COOLDOWN;
+		mInfo.mCooldown = isLevelOne() ? WARDING_REMEDY_1_COOLDOWN : WARDING_REMEDY_2_COOLDOWN;
 		mInfo.mShorthandName = "WR";
 		mInfo.mDescriptions.add("You and allies in a 12 block radius passively gain +5% damage from all sources while having absorption health. Swap hands while sneaking and holding an Alchemist's Bag to give players (including yourself) within a 6 block radius 1 absorption health per 0.5 seconds for 6 seconds, lasting 30 seconds, up to 6 absorption health. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The damage bonus is increased to 10%, and cooldown decreased to 25s.");

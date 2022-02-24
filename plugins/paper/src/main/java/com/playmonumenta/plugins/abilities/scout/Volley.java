@@ -7,8 +7,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,6 +26,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class Volley extends Ability {
@@ -79,7 +78,7 @@ public class Volley extends Ability {
 			@Override
 			public void run() {
 				// Ability Enchantments
-				int numArrows = getAbilityScore() == 1 ? VOLLEY_1_ARROW_COUNT : VOLLEY_2_ARROW_COUNT;
+				int numArrows = isLevelOne() ? VOLLEY_1_ARROW_COUNT : VOLLEY_2_ARROW_COUNT;
 
 				// Store PotionData from the original arrow only if it is weakness or slowness
 				PotionData tArrowData = null;
@@ -134,7 +133,7 @@ public class Volley extends Ability {
 		Entity proj = event.getDamager();
 		if (event.getType() == DamageType.PROJECTILE && proj instanceof AbstractArrow && proj.hasMetadata(VOLLEY_METAKEY)) {
 			if (MetadataUtils.checkOnceThisTick(mPlugin, enemy, VOLLEY_HIT_METAKEY)) {
-				double damageMultiplier = getAbilityScore() == 1 ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
+				double damageMultiplier = isLevelOne() ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
 				event.setDamage(event.getDamage() * damageMultiplier);
 			} else {
 				// Only let one Volley arrow hit a given mob

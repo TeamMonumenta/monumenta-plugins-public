@@ -26,7 +26,7 @@ public abstract class PotionAbility extends Ability {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				mDamage = getAbilityScore() == 1 ? damage1 : damage2;
+				mDamage = isLevelOne() ? damage1 : damage2;
 				mRadius = radius;
 			}
 		}.runTaskLater(mPlugin, 1);

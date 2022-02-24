@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 
 
@@ -65,7 +65,7 @@ public class Dodging extends Ability {
 		mInfo.mDescriptions.add("Blocks an arrow, thrown potion, blaze fireball, or snowball that would have hit you. Cooldown: 12s.");
 		mInfo.mDescriptions.add("The cooldown is reduced to 10 s. When this ability is triggered, you gain +20% Speed for 15s.");
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
-		mInfo.mCooldown = getAbilityScore() == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
+		mInfo.mCooldown = isLevelOne() ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
 		// NOTE: This skill will get events even when it is on cooldown!
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
@@ -158,8 +158,7 @@ public class Dodging extends Ability {
 
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
 		World world = mPlayer.getWorld();
-		int dodging = getAbilityScore();
-		if (dodging > 1) {
+		if (isLevelTwo()) {
 			mPlugin.mEffectManager.addEffect(mPlayer, ATTR_NAME,
 					new PercentSpeed(DODGING_SPEED_EFFECT_DURATION, PERCENT_SPEED, ATTR_NAME));
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15);

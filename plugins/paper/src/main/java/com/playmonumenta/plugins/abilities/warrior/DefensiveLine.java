@@ -49,7 +49,7 @@ public class DefensiveLine extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.CHAIN, 1);
-		mPercentDamageReceived = getAbilityScore() == 1 ? PERCENT_DAMAGE_RECEIVED_EFFECT_1 : PERCENT_DAMAGE_RECEIVED_EFFECT_2;
+		mPercentDamageReceived = isLevelOne() ? PERCENT_DAMAGE_RECEIVED_EFFECT_1 : PERCENT_DAMAGE_RECEIVED_EFFECT_2;
 	}
 
 	@Override

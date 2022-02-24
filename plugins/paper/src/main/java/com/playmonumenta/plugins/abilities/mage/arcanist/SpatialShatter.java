@@ -81,8 +81,7 @@ public class SpatialShatter extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.PRISMARINE_CRYSTALS, 1);
 
-		boolean isUpgraded = getAbilityScore() == 2;
-		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
+		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 		mLevelReduction = REDUCTION_MULTIPLIER;
 		mLevelCap = CAP_TICKS;
 	}

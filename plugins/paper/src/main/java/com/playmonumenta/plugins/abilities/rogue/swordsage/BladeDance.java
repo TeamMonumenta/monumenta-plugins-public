@@ -50,7 +50,7 @@ public class BladeDance extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.STRING, 1);
-		mWeakenAmp = getAbilityScore() == 1 ? WEAKEN_AMP_1 : WEAKEN_AMP_2;
+		mWeakenAmp = isLevelOne() ? WEAKEN_AMP_1 : WEAKEN_AMP_2;
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class BladeDance extends Ability {
 
 					world.spawnParticle(Particle.VILLAGER_ANGRY, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0);
 
-					int damage = getAbilityScore() == 1 ? DANCE_1_DAMAGE : DANCE_2_DAMAGE;
+					int damage = isLevelOne() ? DANCE_1_DAMAGE : DANCE_2_DAMAGE;
 
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DANCE_RADIUS)) {
 						mob.setNoDamageTicks(0);

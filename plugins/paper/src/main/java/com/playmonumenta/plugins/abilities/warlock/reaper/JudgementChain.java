@@ -66,7 +66,7 @@ public class JudgementChain extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.CHAIN, 1);
-		mAmplifierCap = getAbilityScore() == 1 ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2;
+		mAmplifierCap = isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2;
 	}
 
 	@Override
@@ -155,7 +155,7 @@ public class JudgementChain extends Ability {
 								mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, Math.min(mAmplifierCap, effect.getValue()), true, true));
 							}
 						}
-						if (getAbilityScore() > 1) {
+						if (isLevelTwo()) {
 							List<LivingEntity> mobs = EntityUtils.getMobsInLine(l, chainVector, l.distance(mLoc), HITBOX_LENGTH);
 							mobs.remove(mTarget);
 							List<Player> players = EntityUtils.getPlayersInLine(l, chainVector, l.distance(mLoc), HITBOX_LENGTH, mPlayer);
@@ -245,7 +245,7 @@ public class JudgementChain extends Ability {
 
 			if (doDamage) {
 				DamageUtils.damage(mPlayer, mTarget, DamageType.MAGIC, CHAIN_BREAK_DAMAGE, mInfo.mLinkedSpell);
-				if (getAbilityScore() > 1) {
+				if (isLevelTwo()) {
 					for (LivingEntity m : EntityUtils.getNearbyMobs(mTarget.getLocation(), CHAIN_BREAK_RANGE, mTarget)) {
 						DamageUtils.damage(mPlayer, m, DamageType.MAGIC, CHAIN_BREAK_DAMAGE, mInfo.mLinkedSpell);
 					}

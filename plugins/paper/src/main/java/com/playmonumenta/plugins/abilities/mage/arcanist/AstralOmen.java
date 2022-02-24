@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,6 +24,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.NavigableSet;
 
 public class AstralOmen extends Ability {
@@ -77,9 +77,8 @@ public class AstralOmen extends Ability {
 		);
 		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
 
-		boolean isUpgraded = getAbilityScore() == 2;
-		mLevelBonusMultiplier = isUpgraded ? BONUS_MULTIPLIER_2 : BONUS_MULTIPLIER_1;
-		mDoPull = isUpgraded;
+		mLevelBonusMultiplier = isLevelOne() ? BONUS_MULTIPLIER_1 : BONUS_MULTIPLIER_2;
+		mDoPull = isLevelTwo();
 	}
 
 	@Override

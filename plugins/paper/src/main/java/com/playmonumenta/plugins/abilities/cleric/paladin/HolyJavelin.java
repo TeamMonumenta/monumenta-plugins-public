@@ -61,8 +61,8 @@ public class HolyJavelin extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.TRIDENT, 1);
-		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
-		mUndeadDamage = getAbilityScore() == 1 ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2;
+		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mUndeadDamage = isLevelOne() ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2;
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {

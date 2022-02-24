@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 
 
@@ -50,8 +50,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob or deal damage to a boss (R1 100/R2 200), you have a 8% chance to be splashed with an Instant Health I potion, as well as either a Speed I, Regen I, or Absorption I potion with 20 second duration.");
 		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 16%, the effect potions can now also be Strength and Resistance, and the durations of each are increased to 50 seconds.");
 		mTracker = new KillTriggeredAbilityTracker(this);
-		mChance = getAbilityScore() == 1 ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE;
-		mDuration = getAbilityScore() == 1 ? HEAVENLY_BOON_1_DURATION : HEAVENLY_BOON_2_DURATION;
+		mChance = isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE;
+		mDuration = isLevelOne() ? HEAVENLY_BOON_1_DURATION : HEAVENLY_BOON_2_DURATION;
 		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
 
 		if (player != null) {
@@ -128,7 +128,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		) {
 			ItemStack potions;
 
-			if (getAbilityScore() == 1) {
+			if (isLevelOne()) {
 				int rand = FastUtils.RANDOM.nextInt(4);
 				if (rand == 0 || rand == 1) {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, mDuration, 0,

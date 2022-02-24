@@ -102,13 +102,12 @@ public final class MeteorSlam extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.FIRE_CHARGE, 1);
 
-		boolean isUpgraded = getAbilityScore() == 2;
-		mInfo.mCooldown = isUpgraded ? COOLDOWN_TICKS_2 : COOLDOWN_TICKS_1;
+		mInfo.mCooldown = isLevelOne()? COOLDOWN_TICKS_1 : COOLDOWN_TICKS_2;
 
-		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
-		mLevelReducedDamage = isUpgraded ? REDUCED_DAMAGE_2 : REDUCED_DAMAGE_1;
-		mLevelSize = isUpgraded ? SIZE_2 : SIZE_1;
-		mLevelJumpAmplifier = isUpgraded ? JUMP_AMPLIFIER_2 : JUMP_AMPLIFIER_1;
+		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mLevelReducedDamage = isLevelOne() ? REDUCED_DAMAGE_1 : REDUCED_DAMAGE_2;
+		mLevelSize = isLevelOne() ? SIZE_1 : SIZE_2;
+		mLevelJumpAmplifier = isLevelOne() ? JUMP_AMPLIFIER_1 : JUMP_AMPLIFIER_2;
 
 		mSlamAttackRunner = new BukkitRunnable() {
 			@Override

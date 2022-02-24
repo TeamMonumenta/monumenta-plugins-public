@@ -63,21 +63,17 @@ public class Blizzard extends Ability {
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.SNOWBALL, 1);
 
-		boolean isUpgraded = getAbilityScore() == 2;
-		mInfo.mCooldown = isUpgraded ? COOLDOWN_TICKS_2 : COOLDOWN_TICKS_1;
+		mInfo.mCooldown = isLevelOne() ? COOLDOWN_TICKS_1 : COOLDOWN_TICKS_2;
 
-		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
-		mLevelSize = isUpgraded ? SIZE_2 : SIZE_1;
-		mLevelSlowMultiplier = isUpgraded ? SLOW_MULTIPLIER_2 : SLOW_MULTIPLIER_1;
+		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mLevelSize = isLevelOne() ? SIZE_1 : SIZE_2;
+		mLevelSlowMultiplier = isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2;
 	}
-
-	private boolean mActive = false;
 
 	@Override
 	public void cast(Action action) {
 		if (mPlayer != null) {
 			putOnCooldown();
-			mActive = true;
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 			World world = mPlayer.getWorld();
@@ -120,7 +116,6 @@ public class Blizzard extends Ability {
 							|| !mPlayer.isValid() // Ensure player is not dead, is still online?
 					) {
 						this.cancel();
-						mActive = false;
 					}
 				}
 			}.runTaskTimer(mPlugin, 0, 1);

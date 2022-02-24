@@ -6,13 +6,14 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import javax.annotation.Nullable;
 
 public class WardingRemedyNonApothecary extends Ability {
 
@@ -52,11 +53,10 @@ public class WardingRemedyNonApothecary extends Ability {
 		for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), WARDING_REMEDY_RANGE, true)) {
 			Ability wr = AbilityManager.getManager().getPlayerAbility(player, WardingRemedy.class);
 			if (wr != null) {
-				int score = wr.getAbilityScore();
-				if (score == 2) {
-					return score;
-				} else if (score == 1) {
-					level = score;
+				if (wr.isLevelTwo()) {
+					return 2;
+				} else {
+					level = 1;
 				}
 			}
 		}

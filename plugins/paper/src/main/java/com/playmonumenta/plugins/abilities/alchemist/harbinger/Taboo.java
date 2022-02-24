@@ -53,7 +53,7 @@ public class Taboo extends Ability {
 		mDisplayItem = new ItemStack(Material.HONEY_BOTTLE, 1);
 
 		mActive = false;
-		mMagicDamageIncrease = getAbilityScore() == 1 ? MAGIC_DAMAGE_INCREASE_1 : MAGIC_DAMAGE_INCREASE_2;
+		mMagicDamageIncrease = isLevelOne() ? MAGIC_DAMAGE_INCREASE_1 : MAGIC_DAMAGE_INCREASE_2;
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 			mAlchemicalArtillery = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
@@ -67,7 +67,7 @@ public class Taboo extends Ability {
 		if (mPlayer != null && mPlayer.isSneaking() && mAlchemistPotions != null && (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) || (mAlchemicalArtillery != null && mAlchemicalArtillery.isActive() && ItemUtils.isBowOrTrident(mPlayer.getInventory().getItemInMainHand())))) {
 			World world = mPlayer.getWorld();
 			if (mActive) {
-				if (mPlayer.getLocation().getPitch() > 50 && getAbilityScore() > 1) {
+				if (mPlayer.getLocation().getPitch() > 50 && isLevelTwo()) {
 					if (mAlchemistPotions.getCharges() >= 2 && !isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 						putOnCooldown();
 						mAlchemistPotions.decrementCharge();

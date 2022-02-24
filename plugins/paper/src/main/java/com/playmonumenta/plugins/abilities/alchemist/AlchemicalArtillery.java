@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -24,6 +23,8 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
+
+import javax.annotation.Nullable;
 
 
 
@@ -65,7 +66,7 @@ public class AlchemicalArtillery extends Ability {
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
 
 			double bownus = 0;
-			if (getAbilityScore() > 1) {
+			if (isLevelTwo()) {
 				PlayerInventory inv = mPlayer.getInventory();
 				bownus = BOW_DAMAGE_MULTIPLIER * ItemStatUtils.getAttributeAmount(inv.getItemInMainHand(), AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
 				double offhand = ItemStatUtils.getAttributeAmount(inv.getItemInOffHand(), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.OFFHAND);

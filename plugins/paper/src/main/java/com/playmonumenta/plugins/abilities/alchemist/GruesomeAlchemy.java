@@ -48,8 +48,8 @@ public class GruesomeAlchemy extends PotionAbility {
 		//This is just for the Alchemical Artillery integration
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 
-		mSlownessAmount = getAbilityScore() == 1 ? GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER : GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER;
-		mVulnerabilityAmount = getAbilityScore() == 1 ? GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER : GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER;
+		mSlownessAmount = isLevelOne() ? GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER : GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER;
+		mVulnerabilityAmount = isLevelOne() ? GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER : GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER;
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {

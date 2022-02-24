@@ -53,8 +53,8 @@ public class DaggerThrow extends Ability {
 		mInfo.mCooldown = DAGGER_THROW_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.WOODEN_SWORD, 1);
-		mDamage = getAbilityScore() == 1 ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE;
-		mVulnAmplifier = getAbilityScore() == 1 ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN;
+		mDamage = isLevelOne() ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE;
+		mVulnAmplifier = isLevelOne() ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN;
 	}
 
 	@Override

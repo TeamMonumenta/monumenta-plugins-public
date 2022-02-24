@@ -79,7 +79,7 @@ public class MagmaShield extends Ability {
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.MAGMA_CREAM, 1);
 
-		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
+		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 
 		mHasBlizzard = false;
 		if (ServerProperties.getClassSpecializationsEnabled()) {

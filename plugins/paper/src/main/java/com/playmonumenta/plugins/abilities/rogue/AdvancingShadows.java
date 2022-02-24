@@ -51,6 +51,7 @@ public class AdvancingShadows extends Ability {
 	private @Nullable BladeDance mBladeDance;
 
 	private final double mPercentDamageDealt;
+	private final int mActivationRange;
 
 	public AdvancingShadows(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Advancing Shadows");
@@ -62,7 +63,8 @@ public class AdvancingShadows extends Ability {
 		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within " + (ADVANCING_SHADOWS_RANGE_1 - 1) + " blocks and gain +30% Melee Damage for 5 seconds. Cooldown: 20s.");
 		mInfo.mDescriptions.add("Damage increased to +40% Melee Damage for 5s, teleport range is increased to " + (ADVANCING_SHADOWS_RANGE_2 - 1) + " blocks and all hostile non-target mobs within " + ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE + " blocks are knocked away from the target.");
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
-		mPercentDamageDealt = getAbilityScore() == 1 ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2;
+		mPercentDamageDealt = isLevelOne() ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2;
+		mActivationRange = isLevelOne() ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -77,10 +79,9 @@ public class AdvancingShadows extends Ability {
 			return;
 		}
 		LivingEntity entity = mTarget;
-		double maxRange = getActivationRange();
+		double maxRange = mActivationRange;
 		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
 		if (origDistance <= maxRange) {
-			int advancingShadows = getAbilityScore();
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
@@ -149,7 +150,7 @@ public class AdvancingShadows extends Ability {
 			}
 
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES));
-			if (advancingShadows > 1) {
+			if (isLevelTwo()) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
 						ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
 					if (mob != entity) {
@@ -178,7 +179,7 @@ public class AdvancingShadows extends Ability {
 				// Basically makes sure if the target is in LoS and if there is
 				// a path.
 				Location eyeLoc = mPlayer.getEyeLocation();
-				Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), (int)getActivationRange());
+				Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), mActivationRange);
 				ray.mThroughBlocks = false;
 				ray.mThroughNonOccluding = false;
 				if (AbilityManager.getManager().isPvPEnabled(mPlayer)) {
@@ -199,14 +200,5 @@ public class AdvancingShadows extends Ability {
 			}
 		}
 		return false;
-	}
-
-	private double getActivationRange() {
-		if (mPlayer == null) {
-			return 0;
-		}
-		int advancingShadows = getAbilityScore();
-		int range = (advancingShadows == 1) ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
-		return range;
 	}
 }

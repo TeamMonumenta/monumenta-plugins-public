@@ -66,8 +66,8 @@ public class Panacea extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.PANACEA;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mSlowTicks = getAbilityScore() == 1 ? PANACEA_1_SLOW_TICKS : PANACEA_2_SLOW_TICKS;
-		mShield = getAbilityScore() == 1 ? PANACEA_1_SHIELD : PANACEA_2_SHIELD;
+		mSlowTicks = isLevelOne() ? PANACEA_1_SLOW_TICKS : PANACEA_2_SLOW_TICKS;
+		mShield = isLevelOne() ? PANACEA_1_SHIELD : PANACEA_2_SHIELD;
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 		});

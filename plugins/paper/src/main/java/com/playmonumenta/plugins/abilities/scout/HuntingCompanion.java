@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,6 +35,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,9 +71,8 @@ public class HuntingCompanion extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.HUNTING_COMPANION;
 		mDisplayItem = new ItemStack(Material.SWEET_BERRIES, 1);
 
-		boolean isLevelOne = getAbilityScore() == 1;
-		mDamageFraction = isLevelOne ? DAMAGE_FRACTION_1 : DAMAGE_FRACTION_2;
-		mStunTime = isLevelOne ? STUN_TIME_1 : STUN_TIME_2;
+		mDamageFraction = isLevelOne() ? DAMAGE_FRACTION_1 : DAMAGE_FRACTION_2;
+		mStunTime = isLevelOne() ? STUN_TIME_1 : STUN_TIME_2;
 
 		mStunnedMobs = new ArrayList<Entity>();
 

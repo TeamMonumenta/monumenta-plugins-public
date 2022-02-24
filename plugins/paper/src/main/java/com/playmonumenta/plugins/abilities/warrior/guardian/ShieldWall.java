@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -31,6 +30,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class ShieldWall extends Ability {
 		mInfo.mShorthandName = "SW";
 		mInfo.mDescriptions.add("Press the swap key while holding a shield in either hand to create a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 6 magic damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The shield lasts 10 seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown: 20s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
+		mInfo.mCooldown = isLevelOne() ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.SHIELD_WALL;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.STONE_BRICK_WALL, 1);
@@ -63,8 +63,8 @@ public class ShieldWall extends Ability {
 		}
 		event.setCancelled(true);
 		if (!isTimerActive()) {
-			int time = getAbilityScore() == 1 ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
-			boolean knockback = getAbilityScore() != 1;
+			int time = isLevelOne()? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
+			boolean knockback = isLevelTwo();
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);

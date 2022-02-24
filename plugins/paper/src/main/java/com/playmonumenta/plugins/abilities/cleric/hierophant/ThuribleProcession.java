@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -23,6 +22,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -144,7 +144,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	}
 
 	private Effect[] getEffectArray(int duration) {
-		return getAbilityScore() == 1
+		return isLevelOne()
 				? new Effect[] {new PercentAttackSpeed(duration, EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, EFFECT_PERCENT_1, AFFECTED_DAMAGE_TYPES), new ThuribleBonusHealing(duration, EFFECT_PERCENT_1)}
 				: new Effect[] {new PercentAttackSpeed(duration, EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, EFFECT_PERCENT_2, AFFECTED_DAMAGE_TYPES), new ThuribleBonusHealing(duration, EFFECT_PERCENT_2)};
 	}

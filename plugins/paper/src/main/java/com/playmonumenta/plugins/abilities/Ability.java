@@ -321,13 +321,25 @@ public abstract class Ability {
 	 */
 	public int getAbilityScore(Ability this) {
 		AbilityInfo info = mInfo;
-		if (mPlayer != null && info != null && info.mScoreboardId != null) {
+		if (mPlayer != null && info.mScoreboardId != null) {
 			if (mScore == null) {
 				mScore = ScoreboardUtils.getScoreboardValue(mPlayer, info.mScoreboardId).orElse(0);
 			}
 			return mScore;
 		}
 		return 0;
+	}
+
+	public boolean isLevelOne() {
+		return getAbilityScore() % 2 == 1;
+	}
+
+	public boolean isLevelTwo() {
+		return getAbilityScore() % 2 == 0 && getAbilityScore() > 0;
+	}
+
+	public boolean isEnhanced() {
+		return getAbilityScore() > 2;
 	}
 
 	public @Nullable Component getLevelHover(boolean useShorthand) {

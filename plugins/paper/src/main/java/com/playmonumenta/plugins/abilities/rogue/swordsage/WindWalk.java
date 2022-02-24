@@ -16,15 +16,14 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -56,7 +55,7 @@ public class WindWalk extends MultipleChargeAbility {
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.QUARTZ, 1);
-		mDuration = getAbilityScore() == 1 ? WIND_WALK_1_DURATION : WIND_WALK_2_DURATION;
+		mDuration = isLevelOne() ? WIND_WALK_1_DURATION : WIND_WALK_2_DURATION;
 		mMaxCharges = WIND_WALK_MAX_CHARGES;
 	}
 
@@ -119,7 +118,7 @@ public class WindWalk extends MultipleChargeAbility {
 							world.playSound(mob.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 1.25f);
 
 							EntityUtils.applyStun(mPlugin, mDuration, mob);
-							if (getAbilityScore() > 1) {
+							if (isLevelTwo()) {
 								EntityUtils.applyVulnerability(mPlugin, mDuration + WIND_WALK_VULNERABILITY_DURATION_INCREASE, WIND_WALK_VULNERABILITY_AMPLIFIER, mob);
 							}
 

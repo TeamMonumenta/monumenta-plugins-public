@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -17,6 +16,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nullable;
 
 public class PrismaticShield extends Ability {
 
@@ -39,8 +40,8 @@ public class PrismaticShield extends Ability {
 		mInfo.mShorthandName = "PS";
 		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive 4 Absorption hearts which lasts up to 12 s. In addition enemies within four blocks are knocked back. Cooldown: 90s.");
 		mInfo.mDescriptions.add("The shield is improved to 6 Absorption hearts. Enemies within four blocks are knocked back and stunned for 1 s. Cooldown: 70s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
-		mAbsorptionHealth = getAbilityScore() == 1 ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2;
+		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
+		mAbsorptionHealth = isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2;
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 	}
 
@@ -73,7 +74,7 @@ public class PrismaticShield extends Ability {
 			// Conditions match - prismatic shield
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 				MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
-				if (getAbilityScore() == 2) {
+				if (isLevelTwo()) {
 					EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
 				}
 			}

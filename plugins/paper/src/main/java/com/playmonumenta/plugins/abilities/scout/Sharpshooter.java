@@ -8,13 +8,14 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nullable;
 
 public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
 	private static final double PERCENT_BASE_DAMAGE = 0.2;
@@ -41,7 +42,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 			event.setDamage(event.getDamage() * (1 + PERCENT_BASE_DAMAGE + mStacks * PERCENT_DAMAGE_PER_STACK));
 
 			// Critical arrow and mob is actually going to take damage
-			if (getAbilityScore() > 1 && (arrow.isCritical() || arrow instanceof Trident) && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage())) {
+			if (isLevelTwo() && (arrow.isCritical() || arrow instanceof Trident) && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage())) {
 				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 
 				if (mStacks < MAX_STACKS) {

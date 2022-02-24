@@ -42,7 +42,7 @@ public class Swiftness extends Ability {
 
 	@Override
 	public void setupClassPotionEffects() {
-		if (getAbilityScore() > 1) {
+		if (isLevelTwo()) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
 		}
 	}
@@ -62,7 +62,7 @@ public class Swiftness extends Ability {
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (getAbilityScore() < 2) {
+		if (isLevelOne()) {
 			return;
 		}
 

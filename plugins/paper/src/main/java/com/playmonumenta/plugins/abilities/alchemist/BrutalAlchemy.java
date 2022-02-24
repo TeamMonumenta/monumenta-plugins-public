@@ -36,7 +36,7 @@ public class BrutalAlchemy extends PotionAbility {
 		mInfo.mDescriptions.add("Your Brutal Alchemist's Potions now deal +2 damage and apply 1 damage every second instead.");
 		mDisplayItem = new ItemStack(Material.REDSTONE, 1);
 
-		mPeriod = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_1_PERIOD : BRUTAL_ALCHEMY_2_PERIOD;
+		mPeriod = isLevelOne() ? BRUTAL_ALCHEMY_1_PERIOD : BRUTAL_ALCHEMY_2_PERIOD;
 		mDOTDamage = BRUTAL_ALCHEMY_DOT_DAMAGE;
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			if (ServerProperties.getClassSpecializationsEnabled() && AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EsotericEnhancements.class) != null) {

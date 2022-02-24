@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -20,6 +19,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import javax.annotation.Nullable;
 
 
 
@@ -43,13 +44,13 @@ public class ByMyBlade extends Ability {
 		mInfo.mDescriptions.add("Damage is increased from 10 to 20. Haste level is increased from 2 to 4.");
 		mInfo.mCooldown = BY_MY_BLADE_COOLDOWN;
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
-		mDamageBonus = getAbilityScore() == 1 ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE;
+		mDamageBonus = isLevelOne() ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE;
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
-			int hasteAmplifier = getAbilityScore() == 1 ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER;
+			int hasteAmplifier = isLevelOne() ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER;
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 				new PotionEffect(PotionEffectType.FAST_DIGGING, BY_MY_BLADE_HASTE_DURATION, hasteAmplifier, false, true));
@@ -60,7 +61,7 @@ public class ByMyBlade extends Ability {
 			World world = mPlayer.getWorld();
 			loc.add(0, 1, 0);
 			int count = 15;
-			if (getAbilityScore() > 1) {
+			if (isLevelTwo()) {
 				world.spawnParticle(Particle.SPELL_WITCH, loc, 45, 0.2, 0.65, 0.2, 1.0);
 				count = 30;
 			}

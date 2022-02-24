@@ -46,7 +46,7 @@ public class CholericFlames extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.FIRE_CHARGE, 1);
-		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class CholericFlames extends Ability {
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.mLinkedSpell, true);
 			EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
 
-			if (getAbilityScore() > 1) {
+			if (isLevelTwo()) {
 				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, DURATION, 0, false, true));
 			}
 		}

@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -27,6 +26,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.NavigableSet;
 
@@ -66,8 +66,8 @@ public class DarkPact extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.SOUL_SAND, 1);
-		mPercentDamageDealt = getAbilityScore() == 1 ? PERCENT_DAMAGE_DEALT_1 : PERCENT_DAMAGE_DEALT_2;
-		mPercentAtks = getAbilityScore() == 1 ? PERCENT_ATKS_1 : PERCENT_ATKS_2;
+		mPercentDamageDealt = isLevelOne() ? PERCENT_DAMAGE_DEALT_1 : PERCENT_DAMAGE_DEALT_2;
+		mPercentAtks = isLevelOne() ? PERCENT_ATKS_1 : PERCENT_ATKS_2;
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {

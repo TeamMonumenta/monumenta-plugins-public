@@ -131,7 +131,7 @@ public class Bezoar extends Ability {
 		double maxHealth = EntityUtils.getMaxHealth(player);
 		mPlugin.mEffectManager.addEffect(player, "BezoarHealing", new CustomRegeneration(HEAL_DURATION, maxHealth * HEAL_PERCENT, mPlayer, mPlugin));
 
-		if (getAbilityScore() > 1) {
+		if (isLevelTwo()) {
 			mPlugin.mEffectManager.addEffect(player, "BezoarPercentDamageDealtEffect", new PercentDamageDealt(DAMAGE_DURATION, DAMAGE_PERCENT));
 		}
 	}

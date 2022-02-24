@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -21,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -56,9 +56,9 @@ public class Challenge extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.CHALLENGE;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.IRON_AXE, 1);
-		mPercentDamageDealtEffect = getAbilityScore() == 1 ? PERCENT_DAMAGE_DEALT_EFFECT_1 : PERCENT_DAMAGE_DEALT_EFFECT_2;
-		mAbsorptionPerMob = getAbilityScore() == 1 ? ABSORPTION_PER_MOB_1 : ABSORPTION_PER_MOB_2;
-		mMaxAbsorption = getAbilityScore() == 1 ? MAX_ABSORPTION_1 : MAX_ABSORPTION_2;
+		mPercentDamageDealtEffect = isLevelOne() ? PERCENT_DAMAGE_DEALT_EFFECT_1 : PERCENT_DAMAGE_DEALT_EFFECT_2;
+		mAbsorptionPerMob = isLevelOne() ? ABSORPTION_PER_MOB_1 : ABSORPTION_PER_MOB_2;
+		mMaxAbsorption = isLevelOne() ? MAX_ABSORPTION_1 : MAX_ABSORPTION_2;
 	}
 
 	@Override

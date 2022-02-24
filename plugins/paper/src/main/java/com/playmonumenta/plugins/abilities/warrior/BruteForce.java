@@ -39,7 +39,7 @@ public class BruteForce extends Ability {
 		mInfo.mDescriptions.add("Damage is increased to 10 percent of the attack's damage plus 2.");
 		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
 
-		mMultiplier = getAbilityScore() == 1 ? 0 : BRUTE_FORCE_2_MODIFIER;
+		mMultiplier = isLevelOne() ? 0 : BRUTE_FORCE_2_MODIFIER;
 	}
 
 	@Override

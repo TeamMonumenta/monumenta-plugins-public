@@ -42,7 +42,7 @@ public class SanctifiedArmor extends Ability {
 		mInfo.mShorthandName = "Sa";
 		mInfo.mDescriptions.add("Whenever you are damaged by melee or projectile hits from non-boss enemies, the enemy will take 1.5 times the damage you took, as magic damage.");
 		mInfo.mDescriptions.add("Deal 2.5 times the final damage instead, and the undead enemy is also afflicted with 20% Slowness for 3 seconds.");
-		mPercentDamageReturned = getAbilityScore() == 1 ? PERCENT_DAMAGE_RETURNED_1 : PERCENT_DAMAGE_RETURNED_2;
+		mPercentDamageReturned = isLevelOne() ? PERCENT_DAMAGE_RETURNED_1 : PERCENT_DAMAGE_RETURNED_2;
 		mDisplayItem = new ItemStack(Material.IRON_CHESTPLATE, 1);
 
 		if (player != null) {
@@ -74,7 +74,7 @@ public class SanctifiedArmor extends Ability {
 			MovementUtils.knockAway(mPlayer, source, KNOCKBACK_SPEED, KNOCKBACK_SPEED, true);
 			DamageUtils.damage(mPlayer, source, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true);
 
-			if (getAbilityScore() > 1) {
+			if (isLevelTwo()) {
 				EntityUtils.applySlow(mPlugin, SLOWNESS_DURATION, SLOWNESS_AMPLIFIER_2, source);
 			}
 		}

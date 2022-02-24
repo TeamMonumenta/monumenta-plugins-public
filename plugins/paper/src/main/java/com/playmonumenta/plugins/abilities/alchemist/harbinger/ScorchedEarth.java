@@ -59,7 +59,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 		mInfo.mShorthandName = "SE";
 		mInfo.mDescriptions.add("Shift right click while holding an Alchemist's Bag to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. Mobs in this zone are dealt 25% of your potion's damage extra whenever taking damage of types other than ailment or fire. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Cooldown reduced to 25s, and two charges of this ability can be stored at once.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? SCORCHED_EARTH_1_COOLDOWN : SCORCHED_EARTH_2_COOLDOWN;
+		mInfo.mCooldown = isLevelOne() ? SCORCHED_EARTH_1_COOLDOWN : SCORCHED_EARTH_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BROWN_DYE, 1);
 		mMaxCharges = getAbilityScore() == 1 ? SCORCHED_EARTH_1_CHARGES : SCORCHED_EARTH_2_CHARGES;

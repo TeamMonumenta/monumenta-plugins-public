@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -22,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -45,6 +45,9 @@ public class CelestialBlessing extends Ability {
 	);
 	public static final String DAMAGE_EFFECT_NAME = "CelestialBlessingExtraDamage";
 
+	private int mDuration;
+	private int mExtraDamage;
+
 	public CelestialBlessing(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Celestial Blessing");
 		mInfo.mLinkedSpell = ClassAbility.CELESTIAL_BLESSING;
@@ -55,6 +58,9 @@ public class CelestialBlessing extends Ability {
 		mInfo.mCooldown = CELESTIAL_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.SUGAR, 1);
+
+		int mDuration = isLevelOne() ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
+		double mExtraDamage = isLevelOne() ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE;
 	}
 
 	@Override
@@ -62,10 +68,6 @@ public class CelestialBlessing extends Ability {
 		if (mPlayer == null) {
 			return;
 		}
-
-		int celestial = getAbilityScore();
-		int duration = celestial == 1 ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
-		double extraDamage = celestial == 1 ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE;
 
 		World world = mPlayer.getWorld();
 
@@ -76,9 +78,9 @@ public class CelestialBlessing extends Ability {
 
 		// Give these players the metadata tag that boosts their damage
 		for (Player p : affectedPlayers) {
-			mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME, new PercentDamageDealt(duration, extraDamage, AFFECTED_DAMAGE_TYPES));
-			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraSpeed", new PercentSpeed(duration, CELESTIAL_EXTRA_SPEED, ATTR_NAME));
-			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingParticles", new Aesthetics(duration,
+			mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME, new PercentDamageDealt(mDuration, mExtraDamage, AFFECTED_DAMAGE_TYPES));
+			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraSpeed", new PercentSpeed(mDuration, CELESTIAL_EXTRA_SPEED, ATTR_NAME));
+			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingParticles", new Aesthetics(mDuration,
 				(entity, fourHertz, twoHertz, oneHertz) -> {
 					// Tick effect
 					Location loc = p.getLocation().add(0, 1, 0);

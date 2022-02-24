@@ -33,11 +33,10 @@ public class NonClericProvisionsPassive extends Ability {
 		for (Player p : PlayerUtils.playersInRange(player.getLocation(), PROVISIONS_RANGE, true)) {
 			Ability provisions = AbilityManager.getManager().getPlayerAbility(p, SacredProvisions.class);
 			if (provisions != null) {
-				int score = provisions.getAbilityScore();
-				if (score == 2) {
+				if (provisions.isLevelTwo()) {
 					return FastUtils.RANDOM.nextDouble() < PROVISIONS_2_CHANCE;
-				} else if (score > level) {
-					level = score;
+				} else {
+					level = 1;
 				}
 			}
 		}

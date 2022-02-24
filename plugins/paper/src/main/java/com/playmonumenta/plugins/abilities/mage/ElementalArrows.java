@@ -35,6 +35,7 @@ public class ElementalArrows extends Ability {
 	public static final double SLOW_AMPLIFIER = 0.2;
 
 	private double mLastDamage = 0;
+	private double mDamageMultiplier;
 
 	public ElementalArrows(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
@@ -45,6 +46,8 @@ public class ElementalArrows extends Ability {
 		mInfo.mDescriptions.add("Your fully drawn arrows and tridents are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with 20% Slowness for 6 seconds. Fire and Ice arrows deal 10% extra damage. Ice arrows deal 8 extra damage to Blazes. Fire arrows deal 8 extra damage to strays. This skill can not apply Spellshock.");
 		mInfo.mDescriptions.add("Your fire arrows also set nearby enemies within a radius of 3 blocks on fire when they hit a target. Your ice arrows also slow nearby enemies within a radius of 3 blocks when they hit a target. Both area of effect effects do 20% bow damage to all targets affected.");
 		mDisplayItem = new ItemStack(Material.SPECTRAL_ARROW, 1);
+
+		mDamageMultiplier = isLevelOne() ? DAMAGE_MULTIPLIER_1 : DAMAGE_MULTIPLIER_2;
 	}
 
 	@Override
@@ -54,10 +57,9 @@ public class ElementalArrows extends Ability {
 		}
 		AbstractArrow arrow = (AbstractArrow) event.getDamager();
 
-		int elementalArrows = getAbilityScore();
-		double damage = elementalArrows == 1 ? DAMAGE_MULTIPLIER_1 * event.getDamage() : DAMAGE_MULTIPLIER_2 * event.getDamage();
+		double damage = mDamageMultiplier * event.getDamage();
 		if (arrow.hasMetadata("ElementalArrowsFireArrow")) {
-			if (elementalArrows > 1) {
+			if (isLevelTwo()) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), ELEMENTAL_ARROWS_RADIUS, enemy)) {
 					EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, mob, mPlayer);
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, ABILITY_FIRE, true);
@@ -71,7 +73,7 @@ public class ElementalArrows extends Ability {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, ABILITY_FIRE);
 			mLastDamage = event.getDamage();
 		} else if (arrow.hasMetadata("ElementalArrowsIceArrow")) {
-			if (elementalArrows > 1) {
+			if (isLevelTwo()) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), ELEMENTAL_ARROWS_RADIUS, enemy)) {
 					EntityUtils.applySlow(mPlugin, ELEMENTAL_ARROWS_DURATION, SLOW_AMPLIFIER, mob);
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, ABILITY_ICE, true);

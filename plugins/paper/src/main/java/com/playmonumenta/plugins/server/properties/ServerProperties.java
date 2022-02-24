@@ -1,5 +1,17 @@
 package com.playmonumenta.plugins.server.properties;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.scriptedquests.utils.QuestUtils;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.command.CommandSender;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -7,19 +19,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.command.CommandSender;
-import javax.annotation.Nullable;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-import com.playmonumenta.scriptedquests.utils.QuestUtils;
 
 public class ServerProperties {
 
@@ -34,6 +33,7 @@ public class ServerProperties {
 	private boolean mIsSleepingEnabled = true;
 	private boolean mKeepLowTierInventory = false;
 	private boolean mClassSpecializationsEnabled = false;
+	private boolean mAbilityEnhancementsEnabled = false;
 	private boolean mAuditMessagesEnabled = true;
 	private boolean mRepairExplosions = false;
 	private boolean mPreventDungeonItemTransfer = true;
@@ -79,6 +79,8 @@ public class ServerProperties {
 	public static boolean getClassSpecializationsEnabled() {
 		return INSTANCE.mClassSpecializationsEnabled;
 	}
+
+	public static boolean getAbilityEnhancementsEnabled() {return INSTANCE.mAbilityEnhancementsEnabled;}
 
 	public static boolean getAuditMessagesEnabled() {
 		return INSTANCE.mAuditMessagesEnabled;
@@ -219,10 +221,10 @@ public class ServerProperties {
 		return value;
 	}
 
-	private String getPropertyValueString(JsonObject object, String properyName, String defaultVal) {
+	private String getPropertyValueString(JsonObject object, String propertyName, String defaultVal) {
 		String value = defaultVal;
 
-		JsonElement element = object.get(properyName);
+		JsonElement element = object.get(propertyName);
 		if (element != null) {
 			value = element.getAsString();
 		}

@@ -6,12 +6,13 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nullable;
 
 
 
@@ -41,7 +42,7 @@ public class Crusade extends Ability {
 		); // List of human-likes hardcoded
 		mDisplayItem = new ItemStack(Material.ZOMBIE_HEAD, 1);
 
-		mCountsHumanlikes = getAbilityScore() == 2;
+		mCountsHumanlikes = isLevelTwo();
 	}
 
 	@Override

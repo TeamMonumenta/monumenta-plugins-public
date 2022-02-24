@@ -36,6 +36,8 @@ public class ManaLance extends Ability {
 	private static final int COOLDOWN_2 = 3 * 20;
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
 
+	private float mDamage;
+
 	public ManaLance(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Mana Lance");
 		mInfo.mLinkedSpell = ClassAbility.MANA_LANCE;
@@ -43,9 +45,11 @@ public class ManaLance extends Ability {
 		mInfo.mShorthandName = "ML";
 		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 6 magic damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: 5s.");
 		mInfo.mDescriptions.add("The beam instead deals 7 damage. Cooldown: 3s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.TRIDENT, 1);
+
+		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	@Override
@@ -53,8 +57,8 @@ public class ManaLance extends Ability {
 		if (mPlayer == null) {
 			return;
 		}
-		float damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
-		damage = SpellPower.getSpellDamage(mPlugin, mPlayer, damage);
+
+		double damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mDamage);
 
 		putOnCooldown();
 

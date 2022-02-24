@@ -55,12 +55,12 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		mInfo.mDescriptions.add("Use the swap key while holding a weapon and not looking up to throw a whirling blade that circles around you, knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits. Cooldown: 8s. Charges: 2.");
 		mInfo.mDescriptions.add("The damage is increased to " + BLADE_2_DAMAGE + " and the knockback is greatly increased.");
 		mInfo.mLinkedSpell = ClassAbility.WHIRLING_BLADE;
-		mDamage = getAbilityScore() == 1 ? BLADE_1_DAMAGE : BLADE_2_DAMAGE;
-		mKnockback = getAbilityScore() == 1 ? BLADE_1_KNOCKBACK : BLADE_2_KNOCKBACK;
-		mInfo.mCooldown = getAbilityScore() == 1 ? BLADE_1_COOLDOWN : BLADE_2_COOLDOWN;
+		mDamage = isLevelOne() ? BLADE_1_DAMAGE : BLADE_2_DAMAGE;
+		mKnockback = isLevelOne() ? BLADE_1_KNOCKBACK : BLADE_2_KNOCKBACK;
+		mInfo.mCooldown = isLevelOne() ? BLADE_1_COOLDOWN : BLADE_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
-		mMaxCharges = getAbilityScore() == 1 ? BLADE_1_MAX_CHARGES : BLADE_2_MAX_CHARGES;
+		mMaxCharges = isLevelOne() ? BLADE_1_MAX_CHARGES : BLADE_2_MAX_CHARGES;
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {

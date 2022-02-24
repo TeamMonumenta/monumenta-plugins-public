@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,6 +20,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nullable;
 
 
 
@@ -50,9 +51,9 @@ public class RecklessSwing extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
-		mDamagePercentPer4Health = getAbilityScore() == 1 ? DAMAGE_PERCENT_PER_4_HEALTH_1 : DAMAGE_PERCENT_PER_4_HEALTH_2;
-		mMaxDamagePercent = getAbilityScore() == 1 ? MAX_DAMAGE_PERCENT_1 : MAX_DAMAGE_PERCENT_2;
-		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		mDamagePercentPer4Health = isLevelOne() ? DAMAGE_PERCENT_PER_4_HEALTH_1 : DAMAGE_PERCENT_PER_4_HEALTH_2;
+		mMaxDamagePercent = isLevelOne() ? MAX_DAMAGE_PERCENT_1 : MAX_DAMAGE_PERCENT_2;
+		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	@Override

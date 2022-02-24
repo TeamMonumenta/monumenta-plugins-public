@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -28,6 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.annotation.Nullable;
 import java.util.stream.Stream;
 
 
@@ -67,7 +67,7 @@ public class CursedWound extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
-			double cursedWoundCap = getAbilityScore() == 1 ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP;
+			double cursedWoundCap = isLevelOne() ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP;
 			BlockData fallingDustData = Material.ANVIL.createBlockData();
 			World world = mPlayer.getWorld();
 			if (EntityUtils.isHostileMob(enemy)) {
@@ -94,7 +94,7 @@ public class CursedWound extends Ability {
 					world.spawnParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 6,
 					                     (mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, 0);
 					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME, new CustomDamageOverTime(CURSED_WOUND_DURATION, CURSED_WOUND_DOT_DAMAGE, CURSED_WOUND_DOT_PERIOD, mPlayer, null, Particle.SQUID_INK));
-					if (getAbilityScore() > 1) {
+					if (isLevelTwo()) {
 						//Bleed interaction
 						if (EntityUtils.isBleeding(mPlugin, mob)) {
 							EntityUtils.setBleedTicks(mPlugin, mob, EntityUtils.getBleedTicks(mPlugin, mob) + CURSED_WOUND_EXTENDED_DURATION);

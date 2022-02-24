@@ -79,16 +79,16 @@ public class AmplifyingHex extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
-		mAmplifierDamage = getAbilityScore() == 1 ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2;
-		mAmplifierCap = getAbilityScore() == 1 ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2;
-		mRadius = getAbilityScore() == 1 ? RADIUS_1 : RADIUS_2;
+		mAmplifierDamage = isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2;
+		mAmplifierCap = isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2;
+		mRadius = isLevelOne() ? RADIUS_1 : RADIUS_2;
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				int skillPoints = Stream.of(AmplifyingHex.class, CholericFlames.class, GraspingClaws.class, SoulRend.class,
 				                            SanguineHarvest.class, MelancholicLament.class, CursedWound.class, PhlegmaticResolve.class)
 					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c))
-					.mapToInt(a -> a == null ? 0 : a.getAbilityScore())
+					.mapToInt(a -> a == null ? 0 : Math.min(a.getAbilityScore(), 2))
 					.sum();
 				mDamage = DAMAGE_PER_SKILL_POINT * skillPoints;
 			});

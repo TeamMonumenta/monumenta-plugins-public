@@ -52,7 +52,7 @@ public class MelancholicLament extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
-		mWeakenEffect = getAbilityScore() == 1 ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
+		mWeakenEffect = isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				mJudgementChain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, JudgementChain.class);
@@ -91,7 +91,7 @@ public class MelancholicLament extends Ability {
 				EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
 			}
 
-			if (getAbilityScore() > 1) {
+			if (isLevelTwo()) {
 				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true)) {
 					world.spawnParticle(Particle.REDSTONE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125, COLOR);
 					world.spawnParticle(Particle.ENCHANTMENT_TABLE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125);
