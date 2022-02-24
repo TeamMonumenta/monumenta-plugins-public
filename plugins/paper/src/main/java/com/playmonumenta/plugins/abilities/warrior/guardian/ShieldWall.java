@@ -63,7 +63,7 @@ public class ShieldWall extends Ability {
 		}
 		event.setCancelled(true);
 		if (!isTimerActive()) {
-			int time = isLevelOne()? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
+			int time = isLevelOne() ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
 			boolean knockback = isLevelTwo();
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);

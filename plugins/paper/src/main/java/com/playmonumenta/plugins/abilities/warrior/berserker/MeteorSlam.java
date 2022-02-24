@@ -102,7 +102,7 @@ public final class MeteorSlam extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.FIRE_CHARGE, 1);
 
-		mInfo.mCooldown = isLevelOne()? COOLDOWN_TICKS_1 : COOLDOWN_TICKS_2;
+		mInfo.mCooldown = isLevelOne() ? COOLDOWN_TICKS_1 : COOLDOWN_TICKS_2;
 
 		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 		mLevelReducedDamage = isLevelOne() ? REDUCED_DAMAGE_1 : REDUCED_DAMAGE_2;

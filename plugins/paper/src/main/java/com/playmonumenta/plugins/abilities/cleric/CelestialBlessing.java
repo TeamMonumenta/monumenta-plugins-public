@@ -46,7 +46,7 @@ public class CelestialBlessing extends Ability {
 	public static final String DAMAGE_EFFECT_NAME = "CelestialBlessingExtraDamage";
 
 	private int mDuration;
-	private int mExtraDamage;
+	private double mExtraDamage;
 
 	public CelestialBlessing(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Celestial Blessing");
@@ -59,8 +59,8 @@ public class CelestialBlessing extends Ability {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.SUGAR, 1);
 
-		int mDuration = isLevelOne() ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
-		double mExtraDamage = isLevelOne() ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE;
+		mDuration = isLevelOne() ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
+		mExtraDamage = isLevelOne() ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE;
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
 import com.playmonumenta.plugins.itemstats.enchantments.Ineptitude;
 import com.playmonumenta.plugins.itemstats.infusions.Epoch;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.Component;
@@ -339,7 +340,7 @@ public abstract class Ability {
 	}
 
 	public boolean isEnhanced() {
-		return getAbilityScore() > 2;
+		return getAbilityScore() > 2 && ServerProperties.getAbilityEnhancementsEnabled();
 	}
 
 	public @Nullable Component getLevelHover(boolean useShorthand) {

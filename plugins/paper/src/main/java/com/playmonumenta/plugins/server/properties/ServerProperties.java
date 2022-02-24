@@ -80,7 +80,9 @@ public class ServerProperties {
 		return INSTANCE.mClassSpecializationsEnabled;
 	}
 
-	public static boolean getAbilityEnhancementsEnabled() {return INSTANCE.mAbilityEnhancementsEnabled;}
+	public static boolean getAbilityEnhancementsEnabled() {
+		return INSTANCE.mAbilityEnhancementsEnabled;
+	}
 
 	public static boolean getAuditMessagesEnabled() {
 		return INSTANCE.mAuditMessagesEnabled;
