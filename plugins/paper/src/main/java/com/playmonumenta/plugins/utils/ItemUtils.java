@@ -1080,6 +1080,26 @@ public class ItemUtils {
 		}
 	}
 
+	public static int getMiningSpeed(@Nullable ItemStack itemStack) {
+		if (itemStack == null) {
+			return 1;
+		}
+		int baseSpeed = switch (itemStack.getType()) {
+			case WOODEN_PICKAXE, WOODEN_AXE, WOODEN_SHOVEL -> 2;
+			case STONE_PICKAXE, STONE_AXE, STONE_SHOVEL -> 4;
+			case IRON_PICKAXE, IRON_AXE, IRON_SHOVEL -> 6;
+			case DIAMOND_PICKAXE, DIAMOND_AXE, DIAMOND_SHOVEL -> 8;
+			case NETHERITE_PICKAXE, NETHERITE_AXE, NETHERITE_SHOVEL -> 9;
+			case GOLDEN_PICKAXE, GOLDEN_AXE, GOLDEN_SHOVEL -> 12;
+			default -> 1;
+		};
+		if (baseSpeed == 1) {
+			return 1;
+		}
+		int efficiency = ItemStatUtils.getEnchantmentLevel(itemStack, EnchantmentType.EFFICIENCY);
+		return baseSpeed + (efficiency > 0 ? efficiency * efficiency + 1 : 0);
+	}
+
 	public static boolean isBanner(@Nullable ItemStack itemStack) {
 		if (itemStack == null) {
 			return false;

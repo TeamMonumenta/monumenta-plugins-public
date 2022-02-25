@@ -93,8 +93,7 @@ public class ItemStatManager implements Listener {
 			}
 
 			public double get(ItemStat stat) {
-				Double value = mMap.get(stat);
-				return value == null ? 0 : value;
+				return get(stat, 0);
 			}
 
 			public double get(ItemStat stat, double defaultValue) {

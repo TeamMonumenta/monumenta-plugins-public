@@ -5,14 +5,8 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Attribute;
 import com.playmonumenta.plugins.itemstats.enchantments.Ethereal;
 import com.playmonumenta.plugins.itemstats.enchantments.Evasion;
-import com.playmonumenta.plugins.itemstats.enchantments.Inure;
-import com.playmonumenta.plugins.itemstats.enchantments.Poise;
 import com.playmonumenta.plugins.itemstats.enchantments.Reflexes;
-import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
-import com.playmonumenta.plugins.itemstats.enchantments.Steadfast;
 import com.playmonumenta.plugins.itemstats.enchantments.Tempo;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import javax.annotation.Nullable;
@@ -34,28 +28,24 @@ public class Agility implements Attribute {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		// When there is zero Armor, this method runs; otherwise, Armor runs.
+		// When there is zero (or negative) Armor, this method runs; otherwise, Armor runs.
 		if (value > 0 && event.getType().isDefendable() && plugin.mItemStatManager.getAttributeAmount(player, AttributeType.ARMOR) <= 0) {
-			double valueMod = 0;
-			valueMod += Tempo.applyTempo(event, plugin, player);
-			valueMod += Reflexes.applyReflexes(event, plugin, player);
-			valueMod += Evasion.applyEvasion(event, plugin, player);
-			valueMod += Ethereal.applyEthereal(event, plugin, player);
-
-			if ((plugin.mItemStatManager.getAttributeAmount(player, AttributeType.AGILITY) > plugin.mItemStatManager.getAttributeAmount(player, AttributeType.ARMOR)) &&
-				    (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADAPTABILITY) > 0)) {
-				valueMod += Shielding.applyShielding(event, plugin, player);
-				valueMod += Inure.applyInure(event, plugin, player);
-				valueMod += Steadfast.applySteadfast(event, plugin, player);
-				valueMod += Poise.applyPoise(event, plugin, player);
-			}
-
-			double armorCap = ServerProperties.getClassSpecializationsEnabled() ? 30 : 20;
-			double valueBonus = Math.min(value, armorCap) * valueMod;
-			value += valueBonus;
-
-			event.setDamage(event.getDamage() * DamageUtils.getDamageMultiplier(0, value, 0, event.getType().isEnvironmental()));
+			boolean adaptability = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADAPTABILITY) > 0;
+			double damageMultiplier = Armor.getDamageMultiplier(0, Armor.getSecondaryEnchantsMod(event, plugin, player),
+				value, getSecondaryEnchantsMod(event, plugin, player),
+				Armor.getSecondaryEnchantCap(), adaptability, 0, event.getType().isEnvironmental());
+			event.setDamage(event.getDamage() * damageMultiplier);
 		}
+	}
+
+	/**
+	 * Gets the total modifier (0-based) of agility from secondary enchants for the given event and player.
+	 */
+	public static double getSecondaryEnchantsMod(DamageEvent event, Plugin plugin, Player player) {
+		return Tempo.applyTempo(event, plugin, player)
+			       + Reflexes.applyReflexes(event, plugin, player)
+			       + Evasion.applyEvasion(event, plugin, player)
+			       + Ethereal.applyEthereal(event, plugin, player);
 	}
 
 }

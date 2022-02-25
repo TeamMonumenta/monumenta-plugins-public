@@ -33,7 +33,6 @@
 	<module name="TreeWalker">
 		<property name="tabWidth" value="4"/>
 		<module name="OuterTypeFilename"/>
-		<module name="AvoidStarImport"/>
 		<module name="OneTopLevelClass"/>
 		<module name="NoLineWrap"/>
 		<module name="EmptyBlock">

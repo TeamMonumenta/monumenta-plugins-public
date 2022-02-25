@@ -17,8 +17,8 @@ import org.bukkit.potion.PotionEffectType;
 public class RegionScalingDamageTaken implements Enchantment {
 
 	private static final String SPEED_EFFECT_NAME = "RegionScalingPercentSpeedEffect";
-	private static final double SPEED_EFFECT = -0.1;
-	private static final double DAMAGE_TAKEN_MULTIPLIER = 3;
+	public static final double SPEED_EFFECT = -0.1;
+	public static final double DAMAGE_TAKEN_MULTIPLIER = 3;
 
 	@Override
 	public String getName() {

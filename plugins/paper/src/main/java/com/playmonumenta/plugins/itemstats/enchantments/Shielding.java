@@ -1,22 +1,23 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
+import javax.annotation.Nullable;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import javax.annotation.Nullable;
-
 public class Shielding implements Enchantment {
 
-	private static final double ARMOR_BONUS_PER_LEVEL = 0.2;
+	public static final double ARMOR_BONUS_PER_LEVEL = 0.2;
 	private static final double DISTANCE = 2;
 	private static final int DISABLE_DURATION = 5 * 20;
 	private static final String DISABLE_METAKEY = "ShieldingDisabled";
