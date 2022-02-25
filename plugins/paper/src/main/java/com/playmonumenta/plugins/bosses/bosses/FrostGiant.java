@@ -198,6 +198,24 @@ public class FrostGiant extends BossAbilityGroup {
 	private @Nullable LivingEntity mTargeted;
 	private @Nullable Location mStuckLoc;
 
+	/* Thresholds, multipliers, and variables for the Last Stand Mechanic
+	 * Thresholds determine how many players out of the original group size must be remaining for the Last Stand to trigger. Treated as a percentage; 0 = never triggers, 1 = triggers instantly.
+	 * Current values are set to 30% of players for Threshold A, and 15% of players for Threshold B
+	 * Minimum Start Players determines how many players must be present at the start of the boss fight for Last Stand to trigger.
+	 * Last Stand Multipliers are applied to damage dealt to the Frost Giant Boss (115% at Threshold A, 130% at Threshold B)
+	 */
+	private static final int MINIMUM_START_PLAYERS_LAST_STAND = 10;
+	private static final float LAST_STAND_A_THRESHOLD = 0.6F;
+	private static final float LAST_STAND_B_THRESHOLD = 0.3F;
+	private static final float LAST_STAND_A_MULTIPLIER = 1.15F;
+	private static final float LAST_STAND_B_MULTIPLIER = 1.3F;
+
+	//Variables for tracking starting players, and what thresholds have been met:
+	private int mBossStartPlayers;
+	private boolean mCanLastStand = false;
+	private boolean mLastStandAFired = false;
+	private boolean mLastStandBFired = false;
+
 	private final UltimateSeismicRuin mRuin;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -969,6 +987,16 @@ public class FrostGiant extends BossAbilityGroup {
 
 	@Override
 	public void onHurt(DamageEvent event) {
+		//last stand handling block
+		if (mCanLastStand) {
+			if (mLastStandBFired) {
+				double baseDmg = event.getDamage();
+				event.setDamage(baseDmg * LAST_STAND_B_MULTIPLIER);
+			} else if (mLastStandAFired) {
+				double baseDmg = event.getDamage();
+				event.setDamage(baseDmg * LAST_STAND_A_MULTIPLIER);
+			}
+		}
 		LivingEntity source = event.getSource();
 		if (!mFrostArmorActive) {
 			if (source instanceof Player player) {
@@ -1063,6 +1091,7 @@ public class FrostGiant extends BossAbilityGroup {
 	public void init() {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 		int playerCount = players.size();
+		mBossStartPlayers = playerCount;
 		int hpDel = 5000;
 
 		double bossTargetHp = hpDel * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
@@ -1079,6 +1108,38 @@ public class FrostGiant extends BossAbilityGroup {
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 9999, 10));
 
 		mBoss.setPersistent(true);
+		if (mBossStartPlayers >= MINIMUM_START_PLAYERS_LAST_STAND) {
+			mCanLastStand = true;
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (!mLastStandAFired || !mLastStandBFired) {
+						List<Player> currentPlayers = PlayerUtils.playersInRange(mStartLoc, detectionRange, true);
+						int currentPlayerCount = currentPlayers.size();
+						float percentPlayersRemaining = ((float) currentPlayerCount) / mBossStartPlayers;
+						if (!mLastStandAFired && percentPlayersRemaining <= LAST_STAND_A_THRESHOLD) {
+							mLastStandAFired = true;
+							for (Player player : currentPlayers) {
+								player.sendMessage(Component.text("You feel stronger as ancestral War Horns bellow out from below...\nYou now deal more damage to Eldrask.", NamedTextColor.YELLOW));
+								player.playSound(player.getLocation(), Sound.EVENT_RAID_HORN, SoundCategory.HOSTILE, 0.5F, 0.9F);
+							}
+						}
+						if (!mLastStandBFired && mLastStandAFired && percentPlayersRemaining <= LAST_STAND_B_THRESHOLD) {
+							mLastStandBFired = true;
+							for (Player player : currentPlayers) {
+								player.sendMessage(Component.text("Alric's War Horns shake the ground beneath your feet as he lends you immense strength...\nYou now deal even more damage to Eldrask!", NamedTextColor.GOLD));
+								player.playSound(player.getLocation(), Sound.EVENT_RAID_HORN, SoundCategory.HOSTILE, 0.7F, 0.5F);
+							}
+						}
+					} else {
+						this.cancel();
+					}
+					if (mBoss.isDead() || !mBoss.isValid()) {
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 20 * 2, 20 * 2);
+		}
 
 		for (Player player : players) {
 			if (player.hasPotionEffect(PotionEffectType.GLOWING)) {
