@@ -1,14 +1,15 @@
 package com.playmonumenta.plugins.effects;
 
-import org.bukkit.Particle;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import org.bukkit.Particle;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+
+import javax.annotation.Nullable;
 
 public class CustomDamageOverTime extends Effect {
 
@@ -37,7 +38,7 @@ public class CustomDamageOverTime extends Effect {
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
-		if (fourHertz && entity instanceof LivingEntity le) {
+		if (fourHertz && entity instanceof LivingEntity le && !(entity instanceof ArmorStand)) {
 			mTicks += 5; //Activates 4 times a second
 			if (mTicks >= mPeriod) {
 				mTicks %= mPeriod;

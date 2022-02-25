@@ -821,6 +821,10 @@ public class EntityUtils {
 	}
 
 	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player) {
+		if (target instanceof ArmorStand || target.isInvulnerable()) {
+			return;
+		}
+
 		int inferno = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.INFERNO);
 		if (inferno > 0) {
 			Inferno.apply(plugin, player, inferno, target, fireTicks);
