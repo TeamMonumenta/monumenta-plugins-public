@@ -101,7 +101,6 @@ public class PassiveVoidRift extends Spell {
 					}
 
 					for (Location loc : locs) {
-						world.playSound(loc, Sound.UI_TOAST_IN, 1, 2);
 						world.spawnParticle(Particle.BLOCK_DUST, loc, 10, 2, 0.1, 2, 0.25, Material.BONE_BLOCK.createBlockData());
 						world.spawnParticle(Particle.LAVA, loc, 5, 2, 0.1, 2, 0.25);
 
