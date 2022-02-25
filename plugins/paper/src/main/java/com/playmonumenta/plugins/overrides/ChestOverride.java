@@ -85,7 +85,7 @@ public class ChestOverride extends BaseOverride {
 			}
 		}
 
-		if (player != null && !player.getGameMode().equals(GameMode.SPECTATOR) && !command_chest(block)) {
+		if (player != null && !player.getGameMode().equals(GameMode.SPECTATOR) && !event.isCancelled() && !command_chest(block)) {
 			return false;
 		}
 
@@ -117,7 +117,7 @@ public class ChestOverride extends BaseOverride {
 	/* Chests placed on barriers can not be broken */
 	@Override
 	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block, BlockBreakEvent event) {
-		if (!command_chest(block)) {
+		if (!event.isCancelled() && !command_chest(block)) {
 			return false;
 		} else if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
