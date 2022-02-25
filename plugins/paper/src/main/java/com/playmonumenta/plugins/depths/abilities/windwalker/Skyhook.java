@@ -97,7 +97,6 @@ public class Skyhook extends DepthsAbility {
 			arrow.setPierceLevel(0);
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
 			arrow.setMetadata(SKYHOOK_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
 
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);

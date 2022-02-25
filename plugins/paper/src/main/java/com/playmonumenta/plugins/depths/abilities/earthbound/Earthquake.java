@@ -127,7 +127,6 @@ public class Earthquake extends DepthsAbility {
 			arrow.setPierceLevel(0);
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
 
 			mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 
