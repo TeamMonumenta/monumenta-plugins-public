@@ -146,6 +146,9 @@ public class PEBCustomInventory extends CustomInventory {
 		PEB_ITEMS.add(new PebItem(3, 29, "Rocket Jump",
 				"Click to enable or disable Rocket Jump", ChatColor.LIGHT_PURPLE,
 				Material.FIREWORK_ROCKET, "page 31", false));
+		PEB_ITEMS.add(new PebItem(3, 33, "Block Interactions",
+				"Click to disable or enable interactions with blocks (looms, crafting tables, beds, etc.)", ChatColor.LIGHT_PURPLE,
+				Material.LOOM, "blockinteractions", false));
 		PEB_ITEMS.add(new PebItem(3, 37, "Death Sort",
 				"Click to toggle death sorting, which attempts to return items dropped on death to the slot they were in prior to death.", ChatColor.LIGHT_PURPLE,
 				Material.CHEST, "clickable peb_toggle_dso", false));
@@ -399,7 +402,8 @@ public class PEBCustomInventory extends CustomInventory {
 				       command.equals("virtualfirmament") ||
 				       command.startsWith("glowing") ||
 				       command.startsWith("disabledrop") ||
-				       command.startsWith("playerstats");
+				       command.startsWith("playerstats") ||
+				       command.equals("blockinteractions");
 	}
 
 	public void runInternalCommand(Player player, PebItem item) {
