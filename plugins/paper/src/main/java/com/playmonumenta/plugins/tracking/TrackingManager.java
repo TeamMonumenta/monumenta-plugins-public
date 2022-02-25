@@ -17,7 +17,7 @@ import org.bukkit.scoreboard.Team;
 import java.util.List;
 
 public final class TrackingManager {
-	private static final String UNPUSHABLE_TEAM = "UNPUSHABLE_TEAM";
+	public static final String UNPUSHABLE_TEAM = "UNPUSHABLE_TEAM";
 	private static final String UNPUSHABLE_TAG = "UNPUSHABLE";
 	private static final String PUSHABLE_TAG = "PUSHABLE";
 

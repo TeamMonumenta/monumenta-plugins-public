@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -162,7 +163,8 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 	private List<PacketContainer> getSpawnLinesPackets(Player targetPlayer, PlayerMetadata metadata, int startLine) {
 		List<PacketContainer> result = new ArrayList<>();
 		int lastEntity = startLine == 0 ? targetPlayer.getEntityId() : metadata.mLines.get(startLine - 1).mArmorStand.mId;
-		for (LineMetadata line : metadata.mLines.subList(startLine, metadata.mLines.size())) {
+		List<LineMetadata> linesToSend = metadata.mLines.subList(startLine, metadata.mLines.size());
+		for (LineMetadata line : linesToSend) {
 			// spawn armor stand
 			// doc: https://wiki.vg/Protocol#Spawn_Living_Entity
 			{
@@ -197,7 +199,6 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 				packet.getWatchableCollectionModifier().write(0, line.mArmorStand.mDataWatcher.getWatchableObjects()); // data watcher objects
 				result.add(packet);
 			}
-
 			// set spacing entity metadata
 			{
 				PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
@@ -223,6 +224,18 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 			}
 			lastEntity = line.mArmorStand.mId;
 		}
+
+		// assign spacing entities to the unpushable team to not make them push players around
+		// doc: https://wiki.vg/Protocol#Teams
+		{
+			PacketContainer packet = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
+			packet.getStrings().write(0, TrackingManager.UNPUSHABLE_TEAM); // team name
+			packet.getIntegers().write(0, 3); // mode 3: add entity to team
+			packet.getModifier().withType(Collection.class)
+				.write(0, new ArrayList<>(linesToSend.stream().map(line -> line.mSpacingEntity.mUuid.toString()).toList())); // entity UUIDs
+			result.add(packet);
+		}
+
 		return result;
 	}
 
