@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.events.DamageEvent;
-
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -87,8 +87,14 @@ public class BossUtils {
 				damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			}
 			ItemUtils.damageShield(player, durability);
+			if (Shielding.doesShieldingApply(player, damager)) {
+				Shielding.disable(player);
+			}
 		} else {
 			DamageUtils.damage(damager, damagee, new DamageEvent.Metadata(type, null), damage, bypassIFrames, causeKnockback, false, cause);
+			if (damagee instanceof Player player && Shielding.doesShieldingApply(player, damager)) {
+				Shielding.disable(player);
+			}
 		}
 	}
 
@@ -173,6 +179,10 @@ public class BossUtils {
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				ItemUtils.damageShield(player, (int)(percentHealth * 20 / 2.5));
 			}
+
+			if (Shielding.doesShieldingApply(player, boss)) {
+				Shielding.disable(player);
+			}
 		} else {
 			double absorp = AbsorptionUtils.getAbsorption(target);
 			double adjustedHealth = (target.getHealth() + absorp) - toTake;
@@ -218,6 +228,10 @@ public class BossUtils {
 					target.setNoDamageTicks(target.getMaximumNoDamageTicks());
 					target.setLastDamage(originalDamage);
 				}
+			}
+
+			if (target instanceof Player player && Shielding.doesShieldingApply(player, boss)) {
+				Shielding.disable(player);
 			}
 		}
 

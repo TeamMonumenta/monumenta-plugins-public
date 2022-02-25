@@ -6,17 +6,17 @@ import com.playmonumenta.plugins.effects.OnHitTimerEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.util.NavigableSet;
 
 public class Tempo implements Enchantment {
 
 	private static final double AGIL_BONUS_PER_LEVEL = 0.2;
-	private static final int PAST_HIT_DURATION_TIME = 20 * 5;
+	private static final int PAST_HIT_DURATION_TIME = 20 * 4;
 	private static final String TEMPO_EFFECT_NAME = "TempoEffect";
 
 	@Override
