@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsRoom.RoomDirection;
+import com.playmonumenta.structures.StructuresAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -10,8 +12,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -249,7 +251,7 @@ public class DepthsRoomRepository {
 		party.setRoomX(spawn.getBlockX());
 
 		Plugin.getInstance().getLogger().info("Summoning structure " + room.mLoadPath);
-		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure \"" + room.mLoadPath + "\" " + spawn.getX() + " " + spawn.getY() + " " + spawn.getZ() + " true");
+		StructuresAPI.loadAndPasteStructure(room.mLoadPath, spawn, true);
 		return room;
 	}
 
@@ -368,26 +370,39 @@ public class DepthsRoomRepository {
 
 		//Separate rooms by floor here
 		int nextFloorNum = party.getFloor() + 1;
+		String path;
 		if (nextFloorNum > CUSTOM_FLOOR_LOBBIES) {
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure \"depths/f11lobby\" " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " false");
+			path = "depths/f11lobby";
 		} else {
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure \"depths/f" + nextFloorNum + "lobby\" " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " false");
+			path = "depths/f" + nextFloorNum + "lobby";
 		}
 
-		//Tp all the players to it
-		for (DepthsPlayer dp : party.mPlayersInParty) {
+		StructuresAPI.loadAndPasteStructure(path, loc, true).whenComplete((unused, ex) -> {
+			if (ex != null) {
+				ex.printStackTrace();
+				for (DepthsPlayer dp : party.mPlayersInParty) {
+					Player p = Bukkit.getPlayer(dp.mPlayerId);
+					if (p != null) {
+						p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + ChatColor.RED + "Failed to load lobby structure " + path + ". Contact a moderator.");
+					}
+				}
+			} else {
+				//Tp all the players to it
+				for (DepthsPlayer dp : party.mPlayersInParty) {
 
-			Player p = Bukkit.getPlayer(dp.mPlayerId);
-			if (p != null) {
-				Location l = new Location(world, party.mFloorLobbyLoadPlayerTpPoint.getX(), party.mFloorLobbyLoadPlayerTpPoint.getY(), party.mFloorLobbyLoadPlayerTpPoint.getZ());
-				l.setYaw(270f);
-				p.teleport(l);
-				p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Your party earned " + treasure + " treasure score for clearing floor " + party.getFloor() + "! Sending your party to next floor.");
+					Player p = Bukkit.getPlayer(dp.mPlayerId);
+					if (p != null) {
+						Location l = new Location(world, party.mFloorLobbyLoadPlayerTpPoint.getX(), party.mFloorLobbyLoadPlayerTpPoint.getY(), party.mFloorLobbyLoadPlayerTpPoint.getZ());
+						l.setYaw(270f);
+						p.teleport(l);
+						p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Your party earned " + treasure + " treasure score for clearing floor " + party.getFloor() + "! Sending your party to next floor.");
+					}
+				}
+				//Reset used rooms
+				party.mOldRooms.clear();
+				//Just in case they get stuck, set the spawner break trigger to zero
+				party.mSpawnersToBreak = 0;
 			}
-		}
-		//Reset used rooms
-		party.mOldRooms.clear();
-		//Just in case they get stuck, set the spawner break trigger to zero
-		party.mSpawnersToBreak = 0;
+		});
 	}
 }
