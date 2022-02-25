@@ -1,11 +1,15 @@
 package com.playmonumenta.plugins.bosses.spells.falsespirit;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -21,16 +25,10 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 public class SpellMultiEarthshake extends Spell {
 
@@ -79,7 +77,6 @@ public class SpellMultiEarthshake extends Spell {
 	@Override
 	public void run() {
 		List<Player> targets = PlayerUtils.playersInRange(mSpawnLoc, 40, false);
-		targets.removeIf(p -> p.getGameMode() == GameMode.SPECTATOR);
 		List<Location> locs = new ArrayList<>(targets.size());
 
 		for (Player target : targets) {

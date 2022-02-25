@@ -166,8 +166,8 @@ public class ElementalSpiritIce extends Ability {
 				public void run() {
 					if (
 						isTimerActive()
-						|| !mPlayer.isValid() // Ensure player is not dead, is still online?
-						|| PremiumVanishIntegration.isInvisible(mPlayer)
+							|| !mPlayer.isValid() // Ensure player is not dead, is still online?
+							|| PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)
 					) {
 						this.cancel();
 						mPlayerParticlesGenerator = null;

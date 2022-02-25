@@ -460,9 +460,9 @@ public class AbilityManager {
 		}
 		// This zooms the player's screen obnoxiously, so try not to do it if it's not needed
 		if (movementSpeed != null
-			&& movementSpeed.getValue() != 0.1
-			&& !player.getGameMode().equals(GameMode.CREATIVE)
-			&& !player.getGameMode().equals(GameMode.SPECTATOR)) {
+			    && movementSpeed.getValue() != 0.1
+			    && !player.getGameMode().equals(GameMode.CREATIVE)
+			    && !player.getGameMode().equals(GameMode.SPECTATOR)) {
 			movementSpeed.setBaseValue(0.1);
 		}
 

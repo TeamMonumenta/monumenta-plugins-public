@@ -94,9 +94,9 @@ import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -106,7 +106,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -373,9 +372,6 @@ public class DepthsManager {
 		List<DepthsPlayer> depthsPlayers = new ArrayList<>();
 		DepthsParty partyToAdd = null;
 		for (Player p : nearbyPlayers) {
-			if (p.getGameMode() == GameMode.SPECTATOR) {
-				continue;
-			}
 			if (mPlayers.get(p.getUniqueId()) == null) {
 				DepthsPlayer dp = new DepthsPlayer(p);
 				mPlayers.put(p.getUniqueId(), dp);

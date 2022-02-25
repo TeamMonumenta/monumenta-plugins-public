@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -20,7 +21,6 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,16 +71,12 @@ public class PlayerUtils {
 
 	public static List<Player> otherPlayersInRange(Player player, double radius, boolean includeNonTargetable) {
 		List<Player> players = playersInRange(player.getLocation(), radius, includeNonTargetable);
-		players.removeIf(p -> (p == player));
+		players.remove(player);
 		return players;
 	}
 
 	public static boolean isCursed(Plugin plugin, Player p) {
-		NavigableSet<Effect> cursed = plugin.mEffectManager.getEffects(p, "CurseEffect");
-		if (cursed != null) {
-			return true;
-		}
-		return false;
+		return plugin.mEffectManager.hasEffect(p, "CurseEffect");
 	}
 
 	public static void removeCursed(Plugin plugin, Player p) {
@@ -263,7 +259,7 @@ public class PlayerUtils {
 	}
 
 	public static boolean checkPlayer(Player player) {
-		return player.isValid() && !GameMode.SPECTATOR.equals(player.getGameMode());
+		return player.isValid() && player.getGameMode() != GameMode.SPECTATOR;
 	}
 
 	/*

@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -34,8 +35,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import javax.annotation.Nullable;
 
 
 
@@ -85,7 +84,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			return;
 		}
 		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, CAST_RANGE, true, true, true);
-		if ((e instanceof Player ePlayer && ePlayer.getGameMode() != GameMode.SPECTATOR) || EntityUtils.isHostileMob(e)) {
+		if (e instanceof Player || EntityUtils.isHostileMob(e)) {
 			Player player = mPlayer;
 
 			PlayerInventory inventory = mPlayer.getInventory();
@@ -131,7 +130,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 								}
 							}
 						}
-						if ((applyE instanceof Player pe && pe.getGameMode() != GameMode.SPECTATOR)) {
+						if (applyE instanceof Player pe && pe.getGameMode() != GameMode.SPECTATOR) {
 							if (mMode == 2) {
 								incrementCharge();
 								this.cancel();

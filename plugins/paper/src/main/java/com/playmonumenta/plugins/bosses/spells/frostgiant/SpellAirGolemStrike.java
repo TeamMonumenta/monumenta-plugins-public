@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -64,7 +63,7 @@ public class SpellAirGolemStrike extends Spell {
 		int count = 0;
 		//List is farthest players in the beginning, and nearest players at the end
 		List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), FrostGiant.detectionRange);
-		players.removeIf(p -> p.getGameMode() == GameMode.SPECTATOR || mStartLoc.distance(p.getLocation()) > FrostGiant.fighterRange);
+		players.removeIf(p -> mStartLoc.distance(p.getLocation()) > FrostGiant.fighterRange);
 		if (players.size() < 3) {
 			count = 1;
 		} else if (players.size() == 3) {

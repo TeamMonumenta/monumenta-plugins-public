@@ -43,7 +43,7 @@ public class Barking implements Infusion {
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		if (value > 1 && plugin.mItemStatManager.getInfusionLevel(player, InfusionType.DEBARKING) == 0) {
-			if (PremiumVanishIntegration.isInvisible(player)) {
+			if (PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
 				return;
 			}
 

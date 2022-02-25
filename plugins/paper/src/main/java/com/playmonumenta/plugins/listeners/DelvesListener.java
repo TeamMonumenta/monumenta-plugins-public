@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.DelveModifierSelectionGUI;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-
+import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -23,7 +23,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.BoundingBox;
-import javax.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -133,10 +132,9 @@ public class DelvesListener implements Listener {
 		BoundingBox box = new BoundingBox(xRegionMin, 0, zRegionMin, xRegionMin + 512, 256, zRegionMin + 512);
 
 		for (Player player : loc.getWorld().getPlayers()) {
-			if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
-				if (box.contains(player.getLocation().toVector())) {
-					return player;
-				}
+			if (player.getGameMode() != GameMode.SPECTATOR
+				    && box.contains(player.getLocation().toVector())) {
+				return player;
 			}
 		}
 

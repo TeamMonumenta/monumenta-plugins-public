@@ -1,18 +1,11 @@
 package com.playmonumenta.plugins.parrots;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
@@ -26,7 +19,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class ParrotManager implements Listener {
 
@@ -152,7 +151,7 @@ public class ParrotManager implements Listener {
 				for (int i = 0; i < 10 && mPlayers.hasNext(); i++) {
 					Player player = mPlayers.next();
 					// Flying players lose parrots almost instantly, causing flickering, so don't update parrots for them. They'll get their parrots back once they land.
-					if (player.isValid() && !player.isFlying() && player.getGameMode() != GameMode.SPECTATOR) {
+					if (player.isValid() && !player.isFlying() && !PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
 						respawnParrots(player);
 					}
 				}

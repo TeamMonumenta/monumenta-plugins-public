@@ -27,7 +27,7 @@ public class DamageUtils {
 	}
 
 	/**
-	 * Checks if an entity is immune to all damage. Current causes of dammage immunnity are:
+	 * Checks if an entity is immune to all damage. Current causes of damage immunity are:
 	 * <ul>
 	 *     <li>Being invulnerable according to {@link LivingEntity#isInvulnerable()}
 	 *     <li>Having resistance 5+

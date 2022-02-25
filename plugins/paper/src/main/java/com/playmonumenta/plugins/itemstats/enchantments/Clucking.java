@@ -36,7 +36,7 @@ public class Clucking implements Enchantment {
 
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
-		if (PremiumVanishIntegration.isInvisible(player)) {
+		if (PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
 			return;
 		}
 

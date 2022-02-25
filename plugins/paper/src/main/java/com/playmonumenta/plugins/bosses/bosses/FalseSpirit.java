@@ -22,7 +22,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import org.bukkit.Color;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -276,7 +275,6 @@ public final class FalseSpirit extends BossAbilityGroup {
 
 				//Damage players below the arena
 				List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-				players.removeIf(p -> p.getGameMode() == GameMode.SPECTATOR);
 				for (Player p : players) {
 					if (p.getLocation().getY() <= 3 && mGroundMats.contains(p.getLocation().add(0, -1, 0).getBlock().getType())) {
 						Vector vel = p.getVelocity();

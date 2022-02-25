@@ -4,11 +4,11 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -57,9 +57,9 @@ public class SpellTargetVisiblePlayer extends Spell {
 			return;
 		}
 
-		// Forget about this target if they leave the game or switch to spectator or are invisible
+		// Forget about this target if they die, leave the game, switch to spectator, or are invisible
 		if (mLastTarget != null) {
-			if (!mLastTarget.isOnline() || mLastTarget.getGameMode().equals(GameMode.SPECTATOR) || AbilityUtils.isStealthed(mLastTarget)) {
+			if (!mLastTarget.isValid() || mLastTarget.getGameMode() == GameMode.SPECTATOR || AbilityUtils.isStealthed(mLastTarget)) {
 				mLastTarget = null;
 				mBoss.setTarget(null);
 				mCooldownRemaining = 0;

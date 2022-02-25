@@ -30,6 +30,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -67,7 +68,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -356,10 +356,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 								//List is farthest players in the beginning, and nearest players at the end
 								List<Player> players = EntityUtils.getNearestPlayers(mStartLoc, detectionRange);
-								if (players == null || players.size() < 0) {
-									return;
-								}
-								players.removeIf(p -> p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR || p.getScoreboardTags().contains("disable_class"));
+								players.removeIf(p -> p.getGameMode() == GameMode.CREATIVE || p.getScoreboardTags().contains("disable_class"));
 								for (Player player : players) {
 									if (mTargeted == null || !player.getUniqueId().equals(mTargeted.getUniqueId())) {
 										c.setTarget(player);

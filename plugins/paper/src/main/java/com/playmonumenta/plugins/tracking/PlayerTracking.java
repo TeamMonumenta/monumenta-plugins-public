@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,7 +19,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import javax.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -138,13 +138,6 @@ public class PlayerTracking implements EntityTracking {
 				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.MASK_JUMP_BOOST)) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_JUMP_MASK_EFFECT);
 				}
-			}
-
-			// Extra Effects
-			try {
-				inventory.tick(mPlugin, player);
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 
 			try {
