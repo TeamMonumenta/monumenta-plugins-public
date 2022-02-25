@@ -32,7 +32,7 @@ public class CurseOfCrippling implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (source == null || event.getType() != DamageEvent.DamageType.MELEE) {
+		if (source == null || event.getType() != DamageEvent.DamageType.MELEE || event.getDamage() <= 0) {
 			return;
 		}
 		plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, PERCENT_SPEED, PERCENT_SPEED_EFFECT_NAME));
