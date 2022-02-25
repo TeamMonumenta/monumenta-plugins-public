@@ -106,7 +106,7 @@ public class Quake implements Enchantment {
 				player.getWorld().spawnParticle(Particle.SQUID_INK, target.getLocation(), 25, 1.5, 1.5, 1.5);
 			}
 			if (bleed > 0) {
-				player.playSound(player.getLocation(), Sound.BLOCK_SLIME_BLOCK_BREAK, 0.7f, 1.0f);
+				player.playSound(player.getLocation(), Sound.BLOCK_SLIME_BLOCK_BREAK, 1f, 0.8f);
 				player.getWorld().spawnParticle(Particle.REDSTONE, target.getLocation(), 25, 1.5, 1.5, 1.5, BLEED_COLOR);
 			}
 		}
