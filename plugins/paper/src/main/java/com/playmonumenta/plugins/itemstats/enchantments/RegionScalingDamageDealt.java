@@ -43,11 +43,13 @@ public class RegionScalingDamageDealt implements Enchantment {
 
 	@Override
 	public void onEquipmentUpdate(Plugin plugin, Player player) {
-		if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.REGION_SCALING_DAMAGE_DEALT) > 0) {
-			mFatiguePlayers.add(player.getUniqueId());
-			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 10000000, 0, false, false));
-		} else if (mFatiguePlayers.remove(player.getUniqueId())) {
-			plugin.mPotionManager.removePotion(player, PotionManager.PotionID.ITEM, PotionEffectType.SLOW_DIGGING);
+		if (!ServerProperties.getClassSpecializationsEnabled()) {
+			if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.REGION_SCALING_DAMAGE_DEALT) > 0) {
+				mFatiguePlayers.add(player.getUniqueId());
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 10000000, 0, false, false));
+			} else if (mFatiguePlayers.remove(player.getUniqueId())) {
+				plugin.mPotionManager.removePotion(player, PotionManager.PotionID.ITEM, PotionEffectType.SLOW_DIGGING);
+			}
 		}
 	}
 }
