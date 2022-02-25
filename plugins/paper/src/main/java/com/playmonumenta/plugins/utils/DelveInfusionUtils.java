@@ -26,8 +26,7 @@ public class DelveInfusionUtils {
 	public static final int MAX_LEVEL = 4;
 	public static final int[] MAT_DEPTHS_COST_PER_INFUSION = {2, 4, 8, 16};
 	public static final int[] MAT_COST_PER_INFUSION = {3, 6, 12, 24};
-	public static final int[] XP_COST_PER_LEVEL = {2920, 5345, 8670, 12895};
-													//40, 50, 60, 70
+	public static final int[] XP_COST_PER_LEVEL = {ExperienceUtils.LEVEL_40, ExperienceUtils.LEVEL_50, ExperienceUtils.LEVEL_60, ExperienceUtils.LEVEL_70};
 
 	/**When set to true the refund function will return all the XP used for the infusion, when false only the 50% */
 	public static final boolean FULL_REFUND = true;
@@ -140,11 +139,11 @@ public class DelveInfusionUtils {
 			mats.clear();
 		}
 
-		AuditListener.log("Delve infusion refund - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "' level=" + auditLevel + " mats=" + matStr);
+		AuditListener.log("Delve infusion refund - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "' level=" + auditLevel + "' stack size=" + item.getAmount() + " mats=" + matStr);
 
 		int xp = ExperienceUtils.getTotalExperience(player);
 		for (int i = 0; i <= levelXp; i++) {
-			xp += FULL_REFUND ? XP_COST_PER_LEVEL[i] : XP_COST_PER_LEVEL[i] / 2;
+			xp += (FULL_REFUND ? XP_COST_PER_LEVEL[i] : XP_COST_PER_LEVEL[i] / 2) * item.getAmount();
 		}
 		ExperienceUtils.setTotalExperience(player, xp);
 	}
@@ -238,12 +237,12 @@ public class DelveInfusionUtils {
 
 		//Get delve mat loot table
 		ItemStack delveMats = InventoryUtils.getItemFromLootTable(p, selection.mLootTable).clone();
-		delveMats.setAmount(MAT_COST_PER_INFUSION[level]);
+		delveMats.setAmount(MAT_COST_PER_INFUSION[level] * item.getAmount());
 		cost.add(delveMats);
 
 		//Get depth mat loot table
 		ItemStack depthMats = InventoryUtils.getItemFromLootTable(p, DEPTHS_MAT_LOOT_TABLE).clone();
-		depthMats.setAmount(MAT_DEPTHS_COST_PER_INFUSION[level]);
+		depthMats.setAmount(MAT_DEPTHS_COST_PER_INFUSION[level] * item.getAmount());
 		cost.add(depthMats);
 		return cost;
 	}

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -14,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
@@ -38,25 +38,25 @@ public class ReworkRefundInfusions extends GenericCommand {
 		DelveInfusionUtils.refundInfusion(item, player);
 		// Boss Enchants
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.HOPE) > 0) {
-			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/hyper_experience"), 3);
-			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r1/kaul/crownshard"), 9);
+			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/hyper_experience"), 3 * item.getAmount());
+			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r1/kaul/crownshard"), 9 * item.getAmount());
 			ItemStatUtils.removeInfusion(item, InfusionType.HOPE, false);
 		}
 
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.PHYLACTERY) > 0) {
-			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"), 2);
-			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/lich/materials/ancestral_effigy"), 6);
+			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"), 2 * item.getAmount());
+			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/lich/materials/ancestral_effigy"), 6 * item.getAmount());
 			ItemStatUtils.removeInfusion(item, InfusionType.PHYLACTERY, false);
 		}
 
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.COLOSSAL) > 0) {
-			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"), 3);
-			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/eldrask/materials/epic_material"), 9);
+			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"), 3 * item.getAmount());
+			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r2/eldrask/materials/epic_material"), 9 * item.getAmount());
 			ItemStatUtils.removeInfusion(item, InfusionType.COLOSSAL, false);
 		}
 		// Locked
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.LOCKED) > 0) {
-			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/hyper_experience"), 3);
+			giveMaterials(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/hyper_experience"), 3 * item.getAmount());
 			ItemStatUtils.removeInfusion(item, InfusionType.LOCKED, false);
 		}
 		ItemStatUtils.generateItemStats(player.getInventory().getItemInMainHand());
@@ -74,8 +74,8 @@ public class ReworkRefundInfusions extends GenericCommand {
 			Collection<ItemStack> items = lt.populateLoot(FastUtils.RANDOM, context);
 			if (items.size() > 0) {
 				ItemStack materials = items.iterator().next();
-				Item eItem = player.getWorld().dropItemNaturally(player.getLocation(), materials.add(refundMaterials - 1));
-				eItem.setPickupDelay(0);
+				materials.setAmount(refundMaterials);
+				InventoryUtils.giveItem(player, materials);
 				return;
 			}
 		}

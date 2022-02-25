@@ -80,7 +80,7 @@ public class PickLevelAfterAnvils extends GenericCommand {
 								LootTable anvilTable = Bukkit.getLootTable(ANVILTABLE);
 								Collection<ItemStack> anvilLoot = anvilTable.populateLoot(FastUtils.RANDOM, context);
 								int currentXp = ExperienceUtils.getTotalExperience(player);
-								int currentAnvilCount = (int) Math.floor((currentXp - ExperienceUtils.getTotalExperience(finalInputVal)) / ExperienceUtils.getTotalExperience(30));
+								int currentAnvilCount = (currentXp - ExperienceUtils.getTotalExperience(finalInputVal)) / ExperienceUtils.LEVEL_30;
 								if (currentAnvilCount <= 0) {
 									player.sendMessage("The levels between your current level and the requested level will not be enough to create an anvil.");
 									return;
