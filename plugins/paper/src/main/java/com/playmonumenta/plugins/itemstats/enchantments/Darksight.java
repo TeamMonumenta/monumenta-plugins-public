@@ -8,12 +8,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.UUID;
 
 public class Darksight implements Enchantment {
 
-	private static List<Player> mDarksightPlayers = new ArrayList<>();
+	private static HashSet<UUID> mDarksightPlayers = new HashSet<>();
 	private static final String DARKSIGHT_DISABLED_TAG = "DarksightDisabled";
 
 	@Override
@@ -29,9 +29,9 @@ public class Darksight implements Enchantment {
 	@Override
 	public void onEquipmentUpdate(Plugin plugin, Player player) {
 		if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.DARKSIGHT) > 0 && !player.getScoreboardTags().contains(DARKSIGHT_DISABLED_TAG)) {
-			mDarksightPlayers.add(player);
+			mDarksightPlayers.add(player.getUniqueId());
 			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.NIGHT_VISION, 10000000, 0, true, false));
-		} else if (mDarksightPlayers.remove(player)) {
+		} else if (mDarksightPlayers.remove(player.getUniqueId())) {
 			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.NIGHT_VISION);
 		}
 	}
