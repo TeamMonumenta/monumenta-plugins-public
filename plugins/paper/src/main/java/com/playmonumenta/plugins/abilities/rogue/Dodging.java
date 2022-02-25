@@ -107,6 +107,9 @@ public class Dodging extends Ability {
 		if (proj.getShooter() instanceof Player) {
 			return true;
 		}
+		if (mPlayer.getActiveItem() != null && mPlayer.getActiveItem().getType() == Material.SHIELD) {
+			return true;
+		}
 		if (!dodge()) {
 			return true;
 		}
