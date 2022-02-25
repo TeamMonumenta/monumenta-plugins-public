@@ -84,6 +84,7 @@ public class DepthsRoomRepository {
 		mF1NormalRooms.add(new DepthsRoom("depths/f1r45", DepthsRoomType.ABILITY, new Vector(49, 37, 52), new Vector(1.0, -6.0, -29.0), 11, RoomDirection.UP));
 		mF1NormalRooms.add(new DepthsRoom("depths/f1r46", DepthsRoomType.ABILITY, new Vector(51, 56, 32), new Vector(1.0, -9.0, -14.0), 15, RoomDirection.UP));
 		mF1NormalRooms.add(new DepthsRoom("depths/f1r47", DepthsRoomType.ABILITY, new Vector(45, 52, 55), new Vector(1.0, -33.0, -27.0), 11, RoomDirection.DOWN));
+		mF1NormalRooms.add(new DepthsRoom("depths/f1r48", DepthsRoomType.ABILITY, new Vector(32, 35, 35), new Vector(1.0, -8.0, -20.0), 12, RoomDirection.UP));
 
 		//F1 elite rooms
 		mF1EliteRooms.add(new DepthsRoom("depths/f1r12", DepthsRoomType.ABILITY, new Vector(40, 41, 40), new Vector(1.0, -2.0, -21.0), 23, RoomDirection.UP));
@@ -140,7 +141,7 @@ public class DepthsRoomRepository {
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r37", DepthsRoomType.ABILITY, new Vector(34, 29, 31), new Vector(1.0, -15.0, -21.0), 14, RoomDirection.DOWN));
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r38", DepthsRoomType.ABILITY, new Vector(47, 54, 42), new Vector(1.0, -36.0, -21.0), 17, RoomDirection.DOWN));
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r40", DepthsRoomType.ABILITY, new Vector(49, 29, 35), new Vector(1.0, -10.0, -13.0), 11, RoomDirection.EVEN));
-		mF2NormalRooms.add(new DepthsRoom("depths/f2r41", DepthsRoomType.ABILITY, new Vector(44, 44, 43), new Vector(1.0, -25.0, -18.0), 14, RoomDirection.DOWN));
+		mF2NormalRooms.add(new DepthsRoom("depths/f2r41", DepthsRoomType.ABILITY, new Vector(44, 44, 43), new Vector(1.0, -26.0, -18.0), 14, RoomDirection.DOWN));
 
 		//F2 elite rooms
 		mF2EliteRooms.add(new DepthsRoom("depths/f2r1", DepthsRoomType.ABILITY, new Vector(32, 33, 35), new Vector(1.0, -3.0, -18.0), 20, RoomDirection.UP));
@@ -159,6 +160,7 @@ public class DepthsRoomRepository {
 		mF2EliteRooms.add(new DepthsRoom("depths/f2r39", DepthsRoomType.ABILITY, new Vector(56, 45, 60), new Vector(1.0, -20.0, -29.0), 20, RoomDirection.DOWN));
 		mF2EliteRooms.add(new DepthsRoom("depths/f2r42", DepthsRoomType.ABILITY, new Vector(52, 38, 71), new Vector(1.0, -29.0, -4.0), 17, RoomDirection.DOWN));
 		mF2EliteRooms.add(new DepthsRoom("depths/f2r43", DepthsRoomType.ABILITY, new Vector(51, 50, 70), new Vector(1.0, -38.0, -8.0), 18, RoomDirection.DOWN));
+		mF2EliteRooms.add(new DepthsRoom("depths/f2r44", DepthsRoomType.ABILITY, new Vector(46, 55, 65), new Vector(1.0, -40.0, -13.0), 27, RoomDirection.DOWN));
 
 		//F2 twisted rooms
 		mF2TwistedRooms.add(new DepthsRoom("depths/f2r33", DepthsRoomType.TWISTED, new Vector(57, 58, 57), new Vector(1.0, -25.0, -48.0), 51, RoomDirection.EVEN));
@@ -188,6 +190,7 @@ public class DepthsRoomRepository {
 		mF3NormalRooms.add(new DepthsRoom("depths/f3r38", DepthsRoomType.ABILITY, new Vector(39, 21, 29), new Vector(1.0, -6.0, -19.0), 6, RoomDirection.DOWN));
 		mF3NormalRooms.add(new DepthsRoom("depths/f3r39", DepthsRoomType.ABILITY, new Vector(34, 59, 33), new Vector(1.0, -6.0, -16.0), 13, RoomDirection.UP));
 		mF3NormalRooms.add(new DepthsRoom("depths/f3r40", DepthsRoomType.ABILITY, new Vector(60, 34, 47), new Vector(1.0, -6.0, -26.0), 14, RoomDirection.EVEN));
+		mF3NormalRooms.add(new DepthsRoom("depths/f3r41", DepthsRoomType.ABILITY, new Vector(34, 26, 42), new Vector(1.0, -2.0, -27.0), 14, RoomDirection.UP));
 
 		//F3 elite rooms
 		mF3EliteRooms.add(new DepthsRoom("depths/f3r5", DepthsRoomType.ABILITY, new Vector(39, 40, 40), new Vector(1.0, -5.0, -19.0), 28, RoomDirection.UP));
