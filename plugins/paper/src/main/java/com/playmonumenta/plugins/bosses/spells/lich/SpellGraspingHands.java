@@ -162,14 +162,15 @@ public class SpellGraspingHands extends Spell {
 									for (LivingEntity e : mobs) {
 										if (!(e.getType() == EntityType.PLAYER) && !e.isDead()) {
 											double maxHealth = EntityUtils.getMaxHealth(e);
-											double restore = e.getHealth() + maxHealth * 0.005 + 3;
+											double restore = maxHealth * 0.005 + 3;
 											if (restore >= mHealCap) {
 												restore = mHealCap;
 											}
-											if (restore >= maxHealth) {
+											double newHealth = e.getHealth() + restore;
+											if (newHealth >= maxHealth) {
 												e.setHealth(maxHealth);
 											} else {
-												e.setHealth(restore);
+												e.setHealth(newHealth);
 											}
 										}
 									}
