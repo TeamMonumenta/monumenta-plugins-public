@@ -16,15 +16,14 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -94,15 +93,10 @@ public class WindWalk extends MultipleChargeAbility {
 
 		new BukkitRunnable() {
 			final List<LivingEntity> mMobsNotHit = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 32);
+			boolean mTickOne = true;
 			@Override
 			public void run() {
-				if (mPlayer.isOnGround() || mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
-					this.cancel();
-					return;
-				}
-
-				Material block = mPlayer.getLocation().getBlock().getType();
-				if (block == Material.WATER || block == Material.LAVA || block == Material.LADDER) {
+				if (mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
 					this.cancel();
 					return;
 				}
@@ -137,6 +131,13 @@ public class WindWalk extends MultipleChargeAbility {
 						iter.remove();
 					}
 				}
+
+				Material block = mPlayer.getLocation().getBlock().getType();
+				if (!mTickOne && (mPlayer.isOnGround() || block == Material.WATER || block == Material.LAVA || block == Material.LADDER)) {
+					this.cancel();
+					return;
+				}
+				mTickOne = true;
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
