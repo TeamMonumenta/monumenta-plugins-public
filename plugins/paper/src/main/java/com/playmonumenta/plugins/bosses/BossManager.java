@@ -1,14 +1,42 @@
 package com.playmonumenta.plugins.bosses;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Level;
-
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.*;
+import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
+import com.playmonumenta.plugins.bosses.bosses.gray.GrayBookSummoner;
+import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
+import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
+import com.playmonumenta.plugins.bosses.bosses.gray.GrayScarabSummoner;
+import com.playmonumenta.plugins.bosses.bosses.gray.GraySummoned;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichAlchBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichClericBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichConquestBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichCurseBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichDemiseBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichJudgementBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichKeyGlowBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichMageBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichRogueBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichScoutBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichShieldBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichStrifeBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichWarlockBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichWarriorBoss;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.depths.bosses.Davey;
+import com.playmonumenta.plugins.depths.bosses.Hedera;
+import com.playmonumenta.plugins.depths.bosses.Nucleus;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.parrots.RainbowParrot;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -46,46 +74,16 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
+
 import javax.annotation.Nullable;
-
-import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.*;
-import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
-import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
-import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
-import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
-import com.playmonumenta.plugins.bosses.bosses.gray.GrayBookSummoner;
-import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
-import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
-import com.playmonumenta.plugins.bosses.bosses.gray.GrayScarabSummoner;
-import com.playmonumenta.plugins.bosses.bosses.gray.GraySummoned;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichAlchBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichClericBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichConquestBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichCurseBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichDemiseBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichJudgementBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichKeyGlowBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichMageBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichRogueBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichScoutBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichShieldBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichStrifeBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichWarlockBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichWarriorBoss;
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.depths.bosses.Davey;
-import com.playmonumenta.plugins.depths.bosses.Hedera;
-import com.playmonumenta.plugins.depths.bosses.Nucleus;
-import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.parrots.RainbowParrot;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
-
-import net.kyori.adventure.text.Component;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.logging.Level;
 
 public class BossManager implements Listener {
 
@@ -703,7 +701,7 @@ public class BossManager implements Listener {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends BossAbilityGroup> @Nullable T getBoss(Entity entity, Class<T> cls) {
+	public @Nullable <T extends BossAbilityGroup> T getBoss(Entity entity, Class<T> cls) {
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null) {
 			for (BossAbilityGroup ability : boss.getAbilities()) {

@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -29,6 +28,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -309,13 +309,6 @@ public abstract class BossAbilityGroup {
 	 * Boss was stunned by a player. Mobs with the "Boss" tag can't be stunned
 	 */
 	public void bossStunned() {
-		mActiveSpells.cancelAll();
-	}
-
-	/*
-	 * Boss was confused by a player. Mobs with the "Boss" tag can't be confused
-	 */
-	public void bossConfused() {
 		mActiveSpells.cancelAll();
 	}
 

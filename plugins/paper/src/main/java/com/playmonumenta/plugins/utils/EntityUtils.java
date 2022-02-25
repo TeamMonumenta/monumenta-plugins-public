@@ -897,12 +897,14 @@ public class EntityUtils {
 			startTracker(plugin);
 		}
 
-		if (mob instanceof Mob) {
-			((Mob) mob).setTarget(null);
+		if (mob instanceof Mob m) {
+			m.setTarget(null);
 		}
 
-		/* Fake "event" so bosses can handle being stunned if they need to */
-		BossManager.getInstance().entityStunned(mob);
+		if (MetadataUtils.checkOnceThisTick(plugin, mob, "StunnedThisTick")) {
+			/* Fake "event" so bosses can handle being stunned if they need to */
+			BossManager.getInstance().entityStunned(mob);
+		}
 
 		// Only reduce speed if mob is not already in map. We can avoid storing original speed by just +/- 10.
 		Integer t = STUNNED_MOBS.get(mob);

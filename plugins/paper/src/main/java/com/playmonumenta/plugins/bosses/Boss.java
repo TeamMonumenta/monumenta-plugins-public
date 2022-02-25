@@ -1,10 +1,5 @@
 package com.playmonumenta.plugins.bosses;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
@@ -12,7 +7,6 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -26,7 +20,12 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Boss {
 	private final Plugin mPlugin;
@@ -218,15 +217,6 @@ public class Boss {
 	public void bossStunned() {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossStunned();
-		}
-	}
-
-	/*
-	 * Boss was confused by a player. Mobs with the "Boss" tag can't be confused
-	 */
-	public void bossConfused() {
-		for (BossAbilityGroup ability : mAbilities) {
-			ability.bossConfused();
 		}
 	}
 
