@@ -125,8 +125,8 @@ public final class Grave {
 			mDungeonInstance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess").orElse(0);
 		}
 		mLocation = mPlayer.getLocation().clone();
-		if (mLocation.getY() < 0) {
-			mLocation.setY(0);
+		if (mLocation.getY() < 1) {
+			mLocation.setY(1);
 		}
 		mEquipment = new HashMap<>();
 		mEquipment.put(KEY_EQUIPMENT_HEAD, equipment.get(EquipmentSlot.HEAD));
@@ -155,8 +155,8 @@ public final class Grave {
 		mWorldName = item.mWorldName;
 		mDungeonInstance = item.mDungeonInstance;
 		mLocation = item.mLocation.clone();
-		if (mLocation.getY() < 0) {
-			mLocation.setY(0);
+		if (mLocation.getY() < 1) {
+			mLocation.setY(1);
 		}
 		mEquipment = new HashMap<>();
 		mEquipment.put(KEY_EQUIPMENT_HAND, item.mItem);
