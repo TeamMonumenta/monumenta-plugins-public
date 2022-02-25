@@ -380,9 +380,10 @@ public class ItemUtils {
 
 	// Returns an ItemDeathResult reporting what should happen to an item when the player carrying it dies.
 	public static ItemDeathResult getItemDeathResult(ItemStack item) {
-		if (isItemCurseOfVanishingII(item)) {
+		int vanishingLevel = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_VANISHING);
+		if (vanishingLevel >= 2) {
 			return ItemDeathResult.DESTROY;
-		} else if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
+		} else if (vanishingLevel == 1 || item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
 			return ItemDeathResult.SHATTER_NOW;
 		} else if (ShulkerShortcutListener.isEnderExpansion(item)) {
 			return ItemDeathResult.KEEP;
@@ -629,15 +630,6 @@ public class ItemUtils {
 		meta.setColor(color);
 		potion.setItemMeta(meta);
 		ItemUtils.setPlainName(potion);
-	}
-
-	// TODO: all of these methods are redundant, the sources should just directly use ItemStatUtils
-	public static boolean isItemCurseOfVanishingII(ItemStack item) {
-		if (item != null && item.getType() != Material.AIR) {
-			return ItemStatUtils.getEnchantmentLevel(ItemStatUtils.getEnchantments(new NBTItem(item)), EnchantmentType.CURSE_OF_VANISHING) == 2;
-		}
-
-		return false;
 	}
 
 	public static boolean isShootableItem(ItemStack item) {

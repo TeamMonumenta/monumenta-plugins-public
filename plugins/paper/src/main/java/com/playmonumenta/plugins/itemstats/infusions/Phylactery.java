@@ -4,8 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import com.playmonumenta.worlds.paper.ScoreboardUtils;
-
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;

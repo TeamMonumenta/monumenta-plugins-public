@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.listeners.GraveListener;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -10,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Inventory;
@@ -23,7 +26,6 @@ import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
-import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -302,10 +304,33 @@ public class InventoryUtils {
 		if (canFitInInventory(item, inv)) {
 			inv.addItem(item);
 		} else {
-			final Location ploc = player.getLocation();
-			ploc.getWorld().dropItem(ploc, item);
+			dropTempOwnedItem(item, player.getLocation(), player);
 			player.sendMessage(Component.text("Your inventory is full! Some items were dropped on the ground!", NamedTextColor.RED));
 		}
+	}
+
+	/**
+	 * Drops an item that can only be picked up by the given player for the first 10 secconds, and any player afterwards.
+	 * The item will also count as dropped by the player for graving purposes.
+	 *
+	 * @param item     The item to drop
+	 * @param location Location to drop the item at
+	 * @param player   Player that can immediately pick up the item
+	 * @return The dropped item
+	 */
+	public static Item dropTempOwnedItem(final ItemStack item, Location location, final Player player) {
+		Item droppedItem = location.getWorld().dropItem(location, item);
+		droppedItem.setPickupDelay(0);
+		droppedItem.setCanMobPickup(false);
+		droppedItem.setOwner(player.getUniqueId());
+		droppedItem.setThrower(player.getUniqueId());
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			if (droppedItem.isValid()) {
+				droppedItem.setOwner(null);
+			}
+		}, 200);
+		GraveListener.itemDropped(player, droppedItem);
+		return droppedItem;
 	}
 
 	public static boolean rogueTriggerCheck(Plugin plugin, @Nullable Player player) {
@@ -356,7 +381,7 @@ public class InventoryUtils {
 			if (itemInInventory == null) {
 				return true;
 			} else if (item.isSimilar(itemInInventory)) {
-				remainingCount -= item.getMaxStackSize() - itemInInventory.getAmount();
+				remainingCount -= Math.max(0, item.getMaxStackSize() - itemInInventory.getAmount());
 				if (remainingCount <= 0) {
 					return true;
 				}

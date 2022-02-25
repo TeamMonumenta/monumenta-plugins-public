@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.inventories;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -15,7 +14,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -111,28 +109,18 @@ public class LootChestsInInventory implements Listener {
 	//Drop the items upon closing the inventory
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
-		if (event.getInventory().getHolder() == null && event.getView().getTopInventory().getType().equals(InventoryType.CHEST) && event.getView().getTopInventory().getSize() == 27) {
+		if (event.getInventory().getHolder() == null && event.getView().getTopInventory().getType().equals(InventoryType.CHEST) && event.getView().getTopInventory().getSize() == 27
+			    && event.getPlayer() instanceof Player player) {
 			/* Right type of inventory - check if the player is in the map */
-			HumanEntity player = event.getPlayer();
 
 			/* Check if the player had a loot table chest open, and if so, decrement the count by 1. If it decrements to 0, remove from the map */
 			boolean hadLootInventoryOpen = decrementOrClearPlayer(player);
 			if (hadLootInventoryOpen) {
-				/* Player did have a virtual loot inventory open - drop everything from it */
+				/* Player did have a virtual loot inventory open - give remaining items to the player */
 				ItemStack[] items = event.getView().getTopInventory().getContents();
 				for (ItemStack item : items) {
 					if (item != null && !item.getType().isAir()) {
-						Item droppedItem = player.getWorld().dropItem(player.getLocation(), item);
-						droppedItem.setPickupDelay(0);
-						droppedItem.setOwner(player.getUniqueId());
-						droppedItem.setThrower(player.getUniqueId());
-
-						// Allow other players to pick this up after 10s
-						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-							if (droppedItem.isValid() && !droppedItem.isDead()) {
-								droppedItem.setOwner(null);
-							}
-						}, 200);
+						InventoryUtils.giveItem(player, item);
 					}
 				}
 				/* Make sure the source container is cleared, since it won't be reachable anymore anyway */
