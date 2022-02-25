@@ -23,7 +23,10 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Arrays;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class DamageListener implements Listener {
 
@@ -87,9 +90,21 @@ public class DamageListener implements Listener {
 			event.setDamage(originalDamage);
 		}
 
+		// Negative damage fixes (negative damage can make mobs unkillable)
+		if (event.getFinalDamage() < 0 && event.getFinalDamage() > -0.1) {
+			// Small amount of negative damage - can happen as the Paper damage calculation mixes floats and doubles
+			// Add the final damage to the base damage to make the calculation 0, while still damaging absorption
+			// Uses Math.nextUp to prevent a small final damage value from not affecting the addition
+			event.setDamage(EntityDamageEvent.DamageModifier.BASE, Math.nextUp(event.getDamage()) - event.getFinalDamage());
+		}
 		if (event.getDamage() < 0 || event.getFinalDamage() < 0) {
-			event.setDamage(0);
-			new Exception("negative damage dealt").printStackTrace();
+			// (Still) negative: fix and log
+			if (!(event.getEntity() instanceof Player)) { // the negative damage bug doesn't apply to players, and can cause issues with absorption making players invulnerable
+				event.setDamage(0);
+			}
+			mPlugin.getLogger().log(Level.INFO,
+				"Negative damage dealt! finalDamage=" + event.getFinalDamage() + ", "
+					+ Arrays.stream(EntityDamageEvent.DamageModifier.values()).map(mod -> mod + "=" + event.getDamage(mod)).collect(Collectors.joining(", ")), new Exception());
 		}
 	}
 

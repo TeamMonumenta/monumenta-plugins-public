@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.events;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.LivingEntity;
@@ -16,7 +17,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.projectiles.ProjectileSource;
 
-import javax.annotation.Nullable;
 import java.util.logging.Level;
 
 public class DamageEvent extends Event implements Cancellable {
@@ -194,7 +194,7 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public void setDamage(double damage) {
 		if (damage < 0) {
-			new Exception("negative damage dealt").printStackTrace();
+			Plugin.getInstance().getLogger().log(Level.INFO, "Negative damage dealt: " + damage, new Exception());
 		}
 
 		// Never set damage above 1000000 (arbitrary high amount) so that it doesn't go over the limit of what can actually be dealt
