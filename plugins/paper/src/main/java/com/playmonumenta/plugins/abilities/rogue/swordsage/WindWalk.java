@@ -137,7 +137,7 @@ public class WindWalk extends MultipleChargeAbility {
 					this.cancel();
 					return;
 				}
-				mTickOne = true;
+				mTickOne = false;
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
