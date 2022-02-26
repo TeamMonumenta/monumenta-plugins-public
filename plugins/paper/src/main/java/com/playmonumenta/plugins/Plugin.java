@@ -191,7 +191,6 @@ public class Plugin extends JavaPlugin {
 		RedeemVoteRewards.register(this.getLogger());
 		BossFight.register();
 		SpellDetectionCircle.registerCommand(this);
-		RunRegion.register();
 		SkillDescription.register(this);
 		SkillSummary.register(this);
 		TeleportAsync.register();
