@@ -7,7 +7,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,23 +47,18 @@ public class DelveInfuseHeldItem extends GenericCommand {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perm)
 			.withArguments(arguments)
-			.executes((sender, args) -> {
-				if (sender instanceof Player) {
-					Player player = (Player) sender;
-					DelveInfusionSelection selection = DelveInfusionSelection.getInfusionSelection((String) args[0]);
-					if (selection == null) {
-						CommandAPI.fail("Invalid delve infusion selection");
-					} else if (selection == DelveInfusionSelection.REFUND) {
-						DelveInfusionUtils.refundInfusion(player.getInventory().getItemInMainHand(), player);
-					} else {
-						try {
-							DelveInfusionUtils.infuseItem(player, player.getInventory().getItemInMainHand(), selection);
-						} catch (Exception e) {
-							CommandAPI.fail("Error: " + e.getMessage());
-						}
-					}
+			.executesPlayer((player, args) -> {
+				DelveInfusionSelection selection = DelveInfusionSelection.getInfusionSelection((String) args[0]);
+				if (selection == null) {
+					CommandAPI.fail("Invalid delve infusion selection");
+				} else if (selection == DelveInfusionSelection.REFUND) {
+					DelveInfusionUtils.refundInfusion(player.getInventory().getItemInMainHand(), player);
 				} else {
-					CommandAPI.fail("This command can only be run by players");
+					try {
+						DelveInfusionUtils.infuseItem(player, player.getInventory().getItemInMainHand(), selection);
+					} catch (Exception e) {
+						CommandAPI.fail("Error: " + e.getMessage());
+					}
 				}
 			})
 			.register();

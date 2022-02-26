@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
@@ -17,6 +16,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import javax.annotation.Nullable;
 
 public class InfusionUtils {
 
@@ -493,9 +494,7 @@ public class InfusionUtils {
 		ItemStack currency = null;
 		if (ItemStatUtils.getRegion(item) == Region.ISLES) {
 			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
-		}
-
-		if (ItemStatUtils.getRegion(item) == Region.VALLEY) {
+		} else if (ItemStatUtils.getRegion(item) == Region.VALLEY) {
 			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
 		}
 
