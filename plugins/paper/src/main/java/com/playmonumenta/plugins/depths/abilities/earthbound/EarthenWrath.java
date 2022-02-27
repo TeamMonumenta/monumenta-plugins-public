@@ -146,7 +146,7 @@ public class EarthenWrath extends DepthsAbility {
 			Vector velocity = mPlayer.getVelocity();
 
 			// Create a new DamageEvent from the EntityDamageEvent with the same damage and damage type but a different damagee
-			DamageUtils.damage(event.getSource(), mPlayer, event.getType(), originalDamage * PERCENT_DAMAGE_REDUCTION[mRarity - 1], null, false, false, ABILITY_NAME);
+			DamageUtils.damage(event.getSource(), mPlayer, event.getType(), originalDamage * PERCENT_DAMAGE_REDUCTION[mRarity - 1], null, true, false, ABILITY_NAME);
 
 			mPlayer.setVelocity(velocity);
 
@@ -168,6 +168,7 @@ public class EarthenWrath extends DepthsAbility {
 			}
 
 			event.setDamage(0);
+			otherPlayer.setNoDamageTicks(10);
 			return true;
 		}
 		return false;
