@@ -114,12 +114,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 				return true;
 			}
 			mLastCastTicks = ticks;
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					potion.setMetadata(SCORCHED_EARTH_POTION_METAKEY, new FixedMetadataValue(mPlugin, null));
-				}
-			}.runTaskTimer(mPlugin, 0, 1);
+			potion.setMetadata(SCORCHED_EARTH_POTION_METAKEY, new FixedMetadataValue(mPlugin, null));
 		}
 		return true;
 	}
