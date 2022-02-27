@@ -6,9 +6,15 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 public class VersionAdapter_unsupported implements VersionAdapter {
+
+	public void removeAllMetadata(Plugin plugin) {
+
+	}
+
 	public void resetPlayerIdleTimer(Player player) {
 
 	}

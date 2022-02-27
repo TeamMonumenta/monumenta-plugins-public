@@ -10,8 +10,10 @@ import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.Vec3D;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
@@ -21,6 +23,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
@@ -28,8 +31,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class VersionAdapter_v1_16_R3 implements VersionAdapter {
+
+	public void removeAllMetadata(Plugin plugin) {
+		CraftServer server = (CraftServer) plugin.getServer();
+		server.getEntityMetadata().removeAll(plugin);
+		server.getPlayerMetadata().removeAll(plugin);
+		server.getWorldMetadata().removeAll(plugin);
+		for (World world : Bukkit.getWorlds()) {
+			((CraftWorld) world).getBlockMetadata().removeAll(plugin);
+		}
+	}
+
 	public void resetPlayerIdleTimer(Player player) {
-		CraftPlayer p = (CraftPlayer)player;
+		CraftPlayer p = (CraftPlayer) player;
 		EntityPlayer playerHandle = p.getHandle();
 		playerHandle.resetIdleTimer();
 	}
