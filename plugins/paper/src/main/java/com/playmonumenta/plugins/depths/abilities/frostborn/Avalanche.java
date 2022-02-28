@@ -51,8 +51,7 @@ public class Avalanche extends DepthsAbility {
 			Location loc = mPlayer.getLocation();
 
 			HashSet<Location> iceToBreak = new HashSet<>(DepthsUtils.iceActive.keySet());
-			iceToBreak.removeIf(l -> l.distance(loc) > RADIUS);
-			iceToBreak.removeIf(l -> l.getBlock().getType() != DepthsUtils.ICE_MATERIAL);
+			iceToBreak.removeIf(l -> l.getWorld() != loc.getWorld() || l.distance(loc) > RADIUS || l.getBlock().getType() != DepthsUtils.ICE_MATERIAL);
 
 			if (iceToBreak.size() == 0) {
 				return;
