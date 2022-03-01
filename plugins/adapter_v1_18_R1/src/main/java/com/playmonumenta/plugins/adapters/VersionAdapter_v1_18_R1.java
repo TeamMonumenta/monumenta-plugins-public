@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.adapters;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import javax.annotation.Nullable;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -25,10 +28,6 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 
@@ -70,7 +69,6 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 
 		@Override
 		public Component getLocalizedDeathMessage(net.minecraft.world.entity.LivingEntity entityliving) {
-			assert this.entity != null : "@AssumeAssertion(nullness): always set in constructors of this subclass";
 			if (mKilledUsingMsg == null) {
 				String s = "death.attack.mob";
 				return new TranslatableComponent(s, entityliving.getScoreboardName(), this.entity.getScoreboardName());
@@ -83,7 +81,7 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 	}
 
 	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg) {
-		DamageSource reason = new CustomDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle(), blockable, killedUsingMsg);
+		DamageSource reason = damager == null ? DamageSource.GENERIC : new CustomDamageSource(((CraftLivingEntity) damager).getHandle(), blockable, killedUsingMsg);
 
 		((CraftLivingEntity) damagee).getHandle().hurt(reason, (float) amount);
 	}
