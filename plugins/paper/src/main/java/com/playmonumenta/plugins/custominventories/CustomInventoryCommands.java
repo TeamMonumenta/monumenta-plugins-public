@@ -3,6 +3,10 @@ package com.playmonumenta.plugins.custominventories;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -54,7 +58,13 @@ public class CustomInventoryCommands {
 		new CommandAPICommand("openinfusiongui")
 			.withPermission("monumenta.command.openinfusiongui")
 			.executesPlayer((player, args) -> {
-				new InfusionCustomInventory(player).openInventory(player, plugin);
+				if (!player.hasPermission("monumenta.infusions")) {
+					player.sendMessage(Component.text("Infusions are disabled, try again later.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+					return;
+				}
+				Bukkit.getScheduler().runTaskLater(plugin, () -> {
+					new InfusionCustomInventory(player).openInventory(player, plugin);
+				}, 1);
 			})
 			.register();
 		new CommandAPICommand("openinfusiongui")
@@ -62,14 +72,27 @@ public class CustomInventoryCommands {
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
-				new InfusionCustomInventory(player).openInventory(player, plugin);
+				if (!player.hasPermission("monumenta.infusions")) {
+					player.sendMessage(Component.text("Infusions are disabled, try again later.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+					return;
+				}
+				Bukkit.getScheduler().runTaskLater(plugin, () -> {
+					new InfusionCustomInventory(player).openInventory(player, plugin);
+				}, 1);
 			})
 			.register();
 
 		new CommandAPICommand("opendelveinfusiongui")
 			.withPermission("monumenta.command.opendelveinfusiongui")
 			.executesPlayer((player, args) -> {
-				new DelveInfusionCustomInventory(player).openInventory(player, plugin);
+				if (!player.hasPermission("monumenta.infusions")) {
+					player.sendMessage(Component.text("Infusions are disabled, try again later.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+					return;
+				}
+				Bukkit.getScheduler().runTaskLater(plugin, () -> {
+					new DelveInfusionCustomInventory(player).openInventory(player, plugin);
+				}, 1);
+
 			})
 			.register();
 		new CommandAPICommand("opendelveinfusiongui")
@@ -77,7 +100,13 @@ public class CustomInventoryCommands {
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
-				new DelveInfusionCustomInventory(player).openInventory(player, plugin);
+				if (!player.hasPermission("monumenta.infusions")) {
+					player.sendMessage(Component.text("Infusions are disabled, try again later.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+					return;
+				}
+				Bukkit.getScheduler().runTaskLater(plugin, () -> {
+					new DelveInfusionCustomInventory(player).openInventory(player, plugin);
+				}, 1);
 			})
 			.register();
 
