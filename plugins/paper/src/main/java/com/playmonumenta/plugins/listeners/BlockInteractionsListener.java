@@ -50,7 +50,8 @@ public final class BlockInteractionsListener implements Listener {
 		Material.BARREL,
 		Material.CARTOGRAPHY_TABLE,
 		Material.SMITHING_TABLE,
-		Material.FLETCHING_TABLE
+		Material.FLETCHING_TABLE,
+		Material.BREWING_STAND
 	);
 
 	public BlockInteractionsListener() {
