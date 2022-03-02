@@ -83,13 +83,13 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
@@ -234,6 +234,7 @@ public class Plugin extends JavaPlugin {
 		SeasonalEventCommand.register(this);
 		CosmeticsCommand.register(this);
 		NameMCVerify.register(this);
+		TellMiniMessage.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
