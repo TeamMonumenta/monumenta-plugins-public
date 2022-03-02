@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.MagicProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.MeleeProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.ProjectileProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Protection;
+import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheDepths;
 import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken;
@@ -153,12 +154,17 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 		ItemStatUtils.Region maxRegion = stats.getMaximumRegion(false);
 
+		boolean region2 = stats.mSettings.mRegion.compareTo(ItemStatUtils.Region.ISLES) >= 0;
 		double damageMultiplier = Armor.getDamageMultiplier(armor, armorBonus, agility, agilityBonus,
-			Armor.getSecondaryEnchantCap(stats.mSettings.mRegion.compareTo(ItemStatUtils.Region.ISLES) >= 0), adaptability, epf, protection.getType().isEnvironmental());
+			Armor.getSecondaryEnchantCap(region2), adaptability, epf, protection.getType().isEnvironmental());
 
 		// when Steadfast is enabled, also include Second Wind in calculation
 		if (stats.mSettings.mSecondaryStatEnabled.contains(SecondaryStat.STEADFAST)) {
 			damageMultiplier *= SecondWind.getDamageMultiplier(stats.get(EnchantmentType.SECOND_WIND));
+		}
+
+		if (stats.get(EnchantmentType.PROTECTION_OF_THE_DEPTHS) > 0) {
+			damageMultiplier *= ProtectionOfTheDepths.getDamageMultiplier(region2);
 		}
 
 		if (maxRegion.compareTo(stats.mSettings.mRegion) > 0) {
@@ -392,7 +398,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private enum SecondaryStat {
 		SHIELDING(0, Material.NAUTILUS_SHELL, EnchantmentType.SHIELDING, true, """
 			Gain (Level*20%) effective Armor
-			when taking damage from an enemy within 2 blocks."""),
+			when taking damage from an enemy within 2 blocks.
+			Taking damage that would stun a shield
+			disables Shielding for 5 seconds."""),
 		POISE(1, Material.LILY_OF_THE_VALLEY, EnchantmentType.POISE, true, """
 			Gain (Level*20%) effective Armor
 			when above 90% Max Health."""),
@@ -419,7 +427,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			than 5 blocks from the player."""),
 		TEMPO(8, Material.CLOCK, EnchantmentType.TEMPO, false, """
 			Gain (Level*20%) effective Agility
-			on the first hit taken after 5 seconds of taking no damage.""");
+			on the first hit taken after
+			4 seconds of taking no damage.""");
 
 		private final int mSlot;
 		private final Material mIcon;
@@ -636,10 +645,10 @@ public class PlayerItemStatsGUI extends CustomInventory {
 					    && item.getItemMeta() instanceof BlockStateMeta meta
 					    && meta.getBlockState() instanceof ShulkerBox shulker) {
 					Stats stats;
-					if (mSelectedEquipmentsSlot != null) {
+					if (event.getClick().isShiftClick()) {
+						stats = event.getClick().isLeftClick() ? mRightStats : mLeftStats;
+					} else if (mSelectedEquipmentsSlot != null) {
 						stats = mSelectedRightEquipmentSet ? mRightStats : mLeftStats;
-					} else if (event.getClick().isShiftClick()) {
-						stats = mRightStats;
 					} else {
 						return;
 					}
@@ -660,13 +669,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				}
 				Equipment targetSlot = null;
 				boolean targetRightSet = false;
-				if (mSelectedEquipmentsSlot != null) {
-					if (isValid(mSelectedEquipmentsSlot, item.getType())) {
-						targetSlot = mSelectedEquipmentsSlot;
-						targetRightSet = mSelectedRightEquipmentSet;
-					}
-				} else if (event.getClick().isShiftClick()) {
-					targetRightSet = true;
+				if (event.getClick().isShiftClick()) {
+					targetRightSet = event.getClick().isLeftClick();
 					for (Equipment equipment : new Equipment[] {Equipment.HEAD, Equipment.CHEST, Equipment.LEGS, Equipment.FEET}) {
 						if (isValid(equipment, item.getType())) {
 							targetSlot = equipment;
@@ -679,6 +683,11 @@ public class PlayerItemStatsGUI extends CustomInventory {
 						} else {
 							targetSlot = Equipment.MAINHAND;
 						}
+					}
+				} else if (mSelectedEquipmentsSlot != null) {
+					if (isValid(mSelectedEquipmentsSlot, item.getType())) {
+						targetSlot = mSelectedEquipmentsSlot;
+						targetRightSet = mSelectedRightEquipmentSet;
 					}
 				}
 				if (targetSlot != null) {

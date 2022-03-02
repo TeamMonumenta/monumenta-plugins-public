@@ -15,7 +15,8 @@ import java.util.EnumSet;
 
 public class ProtectionOfTheDepths implements Enchantment {
 
-	private double mReductionPct = 0;
+	private static final double DAMAGE_MULTIPLIER_R1 = 0.85; // 15% reduction for region 1
+	private static final double DAMAGE_MULTIPLIER_R2 = 0.75; // 25% reduction for region 2
 
 	@Override
 	public String getName() {
@@ -34,11 +35,10 @@ public class ProtectionOfTheDepths implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (ServerProperties.getClassSpecializationsEnabled()) {
-			mReductionPct = .25; //25% reduction for region2
-		} else {
-			mReductionPct = .15; //15% reduction for region 1
-		}
-		event.setDamage(event.getDamage() * (1.0 - mReductionPct));
+		event.setDamage(event.getDamage() * getDamageMultiplier(ServerProperties.getClassSpecializationsEnabled()));
+	}
+
+	public static double getDamageMultiplier(boolean region2) {
+		return region2 ? DAMAGE_MULTIPLIER_R2 : DAMAGE_MULTIPLIER_R1;
 	}
 }
