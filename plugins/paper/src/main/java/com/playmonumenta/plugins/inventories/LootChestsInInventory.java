@@ -6,6 +6,10 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -31,11 +35,6 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class LootChestsInInventory implements Listener {
 	private final Map<UUID, Integer> mLootMenu = new HashMap<>();
@@ -120,7 +119,8 @@ public class LootChestsInInventory implements Listener {
 				ItemStack[] items = event.getView().getTopInventory().getContents();
 				for (ItemStack item : items) {
 					if (item != null && !item.getType().isAir()) {
-						InventoryUtils.giveItem(player, item);
+						// dropped instead of given directly to allow /pickup to filter out filler items
+						InventoryUtils.dropTempOwnedItem(item, player.getLocation(), player);
 					}
 				}
 				/* Make sure the source container is cleared, since it won't be reachable anymore anyway */
