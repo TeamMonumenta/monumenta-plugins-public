@@ -129,7 +129,7 @@ public class OrinCustomInventory extends CustomInventory {
 
 
 		ORIN_ITEMS.add(new TeleportEntry(4, 9, "Plots", "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, null, 0, "transferserver plots"));
-		// TODO: Eventually add some way to change to other plots you have access to without leaving & coming back
+		ORIN_ITEMS.add(new TeleportEntry(4, 27, "Player Plot", "Click to teleport!", Material.GRASS_BLOCK, "CurrentPlot", 1, "plot gui @S"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 3, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "transferserver valley", "instancebot valley"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 7, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "transferserver isles", "instancebot isles"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 45, "Build Server", "Click to teleport!", Material.STONE_PICKAXE, null, 0, "transferserver build"));

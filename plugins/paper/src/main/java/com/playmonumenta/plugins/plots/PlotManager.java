@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+import com.playmonumenta.worlds.paper.MonumentaWorldManagementAPI;
+
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -379,8 +381,7 @@ public class PlotManager {
 	public static void sendPlayerToPlot(Player player) {
 		try {
 			if (ServerProperties.getShardName().equals("playerplots")) {
-				player.sendMessage("Transferring to playerplots from playerplots is not implemented yet");
-				// TODO: This shard is playerplots, need extra logic
+				MonumentaWorldManagementAPI.sortWorld(player);
 			} else {
 				MonumentaRedisSyncAPI.sendPlayer(player, "playerplots");
 			}
