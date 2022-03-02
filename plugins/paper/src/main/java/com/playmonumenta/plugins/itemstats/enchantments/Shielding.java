@@ -1,19 +1,18 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
-
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
+
+import javax.annotation.Nullable;
 
 public class Shielding implements Enchantment {
 
@@ -48,17 +47,15 @@ public class Shielding implements Enchantment {
 
 	public static void disable(Player player) {
 		Plugin plugin = Plugin.getInstance();
-		if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SHIELDING) > 0) {
-			if (!MetadataUtils.happenedInRecentTicks(player, DISABLE_METAKEY, DISABLE_DURATION)) {
-				player.playSound(player.getLocation(), Sound.ITEM_SHIELD_BREAK, 0.75f, 0.5f);
-			}
+		if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SHIELDING) > 0 && !MetadataUtils.happenedInRecentTicks(player, DISABLE_METAKEY, DISABLE_DURATION)) {
+			player.playSound(player.getLocation(), Sound.ITEM_SHIELD_BREAK, 0.75f, 0.5f);
 			player.setMetadata(DISABLE_METAKEY, new FixedMetadataValue(plugin, player.getTicksLived()));
 		}
 	}
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (source != null && event.getType() == DamageEvent.DamageType.MELEE && source.getEquipment() != null && ItemUtils.isAxe(source.getEquipment().getItemInMainHand()) && doesShieldingApply(player, source)) {
+		if (source != null && event.getType() == DamageEvent.DamageType.MELEE && source.getEquipment() != null && ItemUtils.isAxe(source.getEquipment().getItemInMainHand()) && doesShieldingApply(player, source) && !event.isBlockedByShield()) {
 			disable(player);
 		}
 	}

@@ -26,9 +26,7 @@ public class SpellShieldStun extends Spell {
 			if (event.isBlockedByShield()) {
 				NmsUtils.getVersionAdapter().stunShield(player, mStunTicks);
 				event.setDamage(0);
-			}
-
-			if (Shielding.doesShieldingApply(player, damagee)) {
+			} else if (Shielding.doesShieldingApply(player, damagee)) {
 				Shielding.disable(player);
 			}
 		}

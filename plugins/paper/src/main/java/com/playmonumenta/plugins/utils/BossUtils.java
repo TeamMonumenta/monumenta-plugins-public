@@ -87,9 +87,6 @@ public class BossUtils {
 				damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			}
 			ItemUtils.damageShield(player, durability);
-			if (Shielding.doesShieldingApply(player, damager)) {
-				Shielding.disable(player);
-			}
 		} else {
 			DamageUtils.damage(damager, damagee, new DamageEvent.Metadata(type, null), damage, bypassIFrames, causeKnockback, false, cause);
 			if (damagee instanceof Player player && Shielding.doesShieldingApply(player, damager)) {
@@ -178,10 +175,6 @@ public class BossUtils {
 				NmsUtils.getVersionAdapter().stunShield(player, (int) (20 * percentHealth * 20));
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				ItemUtils.damageShield(player, (int)(percentHealth * 20 / 2.5));
-			}
-
-			if (Shielding.doesShieldingApply(player, boss)) {
-				Shielding.disable(player);
 			}
 		} else {
 			double absorp = AbsorptionUtils.getAbsorption(target);
