@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLeapAttack;
 import com.playmonumenta.plugins.bosses.spells.SpellDuelist;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -12,7 +10,8 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
+import java.util.Arrays;
+import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -39,6 +38,9 @@ public class WrathBoss extends BossAbilityGroup {
 		public int DAMAGE = 18;
 		public int ULTIMATE_EYE_DISTANCE = 6;
 		public double DODGE_CHANCE = 0.3;
+
+		@BossParam(help = "The spell name shown when a player is killed by this skill")
+		public String SPELL_NAME = "";
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -97,7 +99,7 @@ public class WrathBoss extends BossAbilityGroup {
 									mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
 									mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
 									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), mParams.DAMAGE_RADIUS, true)) {
-										BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE);
+										BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE, mParams.SPELL_NAME, mBoss.getLocation());
 									}
 								}
 							} else if (mTime <= 10) {
@@ -117,7 +119,7 @@ public class WrathBoss extends BossAbilityGroup {
 									mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
 									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), mParams.DAMAGE_RADIUS, true)) {
 										p.setNoDamageTicks(0);
-										BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE);
+										BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE, mParams.SPELL_NAME, mBoss.getLocation());
 									}
 								}
 							} else {

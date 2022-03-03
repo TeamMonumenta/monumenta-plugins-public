@@ -14,6 +14,8 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -24,9 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import javax.annotation.Nullable;
-import java.util.List;
 
 
 public class Blizzard extends Ability {
@@ -107,7 +106,7 @@ public class Blizzard extends Ability {
 
 					if (mTicks % DAMAGE_INTERVAL == 0) {
 						for (LivingEntity mob : mobs) {
-							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), spellDamage, false, true, false, null);
+							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), spellDamage, false, true, false);
 						}
 					}
 

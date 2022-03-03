@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
@@ -16,7 +13,8 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-
+import java.util.Arrays;
+import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -75,7 +73,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Effects applied to the player when he got hit")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
-		@BossParam(help = "The spell name showed when the player die by this skill")
+		@BossParam(help = "The spell name shown when a player is killed by this skill")
 		public String SPELL_NAME = "";
 
 		//particle & sound used!

@@ -116,7 +116,7 @@ public class DamageUtils {
 	 * @param bossCause      string to pass for boss death messages
 	 */
 	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount, @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback, @Nullable String bossCause) {
-		damage(damager, damagee, new DamageEvent.Metadata(type, ability), amount, bypassIFrames, causeKnockback, false, bossCause);
+		damage(damager, damagee, new DamageEvent.Metadata(type, ability, null, bossCause), amount, bypassIFrames, causeKnockback, false);
 	}
 
 	/**
@@ -131,9 +131,8 @@ public class DamageUtils {
 	 * @param bypassIFrames  whether the damage should bypass IFrames
 	 * @param causeKnockback whether the damage should cause knockback
 	 * @param blockable      Whether the damage can be blocked with a shield
-	 * @param bossCause      Text to use for the death message if this kills a player
 	 */
-	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageEvent.Metadata metadata, double amount, boolean bypassIFrames, boolean causeKnockback, boolean blockable, @Nullable String bossCause) {
+	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageEvent.Metadata metadata, double amount, boolean bypassIFrames, boolean causeKnockback, boolean blockable) {
 
 		if (!damagee.isValid() || damagee.isInvulnerable()) {
 			return;
@@ -153,7 +152,7 @@ public class DamageUtils {
 
 		DamageUtils.nextEventMetadata = metadata;
 		try {
-			NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, amount, blockable, bossCause);
+			NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, amount, blockable, metadata.getBossSpellName());
 		} finally {
 			DamageUtils.nextEventMetadata = null;
 

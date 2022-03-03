@@ -15,6 +15,8 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.ArrayList;
+import java.util.List;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,9 +29,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RingOfFlames extends DepthsAbility {
 
@@ -117,7 +116,7 @@ public class RingOfFlames extends DepthsAbility {
 								EntityUtils.applyFire(mPlugin, EFFECT_DURATION, e, mPlayer);
 								EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, 2, e);
 
-								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false, null);
+								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false);
 
 								mobsHitThisTick++;
 							}

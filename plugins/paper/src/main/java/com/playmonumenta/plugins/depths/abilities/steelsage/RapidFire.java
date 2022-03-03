@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.WeakHashMap;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -26,8 +27,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.WeakHashMap;
 
 public class RapidFire extends DepthsAbility {
 
@@ -104,7 +103,7 @@ public class RapidFire extends DepthsAbility {
 		if (event.getDamager() instanceof Arrow arrow) {
 			ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(arrow);
 			if (playerItemStats != null) {
-				DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, playerItemStats), DAMAGE, true, true, false, null);
+				DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, playerItemStats), DAMAGE, true, true, false);
 				event.setCancelled(true);
 				arrow.remove();
 			}

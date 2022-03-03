@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
@@ -13,7 +10,8 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseNova;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
-
+import java.util.Arrays;
+import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -42,7 +40,7 @@ public final class NovaBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Effect applied to players hit by the nova")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
-		@BossParam(help = "The spell name showed when the player die by this skill")
+		@BossParam(help = "The spell name shown when a player is killed by this skill")
 		public String SPELL_NAME = "";
 
 		@BossParam(help = "Let you choose the targets of this spell")

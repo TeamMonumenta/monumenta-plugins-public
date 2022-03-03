@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
@@ -17,7 +14,8 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
-
+import java.util.Arrays;
+import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
@@ -60,7 +58,7 @@ public class LaserBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Effects apply to player after the laser end")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
-		@BossParam(help = "The spell name showed when the player die by this skill")
+		@BossParam(help = "The spell name shown when a player is killed by this skill")
 		public String SPELL_NAME = "";
 
 		//particle & sound used!

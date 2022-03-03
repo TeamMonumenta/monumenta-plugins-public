@@ -6,6 +6,10 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import java.util.Arrays;
+import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Creeper;
@@ -22,11 +26,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.Arrays;
-import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 public class DamageListener implements Listener {
 
@@ -74,12 +73,12 @@ public class DamageListener implements Listener {
 		 */
 		double originalDamage = event.getDamage();
 		if (event.getEntity() instanceof LivingEntity le) {
-			if (event.getCause() != DamageCause.CUSTOM) {
-				Bukkit.getPluginManager().callEvent(new DamageEvent(event, le));
-			} else if (DamageUtils.nextEventMetadata != null) {
+			if (DamageUtils.nextEventMetadata != null) {
 				DamageEvent.Metadata nextEventMetadata = DamageUtils.nextEventMetadata;
 				DamageUtils.nextEventMetadata = null;
 				Bukkit.getPluginManager().callEvent(new DamageEvent(event, le, nextEventMetadata));
+			} else if (event.getCause() != DamageCause.CUSTOM) {
+				Bukkit.getPluginManager().callEvent(new DamageEvent(event, le));
 			}
 		}
 		// If the damage is blocked, revert to the initial damage to make sure the shield gets proper durability damage.
@@ -100,13 +99,13 @@ public class DamageListener implements Listener {
 			event.setDamage(EntityDamageEvent.DamageModifier.BASE, Math.nextUp(event.getDamage()) - event.getFinalDamage());
 		}
 		if (event.getDamage() < 0 || event.getFinalDamage() < 0) {
-			// (Still) negative: fix and log
-			if (!(event.getEntity() instanceof Player)) { // the negative damage bug doesn't apply to players, and can cause issues with absorption making players invulnerable
-				event.setDamage(0);
-			}
+			// (Still) negative: log and fix
 			mPlugin.getLogger().log(Level.INFO,
 				"Negative damage dealt! finalDamage=" + event.getFinalDamage() + ", "
 					+ Arrays.stream(EntityDamageEvent.DamageModifier.values()).map(mod -> mod + "=" + event.getDamage(mod)).collect(Collectors.joining(", ")), new Exception());
+			if (!(event.getEntity() instanceof Player)) { // the negative damage bug doesn't apply to players, and can cause issues with absorption making players invulnerable
+				event.setDamage(0);
+			}
 		}
 	}
 

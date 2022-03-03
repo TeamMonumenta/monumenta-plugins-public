@@ -6,6 +6,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -14,10 +17,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntitySpawnEvent;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class StatMultiplier extends DelveModifier {
 
@@ -120,8 +119,16 @@ public class StatMultiplier extends DelveModifier {
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (source == null) {
+			// only scale entity damage, not environmental damage
 			return;
 		}
+
+		String spellName = event.getBossSpellName();
+		if (spellName != null && (Arcanic.SPELL_NAMES.contains(spellName) || Infernal.SPELL_NAMES.contains(spellName) || Transcendent.SPELL_NAMES.contains(spellName))) {
+			// do not scale abilities from delve modifiers (no stat compensation, and they have their own region scaling)
+			return;
+		}
+
 		if (DelvesUtils.isDelveMob(source)) {
 			event.setDamage(event.getDamage() * mDelveMobStatMultiplier);
 		} else {
