@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsRoom.RoomDirection;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.structures.StructuresAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -10,6 +12,8 @@ import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -87,6 +91,7 @@ public class DepthsRoomRepository {
 		mF1NormalRooms.add(new DepthsRoom("depths/f1r46", DepthsRoomType.ABILITY, new Vector(51, 56, 32), new Vector(1.0, -9.0, -14.0), 15, RoomDirection.UP));
 		mF1NormalRooms.add(new DepthsRoom("depths/f1r47", DepthsRoomType.ABILITY, new Vector(45, 52, 55), new Vector(1.0, -33.0, -27.0), 11, RoomDirection.DOWN));
 		mF1NormalRooms.add(new DepthsRoom("depths/f1r48", DepthsRoomType.ABILITY, new Vector(32, 35, 35), new Vector(1.0, -8.0, -20.0), 12, RoomDirection.UP));
+		mF1NormalRooms.add(new DepthsRoom("depths/f1r49", DepthsRoomType.ABILITY, new Vector(38, 31, 37), new Vector(1.0, -11.0, -31.0), 12, RoomDirection.EVEN));
 
 		//F1 elite rooms
 		mF1EliteRooms.add(new DepthsRoom("depths/f1r12", DepthsRoomType.ABILITY, new Vector(40, 41, 40), new Vector(1.0, -2.0, -21.0), 23, RoomDirection.UP));
@@ -118,10 +123,12 @@ public class DepthsRoomRepository {
 
 		//F2 utility rooms
 		mF2UtilityRooms.add(new DepthsRoom("depths/f2r11", DepthsRoomType.UTILITY, new Vector(33, 28, 29), new Vector(1.0, -1.0, -6.0), 0, RoomDirection.EVEN));
-		mF2UtilityRooms.add(new DepthsRoom("depths/f2r12", DepthsRoomType.UTILITY, new Vector(35, 18, 27), new Vector(1.0, -4.0, -7.0), 0, RoomDirection.EVEN));
 		mF2UtilityRooms.add(new DepthsRoom("depths/f2r14", DepthsRoomType.UTILITY, new Vector(38, 26, 38), new Vector(1.0, -11.0, -17.0), 0, RoomDirection.EVEN));
 		mF2UtilityRooms.add(new DepthsRoom("depths/f2r16", DepthsRoomType.UTILITY, new Vector(34, 26, 33), new Vector(1.0, -6.0, -16.0), 0, RoomDirection.EVEN));
 		mF2UtilityRooms.add(new DepthsRoom("depths/f2r17", DepthsRoomType.UTILITY, new Vector(32, 23, 31), new Vector(1.0, -6.0, -15.0), 0, RoomDirection.EVEN));
+		mF2UtilityRooms.add(new DepthsRoom("depths/f2r45", DepthsRoomType.UTILITY, new Vector(36, 24, 31), new Vector(1.0, -3.0, -15.0), 0, RoomDirection.EVEN));
+		//OLD CASINO UTILITY ROOM- currently unused
+		//mF2UtilityRooms.add(new DepthsRoom("depths/f2r12", DepthsRoomType.UTILITY, new Vector(35, 18, 27), new Vector(1.0, -4.0, -7.0), 0, RoomDirection.EVEN));
 
 		//F2 normal rooms
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r2", DepthsRoomType.ABILITY, new Vector(28, 38, 27), new Vector(1.0, -24.0, -13.0), 10, RoomDirection.DOWN));
@@ -144,6 +151,7 @@ public class DepthsRoomRepository {
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r38", DepthsRoomType.ABILITY, new Vector(47, 54, 42), new Vector(1.0, -36.0, -21.0), 17, RoomDirection.DOWN));
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r40", DepthsRoomType.ABILITY, new Vector(49, 29, 35), new Vector(1.0, -10.0, -13.0), 11, RoomDirection.EVEN));
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r41", DepthsRoomType.ABILITY, new Vector(44, 44, 43), new Vector(1.0, -26.0, -18.0), 14, RoomDirection.DOWN));
+		mF2NormalRooms.add(new DepthsRoom("depths/f2r46", DepthsRoomType.ABILITY, new Vector(42, 47, 54), new Vector(1.0, -20.0, -27.0), 10, RoomDirection.DOWN));
 
 		//F2 elite rooms
 		mF2EliteRooms.add(new DepthsRoom("depths/f2r1", DepthsRoomType.ABILITY, new Vector(32, 33, 35), new Vector(1.0, -3.0, -18.0), 20, RoomDirection.UP));
@@ -358,6 +366,7 @@ public class DepthsRoomRepository {
 	 * Spawns the lobby for the next floor for the given party, and teleports
 	 * players to it/sets them up to continue playing
 	 * @param party the party to send to the next floor
+	 * @param treasure the treasure score given to the party
 	 */
 	public void goToNextFloor(DepthsParty party, int treasure) {
 
@@ -387,16 +396,17 @@ public class DepthsRoomRepository {
 					}
 				}
 			} else {
+				Location l = new Location(world, party.mFloorLobbyLoadPlayerTpPoint.getX(), party.mFloorLobbyLoadPlayerTpPoint.getY(), party.mFloorLobbyLoadPlayerTpPoint.getZ());
 				//Tp all the players to it
 				for (DepthsPlayer dp : party.mPlayersInParty) {
-
 					Player p = Bukkit.getPlayer(dp.mPlayerId);
 					if (p != null) {
-						Location l = new Location(world, party.mFloorLobbyLoadPlayerTpPoint.getX(), party.mFloorLobbyLoadPlayerTpPoint.getY(), party.mFloorLobbyLoadPlayerTpPoint.getZ());
 						l.setYaw(270f);
 						p.teleport(l);
+						PotionUtils.applyPotion(Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 						p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Your party earned " + treasure + " treasure score for clearing floor " + party.getFloor() + "! Sending your party to next floor.");
 					}
+					PlayerUtils.executeCommandOnNearbyPlayers(l, 20, "stopsound @s record");
 				}
 				//Reset used rooms
 				party.mOldRooms.clear();

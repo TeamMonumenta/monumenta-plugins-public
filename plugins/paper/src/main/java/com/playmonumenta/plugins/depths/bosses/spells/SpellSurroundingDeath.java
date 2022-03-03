@@ -143,6 +143,6 @@ public class SpellSurroundingDeath extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return mCooldownTicks + 120;
+		return mCooldownTicks;
 	}
 }

@@ -100,6 +100,18 @@ public class DepthsGUICommands {
 
 						new DepthsRemoveAbilityGUI(player).openInventory(player, plugin);
 					}))
+			.withSubcommand(new CommandAPICommand("mutateability")
+				.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+				.executes((sender, args) -> {
+					Player player = (Player) args[0];
+
+					if (!DepthsManager.getInstance().isInSystem(player) || DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mUsedAbilityMutation) {
+						MessagingUtils.sendActionBarMessage(player, "You've already mutated an ability on this floor!");
+						return;
+					}
+
+					new DepthsMutateAbilityGUI(player).openInventory(player, plugin);
+				}))
 			.register();
 	}
 }

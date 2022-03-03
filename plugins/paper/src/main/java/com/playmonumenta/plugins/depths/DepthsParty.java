@@ -325,6 +325,7 @@ public class DepthsParty {
 				p.mUsedChaosThisFloor = false;
 				//Reset ability removal eligibility
 				p.mUsedAbilityDeletion = false;
+				p.mUsedAbilityMutation = false;
 			}
 			mTwistedThisFloor = false;
 		}

@@ -51,12 +51,13 @@ public final class Nucleus extends BossAbilityGroup {
 	public static final String identityTag = "boss_nucleus";
 	public static final int detectionRange = 50;
 	public static final String DOOR_FILL_TAG = "Door";
-	public static final int NUCLEUS_HEALTH = 7000;
+	public static final int NUCLEUS_HEALTH = 8000;
 	public static final int SWAP_TARGET_SECONDS = 15;
 	public static final String EYE_STAND_TAG = "Plant";
 	public static final String EYE_LOS = "GyrhaeddantEye";
 	public static final int EYE_KILL_COUNT = 4;
 
+	public static final String MUSIC_TITLE = "epic:music.nucleus";
 	private static final int MUSIC_DURATION = 152; //seconds
 
 	public final Location mSpawnLoc;
@@ -100,14 +101,21 @@ public final class Nucleus extends BossAbilityGroup {
 
 		//Switch mCooldownTicks depending on floor of party
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
+		int surroundingDeathCooldown = 14 * 20;
 		if (party == null || party.getFloor() == 3) {
 			mCooldownTicks = 8 * 20;
 			//Disable passive mob spawning until 90% hp if fighting for the first time
 			mCanSpawnMobs = false;
 		} else if (party.getFloor() == 6) {
 			mCooldownTicks = 7 * 20;
+			surroundingDeathCooldown = 10 * 20;
 		} else if (party.getFloor() % 3 == 0) {
 			mCooldownTicks = 6 * 20;
+			if (party.getFloor() == 9) {
+				surroundingDeathCooldown = 6 * 20;
+			} else {
+				surroundingDeathCooldown = 4 * 20;
+			}
 		} else {
 			mCooldownTicks = 8 * 20;
 		}
@@ -122,7 +130,7 @@ public final class Nucleus extends BossAbilityGroup {
 				}
 
 				List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-				if (players != null && players.size() > 0) {
+				if (!players.isEmpty()) {
 					Collections.shuffle(players);
 					mTendrils.setTarget(players.get(0));
 				}
@@ -154,7 +162,7 @@ public final class Nucleus extends BossAbilityGroup {
 
 		//Spell setup
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
-				new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, mCooldownTicks, this),
+				new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
 				new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
 			));
 		List<Spell> phase1Passives = Arrays.asList(
@@ -165,7 +173,7 @@ public final class Nucleus extends BossAbilityGroup {
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
 				new SpellTectonicDevastation(mPlugin, mBoss, mSpawnLoc, mCooldownTicks, this),
-				new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, mCooldownTicks, this),
+				new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
 				new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
 			));
 		List<Spell> phase2Passives = Arrays.asList(
@@ -176,7 +184,7 @@ public final class Nucleus extends BossAbilityGroup {
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
 			new SpellTectonicDevastation(mPlugin, mBoss, mSpawnLoc, mCooldownTicks, this),
-			new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, mCooldownTicks, this),
+			new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
 			new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
 		));
 		List<Spell> phase3Passives = Arrays.asList(
@@ -363,37 +371,24 @@ public final class Nucleus extends BossAbilityGroup {
 		}
 
 		DepthsUtils.animate(mBoss.getLocation());
-		//Send players
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
-				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "stopsound @p");
-				if (!mMusicRunnable.isCancelled()) {
-					mMusicRunnable.cancel();
-				}
-			}
-
-		}.runTaskLater(mPlugin, 60);
 
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				DepthsManager.getInstance().goToNextFloor(PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).get(0));
+				DepthsManager.getInstance().goToNextFloor(EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange));
 			}
 
-		}.runTaskLater(mPlugin, 80);
+		}.runTaskLater(mPlugin, 20);
 	}
 
 	BukkitRunnable mMusicRunnable = new BukkitRunnable() {
 		@Override
 		public void run() {
-			if (mBoss == null || mBoss.getHealth() <= 0) {
+			if (mBoss.isDead()) {
 				this.cancel();
 			}
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound epic:music.nucleus record @s ~ ~ ~ 2");
+			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound " + MUSIC_TITLE + " record @s ~ ~ ~ 2");
 		}
 	};
 }

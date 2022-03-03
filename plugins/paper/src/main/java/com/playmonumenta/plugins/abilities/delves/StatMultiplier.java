@@ -96,10 +96,16 @@ public class StatMultiplier extends DelveModifier {
 	}
 
 	public static double getDamageMultiplier(int depthPoints) {
+		if (isDepthsShard()) {
+			return 1 + (depthPoints * DAMAGE_MULTIPLIER_INCREMENT);
+		}
 		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * DAMAGE_MULTIPLIER_INCREMENT;
 	}
 
 	public static double getHealthMultiplier(int depthPoints) {
+		if (isDepthsShard()) {
+			return 1 + (depthPoints * DAMAGE_MULTIPLIER_INCREMENT);
+		}
 		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * HEALTH_MULTIPLIER_INCREMENT;
 	}
 
@@ -109,6 +115,12 @@ public class StatMultiplier extends DelveModifier {
 
 	public static boolean canUseStatic(Player player) {
 		return DelvesUtils.getDelveInfo(player).getDepthPoints() > 0;
+	}
+
+	public static boolean isDepthsShard() {
+		return ServerProperties.getShardName().contains("depths")
+			|| ServerProperties.getShardName().equals("mobs")
+			|| ServerProperties.getShardName().startsWith("dev");
 	}
 
 	@Override

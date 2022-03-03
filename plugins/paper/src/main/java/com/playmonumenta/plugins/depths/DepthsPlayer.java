@@ -33,6 +33,8 @@ public class DepthsPlayer {
 	public boolean mUsedChaosThisFloor;
 	//Whether or not they have deleted an ability on this floor
 	public boolean mUsedAbilityDeletion;
+	//Whether or not they have mutated an ability on this floor
+	public boolean mUsedAbilityMutation;
 	//Individual treasure score. Copied from the party's treasure score when they die.
 	public int mFinalTreasureScore;
 	//Reward queue implementation to let the player catch up on reward chests they have missed later

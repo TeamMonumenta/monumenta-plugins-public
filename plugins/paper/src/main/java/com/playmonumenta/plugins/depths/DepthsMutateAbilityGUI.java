@@ -20,8 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DepthsRemoveAbilityGUI extends CustomInventory {
-	private static final int START_OF_PASSIVES = 36;
+public class DepthsMutateAbilityGUI extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final Material CONFIRM_MAT = Material.GREEN_STAINED_GLASS_PANE;
 	private static final Material CANCEL_MAT = Material.ORANGE_STAINED_GLASS_PANE;
@@ -43,18 +42,16 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 
 	private String mAbilityName;
 
-	public DepthsRemoveAbilityGUI(Player targetPlayer) {
-		super(targetPlayer, 54, "Remove an Ability");
+	public DepthsMutateAbilityGUI(Player targetPlayer) {
+		super(targetPlayer, 54, "Mutate an Ability Trigger");
 
-		TRIGGER_STRINGS.add(new TriggerData(18, DepthsTrigger.COMBO, "No Combo ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(19, DepthsTrigger.RIGHT_CLICK, "No Right Click ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(20, DepthsTrigger.SHIFT_LEFT_CLICK, "No Sneak Left Click ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(21, DepthsTrigger.SHIFT_RIGHT_CLICK, "No Sneak Right Click ability!"));
-		//empty space to be even
+		TRIGGER_STRINGS.add(new TriggerData(19, DepthsTrigger.COMBO, "No Combo ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(20, DepthsTrigger.RIGHT_CLICK, "No Right Click ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(21, DepthsTrigger.SHIFT_LEFT_CLICK, "No Sneak Left Click ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(22, DepthsTrigger.SHIFT_RIGHT_CLICK, "No Sneak Right Click ability!"));
 		TRIGGER_STRINGS.add(new TriggerData(23, DepthsTrigger.SPAWNER, "No Spawner Break ability!"));
 		TRIGGER_STRINGS.add(new TriggerData(24, DepthsTrigger.SHIFT_BOW, "No Sneak Bow ability!"));
 		TRIGGER_STRINGS.add(new TriggerData(25, DepthsTrigger.SWAP, "No Swap ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(26, DepthsTrigger.LIFELINE, "No Lifeline ability!"));
 
 		for (int i = 0; i < 54; i++) {
 			mInventory.setItem(i, new ItemStack(FILLER, 1));
@@ -84,12 +81,13 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 			for (DepthsAbility ability : abilities) {
 				if (ability.mInfo.mDisplayName != null && mAbilityName.contains(ability.mInfo.mDisplayName)) {
 					DepthsPlayer depthsplayer = instance.mPlayers.get(player.getUniqueId());
-					if (depthsplayer != null && !depthsplayer.mUsedAbilityDeletion) {
-						depthsplayer.mUsedAbilityDeletion = true;
+					if (depthsplayer != null && !depthsplayer.mUsedAbilityMutation) {
+						depthsplayer.mUsedAbilityMutation = true;
 						instance.setPlayerLevelInAbility(ability.getDisplayName(), player, 0);
 						event.getWhoClicked().closeInventory();
-						player.getWorld().playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.0f, 1.0f);
-						MessagingUtils.sendActionBarMessage(player, "Ability removed!");
+						DepthsManager.getInstance().getMutatedAbility(player, depthsplayer, ability.getTrigger(), ability.mInfo.mDisplayName);
+						player.getWorld().playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 1.0f, 1.0f);
+						MessagingUtils.sendActionBarMessage(player, "Ability mutated!");
 						return;
 					}
 				}
@@ -132,15 +130,12 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 		}
 
 		ItemStack createItem = createCustomItem(Material.PURPLE_STAINED_GLASS_PANE,
-		                                        "Click the ability to remove",
-		                                        "Remove 1 ability of your choosing at no cost.");
+		                                        "Click the ability to mutate",
+		                                        "Replace one ability trigger of your choosing.");
 		mInventory.setItem(4, createItem);
 
-		List<DepthsAbilityItem> passiveItems = new ArrayList<>();
 		for (DepthsAbilityItem item : items) {
-			if (item.mTrigger == DepthsTrigger.PASSIVE) {
-				passiveItems.add(item);
-			} else {
+			if (item.mTrigger != DepthsTrigger.PASSIVE) {
 				for (TriggerData data : TRIGGER_STRINGS) {
 					if (data.mTrigger == item.mTrigger) {
 						mInventory.setItem(data.mInvLocation, item.mItem);
@@ -148,10 +143,6 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 					}
 				}
 			}
-		}
-
-		for (int i = 0; i < passiveItems.size() && i < 18; i++) {
-			mInventory.setItem(i + START_OF_PASSIVES, passiveItems.get(i).mItem);
 		}
 
 		for (int i = 19; i <= 25; i++) {
