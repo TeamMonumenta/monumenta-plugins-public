@@ -68,6 +68,9 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public boolean COLLIDES_WITH_BLOCKS = true;
 
+		@BossParam(help = "Delay on each single cast between sound_start and the actual cast of the projectile")
+		public int SPELL_DELAY = 20 * 5;
+
 		@BossParam(help = "Let you choose the targets of this spell")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
 
@@ -120,7 +123,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 			//by default LaserBoss don't take player in stealt.
 		}
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
+			new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.COOLDOWN, p.SPELL_DELAY,
 					p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS, 0, p.COLLIDES_WITH_OTHERS,
 					//spell targets
 					() -> {
@@ -128,7 +131,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 					},
 					// Initiate Aesthetic
 					(World world, Location loc, int ticks) -> {
-						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DELAY, 0));
+						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.SPELL_DELAY, 0));
 						p.SOUND_START.play(loc);
 					},
 					// Launch Aesthetic
