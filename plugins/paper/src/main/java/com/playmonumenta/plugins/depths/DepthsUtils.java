@@ -265,7 +265,7 @@ public class DepthsUtils {
 		}
 
 		BlockData bd = l.getWorld().getBlockAt(l).getBlockData();
-		l.getWorld().getBlockAt(l).setType(ICE_MATERIAL);
+		l.getBlock().setType(ICE_MATERIAL);
 		iceActive.put(l, bd);
 		iceBarrier.put(l, isBarrier);
 
@@ -273,9 +273,11 @@ public class DepthsUtils {
 			@Override
 			public void run() {
 				if (iceActive.containsKey(l)) {
-					Block b = l.getWorld().getBlockAt(l);
-					if (b.getType() == ICE_MATERIAL) {
-						b.setBlockData(bd);
+					if (l.isChunkLoaded()) {
+						Block b = l.getBlock();
+						if (b.getType() == ICE_MATERIAL) {
+							b.setBlockData(bd);
+						}
 					}
 					iceActive.remove(l);
 					iceBarrier.remove(l);
