@@ -117,7 +117,7 @@ public class ElementalSpiritIce extends Ability {
 											ClassAbility.ELEMENTAL_ARROWS_ICE.equals(ability)
 											&& mElementalArrows != null
 										) {
-											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
+											finalDamage += Math.max(0, mElementalArrows.getLastDamage() * mLevelBowMultiplier);
 										}
 
 										DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.mLinkedSpell, true);

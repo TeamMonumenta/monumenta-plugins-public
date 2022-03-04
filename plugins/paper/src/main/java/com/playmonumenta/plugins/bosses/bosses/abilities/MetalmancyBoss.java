@@ -61,6 +61,9 @@ public class MetalmancyBoss extends BossAbilityGroup {
 	@Override
 	public void bossChangedTarget(EntityTargetEvent event) {
 		Entity target = event.getTarget();
+		if (target == null) {
+			return;
+		}
 		Set<String> tags = target.getScoreboardTags();
 		if (!EntityUtils.isHostileMob(target) || (tags != null && tags.contains(AbilityUtils.IGNORE_TAG))) {
 			event.setCancelled(true);

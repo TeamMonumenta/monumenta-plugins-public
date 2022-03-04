@@ -51,7 +51,7 @@ public class PercentDamageDealt extends Effect {
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
-			event.setDamage(event.getDamage() * (1 + mAmount));
+			event.setDamage(event.getDamage() * Math.max(0, 1 + mAmount));
 		}
 	}
 

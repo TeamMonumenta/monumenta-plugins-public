@@ -63,7 +63,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EntityEquipment;
@@ -955,17 +954,6 @@ public class FrostGiant extends BossAbilityGroup {
 		ItemUtils.setPlainName(item, newName);
 
 		return item;
-	}
-
-	@Override
-	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
-		if (event.getModifiedType().equals(PotionEffectType.SLOW)) {
-			if (event.getNewEffect().getAmplifier() > 0) {
-				event.getNewEffect().withAmplifier(event.getNewEffect().getAmplifier() - 1);
-			} else {
-				event.setCancelled(true);
-			}
-		}
 	}
 
 	@Override

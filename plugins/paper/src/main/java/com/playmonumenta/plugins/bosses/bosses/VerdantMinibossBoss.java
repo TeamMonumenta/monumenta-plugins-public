@@ -323,8 +323,8 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 						},
 						// Attack hit a player
 						(LivingEntity target) -> {
-							world.spawnParticle(Particle.BLOCK_CRACK, target.getEyeLocation(), 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK);
-							world.spawnParticle(Particle.BLOCK_CRACK, target.getEyeLocation(), 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE);
+							world.spawnParticle(Particle.BLOCK_CRACK, target.getEyeLocation(), 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
+							world.spawnParticle(Particle.BLOCK_CRACK, target.getEyeLocation(), 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
 							BossUtils.blockableDamage(mBoss, target, DamageType.MELEE, 20);
 						},
 						// Attack particles
