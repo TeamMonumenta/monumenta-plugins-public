@@ -1016,9 +1016,8 @@ public class BossManager implements Listener {
 	 */
 	private void checkDisablePerformanceEvents(Boss boss) {
 		if (boss.hasNearbyEntityDeathTrigger()) {
-			if (mNearbyEntityDeathEnabled == false) {
+			if (!mNearbyEntityDeathEnabled) {
 				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyEntityDeathTrigger but feature was not enabled. Definitely a bug!");
-				return;
 			}
 
 			/*
@@ -1026,21 +1025,14 @@ public class BossManager implements Listener {
 			 *
 			 * Need to check all other loaded bosses to see if it still needs to be enabled
 			 */
-			for (Boss testBoss : mBosses.values()) {
-				if (testBoss.hasNearbyEntityDeathTrigger()) {
-					/* Still at least one other boss that needs this - don't turn off yet */
-					return;
-				}
+			if (mBosses.values().stream().noneMatch(Boss::hasNearbyEntityDeathTrigger)) {
+				mNearbyEntityDeathEnabled = false;
 			}
-
-			/* No bosses still loaded that need this feature - turn it off */
-			mNearbyEntityDeathEnabled = false;
 		}
 
 		if (boss.hasNearbyBlockBreakTrigger()) {
-			if (mNearbyBlockBreakEnabled == false) {
+			if (!mNearbyBlockBreakEnabled) {
 				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyBlockBreakTrigger but feature was not enabled. Definitely a bug!");
-				return;
 			}
 
 			/*
@@ -1048,21 +1040,14 @@ public class BossManager implements Listener {
 			 *
 			 * Need to check all other loaded bosses to see if it still needs to be enabled
 			 */
-			for (Boss testBoss : mBosses.values()) {
-				if (testBoss.hasNearbyBlockBreakTrigger()) {
-					/* Still at least one other boss that needs this - don't turn off yet */
-					return;
-				}
+			if (mBosses.values().stream().noneMatch(Boss::hasNearbyBlockBreakTrigger)) {
+				mNearbyBlockBreakEnabled = false;
 			}
-
-			/* No bosses still loaded that need this feature - turn it off */
-			mNearbyBlockBreakEnabled = false;
 		}
 
 		if (boss.hasNearbyPlayerDeathTrigger()) {
-			if (mNearbyBlockBreakEnabled == false) {
+			if (!mNearbyBlockBreakEnabled) {
 				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyPlayerDeathTrigger but feature was not enabled. Definitely a bug!");
-				return;
 			}
 
 			/*
@@ -1070,15 +1055,9 @@ public class BossManager implements Listener {
 			 *
 			 * Need to check all other loaded bosses to see if it still needs to be enabled
 			 */
-			for (Boss testBoss : mBosses.values()) {
-				if (testBoss.hasNearbyPlayerDeathTrigger()) {
-					/* Still at least one other boss that needs this - don't turn off yet */
-					return;
-				}
+			if (mBosses.values().stream().noneMatch(Boss::hasNearbyPlayerDeathTrigger)) {
+				mNearbyPlayerDeathEnabled = false;
 			}
-
-			/* No bosses still loaded that need this feature - turn it off */
-			mNearbyPlayerDeathEnabled = false;
 		}
 	}
 
