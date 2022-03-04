@@ -32,6 +32,14 @@
 	</module>
 	<module name="TreeWalker">
 		<property name="tabWidth" value="4"/>
+		<module name="CustomImportOrder">
+			<property name="sortImportsInGroupAlphabetically"
+					  value="true"/>
+			<property name="standardPackageRegExp"
+					  value="^$"/>
+			<property name="customImportOrderRules"
+					  value="THIRD_PARTY_PACKAGE###STATIC"/>
+		</module>
 		<module name="OuterTypeFilename"/>
 		<module name="OneTopLevelClass"/>
 		<module name="NoLineWrap"/>
