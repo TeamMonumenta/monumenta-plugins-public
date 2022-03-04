@@ -108,8 +108,6 @@ public class FileUtils {
 					matchedFiles.add(path.toFile());
 				}
 			});
-		} catch (Exception ex) {
-			ex.printStackTrace();
 		}
 
 		return matchedFiles;
