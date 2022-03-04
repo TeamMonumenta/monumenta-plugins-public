@@ -4,14 +4,13 @@ import com.playmonumenta.libraryofsouls.Soul;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import dev.jorel.commandapi.Tooltip;
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import javax.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 
 public class LoSPool {
 

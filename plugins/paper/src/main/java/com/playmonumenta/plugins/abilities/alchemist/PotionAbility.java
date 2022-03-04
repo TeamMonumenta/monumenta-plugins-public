@@ -2,12 +2,12 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
 public abstract class PotionAbility extends Ability {
 

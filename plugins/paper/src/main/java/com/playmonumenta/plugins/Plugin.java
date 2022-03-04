@@ -83,16 +83,15 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
 
 public class Plugin extends JavaPlugin {
 	public static final boolean IS_PLAY_SERVER;

@@ -2,16 +2,15 @@ package com.playmonumenta.plugins.tracking;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import org.bukkit.Material;
 import org.bukkit.TreeSpecies;
 import org.bukkit.World;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 public class BoatTracking implements EntityTracking {
 	private Set<Boat> mEntities = new HashSet<Boat>();

@@ -1,7 +1,6 @@
 package com.playmonumenta.bungeecord.commands;
 
 import com.playmonumenta.bungeecord.voting.VoteManager;
-
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;

@@ -2,7 +2,10 @@ package com.playmonumenta.plugins.guis;
 
 import com.playmonumenta.plugins.guis.singlepageguis.ExampleSinglePageGUI;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import javax.annotation.Nullable;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,11 +14,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import javax.annotation.Nullable;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class SinglePageGUIManager implements Listener {
 

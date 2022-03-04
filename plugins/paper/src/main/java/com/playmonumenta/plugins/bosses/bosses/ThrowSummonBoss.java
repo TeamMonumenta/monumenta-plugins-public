@@ -3,11 +3,10 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellThrowSummon;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
-
 import java.util.Arrays;
 import java.util.Collections;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
 
 public class ThrowSummonBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_throwsummon";

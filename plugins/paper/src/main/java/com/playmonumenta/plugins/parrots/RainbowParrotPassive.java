@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.parrots;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import org.bukkit.entity.Parrot;
-
 import java.util.Arrays;
 import java.util.List;
+import org.bukkit.entity.Parrot;
 
 class RainbowParrotPassive extends Spell {
 	private static final List<Parrot.Variant> mVariants = Arrays.asList(

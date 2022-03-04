@@ -1,11 +1,5 @@
 package com.playmonumenta.plugins.protocollib;
 
-import java.util.Collection;
-import java.util.List;
-
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
@@ -16,6 +10,10 @@ import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.GlowingCommand;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.Collection;
+import java.util.List;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 /**
  * Packet listener for selectively disabling the glowing effect

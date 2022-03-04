@@ -1,11 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
-
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
-
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class SpellDrawAggro extends Spell {
 	private LivingEntity mBoss;

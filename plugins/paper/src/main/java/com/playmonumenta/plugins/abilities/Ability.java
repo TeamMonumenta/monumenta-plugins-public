@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Ineptitude;
 import com.playmonumenta.plugins.itemstats.infusions.Epoch;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.Collection;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
@@ -34,8 +35,6 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Collection;
 
 
 public abstract class Ability {

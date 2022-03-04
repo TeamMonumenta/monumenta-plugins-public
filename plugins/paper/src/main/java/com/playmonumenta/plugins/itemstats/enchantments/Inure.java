@@ -7,13 +7,12 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import java.util.NavigableSet;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.NavigableSet;
 
 public class Inure implements Enchantment {
 

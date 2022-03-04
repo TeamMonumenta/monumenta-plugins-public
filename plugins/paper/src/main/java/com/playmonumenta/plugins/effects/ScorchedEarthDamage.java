@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 
 public class ScorchedEarthDamage extends Effect {
 	private double mBonusDamage;

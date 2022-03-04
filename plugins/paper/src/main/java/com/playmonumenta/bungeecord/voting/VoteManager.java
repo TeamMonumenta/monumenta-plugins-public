@@ -1,5 +1,8 @@
 package com.playmonumenta.bungeecord.voting;
 
+import com.playmonumenta.bungeecord.listeners.NameListener;
+import com.vexsoftware.votifier.bungee.events.VotifierEvent;
+import com.vexsoftware.votifier.model.Vote;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -11,11 +14,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
-
-import com.playmonumenta.bungeecord.listeners.NameListener;
-import com.vexsoftware.votifier.bungee.events.VotifierEvent;
-import com.vexsoftware.votifier.model.Vote;
-
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

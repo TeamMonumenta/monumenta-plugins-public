@@ -18,6 +18,15 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import io.papermc.paper.adventure.AdventureComponent;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.IntStream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -30,16 +39,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
 import org.bukkit.entity.Slime;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.IntStream;
 
 public class PlayerTitlePacketAdapter extends PacketAdapter {
 

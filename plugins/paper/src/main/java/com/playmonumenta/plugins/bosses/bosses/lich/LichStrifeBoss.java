@@ -7,15 +7,14 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.lich.horseman.SpellLichSinisterReach;
+import java.util.Arrays;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class LichStrifeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_strife";

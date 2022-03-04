@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
 
 public class DepthsAbilitiesGUI extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;

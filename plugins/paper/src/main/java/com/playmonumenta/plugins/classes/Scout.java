@@ -15,12 +15,12 @@ import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
 
 
 public class Scout extends PlayerClass {

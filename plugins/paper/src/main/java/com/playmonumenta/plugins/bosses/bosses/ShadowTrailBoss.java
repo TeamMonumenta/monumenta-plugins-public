@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseTrail;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import java.util.Arrays;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -12,9 +14,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class ShadowTrailBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_shadowtrail";

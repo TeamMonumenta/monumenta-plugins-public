@@ -10,6 +10,9 @@ import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.executors.CommandExecutor;
 import dev.jorel.commandapi.executors.PlayerCommandExecutor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -17,10 +20,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
 
 public class Grave {
 	private static final String SUMMON_LIST_TAG = "SummonGraveSelect";

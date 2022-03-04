@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.custominventories;
 
+import java.util.Map;
+import java.util.function.BiFunction;
+import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
-
-import java.util.Map;
-import java.util.function.BiFunction;
 
 public class GuiItem {
 	private final int mPage;

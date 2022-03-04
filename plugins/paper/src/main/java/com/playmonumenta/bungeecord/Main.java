@@ -1,16 +1,14 @@
 package com.playmonumenta.bungeecord;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-
 import com.playmonumenta.bungeecord.commands.Vote;
 import com.playmonumenta.bungeecord.integrations.NetworkRelayIntegration;
 import com.playmonumenta.bungeecord.listeners.EventListener;
 import com.playmonumenta.bungeecord.listeners.NameListener;
 import com.playmonumenta.bungeecord.reconnect.MonumentaReconnectHandler;
 import com.playmonumenta.bungeecord.voting.VoteManager;
-
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.config.Configuration;

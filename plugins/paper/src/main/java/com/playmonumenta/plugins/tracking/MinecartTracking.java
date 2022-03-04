@@ -2,6 +2,9 @@ package com.playmonumenta.plugins.tracking;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
@@ -10,10 +13,6 @@ import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 public class MinecartTracking implements EntityTracking {
 	private Set<Minecart> mEntities = new HashSet<Minecart>();

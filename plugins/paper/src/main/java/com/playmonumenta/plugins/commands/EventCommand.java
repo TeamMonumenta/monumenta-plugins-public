@@ -1,19 +1,18 @@
 package com.playmonumenta.plugins.commands;
 
 
-import com.playmonumenta.plugins.seasonalevents.MonumentaContent;
 import com.playmonumenta.plugins.events.MonumentaEvent;
+import com.playmonumenta.plugins.seasonalevents.MonumentaContent;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.executors.CommandExecutor;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class EventCommand extends GenericCommand {
 	public static final String COMMAND = "event";

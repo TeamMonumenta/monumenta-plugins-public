@@ -3,11 +3,10 @@ package com.playmonumenta.plugins.commands.experiencinator;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import org.bukkit.entity.Player;
-
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
+import org.bukkit.entity.Player;
 
 /**
  * Handles the Experiencinator settings stored as packed decimals in scoreboards.

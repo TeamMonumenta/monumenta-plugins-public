@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collection;
 import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -16,8 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.Collection;
 
 public class ScytheAspect extends WeaponAspectDepthsAbility {
 

@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.messaging.MessagingService;
@@ -16,9 +18,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
-
-import java.util.Optional;
 
 public class LuckPermsIntegration {
 	protected static LuckPerms LP = null;

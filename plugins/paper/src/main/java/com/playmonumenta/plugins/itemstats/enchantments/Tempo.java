@@ -6,12 +6,11 @@ import com.playmonumenta.plugins.effects.OnHitTimerEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import java.util.NavigableSet;
+import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-import javax.annotation.Nullable;
-import java.util.NavigableSet;
 
 public class Tempo implements Enchantment {
 

@@ -3,13 +3,13 @@ package com.playmonumenta.plugins.abilities.alchemist;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
 
 public class EmpoweringOdor extends PotionAbility {
 	public static final int POTION_RECHARGE_TIME_REDUCTION_2 = 10;

@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.destroystokyo.paper.event.entity.WitchThrowPotionEvent;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
@@ -12,12 +17,6 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.destroystokyo.paper.event.entity.WitchThrowPotionEvent;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class WitchListener implements Listener {
 

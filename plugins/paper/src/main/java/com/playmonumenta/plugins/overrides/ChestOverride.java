@@ -6,6 +6,10 @@ import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.TOVUtils;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
+import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -22,11 +26,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
-
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
 
 public class ChestOverride extends BaseOverride {
 	// Convenience list of offsets to get adjacent blocks

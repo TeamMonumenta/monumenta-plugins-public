@@ -7,11 +7,10 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
-
-import java.util.UUID;
 
 public class ClaimRaffle {
 	private static final String CONFIRMED_METAKEY = "MonumentaRaffleClaimMetadata";

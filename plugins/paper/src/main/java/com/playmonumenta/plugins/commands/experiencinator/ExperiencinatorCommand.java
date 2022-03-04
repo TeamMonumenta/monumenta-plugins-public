@@ -12,14 +12,13 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiConsumer;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiConsumer;
 
 public class ExperiencinatorCommand {
 

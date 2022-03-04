@@ -4,12 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.abilities.delves.DelveModifier;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import javax.annotation.Nullable;
-
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 public class AbilityCollection {
 

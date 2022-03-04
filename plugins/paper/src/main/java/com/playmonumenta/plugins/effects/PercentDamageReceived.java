@@ -3,10 +3,9 @@ package com.playmonumenta.plugins.effects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.EnumSet;
 import org.bukkit.entity.LivingEntity;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.EnumSet;
 
 public class PercentDamageReceived extends Effect {
 

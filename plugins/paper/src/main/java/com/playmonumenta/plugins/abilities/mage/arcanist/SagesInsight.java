@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import java.util.HashMap;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -20,8 +21,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashMap;
 
 public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DECAY_TIMER = 20 * 4;

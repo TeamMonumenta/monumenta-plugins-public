@@ -12,10 +12,9 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTType;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
 
 /**
  * Removes unnecessary info from equipment items to reduce network load.

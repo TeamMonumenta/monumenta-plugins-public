@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -34,7 +35,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
 
 /**
  * These listeners work together with ShulkerInventoryManager and ShulkerInventory to

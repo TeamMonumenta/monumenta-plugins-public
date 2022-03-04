@@ -1,13 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.events.DamageEvent;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;

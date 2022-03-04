@@ -4,6 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -19,13 +25,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 public class ParrotManager implements Listener {
 

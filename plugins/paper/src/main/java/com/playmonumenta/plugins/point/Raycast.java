@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.point;
 
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -10,8 +11,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
-import java.util.List;
 
 public class Raycast {
 

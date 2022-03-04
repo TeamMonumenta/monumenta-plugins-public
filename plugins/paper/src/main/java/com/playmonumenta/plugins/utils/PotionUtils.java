@@ -7,6 +7,13 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableSet;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -18,14 +25,6 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableSet;
 
 
 public class PotionUtils {

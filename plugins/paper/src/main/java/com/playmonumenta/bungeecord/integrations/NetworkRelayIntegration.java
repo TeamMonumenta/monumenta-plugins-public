@@ -1,13 +1,11 @@
 package com.playmonumenta.bungeecord.integrations;
 
-import java.util.UUID;
-import java.util.logging.Logger;
-
 import com.google.gson.JsonObject;
 import com.playmonumenta.bungeecord.voting.VoteManager;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEventBungee;
-
+import java.util.UUID;
+import java.util.logging.Logger;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;

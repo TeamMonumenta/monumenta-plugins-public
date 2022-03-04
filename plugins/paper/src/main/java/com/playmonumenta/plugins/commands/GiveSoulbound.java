@@ -9,12 +9,11 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.ItemStackArgument;
 import dev.jorel.commandapi.arguments.LootTableArgument;
+import java.util.Collection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
-
-import java.util.Collection;
 
 /*
  * NOTICE!

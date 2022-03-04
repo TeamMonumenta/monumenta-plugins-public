@@ -8,6 +8,9 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.LiteralArgument;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.HumanEntity;
@@ -24,10 +27,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 public final class ItemDropListener implements Listener {
 	public static final String COMMAND = "disabledrop";

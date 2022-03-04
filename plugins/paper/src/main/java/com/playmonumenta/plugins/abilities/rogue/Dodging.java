@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import java.util.Collection;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,8 +25,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
-
-import java.util.Collection;
 
 
 

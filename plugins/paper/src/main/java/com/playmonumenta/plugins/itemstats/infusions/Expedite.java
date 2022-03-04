@@ -8,12 +8,11 @@ import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-import java.util.NavigableSet;
-import java.util.TreeSet;
 
 public class Expedite implements Infusion {
 

@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.commands;
 
+import com.opencsv.CSVReader;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -7,11 +10,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.opencsv.CSVReader;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;

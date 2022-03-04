@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.player;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -20,8 +21,6 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Objects;
 
 public class PlayerInventoryManager {
 	/*

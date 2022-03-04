@@ -1,12 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Collections;
-import java.util.Set;
-
 import com.playmonumenta.plugins.abilities.delves.Chivalrous;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
-
+import java.util.Collections;
+import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;

@@ -5,9 +5,8 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.entity.Player;
-
 import java.util.EnumSet;
+import org.bukkit.entity.Player;
 
 public class Regeneration implements Enchantment {
 	// Level 1 heals 1 health total every 3s.

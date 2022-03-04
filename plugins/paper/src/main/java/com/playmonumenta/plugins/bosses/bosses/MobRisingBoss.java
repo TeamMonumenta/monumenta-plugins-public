@@ -1,14 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
-
+import java.util.Arrays;
+import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;

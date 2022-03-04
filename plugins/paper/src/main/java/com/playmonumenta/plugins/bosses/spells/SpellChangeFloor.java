@@ -1,12 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;

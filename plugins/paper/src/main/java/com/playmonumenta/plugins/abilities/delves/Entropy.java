@@ -2,8 +2,8 @@ package com.playmonumenta.plugins.abilities.delves;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
-import org.bukkit.entity.Player;
 import javax.annotation.Nullable;
+import org.bukkit.entity.Player;
 
 public class Entropy extends DelveModifier {
 

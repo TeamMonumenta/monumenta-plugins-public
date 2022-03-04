@@ -11,6 +11,9 @@ import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -34,10 +37,6 @@ import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 public class Twisted extends DelveModifier {
 

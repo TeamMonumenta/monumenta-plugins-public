@@ -16,6 +16,10 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -42,11 +46,6 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
-
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 public class DepthsListener implements Listener {
 	Plugin mPlugin = null;

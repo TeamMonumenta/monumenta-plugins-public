@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.Collection;
+import java.util.List;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Collection;
-import java.util.List;
 
 public class Magnetize extends GenericCommand {
 

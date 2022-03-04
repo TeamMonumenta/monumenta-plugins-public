@@ -1,10 +1,25 @@
 package com.playmonumenta.plugins.depths.abilities.dawnbringer;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,24 +33,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 
 public class TotemOfSalvation extends DepthsAbility {
 

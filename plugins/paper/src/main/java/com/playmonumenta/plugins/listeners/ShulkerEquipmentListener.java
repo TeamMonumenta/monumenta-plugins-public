@@ -9,6 +9,10 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -31,11 +35,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
 
 public class ShulkerEquipmentListener implements Listener {
 	private static final String LOCK_STRING = "AdminEquipmentTool";

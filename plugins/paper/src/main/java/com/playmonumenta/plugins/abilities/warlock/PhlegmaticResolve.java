@@ -11,13 +11,12 @@ import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
-
-import java.util.stream.Stream;
 
 public class PhlegmaticResolve extends Ability {
 

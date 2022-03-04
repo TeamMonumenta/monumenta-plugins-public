@@ -4,12 +4,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 public class EsotericEnhancements extends PotionAbility {
 	private static final int PARALYZE_DURATION = 8 * 20;

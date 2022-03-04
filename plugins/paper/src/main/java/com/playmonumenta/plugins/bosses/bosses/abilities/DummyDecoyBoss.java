@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses.abilities;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
@@ -10,7 +7,8 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellDrawAggro;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;

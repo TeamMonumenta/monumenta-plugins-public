@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class SpellPushPlayersAway extends Spell {
 	private Entity mLauncher;

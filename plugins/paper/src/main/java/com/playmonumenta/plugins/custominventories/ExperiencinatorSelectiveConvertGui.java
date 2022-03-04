@@ -10,6 +10,9 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -19,10 +22,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import static org.bukkit.ChatColor.BOLD;
 import static org.bukkit.ChatColor.GOLD;

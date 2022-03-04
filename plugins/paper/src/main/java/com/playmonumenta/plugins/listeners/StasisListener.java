@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Stasis;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -17,12 +22,6 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.projectiles.ProjectileSource;
-import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Stasis;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 
 public class StasisListener implements Listener {
 

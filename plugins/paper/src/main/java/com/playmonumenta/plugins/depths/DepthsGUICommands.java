@@ -2,16 +2,14 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
 import java.util.EnumSet;
 import java.util.List;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public class DepthsGUICommands {
 	public static void register(Plugin plugin) {

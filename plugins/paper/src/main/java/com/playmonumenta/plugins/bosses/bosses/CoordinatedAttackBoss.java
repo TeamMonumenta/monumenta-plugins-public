@@ -6,6 +6,9 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -18,10 +21,6 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 public class CoordinatedAttackBoss extends BossAbilityGroup {
 

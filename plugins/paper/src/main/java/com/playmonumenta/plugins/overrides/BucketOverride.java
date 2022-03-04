@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -11,7 +12,6 @@ import org.bukkit.entity.Fish;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
 
 public class BucketOverride extends BaseOverride {
 	@Override

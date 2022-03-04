@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.Collection;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -9,8 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Collection;
 
 public class EnderChestOverride extends BaseOverride {
 	@Override

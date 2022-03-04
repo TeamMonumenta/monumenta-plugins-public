@@ -17,6 +17,9 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Collection;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -41,10 +44,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Collection;
 
 public class VerdantMinibossBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_verdantmini";

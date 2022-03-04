@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.integrations;
 
 import de.myzelyam.api.vanish.VanishAPI;
-import javax.annotation.Nullable;
-import org.bukkit.GameMode;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 
 public class PremiumVanishIntegration {
 	private static @Nullable PremiumVanishIntegration INSTANCE = null;

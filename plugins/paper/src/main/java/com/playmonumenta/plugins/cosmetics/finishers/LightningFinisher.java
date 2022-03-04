@@ -8,12 +8,12 @@ import com.playmonumenta.plugins.player.PartialParticle;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LightningFinisher {

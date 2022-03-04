@@ -1,12 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
-
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.Collections;
+import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 

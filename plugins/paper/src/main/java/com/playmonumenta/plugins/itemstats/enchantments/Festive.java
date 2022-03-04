@@ -6,6 +6,9 @@ import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -13,10 +16,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 public class Festive implements Infusion {
 

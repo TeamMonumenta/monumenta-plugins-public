@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.itemstats.infusions;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 public class Nutriment implements Infusion {
 

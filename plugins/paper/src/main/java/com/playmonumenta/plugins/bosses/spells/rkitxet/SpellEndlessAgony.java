@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.bosses.bosses.RKitxet;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.player.PPGroundCircle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.List;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -17,9 +19,6 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.Collections;
-import java.util.List;
 
 public class SpellEndlessAgony extends Spell {
 	public static final Particle.DustOptions ENDLESS_AGONY_COLOR = new Particle.DustOptions(Color.fromRGB(214, 58, 166), 1.65f);

@@ -29,6 +29,16 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.function.DoubleFunction;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,17 +55,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.function.DoubleFunction;
-import java.util.function.ToDoubleFunction;
-import java.util.stream.Stream;
 
 public class PlayerItemStatsGUI extends CustomInventory {
 

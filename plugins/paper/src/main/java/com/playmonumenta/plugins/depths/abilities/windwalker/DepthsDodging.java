@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import java.util.Collection;
 import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -25,8 +26,6 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
-
-import java.util.Collection;
 
 public class DepthsDodging extends DepthsAbility {
 

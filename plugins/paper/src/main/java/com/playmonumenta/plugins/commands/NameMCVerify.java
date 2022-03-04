@@ -3,11 +3,6 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
 import dev.jaqobb.namemcapi.NameMCAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -16,6 +11,9 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.FunctionArgument;
 import dev.jorel.commandapi.arguments.ObjectiveArgument;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 public class NameMCVerify extends GenericCommand {
 	public static void register(Plugin plugin) {

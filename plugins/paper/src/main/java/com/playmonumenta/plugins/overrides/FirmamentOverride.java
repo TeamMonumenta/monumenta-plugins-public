@@ -13,6 +13,8 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBTItem;
+import java.util.List;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -34,9 +36,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import javax.annotation.Nullable;
-
-import java.util.List;
 
 public class FirmamentOverride extends BaseOverride {
 	private static final String CAN_PLACE_SHULKER_PERM = "monumenta.canplaceshulker";

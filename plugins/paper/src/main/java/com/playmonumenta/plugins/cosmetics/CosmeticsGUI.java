@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.cosmetics;
 
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.util.ArrayList;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -13,9 +15,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CosmeticsGUI extends CustomInventory {
 

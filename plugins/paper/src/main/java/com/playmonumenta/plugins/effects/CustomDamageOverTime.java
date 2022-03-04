@@ -3,13 +3,12 @@ package com.playmonumenta.plugins.effects;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Particle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-import javax.annotation.Nullable;
 
 public class CustomDamageOverTime extends Effect {
 

@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.infusions.Understanding;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -17,9 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DelveInfusionUtils {
 

@@ -4,12 +4,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import java.util.HashSet;
+import java.util.UUID;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.HashSet;
-import java.util.UUID;
 
 public class Darksight implements Enchantment {
 

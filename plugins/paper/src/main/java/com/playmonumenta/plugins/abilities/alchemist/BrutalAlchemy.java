@@ -6,14 +6,13 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhanceme
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 public class BrutalAlchemy extends PotionAbility {
 	private static final int BRUTAL_ALCHEMY_1_DAMAGE = 1;

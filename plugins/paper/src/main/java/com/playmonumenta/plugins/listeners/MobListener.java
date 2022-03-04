@@ -9,6 +9,10 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.ListIterator;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -47,11 +51,6 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
-
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.ListIterator;
 
 public class MobListener implements Listener {
 	static final int SPAWNER_DROP_THRESHOLD = 20;

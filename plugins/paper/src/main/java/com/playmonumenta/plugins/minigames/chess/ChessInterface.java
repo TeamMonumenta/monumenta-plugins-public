@@ -5,6 +5,13 @@ import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
@@ -19,14 +26,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class ChessInterface {
 	public enum InterfaceType {

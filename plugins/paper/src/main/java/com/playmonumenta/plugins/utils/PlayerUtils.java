@@ -8,6 +8,11 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.NavigableSet;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,12 +26,6 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.NavigableSet;
-import java.util.Optional;
 
 
 public class PlayerUtils {

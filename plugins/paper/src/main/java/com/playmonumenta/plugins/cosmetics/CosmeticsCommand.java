@@ -8,11 +8,10 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public class CosmeticsCommand extends GenericCommand {
 

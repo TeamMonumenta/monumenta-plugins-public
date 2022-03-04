@@ -6,12 +6,11 @@ import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Collections;
 
 public class OnHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_onhit";

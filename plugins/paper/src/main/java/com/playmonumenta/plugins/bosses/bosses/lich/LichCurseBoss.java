@@ -1,15 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses.lich;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.lich.undeadplayers.SpellLichCurse;
 import com.playmonumenta.plugins.events.DamageEvent;
-
+import java.util.Arrays;
+import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

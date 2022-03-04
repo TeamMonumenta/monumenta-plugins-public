@@ -7,10 +7,9 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.entity.Player;
 
 /*
  * NOTICE!

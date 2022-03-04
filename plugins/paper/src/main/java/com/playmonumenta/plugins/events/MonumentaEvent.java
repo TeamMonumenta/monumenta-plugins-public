@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.events;
 
+import java.time.Instant;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-
-import java.time.Instant;
 
 public class MonumentaEvent extends Event implements Cancellable {
 

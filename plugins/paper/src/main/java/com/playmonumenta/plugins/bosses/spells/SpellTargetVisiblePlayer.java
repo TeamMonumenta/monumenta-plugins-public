@@ -4,14 +4,13 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-
-import java.util.Collections;
-import java.util.List;
 
 /*
  * This spell is designed to run as a passive. Here are the rules:

@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.effects;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import javax.annotation.Nullable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 public class CustomRegeneration extends Effect {
 

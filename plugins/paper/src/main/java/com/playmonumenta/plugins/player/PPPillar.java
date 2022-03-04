@@ -2,9 +2,9 @@ package com.playmonumenta.plugins.player;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.utils.FastUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import javax.annotation.Nullable;
 
 
 

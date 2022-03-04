@@ -5,10 +5,10 @@ import com.playmonumenta.plugins.bosses.bosses.CarapaceBoss;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import javax.annotation.Nullable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntitySpawnEvent;
-import javax.annotation.Nullable;
 
 public class Carapace extends DelveModifier {
 

@@ -12,12 +12,6 @@ import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.commands.BossTagCommand.TypeAndDesc;
 import com.playmonumenta.plugins.utils.BossUtils;
 import dev.jorel.commandapi.Tooltip;
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
-import org.bukkit.potion.PotionEffectType;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,6 +19,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
+import org.bukkit.potion.PotionEffectType;
 
 public abstract class BossParameters {
 

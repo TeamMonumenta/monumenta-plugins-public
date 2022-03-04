@@ -14,6 +14,8 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.EnumSet;
+import java.util.NavigableSet;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -26,9 +28,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.EnumSet;
-import java.util.NavigableSet;
 
 
 public class DarkPact extends Ability {

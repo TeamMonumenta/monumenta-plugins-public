@@ -1,8 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.logging.Logger;
-
 import com.playmonumenta.plugins.adapters.VersionAdapter;
+import java.util.logging.Logger;
 
 public class NmsUtils {
 	private static VersionAdapter mVersionAdapter = null;

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.itemstats;
 
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
-
 import java.util.EnumSet;
 
 public interface Enchantment extends ItemStat {

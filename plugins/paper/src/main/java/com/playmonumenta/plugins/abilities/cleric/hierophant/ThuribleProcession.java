@@ -13,6 +13,8 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.EnumSet;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -22,9 +24,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.EnumSet;
-import java.util.List;
 
 public class ThuribleProcession extends Ability implements AbilityWithChargesOrStacks {
 

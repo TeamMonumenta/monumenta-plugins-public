@@ -15,12 +15,12 @@ import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
 
 
 public class Alchemist extends PlayerClass {

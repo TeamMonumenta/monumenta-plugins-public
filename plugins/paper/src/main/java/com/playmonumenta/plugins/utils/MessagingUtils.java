@@ -1,15 +1,10 @@
 package com.playmonumenta.plugins.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Duration;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -19,6 +14,8 @@ import net.kyori.adventure.text.minimessage.transformation.TransformationType;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 
 

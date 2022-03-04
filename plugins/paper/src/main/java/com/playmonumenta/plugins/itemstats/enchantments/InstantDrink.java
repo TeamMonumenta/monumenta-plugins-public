@@ -1,5 +1,15 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -16,18 +26,6 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.itemstats.Enchantment;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-
-import de.tr7zw.nbtapi.NBTItem;
 
 public class InstantDrink implements Enchantment {
 

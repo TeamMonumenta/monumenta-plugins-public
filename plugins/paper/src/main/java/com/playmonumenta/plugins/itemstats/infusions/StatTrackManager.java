@@ -8,13 +8,12 @@ import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.UUID;
 
 
 public class StatTrackManager {

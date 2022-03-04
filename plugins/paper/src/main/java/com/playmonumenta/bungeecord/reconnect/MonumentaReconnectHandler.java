@@ -1,7 +1,6 @@
 package com.playmonumenta.bungeecord.reconnect;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -13,13 +12,11 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
-
-import org.yaml.snakeyaml.Yaml;
-
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ReconnectHandler;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.yaml.snakeyaml.Yaml;
 
 public class MonumentaReconnectHandler implements ReconnectHandler {
 
