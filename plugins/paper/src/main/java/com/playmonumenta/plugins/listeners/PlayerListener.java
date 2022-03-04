@@ -29,6 +29,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -159,6 +160,8 @@ public class PlayerListener implements Listener {
 		player.removeScoreboardTag("MidTransfer");
 
 		mPlugin.mTrackingManager.addEntity(player);
+		mPlugin.mAbilityManager.playerJoinEvent(player, event);
+
 		DailyReset.handle(mPlugin, player);
 		//This checks to make sure that when you login you aren't stuck in blocks, just in case the lag that causes you to fall also kicks you. You don't want to be stuck in dirt forever, right?
 		Location loc = player.getLocation();
@@ -224,6 +227,12 @@ public class PlayerListener implements Listener {
 		if (playersTeam != null) {
 			playersTeam.removeEntry(player.getName());
 		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void playerSaveEvent(PlayerSaveEvent event) {
+		Player player = event.getPlayer();
+		mPlugin.mAbilityManager.playerSaveEvent(player, event);
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)

@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +30,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+
+import javax.annotation.Nullable;
 
 public class BodkinBlitz extends MultipleChargeAbility {
 
@@ -63,6 +64,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 		mMaxCharges = BODKINBLITZ_MAX_CHARGES;
+		mCharges = getTrackedCharges();
 
 		mStealthDuration = getAbilityScore() == 1 ? BODKINBLITZ_1_STEALTH_DURATION : BODKINBLITZ_2_STEALTH_DURATION;
 		mBonusDmg = getAbilityScore() == 1 ? BODKINBLITZ_1_BONUS_DMG : BODKINBLITZ_2_BONUS_DMG;

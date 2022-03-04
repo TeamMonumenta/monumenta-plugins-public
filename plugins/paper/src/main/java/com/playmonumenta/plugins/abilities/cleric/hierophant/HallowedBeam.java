@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -35,6 +34,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import javax.annotation.Nullable;
 
 
 
@@ -71,6 +72,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BOW, 1);
 		mMaxCharges = getAbilityScore() == 1 ? HALLOWED_1_MAX_CHARGES : HALLOWED_2_MAX_CHARGES;
+		mCharges = getTrackedCharges();
 		if (player != null) {
 			mMode = ScoreboardUtils.getScoreboardValue(player, MODE_SCOREBOARD).orElse(0);
 		}

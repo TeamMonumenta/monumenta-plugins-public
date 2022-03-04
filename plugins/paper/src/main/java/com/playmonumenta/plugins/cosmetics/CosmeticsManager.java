@@ -206,9 +206,9 @@ public class CosmeticsManager implements Listener {
 		JsonObject cosmeticData = MonumentaRedisSyncAPI.getPlayerPluginData(p.getUniqueId(), KEY_PLUGIN_DATA);
 		if (cosmeticData != null) {
 			if (cosmeticData.has(KEY_COSMETICS)) {
-				JsonArray charmArray = cosmeticData.getAsJsonArray(KEY_COSMETICS);
+				JsonArray cosmeticArray = cosmeticData.getAsJsonArray(KEY_COSMETICS);
 				List<Cosmetic> playerCosmetics = new ArrayList<>();
-				for (JsonElement cosmeticElement : charmArray) {
+				for (JsonElement cosmeticElement : cosmeticArray) {
 					JsonObject data = cosmeticElement.getAsJsonObject();
 					if (data.has("name") && data.has("type") && data.has("enabled")) {
 						playerCosmetics.add(new Cosmetic(CosmeticType.getTypeSelection(data.getAsJsonPrimitive("type").getAsString()), data.getAsJsonPrimitive("name").getAsString(),

@@ -61,6 +61,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 		mMaxCharges = getAbilityScore() == 1 ? BLADE_1_MAX_CHARGES : BLADE_2_MAX_CHARGES;
+		mCharges = getTrackedCharges();
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {

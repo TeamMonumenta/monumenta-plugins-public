@@ -63,6 +63,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BROWN_DYE, 1);
 		mMaxCharges = getAbilityScore() == 1 ? SCORCHED_EARTH_1_CHARGES : SCORCHED_EARTH_2_CHARGES;
+		mCharges = getTrackedCharges();
 		mCenters = new HashMap<>();
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);

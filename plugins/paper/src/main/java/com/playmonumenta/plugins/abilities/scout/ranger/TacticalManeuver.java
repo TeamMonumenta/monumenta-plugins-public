@@ -51,6 +51,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.STRING, 1);
 		mMaxCharges = getAbilityScore() == 1 ? TACTICAL_MANEUVER_1_MAX_CHARGES : TACTICAL_MANEUVER_2_MAX_CHARGES;
+		mCharges = getTrackedCharges();
 	}
 
 	@Override

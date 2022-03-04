@@ -57,6 +57,7 @@ public class WindWalk extends MultipleChargeAbility {
 		mDisplayItem = new ItemStack(Material.QUARTZ, 1);
 		mDuration = getAbilityScore() == 1 ? WIND_WALK_1_DURATION : WIND_WALK_2_DURATION;
 		mMaxCharges = WIND_WALK_MAX_CHARGES;
+		mCharges = getTrackedCharges();
 	}
 
 	@Override
