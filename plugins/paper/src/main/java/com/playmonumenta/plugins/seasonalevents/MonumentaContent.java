@@ -24,7 +24,7 @@ public enum MonumentaContent {
 	PURPLE("purple", ContentType.DUNGEON, 2),
 	TEAL("teal", ContentType.DUNGEON, 2),
 	FORUM("forum", ContentType.DUNGEON, 2),
-	SHIFTING("shifting", ContentType.DUNGEON, 2),
+	SHIFTING("shiftingcity", ContentType.DUNGEON, 2),
 	DEPTHS("depths", ContentType.DUNGEON, 2), // Called from depths party in plugin
 	MIST("mist", ContentType.STRIKE, 2),
 	REMORSE("remorse", ContentType.STRIKE, 2),
