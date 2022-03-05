@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.adapters;
 import javax.annotation.Nullable;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -46,16 +45,6 @@ public interface VersionAdapter {
 	void stunShield(Player player, int ticks);
 
 	void cancelStrafe(Mob mob);
-
-	/**
-	 * Spawns an entity that will not be present in the world
-	 *
-	 * @param type  Entity type to spawn - not all types may work!
-	 * @param world Any world (required for the constructor, and used for activation range and possibly some more things)
-	 * @return Newly spawned entity
-	 * @throws IllegalArgumentException if the provided entity type cannot be spawned
-	 */
-	Entity spawnWorldlessEntity(EntityType type, World world);
 
 	int getEntityTypeRegistryId(Entity entity);
 

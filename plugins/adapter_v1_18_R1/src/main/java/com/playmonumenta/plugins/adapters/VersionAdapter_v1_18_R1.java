@@ -3,8 +3,6 @@ package com.playmonumenta.plugins.adapters;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Locale;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -25,7 +23,6 @@ import org.bukkit.craftbukkit.v1_18_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -228,19 +225,6 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 	public void cancelStrafe(Mob mob) {
 		((CraftMob) mob).getHandle().setXxa(0);
 		((CraftMob) mob).getHandle().setZza(0);
-	}
-
-	@Override
-	public Entity spawnWorldlessEntity(EntityType type, World world) {
-		Optional<net.minecraft.world.entity.EntityType<?>> entityTypes = net.minecraft.world.entity.EntityType.byString(type.name().toLowerCase(Locale.ROOT));
-		if (entityTypes.isEmpty()) {
-			throw new IllegalArgumentException("Invalid entity type " + type.name());
-		}
-		net.minecraft.world.entity.Entity entity = entityTypes.get().create(((CraftWorld) world).getHandle());
-		if (entity == null) {
-			throw new IllegalArgumentException("Unspawnable entity type " + type.name());
-		}
-		return entity.getBukkitEntity();
 	}
 
 	@Override

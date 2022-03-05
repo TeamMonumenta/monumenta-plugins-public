@@ -30,10 +30,12 @@ import java.util.stream.IntStream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.minecraft.server.v1_16_R3.EntityTypes;
+import net.minecraft.server.v1_16_R3.IRegistry;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
@@ -49,7 +51,7 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 		private final int mEntityType;
 
 		private EntityMetadata(Entity entity) {
-			mDataWatcher = WrappedDataWatcher.getEntityWatcher(entity);
+			mDataWatcher = WrappedDataWatcher.getEntityWatcher(entity).deepClone();
 			mId = entity.getEntityId();
 			mUuid = entity.getUniqueId();
 			mEntityType = NmsUtils.getVersionAdapter().getEntityTypeRegistryId(entity);
@@ -96,11 +98,18 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 
 			Entity targetEntity = event.getPacket().getEntityModifier(event).read(0);
 
+			// cancel packets created by spawning the fake entities for real
+			int entityId = targetEntity.getEntityId();
+			if (METADATA.values().stream().anyMatch(md -> md.isMetadataEntity(entityId))) {
+				event.setCancelled(true);
+				return;
+			}
+
 			if (!(targetEntity instanceof Player targetPlayer)) {
 				return;
 			}
 
-			// Run the rest outside of the packet code, as it potentially modifies world state
+			// Run the rest outside of the packet code, as it modifies world state (creates new entities)
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				PlayerMetadata metadata = METADATA.computeIfAbsent(targetPlayer.getEntityId(), k -> createLines(targetPlayer, getDisplay(targetPlayer)));
 
@@ -134,6 +143,11 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 						changed = true;
 					}
 				}
+				// filter out the removal packets created by spawning the fake entities for real
+				if (METADATA.values().stream().anyMatch(md -> md.isMetadataEntity(eid))) {
+					entityIds.rem(eid);
+					changed = true;
+				}
 			}
 			if (changed) {
 				if (entityIds.isEmpty()) {
@@ -156,7 +170,7 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 				PacketContainer packet = new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
 				packet.getIntegers().write(0, line.mArmorStand.mId); // id
 				packet.getUUIDs().write(0, line.mArmorStand.mUuid); // uuid
-				packet.getIntegers().write(1, line.mArmorStand.mEntityType); // type
+				packet.getIntegers().write(1, IRegistry.ENTITY_TYPE.a(EntityTypes.ARMOR_STAND)); // type
 				packet.getDoubles().write(0, targetPlayer.getLocation().getX()) // position: 256 blocks below the target player (to spawn in range but out of sight)
 					.write(1, targetPlayer.getLocation().getY() - 256)
 					.write(2, targetPlayer.getLocation().getZ());
@@ -269,7 +283,12 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 	}
 
 	private static LineMetadata createLine(Player targetPlayer, Component text, boolean lowest) {
-		ArmorStand armorStand = (ArmorStand) NmsUtils.getVersionAdapter().spawnWorldlessEntity(EntityType.ARMOR_STAND, targetPlayer.getWorld());
+		// Prepare armor stand
+		// Spawns a real armor stand to set the data much more easily, and also to get an unused entity id.
+		// Unfortunately this spawning sends packets to nearby players, so these need to be filtered out again.
+		Location farAway = targetPlayer.getLocation().subtract(0, 10000, 0);
+
+		ArmorStand armorStand = targetPlayer.getWorld().spawn(farAway, ArmorStand.class);
 		armorStand.setMarker(true);
 		armorStand.setInvisible(true);
 		armorStand.setInvulnerable(true);
@@ -280,22 +299,24 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 		armorStand.setBasePlate(false);
 		armorStand.setCollidable(false);
 		EntityMetadata armorStandMetadata = new EntityMetadata(armorStand);
+		armorStand.remove();
 
 		LivingEntity spacingEntity;
 		if (lowest) {
-			Slime slime = (Slime) NmsUtils.getVersionAdapter().spawnWorldlessEntity(EntityType.SLIME, targetPlayer.getWorld());
+			Slime slime = targetPlayer.getWorld().spawn(farAway, Slime.class);
 			slime.setSize(1);
 			spacingEntity = slime;
 		} else {
-			spacingEntity = (Silverfish) NmsUtils.getVersionAdapter().spawnWorldlessEntity(EntityType.SILVERFISH, targetPlayer.getWorld());
+			spacingEntity = targetPlayer.getWorld().spawn(farAway, Silverfish.class);
 		}
 		spacingEntity.setAI(false);
 		spacingEntity.setInvisible(true);
 		spacingEntity.setInvulnerable(true);
 		spacingEntity.setSilent(true);
 		spacingEntity.setGravity(false);
-		armorStand.setCollidable(false);
+		spacingEntity.setCollidable(false);
 		EntityMetadata spacingEntityMetadata = new EntityMetadata(spacingEntity);
+		spacingEntity.remove();
 
 		return new LineMetadata(armorStandMetadata, spacingEntityMetadata);
 	}
@@ -332,13 +353,12 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 		Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
 		for (Player player : onlinePlayers) {
 			PlayerMetadata metadata = METADATA.get(player.getEntityId());
-			if (metadata == null || !player.isValid()) {
+			if (metadata == null) {
 				return;
 			}
 			List<Component> display = getDisplay(player);
-			if (!metadata.mDisplay.equals(display) || player.getTicksLived() % 200 == 0) {
+			if (!metadata.mDisplay.equals(display)) {
 				// display has changed, update
-				// also just update every 10 seconds because some teleportation/respawn stuff breaks the current implementation
 
 				// create new lines
 				int existingSize = metadata.mLines.size();
