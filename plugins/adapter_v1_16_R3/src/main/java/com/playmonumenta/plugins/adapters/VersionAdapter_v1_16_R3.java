@@ -3,12 +3,15 @@ package com.playmonumenta.plugins.adapters;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Locale;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import net.minecraft.server.v1_16_R3.ChatMessage;
 import net.minecraft.server.v1_16_R3.DamageSource;
 import net.minecraft.server.v1_16_R3.EntityDamageSource;
 import net.minecraft.server.v1_16_R3.EntityLiving;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.v1_16_R3.EntityTypes;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -23,6 +26,7 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -225,6 +229,19 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	public void cancelStrafe(Mob mob) {
 		((CraftMob) mob).getHandle().t(0);
 		((CraftMob) mob).getHandle().v(0);
+	}
+
+	@Override
+	public Entity spawnWorldlessEntity(EntityType type, World world) {
+		Optional<EntityTypes<?>> entityTypes = EntityTypes.getByName(type.name().toLowerCase(Locale.ROOT));
+		if (entityTypes.isEmpty()) {
+			throw new IllegalArgumentException("Invalid entity type " + type.name());
+		}
+		net.minecraft.server.v1_16_R3.Entity entity = entityTypes.get().a(((CraftWorld) world).getHandle());
+		if (entity == null) {
+			throw new IllegalArgumentException("Unspawnable entity type " + type.name());
+		}
+		return entity.getBukkitEntity();
 	}
 
 	@Override
