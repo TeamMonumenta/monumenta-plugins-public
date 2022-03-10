@@ -294,8 +294,8 @@ public class EntityListener implements Listener {
 					!(edbee.getDamager() instanceof Player player)
 						// OR The damage is from a player but the item frame/painting is invulnerable and the player is not in creative
 						|| (damagee.isInvulnerable() && !player.getGameMode().equals(GameMode.CREATIVE))
-						// OR the damage is from a player and they are in adventure mode
-						|| player.getGameMode().equals(GameMode.ADVENTURE)) {
+						// OR the damage is from a player and they are in adventure mode, and the item frame is not tagged "Removable"
+						|| (player.getGameMode().equals(GameMode.ADVENTURE) && !damagee.getScoreboardTags().contains("Removable"))) {
 					// Don't allow it
 					event.setCancelled(true);
 				}
