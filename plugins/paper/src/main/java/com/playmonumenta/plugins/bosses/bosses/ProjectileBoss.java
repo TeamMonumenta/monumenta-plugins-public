@@ -69,7 +69,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 		public boolean COLLIDES_WITH_BLOCKS = true;
 
 		@BossParam(help = "Delay on each single cast between sound_start and the actual cast of the projectile")
-		public int SPELL_DELAY = 20 * 5;
+		public int SPELL_DELAY = Integer.MAX_VALUE;
 
 		@BossParam(help = "Let you choose the targets of this spell")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
@@ -121,6 +121,10 @@ public class ProjectileBoss extends BossAbilityGroup {
 			//build a new target from others config
 			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL));
 			//by default LaserBoss don't take player in stealt.
+		}
+
+		if (p.SPELL_DELAY == Integer.MAX_VALUE) {
+			p.SPELL_DELAY = p.DELAY;
 		}
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.COOLDOWN, p.SPELL_DELAY,
