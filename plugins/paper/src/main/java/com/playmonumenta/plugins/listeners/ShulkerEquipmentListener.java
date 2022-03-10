@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -122,7 +123,7 @@ public class ShulkerEquipmentListener implements Listener {
 					//check if swapped in radius of boss
 					Location loc = player.getLocation();
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 24)) {
-				        if (mob.getScoreboardTags().contains("Boss")) {
+				        if (mob.getScoreboardTags().contains("Boss") && !mob.getScoreboardTags().contains(TrainingDummyBoss.identityTag)) {
 				            player.sendMessage(ChatColor.RED + "Close to boss - Lockbox on 15s cooldown!");
 				            setSwapCooldown(player);
 				        }
