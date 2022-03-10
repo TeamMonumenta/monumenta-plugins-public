@@ -41,7 +41,6 @@ public final class BlockInteractionsListener implements Listener {
 		Material.LOOM,
 		Material.CRAFTING_TABLE,
 		Material.STONECUTTER,
-		Material.DROPPER,
 		Material.DISPENSER,
 		Material.FURNACE,
 		Material.BLAST_FURNACE,
@@ -77,7 +76,7 @@ public final class BlockInteractionsListener implements Listener {
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		Block block = event.getClickedBlock();
 		Player player = event.getPlayer();
-		if (block != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && !player.isSneaking() && !ServerProperties.getIsTownWorld() && player.getScoreboardTags().contains(DISABLE_TAG) && INTERACTABLES.contains(block.getType())) {
+		if (block != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && !player.isSneaking() && !ServerProperties.getIsTownWorld() && !player.getInventory().getItemInMainHand().getType().isAir() && player.getScoreboardTags().contains(DISABLE_TAG) && INTERACTABLES.contains(block.getType())) {
 			event.setCancelled(true);
 		}
 	}
