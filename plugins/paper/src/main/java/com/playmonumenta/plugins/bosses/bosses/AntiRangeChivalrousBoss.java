@@ -18,7 +18,7 @@ public class AntiRangeChivalrousBoss extends BossAbilityGroup {
 	public static final int detectionRange = 40;
 	public static final String ignoreTag = "antirange_ignore";
 
-	private static final int ANTI_RANGE_DISTANCE = 6;
+	private static final int ANTI_RANGE_DISTANCE = 8;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new AntiRangeChivalrousBoss(plugin, boss);

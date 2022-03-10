@@ -40,9 +40,10 @@ public class Spellshock extends Ability {
 	public static final String PERCENT_SPEED_EFFECT_NAME = "SpellShockPercentSpeedEffect";
 	public static final String PERCENT_SLOW_EFFECT_NAME = "SpellShockPercentSlowEffect";
 
-	public static final float DAMAGE_1 = 0.25f;
-	public static final float DAMAGE_2 = 0.35f;
-	public static final float MELEE_BONUS = 0.15f;
+	public static final float DAMAGE_1 = 0.20f;
+	public static final float DAMAGE_2 = 0.30f;
+	public static final float MELEE_BONUS_1 = 0.10f;
+	public static final float MELEE_BONUS_2 = 0.15f;
 	public static final int SIZE = 3;
 	public static final double SPEED_MULTIPLIER = 0.2;
 	public static final int DURATION_TICKS = 6 * 20;
@@ -50,6 +51,7 @@ public class Spellshock extends Ability {
 	public static final double SLOW_MULTIPLIER = -0.3;
 
 	private final float mLevelDamage;
+	private final float mMeleeBonus;
 
 	public Spellshock(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
@@ -57,11 +59,12 @@ public class Spellshock extends Ability {
 
 		mInfo.mScoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";
-		mInfo.mDescriptions.add("Hitting an enemy with a spell inflicts static for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 25% of the triggering spell's damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick. If a static mob is struck by a melee attack, it takes 15% more damage on the hit and is slowed by 30% for 0.5 seconds, clearing the static.");
-		mInfo.mDescriptions.add("Damage is increased to 35% for spells and 20% for melee. Additionally, gain +20% speed for 2 seconds whenever a spellshock is triggered.");
+		mInfo.mDescriptions.add("Hitting an enemy with a spell inflicts static for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 20% of the triggering spell's damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick. If a static mob is struck by a melee attack, it takes 10% more damage on the hit and is slowed by 30% for 0.5 seconds, clearing the static.");
+		mInfo.mDescriptions.add("Damage is increased to 30% for spells and 15% for melee. Additionally, gain +20% speed for 2 seconds whenever a spellshock is triggered.");
 		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
 
 		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
+		mMeleeBonus = getAbilityScore() == 2 ? MELEE_BONUS_2 : MELEE_BONUS_1;
 	}
 
 	@Override
@@ -73,7 +76,7 @@ public class Spellshock extends Ability {
 		if (event.getType() == DamageType.MELEE) {
 			NavigableSet<Effect> effectGroupOriginal = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
 			if (effectGroupOriginal != null) {
-				event.setDamage(event.getDamage() * (1 + MELEE_BONUS));
+				event.setDamage(event.getDamage() * (1 + mMeleeBonus));
 				mPlugin.mEffectManager.addEffect(enemy, PERCENT_SLOW_EFFECT_NAME, new PercentSpeed(SLOW_DURATION, SLOW_MULTIPLIER, PERCENT_SLOW_EFFECT_NAME));
 				for (Effect e : effectGroupOriginal) {
 					e.clearEffect();
