@@ -304,36 +304,39 @@ public class PEBCustomInventory extends CustomInventory {
 
 		//page 30: Glowing options
 		PEB_ITEMS.add(new PebItem(30, 0, "Back to Toggleable Options",
-				"", ChatColor.LIGHT_PURPLE,
-				Material.OBSERVER, "page 3", false));
+			"", ChatColor.LIGHT_PURPLE,
+			Material.OBSERVER, "page 3", false));
 		PEB_ITEMS.add(new PebItem(30, 4, "Glowing Settings",
-				"Choose for which entity types the glowing effect may be shown. " +
-						"If an entity fits into more than one category (e.g. a boss matches both 'mobs' and 'bosses'), it will glow if any of the matching options are enabled.", ChatColor.LIGHT_PURPLE,
-				Material.SPECTRAL_ARROW, "", false));
+			"Choose for which entity types the glowing effect may be shown. " +
+				"If an entity fits into more than one category (e.g. a boss matches both 'mobs' and 'bosses'), it will glow if any of the matching options are enabled.", ChatColor.LIGHT_PURPLE,
+			Material.SPECTRAL_ARROW, "", false));
 		PEB_ITEMS.add(new PebItem(30, 22, "Enable All",
-				"Enable glowing for all entities (default).", ChatColor.LIGHT_PURPLE,
-				Material.GOLD_INGOT, "glowing enable all", false));
-		PEB_ITEMS.add(new PebItem(30, 28, "Players",
-				"Toggle glowing for players.", ChatColor.LIGHT_PURPLE,
-				Material.PLAYER_HEAD, "glowing toggle players", false));
-		PEB_ITEMS.add(new PebItem(30, 29, "Mobs",
-				"Toggle glowing for mobs.", ChatColor.LIGHT_PURPLE,
-				Material.ZOMBIE_HEAD, "glowing toggle mobs", false));
-		PEB_ITEMS.add(new PebItem(30, 30, "Bosses",
-				"Toggle glowing for bosses. Note that pretty much all bosses are mobs, soa re affected by that option as well.", ChatColor.LIGHT_PURPLE,
-				Material.DRAGON_HEAD, "glowing toggle bosses", false));
+			"Enable glowing for all entities (default).", ChatColor.LIGHT_PURPLE,
+			Material.GOLD_INGOT, "glowing enable all", false));
+		PEB_ITEMS.add(new PebItem(30, 28, "Other Players",
+			"Toggle glowing for other players.", ChatColor.LIGHT_PURPLE,
+			Material.PLAYER_WALL_HEAD, "glowing toggle other_players", false));
+		PEB_ITEMS.add(new PebItem(30, 29, "Yourself",
+			"Toggle glowing for yourself (visible in third-person). Disable this if glowing causes rendering issues.", ChatColor.LIGHT_PURPLE,
+			Material.PLAYER_HEAD, "glowing toggle self", false));
+		PEB_ITEMS.add(new PebItem(30, 30, "Mobs",
+			"Toggle glowing for mobs.", ChatColor.LIGHT_PURPLE,
+			Material.ZOMBIE_HEAD, "glowing toggle mobs", false));
+		PEB_ITEMS.add(new PebItem(30, 31, "Bosses",
+			"Toggle glowing for bosses. Note that pretty much all bosses are mobs, soa re affected by that option as well.", ChatColor.LIGHT_PURPLE,
+			Material.DRAGON_HEAD, "glowing toggle bosses", false));
 		PEB_ITEMS.add(new PebItem(30, 32, "Invisible Entities",
-				"Toggle glowing for invisible entities.", ChatColor.LIGHT_PURPLE,
-				Material.GLASS, "glowing toggle invisible", false));
+			"Toggle glowing for invisible entities.", ChatColor.LIGHT_PURPLE,
+			Material.GLASS, "glowing toggle invisible", false));
 		PEB_ITEMS.add(new PebItem(30, 33, "Experience Orbs",
-				"Toggle glowing for experience orbs.", ChatColor.LIGHT_PURPLE,
-				Material.EXPERIENCE_BOTTLE, "glowing toggle experience_orbs", false));
+			"Toggle glowing for experience orbs.", ChatColor.LIGHT_PURPLE,
+			Material.EXPERIENCE_BOTTLE, "glowing toggle experience_orbs", false));
 		PEB_ITEMS.add(new PebItem(30, 34, "Miscellaneous",
-				"Toggle glowing for miscellaneous entities, i.e. entities that don't fit into any other category.", ChatColor.LIGHT_PURPLE,
-				Material.IRON_NUGGET, "glowing toggle misc", false));
+			"Toggle glowing for miscellaneous entities, i.e. entities that don't fit into any other category.", ChatColor.LIGHT_PURPLE,
+			Material.IRON_NUGGET, "glowing toggle misc", false));
 		PEB_ITEMS.add(new PebItem(30, 40, "Disable All",
-				"Disable glowing for all entities.", ChatColor.LIGHT_PURPLE,
-				Material.DIRT, "glowing disable all", false));
+			"Disable glowing for all entities.", ChatColor.LIGHT_PURPLE,
+			Material.DIRT, "glowing disable all", false));
 
 		//page 39: Rocket Jump Option
 		PEB_ITEMS.add(new PebItem(31, 0, "Back to Toggleable Options",
@@ -477,7 +480,7 @@ public class PEBCustomInventory extends CustomInventory {
 	}
 
 	public static ItemStack createCustomItem(PebItem item, Player player) {
-		ItemStack newItem = new ItemStack(item.mType, 1);
+		ItemStack newItem = new ItemStack(item.mType == Material.PLAYER_WALL_HEAD ? Material.PLAYER_HEAD : item.mType, 1);
 		if (item.mType == Material.PLAYER_HEAD) {
 			SkullMeta meta = (SkullMeta) newItem.getItemMeta();
 			meta.setOwningPlayer(player);
