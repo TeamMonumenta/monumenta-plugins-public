@@ -1641,7 +1641,7 @@ public class ItemStatUtils {
 			Tier tier = Tier.getTier((String) args[1]);
 			Location location = Location.getLocation((String) args[2]);
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1670,7 +1670,7 @@ public class ItemStatUtils {
 			}
 			Integer index = (Integer) args[1];
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1690,7 +1690,7 @@ public class ItemStatUtils {
 			Integer index = (Integer) args[1];
 			String lore = (String) args[2];
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1711,7 +1711,7 @@ public class ItemStatUtils {
 			}
 			Integer index = (Integer) args[1];
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1730,7 +1730,7 @@ public class ItemStatUtils {
 				return;
 			}
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1776,7 +1776,7 @@ public class ItemStatUtils {
 			Boolean underline = (Boolean) args[2];
 			String name = (String) args[3];
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1820,7 +1820,7 @@ public class ItemStatUtils {
 			String enchantment = (String) args[0];
 			Integer level = (Integer) args[1];
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1878,7 +1878,7 @@ public class ItemStatUtils {
 			Operation operation = Operation.getOperation((String) args[2]);
 			Slot slot = Slot.getSlot((String) args[3]);
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1900,6 +1900,46 @@ public class ItemStatUtils {
 					removeAttribute(item, type1, operation, slot);
 				}
 			}
+
+			generateItemStats(item);
+			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
+			if (playerItemStats != null) {
+				playerItemStats.updateStats(player, true);
+			}
+		}).register();
+	}
+
+	public static void registerRemoveCommand() {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.removestats");
+
+		new CommandAPICommand("removestats").withPermission(perms).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			for (EnchantmentType ench : EnchantmentType.values()) {
+				removeEnchantment(item, ench);
+			}
+
+			for (InfusionType infusion : InfusionType.values()) {
+				removeInfusion(item, infusion);
+			}
+
+			for (AttributeType attr : AttributeType.values()) {
+				for (Operation op : Operation.values()) {
+					for (Slot slot : Slot.values()) {
+						removeAttribute(item, attr, op, slot);
+					}
+				}
+			}
+
+			editItemInfo(item, Region.NONE, Tier.NONE, Location.NONE);
 
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
