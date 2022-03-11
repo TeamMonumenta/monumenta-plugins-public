@@ -3,8 +3,6 @@ package com.playmonumenta.plugins.graves;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTEntity;
@@ -111,9 +109,6 @@ public class ThrownItem {
 			mEntity.setCanMobPickup(false);
 			mEntity.setPickupDelay(0);
 			mEntity.setThrower(mPlayer.getUniqueId());
-			if (ItemStatUtils.getInfusionLevel(mItem, InfusionType.HOPE) > 0) {
-				mEntity.setInvulnerable(true);
-			}
 			NBTEntity nbt = new NBTEntity(mEntity);
 			nbt.setShort("Age", mAge);
 			mManager.addItem(mEntity.getUniqueId(), this);
@@ -143,9 +138,6 @@ public class ThrownItem {
 						if (!(loc.getBlock().isLiquid() || loc.getBlock().getRelative(BlockFace.DOWN).isLiquid())
 							&& loc.getY() > mLocation.getY() + 2) {
 							mEntity.teleport(mLocation);
-						} else if (loc.getBlock().getType() == Material.LAVA) {
-							//Force hoped items upwards if they're in lava.
-							mEntity.setVelocity(new Vector(0, 0.4, 0));
 						}
 					} else {
 						delete();

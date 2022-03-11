@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.graves.Grave;
 import com.playmonumenta.plugins.graves.GraveManager;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -17,11 +18,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class Grave {
+public class GraveCommand {
 	private static final String SUMMON_LIST_TAG = "SummonGraveSelect";
 	private static final HashMap<UUID, BukkitRunnable> SUMMON_LIST_RUNNABLES = new HashMap<>();
 
@@ -92,6 +94,15 @@ public class Grave {
 				.withArguments(new IntegerArgument("grave"))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveOther(player, (Player) args[0], (Location) args[1], (int) args[2]))
 			)
+			.withSubcommand(new CommandAPICommand("summon")
+				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER).withPermission("monumenta.command.grave.summon.other"))
+				.withArguments(new IntegerArgument("grave"))
+				.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveOther(player, (Player) args[0], player.getLocation(), (int) args[1]))
+			)
+			.withSubcommand(new CommandAPICommand("delete")
+				.withPermission("monumenta.command.grave.delete")
+				.withArguments(new IntegerArgument("grave"))
+				.executesPlayer((PlayerCommandExecutor) (player, args) -> delete(player, (int) args[0])))
 			.register();
 	}
 
@@ -409,5 +420,39 @@ public class Grave {
 			}
 		}
 		return false;
+	}
+
+	private static void delete(Player player, int index) {
+		GraveManager manager = GraveManager.getInstance(player);
+		if (manager != null) {
+			if (index < 0) {
+				if (manager.cancelDeletion()) {
+					player.sendMessage(Component.text("Grave deletion cancelled.", NamedTextColor.RED));
+				}
+			} else if (manager.getGravesCount() > index) {
+				Grave grave = manager.getGraves().get(index);
+				if (manager.isDeleteConfirmation(index, player.getTicksLived())) {
+					grave.delete();
+					manager.cancelDeletion();
+					player.sendMessage(Component.text("Grave " + index + " has been deleted.", NamedTextColor.GREEN));
+				} else {
+					player.sendMessage(Component.text("Are you sure you want to fully delete grave " + index + "? This cannot be undone!", NamedTextColor.RED, TextDecoration.BOLD));
+					player.sendMessage(Component.text("Item" + (grave.getItems().size() > 1 ? "s" : "") + " in the grave: ", NamedTextColor.AQUA)
+						.append(grave.getItemList()));
+					player.sendMessage(Component.text()
+						.append(Component.text("[DELETE]", NamedTextColor.RED)
+							.hoverEvent(HoverEvent.showText(Component.text("Delete the grave. Cannot be undone!", NamedTextColor.RED)))
+							.clickEvent(ClickEvent.runCommand("/grave delete " + index)))
+						.append(Component.text("   "))
+						.append(Component.text("[CANCEL]", NamedTextColor.WHITE)
+							.hoverEvent(HoverEvent.showText(Component.text("Cancel deletion of the grave", NamedTextColor.WHITE)))
+							.clickEvent(ClickEvent.runCommand("/grave delete -1"))));
+				}
+			} else {
+				player.sendMessage(Component.text("Grave " + index + " does not exist. Maximum is " + (manager.getGravesCount() - 1), NamedTextColor.RED));
+			}
+		} else {
+			player.sendMessage(Component.text("You do not have any graves", NamedTextColor.RED));
+		}
 	}
 }

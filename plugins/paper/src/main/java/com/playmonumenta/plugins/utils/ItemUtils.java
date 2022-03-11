@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
@@ -41,6 +40,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 public class ItemUtils {
@@ -1232,5 +1232,17 @@ public class ItemUtils {
 		NBTItem nbtItem = new NBTItem(item);
 		String itemTag = nbtItem.toString();
 		return "/give @s " + itemId + itemTag + " " + item.getAmount();
+	}
+
+	public static Component getItemNameComponent(ItemStack item) {
+		if (hasPlainName(item)) {
+			return Component.text(getPlainName(item));
+		} else {
+			return Component.translatable(item.getType().getTranslationKey());
+		}
+	}
+
+	public static Component getItemNameComponentWithHover(ItemStack item) {
+		return getItemNameComponent(item).hoverEvent(item.asHoverEvent());
 	}
 }

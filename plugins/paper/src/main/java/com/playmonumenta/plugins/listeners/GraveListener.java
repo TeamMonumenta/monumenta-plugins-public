@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.listeners;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.commands.Grave;
+import com.playmonumenta.plugins.commands.GraveCommand;
 import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -18,7 +18,6 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -61,7 +60,7 @@ public class GraveListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void playerJoin(PlayerJoinEvent event) {
-		Grave.removeSummonListTag(event.getPlayer());
+		GraveCommand.removeSummonListTag(event.getPlayer());
 		GraveManager.onLogin(event.getPlayer());
 	}
 
@@ -129,37 +128,32 @@ public class GraveListener implements Listener {
 	// Fires whenever an item entity despawns due to time. Does not catch items that got killed in other ways.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void itemDespawnEvent(ItemDespawnEvent event) {
-		GraveManager.onDestroyItem(event.getEntity());
+		GraveManager.onDestroyItem(event.getEntity(), true);
 	}
 
 	// Fires any time any entity is deleted.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityRemoveFromWorld(EntityRemoveFromWorldEvent event) {
-		if (event.getEntity() instanceof Item) {
+		if (event.getEntity() instanceof Item entity) {
 			// Check if an item entity was destroyed by the void.
-			Item entity = (Item) event.getEntity();
 			if (entity.getLocation().getY() <= -64) {
-				GraveManager.onDestroyItem(entity);
+				GraveManager.onDestroyItem(entity, true);
 			}
 		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void entityDamage(EntityDamageEvent event) {
-		if (event.getEntityType() == EntityType.DROPPED_ITEM) {
-			Item entity = (Item) event.getEntity();
+		if (event.getEntity() instanceof Item entity) {
 			EntityDamageEvent.DamageCause cause = event.getCause();
-			if (entity.isInvulnerable()
-				|| (entity.getScoreboardTags().contains("ExplosionImmune")
+			if ((entity.getScoreboardTags().contains("ExplosionImmune")
 				&& (cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION))) {
 				event.setCancelled(true);
 				return;
 			}
-			GraveManager.onDestroyItem(entity);
-		} else if (event.getEntityType() == EntityType.ARMOR_STAND) {
-			if (GraveManager.isGrave(event.getEntity())) {
-				event.setCancelled(true);
-			}
+			GraveManager.onDestroyItem(entity, event.getCause() == EntityDamageEvent.DamageCause.VOID);
+		} else if (GraveManager.isGrave(event.getEntity())) {
+			event.setCancelled(true);
 		}
 	}
 

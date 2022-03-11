@@ -11,13 +11,12 @@ import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTEntity;
 import de.tr7zw.nbtapi.NBTItem;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -28,6 +27,7 @@ import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GraveItem {
 	public enum Status {
@@ -154,7 +154,7 @@ public class GraveItem {
 	}
 
 	// New GraveItem from ThrownItem being destroyed
-	public GraveItem(Grave grave, ThrownItem item) {
+	public GraveItem(Grave grave, ThrownItem item, boolean destroyedByVoid) {
 		this(grave.mManager, grave, grave.mPlayer, item.mItem);
 		switch (ItemUtils.getItemDeathResult(mItem)) {
 			case SHATTER_NOW:
@@ -165,7 +165,11 @@ public class GraveItem {
 				mStatus = Status.SAFE;
 				break;
 			default:
-				mStatus = Status.LIMBO;
+				if (!destroyedByVoid && ItemStatUtils.getInfusionLevel(mItem, InfusionType.HOPE) > 0) {
+					mStatus = Status.SAFE;
+				} else {
+					mStatus = Status.LIMBO;
+				}
 		}
 		mDungeonInstance = grave.mDungeonInstance;
 		mLocation = grave.getLocation();
@@ -192,9 +196,6 @@ public class GraveItem {
 						if (!(loc.getBlock().isLiquid() || loc.getBlock().getRelative(BlockFace.DOWN).isLiquid())
 						    && loc.getY() > mGrave.mLocation.getY() + 2) {
 							respawn();
-						} else if (loc.getBlock().getType() == Material.LAVA) {
-							//Force hoped items upwards if they're in lava.
-							mEntity.setVelocity(new Vector(0, 0.4, 0));
 						}
 					} else {
 						if (mStatus == Status.DROPPED) {
@@ -240,9 +241,6 @@ public class GraveItem {
 			mEntity.setPickupDelay(0);
 			mEntity.setThrower(mGrave.getUniqueId());
 			mEntity.setOwner(mPlayer.getUniqueId());
-			if (ItemStatUtils.getInfusionLevel(mItem, InfusionType.HOPE) > 0) {
-				mEntity.setInvulnerable(true);
-			}
 			if (mAge != null) {
 				NBTEntity nbt = new NBTEntity(mEntity);
 				nbt.setShort("Age", mAge);
@@ -371,12 +369,18 @@ public class GraveItem {
 		}
 	}
 
-	void onDestroyItem() {
+	void onDestroyItem(boolean destroyedByVoid) {
 		if (mStatus == Status.DROPPED) {
-			remove(Status.LIMBO);
-			if (!mGrave.mAlertedLimbo) {
-				mGrave.mAlertedLimbo = true;
-				mPlayer.sendMessage(Component.text("Some of the items you died with were destroyed, but don't worry! If you can get back without dying again, you can get them back! (/deathhelp for more info)", NamedTextColor.RED));
+			if (!destroyedByVoid && ItemStatUtils.getInfusionLevel(mItem, InfusionType.HOPE) > 0) {
+				remove(Status.SAFE);
+			} else {
+				remove(Status.LIMBO);
+				if (!mGrave.mAlertedLimbo) {
+					mGrave.mAlertedLimbo = true;
+					mPlayer.sendMessage(Component.text("Some of the items you died with were destroyed, but don't worry! If you can get back without dying again, you can get them back! ", NamedTextColor.RED)
+						.append(Component.text("(/deathhelp for more info)", NamedTextColor.RED)
+							.clickEvent(ClickEvent.runCommand("/deathhelp"))));
+				}
 			}
 		}
 	}
@@ -393,13 +397,17 @@ public class GraveItem {
 				remove(Status.SHATTERED);
 				if (!mGrave.mAlertedShatter) {
 					mGrave.mAlertedShatter = true;
-					mPlayer.sendMessage(Component.text("Some of the items in your grave were shattered! You can still get them back from the grave, but won't be able to equip them until repaired. (/deathhelp for more info)", NamedTextColor.RED));
+					mPlayer.sendMessage(Component.text("Some of the items in your grave were shattered! You can still get them back from the grave, but won't be able to equip them until repaired. ", NamedTextColor.RED)
+						.append(Component.text("(/deathhelp for more info)", NamedTextColor.RED)
+							.clickEvent(ClickEvent.runCommand("/deathhelp"))));
 				}
 			} else {
 				remove(Status.LOST);
 				if (!mGrave.mAlertedLost) {
 					mGrave.mAlertedLost = true;
-					mPlayer.sendMessage(Component.text("Some of the items in your grave were lost! This only happens to common items like torches and food; be sure to restock! (/deathhelp for more info)", NamedTextColor.RED));
+					mPlayer.sendMessage(Component.text("Some of the items in your grave were lost! This only happens to common items like torches and food; be sure to restock! ", NamedTextColor.RED)
+						.append(Component.text("(/deathhelp for more info)", NamedTextColor.RED)
+							.clickEvent(ClickEvent.runCommand("/deathhelp"))));
 				}
 			}
 		}

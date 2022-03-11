@@ -13,8 +13,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -27,6 +28,7 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GraveManager {
 	private static final String KEY_PLUGIN_DATA = "MonumentaGravesV2";
@@ -44,6 +46,8 @@ public class GraveManager {
 	private final HashSet<UUID> mAllowed = new HashSet<>();
 	private final Player mPlayer;
 	private boolean mLoggedOut = false;
+	private int mDeleteAttemptIndex = -1;
+	private int mDeleteAttemptTicksLived = -1;
 
 	private GraveManager(Player player) {
 		mPlayer = player;
@@ -206,7 +210,7 @@ public class GraveManager {
 	// Called only when an item is dropped that, when destroyed, would result in a grave
 	public static void onDropItem(Player player, Item entity) {
 		GraveManager manager = INSTANCES.get(player.getUniqueId());
-		if (player != null && entity != null && manager != null) {
+		if (entity != null && manager != null) {
 			manager.mThrownItems.add(new ThrownItem(manager, player, entity));
 		}
 	}
@@ -233,14 +237,14 @@ public class GraveManager {
 	}
 
 	// Called when an item entity is killed by any method
-	public static void onDestroyItem(Item entity) {
+	public static void onDestroyItem(Item entity, boolean destroyedByVoid) {
 		if (GRAVE_ITEMS.containsKey(entity.getUniqueId())) {
-			GRAVE_ITEMS.get(entity.getUniqueId()).onDestroyItem();
+			GRAVE_ITEMS.get(entity.getUniqueId()).onDestroyItem(destroyedByVoid);
 		} else if (THROWN_ITEMS.containsKey(entity.getUniqueId())) {
 			ThrownItem item = THROWN_ITEMS.remove(entity.getUniqueId());
 			if (item.isValid()) {
 				item.onDestroyItem();
-				item.mManager.mGraves.add(new Grave(item));
+				item.mManager.mGraves.add(new Grave(item, destroyedByVoid));
 			}
 			item.mManager.mThrownItems.remove(item);
 		}
@@ -383,13 +387,22 @@ public class GraveManager {
 	public @Nullable Component getGraveInfo(int index) {
 		if (mGraves.size() > index) {
 			Grave grave = mGraves.get(index);
+			Component itemList = grave.getItemList();
 			return Component.text("World: (", NamedTextColor.GRAY)
 				.append(Component.text(grave.mWorldName.replace("Project_Epic-", ""), NamedTextColor.WHITE))
 				.append(Component.text(") Loc: (", NamedTextColor.GRAY))
 				.append(Component.text(grave.mLocation.getBlockX() + "," + grave.mLocation.getBlockY() + "," + grave.mLocation.getBlockZ(), NamedTextColor.WHITE))
-				.append(Component.text(") Items: (", NamedTextColor.GRAY))
-				.append(Component.text(grave.mItems.size(), NamedTextColor.WHITE))
-				.append(Component.text(")", NamedTextColor.GRAY));
+				.append(Component.text(") ", NamedTextColor.GRAY))
+				.append(Component.text("Items: (", NamedTextColor.GRAY)
+					.hoverEvent(HoverEvent.showText(itemList)))
+				.append(Component.text(grave.mItems.size(), NamedTextColor.WHITE)
+					.hoverEvent(HoverEvent.showText(itemList)))
+				.append(Component.text(")", NamedTextColor.GRAY)
+					.hoverEvent(HoverEvent.showText(itemList)))
+				.append(Component.text(" "))
+				.append(Component.text("[X]", NamedTextColor.DARK_RED)
+					.hoverEvent(HoverEvent.showText(Component.text("Click to delete", NamedTextColor.RED)))
+					.clickEvent(ClickEvent.runCommand("/grave delete " + index)));
 		}
 		return null;
 	}
@@ -409,5 +422,34 @@ public class GraveManager {
 
 	private void removeEmptyGraves() {
 		mGraves.removeIf(Grave::isEmpty);
+	}
+
+	public @Nullable Integer getIndex(Grave grave) {
+		List<Grave> graves = getGraves();
+		for (int i = 0; i < graves.size(); i++) {
+			if (graves.get(i).equals(grave)) {
+				return i;
+			}
+		}
+		return null;
+	}
+
+	public boolean isDeleteConfirmation(int index, int ticksLived) {
+		if (index == mDeleteAttemptIndex && ticksLived <= mDeleteAttemptTicksLived + 20 * 20) {
+			return true;
+		} else {
+			mDeleteAttemptIndex = index;
+			mDeleteAttemptTicksLived = ticksLived;
+			return false;
+		}
+	}
+
+	public boolean cancelDeletion() {
+		mDeleteAttemptTicksLived = -1;
+		if (mDeleteAttemptIndex == -1) {
+			return false;
+		}
+		mDeleteAttemptIndex = -1;
+		return true;
 	}
 }

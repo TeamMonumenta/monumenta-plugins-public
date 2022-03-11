@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import de.tr7zw.nbtapi.NBTEntity;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -30,7 +29,6 @@ public class Hope implements Infusion {
 
 	@Override
 	public void onSpawn(Plugin plugin, Item item, double value) {
-		item.setInvulnerable(true);
 		NBTEntity nbt = new NBTEntity(item);
 		nbt.setShort("Age", (short) (-1 * EXTRA_MINUTES_PER_LEVEL * Constants.TICKS_PER_MINUTE * value));
 
@@ -47,13 +45,6 @@ public class Hope implements Infusion {
 				}
 
 				item.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 3, 0.2, 0.2, 0.2, 0);
-
-				//Attempt to move the item upwards if in lava
-				Material currentBlock = loc.getBlock().getType();
-				Material upwardsBlock = loc.clone().add(0, 1, 0).getBlock().getType();
-				if (currentBlock == Material.LAVA && (upwardsBlock == Material.LAVA || upwardsBlock == Material.AIR)) {
-					item.teleport(loc.clone().add(0, 0.25, 0));
-				}
 
 				// Very infrequently check if the item is still actually there
 				mNumTicks++;

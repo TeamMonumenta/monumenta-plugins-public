@@ -199,7 +199,7 @@ public class Plugin extends JavaPlugin {
 		Magnetize.register();
 		UnsignBook.register();
 		GetScoreCommand.register();
-		Grave.register();
+		GraveCommand.register();
 		StatTrackItem.register();
 		ToggleSwap.register(this);
 		CustomInventoryCommands.register(this);
