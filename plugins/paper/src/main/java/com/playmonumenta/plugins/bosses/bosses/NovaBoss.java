@@ -35,6 +35,9 @@ public final class NovaBoss extends BossAbilityGroup {
 		public int COOLDOWN = 8 * 20;
 		@BossParam(help = "not written")
 		public boolean CAN_MOVE = false;
+		@BossParam(help = "You should not use this. use TARGETS instead.")
+		public boolean NEED_LINE_OF_SIGHT = true;
+
 		@BossParam(help = "not written")
 		public double DAMAGE_PERCENTAGE = 0.0;
 
@@ -79,9 +82,11 @@ public final class NovaBoss extends BossAbilityGroup {
 			//build a new target from others config
 			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.RADIUS, true);
 			//by default LaserBoss take player in stealt.
+		} else {
+			p.NEED_LINE_OF_SIGHT = false;
 		}
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseNova(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.SOUND_CHARGE,
+			new SpellBaseNova(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE,
 			(Location loc) -> {
 				p.PARTICLE_AIR.spawn(loc, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, 0.05);
 			},

@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
@@ -139,4 +140,16 @@ public class FileUtils {
 			}
 		}
 	}
+
+	public static JsonObject readJson(String fileName) throws Exception {
+		// Do not attempt to catch exceptions here - let them propagate to the caller
+
+		Gson gson = new Gson();
+
+		Reader reader = Files.newBufferedReader(Paths.get(fileName));
+
+		return gson.fromJson(reader, JsonObject.class);
+
+	}
+
 }

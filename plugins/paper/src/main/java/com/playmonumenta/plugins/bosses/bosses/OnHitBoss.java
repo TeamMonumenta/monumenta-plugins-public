@@ -50,16 +50,15 @@ public class OnHitBoss extends BossAbilityGroup {
 			return;
 		}
 
-		if (damagee instanceof Player player) {
-			Location loc = damagee.getLocation().add(0, 1, 0);
+		Location loc = damagee.getLocation().add(0, 1, 0);
 
-			mParams.EFFECTS.apply(player, mBoss);
 
-			//Particle & Sound
-			mParams.SOUND.play(loc);
-			mParams.PARTICLE.spawn(loc, 0d, 0d, 0d);
-		}
 
+		mParams.EFFECTS.apply(damagee, mBoss);
+
+		//Particle & Sound
+		mParams.SOUND.play(loc);
+		mParams.PARTICLE.spawn(loc, 0d, 0d, 0d);
 
 	}
 

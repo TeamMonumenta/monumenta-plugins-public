@@ -58,7 +58,6 @@ public class SpellMobHealAoE extends Spell {
 		if (!mCanMoveWhileCasting) {
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 20));
 		}
-
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTimer = 0;
 			double mCurrentRadius = mParticleRadius;

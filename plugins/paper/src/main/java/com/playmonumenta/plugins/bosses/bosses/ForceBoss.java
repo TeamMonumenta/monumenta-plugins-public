@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellForce;
@@ -27,11 +28,17 @@ public class ForceBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public int DURATION = 70;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "DEPRECATED. Use TARGETS for choosing the radius instead", deprecated = true)
 		public int RADIUS = 5;
 
 		@BossParam(help = "not written")
 		public int DELAY = 100;
+
+		@BossParam(help = "DON'T change this unless you also change the TARGETS to Entity or Mob")
+		public boolean NEED_PLAYERS = true;
+
+		@BossParam(help = "Targets of this ability")
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
 
 		@BossParam(help = "Effects applied to the player if he is near the boss (< RADIUS /3) when cast is over")
 		public EffectsList EFFECTS_NEAR = EffectsList.fromString("[(pushforce,3),(SLOW,100,2)]");
@@ -70,10 +77,15 @@ public class ForceBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
+		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET) {
+			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RADIUS, true, EntityTargets.Limit.DEFAULT);
+			//by default Force boss hit all the player in range even the players in stealth
+		}
+		final double currentRadius = p.TARGETS.getRange();
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellForce(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN,
+			new SpellForce(plugin, boss, (int) currentRadius, p.DURATION, p.COOLDOWN, p.NEED_PLAYERS,
 			(Location loc) -> {
-				p.PARTICLE_AIR.spawn(loc, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, 0.05);
+				p.PARTICLE_AIR.spawn(loc, currentRadius / 2, currentRadius / 2, currentRadius / 2, 0.05);
 			},
 			(Location loc) -> {
 				p.PARTICLE_CIRCLE.spawn(loc, 0.25, 0.25, 0.25, 0.1);
@@ -86,17 +98,17 @@ public class ForceBoss extends BossAbilityGroup {
 				p.PARTICLE_CIRCLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
 			},
 			(Location loc) -> {
-				for (Player player : PlayerUtils.playersInRange(boss.getLocation(), p.RADIUS, true)) {
+				for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
 
-					double distance = player.getLocation().distance(loc);
+					double distance = target.getLocation().distance(loc);
 					if (distance < p.RADIUS / 3.0) {
-						p.EFFECTS_NEAR.apply(player, boss);
+						p.EFFECTS_NEAR.apply(target, boss);
 					} else if (distance < (p.RADIUS * 2.0) / 3.0) {
-						p.EFFECTS_MIDDLE.apply(player, boss);
+						p.EFFECTS_MIDDLE.apply(target, boss);
 					} else if (distance < p.RADIUS) {
-						p.EFFECTS_LIMIT.apply(player, boss);
+						p.EFFECTS_LIMIT.apply(target, boss);
 					}
-					p.PARTICLE_HIT.spawn(player.getLocation().clone().add(0, 1, 0), 0.25, 0.5, 0.25, 0);
+					p.PARTICLE_HIT.spawn(target.getEyeLocation(), 0.25, 0.5, 0.25, 0);
 				}
 			}
 			)));

@@ -240,6 +240,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(PounceBoss.identityTag, (Plugin p, LivingEntity e) -> new PounceBoss(p, e));
 		mStatelessBosses.put(NoAbilityDamageBoss.identityTag, (Plugin p, LivingEntity e) -> new NoAbilityDamageBoss(p, e));
 		mStatelessBosses.put(NoGlowingBoss.identityTag, (Plugin p, LivingEntity e) -> new NoGlowingBoss(p, e));
+		mStatelessBosses.put(GenericTargetBoss.identityTag, (Plugin p, LivingEntity e) -> new GenericTargetBoss(p, e));
 		mStatelessBosses.put(MobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> new MobRisingBoss(p, e));
 		mStatelessBosses.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> new GrenadeLauncherBoss(p, e));
 		mStatelessBosses.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> new SizeChangerBoss(p, e));
@@ -452,6 +453,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(NoGlowingBoss.identityTag, (Plugin p, LivingEntity e) -> NoGlowingBoss.deserialize(p, e));
 		mBossDeserializers.put(RKitxet.identityTag, (Plugin p, LivingEntity e) -> RKitxet.deserialize(p, e));
 		mBossDeserializers.put(VerdantMinibossBoss.identityTag, (Plugin p, LivingEntity e) -> VerdantMinibossBoss.deserialize(p, e));
+		mBossDeserializers.put(GenericTargetBoss.identityTag, (Plugin p, LivingEntity e) -> GenericTargetBoss.deserialize(p, e));
 		mBossDeserializers.put(MobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> MobRisingBoss.deserialize(p, e));
 		mBossDeserializers.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> GrenadeLauncherBoss.deserialize(p, e));
 		mBossDeserializers.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> SizeChangerBoss.deserialize(p, e));
@@ -1061,7 +1063,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	private void createBossInternal(LivingEntity targetEntity, BossAbilityGroup ability) throws Exception {
+	public void createBossInternal(LivingEntity targetEntity, BossAbilityGroup ability) throws Exception {
 		/* Set up boss health / armor / etc */
 		ability.init();
 

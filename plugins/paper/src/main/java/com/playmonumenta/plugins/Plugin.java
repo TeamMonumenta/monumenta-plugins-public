@@ -15,6 +15,8 @@ import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.guis.SinglePageGUIManager;
+import com.playmonumenta.plugins.infinitytower.TowerCommands;
+import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -134,6 +136,7 @@ public class Plugin extends JavaPlugin {
 	public ParrotManager mParrotManager;
 	public ItemStatManager mItemStatManager;
 	public ChessManager mChessManager;
+	public TowerManager mTowerManager;
 	public SignUtils mSignUtils;
 	public DeathItemListener mDeathItemListener;
 	public ItemOverrides mItemOverrides;
@@ -236,6 +239,7 @@ public class Plugin extends JavaPlugin {
 		NameMCVerify.register(this);
 		TellMiniMessage.register();
 
+
 		try {
 			mHttpManager = new HttpManager(this);
 		} catch (IOException err) {
@@ -301,6 +305,7 @@ public class Plugin extends JavaPlugin {
 		mItemStatManager = new ItemStatManager(this);
 		mChessManager = new ChessManager(this);
 		mSignUtils = new SignUtils(this);
+		mTowerManager = new TowerManager(this);
 		mCosmeticsManager = CosmeticsManager.getInstance();
 		mSeasonalEventManager = new SeasonalEventManager();
 
@@ -324,7 +329,15 @@ public class Plugin extends JavaPlugin {
 
 		if (ServerProperties.getShardName().contains("valley")
 			|| ServerProperties.getShardName().contains("dev")) {
+
+			//minigames can only be on devshard or valley
+			TowerCommands.register(this);
 			manager.registerEvents(mChessManager, this);
+			manager.registerEvents(mTowerManager, this);
+		}
+
+		if (ServerProperties.getShardName().contains("mobs")) {
+			TowerCommands.registerDesign(this);
 		}
 
 		if (ServerProperties.getAuditMessagesEnabled()) {
@@ -507,6 +520,7 @@ public class Plugin extends JavaPlugin {
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
 
+		TowerManager.unload();
 		mChessManager.unloadAll();
 		mTrackingManager.unloadTrackedEntities();
 		if (mHttpManager != null) {

@@ -38,7 +38,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public int DETECTION = 24;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Delay of the first spell, then cooldown is used to determinate when this spell will cast again")
 		public int DELAY = 20 * 5;
 
 		@BossParam(help = "not written")
