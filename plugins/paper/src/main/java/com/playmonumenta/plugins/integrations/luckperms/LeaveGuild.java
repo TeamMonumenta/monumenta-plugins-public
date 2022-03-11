@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
@@ -16,6 +17,7 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.InheritanceNode;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -54,26 +56,27 @@ public class LeaveGuild {
 
 		String guildName = LuckPermsIntegration.getGuildName(group);
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				User user = LuckPermsIntegration.UM.getUser(player.getUniqueId());
-				if (user == null) {
-					return;
-				}
-				for (InheritanceNode node : user.getNodes(NodeType.INHERITANCE)) {
-					if (node.getGroupName().equals(group.getName())) {
-						user.data().remove(node);
-					}
-				}
-				LuckPermsIntegration.UM.saveUser(user).whenComplete((unused, ex) -> {
-					if (ex != null) {
-						ex.printStackTrace();
-					}
-				});
-				LuckPermsIntegration.pushUserUpdate(user);
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+			User user = LuckPermsIntegration.UM.getUser(player.getUniqueId());
+			if (user == null) {
+				return;
 			}
-		}.runTaskAsynchronously(plugin);
+			for (InheritanceNode node : user.getNodes(NodeType.INHERITANCE)) {
+				if (node.getGroupName().equals(group.getName())) {
+					user.data().remove(node);
+				}
+			}
+			LuckPermsIntegration.UM.saveUser(user).whenComplete((unused, ex) -> {
+				if (ex != null) {
+					ex.printStackTrace();
+				} else {
+					Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+						MonumentaNetworkChatIntegration.refreshPlayer(plugin, player);
+					});
+				}
+			});
+			LuckPermsIntegration.pushUserUpdate(user);
+		});
 
 		player.sendMessage(ChatColor.GOLD + "You have left the guild '" + guildName + "'");
 	}

@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.cosmetics;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,15 +29,17 @@ public class CosmeticsGUI extends CustomInventory {
 	private static final int COSMETICS_START = 9;
 	private static final int COSMETICS_PER_PAGE = 36;
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private Plugin mPlugin;
 	private CosmeticType mDisplayPage = null;
 	private int mPageNumber = 1;
 
-	public CosmeticsGUI(Player player) {
-		this(player, player);
+	public CosmeticsGUI(Plugin plugin, Player player) {
+		this(plugin, player, player);
 	}
 
-	public CosmeticsGUI(Player requestingPlayer, Player targetPlayer) {
+	public CosmeticsGUI(Plugin plugin, Player requestingPlayer, Player targetPlayer) {
 		super(requestingPlayer, 54, "Cosmetics Manager");
+		mPlugin = plugin;
 		setUpCosmetics(targetPlayer);
 	}
 
@@ -79,6 +83,7 @@ public class CosmeticsGUI extends CustomInventory {
 						} else {
 							playerCosmetics.get(i).mEquipped = false;
 						}
+						MonumentaNetworkChatIntegration.refreshPlayer(mPlugin, p);
 					}
 					setUpCosmetics(p);
 					return;

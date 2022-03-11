@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -76,6 +77,7 @@ public class JoinGuild {
 				// Success indicators
 				player.sendMessage(ChatColor.GOLD + "Congratulations! You have joined " + guildName + "!");
 				p.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.GOLD + " has joined your guild");
+				MonumentaNetworkChatIntegration.refreshPlayer(plugin, player);
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
 				                       "execute at " + player.getName()
 				                       + " run summon minecraft:firework_rocket ~ ~1 ~ "
