@@ -67,7 +67,7 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 		mSettings = new ExperiencinatorSettings(mConfig.getScoreboardConfig(), owner);
 
 		mConversions = mConfig.getConversions().stream()
-			.filter(c -> c.conversionAllowedInGeneral(mPlayer))
+			.filter(c -> c.conversionAllowedInGeneral(mPlayer, experiencinatorItem))
 			.collect(Collectors.groupingBy(Conversion::getSettingsId))
 			.entrySet().stream()
 			.sorted(Entry.comparingByKey())
@@ -224,7 +224,7 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 		if (conversion == null) {
 			return false;
 		}
-		if (!conversion.conversionAllowed(mPlayer, tier)) {
+		if (!conversion.conversionAllowed(mPlayer, tier, mExperiencinatorItem)) {
 			return false;
 		}
 		return ExperiencinatorUtils.convertSingleItem(mPlayer, item, conversion, conversionRateName);

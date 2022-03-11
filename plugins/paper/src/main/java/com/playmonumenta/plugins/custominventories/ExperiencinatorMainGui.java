@@ -86,6 +86,9 @@ public final class ExperiencinatorMainGui extends CustomInventory {
 		if (config == null) {
 			return;
 		}
+		if (!ExperiencinatorUtils.checkExperiencinator(experiencinator, experiencinatorItem, player)) {
+			return;
+		}
 		new ExperiencinatorMainGui(player, experiencinator, experiencinatorItem).openInventory(player, plugin);
 	}
 

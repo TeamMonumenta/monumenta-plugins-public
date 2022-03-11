@@ -89,6 +89,9 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 		if (config == null) {
 			return;
 		}
+		if (!ExperiencinatorUtils.checkExperiencinator(experiencinator, experiencinatorItem, player)) {
+			return;
+		}
 
 		// calculate which options are visible
 		Set<Tier> allUsedTiers = EnumSet.noneOf(Tier.class);
@@ -106,7 +109,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 					continue;
 				}
 				for (Tier tier : tierRates.keySet()) {
-					if (conversion.conversionAllowed(player, tier)) {
+					if (conversion.conversionAllowed(player, tier, experiencinatorItem)) {
 						tiers.add(tier);
 						allUsedTiers.add(tier);
 					}
@@ -297,7 +300,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 	}
 
 	private boolean isValidConversion(Conversion conversion, Region region, Tier tier) {
-		if (!conversion.conversionAllowed(mPlayer, tier)) {
+		if (!conversion.conversionAllowed(mPlayer, tier, mExperiencinatorItem)) {
 			return false;
 		}
 		ExperiencinatorConfig.ConversionRates conversionRates = conversion.getConversionRates(region);

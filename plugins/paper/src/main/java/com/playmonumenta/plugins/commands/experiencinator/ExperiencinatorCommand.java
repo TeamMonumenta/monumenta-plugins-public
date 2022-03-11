@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.custominventories.ExperiencinatorMainGui;
 import com.playmonumenta.plugins.custominventories.ExperiencinatorSettingsGui;
 import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.scriptedquests.managers.InteractableManager;
+import com.playmonumenta.scriptedquests.quests.QuestContext;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.BooleanArgument;
@@ -128,7 +128,8 @@ public class ExperiencinatorCommand {
 		}
 
 		// Try SQ's "used item" first
-		ItemStack item = InteractableManager.getUsedItem();
+		QuestContext questContext = QuestContext.getCurrentContext();
+		ItemStack item = questContext != null ? questContext.getUsedItem() : null;
 		ExperiencinatorConfig.Experiencinator experiencinator = item != null ? experiencinatorConfig.getExperiencinator(item) : null;
 
 		// Try mainhand second

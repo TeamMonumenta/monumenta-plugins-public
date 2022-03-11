@@ -8,6 +8,8 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.scriptedquests.Plugin;
+import com.playmonumenta.scriptedquests.quests.QuestContext;
 import com.playmonumenta.scriptedquests.quests.components.QuestPrerequisites;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -205,8 +207,8 @@ public final class ExperiencinatorConfig {
 			}
 		}
 
-		public boolean checkPrerequisites(Player player) {
-			if (mPrerequisites != null && !mPrerequisites.prerequisiteMet(player, null)) {
+		public boolean checkPrerequisites(Player player, ItemStack experiencinatorItem) {
+			if (mPrerequisites != null && !new QuestContext(Plugin.getInstance(), player, null, false, mPrerequisites, experiencinatorItem).prerequisitesMet()) {
 				player.sendRawMessage(ChatColor.DARK_RED + mPrerequisitesFailureMessage);
 				return false;
 			}
@@ -332,19 +334,19 @@ public final class ExperiencinatorConfig {
 			return mCompressExistingResults;
 		}
 
-		public boolean conversionAllowed(Player player, Tier tier) {
-			if (!conversionAllowedInGeneral(player)) {
+		public boolean conversionAllowed(Player player, Tier tier, ItemStack experiencinatorItem) {
+			if (!conversionAllowedInGeneral(player, experiencinatorItem)) {
 				return false;
 			}
 			QuestPrerequisites tierPrerequisites = mTierPrerequisites.get(tier);
-			return tierPrerequisites == null || tierPrerequisites.prerequisiteMet(player, null);
+			return tierPrerequisites == null || new QuestContext(Plugin.getInstance(), player, null, false, tierPrerequisites, experiencinatorItem).prerequisitesMet();
 		}
 
 		/**
 		 * Whether the player has access to this conversion. Does not check any tier prerequisites.
 		 */
-		public boolean conversionAllowedInGeneral(Player player) {
-			return mPrerequisites == null || mPrerequisites.prerequisiteMet(player, null);
+		public boolean conversionAllowedInGeneral(Player player, ItemStack experiencinatorItem) {
+			return mPrerequisites == null || new QuestContext(Plugin.getInstance(), player, null, false, mPrerequisites, experiencinatorItem).prerequisitesMet();
 		}
 
 		private void validate(ExperiencinatorConfig config) throws Exception {
