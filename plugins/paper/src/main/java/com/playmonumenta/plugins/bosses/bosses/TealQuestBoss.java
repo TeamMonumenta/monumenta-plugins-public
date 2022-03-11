@@ -130,7 +130,7 @@ public class TealQuestBoss extends BossAbilityGroup {
 							}
 						})));
 
-		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, mBoss, detectionRange, RECHARGE_TIME, HITS_TO_BREAK,
+		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, mBoss, detectionRange, RECHARGE_TIME, HITS_TO_BREAK, false,
 				(Location loc) -> {
 					World world = loc.getWorld();
 					world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1, 1);

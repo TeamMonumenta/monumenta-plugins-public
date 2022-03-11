@@ -760,12 +760,12 @@ public final class ParrotCustomInventory extends CustomInventory {
 								}));
 
 		lore.clear();
-		lore.add("Requires clearing floor 15 from Darkest Depths");
+		lore.add("Requires clearing floor 12 from Darkest Depths");
 		lore.add("You have cleared floor " + ((depthsScore - 1) / 10));
 		ItemStack canBuyDepthsU2 = buildItem(Material.CRYING_OBSIDIAN, "Otherworldly Myiopsitta (u)", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 21, canBuyDepthsU2, (player, inv) -> {
 							return ScoreboardUtils.getScoreboardValue(player, "ParrotBought14").orElse(0) > 0 &&
-							ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) < 151 &&
+							ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) < 121 &&
 							ScoreboardUtils.getScoreboardValue(player, "ParrotBought15").orElse(0) == 0 &&
 							mShoulderSelected == PlayerShoulder.NONE;
 								}));
@@ -778,7 +778,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		ItemStack buyDepthsU = buildItem(Material.CRYING_OBSIDIAN, "Otherworldly Myiopsitta (u)", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 21, buyDepthsU, new HashMap<>(cost), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought15").orElse(0) == 0 &&
-			ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) >= 151 &&
+			ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) >= 121 &&
 			ScoreboardUtils.getScoreboardValue(player, "ParrotBought14").orElse(0) > 0 &&
 			mShoulderSelected == PlayerShoulder.NONE;
 		}, (player, inv) -> {

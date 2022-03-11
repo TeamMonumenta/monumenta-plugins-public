@@ -24,6 +24,9 @@ public class BarrierBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public int HITS_TO_BREAK = 1;
 
+		@BossParam(help = "not written")
+		public boolean IS_CARAPACE = false;
+
 		@BossParam(help = "Particle summon at boss loc")
 		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,4,0,1,0,0,#ffffff,2)]");
 
@@ -43,7 +46,7 @@ public class BarrierBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, boss, p.DETECTION, p.COOLDOWN, p.HITS_TO_BREAK,
+		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, boss, p.DETECTION, p.COOLDOWN, p.HITS_TO_BREAK, p.IS_CARAPACE,
 				(Location loc) -> {
 					p.SOUND_REFRESH.play(loc);
 				}, (Location loc) -> {

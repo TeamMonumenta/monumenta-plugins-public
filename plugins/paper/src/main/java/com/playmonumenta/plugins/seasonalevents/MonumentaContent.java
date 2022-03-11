@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.seasonalevents;
 import javax.annotation.Nullable;
 
 public enum MonumentaContent {
+	LABS("labs", ContentType.DUNGEON, 1),
 	WHITE("white", ContentType.DUNGEON, 1),
 	ORANGE("orange", ContentType.DUNGEON, 1),
 	MAGENTA("magenta", ContentType.DUNGEON, 1),

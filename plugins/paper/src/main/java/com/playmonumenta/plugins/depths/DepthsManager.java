@@ -1214,6 +1214,7 @@ public class DepthsManager {
 		String removedAbility = null;
 		int index = 0;
 		int removedLevel = 1;
+		boolean isMutated = false;
 		while (removedAbility == null) {
 			if (index >= abilityList.size()) {
 				return;
@@ -1227,14 +1228,29 @@ public class DepthsManager {
 			}
 			index++;
 		}
+		for (DepthsAbility da : getAbilities()) {
+			if (da.getDisplayName().equals(removedAbility)) {
+				if (!(dp.mEligibleTrees.contains(da.getDepthsTree()))) {
+					isMutated = true;
+				}
+			}
+		}
 		setPlayerLevelInAbility(removedAbility, p, 0);
 		p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Removed ability: " + removedAbility);
 		dp.mUsedChaosThisFloor = true;
 
 		//Give 2 random abilities that aren't the one we just removed
-
 		for (int i = 0; i < 2; i++) {
 			List<DepthsAbility> abilities = getFilteredAbilities(dp.mEligibleTrees);
+			if (isMutated) {
+				List<DepthsTree> validTrees = new ArrayList<>();
+				for (DepthsTree tree : DepthsTree.values()) {
+					if (!dp.mEligibleTrees.contains(tree)) {
+						validTrees.add(tree);
+					}
+				}
+				abilities = getFilteredAbilities(validTrees);
+			}
 
 			//Do not give any abilities that have the same trigger as abilities that are currently offered in an ability reward
 			//This is needed because players can open up an ability reward, not choose anything, then take mystery box or chaos and end up with two abilities on a trigger
