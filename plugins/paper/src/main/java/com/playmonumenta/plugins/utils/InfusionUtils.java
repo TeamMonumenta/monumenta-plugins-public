@@ -21,7 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class InfusionUtils {
 
 	/**When set to true the refund function will return all the XP used for the infusion, when false only the 50% */
-	public static final boolean FULL_REFUND = true;
+	public static final boolean FULL_REFUND = false;
 
 	public enum InfusionSelection {
 		ACUMEN("acumen", "Acumen"),

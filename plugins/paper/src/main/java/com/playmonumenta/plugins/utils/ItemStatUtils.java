@@ -32,6 +32,7 @@ import dev.jorel.commandapi.arguments.DoubleArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.PlayerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -1825,30 +1827,52 @@ public class ItemStatUtils {
 				return;
 			}
 
-			EnchantmentType type1 = EnchantmentType.getEnchantmentType(enchantment);
-			if (type1 != null) {
-				if (level > 0) {
-					addEnchantment(item, type1, level);
-				} else {
-					removeEnchantment(item, type1);
-				}
-			}
-
-			InfusionType type2 = InfusionType.getInfusionType(enchantment);
-			if (type2 != null) {
-				if (level > 0) {
-					addInfusion(item, type2, level, player.getUniqueId(), false);
-				} else {
-					removeInfusion(item, type2, false);
-				}
-			}
-
-			generateItemStats(item);
-			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
-			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true);
-			}
+			addEnchantmentOrInfusion(item, player, enchantment, level);
 		}).register();
+
+		List<Argument> argumentsOther = new ArrayList<>();
+		argumentsOther.add(new PlayerArgument("player"));
+		argumentsOther.add(new StringArgument("enchantment").replaceSuggestions(info -> enchantments));
+		argumentsOther.add(new IntegerArgument("level", 0));
+
+		new CommandAPICommand("editench").withPermission(perms).withArguments(argumentsOther).executes((sender, args) -> {
+			Player player = (Player) args[0];
+			String enchantment = (String) args[1];
+			Integer level = (Integer) args[2];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			addEnchantmentOrInfusion(item, player, enchantment, level);
+		}).register();
+	}
+
+	private static void addEnchantmentOrInfusion(ItemStack item, Player player, String enchantment, int level) {
+		EnchantmentType type1 = EnchantmentType.getEnchantmentType(enchantment);
+		if (type1 != null) {
+			if (level > 0) {
+				addEnchantment(item, type1, level);
+			} else {
+				removeEnchantment(item, type1);
+			}
+		}
+
+		InfusionType type2 = InfusionType.getInfusionType(enchantment);
+		if (type2 != null) {
+			if (level > 0) {
+				addInfusion(item, type2, level, player.getUniqueId(), false);
+			} else {
+				removeInfusion(item, type2, false);
+			}
+		}
+
+		generateItemStats(item);
+		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
+		if (playerItemStats != null) {
+			playerItemStats.updateStats(player, true);
+		}
 	}
 
 	public static void registerAttrCommand() {

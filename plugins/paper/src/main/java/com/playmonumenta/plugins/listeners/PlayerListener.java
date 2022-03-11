@@ -17,13 +17,11 @@ import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -32,7 +30,6 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +43,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -122,8 +118,6 @@ import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.loot.LootContext;
-import org.bukkit.loot.LootTable;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -175,18 +169,6 @@ public class PlayerListener implements Listener {
 			playersTeam.setCanSeeFriendlyInvisibles(false);
 		}
 		playersTeam.addEntry(player.getName());
-
-		//TODO temporary for item rework
-		if (!ServerProperties.getShardName().equals("tutorial") && ScoreboardUtils.getScoreboardValue(player, "ItemReworkToken").orElse(0) > 0) {
-			NamespacedKey tokenKey = NamespacedKeyUtils.fromString("epic:legacy/r1/morning_lily");
-			LootTable tokenLootTable = Bukkit.getLootTable(tokenKey);
-			Collection<ItemStack> tokenLoot = tokenLootTable.populateLoot(FastUtils.RANDOM, new LootContext.Builder(player.getLocation()).build());
-			for (ItemStack item : tokenLoot) {
-				item.setAmount(ScoreboardUtils.getScoreboardValue(player, "ItemReworkToken").orElse(0));
-				InventoryUtils.giveItem(player, item);
-			}
-			ScoreboardUtils.setScoreboardValue(player, "ItemReworkToken", 0);
-		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

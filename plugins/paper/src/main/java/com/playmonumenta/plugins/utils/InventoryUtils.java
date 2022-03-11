@@ -308,6 +308,22 @@ public class InventoryUtils {
 		}
 	}
 
+	public static void giveItemFromLootTable(Player player, NamespacedKey key, int amount) {
+		LootTable lt = Bukkit.getLootTable(key);
+		if (lt != null) {
+			LootContext.Builder builder = new LootContext.Builder(player.getLocation());
+			LootContext context = builder.build();
+			Collection<ItemStack> items = lt.populateLoot(FastUtils.RANDOM, context);
+			if (items.size() > 0) {
+				ItemStack materials = items.iterator().next();
+				materials.setAmount(amount);
+				InventoryUtils.giveItem(player, materials);
+				return;
+			}
+		}
+		player.sendMessage(Component.text("ERROR getting loot table. Please contact a moderator if you see this message!", NamedTextColor.RED));
+	}
+
 	/**
 	 * Drops an item that can only be picked up by the given player for the first 10 secconds, and any player afterwards.
 	 * The item will also count as dropped by the player for graving purposes.

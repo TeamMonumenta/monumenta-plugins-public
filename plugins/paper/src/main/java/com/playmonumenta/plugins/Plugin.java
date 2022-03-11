@@ -167,17 +167,8 @@ public class Plugin extends JavaPlugin {
 		 */
 		StasisCommand.register();
 		GiveSoulbound.register();
-		HopeifyHeldItem.register();
-		ColossalifyHeldItem.register();
-		FestiveHeldItem.register();
-		GildifyHeldItem.register();
-		InfuseHeldItem.register();
 		ClaimRaffle.register(this);
-		BarkifyHeldItem.register();
-		DeCluckifyHeldItem.register();
 		ShatterHeldItem.register();
-		DeBarkifyHeldItem.register();
-		PhylacteryifyHeldItem.register();
 		CalculateReforge.register();
 		ReforgeHeldItem.register();
 		ReforgeInventory.register();
@@ -210,10 +201,7 @@ public class Plugin extends JavaPlugin {
 		GetScoreCommand.register();
 		Grave.register();
 		StatTrackItem.register();
-		LockedHeldItem.register();
-		UnlockHeldItem.register();
 		ToggleSwap.register(this);
-		DelveInfuseHeldItem.register();
 		CustomInventoryCommands.register(this);
 		AdminNotify.register();
 		ItemStatUtils.registerInfoCommand();
@@ -223,7 +211,6 @@ public class Plugin extends JavaPlugin {
 		ItemStatUtils.registerAttrCommand();
 		ItemStatUtils.registerRemoveCommand();
 		PlayerItemStatsGUICommand.register(this);
-		ReworkRefundInfusions.register();
 		AuditLogCommand.register();
 		PickLevelAfterAnvils.register();
 		GenerateItems.register();
