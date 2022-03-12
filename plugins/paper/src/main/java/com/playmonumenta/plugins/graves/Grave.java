@@ -145,7 +145,7 @@ public final class Grave {
 		}
 		if (!mAlertedSpawned) {
 			mAlertedSpawned = true;
-			mPlayer.sendMessage(Component.text("You died and dropped items! Your grave will keep them safe; be careful on the way back! (/deathhelp for more info)", NamedTextColor.RED));
+			mPlayer.sendMessage(Component.text("You died and dropped items! Your grave will keep them safe; be careful on the way back! (/help death for more info)", NamedTextColor.RED));
 		}
 		spawn();
 	}
@@ -175,8 +175,8 @@ public final class Grave {
 			mPlayer.sendMessage(Component.text("An item you dropped at ", NamedTextColor.RED)
 				.append(Component.text(mLocation.getBlockX() + "," + mLocation.getBlockY() + "," + mLocation.getBlockZ()))
 				.append(Component.text(" was destroyed. A grave will keep it safe for you. "))
-				.append(Component.text("(/deathhelp for more info)")
-					.clickEvent(ClickEvent.runCommand("/deathhelp")))
+				.append(Component.text("(/help death for more info)")
+					.clickEvent(ClickEvent.runCommand("/help death")))
 			);
 		}
 		spawn();
@@ -266,8 +266,8 @@ public final class Grave {
 						.append(Component.text(" with "))
 						.append(Component.text(mItems.size() == 1 ? "1 item." : mItems.size() + " items.")
 							.hoverEvent(HoverEvent.showText(getItemList())))
-						.append(Component.text(" (/deathhelp for more info)")
-							.clickEvent(ClickEvent.runCommand("/deathhelp")))
+						.append(Component.text(" (/help death for more info)")
+							.clickEvent(ClickEvent.runCommand("/help death")))
 						.append(Component.text(" "))
 						.append(Component.text("Click to delete this grave permanently.", NamedTextColor.RED)
 							.hoverEvent(HoverEvent.showText(Component.text("Delete grave " + index, NamedTextColor.RED)))

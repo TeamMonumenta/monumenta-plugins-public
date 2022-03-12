@@ -378,8 +378,8 @@ public class GraveItem {
 				if (!mGrave.mAlertedLimbo) {
 					mGrave.mAlertedLimbo = true;
 					mPlayer.sendMessage(Component.text("Some of the items you died with were destroyed, but don't worry! If you can get back without dying again, you can get them back! ", NamedTextColor.RED)
-						.append(Component.text("(/deathhelp for more info)", NamedTextColor.RED)
-							.clickEvent(ClickEvent.runCommand("/deathhelp"))));
+						.append(Component.text("(/help death for more info)", NamedTextColor.RED)
+							.clickEvent(ClickEvent.runCommand("/help death"))));
 				}
 			}
 		}
@@ -398,16 +398,16 @@ public class GraveItem {
 				if (!mGrave.mAlertedShatter) {
 					mGrave.mAlertedShatter = true;
 					mPlayer.sendMessage(Component.text("Some of the items in your grave were shattered! You can still get them back from the grave, but won't be able to equip them until repaired. ", NamedTextColor.RED)
-						.append(Component.text("(/deathhelp for more info)", NamedTextColor.RED)
-							.clickEvent(ClickEvent.runCommand("/deathhelp"))));
+						.append(Component.text("(/help death for more info)", NamedTextColor.RED)
+							.clickEvent(ClickEvent.runCommand("/help death"))));
 				}
 			} else {
 				remove(Status.LOST);
 				if (!mGrave.mAlertedLost) {
 					mGrave.mAlertedLost = true;
 					mPlayer.sendMessage(Component.text("Some of the items in your grave were lost! This only happens to common items like torches and food; be sure to restock! ", NamedTextColor.RED)
-						.append(Component.text("(/deathhelp for more info)", NamedTextColor.RED)
-							.clickEvent(ClickEvent.runCommand("/deathhelp"))));
+						.append(Component.text("(/help death for more info)", NamedTextColor.RED)
+							.clickEvent(ClickEvent.runCommand("/help death"))));
 				}
 			}
 		}
