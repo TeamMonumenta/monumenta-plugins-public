@@ -29,10 +29,10 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.DoubleArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
-import dev.jorel.commandapi.arguments.PlayerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -1831,7 +1831,7 @@ public class ItemStatUtils {
 		}).register();
 
 		List<Argument> argumentsOther = new ArrayList<>();
-		argumentsOther.add(new PlayerArgument("player"));
+		argumentsOther.add(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER));
 		argumentsOther.add(new StringArgument("enchantment").replaceSuggestions(info -> enchantments));
 		argumentsOther.add(new IntegerArgument("level", 0));
 
