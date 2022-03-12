@@ -57,9 +57,12 @@ public class GenericTowerMob extends TowerAbility {
 					mLastTarget = null;
 				}
 
+				if (mBoss.getTarget() != null && mBoss.getTarget() instanceof Player) {
+					mBoss.setTarget(mLastTarget);
+				}
+
 				if (mBoss.getTarget() != null && (mBoss.getTarget().isDead() || !mBoss.getTarget().isValid())) {
-					mLastTarget = null;
-					mBoss.setTarget(null);
+					mBoss.setTarget(mLastTarget);
 				}
 
 				if (mLastTarget != null && ((mIsPlayerMob && mLastTarget.getScoreboardTags().contains(TowerConstants.MOB_TAG_PLAYER_TEAM) || (!mIsPlayerMob && mLastTarget.getScoreboardTags().contains(TowerConstants.MOB_TAG_FLOOR_TEAM))))) {
@@ -91,6 +94,8 @@ public class GenericTowerMob extends TowerAbility {
 					} else {
 						mBoss.setTarget(null);
 					}
+				} else {
+					mBoss.setTarget(mLastTarget);
 				}
 			}
 
