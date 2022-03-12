@@ -309,8 +309,8 @@ public class TowerGame {
 	}
 
 	public void start() {
-		Bukkit.dispatchCommand(mPlayer.mPlayer, "function mechanisms/music/music_stop_reset");
-		mPlayer.mPlayer.teleport(new Location(mPlayer.mPlayer.getWorld(), mFloor.mVector.getX() + 0.5, mFloor.mVector.getY() + 1, mFloor.mVector.getZ() + 0.5));
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute as " + mPlayer.mPlayer.getName() + " run function monumenta:mechanisms/music/music_stop_reset");
+		mPlayer.mPlayer.teleport(new Location(mPlayer.mPlayer.getWorld(), mFloor.mVector.getX() + 0.5, mFloor.mVector.getY() + 5, mFloor.mVector.getZ() + 0.5));
 		launchCooldown();
 	}
 

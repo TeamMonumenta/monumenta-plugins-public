@@ -78,7 +78,7 @@ public class TowerManager implements Listener {
 		Player player = event.getPlayer();
 		if (player.getScoreboardTags().contains(TowerConstants.PLAYER_TAG)) {
 			UUID uuid = player.getUniqueId();
-			GAMES.get(uuid).forceStopGame();
+			GAMES.get(uuid).stop();
 		}
 	}
 
