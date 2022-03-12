@@ -94,7 +94,7 @@ public class GenericTowerMob extends TowerAbility {
 				}
 			}
 
-		}.runTaskTimer(TowerManager.mPlugin, 5, 5);
+		}.runTaskTimer(TowerManager.mPlugin, 10, 5);
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), -1, null);
 
