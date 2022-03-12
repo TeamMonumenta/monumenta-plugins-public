@@ -128,13 +128,22 @@ public class TowerMob {
 		meta.displayName(TowerGameUtils.getLevelComponent(mMobLevel));
 
 		List<Component> list = new ArrayList<>();
-		double dmgMult = (mInfo.mMobRarity.getDamageMult() * (mMobLevel - 1) * 100)/ 100;
-		list.addAll(TowerGameUtils.getGenericLoreComponent("This mob receives " + (dmgMult * 100) + "% less damage"));
-		list.addAll(TowerGameUtils.getGenericLoreComponent("This mob does " + (dmgMult * 100) + "% more damage"));
-		list.add(Component.empty());
+		int damageMult = (int) ((mInfo.mMobRarity.getDamageMult() * (mMobLevel - 1) * 100)/ 100 * 100);
+		int lvlDamageMult = (int) (mInfo.mMobRarity.getDamageMult() * 100);
+
 		if (mMobLevel < 5) {
+			list.add(Component.text("This mob receives " + damageMult + "% ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
+				         .append(Component.text("(+" + lvlDamageMult + "%)", NamedTextColor.DARK_PURPLE))
+				         .append(Component.text(" less damage", NamedTextColor.DARK_GRAY)));
+			list.add(Component.text("This mob does " + damageMult + "% ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
+						.append(Component.text("(+" + lvlDamageMult + "%)", NamedTextColor.DARK_PURPLE))
+						.append(Component.text(" more damage", NamedTextColor.DARK_GRAY)));
+			list.add(Component.empty());
 			int nextLvlCost = TowerGameUtils.getNextLevelCost(this);
-			list.addAll(TowerGameUtils.getGenericLoreComponent("Pay " + nextLvlCost + " to buy an upgrade!"));
+			list.add(Component.text("Pay " + nextLvlCost + " to buy an upgrade!", NamedTextColor.DARK_PURPLE).decoration(TextDecoration.ITALIC, false));
+		} else {
+			list.addAll(TowerGameUtils.getGenericLoreComponent("This mob receives " + damageMult + "% less damage"));
+			list.addAll(TowerGameUtils.getGenericLoreComponent("This mob does " + damageMult + "% more damage"));
 		}
 		meta.lore(list);
 		stack.setItemMeta(meta);
@@ -299,12 +308,14 @@ public class TowerMob {
 		mobspawned.setInvulnerable(true);
 		mobspawned.setSilent(true);
 		mobspawned.setGravity(false);
+		mobspawned.addScoreboardTag(TowerConstants.TAG_UNLOAD_ENTITY);
 
 		LivingEntity armorClass = mobspawned.getWorld().spawn(mobspawned.getLocation().clone().add(0, 0.25, 0), ArmorStand.class);
 		armorClass.setCustomNameVisible(true);
 		armorClass.customName(Component.text("Class " + mInfo.mMobClass.getName(), NamedTextColor.RED).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		armorClass.setInvisible(true);
 		armorClass.setGravity(false);
+		armorClass.addScoreboardTag(TowerConstants.TAG_UNLOAD_ENTITY);
 
 		Location loc = armorClass.getLocation().clone().add(0, 0.25, 0);
 		LivingEntity armorLvl = loc.getWorld().spawn(loc, ArmorStand.class);
@@ -312,6 +323,7 @@ public class TowerMob {
 		armorLvl.setGravity(false);
 		armorLvl.customName(Component.text("Level " + mMobLevel, NamedTextColor.RED).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		armorLvl.setCustomNameVisible(true);
+		armorLvl.addScoreboardTag(TowerConstants.TAG_UNLOAD_ENTITY);
 
 		Location loc2 = loc.clone().add(0, 0.25, 0);
 		LivingEntity armorName = loc2.getWorld().spawn(loc2, ArmorStand.class);
@@ -319,6 +331,7 @@ public class TowerMob {
 		armorName.setGravity(false);
 		armorName.customName(Component.text(mInfo.mDisplayName, NamedTextColor.RED).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		armorName.setCustomNameVisible(true);
+		armorName.addScoreboardTag(TowerConstants.TAG_UNLOAD_ENTITY);
 
 		if (list != null) {
 			list.add(mobspawned);

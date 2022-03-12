@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -299,6 +300,7 @@ public class TowerGame {
 		double dz = (mPlayer.mPlayer.getLocation().getZ() - mFloor.mVector.getZ());
 		dz = Math.max(0.5, Math.min(dz, mFloor.mZSize - 0.5));
 		dx = Math.max(0.5, Math.min(dx, mFloor.mXSize - 0.5));
+		dy = Math.max(0.1, dy);
 		mPlayer.mTeam.addMob(new TowerMob(info, dx, dy, dz));
 	}
 
@@ -307,11 +309,12 @@ public class TowerGame {
 	}
 
 	public void start() {
+		Bukkit.dispatchCommand(mPlayer.mPlayer, "function mechanisms/music/music_stop_reset");
 		mPlayer.mPlayer.teleport(new Location(mPlayer.mPlayer.getWorld(), mFloor.mVector.getX() + 0.5, mFloor.mVector.getY() + 1, mFloor.mVector.getZ() + 0.5));
 		launchCooldown();
 	}
 
-	private void stop() {
+	public void stop() {
 		if (!mIsGameEnded) {
 			mIsGameEnded = true;
 			mIsTurnEnded = true;

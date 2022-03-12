@@ -73,7 +73,7 @@ public class VoidWalkerTowerAbility extends TowerAbility {
 				world.spawnParticle(Particle.CLOUD, loc, 40, 1, 1, 1, 0.5);
 				if (target != null) {
 					world.playSound(target.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
-					BossUtils.bossDamagePercent(mBoss, target, 0.3);
+					BossUtils.bossDamagePercent(mBoss, target, 0.4);
 				}
 			}
 		);

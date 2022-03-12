@@ -9,11 +9,13 @@ import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Blaze;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,6 +26,7 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class TowerManager implements Listener {
@@ -101,6 +104,15 @@ public class TowerManager implements Listener {
 		if (event.getEntity().getShooter() instanceof LivingEntity mob) {
 			if (mob.getScoreboardTags().contains(TowerConstants.MOB_TAG) && event.getHitEntity() == null) {
 				event.setCancelled(true);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public static void onChunUnloadEvent(ChunkUnloadEvent event) {
+		for (Entity entity : List.of(event.getChunk().getEntities())) {
+			if (entity != null && entity.getScoreboardTags().contains(TowerConstants.TAG_UNLOAD_ENTITY)) {
+				entity.remove();
 			}
 		}
 	}

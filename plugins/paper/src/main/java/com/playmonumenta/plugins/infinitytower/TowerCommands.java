@@ -152,7 +152,7 @@ public class TowerCommands {
 			.executes((sender, args) -> {
 				Player player = (Player) args[2];
 				if (TowerManager.GAMES.get(player.getUniqueId()) != null) {
-					TowerManager.GAMES.get(player.getUniqueId()).forceStopGame();
+					TowerManager.GAMES.get(player.getUniqueId()).stop();
 				} else {
 					//someone trapped? remove the tags to be sure
 					TowerGame.clearPlayer(player);

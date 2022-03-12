@@ -68,7 +68,7 @@ public class TowerConstants {
 	public static final NamespacedKey BOOK_LOOT_TABLE_KEY = NamespacedKey.fromString("epic:r1/blitz/blitz_master_guide");
 	public static final NamespacedKey COIN_LOOT_TABLE_KEY = NamespacedKey.fromString("epic:r1/blitz/blitz_doubloon");
 
-	public static final String LOOT_SCOREBOARD_HOLDER = "ITMissingLoot";
+	public static final String TAG_UNLOAD_ENTITY = "ITUnloadMe";
 
 
 }

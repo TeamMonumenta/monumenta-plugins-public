@@ -24,8 +24,8 @@ import org.bukkit.util.BoundingBox;
 
 public class ForgemasterTowerAbility extends TowerAbility {
 
-	private static final int DAMAGE = 10;
-	private static final int GROUND_DAMAGE = 3;
+	private static final int DAMAGE = 8;
+	private static final int GROUND_DAMAGE = 2;
 	private static final int FIRE_DURATION = 20 * 4;
 
 	public ForgemasterTowerAbility(Plugin plugin, String identityTag, LivingEntity boss, TowerGame game, TowerMob mob, boolean isPlayerMob) {
