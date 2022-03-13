@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import com.playmonumenta.scriptedquests.quests.QuestContext;
 import com.playmonumenta.scriptedquests.quests.QuestNpc;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -98,7 +99,8 @@ public class ShopManager implements Listener {
 
 				/* Only trigger quest interactions via melee attack */
 				if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-					sq.mNpcManager.interactEvent(sq, player, npcName, EntityType.SHULKER, damagee, npc, false);
+					sq.mNpcManager.interactEvent(new QuestContext(sq, player, damagee, false, null, player.getInventory().getItemInMainHand()),
+						npcName, EntityType.SHULKER, npc, false);
 				}
 			}
 		}
