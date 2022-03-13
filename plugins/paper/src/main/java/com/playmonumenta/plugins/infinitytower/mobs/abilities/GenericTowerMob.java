@@ -29,7 +29,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class GenericTowerMob extends TowerAbility {
 
 	final Mob mBoss;
-	private LivingEntity mLastTarget = null;
+	public LivingEntity mLastTarget = null;
 
 	public GenericTowerMob(Plugin plugin, String identityTag, Mob boss, TowerGame game, TowerMob mob, boolean isPlayerMob) {
 		super(plugin, identityTag, boss, game, mob, isPlayerMob);
@@ -42,6 +42,7 @@ public class GenericTowerMob extends TowerAbility {
 			@Override
 			public void run() {
 				if (mBoss.isDead() || !mBoss.isValid()) {
+					mGame.towerMobsDied(mBoss);
 					cancel();
 					return;
 				}
@@ -71,6 +72,8 @@ public class GenericTowerMob extends TowerAbility {
 				}
 
 				if (mGame.isTurnEnded()) {
+					mBoss.setTarget(null);
+					cancel();
 					return;
 				}
 

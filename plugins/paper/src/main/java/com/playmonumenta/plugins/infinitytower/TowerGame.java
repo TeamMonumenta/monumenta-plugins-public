@@ -24,7 +24,7 @@ import org.bukkit.util.Vector;
 
 public class TowerGame {
 
-	private static final int COOLDOWN_TURNS = 60;
+	private static final int COOLDOWN_TURNS = 90;
 	//in sec
 
 	public int mPlayerLevel = 1;
@@ -32,6 +32,8 @@ public class TowerGame {
 
 	public int mRoll = 0;
 	//mRoll is used so even if the player open the gui multiple times its always keep the same item
+
+	public boolean mFreeRoll = true;
 
 	protected int mCurrentFloor;
 
@@ -89,9 +91,24 @@ public class TowerGame {
 			forceStopGame();
 			return;
 		}
-		Item item = mPlayer.mPlayer.getWorld().dropItemNaturally(new Location(mPlayer.mPlayer.getWorld(), mFloor.mVector.getX() + (((float) mFloor.mXSize) / 4), mFloor.mVector.getY() + 5, mFloor.mVector.getZ() + ((float) mFloor.mZSize) / 2), stack);
-		item.setCanMobPickup(false);
-		item.setGlowing(true);
+		boolean dropBook = true;
+
+		for (ItemStack itemStack : mPlayer.mPlayer.getInventory()) {
+			if (itemStack != null && itemStack.isSimilar(stack)) {
+				dropBook = false;
+				break;
+			}
+		}
+
+		if (dropBook) {
+			TowerGameUtils.sendMessage(mPlayer.mPlayer, "Take the book to play!");
+			Item item = mPlayer.mPlayer.getWorld().dropItemNaturally(new Location(mPlayer.mPlayer.getWorld(), mFloor.mVector.getX() + (((float) mFloor.mXSize) / 4), mFloor.mVector.getY() + 5, mFloor.mVector.getZ() + ((float) mFloor.mZSize) / 2), stack);
+			item.setCanMobPickup(false);
+			item.setGlowing(true);
+		} else {
+			TowerGameUtils.sendMessage(mPlayer.mPlayer, "You can use the Blitz Master Guide in your inventory to play");
+		}
+
 	}
 
 	public void setFloor(TowerFloor floor) {
@@ -143,6 +160,8 @@ public class TowerGame {
 		mCurrentFloor++;
 		mRoll++;
 		//refresh the roll for the shop mobs gui
+
+		mFreeRoll = mCurrentFloor < 5;
 
 		TowerGameUtils.sendMessage(mPlayer.mPlayer, "You are now at round: " + (mCurrentFloor + 1));
 		TowerGameUtils.addGold(mPlayer.mPlayer, TowerConstants.getGoldWin(mCurrentFloor));
@@ -315,6 +334,7 @@ public class TowerGame {
 	}
 
 	public void stop() {
+		clearPlayer(mPlayer.mPlayer);
 		if (!mIsGameEnded) {
 			mIsGameEnded = true;
 			mIsTurnEnded = true;
@@ -333,7 +353,6 @@ public class TowerGame {
 			TowerGameUtils.sendMessage(mPlayer.mPlayer, "Congratulations! your team will now defend " + (mCurrentFloor + 1) + "th round");
 		}
 
-		clearPlayer(mPlayer.mPlayer);
 		TowerGameUtils.giveLoot(this);
 		forceStopGame();
 

@@ -28,6 +28,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 	private static final ItemStack WHITE_BORDER_ITEM = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
 	private static final ItemStack WHITE_CENTER_ITEM = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
 	private static final ItemStack REFRESH_ITEM = new ItemStack(Material.BONE_MEAL);
+	private static final ItemStack FREE_REFRESH_ITEM = new ItemStack(Material.BONE_MEAL);
 
 	static {
 		ItemMeta meta = WHITE_BORDER_ITEM.getItemMeta();
@@ -43,12 +44,22 @@ public class TowerGuiBuyMob extends CustomInventory {
 
 		meta.lore(lore);
 		REFRESH_ITEM.setItemMeta(meta);
+
+		meta = FREE_REFRESH_ITEM.getItemMeta();
+		meta.displayName(Component.text("Refresh the shop!", NamedTextColor.AQUA).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		List<Component> lore2 = new ArrayList<>();
+		lore2.add(Component.text("1 free refresh!", NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false));
+		lore2.add(Component.empty());
+		lore2.add(Component.text("You have one free refresh each round before 6th", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+		meta.lore(lore2);
+		FREE_REFRESH_ITEM.setItemMeta(meta);
+
 	}
 
 	private static final int[] VALID_MOBS_SLOT = {
-		// 0,     1,     2,  3,    4,    5,  6,     7,    8
-		/* 9*/   10, /* 11, 12,*/ 13, /* 14, 15,*/ 16  //17
-		/*18*/// 19,    20, 21,   22,   23, 24,    25, //26
+		// 0,     1,     2,   3,     4,     5,     6,    7,    8
+		/* 9*/   10, /* 11,*/12, /* 13,*/  14, /* 15,*/ 16  //17
+		/*18*/// 19,    20,  21,    22,    23,    24,   25, //26
 	};
 
 	private static final int VALID_MOBS_SIZE = VALID_MOBS_SLOT.length;
@@ -121,7 +132,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 
 		mInventory.setItem(21, TowerGameUtils.getXPItem(mGame));
 		mInventory.setItem(22, TowerGameUtils.getCoinItem(mGame));
-		mInventory.setItem(23, REFRESH_ITEM);
+		mInventory.setItem(23, mGame.mFreeRoll ? FREE_REFRESH_ITEM : REFRESH_ITEM);
 		mInventory.setItem(25, TowerGameUtils.getWeightItem(mGame));
 
 	}
@@ -170,10 +181,14 @@ public class TowerGuiBuyMob extends CustomInventory {
 			}
 
 			if (slot == 23) {
-				if (TowerGameUtils.canBuy(player, TowerConstants.COST_REROLL)) {
-					TowerGameUtils.pay(player, TowerConstants.COST_REROLL);
+				//do we have a free roll or we need to pay
+				if (mGame.mFreeRoll || TowerGameUtils.canBuy(player, TowerConstants.COST_REROLL)) {
+					if (!mGame.mFreeRoll) {
+						TowerGameUtils.pay(player, TowerConstants.COST_REROLL);
+					}
 					player.playSound(player.getEyeLocation(), Sound.UI_LOOM_SELECT_PATTERN, 1, 0.9f);
 					mGame.mRoll++;
+					mGame.mFreeRoll = false;
 				}
 			}
 

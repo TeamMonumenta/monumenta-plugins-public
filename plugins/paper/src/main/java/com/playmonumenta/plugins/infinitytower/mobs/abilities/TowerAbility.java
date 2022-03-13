@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDeathEvent;
 
 public abstract class TowerAbility extends BossAbilityGroup {
 
@@ -22,9 +21,4 @@ public abstract class TowerAbility extends BossAbilityGroup {
 
 	}
 
-
-	@Override
-	public void death(EntityDeathEvent event) {
-		mGame.towerMobsDied(mBoss);
-	}
 }

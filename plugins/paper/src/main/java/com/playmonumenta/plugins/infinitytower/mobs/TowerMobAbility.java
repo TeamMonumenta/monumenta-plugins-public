@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.infinitytower.mobs.abilities.EarthquakeTowerAbi
 import com.playmonumenta.plugins.infinitytower.mobs.abilities.EarthsWrathTowerAbility;
 import com.playmonumenta.plugins.infinitytower.mobs.abilities.FoolsGoldTowerAbility;
 import com.playmonumenta.plugins.infinitytower.mobs.abilities.ForcefulGridTowerAbility;
+import com.playmonumenta.plugins.infinitytower.mobs.abilities.GenericTowerMob;
 import com.playmonumenta.plugins.infinitytower.mobs.abilities.GoldCacheTowerAbility;
 import com.playmonumenta.plugins.infinitytower.mobs.abilities.GreatswordSlamTowerAbility;
 import com.playmonumenta.plugins.infinitytower.mobs.abilities.ImmortalTowerAbility;
@@ -40,7 +41,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -73,10 +73,13 @@ public class TowerMobAbility {
 							@Override
 							public void onDamage(DamageEvent event, LivingEntity damagee) {
 								if (damagee instanceof Mob mob && damagee.getScoreboardTags().contains(TowerConstants.MOB_TAG)) {
+									GenericTowerMob towerMob = BossManager.getInstance().getBoss(mob, GenericTowerMob.class);
+									if (towerMob != null) {
+										//this should always be true.
+										towerMob.mLastTarget = mBoss;
+									}
 									mob.setTarget(mBoss);
-									Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-										mob.setTarget(mBoss);
-									}, 1);
+
 								}
 							}
 						}

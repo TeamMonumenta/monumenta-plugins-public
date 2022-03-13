@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.infinitytower.mobs.abilities;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.infinitytower.TowerConstants;
@@ -9,7 +10,6 @@ import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -81,10 +81,12 @@ public class AdvancingShadowTowerAbility extends TowerAbility {
 										mBoss.teleport(locTest);
 										mHasTP = true;
 										if (mBoss instanceof Mob mob) {
+											GenericTowerMob towerMob = BossManager.getInstance().getBoss(mob, GenericTowerMob.class);
+											if (towerMob != null) {
+												//this should always be true.
+												towerMob.mLastTarget = mBoss;
+											}
 											mob.setTarget(mTarget);
-											Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-												mob.setTarget(mTarget);
-											}, 1);
 										}
 
 										locTest.add(0, mBoss.getHeight() / 2, 0);

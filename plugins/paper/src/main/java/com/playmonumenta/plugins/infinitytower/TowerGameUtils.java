@@ -32,8 +32,7 @@ public class TowerGameUtils {
 	public static void sellMob(TowerGame game, TowerMob mob) {
 		game.removeMob(mob);
 
-		int unitCost = mob.mInfo.mMobStats.mCost;
-		int refund = (unitCost / 2 > 0 ? unitCost / 2 : 1);
+		int refund = mob.mInfo.mMobStats.mCost;
 
 		Player player = game.mPlayer.mPlayer;
 

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.infinitytower.mobs.abilities;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -10,11 +11,11 @@ import com.playmonumenta.plugins.infinitytower.TowerConstants;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -77,11 +78,14 @@ public class ForcefulGridTowerAbility extends TowerAbility {
 				if (target != null) {
 					DamageUtils.damage(mBoss, target, DamageEvent.DamageType.MAGIC, 15);
 					MovementUtils.pullTowards(boss, target, 1);
-					if (mBoss instanceof Mob aiMob) {
-						aiMob.setTarget(target);
-						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-							aiMob.setTarget(target);
-						}, 1);
+					EntityUtils.applySilence(Plugin.getInstance(), 20 * 5, target);
+					if (mBoss instanceof Mob aiMob && BossManager.getInstance() != null) {
+						GenericTowerMob towerMob = BossManager.getInstance().getBoss(mBoss, GenericTowerMob.class);
+						if (towerMob != null) {
+							//this should always be true.
+							towerMob.mLastTarget = mBoss;
+						}
+						aiMob.setTarget(mBoss);
 					}
 				}
 			}
