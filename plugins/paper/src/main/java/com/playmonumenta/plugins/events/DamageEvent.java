@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.events;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import java.util.logging.Level;
+import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.LivingEntity;
@@ -15,9 +17,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.projectiles.ProjectileSource;
-
-import javax.annotation.Nullable;
-import java.util.logging.Level;
 
 public class DamageEvent extends Event implements Cancellable {
 
@@ -105,12 +104,17 @@ public class DamageEvent extends Event implements Cancellable {
 		private final DamageType mType;
 		private final @Nullable ClassAbility mAbility;
 		private final @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
+		private final @Nullable String mBossSpellName;
 
 		public Metadata(DamageType type, @Nullable ClassAbility ability) {
 			this(type, ability, null);
 		}
 
 		public Metadata(DamageType type, @Nullable ClassAbility ability, @Nullable ItemStatManager.PlayerItemStats playerItemStats) {
+			this(type, ability, playerItemStats, null);
+		}
+
+		public Metadata(DamageType type, @Nullable ClassAbility ability, @Nullable ItemStatManager.PlayerItemStats playerItemStats, @Nullable String bossSpellName) {
 			if (type == null) {
 				mType = DamageType.OTHER;
 				Plugin.getInstance().getLogger().log(Level.WARNING, "Attempted to construct DamageEvent with null DamageType");
@@ -119,8 +123,12 @@ public class DamageEvent extends Event implements Cancellable {
 			}
 			mAbility = ability;
 			mPlayerItemStats = playerItemStats;
+			mBossSpellName = bossSpellName;
 		}
 
+		public @Nullable String getBossSpellName() {
+			return mBossSpellName;
+		}
 	}
 
 	private final LivingEntity mDamagee;
@@ -194,7 +202,7 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public void setDamage(double damage) {
 		if (damage < 0) {
-			new Exception("negative damage dealt").printStackTrace();
+			Plugin.getInstance().getLogger().log(Level.INFO, "Negative damage dealt: " + damage, new Exception());
 		}
 
 		// Never set damage above 1000000 (arbitrary high amount) so that it doesn't go over the limit of what can actually be dealt
@@ -213,6 +221,10 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public @Nullable ClassAbility getAbility() {
 		return mMetadata.mAbility;
+	}
+
+	public @Nullable String getBossSpellName() {
+		return mMetadata.mBossSpellName;
 	}
 
 	public LivingEntity getDamagee() {

@@ -2,18 +2,22 @@ package com.playmonumenta.plugins.listeners;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.commands.Grave;
+import com.playmonumenta.plugins.commands.GraveCommand;
 import com.playmonumenta.plugins.graves.GraveManager;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import de.tr7zw.nbtapi.NBTEntity;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,13 +43,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 public class GraveListener implements Listener {
 	Plugin mPlugin;
 
@@ -63,7 +60,7 @@ public class GraveListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void playerJoin(PlayerJoinEvent event) {
-		Grave.removeSummonListTag(event.getPlayer());
+		GraveCommand.removeSummonListTag(event.getPlayer());
 		GraveManager.onLogin(event.getPlayer());
 	}
 
@@ -131,69 +128,64 @@ public class GraveListener implements Listener {
 	// Fires whenever an item entity despawns due to time. Does not catch items that got killed in other ways.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void itemDespawnEvent(ItemDespawnEvent event) {
-		GraveManager.onDestroyItem(event.getEntity());
+		GraveManager.onDestroyItem(event.getEntity(), true);
 	}
 
 	// Fires any time any entity is deleted.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityRemoveFromWorld(EntityRemoveFromWorldEvent event) {
-		if (event.getEntity() instanceof Item) {
+		if (event.getEntity() instanceof Item entity) {
 			// Check if an item entity was destroyed by the void.
-			Item entity = (Item) event.getEntity();
 			if (entity.getLocation().getY() <= -64) {
-				GraveManager.onDestroyItem(entity);
+				GraveManager.onDestroyItem(entity, true);
 			}
 		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void entityDamage(EntityDamageEvent event) {
-		if (event.getEntityType() == EntityType.DROPPED_ITEM) {
-			Item entity = (Item) event.getEntity();
+		if (event.getEntity() instanceof Item entity) {
 			EntityDamageEvent.DamageCause cause = event.getCause();
-			if (entity.isInvulnerable()
-				|| (entity.getScoreboardTags().contains("ExplosionImmune")
+			if ((entity.getScoreboardTags().contains("ExplosionImmune")
 				&& (cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION))) {
 				event.setCancelled(true);
 				return;
 			}
-			GraveManager.onDestroyItem(entity);
-		} else if (event.getEntityType() == EntityType.ARMOR_STAND) {
-			if (GraveManager.isGrave(event.getEntity())) {
-				event.setCancelled(true);
-			}
+			GraveManager.onDestroyItem(entity, event.getCause() == EntityDamageEvent.DamageCause.VOID);
+		} else if (GraveManager.isGrave(event.getEntity())) {
+			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerDropItem(PlayerDropItemEvent event) {
-		Player player = event.getPlayer();
-		Item entity = event.getItemDrop();
-		ItemStack item = entity.getItemStack();
-		if (item == null) {
-			return;
-		}
+		itemDropped(event.getPlayer(), event.getItemDrop());
+	}
 
+	public static void itemDropped(Player player, Item entity) {
+		ItemStack item = entity.getItemStack();
 		ItemUtils.ItemDeathResult result = ItemUtils.getItemDeathResult(item);
-		if (gravesEnabled(player)) {
-			if (result == ItemUtils.ItemDeathResult.SHATTER || result == ItemUtils.ItemDeathResult.SHATTER_NOW
-				|| result == ItemUtils.ItemDeathResult.SAFE || result == ItemUtils.ItemDeathResult.KEEP) {
-				@Nullable UUID thrower = entity.getThrower();
-				if (thrower != null && thrower.equals(player.getUniqueId())) {
-					GraveManager.onDropItem(player, entity);
-				} else {
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							if (entity.isValid()) {
-								NBTEntity nbte = new NBTEntity(entity);
-								if (nbte.getShort("Age") < 11999) {
-									GraveManager.onDropItem(player, entity);
-								}
+		if (gravesEnabled(player)
+			    && result != ItemUtils.ItemDeathResult.LOSE
+			    && result != ItemUtils.ItemDeathResult.KEEP_EQUIPPED // similar to LOSE except in the overworld
+			    && result != ItemUtils.ItemDeathResult.KEEP_DAMAGED // same
+			    && result != ItemUtils.ItemDeathResult.KEEP_NOGRAVE
+			    && result != ItemUtils.ItemDeathResult.DESTROY) {
+			@Nullable UUID thrower = entity.getThrower();
+			if (thrower != null && thrower.equals(player.getUniqueId())) {
+				GraveManager.onDropItem(player, entity);
+			} else {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						if (entity.isValid()) {
+							NBTEntity nbte = new NBTEntity(entity);
+							if (nbte.getShort("Age") < 11999) {
+								GraveManager.onDropItem(player, entity);
 							}
 						}
-					}.runTask(mPlugin);
-				}
+					}
+				}.runTask(Plugin.getInstance());
 			}
 		}
 	}
@@ -206,21 +198,8 @@ public class GraveListener implements Listener {
 		if (ItemStatUtils.isShattered(item) || ItemStatUtils.shatter(item)) {
 			// If the item shatters, drop it on the player with instant pickup, grave item if it couldn't be picked up.
 			Player player = event.getPlayer();
-			Location location = player.getLocation();
-			Item droppedItem = player.getWorld().dropItemNaturally(location, item);
-			droppedItem.setOwner(player.getUniqueId());
-			droppedItem.setThrower(player.getUniqueId());
-			droppedItem.setPickupDelay(0);
-			// Allow other players to pick this up after 10s
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				if (droppedItem.isValid() && !droppedItem.isDead()) {
-					droppedItem.setOwner(null);
-				}
-			}, 200);
-			if (gravesEnabled(player)) {
-				GraveManager.onDropItem(player, droppedItem);
-			}
-			player.sendMessage(ChatColor.RED + "An item shattered because it ran out of durability");
+			player.sendMessage(ChatColor.RED + "An item shattered because it ran out of durability!");
+			InventoryUtils.giveItem(player, item);
 		}
 	}
 
@@ -238,7 +217,7 @@ public class GraveListener implements Listener {
 			//Remove Curse of Vanishing 2 Items even if Keep Inventory is on
 			for (int slot = 0; slot <= 40; slot++) {
 				ItemStack item = inv.getItem(slot);
-				if (ItemUtils.isItemCurseOfVanishingII(item)) {
+				if (ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.CURSE_OF_VANISHING) >= 2) {
 					inv.setItem(slot, null);
 				}
 			}
@@ -305,7 +284,7 @@ public class GraveListener implements Listener {
 		}
 	}
 
-	public boolean gravesEnabled(Player player) {
+	public static boolean gravesEnabled(Player player) {
 		if (player.getScoreboardTags().contains("DisableGraves")) {
 			return false;
 		}

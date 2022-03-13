@@ -1,12 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Collections;
-import java.util.Set;
-
 import com.playmonumenta.plugins.abilities.delves.Chivalrous;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
-
+import java.util.Collections;
+import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -20,7 +18,7 @@ public class AntiRangeChivalrousBoss extends BossAbilityGroup {
 	public static final int detectionRange = 40;
 	public static final String ignoreTag = "antirange_ignore";
 
-	private static final int ANTI_RANGE_DISTANCE = 6;
+	private static final int ANTI_RANGE_DISTANCE = 8;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new AntiRangeChivalrousBoss(plugin, boss);

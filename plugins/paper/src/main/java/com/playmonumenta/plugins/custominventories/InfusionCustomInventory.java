@@ -9,6 +9,12 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -24,13 +30,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 public class InfusionCustomInventory extends CustomInventory {
@@ -183,7 +182,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		mInfusionPanelsMap.put(InfusionSelection.VITALITY, vitalityPanels);
 
 
-		//INVALIDS ITEM.
+		//INVALID ITEM.
 		//placeholder when an item can't be infused.
 
 		ItemStack invalidItem = new ItemStack(Material.ARMOR_STAND, 1);
@@ -332,7 +331,8 @@ public class InfusionCustomInventory extends CustomInventory {
 	}
 
 	private void loadRowNormalInfusionItem(Player player, ItemStack item, int row) {
-		InfusionSelection infusion = InfusionUtils.getCurrentInfusion(Plugin.getInstance(), player, item);
+		Plugin plugin = Plugin.getInstance();
+		InfusionSelection infusion = InfusionUtils.getCurrentInfusion(plugin, player, item);
 		int infusionLvl = InfusionUtils.getInfuseLevel(item);
 
 		List<ItemStack> panelsInfusions = mInfusionPanelsMap.get(infusion);
@@ -344,7 +344,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			mInventory.setItem((row * 9), mRefundItem);
 			mMapFunction.put((row * 9), (p, inventory, slot) -> {
 				try {
-					InfusionUtils.refundInfusion(item, p, Plugin.getInstance());
+					InfusionUtils.refundInfusion(item, p, plugin);
 				} catch (WrapperCommandSyntaxException e) {
 					p.sendMessage(Component.text("Error refunding infusion. Please contact a mod: " + e.getMessage()));
 				}
@@ -366,12 +366,12 @@ public class InfusionCustomInventory extends CustomInventory {
 						                       .decoration(TextDecoration.ITALIC, false)
 						                       .decoration(TextDecoration.BOLD, true));
 				List<Component> itemLore = new ArrayList<>();
-				itemLore.add(Component.text("You need " + InfusionUtils.getExpLvlInfuseCost(Plugin.getInstance(), player, item) + " experience levels", NamedTextColor.GRAY)
+				itemLore.add(Component.text("You need " + InfusionUtils.getExpLvlInfuseCost(plugin, player, item) + " experience levels", NamedTextColor.GRAY)
 						.decoration(TextDecoration.ITALIC, false));
 				int currency = -1;
 
 				try {
-					currency = InfusionUtils.calcInfuseCost(Plugin.getInstance(), player, item);
+					currency = InfusionUtils.calcInfuseCost(plugin, player, item);
 				} catch (WrapperCommandSyntaxException e) {
 					currency = -1;
 				}
@@ -393,10 +393,10 @@ public class InfusionCustomInventory extends CustomInventory {
 				mInventory.setItem(slot, infuseItem);
 
 				mMapFunction.put(slot, (p, inventory, itemSlot) -> {
-					if (InfusionUtils.canPayInfusion(Plugin.getInstance(), p, item)) {
-						if (InfusionUtils.payInfusion(Plugin.getInstance(), p, item)) {
+					if (InfusionUtils.canPayInfusion(plugin, p, item)) {
+						if (InfusionUtils.payInfusion(plugin, p, item)) {
 							InfusionUtils.animate(p);
-							InfusionUtils.infuseItem(Plugin.getInstance(), p, item, infusion);
+							InfusionUtils.infuseItem(plugin, p, item, infusion);
 						} else {
 							p.sendMessage("If you see this message please contact a mod! (Error payInfusion)");
 						}
@@ -415,93 +415,60 @@ public class InfusionCustomInventory extends CustomInventory {
 								.decoration(TextDecoration.ITALIC, false)
 								.decoration(TextDecoration.BOLD, true));
 			List<Component> lore = new ArrayList<>();
-			lore.add(Component.text("The first infusion costs only " + InfusionUtils.getExpLvlInfuseCost(Plugin.getInstance(), player, item) + " experience levels", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("The first infusion costs only " + InfusionUtils.getExpLvlInfuseCost(plugin, player, item) + " experience levels", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 			meta.lore(lore);
 			mInfuseStack.setItemMeta(meta);
 			mInventory.setItem((row * 9), mInfuseStack);
 
 			//set the function when the item is clicked
 
-			mInventory.setItem((row*9) + 2, mPanelList.get(0));
-			mMapFunction.put((row*9) + 2, (p, inventory, slot) -> {
-				if (InfusionUtils.canPayExp(Plugin.getInstance(), p, item)) {
-					InfusionUtils.payInfusion(Plugin.getInstance(), p, item);
-					InfusionUtils.animate(p);
-					InfusionUtils.infuseItem(Plugin.getInstance(), p, item, InfusionSelection.VITALITY);
-				} else {
-					p.sendMessage("You don't have enough currency and/or experience for this infusion.");
-				}
+			mInventory.setItem((row * 9) + 2, mPanelList.get(0));
+			mMapFunction.put((row * 9) + 2, (p, inventory, slot) -> {
+				attemptInfusion(plugin, p, item, InfusionSelection.VITALITY);
 			});
 
-			mInventory.setItem((row*9) + 3, mPanelList.get(1));
-			mMapFunction.put((row*9) + 3, (p, inventory, slot) -> {
-				if (InfusionUtils.canPayExp(Plugin.getInstance(), p, item)) {
-					if (InfusionUtils.payInfusion(Plugin.getInstance(), p, item)) {
-						InfusionUtils.animate(p);
-						InfusionUtils.infuseItem(Plugin.getInstance(), p, item, InfusionSelection.VIGOR);
-					} else {
-						p.sendMessage("If you see this message please contact a mod! (Error payInfusion)");
-					}
-				} else {
-					p.sendMessage("You don't have enough currency and/or experience for this infusion.");
-				}
+			mInventory.setItem((row * 9) + 3, mPanelList.get(1));
+			mMapFunction.put((row * 9) + 3, (p, inventory, slot) -> {
+				attemptInfusion(plugin, p, item, InfusionSelection.VIGOR);
 			});
 
-			mInventory.setItem((row*9) + 4, mPanelList.get(2));
-			mMapFunction.put((row*9) + 4, (p, inventory, slot) -> {
-				if (InfusionUtils.canPayExp(Plugin.getInstance(), p, item)) {
-					if (InfusionUtils.payInfusion(Plugin.getInstance(), p, item)) {
-						InfusionUtils.animate(p);
-						InfusionUtils.infuseItem(Plugin.getInstance(), p, item, InfusionSelection.TENACITY);
-					} else {
-						p.sendMessage("If you see this message please contact a mod! (Error payInfusion)");
-					}
-				} else {
-					p.sendMessage("You don't have enough currency and/or experience for this infusion.");
-				}
+			mInventory.setItem((row * 9) + 4, mPanelList.get(2));
+			mMapFunction.put((row * 9) + 4, (p, inventory, slot) -> {
+				attemptInfusion(plugin, p, item, InfusionSelection.TENACITY);
 			});
 
-			mInventory.setItem((row*9) + 5, mPanelList.get(3));
-			mMapFunction.put((row*9) + 5, (p, inventory, slot) -> {
-				if (InfusionUtils.canPayExp(Plugin.getInstance(), p, item)) {
-					if (InfusionUtils.payInfusion(Plugin.getInstance(), p, item)) {
-						InfusionUtils.animate(p);
-						InfusionUtils.infuseItem(Plugin.getInstance(), p, item, InfusionSelection.PERSPICACITY);
-					} else {
-						p.sendMessage("If you see this message please contact a mod! (Error payInfusion)");
-					}
-				} else {
-					p.sendMessage("You don't have enough currency and/or experience for this infusion.");
-				}
+			mInventory.setItem((row * 9) + 5, mPanelList.get(3));
+			mMapFunction.put((row * 9) + 5, (p, inventory, slot) -> {
+				attemptInfusion(plugin, p, item, InfusionSelection.PERSPICACITY);
 			});
 
-			mInventory.setItem((row*9) + 6, mPanelList.get(4));
-			mMapFunction.put((row*9) + 6, (p, inventory, slot) -> {
-				if (InfusionUtils.canPayExp(Plugin.getInstance(), p, item)) {
-					if (InfusionUtils.payInfusion(Plugin.getInstance(), p, item)) {
-						InfusionUtils.animate(p);
-						InfusionUtils.infuseItem(Plugin.getInstance(), p, item, InfusionSelection.FOCUS);
-					} else {
-						p.sendMessage("If you see this message please contact a mod! (Error payInfusion)");
-					}
-				} else {
-					p.sendMessage("You don't have enough currency and/or experience for this infusion.");
-				}
+			mInventory.setItem((row * 9) + 6, mPanelList.get(4));
+			mMapFunction.put((row * 9) + 6, (p, inventory, slot) -> {
+				attemptInfusion(plugin, p, item, InfusionSelection.FOCUS);
 			});
 
-			mInventory.setItem((row*9) + 7, mPanelList.get(5));
-			mMapFunction.put((row*9) + 7, (p, inventory, slot) -> {
-				if (InfusionUtils.canPayExp(Plugin.getInstance(), p, item)) {
-					if (InfusionUtils.payInfusion(Plugin.getInstance(), p, item)) {
-						InfusionUtils.animate(p);
-						InfusionUtils.infuseItem(Plugin.getInstance(), p, item, InfusionSelection.ACUMEN);
-					} else {
-						p.sendMessage("If you see this message please contact a mod! (Error payInfusion)");
-					}
-				} else {
-					p.sendMessage("You don't have enough currency and/or experience for this infusion.");
-				}
+			mInventory.setItem((row * 9) + 7, mPanelList.get(5));
+			mMapFunction.put((row * 9) + 7, (p, inventory, slot) -> {
+				attemptInfusion(plugin, p, item, InfusionSelection.ACUMEN);
 			});
+		}
+	}
+
+	private void attemptInfusion(Plugin plugin, Player p, ItemStack item, InfusionSelection infusion) {
+		if (item.getAmount() > 1) {
+			p.sendMessage(ChatColor.RED + "You cannot infuse stacked items.");
+			return;
+		}
+
+		if (InfusionUtils.canPayExp(plugin, p, item)) {
+			if (InfusionUtils.payInfusion(plugin, p, item)) {
+				InfusionUtils.animate(p);
+				InfusionUtils.infuseItem(plugin, p, item, infusion);
+			} else {
+				p.sendMessage(ChatColor.RED + "If you see this message please contact a mod! (Error in paying infusion cost)");
+			}
+		} else {
+			p.sendMessage(ChatColor.RED + "You don't have enough currency and/or experience for this infusion.");
 		}
 	}
 
@@ -532,14 +499,16 @@ public class InfusionCustomInventory extends CustomInventory {
 
 	@Override
 	protected void inventoryClose(InventoryCloseEvent event) {
-		if (event.getPlayer() instanceof Player) {
-			Player player = (Player) event.getPlayer();
-			PlayerTracking.getInstance().updateItemSlotProperties(player, player.getInventory().getHeldItemSlot());
-			PlayerTracking.getInstance().updateItemSlotProperties(player, 36);
-			PlayerTracking.getInstance().updateItemSlotProperties(player, 37);
-			PlayerTracking.getInstance().updateItemSlotProperties(player, 38);
-			PlayerTracking.getInstance().updateItemSlotProperties(player, 39);
-			PlayerTracking.getInstance().updateItemSlotProperties(player, 40);
+		if (event.getPlayer() instanceof Player player) {
+			PlayerTracking playerTracking = PlayerTracking.getInstance();
+			if (playerTracking != null) {
+				playerTracking.updateItemSlotProperties(player, player.getInventory().getHeldItemSlot());
+				playerTracking.updateItemSlotProperties(player, 36);
+				playerTracking.updateItemSlotProperties(player, 37);
+				playerTracking.updateItemSlotProperties(player, 38);
+				playerTracking.updateItemSlotProperties(player, 39);
+				playerTracking.updateItemSlotProperties(player, 40);
+			}
 		}
 	}
 }

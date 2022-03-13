@@ -13,7 +13,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -22,7 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class InfusionUtils {
 
 	/**When set to true the refund function will return all the XP used for the infusion, when false only the 50% */
-	public static final boolean FULL_REFUND = true;
+	public static final boolean FULL_REFUND = false;
 
 	public enum InfusionSelection {
 		ACUMEN("acumen", "Acumen"),
@@ -72,13 +71,13 @@ public class InfusionUtils {
 		int infuseLevel = getInfuseLevel(item) - 1;
 		int costMult = getCostMultiplierWithCheck(item);
 		while (infuseLevel > 0) {
-			refundMaterials += (costMult * (int)Math.pow(2, infuseLevel - 1));
+			refundMaterials += (costMult * (int) Math.pow(2, infuseLevel - 1)) * item.getAmount();
 			infuseLevel--;
 		}
 
 		int level = getInfuseLevel(item);
 
-		AuditListener.log("Infusion refund - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "' level=" + level);
+		AuditListener.log("Infusion refund - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "' level=" + level + "' stack size=" + item.getAmount());
 
 		//Remove the infusion enchants from the item
 		for (InfusionSelection sel : InfusionSelection.values()) {
@@ -100,16 +99,16 @@ public class InfusionUtils {
 			case PATRON:
 				switch (level) {
 					case 1:
-						refundXP = 1395;
+						refundXP = ExperienceUtils.LEVEL_30;
 						break;
 					case 2:
-						refundXP = 1395 + 2920;
+						refundXP = ExperienceUtils.LEVEL_30 + ExperienceUtils.LEVEL_40;
 						break;
 					case 3:
-						refundXP = 1395 + 2920 + 5345;
+						refundXP = ExperienceUtils.LEVEL_30 + ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50;
 						break;
 					case 4:
-						refundXP = 1395 + 2920 + 5345 + 8670;
+						refundXP = ExperienceUtils.LEVEL_30 + ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60;
 						break;
 					default:
 					case 0:
@@ -119,16 +118,16 @@ public class InfusionUtils {
 			case ARTIFACT:
 				switch (level) {
 					case 1:
-						refundXP = 2920;
+						refundXP = ExperienceUtils.LEVEL_40;
 						break;
 					case 2:
-						refundXP = 2920 + 5345;
+						refundXP = ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50;
 						break;
 					case 3:
-						refundXP = 2920 + 5345 + 8670;
+						refundXP = ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60;
 						break;
 					case 4:
-						refundXP = 2920 + 5345 + 8670 + 12895;
+						refundXP = ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60 + ExperienceUtils.LEVEL_70;
 						break;
 					default:
 					case 0:
@@ -138,16 +137,16 @@ public class InfusionUtils {
 			case EPIC:
 				switch (level) {
 					case 1:
-						refundXP = 5345;
+						refundXP = ExperienceUtils.LEVEL_50;
 						break;
 					case 2:
-						refundXP = 5345 + 8670;
+						refundXP = ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60;
 						break;
 					case 3:
-						refundXP = 5345 + 8670 + 12895;
+						refundXP = ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60 + ExperienceUtils.LEVEL_70;
 						break;
 					case 4:
-						refundXP = 5345 + 8670 + 12895 + 18020;
+						refundXP = ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60 + ExperienceUtils.LEVEL_70 + ExperienceUtils.LEVEL_80;
 						break;
 					default:
 					case 0:
@@ -158,7 +157,7 @@ public class InfusionUtils {
 				CommandAPI.fail("Invalid item. Item must be infused!");
 		}
 
-		refundXP = (FULL_REFUND ? refundXP : refundXP / 2);
+		refundXP = (FULL_REFUND ? refundXP : refundXP / 2) * item.getAmount();
 		ExperienceUtils.setTotalExperience(player, xp + refundXP);
 	}
 
@@ -173,8 +172,8 @@ public class InfusionUtils {
 			return;
 		}
 		if (stack != null) {
-			Item eItem = player.getWorld().dropItemNaturally(player.getLocation(), stack.add(refundMaterials - 1));
-			eItem.setPickupDelay(0);
+			stack.setAmount(refundMaterials);
+			InventoryUtils.giveItem(player, stack);
 			return;
 		}
 		CommandAPI.fail("ERROR while refunding infusion (failed to get loot table). Please contact a moderator if you see this message!");
@@ -258,20 +257,16 @@ public class InfusionUtils {
 				switch (level) {
 					case 0:
 					// Infuse Level 0 Rare
-						return 1395;
-						// Exp Level 30
+						return ExperienceUtils.LEVEL_30;
 					case 1:
 					// Infuse Level 1 Rare
-						return 2920;
-						// Exp Level 40
+						return ExperienceUtils.LEVEL_40;
 					case 2:
 					// Infuse Level 2 Rare
-						return 5345;
-						// Exp Level 50
+						return ExperienceUtils.LEVEL_50;
 					case 3:
 					// Infuse Level 3 Rare
-						return 8670;
-						// Exp Level 60
+						return ExperienceUtils.LEVEL_60;
 					default:
 					// Infuse Level 4 Rare
 						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
@@ -282,20 +277,16 @@ public class InfusionUtils {
 				switch (level) {
 					case 0:
 					// Infuse Level 0 Artifact
-						return 2920;
-						// Exp Level 40
+						return ExperienceUtils.LEVEL_40;
 					case 1:
 					// Infuse Level 1 Artifact
-						return 5345;
-						// Exp Level 50
+						return ExperienceUtils.LEVEL_50;
 					case 2:
 					// Infuse Level 2 Artifact
-						return 8670;
-						// Exp Level 60
+						return ExperienceUtils.LEVEL_60;
 					case 3:
 					// Infuse Level 3 Artifact
-						return 12895;
-						// Exp Level 70
+						return ExperienceUtils.LEVEL_70;
 					default:
 					// Infuse Level 4 Artifact
 						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
@@ -306,20 +297,16 @@ public class InfusionUtils {
 				switch (level) {
 					case 0:
 					// Infuse Level 0 Epic
-						return 5345;
-						// Exp Level 50
+						return ExperienceUtils.LEVEL_50;
 					case 1:
 					// Infuse Level 1 Epic
-						return 8670;
-						// Exp Level 60
+						return ExperienceUtils.LEVEL_60;
 					case 2:
 					// Infuse Level 2 Epic
-						return 12895;
-						// Exp Level 70
+						return ExperienceUtils.LEVEL_70;
 					case 3:
 					// Infuse Level 3 Epic
-						return 18020;
-						// Exp Level 80
+						return ExperienceUtils.LEVEL_80;
 					default:
 					// Infuse Level 4 Epic
 						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
@@ -407,7 +394,7 @@ public class InfusionUtils {
 	}
 
 	public static int getExpLvlInfuseCost(Plugin plugin, Player player, ItemStack item) {
-		int exp = -10;
+		int exp;
 		try {
 			exp = getExpInfuseCost(item);
 		} catch (WrapperCommandSyntaxException e) {
@@ -415,17 +402,17 @@ public class InfusionUtils {
 		}
 
 		switch (exp) {
-			case 1395:
+			case ExperienceUtils.LEVEL_30:
 				return 30;
-			case 2920:
+			case ExperienceUtils.LEVEL_40:
 				return 40;
-			case 5345:
+			case ExperienceUtils.LEVEL_50:
 				return 50;
-			case 8670:
+			case ExperienceUtils.LEVEL_60:
 				return 60;
-			case 12895:
+			case ExperienceUtils.LEVEL_70:
 				return 70;
-			case 18020:
+			case ExperienceUtils.LEVEL_80:
 				return 80;
 			default:
 				return 0;
@@ -506,9 +493,7 @@ public class InfusionUtils {
 		ItemStack currency = null;
 		if (ItemStatUtils.getRegion(item) == Region.ISLES) {
 			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
-		}
-
-		if (ItemStatUtils.getRegion(item) == Region.VALLEY) {
+		} else if (ItemStatUtils.getRegion(item) == Region.VALLEY) {
 			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
 		}
 

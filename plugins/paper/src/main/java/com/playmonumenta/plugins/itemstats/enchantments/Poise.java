@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import org.bukkit.entity.Player;
 
 public class Poise implements Enchantment {
 
@@ -24,8 +23,8 @@ public class Poise implements Enchantment {
 	}
 
 	public static double applyPoise(DamageEvent event, Plugin plugin, Player player) {
-		double health = (EntityUtils.getMaxHealth(player) - player.getHealth()) / EntityUtils.getMaxHealth(player);
-		if (health > MIN_HEALTH_PERCENT) {
+		double health = player.getHealth() / EntityUtils.getMaxHealth(player);
+		if (health >= MIN_HEALTH_PERCENT) {
 			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.POISE) * ARMOR_BONUS_PER_LEVEL;
 		} else {
 			return 0;

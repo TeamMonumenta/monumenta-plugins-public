@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class SpellBerserk extends Spell {
 	private final LivingEntity mLauncher;

@@ -7,8 +7,10 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -25,7 +27,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
 public class IronTincture extends Ability {
 
@@ -75,6 +76,8 @@ public class IronTincture extends Ability {
 		tinctMeta.displayName(Component.text("Iron Tincture", NamedTextColor.WHITE)
 				.decoration(TextDecoration.ITALIC, false));
 		itemTincture.setItemMeta(tinctMeta);
+		// Add infinity enchantment so that potion injector cannot use it
+		ItemStatUtils.addEnchantment(itemTincture, ItemStatUtils.EnchantmentType.INFINITY, 1);
 		ItemUtils.setPlainName(itemTincture, "Iron Tincture");
 		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);

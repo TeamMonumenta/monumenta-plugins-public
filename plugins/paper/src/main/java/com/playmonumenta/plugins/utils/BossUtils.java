@@ -1,9 +1,11 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.events.DamageEvent;
-
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
+import java.util.Map;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -12,9 +14,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
-import javax.annotation.Nullable;
-import java.util.Map;
 
 public class BossUtils {
 
@@ -88,7 +87,10 @@ public class BossUtils {
 			}
 			ItemUtils.damageShield(player, durability);
 		} else {
-			DamageUtils.damage(damager, damagee, new DamageEvent.Metadata(type, null), damage, bypassIFrames, causeKnockback, false, cause);
+			DamageUtils.damage(damager, damagee, new DamageEvent.Metadata(type, null, null, cause), damage, bypassIFrames, causeKnockback, false);
+			if (damagee instanceof Player player && Shielding.doesShieldingApply(player, damager)) {
+				Shielding.disable(player);
+			}
 		}
 	}
 
@@ -180,7 +182,7 @@ public class BossUtils {
 			if (adjustedHealth <= 0) {
 				// Kill the player, but allow totems to trigger
 				target.setNoDamageTicks(0);
-				DamageUtils.damage(boss, target, new DamageEvent.Metadata(DamageType.OTHER, null), 1000, false, true, false, cause);
+				DamageUtils.damage(boss, target, new DamageEvent.Metadata(DamageType.OTHER, null, null, cause), 1000, false, true, false);
 				return false;
 			} else {
 				double originalDamage = toTake;
@@ -207,7 +209,7 @@ public class BossUtils {
 				int noDamageTicks = target.getNoDamageTicks();
 				target.setNoDamageTicks(0);
 
-				DamageUtils.damage(boss, target, new DamageEvent.Metadata(DamageType.OTHER, null), 0.001, false, true, false, cause);
+				DamageUtils.damage(boss, target, new DamageEvent.Metadata(DamageType.OTHER, null, null, cause), 0.001, false, true, false);
 
 				if (noDamageTicks <= target.getMaximumNoDamageTicks() / 2f) {
 					// had iframes: increase iframes by dealt damage, but keep length
@@ -218,6 +220,10 @@ public class BossUtils {
 					target.setNoDamageTicks(target.getMaximumNoDamageTicks());
 					target.setLastDamage(originalDamage);
 				}
+			}
+
+			if (target instanceof Player player && Shielding.doesShieldingApply(player, boss)) {
+				Shielding.disable(player);
 			}
 		}
 

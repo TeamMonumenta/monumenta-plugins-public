@@ -3,15 +3,14 @@ package com.playmonumenta.plugins.depths;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
+import com.playmonumenta.plugins.events.MonumentaEvent;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import net.md_5.bungee.api.ChatColor;
-import com.playmonumenta.plugins.events.MonumentaEvent;
-import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -19,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.annotation.Nullable;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,7 +32,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
 
 /**
@@ -142,7 +142,6 @@ public class DepthsParty {
 
 		}.runTaskLater(Plugin.getInstance(), 5);
 
-
 		mRoomNumber = 0;
 		mSpawnersToBreak = 0;
 		mHasAtLeastOneAbility = false;
@@ -153,8 +152,7 @@ public class DepthsParty {
 		mRoomStartX = loc.getBlockX();
 
 		//Attempt to set locations for the next floor lobby to load
-		World world = loc.getWorld();
-		Collection<ArmorStand> nearbyStands = world.getNearbyEntitiesByType(ArmorStand.class, loc, 60.0);
+		Collection<ArmorStand> nearbyStands = loc.getNearbyEntitiesByType(ArmorStand.class, 60.0);
 		for (ArmorStand stand : nearbyStands) {
 			if (stand.getName().contains(DepthsManager.PLAYER_SPAWN_STAND_NAME)) {
 				mFloorLobbyLoadPlayerTpPoint = stand.getLocation().toVector();
@@ -326,6 +324,7 @@ public class DepthsParty {
 				p.mUsedChaosThisFloor = false;
 				//Reset ability removal eligibility
 				p.mUsedAbilityDeletion = false;
+				p.mUsedAbilityMutation = false;
 			}
 			mTwistedThisFloor = false;
 		}

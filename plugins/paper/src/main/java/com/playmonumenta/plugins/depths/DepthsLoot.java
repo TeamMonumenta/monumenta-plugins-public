@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import java.util.Collection;
+import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,9 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
-
-import java.util.Collection;
-import java.util.Random;
 
 public class DepthsLoot {
 

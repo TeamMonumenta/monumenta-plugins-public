@@ -17,130 +17,8 @@ import com.playmonumenta.plugins.itemstats.attributes.ProjectileSpeed;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.itemstats.attributes.ThornsDamage;
 import com.playmonumenta.plugins.itemstats.attributes.ThrowRate;
-import com.playmonumenta.plugins.itemstats.enchantments.Abyssal;
-import com.playmonumenta.plugins.itemstats.enchantments.Adaptability;
-import com.playmonumenta.plugins.itemstats.enchantments.Adrenaline;
-import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
-import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
-import com.playmonumenta.plugins.itemstats.enchantments.ArcaneThrust;
-import com.playmonumenta.plugins.itemstats.enchantments.AshesOfEternity;
-import com.playmonumenta.plugins.itemstats.enchantments.Baaing;
-import com.playmonumenta.plugins.itemstats.enchantments.BlastProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.Bleeding;
-import com.playmonumenta.plugins.itemstats.enchantments.Chaotic;
-import com.playmonumenta.plugins.itemstats.enchantments.Clucking;
-import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfAnemia;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfCorruption;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfCrippling;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfIrreparability;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfShrapnel;
-import com.playmonumenta.plugins.itemstats.enchantments.Darksight;
-import com.playmonumenta.plugins.itemstats.enchantments.Decay;
-import com.playmonumenta.plugins.itemstats.enchantments.DivineAura;
-import com.playmonumenta.plugins.itemstats.enchantments.Duelist;
-import com.playmonumenta.plugins.itemstats.enchantments.Eruption;
-import com.playmonumenta.plugins.itemstats.enchantments.Ethereal;
-import com.playmonumenta.plugins.itemstats.enchantments.Evasion;
-import com.playmonumenta.plugins.itemstats.enchantments.FeatherFalling;
-import com.playmonumenta.plugins.itemstats.enchantments.Festive;
-import com.playmonumenta.plugins.itemstats.enchantments.FireAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.Flame;
-import com.playmonumenta.plugins.itemstats.enchantments.Frost;
-import com.playmonumenta.plugins.itemstats.enchantments.Gilded;
-import com.playmonumenta.plugins.itemstats.enchantments.Gills;
-import com.playmonumenta.plugins.itemstats.enchantments.HexEater;
-import com.playmonumenta.plugins.itemstats.enchantments.HideAttributes;
-import com.playmonumenta.plugins.itemstats.enchantments.HideEnchants;
-import com.playmonumenta.plugins.itemstats.enchantments.HideInfo;
-import com.playmonumenta.plugins.itemstats.enchantments.IceAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.Ineptitude;
-import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
-import com.playmonumenta.plugins.itemstats.enchantments.InstantDrink;
-import com.playmonumenta.plugins.itemstats.enchantments.Intuition;
-import com.playmonumenta.plugins.itemstats.enchantments.Inure;
-import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
-import com.playmonumenta.plugins.itemstats.enchantments.LifeDrain;
-import com.playmonumenta.plugins.itemstats.enchantments.MagicProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.MainhandOffhandDisable;
-import com.playmonumenta.plugins.itemstats.enchantments.MaterialEnch;
-import com.playmonumenta.plugins.itemstats.enchantments.MeleeProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
-import com.playmonumenta.plugins.itemstats.enchantments.OffhandMainhandDisable;
-import com.playmonumenta.plugins.itemstats.enchantments.Oinking;
-import com.playmonumenta.plugins.itemstats.enchantments.Persistence;
-import com.playmonumenta.plugins.itemstats.enchantments.PestilenceTesseract;
-import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
-import com.playmonumenta.plugins.itemstats.enchantments.Poise;
-import com.playmonumenta.plugins.itemstats.enchantments.ProjectileProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheDepths;
-import com.playmonumenta.plugins.itemstats.enchantments.Quake;
-import com.playmonumenta.plugins.itemstats.enchantments.Radiant;
-import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
-import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
-import com.playmonumenta.plugins.itemstats.enchantments.Reflexes;
-import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
-import com.playmonumenta.plugins.itemstats.enchantments.Regicide;
-import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
-import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken;
-import com.playmonumenta.plugins.itemstats.enchantments.Resurrection;
-import com.playmonumenta.plugins.itemstats.enchantments.Retrieval;
-import com.playmonumenta.plugins.itemstats.enchantments.Sapper;
-import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
-import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
-import com.playmonumenta.plugins.itemstats.enchantments.Slayer;
-import com.playmonumenta.plugins.itemstats.enchantments.Smite;
-import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
-import com.playmonumenta.plugins.itemstats.enchantments.Spark;
-import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
-import com.playmonumenta.plugins.itemstats.enchantments.Steadfast;
-import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
-import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
-import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
-import com.playmonumenta.plugins.itemstats.enchantments.Tempo;
-import com.playmonumenta.plugins.itemstats.enchantments.ThrowingKnife;
-import com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.Triage;
-import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
-import com.playmonumenta.plugins.itemstats.enchantments.VoidTether;
-import com.playmonumenta.plugins.itemstats.enchantments.Weightless;
-import com.playmonumenta.plugins.itemstats.infusions.Acumen;
-import com.playmonumenta.plugins.itemstats.infusions.Ardor;
-import com.playmonumenta.plugins.itemstats.infusions.Aura;
-import com.playmonumenta.plugins.itemstats.infusions.Barking;
-import com.playmonumenta.plugins.itemstats.infusions.Carapace;
-import com.playmonumenta.plugins.itemstats.infusions.Choler;
-import com.playmonumenta.plugins.itemstats.infusions.Colossal;
-import com.playmonumenta.plugins.itemstats.infusions.Debarking;
-import com.playmonumenta.plugins.itemstats.infusions.Empowered;
-import com.playmonumenta.plugins.itemstats.infusions.Epoch;
-import com.playmonumenta.plugins.itemstats.infusions.Execution;
-import com.playmonumenta.plugins.itemstats.infusions.Expedite;
-import com.playmonumenta.plugins.itemstats.infusions.Focus;
-import com.playmonumenta.plugins.itemstats.infusions.Hope;
-import com.playmonumenta.plugins.itemstats.infusions.Locked;
-import com.playmonumenta.plugins.itemstats.infusions.Mitosis;
-import com.playmonumenta.plugins.itemstats.infusions.Natant;
-import com.playmonumenta.plugins.itemstats.infusions.Nutriment;
-import com.playmonumenta.plugins.itemstats.infusions.Pennate;
-import com.playmonumenta.plugins.itemstats.infusions.Perspicacity;
-import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
-import com.playmonumenta.plugins.itemstats.infusions.Reflection;
-import com.playmonumenta.plugins.itemstats.infusions.Soulbound;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrack;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackBlocks;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackBoss;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackConsumed;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackKills;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackMelee;
-import com.playmonumenta.plugins.itemstats.infusions.StatTrackSpawners;
-import com.playmonumenta.plugins.itemstats.infusions.Tenacity;
-import com.playmonumenta.plugins.itemstats.infusions.Understanding;
-import com.playmonumenta.plugins.itemstats.infusions.Usurper;
-import com.playmonumenta.plugins.itemstats.infusions.Vigor;
-import com.playmonumenta.plugins.itemstats.infusions.Vitality;
+import com.playmonumenta.plugins.itemstats.enchantments.*;
+import com.playmonumenta.plugins.itemstats.infusions.*;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
@@ -151,26 +29,11 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.DoubleArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -184,6 +47,22 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemStatUtils {
 
@@ -1764,7 +1643,7 @@ public class ItemStatUtils {
 			Tier tier = Tier.getTier((String) args[1]);
 			Location location = Location.getLocation((String) args[2]);
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1793,7 +1672,7 @@ public class ItemStatUtils {
 			}
 			Integer index = (Integer) args[1];
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1813,7 +1692,7 @@ public class ItemStatUtils {
 			Integer index = (Integer) args[1];
 			String lore = (String) args[2];
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1834,7 +1713,7 @@ public class ItemStatUtils {
 			}
 			Integer index = (Integer) args[1];
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1853,7 +1732,7 @@ public class ItemStatUtils {
 				return;
 			}
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1899,7 +1778,7 @@ public class ItemStatUtils {
 			Boolean underline = (Boolean) args[2];
 			String name = (String) args[3];
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -1943,35 +1822,57 @@ public class ItemStatUtils {
 			String enchantment = (String) args[0];
 			Integer level = (Integer) args[1];
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
 
-			EnchantmentType type1 = EnchantmentType.getEnchantmentType(enchantment);
-			if (type1 != null) {
-				if (level > 0) {
-					addEnchantment(item, type1, level);
-				} else {
-					removeEnchantment(item, type1);
-				}
-			}
-
-			InfusionType type2 = InfusionType.getInfusionType(enchantment);
-			if (type2 != null) {
-				if (level > 0) {
-					addInfusion(item, type2, level, player.getUniqueId(), false);
-				} else {
-					removeInfusion(item, type2, false);
-				}
-			}
-
-			generateItemStats(item);
-			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
-			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true);
-			}
+			addEnchantmentOrInfusion(item, player, enchantment, level);
 		}).register();
+
+		List<Argument> argumentsOther = new ArrayList<>();
+		argumentsOther.add(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER));
+		argumentsOther.add(new StringArgument("enchantment").replaceSuggestions(info -> enchantments));
+		argumentsOther.add(new IntegerArgument("level", 0));
+
+		new CommandAPICommand("editench").withPermission(perms).withArguments(argumentsOther).executes((sender, args) -> {
+			Player player = (Player) args[0];
+			String enchantment = (String) args[1];
+			Integer level = (Integer) args[2];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			addEnchantmentOrInfusion(item, player, enchantment, level);
+		}).register();
+	}
+
+	private static void addEnchantmentOrInfusion(ItemStack item, Player player, String enchantment, int level) {
+		EnchantmentType type1 = EnchantmentType.getEnchantmentType(enchantment);
+		if (type1 != null) {
+			if (level > 0) {
+				addEnchantment(item, type1, level);
+			} else {
+				removeEnchantment(item, type1);
+			}
+		}
+
+		InfusionType type2 = InfusionType.getInfusionType(enchantment);
+		if (type2 != null) {
+			if (level > 0) {
+				addInfusion(item, type2, level, player.getUniqueId(), false);
+			} else {
+				removeInfusion(item, type2, false);
+			}
+		}
+
+		generateItemStats(item);
+		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
+		if (playerItemStats != null) {
+			playerItemStats.updateStats(player, true);
+		}
 	}
 
 	public static void registerAttrCommand() {
@@ -2001,7 +1902,7 @@ public class ItemStatUtils {
 			Operation operation = Operation.getOperation((String) args[2]);
 			Slot slot = Slot.getSlot((String) args[3]);
 			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item == null || item.getType() == Material.AIR) {
+			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
@@ -2023,6 +1924,46 @@ public class ItemStatUtils {
 					removeAttribute(item, type1, operation, slot);
 				}
 			}
+
+			generateItemStats(item);
+			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
+			if (playerItemStats != null) {
+				playerItemStats.updateStats(player, true);
+			}
+		}).register();
+	}
+
+	public static void registerRemoveCommand() {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.removestats");
+
+		new CommandAPICommand("removestats").withPermission(perms).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			for (EnchantmentType ench : EnchantmentType.values()) {
+				removeEnchantment(item, ench);
+			}
+
+			for (InfusionType infusion : InfusionType.values()) {
+				removeInfusion(item, infusion);
+			}
+
+			for (AttributeType attr : AttributeType.values()) {
+				for (Operation op : Operation.values()) {
+					for (Slot slot : Slot.values()) {
+						removeAttribute(item, attr, op, slot);
+					}
+				}
+			}
+
+			editItemInfo(item, Region.NONE, Tier.NONE, Location.NONE);
 
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);

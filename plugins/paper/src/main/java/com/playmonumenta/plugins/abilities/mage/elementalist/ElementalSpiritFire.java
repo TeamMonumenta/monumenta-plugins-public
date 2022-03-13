@@ -16,6 +16,11 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -212,8 +217,8 @@ public class ElementalSpiritFire extends Ability {
 				public void run() {
 					if (
 						isTimerActive()
-						|| !mPlayer.isValid() // Ensure player is not dead, is still online?
-						|| PremiumVanishIntegration.isInvisible(mPlayer)
+							|| !mPlayer.isValid() // Ensure player is not dead, is still online?
+							|| PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)
 					) {
 						this.cancel();
 						mPlayerParticlesGenerator = null;

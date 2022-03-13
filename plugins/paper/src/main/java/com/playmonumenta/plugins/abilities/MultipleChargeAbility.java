@@ -26,6 +26,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 			PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.mLinkedSpell);
 			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
 			ClientModHandler.updateAbility(mPlayer, this);
+			AbilityManager.getManager().trackCharges(mPlayer, mInfo.mLinkedSpell, mCharges);
 
 			return true;
 		}
@@ -38,6 +39,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 			mCharges++;
 			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
 			ClientModHandler.updateAbility(mPlayer, this);
+			AbilityManager.getManager().trackCharges(mPlayer, mInfo.mLinkedSpell, mCharges);
 
 			return true;
 		}
@@ -64,6 +66,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 			mCharges++;
 			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
 			needsClientModUpdate = true;
+			AbilityManager.getManager().trackCharges(mPlayer, mInfo.mLinkedSpell, mCharges);
 		}
 
 		// Put on cooldown if charges can still be gained
@@ -100,6 +103,13 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	@Override
 	public int getMaxCharges() {
 		return mMaxCharges;
+	}
+
+	public int getTrackedCharges() {
+		if (mPlayer != null && mInfo.mLinkedSpell != null) {
+			return Math.min(AbilityManager.getManager().getTrackedCharges(mPlayer, mInfo.mLinkedSpell), mMaxCharges);
+		}
+		return 0;
 	}
 
 }

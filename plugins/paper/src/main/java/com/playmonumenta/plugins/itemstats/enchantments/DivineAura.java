@@ -8,6 +8,9 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -18,10 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 public class DivineAura implements Enchantment {
 
@@ -84,7 +83,7 @@ public class DivineAura implements Enchantment {
 
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
-		if (PremiumVanishIntegration.isInvisible(player)) {
+		if (PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
 			return;
 		}
 

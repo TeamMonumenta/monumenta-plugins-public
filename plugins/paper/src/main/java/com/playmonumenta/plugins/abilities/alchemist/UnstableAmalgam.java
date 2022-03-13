@@ -142,7 +142,7 @@ public class UnstableAmalgam extends Ability {
 		}
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, UNSTABLE_AMALGAM_RADIUS, mAmalgam)) {
-			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), mDamage + mAlchemistPotions.getDamage(), true, true, false, null);
+			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), mDamage + mAlchemistPotions.getDamage(), true, true, false);
 
 			mAlchemistPotions.applyEffects(mob, false);
 			mAlchemistPotions.applyEffects(mob, true);

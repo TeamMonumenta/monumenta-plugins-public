@@ -12,13 +12,12 @@ import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 /**
  * Handles communication with an (optional) client mod.

@@ -8,9 +8,9 @@ import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
 
 
 public abstract class PatronParticles extends Ability {
@@ -42,6 +42,9 @@ public abstract class PatronParticles extends Ability {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		if (PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
+			return;
+		}
 		double widthDelta = PartialParticle.getWidthDelta(mPlayer);
 		new PartialParticle(
 			mParticle,
@@ -67,8 +70,8 @@ public abstract class PatronParticles extends Ability {
 		int particleScore = ScoreboardUtils.getScoreboardValue(player, mParticleObjectiveName).orElse(0);
 		return (
 			particleScore > 0
-			&& PlayerData.getPatreonDollars(player) >= mMinimumPatreonScore
-			&& !PremiumVanishIntegration.isInvisible(player)
+				&& PlayerData.getPatreonDollars(player) >= mMinimumPatreonScore
+				&& !PremiumVanishIntegration.isInvisibleOrSpectator(player)
 		);
 	}
 }

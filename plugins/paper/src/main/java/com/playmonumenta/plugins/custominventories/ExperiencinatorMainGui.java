@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -12,8 +13,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-
-import java.util.List;
 
 import static org.bukkit.ChatColor.BOLD;
 import static org.bukkit.ChatColor.GOLD;
@@ -85,6 +84,9 @@ public final class ExperiencinatorMainGui extends CustomInventory {
 	public static void show(Player player, Plugin plugin, ExperiencinatorConfig.Experiencinator experiencinator, ItemStack experiencinatorItem) {
 		ExperiencinatorConfig config = ExperiencinatorUtils.getConfig(player.getLocation());
 		if (config == null) {
+			return;
+		}
+		if (!ExperiencinatorUtils.checkExperiencinator(experiencinator, experiencinatorItem, player)) {
 			return;
 		}
 		new ExperiencinatorMainGui(player, experiencinator, experiencinatorItem).openInventory(player, plugin);

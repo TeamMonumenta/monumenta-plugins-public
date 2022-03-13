@@ -16,6 +16,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellBarrier extends Spell {
 
+	public static final double CARAPACE_DAMAGE_MODIFIER = 1.3;
+
 	@FunctionalInterface
 	public interface RefreshBarrierAction {
 		/** The action that runs when the barrier comes up
@@ -45,6 +47,7 @@ public class SpellBarrier extends Spell {
 	private final int mActivationRadius;
 	private final int mRechargeTime;
 	private final int mHitsToBreak;
+	private final boolean mIsCarapace;
 	private final RefreshBarrierAction mRefreshAction;
 	private final BarrierRunningAmbientAction mRunningAmbientAction;
 	private final BreakBarrierAction mBreakAction;
@@ -53,13 +56,14 @@ public class SpellBarrier extends Spell {
 	private boolean mActive = false;
 	private int mTimer = 0;
 
-	public SpellBarrier(Plugin plugin, LivingEntity boss, int detectionRadius, int rechargeTime, int hitsToBreak, RefreshBarrierAction refreshAction, BarrierRunningAmbientAction ambientRunningAction,
+	public SpellBarrier(Plugin plugin, LivingEntity boss, int detectionRadius, int rechargeTime, int hitsToBreak, boolean isCarapace, RefreshBarrierAction refreshAction, BarrierRunningAmbientAction ambientRunningAction,
 			BreakBarrierAction breakAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mActivationRadius = detectionRadius;
 		mRechargeTime = rechargeTime;
 		mHitsToBreak = hitsToBreak;
+		mIsCarapace = isCarapace;
 		mRefreshAction = refreshAction;
 		mRunningAmbientAction = ambientRunningAction;
 		mBreakAction = breakAction;
@@ -125,6 +129,13 @@ public class SpellBarrier extends Spell {
 			event.setCancelled(true);
 			World world = mBoss.getWorld();
 			world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 1, 1);
+		}
+	}
+
+	@Override
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		if (mActive && mIsCarapace) {
+			event.setDamage(event.getDamage() * CARAPACE_DAMAGE_MODIFIER);
 		}
 	}
 

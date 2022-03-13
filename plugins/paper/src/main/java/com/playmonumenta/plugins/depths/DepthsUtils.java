@@ -18,6 +18,13 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -43,14 +50,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import javax.annotation.Nullable;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class DepthsUtils {
 
@@ -265,7 +264,7 @@ public class DepthsUtils {
 		}
 
 		BlockData bd = l.getWorld().getBlockAt(l).getBlockData();
-		l.getWorld().getBlockAt(l).setType(ICE_MATERIAL);
+		l.getBlock().setType(ICE_MATERIAL);
 		iceActive.put(l, bd);
 		iceBarrier.put(l, isBarrier);
 
@@ -273,9 +272,11 @@ public class DepthsUtils {
 			@Override
 			public void run() {
 				if (iceActive.containsKey(l)) {
-					Block b = l.getWorld().getBlockAt(l);
-					if (b.getType() == ICE_MATERIAL) {
-						b.setBlockData(bd);
+					if (l.isChunkLoaded()) {
+						Block b = l.getBlock();
+						if (b.getType() == ICE_MATERIAL) {
+							b.setBlockData(bd);
+						}
 					}
 					iceActive.remove(l);
 					iceBarrier.remove(l);

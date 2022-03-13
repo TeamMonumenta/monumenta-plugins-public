@@ -1,11 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Collections;
-
 import com.playmonumenta.plugins.abilities.delves.Twisted;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.utils.FastUtils;
-
+import java.util.Collections;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;

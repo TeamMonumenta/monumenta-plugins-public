@@ -6,11 +6,10 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.TextArgument;
-import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.List;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.entity.Player;
 
 public class AdminNotify {
 	public static String COMMAND = "adminnotify";

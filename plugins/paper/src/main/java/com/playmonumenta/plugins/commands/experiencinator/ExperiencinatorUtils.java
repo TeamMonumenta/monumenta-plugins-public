@@ -1,18 +1,5 @@
 package com.playmonumenta.plugins.commands.experiencinator;
 
-import java.io.File;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-
-import javax.annotation.Nullable;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
@@ -23,7 +10,17 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
 import com.playmonumenta.plugins.utils.ItemUtils;
-
+import java.io.File;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import javax.annotation.Nullable;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -76,7 +73,7 @@ public abstract class ExperiencinatorUtils {
 			return false;
 		}
 
-		if (!experiencinator.checkPrerequisites(player)) { // sends a failure message directly
+		if (!experiencinator.checkPrerequisites(player, experiencinatorItem)) { // sends a failure message directly
 			return false;
 		}
 
@@ -118,7 +115,7 @@ public abstract class ExperiencinatorUtils {
 					continue;
 				}
 				Tier tier = ItemStatUtils.getTier(item);
-				if (!conversion.conversionAllowed(player, tier)) { // prerequisites for conversion not met
+				if (!conversion.conversionAllowed(player, tier, experiencinatorItem)) { // prerequisites for conversion not met
 					continue;
 				}
 				if (settings.getConversion(region, tier) != conversion.getSettingsId()) { // conversion not enabled

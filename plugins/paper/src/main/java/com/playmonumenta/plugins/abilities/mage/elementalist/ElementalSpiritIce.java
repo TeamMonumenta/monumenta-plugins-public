@@ -15,6 +15,9 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.HashSet;
+import java.util.Set;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -117,7 +120,7 @@ public class ElementalSpiritIce extends Ability {
 											ClassAbility.ELEMENTAL_ARROWS_ICE.equals(ability)
 											&& mElementalArrows != null
 										) {
-											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
+											finalDamage += Math.max(0, mElementalArrows.getLastDamage() * mLevelBowMultiplier);
 										}
 
 										DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.mLinkedSpell, true);
@@ -165,8 +168,8 @@ public class ElementalSpiritIce extends Ability {
 				public void run() {
 					if (
 						isTimerActive()
-						|| !mPlayer.isValid() // Ensure player is not dead, is still online?
-						|| PremiumVanishIntegration.isInvisible(mPlayer)
+							|| !mPlayer.isValid() // Ensure player is not dead, is still online?
+							|| PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)
 					) {
 						this.cancel();
 						mPlayerParticlesGenerator = null;

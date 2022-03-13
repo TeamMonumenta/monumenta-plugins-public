@@ -5,12 +5,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.Tooltip;
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,6 +12,11 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class EntityTargets {
 
@@ -110,7 +109,7 @@ public class EntityTargets {
 		SELF {
 			@Override
 			public List<LivingEntity> getTargets(LivingEntity launcher, Location notUsed, double notUsed2, boolean notUsed3) {
-				return Arrays.asList(launcher);
+				return List.of(launcher);
 			}
 		};
 	}
@@ -503,10 +502,9 @@ public class EntityTargets {
 
 
 	public static final EntityTargets GENERIC_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.DEFAULT, new ArrayList<>(), TagsListFiter.DEFAULT);
+	public static final EntityTargets GENERIC_MOB_TARGET = new EntityTargets(TARGETS.MOB, 30, true, Limit.DEFAULT, new ArrayList<>(), TagsListFiter.DEFAULT);
 	public static final EntityTargets GENERIC_SELF_TARGET = new EntityTargets(TARGETS.SELF, 0, false, Limit.DEFAULT, new ArrayList<>(), TagsListFiter.DEFAULT);
 	public static final EntityTargets GENERIC_ONE_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.DEFAULT_ONE, new ArrayList<>(), TagsListFiter.DEFAULT);
-
-	public static final EntityTargets GENERIC_MOB_TARGET = new EntityTargets(TARGETS.MOB, 15, false, Limit.DEFAULT, new ArrayList<>(), TagsListFiter.DEFAULT);
 
 	private static final String LIMIT_STRING = "limit=";
 	private static final String FILTERS_STRING = "filters=";

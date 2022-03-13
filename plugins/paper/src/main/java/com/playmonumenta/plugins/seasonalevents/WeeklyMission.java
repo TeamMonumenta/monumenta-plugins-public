@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.seasonalevents;
 
 import com.playmonumenta.plugins.utils.DelvesUtils;
-
 import java.util.List;
 
 public class WeeklyMission {

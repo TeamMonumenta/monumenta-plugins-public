@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.integrations;
 
 import de.myzelyam.api.vanish.VanishAPI;
-import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 
 public class PremiumVanishIntegration {
 	private static @Nullable PremiumVanishIntegration INSTANCE = null;
@@ -33,7 +33,10 @@ public class PremiumVanishIntegration {
 	 * @param p - the player.
 	 * @return TRUE if the player is invisible, FALSE otherwise.
 	 */
-	public static boolean isInvisible(Player p) {
+	public static boolean isInvisibleOrSpectator(Player p) {
+		if (p.getGameMode() == GameMode.SPECTATOR) {
+			return true;
+		}
 		if (INSTANCE == null) {
 			return false;
 		}

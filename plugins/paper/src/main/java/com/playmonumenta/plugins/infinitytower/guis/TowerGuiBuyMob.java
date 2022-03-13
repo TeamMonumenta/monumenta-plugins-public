@@ -1,0 +1,191 @@
+package com.playmonumenta.plugins.infinitytower.guis;
+
+import com.playmonumenta.plugins.infinitytower.TowerConstants;
+import com.playmonumenta.plugins.infinitytower.TowerFileUtils;
+import com.playmonumenta.plugins.infinitytower.TowerGame;
+import com.playmonumenta.plugins.infinitytower.TowerGameUtils;
+import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
+import com.playmonumenta.plugins.infinitytower.mobs.TowerMobRarity;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+public class TowerGuiBuyMob extends CustomInventory {
+
+	private static final ItemStack WHITE_BORDER_ITEM = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+	private static final ItemStack WHITE_CENTER_ITEM = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+	private static final ItemStack REFRESH_ITEM = new ItemStack(Material.BONE_MEAL);
+
+	static {
+		ItemMeta meta = WHITE_BORDER_ITEM.getItemMeta();
+		meta.displayName(Component.empty());
+		WHITE_BORDER_ITEM.setItemMeta(meta);
+		WHITE_CENTER_ITEM.setItemMeta(meta);
+
+		meta = REFRESH_ITEM.getItemMeta();
+		meta.displayName(Component.text("Refresh the shop!", NamedTextColor.AQUA).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+
+		List<Component> lore = new ArrayList<>();
+		lore.add(Component.text("This will cost " + TowerConstants.COST_REROLL + " coin", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+
+		meta.lore(lore);
+		REFRESH_ITEM.setItemMeta(meta);
+	}
+
+	private static final int[] VALID_MOBS_SLOT = {
+		// 0,     1,     2,  3,    4,    5,  6,     7,    8
+		/* 9*/   10, /* 11, 12,*/ 13, /* 14, 15,*/ 16  //17
+		/*18*/// 19,    20, 21,   22,   23, 24,    25, //26
+	};
+
+	private static final int VALID_MOBS_SIZE = VALID_MOBS_SLOT.length;
+
+	private static final Map<TowerGame, Integer> ROLL_MAP = new LinkedHashMap<>();
+	private static final Map<TowerGame, List<TowerMobInfo>> ITEM_MAP = new LinkedHashMap<>();
+
+	private final TowerGame mGame;
+	private final Map<Integer, TowerMobInfo> mMapItem = new LinkedHashMap<>();
+
+	public TowerGuiBuyMob(Player owner, TowerGame game) {
+		super(owner, 9 * 3, "Buy a new mob");
+		mGame = game;
+		owner.playSound(owner.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.MASTER, 1, 2);
+
+		ITEM_MAP.computeIfAbsent(mGame, game1 -> new ArrayList<>());
+
+		loadInv();
+	}
+
+
+	private List<TowerMobInfo> getItemList() {
+		if (ROLL_MAP.get(mGame) != null && ROLL_MAP.get(mGame) == mGame.mRoll) {
+			return ITEM_MAP.get(mGame);
+		}
+
+		int currentLvl = mGame.mPlayerLevel;
+		ROLL_MAP.put(mGame, mGame.mRoll);
+		List<TowerMobInfo> mobs = ITEM_MAP.get(mGame);
+		mobs.clear();
+		double rand;
+		for (int i = 0; i < VALID_MOBS_SIZE; i++) {
+			rand = FastUtils.RANDOM.nextDouble();
+			for (TowerMobRarity rarity : TowerMobRarity.values()) {
+				rand -= rarity.getWeight(currentLvl - 1);
+				if (rand <= 0) {
+					mobs.add(TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(rarity).get(FastUtils.RANDOM.nextInt(TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(rarity).size())));
+					break;
+				}
+			}
+		}
+
+		return mobs;
+	}
+
+	private void loadInv() {
+		mInventory.clear();
+		mMapItem.clear();
+
+		List<TowerMobInfo> mobs = getItemList();
+
+		mInventory.setItem(4, TowerGameUtils.getSignLvlItem(mGame));
+
+		int i = 0;
+		for (TowerMobInfo info : mobs) {
+			mInventory.setItem(VALID_MOBS_SLOT[i], info.getBuyableItem());
+			mMapItem.put(VALID_MOBS_SLOT[i], info);
+			i++;
+		}
+
+		while (i < VALID_MOBS_SIZE) {
+			mInventory.setItem(VALID_MOBS_SLOT[i++], WHITE_CENTER_ITEM);
+		}
+
+		for (int j = 0; j < mInventory.getSize(); j++) {
+			if (mInventory.getItem(j) == null) {
+				mInventory.setItem(j, WHITE_BORDER_ITEM);
+			}
+		}
+
+		mInventory.setItem(21, TowerGameUtils.getXPItem(mGame));
+		mInventory.setItem(22, TowerGameUtils.getCoinItem(mGame));
+		mInventory.setItem(23, REFRESH_ITEM);
+		mInventory.setItem(25, TowerGameUtils.getWeightItem(mGame));
+
+	}
+
+
+	@Override
+	protected void inventoryClick(InventoryClickEvent event) {
+		event.setCancelled(true);
+		if (!mInventory.equals(event.getClickedInventory())) {
+			return;
+		}
+
+		if (event.isShiftClick()) {
+			return;
+		}
+
+		Player player = ((Player)event.getWhoClicked());
+		int slot = event.getSlot();
+		TowerMobInfo info = mMapItem.get(slot);
+
+		if (info != null) {
+			if (TowerGameUtils.canBuy(info, player)) {
+				if (mGame.canAdd(info)) {
+					ITEM_MAP.get(mGame).remove(info);
+					TowerGameUtils.pay(info, player);
+					mGame.addNewMob(info);
+					player.playSound(player.getEyeLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.MASTER, 10f, 0.6f);
+				} else {
+					player.sendMessage(Component.text("[Plunderer's Blitz]", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).append(
+											Component.text(" You don't have enough space inside the team", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)
+					));
+					//no space
+				}
+			} else {
+				player.sendMessage(Component.text("[Plunderer's Blitz]", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).append(
+											Component.text(" You don't have enough money to buy this item", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)
+					));
+				//no money
+			}
+		} else {
+			if (slot == 21) {
+				if (TowerGameUtils.canBuyXP(mGame, player)) {
+					TowerGameUtils.upgradeLvl(mGame, player);
+					player.playSound(player.getEyeLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 2f);
+				}
+			}
+
+			if (slot == 23) {
+				if (TowerGameUtils.canBuy(player, TowerConstants.COST_REROLL)) {
+					TowerGameUtils.pay(player, TowerConstants.COST_REROLL);
+					player.playSound(player.getEyeLocation(), Sound.UI_LOOM_SELECT_PATTERN, 1, 0.9f);
+					mGame.mRoll++;
+				}
+			}
+
+		}
+
+		loadInv();
+
+	}
+
+
+	public static void unloadGame(TowerGame game) {
+		ITEM_MAP.remove(game);
+		ROLL_MAP.remove(game);
+	}
+}

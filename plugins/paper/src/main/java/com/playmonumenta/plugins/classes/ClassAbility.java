@@ -12,7 +12,7 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.SpatialShatter;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
-
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 // TODO perhaps simply pass around class literals instead of maintaining this?
@@ -210,5 +210,14 @@ public enum ClassAbility {
 
 	public String getName() {
 		return mName;
+	}
+
+	public static @Nullable ClassAbility getAbility(String name) {
+		for (ClassAbility ability : ClassAbility.values()) {
+			if (ability.getName().equals(name)) {
+				return ability;
+			}
+		}
+		return null;
 	}
 }

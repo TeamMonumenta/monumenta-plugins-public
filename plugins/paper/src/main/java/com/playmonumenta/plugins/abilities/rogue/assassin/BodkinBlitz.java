@@ -64,6 +64,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 		mMaxCharges = BODKINBLITZ_MAX_CHARGES;
+		mCharges = getTrackedCharges();
 
 		mStealthDuration = isLevelOne() ? BODKINBLITZ_1_STEALTH_DURATION : BODKINBLITZ_2_STEALTH_DURATION;
 		mBonusDmg = isLevelOne() ? BODKINBLITZ_1_BONUS_DMG : BODKINBLITZ_2_BONUS_DMG;

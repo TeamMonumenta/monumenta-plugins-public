@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
@@ -9,10 +8,11 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.LiteralArgument;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -27,10 +27,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 public final class ItemDropListener implements Listener {
 	public static final String COMMAND = "disabledrop";
@@ -56,7 +52,7 @@ public final class ItemDropListener implements Listener {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withAliases(ALIAS)
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				playerToggle(sender);
 			})
 			.register();
@@ -65,7 +61,7 @@ public final class ItemDropListener implements Listener {
 			.withPermission(perms)
 			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("none"))
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				enable(sender);
 			})
 			.register();
@@ -74,7 +70,7 @@ public final class ItemDropListener implements Listener {
 			.withPermission(perms)
 			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("lore"))
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				disableLore(sender);
 			})
 			.register();
@@ -83,7 +79,7 @@ public final class ItemDropListener implements Listener {
 			.withPermission(perms)
 			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("interesting"))
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				disableInteresting(sender);
 			})
 			.register();
@@ -92,7 +88,7 @@ public final class ItemDropListener implements Listener {
 			.withPermission(perms)
 			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("all"))
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				disableAll(sender);
 			})
 			.register();
@@ -101,7 +97,7 @@ public final class ItemDropListener implements Listener {
 			.withPermission(perms)
 			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("holding"))
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				disableHolding(sender);
 			})
 			.register();
@@ -110,7 +106,7 @@ public final class ItemDropListener implements Listener {
 			.withPermission(perms)
 			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("equipped"))
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				disableEquipped(sender);
 			})
 			.register();
@@ -119,15 +115,13 @@ public final class ItemDropListener implements Listener {
 			.withPermission(perms)
 			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("tiered"))
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				disableTiered(sender);
 			})
 			.register();
 	}
 
-	private void playerToggle(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
-
+	private void playerToggle(Player player) {
 		if (hasTag(player)) {
 			enable(player);
 		} else {
@@ -139,21 +133,19 @@ public final class ItemDropListener implements Listener {
 	public void join(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		Set<String> tags = player.getScoreboardTags();
-		if (tags != null) {
-			UUID uuid = player.getUniqueId();
-			if (tags.contains(TIERED_TAG)) {
-				mTieredPlayers.add(uuid);
-			} else if (tags.contains(LORE_TAG)) {
-				mLorePlayers.add(uuid);
-			} else if (tags.contains(INTERESTING_TAG)) {
-				mInterestingPlayers.add(uuid);
-			} else if (tags.contains(ALL_TAG)) {
-				mAllPlayers.add(uuid);
-			} else if (tags.contains(HOLDING_TAG)) {
-				mHoldingPlayers.add(uuid);
-			} else if (tags.contains(EQUIPPED_TAG)) {
-				mEquippedPlayers.add(uuid);
-			}
+		UUID uuid = player.getUniqueId();
+		if (tags.contains(TIERED_TAG)) {
+			mTieredPlayers.add(uuid);
+		} else if (tags.contains(LORE_TAG)) {
+			mLorePlayers.add(uuid);
+		} else if (tags.contains(INTERESTING_TAG)) {
+			mInterestingPlayers.add(uuid);
+		} else if (tags.contains(ALL_TAG)) {
+			mAllPlayers.add(uuid);
+		} else if (tags.contains(HOLDING_TAG)) {
+			mHoldingPlayers.add(uuid);
+		} else if (tags.contains(EQUIPPED_TAG)) {
+			mEquippedPlayers.add(uuid);
 		}
 	}
 
@@ -212,7 +204,7 @@ public final class ItemDropListener implements Listener {
 
 		Player player = event.getPlayer();
 		Item itemEntity = event.getItemDrop();
-		if (player == null || itemEntity == null || player.getGameMode() == GameMode.CREATIVE) {
+		if (player.getGameMode() == GameMode.CREATIVE) {
 			return;
 		}
 
@@ -249,7 +241,8 @@ public final class ItemDropListener implements Listener {
 		if (mAllPlayers.contains(uuid)) {
 			return true;
 		} else if (mTieredPlayers.contains(uuid)) {
-			return ItemStatUtils.getTier(item) != Tier.NONE;
+			Tier tier = ItemStatUtils.getTier(item);
+			return tier != Tier.NONE && tier != Tier.CURRENCY && tier != Tier.KEYTIER;
 		} else if (mLorePlayers.contains(uuid)) {
 			return ItemUtils.hasLore(item) || ItemUtils.isShulkerBox(item.getType());
 		} else if (mInterestingPlayers.contains(uuid)) {
@@ -266,54 +259,47 @@ public final class ItemDropListener implements Listener {
 		return (0 <= slot && slot <= 8) || (36 <= slot && slot <= 40);
 	}
 
-	private void enable(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
+	private void enable(Player player) {
 		remove(player);
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can now drop all items.");
 	}
 
-	private void disableLore(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
+	private void disableLore(Player player) {
 		remove(player);
 		player.addScoreboardTag(LORE_TAG);
 		mLorePlayers.add(player.getUniqueId());
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop items with lore text.");
 	}
 
-	private void disableInteresting(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
+	private void disableInteresting(Player player) {
 		remove(player);
 		player.addScoreboardTag(INTERESTING_TAG);
 		mInterestingPlayers.add(player.getUniqueId());
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop interesting items.");
 	}
 
-	private void disableAll(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
+	private void disableAll(Player player) {
 		remove(player);
 		player.addScoreboardTag(ALL_TAG);
 		mAllPlayers.add(player.getUniqueId());
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop items.");
 	}
 
-	private void disableHolding(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
+	private void disableHolding(Player player) {
 		remove(player);
 		player.addScoreboardTag(HOLDING_TAG);
 		mHoldingPlayers.add(player.getUniqueId());
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop the item you are holding.");
 	}
 
-	private void disableEquipped(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
+	private void disableEquipped(Player player) {
 		remove(player);
 		player.addScoreboardTag(EQUIPPED_TAG);
 		mEquippedPlayers.add(player.getUniqueId());
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop items you have equipped.");
 	}
 
-	private void disableTiered(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
+	private void disableTiered(Player player) {
 		remove(player);
 		player.addScoreboardTag(TIERED_TAG);
 		mTieredPlayers.add(player.getUniqueId());

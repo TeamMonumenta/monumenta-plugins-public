@@ -8,14 +8,13 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nullable;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TeleportGuild {
 	private static final String COMMAND = "teleportguild";

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.events.MonumentaEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.redissync.utils.ScoreboardUtils;
+import java.util.Set;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -109,7 +110,15 @@ public class SeasonalEventListener implements Listener {
 				} else if (mission.mType == WeeklyMissionType.ROD_WAVES && content == MonumentaContent.RUSH) {
 					// Cleared rod- add number of waves cleared
 					int waves = ScoreboardUtils.getScoreboardValue(p.getName(), ROD_WAVE_SCOREBOARD);
-					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, waves);
+					// Subtract the 20 wave checkpoint if player has certain tags
+					Set<String> tags = p.getScoreboardTags();
+					if (tags.contains("rod_checkpoint_start") || tags.contains("Primary") || tags.contains("Partner")) {
+						waves -= 20;
+					}
+
+					if (waves > 0) {
+						SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, waves);
+					}
 				}
 				missionNumber++;
 			}

@@ -7,7 +7,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.GameMode;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -20,9 +21,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class SpellFlamethrower extends Spell {
 
@@ -46,7 +44,6 @@ public class SpellFlamethrower extends Spell {
 	public void run() {
 		//List is sorted with nearest players further in the list, and farthest players at the beginning
 		List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), FalseSpirit.detectionRange);
-		players.removeIf(p -> p.getGameMode() == GameMode.SPECTATOR);
 		launch(players.get(0));
 	}
 

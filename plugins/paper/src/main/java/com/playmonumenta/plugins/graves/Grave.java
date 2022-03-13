@@ -7,27 +7,11 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
-import javax.annotation.Nullable;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.EulerAngle;
-
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,6 +21,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.EulerAngle;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Grave {
 	private static final String KEY_TIME = "time";
@@ -125,8 +128,8 @@ public final class Grave {
 			mDungeonInstance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess").orElse(0);
 		}
 		mLocation = mPlayer.getLocation().clone();
-		if (mLocation.getY() < 0) {
-			mLocation.setY(0);
+		if (mLocation.getY() < 1) {
+			mLocation.setY(1);
 		}
 		mEquipment = new HashMap<>();
 		mEquipment.put(KEY_EQUIPMENT_HEAD, equipment.get(EquipmentSlot.HEAD));
@@ -142,21 +145,21 @@ public final class Grave {
 		}
 		if (!mAlertedSpawned) {
 			mAlertedSpawned = true;
-			mPlayer.sendMessage(Component.text("You died and dropped items! Your grave will keep them safe; be careful on the way back! (/deathhelp for more info)", NamedTextColor.RED));
+			mPlayer.sendMessage(Component.text("You died and dropped items! Your grave will keep them safe; be careful on the way back! (/help death for more info)", NamedTextColor.RED));
 		}
 		spawn();
 	}
 
 	// For spawning a single-item grave from a dropped item.
-	public Grave(ThrownItem item) {
+	public Grave(ThrownItem item, boolean destroyedByVoid) {
 		mManager = item.mManager;
 		mPlayer = item.mPlayer;
 		mDeathTime = Instant.now();
 		mWorldName = item.mWorldName;
 		mDungeonInstance = item.mDungeonInstance;
 		mLocation = item.mLocation.clone();
-		if (mLocation.getY() < 0) {
-			mLocation.setY(0);
+		if (mLocation.getY() < 1) {
+			mLocation.setY(1);
 		}
 		mEquipment = new HashMap<>();
 		mEquipment.put(KEY_EQUIPMENT_HAND, item.mItem);
@@ -165,13 +168,15 @@ public final class Grave {
 		setPoseDegrees(KEY_POSE_RIGHT_ARM, 270d, 330d, 0d);
 		mSmall = true;
 		mItems = new HashSet<>();
-		mItems.add(new GraveItem(this, item));
+		mItems.add(new GraveItem(this, item, destroyedByVoid));
 		item.delete();
 		if (!mAlertedSpawned) {
 			mAlertedSpawned = true;
 			mPlayer.sendMessage(Component.text("An item you dropped at ", NamedTextColor.RED)
 				.append(Component.text(mLocation.getBlockX() + "," + mLocation.getBlockY() + "," + mLocation.getBlockZ()))
-				.append(Component.text(" was destroyed. A grave will keep it safe for you. (/deathhelp for more info)"))
+				.append(Component.text(" was destroyed. A grave will keep it safe for you. "))
+				.append(Component.text("(/help death for more info)")
+					.clickEvent(ClickEvent.runCommand("/help death")))
 			);
 		}
 		spawn();
@@ -254,11 +259,21 @@ public final class Grave {
 			startTracking();
 			if (!mAlertedSpawned) {
 				mAlertedSpawned = true;
-				mPlayer.sendMessage(Component.text("You have a grave at ", NamedTextColor.RED)
-					.append(Component.text(mLocation.getBlockX() + "," + mLocation.getBlockY() + "," + mLocation.getBlockZ()))
-					.append(Component.text(mItems.size() == 1 ? " with 1 item." : " with " + mItems.size() + " items."))
-					.append(Component.text(" (/deathhelp for more info)"))
-				);
+				Integer index = mManager.getIndex(this);
+				if (index != null) {
+					mPlayer.sendMessage(Component.text("You have a grave at ", NamedTextColor.AQUA)
+						.append(Component.text(mLocation.getBlockX() + "," + mLocation.getBlockY() + "," + mLocation.getBlockZ()))
+						.append(Component.text(" with "))
+						.append(Component.text(mItems.size() == 1 ? "1 item." : mItems.size() + " items.")
+							.hoverEvent(HoverEvent.showText(getItemList())))
+						.append(Component.text(" (/help death for more info)")
+							.clickEvent(ClickEvent.runCommand("/help death")))
+						.append(Component.text(" "))
+						.append(Component.text("Click to delete this grave permanently.", NamedTextColor.RED)
+							.hoverEvent(HoverEvent.showText(Component.text("Delete grave " + index, NamedTextColor.RED)))
+							.clickEvent(ClickEvent.runCommand("/grave delete " + index)))
+					);
+				}
 			}
 		}
 	}
@@ -288,6 +303,11 @@ public final class Grave {
 						} else {
 							mEntity.setGlowing(false);
 						}
+
+						if (ScoreboardUtils.getScoreboardValue(mPlayer, Phylactery.SCOREBOARD).orElse(0) > 0) {
+							doPhylacteryParticles();
+						}
+
 						if (mEntity.getScoreboardTags().contains("RespawnItems")) {
 							mEntity.removeScoreboardTag("RespawnItems");
 							for (GraveItem item : mItems) {
@@ -306,6 +326,32 @@ public final class Grave {
 			};
 			mRunnable.runTaskTimer(Plugin.getInstance(), 20, 20);
 		}
+	}
+
+	private void doPhylacteryParticles() {
+		if (mEntity == null) {
+			return;
+		}
+		Location loc = mEntity.getLocation();
+		new BukkitRunnable() {
+			int mTicks = 0;
+			double mY = 0;
+			double mTheta = 0;
+			@Override
+			public void run() {
+				mPlayer.spawnParticle(Particle.TOTEM, loc.clone().add(FastUtils.cos(mTheta), mY, FastUtils.sin(mTheta)), 1, 0, 0, 0, 0);
+				mPlayer.spawnParticle(Particle.TOTEM, loc.clone().add(-FastUtils.cos(mTheta), mY, -FastUtils.sin(mTheta)), 1, 0, 0, 0, 0);
+
+				mTicks += 2;
+				mY += 0.2;
+				mTheta += Math.PI / 5;
+
+				if (mTicks >= 20) {
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(Plugin.getInstance(), 0, 2);
 	}
 
 	private void stopTracking() {
@@ -338,7 +384,7 @@ public final class Grave {
 		}
 	}
 
-	void delete() {
+	public void delete() {
 		Iterator<GraveItem> items = mItems.iterator();
 		while (items.hasNext()) {
 			GraveItem item = items.next();
@@ -501,14 +547,23 @@ public final class Grave {
 			);
 			UUID graveUUID = getUniqueId();
 			if (graveUUID != null && !mGraveMessageCooldown.contains(graveUUID)) {
-				mPlayer.sendMessage(Component.text("Your grave at ", NamedTextColor.AQUA)
-					.append(Component.text((int) mLocation.getX() + ", " + (int) mLocation.getY() + ", " + (int) mLocation.getZ(), NamedTextColor.AQUA))
-					.append(Component.text(" has been located by another player!", NamedTextColor.AQUA))
-				);
-				mGraveMessageCooldown.add(graveUUID);
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-					mGraveMessageCooldown.remove(graveUUID);
-				}, 60);
+				Integer index = mManager.getIndex(this);
+				if (index != null) {
+					mPlayer.sendMessage(Component.text("Your grave at ", NamedTextColor.AQUA)
+						.append(Component.text(mLocation.getBlockX() + "," + mLocation.getBlockY() + "," + mLocation.getBlockZ(), NamedTextColor.AQUA))
+						.append(Component.text(" with ", NamedTextColor.AQUA))
+						.append(Component.text(getItems().size() + " item" + (getItems().size() > 1 ? "s" : ""), NamedTextColor.AQUA)
+							.hoverEvent(HoverEvent.showText(getItemList())))
+						.append(Component.text(" has been located by another player! ", NamedTextColor.AQUA))
+						.append(Component.text("Click here to delete this grave permanently.", NamedTextColor.RED)
+							.hoverEvent(HoverEvent.showText(Component.text("Delete grave " + index, NamedTextColor.RED)))
+							.clickEvent(ClickEvent.runCommand("/grave delete " + index)))
+					);
+					mGraveMessageCooldown.add(graveUUID);
+					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+						mGraveMessageCooldown.remove(graveUUID);
+					}, 60);
+				}
 			}
 			if (dropped > 0) {
 				player.sendMessage(Component.text("There ", NamedTextColor.AQUA)
@@ -708,6 +763,18 @@ public final class Grave {
 		}
 
 		return data;
+	}
+
+	public Component getItemList() {
+		Component output = Component.text("");
+		for (GraveItem item : getItems()) {
+			if (!output.equals(Component.text(""))) {
+				output = output.append(Component.text(", ", NamedTextColor.WHITE));
+			}
+
+			output = output.append(ItemUtils.getItemNameComponentWithHover(item.getItem()));
+		}
+		return output;
 	}
 
 }

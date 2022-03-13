@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,10 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-
 import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
 
 /*
  * The SpellManager class is designed to manage active spells for a boss. It

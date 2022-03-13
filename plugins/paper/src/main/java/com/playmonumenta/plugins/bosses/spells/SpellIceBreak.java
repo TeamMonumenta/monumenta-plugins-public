@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.HashSet;
+import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -9,9 +11,6 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class SpellIceBreak extends Spell {
 	private Entity mLauncher;

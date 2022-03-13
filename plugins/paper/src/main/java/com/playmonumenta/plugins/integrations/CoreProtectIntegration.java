@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.integrations;
 
+import java.util.logging.Logger;
+import javax.annotation.Nullable;
 import net.coreprotect.CoreProtect;
 import net.coreprotect.CoreProtectAPI;
 import org.bukkit.Bukkit;
@@ -8,9 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import javax.annotation.Nullable;
-
-import java.util.logging.Logger;
 
 public class CoreProtectIntegration {
 	private static @Nullable CoreProtectAPI API = null;

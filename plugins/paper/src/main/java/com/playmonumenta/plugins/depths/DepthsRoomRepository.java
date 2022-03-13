@@ -2,19 +2,24 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsRoom.RoomDirection;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.structures.StructuresAPI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * This class contains hard coded information about all the rooms possible in the system, including type, spawner count, load paths, etc.
@@ -84,6 +89,8 @@ public class DepthsRoomRepository {
 		mF1NormalRooms.add(new DepthsRoom("depths/f1r45", DepthsRoomType.ABILITY, new Vector(49, 37, 52), new Vector(1.0, -6.0, -29.0), 11, RoomDirection.UP));
 		mF1NormalRooms.add(new DepthsRoom("depths/f1r46", DepthsRoomType.ABILITY, new Vector(51, 56, 32), new Vector(1.0, -9.0, -14.0), 15, RoomDirection.UP));
 		mF1NormalRooms.add(new DepthsRoom("depths/f1r47", DepthsRoomType.ABILITY, new Vector(45, 52, 55), new Vector(1.0, -33.0, -27.0), 11, RoomDirection.DOWN));
+		mF1NormalRooms.add(new DepthsRoom("depths/f1r48", DepthsRoomType.ABILITY, new Vector(32, 35, 35), new Vector(1.0, -8.0, -20.0), 12, RoomDirection.UP));
+		mF1NormalRooms.add(new DepthsRoom("depths/f1r49", DepthsRoomType.ABILITY, new Vector(38, 31, 37), new Vector(1.0, -11.0, -31.0), 12, RoomDirection.EVEN));
 
 		//F1 elite rooms
 		mF1EliteRooms.add(new DepthsRoom("depths/f1r12", DepthsRoomType.ABILITY, new Vector(40, 41, 40), new Vector(1.0, -2.0, -21.0), 23, RoomDirection.UP));
@@ -103,6 +110,9 @@ public class DepthsRoomRepository {
 		mF1EliteRooms.add(new DepthsRoom("depths/f1r40", DepthsRoomType.ABILITY, new Vector(30, 22, 71), new Vector(1.0, -2.0, -7.0), 23, RoomDirection.EVEN));
 		mF1EliteRooms.add(new DepthsRoom("depths/f1r43", DepthsRoomType.ABILITY, new Vector(44, 23, 40), new Vector(1.0, -1.0, -32.0), 19, RoomDirection.UP));
 		mF1EliteRooms.add(new DepthsRoom("depths/f1r44", DepthsRoomType.ABILITY, new Vector(34, 40, 36), new Vector(1.0, -23.0, -29.0), 26, RoomDirection.DOWN));
+		mF1EliteRooms.add(new DepthsRoom("depths/f1r50", DepthsRoomType.ABILITY, new Vector(35, 54, 33), new Vector(1.0, -39.0, -18.0), 20, RoomDirection.DOWN));
+		mF1EliteRooms.add(new DepthsRoom("depths/f1r51", DepthsRoomType.ABILITY, new Vector(44, 16, 71), new Vector(1.0, 0.0, -7.0), 21, RoomDirection.UP));
+		mF1EliteRooms.add(new DepthsRoom("depths/f1r52", DepthsRoomType.ABILITY, new Vector(41, 39, 49), new Vector(1.0, -16.0, -10.0), 36, RoomDirection.DOWN));
 
 		//F1 twisted rooms
 		mF1TwistedRooms.add(new DepthsRoom("depths/f1r41", DepthsRoomType.TWISTED, new Vector(51, 60, 70), new Vector(1.0, -3.0, -61.0), 50, RoomDirection.EVEN));
@@ -115,10 +125,12 @@ public class DepthsRoomRepository {
 
 		//F2 utility rooms
 		mF2UtilityRooms.add(new DepthsRoom("depths/f2r11", DepthsRoomType.UTILITY, new Vector(33, 28, 29), new Vector(1.0, -1.0, -6.0), 0, RoomDirection.EVEN));
-		mF2UtilityRooms.add(new DepthsRoom("depths/f2r12", DepthsRoomType.UTILITY, new Vector(35, 18, 27), new Vector(1.0, -4.0, -7.0), 0, RoomDirection.EVEN));
 		mF2UtilityRooms.add(new DepthsRoom("depths/f2r14", DepthsRoomType.UTILITY, new Vector(38, 26, 38), new Vector(1.0, -11.0, -17.0), 0, RoomDirection.EVEN));
 		mF2UtilityRooms.add(new DepthsRoom("depths/f2r16", DepthsRoomType.UTILITY, new Vector(34, 26, 33), new Vector(1.0, -6.0, -16.0), 0, RoomDirection.EVEN));
 		mF2UtilityRooms.add(new DepthsRoom("depths/f2r17", DepthsRoomType.UTILITY, new Vector(32, 23, 31), new Vector(1.0, -6.0, -15.0), 0, RoomDirection.EVEN));
+		mF2UtilityRooms.add(new DepthsRoom("depths/f2r45", DepthsRoomType.UTILITY, new Vector(36, 24, 31), new Vector(1.0, -3.0, -15.0), 0, RoomDirection.EVEN));
+		//OLD CASINO UTILITY ROOM- currently unused
+		//mF2UtilityRooms.add(new DepthsRoom("depths/f2r12", DepthsRoomType.UTILITY, new Vector(35, 18, 27), new Vector(1.0, -4.0, -7.0), 0, RoomDirection.EVEN));
 
 		//F2 normal rooms
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r2", DepthsRoomType.ABILITY, new Vector(28, 38, 27), new Vector(1.0, -24.0, -13.0), 10, RoomDirection.DOWN));
@@ -140,7 +152,8 @@ public class DepthsRoomRepository {
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r37", DepthsRoomType.ABILITY, new Vector(34, 29, 31), new Vector(1.0, -15.0, -21.0), 14, RoomDirection.DOWN));
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r38", DepthsRoomType.ABILITY, new Vector(47, 54, 42), new Vector(1.0, -36.0, -21.0), 17, RoomDirection.DOWN));
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r40", DepthsRoomType.ABILITY, new Vector(49, 29, 35), new Vector(1.0, -10.0, -13.0), 11, RoomDirection.EVEN));
-		mF2NormalRooms.add(new DepthsRoom("depths/f2r41", DepthsRoomType.ABILITY, new Vector(44, 44, 43), new Vector(1.0, -25.0, -18.0), 14, RoomDirection.DOWN));
+		mF2NormalRooms.add(new DepthsRoom("depths/f2r41", DepthsRoomType.ABILITY, new Vector(44, 44, 43), new Vector(1.0, -26.0, -18.0), 14, RoomDirection.DOWN));
+		mF2NormalRooms.add(new DepthsRoom("depths/f2r46", DepthsRoomType.ABILITY, new Vector(42, 47, 54), new Vector(1.0, -20.0, -27.0), 10, RoomDirection.DOWN));
 
 		//F2 elite rooms
 		mF2EliteRooms.add(new DepthsRoom("depths/f2r1", DepthsRoomType.ABILITY, new Vector(32, 33, 35), new Vector(1.0, -3.0, -18.0), 20, RoomDirection.UP));
@@ -159,9 +172,11 @@ public class DepthsRoomRepository {
 		mF2EliteRooms.add(new DepthsRoom("depths/f2r39", DepthsRoomType.ABILITY, new Vector(56, 45, 60), new Vector(1.0, -20.0, -29.0), 20, RoomDirection.DOWN));
 		mF2EliteRooms.add(new DepthsRoom("depths/f2r42", DepthsRoomType.ABILITY, new Vector(52, 38, 71), new Vector(1.0, -29.0, -4.0), 17, RoomDirection.DOWN));
 		mF2EliteRooms.add(new DepthsRoom("depths/f2r43", DepthsRoomType.ABILITY, new Vector(51, 50, 70), new Vector(1.0, -38.0, -8.0), 18, RoomDirection.DOWN));
+		mF2EliteRooms.add(new DepthsRoom("depths/f2r44", DepthsRoomType.ABILITY, new Vector(46, 55, 65), new Vector(1.0, -40.0, -13.0), 27, RoomDirection.DOWN));
 
 		//F2 twisted rooms
-		mF2TwistedRooms.add(new DepthsRoom("depths/f2r33", DepthsRoomType.TWISTED, new Vector(57, 58, 57), new Vector(1.0, -25.0, -48.0), 51, RoomDirection.EVEN));
+		mF2TwistedRooms.add(new DepthsRoom("depths/f2r33", DepthsRoomType.TWISTED, new Vector(57, 58, 57), new Vector(1.0, -25.0, -48.0), 51, RoomDirection.DOWN));
+		mF2TwistedRooms.add(new DepthsRoom("depths/f2r47", DepthsRoomType.TWISTED, new Vector(106, 64, 80), new Vector(1.0, -11.0, -25.0), 61, RoomDirection.UP));
 
 		//F2 boss room
 		DepthsRoom f2r26 = new DepthsRoom("depths/f2r26", DepthsRoomType.BOSS, new Vector(73, 48, 56), new Vector(1.0, -11.0, -35.0), 0, RoomDirection.EVEN);
@@ -188,6 +203,7 @@ public class DepthsRoomRepository {
 		mF3NormalRooms.add(new DepthsRoom("depths/f3r38", DepthsRoomType.ABILITY, new Vector(39, 21, 29), new Vector(1.0, -6.0, -19.0), 6, RoomDirection.DOWN));
 		mF3NormalRooms.add(new DepthsRoom("depths/f3r39", DepthsRoomType.ABILITY, new Vector(34, 59, 33), new Vector(1.0, -6.0, -16.0), 13, RoomDirection.UP));
 		mF3NormalRooms.add(new DepthsRoom("depths/f3r40", DepthsRoomType.ABILITY, new Vector(60, 34, 47), new Vector(1.0, -6.0, -26.0), 14, RoomDirection.EVEN));
+		mF3NormalRooms.add(new DepthsRoom("depths/f3r41", DepthsRoomType.ABILITY, new Vector(34, 26, 42), new Vector(1.0, -2.0, -27.0), 14, RoomDirection.UP));
 
 		//F3 elite rooms
 		mF3EliteRooms.add(new DepthsRoom("depths/f3r5", DepthsRoomType.ABILITY, new Vector(39, 40, 40), new Vector(1.0, -5.0, -19.0), 28, RoomDirection.UP));
@@ -203,6 +219,7 @@ public class DepthsRoomRepository {
 		mF3EliteRooms.add(new DepthsRoom("depths/f3r29", DepthsRoomType.ABILITY, new Vector(61, 53, 60), new Vector(1.0, -8.0, -46.0), 23, RoomDirection.EVEN));
 		mF3EliteRooms.add(new DepthsRoom("depths/f3r31", DepthsRoomType.ABILITY, new Vector(53, 39, 45), new Vector(1.0, -12.0, -36.0), 18, RoomDirection.UP));
 		mF3EliteRooms.add(new DepthsRoom("depths/f3r32", DepthsRoomType.ABILITY, new Vector(52, 51, 61), new Vector(1.0, -8.0, -37.0), 21, RoomDirection.UP));
+		mF3EliteRooms.add(new DepthsRoom("depths/f3r42", DepthsRoomType.ABILITY, new Vector(50, 46, 63), new Vector(1.0, -29.0, -27.0), 21, RoomDirection.EVEN));
 
 		//F3 utility rooms
 		mF3UtilityRooms.add(new DepthsRoom("depths/f3r11", DepthsRoomType.UTILITY, new Vector(34, 26, 33), new Vector(1.0, -6.0, -16.0), 0, RoomDirection.EVEN));
@@ -246,7 +263,7 @@ public class DepthsRoomRepository {
 		party.setRoomX(spawn.getBlockX());
 
 		Plugin.getInstance().getLogger().info("Summoning structure " + room.mLoadPath);
-		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure \"" + room.mLoadPath + "\" " + spawn.getX() + " " + spawn.getY() + " " + spawn.getZ() + " true");
+		StructuresAPI.loadAndPasteStructure(room.mLoadPath, spawn, true);
 		return room;
 	}
 
@@ -353,6 +370,7 @@ public class DepthsRoomRepository {
 	 * Spawns the lobby for the next floor for the given party, and teleports
 	 * players to it/sets them up to continue playing
 	 * @param party the party to send to the next floor
+	 * @param treasure the treasure score given to the party
 	 */
 	public void goToNextFloor(DepthsParty party, int treasure) {
 
@@ -365,26 +383,40 @@ public class DepthsRoomRepository {
 
 		//Separate rooms by floor here
 		int nextFloorNum = party.getFloor() + 1;
+		String path;
 		if (nextFloorNum > CUSTOM_FLOOR_LOBBIES) {
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure \"depths/f11lobby\" " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " false");
+			path = "depths/f11lobby";
 		} else {
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure \"depths/f" + nextFloorNum + "lobby\" " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " false");
+			path = "depths/f" + nextFloorNum + "lobby";
 		}
 
-		//Tp all the players to it
-		for (DepthsPlayer dp : party.mPlayersInParty) {
-
-			Player p = Bukkit.getPlayer(dp.mPlayerId);
-			if (p != null) {
+		StructuresAPI.loadAndPasteStructure(path, loc, true).whenComplete((unused, ex) -> {
+			if (ex != null) {
+				ex.printStackTrace();
+				for (DepthsPlayer dp : party.mPlayersInParty) {
+					Player p = Bukkit.getPlayer(dp.mPlayerId);
+					if (p != null) {
+						p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + ChatColor.RED + "Failed to load lobby structure " + path + ". Contact a moderator.");
+					}
+				}
+			} else {
 				Location l = new Location(world, party.mFloorLobbyLoadPlayerTpPoint.getX(), party.mFloorLobbyLoadPlayerTpPoint.getY(), party.mFloorLobbyLoadPlayerTpPoint.getZ());
-				l.setYaw(270f);
-				p.teleport(l);
-				p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Your party earned " + treasure + " treasure score for clearing floor " + party.getFloor() + "! Sending your party to next floor.");
+				//Tp all the players to it
+				for (DepthsPlayer dp : party.mPlayersInParty) {
+					Player p = Bukkit.getPlayer(dp.mPlayerId);
+					if (p != null) {
+						l.setYaw(270f);
+						p.teleport(l);
+						PotionUtils.applyPotion(Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
+						p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Your party earned " + treasure + " treasure score for clearing floor " + party.getFloor() + "! Sending your party to next floor.");
+					}
+					PlayerUtils.executeCommandOnNearbyPlayers(l, 20, "stopsound @s record");
+				}
+				//Reset used rooms
+				party.mOldRooms.clear();
+				//Just in case they get stuck, set the spawner break trigger to zero
+				party.mSpawnersToBreak = 0;
 			}
-		}
-		//Reset used rooms
-		party.mOldRooms.clear();
-		//Just in case they get stuck, set the spawner break trigger to zero
-		party.mSpawnersToBreak = 0;
+		});
 	}
 }

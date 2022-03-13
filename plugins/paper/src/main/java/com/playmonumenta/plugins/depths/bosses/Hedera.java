@@ -20,6 +20,13 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -38,23 +45,16 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class Hedera extends BossAbilityGroup {
 	public static final String identityTag = "boss_hedera";
 	public static final int detectionRange = 70;
 	public static final String PLANT_STAND_TAG = "Plant";
 	public static final String DOOR_FILL_TAG = "Door";
-	public static final int PLANT_CONSUME_HP = 150;
+	public static final double PLANT_CONSUME_PERCENT = 0.05;
 	public static final int HEDERA_HEALTH = 4000;
 	public static final int SWAP_TARGET_SECONDS = 15;
 
+	public static final String MUSIC_TITLE = "epic:music.hedera";
 	private static final int MUSIC_DURATION = 202; //seconds
 
 	private final Location mSpawnLoc;
@@ -216,28 +216,15 @@ public class Hedera extends BossAbilityGroup {
 
 		//Finish animation
 		DepthsUtils.animate(mBoss.getLocation());
-		//Send players
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
-				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "stopsound @p");
-				if (!mMusicRunnable.isCancelled()) {
-					mMusicRunnable.cancel();
-				}
-			}
-
-		}.runTaskLater(mPlugin, 60);
 
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				DepthsManager.getInstance().goToNextFloor(PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).get(0));
+				DepthsManager.getInstance().goToNextFloor(EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange));
 			}
 
-		}.runTaskLater(mPlugin, 80);
+		}.runTaskLater(mPlugin, 20);
 	}
 
 	@Override
@@ -251,7 +238,7 @@ public class Hedera extends BossAbilityGroup {
 		}
 
 		//Consume random plant if there are any
-		if (mBoss.getHealth() < PLANT_CONSUME_HP && plantsAlive) {
+		if (mBoss.getHealth() < PLANT_CONSUME_PERCENT * EntityUtils.getMaxHealth(mBoss) && plantsAlive) {
 
 			//If not being damaged from a source, don't consume plants but don't take damage
 			if (event.getSource() == null) {
@@ -297,10 +284,10 @@ public class Hedera extends BossAbilityGroup {
 	BukkitRunnable mMusicRunnable = new BukkitRunnable() {
 		@Override
 		public void run() {
-			if (mBoss == null || mBoss.getHealth() <= 0) {
+			if (mBoss.isDead()) {
 				this.cancel();
 			}
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound epic:music.hedera record @s ~ ~ ~ 2");
+			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound " + MUSIC_TITLE + " record @s ~ ~ ~ 2");
 		}
 	};
 }

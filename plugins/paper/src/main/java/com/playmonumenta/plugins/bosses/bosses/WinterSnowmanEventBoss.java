@@ -1,11 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Collections;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
-
+import java.util.Collections;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;

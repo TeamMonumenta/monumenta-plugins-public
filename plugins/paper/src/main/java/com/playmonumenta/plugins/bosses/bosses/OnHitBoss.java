@@ -6,12 +6,11 @@ import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Collections;
 
 public class OnHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_onhit";
@@ -51,16 +50,15 @@ public class OnHitBoss extends BossAbilityGroup {
 			return;
 		}
 
-		if (damagee instanceof Player player) {
-			Location loc = damagee.getLocation().add(0, 1, 0);
+		Location loc = damagee.getLocation().add(0, 1, 0);
 
-			mParams.EFFECTS.apply(player, mBoss);
 
-			//Particle & Sound
-			mParams.SOUND.play(loc);
-			mParams.PARTICLE.spawn(loc, 0d, 0d, 0d);
-		}
 
+		mParams.EFFECTS.apply(damagee, mBoss);
+
+		//Particle & Sound
+		mParams.SOUND.play(loc);
+		mParams.PARTICLE.spawn(loc, 0d, 0d, 0d);
 
 	}
 

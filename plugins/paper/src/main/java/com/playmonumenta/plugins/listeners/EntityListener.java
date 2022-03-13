@@ -22,6 +22,17 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.scriptedquests.zones.Zone;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
@@ -91,18 +102,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.spigotmc.event.entity.EntityDismountEvent;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 public class EntityListener implements Listener {
 	private static final Set<Material> ENTITY_UNINTERACTABLE_MATS = EnumSet.of(
@@ -295,8 +294,8 @@ public class EntityListener implements Listener {
 					!(edbee.getDamager() instanceof Player player)
 						// OR The damage is from a player but the item frame/painting is invulnerable and the player is not in creative
 						|| (damagee.isInvulnerable() && !player.getGameMode().equals(GameMode.CREATIVE))
-						// OR the damage is from a player and they are in adventure mode
-						|| player.getGameMode().equals(GameMode.ADVENTURE)) {
+						// OR the damage is from a player and they are in adventure mode, and the item frame is not tagged "Removable"
+						|| (player.getGameMode().equals(GameMode.ADVENTURE) && !damagee.getScoreboardTags().contains("Removable"))) {
 					// Don't allow it
 					event.setCancelled(true);
 				}
@@ -629,39 +628,21 @@ public class EntityListener implements Listener {
 		affectedEntities.removeIf(entity -> (cloud.hasCustomEffect(PotionEffectType.SLOW) && entity instanceof Player && cloud.getSource() instanceof Player));
 
 		// Don't apply invisibility type lingering potions to players if created by an (invisible) creeper exploding
-		affectedEntities.removeIf(entity -> (cloud.hasCustomEffect(PotionEffectType.INVISIBILITY) && entity instanceof Player && cloud.getSource() instanceof Creeper));
+		affectedEntities.removeIf(entity -> ((cloud.hasCustomEffect(PotionEffectType.INVISIBILITY) || cloud.hasCustomEffect(PotionEffectType.SLOW_FALLING)) && entity instanceof Player && cloud.getSource() instanceof Creeper));
 
 		PotionData data = cloud.getBasePotionData();
-		PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 4) : null;
+		PotionInfo info = PotionUtils.getPotionInfo(data, 4);
 		List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
-		List<Player> affectedPlayers = new ArrayList<>();
 
 		// All affected players need to have the effect added to their potion manager.
 		for (LivingEntity entity : affectedEntities) {
 			if (entity instanceof Player player) {
-				affectedPlayers.add(player);
 				if (info != null) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
 				}
 
 				if (effects != null) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
-				}
-			}
-		}
-
-		for (Player p : affectedPlayers) {
-			Collection<PotionEffect> appliedEffects = p.getActivePotionEffects();
-			for (PotionEffect pe : appliedEffects) {
-				if (pe.getType().equals(PotionEffectType.SLOW_FALLING)) {
-					//Remove Slow Falling effects
-					p.sendMessage(ChatColor.RED + "You cannot apply slow falling potion effects, other effects were still applied.");
-					p.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-						@Override
-						public void run() {
-							p.removePotionEffect(PotionEffectType.SLOW_FALLING);
-						}
-					}, 1);
 				}
 			}
 		}

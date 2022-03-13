@@ -5,8 +5,9 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Color;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -16,9 +17,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class JollyBall extends SpellBaseSeekingProjectile {
 
@@ -85,7 +83,6 @@ public class JollyBall extends SpellBaseSeekingProjectile {
 
 			//List is sorted with nearest players earlier in the list, and farthest players at the end
 			List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), SnowSpirit.detectionRange);
-			players.removeIf(p -> p.getGameMode() == GameMode.SPECTATOR);
 
 			mBoss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, mBoss.getLocation(), 20, 1, 1, 1, 0);
 

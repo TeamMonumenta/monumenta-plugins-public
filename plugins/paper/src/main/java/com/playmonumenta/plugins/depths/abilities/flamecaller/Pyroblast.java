@@ -12,6 +12,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.List;
+import java.util.WeakHashMap;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,9 +26,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.List;
-import java.util.WeakHashMap;
 
 public class Pyroblast extends DepthsAbility {
 
@@ -64,7 +63,7 @@ public class Pyroblast extends DepthsAbility {
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, RADIUS);
 			for (LivingEntity mob : mobs) {
 				EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
-				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false, null);
+				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false);
 			}
 			World world = arrow.getWorld();
 			world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);
@@ -90,7 +89,6 @@ public class Pyroblast extends DepthsAbility {
 			arrow.setPierceLevel(0);
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
 
 			mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 

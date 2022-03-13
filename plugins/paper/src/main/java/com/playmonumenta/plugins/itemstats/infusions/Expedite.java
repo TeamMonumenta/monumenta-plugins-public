@@ -8,12 +8,11 @@ import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-import java.util.NavigableSet;
-import java.util.TreeSet;
 
 public class Expedite implements Infusion {
 
@@ -41,9 +40,9 @@ public class Expedite implements Infusion {
 		if (MetadataUtils.checkOnceThisTick(plugin, player, CHECK_ONCE_THIS_TICK_METAKEY)) {
 			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 			double percentSpeed = PERCENT_SPEED_PER_LEVEL * modifiedLevel;
-			NavigableSet<Effect> speedEffects = new TreeSet<>(plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME));
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
-			if (!speedEffects.isEmpty()) {
+			NavigableSet<Effect> oldEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
+			if (oldEffects != null && !oldEffects.isEmpty()) {
+				NavigableSet<Effect> speedEffects = new TreeSet<>(oldEffects);
 				for (Effect effect : speedEffects) {
 					double mag = effect.getMagnitude() / percentSpeed;
 					if (effect.getMagnitude() == percentSpeed * Math.min(5, mag + 1)) {
@@ -56,6 +55,7 @@ public class Expedite implements Infusion {
 			} else {
 				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed, PERCENT_SPEED_EFFECT_NAME));
 			}
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
 		}
 	}
 }

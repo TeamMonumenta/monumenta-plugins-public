@@ -2,16 +2,14 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
 import java.util.EnumSet;
 import java.util.List;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public class DepthsGUICommands {
 	public static void register(Plugin plugin) {
@@ -100,6 +98,18 @@ public class DepthsGUICommands {
 
 						new DepthsRemoveAbilityGUI(player).openInventory(player, plugin);
 					}))
+			.withSubcommand(new CommandAPICommand("mutateability")
+				.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+				.executes((sender, args) -> {
+					Player player = (Player) args[0];
+
+					if (!DepthsManager.getInstance().isInSystem(player) || DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mUsedAbilityMutation) {
+						MessagingUtils.sendActionBarMessage(player, "You've already mutated an ability on this floor!");
+						return;
+					}
+
+					new DepthsMutateAbilityGUI(player).openInventory(player, plugin);
+				}))
 			.register();
 	}
 }

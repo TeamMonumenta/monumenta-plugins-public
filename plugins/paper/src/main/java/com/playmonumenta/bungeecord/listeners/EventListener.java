@@ -1,13 +1,10 @@
 package com.playmonumenta.bungeecord.listeners;
 
+import com.playmonumenta.bungeecord.Main;
+import de.myzelyam.api.vanish.BungeeVanishAPI;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
-
-import com.playmonumenta.bungeecord.Main;
-
-import de.myzelyam.api.vanish.BungeeVanishAPI;
-
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;

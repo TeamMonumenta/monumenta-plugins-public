@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.itemstats;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
+import com.playmonumenta.plugins.itemstats.attributes.Armor;
 import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
 import com.playmonumenta.plugins.itemstats.enchantments.BlastProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.FeatherFalling;
@@ -12,10 +14,14 @@ import com.playmonumenta.plugins.itemstats.enchantments.MagicProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.MeleeProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.ProjectileProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Protection;
+import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheDepths;
 import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
+import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
+import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken;
+import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
+import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
-import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -23,6 +29,16 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.function.DoubleFunction;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -40,25 +56,23 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.function.DoubleFunction;
-import java.util.function.ToDoubleFunction;
-
 public class PlayerItemStatsGUI extends CustomInventory {
+
+	private static class Settings {
+		private final EnumSet<SecondaryStat> mSecondaryStatEnabled = EnumSet.noneOf(SecondaryStat.class);
+		private ItemStatUtils.Region mRegion = ItemStatUtils.Region.VALLEY;
+	}
 
 	private static class Stats {
 		private final PlayerItemStats mPlayerItemStats = new PlayerItemStats();
-		private final EnumSet<SecondaryStat> mSecondaryStatEnabled = EnumSet.noneOf(SecondaryStat.class);
 		private final EnumMap<Equipment, ItemStack> mEquipment = new EnumMap<>(Equipment.class);
 		private final EnumMap<Stat, Double> mStatCache = new EnumMap<>(Stat.class);
 		private final @Nullable Stats mMainStats;
+		private final Settings mSettings;
 
-		private Stats(@Nullable Stats mainStats) {
+		private Stats(@Nullable Stats mainStats, Settings settings) {
 			mMainStats = mainStats;
+			mSettings = settings;
 		}
 
 		private double get(AttributeType attr) {
@@ -73,7 +87,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			return mPlayerItemStats.getItemStats().get(ench.getItemStat());
 		}
 
-		private ItemStack getItem(Equipment slot) {
+		private @Nullable ItemStack getItem(Equipment slot) {
 			ItemStack result = mEquipment.get(slot);
 			if ((result == null || result.getType() == Material.AIR) && mMainStats != null) {
 				return mMainStats.mEquipment.get(slot);
@@ -96,39 +110,67 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		}
 
 		private double getAttributeAmount(AttributeType type, double base) {
-			return (base + getAttributeAmount(type, Operation.ADD)) * (1 + getAttributeAmount(type, Operation.MULTIPLY));
+			return getAttributeAmount(type, base, 0);
 		}
 
+		private double getAttributeAmount(AttributeType type, double base, double additionalModifier) {
+			return (base + getAttributeAmount(type, Operation.ADD)) * (1 + getAttributeAmount(type, Operation.MULTIPLY) + additionalModifier);
+		}
+
+		private ItemStatUtils.Region getMaximumRegion(boolean mainhand) {
+			return (mainhand ? Stream.of(Equipment.MAINHAND) : Arrays.stream(Equipment.values()).filter(slot -> slot != Equipment.MAINHAND))
+				.map(slot -> ItemStatUtils.getRegion(getItem(slot)))
+				.filter(region -> region == ItemStatUtils.Region.VALLEY || region == ItemStatUtils.Region.ISLES || region == ItemStatUtils.Region.RING)
+				.max(Comparator.naturalOrder())
+				.orElse(ItemStatUtils.Region.VALLEY);
+		}
+
+		private boolean hasLaterRegionEquipment(boolean mainhand) {
+			return getMaximumRegion(mainhand).compareTo(mSettings.mRegion) > 0;
+		}
+
+		private double getRegionScalingDamageDealtMultiplier() {
+			return hasLaterRegionEquipment(true) ? RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER : 1;
+		}
 	}
 
-	static double calculateDamageTaken(Stats stats, Protection protection) {
-		double armorBonus = 0;
-		double agilityBonus = 0;
-		for (SecondaryStat stat : SecondaryStat.values()) {
-			if (stats.mSecondaryStatEnabled.contains(stat)) {
-				if (stat.isArmorModifier()) {
-					armorBonus += stats.get(stat.getEnchantmentType());
-				} else {
-					agilityBonus += stats.get(stat.getEnchantmentType());
-				}
-			}
-		}
-
+	static double calculateDamageMultiplier(Stats stats, Protection protection) {
 		double armor = stats.get(AttributeType.ARMOR);
 		double agility = stats.get(AttributeType.AGILITY);
-		// TODO: remove the magic number 0.2 (preferably link it to some constant declared in the enchantment classes themselves)
-		if (stats.get(EnchantmentType.ADAPTABILITY) > 0) {
-			if (armor > agility) {
-				armor *= 1 + 0.2 * (armorBonus + agilityBonus);
+
+		double armorBonus = 0;
+		double agilityBonus = 0;
+		for (SecondaryStat stat : stats.mSettings.mSecondaryStatEnabled) {
+			if (stat.isArmorModifier()) {
+				armorBonus += Shielding.ARMOR_BONUS_PER_LEVEL * stats.get(stat.getEnchantmentType());
 			} else {
-				agility *= 1 + 0.2 * (armorBonus + agilityBonus);
+				agilityBonus += Shielding.ARMOR_BONUS_PER_LEVEL * stats.get(stat.getEnchantmentType());
 			}
-		} else {
-			armor *= 1 + 0.2 * armorBonus;
-			agility *= 1 + 0.2 * agilityBonus;
 		}
 
-		return DamageUtils.getDamageMultiplier(armor, agility, protection.getEPF() * stats.get(protection.getEnchantmentType()), protection.getType().isEnvironmental());
+		boolean adaptability = stats.get(EnchantmentType.ADAPTABILITY) > 0;
+		double epf = protection.getEPF() * stats.get(protection.getEnchantmentType());
+
+		ItemStatUtils.Region maxRegion = stats.getMaximumRegion(false);
+
+		boolean region2 = stats.mSettings.mRegion.compareTo(ItemStatUtils.Region.ISLES) >= 0;
+		double damageMultiplier = Armor.getDamageMultiplier(armor, armorBonus, agility, agilityBonus,
+			Armor.getSecondaryEnchantCap(region2), adaptability, epf, protection.getType().isEnvironmental());
+
+		// when Steadfast is enabled, also include Second Wind in calculation
+		if (stats.mSettings.mSecondaryStatEnabled.contains(SecondaryStat.STEADFAST)) {
+			damageMultiplier *= SecondWind.getDamageMultiplier(stats.get(EnchantmentType.SECOND_WIND));
+		}
+
+		if (stats.get(EnchantmentType.PROTECTION_OF_THE_DEPTHS) > 0) {
+			damageMultiplier *= ProtectionOfTheDepths.getDamageMultiplier(region2);
+		}
+
+		if (maxRegion.compareTo(stats.mSettings.mRegion) > 0) {
+			damageMultiplier *= RegionScalingDamageTaken.DAMAGE_TAKEN_MULTIPLIER;
+		}
+
+		return damageMultiplier;
 	}
 
 	private static final DecimalFormat NUMBER_FORMATTER = new DecimalFormat("0.##");
@@ -154,12 +196,12 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		EFFECTIVE_LIFE_DRAIN("Life Drain on crit in %HP", PERCENT, stats -> LIFE_DRAIN.get(stats) / HEALTH.get(stats)),
 
 		// These stats are damage taken, but get displayed as damage reduction
-		MELEE_DAMAGE_TAKEN("Melee", ONE_MINUS_PERCENT, stats -> calculateDamageTaken(stats, new MeleeProtection()), false, DR_CHANGE_FORMAT),
-		PROJECTILE_DAMAGE_TAKEN("Projectile", ONE_MINUS_PERCENT, stats -> calculateDamageTaken(stats, new ProjectileProtection()), false, DR_CHANGE_FORMAT),
-		MAGIC_DAMAGE_TAKEN("Magic", ONE_MINUS_PERCENT, stats -> calculateDamageTaken(stats, new MagicProtection()), false, DR_CHANGE_FORMAT),
-		BLAST_DAMAGE_TAKEN("Blast", ONE_MINUS_PERCENT, stats -> calculateDamageTaken(stats, new BlastProtection()), false, DR_CHANGE_FORMAT),
-		FIRE_DAMAGE_TAKEN("Fire", ONE_MINUS_PERCENT, stats -> calculateDamageTaken(stats, new FireProtection()), false, DR_CHANGE_FORMAT),
-		FALL_DAMAGE_TAKEN("Fall", ONE_MINUS_PERCENT, stats -> calculateDamageTaken(stats, new FeatherFalling()), false, DR_CHANGE_FORMAT),
+		MELEE_DAMAGE_TAKEN("Melee", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new MeleeProtection()), false, DR_CHANGE_FORMAT),
+		PROJECTILE_DAMAGE_TAKEN("Projectile", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new ProjectileProtection()), false, DR_CHANGE_FORMAT),
+		MAGIC_DAMAGE_TAKEN("Magic", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new MagicProtection()), false, DR_CHANGE_FORMAT),
+		BLAST_DAMAGE_TAKEN("Blast", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new BlastProtection()), false, DR_CHANGE_FORMAT),
+		FIRE_DAMAGE_TAKEN("Fire", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new FireProtection()), false, DR_CHANGE_FORMAT),
+		FALL_DAMAGE_TAKEN("Fall", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new FeatherFalling()), false, DR_CHANGE_FORMAT),
 
 		// These stats are effective damage taken, but get displayed as effective damage reduction
 		EFFECTIVE_MELEE_DAMAGE_TAKEN("Melee", ONE_MINUS_PERCENT, stats -> MELEE_DAMAGE_TAKEN.get(stats) * 20.0 / HEALTH.get(stats), false, DR_CHANGE_FORMAT),
@@ -190,13 +232,13 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		// melee
 		ATTACK_DAMAGE("Attack Damage", NUMBER, stats -> (1 + stats.get(AttributeType.ATTACK_DAMAGE_ADD)) * stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY, 1)),
 		ATTACK_DAMAGE_ADD("+flat Attack Damage", NUMBER, stats -> stats.get(AttributeType.ATTACK_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD)),
-		ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", PERCENT, stats -> stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY, 1) - 1),
+		ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", PERCENT, stats -> stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY, 1) * stats.getRegionScalingDamageDealtMultiplier() - 1),
 		ATTACK_SPEED("Attack Speed", NUMBER, stats -> stats.getAttributeAmount(AttributeType.ATTACK_SPEED, 4)),
 
 		// projectile
 		PROJECTILE_DAMAGE("Projectile Damage", NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) * stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY, 1)),
 		PROJECTILE_DAMAGE_ADD("+flat Projectile Damage", NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD)),
-		PROJECTILE_MULTIPLY("+% Projectile Damage", PERCENT, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY, 1) - 1),
+		PROJECTILE_DAMAGE_MULTIPLY("+% Projectile Damage", PERCENT, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY, 1) * stats.getRegionScalingDamageDealtMultiplier() - 1),
 		PROJECTILE_SPEED("Projectile Speed", NUMBER, stats -> {
 			ItemStack mainhand = stats.getItem(Equipment.MAINHAND);
 			if (ItemUtils.isBowOrTrident(mainhand)) {
@@ -226,15 +268,17 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		// magic
 		SPELL_POWER("Spell Power", PERCENT, stats -> stats.get(AttributeType.SPELL_DAMAGE)),
 		MAGIC_DAMAGE_ADD("+flat Magic Damage", NUMBER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_ADD)),
-		MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", PERCENT, stats -> stats.get(AttributeType.MAGIC_DAMAGE_MULTIPLY, 1) - 1),
+		MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", PERCENT, stats -> stats.get(AttributeType.MAGIC_DAMAGE_MULTIPLY, 1) * stats.getRegionScalingDamageDealtMultiplier() - 1),
 		COOLDOWN_MULTIPLIER("Cooldown Multiplier", PERCENT, stats -> (1 + Aptitude.getCooldownPercentage(stats.get(EnchantmentType.APTITUDE)))
 			                                                             * (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE))), false),
 		// misc
 		ARMOR("Total Armor", NUMBER, stats -> stats.get(AttributeType.ARMOR)),
 		AGILITY("Total Agility", NUMBER, stats -> stats.get(AttributeType.AGILITY)),
-		MOVEMENT_SPEED("Movement Speed", PERCENT, stats -> stats.getAttributeAmount(AttributeType.SPEED, 0.1) / 0.1),
+		MOVEMENT_SPEED("Movement Speed", PERCENT,
+			stats -> stats.getAttributeAmount(AttributeType.SPEED, 0.1, stats.hasLaterRegionEquipment(false) ? RegionScalingDamageTaken.SPEED_EFFECT : 0) / 0.1),
 		KNOCKBACK_RESISTANCE("Knockback Resistance", PERCENT, stats -> stats.getAttributeAmount(AttributeType.KNOCKBACK_RESISTANCE, 0)),
-		THORNS_DAMAGE("Thorns Damage", NUMBER, stats -> stats.get(AttributeType.THORNS)),
+		THORNS_DAMAGE("Thorns Damage", NUMBER, stats -> stats.get(AttributeType.THORNS) * stats.getRegionScalingDamageDealtMultiplier()),
+		MINING_SPEED("Mining Speed", NUMBER, stats -> ItemUtils.getMiningSpeed(stats.getItem(Equipment.MAINHAND)) * (stats.hasLaterRegionEquipment(true) ? 0.3 : 1)),
 
 		;
 
@@ -333,7 +377,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	private static final StatItem PROJECTILE_INFO = new StatItem(31, Material.BOW,
 		Component.text("Projectile", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
-		Stat.PROJECTILE_DAMAGE, Stat.PROJECTILE_DAMAGE_ADD, Stat.PROJECTILE_MULTIPLY, Stat.PROJECTILE_SPEED, Stat.PROJECTILE_RATE);
+		Stat.PROJECTILE_DAMAGE, Stat.PROJECTILE_DAMAGE_ADD, Stat.PROJECTILE_DAMAGE_MULTIPLY, Stat.PROJECTILE_SPEED, Stat.PROJECTILE_RATE);
 
 	private static final StatItem MAGIC_INFO = new StatItem(32, Material.BLAZE_ROD,
 		Component.text("Magic", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
@@ -341,7 +385,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	private static final StatItem MISC_INFO = new StatItem(40, Material.LEATHER_BOOTS,
 		Component.text("Misc", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
-		Stat.ARMOR, Stat.AGILITY, Stat.MOVEMENT_SPEED, Stat.KNOCKBACK_RESISTANCE, Stat.THORNS_DAMAGE);
+		Stat.ARMOR, Stat.AGILITY, Stat.MOVEMENT_SPEED, Stat.KNOCKBACK_RESISTANCE, Stat.THORNS_DAMAGE, Stat.MINING_SPEED);
 
 	private static final StatItem[] STAT_ITEMS = {
 		HEALTH_INFO,
@@ -351,28 +395,54 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	};
 
 	private enum SecondaryStat {
-		SHIELDING(0, Material.NAUTILUS_SHELL, EnchantmentType.SHIELDING, true),
-		POISE(1, Material.LILY_OF_THE_VALLEY, EnchantmentType.POISE, true),
-		INURE(2, Material.NETHERITE_SCRAP, EnchantmentType.INURE, true),
-		STEADFAST(3, Material.LEAD, EnchantmentType.STEADFAST, true),
-		ETHEREAL(5, Material.PHANTOM_MEMBRANE, EnchantmentType.ETHEREAL, false),
-		REFLEXES(6, Material.ENDER_EYE, EnchantmentType.REFLEXES, false),
-		EVASION(7, Material.ELYTRA, EnchantmentType.EVASION, false),
-		TEMPO(8, Material.CLOCK, EnchantmentType.TEMPO, false);
-		// TODO second wind?
+		SHIELDING(0, Material.NAUTILUS_SHELL, EnchantmentType.SHIELDING, true, """
+			Gain (Level*20%) effective Armor
+			when taking damage from an enemy within 2 blocks.
+			Taking damage that would stun a shield
+			disables Shielding for 5 seconds."""),
+		POISE(1, Material.LILY_OF_THE_VALLEY, EnchantmentType.POISE, true, """
+			Gain (Level*20%) effective Armor
+			when above 90% Max Health."""),
+		INURE(2, Material.NETHERITE_SCRAP, EnchantmentType.INURE, true, """
+			Gain (Level*20%) effective Armor
+			when taking the same type of mob damage consecutively
+			(Melee, Projectile, Blast, or Magic)."""),
+		STEADFAST(3, Material.LEAD, EnchantmentType.STEADFAST, true, """
+			Scaling with percent health missing,
+			gain up to (Level*20%) effective Armor,
+			but lose up to (Level*10%) Speed
+			(0.25% armor and -0.125% speed per 1% health lost,
+			up to 20% armor and -10% speed).
+			Also calculates bonus from Second Wind when enabled."""),
+		ETHEREAL(5, Material.PHANTOM_MEMBRANE, EnchantmentType.ETHEREAL, false, """
+			Gain (Level*20%) effective Agility
+			on hits taken within 1.5 seconds of any previous hit."""),
+		REFLEXES(6, Material.ENDER_EYE, EnchantmentType.REFLEXES, false, """
+			Gain (Level*20%) effective Agility
+			when there are 4 or more enemies within 8 blocks."""),
+		EVASION(7, Material.ELYTRA, EnchantmentType.EVASION, false, """
+			Gain (Level*20%) effective Agility
+			when taking damage from a source further
+			than 5 blocks from the player."""),
+		TEMPO(8, Material.CLOCK, EnchantmentType.TEMPO, false, """
+			Gain (Level*20%) effective Agility
+			on the first hit taken after
+			4 seconds of taking no damage.""");
 
 		private final int mSlot;
 		private final Material mIcon;
 		private final String mName;
 		private final boolean mIsArmorModifier;
 		private final EnchantmentType mEnchantmentType;
+		private final String mDescription;
 
-		SecondaryStat(int slot, Material icon, EnchantmentType enchantmentType, boolean isArmorModifier) {
+		SecondaryStat(int slot, Material icon, EnchantmentType enchantmentType, boolean isArmorModifier, String description) {
 			mSlot = slot;
 			mIcon = icon;
 			mName = enchantmentType.getName();
 			mEnchantmentType = enchantmentType;
 			mIsArmorModifier = isArmorModifier;
+			mDescription = description;
 		}
 
 		public int getSlot() {
@@ -397,6 +467,10 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 		public Component getDisplay(boolean enabled) {
 			return Component.text(String.format("Calculate Bonus from %s%s", mName, enabled ? " - Enabled" : " - Disabled"), enabled ? NamedTextColor.GREEN : NamedTextColor.GRAY).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
+		}
+
+		public List<Component> getDisplayLore() {
+			return Arrays.stream(mDescription.split("\n")).map(line -> (Component) Component.text(line, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)).toList();
 		}
 	}
 
@@ -440,10 +514,17 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		}
 	}
 
+	private static final int REGION_SETTING_SLOT = 4;
+	private static final ImmutableMap<ItemStatUtils.Region, ItemStack> REGION_ICONS = ImmutableMap.of(
+		ItemStatUtils.Region.VALLEY, ItemUtils.parseItemStack("{id:\"minecraft:cyan_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"sc\",Color:3},{Pattern:\"mc\",Color:11},{Pattern:\"flo\",Color:15},{Pattern:\"bts\",Color:11},{Pattern:\"tts\",Color:11}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: King\\'s Valley\",\"italic\":false,\"bold\":true,\"color\":\"aqua\"}'}}}"),
+		ItemStatUtils.Region.ISLES, ItemUtils.parseItemStack("{id:\"minecraft:green_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"gru\",Color:5},{Pattern:\"bo\",Color:13},{Pattern:\"mr\",Color:13},{Pattern:\"mc\",Color:5}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: Celsian Isles\",\"italic\":false,\"bold\":true,\"color\":\"green\"}'}}}")
+	);
+
 	private static final int SWAP_EQUIPMENT_SET_SLOT = 49;
 
-	private final Stats mLeftStats = new Stats(null);
-	private final Stats mRightStats = new Stats(mLeftStats);
+	private final Settings mSettings = new Settings();
+	private final Stats mLeftStats = new Stats(null, mSettings);
+	private final Stats mRightStats = new Stats(mLeftStats, mSettings);
 
 	private final EnumMap<Equipment, ItemStack> mOriginalEquipmentLeft = new EnumMap<>(Equipment.class);
 	private final EnumMap<Equipment, ItemStack> mOriginalEquipmentRight = new EnumMap<>(Equipment.class);
@@ -452,15 +533,16 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private @Nullable Equipment mSelectedEquipmentsSlot = null;
 
 	public PlayerItemStatsGUI(Player player) {
-		super(player, 54, Component.text("Player Stats Calculator", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		setEquipmentFromPlayer(false, player);
-		generateInventory();
+		this(player, null);
 	}
 
-	public PlayerItemStatsGUI(Player player, Player otherPlayer) {
+	public PlayerItemStatsGUI(Player player, @Nullable Player otherPlayer) {
 		super(player, 54, Component.text("Player Stats Calculator", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 		setEquipmentFromPlayer(false, player);
-		setEquipmentFromPlayer(true, otherPlayer);
+		if (otherPlayer != null) {
+			setEquipmentFromPlayer(true, otherPlayer);
+		}
+		mSettings.mRegion = Stream.of(mLeftStats.getMaximumRegion(false), mRightStats.getMaximumRegion(false)).max(Comparator.naturalOrder()).orElse(ItemStatUtils.Region.VALLEY);
 		generateInventory();
 	}
 
@@ -502,13 +584,17 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				return;
 			}
 
+			if (slot == REGION_SETTING_SLOT) {
+				mSettings.mRegion = mSettings.mRegion == ItemStatUtils.Region.VALLEY ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY;
+				generateInventory();
+				return;
+			}
+
 			for (SecondaryStat stat : SecondaryStat.values()) {
 				if (slot == stat.getSlot()) {
-					if (!mLeftStats.mSecondaryStatEnabled.remove(stat)) {
-						mLeftStats.mSecondaryStatEnabled.add(stat);
+					if (!mSettings.mSecondaryStatEnabled.remove(stat)) {
+						mSettings.mSecondaryStatEnabled.add(stat);
 					}
-					mRightStats.mSecondaryStatEnabled.clear();
-					mRightStats.mSecondaryStatEnabled.addAll(mLeftStats.mSecondaryStatEnabled);
 					generateInventory();
 					return;
 				}
@@ -558,10 +644,10 @@ public class PlayerItemStatsGUI extends CustomInventory {
 					    && item.getItemMeta() instanceof BlockStateMeta meta
 					    && meta.getBlockState() instanceof ShulkerBox shulker) {
 					Stats stats;
-					if (mSelectedEquipmentsSlot != null) {
+					if (event.getClick().isShiftClick()) {
+						stats = event.getClick().isLeftClick() ? mRightStats : mLeftStats;
+					} else if (mSelectedEquipmentsSlot != null) {
 						stats = mSelectedRightEquipmentSet ? mRightStats : mLeftStats;
-					} else if (event.getClick().isShiftClick()) {
-						stats = mRightStats;
 					} else {
 						return;
 					}
@@ -582,13 +668,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				}
 				Equipment targetSlot = null;
 				boolean targetRightSet = false;
-				if (mSelectedEquipmentsSlot != null) {
-					if (isValid(mSelectedEquipmentsSlot, item.getType())) {
-						targetSlot = mSelectedEquipmentsSlot;
-						targetRightSet = mSelectedRightEquipmentSet;
-					}
-				} else if (event.getClick().isShiftClick()) {
-					targetRightSet = true;
+				if (event.getClick().isShiftClick()) {
+					targetRightSet = event.getClick().isLeftClick();
 					for (Equipment equipment : new Equipment[] {Equipment.HEAD, Equipment.CHEST, Equipment.LEGS, Equipment.FEET}) {
 						if (isValid(equipment, item.getType())) {
 							targetSlot = equipment;
@@ -601,6 +682,11 @@ public class PlayerItemStatsGUI extends CustomInventory {
 						} else {
 							targetSlot = Equipment.MAINHAND;
 						}
+					}
+				} else if (mSelectedEquipmentsSlot != null) {
+					if (isValid(mSelectedEquipmentsSlot, item.getType())) {
+						targetSlot = mSelectedEquipmentsSlot;
+						targetRightSet = mSelectedRightEquipmentSet;
 					}
 				}
 				if (targetSlot != null) {
@@ -640,12 +726,18 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	private static @Nullable ItemStack getWarningIcon(Stats stats) {
 		List<Component> warnings = new ArrayList<>();
+		if (stats.hasLaterRegionEquipment(false)) {
+			warnings.add(Component.text("Build has equipment of a later region.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+		}
+		if (stats.hasLaterRegionEquipment(true)) {
+			warnings.add(Component.text("Build has mainhand of a later region.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+		}
 		if (stats.get(EnchantmentType.CURSE_OF_CORRUPTION) > 1) {
 			warnings.add(Component.text("Build has more than one Curse of Corruption item.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		}
 		if (stats.get(EnchantmentType.TWO_HANDED) > 0
-			&& stats.getItem(Equipment.OFFHAND) != null
-			&& ItemStatUtils.getEnchantmentLevel(stats.getItem(Equipment.OFFHAND), EnchantmentType.WEIGHTLESS) == 0) {
+			    && stats.getItem(Equipment.OFFHAND) != null
+			    && ItemStatUtils.getEnchantmentLevel(stats.getItem(Equipment.OFFHAND), EnchantmentType.WEIGHTLESS) == 0) {
 			warnings.add(Component.text("Build has a Two Handed item, but not a Weightless offhand.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		}
 		if (warnings.isEmpty()) {
@@ -677,6 +769,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		swapItem.setItemMeta(swapItemMeta);
 		mInventory.setItem(SWAP_EQUIPMENT_SET_SLOT, swapItem);
 
+		mInventory.setItem(REGION_SETTING_SLOT, REGION_ICONS.get(mSettings.mRegion));
+
 		for (StatItem statItem : STAT_ITEMS) {
 			mInventory.setItem(statItem.mSlot, statItem.getDisplay(mLeftStats, mRightStats.mEquipment.isEmpty() ? null : mRightStats));
 		}
@@ -684,12 +778,13 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		for (SecondaryStat stat : SecondaryStat.values()) {
 			ItemStack item = getCleanItem(new ItemStack(stat.getIcon(), 1));
 			ItemMeta meta = item.getItemMeta();
-			if (mLeftStats.mSecondaryStatEnabled.contains(stat)) {
+			if (mSettings.mSecondaryStatEnabled.contains(stat)) {
 				meta.displayName(stat.getDisplay(true));
 				meta.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
 			} else {
 				meta.displayName(stat.getDisplay(false));
 			}
+			meta.lore(stat.getDisplayLore());
 
 			item.setItemMeta(meta);
 

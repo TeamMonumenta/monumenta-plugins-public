@@ -21,7 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -57,8 +56,8 @@ public class Quickdraw extends Ability {
 			return;
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		Damageable damageable = (Damageable) inMainHand.getItemMeta();
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isSomeBow(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability()) && !ItemStatUtils.isShattered(inMainHand)) {
+		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isShootableItem(inOffHand) && !ItemStatUtils.isShattered(inMainHand)) {
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.4f);
 			world.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
@@ -72,13 +71,6 @@ public class Quickdraw extends Ability {
 					for (int i = 0; i < 2; i++) {
 						shootArrow(inMainHand, 2 * i - 1);
 					}
-				}
-
-				//Shatter bow if durability is 0 and isn't shattered.
-				//This is needed because QuickDraw doesn't consume durability, but there is a high-damage uncommon bow
-				//with 0 durability that should not be infinitely usable with the QuickDraw ability
-				if ((damageable.getDamage() >= inMainHand.getType().getMaxDurability()) && !ItemStatUtils.isShattered(inMainHand)) {
-					ItemStatUtils.shatter(inMainHand);
 				}
 			}
 		}

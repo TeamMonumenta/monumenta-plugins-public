@@ -1,15 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseTrail;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
-
+import java.util.Arrays;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -51,6 +49,9 @@ public final class FlameTrailBoss extends BossAbilityGroup {
 
 		@BossParam(help = "not written")
 		public boolean TRAIL_GROUND_ONLY = true;
+
+		@BossParam(help = "The spell name shown when a player is killed by this skill")
+		public String SPELL_NAME = "";
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -73,7 +74,7 @@ public final class FlameTrailBoss extends BossAbilityGroup {
 					(World world, Player player, Location loc) -> {
 						world.playSound(loc, Sound.ENTITY_GENERIC_BURN, 0.5f, 1f);
 						player.setFireTicks(p.FIRE_DURATION);
-						DamageUtils.damage(boss, player, DamageType.MAGIC, p.DAMAGE);
+						DamageUtils.damage(boss, player, DamageType.MAGIC, p.DAMAGE, null, false, false, p.SPELL_NAME);
 					},
 					// Expire Action
 					(World world, Location loc) -> { })

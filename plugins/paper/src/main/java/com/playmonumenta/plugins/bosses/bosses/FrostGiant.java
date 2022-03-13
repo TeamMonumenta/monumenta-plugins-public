@@ -30,6 +30,15 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -54,7 +63,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EntityEquipment;
@@ -66,16 +74,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /* WARNING: Basically all the spell info in the comments is outdated.
  * Please use the Frost Giant Formal Write-up for up to date spell descriptions.
@@ -197,6 +195,24 @@ public class FrostGiant extends BossAbilityGroup {
 
 	private @Nullable LivingEntity mTargeted;
 	private @Nullable Location mStuckLoc;
+
+	/* Thresholds, multipliers, and variables for the Last Stand Mechanic
+	 * Thresholds determine how many players out of the original group size must be remaining for the Last Stand to trigger. Treated as a percentage; 0 = never triggers, 1 = triggers instantly.
+	 * Current values are set to 30% of players for Threshold A, and 15% of players for Threshold B
+	 * Minimum Start Players determines how many players must be present at the start of the boss fight for Last Stand to trigger.
+	 * Last Stand Multipliers are applied to damage dealt to the Frost Giant Boss (115% at Threshold A, 130% at Threshold B)
+	 */
+	private static final int MINIMUM_START_PLAYERS_LAST_STAND = 10;
+	private static final float LAST_STAND_A_THRESHOLD = 0.6F;
+	private static final float LAST_STAND_B_THRESHOLD = 0.3F;
+	private static final float LAST_STAND_A_MULTIPLIER = 1.15F;
+	private static final float LAST_STAND_B_MULTIPLIER = 1.3F;
+
+	//Variables for tracking starting players, and what thresholds have been met:
+	private int mBossStartPlayers;
+	private boolean mCanLastStand = false;
+	private boolean mLastStandAFired = false;
+	private boolean mLastStandBFired = false;
 
 	private final UltimateSeismicRuin mRuin;
 
@@ -338,10 +354,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 								//List is farthest players in the beginning, and nearest players at the end
 								List<Player> players = EntityUtils.getNearestPlayers(mStartLoc, detectionRange);
-								if (players == null || players.size() < 0) {
-									return;
-								}
-								players.removeIf(p -> p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR || p.getScoreboardTags().contains("disable_class"));
+								players.removeIf(p -> p.getGameMode() == GameMode.CREATIVE || p.getScoreboardTags().contains("disable_class"));
 								for (Player player : players) {
 									if (mTargeted == null || !player.getUniqueId().equals(mTargeted.getUniqueId())) {
 										c.setTarget(player);
@@ -483,6 +496,7 @@ public class FrostGiant extends BossAbilityGroup {
 			}
 			changePhase(phase2Spells, phase2PassiveSpells, null);
 			mFrostArmorActive = true;
+			changeArmorPhase(mBoss.getEquipment(), false);
 			mPreventTargetting = false;
 			mBoss.setAI(true);
 			mRuin.run();
@@ -509,6 +523,7 @@ public class FrostGiant extends BossAbilityGroup {
 			}
 			changePhase(phase3Spells, phase3PassiveSpells, null);
 			mFrostArmorActive = true;
+			changeArmorPhase(mBoss.getEquipment(), false);
 			mPreventTargetting = false;
 			mBoss.setAI(true);
 			mRuin.run();
@@ -528,6 +543,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I... WILL NOT... BE THE END... OF THE SONG!\",\"color\":\"dark_aqua\"}]");
 			mFrostArmorActive = true;
+			changeArmorPhase(mBoss.getEquipment(), false);
 			changePhase(phase4Spells, phase4PassiveSpells, null);
 			mBoss.setAI(true);
 			for (Spell sp : phase3PassiveSpells) {
@@ -941,17 +957,6 @@ public class FrostGiant extends BossAbilityGroup {
 	}
 
 	@Override
-	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
-		if (event.getModifiedType().equals(PotionEffectType.SLOW)) {
-			if (event.getNewEffect().getAmplifier() > 0) {
-				event.getNewEffect().withAmplifier(event.getNewEffect().getAmplifier() - 1);
-			} else {
-				event.setCancelled(true);
-			}
-		}
-	}
-
-	@Override
 	public void bossChangedTarget(EntityTargetEvent event) {
 		if (!mCutsceneDone) {
 			event.setCancelled(true);
@@ -969,6 +974,16 @@ public class FrostGiant extends BossAbilityGroup {
 
 	@Override
 	public void onHurt(DamageEvent event) {
+		//last stand handling block
+		if (mCanLastStand) {
+			if (mLastStandBFired) {
+				double baseDmg = event.getDamage();
+				event.setDamage(baseDmg * LAST_STAND_B_MULTIPLIER);
+			} else if (mLastStandAFired) {
+				double baseDmg = event.getDamage();
+				event.setDamage(baseDmg * LAST_STAND_A_MULTIPLIER);
+			}
+		}
 		LivingEntity source = event.getSource();
 		if (!mFrostArmorActive) {
 			if (source instanceof Player player) {
@@ -1063,6 +1078,7 @@ public class FrostGiant extends BossAbilityGroup {
 	public void init() {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 		int playerCount = players.size();
+		mBossStartPlayers = playerCount;
 		int hpDel = 5000;
 
 		double bossTargetHp = hpDel * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
@@ -1079,6 +1095,38 @@ public class FrostGiant extends BossAbilityGroup {
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 9999, 10));
 
 		mBoss.setPersistent(true);
+		if (mBossStartPlayers >= MINIMUM_START_PLAYERS_LAST_STAND) {
+			mCanLastStand = true;
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (!mLastStandAFired || !mLastStandBFired) {
+						List<Player> currentPlayers = PlayerUtils.playersInRange(mStartLoc, detectionRange, true);
+						int currentPlayerCount = currentPlayers.size();
+						float percentPlayersRemaining = ((float) currentPlayerCount) / mBossStartPlayers;
+						if (!mLastStandAFired && percentPlayersRemaining <= LAST_STAND_A_THRESHOLD) {
+							mLastStandAFired = true;
+							for (Player player : currentPlayers) {
+								player.sendMessage(Component.text("You feel stronger as ancestral War Horns bellow out from below...\nYou now deal more damage to Eldrask.", NamedTextColor.YELLOW));
+								player.playSound(player.getLocation(), Sound.EVENT_RAID_HORN, SoundCategory.HOSTILE, 0.5F, 0.9F);
+							}
+						}
+						if (!mLastStandBFired && mLastStandAFired && percentPlayersRemaining <= LAST_STAND_B_THRESHOLD) {
+							mLastStandBFired = true;
+							for (Player player : currentPlayers) {
+								player.sendMessage(Component.text("Alric's War Horns shake the ground beneath your feet as he lends you immense strength...\nYou now deal even more damage to Eldrask!", NamedTextColor.GOLD));
+								player.playSound(player.getLocation(), Sound.EVENT_RAID_HORN, SoundCategory.HOSTILE, 0.7F, 0.5F);
+							}
+						}
+					} else {
+						this.cancel();
+					}
+					if (mBoss.isDead() || !mBoss.isValid()) {
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 20 * 2, 20 * 2);
+		}
 
 		for (Player player : players) {
 			if (player.hasPotionEffect(PotionEffectType.GLOWING)) {

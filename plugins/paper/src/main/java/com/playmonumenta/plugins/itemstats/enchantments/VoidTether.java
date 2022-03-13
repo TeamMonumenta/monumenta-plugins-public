@@ -4,6 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -13,10 +16,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class VoidTether implements Enchantment {
 	private static final Map<UUID, Location> PLAYER_LOCS = new HashMap<>();

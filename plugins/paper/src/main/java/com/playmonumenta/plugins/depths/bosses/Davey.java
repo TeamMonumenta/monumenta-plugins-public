@@ -23,6 +23,13 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -38,14 +45,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class Davey extends BossAbilityGroup {
 	public static final String identityTag = "boss_davey";
 	public static final int detectionRange = 50;
@@ -54,6 +53,7 @@ public class Davey extends BossAbilityGroup {
 	public static final String VEX_LOS = "AbyssalSpawn";
 	public static final int SWAP_TARGET_SECONDS = 15;
 
+	public static final String MUSIC_TITLE = "epic:music.varcosa";
 	private static final int MUSIC_DURATION = 196; //seconds
 
 	private final Location mSpawnLoc;
@@ -110,15 +110,15 @@ public class Davey extends BossAbilityGroup {
 				}
 
 				List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-				if (players != null && players.size() > 0) {
+				if (players.size() > 0) {
 					Collections.shuffle(players);
 					mDavey.setTarget(players.get(0));
 				}
-				if (players != null && players.size() > 0 && mVexes.size() >= 1 && mVexes.get(0) != null) {
+				if (players.size() > 0 && mVexes.size() >= 1 && mVexes.get(0) != null) {
 					Collections.shuffle(players);
 					((Mob) mVexes.get(0)).setTarget(players.get(0));
 				}
-				if (players != null && players.size() > 0 && mVexes.size() >= 2 && mVexes.get(1) != null) {
+				if (players.size() > 0 && mVexes.size() >= 2 && mVexes.get(1) != null) {
 					Collections.shuffle(players);
 					((Mob) mVexes.get(1)).setTarget(players.get(0));
 				}
@@ -204,28 +204,15 @@ public class Davey extends BossAbilityGroup {
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
 		DepthsUtils.animate(mBoss.getLocation());
-		//Send players
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
-				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "stopsound @p");
-				if (!mMusicRunnable.isCancelled()) {
-					mMusicRunnable.cancel();
-				}
-			}
-
-		}.runTaskLater(mPlugin, 60);
 
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				DepthsManager.getInstance().goToNextFloor(PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).get(0));
+				DepthsManager.getInstance().goToNextFloor(EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange));
 			}
 
-		}.runTaskLater(mPlugin, 80);
+		}.runTaskLater(mPlugin, 20);
 	}
 
 	@Override
@@ -239,10 +226,10 @@ public class Davey extends BossAbilityGroup {
 	BukkitRunnable mMusicRunnable = new BukkitRunnable() {
 		@Override
 		public void run() {
-			if (mBoss == null || mBoss.getHealth() <= 0) {
+			if (mBoss.isDead()) {
 				this.cancel();
 			}
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound epic:music.varcosa record @s ~ ~ ~ 2");
+			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound " + MUSIC_TITLE + " record @s ~ ~ ~ 2");
 		}
 	};
 }

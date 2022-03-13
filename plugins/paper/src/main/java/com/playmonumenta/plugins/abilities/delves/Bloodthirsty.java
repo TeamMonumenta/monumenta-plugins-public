@@ -5,10 +5,10 @@ import com.playmonumenta.plugins.bosses.bosses.CoordinatedAttackBoss;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.FastUtils;
+import javax.annotation.Nullable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
-import javax.annotation.Nullable;
 
 public class Bloodthirsty extends DelveModifier {
 

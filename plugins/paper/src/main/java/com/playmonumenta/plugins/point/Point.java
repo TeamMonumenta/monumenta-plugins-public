@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.point;
 
 import com.playmonumenta.plugins.utils.CommandUtils;
+import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import javax.annotation.Nullable;
 
 public class Point {
 	public double mX;

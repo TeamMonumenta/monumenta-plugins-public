@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
@@ -136,6 +137,7 @@ import com.playmonumenta.plugins.abilities.warrior.berserker.RecklessSwing;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -150,6 +152,16 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+import com.playmonumenta.redissync.event.PlayerSaveEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -175,17 +187,9 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 public class AbilityManager {
 
@@ -198,6 +202,10 @@ public class AbilityManager {
 	private final List<Ability> mReferenceAbilities;
 	private final List<Ability> mDisabledAbilities;
 	private final Map<UUID, AbilityCollection> mAbilities = new HashMap<>();
+
+	//Only used for MultipleChargeAbilities
+	private final Map<UUID, HashMap<ClassAbility, Integer>> mChargeTracker = new HashMap<>();
+	private static final String KEY_PLUGIN_DATA = "AbilityCharges";
 
 	//Public manager methods
 	//---------------------------------------------------------------------------------------------------------------
@@ -460,9 +468,9 @@ public class AbilityManager {
 		}
 		// This zooms the player's screen obnoxiously, so try not to do it if it's not needed
 		if (movementSpeed != null
-			&& movementSpeed.getValue() != 0.1
-			&& !player.getGameMode().equals(GameMode.CREATIVE)
-			&& !player.getGameMode().equals(GameMode.SPECTATOR)) {
+			    && movementSpeed.getValue() != 0.1
+			    && !player.getGameMode().equals(GameMode.CREATIVE)
+			    && !player.getGameMode().equals(GameMode.SPECTATOR)) {
 			movementSpeed.setBaseValue(0.1);
 		}
 
@@ -782,8 +790,44 @@ public class AbilityManager {
 	public void playerQuitEvent(Player player, PlayerQuitEvent event) {
 		conditionalCast(player, (ability) -> ability.playerQuitEvent(event));
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			mAbilities.remove(player.getUniqueId());
+			UUID uuid = player.getUniqueId();
+			mAbilities.remove(uuid);
+			mChargeTracker.remove(uuid);
 		}, 5);
+	}
+
+	public void playerSaveEvent(Player player, PlayerSaveEvent event) {
+		HashMap<ClassAbility, Integer> charges = mChargeTracker.get(player.getUniqueId());
+		if (charges != null) {
+			JsonObject data = new JsonObject();
+			for (Map.Entry<ClassAbility, Integer> entry : charges.entrySet()) {
+				data.addProperty(entry.getKey().getName(), entry.getValue());
+			}
+			event.setPluginData(KEY_PLUGIN_DATA, data);
+		}
+	}
+
+	public void playerJoinEvent(Player player, PlayerJoinEvent event) {
+		UUID uuid = player.getUniqueId();
+		JsonObject chargesData = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_PLUGIN_DATA);
+		if (chargesData != null) {
+			HashMap<ClassAbility, Integer> chargeMap = new HashMap<>();
+			for (Map.Entry<String, JsonElement> entry : chargesData.entrySet()) {
+				ClassAbility ability = ClassAbility.getAbility(entry.getKey());
+				if (ability != null) {
+					if (entry.getValue().isJsonPrimitive() && entry.getValue().getAsJsonPrimitive().isNumber()) {
+						chargeMap.put(ability, entry.getValue().getAsJsonPrimitive().getAsInt());
+					} else {
+						mPlugin.getLogger().warning("Got player " + player.getName() + " with ability charge for " + ability.getName() + " with unknown value '" + entry.getValue() + "'");
+					}
+				} else {
+					mPlugin.getLogger().warning("Got player " + player.getName() + " with unknown ability charges: " + entry.getKey());
+				}
+			}
+			if (!chargeMap.isEmpty()) {
+				mChargeTracker.put(uuid, chargeMap);
+			}
+		}
 	}
 
 	public void playerInteractEvent(Player player, Action action, Material blockClicked) {
@@ -866,6 +910,27 @@ public class AbilityManager {
 
 		// Run updatePlayerAbilities to clear existing ability effects.
 		updatePlayerAbilities(player);
+	}
+
+	public void trackCharges(Player player, ClassAbility ability, int charges) {
+		UUID uuid = player.getUniqueId();
+		HashMap<ClassAbility, Integer> playerCharges = mChargeTracker.get(uuid);
+		if (playerCharges == null) {
+			playerCharges = new HashMap<>();
+		}
+		playerCharges.put(ability, charges);
+		mChargeTracker.put(uuid, playerCharges);
+	}
+
+	public int getTrackedCharges(Player player, ClassAbility ability) {
+		HashMap<ClassAbility, Integer> playerCharges = mChargeTracker.get(player.getUniqueId());
+		if (playerCharges != null) {
+			Integer charges = playerCharges.get(ability);
+			if (charges != null) {
+				return charges.intValue();
+			}
+		}
+		return 0;
 	}
 
 	//---------------------------------------------------------------------------------------------------------------

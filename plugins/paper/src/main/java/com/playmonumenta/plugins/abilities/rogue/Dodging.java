@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import java.util.Collection;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -105,6 +107,9 @@ public class Dodging extends Ability {
 		Projectile proj = event.getEntity();
 		// See if we should dodge. If false, allow the event to proceed normally
 		if (proj.getShooter() instanceof Player) {
+			return true;
+		}
+		if (mPlayer.getActiveItem() != null && mPlayer.getActiveItem().getType() == Material.SHIELD) {
 			return true;
 		}
 		if (!dodge()) {

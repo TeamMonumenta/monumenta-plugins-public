@@ -11,16 +11,15 @@ import dev.jorel.commandapi.arguments.FunctionArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.ObjectiveArgument;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TeleportByScore extends GenericCommand {
 	private static final String COMMAND = "teleportbyscore";

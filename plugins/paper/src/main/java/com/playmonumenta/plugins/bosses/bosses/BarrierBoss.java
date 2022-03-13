@@ -1,16 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBarrier;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -25,6 +23,9 @@ public class BarrierBoss extends BossAbilityGroup {
 		public int COOLDOWN = 5 * 20;
 		@BossParam(help = "not written")
 		public int HITS_TO_BREAK = 1;
+
+		@BossParam(help = "not written")
+		public boolean IS_CARAPACE = false;
 
 		@BossParam(help = "Particle summon at boss loc")
 		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,4,0,1,0,0,#ffffff,2)]");
@@ -45,7 +46,7 @@ public class BarrierBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, boss, p.DETECTION, p.COOLDOWN, p.HITS_TO_BREAK,
+		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, boss, p.DETECTION, p.COOLDOWN, p.HITS_TO_BREAK, p.IS_CARAPACE,
 				(Location loc) -> {
 					p.SOUND_REFRESH.play(loc);
 				}, (Location loc) -> {

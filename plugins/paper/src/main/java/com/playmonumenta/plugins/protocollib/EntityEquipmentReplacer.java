@@ -8,12 +8,13 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.Pair;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTType;
-import org.bukkit.inventory.ItemStack;
-
 import java.util.List;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Removes unnecessary info from equipment items to reduce network load.
@@ -38,7 +39,9 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 				continue;
 			}
 			NBTItem nbtItem = new NBTItem(item);
-			nbtItem.removeKey("BlockEntityTag"); // most important one - shulker contents
+			if (item.getType() != Material.SHIELD && !ItemUtils.isBanner(item)) {
+				nbtItem.removeKey("BlockEntityTag"); // most important one - shulker contents, and also other invisible block entity data
+			}
 			if (nbtItem.getType("display") == NBTType.NBTTagCompound) {
 				NBTCompound display = nbtItem.getCompound("display");
 				display.removeKey("Lore"); // plain.display.Lore is still sent which is used by the RP

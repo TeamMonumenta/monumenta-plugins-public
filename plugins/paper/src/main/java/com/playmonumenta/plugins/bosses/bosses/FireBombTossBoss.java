@@ -1,15 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
+import java.util.Arrays;
+import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -46,6 +44,9 @@ public class FireBombTossBoss extends BossAbilityGroup {
 
 		@BossParam(help = "not written")
 		public int FIRE_DURATION = 20 * 8;
+
+		@BossParam(help = "The spell name shown when a player is killed by this skill")
+		public String SPELL_NAME = "";
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -67,8 +68,8 @@ public class FireBombTossBoss extends BossAbilityGroup {
 						for (Player player : PlayerUtils.playersInRange(loc, p.RADIUS, true)) {
 							if (player.hasLineOfSight(tnt)) {
 								double multiplier = (p.RADIUS - player.getLocation().distance(loc)) / p.RADIUS;
-								BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE * multiplier);
-								player.setFireTicks((int)(p.FIRE_DURATION * multiplier));
+								BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE * multiplier, p.SPELL_NAME, boss.getLocation());
+								player.setFireTicks((int) (p.FIRE_DURATION * multiplier));
 							}
 						}
 					})

@@ -14,8 +14,12 @@ import org.bukkit.potion.PotionEffectType;
 
 public class SpellForce extends SpellBaseAoE {
 
+	public SpellForce(Plugin plugin, LivingEntity launcher, int radius, int time, int cooldown, boolean needNearPlayers, ChargeAuraAction chargeAura, ChargeCircleAction chargeCircle, OutburstAction outburst, CircleOutburstAction circleOutburstAction, DealDamageAction damageAction) {
+		super(plugin, launcher, radius, time, cooldown, true, needNearPlayers, Sound.ENTITY_IRON_GOLEM_ATTACK, 1, 1, chargeAura, chargeCircle, outburst, circleOutburstAction, damageAction);
+	}
+
 	public SpellForce(Plugin plugin, LivingEntity launcher, int radius, int time, int cooldown, ChargeAuraAction chargeAura, ChargeCircleAction chargeCircle, OutburstAction outburst, CircleOutburstAction circleOutburstAction, DealDamageAction damageAction) {
-		super(plugin, launcher, radius, time, cooldown, true, Sound.ENTITY_IRON_GOLEM_ATTACK, chargeAura, chargeCircle, outburst, circleOutburstAction, damageAction);
+		this(plugin, launcher, radius, time, cooldown, true, chargeAura, chargeCircle, outburst, circleOutburstAction, damageAction);
 	}
 
 	public SpellForce(Plugin plugin, LivingEntity launcher, int radius, int time) {

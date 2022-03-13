@@ -12,6 +12,15 @@ import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTList;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
@@ -31,17 +40,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Pattern;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 public class ItemUtils {
@@ -380,9 +379,10 @@ public class ItemUtils {
 
 	// Returns an ItemDeathResult reporting what should happen to an item when the player carrying it dies.
 	public static ItemDeathResult getItemDeathResult(ItemStack item) {
-		if (isItemCurseOfVanishingII(item)) {
+		int vanishingLevel = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_VANISHING);
+		if (vanishingLevel >= 2) {
 			return ItemDeathResult.DESTROY;
-		} else if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
+		} else if (vanishingLevel == 1 || item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
 			return ItemDeathResult.SHATTER_NOW;
 		} else if (ShulkerShortcutListener.isEnderExpansion(item)) {
 			return ItemDeathResult.KEEP;
@@ -629,15 +629,6 @@ public class ItemUtils {
 		meta.setColor(color);
 		potion.setItemMeta(meta);
 		ItemUtils.setPlainName(potion);
-	}
-
-	// TODO: all of these methods are redundant, the sources should just directly use ItemStatUtils
-	public static boolean isItemCurseOfVanishingII(ItemStack item) {
-		if (item != null && item.getType() != Material.AIR) {
-			return ItemStatUtils.getEnchantmentLevel(ItemStatUtils.getEnchantments(new NBTItem(item)), EnchantmentType.CURSE_OF_VANISHING) == 2;
-		}
-
-		return false;
 	}
 
 	public static boolean isShootableItem(ItemStack item) {
@@ -1088,6 +1079,40 @@ public class ItemUtils {
 		}
 	}
 
+	public static int getMiningSpeed(@Nullable ItemStack itemStack) {
+		if (itemStack == null) {
+			return 1;
+		}
+		int baseSpeed = switch (itemStack.getType()) {
+			case WOODEN_PICKAXE, WOODEN_AXE, WOODEN_SHOVEL -> 2;
+			case STONE_PICKAXE, STONE_AXE, STONE_SHOVEL -> 4;
+			case IRON_PICKAXE, IRON_AXE, IRON_SHOVEL -> 6;
+			case DIAMOND_PICKAXE, DIAMOND_AXE, DIAMOND_SHOVEL -> 8;
+			case NETHERITE_PICKAXE, NETHERITE_AXE, NETHERITE_SHOVEL -> 9;
+			case GOLDEN_PICKAXE, GOLDEN_AXE, GOLDEN_SHOVEL -> 12;
+			default -> 1;
+		};
+		if (baseSpeed == 1) {
+			return 1;
+		}
+		int efficiency = ItemStatUtils.getEnchantmentLevel(itemStack, EnchantmentType.EFFICIENCY);
+		return baseSpeed + (efficiency > 0 ? efficiency * efficiency + 1 : 0);
+	}
+
+	public static boolean isBanner(@Nullable ItemStack itemStack) {
+		if (itemStack == null) {
+			return false;
+		}
+		return switch (itemStack.getType()) {
+			case BLACK_BANNER, BLACK_WALL_BANNER, BLUE_BANNER, BLUE_WALL_BANNER, BROWN_BANNER, BROWN_WALL_BANNER, CYAN_BANNER, CYAN_WALL_BANNER,
+				     GRAY_BANNER, GRAY_WALL_BANNER, GREEN_BANNER, GREEN_WALL_BANNER, LIGHT_BLUE_BANNER, LIGHT_BLUE_WALL_BANNER,
+				     LIGHT_GRAY_BANNER, LIGHT_GRAY_WALL_BANNER, LIME_BANNER, LIME_WALL_BANNER, MAGENTA_BANNER, MAGENTA_WALL_BANNER,
+				     ORANGE_BANNER, ORANGE_WALL_BANNER, PINK_BANNER, PINK_WALL_BANNER, PURPLE_BANNER, PURPLE_WALL_BANNER,
+				     RED_BANNER, RED_WALL_BANNER, WHITE_BANNER, WHITE_WALL_BANNER, YELLOW_BANNER, YELLOW_WALL_BANNER -> true;
+			default -> false;
+		};
+	}
+
 	public static boolean hasLore(ItemStack item) {
 		return item.hasItemMeta() && item.getItemMeta().hasLore();
 	}
@@ -1207,5 +1232,17 @@ public class ItemUtils {
 		NBTItem nbtItem = new NBTItem(item);
 		String itemTag = nbtItem.toString();
 		return "/give @s " + itemId + itemTag + " " + item.getAmount();
+	}
+
+	public static Component getItemNameComponent(ItemStack item) {
+		if (hasPlainName(item)) {
+			return Component.text(getPlainName(item));
+		} else {
+			return Component.translatable(item.getType().getTranslationKey());
+		}
+	}
+
+	public static Component getItemNameComponentWithHover(ItemStack item) {
+		return getItemNameComponent(item).hoverEvent(item.asHoverEvent());
 	}
 }

@@ -1,35 +1,52 @@
 package com.playmonumenta.plugins.adapters;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Locale;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import net.minecraft.server.v1_16_R3.ChatMessage;
 import net.minecraft.server.v1_16_R3.DamageSource;
 import net.minecraft.server.v1_16_R3.EntityDamageSource;
 import net.minecraft.server.v1_16_R3.EntityLiving;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.v1_16_R3.EntityTypes;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.Vec3D;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 public class VersionAdapter_v1_16_R3 implements VersionAdapter {
+
+	public void removeAllMetadata(Plugin plugin) {
+		CraftServer server = (CraftServer) plugin.getServer();
+		server.getEntityMetadata().removeAll(plugin);
+		server.getPlayerMetadata().removeAll(plugin);
+		server.getWorldMetadata().removeAll(plugin);
+		for (World world : Bukkit.getWorlds()) {
+			((CraftWorld) world).getBlockMetadata().removeAll(plugin);
+		}
+	}
+
 	public void resetPlayerIdleTimer(Player player) {
-		CraftPlayer p = (CraftPlayer)player;
+		CraftPlayer p = (CraftPlayer) player;
 		EntityPlayer playerHandle = p.getHandle();
 		playerHandle.resetIdleTimer();
 	}
@@ -69,7 +86,7 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	}
 
 	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg) {
-		DamageSource reason = new CustomDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle(), blockable, killedUsingMsg);
+		DamageSource reason = damager == null ? DamageSource.GENERIC : new CustomDamageSource(((CraftLivingEntity) damager).getHandle(), blockable, killedUsingMsg);
 
 		((CraftLivingEntity) damagee).getHandle().damageEntity(reason, (float) amount);
 	}
@@ -212,6 +229,19 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	public void cancelStrafe(Mob mob) {
 		((CraftMob) mob).getHandle().t(0);
 		((CraftMob) mob).getHandle().v(0);
+	}
+
+	@Override
+	public Entity spawnWorldlessEntity(EntityType type, World world) {
+		Optional<EntityTypes<?>> entityTypes = EntityTypes.getByName(type.name().toLowerCase(Locale.ROOT));
+		if (entityTypes.isEmpty()) {
+			throw new IllegalArgumentException("Invalid entity type " + type.name());
+		}
+		net.minecraft.server.v1_16_R3.Entity entity = entityTypes.get().a(((CraftWorld) world).getHandle());
+		if (entity == null) {
+			throw new IllegalArgumentException("Unspawnable entity type " + type.name());
+		}
+		return entity.getBukkitEntity();
 	}
 
 	@Override

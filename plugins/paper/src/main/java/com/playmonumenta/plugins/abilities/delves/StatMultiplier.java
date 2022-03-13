@@ -6,6 +6,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -14,10 +17,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntitySpawnEvent;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class StatMultiplier extends DelveModifier {
 
@@ -52,7 +51,7 @@ public class StatMultiplier extends DelveModifier {
 		STAT_COMPENSATION_MAPPINGS.put("teal", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("forum", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("shiftingcity", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("depths", 0.9);
+		STAT_COMPENSATION_MAPPINGS.put("depths", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev1", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev2", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("mobs", 1.0);
@@ -97,10 +96,20 @@ public class StatMultiplier extends DelveModifier {
 	}
 
 	public static double getDamageMultiplier(int depthPoints) {
+		if (isDepthsShard()) {
+			double basePoints = Math.min(25, depthPoints);
+			double bonusPoints = Math.max(0, (depthPoints - 25) / 2.0);
+			return 1 + ((basePoints + bonusPoints) * DAMAGE_MULTIPLIER_INCREMENT);
+		}
 		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * DAMAGE_MULTIPLIER_INCREMENT;
 	}
 
 	public static double getHealthMultiplier(int depthPoints) {
+		if (isDepthsShard()) {
+			double basePoints = Math.min(25, depthPoints);
+			double bonusPoints = Math.max(0, (depthPoints - 25) / 2.0);
+			return 1 + ((basePoints + bonusPoints) * DAMAGE_MULTIPLIER_INCREMENT);
+		}
 		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * HEALTH_MULTIPLIER_INCREMENT;
 	}
 
@@ -112,6 +121,12 @@ public class StatMultiplier extends DelveModifier {
 		return DelvesUtils.getDelveInfo(player).getDepthPoints() > 0;
 	}
 
+	public static boolean isDepthsShard() {
+		return ServerProperties.getShardName().contains("depths")
+			|| ServerProperties.getShardName().equals("mobs")
+			|| ServerProperties.getShardName().startsWith("dev");
+	}
+
 	@Override
 	public boolean canUse(Player player) {
 		return canUseStatic(player);
@@ -120,8 +135,16 @@ public class StatMultiplier extends DelveModifier {
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (source == null) {
+			// only scale entity damage, not environmental damage
 			return;
 		}
+
+		String spellName = event.getBossSpellName();
+		if (spellName != null && (Arcanic.SPELL_NAMES.contains(spellName) || Infernal.SPELL_NAMES.contains(spellName) || Transcendent.SPELL_NAMES.contains(spellName))) {
+			// do not scale abilities from delve modifiers (no stat compensation, and they have their own region scaling)
+			return;
+		}
+
 		if (DelvesUtils.isDelveMob(source)) {
 			event.setDamage(event.getDamage() * mDelveMobStatMultiplier);
 		} else {

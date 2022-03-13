@@ -3,10 +3,9 @@ package com.playmonumenta.plugins.classes;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.Ability;
-import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
-
 import java.util.ArrayList;
+import javax.annotation.Nullable;
+import org.bukkit.inventory.ItemStack;
 
 
 public class PlayerSpec {

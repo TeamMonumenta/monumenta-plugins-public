@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.tracking;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Player;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.UUID;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.FishHook;
+import org.bukkit.entity.Player;
 
 public class FishingHookTracking implements EntityTracking {
 	private HashMap<UUID, FishHook> mEntities = new HashMap<UUID, FishHook>();

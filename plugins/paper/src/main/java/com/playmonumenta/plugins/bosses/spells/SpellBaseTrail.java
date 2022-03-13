@@ -1,16 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
-import org.bukkit.Bukkit;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 public class SpellBaseTrail extends Spell {
 
@@ -119,7 +117,7 @@ public class SpellBaseTrail extends Spell {
 			}
 		}
 
-		for (Player player : Bukkit.getOnlinePlayers()) {
+		for (Player player : mBoss.getWorld().getPlayers()) {
 			BoundingBox target = player.getBoundingBox();
 			Iterator<Map.Entry<Location, TrailNode>> iterHit = mTrailNodes.entrySet().iterator();
 			while (iterHit.hasNext()) {

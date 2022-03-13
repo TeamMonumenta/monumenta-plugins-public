@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -11,6 +12,8 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.InheritanceNode;
@@ -18,9 +21,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class JoinGuild {
 	public static void register(Plugin plugin) {
@@ -77,6 +77,7 @@ public class JoinGuild {
 				// Success indicators
 				player.sendMessage(ChatColor.GOLD + "Congratulations! You have joined " + guildName + "!");
 				p.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.GOLD + " has joined your guild");
+				MonumentaNetworkChatIntegration.refreshPlayer(plugin, player);
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
 				                       "execute at " + player.getName()
 				                       + " run summon minecraft:firework_rocket ~ ~1 ~ "

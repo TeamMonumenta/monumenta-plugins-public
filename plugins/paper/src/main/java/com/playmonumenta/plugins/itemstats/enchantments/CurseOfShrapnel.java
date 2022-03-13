@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -31,8 +32,10 @@ public class CurseOfShrapnel implements Enchantment {
 	@Override
 	public void onBlockBreak(Plugin plugin, Player player, double level, BlockBreakEvent event) {
 		if (ItemUtils.isPickaxe(player.getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
-			DamageUtils.damage(null, player, DamageEvent.DamageType.OTHER, level, null, true, false);
 			player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation().add(0, 1, 0), 8, 0.4, 0.4, 0.4, 0.1);
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				DamageUtils.damage(null, player, DamageEvent.DamageType.OTHER, level, null, true, false);
+			});
 		}
 	}
 

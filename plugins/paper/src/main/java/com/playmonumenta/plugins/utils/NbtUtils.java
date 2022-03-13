@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.utils;
 
 import de.tr7zw.nbtapi.NBTCompound;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.jetbrains.annotations.Nullable;
 
 public class NbtUtils {
 	/*

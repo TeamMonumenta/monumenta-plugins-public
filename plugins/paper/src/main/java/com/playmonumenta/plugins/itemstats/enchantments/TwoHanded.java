@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -9,12 +14,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.itemstats.Enchantment;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 
 public class TwoHanded implements Enchantment {
 

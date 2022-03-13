@@ -23,6 +23,7 @@ import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SteelStallion extends DepthsAbility {
@@ -128,6 +129,14 @@ public class SteelStallion extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.5f);
 
 		MessagingUtils.sendActionBarMessage(mPlayer, "Steel Stallion has been activated!");
+	}
+
+	@Override
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		if (mHorse != null) {
+			mHorse.remove();
+			mHorse = null;
+		}
 	}
 
 	public static boolean isSteelStallion(Entity entity) {

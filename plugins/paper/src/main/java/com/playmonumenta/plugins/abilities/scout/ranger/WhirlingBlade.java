@@ -10,6 +10,9 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.Iterator;
+import java.util.List;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,10 +26,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
-
-import java.util.Iterator;
-import java.util.List;
 
 
 public class WhirlingBlade extends MultipleChargeAbility {
@@ -61,6 +60,8 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 		mMaxCharges = isLevelOne() ? BLADE_1_MAX_CHARGES : BLADE_2_MAX_CHARGES;
+		mMaxCharges = getAbilityScore() == 1 ? BLADE_1_MAX_CHARGES : BLADE_2_MAX_CHARGES;
+		mCharges = getTrackedCharges();
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {

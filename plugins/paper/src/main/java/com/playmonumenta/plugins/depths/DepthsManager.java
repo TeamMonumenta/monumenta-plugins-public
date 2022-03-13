@@ -94,20 +94,6 @@ import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Type;
@@ -122,6 +108,18 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 /**
  * This is the main brain of the depths plugin, responsible for handling all interactions from
@@ -373,9 +371,6 @@ public class DepthsManager {
 		List<DepthsPlayer> depthsPlayers = new ArrayList<>();
 		DepthsParty partyToAdd = null;
 		for (Player p : nearbyPlayers) {
-			if (p.getGameMode() == GameMode.SPECTATOR) {
-				continue;
-			}
 			if (mPlayers.get(p.getUniqueId()) == null) {
 				DepthsPlayer dp = new DepthsPlayer(p);
 				mPlayers.put(p.getUniqueId(), dp);
@@ -551,6 +546,16 @@ public class DepthsManager {
 		List<DepthsAbility> filteredList = new ArrayList<>();
 		for (DepthsAbility da : getAbilities()) {
 			if (filter.contains(da.getDepthsTree())) {
+				filteredList.add(da);
+			}
+		}
+		return filteredList;
+	}
+
+	public static List<DepthsAbility> getMutatedAbilities(List<DepthsTree> filter, DepthsTrigger trigger) {
+		List<DepthsAbility> filteredList = new ArrayList<>();
+		for (DepthsAbility da : getAbilities()) {
+			if (filter.contains(da.getDepthsTree()) && da.getTrigger() == trigger) {
 				filteredList.add(da);
 			}
 		}
@@ -1209,6 +1214,7 @@ public class DepthsManager {
 		String removedAbility = null;
 		int index = 0;
 		int removedLevel = 1;
+		boolean isMutated = false;
 		while (removedAbility == null) {
 			if (index >= abilityList.size()) {
 				return;
@@ -1222,14 +1228,29 @@ public class DepthsManager {
 			}
 			index++;
 		}
+		for (DepthsAbility da : getAbilities()) {
+			if (da.getDisplayName().equals(removedAbility)) {
+				if (!(dp.mEligibleTrees.contains(da.getDepthsTree()))) {
+					isMutated = true;
+				}
+			}
+		}
 		setPlayerLevelInAbility(removedAbility, p, 0);
 		p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Removed ability: " + removedAbility);
 		dp.mUsedChaosThisFloor = true;
 
 		//Give 2 random abilities that aren't the one we just removed
-
 		for (int i = 0; i < 2; i++) {
 			List<DepthsAbility> abilities = getFilteredAbilities(dp.mEligibleTrees);
+			if (isMutated) {
+				List<DepthsTree> validTrees = new ArrayList<>();
+				for (DepthsTree tree : DepthsTree.values()) {
+					if (!dp.mEligibleTrees.contains(tree)) {
+						validTrees.add(tree);
+					}
+				}
+				abilities = getFilteredAbilities(validTrees);
+			}
 
 			//Do not give any abilities that have the same trigger as abilities that are currently offered in an ability reward
 			//This is needed because players can open up an ability reward, not choose anything, then take mystery box or chaos and end up with two abilities on a trigger
@@ -1260,7 +1281,7 @@ public class DepthsManager {
 
 	/**
 	 * Sends the party to the next floor (boss death for each will call this)
-	 * @param p player- get their party and send them to next floor
+	 * @param p player - get their party and send them to next floor
 	 */
 	public void goToNextFloor(Player p) {
 		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
@@ -1445,6 +1466,38 @@ public class DepthsManager {
 				break;
 			}
 		}
+	}
+
+	public void getMutatedAbility(Player p, DepthsPlayer dp, DepthsTrigger trigger, String currentAbility) {
+		//Give random ability
+		List<DepthsTree> validTrees = new ArrayList<>();
+		for (DepthsTree tree : DepthsTree.values()) {
+			if (!dp.mEligibleTrees.contains(tree)) {
+				validTrees.add(tree);
+			}
+		}
+		List<DepthsAbility> abilities = getMutatedAbilities(validTrees, trigger);
+
+		//Clear any upgrades the player may have for the ability they are mutating
+		List<DepthsAbilityItem> upgradeOffering = mUpgradeOfferings.get(p.getUniqueId());
+		if (upgradeOffering != null) {
+			for (DepthsAbilityItem offeredUpgrade : upgradeOffering) {
+				DepthsTrigger currentTrigger = offeredUpgrade.mTrigger;
+				if (trigger == currentTrigger) {
+					mUpgradeOfferings.remove(p.getUniqueId());
+				}
+			}
+		}
+
+		Collections.shuffle(abilities);
+		if (abilities.get(0).getDisplayName().equals(currentAbility) && abilities.size() > 1) {
+			setPlayerLevelInAbility(abilities.get(1).getDisplayName(), p, 1);
+			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + abilities.get(1).getDisplayName() + " at " + DepthsUtils.getRarityText(1) + " level!");
+		} else if (abilities.size() > 0) {
+			setPlayerLevelInAbility(abilities.get(0).getDisplayName(), p, 1);
+			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + abilities.get(0).getDisplayName() + " at " + DepthsUtils.getRarityText(1) + " level!");
+		}
+
 	}
 
 	/**

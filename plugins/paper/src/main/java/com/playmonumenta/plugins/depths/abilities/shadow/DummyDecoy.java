@@ -14,6 +14,8 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.List;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,8 +30,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.List;
 
 public class DummyDecoy extends DepthsAbility {
 
@@ -61,7 +61,6 @@ public class DummyDecoy extends DepthsAbility {
 		arrow.setPierceLevel(0);
 		arrow.setCritical(true);
 		arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-		arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
 		arrow.setMetadata(DUMMY_DECOY_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
 
 		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SPELL_WITCH);
@@ -100,7 +99,7 @@ public class DummyDecoy extends DepthsAbility {
 		arrow.remove();
 
 		LivingEntity e = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, DUMMY_NAME);
-		e.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(HEALTH[mRarity - 1]);
+		EntityUtils.setAttributeBase(e, Attribute.GENERIC_MAX_HEALTH, HEALTH[mRarity - 1]);
 		e.setHealth(HEALTH[mRarity - 1]);
 
 		BossManager bossManager = BossManager.getInstance();

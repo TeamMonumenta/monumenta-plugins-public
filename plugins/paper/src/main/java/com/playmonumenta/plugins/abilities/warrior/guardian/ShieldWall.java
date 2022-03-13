@@ -13,6 +13,9 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -121,7 +124,7 @@ public class ShieldWall extends Ability {
 									mMobsAlreadyHit.add(le);
 									Vector v = le.getVelocity();
 
-									DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), SHIELD_WALL_DAMAGE, false, true, false, null);
+									DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), SHIELD_WALL_DAMAGE, false, true, false);
 
 									//Bosses should not be affected by slowness or knockback.
 									if (knockback && !e.getScoreboardTags().contains("Boss")) {

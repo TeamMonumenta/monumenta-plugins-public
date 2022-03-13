@@ -3,13 +3,12 @@ package com.playmonumenta.plugins.player;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.Constants.Objectives;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
-
-import java.util.function.Consumer;
 
 
 public class PartialParticle {

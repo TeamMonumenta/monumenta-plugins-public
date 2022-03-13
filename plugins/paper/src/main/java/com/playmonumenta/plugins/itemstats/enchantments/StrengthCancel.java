@@ -31,12 +31,16 @@ public class StrengthCancel implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if (player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE) && (event.getCause() == DamageCause.ENTITY_ATTACK || event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK)) {
+		if (player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE) && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			int potLevel = player.getPotionEffect(PotionEffectType.INCREASE_DAMAGE).getAmplifier();
+
+			float cooldown = player.getCooledAttackStrength(0.5F);
+			double strengthDamage = (potLevel + 1) * DAMAGE_ADD_CANCEL_PER_LEVEL * (0.2F + cooldown * cooldown * 0.8F);
+
 			if (PlayerUtils.isCriticalAttack(player)) {
-				event.setDamage(event.getDamage() - (potLevel + 1) * DAMAGE_ADD_CANCEL_PER_LEVEL * 1.5);
+				event.setDamage(event.getDamage() - strengthDamage * 1.5);
 			} else {
-				event.setDamage(event.getDamage() - (potLevel + 1) * DAMAGE_ADD_CANCEL_PER_LEVEL);
+				event.setDamage(event.getDamage() - strengthDamage);
 			}
 		}
 	}

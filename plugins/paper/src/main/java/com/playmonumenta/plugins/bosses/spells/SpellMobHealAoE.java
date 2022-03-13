@@ -2,13 +2,12 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.List;
 
 public class SpellMobHealAoE extends Spell {
 
@@ -59,7 +58,6 @@ public class SpellMobHealAoE extends Spell {
 		if (!mCanMoveWhileCasting) {
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 20));
 		}
-
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTimer = 0;
 			double mCurrentRadius = mParticleRadius;

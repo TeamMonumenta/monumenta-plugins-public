@@ -10,8 +10,16 @@ import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.redissync.utils.ScoreboardUtils;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -22,21 +30,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
 
 public class SeasonalEventManager {
 	public static final int LEVEL_COUNT = 25;
@@ -332,8 +331,7 @@ public class SeasonalEventManager {
 				break;
 			case SHULKER_BOX:
 				ItemStack shulker = new ItemStack(Material.PURPLE_SHULKER_BOX, 1);
-				Item eItem = p.getWorld().dropItemNaturally(p.getLocation(), shulker);
-				eItem.setPickupDelay(0);
+				InventoryUtils.giveItem(p, shulker);
 				break;
 			default:
 				break;
@@ -353,8 +351,7 @@ public class SeasonalEventManager {
 			Collection<ItemStack> loot = rewardTable.populateLoot(FastUtils.RANDOM, context);
 			if (loot != null) {
 				for (ItemStack item : loot) {
-					Item eItem = p.getWorld().dropItemNaturally(p.getLocation(), item);
-					eItem.setPickupDelay(0);
+					InventoryUtils.giveItem(p, item);
 				}
 			}
 		}

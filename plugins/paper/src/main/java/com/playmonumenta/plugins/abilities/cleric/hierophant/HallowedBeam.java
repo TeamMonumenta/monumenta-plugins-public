@@ -16,6 +16,8 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -31,11 +33,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import javax.annotation.Nullable;
 
 
 
@@ -53,6 +52,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final int HALLOWED_UNDEAD_STUN = 10; // 20 * 0.5
 	private static final int HALLOWED_LIVING_STUN = 20 * 2;
 	private static final int CAST_RANGE = 30;
+	private static final String MODE_SCOREBOARD = "HallowedBeamMode";
 
 	private @Nullable Crusade mCrusade;
 
@@ -63,7 +63,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		super(plugin, player, "Hallowed Beam");
 		mInfo.mScoreboardId = "HallowedBeam";
 		mInfo.mShorthandName = "HB";
-		mInfo.mDescriptions.add("Left-click with a bow or crossbow while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 20% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals the equipped projectile weapon's damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a bow will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). Cooldown: 16s each charge.");
+		mInfo.mDescriptions.add("Left-click with a bow or crossbow while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 20% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals projectile damage equal to the used weapon's projectile damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a bow will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). Cooldown: 16s each charge.");
 		mInfo.mDescriptions.add("Hallowed Beam gains a third charge, the cooldown is reduced to 12 seconds, and players healed by it gain 10% damage resistance for 5 seconds.");
 		mInfo.mLinkedSpell = ClassAbility.HALLOWED_BEAM;
 		mInfo.mCooldown = isLevelOne() ? HALLOWED_1_COOLDOWN : HALLOWED_2_COOLDOWN;
@@ -71,6 +71,11 @@ public class HallowedBeam extends MultipleChargeAbility {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BOW, 1);
 		mMaxCharges = isLevelOne() ? HALLOWED_1_MAX_CHARGES : HALLOWED_2_MAX_CHARGES;
+		mMaxCharges = getAbilityScore() == 1 ? HALLOWED_1_MAX_CHARGES : HALLOWED_2_MAX_CHARGES;
+		mCharges = getTrackedCharges();
+		if (player != null) {
+			mMode = ScoreboardUtils.getScoreboardValue(player, MODE_SCOREBOARD).orElse(0);
+		}
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -85,14 +90,13 @@ public class HallowedBeam extends MultipleChargeAbility {
 			return;
 		}
 		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, CAST_RANGE, true, true, true);
-		if ((e instanceof Player ePlayer && ePlayer.getGameMode() != GameMode.SPECTATOR) || EntityUtils.isHostileMob(e)) {
+		if (e instanceof Player || EntityUtils.isHostileMob(e)) {
 			Player player = mPlayer;
 
 			PlayerInventory inventory = mPlayer.getInventory();
 			ItemStack inMainHand = inventory.getItemInMainHand();
-			Damageable damageable = (Damageable) inMainHand.getItemMeta();
 
-			if (ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand()) && !ItemStatUtils.isShattered(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability())) {
+			if (ItemUtils.isBowOrTrident(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand()) && !ItemStatUtils.isShattered(inMainHand)) {
 				int ticks = mPlayer.getTicksLived();
 				// Prevent double casting on accident
 				if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
@@ -108,18 +112,6 @@ public class HallowedBeam extends MultipleChargeAbility {
 						Vector dir = loc.getDirection();
 						World world = mPlayer.getWorld();
 
-						if (e == null) {
-							for (int i = 0; i < CAST_RANGE; i++) {
-								loc.add(dir);
-								world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
-								world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
-								world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
-								world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
-							}
-							this.cancel();
-							return;
-						}
-
 						LivingEntity applyE = e;
 						//Check if heal should override damage
 						for (Entity en : e.getNearbyEntities(1.5, 1.5, 1.5)) {
@@ -131,7 +123,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 								}
 							}
 						}
-						if ((applyE instanceof Player pe && pe.getGameMode() != GameMode.SPECTATOR)) {
+						if (applyE instanceof Player pe && pe.getGameMode() != GameMode.SPECTATOR) {
 							if (mMode == 2) {
 								incrementCharge();
 								this.cancel();
@@ -184,18 +176,11 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 							double damage = ItemStatUtils.getAttributeAmount(player.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
 
-							DamageUtils.damage(mPlayer, applyE, DamageType.PROJECTILE, damage, mInfo.mLinkedSpell, true);
+							DamageUtils.damage(mPlayer, applyE, DamageType.PROJECTILE_SKILL, damage, mInfo.mLinkedSpell, true, true);
 
 							Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
 							world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
 							world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
-
-							//Shatter if durability is 0 and isn't shattered.
-							//This is needed because Hallowed doesn't consume durability, but there is a high-damage uncommon bow
-							//with 0 durability that should not be infinitely usable.
-							if (damageable.getDamage() >= inMainHand.getType().getMaxDurability() && !ItemStatUtils.isShattered(inMainHand)) {
-								ItemStatUtils.shatter(inMainHand);
-							}
 						} else if (EntityUtils.isHostileMob(applyE)) {
 							if (mMode == 1) {
 								incrementCharge();
@@ -251,7 +236,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		PlayerInventory inventory = mPlayer.getInventory();
 		ItemStack inMainHand = inventory.getItemInMainHand();
 
-		if (ItemUtils.isSomeBow(inMainHand) && !mPlayer.isSneaking()) {
+		if (ItemUtils.isBowOrTrident(inMainHand) && !mPlayer.isSneaking()) {
 			event.setCancelled(true);
 			if (mMode == 0) {
 				mMode = 1;
@@ -263,6 +248,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 				mMode = 0;
 				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Mode: " + "Default");
 			}
+			ScoreboardUtils.setScoreboardValue(mPlayer, MODE_SCOREBOARD, mMode);
 		}
 	}
 }

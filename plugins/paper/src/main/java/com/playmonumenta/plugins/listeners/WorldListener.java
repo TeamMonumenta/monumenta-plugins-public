@@ -6,6 +6,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Queue;
+import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -27,13 +33,6 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Queue;
-import java.util.Set;
 
 public class WorldListener implements Listener {
 	Plugin mPlugin;

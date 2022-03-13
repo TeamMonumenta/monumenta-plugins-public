@@ -6,15 +6,14 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import javax.annotation.Nullable;
-
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import javax.annotation.Nullable;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class PotionMap {
 	// PotionID is the type (safezone, item, etc.)

@@ -1,11 +1,11 @@
 package com.playmonumenta.plugins.player;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockDispenseArmorEvent;
@@ -21,9 +21,6 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class PlayerInventoryManager {
 	/*
@@ -44,13 +41,6 @@ public class PlayerInventoryManager {
 
 	public PlayerInventoryManager(Plugin plugin, Player player) {
 		InventoryUtils.scheduleDelayedEquipmentCheck(plugin, player, new PlayerJoinEvent(player, Component.text(""))); // Just a dummy event
-	}
-
-	public void tick(Plugin plugin, Player player) {
-		// Players in spectator or who are vanished do not have ticking effects
-		if (PremiumVanishIntegration.isInvisible(player) || player.getGameMode().equals(GameMode.SPECTATOR)) {
-			return;
-		}
 	}
 
 	//Updates only for the slot given

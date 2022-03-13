@@ -6,18 +6,18 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.util.ArrayList;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DepthsRemoveAbilityGUI extends CustomInventory {
 	private static final int START_OF_PASSIVES = 36;
@@ -87,6 +87,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 						depthsplayer.mUsedAbilityDeletion = true;
 						instance.setPlayerLevelInAbility(ability.getDisplayName(), player, 0);
 						event.getWhoClicked().closeInventory();
+						player.getWorld().playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.0f, 1.0f);
 						MessagingUtils.sendActionBarMessage(player, "Ability removed!");
 						return;
 					}

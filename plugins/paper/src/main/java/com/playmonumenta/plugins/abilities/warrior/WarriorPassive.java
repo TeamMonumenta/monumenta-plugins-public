@@ -3,10 +3,10 @@ package com.playmonumenta.plugins.abilities.warrior;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import javax.annotation.Nullable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
 
 public class WarriorPassive extends Ability {
 

@@ -3,11 +3,10 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.utils.StringUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import java.time.Instant;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
-
-import java.time.Instant;
 
 public class UpTimeCommand {
 	public static final Instant startTime = Instant.now();

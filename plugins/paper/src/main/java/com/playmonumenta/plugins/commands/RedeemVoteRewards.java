@@ -11,14 +11,13 @@ import dev.jorel.commandapi.arguments.FunctionArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
+import org.bukkit.entity.Player;
 
 /*
  * This is obnoxiously complicated.

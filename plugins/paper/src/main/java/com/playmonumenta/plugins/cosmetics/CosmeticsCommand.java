@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.GenericCommand;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -8,11 +9,9 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.entity.Player;
 
 public class CosmeticsCommand extends GenericCommand {
 
@@ -114,7 +113,7 @@ public class CosmeticsCommand extends GenericCommand {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
-				new CosmeticsGUI(player).openInventory(player, plugin);
+				new CosmeticsGUI(plugin, player).openInventory(player, plugin);
 			}).register();
 	}
 }

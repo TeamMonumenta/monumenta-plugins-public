@@ -4,14 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
+import java.util.ArrayList;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
-
-import java.util.ArrayList;
 
 
 public class PlayerClass {

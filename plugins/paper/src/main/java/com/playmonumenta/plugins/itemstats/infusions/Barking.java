@@ -5,14 +5,13 @@ import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import java.util.Arrays;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class Barking implements Infusion {
 
@@ -43,7 +42,7 @@ public class Barking implements Infusion {
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		if (value > 1 && plugin.mItemStatManager.getInfusionLevel(player, InfusionType.DEBARKING) == 0) {
-			if (PremiumVanishIntegration.isInvisible(player)) {
+			if (PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
 				return;
 			}
 

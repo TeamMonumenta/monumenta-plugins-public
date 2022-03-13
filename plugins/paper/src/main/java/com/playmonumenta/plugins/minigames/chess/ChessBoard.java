@@ -6,15 +6,14 @@ import com.playmonumenta.plugins.minigames.chess.events.ChessEvent;
 import com.playmonumenta.plugins.minigames.chess.events.EndGameChessEvent;
 import com.playmonumenta.plugins.minigames.chess.events.MovePieceChessEvent;
 import com.playmonumenta.plugins.minigames.chess.events.PromotingChessEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class ChessBoard {
 

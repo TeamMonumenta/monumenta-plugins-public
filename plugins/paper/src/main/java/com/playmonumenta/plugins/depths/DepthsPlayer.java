@@ -3,9 +3,6 @@ package com.playmonumenta.plugins.depths;
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +11,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import org.bukkit.entity.Player;
 
 public class DepthsPlayer {
 
@@ -33,6 +31,8 @@ public class DepthsPlayer {
 	public boolean mUsedChaosThisFloor;
 	//Whether or not they have deleted an ability on this floor
 	public boolean mUsedAbilityDeletion;
+	//Whether or not they have mutated an ability on this floor
+	public boolean mUsedAbilityMutation;
 	//Individual treasure score. Copied from the party's treasure score when they die.
 	public int mFinalTreasureScore;
 	//Reward queue implementation to let the player catch up on reward chests they have missed later

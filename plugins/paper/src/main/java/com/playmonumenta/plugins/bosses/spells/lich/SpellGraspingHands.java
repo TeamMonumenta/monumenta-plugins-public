@@ -6,6 +6,9 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.player.PPGroundCircle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -23,10 +26,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 /*
 Grasping Hands - Pools of "hands" appear under ½  players in a 5 block radius. Players inside
@@ -162,14 +161,15 @@ public class SpellGraspingHands extends Spell {
 									for (LivingEntity e : mobs) {
 										if (!(e.getType() == EntityType.PLAYER) && !e.isDead()) {
 											double maxHealth = EntityUtils.getMaxHealth(e);
-											double restore = e.getHealth() + maxHealth * 0.005 + 3;
+											double restore = maxHealth * 0.005 + 3;
 											if (restore >= mHealCap) {
 												restore = mHealCap;
 											}
-											if (restore >= maxHealth) {
+											double newHealth = e.getHealth() + restore;
+											if (newHealth >= maxHealth) {
 												e.setHealth(maxHealth);
 											} else {
-												e.setHealth(restore);
+												e.setHealth(newHealth);
 											}
 										}
 									}

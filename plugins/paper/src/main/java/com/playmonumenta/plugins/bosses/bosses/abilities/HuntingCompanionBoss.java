@@ -9,6 +9,10 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -16,11 +20,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 public class HuntingCompanionBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_huntingcompanion";
@@ -58,7 +57,7 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 		if (mPlayer != null && mPlayerItemStats != null) {
 			event.setCancelled(true);
 
-			DamageUtils.damage(mPlayer, damagee, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, ClassAbility.HUNTING_COMPANION, mPlayerItemStats), mDamage, true, true, false, null);
+			DamageUtils.damage(mPlayer, damagee, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, ClassAbility.HUNTING_COMPANION, mPlayerItemStats), mDamage, true, true, false);
 
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_FOX_BITE, 1.5f, 1.0f);
 			UUID uuid = damagee.getUniqueId();

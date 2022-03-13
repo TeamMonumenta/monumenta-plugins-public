@@ -4,9 +4,8 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import org.bukkit.Bukkit;
-
 import java.util.logging.Logger;
+import org.bukkit.Bukkit;
 
 public class ProtocolLibIntegration {
 

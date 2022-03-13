@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
@@ -14,10 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.stream.Stream;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonWriter;
 
 public class FileUtils {
 	public static String readFile(String fileName) throws Exception, FileNotFoundException {
@@ -108,8 +108,6 @@ public class FileUtils {
 					matchedFiles.add(path.toFile());
 				}
 			});
-		} catch (Exception ex) {
-			ex.printStackTrace();
 		}
 
 		return matchedFiles;
@@ -142,4 +140,16 @@ public class FileUtils {
 			}
 		}
 	}
+
+	public static JsonObject readJson(String fileName) throws Exception {
+		// Do not attempt to catch exceptions here - let them propagate to the caller
+
+		Gson gson = new Gson();
+
+		Reader reader = Files.newBufferedReader(Paths.get(fileName));
+
+		return gson.fromJson(reader, JsonObject.class);
+
+	}
+
 }

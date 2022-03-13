@@ -2,10 +2,10 @@ package com.playmonumenta.plugins.abilities.other;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
 
 
 

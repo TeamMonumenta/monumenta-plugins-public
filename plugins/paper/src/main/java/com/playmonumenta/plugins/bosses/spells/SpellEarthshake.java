@@ -6,6 +6,11 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,12 +24,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
 
 public class SpellEarthshake extends SpellBaseAoE {
 
@@ -60,7 +59,7 @@ public class SpellEarthshake extends SpellBaseAoE {
 						if (LocationUtils.hasLineOfSight(launcher, player) || !lineOfSight) {
 							targetLocation = player.getLocation().clone();
 							targeted = true;
-							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1f, 0.75f);
+							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 5f, 0.75f);
 						} else {
 							targetLocation = null;
 						}
@@ -76,8 +75,8 @@ public class SpellEarthshake extends SpellBaseAoE {
 					world.spawnParticle(Particle.BLOCK_CRACK, loc, 2, radius / 2, 0.1, radius / 2, Bukkit.createBlockData(Material.STONE));
 
 					if (particleCounter1 % 20 == 0 && particleCounter1 > 0) {
-						world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1f, 0.5f);
-						world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1f, 0.5f);
+						world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 3f, 0.5f);
+						world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 3f, 0.5f);
 						for (int i = 0; i < 360; i += 18) {
 							world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(FastUtils.cos(Math.toRadians(i)) * radius, 0.2, FastUtils.sin(Math.toRadians(i)) * radius), 1, 0.1, 0.1, 0.1, 0);
 						}
@@ -103,9 +102,9 @@ public class SpellEarthshake extends SpellBaseAoE {
 				if (targetLocation != null) {
 					loc = targetLocation;
 					World world = loc.getWorld();
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1.35f);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.5f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3f, 1.35f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 3f, 0.5f);
 
 					world.spawnParticle(Particle.CLOUD, loc, 150, 0, 0, 0, 0.5);
 					world.spawnParticle(Particle.LAVA, loc, 35, radius / 2, 0.1, radius / 2, 0);

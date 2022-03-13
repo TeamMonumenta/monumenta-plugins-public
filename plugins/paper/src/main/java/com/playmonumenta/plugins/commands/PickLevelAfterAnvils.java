@@ -12,6 +12,10 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -19,11 +23,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 public class PickLevelAfterAnvils extends GenericCommand {
 	static final String COMMAND = "picklevelafteranvils";
@@ -80,7 +79,7 @@ public class PickLevelAfterAnvils extends GenericCommand {
 								LootTable anvilTable = Bukkit.getLootTable(ANVILTABLE);
 								Collection<ItemStack> anvilLoot = anvilTable.populateLoot(FastUtils.RANDOM, context);
 								int currentXp = ExperienceUtils.getTotalExperience(player);
-								int currentAnvilCount = (int) Math.floor((currentXp - ExperienceUtils.getTotalExperience(finalInputVal)) / ExperienceUtils.getTotalExperience(30));
+								int currentAnvilCount = (currentXp - ExperienceUtils.getTotalExperience(finalInputVal)) / ExperienceUtils.LEVEL_30;
 								if (currentAnvilCount <= 0) {
 									player.sendMessage("The levels between your current level and the requested level will not be enough to create an anvil.");
 									return;

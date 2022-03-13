@@ -4,6 +4,13 @@ import org.bukkit.entity.Player;
 
 public class ExperienceUtils {
 
+	public static final int LEVEL_30 = 1395;
+	public static final int LEVEL_40 = 2920;
+	public static final int LEVEL_50 = 5345;
+	public static final int LEVEL_60 = 8670;
+	public static final int LEVEL_70 = 12895;
+	public static final int LEVEL_80 = 18020;
+
 	public static int getTotalExperience(int level) {
 		int xp = 0;
 

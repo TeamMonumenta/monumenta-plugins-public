@@ -1,9 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
@@ -14,7 +10,9 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
-
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -52,7 +50,7 @@ public class ChargerBoss extends BossAbilityGroup {
 		@BossParam(help = "Effects applied to players hit by the charge")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
 
-		@BossParam(help = "The spell name showed when the player die by this skill")
+		@BossParam(help = "The spell name shown when a player is killed by this skill")
 		public String SPELL_NAME = "";
 
 		@BossParam(help = "Let you choose the targets of this spell")

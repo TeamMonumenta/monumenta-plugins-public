@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.listeners;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;

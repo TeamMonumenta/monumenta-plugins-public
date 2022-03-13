@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.EnumSet;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -15,8 +16,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
-
-import java.util.EnumSet;
 
 public class Chivalrous extends DelveModifier {
 

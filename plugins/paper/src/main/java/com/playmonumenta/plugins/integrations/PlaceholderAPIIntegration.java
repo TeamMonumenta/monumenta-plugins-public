@@ -1,14 +1,19 @@
 package com.playmonumenta.plugins.integrations;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
-import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 	Plugin mPlugin;
@@ -41,6 +46,21 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 
 	@Override
 	public @Nullable String onPlaceholderRequest(Player player, String identifier) {
+
+		if (identifier.startsWith("loot_table:")) {
+			String lootTable = identifier.substring("loot_table:".length());
+			ItemStack item = InventoryUtils.getItemFromLootTable(Bukkit.getWorlds().get(0).getSpawnLocation(), NamespacedKeyUtils.fromString(lootTable));
+			if (item == null) {
+				return "";
+			} else {
+				Component name = item.getItemMeta().displayName();
+				if (name == null) {
+					name = Component.translatable(item.getType().getTranslationKey());
+				}
+				return MiniMessage.miniMessage().serialize(name.hoverEvent(item.asHoverEvent()));
+			}
+		}
+
 		if (player == null) {
 			return "";
 		}

@@ -15,6 +15,10 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -27,11 +31,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
 
 public class EarthenWrath extends DepthsAbility {
 
@@ -112,7 +111,7 @@ public class EarthenWrath extends DepthsAbility {
 
 					if (mDamageAbsorbed > 0) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, DAMAGE_RADIUS)) {
-							DamageUtils.damage(mPlayer, mob, DamageType.OTHER, mDamageAbsorbed * PERCENT_DAMAGE_REFLECTED[mRarity - 1], mInfo.mLinkedSpell);
+							DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamageAbsorbed * PERCENT_DAMAGE_REFLECTED[mRarity - 1], mInfo.mLinkedSpell);
 						}
 
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
@@ -140,12 +139,13 @@ public class EarthenWrath extends DepthsAbility {
 		}
 
 		if (isWrathing() && !otherPlayer.equals(mPlayer)) {
-			mDamageAbsorbed += event.getFinalDamage(false);
+			double originalDamage = event.getOriginalDamage();
+			mDamageAbsorbed += originalDamage;
 
 			Vector velocity = mPlayer.getVelocity();
 
 			// Create a new DamageEvent from the EntityDamageEvent with the same damage and damage type but a different damagee
-			DamageUtils.damage(event.getSource(), mPlayer, event.getType(), event.getDamage(), null, false, false, ABILITY_NAME);
+			DamageUtils.damage(event.getSource(), mPlayer, event.getType(), originalDamage * PERCENT_DAMAGE_REDUCTION[mRarity - 1], null, true, false, ABILITY_NAME);
 
 			mPlayer.setVelocity(velocity);
 
@@ -167,6 +167,7 @@ public class EarthenWrath extends DepthsAbility {
 			}
 
 			event.setDamage(0);
+			otherPlayer.setNoDamageTicks(10);
 			return true;
 		}
 		return false;
@@ -221,7 +222,7 @@ public class EarthenWrath extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap while holding a weapon to redirect all damage allies take from mobs (excluding percent health damage) to you at a " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REDUCTION[rarity - 1]) + "%" + ChatColor.WHITE + " damage reduction for " + DURATION / 20 + " seconds, then do a burst damage in a " + DAMAGE_RADIUS + " block radius around you, dealing " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(PERCENT_DAMAGE_REFLECTED[rarity - 1]) + "%" + ChatColor.WHITE + " of original damage absorbed. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap while holding a weapon to redirect all damage allies take from mobs (excluding percent health damage) to you at a " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REDUCTION[rarity - 1]) + "%" + ChatColor.WHITE + " damage reduction for " + DURATION / 20 + " seconds, then do a burst damage in a " + DAMAGE_RADIUS + " block radius around you, dealing " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(PERCENT_DAMAGE_REFLECTED[rarity - 1]) + "%" + ChatColor.WHITE + " of original damage absorbed as melee damage. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

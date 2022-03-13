@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
@@ -16,7 +13,8 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-
+import java.util.Arrays;
+import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -40,7 +38,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public int DETECTION = 24;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Delay of the first spell, then cooldown is used to determinate when this spell will cast again")
 		public int DELAY = 20 * 5;
 
 		@BossParam(help = "not written")
@@ -70,12 +68,15 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public boolean COLLIDES_WITH_BLOCKS = true;
 
+		@BossParam(help = "Delay on each single cast between sound_start and the actual cast of the projectile")
+		public int SPELL_DELAY = Integer.MAX_VALUE;
+
 		@BossParam(help = "Let you choose the targets of this spell")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
 
 		@BossParam(help = "Effects applied to the player when he got hit")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
-		@BossParam(help = "The spell name showed when the player die by this skill")
+		@BossParam(help = "The spell name shown when a player is killed by this skill")
 		public String SPELL_NAME = "";
 
 		//particle & sound used!
@@ -121,8 +122,12 @@ public class ProjectileBoss extends BossAbilityGroup {
 			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL));
 			//by default LaserBoss don't take player in stealt.
 		}
+
+		if (p.SPELL_DELAY == Integer.MAX_VALUE) {
+			p.SPELL_DELAY = p.DELAY;
+		}
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
+			new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.COOLDOWN, p.SPELL_DELAY,
 					p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS, 0, p.COLLIDES_WITH_OTHERS,
 					//spell targets
 					() -> {
@@ -130,7 +135,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 					},
 					// Initiate Aesthetic
 					(World world, Location loc, int ticks) -> {
-						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DELAY, 0));
+						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.SPELL_DELAY, 0));
 						p.SOUND_START.play(loc);
 					},
 					// Launch Aesthetic

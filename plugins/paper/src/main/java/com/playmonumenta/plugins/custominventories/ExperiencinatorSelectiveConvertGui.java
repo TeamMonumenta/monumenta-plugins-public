@@ -10,6 +10,9 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -19,10 +22,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import static org.bukkit.ChatColor.BOLD;
 import static org.bukkit.ChatColor.GOLD;
@@ -68,7 +67,7 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 		mSettings = new ExperiencinatorSettings(mConfig.getScoreboardConfig(), owner);
 
 		mConversions = mConfig.getConversions().stream()
-			.filter(c -> c.conversionAllowedInGeneral(mPlayer))
+			.filter(c -> c.conversionAllowedInGeneral(mPlayer, experiencinatorItem))
 			.collect(Collectors.groupingBy(Conversion::getSettingsId))
 			.entrySet().stream()
 			.sorted(Entry.comparingByKey())
@@ -225,7 +224,7 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 		if (conversion == null) {
 			return false;
 		}
-		if (!conversion.conversionAllowed(mPlayer, tier)) {
+		if (!conversion.conversionAllowed(mPlayer, tier, mExperiencinatorItem)) {
 			return false;
 		}
 		return ExperiencinatorUtils.convertSingleItem(mPlayer, item, conversion, conversionRateName);

@@ -1,5 +1,41 @@
 package com.playmonumenta.plugins.bosses;
 
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.*;
+import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
+import com.playmonumenta.plugins.bosses.bosses.gray.GrayBookSummoner;
+import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
+import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
+import com.playmonumenta.plugins.bosses.bosses.gray.GrayScarabSummoner;
+import com.playmonumenta.plugins.bosses.bosses.gray.GraySummoned;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichAlchBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichClericBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichConquestBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichCurseBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichDemiseBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichJudgementBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichKeyGlowBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichMageBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichRogueBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichScoutBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichShieldBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichStrifeBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichWarlockBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichWarriorBoss;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.depths.bosses.Davey;
+import com.playmonumenta.plugins.depths.bosses.Hedera;
+import com.playmonumenta.plugins.depths.bosses.Nucleus;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.parrots.RainbowParrot;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,7 +44,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
-
+import javax.annotation.Nullable;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -46,46 +83,6 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
-import javax.annotation.Nullable;
-
-import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.*;
-import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
-import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
-import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
-import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
-import com.playmonumenta.plugins.bosses.bosses.gray.GrayBookSummoner;
-import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
-import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
-import com.playmonumenta.plugins.bosses.bosses.gray.GrayScarabSummoner;
-import com.playmonumenta.plugins.bosses.bosses.gray.GraySummoned;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichAlchBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichClericBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichConquestBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichCurseBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichDemiseBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichJudgementBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichKeyGlowBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichMageBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichRogueBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichScoutBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichShieldBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichStrifeBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichWarlockBoss;
-import com.playmonumenta.plugins.bosses.bosses.lich.LichWarriorBoss;
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.depths.bosses.Davey;
-import com.playmonumenta.plugins.depths.bosses.Hedera;
-import com.playmonumenta.plugins.depths.bosses.Nucleus;
-import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.parrots.RainbowParrot;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
-
-import net.kyori.adventure.text.Component;
 
 public class BossManager implements Listener {
 
@@ -243,6 +240,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(PounceBoss.identityTag, (Plugin p, LivingEntity e) -> new PounceBoss(p, e));
 		mStatelessBosses.put(NoAbilityDamageBoss.identityTag, (Plugin p, LivingEntity e) -> new NoAbilityDamageBoss(p, e));
 		mStatelessBosses.put(NoGlowingBoss.identityTag, (Plugin p, LivingEntity e) -> new NoGlowingBoss(p, e));
+		mStatelessBosses.put(GenericTargetBoss.identityTag, (Plugin p, LivingEntity e) -> new GenericTargetBoss(p, e));
 		mStatelessBosses.put(MobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> new MobRisingBoss(p, e));
 		mStatelessBosses.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> new GrenadeLauncherBoss(p, e));
 		mStatelessBosses.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> new SizeChangerBoss(p, e));
@@ -455,6 +453,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(NoGlowingBoss.identityTag, (Plugin p, LivingEntity e) -> NoGlowingBoss.deserialize(p, e));
 		mBossDeserializers.put(RKitxet.identityTag, (Plugin p, LivingEntity e) -> RKitxet.deserialize(p, e));
 		mBossDeserializers.put(VerdantMinibossBoss.identityTag, (Plugin p, LivingEntity e) -> VerdantMinibossBoss.deserialize(p, e));
+		mBossDeserializers.put(GenericTargetBoss.identityTag, (Plugin p, LivingEntity e) -> GenericTargetBoss.deserialize(p, e));
 		mBossDeserializers.put(MobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> MobRisingBoss.deserialize(p, e));
 		mBossDeserializers.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> GrenadeLauncherBoss.deserialize(p, e));
 		mBossDeserializers.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> SizeChangerBoss.deserialize(p, e));
@@ -703,7 +702,7 @@ public class BossManager implements Listener {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends BossAbilityGroup> @Nullable T getBoss(Entity entity, Class<T> cls) {
+	public @Nullable <T extends BossAbilityGroup> T getBoss(Entity entity, Class<T> cls) {
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null) {
 			for (BossAbilityGroup ability : boss.getAbilities()) {
@@ -1019,9 +1018,8 @@ public class BossManager implements Listener {
 	 */
 	private void checkDisablePerformanceEvents(Boss boss) {
 		if (boss.hasNearbyEntityDeathTrigger()) {
-			if (mNearbyEntityDeathEnabled == false) {
+			if (!mNearbyEntityDeathEnabled) {
 				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyEntityDeathTrigger but feature was not enabled. Definitely a bug!");
-				return;
 			}
 
 			/*
@@ -1029,21 +1027,14 @@ public class BossManager implements Listener {
 			 *
 			 * Need to check all other loaded bosses to see if it still needs to be enabled
 			 */
-			for (Boss testBoss : mBosses.values()) {
-				if (testBoss.hasNearbyEntityDeathTrigger()) {
-					/* Still at least one other boss that needs this - don't turn off yet */
-					return;
-				}
+			if (mBosses.values().stream().noneMatch(Boss::hasNearbyEntityDeathTrigger)) {
+				mNearbyEntityDeathEnabled = false;
 			}
-
-			/* No bosses still loaded that need this feature - turn it off */
-			mNearbyEntityDeathEnabled = false;
 		}
 
 		if (boss.hasNearbyBlockBreakTrigger()) {
-			if (mNearbyBlockBreakEnabled == false) {
+			if (!mNearbyBlockBreakEnabled) {
 				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyBlockBreakTrigger but feature was not enabled. Definitely a bug!");
-				return;
 			}
 
 			/*
@@ -1051,21 +1042,14 @@ public class BossManager implements Listener {
 			 *
 			 * Need to check all other loaded bosses to see if it still needs to be enabled
 			 */
-			for (Boss testBoss : mBosses.values()) {
-				if (testBoss.hasNearbyBlockBreakTrigger()) {
-					/* Still at least one other boss that needs this - don't turn off yet */
-					return;
-				}
+			if (mBosses.values().stream().noneMatch(Boss::hasNearbyBlockBreakTrigger)) {
+				mNearbyBlockBreakEnabled = false;
 			}
-
-			/* No bosses still loaded that need this feature - turn it off */
-			mNearbyBlockBreakEnabled = false;
 		}
 
 		if (boss.hasNearbyPlayerDeathTrigger()) {
-			if (mNearbyBlockBreakEnabled == false) {
+			if (!mNearbyBlockBreakEnabled) {
 				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyPlayerDeathTrigger but feature was not enabled. Definitely a bug!");
-				return;
 			}
 
 			/*
@@ -1073,19 +1057,13 @@ public class BossManager implements Listener {
 			 *
 			 * Need to check all other loaded bosses to see if it still needs to be enabled
 			 */
-			for (Boss testBoss : mBosses.values()) {
-				if (testBoss.hasNearbyPlayerDeathTrigger()) {
-					/* Still at least one other boss that needs this - don't turn off yet */
-					return;
-				}
+			if (mBosses.values().stream().noneMatch(Boss::hasNearbyPlayerDeathTrigger)) {
+				mNearbyPlayerDeathEnabled = false;
 			}
-
-			/* No bosses still loaded that need this feature - turn it off */
-			mNearbyPlayerDeathEnabled = false;
 		}
 	}
 
-	private void createBossInternal(LivingEntity targetEntity, BossAbilityGroup ability) throws Exception {
+	public void createBossInternal(LivingEntity targetEntity, BossAbilityGroup ability) throws Exception {
 		/* Set up boss health / armor / etc */
 		ability.init();
 

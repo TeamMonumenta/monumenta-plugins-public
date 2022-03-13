@@ -7,6 +7,12 @@ import com.playmonumenta.plugins.utils.DelveInfusionUtils.DelveInfusionSelection
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -22,13 +28,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public final class DelveInfusionCustomInventory extends CustomInventory {
 
@@ -553,275 +552,88 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 
 
 		mMapFunction.put(19, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.PENNATE, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.PENNATE, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.PENNATE);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.PENNATE);
 		});
 
 		mMapFunction.put(20, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.CARAPACE, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.CARAPACE, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.CARAPACE);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.CARAPACE);
 		});
 
 		mMapFunction.put(21, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.AURA, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.AURA, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.AURA);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.AURA);
 		});
 
 		mMapFunction.put(23, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.EXPEDITE, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.EXPEDITE, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.EXPEDITE);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.EXPEDITE);
 		});
 
 		mMapFunction.put(24, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.CHOLER, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.CHOLER, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.CHOLER);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.CHOLER);
 		});
 
 		mMapFunction.put(25, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.USURPER, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.USURPER, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.USURPER);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.USURPER);
 		});
 
 		//R2
 		mMapFunction.put(27, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.EMPOWERED, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.EMPOWERED, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.EMPOWERED);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.EMPOWERED);
 		});
 
 		mMapFunction.put(28, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.NUTRIMENT, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.NUTRIMENT, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.NUTRIMENT);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.NUTRIMENT);
 		});
 
 		mMapFunction.put(29, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.EXECUTION, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.EXECUTION, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.EXECUTION);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.EXECUTION);
 		});
 
 		mMapFunction.put(30, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.REFLECTION, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.REFLECTION, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.REFLECTION);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.REFLECTION);
 		});
 
 		mMapFunction.put(31, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.MITOSIS, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.MITOSIS, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.MITOSIS);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.MITOSIS);
 		});
 
 		mMapFunction.put(32, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.ARDOR, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.ARDOR, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.ARDOR);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.ARDOR);
 		});
 
 		mMapFunction.put(33, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.EPOCH, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.EPOCH, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.EPOCH);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.EPOCH);
 		});
 
 		mMapFunction.put(34, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.NATANT, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.NATANT, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.NATANT);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.NATANT);
 		});
 
 		mMapFunction.put(35, (p, inventory, slot) -> {
-			try {
-				if (DelveInfusionUtils.canPayInfusion(infusedItem, DelveInfusionSelection.UNDERSTANDING, p)) {
-					if (DelveInfusionUtils.payInfusion(infusedItem, DelveInfusionSelection.UNDERSTANDING, p)) {
-						DelveInfusionUtils.infuseItem(p, infusedItem, DelveInfusionSelection.UNDERSTANDING);
-					} else {
-						p.sendMessage("If you see this message please contact a mod. Error paying.");
-					}
-				} else {
-					p.sendMessage("You don't have enough experience and/or currency for this infusion.");
-				}
-				mRowSelected = 99;
-			} catch (Exception e) {
-				p.sendMessage("Error while infusing, please contact a mod: " + e);
-			}
-
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.UNDERSTANDING);
 		});
+	}
+
+	private void attemptInfusion(Player p, ItemStack item, DelveInfusionSelection infusion) {
+		if (item.getAmount() > 1) {
+			p.sendMessage(ChatColor.RED + "You cannot infuse stacked items.");
+			return;
+		}
+
+		try {
+			if (DelveInfusionUtils.canPayInfusion(item, infusion, p)) {
+				if (DelveInfusionUtils.payInfusion(item, infusion, p)) {
+					DelveInfusionUtils.infuseItem(p, item, infusion);
+				} else {
+					p.sendMessage(ChatColor.RED + "If you see this message please contact a mod! (Error in paying infusion cost)");
+				}
+			} else {
+				p.sendMessage(ChatColor.RED + "You don't have enough experience and/or currency for this infusion.");
+			}
+			mRowSelected = 99;
+		} catch (Exception e) {
+			p.sendMessage(ChatColor.RED + "If you see this message please contact a mod! (Error in infusing)");
+			e.printStackTrace();
+		}
 	}
 
 	private void loadDelveInfusionPage(List<ItemStack> items) {

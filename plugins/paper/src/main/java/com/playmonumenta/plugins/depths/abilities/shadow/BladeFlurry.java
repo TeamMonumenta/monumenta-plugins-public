@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.List;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,8 +23,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import java.util.List;
 
 public class BladeFlurry extends DepthsAbility {
 
@@ -93,7 +92,7 @@ public class BladeFlurry extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while sneaking and holding a weapon to deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage in a " + RADIUS + " block radius around you. Affected mobs are silenced for " + DepthsUtils.getRarityColor(rarity) + (SILENCE_DURATION[rarity - 1] / 20.0) + ChatColor.WHITE + " seconds and knocked away slightly. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while sneaking and holding a weapon to deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage in a " + RADIUS + " block radius around you. Affected mobs are silenced for " + DepthsUtils.getRarityColor(rarity) + (SILENCE_DURATION[rarity - 1] / 20.0) + ChatColor.WHITE + " seconds and knocked away slightly. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

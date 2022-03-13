@@ -1,11 +1,5 @@
 package com.playmonumenta.plugins.protocollib;
 
-import java.util.Collection;
-import java.util.List;
-
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
@@ -16,6 +10,10 @@ import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.GlowingCommand;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.Collection;
+import java.util.List;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 /**
  * Packet listener for selectively disabling the glowing effect
@@ -61,7 +59,7 @@ public class GlowingReplacer extends PacketAdapter {
 		// check if glowing is disabled for the entity's type.
 		if (playerSettings != 0xFFFFFFFF) { // If all glowing is disabled, this check can be skipped.
 			Entity entity = packet.getEntityModifier(event).read(0); // NB: this is the first int, not (just) the first entity in the packet.
-			if (entity == null || GlowingCommand.isGlowingEnabled(playerSettings, entity)) {
+			if (entity == null || GlowingCommand.isGlowingEnabled(player, playerSettings, entity)) {
 				return;
 			}
 		}

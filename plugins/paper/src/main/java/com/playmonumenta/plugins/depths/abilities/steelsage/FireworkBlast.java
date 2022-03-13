@@ -98,7 +98,7 @@ public class FireworkBlast extends DepthsAbility {
 						double damage = (mPlayer.getLocation().distance(loc) * DAMAGE_INCREASE_PER_BLOCK + 1) * DAMAGE[mRarity - 1];
 
 						//Max damage cap from array
-						DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, playerItemStats), Math.min(damage, DAMAGE_CAP[mRarity - 1]), false, true, false, null);
+						DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, playerItemStats), Math.min(damage, DAMAGE_CAP[mRarity - 1]), false, true, false);
 
 						world.spawnParticle(Particle.SMOKE_LARGE, e.getLocation(), 20, 0, 0, 0, 0.2);
 						world.spawnParticle(Particle.REDSTONE, e.getLocation(), 10, 0.25, 0.25, 0.25, GRAY_COLOR);

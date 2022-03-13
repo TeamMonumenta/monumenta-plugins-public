@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -11,8 +12,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
-
-import java.util.List;
 
 public class SpellAxtalMeleeMinions extends Spell {
 	private Plugin mPlugin;

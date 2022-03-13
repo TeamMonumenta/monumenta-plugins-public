@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
@@ -13,7 +10,8 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseNova;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
-
+import java.util.Arrays;
+import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -37,12 +35,15 @@ public final class NovaBoss extends BossAbilityGroup {
 		public int COOLDOWN = 8 * 20;
 		@BossParam(help = "not written")
 		public boolean CAN_MOVE = false;
+		@BossParam(help = "You should not use this. use TARGETS instead.")
+		public boolean NEED_LINE_OF_SIGHT = true;
+
 		@BossParam(help = "not written")
 		public double DAMAGE_PERCENTAGE = 0.0;
 
 		@BossParam(help = "Effect applied to players hit by the nova")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
-		@BossParam(help = "The spell name showed when the player die by this skill")
+		@BossParam(help = "The spell name shown when a player is killed by this skill")
 		public String SPELL_NAME = "";
 
 		@BossParam(help = "Let you choose the targets of this spell")
@@ -81,9 +82,11 @@ public final class NovaBoss extends BossAbilityGroup {
 			//build a new target from others config
 			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.RADIUS, true);
 			//by default LaserBoss take player in stealt.
+		} else {
+			p.NEED_LINE_OF_SIGHT = false;
 		}
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseNova(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.SOUND_CHARGE,
+			new SpellBaseNova(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE,
 			(Location loc) -> {
 				p.PARTICLE_AIR.spawn(loc, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, 0.05);
 			},

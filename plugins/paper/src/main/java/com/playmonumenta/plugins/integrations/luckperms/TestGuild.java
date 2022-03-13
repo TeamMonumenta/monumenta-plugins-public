@@ -9,11 +9,10 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import net.luckperms.api.model.group.Group;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.luckperms.api.model.group.Group;
+import org.bukkit.entity.Player;
 
 public class TestGuild {
 	public static void register(Plugin plugin) {

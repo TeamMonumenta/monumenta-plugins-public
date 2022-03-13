@@ -3,13 +3,12 @@ package com.playmonumenta.plugins.integrations;
 import com.playmonumenta.libraryofsouls.LibraryOfSoulsAPI;
 import com.playmonumenta.libraryofsouls.Soul;
 import com.playmonumenta.plugins.utils.FastUtils;
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import javax.annotation.Nullable;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 
 public class LibraryOfSoulsIntegration {
 	private static boolean ENABLED = false;

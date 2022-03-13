@@ -12,6 +12,10 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.WeakHashMap;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -27,11 +31,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.WeakHashMap;
 
 public class LightningBottle extends DepthsAbility {
 	public static final String ABILITY_NAME = "Lightning Bottle";
@@ -73,7 +72,7 @@ public class LightningBottle extends DepthsAbility {
 		if (mPlayer != null && playerItemStats != null) {
 			for (LivingEntity entity : affectedEntities) {
 				if (EntityUtils.isHostileMob(entity)) {
-					DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false, null);
+					DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false);
 
 					EntityUtils.applyVulnerability(mPlugin, DURATION, VULNERABILITY[mRarity - 1], entity);
 					EntityUtils.applySlow(mPlugin, DURATION, SLOWNESS, entity);

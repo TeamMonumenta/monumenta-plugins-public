@@ -4,71 +4,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
-import com.playmonumenta.plugins.commands.AdminNotify;
-import com.playmonumenta.plugins.commands.AuditLogCommand;
-import com.playmonumenta.plugins.commands.BarkifyHeldItem;
-import com.playmonumenta.plugins.commands.BossDebug;
-import com.playmonumenta.plugins.commands.BossFight;
-import com.playmonumenta.plugins.commands.BossTagCommand;
-import com.playmonumenta.plugins.commands.CalculateReforge;
-import com.playmonumenta.plugins.commands.ClaimRaffle;
-import com.playmonumenta.plugins.commands.ClearPortals;
-import com.playmonumenta.plugins.commands.ColossalifyHeldItem;
-import com.playmonumenta.plugins.commands.DeBarkifyHeldItem;
-import com.playmonumenta.plugins.commands.DeCluckifyHeldItem;
-import com.playmonumenta.plugins.commands.DeathMsg;
-import com.playmonumenta.plugins.commands.DebugInfo;
-import com.playmonumenta.plugins.commands.DelveInfuseHeldItem;
-import com.playmonumenta.plugins.commands.Effect;
-import com.playmonumenta.plugins.commands.Eggify;
-import com.playmonumenta.plugins.commands.EventCommand;
-import com.playmonumenta.plugins.commands.FestiveHeldItem;
-import com.playmonumenta.plugins.commands.GenerateItems;
-import com.playmonumenta.plugins.commands.GetDepthPoints;
-import com.playmonumenta.plugins.commands.GetScoreCommand;
-import com.playmonumenta.plugins.commands.GildifyHeldItem;
-import com.playmonumenta.plugins.commands.GiveSoulbound;
-import com.playmonumenta.plugins.commands.GlowingCommand;
-import com.playmonumenta.plugins.commands.Grave;
-import com.playmonumenta.plugins.commands.HopeifyHeldItem;
-import com.playmonumenta.plugins.commands.InfuseHeldItem;
-import com.playmonumenta.plugins.commands.JingleBells;
-import com.playmonumenta.plugins.commands.Launch;
-import com.playmonumenta.plugins.commands.LockedHeldItem;
-import com.playmonumenta.plugins.commands.Magnetize;
-import com.playmonumenta.plugins.commands.MonumentaDebug;
-import com.playmonumenta.plugins.commands.MonumentaReload;
-import com.playmonumenta.plugins.commands.NameMCVerify;
-import com.playmonumenta.plugins.commands.OpenDelveModifierSelectionGUI;
-import com.playmonumenta.plugins.commands.PhylacteryifyHeldItem;
-import com.playmonumenta.plugins.commands.PickLevelAfterAnvils;
-import com.playmonumenta.plugins.commands.PlayerItemStatsGUICommand;
-import com.playmonumenta.plugins.commands.Portal1;
-import com.playmonumenta.plugins.commands.Portal2;
-import com.playmonumenta.plugins.commands.RedeemVoteRewards;
-import com.playmonumenta.plugins.commands.ReforgeHeldItem;
-import com.playmonumenta.plugins.commands.ReforgeInventory;
-import com.playmonumenta.plugins.commands.RefreshClass;
-import com.playmonumenta.plugins.commands.RemoveTags;
-import com.playmonumenta.plugins.commands.RestartEmptyCommand;
-import com.playmonumenta.plugins.commands.ReworkRefundInfusions;
-import com.playmonumenta.plugins.commands.RunRegion;
-import com.playmonumenta.plugins.commands.ShatterHeldItem;
-import com.playmonumenta.plugins.commands.SkillDescription;
-import com.playmonumenta.plugins.commands.SkillSummary;
-import com.playmonumenta.plugins.commands.Spectate;
-import com.playmonumenta.plugins.commands.SpectateBot;
-import com.playmonumenta.plugins.commands.StasisCommand;
-import com.playmonumenta.plugins.commands.StatTrackItem;
-import com.playmonumenta.plugins.commands.Stuck;
-import com.playmonumenta.plugins.commands.TeleportAsync;
-import com.playmonumenta.plugins.commands.TeleportByScore;
-import com.playmonumenta.plugins.commands.ToggleSwap;
-import com.playmonumenta.plugins.commands.UnlockHeldItem;
-import com.playmonumenta.plugins.commands.UnsignBook;
-import com.playmonumenta.plugins.commands.UpTimeCommand;
-import com.playmonumenta.plugins.commands.UpdateHeldItem;
-import com.playmonumenta.plugins.commands.VirtualFirmament;
+import com.playmonumenta.plugins.commands.*;
 import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorCommand;
 import com.playmonumenta.plugins.cosmetics.CosmeticsCommand;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
@@ -79,6 +15,8 @@ import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.guis.SinglePageGUIManager;
+import com.playmonumenta.plugins.infinitytower.TowerCommands;
+import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -95,6 +33,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
 import com.playmonumenta.plugins.listeners.ArrowListener;
 import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.listeners.BlockInteractionsListener;
 import com.playmonumenta.plugins.listeners.BrewingListener;
 import com.playmonumenta.plugins.listeners.CrossbowListener;
 import com.playmonumenta.plugins.listeners.DamageListener;
@@ -146,16 +85,15 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
 
 public class Plugin extends JavaPlugin {
 	public static final boolean IS_PLAY_SERVER;
@@ -186,6 +124,7 @@ public class Plugin extends JavaPlugin {
 
 	public JunkItemListener mJunkItemsListener;
 	public ItemDropListener mItemDropListener;
+	public BlockInteractionsListener mBlockInteractionsListener;
 	private @Nullable HttpManager mHttpManager = null;
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
@@ -197,6 +136,7 @@ public class Plugin extends JavaPlugin {
 	public ParrotManager mParrotManager;
 	public ItemStatManager mItemStatManager;
 	public ChessManager mChessManager;
+	public TowerManager mTowerManager;
 	public SignUtils mSignUtils;
 	public DeathItemListener mDeathItemListener;
 	public ItemOverrides mItemOverrides;
@@ -227,17 +167,8 @@ public class Plugin extends JavaPlugin {
 		 */
 		StasisCommand.register();
 		GiveSoulbound.register();
-		HopeifyHeldItem.register();
-		ColossalifyHeldItem.register();
-		FestiveHeldItem.register();
-		GildifyHeldItem.register();
-		InfuseHeldItem.register();
 		ClaimRaffle.register(this);
-		BarkifyHeldItem.register();
-		DeCluckifyHeldItem.register();
 		ShatterHeldItem.register();
-		DeBarkifyHeldItem.register();
-		PhylacteryifyHeldItem.register();
 		CalculateReforge.register();
 		ReforgeHeldItem.register();
 		ReforgeInventory.register();
@@ -253,7 +184,6 @@ public class Plugin extends JavaPlugin {
 		RedeemVoteRewards.register(this.getLogger());
 		BossFight.register();
 		SpellDetectionCircle.registerCommand(this);
-		RunRegion.register();
 		SkillDescription.register(this);
 		SkillSummary.register(this);
 		TeleportAsync.register();
@@ -269,12 +199,9 @@ public class Plugin extends JavaPlugin {
 		Magnetize.register();
 		UnsignBook.register();
 		GetScoreCommand.register();
-		Grave.register();
+		GraveCommand.register();
 		StatTrackItem.register();
-		LockedHeldItem.register();
-		UnlockHeldItem.register();
 		ToggleSwap.register(this);
-		DelveInfuseHeldItem.register();
 		CustomInventoryCommands.register(this);
 		AdminNotify.register();
 		ItemStatUtils.registerInfoCommand();
@@ -282,8 +209,8 @@ public class Plugin extends JavaPlugin {
 		ItemStatUtils.registerNameCommand();
 		ItemStatUtils.registerEnchCommand();
 		ItemStatUtils.registerAttrCommand();
+		ItemStatUtils.registerRemoveCommand();
 		PlayerItemStatsGUICommand.register(this);
-		ReworkRefundInfusions.register();
 		AuditLogCommand.register();
 		PickLevelAfterAnvils.register();
 		GenerateItems.register();
@@ -297,6 +224,8 @@ public class Plugin extends JavaPlugin {
 		SeasonalEventCommand.register(this);
 		CosmeticsCommand.register(this);
 		NameMCVerify.register(this);
+		TellMiniMessage.register();
+
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -320,6 +249,7 @@ public class Plugin extends JavaPlugin {
 
 		mJunkItemsListener = new JunkItemListener();
 		mItemDropListener = new ItemDropListener();
+		mBlockInteractionsListener = new BlockInteractionsListener();
 	}
 
 	//  Logic that is performed upon enabling the plugin.
@@ -362,6 +292,7 @@ public class Plugin extends JavaPlugin {
 		mItemStatManager = new ItemStatManager(this);
 		mChessManager = new ChessManager(this);
 		mSignUtils = new SignUtils(this);
+		mTowerManager = new TowerManager(this);
 		mCosmeticsManager = CosmeticsManager.getInstance();
 		mSeasonalEventManager = new SeasonalEventManager();
 
@@ -385,7 +316,15 @@ public class Plugin extends JavaPlugin {
 
 		if (ServerProperties.getShardName().contains("valley")
 			|| ServerProperties.getShardName().contains("dev")) {
+
+			//minigames can only be on devshard or valley
+			TowerCommands.register(this);
 			manager.registerEvents(mChessManager, this);
+			manager.registerEvents(mTowerManager, this);
+		}
+
+		if (ServerProperties.getShardName().contains("mobs")) {
+			TowerCommands.registerDesign(this);
 		}
 
 		if (ServerProperties.getAuditMessagesEnabled()) {
@@ -408,6 +347,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new CrossbowListener(this), this);
 		manager.registerEvents(mJunkItemsListener, this);
 		manager.registerEvents(mItemDropListener, this);
+		manager.registerEvents(mBlockInteractionsListener, this);
 		manager.registerEvents(mBossManager, this);
 		manager.registerEvents(mEffectManager, this);
 		manager.registerEvents(mParrotManager, this);
@@ -567,6 +507,7 @@ public class Plugin extends JavaPlugin {
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
 
+		TowerManager.unload();
 		mChessManager.unloadAll();
 		mTrackingManager.unloadTrackedEntities();
 		if (mHttpManager != null) {

@@ -16,60 +16,6 @@ import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.World;
-import org.bukkit.attribute.Attributable;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.block.Block;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.AreaEffectCloud;
-import org.bukkit.entity.Bee;
-import org.bukkit.entity.Blaze;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Flying;
-import org.bukkit.entity.Ghast;
-import org.bukkit.entity.Giant;
-import org.bukkit.entity.Hoglin;
-import org.bukkit.entity.LargeFireball;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.MagmaCube;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Phantom;
-import org.bukkit.entity.PigZombie;
-import org.bukkit.entity.Piglin;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.PolarBear;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.PufferFish;
-import org.bukkit.entity.Rabbit;
-import org.bukkit.entity.Shulker;
-import org.bukkit.entity.SkeletonHorse;
-import org.bukkit.entity.Slime;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.entity.Vex;
-import org.bukkit.entity.Wither;
-import org.bukkit.entity.WitherSkeleton;
-import org.bukkit.entity.Wolf;
-import org.bukkit.entity.ZombieHorse;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BlockIterator;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -81,6 +27,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
+import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.attribute.Attributable;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.block.Block;
+import org.bukkit.entity.*;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BlockIterator;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
 
 
 public class EntityUtils {
@@ -384,7 +352,7 @@ public class EntityUtils {
 			//  Make sure to only get living entities.
 			if (e instanceof LivingEntity) {
 				//  Make sure we should be targeting this entity.
-				if ((targetPlayers && (e instanceof Player)) || (targetNonPlayers && !(e instanceof Player))) {
+				if ((targetPlayers && (e instanceof Player ep) && ep.getGameMode() != GameMode.SPECTATOR) || (targetNonPlayers && !(e instanceof Player))) {
 					entities.add((LivingEntity) e);
 				}
 			}
@@ -412,7 +380,7 @@ public class EntityUtils {
 			by = b.getY();
 			bz = b.getZ();
 
-			//  If we want to check Line of sight we want to make sure the the blocks are transparent.
+			//  If we want to check Line of sight we want to make sure that the blocks are transparent.
 			if (checkLos && LocationUtils.isLosBlockingBlock(b.getType())) {
 				break;
 			}
@@ -852,6 +820,10 @@ public class EntityUtils {
 	}
 
 	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player) {
+		if (target instanceof ArmorStand || target.isInvulnerable()) {
+			return;
+		}
+
 		int inferno = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.INFERNO);
 		if (inferno > 0) {
 			Inferno.apply(plugin, player, inferno, target, fireTicks);
@@ -924,12 +896,14 @@ public class EntityUtils {
 			startTracker(plugin);
 		}
 
-		if (mob instanceof Mob) {
-			((Mob) mob).setTarget(null);
+		if (mob instanceof Mob m) {
+			m.setTarget(null);
 		}
 
-		/* Fake "event" so bosses can handle being stunned if they need to */
-		BossManager.getInstance().entityStunned(mob);
+		if (MetadataUtils.checkOnceThisTick(plugin, mob, "StunnedThisTick")) {
+			/* Fake "event" so bosses can handle being stunned if they need to */
+			BossManager.getInstance().entityStunned(mob);
+		}
 
 		// Only reduce speed if mob is not already in map. We can avoid storing original speed by just +/- 10.
 		Integer t = STUNNED_MOBS.get(mob);

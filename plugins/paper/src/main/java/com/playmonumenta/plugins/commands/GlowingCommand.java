@@ -8,18 +8,16 @@ import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
 
 public class GlowingCommand {
 
@@ -37,39 +35,45 @@ public class GlowingCommand {
 		// special option for toggling all entities on/off.
 		ALL("all entities", -1) {
 			@Override
-			boolean appliesTo(Entity entity) {
+			boolean appliesTo(Player player, Entity entity) {
 				return true;
 			}
 		},
 
 		// normal options
-		PLAYERS("players", 1) {
+		OTHER_PLAYERS("other players", 1) {
 			@Override
-			boolean appliesTo(Entity entity) {
-				return entity instanceof Player;
+			boolean appliesTo(Player player, Entity entity) {
+				return entity instanceof Player && entity != player;
+			}
+		},
+		SELF("yourself", 6) {
+			@Override
+			boolean appliesTo(Player player, Entity entity) {
+				return player == entity;
 			}
 		},
 		MOBS("mobs", 2) {
 			@Override
-			boolean appliesTo(Entity entity) {
+			boolean appliesTo(Player player, Entity entity) {
 				return entity instanceof Mob;
 			}
 		},
 		BOSSES("bosses", 3) {
 			@Override
-			boolean appliesTo(Entity entity) {
+			boolean appliesTo(Player player, Entity entity) {
 				return entity.getScoreboardTags().contains("Boss");
 			}
 		},
-		INVISIBLE("invisible entities", 4) {
+		INVISIBLE("invisible mobs", 4) {
 			@Override
-			boolean appliesTo(Entity entity) {
-				return entity instanceof LivingEntity && ((LivingEntity) entity).isInvisible();
+			boolean appliesTo(Player player, Entity entity) {
+				return entity instanceof Mob && ((Mob) entity).isInvisible();
 			}
 		},
 		EXPERIENCE_ORBS("experience orbs", 5) {
 			@Override
-			boolean appliesTo(Entity entity) {
+			boolean appliesTo(Player player, Entity entity) {
 				return entity instanceof ExperienceOrb;
 			}
 		},
@@ -77,9 +81,9 @@ public class GlowingCommand {
 		// a somewhat special option that matches every entity that no other option matches
 		MISC("miscellaneous entities", 31) {
 			@Override
-			boolean appliesTo(Entity entity) {
+			boolean appliesTo(Player player, Entity entity) {
 				return Arrays.stream(Option.values())
-						.noneMatch(option -> option != ALL && option != MISC && option.appliesTo(entity));
+					.noneMatch(option -> option != ALL && option != MISC && option.appliesTo(player, entity));
 			}
 		};
 
@@ -94,7 +98,7 @@ public class GlowingCommand {
 			mPackedIndex = packedIndex;
 		}
 
-		abstract boolean appliesTo(Entity entity);
+		abstract boolean appliesTo(Player player, Entity entity);
 
 		@Override
 		public String toString() {
@@ -226,11 +230,11 @@ public class GlowingCommand {
 		}
 	}
 
-	public static boolean isGlowingEnabled(int scoreboardValue, Entity entity) {
+	public static boolean isGlowingEnabled(Player player, int scoreboardValue, Entity entity) {
 		for (Option option : Option.values()) {
 			if (option != Option.ALL
-					&& option.appliesTo(entity)
-					&& isOptionEnabled(scoreboardValue, option)) {
+				    && option.appliesTo(player, entity)
+				    && isOptionEnabled(scoreboardValue, option)) {
 				return true;
 			}
 		}

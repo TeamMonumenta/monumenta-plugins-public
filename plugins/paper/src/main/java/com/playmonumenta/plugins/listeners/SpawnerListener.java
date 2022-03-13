@@ -1,14 +1,12 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.Plugin;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import com.playmonumenta.plugins.Plugin;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -86,7 +84,7 @@ public class SpawnerListener implements Listener {
 	public void spawnerSpawnEvent(SpawnerSpawnEvent event) {
 		Entity mob = event.getEntity();
 
-		List<MobInfo> spawnerInfo = mSpawnerInfos.putIfAbsent(event.getSpawner().getLocation(), new ArrayList<>());
+		List<MobInfo> spawnerInfo = mSpawnerInfos.computeIfAbsent(event.getSpawner().getLocation(), k -> new ArrayList<>());
 
 		// Generate list of player locations a single time
 		List<Location> playerLocations = new ArrayList<Location>();
