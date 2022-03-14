@@ -338,8 +338,12 @@ public class TowerGame {
 		if (!mIsGameEnded) {
 			mIsGameEnded = true;
 			mIsTurnEnded = true;
-			mAesthetics.cancel();
-			mCountDown.cancel();
+			if (mAesthetics != null) {
+				mAesthetics.cancel();
+			}
+			if (mCountDown != null) {
+				mCountDown.cancel();
+			}
 			clearMobs();
 		}
 		if (mCurrentFloor > TowerConstants.DESIGNED_FLOORS - 1 && mFloor != null) {
@@ -350,7 +354,7 @@ public class TowerGame {
 				TowerFileUtils.convertPlayerTeamLocation(this);
 				TowerFileUtils.savePlayerTeam(mPlayer.mTeam, mCurrentFloor - 1);
 			}
-			TowerGameUtils.sendMessage(mPlayer.mPlayer, "Congratulations! your team will now defend " + (mCurrentFloor + 1) + "th round");
+			TowerGameUtils.sendMessage(mPlayer.mPlayer, "Congratulations! your team will now defend round " + (mCurrentFloor + 1));
 		}
 
 		TowerGameUtils.giveLoot(this);
