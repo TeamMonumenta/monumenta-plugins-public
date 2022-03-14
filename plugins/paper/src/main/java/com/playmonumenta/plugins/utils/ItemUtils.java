@@ -26,12 +26,14 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -1243,6 +1245,15 @@ public class ItemUtils {
 	}
 
 	public static Component getItemNameComponentWithHover(ItemStack item) {
-		return getItemNameComponent(item).hoverEvent(item.asHoverEvent());
+		ItemStack clone = item.clone();
+		if (clone.getItemMeta() instanceof BookMeta book) {
+			book.setPages();
+			clone.setItemMeta(book);
+		} else if (clone.getItemMeta() instanceof BlockStateMeta blockStateMeta && blockStateMeta.getBlockState() instanceof ShulkerBox shulker) {
+			shulker.getInventory().clear();
+			blockStateMeta.setBlockState(shulker);
+			clone.setItemMeta(blockStateMeta);
+		}
+		return getItemNameComponent(item).hoverEvent(clone.asHoverEvent());
 	}
 }

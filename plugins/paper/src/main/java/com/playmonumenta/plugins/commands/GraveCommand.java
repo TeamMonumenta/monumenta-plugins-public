@@ -438,7 +438,7 @@ public class GraveCommand {
 				} else {
 					player.sendMessage(Component.text("Are you sure you want to fully delete grave " + index + "? This cannot be undone!", NamedTextColor.RED, TextDecoration.BOLD));
 					player.sendMessage(Component.text("Item" + (grave.getItems().size() > 1 ? "s" : "") + " in the grave: ", NamedTextColor.AQUA)
-						.append(grave.getItemList()));
+						.append(grave.getItemList(true)));
 					player.sendMessage(Component.text()
 						.append(Component.text("[DELETE]", NamedTextColor.RED)
 							.hoverEvent(HoverEvent.showText(Component.text("Delete the grave. Cannot be undone!", NamedTextColor.RED)))
