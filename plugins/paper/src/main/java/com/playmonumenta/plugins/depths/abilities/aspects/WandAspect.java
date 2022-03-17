@@ -41,7 +41,7 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "You deal " + DAMAGE + " extra damage with wand attacks, and all abilities casted with a wand benefit from " + (int) (SPELL_MOD * 100) + "% of the wands spell power.";
+		return "You deal " + DAMAGE + " extra melee damage while holding a wand, and all ability damage is increased by " + (int) (SPELL_MOD * 100) + "% of the wand's spell power.";
 	}
 }
 

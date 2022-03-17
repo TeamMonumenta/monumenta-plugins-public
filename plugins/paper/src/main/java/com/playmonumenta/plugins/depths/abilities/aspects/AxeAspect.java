@@ -40,7 +40,7 @@ public class AxeAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "You deal " + DAMAGE + " extra damage with axe attacks and gain " + (int) DepthsUtils.roundPercent(ATTACK_SPEED) + "% attack speed.";
+		return "You deal " + DAMAGE + " extra melee damage and gain " + (int) DepthsUtils.roundPercent(ATTACK_SPEED) + "% attack speed when holding an axe.";
 	}
 }
 
