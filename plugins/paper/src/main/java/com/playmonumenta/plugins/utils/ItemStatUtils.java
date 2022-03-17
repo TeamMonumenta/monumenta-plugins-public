@@ -1303,7 +1303,7 @@ public class ItemStatUtils {
 	}
 
 	public static boolean shatter(final @Nullable ItemStack item) {
-		if (item == null || item.getType() == Material.AIR) {
+		if (item == null || item.getType() == Material.AIR || getTier(item) == Tier.NONE) {
 			return false;
 		}
 		NBTItem nbt = new NBTItem(item);

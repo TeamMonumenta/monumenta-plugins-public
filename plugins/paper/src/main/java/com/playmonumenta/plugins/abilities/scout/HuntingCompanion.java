@@ -32,7 +32,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -92,10 +91,9 @@ public class HuntingCompanion extends Ability {
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		Damageable damageable = (Damageable) inMainHand.getItemMeta();
-		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isBowOrTrident(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability() && !ItemStatUtils.isShattered(inMainHand))) {
+		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isBowOrTrident(inMainHand) && !ItemStatUtils.isShattered(inMainHand)) {
 			putOnCooldown();
-			mStunnedMobs = new ArrayList<Entity>();
+			mStunnedMobs = new ArrayList<>();
 
 			if (mFox != null) {
 				mFox.remove();
@@ -142,13 +140,6 @@ public class HuntingCompanion extends Ability {
 
 			mFox.setVelocity(facingDirection.clone().setY(JUMP_HEIGHT).normalize().multiply(VELOCITY));
 			mFox.teleport(mFox.getLocation().setDirection(facingDirection));
-
-			//Shatter if durability is 0 and isn't shattered.
-			//This is needed because Hunting Companion doesn't consume durability, but there is a high-damage uncommon bow
-			//with 0 durability that should not be infinitely usable.
-			if (damageable.getDamage() >= inMainHand.getType().getMaxDurability() && !ItemStatUtils.isShattered(inMainHand)) {
-				ItemStatUtils.shatter(inMainHand);
-			}
 
 			world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
 			world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);

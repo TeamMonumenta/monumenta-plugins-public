@@ -672,9 +672,7 @@ public class ItemUtils {
 			int currentDamage = dMeta.getDamage();
 			int newDamage = currentDamage + damage;
 			if (canBreak && newDamage > maxDurability - 1) {
-				if (ItemStatUtils.getTier(item) != null) {
-					ItemStatUtils.shatter(item);
-				} else {
+				if (!ItemStatUtils.shatter(item)) {
 					item.setAmount(0);
 				}
 			} else {
@@ -692,9 +690,7 @@ public class ItemUtils {
 			int currentDamage = dMeta.getDamage();
 			int newDamage = (int) (currentDamage + (maxDurability * damagePercent) / 100);
 			if (canBreak && newDamage > maxDurability - 1) {
-				if (ItemStatUtils.getTier(item) != null) {
-					ItemStatUtils.shatter(item);
-				} else {
+				if (!ItemStatUtils.shatter(item)) {
 					item.setAmount(0);
 				}
 			} else {
