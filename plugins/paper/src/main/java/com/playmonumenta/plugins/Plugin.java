@@ -225,6 +225,7 @@ public class Plugin extends JavaPlugin {
 		CosmeticsCommand.register(this);
 		NameMCVerify.register(this);
 		TellMiniMessage.register();
+		RunWithPlaceholdersCommand.register();
 
 
 		try {

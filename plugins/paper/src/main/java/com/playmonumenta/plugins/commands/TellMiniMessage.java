@@ -4,7 +4,7 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import java.util.Collection;
-import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
@@ -21,8 +21,9 @@ public class TellMiniMessage {
 				Collection<Player> recipients = (Collection<Player>) args[0];
 				String message = (String) args[1];
 
+				Component parsedMessage = MiniMessage.miniMessage().parse(message);
 				for (Player recipient : recipients) {
-					recipient.sendMessage(MiniMessage.miniMessage().parse(PlaceholderAPI.setPlaceholders(recipient, message)));
+					recipient.sendMessage(parsedMessage);
 				}
 			}).register();
 	}
