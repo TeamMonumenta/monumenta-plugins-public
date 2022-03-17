@@ -83,6 +83,7 @@ public final class Grave {
 	HashSet<GraveItem> mItems;
 	private @Nullable ArmorStand mEntity;
 	private final HashSet<UUID> mGraveMessageCooldown = new HashSet<>();
+	private boolean mLoggedOut = false;
 
 	boolean mAlertedSpawned = false;
 	boolean mAlertedLimbo = false;
@@ -223,7 +224,7 @@ public final class Grave {
 
 	private boolean canSpawn() {
 		World world = mPlayer.getWorld();
-		if ((mEntity == null || !mEntity.isValid()) && isInThisWorld()) {
+		if (!mLoggedOut && (mEntity == null || !mEntity.isValid()) && isInThisWorld()) {
 			mLocation.setWorld(world);
 			return mLocation.isChunkLoaded();
 		}
@@ -403,6 +404,7 @@ public final class Grave {
 	}
 
 	void onLogout() {
+		mLoggedOut = true;
 		remove();
 		mManager.removeUnloadedGrave(Chunk.getChunkKey(mLocation), this);
 		for (GraveItem item : mItems) {

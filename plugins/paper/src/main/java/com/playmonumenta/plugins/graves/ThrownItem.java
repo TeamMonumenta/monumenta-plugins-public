@@ -41,6 +41,7 @@ public class ThrownItem {
 	Integer mDungeonInstance;
 	private Short mAge;
 	private boolean mValid;
+	private boolean mLoggedOut = false;
 
 	// Full ThrownItem from deserialization
 	public ThrownItem(GraveManager manager, Player player, ItemStack item, String world, Location location, Vector velocity, Integer instance, Short age) {
@@ -95,7 +96,7 @@ public class ThrownItem {
 	}
 
 	private boolean canSpawn() {
-		if (isInThisWorld() && (mEntity == null || !mEntity.isValid())) {
+		if (!mLoggedOut && isInThisWorld() && (mEntity == null || !mEntity.isValid())) {
 			mLocation.setWorld(mPlayer.getWorld());
 			return mLocation.isChunkLoaded();
 		}
@@ -170,6 +171,7 @@ public class ThrownItem {
 	}
 
 	void onLogout() {
+		mLoggedOut = true;
 		remove();
 		mManager.removeUnloadedItem(Chunk.getChunkKey(mLocation), this);
 	}
