@@ -6,6 +6,7 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import java.util.EnumSet;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -76,7 +77,7 @@ public final class BlockInteractionsListener implements Listener {
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		Block block = event.getClickedBlock();
 		Player player = event.getPlayer();
-		if (block != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && !player.isSneaking() && !ServerProperties.getIsTownWorld() && !player.getInventory().getItemInMainHand().getType().isAir() && player.getScoreboardTags().contains(DISABLE_TAG) && INTERACTABLES.contains(block.getType())) {
+		if (block != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && !player.isSneaking() && player.getGameMode() == GameMode.SURVIVAL && !ServerProperties.getIsTownWorld() && !player.getInventory().getItemInMainHand().getType().isAir() && player.getScoreboardTags().contains(DISABLE_TAG) && INTERACTABLES.contains(block.getType())) {
 			event.setCancelled(true);
 		}
 	}
