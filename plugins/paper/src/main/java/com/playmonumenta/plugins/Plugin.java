@@ -89,11 +89,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 
 public class Plugin extends JavaPlugin {
 	public static final boolean IS_PLAY_SERVER;
@@ -264,7 +267,12 @@ public class Plugin extends JavaPlugin {
 		 * This is used by mechanisms to test if this is the build server or the play server, like:
 		 * /execute if score $IsPlay const matches 1 run ...
 		 */
-		ScoreboardUtils.setScoreboardValue("$IsPlay", "const", IS_PLAY_SERVER ? 1 : 0);
+		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+		Objective obj = scoreboard.getObjective("const");
+		if (obj == null) {
+			obj = scoreboard.registerNewObjective("const", "dummy", Component.text("const"));
+		}
+		obj.getScore("$IsPlay").setScore(IS_PLAY_SERVER ? 1 : 0);
 		getLogger().info("Setting $IsPlay const = " + Integer.toString(IS_PLAY_SERVER ? 1 : 0) + " (" + (IS_PLAY_SERVER ? "play" : "build") + " server)");
 
 		PluginManager manager = getServer().getPluginManager();
