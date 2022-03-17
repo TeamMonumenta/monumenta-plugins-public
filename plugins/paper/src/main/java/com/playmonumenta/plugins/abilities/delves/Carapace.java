@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
 
 public class Carapace extends DelveModifier {
 	private static final List<List<String>> ABILITY_POOL;
@@ -82,7 +83,7 @@ public class Carapace extends DelveModifier {
 	}
 
 	@Override
-	public void applyModifiers(LivingEntity mob, EntitySpawnEvent event) {
+	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
 		if (FastUtils.RANDOM.nextDouble() < mAbilityChance) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
 			List<String> ability = ABILITY_POOL.get(FastUtils.RANDOM.nextInt(ABILITY_POOL.size()));

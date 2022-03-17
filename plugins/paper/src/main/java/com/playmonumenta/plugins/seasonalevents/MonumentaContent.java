@@ -10,7 +10,7 @@ public enum MonumentaContent {
 	LIGHTBLUE("lightblue", ContentType.DUNGEON, 1),
 	YELLOW("yellow", ContentType.DUNGEON, 1),
 	WILLOWS("willows", ContentType.DUNGEON, 1),
-	SANCTUM("sanctum", ContentType.DUNGEON, 1),
+	SANCTUM("sanctum", ContentType.STRIKE, 1),
 	REVERIE("reverie", ContentType.DUNGEON, 1),
 	CORRIDORS("corridors", ContentType.DUNGEON, 1),
 	VERDANT("verdant", ContentType.STRIKE, 1),

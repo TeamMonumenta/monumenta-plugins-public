@@ -108,7 +108,7 @@ public class StatMultiplier extends DelveModifier {
 		if (isDepthsShard()) {
 			double basePoints = Math.min(25, depthPoints);
 			double bonusPoints = Math.max(0, (depthPoints - 25) / 2.0);
-			return 1 + ((basePoints + bonusPoints) * DAMAGE_MULTIPLIER_INCREMENT);
+			return 1 + ((basePoints + bonusPoints) * HEALTH_MULTIPLIER_INCREMENT);
 		}
 		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * HEALTH_MULTIPLIER_INCREMENT;
 	}
