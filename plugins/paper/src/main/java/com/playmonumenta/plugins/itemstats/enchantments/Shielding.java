@@ -40,8 +40,8 @@ public class Shielding implements Enchantment {
 		return 0;
 	}
 
-	public static boolean doesShieldingApply(Player player, LivingEntity source) {
-		return player.getLocation().distance(source.getLocation()) <= DISTANCE;
+	public static boolean doesShieldingApply(Player player, @Nullable LivingEntity source) {
+		return source != null && player.getLocation().distance(source.getLocation()) <= DISTANCE;
 	}
 
 	public static void disable(Player player) {

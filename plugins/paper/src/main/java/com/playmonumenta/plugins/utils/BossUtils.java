@@ -125,30 +125,30 @@ public class BossUtils {
 		}
 	}*/
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, null);
 	}
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location) {
 		return bossDamagePercent(boss, target, percentHealth, location, false, null);
 	}
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw) {
 		return bossDamagePercent(boss, target, percentHealth, location, raw, null);
 	}
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, String cause) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, String cause) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, cause);
 	}
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, @Nullable String cause) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, @Nullable String cause) {
 		return bossDamagePercent(boss, target, percentHealth, location, false, cause);
 	}
 
 	/*
 	 * Returns whether or not the player survived (true) or was killed (false)
 	 */
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause) {
 		if (percentHealth <= 0) {
 			return true;
 		}
