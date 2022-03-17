@@ -285,13 +285,29 @@ public class BossTagCommand {
 
 		int index = newTag.indexOf("[");
 		if (index != -1) {
-			/* TODO:
-			if (!BossUtils.checkParametersStringPropriety(newTag.substring(index, newTag.length()))) {
-				CommandAPI.fail("Parameters property not rispected. (May be to many brackets?)");
-			}
-			*/
-
 			String bossTag = newTag.substring(0, index);
+
+			try {
+				BossUtils.checkParametersStringProperty(newTag);
+			} catch (Exception e) {
+				player.sendMessage(Component.empty()
+					.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					.append(Component.text("problems during parsing bosstag. Reason: " + e.getMessage(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+				player.sendMessage(Component.empty()
+					.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					.append(Component.text(newTag, NamedTextColor.RED).decoration(TextDecoration.BOLD, false)));
+
+				player.sendMessage(Component.empty()
+					.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					.append(Component.text("Do you still want to add this tag?", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+				player.sendMessage(Component.empty()
+					.append(Component.text("[YES] ", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.BOLD, true).clickEvent(
+						ClickEvent.runCommand("/bos var Tags add " + newTag)
+					)));
+				return;
+			}
+
+
 			Boolean found = false;
 			Map<String, String> oldParams = new HashMap<>();
 			Map<String, String> newParams = new HashMap<>();

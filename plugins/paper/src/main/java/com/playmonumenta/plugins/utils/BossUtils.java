@@ -306,4 +306,48 @@ public class BossUtils {
 	public static String translateFieldNameToTag(String fieldName) {
 		return fieldName.toLowerCase().replaceAll("[^a-z0-9]", "");
 	}
+
+	public static boolean checkParametersStringProperty(String tag) throws Exception {
+		int roundBrackets = 0;
+		int squareBrackets = 0;
+		boolean doubleQuote = false;
+
+		for (int i = 0; i < tag.length(); i++) {
+			char c = tag.charAt(i);
+			switch (c) {
+				case '[' -> {
+					squareBrackets = doubleQuote ? squareBrackets : squareBrackets + 1;
+				}
+				case ']' -> {
+					squareBrackets = doubleQuote ? squareBrackets : squareBrackets - 1;
+				}
+				case '(' -> {
+					roundBrackets = doubleQuote ? roundBrackets : roundBrackets + 1;
+				}
+				case ')' -> {
+					roundBrackets = doubleQuote ? roundBrackets : roundBrackets - 1;
+				}
+				case '"' -> {
+					doubleQuote = !doubleQuote;
+				}
+				default -> {
+				}
+			}
+		}
+
+		if (roundBrackets != 0) {
+			throw new Exception("too many round brackets () " + roundBrackets);
+		}
+
+		if (squareBrackets != 0) {
+			throw new Exception("too many square brackets [] " + squareBrackets);
+		}
+
+		if (doubleQuote) {
+			throw new Exception("too many double_Quote \" ");
+		}
+
+		return true;
+
+	}
 }
