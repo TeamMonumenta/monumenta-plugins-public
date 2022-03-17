@@ -37,13 +37,12 @@ public class Chaotic implements Enchantment {
 	}
 
 	@Override
-	public void onDamage(@NotNull Plugin plugin, @NotNull Player player, double value, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
-		double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CHAOTIC);
-		int rand = FastUtils.RANDOM.nextInt(2 * (int) level + 1) - (int) level;
-		if (event.getType() == DamageType.MELEE && rand > 0) {
+	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+		int rand = FastUtils.RANDOM.nextInt(2 * (int) value + 1) - (int) value;
+		if (event.getType() == DamageType.MELEE) {
 			player.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, enemy.getLocation().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.001);
 			event.setDamage(Math.max(0, event.getDamage() + rand * player.getCooledAttackStrength(0)));
-		} else if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident && rand > 0) {
+		} else if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
 			event.setDamage(Math.max(0, event.getDamage() + rand));
 		}
 	}
