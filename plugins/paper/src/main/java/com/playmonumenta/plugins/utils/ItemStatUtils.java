@@ -1724,6 +1724,29 @@ public class ItemStatUtils {
 		}).register();
 
 		arguments.clear();
+		arguments.add(new MultiLiteralArgument("replace"));
+		arguments.add(new IntegerArgument("index", 0));
+		arguments.add(new GreedyStringArgument("lore"));
+		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			String lore = (String) args[2];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			removeLore(item, index);
+			addLore(item, index, MessagingUtils.fromMiniMessage(lore));
+
+			generateItemStats(item);
+		}).register();
+
+		arguments.clear();
 		arguments.add(new MultiLiteralArgument("register"));
 
 		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
