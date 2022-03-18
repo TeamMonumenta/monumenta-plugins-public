@@ -33,6 +33,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -371,6 +372,7 @@ public class SpellDimensionDoor extends Spell {
 
 		new BukkitRunnable() {
 			int mT = tick;
+			boolean mTrigger = false;
 
 			@Override
 			public void run() {
@@ -417,6 +419,12 @@ public class SpellDimensionDoor extends Spell {
 					bar.setVisible(false);
 					bar.removeAll();
 					this.cancel();
+				}
+				if (p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.SUFFOCATION && !mTrigger) {
+					//something went wrong with the other check, catching wrong tp
+					p.teleport(shadowLoc.clone().add(-5, 0, 0));
+					spectre.teleport(shadowLoc.clone().add(5, 0, 0));
+					mTrigger = true;
 				}
 			}
 		}.runTaskTimer(plugin, 0, 2);
