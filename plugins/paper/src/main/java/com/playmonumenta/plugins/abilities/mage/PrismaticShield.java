@@ -22,8 +22,8 @@ public class PrismaticShield extends Ability {
 
 	private static final float RADIUS = 4.0f;
 	private static final int TRIGGER_HEALTH = 6;
-	private static final int ABSORPTION_HEALTH_1 = 8;
-	private static final int ABSORPTION_HEALTH_2 = 12;
+	private static final int ABSORPTION_HEALTH_1 = 4;
+	private static final int ABSORPTION_HEALTH_2 = 8;
 	private static final int DURATION = 12 * 20;
 	private static final int COOLDOWN_1 = 90 * 20;
 	private static final int COOLDOWN_2 = 70 * 20;
@@ -37,8 +37,8 @@ public class PrismaticShield extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.PRISMATIC_SHIELD;
 		mInfo.mScoreboardId = "Prismatic";
 		mInfo.mShorthandName = "PS";
-		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive 4 Absorption hearts which lasts up to 12 s. In addition enemies within four blocks are knocked back. Cooldown: 90s.");
-		mInfo.mDescriptions.add("The shield is improved to 6 Absorption hearts. Enemies within four blocks are knocked back and stunned for 1 s. Cooldown: 70s.");
+		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive 2 Absorption hearts which lasts up to 12 s. In addition enemies within four blocks are knocked back. Cooldown: 90s.");
+		mInfo.mDescriptions.add("The shield is improved to 4 Absorption hearts. Enemies within four blocks are knocked back and stunned for 1 s. Cooldown: 70s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mAbsorptionHealth = getAbilityScore() == 1 ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2;
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
