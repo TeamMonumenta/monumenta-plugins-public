@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.plots;
 
+import com.playmonumenta.plugins.cosmetics.CosmeticType;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
@@ -34,26 +36,43 @@ public class PlotBorderCustomInventory extends CustomInventory {
 	 * Pages 20-29: Region 2
 	 * Pages 50-on: Common pages
 	 */
+	private enum PermType {
+		SCOREBOARD, COSMETIC_ITEM
+	}
 
 	public static class TeleportEntry {
 		int mPage;
 		int mSlot;
 		String mName;
-		@Nullable String mScoreboard;
 		String mLore;
+		PermType mPermType;
+		String mCosmeticString;
+		@Nullable String mScoreboard;
 		int mScoreRequired;
 		Material mType;
 		String mLeftClick;
 
-		public TeleportEntry(int p, int s, String n, String l, Material t, @Nullable String sc, int sr, String left) {
-			mPage = p;
-			mSlot = s;
-			mName = n;
-			mLore = l;
-			mType = t;
-			mScoreboard = sc;
-			mScoreRequired = sr;
-			mLeftClick = left;
+		public TeleportEntry(int page, int slot, String name, String lore, Material type, @Nullable String scoreboard, int scoreRequired, String leftClick) {
+			mPage = page;
+			mSlot = slot;
+			mName = name;
+			mLore = lore;
+			mType = type;
+			mPermType = PermType.SCOREBOARD;
+			mScoreboard = scoreboard;
+			mScoreRequired = scoreRequired;
+			mLeftClick = leftClick;
+		}
+
+		public TeleportEntry(int page, int slot, String name, String lore, Material type, String cosmetic, String leftClick) {
+			mPage = page;
+			mSlot = slot;
+			mName = name;
+			mLore = lore;
+			mType = type;
+			mPermType = PermType.COSMETIC_ITEM;
+			mCosmeticString = cosmetic;
+			mLeftClick = leftClick;
 		}
 	}
 	/* Page Info
@@ -85,6 +104,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		BORDER_ITEMS.add(new TeleportEntry(2, 22, "Kaul's Arena", "Located in the Kaul arena.", Material.JUNGLE_LEAVES, "KaulWins", 1, "kaul_arena"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 23, "Eldrask's Arena", "Located in the Eldrask arena.", Material.PACKED_ICE, "FGWins", 1, "eldrask_arena"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 24, "Hekawt's Arena", "Located in the Hekawt arena.", Material.RED_SANDSTONE, "LichWins", 1, "hekawt_arena"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 31, "Verdant Remnants", "A plot located right in the middle of Verdant Remnants.", Material.JUNGLE_SAPLING, "Verdant Remnants", "dungeons/verdant_remnants"));
 
 		BORDER_ITEMS.add(new TeleportEntry(3, 18, "Halls of Wind and Blood", "A plot right in the middle of the main room.", Material.WHITE_WOOL, "White", 1, "dungeons/white"));
 		BORDER_ITEMS.add(new TeleportEntry(3, 19, "Arcane Rivalry", "Located in the lake looking in towards the first castle.", Material.LIGHT_BLUE_WOOL, "LightBlue", 1, "dungeons/lightblue"));
@@ -205,17 +225,28 @@ public class PlotBorderCustomInventory extends CustomInventory {
 
 	public void setLayout(Player player) {
 		mInventory.clear();
+		CosmeticsManager cosmetics = CosmeticsManager.getInstance();
 		int commonPage = (int) Math.floor(mCurrentPage / 10.0) * 10;
 		for (TeleportEntry item : BORDER_ITEMS) {
 			if (item.mPage == commonPage) {
-				if (item.mScoreboard == null || mOverridePermissions ||
-						ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired) {
+				if (item.mPermType == PermType.COSMETIC_ITEM &&
+					(mOverridePermissions || cosmetics.playerHasCosmetic(player, item.mCosmeticString, CosmeticType.PLOT_BORDER))) {
+					mInventory.setItem(item.mSlot, createCustomItem(item));
+				} else if (item.mPermType == PermType.SCOREBOARD &&
+						(item.mScoreboard == null || mOverridePermissions ||
+						ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired)) {
 					mInventory.setItem(item.mSlot, createCustomItem(item));
 				}
-			} //intentionally not else, so overrides can happen
+			}
+
+			//intentionally not else, so overrides can happen
 			if (item.mPage == mCurrentPage) {
-				if (item.mScoreboard == null || mOverridePermissions ||
-						ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired) {
+				if (item.mPermType == PermType.COSMETIC_ITEM &&
+					cosmetics.playerHasCosmetic(player, item.mCosmeticString, CosmeticType.PLOT_BORDER)) {
+					mInventory.setItem(item.mSlot, createCustomItem(item));
+				} else if (item.mPermType == PermType.SCOREBOARD &&
+						(item.mScoreboard == null || mOverridePermissions ||
+						ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired)) {
 					mInventory.setItem(item.mSlot, createCustomItem(item));
 				}
 			}

@@ -162,8 +162,9 @@ public class PlotManager {
 				.withPermission(CommandPermission.fromString("monumenta.plot.bordergui"))
 				.withArguments(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS))
 				.executes((sender, args) -> {
-					if (!ServerProperties.getShardName().equals("playerplots")) {
-						CommandAPI.fail("This command is only available on the playerplots world");
+					if (!ServerProperties.getShardName().equals("playerplots") &&
+						!ServerProperties.getShardName().startsWith("dev")) {
+						CommandAPI.fail("This command is only available on the playerplots world. Current shard: " + ServerProperties.getShardName());
 						return;
 					}
 					for (Player player : (List<Player>)args[0]) {
