@@ -26,6 +26,9 @@ public class SizeChangerBoss extends BossAbilityGroup {
 		@BossParam(help = "max size of this slime/magma cube")
 		public int MAX_SIZE = 20;
 
+		@BossParam(help = "min size of this slime/magma cube")
+		public int MIN_SIZE = 1;
+
 		@BossParam(help = "how much is the increase/decrease")
 		public int CHANGER = 1;
 
@@ -78,14 +81,21 @@ public class SizeChangerBoss extends BossAbilityGroup {
 		}
 
 
+		double healthWithDamage = mBoss.getHealth() - event.getFinalDamage(true);
 		double currentHealth = mBoss.getHealth();
 		double maxHealth = mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-		double tmp = mTimes * mParams.SPEED;
+		boolean shouldChangeSize = false;
 
-		if (1f - (currentHealth / maxHealth) - tmp >= mParams.SPEED) {
-			//change the size
+		while (1f - (healthWithDamage / maxHealth) - (mTimes * mParams.SPEED) >= mParams.SPEED) {
+			shouldChangeSize = true;
 			mTimes++;
 			mCurrentSize = mParams.INCREASE ? mCurrentSize + mParams.CHANGER : mCurrentSize - mParams.CHANGER;
+		}
+
+		mCurrentSize = Math.min(mParams.MAX_SIZE, Math.max(mParams.MIN_SIZE, mCurrentSize));
+
+		if (shouldChangeSize) {
+			//change the size
 			mSlime.setSize(mCurrentSize);
 
 			mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
