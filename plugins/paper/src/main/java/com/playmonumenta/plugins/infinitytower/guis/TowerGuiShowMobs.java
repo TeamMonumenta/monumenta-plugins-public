@@ -1,25 +1,20 @@
 package com.playmonumenta.plugins.infinitytower.guis;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.infinitytower.TowerFileUtils;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
+import com.playmonumenta.plugins.infinitytower.mobs.TowerMobRarity;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class TowerGuiShowMobs extends CustomInventory {
-
-	private static final Map<Player, TowerGuiShowMobs> mInstances = new LinkedHashMap<>();
-	//used so we keep track of player instance of this class, we can save all item in a static way.
-
 
 	private static final int[] VALID_MOBS_SLOT = {
 	// 0,   1,  2,  3,  4,  5,  6,  7,    8
@@ -30,86 +25,51 @@ public class TowerGuiShowMobs extends CustomInventory {
 	//45,  46, 47, 48, 49, 50, 51, 52,   53
 	};
 
-	private static final int VALID_MOBS_SLOT_SIZE = 28;
+	private static final int VALID_MOBS_SLOT_SIZE = VALID_MOBS_SLOT.length;
 
-	private static final int ARROW_UP_SLOT = 17;
-	private static final int ARROW_DOWN_SLOT = 44;
 
 	public static final List<TowerGuiItem> MOBS_ITEMS = new ArrayList<>();
-
-	private static final List<TowerGuiItem> FUNCTIONAL_ITEMS = new ArrayList<>();
+	private static final List<TowerMobInfo> MOBS_INFO = new ArrayList<>();
 
 	public static void loadGuiItems() {
-		for (TowerMobInfo item : TowerFileUtils.TOWER_MOBS_INFO) {
-			MOBS_ITEMS.add(new TowerGuiItem(item.getBuyableItem(), player -> true));
+		for (TowerMobInfo info : TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(TowerMobRarity.COMMON)) {
+			MOBS_ITEMS.add(new TowerGuiItem(info.getBuyableItem(), player -> true));
+			MOBS_INFO.add(info);
 		}
-
-		ItemStack arrow = TowerFileUtils.getHeadFromTexture("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzQzNzM0NmQ4YmRhNzhkNTI1ZDE5ZjU0MGE5NWU0ZTc5ZGFlZGE3OTVjYmM1YTEzMjU2MjM2MzEyY2YifX19");
-		ItemMeta meta = arrow.getItemMeta();
-		meta.displayName(Component.empty());
-		arrow.setItemMeta(meta);
-
-		FUNCTIONAL_ITEMS.add(new TowerGuiItem(arrow, (player) -> {
-			TowerGuiShowMobs instance = mInstances.get(player);
-			return instance.mGuiSize >= instance.mOffset + 7;
-		}, (player, clickedSlot) -> {
-			mInstances.get(player).mOffset += 7;
-			return true;
-		}));
-
-		arrow = TowerFileUtils.getHeadFromTexture("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzA0MGZlODM2YTZjMmZiZDJjN2E5YzhlYzZiZTUxNzRmZGRmMWFjMjBmNTVlMzY2MTU2ZmE1ZjcxMmUxMCJ9fX0=");
-		meta = arrow.getItemMeta();
-		meta.displayName(Component.empty());
-		arrow.setItemMeta(meta);
-
-		FUNCTIONAL_ITEMS.add(new TowerGuiItem(arrow, player -> mInstances.get(player).mOffset != 0, (player, clickedSlot) -> {
-			mInstances.get(player).mOffset -= 7;
-			return true;
-		}));
-
+		for (TowerMobInfo info : TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(TowerMobRarity.RARE)) {
+			MOBS_ITEMS.add(new TowerGuiItem(info.getBuyableItem(), player -> true));
+			MOBS_INFO.add(info);
+		}
+		for (TowerMobInfo info : TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(TowerMobRarity.EPIC)) {
+			MOBS_ITEMS.add(new TowerGuiItem(info.getBuyableItem(), player -> true));
+			MOBS_INFO.add(info);
+		}
+		for (TowerMobInfo info : TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(TowerMobRarity.LEGENDARY)) {
+			MOBS_ITEMS.add(new TowerGuiItem(info.getBuyableItem(), player -> true));
+			MOBS_INFO.add(info);
+		}
 	}
 
 	private int mOffset = 0;
 	private final int mGuiSize = Math.min(VALID_MOBS_SLOT_SIZE, MOBS_ITEMS.size());
 
-	private final Map<Integer, TowerGuiItem> mFunctions = new LinkedHashMap<>();
-
 
 	public TowerGuiShowMobs(Player owner) {
-		super(owner, 54, "Shop new Mobs");
-		mInstances.put(owner, this);
+		super(owner, 54, "Blitz units");
 
 		loadInv(owner);
 	}
 
 	private void loadInv(Player player) {
-		mFunctions.clear();
 		mInventory.clear();
 
 		ItemStack stack;
 		for (int i = 0; i < mGuiSize; i++) {
 			if (i + mOffset < MOBS_ITEMS.size()) {
-				stack = MOBS_ITEMS.get(i + mOffset).getItem(player);
+				stack = MOBS_ITEMS.get(i).getItem(player);
 				mInventory.setItem(VALID_MOBS_SLOT[i], stack);
-				if (stack != null) {
-					mFunctions.put(VALID_MOBS_SLOT[i], MOBS_ITEMS.get(i + mOffset));
-				}
 			}
 		}
-
-		stack = FUNCTIONAL_ITEMS.get(0).getItem(player);
-		mInventory.setItem(ARROW_DOWN_SLOT, stack);
-		if (stack != null) {
-			mFunctions.put(ARROW_DOWN_SLOT, FUNCTIONAL_ITEMS.get(0));
-		}
-
-		stack = FUNCTIONAL_ITEMS.get(1).getItem(player);
-		mInventory.setItem(ARROW_UP_SLOT, stack);
-		if (stack != null) {
-			mFunctions.put(ARROW_UP_SLOT, FUNCTIONAL_ITEMS.get(1));
-		}
-
-
 
 
 		//fill white hole
@@ -148,20 +108,33 @@ public class TowerGuiShowMobs extends CustomInventory {
 		Player player = ((Player)event.getWhoClicked());
 		int slot = event.getSlot();
 
-		if (mFunctions.get(slot) != null) {
-
-			mFunctions.get(slot).mPostClick.apply(player, slot);
-			loadInv(player);
+		if (validMobSlot(slot)) {
+			mInventory.clear();
+			player.closeInventory();
+			new TowerGuiMobInfo(player, MOBS_INFO.get(getMobIndex(slot))).openInventory(player, Plugin.getInstance());
 		}
 
 	}
 
 
+	private static boolean validMobSlot(int slot) {
+		for (int i : VALID_MOBS_SLOT) {
+			if (i == slot) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-	@Override
-	protected void inventoryClose(InventoryCloseEvent event) {
-		mInstances.remove(event.getPlayer());
-		super.inventoryClose(event);
+	private static int getMobIndex(int slot) {
+		int ind = 0;
+		for (int i : VALID_MOBS_SLOT) {
+			if (i == slot) {
+				return ind;
+			}
+			ind++;
+		}
+		return -1;
 	}
 
 }

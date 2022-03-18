@@ -84,7 +84,8 @@ public class AdvancingShadowTowerAbility extends TowerAbility {
 											GenericTowerMob towerMob = BossManager.getInstance().getBoss(mob, GenericTowerMob.class);
 											if (towerMob != null) {
 												//this should always be true.
-												towerMob.mLastTarget = mBoss;
+												towerMob.mLastTarget = mTarget;
+												towerMob.mCanChangeTarget = false;
 											}
 											mob.setTarget(mTarget);
 										}

@@ -50,7 +50,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 		List<Component> lore2 = new ArrayList<>();
 		lore2.add(Component.text("1 free refresh!", NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false));
 		lore2.add(Component.empty());
-		lore2.add(Component.text("You have one free refresh each round before 6th", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+		lore2.add(Component.text("Each round from 1 to 5 have a free shop refresh", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 		meta.lore(lore2);
 		FREE_REFRESH_ITEM.setItemMeta(meta);
 
@@ -96,7 +96,12 @@ public class TowerGuiBuyMob extends CustomInventory {
 			for (TowerMobRarity rarity : TowerMobRarity.values()) {
 				rand -= rarity.getWeight(currentLvl - 1);
 				if (rand <= 0) {
-					mobs.add(TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(rarity).get(FastUtils.RANDOM.nextInt(TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(rarity).size())));
+					TowerMobInfo info = TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(rarity).get(FastUtils.RANDOM.nextInt(TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(rarity).size()));
+					if (mGame.mCurrentFloor == 0 && info.mLosName.equals("ITBabyMimic")) {
+						info = TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(TowerMobRarity.COMMON).get(0);
+						//at the first round don't take any BabyMimic
+					}
+					mobs.add(info);
 					break;
 				}
 			}
@@ -155,11 +160,18 @@ public class TowerGuiBuyMob extends CustomInventory {
 
 		if (info != null) {
 			if (TowerGameUtils.canBuy(info, player)) {
-				if (mGame.canAdd(info)) {
-					ITEM_MAP.get(mGame).remove(info);
-					TowerGameUtils.pay(info, player);
-					mGame.addNewMob(info);
-					player.playSound(player.getEyeLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.MASTER, 10f, 0.6f);
+				if (mGame.canAddWeight(info)) {
+					if (mGame.canAddLimit(info)) {
+						ITEM_MAP.get(mGame).remove(info);
+						TowerGameUtils.pay(info, player);
+						mGame.addNewMob(info);
+						player.playSound(player.getEyeLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.MASTER, 10f, 0.6f);
+					} else {
+						player.sendMessage(Component.text("[Plunderer's Blitz]", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).append(
+							Component.text(" You can't use more then " + info.mMobStats.mLimit + " " + info.mDisplayName + " in the same team!", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)
+						));
+						//Limit of the same mob
+					}
 				} else {
 					player.sendMessage(Component.text("[Plunderer's Blitz]", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).append(
 											Component.text(" You don't have enough space inside the team", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)

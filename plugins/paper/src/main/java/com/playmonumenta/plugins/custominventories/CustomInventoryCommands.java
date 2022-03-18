@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.custominventories;
 
+import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
@@ -135,6 +136,22 @@ public class CustomInventoryCommands {
 					player.sendMessage(msg);
 					ex.printStackTrace();
 				}
+			})
+			.register();
+
+		new CommandAPICommand("openblitzmobgui")
+			.withPermission("monumenta.command.openblitzmobgui")
+			.executesPlayer((player, args) -> {
+				new TowerGuiShowMobs(player).openInventory(player, plugin);
+			})
+			.register();
+
+		new CommandAPICommand("openblitzmobgui")
+			.withPermission("monumenta.command.openblitzmobgui")
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				new TowerGuiShowMobs(player).openInventory(player, plugin);
 			})
 			.register();
 

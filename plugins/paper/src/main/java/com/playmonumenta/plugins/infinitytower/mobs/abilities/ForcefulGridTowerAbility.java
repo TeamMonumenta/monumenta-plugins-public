@@ -83,7 +83,8 @@ public class ForcefulGridTowerAbility extends TowerAbility {
 						GenericTowerMob towerMob = BossManager.getInstance().getBoss(mBoss, GenericTowerMob.class);
 						if (towerMob != null) {
 							//this should always be true.
-							towerMob.mLastTarget = mBoss;
+							towerMob.mLastTarget = target;
+							towerMob.mCanChangeTarget = false;
 						}
 						aiMob.setTarget(mBoss);
 					}

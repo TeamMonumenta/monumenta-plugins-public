@@ -77,9 +77,9 @@ public class TowerMobAbility {
 									if (towerMob != null) {
 										//this should always be true.
 										towerMob.mLastTarget = mBoss;
+										towerMob.mCanChangeTarget = false;
 									}
 									mob.setTarget(mBoss);
-
 								}
 							}
 						}

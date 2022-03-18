@@ -42,13 +42,22 @@ public class TowerManager implements Listener {
 		String shardName = ServerProperties.getShardName();
 		if (shardName.contains("valley") || shardName.contains("dev") || shardName.contains("mobs")) {
 			Bukkit.getScheduler().runTaskLaterAsynchronously(mPlugin, () -> {
-					TowerConstants.SHOULD_GAME_START = true;
-					TowerFileUtils.loadTowerMobsInfo();
-					TowerFileUtils.loadDefaultTeams();
-					TowerFileUtils.loadPlayerTeams();
-					TowerFileUtils.loadFloors();
-					TowerGuiShowMobs.loadGuiItems();
-					TowerGuiFloorDesignMob.loadGuiItems();
+				TowerConstants.SHOULD_GAME_START = true;
+				TowerFileUtils.loadTowerMobsInfo();
+				TowerFileUtils.loadDefaultTeams();
+				TowerFileUtils.loadPlayerTeams();
+				TowerFileUtils.loadFloors();
+				TowerGuiShowMobs.loadGuiItems();
+				TowerGuiFloorDesignMob.loadGuiItems();
+				mPlugin.getLogger().info("[InfinityTower - Blitz] loaded all the files! With result: " + (TowerConstants.SHOULD_GAME_START ? "POSITIVE" : "NEGATIVE - check warnings!"));
+			}, 10);
+		} else {
+			Bukkit.getScheduler().runTaskLaterAsynchronously(mPlugin, () -> {
+				TowerFileUtils.loadTowerMobsInfo();
+				TowerFileUtils.loadDefaultTeams();
+				TowerFileUtils.loadPlayerTeams();
+				TowerGuiShowMobs.loadGuiItems();
+				mPlugin.getLogger().info("[InfinityTower - Blitz] loaded all the files!");
 			}, 10);
 		}
 

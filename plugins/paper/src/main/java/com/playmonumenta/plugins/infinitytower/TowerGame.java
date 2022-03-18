@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
@@ -35,7 +34,7 @@ public class TowerGame {
 
 	public boolean mFreeRoll = true;
 
-	protected int mCurrentFloor;
+	public int mCurrentFloor;
 
 	public TowerPlayer mPlayer;
 	protected TowerTeam mFloorTeam;
@@ -291,14 +290,14 @@ public class TowerGame {
 		new TowerGuiBuyMob(mPlayer.mPlayer, this).openInventory(mPlayer.mPlayer, TowerManager.mPlugin);
 	}
 
-	public boolean canAdd(TowerMobInfo info) {
+	public boolean canAddWeight(TowerMobInfo info) {
 		int size = info.mMobStats.mWeight;
 		int currentSize = mPlayer.mTeam.mCurrentSize;
 		int maxSize = TowerConstants.STARTING_TEAM_SIZE + (mPlayerLevel > 1 ? (mPlayerLevel - 1) * TowerConstants.LEVEL_UP_TEAM_SIZE_INCREASE : 0);
-		if (currentSize + size > maxSize) {
-			return false;
-		}
+		return currentSize + size <= maxSize;
+	}
 
+	public boolean canAddLimit(TowerMobInfo info) {
 		int limit = info.mMobStats.mLimit;
 		for (TowerMob mob : mPlayer.mTeam.mMobs) {
 			if (mob.isSameBaseMob(info)) {
@@ -463,7 +462,7 @@ public class TowerGame {
 				if (mPlayer != null) {
 					World world = mPlayer.mPlayer.getWorld();
 					for (TowerMob playerMob : mPlayer.mTeam.mMobs) {
-						world.spawnParticle(Particle.REDSTONE, playerMob.getSpawnLocation(INSTANCE), 80, 0, 0.5, 0, 1, new DustOptions(Color.ORANGE, 0.5f));
+						world.spawnParticle(Particle.REDSTONE, playerMob.getSpawnLocation(INSTANCE), 80, 0, 0.5, 0, 1, new DustOptions(playerMob.mInfo.mMobRarity.getColor(), 0.5f));
 					}
 				}
 
