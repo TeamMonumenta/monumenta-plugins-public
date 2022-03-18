@@ -130,17 +130,18 @@ public class SpellFinalLaser extends Spell {
 				);
 
 				LocationUtils.travelTillObstructed(
-						world,
-						movingLaserBox,
-						startLocation.distance(targetedLocation),
-						vector,
-						CHECK_INCREMENT,
-						(Location loc) -> {
-							mSmoke.location(loc).spawnAsBoss();
-							mMob.location(loc).spawnAsBoss();
-						},
-						1,
-						6
+					world,
+					movingLaserBox,
+					startLocation.distance(targetedLocation),
+					vector,
+					CHECK_INCREMENT,
+					false,
+					(Location loc) -> {
+						mSmoke.location(loc).spawnAsBoss();
+						mMob.location(loc).spawnAsBoss();
+					},
+					1,
+					6
 				);
 
 				if (mTicks % 8 == 0) {

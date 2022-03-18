@@ -23,6 +23,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -69,7 +70,7 @@ public class ThunderStep extends Ability {
 		mInfo.mShorthandName = "TS";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While holding a wand while sneaking and airborne, pressing the swap key materializes a flash of thunder, dealing %s magic damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
+				"While holding a wand while sneaking, pressing the swap key materializes a flash of thunder, dealing %s magic damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
 				DISTANCE_1,
@@ -108,17 +109,12 @@ public class ThunderStep extends Ability {
 	 */
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer != null &&
-			ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())
-		) {
+		if (mPlayer != null && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
 			event.setCancelled(true);
 
-			if (
-				!isTimerActive()
-					&& mPlayer.isSneaking()
-					&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-					&& !mPlayer.isOnGround()
-			) {
+			if (!isTimerActive()
+				    && mPlayer.isSneaking()
+				    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 				putOnCooldown();
 
 				Location playerStartLocation = mPlayer.getLocation();
@@ -133,13 +129,13 @@ public class ThunderStep extends Ability {
 					movingPlayerBox,
 					mLevelDistance,
 					vector,
-					CHECK_INCREMENT
+					CHECK_INCREMENT,
+					true,
+					null, -1, -1
 				);
 				Location playerEndLocation = movingPlayerBox
 					.getCenter()
-					.setY(
-						movingPlayerBox.getMinY()
-					)
+					.setY(movingPlayerBox.getMinY())
 					.toLocation(world)
 					.setDirection(vector);
 
@@ -147,7 +143,7 @@ public class ThunderStep extends Ability {
 					return;
 				}
 
-				mPlayer.teleport(playerEndLocation);
+				mPlayer.teleport(playerEndLocation, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 				doDamage(playerEndLocation, spellDamage);
 			}
 		}

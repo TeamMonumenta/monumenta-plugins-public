@@ -1074,6 +1074,30 @@ public class LocationUtils {
 		return locationsTouching;
 	}
 
+	/**
+	 * Tests if a given bounding box collides with any blocks.
+	 * Uses {@link Block#getBoundingBox()} for the collision check, so may be inaccurate for special blocks.
+	 *
+	 * @param boundingBox The box to check
+	 * @param world       The world to check in
+	 * @return Whether the box collides with any blocks or is outside of loadied chunks
+	 */
+	public static boolean collidesWithBlocks(BoundingBox boundingBox, World world) {
+		ArrayList<Location> locationsTouching = getLocationsTouching(boundingBox, world);
+		for (Location location : locationsTouching) {
+			if (!location.isChunkLoaded()) {
+				return true;
+			}
+			Block block = location.getBlock();
+			if (block.getBoundingBox().overlaps(boundingBox) // Seems liquids have empty bounding boxes similar to air, so they won't count as overlapping
+				    && block.getType().isSolid()) { // Allow passing through non-solids like signs, grass, vines etc
+				// Obstructed by solid block
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static boolean travelTillObstructed(
 		World world,
 		BoundingBox movingBoundingBox,
@@ -1081,47 +1105,74 @@ public class LocationUtils {
 		Vector vector,
 		double increment
 	) {
-		return travelTillObstructed(world, movingBoundingBox, maxDistance, vector, increment, null, -7050, 1);
+		return travelTillObstructed(world, movingBoundingBox, maxDistance, vector, increment, false, null, -1, -1);
 	}
 
+	/**
+	 * Moved a {@link BoundingBox} along a straight path for the given max distance or until it collides with a block.
+	 *
+	 * @param world             World to travel in
+	 * @param movingBoundingBox The bounding box to move and check collisions with. Is uses as starting location, and it will hold the final location after the method returns.
+	 * @param maxDistance       Maximum travel distance
+	 * @param vector            Direction of travel, does not need to be normalized
+	 * @param increment         Step size of travel. Should be smaller than the smallest dimension of the bounding box to prevent travelling through walls.
+	 * @param wiggleY           Whether to allow a bit of vertical wiggle room for the box while traveling to be able to scale over/under obstacles up to 1 block in size
+	 * @param travelAction      Action to execute every {@code actionFrequency} steps, may be null. Will get the center of the bounding box as argument.
+	 * @param actionFrequency   How often to execute {@code travelAction}, in steps
+	 * @param actionChance      Reciprocal random chance to perform the action (for a given n, the chance is 1/n)
+	 * @return Whether travel was stopped by a block before the maximum distance has been reached
+	 */
 	public static boolean travelTillObstructed(
-			World world,
-			BoundingBox movingBoundingBox,
-			double maxDistance,
-			Vector vector,
-			double increment,
-			@Nullable TravelAction travelAction,
-			int actionFrequency,
-			int actionChance
+		World world,
+		BoundingBox movingBoundingBox,
+		double maxDistance,
+		Vector vector,
+		double increment,
+		boolean wiggleY,
+		@Nullable TravelAction travelAction,
+		int actionFrequency,
+		int actionChance
 	) {
 		Vector start = movingBoundingBox.getCenter(); // For checking if exceeded maxDistance
 		Vector vectorIncrement = vector.clone().normalize().multiply(increment);
-		Vector reverseVectorIncrement = vectorIncrement.clone().multiply(-1);
 		int frequencyTracker = actionFrequency; // For deciding whether to run travelAction for this interval
+
+		// this box always moves along a straight line, even if wiggle room is enabled
+		BoundingBox testBox = movingBoundingBox.clone();
 
 		double maxIterations = maxDistance / increment * 1.1;
 		for (int i = 0; i < maxIterations; i++) {
-			movingBoundingBox.shift(vectorIncrement);
-			Vector potentialBoxCentre = movingBoundingBox.getCenter();
+			testBox.shift(vectorIncrement);
+			Vector testBoxCentre = testBox.getCenter();
 
-			if (start.distanceSquared(potentialBoxCentre) > maxDistance * maxDistance) {
+			if (start.distanceSquared(testBoxCentre) > maxDistance * maxDistance) {
 				// Gone too far
-				movingBoundingBox.shift(reverseVectorIncrement);
 				return false;
 			}
-
-			ArrayList<Location> locationsTouching = LocationUtils.getLocationsTouching(movingBoundingBox, world);
-			for (Location location : locationsTouching) {
-				Block block = location.getBlock();
-				BoundingBox blockBoxEstimate = block.getBoundingBox();
-				Material blockMaterial = block.getType();
-				if (blockBoxEstimate.overlaps(movingBoundingBox)) { // Seems liquids have empty bounding boxes similar to air, so they won't count as overlapping
-					if (blockMaterial.isSolid()) { // Allow passing through non-solids like signs, grass, vines etc
-						// Obstructed by solid block
-						movingBoundingBox.shift(reverseVectorIncrement);
+			if (collidesWithBlocks(testBox, world)) {
+				// Collision on path
+				// If wiggleY is enabled, look for a free spot up to 1 block below or above the blocked location
+				if (wiggleY) {
+					boolean blocked = true;
+					BoundingBox wiggleBox = testBox.clone();
+					wiggleBox.shift(0, -1, 0);
+					for (int dy = 0; dy < 20; dy++) {
+						// Scan along the y-axis, from -1 to +1, to find the lowest available space.
+						if (!collidesWithBlocks(wiggleBox, world)) {
+							blocked = false;
+							break;
+						}
+						wiggleBox.shift(0, 0.1, 0);
+					}
+					if (blocked) {
 						return true;
 					}
+					movingBoundingBox.copy(wiggleBox);
+				} else {
+					return true;
 				}
+			} else {
+				movingBoundingBox.copy(testBox);
 			}
 
 			// The central location of the bounding box is valid;
@@ -1130,8 +1181,8 @@ public class LocationUtils {
 				if (frequencyTracker >= actionFrequency) {
 					actionFrequency = 1;
 
-					if (FastUtils.RANDOM.nextInt(actionChance) == 0) {
-						travelAction.run(potentialBoxCentre.toLocation(world));
+					if (actionChance <= 1 || FastUtils.RANDOM.nextInt(actionChance) == 0) {
+						travelAction.run(testBoxCentre.toLocation(world));
 					}
 				} else {
 					actionFrequency++;
