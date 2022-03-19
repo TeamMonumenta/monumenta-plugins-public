@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import javax.annotation.Nullable;
@@ -66,11 +67,9 @@ public class EnergizingElixir extends Ability {
 			&& ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())
 			&& !(mUnstableAmalgam != null && mPlayer.isSneaking())
 			&& (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK)) {
-			if (mAlchemistPotions != null) {
-				if (!mAlchemistPotions.decrementCharge()) {
+			if (mAlchemistPotions == null || !mAlchemistPotions.decrementCharge()) {
 					// If no charges, do not activate ability
 					return;
-				}
 			}
 
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, mSpeedAmp, PERCENT_SPEED_EFFECT_NAME));
@@ -81,7 +80,7 @@ public class EnergizingElixir extends Ability {
 
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
-			world.spawnParticle(Particle.TOTEM, loc, 50, 1.5, 1, 1.5, 0);
+			new PartialParticle(Particle.TOTEM, loc, 50, 1.5, 1, 1.5, 0).spawnAsPlayerActive(mPlayer);
 			world.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 1, 0);
 
 			putOnCooldown();

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.JudgementChainMobEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -120,15 +121,15 @@ public class JudgementChain extends Ability {
 						BoundingBox box = BoundingBox.of(l, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
 						box.shift(chainVector);
 
-						world.spawnParticle(Particle.REDSTONE, mLoc, 1, mWidth, mWidth, mWidth, 0, LIGHT_COLOR);
-						world.spawnParticle(Particle.REDSTONE, mLoc, 1, mWidth, mWidth, mWidth, 0, DARK_COLOR);
-						world.spawnParticle(Particle.CRIT, mLoc, 1, mWidth, mWidth, mWidth, 0);
+						new PartialParticle(Particle.REDSTONE, mLoc, 1, mWidth, mWidth, mWidth, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, mLoc, 1, mWidth, mWidth, mWidth, 0, DARK_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CRIT, mLoc, 1, mWidth, mWidth, mWidth, 0).spawnAsPlayerActive(mPlayer);
 						int particleReduce = 0;
 						for (double r = 0; r <= l.distance(mLoc); r += HITBOX_LENGTH) {
 							Location bLoc = box.getCenter().toLocation(world);
 							if (particleReduce % 2 == 0) {
-								world.spawnParticle(Particle.REDSTONE, bLoc, 1, 0.05, 0.05, 0.05, 0.075, DARK_COLOR);
-								world.spawnParticle(Particle.FALLING_DUST, bLoc, 1, 0.05, 0.05, 0.05, Material.CHAIN.createBlockData());
+								new PartialParticle(Particle.REDSTONE, bLoc, 1, 0.05, 0.05, 0.05, 0.075, DARK_COLOR).spawnAsPlayerActive(mPlayer);
+								new PartialParticle(Particle.FALLING_DUST, bLoc, 1, 0.05, 0.05, 0.05, Material.CHAIN.createBlockData()).spawnAsPlayerActive(mPlayer);
 							}
 							box.shift(shift);
 							particleReduce++;
@@ -236,9 +237,9 @@ public class JudgementChain extends Ability {
 			Location mLoc = mTarget.getLocation();
 			World world = mPlayer.getWorld();
 
-			world.spawnParticle(Particle.REDSTONE, mLoc.add(0, mTarget.getHeight() / 2, 0), 15, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, 0.125, LIGHT_COLOR);
-			world.spawnParticle(Particle.REDSTONE, mLoc.add(0, mTarget.getHeight() / 2, 0), 15, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, 0.125, DARK_COLOR);
-			world.spawnParticle(Particle.CRIT, mLoc.add(0, mTarget.getHeight() / 2, 0), 30, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, 0.125);
+			new PartialParticle(Particle.REDSTONE, mLoc.add(0, mTarget.getHeight() / 2, 0), 15, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, 0.125, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, mLoc.add(0, mTarget.getHeight() / 2, 0), 15, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, 0.125, DARK_COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CRIT, mLoc.add(0, mTarget.getHeight() / 2, 0), 30, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, 0.125).spawnAsPlayerActive(mPlayer);
 			world.playSound(mLoc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.7f, 0.6f);
 			world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.6f, 0.6f);
 

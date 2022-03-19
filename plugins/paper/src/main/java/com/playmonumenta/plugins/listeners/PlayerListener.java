@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -169,6 +170,14 @@ public class PlayerListener implements Listener {
 			playersTeam.setCanSeeFriendlyInvisibles(false);
 		}
 		playersTeam.addEntry(player.getName());
+
+		// transform old NO_SELF_PARTICLES tag into new partial particle option
+		// can be removed after a while
+		if (ScoreboardUtils.checkTag(player, Constants.Tags.NO_SELF_PARTICLES)) {
+			player.removeScoreboardTag(Constants.Tags.NO_SELF_PARTICLES);
+			ScoreboardUtils.setScoreboardValue(player, ParticleCategory.OWN_PASSIVE.mObjectiveName, 0);
+		}
+
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

@@ -28,8 +28,8 @@ import com.playmonumenta.plugins.bosses.spells.lich.SpellSoulShackle;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -1615,7 +1615,7 @@ public final class Lich extends BossAbilityGroup {
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 
 		//warning smoke ring
-		PPGroundCircle indicator = new PPGroundCircle(Particle.SMOKE_LARGE, mStart.getLocation(), 20, 0.1, 0.1, 0.1, 0).init(8, true);
+		PPCircle indicator = new PPCircle(Particle.SMOKE_LARGE, mStart.getLocation(), 8).ringMode(true).count(20).delta(0.1);
 		new BukkitRunnable() {
 			int mT = 0;
 			@Override

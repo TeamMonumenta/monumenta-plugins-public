@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -76,13 +77,13 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			World world = mPlayer.getWorld();
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RAMPAGE_RADIUS)) {
 				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mStacks, mInfo.mLinkedSpell);
-				world.spawnParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1);
+				new PartialParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
 			}
 
 			mTimer = mStacks / 2;
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(mTimer, mStacks / -100.0));
-			world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.2, 0.2, 0.2, 0);
-			world.spawnParticle(Particle.SWEEP_ATTACK, loc.clone().add(0, 1, 0), 50, 3, 1, 3, 0);
+			new PartialParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SWEEP_ATTACK, loc.clone().add(0, 1, 0), 50, 3, 1, 3, 0).spawnAsPlayerActive(mPlayer);
 			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, mStacks * 0.4f, 0.5f);
 			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, mStacks * 0.4f, 1.5f);
 			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, mStacks * 0.4f, 2);
@@ -111,7 +112,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 				mTimer--;
 				double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 				PlayerUtils.healPlayer(mPlugin, mPlayer, HEAL_PERCENT * maxHealth);
-				mPlayer.getWorld().spawnParticle(Particle.HEART, mPlayer.getLocation().add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
+				new PartialParticle(Particle.HEART, mPlayer.getLocation().add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001).spawnAsPlayerActive(mPlayer);
 			}
 		}
 	}

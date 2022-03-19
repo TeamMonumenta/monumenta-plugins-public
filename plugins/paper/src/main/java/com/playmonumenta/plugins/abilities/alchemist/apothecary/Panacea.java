@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -82,8 +83,8 @@ public class Panacea extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1.75f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 0.75f);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 1.25f);
-		world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1);
-		world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1);
+		new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1).spawnAsPlayerActive(mPlayer);
 
 		putOnCooldown();
 
@@ -142,11 +143,11 @@ public class Panacea extends Ability {
 						vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 						Location l = mLoc.clone().add(vec);
-						world.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_LIGHT_COLOR);
-						world.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_DARK_COLOR);
+						new PartialParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_DARK_COLOR).spawnAsPlayerActive(mPlayer);
 					}
-					world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 5, 0.35, 0.35, 0.35, 1);
-					world.spawnParticle(Particle.SPELL_WITCH, mLoc, 5, 0.35, 0.35, 0.35, 1);
+					new PartialParticle(Particle.SPELL_INSTANT, mLoc, 5, 0.35, 0.35, 0.35, 1).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SPELL_WITCH, mLoc, 5, 0.35, 0.35, 0.35, 1).spawnAsPlayerActive(mPlayer);
 
 					if (!mReverse && (!mLoc.isChunkLoaded() || LocationUtils.collidesWithSolid(mLoc, mLoc.getBlock()) || mTicks >= PANACEA_MAX_DURATION)) {
 						mMobs = EntityUtils.getNearbyMobs(mLoc, (0.3 + PANACEA_MOVE_SPEED) * PANACEA_MAX_DURATION + 2, mPlayer);
@@ -158,9 +159,9 @@ public class Panacea extends Ability {
 					if (mReverse) {
 						if (mTicks <= 0) {
 							world.playSound(mLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.2f, 2.4f);
-							world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.5);
-							world.spawnParticle(Particle.SPELL, mPlayer.getLocation().add(0, 1, 0), 8, 0.35, 0.5, 0.35);
-							world.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 25, 0.35, 0.5, 0.35, APOTHECARY_LIGHT_COLOR);
+							new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.5).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.SPELL, mPlayer.getLocation().add(0, 1, 0), 8, 0.35, 0.5, 0.35).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 25, 0.35, 0.5, 0.35, APOTHECARY_LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
 							this.cancel();
 						}
 

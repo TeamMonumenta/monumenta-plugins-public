@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.HashMap;
 import javax.annotation.Nullable;
@@ -89,8 +90,8 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 				mStacksMap.put(ability, false);
 				if (mStacks == MAX_STACKS) {
 					mPlugin.mEffectManager.addEffect(mPlayer, "SagesExtraSpeed", new PercentSpeed(SPEED_DURATION, mSpeed, ATTR_NAME));
-					world.spawnParticle(Particle.REDSTONE, loc, 20, 1.4, 1.4, 1.4, COLOR);
-					world.spawnParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 2.1, 0), 20, 0.5, 0.1, 0.5, 0.1);
+					new PartialParticle(Particle.REDSTONE, loc, 20, 1.4, 1.4, 1.4, COLOR).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 2.1, 0), 20, 0.5, 0.1, 0.5, 0.1).spawnAsPlayerActive(mPlayer);
 					for (int i = 0; i < PITCHES.length; i++) {
 						float pitch = PITCHES[i];
 						new BukkitRunnable() {
@@ -107,8 +108,8 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 						mPlugin.mTimers.removeCooldown(mPlayer, s);
 					}
 				} else {
-					world.spawnParticle(Particle.REDSTONE, locD, 15, 0.4, 0.4, 0.4, COLOR);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 15, 0, 0, 0, 0.2);
+					new PartialParticle(Particle.REDSTONE, locD, 15, 0.4, 0.4, 0.4, COLOR).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, locD, 15, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
 					MessagingUtils.sendActionBarMessage(mPlayer, "Sage's Insight Stacks: " + mStacks);
 				}
 				ClientModHandler.updateAbility(mPlayer, this);

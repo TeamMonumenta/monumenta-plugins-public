@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -221,7 +222,7 @@ public class EntityUtils {
 					double angle = Math.toRadians(mRotation);
 					Location l = mob.getLocation();
 					l.add(FastUtils.cos(angle) * 0.5, mob.getHeight(), FastUtils.sin(angle) * 0.5);
-					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 5, 0, 0, 0, STUN_COLOR);
+					new PartialParticle(Particle.REDSTONE, l, 5, 0, 0, 0, STUN_COLOR).spawnAsEnemyBuff();
 
 					if (stunned.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
 						AttributeInstance ai = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
@@ -244,7 +245,7 @@ public class EntityUtils {
 					double angle = Math.toRadians(mRotation);
 					Location l = mob.getLocation();
 					l.add(FastUtils.cos(angle) * 0.5, mob.getHeight(), FastUtils.sin(angle) * 0.5);
-					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 5, 0, 0, 0, SILENCE_COLOR);
+					new PartialParticle(Particle.REDSTONE, l, 5, 0, 0, 0, SILENCE_COLOR).spawnAsEnemyBuff();
 
 					if (silenced.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
 						silencedIter.remove();
@@ -750,10 +751,9 @@ public class EntityUtils {
 		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_AESTHETICS_NAME, new Aesthetics(ticks,
 			(entity, fourHertz, twoHertz, oneHertz) -> {
 				if (fourHertz) {
-					if (!(mob instanceof Player)) {
+					if (!(mob instanceof Player p)) {
 						return;
 					}
-					Player p = (Player) mob;
 					World world = p.getWorld();
 					Location rightHand = PlayerUtils.getRightSide(p.getEyeLocation(), 0.45).subtract(0, .8, 0);
 					Location leftHand = PlayerUtils.getRightSide(p.getEyeLocation(), -0.45).subtract(0, .8, 0);
@@ -838,7 +838,7 @@ public class EntityUtils {
 		if (!tauntedEntity.getScoreboardTags().contains(IGNORE_TAUNT_TAG)) {
 			Mob tauntedMob = (Mob)tauntedEntity;
 			tauntedMob.setTarget(targetedPlayer);
-			targetedPlayer.getWorld().spawnParticle(Particle.REDSTONE, tauntedEntity.getEyeLocation().add(0, 0.5, 0), 12, 0.4, 0.5, 0.4, TAUNT_COLOR);
+			new PartialParticle(Particle.REDSTONE, tauntedEntity.getEyeLocation().add(0, 0.5, 0), 12, 0.4, 0.5, 0.4, TAUNT_COLOR).spawnAsPlayerActive(targetedPlayer);
 
 			// Damage the taunted enemy to keep focus on the player who casted the taunt.
 			// Damage bypasses iframes & doesn't affect velocity

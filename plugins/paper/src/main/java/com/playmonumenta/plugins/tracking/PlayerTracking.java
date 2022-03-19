@@ -89,7 +89,6 @@ public class PlayerTracking implements EntityTracking {
 		while (playerIter.hasNext()) {
 			Entry<Player, PlayerInventoryManager> entry = playerIter.next();
 			Player player = entry.getKey();
-			PlayerInventoryManager inventory = entry.getValue();
 
 			GameMode mode = player.getGameMode();
 

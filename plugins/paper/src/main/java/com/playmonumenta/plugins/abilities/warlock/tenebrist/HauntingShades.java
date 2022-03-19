@@ -6,9 +6,10 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashSet;
@@ -99,8 +100,8 @@ public class HauntingShades extends Ability {
 			for (double r = 0; r < RANGE; r += HITBOX_LENGTH) {
 				Location bLoc = box.getCenter().toLocation(world);
 
-				world.spawnParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075);
-				world.spawnParticle(Particle.REDSTONE, bLoc, 16, 0.2, 0.2, 0.2, 0.1, COLOR);
+				new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, bLoc, 16, 0.2, 0.2, 0.2, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
 
 				Iterator<LivingEntity> iter = nearbyMobs.iterator();
 				while (iter.hasNext()) {
@@ -146,11 +147,10 @@ public class HauntingShades extends Ability {
 			int mT = 0;
 			@Override
 			public void run() {
-				Location l = bLoc;
 				mT++;
 				if (mT % 5 == 0) {
-					List<Player> affectedPlayers = PlayerUtils.playersInRange(l, AOE_RANGE, true);
-				    Set<LivingEntity> affectedMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(l, AOE_RANGE));
+					List<Player> affectedPlayers = PlayerUtils.playersInRange(bLoc, AOE_RANGE, true);
+					Set<LivingEntity> affectedMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(bLoc, AOE_RANGE));
 					if (getAbilityScore() > 1) {
 						for (Player p : affectedPlayers) {
 							double maxHealth = EntityUtils.getMaxHealth(p);
@@ -168,17 +168,13 @@ public class HauntingShades extends Ability {
 				if (mT % 10 == 0) {
 					new BukkitRunnable() {
 						double mRadius = 0;
-						final Location mLoc = l;
+						final Location mLoc = bLoc.clone().add(0, 0.15, 0);
+
 						@Override
 						public void run() {
 							mRadius += 1.25;
-							for (double j = 0; j < 360; j += 30) {
-								double radian1 = Math.toRadians(j);
-								mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-								world.spawnParticle(Particle.REDSTONE, mLoc, 3, 0.2, 0.2, 0.2, 0.1, COLOR);
-								world.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 1, 0, 0, 0, 0.15);
-								mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-							}
+							new PPCircle(Particle.REDSTONE, mLoc, mRadius).ringMode(true).count(36).delta(0.2).extra(0.1).data(COLOR).spawnAsPlayerActive(mPlayer);
+							new PPCircle(Particle.SMOKE_NORMAL, mLoc, mRadius).ringMode(true).count(12).extra(0.15).spawnAsPlayerActive(mPlayer);
 							if (mRadius >= AOE_RANGE + 1) {
 								this.cancel();
 							}
@@ -187,13 +183,13 @@ public class HauntingShades extends Ability {
 				}
 
 				if (mT % 20 == 0) {
-					world.playSound(l, Sound.ENTITY_BLAZE_HURT, 0.3f, 0.5f);
+					world.playSound(bLoc, Sound.ENTITY_BLAZE_HURT, 0.3f, 0.5f);
 				}
 
 				if (mT >= SHADES_DURATION || mPlayer.isDead() || !mPlayer.isValid()) {
 					stand.remove();
-					world.spawnParticle(Particle.REDSTONE, bLoc, 45, 0.2, 1.1, 0.2, 0.1, COLOR);
-					world.spawnParticle(Particle.SMOKE_NORMAL, bLoc, 40, 0.3, 1.1, 0.3, 0.15);
+					new PartialParticle(Particle.REDSTONE, bLoc, 45, 0.2, 1.1, 0.2, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 40, 0.3, 1.1, 0.3, 0.15).spawnAsPlayerActive(mPlayer);
 					world.playSound(bLoc, Sound.ENTITY_BLAZE_DEATH, 0.7f, 0.5f);
 					this.cancel();
 				}

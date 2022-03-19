@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.other;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
@@ -53,7 +54,7 @@ public class PvP extends Ability {
 			player.setGameMode(GameMode.SPECTATOR);
 			World world = mPlayer.getWorld();
 			world.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_DEATH, 1, 1);
-			world.spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 30, 0.15, 0.15, 0.15, 0.75F, Material.REDSTONE_BLOCK.createBlockData());
+			new PartialParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 30, 0.15, 0.15, 0.15, 0.75F, Material.REDSTONE_BLOCK.createBlockData()).spawnAsPlayerActive(player);
 			player.sendTitle(ChatColor.RED + "Respawning...", ChatColor.GREEN + "In 3 seconds...", 10, 20 * 2, 10);
 			PotionUtils.clearNegatives(mPlugin, player);
 			@Nullable ItemStack[] inv = player.getInventory().getContents();

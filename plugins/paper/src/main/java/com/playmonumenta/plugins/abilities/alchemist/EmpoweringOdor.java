@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.alchemist;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -39,6 +40,6 @@ public class EmpoweringOdor extends PotionAbility {
 		mPlugin.mEffectManager.addEffect(player, EMPOWERING_ODOR_SPEED_EFFECT_NAME, new PercentSpeed(EMPOWERING_ODOR_DURATION, EMPOWERING_ODOR_SPEED_AMPLIFIER, EMPOWERING_ODOR_SPEED_EFFECT_NAME));
 		mPlugin.mEffectManager.addEffect(player, EMPOWERING_ODOR_DAMAGE_EFFECT_NAME, new PercentDamageDealt(EMPOWERING_ODOR_DURATION, mDamageAmplifier));
 		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1, 2);
-		player.getWorld().spawnParticle(Particle.END_ROD, player.getLocation(), 15, 0.4, 0.6, 0.4, 0);
+		new PartialParticle(Particle.END_ROD, player.getLocation(), 15, 0.4, 0.6, 0.4, 0).spawnAsPlayerActive(mPlayer);
 	}
 }

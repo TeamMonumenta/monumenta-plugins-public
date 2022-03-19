@@ -5,8 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.player.PartialParticle.DeltaVarianceGroup;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -89,8 +88,7 @@ public class Spark implements Enchantment {
 				partialParticle.mData = null;
 				partialParticle.mDirectionalMode = true;
 				partialParticle.mExtraVariance = 0.1;
-				partialParticle.setDeltaVariance(DeltaVarianceGroup.VARY_X, true);
-				partialParticle.setDeltaVariance(DeltaVarianceGroup.VARY_Z, true);
+				partialParticle.deltaVariance(true, false, true);
 				partialParticle.mVaryPositiveY = true;
 				partialParticle.spawnAsEnemy();
 

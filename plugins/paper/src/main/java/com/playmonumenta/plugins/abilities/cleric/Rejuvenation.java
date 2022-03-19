@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.cleric;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public class Rejuvenation extends Ability {
 						double maxHealth = EntityUtils.getMaxHealth(player);
 						if (player.getHealth() != maxHealth) {
 							PlayerUtils.healPlayer(mPlugin, player, PERCENT_HEAL * maxHealth, mPlayer);
-							player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
+							new PartialParticle(Particle.HEART, player.getLocation().add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001).spawnAsPlayerActive(mPlayer);
 						}
 					}
 				}

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -78,9 +79,9 @@ public class ArcaneStrike extends Ability {
 
 			Location locD = enemy.getLocation().add(0, 1, 0);
 			World world = mPlayer.getWorld();
-			world.spawnParticle(Particle.DRAGON_BREATH, locD, 75, 0, 0, 0, 0.25);
-			world.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2);
-			world.spawnParticle(Particle.SPELL_WITCH, locD, 150, 2.5, 1, 2.5, 0.001);
+			new PartialParticle(Particle.DRAGON_BREATH, locD, 75, 0, 0, 0, 0.25).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SPELL_WITCH, locD, 150, 2.5, 1, 2.5, 0.001).spawnAsPlayerActive(mPlayer);
 			world.playSound(locD, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.75f, 1.5f);
 
 			Location loc = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
@@ -101,8 +102,8 @@ public class ArcaneStrike extends Ability {
 							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 							Location l = loc.clone().add(vec);
-							world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_1);
-							world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_2);
+							new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_2).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 						}
 					}
 					mD += 30;

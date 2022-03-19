@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.Color;
@@ -36,19 +36,16 @@ public class Gilded implements Infusion {
 		}
 
 		double doubleWidthDelta = PartialParticle.getWidthDelta(player) * 2;
-		new PartialParticle(
-			PARTICLE,
-			LocationUtils.getHalfEyeLocation(player),
+		new PartialParticle(PARTICLE, LocationUtils.getHalfEyeLocation(player))
 			// Count of 5 at level 1 like other cosmetic enchants
 			// /patron particles (1 for each game tick).
 			// Scales to 15 at level 10 cap
-			Constants.QUARTER_TICKS_PER_SECOND - 1 + Math.max(10, (int) value),
-			doubleWidthDelta,
-			PartialParticle.getHeightDelta(player),
-			doubleWidthDelta,
-			1,
-			COLOUR_GOLD
-		).spawnAsPlayer(player, true);
+			.count(Constants.QUARTER_TICKS_PER_SECOND - 1 + Math.max(10, (int) value))
+			.delta(doubleWidthDelta, PartialParticle.getHeightDelta(player), doubleWidthDelta)
+			.extra(1)
+			.data(COLOUR_GOLD)
+			.minimumMultiplier(false)
+			.spawnAsPlayerPassive(player);
 	}
 
 	@Override
@@ -68,7 +65,9 @@ public class Gilded implements Infusion {
 					1,
 					PartialParticle.getWidthDelta(item) * 2,
 					1,
-					COLOUR_GOLD
+					COLOUR_GOLD,
+					false,
+					0
 				).spawnFull();
 			}
 		}.runTaskTimer(

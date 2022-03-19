@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
@@ -49,7 +50,7 @@ public class AbilitySilence extends Effect {
 		}
 
 		if (fourHertz) {
-			entity.getWorld().spawnParticle(Particle.REDSTONE, entity.getLocation().add(0, 0.5, 0), 4, 0.2, 0.4, 0.2, 0, COLOR);
+			new PartialParticle(Particle.REDSTONE, entity.getLocation().add(0, 0.5, 0), 4, 0.2, 0.4, 0.2, 0, COLOR).spawnAsEntityBuff(entity);
 		}
 	}
 

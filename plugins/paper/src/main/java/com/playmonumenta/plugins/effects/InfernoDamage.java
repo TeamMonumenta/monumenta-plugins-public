@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Particle;
@@ -32,7 +33,7 @@ public class InfernoDamage extends Effect {
 				damage *= 0.5;
 			}
 			DamageUtils.damage(mPlayer, le, DamageType.AILMENT, damage, null, true, false);
-			le.getWorld().spawnParticle(Particle.FLAME, le.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05);
+			new PartialParticle(Particle.FLAME, le.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05).spawnAsEnemyBuff();
 		}
 	}
 

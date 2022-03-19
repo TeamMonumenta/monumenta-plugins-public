@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.rkitxet;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.RKitxet;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
@@ -71,7 +71,7 @@ public class SpellEndlessAgony extends Spell {
 		target.playSound(target.getLocation(), Sound.ENTITY_SLIME_SQUISH, SoundCategory.HOSTILE, 3, 1);
 		target.sendMessage(ChatColor.LIGHT_PURPLE + "Pain and suffering haunt you with every step you take.");
 
-		PPGroundCircle indicator = new PPGroundCircle(Particle.REDSTONE, target.getLocation(), 30, 0.1, 0.05, 0.1, 0, ENDLESS_AGONY_COLOR).init(0, true);
+		PPCircle indicator = new PPCircle(Particle.REDSTONE, target.getLocation(), RADIUS).ringMode(true).count(30).delta(0.1, 0.05, 0.1).data(ENDLESS_AGONY_COLOR);
 
 		mChargeUp.setTitle(ChatColor.DARK_PURPLE + "Forming Endless Agony...");
 		mChargeUp.setColor(BarColor.PURPLE);
@@ -95,7 +95,7 @@ public class SpellEndlessAgony extends Spell {
 					mLoc.setY((int) mLoc.getY());
 				}
 
-				indicator.radius(RADIUS).location(mLoc).spawnAsBoss();
+				indicator.location(mLoc).spawnAsBoss();
 
 				if (mChargeUp.getTime() == MOVEMENT_TIME) {
 					world.playSound(targetLoc, Sound.BLOCK_BELL_RESONATE, SoundCategory.HOSTILE, 2f, 0.3f);

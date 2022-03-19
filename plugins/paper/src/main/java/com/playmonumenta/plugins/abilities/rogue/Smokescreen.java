@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import javax.annotation.Nullable;
@@ -45,8 +46,8 @@ public class Smokescreen extends Ability {
 	public void cast(Action action) {
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 750, 4.5, 0.8, 4.5, 0.05);
-		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1500, 4.5, 0.2, 4.5, 0.1);
+		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 750, 4.5, 0.8, 4.5, 0.05).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 1500, 4.5, 0.2, 4.5, 0.1).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, SMOKESCREEN_RANGE, mPlayer)) {
 			EntityUtils.applySlow(mPlugin, SMOKESCREEN_DURATION, SMOKESCREEN_SLOWNESS_AMPLIFIER, mob);

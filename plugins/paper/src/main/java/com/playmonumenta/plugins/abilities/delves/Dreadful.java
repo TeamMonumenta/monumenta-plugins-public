@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.delves;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -9,7 +10,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -69,12 +69,11 @@ public class Dreadful extends DelveModifier {
 		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob)) {
 			if (FastUtils.RANDOM.nextDouble() < mSpawnChance) {
 				Location loc = mob.getLocation();
-				World world = loc.getWorld();
 				LibraryOfSoulsIntegration.summon(loc, DREADNAUGHTS[FastUtils.RANDOM.nextInt(DREADNAUGHTS.length)]);
 
 				loc.add(0, 1, 0);
-				world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.1);
-				world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
+				new PartialParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.1).spawnAsEnemy();
+				new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0).spawnAsEnemy();
 			}
 		}
 	}

@@ -5,11 +5,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PPLightning;
-import com.playmonumenta.plugins.player.PPPillar;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.player.PartialParticle.DeltaVarianceGroup;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PPLightning;
+import com.playmonumenta.plugins.particle.PPPillar;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -124,25 +123,11 @@ public class SpellLightningStrike extends Spell {
 		strikeLocation.setY(mCenter.getY());
 
 		// P: Danger, tall markers
-		PPPillar abovegroundMarker = new PPPillar(
-			Particle.REDSTONE,
-			strikeLocation,
-			2 * SHOCK_VERTICAL_RANGE,
-			0,
-			0,
-			DUST_YELLOW_SMALL
-		);
-		abovegroundMarker.init(SHOCK_VERTICAL_RANGE);
-		abovegroundMarker.spawnAsBoss();
-		PPPillar undergroundMarker = new PPPillar(
-			Particle.FIREWORKS_SPARK,
-			strikeLocation.clone().subtract(0, SHOCK_VERTICAL_RANGE, 0),
-			2 * SHOCK_VERTICAL_RANGE,
-			0,
-			0
-		);
-		undergroundMarker.init(SHOCK_VERTICAL_RANGE);
-		undergroundMarker.spawnAsBoss();
+		new PPPillar(Particle.REDSTONE, strikeLocation, SHOCK_VERTICAL_RANGE)
+			.count(2 * SHOCK_VERTICAL_RANGE)
+			.data(DUST_YELLOW_SMALL).spawnAsBoss();
+		new PPPillar(Particle.FIREWORKS_SPARK, strikeLocation.clone().subtract(0, SHOCK_VERTICAL_RANGE, 0), SHOCK_VERTICAL_RANGE)
+			.count(2 * SHOCK_VERTICAL_RANGE).spawnAsBoss();
 
 
 		// S: Thunder & distant sparks
@@ -193,17 +178,11 @@ public class SpellLightningStrike extends Spell {
 
 		// /particle dust 1 1 0.25 1 ~ ~ ~ 0.75 0.25 0.75 0 5
 		int electricRingMarkerCount = 8;
-		PPGroundCircle electricRingMarker = new PPGroundCircle(
-			Particle.REDSTONE,
-			strikeLocation,
-			5 * electricRingMarkerCount,
-			0,
-			0.25,
-			0,
-			0,
-			DUST_YELLOW_LARGE
-		);
-		electricRingMarker.init(SHOCK_RADIUS, true);
+		PPCircle electricRingMarker = new PPCircle(Particle.REDSTONE, strikeLocation, SHOCK_RADIUS)
+			.ringMode(true)
+			.count(5 * electricRingMarkerCount)
+			.delta(0, 0.25, 0)
+			.data(DUST_YELLOW_LARGE);
 
 		BukkitRunnable lightningRunnable = new BukkitRunnable() {
 			int mCountdownTicks = SHOCK_DELAY_TICKS;
@@ -224,13 +203,8 @@ public class SpellLightningStrike extends Spell {
 				// Count of the tick this run, last being 1
 				if (mCountdownTicks == PPLightning.ANIMATION_TICKS) {
 					// P: Lightning starts
-					PPLightning lightning = new PPLightning(
-						Particle.END_ROD,
-						strikeLocation,
-						8,
-						0,
-						0
-					);
+					PPLightning lightning = new PPLightning(Particle.END_ROD, strikeLocation)
+						.count(8);
 					lightning.init(SHOCK_VERTICAL_RANGE, 2.5, 0.3, 0.15);
 					lightning.spawnAsBoss();
 					mInternalParticleRunnable = lightning.runnable();
@@ -289,8 +263,7 @@ public class SpellLightningStrike extends Spell {
 						true,
 						0.05
 					);
-					sparks.setDeltaVariance(DeltaVarianceGroup.VARY_X, true);
-					sparks.setDeltaVariance(DeltaVarianceGroup.VARY_Z, true);
+					sparks.deltaVariance(true, false, true);
 					sparks.mVaryPositiveY = true;
 					sparks.spawnAsBoss();
 					// /particle lava ~ ~ ~ 0 0 0 0 10
@@ -307,7 +280,8 @@ public class SpellLightningStrike extends Spell {
 						strikeLocation,
 						100,
 						1.5,
-						0,
+						1.5,
+						1.5,
 						DUST_LIGHT_YELLOW_SMALL
 					).spawnAsBoss();
 
@@ -401,51 +375,28 @@ public class SpellLightningStrike extends Spell {
 		World world = fireLocation.getWorld();
 
 		// /particle dust 1 1 0.25 1 ~ ~ ~ 0.75 0.25 0.75 0 5
-		PPGroundCircle fireRingMarker = new PPGroundCircle(
-			Particle.FLAME,
-			fireLocation,
-			5,
-			0,
-			0.25,
-			0,
-			0
-		);
-		fireRingMarker.init(FIRE_RADIUS, true);
+		PPCircle fireRingMarker = new PPCircle(Particle.FLAME, fireLocation, FIRE_RADIUS)
+			.ringMode(true)
+			.count(5)
+			.delta(0, 0.25, 0);
 
 		// /particle flame ~ ~ ~ 0.1 1 0.1 0.1 0
 		int risingFlamesCount = 5;
-		PPGroundCircle risingFlames = new PPGroundCircle(
-			Particle.FLAME,
-			fireLocation,
-			3 * risingFlamesCount,
-			0.1,
-			1,
-			0.1,
-			0.075,
-			null,
-			true,
-			0.025
-		);
-		risingFlames.init(FIRE_RADIUS);
-		risingFlames.setDeltaVariance(DeltaVarianceGroup.VARY_X, true);
-		risingFlames.setDeltaVariance(DeltaVarianceGroup.VARY_Z, true);
+		PPCircle risingFlames = new PPCircle(Particle.FLAME, fireLocation, FIRE_RADIUS)
+			.count(3 * risingFlamesCount)
+			.delta(0.1, 1, 0.1)
+			.extraRange(0.05, 0.1)
+			.directionalMode(true);
+		risingFlames.deltaVariance(true, false, true);
 		risingFlames.mVaryPositiveY = true;
 
 		// /particle smoke ~ ~ ~ 0.75 0 0.75 0.01 5
 		// /particle large_smoke ~ ~ ~ 0.75 0 0.75 0.01 2
 		int smallSmokeCount = 4;
 		int largeSmokeCount = 2;
-		PPGroundCircle smoke = new PPGroundCircle(
-			Particle.SMOKE_NORMAL,
-			fireLocation,
-			5,
-			0,
-			0.005,
-			null,
-			false,
-			0.005
-		);
-		smoke.init(FIRE_RADIUS);
+		PPCircle smoke = new PPCircle(Particle.SMOKE_NORMAL, fireLocation, FIRE_RADIUS)
+			.count(5)
+			.extraRange(0, 0.01);
 
 		int fireSoundLastThreshold = 3 * Constants.TICKS_PER_SECOND;
 		BukkitRunnable fireRunnable = new BukkitRunnable() {

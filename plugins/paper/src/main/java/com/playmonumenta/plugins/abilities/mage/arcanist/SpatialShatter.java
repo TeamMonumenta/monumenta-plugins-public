@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -88,16 +89,9 @@ public class SpatialShatter extends Ability {
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (
-			ItemUtils.isWand(
-				mPlayer.getInventory().getItemInMainHand()
-			)
-		) {
+		if (ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
 			event.setCancelled(true);
-			if (
-				!isTimerActive()
-				&& !mPlayer.isSneaking()
-			) {
+			if (!isTimerActive() && !mPlayer.isSneaking()) {
 				putOnCooldown();
 
 				Location loc = mPlayer.getEyeLocation();
@@ -116,9 +110,9 @@ public class SpatialShatter extends Ability {
 				for (double r = 0; r < DISTANCE; r += HITBOX) {
 					Location bLoc = box.getCenter().toLocation(world);
 
-					world.spawnParticle(Particle.FIREWORKS_SPARK, bLoc, 5, 0.1, 0.1, 0.1, 0.1);
-					world.spawnParticle(Particle.SPELL_WITCH, bLoc, 5, 0, 0, 0, 0.5);
-					world.spawnParticle(Particle.REDSTONE, bLoc, 20, 0.2, 0.2, 0.2, 0.1, COLOR_BLUE);
+					new PartialParticle(Particle.FIREWORKS_SPARK, bLoc, 5, 0.1, 0.1, 0.1, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SPELL_WITCH, bLoc, 5, 0, 0, 0, 0.5).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, bLoc, 20, 0.2, 0.2, 0.2, 0.1, COLOR_BLUE).spawnAsPlayerActive(mPlayer);
 
 					if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 						bLoc.subtract(direction.multiply(0.5));
@@ -146,11 +140,11 @@ public class SpatialShatter extends Ability {
 		double damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 		boolean cdr = true;
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.125);
-		world.spawnParticle(Particle.REDSTONE, loc, 10, 0, 0, 0, 0.1, COLOR_BLUE);
+		new PartialParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, loc, 10, 0, 0, 0, 0.1, COLOR_BLUE).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 
-		world.spawnParticle(Particle.REDSTONE, loc, 125, 2.5, 2.5, 2.5, 0.25, COLOR_BLUE);
-		world.spawnParticle(Particle.FALLING_DUST, loc, 150, 2.5, 2.5, 2.5, Material.LIGHT_BLUE_CONCRETE.createBlockData());
+		new PartialParticle(Particle.REDSTONE, loc, 125, 2.5, 2.5, 2.5, 0.25, COLOR_BLUE).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FALLING_DUST, loc, 150, 2.5, 2.5, 2.5, Material.LIGHT_BLUE_CONCRETE.createBlockData()).spawnAsPlayerActive(mPlayer);
 
 		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.25f, 0.5f);
 

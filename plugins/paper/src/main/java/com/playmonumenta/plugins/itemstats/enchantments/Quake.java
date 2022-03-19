@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -89,24 +90,24 @@ public class Quake implements Enchantment {
 			}
 			if (fire > 0) {
 				player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);
-				player.getWorld().spawnParticle(Particle.LAVA, target.getLocation(), 25, 1.5, 1.5, 1.5);
+				new PartialParticle(Particle.LAVA, target.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (ice > 0) {
 				player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.6f, 1.3f);
-				player.getWorld().spawnParticle(Particle.SNOW_SHOVEL, target.getLocation(), 25, 1.5, 1.5, 1.5);
+				new PartialParticle(Particle.SNOW_SHOVEL, target.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (thunder > 0) {
 				player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.6f, 0.8f);
-				player.getWorld().spawnParticle(Particle.REDSTONE, target.getLocation(), 12, 1.5, 1.5, 1.5, YELLOW_1_COLOR);
-				player.getWorld().spawnParticle(Particle.REDSTONE, target.getLocation(), 12, 1.5, 1.5, 1.5, YELLOW_2_COLOR);
+				new PartialParticle(Particle.REDSTONE, target.getLocation(), 12, 1.5, 1.5, 1.5, YELLOW_1_COLOR).spawnAsPlayerActive(player);
+				new PartialParticle(Particle.REDSTONE, target.getLocation(), 12, 1.5, 1.5, 1.5, YELLOW_2_COLOR).spawnAsPlayerActive(player);
 			}
 			if (decay > 0) {
 				player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.4f, 0.7f);
-				player.getWorld().spawnParticle(Particle.SQUID_INK, target.getLocation(), 25, 1.5, 1.5, 1.5);
+				new PartialParticle(Particle.SQUID_INK, target.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (bleed > 0) {
 				player.playSound(player.getLocation(), Sound.BLOCK_SLIME_BLOCK_BREAK, 1f, 0.8f);
-				player.getWorld().spawnParticle(Particle.REDSTONE, target.getLocation(), 25, 1.5, 1.5, 1.5, BLEED_COLOR);
+				new PartialParticle(Particle.REDSTONE, target.getLocation(), 25, 1.5, 1.5, 1.5, BLEED_COLOR).spawnAsPlayerActive(player);
 			}
 		}
 	}

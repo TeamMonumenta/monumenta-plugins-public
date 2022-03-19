@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.FestiveTesseractSnowmanBoss;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -47,13 +48,13 @@ public class FestiveTesseractOverride extends BaseOverride {
 		Location loc = player.getEyeLocation();
 		loc.add(loc.getDirection().normalize().multiply(2));
 
-		loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 4, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR);
-		loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 4, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR);
-		loc.getWorld().spawnParticle(Particle.SNOWBALL, loc, 4, 0.2, 0.2, 0.2, 0);
+		new PartialParticle(Particle.REDSTONE, loc, 4, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, loc, 4, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SNOWBALL, loc, 4, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(player);
 		if (checkTesseractName(item) == 2) {
-			loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 4, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR);
-			loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 4, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR);
-			loc.getWorld().spawnParticle(Particle.SNOWBALL, loc, 4, 0.2, 0.2, 0.2, 0);
+			new PartialParticle(Particle.REDSTONE, loc, 4, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.REDSTONE, loc, 4, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.SNOWBALL, loc, 4, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(player);
 		}
 
 		return false;
@@ -96,9 +97,9 @@ public class FestiveTesseractOverride extends BaseOverride {
 
 		// Off cooldown, available to cast
 		Location loc = player.getLocation();
-		loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 20, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR);
-		loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 20, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR);
-		loc.getWorld().spawnParticle(Particle.SNOWBALL, loc, 20, 0.2, 0.2, 0.2, 0);
+		new PartialParticle(Particle.REDSTONE, loc, 20, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, loc, 20, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SNOWBALL, loc, 20, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(player);
 		loc.getWorld().playSound(loc, Sound.ENTITY_SNOW_GOLEM_SHOOT, SoundCategory.PLAYERS, 0.8f, 0.1f);
 
 

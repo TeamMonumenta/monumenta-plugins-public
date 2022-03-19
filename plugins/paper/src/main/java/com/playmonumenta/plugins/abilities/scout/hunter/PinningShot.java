@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.HashMap;
@@ -61,8 +62,8 @@ public class PinningShot extends Ability {
 				mPinnedMobs.put(enemy, false);
 				Location loc = enemy.getEyeLocation();
 				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
-				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0, 0, 0, 0.2);
-				world.spawnParticle(Particle.SNOWBALL, loc, 30, 0, 0, 0, 0.25);
+				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.SNOWBALL, loc, 30, 0, 0, 0, 0.25).spawnAsPlayerActive(mPlayer);
 				EntityUtils.setSlowTicks(mPlugin, enemy, 1);
 				EntityUtils.setWeakenTicks(mPlugin, enemy, 1);
 				if (!EntityUtils.isBoss(enemy)) {
@@ -72,7 +73,7 @@ public class PinningShot extends Ability {
 		} else {
 			Location loc = enemy.getLocation();
 			world.playSound(loc, Sound.BLOCK_SLIME_BLOCK_PLACE, 1, 0.5f);
-			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 8, 0, 0, 0, 0.2);
+			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 8, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
 			if (EntityUtils.isBoss(enemy)) {
 				EntityUtils.applySlow(mPlugin, PINNING_SHOT_DURATION, PINNING_SLOW_BOSS, enemy);
 			} else {

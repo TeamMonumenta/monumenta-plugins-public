@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -152,12 +153,12 @@ public class ThunderStep extends Ability {
 	private void doDamage(Location location, float spellDamage) {
 		World world = location.getWorld();
 		world.playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 1.5f);
-		world.spawnParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_YELLOW);
-		world.spawnParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_AQUA);
-		world.spawnParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10);
+		new PartialParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_AQUA).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10).spawnAsPlayerActive(mPlayer);
 
 		List<LivingEntity> enemies = EntityUtils.getNearbyMobs(location, SIZE);
-		// The more enemies, the less particles for each one
+		// The more enemies, the fewer particles for each one
 		int mobParticles = Math.max(
 			1,
 			20 / Math.max(1, enemies.size()) // Never divide by 0. Always maximum 20 particles for <= 1 enemy
@@ -170,8 +171,8 @@ public class ThunderStep extends Ability {
 			}
 
 			Location enemyParticleLocation = enemy.getLocation().add(0, enemy.getHeight() / 2, 0);
-			world.spawnParticle(Particle.CLOUD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5);
-			world.spawnParticle(Particle.END_ROD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5);
+			new PartialParticle(Particle.CLOUD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.END_ROD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
 		}
 	}
 

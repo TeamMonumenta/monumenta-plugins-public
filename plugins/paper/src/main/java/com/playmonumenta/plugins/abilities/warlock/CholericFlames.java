@@ -5,9 +5,10 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import javax.annotation.Nullable;
@@ -59,20 +60,14 @@ public class CholericFlames extends Ability {
 		World world = mPlayer.getWorld();
 		new BukkitRunnable() {
 			double mRadius = 0;
-			final Location mLoc = mPlayer.getLocation();
+			final Location mLoc = mPlayer.getLocation().add(0, 0.15, 0);
 
 			@Override
 			public void run() {
 				mRadius += 1.25;
-				for (double j = 0; j < 360; j += 18) {
-					double radian1 = Math.toRadians(j);
-					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-					world.spawnParticle(Particle.FLAME, mLoc, 2, 0, 0, 0, 0.125);
-					world.spawnParticle(Particle.SOUL_FIRE_FLAME, mLoc, 2, 0, 0, 0, 0.125);
-					world.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 1, 0, 0, 0, 0.15);
-					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-				}
-
+				new PPCircle(Particle.FLAME, mLoc, mRadius).ringMode(true).count(40).extra(0.125).spawnAsPlayerActive(mPlayer);
+				new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).ringMode(true).count(40).extra(0.125).spawnAsPlayerActive(mPlayer);
+				new PPCircle(Particle.SMOKE_NORMAL, mLoc, mRadius).ringMode(true).count(20).extra(0.15).spawnAsPlayerActive(mPlayer);
 				if (mRadius >= RADIUS + 1) {
 					this.cancel();
 				}
@@ -80,7 +75,7 @@ public class CholericFlames extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		world.spawnParticle(Particle.SMOKE_LARGE, loc, 30, 0, 0, 0, 0.15);
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 30, 0, 0, 0, 0.15).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1.0f, 0.35f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
 

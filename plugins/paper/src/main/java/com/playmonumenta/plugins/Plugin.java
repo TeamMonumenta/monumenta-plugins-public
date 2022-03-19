@@ -229,6 +229,7 @@ public class Plugin extends JavaPlugin {
 		NameMCVerify.register(this);
 		TellMiniMessage.register();
 		RunWithPlaceholdersCommand.register();
+		PartialParticleCommand.register();
 
 
 		try {

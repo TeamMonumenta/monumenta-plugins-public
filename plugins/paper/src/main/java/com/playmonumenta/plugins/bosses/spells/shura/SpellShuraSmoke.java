@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells.shura;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
@@ -77,7 +77,7 @@ public class SpellShuraSmoke extends Spell {
 					mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
 
 					PartialParticle smokeMarker = new PartialParticle(Particle.SMOKE_LARGE, loc, 5, 1.5, 0.15, 1.5, 0.025);
-					PPGroundCircle indicator = new PPGroundCircle(Particle.SPELL_WITCH, loc, 3, 0.1, 0, 0.1, 0).init(mRadius, true);
+					PPCircle indicator = new PPCircle(Particle.SPELL_WITCH, loc, mRadius).count(3).ringMode(true).delta(0.1, 0, 0.1);
 					new BukkitRunnable() {
 						int mTicks = 0;
 						@Override

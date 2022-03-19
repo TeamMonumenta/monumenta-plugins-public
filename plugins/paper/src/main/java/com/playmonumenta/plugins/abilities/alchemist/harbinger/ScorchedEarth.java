@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.ScorchedEarthDamage;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -77,20 +78,20 @@ public class ScorchedEarth extends MultipleChargeAbility {
 			if (time == null) {
 				continue;
 			}
-			int timeRemaining = time.intValue();
+			int timeRemaining = time;
 			if (timeRemaining <= 0) {
 				mCenters.remove(loc);
 			} else {
 				mCenters.replace(loc, timeRemaining - 5);
 
 				World world = loc.getWorld();
-				world.spawnParticle(Particle.SMOKE_LARGE, loc, 3, 2.1, 0.3, 2.1, 0);
-				world.spawnParticle(Particle.FLAME, loc, 3, 2, 0.1, 2, 0.1f);
-				world.spawnParticle(Particle.REDSTONE, loc, 5, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_LIGHT, 1.5f));
-				world.spawnParticle(Particle.REDSTONE, loc, 5, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.5f));
-				world.spawnParticle(Particle.LAVA, loc, 1, 2.1, 0.1, 2.1, 0);
+				new PartialParticle(Particle.SMOKE_LARGE, loc, 3, 2.1, 0.3, 2.1, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.FLAME, loc, 3, 2, 0.1, 2, 0.1f).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, loc, 5, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_LIGHT, 1.5f)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, loc, 5, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.5f)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.LAVA, loc, 1, 2.1, 0.1, 2.1, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 
-				world.spawnParticle(Particle.REDSTONE, loc.clone().add(5 * FastUtils.sin((timeRemaining % 40 / 20.0 - 1) * Math.PI), 0, 5 * FastUtils.cos((timeRemaining % 40 / 20.0 - 1) * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f));
+				new PartialParticle(Particle.REDSTONE, loc.clone().add(5 * FastUtils.sin((timeRemaining % 40 / 20.0 - 1) * Math.PI), 0, 5 * FastUtils.cos((timeRemaining % 40 / 20.0 - 1) * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 
 				if (timeRemaining % 120 == 60 && timeRemaining < SCORCHED_EARTH_DURATION) {
 					world.playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 0.5f);
@@ -123,11 +124,11 @@ public class ScorchedEarth extends MultipleChargeAbility {
 		if (mPlayer != null && potion.hasMetadata(SCORCHED_EARTH_POTION_METAKEY)) {
 			Location loc = potion.getLocation();
 			World world = mPlayer.getWorld();
-			world.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 2.1, 0.5, 2.1, 0.1);
-			world.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 2.1, 0.5, 2.1, 0);
-			world.spawnParticle(Particle.REDSTONE, loc, 20, 2.1, 0.5, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 2.0f));
-			world.spawnParticle(Particle.FLAME, loc, 30, 2.1, 0.5, 2.1, 0.1);
-			world.spawnParticle(Particle.LAVA, loc, 25, 1.5, 0.5, 1.5, 0);
+			new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 2.1, 0.5, 2.1, 0.1).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SMOKE_LARGE, loc, 15, 2.1, 0.5, 2.1, 0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, loc, 20, 2.1, 0.5, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 2.0f)).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.FLAME, loc, 30, 2.1, 0.5, 2.1, 0.1).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.LAVA, loc, 25, 1.5, 0.5, 1.5, 0).spawnAsPlayerActive(mPlayer);
 
 			world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1f, 0.5f);
 			world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);

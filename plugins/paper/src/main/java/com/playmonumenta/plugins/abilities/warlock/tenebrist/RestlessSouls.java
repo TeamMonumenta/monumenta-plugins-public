@@ -12,7 +12,7 @@ import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
@@ -135,8 +135,8 @@ public class RestlessSouls extends Ability {
 				}
 			}
 
-			mParticle1 = new PartialParticle(Particle.SOUL, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayer(mPlayer);
-			mParticle2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayer(mPlayer);
+			mParticle1 = new PartialParticle(Particle.SOUL, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
+			mParticle2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
 			new BukkitRunnable() {
 				int mTicksElapsed = 0;
 				@Nullable LivingEntity mTarget;
@@ -145,8 +145,8 @@ public class RestlessSouls extends Ability {
 				public void run() {
 
 					Location loc = mBoss.getLocation().add(0, 0.25, 0);
-					mParticle1.location(loc).spawnAsPlayer(mPlayer);
-					mParticle2.location(loc).spawnAsPlayer(mPlayer);
+					mParticle1.location(loc).spawnAsPlayerActive(mPlayer);
+					mParticle2.location(loc).spawnAsPlayerActive(mPlayer);
 
 					boolean isOutOfTime = mTicksElapsed >= VEX_DURATION;
 					if (isOutOfTime || !mBoss.isValid()) {
@@ -154,7 +154,7 @@ public class RestlessSouls extends Ability {
 							Location vexLoc = mBoss.getLocation();
 
 							world.playSound(vexLoc, Sound.ENTITY_VEX_DEATH, 1.5f, 1.0f);
-							world.spawnParticle(Particle.SOUL, vexLoc, 20, 0.2, 0.2, 0.2);
+							new PartialParticle(Particle.SOUL, vexLoc, 20, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
 						}
 						if (mTarget != null) {
 							mTarget.removePotionEffect(PotionEffectType.GLOWING);

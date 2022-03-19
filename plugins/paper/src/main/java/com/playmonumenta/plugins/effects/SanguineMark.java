@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -29,11 +29,10 @@ public class SanguineMark extends Effect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (fourHertz) {
-			World world = entity.getWorld();
 			Location loc = entity.getLocation().add(0, 1, 0);
-			world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.5, 0.25, 0.02);
-			world.spawnParticle(Particle.CRIMSON_SPORE, loc, 4, 0.25, 0.5, 0.25, 0);
-			world.spawnParticle(Particle.REDSTONE, loc, 4, 0.2, 0.2, 0.2, 0.1, COLOR);
+			new PartialParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.5, 0.25, 0.02).spawnAsEnemyBuff();
+			new PartialParticle(Particle.CRIMSON_SPORE, loc, 4, 0.25, 0.5, 0.25, 0).spawnAsEnemyBuff();
+			new PartialParticle(Particle.REDSTONE, loc, 4, 0.2, 0.2, 0.2, 0.1, COLOR).spawnAsEnemyBuff();
 		}
 	}
 

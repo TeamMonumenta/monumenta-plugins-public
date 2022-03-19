@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.WindBombAirTag;
 import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -83,14 +84,14 @@ public class WindBomb extends Ability {
 
 			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.2f, 1.25f);
 			new BukkitRunnable() {
-				double mRadius = RADIUS;
+				final double mRadius = RADIUS;
 
 				@Override
 				public void run() {
 					for (double j = 0; j < 360; j += 6) {
 						double radian1 = Math.toRadians(j);
 						loc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-						world.spawnParticle(Particle.CLOUD, loc, 3, 0, 0, 0, 0.125);
+						new PartialParticle(Particle.CLOUD, loc, 3, 0, 0, 0, 0.125).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 						loc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 					}
 					this.cancel();

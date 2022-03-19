@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -161,7 +162,7 @@ public class HuntingCompanion extends Ability {
 							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
 							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
 							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.2f);
-							world.spawnParticle(Particle.SMOKE_NORMAL, foxLoc, 20);
+							new PartialParticle(Particle.SMOKE_NORMAL, foxLoc, 20).spawnAsPlayerActive(mPlayer);
 						}
 						if (mTarget != null) {
 							mTarget.removePotionEffect(PotionEffectType.GLOWING);
@@ -208,7 +209,7 @@ public class HuntingCompanion extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
 		world.playSound(mFox.getLocation(), Sound.ENTITY_FOX_AGGRO, 1.5f, 1.0f);
 		PotionUtils.applyPotion(mPlayer, mTarget, new PotionEffect(PotionEffectType.GLOWING, DURATION, 0, true, false));
-		world.spawnParticle(Particle.VILLAGER_ANGRY, mFox.getEyeLocation(), 25);
+		new PartialParticle(Particle.VILLAGER_ANGRY, mFox.getEyeLocation(), 25).spawnAsPlayerActive(mPlayer);
 		return true; // only one targeting instance per tick
 	}
 

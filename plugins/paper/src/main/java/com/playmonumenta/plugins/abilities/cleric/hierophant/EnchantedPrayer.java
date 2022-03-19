@@ -5,7 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.EnchantedPrayerAoE;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
@@ -75,21 +76,13 @@ public class EnchantedPrayer extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.5f, 1);
 		putOnCooldown();
 		new BukkitRunnable() {
-			double mRotation = 0;
-			final Location mLoc = mPlayer.getLocation();
+			final Location mLoc = mPlayer.getLocation().add(0, 0.15, 0);
 			double mRadius = 0;
 
 			@Override
 			public void run() {
 				mRadius += 0.25;
-				for (int i = 0; i < 36; i += 1) {
-					mRotation += 10;
-					double radian1 = Math.toRadians(mRotation);
-					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-					world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 2, 0.15, 0.15, 0.15, 0);
-					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-
-				}
+				new PPCircle(Particle.SPELL_INSTANT, mLoc, mRadius).count(72).delta(0.15).spawnAsPlayerActive(mPlayer);
 				if (mRadius >= 5) {
 					this.cancel();
 				}
@@ -98,7 +91,7 @@ public class EnchantedPrayer extends Ability {
 		}.runTaskTimer(mPlugin, 0, 1);
 		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), ENCHANTED_PRAYER_RANGE, true)) {
 			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
-			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
+			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01).spawnAsPlayerActive(mPlayer);
 			mPlugin.mEffectManager.addEffect(p, "EnchantedPrayerEffect",
 					new EnchantedPrayerAoE(mPlugin, ENCHANTED_PRAYER_COOLDOWN, mDamage, mHeal, p, AFFECTED_DAMAGE_TYPES));
 		}

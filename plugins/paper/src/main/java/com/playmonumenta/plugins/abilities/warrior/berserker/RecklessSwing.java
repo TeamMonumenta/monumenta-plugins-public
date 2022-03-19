@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -86,7 +87,7 @@ public class RecklessSwing extends Ability {
 				Location loc = mPlayer.getLocation();
 				World world = mPlayer.getWorld();
 				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-				world.spawnParticle(Particle.SWEEP_ATTACK, loc, 25, 2, 0, 2, 0);
+				new PartialParticle(Particle.SWEEP_ATTACK, loc, 25, 2, 0, 2, 0).spawnAsPlayerActive(mPlayer);
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
 					// Only ignore iframes if the mob is *not* a boss

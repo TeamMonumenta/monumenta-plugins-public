@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -66,9 +67,9 @@ public class ShieldBash extends Ability {
 						for (LivingEntity mob : mobs) {
 							if (mob.isValid() && !mob.isDead() && EntityUtils.isHostileMob(mob)) {
 								Location mobLoc = mob.getEyeLocation();
-								world.spawnParticle(Particle.CRIT, mobLoc, 50, 0, 0.25, 0, 0.25);
-								world.spawnParticle(Particle.CRIT_MAGIC, mobLoc, 50, 0, 0.25, 0, 0.25);
-								world.spawnParticle(Particle.CLOUD, mobLoc, 5, 0.15, 0.5, 0.15, 0);
+								new PartialParticle(Particle.CRIT, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
+								new PartialParticle(Particle.CRIT_MAGIC, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
+								new PartialParticle(Particle.CLOUD, mobLoc, 5, 0.15, 0.5, 0.15, 0).spawnAsPlayerActive(mPlayer);
 								world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, 1.5f, 1);
 								world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
 

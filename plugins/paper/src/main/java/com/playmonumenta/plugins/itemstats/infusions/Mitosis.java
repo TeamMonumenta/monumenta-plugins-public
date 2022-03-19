@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
@@ -41,7 +42,7 @@ public class Mitosis implements Infusion {
 		//If we break a spawner with a pickaxe
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER) {
 			player.playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH, 0.7f, 0.7f);
-			player.getWorld().spawnParticle(Particle.REDSTONE, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5, COLOR);
+			new PartialParticle(Particle.REDSTONE, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5, COLOR).spawnAsPlayerActive(player);
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(event.getBlock().getLocation(), RADIUS);
 			for (LivingEntity mob : mobs) {
 				EntityUtils.applyWeaken(plugin, DURATION, percentWeaken, mob);

@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -105,15 +106,15 @@ public class AstralOmen extends Ability {
 						EntityUtils.applySlow(mPlugin, SLOW_TICKS, SLOW_MULTIPLIER, mob);
 					}
 
-					world.spawnParticle(Particle.REDSTONE, enemy.getLocation(), 10, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE);
+					new PartialParticle(Particle.REDSTONE, enemy.getLocation(), 10, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE).spawnAsPlayerActive(mPlayer);
 				}
 			}
 
 			mPlugin.mEffectManager.addEffect(enemy, BONUS_DAMAGE_SOURCE, new AstralOmenBonusDamage(BONUS_TICKS, mLevelBonusMultiplier, mPlayer));
 
 			Location loc = enemy.getLocation();
-			world.spawnParticle(Particle.ENCHANTMENT_TABLE, loc, 80, 0, 0, 0, 4);
-			world.spawnParticle(Particle.REDSTONE, loc, 20, 3, 3, 3, 0.1, COLOR_PURPLE);
+			new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 80, 0, 0, 0, 4).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, loc, 20, 3, 3, 3, 0.1, COLOR_PURPLE).spawnAsPlayerActive(mPlayer);
 			world.playSound(loc, Sound.ENTITY_BLAZE_HURT, 1.3f, 1.5f);
 		} else {
 			// Effect implements Comparable in compareTo(), which uses the internal magnitude

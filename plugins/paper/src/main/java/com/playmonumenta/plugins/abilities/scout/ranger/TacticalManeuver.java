@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -79,8 +80,8 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 		World world = mPlayer.getWorld();
 		if (mPlayer.isSprinting()) {
-			world.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
-			world.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
+			new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1.7f);
 			Vector dir = mPlayer.getLocation().getDirection();
@@ -100,7 +101,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 						return;
 					}
 
-					world.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
+					new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
 
 					Location loc = mPlayer.getLocation();
 					if (mPlayer.getVelocity().length() > 0.001) {
@@ -113,8 +114,8 @@ public class TacticalManeuver extends MultipleChargeAbility {
 								EntityUtils.applyStun(mPlugin, TACTICAL_DASH_STUN_DURATION, e);
 							}
 
-							world.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
-							world.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
+							new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
 							world.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 
 							this.cancel();
@@ -132,9 +133,9 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 1.2f);
-			world.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.1f, 0, 0.1f, 0.125f);
-			world.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 10, 0.1f, 0, 0.1f, 0.15f);
-			world.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 25, 0.1f, 0, 0.1f, 0.15f);
+			new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.1f, 0, 0.1f, 0.125f).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 10, 0.1f, 0, 0.1f, 0.15f).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 25, 0.1f, 0, 0.1f, 0.15f).spawnAsPlayerActive(mPlayer);
 			mPlayer.setVelocity(mPlayer.getLocation().getDirection().setY(0).normalize().multiply(-1.65).setY(0.65));
 		}
 	}

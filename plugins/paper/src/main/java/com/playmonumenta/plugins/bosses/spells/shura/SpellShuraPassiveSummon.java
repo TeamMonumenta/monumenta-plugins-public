@@ -2,8 +2,8 @@ package com.playmonumenta.plugins.bosses.spells.shura;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,9 +74,10 @@ public class SpellShuraPassiveSummon extends Spell {
 				String summonName = mSummons.get(0);
 				World world = spawnLoc.getWorld();
 
-				PPGroundCircle indicator = new PPGroundCircle(Particle.SMOKE_NORMAL, spawnLoc.add(0, 1, 0), 4, 0.2, 0, 0.2, 0).init(0, true);
+				PPCircle indicator = new PPCircle(Particle.SMOKE_NORMAL, spawnLoc.add(0, 1, 0), 0).count(4).ringMode(true).delta(0.2, 0, 0.2);
 				BukkitRunnable a = new BukkitRunnable() {
 					int mT = 0;
+
 					@Override
 					public void run() {
 						mT++;

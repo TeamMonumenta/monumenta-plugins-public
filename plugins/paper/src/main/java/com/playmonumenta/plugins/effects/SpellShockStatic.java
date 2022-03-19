@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
 public class SpellShockStatic extends Effect {
@@ -27,9 +27,8 @@ public class SpellShockStatic extends Effect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		Location loc = entity.getLocation();
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.SPELL_WITCH, loc, 3, 0.2, 0.6, 0.2, 1);
-		world.spawnParticle(Particle.REDSTONE, loc, 3, 0.3, 0.6, 0.3, COLOR);
+		new PartialParticle(Particle.SPELL_WITCH, loc, 3, 0.2, 0.6, 0.2, 1).minimumMultiplier(false).spawnAsEnemyBuff();
+		new PartialParticle(Particle.REDSTONE, loc, 3, 0.3, 0.6, 0.3, COLOR).minimumMultiplier(false).spawnAsEnemyBuff();
 	}
 
 	@Override

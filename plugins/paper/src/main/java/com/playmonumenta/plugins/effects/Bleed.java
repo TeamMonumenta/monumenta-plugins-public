@@ -1,11 +1,11 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -34,12 +34,10 @@ public class Bleed extends Effect {
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
-		if (entity instanceof LivingEntity) {
-			LivingEntity le = (LivingEntity) entity;
+		if (entity instanceof LivingEntity le) {
 			if (le.getHealth() <= EntityUtils.getMaxHealth(le) / 2) {
 				Location loc = le.getLocation();
-				World world = loc.getWorld();
-				world.spawnParticle(Particle.REDSTONE, loc, 4, 0.3, 0.6, 0.3, COLOR);
+				new PartialParticle(Particle.REDSTONE, loc, 4, 0.3, 0.6, 0.3, COLOR).spawnAsEnemyBuff();
 				if (oneHertz) {
 					// Delay this call to later since this method runs inside of a loop iterating over the player's effects
 					new BukkitRunnable() {

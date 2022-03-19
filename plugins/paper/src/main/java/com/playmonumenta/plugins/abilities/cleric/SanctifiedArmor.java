@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -66,7 +67,7 @@ public class SanctifiedArmor extends Ability {
 			    && !event.isBlocked()) {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
-			world.spawnParticle(Particle.FIREWORKS_SPARK, loc.add(0, source.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125);
+			new PartialParticle(Particle.FIREWORKS_SPARK, loc.add(0, source.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125).spawnAsPlayerPassive(mPlayer);
 			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
 
 			double damage = mPercentDamageReturned * event.getFinalDamage(false);

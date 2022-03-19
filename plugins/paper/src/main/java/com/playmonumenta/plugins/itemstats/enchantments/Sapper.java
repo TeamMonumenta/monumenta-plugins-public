@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -31,7 +32,7 @@ public class Sapper implements Enchantment {
 		ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER && !ItemUtils.isPickaxe(player.getInventory().getItemInOffHand())) {
 			PlayerUtils.healPlayer(plugin, player, value);
-			player.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 1, 0), 8, 0.4, 0.4, 0.4, 0.1);
+			new PartialParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 1, 0), 8, 0.4, 0.4, 0.4, 0.1).spawnAsPlayerActive(player);
 		}
 	}
 }

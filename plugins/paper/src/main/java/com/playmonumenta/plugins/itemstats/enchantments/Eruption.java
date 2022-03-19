@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -89,9 +90,9 @@ public class Eruption implements Enchantment {
 			if (sapper > 0) {
 				player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
 				player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.05f, 1.0f);
-				player.getWorld().spawnParticle(Particle.HEART, event.getBlock().getLocation().add(0, 1, 0), 25, 1.5, 1.5, 1.5);
+				new PartialParticle(Particle.HEART, event.getBlock().getLocation().add(0, 1, 0), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 				for (Player p : PlayerUtils.playersInRange(event.getBlock().getLocation(), SAPPER_RADIUS, true)) {
-					p.getWorld().spawnParticle(Particle.HEART, p.getEyeLocation(), 5, 1, 1, 1);
+					new PartialParticle(Particle.HEART, p.getEyeLocation(), 5, 1, 1, 1).spawnAsPlayerActive(player);
 					if (p == player) {
 						continue;
 					}
@@ -113,20 +114,20 @@ public class Eruption implements Enchantment {
 			//Visual feedback
 			if (ice > 0) {
 				player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.6f, 1.3f);
-				player.getWorld().spawnParticle(Particle.SNOW_SHOVEL, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5);
+				new PartialParticle(Particle.SNOW_SHOVEL, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (thunder > 0) {
 				player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.6f, 0.8f);
-				player.getWorld().spawnParticle(Particle.REDSTONE, event.getBlock().getLocation(), 12, 1.5, 1.5, 1.5, YELLOW_1_COLOR);
-				player.getWorld().spawnParticle(Particle.REDSTONE, event.getBlock().getLocation(), 12, 1.5, 1.5, 1.5, YELLOW_2_COLOR);
+				new PartialParticle(Particle.REDSTONE, event.getBlock().getLocation(), 12, 1.5, 1.5, 1.5, YELLOW_1_COLOR).spawnAsPlayerActive(player);
+				new PartialParticle(Particle.REDSTONE, event.getBlock().getLocation(), 12, 1.5, 1.5, 1.5, YELLOW_2_COLOR).spawnAsPlayerActive(player);
 			}
 			if (decay > 0) {
 				player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.4f, 0.7f);
-				player.getWorld().spawnParticle(Particle.SQUID_INK, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5);
+				new PartialParticle(Particle.SQUID_INK, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (bleed > 0 || adrenaline > 0) {
 				player.playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH, 0.7f, 0.7f);
-				player.getWorld().spawnParticle(Particle.REDSTONE, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5, BLEED_COLOR);
+				new PartialParticle(Particle.REDSTONE, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5, BLEED_COLOR).spawnAsPlayerActive(player);
 			}
 			if (fire > 0 || fire + ice + thunder + decay + bleed + adrenaline == 0) {
 				player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);

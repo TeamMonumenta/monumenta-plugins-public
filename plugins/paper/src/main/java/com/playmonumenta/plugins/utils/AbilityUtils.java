@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,8 +91,8 @@ public class AbilityUtils {
 		Location loc = player.getLocation();
 		World world = player.getWorld();
 
-		world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f);
-		world.spawnParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f);
+		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, 1f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_PHANTOM_HURT, 0.6f, 0.5f);
 
@@ -108,8 +109,8 @@ public class AbilityUtils {
 		Location loc = player.getLocation();
 		World world = player.getWorld();
 
-		world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f);
-		world.spawnParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f);
+		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.ENTITY_SNOW_GOLEM_DEATH, 1f, 0.5f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, 0.5f, 2f);
 

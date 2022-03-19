@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -90,8 +91,8 @@ public class VoodooBondsOtherPlayer extends Effect {
 
 		Location loc = entity.getLocation();
 		World world = loc.getWorld();
-		world.spawnParticle(Particle.SPELL_WITCH, loc, 65, 1, 0.5, 1, 0.001);
-		world.spawnParticle(Particle.REDSTONE, loc, 65, 1, 0.5, 1, 0, COLOR);
+		new PartialParticle(Particle.SPELL_WITCH, loc, 65, 1, 0.5, 1, 0.001).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, loc, 65, 1, 0.5, 1, 0, COLOR).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, 2f, 0.75f);
 	}
 
@@ -104,12 +105,12 @@ public class VoodooBondsOtherPlayer extends Effect {
 			//replace with halo effect
 			double angle = Math.toRadians(mRotation);
 			loc.add(FastUtils.cos(angle) * 0.5, le.getHeight(), FastUtils.sin(angle) * 0.5);
-			world.spawnParticle(Particle.REDSTONE, loc, 5, 0, 0, 0, COLOR);
+			new PartialParticle(Particle.REDSTONE, loc, 5, 0, 0, 0, COLOR).spawnAsEnemy();
 			if (mTriggerTickParticle) {
 				setDuration(0);
 				mTriggerTickParticle = false;
 				//replace with better particles
-				world.spawnParticle(Particle.REDSTONE, loc, 60, 3, 3, 3, 0.075, COLOR);
+				new PartialParticle(Particle.REDSTONE, loc, 60, 3, 3, 3, 0.075, COLOR).spawnAsEnemy();
 				world.playSound(loc, Sound.BLOCK_ANVIL_FALL, SoundCategory.PLAYERS, 2f, 1.0f);
 			}
 		}

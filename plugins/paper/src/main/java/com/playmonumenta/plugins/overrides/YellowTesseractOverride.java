@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityCollection;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -148,7 +149,7 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
-		player.getWorld().spawnParticle(Particle.BLOCK_DUST, pLoc, 10, 0.5, 0.5, 0.5, 0, Material.BLACK_CONCRETE.createBlockData());
+		new PartialParticle(Particle.BLOCK_DUST, pLoc, 10, 0.5, 0.5, 0.5, 0, Material.BLACK_CONCRETE.createBlockData()).spawnAsPlayerActive(player);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 2.5f);
 		player.sendMessage(Component.text("The Tesseract of the Elements has been reset!", NamedTextColor.YELLOW));
 	}
@@ -254,7 +255,7 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
-		player.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, pLoc, 10, 0.5, 0.5, 0.5, 0);
+		new PartialParticle(Particle.FIREWORKS_SPARK, pLoc, 10, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 2.5f);
 		player.sendMessage(Component.text("The Tesseract of the Elements has swapped your class!", NamedTextColor.YELLOW));
 
@@ -300,7 +301,7 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
-		player.getWorld().spawnParticle(Particle.SNOWBALL, pLoc, 10, 0.5, 0.5, 0.5, 0);
+		new PartialParticle(Particle.SNOWBALL, pLoc, 10, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
 		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, 1, 2.5f);
 		player.sendMessage(Component.text("The Tesseract of the Elements has stored your skills!", NamedTextColor.YELLOW));
 

@@ -10,7 +10,8 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPPeriodic;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -125,17 +126,15 @@ public class ElementalSpiritIce extends Ability {
 									}
 
 									// Ice spirit effects
-									PartialParticle partialParticle = new PartialParticle(
-										Particle.SNOWBALL,
-										centre,
-										150,
-										PartialParticle.getWidthDelta(SIZE),
-										0.1
-									).spawnAsPlayer(mPlayer);
+									PartialParticle partialParticle = new PartialParticle(Particle.SNOWBALL, centre)
+										.count(150)
+										.delta(PartialParticle.getWidthDelta(SIZE))
+										.extra(0.1)
+										.spawnAsPlayerActive(mPlayer);
 									//TODO falling dust
-									partialParticle.mParticle = Particle.FIREWORKS_SPARK;
-									partialParticle.mCount = 30;
-									partialParticle.spawnAsPlayer(mPlayer);
+									partialParticle.particle(Particle.FIREWORKS_SPARK)
+										.count(30)
+										.spawnAsPlayerActive(mPlayer);
 									world.playSound(centre, Sound.ENTITY_TURTLE_HURT_BABY, 1, 0.2f);
 									world.playSound(centre, Sound.BLOCK_GLASS_BREAK, 0.5f, 0.05f);
 
@@ -156,18 +155,18 @@ public class ElementalSpiritIce extends Ability {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mPlayerParticlesGenerator == null) {
+		if (mPlayerParticlesGenerator == null && mPlayer != null) {
 			mPlayerParticlesGenerator = new BukkitRunnable() {
 				double mVerticalAngle = 0;
+				final PPPeriodic mParticle = new PPPeriodic(Particle.SNOWBALL, mPlayer.getLocation()).count(3);
 				double mRotationAngle = 180;
 
 				@Override
 				public void run() {
-					if (
-						isTimerActive()
+					if (isTimerActive()
+						    || mPlayer == null
 							|| !mPlayer.isValid() // Ensure player is not dead, is still online?
-							|| PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)
-					) {
+						    || PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
 						this.cancel();
 						mPlayerParticlesGenerator = null;
 					}
@@ -177,19 +176,15 @@ public class ElementalSpiritIce extends Ability {
 					mVerticalAngle %= -360;
 					mRotationAngle %= -360;
 
-					new PartialParticle(
-						Particle.SNOWBALL,
+					mParticle.location(
 						LocationUtils
 							.getHalfHeightLocation(mPlayer)
 							.add(
 								FastUtils.cos(Math.toRadians(mRotationAngle)),
 								FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.5,
 								FastUtils.sin(Math.toRadians(mRotationAngle))
-							),
-						3,
-						0,
-						0
-					).spawnAsPlayer(mPlayer, true);
+								))
+						.spawnAsPlayerPassive(mPlayer);
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
 		}

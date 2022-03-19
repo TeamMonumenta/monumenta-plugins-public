@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -41,10 +41,9 @@ public class WindBombAirTag extends Effect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (fourHertz) {
-			World world = entity.getWorld();
 			Location loc = entity.getLocation();
-			world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.5, 0.25, 0.02);
-			world.spawnParticle(Particle.CLOUD, loc, 1, 0.25, 0.5, 0.25, 0);
+			new PartialParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.5, 0.25, 0.02).spawnAsEnemy();
+			new PartialParticle(Particle.CLOUD, loc, 1, 0.25, 0.5, 0.25, 0).spawnAsEnemy();
 			if (entity.isOnGround()) {
 				setDuration(0);
 			}

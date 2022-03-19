@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.particle.PPLine;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -63,18 +65,17 @@ public class ManaLance extends Ability {
 		box.shift(dir);
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 10, mPlayer);
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.125);
+
+		Location endLoc = loc;
 
 		for (int i = 0; i < 8; i++) {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(world);
-
-			world.spawnParticle(Particle.EXPLOSION_NORMAL, bLoc, 2, 0.05, 0.05, 0.05, 0.025);
-			world.spawnParticle(Particle.REDSTONE, bLoc, 18, 0.35, 0.35, 0.35, MANA_LANCE_COLOR);
+			endLoc = bLoc;
 
 			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 				bLoc.subtract(dir.multiply(0.5));
-				world.spawnParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125);
+				new PartialParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
 				break;
 			}
@@ -85,10 +86,12 @@ public class ManaLance extends Ability {
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true);
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f, true);
 					iter.remove();
-					mobs.remove(mob);
 				}
 			}
 		}
+
+		new PPLine(Particle.EXPLOSION_NORMAL, loc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0.05).extra(0.025).spawnAsPlayerActive(mPlayer);
+		new PPLine(Particle.REDSTONE, loc, endLoc).shiftStart(0.75).countPerMeter(18).delta(0.35).data(MANA_LANCE_COLOR).spawnAsPlayerActive(mPlayer);
 
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 	}

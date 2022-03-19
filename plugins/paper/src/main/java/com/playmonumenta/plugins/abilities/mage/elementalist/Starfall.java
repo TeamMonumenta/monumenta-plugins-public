@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -93,13 +94,13 @@ public class Starfall extends Ability {
 				float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 
 				world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
-				world.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f);
-				world.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
+				new PartialParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
 				Vector dir = loc.getDirection().normalize();
 				for (int i = 0; i < DISTANCE; i++) {
 					loc.add(dir);
 
-					mPlayer.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0);
+					new PartialParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
 					int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
 					if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
 						launchMeteor(loc, playerItemStats, damage);
@@ -125,9 +126,9 @@ public class Starfall extends Ability {
 					if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
 						if (loc.getY() - ogLoc.getY() <= 2) {
 							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0);
-							world.spawnParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.235F);
-							world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.2F);
-							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2F);
+							new PartialParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.235F).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.2F).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2F).spawnAsPlayerActive(mPlayer);
 							this.cancel();
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, SIZE, mPlayer)) {
@@ -140,8 +141,8 @@ public class Starfall extends Ability {
 					}
 				}
 				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
-				world.spawnParticle(Particle.FLAME, loc, 25, 0.25F, 0.25F, 0.25F, 0.1F);
-				world.spawnParticle(Particle.SMOKE_LARGE, loc, 5, 0.25F, 0.25F, 0.25F, 0.1F);
+				new PartialParticle(Particle.FLAME, loc, 25, 0.25F, 0.25F, 0.25F, 0.1F).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.SMOKE_LARGE, loc, 5, 0.25F, 0.25F, 0.25F, 0.1F).spawnAsPlayerActive(mPlayer);
 
 				if (mT >= 50) {
 					this.cancel();

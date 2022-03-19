@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -114,10 +115,10 @@ public class BodkinBlitz extends MultipleChargeAbility {
 				boolean isBlocked = LocationUtils.travelTillObstructed(world, travelBox,
 					mDistancePerTick, mDirection, 0.1, true,
 					loc -> {
-						world.spawnParticle(Particle.FALLING_DUST, loc, 5, 0.15, 0.45, 0.1,
-							Bukkit.createBlockData("gray_concrete"));
-						world.spawnParticle(Particle.CRIT, loc, 4, 0.25, 0.5, 0.25, 0);
-						world.spawnParticle(Particle.SMOKE_NORMAL, loc, 5, 0.15, 0.45, 0.15, 0.01);
+						new PartialParticle(Particle.FALLING_DUST, loc, 5, 0.15, 0.45, 0.1,
+							Bukkit.createBlockData("gray_concrete")).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CRIT, loc, 4, 0.25, 0.5, 0.25, 0).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SMOKE_NORMAL, loc, 5, 0.15, 0.45, 0.15, 0.01).spawnAsPlayerActive(mPlayer);
 					}, 1, 1);
 				Location tpLoc = travelBox.getCenter().toLocation(world).add(0, -travelBox.getHeight() / 2, 0);
 				if (isBlocked) {
@@ -151,11 +152,11 @@ public class BodkinBlitz extends MultipleChargeAbility {
 					world.playSound(tpLoc, Sound.ENTITY_PHANTOM_HURT, 1f, 0.75f);
 					world.playSound(tpLoc, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f);
 
-					world.spawnParticle(Particle.SMOKE_LARGE, tpLoc.clone().add(0, 1, 0), 30, 0.25, 0.5, 0.25, 0.18);
-					world.spawnParticle(Particle.SMOKE_LARGE, tpLoc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.04);
-					world.spawnParticle(Particle.SPELL_WITCH, tpLoc.clone().add(0, 1, 0), 15, 0.5, 0.5, 0.5, 0);
-					world.spawnParticle(Particle.SMOKE_NORMAL, tpLoc.clone().add(0, 1, 0), 50, 0.75, 0.5, 0.75, 0.05);
-					world.spawnParticle(Particle.CRIT, tpLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.3);
+					new PartialParticle(Particle.SMOKE_LARGE, tpLoc.clone().add(0, 1, 0), 30, 0.25, 0.5, 0.25, 0.18).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SMOKE_LARGE, tpLoc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.04).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SPELL_WITCH, tpLoc.clone().add(0, 1, 0), 15, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SMOKE_NORMAL, tpLoc.clone().add(0, 1, 0), 50, 0.75, 0.5, 0.75, 0.05).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.CRIT, tpLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.3).spawnAsPlayerActive(mPlayer);
 
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 						new PotionEffect(PotionEffectType.FAST_DIGGING, 5, 19, true, false));
@@ -167,7 +168,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 						mRunnable = new BukkitRunnable() {
 							@Override
 							public void run() {
-								world.spawnParticle(Particle.FALLING_DUST, mPlayer.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, Bukkit.createBlockData("gray_concrete"));
+								new PartialParticle(Particle.FALLING_DUST, mPlayer.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, Bukkit.createBlockData("gray_concrete")).spawnAsPlayerActive(mPlayer);
 								if (mTicks <= 0) {
 									mTicks = 0;
 									this.cancel();
@@ -199,8 +200,8 @@ public class BodkinBlitz extends MultipleChargeAbility {
 					World world = entityLoc.getWorld();
 					world.playSound(entityLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 2f);
 					world.playSound(entityLoc, Sound.BLOCK_ANVIL_LAND, 0.8f, 2f);
-					world.spawnParticle(Particle.FALLING_DUST, entityLoc, 35, 0.35, 0.5, 0.35, Bukkit.createBlockData("gray_concrete"));
-					world.spawnParticle(Particle.BLOCK_CRACK, entityLoc, 20, 0.25, 0.25, 0.25, 1, Bukkit.createBlockData("redstone_block"));
+					new PartialParticle(Particle.FALLING_DUST, entityLoc, 35, 0.35, 0.5, 0.35, Bukkit.createBlockData("gray_concrete")).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.BLOCK_CRACK, entityLoc, 20, 0.25, 0.25, 0.25, 1, Bukkit.createBlockData("redstone_block")).spawnAsPlayerActive(mPlayer);
 
 					DamageUtils.damage(mPlayer, m, DamageType.MELEE_SKILL, mBonusDmg, mInfo.mLinkedSpell, true);
 				}

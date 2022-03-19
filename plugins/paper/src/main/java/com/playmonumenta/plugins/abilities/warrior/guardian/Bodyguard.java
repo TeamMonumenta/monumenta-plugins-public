@@ -4,11 +4,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.particle.PPExplosion;
+import com.playmonumenta.plugins.particle.PPLine;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -116,32 +117,26 @@ public class Bodyguard extends Ability {
 					}
 					// Don't set mLeftClicks to 0, self cast below handles that
 
-					Location loc = mPlayer.getEyeLocation();
-					for (int j = 0; j < 45; j++) {
-						loc.add(dir.clone().multiply(0.33));
-						world.spawnParticle(Particle.FLAME, loc, 4, 0.25, 0.25, 0.25, 0f);
-						if (loc.distance(bLoc) < 1) {
-							break;
-						}
-					}
+					new PPLine(Particle.FLAME, mPlayer.getEyeLocation(), bLoc)
+						.countPerMeter(12)
+						.delta(0.25, 0.25, 0.25)
+						.spawnAsPlayerActive(mPlayer);
 
 					// Flame
-					for (int k = 0; k < 120; k++) {
-						double x = FastUtils.randomDoubleInRange(-3, 3);
-						double z = FastUtils.randomDoubleInRange(-3, 3);
-						Location to = player.getLocation().add(x, 0.15, z);
-						Vector pdir = LocationUtils.getDirectionTo(to, player.getLocation().add(0, 0.15, 0));
-						world.spawnParticle(Particle.FLAME, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.1, 0.4));
-					}
+					new PPExplosion(Particle.FLAME, player.getLocation().add(0, 0.15, 0))
+						.flat(true)
+						.speed(1)
+						.count(120)
+						.extraRange(0.1, 0.4)
+						.spawnAsPlayerActive(mPlayer);
 
 					// Explosion_Normal
-					for (int k = 0; k < 60; k++) {
-						double x = FastUtils.randomDoubleInRange(-3, 3);
-						double z = FastUtils.randomDoubleInRange(-3, 3);
-						Location to = player.getLocation().add(x, 0.15, z);
-						Vector pdir = LocationUtils.getDirectionTo(to, player.getLocation().add(0, 0.15, 0));
-						world.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.15, 0.5));
-					}
+					new PPExplosion(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0))
+						.flat(true)
+						.speed(1)
+						.count(60)
+						.extraRange(0.15, 0.5)
+						.spawnAsPlayerActive(mPlayer);
 
 					Location userLoc = mPlayer.getLocation();
 					Location targetLoc = player.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
@@ -166,7 +161,7 @@ public class Bodyguard extends Ability {
 		putOnCooldown();
 
 		world.playSound(oLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
-		world.spawnParticle(Particle.FLAME, oLoc.add(0, 0.15, 0), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FLAME, oLoc.add(0, 0.15, 0), 25, 0.2, 0, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
 
 		AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, BUFF_DURATION);
 

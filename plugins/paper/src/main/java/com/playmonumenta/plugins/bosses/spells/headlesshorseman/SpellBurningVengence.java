@@ -2,8 +2,8 @@ package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -49,17 +49,15 @@ public class SpellBurningVengence extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		Horse horse = null;
 		if (mBoss.getVehicle() != null) {
-			if (mBoss.getVehicle() instanceof Horse) {
-				horse = (Horse) mBoss.getVehicle();
+			if (mBoss.getVehicle() instanceof Horse horse) {
 				horse.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 65, 2));
 			}
 		}
 
 		if (mBoss.getVehicle() != null) {
-			if (mBoss.getVehicle() instanceof LivingEntity h) {
-				PPGroundCircle outerFlameCircle = new PPGroundCircle(Particle.FLAME, h.getLocation(), 48, 0.07, 0.07, 0.07, 0.01).init(0, true);
+			if (mBoss.getVehicle() instanceof LivingEntity horse) {
+				PPCircle outerFlameCircle = new PPCircle(Particle.FLAME, horse.getLocation(), 0).ringMode(true).count(48).delta(0.07).extra(0.01);
 
 				BukkitRunnable run = new BukkitRunnable() {
 					double mRadius = 16;
@@ -72,7 +70,7 @@ public class SpellBurningVengence extends Spell {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 3, 0.5f + mTicks / 32f);
 						}
 						mTicks++;
-						Location loc = h.getLocation();
+						Location loc = horse.getLocation();
 
 						outerFlameCircle.radius(mRadius).location(loc).spawnAsBoss();
 
@@ -94,7 +92,7 @@ public class SpellBurningVengence extends Spell {
 
 						if (mRadius <= 0) {
 							this.cancel();
-							h.removePotionEffect(PotionEffectType.SLOW);
+							horse.removePotionEffect(PotionEffectType.SLOW);
 							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3, 1.25f);
 							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3, 0.85f);
 							new PartialParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.125).spawnAsBoss();

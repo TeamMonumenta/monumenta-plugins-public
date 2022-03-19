@@ -4,8 +4,8 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -131,7 +131,7 @@ public class SpellSoulShackle extends Spell {
 			bar.setVisible(true);
 			bar.addPlayer(p);
 
-			PPGroundCircle indicator = new PPGroundCircle(Particle.END_ROD, pLoc, 36, 0, 0, 0, 0).init(3, true);
+			PPCircle indicator = new PPCircle(Particle.END_ROD, pLoc, 3).ringMode(true).count(36);
 
 			BukkitRunnable run = new BukkitRunnable() {
 

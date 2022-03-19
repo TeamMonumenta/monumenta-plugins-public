@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -83,8 +84,8 @@ public class MelancholicLament extends Ability {
 			world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.4f);
 			world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.6f);
 
-			world.spawnParticle(Particle.REDSTONE, loc, 300, 8, 8, 8, 0.125, COLOR);
-			world.spawnParticle(Particle.ENCHANTMENT_TABLE, loc, 300, 8, 8, 8, 0.125);
+			new PartialParticle(Particle.REDSTONE, loc, 300, 8, 8, 8, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 300, 8, 8, 8, 0.125).spawnAsPlayerActive(mPlayer);
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 				EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
@@ -93,8 +94,8 @@ public class MelancholicLament extends Ability {
 
 			if (getAbilityScore() > 1) {
 				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true)) {
-					world.spawnParticle(Particle.REDSTONE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125, COLOR);
-					world.spawnParticle(Particle.ENCHANTMENT_TABLE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125);
+					new PartialParticle(Particle.REDSTONE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.ENCHANTMENT_TABLE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
 					for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, player)) {
 						PotionEffect effect = player.getPotionEffect(effectType);
 						if (effect != null) {

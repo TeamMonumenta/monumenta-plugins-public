@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -134,7 +135,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 					}
 				}
 
-				mWorld.spawnParticle(Particle.SWEEP_ATTACK, bladeLoc1, 3, 0.35, 0, 0.35, 1);
+				new PartialParticle(Particle.SWEEP_ATTACK, bladeLoc1, 3, 0.35, 0, 0.35, 1).spawnAsPlayerActive(mPlayer);
 
 				mIncrementDegrees += 30;
 				if (mIncrementDegrees > 360) {

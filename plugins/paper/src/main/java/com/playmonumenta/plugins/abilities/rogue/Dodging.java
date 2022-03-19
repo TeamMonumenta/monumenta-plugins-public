@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.Collection;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
@@ -164,10 +165,10 @@ public class Dodging extends Ability {
 		if (dodging > 1) {
 			mPlugin.mEffectManager.addEffect(mPlayer, ATTR_NAME,
 					new PercentSpeed(DODGING_SPEED_EFFECT_DURATION, PERCENT_SPEED, ATTR_NAME));
-			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15);
+			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15).spawnAsPlayerActive(mPlayer);
 			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.35f);
 		}
-		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
 		return true;
 	}

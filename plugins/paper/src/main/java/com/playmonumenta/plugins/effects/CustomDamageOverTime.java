@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Particle;
@@ -42,7 +43,7 @@ public class CustomDamageOverTime extends Effect {
 			if (mTicks >= mPeriod) {
 				mTicks %= mPeriod;
 				DamageUtils.damage(mPlayer, le, DamageType.AILMENT, mDamage, mSpell, true, false);
-				entity.getWorld().spawnParticle(mParticle, le.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1);
+				new PartialParticle(mParticle, le.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1).spawnAsEnemy();
 			}
 		}
 	}

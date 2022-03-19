@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.player;
+package com.playmonumenta.plugins.particle;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.Constants;
@@ -11,9 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
 
-
-
-public class PPLightning extends PartialParticle {
+public class PPLightning extends AbstractPartialParticle<PPLightning> {
 	public static final int ANIMATION_TICKS = Constants.TICKS_PER_SECOND;
 
 	/*
@@ -50,36 +48,8 @@ public class PPLightning extends PartialParticle {
 	 * Constructors
 	 */
 
-	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double delta, double extra) {
-		super(particle, strikeLocation, hopParticleCount, delta, extra);
-	}
-
-	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double delta, double extra, @Nullable Object data) {
-		super(particle, strikeLocation, hopParticleCount, delta, extra, data);
-	}
-
-	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
-		super(particle, strikeLocation, hopParticleCount, delta, extra, data, directionalMode, extraVariance);
-	}
-
-	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance, boolean minimumMultiplier) {
-		super(particle, strikeLocation, hopParticleCount, delta, extra, data, directionalMode, extraVariance, minimumMultiplier);
-	}
-
-	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double deltaX, double deltaY, double deltaZ, double extra) {
-		super(particle, strikeLocation, hopParticleCount, deltaX, deltaY, deltaZ, extra);
-	}
-
-	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data) {
-		super(particle, strikeLocation, hopParticleCount, deltaX, deltaY, deltaZ, extra, data);
-	}
-
-	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
-		super(particle, strikeLocation, hopParticleCount, deltaX, deltaY, deltaZ, extra, data, directionalMode, extraVariance);
-	}
-
-	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode, double extraVariance, boolean minimumMultiplier) {
-		super(particle, strikeLocation, hopParticleCount, deltaX, deltaY, deltaZ, extra, data, directionalMode, extraVariance, minimumMultiplier);
+	public PPLightning(Particle particle, Location strikeLocation) {
+		super(particle, strikeLocation);
 	}
 
 	/*-------------------------------------------------------------------------------
@@ -172,7 +142,7 @@ public class PPLightning extends PartialParticle {
 			public void run() {
 				// Frame of animation this run, starting at 1
 				mAnimationProgress++;
-				int targetIndex = (int)Math.round(mAnimationProgress * particlesPerTick) - 1;
+				int targetIndex = (int) Math.round(mAnimationProgress * particlesPerTick) - 1;
 
 				for (int index = mIndexPointer; index <= targetIndex; index++) {
 					packagedValues.location(
@@ -222,7 +192,7 @@ public class PPLightning extends PartialParticle {
 			// First and last points don't get varied
 			if (
 				hopIndex != 0
-				&& hopIndex != hopCount - 1
+					&& hopIndex != hopCount - 1
 			) {
 				double currentX = currentHopLocation.getX();
 				double currentZ = currentHopLocation.getZ();

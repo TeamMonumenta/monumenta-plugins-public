@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -76,8 +77,8 @@ public class EscapeDeath extends Ability {
 				loc.add(0, 1, 0);
 
 				World world = mPlayer.getWorld();
-				world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 80, 0, 0, 0, 0.25);
-				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 125, 0, 0, 0, 0.3);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 80, 0, 0, 0, 0.25).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 125, 0, 0, 0, 0.3).spawnAsPlayerActive(mPlayer);
 
 				world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.75f, 1.5f);
 				world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1f, 0f);

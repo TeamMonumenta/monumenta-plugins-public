@@ -2,8 +2,8 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class SpellFinalParticle extends Spell {
 	private List<Player> mPlayers = new ArrayList<Player>();
 	private static final Particle.DustOptions BLACK = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.5f);
 	private PartialParticle mBlack;
-	private PPGroundCircle mIndicator;
+	private PPCircle mIndicator;
 
 	public SpellFinalParticle(Plugin plugin, LivingEntity boss, Location loc, double range, FallingBlock block) {
 		mPlugin = plugin;
@@ -49,7 +49,7 @@ public class SpellFinalParticle extends Spell {
 		mRange = range;
 		mBlock = block;
 		mBlack = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0, BLACK);
-		mIndicator = new PPGroundCircle(Particle.REDSTONE, mCenter, 20, 0.1, 0.1, 0.1, 0, BLACK).init(mCylRadius, true);
+		mIndicator = new PPCircle(Particle.REDSTONE, mCenter, mCylRadius).ringMode(true).count(20).delta(0.1).data(BLACK);
 	}
 
 	@Override

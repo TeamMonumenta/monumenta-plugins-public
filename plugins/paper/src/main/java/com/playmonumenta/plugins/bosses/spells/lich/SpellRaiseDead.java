@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.List;
 import org.bukkit.ChatColor;

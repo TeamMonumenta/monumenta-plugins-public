@@ -2,8 +2,8 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -199,7 +199,7 @@ public class SpellFinalCrystal extends Spell {
 				FallingBlock block = world.spawnFallingBlock(spawnLoc, Bukkit.createBlockData(Material.CRYING_OBSIDIAN));
 				block.setVelocity(new Vector(FastUtils.randomDoubleInRange(-0.55, 0.55), FastUtils.randomDoubleInRange(0.25, 1), FastUtils.randomDoubleInRange(-0.55, 0.55)));
 
-				PPGroundCircle indicator = new PPGroundCircle(Particle.SOUL_FIRE_FLAME, block.getLocation(), 12, 0.2, 0, 0.2, 0).init(4, true);
+				PPCircle indicator = new PPCircle(Particle.SOUL_FIRE_FLAME, block.getLocation(), 4).ringMode(true).count(12).delta(0.2, 0, 0.2);
 
 				BukkitRunnable runB = new BukkitRunnable() {
 

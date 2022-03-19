@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -86,7 +87,7 @@ public class LuminousInfusion extends Ability {
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1.65f);
-			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.75f, 0.25f, 0.75f, 1);
+			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.75f, 0.25f, 0.75f, 1).spawnAsPlayerActive(mPlayer);
 			new BukkitRunnable() {
 				int mT = 0;
 
@@ -95,8 +96,8 @@ public class LuminousInfusion extends Ability {
 					mT++;
 					Location rightHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), 0.45).subtract(0, .8, 0);
 					Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
-					world.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
-					world.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
+					new PartialParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					if (mT >= COOLDOWN || !mActive) {
 						if (mT >= COOLDOWN) {
 							MessagingUtils.sendActionBarMessage(mPlayer, EXPIRATION_MESSAGE);
@@ -147,8 +148,8 @@ public class LuminousInfusion extends Ability {
 
 		Location loc = damagee.getLocation();
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
-		world.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
+		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.8f, 1.1f);
 
 		// Exclude the damagee so that the knockaway is valid
@@ -157,8 +158,8 @@ public class LuminousInfusion extends Ability {
 			// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
 			double volume = 0.6 / Math.sqrt(affected.size());
 			world.playSound(loc, Sound.ITEM_TOTEM_USE, (float) volume, 1.1f);
-			world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0.05f, 0.05f, 0.05f, 0.1);
-			world.spawnParticle(Particle.FLAME, loc, 7, 0.05f, 0.05f, 0.05f, 0.1);
+			new PartialParticle(Particle.FIREWORKS_SPARK, loc, 10, 0.05f, 0.05f, 0.05f, 0.1).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.FLAME, loc, 7, 0.05f, 0.05f, 0.05f, 0.1).spawnAsPlayerActive(mPlayer);
 
 			if (Crusade.enemyTriggersAbilities(e, mCrusade)) {
 				/*

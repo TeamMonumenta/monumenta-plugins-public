@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -67,7 +68,7 @@ public class ShieldWall extends Ability {
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
-			world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f);
+			new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f).spawnAsPlayerActive(mPlayer);
 			putOnCooldown();
 
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
@@ -92,7 +93,7 @@ public class ShieldWall extends Ability {
 
 							Location l = mLoc.clone().add(vec);
 							if (mT % 4 == 0) {
-								world.spawnParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0);
+								new PartialParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 							}
 							if (!mHitboxes) {
 								mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
@@ -109,7 +110,7 @@ public class ShieldWall extends Ability {
 								if (proj.getShooter() instanceof LivingEntity shooter
 										&& (!(proj.getShooter() instanceof Player) || AbilityManager.getManager().isPvPEnabled((Player) shooter))) {
 									proj.remove();
-									world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f);
+									new PartialParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f).spawnAsPlayerActive(mPlayer);
 									world.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
 								}
 							} else if (e instanceof LivingEntity le && EntityUtils.isHostileMob(e)) {
@@ -125,7 +126,7 @@ public class ShieldWall extends Ability {
 									//Bosses should not be affected by slowness or knockback.
 									if (knockback && !e.getScoreboardTags().contains("Boss")) {
 										MovementUtils.knockAway(mLoc, le, 0.3f, true);
-										world.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
+										new PartialParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f).spawnAsPlayerActive(mPlayer);
 										world.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
 									} else {
 										le.setVelocity(v);

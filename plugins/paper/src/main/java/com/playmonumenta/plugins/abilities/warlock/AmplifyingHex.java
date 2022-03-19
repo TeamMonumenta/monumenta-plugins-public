@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -100,7 +101,7 @@ public class AmplifyingHex extends Ability {
 			return;
 		}
 		World world = mPlayer.getWorld();
-		mRegionCap = ServerProperties.getClassSpecializationsEnabled() == true ? R2_CAP : R1_CAP;
+		mRegionCap = ServerProperties.getClassSpecializationsEnabled() ? R2_CAP : R1_CAP;
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getLocation();
 			double mRadiusIncrement = 0.5;
@@ -119,8 +120,8 @@ public class AmplifyingHex extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().clone().add(0, 0.15, 0).add(vec);
-					world.spawnParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1);
-					world.spawnParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1);
+					new PartialParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 				}
 
 				if (mRadiusIncrement >= mRadius + 1) {

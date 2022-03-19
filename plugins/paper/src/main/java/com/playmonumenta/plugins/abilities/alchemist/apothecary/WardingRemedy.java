@@ -3,8 +3,10 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PPPeriodic;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import javax.annotation.Nullable;
@@ -57,15 +59,17 @@ public class WardingRemedy extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_CONDUIT_ATTACK_TARGET, 1f, 1.5f);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, 1f, 1.5f);
 
-		world.spawnParticle(Particle.END_ROD, mPlayer.getLocation().clone().add(0, 1, 0), 50, 0.25, 0.25, 0.25, 0.2);
-		world.spawnParticle(Particle.REDSTONE, mPlayer.getLocation(), 80, 2.8, 2.8, 2.8, new Particle.DustOptions(APOTHECARY_LIGHT_COLOR, 3.0f));
-		world.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(0, 1, 0), 40, 0.35, 0.5, 0.35, APOTHECARY_DARK_COLOR);
-		world.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 60, 0.25, 0.25, 0.25, 0.2);
-		world.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(0, 0.15, 0), 100, 2.8, 0, 2.8, APOTHECARY_DARK_COLOR);
+		new PartialParticle(Particle.END_ROD, mPlayer.getLocation().clone().add(0, 1, 0), 50, 0.25, 0.25, 0.25, 0.2).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, mPlayer.getLocation(), 80, 2.8, 2.8, 2.8, new Particle.DustOptions(APOTHECARY_LIGHT_COLOR, 3.0f)).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(0, 1, 0), 40, 0.35, 0.5, 0.35, APOTHECARY_DARK_COLOR).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 60, 0.25, 0.25, 0.25, 0.2).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(0, 0.15, 0), 100, 2.8, 0, 2.8, APOTHECARY_DARK_COLOR).spawnAsPlayerActive(mPlayer);
 
 		new BukkitRunnable() {
 			int mPulses = 0;
 			int mTick = 10;
+			final PPPeriodic mParticle = new PPPeriodic(Particle.END_ROD, mPlayer.getLocation()).count(1).delta(0.35, 0.15, 0.35).extra(0.05);
+
 			@Override
 			public void run() {
 				if (mPlayer == null) {
@@ -73,23 +77,21 @@ public class WardingRemedy extends Ability {
 					return;
 				}
 
-				world.spawnParticle(Particle.END_ROD, mPlayer.getLocation().add(0, 0.5, 0), 1, 0.35, 0.15, 0.35, 0.05);
+				mParticle.location(mPlayer.getLocation().add(0, 0.5, 0)).spawnAsPlayerActive(mPlayer);
 
 				if (mTick >= WARDING_REMEDY_PULSE_DELAY) {
 					world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.7f, 2f);
 
-					for (int i = 0; i < 50; i++) {
-						world.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(6 * FastUtils.sin(i / 25.0 * Math.PI), 0.15, 6 * FastUtils.cos(i / 25.0 * Math.PI)), 1, 0, 0, 0, APOTHECARY_DARK_COLOR);
-					}
-					world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().clone().add(0, 0.15, 0), 15, 2.8, 0, 2.8, 0);
-					world.spawnParticle(Particle.REDSTONE, mPlayer.getLocation(), 40, 2.8, 2.8, 2.8, new Particle.DustOptions(APOTHECARY_LIGHT_COLOR, 1.5f));
-					world.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 2.8, 2.8, 2.8, 0);
+					new PPCircle(Particle.REDSTONE, mPlayer.getLocation().clone().add(0, 0.15, 0), 6).ringMode(true).count(1).data(APOTHECARY_DARK_COLOR).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().clone().add(0, 0.15, 0), 15, 2.8, 0, 2.8, 0).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, mPlayer.getLocation(), 40, 2.8, 2.8, 2.8, new Particle.DustOptions(APOTHECARY_LIGHT_COLOR, 1.5f)).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 2.8, 2.8, 2.8, 0).spawnAsPlayerActive(mPlayer);
 
 					for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), WARDING_REMEDY_ACTIVE_RADIUS, true)) {
 						AbsorptionUtils.addAbsorption(p, 1, WARDING_REMEDY_MAX_ABSORPTION, WARDING_REMEDY_ABSORPTION_DURATION);
 
-						world.spawnParticle(Particle.REDSTONE, p.getLocation().clone().add(0, 0.5, 0), 10, 0.35, 0.15, 0.35, new Particle.DustOptions(APOTHECARY_LIGHT_COLOR, 1.0f));
-						world.spawnParticle(Particle.SPELL, p.getLocation().clone().add(0, 0.5, 0), 5, 0.35, 0.15, 0.35, 0);
+						new PartialParticle(Particle.REDSTONE, p.getLocation().clone().add(0, 0.5, 0), 10, 0.35, 0.15, 0.35, new Particle.DustOptions(APOTHECARY_LIGHT_COLOR, 1.0f)).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SPELL, p.getLocation().clone().add(0, 0.5, 0), 5, 0.35, 0.15, 0.35, 0).spawnAsPlayerActive(mPlayer);
 					}
 					mTick = 0;
 					mPulses++;

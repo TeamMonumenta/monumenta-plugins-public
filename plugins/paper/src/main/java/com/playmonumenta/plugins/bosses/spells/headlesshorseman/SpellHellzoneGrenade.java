@@ -3,8 +3,8 @@ package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -130,7 +130,7 @@ public class SpellHellzoneGrenade extends Spell {
 						}
 
 						PartialParticle smokeMarker = new PartialParticle(Particle.SMOKE_LARGE, loc, 4, 1.5, 0.15, 1.5, 0.025);
-						PPGroundCircle flameMarker = new PPGroundCircle(Particle.FLAME, loc, 12, 0.15, 0.15, 0.15, 0).init(RADIUS, true);
+						PPCircle flameMarker = new PPCircle(Particle.FLAME, loc, RADIUS).ringMode(true).count(12).delta(0.15);
 
 						new BukkitRunnable() {
 							int mTicks = 0;

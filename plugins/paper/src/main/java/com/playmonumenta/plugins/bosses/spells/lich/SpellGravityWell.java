@@ -4,8 +4,8 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -79,8 +79,8 @@ public class SpellGravityWell extends Spell {
 		World world = mBoss.getWorld();
 		mPortal1.location(mBoss.getLocation()).spawnAsBoss();
 
-		PPGroundCircle indicator = new PPGroundCircle(Particle.REDSTONE, mBoss.getLocation(), 36, 0.01, 0.01, 0.01, 0, YELLOW).init(mRadius, true);
-		PPGroundCircle indicator2 = new PPGroundCircle(Particle.REDSTONE, mBoss.getLocation(), 36, 0.01, 0.01, 0.01, 0, RED).init(mRadius, true);
+		PPCircle indicator = new PPCircle(Particle.REDSTONE, mBoss.getLocation(), mRadius).ringMode(true).count(36).delta(0.01).data(YELLOW);
+		PPCircle indicator2 = new PPCircle(Particle.REDSTONE, mBoss.getLocation(), mRadius).ringMode(true).count(36).delta(0.01).data(RED);
 
 		List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 		players.removeIf(p -> SpellDimensionDoor.getShadowed().contains(p));

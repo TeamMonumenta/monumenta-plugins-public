@@ -3,12 +3,9 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.Infusion;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -22,7 +19,6 @@ public class Festive implements Infusion {
 	private static final int TICK_PERIOD = 5;
 	private static final Particle.DustOptions FESTIVE_RED_COLOR = new Particle.DustOptions(Color.fromRGB(255, 98, 71), 1.0f);
 	private static final Particle.DustOptions FESTIVE_GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(75, 200, 0), 1.0f);
-	private static final Set<UUID> NO_SELF_PARTICLES = new HashSet<>();
 
 	@Override
 	public String getName() {
@@ -35,40 +31,28 @@ public class Festive implements Infusion {
 	}
 
 	@Override
-	public void onEquipmentUpdate(Plugin plugin, Player player) {
-		if (player.getScoreboardTags().contains("noSelfParticles")) {
-			NO_SELF_PARTICLES.add(player.getUniqueId());
-		} else {
-			NO_SELF_PARTICLES.remove(player.getUniqueId());
-		}
-	}
-
-	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		if (PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
 			return;
 		}
-
+		int level = (int) value;
 		final Location loc = player.getLocation().add(0, 1, 0);
-		if (NO_SELF_PARTICLES.contains(player.getUniqueId())) {
-			for (Player other : PlayerUtils.otherPlayersInRange(player, 30, true)) {
-				other.spawnParticle(Particle.REDSTONE, loc, Math.max(6, 2 + (int) value), 0.4, 0.4, 0.4, FESTIVE_RED_COLOR);
-				other.spawnParticle(Particle.REDSTONE, loc, Math.max(6, 2 + (int) value), 0.4, 0.4, 0.4, FESTIVE_GREEN_COLOR);
-				other.spawnParticle(Particle.SNOWBALL, loc, Math.max(3, (int) value), 0.4, 0.4, 0.4, 0);
-			}
-		} else {
-			World world = player.getWorld();
-			world.spawnParticle(Particle.REDSTONE, loc, Math.max(6, 2 + (int) value), 0.4, 0.4, 0.4, FESTIVE_RED_COLOR);
-			world.spawnParticle(Particle.REDSTONE, loc, Math.max(6, 2 + (int) value), 0.4, 0.4, 0.4, FESTIVE_GREEN_COLOR);
-			world.spawnParticle(Particle.SNOWBALL, loc, Math.max(3, (int) value), 0.4, 0.4, 0.4, 0);
-		}
+		new PartialParticle(Particle.REDSTONE, loc, Math.max(6, 2 + level), 0.4, 0.4, 0.4, 0, FESTIVE_RED_COLOR)
+			.minimumMultiplier(false)
+			.spawnAsPlayerPassive(player);
+		new PartialParticle(Particle.REDSTONE, loc, Math.max(6, 2 + level), 0.4, 0.4, 0.4, 0, FESTIVE_GREEN_COLOR)
+			.minimumMultiplier(false)
+			.spawnAsPlayerPassive(player);
+		new PartialParticle(Particle.SNOWBALL, loc, Math.max(3, level), 0.4, 0.4, 0.4, 0)
+			.minimumMultiplier(false)
+			.spawnAsPlayerPassive(player);
 	}
 
 	@Override
 	public void onSpawn(Plugin plugin, Item item, double value) {
 		new BukkitRunnable() {
 			int mTicks = 0;
-			World mWorld = item.getWorld();
+			final World mWorld = item.getWorld();
 
 			@Override
 			public void run() {
