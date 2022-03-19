@@ -49,8 +49,8 @@ public class CShura extends BossAbilityGroup {
 	public static final String identityTag = "boss_cshura";
 	public static final int detectionRange = 50;
 	private static final String START_TAG = "shuraCenter";
-	private @Nullable static LivingEntity mStart;
 
+	private @Nullable LivingEntity mStart;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 	private int mDodgeCD = 5;
