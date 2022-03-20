@@ -56,7 +56,7 @@ public class ClaimRaffle {
 		} else if (!claimReward && eligible) {
 			player.setMetadata(CONFIRMED_METAKEY, new FixedMetadataValue(Plugin.getInstance(), 0));
 			player.sendMessage(ChatColor.GREEN + "You have won the weekly voting raffle! Congratulations!");
-			player.sendMessage(ChatColor.GREEN + "The reward is to add the Gilded enchant to an item of your choice. This will give you a unique particle effect while it is anywhere in your inventory.");
+			player.sendMessage(ChatColor.GREEN + "The reward is to add the Gilded enchant to an item of your choice. This will give you a unique particle effect while equipped or held.");
 			player.sendMessage(ChatColor.GREEN + "To claim this reward, run " + ChatColor.GOLD + "/claimraffle " + ChatColor.GREEN + "again with the item you wish to gild in your main hand.");
 		} else {
 			player.sendMessage(ChatColor.GREEN + "You have no unclaimed raffle rewards.");
