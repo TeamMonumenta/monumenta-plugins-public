@@ -6,18 +6,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.scriptedquests.utils.QuestUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.command.CommandSender;
-
-import javax.annotation.Nullable;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-import com.playmonumenta.scriptedquests.utils.QuestUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -25,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -154,6 +141,7 @@ public class ServerProperties {
 			mIsSleepingEnabled = getPropertyValueBool(object, "isSleepingEnabled", mIsSleepingEnabled);
 			mKeepLowTierInventory = getPropertyValueBool(object, "keepLowTierInventory", mKeepLowTierInventory);
 			mClassSpecializationsEnabled = getPropertyValueBool(object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
+			mClassSpecializationsEnabled = getPropertyValueBool(object, "abilityEnhancementsEnabled", mAbilityEnhancementsEnabled);
 			mAuditMessagesEnabled = getPropertyValueBool(object, "auditMessagesEnabled", mAuditMessagesEnabled);
 			mRepairExplosions = getPropertyValueBool(object, "repairExplosions", mRepairExplosions);
 			mPreventDungeonItemTransfer = getPropertyValueBool(object, "preventDungeonItemTransfer", mPreventDungeonItemTransfer);
@@ -195,6 +183,7 @@ public class ServerProperties {
 		out.add("isSleepingEnabled = " + mIsSleepingEnabled);
 		out.add("keepLowTierInventory = " + mKeepLowTierInventory);
 		out.add("classSpecializationsEnabled = " + mClassSpecializationsEnabled);
+		out.add("abilityEnhancementsEnabled = " + mAbilityEnhancementsEnabled);
 		out.add("auditMessagesEnabled = " + mAuditMessagesEnabled);
 		out.add("repairExplosions = " + mRepairExplosions);
 		out.add("preventDungeonItemTransfer = " + mPreventDungeonItemTransfer);
