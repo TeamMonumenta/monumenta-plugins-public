@@ -22,6 +22,8 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 4;
 	private static final int MAX_STACKS = 8;
 	private static final double PERCENT_DAMAGE_PER_STACK = 0.035;
+	private static final double DAMAGE_PER_BLOCK = 0.02;
+	private static final double MAX_DISTANCE = 16;
 
 	public Sharpshooter(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Sharpshooter");
@@ -29,6 +31,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		mInfo.mShorthandName = "Ss";
 		mInfo.mDescriptions.add("Your arrows deal 20% more damage.");
 		mInfo.mDescriptions.add("Each enemy hit with a critical arrow or trident gives you a stack of Sharpshooter, up to 8. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows and tridents deal +3.5% damage.");
+		mInfo.mDescriptions.add("Your arrows and tridents deal an extra 2% per block of distance between you and the target, up to 16 blocks.");
 		mDisplayItem = new ItemStack(Material.TARGET, 1);
 	}
 
@@ -40,6 +43,9 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow) {
 
 			event.setDamage(event.getDamage() * (1 + PERCENT_BASE_DAMAGE + mStacks * PERCENT_DAMAGE_PER_STACK));
+			if (isEnhanced()) {
+				event.setDamage(event.getDamage() * (1 + Math.min(enemy.getLocation().distance(mPlayer.getLocation()), MAX_DISTANCE) * DAMAGE_PER_BLOCK));
+			}
 
 			// Critical arrow and mob is actually going to take damage
 			if (isLevelTwo() && (arrow.isCritical() || arrow instanceof Trident) && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage())) {

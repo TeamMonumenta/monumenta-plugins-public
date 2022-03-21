@@ -61,6 +61,7 @@ public class AbilityInfo {
 			return Component.text("No descriptions found for " + mDisplayName + "!", NamedTextColor.RED);
 		}
 
+		//TODO edit to include enhancements
 		Component component = Component.text("");
 		component = component.append(getFormattedDescription(1));
 		for (int skillLevel = 2; skillLevel <= mDescriptions.size(); skillLevel++) {
