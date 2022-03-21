@@ -36,8 +36,10 @@ public class DaggerThrow extends Ability {
 	private static final int DAGGER_THROW_1_DAMAGE = 4;
 	private static final int DAGGER_THROW_2_DAMAGE = 8;
 	private static final int DAGGER_THROW_DURATION = 10 * 20;
+	private static final int DAGGER_THROW_SILENCE_DURATION = 2 * 20;
 	private static final double DAGGER_THROW_1_VULN = 0.2;
 	private static final double DAGGER_THROW_2_VULN = 0.4;
+	private static final double DAGGER_THROW_VULN_ENHANCEMENT = 0.1;
 	private static final double DAGGER_THROW_SPREAD = Math.toRadians(25);
 	private static final Particle.DustOptions DAGGER_THROW_COLOR = new Particle.DustOptions(Color.fromRGB(64, 64, 64), 1);
 
@@ -51,11 +53,12 @@ public class DaggerThrow extends Ability {
 		mInfo.mShorthandName = "DT";
 		mInfo.mDescriptions.add("Sneak left click while holding two swords to throw three daggers which deal 4 melee damage and gives each target 20% Vulnerability for 10 seconds. Cooldown: 12s.");
 		mInfo.mDescriptions.add("The damage is increased to 8 and the Vulnerability increased to 40%.");
+		mInfo.mDescriptions.add("Targets are additionally silenced for 2s. Vulnerability is increased by 10%.");
 		mInfo.mCooldown = DAGGER_THROW_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.WOODEN_SWORD, 1);
 		mDamage = isLevelOne() ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE;
-		mVulnAmplifier = isLevelOne() ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN;
+		mVulnAmplifier = (isLevelOne() ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN) + (isEnhanced() ? DAGGER_THROW_VULN_ENHANCEMENT : 0);
 	}
 
 	@Override
@@ -93,6 +96,9 @@ public class DaggerThrow extends Ability {
 
 						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell, true);
 						EntityUtils.applyVulnerability(mPlugin, DAGGER_THROW_DURATION, mVulnAmplifier, mob);
+						if (isEnhanced()) {
+							EntityUtils.applySilence(mPlugin, DAGGER_THROW_SILENCE_DURATION, mob);
+						}
 						break;
 
 					} else if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
