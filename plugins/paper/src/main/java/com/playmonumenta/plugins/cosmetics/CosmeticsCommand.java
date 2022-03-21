@@ -51,6 +51,22 @@ public class CosmeticsCommand extends GenericCommand {
 			})
 			.register();
 
+		// ADD PLOT BORDER COMMAND
+		arguments.clear();
+		arguments.add(new LiteralArgument("add"));
+		arguments.add(new LiteralArgument("plotborder"));
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new TextArgument("name"));
+
+		new CommandAPICommand("cosmetics")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				CosmeticsManager.getInstance().addCosmetic(player, CosmeticType.PLOT_BORDER, (String) args[1]);
+			})
+			.register();
+
 		// REMOVE COSMETIC COMMAND
 		arguments.clear();
 		arguments.add(new LiteralArgument("remove"));

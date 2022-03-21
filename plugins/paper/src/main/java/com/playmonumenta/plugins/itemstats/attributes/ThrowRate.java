@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -71,7 +72,9 @@ public class ThrowRate implements Attribute {
 				newProj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 
-				ItemUtils.damageItemWithUnbreaking(plugin, player, player.getInventory().getItemInMainHand(), 1, true);
+				if (player.getGameMode() != GameMode.CREATIVE) {
+					ItemUtils.damageItemWithUnbreaking(plugin, player, player.getInventory().getItemInMainHand(), 1, true);
+				}
 				AbilityManager.getManager().playerShotArrowEvent(player, newProj);
 			}
 		} else if (proj instanceof Snowball) {

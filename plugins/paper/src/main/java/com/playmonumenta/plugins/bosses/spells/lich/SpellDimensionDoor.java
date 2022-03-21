@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -33,6 +33,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -169,14 +170,15 @@ public class SpellDimensionDoor extends Spell {
 			world.playSound(pLoc, Sound.BLOCK_PORTAL_TRIGGER, SoundCategory.HOSTILE, 1f, 2.0f);
 			world.playSound(pLoc, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1f, 1.0f);
 
-			PPGroundCircle indicator = new PPGroundCircle(Particle.SPELL_WITCH, pLoc, 3, 0.2, 0, 0.2, 0).init(3, true);
-			PPGroundCircle indicator2 = new PPGroundCircle(Particle.SMOKE_NORMAL, pLoc, 2, 0.2, 0, 0.2, 0).init(3, true);
+			PPCircle indicator = new PPCircle(Particle.SPELL_WITCH, pLoc, 3).ringMode(true).count(3).delta(0.2, 0, 0.2);
+			PPCircle indicator2 = new PPCircle(Particle.SMOKE_NORMAL, pLoc, 3).ringMode(true).count(2).delta(0.2, 0, 0.2);
 
 			List<BlockState> toRestore = new ArrayList<>();
 			BukkitRunnable runB = new BukkitRunnable() {
 				int mT = 0;
 				List<Player> mTeleport = new ArrayList<>();
-				Location mLoc = p.getLocation();
+				final Location mLoc = p.getLocation();
+
 				@Override
 				public void run() {
 					mT++;
@@ -371,6 +373,7 @@ public class SpellDimensionDoor extends Spell {
 
 		new BukkitRunnable() {
 			int mT = tick;
+			boolean mTrigger = false;
 
 			@Override
 			public void run() {
@@ -417,6 +420,12 @@ public class SpellDimensionDoor extends Spell {
 					bar.setVisible(false);
 					bar.removeAll();
 					this.cancel();
+				}
+				if (p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.SUFFOCATION && !mTrigger) {
+					//something went wrong with the other check, catching wrong tp
+					p.teleport(shadowLoc.clone().add(-5, 0, 0));
+					spectre.teleport(shadowLoc.clone().add(5, 0, 0));
+					mTrigger = true;
 				}
 			}
 		}.runTaskTimer(plugin, 0, 2);

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -23,6 +24,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -69,7 +71,7 @@ public class ThunderStep extends Ability {
 		mInfo.mShorthandName = "TS";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While holding a wand while sneaking and airborne, pressing the swap key materializes a flash of thunder, dealing %s magic damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
+				"While holding a wand while sneaking, pressing the swap key materializes a flash of thunder, dealing %s magic damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
 				DISTANCE_1,
@@ -107,17 +109,12 @@ public class ThunderStep extends Ability {
 	 */
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer != null &&
-			ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())
-		) {
+		if (mPlayer != null && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
 			event.setCancelled(true);
 
-			if (
-				!isTimerActive()
-					&& mPlayer.isSneaking()
-					&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-					&& !mPlayer.isOnGround()
-			) {
+			if (!isTimerActive()
+				    && mPlayer.isSneaking()
+				    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 				putOnCooldown();
 
 				Location playerStartLocation = mPlayer.getLocation();
@@ -132,13 +129,13 @@ public class ThunderStep extends Ability {
 					movingPlayerBox,
 					mLevelDistance,
 					vector,
-					CHECK_INCREMENT
+					CHECK_INCREMENT,
+					true,
+					null, -1, -1
 				);
 				Location playerEndLocation = movingPlayerBox
 					.getCenter()
-					.setY(
-						movingPlayerBox.getMinY()
-					)
+					.setY(movingPlayerBox.getMinY())
 					.toLocation(world)
 					.setDirection(vector);
 
@@ -146,7 +143,7 @@ public class ThunderStep extends Ability {
 					return;
 				}
 
-				mPlayer.teleport(playerEndLocation);
+				mPlayer.teleport(playerEndLocation, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 				doDamage(playerEndLocation, spellDamage);
 			}
 		}
@@ -155,12 +152,12 @@ public class ThunderStep extends Ability {
 	private void doDamage(Location location, float spellDamage) {
 		World world = location.getWorld();
 		world.playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 1.5f);
-		world.spawnParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_YELLOW);
-		world.spawnParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_AQUA);
-		world.spawnParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10);
+		new PartialParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_AQUA).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10).spawnAsPlayerActive(mPlayer);
 
 		List<LivingEntity> enemies = EntityUtils.getNearbyMobs(location, SIZE);
-		// The more enemies, the less particles for each one
+		// The more enemies, the fewer particles for each one
 		int mobParticles = Math.max(
 			1,
 			20 / Math.max(1, enemies.size()) // Never divide by 0. Always maximum 20 particles for <= 1 enemy
@@ -173,8 +170,8 @@ public class ThunderStep extends Ability {
 			}
 
 			Location enemyParticleLocation = enemy.getLocation().add(0, enemy.getHeight() / 2, 0);
-			world.spawnParticle(Particle.CLOUD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5);
-			world.spawnParticle(Particle.END_ROD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5);
+			new PartialParticle(Particle.CLOUD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.END_ROD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
 		}
 	}
 

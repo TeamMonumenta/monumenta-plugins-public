@@ -46,7 +46,7 @@ public class DepthsDamageRunnable extends BukkitRunnable {
 				//Damage player
 				Vector vel = p.getVelocity();
 				DamageUtils.damage(null, p, DamageType.AILMENT, 0.1, null, true, false);
-				BossUtils.bossDamagePercent(p, p, PCT_DAMAGE);
+				BossUtils.bossDamagePercent(null, p, PCT_DAMAGE);
 				p.setVelocity(vel);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 0.3f, 1.5f);
 			}

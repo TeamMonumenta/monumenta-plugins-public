@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.SanguineMark;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -116,8 +117,8 @@ public class SanguineHarvest extends Ability {
 			for (double r = 0; r < RANGE; r += HITBOX_LENGTH) {
 				Location bLoc = box.getCenter().toLocation(world);
 
-				world.spawnParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075);
-				world.spawnParticle(Particle.REDSTONE, bLoc, 16, 0.2, 0.2, 0.2, 0.1, COLOR);
+				new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, bLoc, 16, 0.2, 0.2, 0.2, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
 
 				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 					bLoc.subtract(direction.multiply(0.5));
@@ -142,12 +143,12 @@ public class SanguineHarvest extends Ability {
 
 	private void explode(Location loc) {
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 25, 0, 0, 0, 0.125);
-		world.spawnParticle(Particle.REDSTONE, loc, 10, 0, 0, 0, 0.1, COLOR);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 25, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, loc, 10, 0, 0, 0, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
 
-		world.spawnParticle(Particle.REDSTONE, loc, 75, mRadius, mRadius, mRadius, 0.25, COLOR);
-		world.spawnParticle(Particle.FALLING_DUST, loc, 75, mRadius, mRadius, mRadius, Material.RED_CONCRETE.createBlockData());
-		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 55, mRadius, mRadius, mRadius, 0.25);
+		new PartialParticle(Particle.REDSTONE, loc, 75, mRadius, mRadius, mRadius, 0.25, COLOR).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FALLING_DUST, loc, 75, mRadius, mRadius, mRadius, Material.RED_CONCRETE.createBlockData()).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 55, mRadius, mRadius, mRadius, 0.25).spawnAsPlayerActive(mPlayer);
 
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.3f);
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.5f);

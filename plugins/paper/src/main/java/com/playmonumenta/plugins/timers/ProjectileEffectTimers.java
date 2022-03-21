@@ -56,7 +56,7 @@ public class ProjectileEffectTimers {
 			Location entityLoc = entity.getLocation();
 			entityLoc.getWorld().spawnParticle(particle, entityLoc, numParticles, 0.1, 0.1, 0.1, 0);
 
-			/* EVery so often check if this entity is actually still there */
+			/* Every so often check if this entity is actually still there */
 			if (mDeadTicks > 100) {
 				mDeadTicks = 0;
 				boolean isPresent = false;

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Particle;
@@ -32,7 +33,7 @@ public class LifeDrain implements Enchantment {
 		}
 		if (PlayerUtils.isFallingAttack(player)) {
 			PlayerUtils.healPlayer(plugin, player, LIFE_DRAIN_CRIT_HEAL * Math.sqrt(level));
-			player.getWorld().spawnParticle(Particle.HEART, target.getEyeLocation(), 3, 0.1, 0.1, 0.1, 0.001);
+			new PartialParticle(Particle.HEART, target.getEyeLocation(), 3, 0.1, 0.1, 0.1, 0.001).spawnAsPlayerActive(player);
 		} else {
 			PlayerUtils.healPlayer(
 				plugin,
@@ -45,7 +46,7 @@ public class LifeDrain implements Enchantment {
 					* Math.sqrt(player.getCooldownPeriod() / Constants.TICKS_PER_SECOND)
 					* player.getCooledAttackStrength(0)
 			);
-			player.getWorld().spawnParticle(Particle.HEART, target.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0.001);
+			new PartialParticle(Particle.HEART, target.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0.001).spawnAsPlayerActive(player);
 		}
 	}
 }

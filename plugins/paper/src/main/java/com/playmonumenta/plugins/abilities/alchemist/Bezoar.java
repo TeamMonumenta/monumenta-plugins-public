@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -80,8 +81,7 @@ public class Bezoar extends Ability {
 					return;
 				}
 				mT++;
-				world.spawnParticle(Particle.FALLING_DUST, item.getLocation(), 1, 0.2, 0.2, 0.2, mFallingDustData);
-
+				new PartialParticle(Particle.FALLING_DUST, item.getLocation(), 1, 0.2, 0.2, 0.2, mFallingDustData).spawnAsPlayerActive(mPlayer);
 				for (Player p : PlayerUtils.playersInRange(item.getLocation(), 1, true)) {
 					if (p != mPlayer) {
 						applyEffects(p);
@@ -97,8 +97,8 @@ public class Bezoar extends Ability {
 					world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
 					world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
 					world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1f);
-					world.spawnParticle(Particle.BLOCK_CRACK, item.getLocation(), 30, 0.15, 0.15, 0.15, 0.75F, Material.LIME_CONCRETE.createBlockData());
-					world.spawnParticle(Particle.TOTEM, item.getLocation(), 20, 0, 0, 0, 0.35F);
+					new PartialParticle(Particle.BLOCK_CRACK, item.getLocation(), 30, 0.15, 0.15, 0.15, 0.75F, Material.LIME_CONCRETE.createBlockData()).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.TOTEM, item.getLocation(), 20, 0, 0, 0, 0.35F).spawnAsPlayerActive(mPlayer);
 
 					this.cancel();
 					break;

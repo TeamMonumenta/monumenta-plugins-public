@@ -36,7 +36,6 @@ public class TowerGuiFloorDesign extends CustomInventory {
 	private static final ItemStack MOVE_LEFT = TowerFileUtils.getHeadFromTexture("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ==");
 
 
-
 	private static final int[] VALID_FLOOR_SLOT = {
 		 0, 1, 2, 3, 4,     // 5,  6,  7,  8,
 		 9, 10, 11, 12, 13, //14, 15, 16, 17,

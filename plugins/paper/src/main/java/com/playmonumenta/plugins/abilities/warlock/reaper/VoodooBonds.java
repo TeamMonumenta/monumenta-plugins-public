@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.VoodooBondsOtherPlayer;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -83,8 +84,8 @@ public class VoodooBonds extends Ability {
 					double radian1 = Math.toRadians(mRotation);
 					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 					//new particles
-					world.spawnParticle(Particle.SPELL_WITCH, mLoc, 1, 0.15, 0.15, 0.15, 0);
-					world.spawnParticle(Particle.REDSTONE, mLoc, 1, 0.15, 0.15, 0.15, 0, COLOR);
+					new PartialParticle(Particle.SPELL_WITCH, mLoc, 1, 0.15, 0.15, 0.15, 0).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, mLoc, 1, 0.15, 0.15, 0.15, 0, COLOR).spawnAsPlayerActive(mPlayer);
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 
 				}
@@ -97,7 +98,7 @@ public class VoodooBonds extends Ability {
 		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), ACTIVE_RADIUS, true)) {
 			//better effects
 			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 0.75f);
-			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
+			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01).spawnAsPlayerActive(mPlayer);
 			mPlugin.mEffectManager.addEffect(p, "VoodooBondsEffect",
 					new VoodooBondsOtherPlayer(mInfo.mCooldown, mPlayer, mPlugin));
 		}
@@ -107,15 +108,13 @@ public class VoodooBonds extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && mPlayer != null) {
 			EntityType type = enemy.getType();
-			Location loc = enemy.getLocation();
-			World world = loc.getWorld();
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), PASSIVE_RADIUS, mPlayer)) {
 				if (mob.getType().equals(type) && mob != enemy) {
 					Location mLoc = mob.getLocation();
 					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, event.getDamage() * mDamage, mInfo.mLinkedSpell, true);
-					world.spawnParticle(Particle.SPELL_WITCH, mLoc, 30, 0.5, 0.5, 0.5, 0.001);
-					world.spawnParticle(Particle.REDSTONE, mLoc, 30, 0.5, 0.5, 0.5, 0, COLOR);
+					new PartialParticle(Particle.SPELL_WITCH, mLoc, 30, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, mLoc, 30, 0.5, 0.5, 0.5, 0, COLOR).spawnAsPlayerActive(mPlayer);
 				}
 			}
 			return true;

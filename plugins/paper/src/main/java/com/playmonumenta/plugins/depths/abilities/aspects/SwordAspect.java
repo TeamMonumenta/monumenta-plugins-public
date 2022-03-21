@@ -29,7 +29,7 @@ public class SwordAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "You deal 1.5 extra damage with sword attacks.";
+		return "You deal 1.5 extra melee damage when holding a sword.";
 	}
 }
 

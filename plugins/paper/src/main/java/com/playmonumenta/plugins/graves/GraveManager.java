@@ -387,7 +387,7 @@ public class GraveManager {
 	public @Nullable Component getGraveInfo(int index) {
 		if (mGraves.size() > index) {
 			Grave grave = mGraves.get(index);
-			Component itemList = grave.getItemList();
+			Component itemList = grave.getItemList(false);
 			return Component.text("World: (", NamedTextColor.GRAY)
 				.append(Component.text(grave.mWorldName.replace("Project_Epic-", ""), NamedTextColor.WHITE))
 				.append(Component.text(") Loc: (", NamedTextColor.GRAY))

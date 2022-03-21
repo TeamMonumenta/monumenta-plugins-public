@@ -101,9 +101,12 @@ public class Constants {
 	public static class Objectives {
 		// PartialParticle
 		public static final String PP_OWN_PASSIVE = "PPOwnPassive";
+		public static final String PP_OWN_BUFF = "PPOwnBuff";
 		public static final String PP_OWN_ACTIVE = "PPOwnActive";
 		public static final String PP_OTHER_PASSIVE = "PPOtherPassive";
+		public static final String PP_OTHER_BUFF = "PPOtherBuff";
 		public static final String PP_OTHER_ACTIVE = "PPOtherActive";
+		public static final String PP_ENEMY_BUFF = "PPEnemyBuff";
 		public static final String PP_ENEMY = "PPEnemy";
 		public static final String PP_BOSS = "PPBoss";
 

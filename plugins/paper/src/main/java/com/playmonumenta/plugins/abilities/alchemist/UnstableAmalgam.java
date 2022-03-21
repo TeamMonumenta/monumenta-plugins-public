@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -126,7 +127,7 @@ public class UnstableAmalgam extends Ability {
 						this.cancel();
 						return;
 					} else if (mTicks % 20 == 0) {
-						world.spawnParticle(Particle.FLAME, loc, 20, 0.02, 0.02, 0.02, 0.1);
+						new PartialParticle(Particle.FLAME, loc, 20, 0.02, 0.02, 0.02, 0.1).spawnAsPlayerActive(mPlayer);
 						world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 0.6f, 1.7f);
 					}
 
@@ -167,9 +168,9 @@ public class UnstableAmalgam extends Ability {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 0f);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 1.25f);
-		world.spawnParticle(Particle.FLAME, loc, 115, 0.02, 0.02, 0.02, 0.2);
-		world.spawnParticle(Particle.SMOKE_LARGE, loc, 40, 0.02, 0.02, 0.02, 0.35);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 40, 0.02, 0.02, 0.02, 0.35);
+		new PartialParticle(Particle.FLAME, loc, 115, 0.02, 0.02, 0.02, 0.2).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 40, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override

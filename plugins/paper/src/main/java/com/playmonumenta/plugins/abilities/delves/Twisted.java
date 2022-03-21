@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.bosses.ShadePossessedBoss;
 import com.playmonumenta.plugins.bosses.bosses.TwistedEventBoss;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -165,7 +166,7 @@ public class Twisted extends DelveModifier {
 				@Override
 				public void run() {
 					world.playSound(loc, Sound.ENTITY_GHAST_DEATH, 1f, 0.5f);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 20, 0.2, 0.3, 0.2, 0.1);
+					new PartialParticle(Particle.SMOKE_LARGE, loc, 20, 0.2, 0.3, 0.2, 0.1).spawnAsEnemy();
 
 					LibraryOfSoulsIntegration.summon(mob.getLocation(), SHADE_OF_DESPAIR);
 				}
@@ -190,7 +191,7 @@ public class Twisted extends DelveModifier {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 20, 0.2, 0.3, 0.2, 0.1);
+					new PartialParticle(Particle.SMOKE_LARGE, loc, 20, 0.2, 0.3, 0.2, 0.1).spawnAsEnemy();
 					world.playSound(loc, Sound.ENTITY_HUSK_AMBIENT, 1f, 0.5f);
 
 					// These mobs don't have visible equipment and are obnoxious when invisible

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -113,7 +114,7 @@ public class MagmaShield extends Ability {
 		}
 
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 15, 0.05, 0.05, 0.05, 0.1);
+		new PartialParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 15, 0.05, 0.05, 0.05, 0.1).spawnAsPlayerActive(mPlayer);
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getLocation();
 			double mRadius = 0;
@@ -132,8 +133,8 @@ public class MagmaShield extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().add(0, 0.1, 0).add(vec);
-					world.spawnParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15);
-					world.spawnParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1);
+					new PartialParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 				}
 
 				if (mRadius >= SIZE + 1) {

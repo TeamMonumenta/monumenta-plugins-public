@@ -15,7 +15,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 
-
+// TODO use PartialParticle
 public class ParticleUtils {
 	public enum BoundingBoxEdge {
 		X_YMIN_ZMIN,

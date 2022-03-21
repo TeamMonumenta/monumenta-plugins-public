@@ -1,23 +1,27 @@
 package com.playmonumenta.plugins.infinitytower.mobs;
 
+import org.bukkit.Color;
+
 public enum TowerMobRarity {
-	COMMON(1, "Common", 0.07, "ITCommon", 1, 0.8, 0.65, 0.60, 0.50, 0.35, 0.25, 0.20, 0.15, 0.05),
-	RARE(2, "Rare", 0.09, "ITRare", 0, 0.2, 0.3, 0.3, 0.30, 0.4, 0.4, 0.30, 0.25, 0.25),
-	EPIC(3, "Epic", 0.11, "ITEpic", 0, 0, 0.05, 0.1, 0.20, 0.25, 0.30, 0.40, 0.45, 0.50),
-	LEGENDARY(4, "Legendary", 0.13, "ITLegendary", 0, 0, 0, 0, 0, 0, 0.05, 0.10, 0.15, 0.20);
+	COMMON(1, "Common", 0.07, "ITCommon", Color.GRAY, 1, 0.8, 0.65, 0.60, 0.50, 0.35, 0.25, 0.20, 0.15, 0.05),
+	RARE(2, "Rare", 0.09, "ITRare", Color.AQUA, 0, 0.2, 0.3, 0.3, 0.30, 0.4, 0.4, 0.30, 0.25, 0.25),
+	EPIC(3, "Epic", 0.11, "ITEpic", Color.FUCHSIA, 0, 0, 0.05, 0.1, 0.20, 0.25, 0.30, 0.40, 0.45, 0.50),
+	LEGENDARY(4, "Legendary", 0.13, "ITLegendary", Color.ORANGE, 0, 0, 0, 0, 0, 0, 0.05, 0.10, 0.15, 0.20);
 
 	private final int mIndex;
+	private final Color mColor;
 	private final double[] mRarity;
 	private final double mDamageMult;
 	private final String mName;
 	private final String mTag;
 
-	TowerMobRarity(int index, String name, double damageMult, String tag, double... rarity) {
+	TowerMobRarity(int index, String name, double damageMult, String tag, Color color, double... rarity) {
 		mIndex = index;
 		mRarity = rarity;
 		mName = name;
 		mTag = tag;
 		mDamageMult = damageMult;
+		mColor = color;
 	}
 
 	public double getDamageMult() {
@@ -41,6 +45,10 @@ public enum TowerMobRarity {
 
 	public String getTag() {
 		return mTag;
+	}
+
+	public Color getColor() {
+		return mColor;
 	}
 
 	public static TowerMobRarity fromName(String name) {

@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -76,7 +77,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
 				@Override
 				public void run() {
-					mPlayer.getWorld().spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, SWORDSAGE_COLOR);
+					new PartialParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, SWORDSAGE_COLOR).spawnAsPlayerBuff(mPlayer);
 					mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde", new PercentSpeed(5, 0.2, "DeadlyRondeMod"));
 					if (mActiveRunnable == null) {
 						this.cancel();
@@ -126,10 +127,10 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
 			Location particleLoc = mPlayer.getEyeLocation().add(mPlayer.getEyeLocation().getDirection().multiply(3));
 			World world = mPlayer.getWorld();
-			world.spawnParticle(Particle.SWEEP_ATTACK, particleLoc, 10, 1.5, 0.5, 1.5);
-			world.spawnParticle(Particle.CRIT, particleLoc, 50, 1.5, 0.5, 1.5, 0.2);
-			world.spawnParticle(Particle.CLOUD, particleLoc, 20, 1.5, 0.5, 1.5, 0.3);
-			world.spawnParticle(Particle.REDSTONE, particleLoc, 45, 1.5, 0.5, 1.5, SWORDSAGE_COLOR);
+			new PartialParticle(Particle.SWEEP_ATTACK, particleLoc, 10, 1.5, 0.5, 1.5).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CRIT, particleLoc, 50, 1.5, 0.5, 1.5, 0.2).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CLOUD, particleLoc, 20, 1.5, 0.5, 1.5, 0.3).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, particleLoc, 45, 1.5, 0.5, 1.5, SWORDSAGE_COLOR).spawnAsPlayerActive(mPlayer);
 
 			world.playSound(particleLoc, Sound.ITEM_TRIDENT_THROW, 1, 1.25f);
 			world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.8f, 0.75f);

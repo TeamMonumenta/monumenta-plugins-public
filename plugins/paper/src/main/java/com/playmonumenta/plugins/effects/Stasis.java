@@ -2,12 +2,12 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -44,10 +44,9 @@ public class Stasis extends Effect {
 		if (oneHertz) {
 			entity.sendActionBar(Component.text("You are in stasis! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
 		}
-		Location loc = entity.getLocation();
-		World world = loc.getWorld();
 		if (fourHertz) {
-			world.spawnParticle(Particle.END_ROD, loc, 45, 1, 1, 1, .00000001);
+			Location loc = entity.getLocation();
+			new PartialParticle(Particle.END_ROD, loc, 45, 1, 1, 1, .00000001).spawnAsEntityBuff(entity);
 		}
 
 	}

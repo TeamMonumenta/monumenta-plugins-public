@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -32,7 +33,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -95,10 +95,9 @@ public class HuntingCompanion extends Ability {
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		Damageable damageable = (Damageable) inMainHand.getItemMeta();
-		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isBowOrTrident(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability() && !ItemStatUtils.isShattered(inMainHand))) {
+		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isBowOrTrident(inMainHand) && !ItemStatUtils.isShattered(inMainHand)) {
 			putOnCooldown();
-			mStunnedMobs = new ArrayList<Entity>();
+			mStunnedMobs = new ArrayList<>();
 
 			if (mFox != null) {
 				mFox.remove();
@@ -146,13 +145,6 @@ public class HuntingCompanion extends Ability {
 			mFox.setVelocity(facingDirection.clone().setY(JUMP_HEIGHT).normalize().multiply(VELOCITY));
 			mFox.teleport(mFox.getLocation().setDirection(facingDirection));
 
-			//Shatter if durability is 0 and isn't shattered.
-			//This is needed because Hunting Companion doesn't consume durability, but there is a high-damage uncommon bow
-			//with 0 durability that should not be infinitely usable.
-			if (damageable.getDamage() >= inMainHand.getType().getMaxDurability() && !ItemStatUtils.isShattered(inMainHand)) {
-				ItemStatUtils.shatter(inMainHand);
-			}
-
 			world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
 			world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
 			world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.2f);
@@ -173,7 +165,7 @@ public class HuntingCompanion extends Ability {
 							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
 							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
 							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.2f);
-							world.spawnParticle(Particle.SMOKE_NORMAL, foxLoc, 20);
+							new PartialParticle(Particle.SMOKE_NORMAL, foxLoc, 20).spawnAsPlayerActive(mPlayer);
 						}
 						if (mTarget != null) {
 							mTarget.removePotionEffect(PotionEffectType.GLOWING);
@@ -220,7 +212,7 @@ public class HuntingCompanion extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
 		world.playSound(mFox.getLocation(), Sound.ENTITY_FOX_AGGRO, 1.5f, 1.0f);
 		PotionUtils.applyPotion(mPlayer, mTarget, new PotionEffect(PotionEffectType.GLOWING, DURATION, 0, true, false));
-		world.spawnParticle(Particle.VILLAGER_ANGRY, mFox.getEyeLocation(), 25);
+		new PartialParticle(Particle.VILLAGER_ANGRY, mFox.getEyeLocation(), 25).spawnAsPlayerActive(mPlayer);
 		return true; // only one targeting instance per tick
 	}
 

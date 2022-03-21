@@ -50,6 +50,27 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("(venturechat:)?(r(eply)?|vreply)"),
 		exactOptionalArguments("(venturechat:)?v?me"),
 
+		// MonumentaNetworkChat
+		exactOptionalArguments("help"),
+		exactOptionalArguments("(minecraft:)?ch help"),
+		exactOptionalArguments("(minecraft:)?chat help"),
+		exactOptionalArguments("(minecraft:)?networkchat help"),
+		exactOptionalArguments("(minecraft:)?ch say"),
+		exactOptionalArguments("(minecraft:)?chat say"),
+		exactOptionalArguments("(minecraft:)?networkchat say"),
+		exactOptionalArguments("(minecraft:)?g"),
+		exactOptionalArguments("(minecraft:)?global"),
+		exactOptionalArguments("(minecraft:)?l"),
+		exactOptionalArguments("(minecraft:)?local"),
+		exactOptionalArguments("(minecraft:)?p"),
+		exactOptionalArguments("(minecraft:)?party"),
+		exactOptionalArguments("(minecraft:)?msg"),
+		exactOptionalArguments("(minecraft:)?tell"),
+		exactOptionalArguments("(minecraft:)?w"),
+		exactOptionalArguments("(minecraft:)?r"),
+		exactOptionalArguments("(minecraft:)?tm"),
+		exactOptionalArguments("(minecraft:)?teammsg"),
+
 		// CoreProtect
 		exactOptionalArguments("(coreprotect:)?co i(nspect)?"),
 		exactOptionalArguments("(coreprotect:)?co l(ookup)?"),

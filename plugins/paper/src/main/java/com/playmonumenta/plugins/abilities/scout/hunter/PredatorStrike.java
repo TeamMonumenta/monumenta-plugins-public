@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -75,7 +76,7 @@ public class PredatorStrike extends Ability {
 					@Override
 					public void run() {
 						mTicks++;
-						world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 0.75, 0), 1, 0.25, 0, 0.25, 0);
+						new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 0.75, 0), 1, 0.25, 0, 0.25, 0).spawnAsPlayerActive(mPlayer);
 						if (!mActive || mTicks >= 20 * 5) {
 							mActive = false;
 							this.cancel();
@@ -108,8 +109,8 @@ public class PredatorStrike extends Ability {
 			for (double r = 0; r < MAX_RANGE; r += HITBOX_LENGTH) {
 				Location bLoc = box.getCenter().toLocation(world);
 
-				world.spawnParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075);
-				world.spawnParticle(Particle.FLAME, bLoc, 2, 0.2, 0.2, 0.2, 0.1);
+				new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.FLAME, bLoc, 2, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
 
 				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 					bLoc.subtract(direction.multiply(0.5));
@@ -141,8 +142,8 @@ public class PredatorStrike extends Ability {
 
 		double damage = ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE));
 
-		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 45, EXPLODE_RADIUS, EXPLODE_RADIUS, EXPLODE_RADIUS, 0.125);
-		world.spawnParticle(Particle.FLAME, loc, 12, EXPLODE_RADIUS, EXPLODE_RADIUS, EXPLODE_RADIUS, 0.1);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 45, EXPLODE_RADIUS, EXPLODE_RADIUS, EXPLODE_RADIUS, 0.125).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLAME, loc, 12, EXPLODE_RADIUS, EXPLODE_RADIUS, EXPLODE_RADIUS, 0.1).spawnAsPlayerActive(mPlayer);
 
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.7f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.7f);

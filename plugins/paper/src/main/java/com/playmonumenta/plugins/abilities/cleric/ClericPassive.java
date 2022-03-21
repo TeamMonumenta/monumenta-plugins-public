@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -65,7 +66,7 @@ public class ClericPassive extends Ability {
 						if (hp <= HEALTH_LIMIT) {
 							PlayerUtils.healPlayer(mPlugin, player, healPercent * maxHealth, mPlayer);
 							int numHearts = (int) (healPercent * 20);
-							player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 2, 0), numHearts, 0.07, 0.07, 0.07, 0.001);
+							new PartialParticle(Particle.HEART, player.getLocation().add(0, 2, 0), numHearts, 0.07, 0.07, 0.07, 0.001).spawnAsPlayerBuff(player);
 						}
 					}
 				}

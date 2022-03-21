@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -15,7 +16,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
@@ -67,7 +67,6 @@ public class InstantDrink implements Enchantment {
 				}
 
 				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1, 1);
-				World world = player.getWorld();
 				Color color = meta.getColor();
 				if (color != null) {
 					double red = color.getRed() / 255D;
@@ -75,10 +74,11 @@ public class InstantDrink implements Enchantment {
 					double blue = color.getBlue() / 255D;
 					for (int i = 0; i < 30; i++) {
 						double y = FastUtils.randomDoubleInRange(0.25, 1.75);
-						world.spawnParticle(Particle.SPELL_MOB, player.getLocation().add(0, y, 0), 0, red, green, blue, 1);
+						new PartialParticle(Particle.SPELL_MOB, player.getLocation().add(0, y, 0), 1, red, green, blue, 1)
+							.directionalMode(true).minimumMultiplier(false).spawnAsPlayerActive(player);
 					}
 				} else {
-					world.spawnParticle(Particle.SPELL, player.getLocation().add(0, 0.75, 0), 30, 0, 0.45, 0, 1);
+					new PartialParticle(Particle.SPELL, player.getLocation().add(0, 0.75, 0), 30, 0, 0.45, 0, 1).spawnAsPlayerActive(player);
 				}
 
 				//Wait, this is illegal for a potion to have.

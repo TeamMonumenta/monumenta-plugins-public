@@ -4,10 +4,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Infusion;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
@@ -47,7 +48,7 @@ public class Reflection implements Infusion {
 				@Override
 				public void run() {
 					mTicks++;
-					world.spawnParticle(Particle.SOUL_FIRE_FLAME, player.getLocation(), 2, 0.1, 0.1, 0.1, 0.15);
+					new PartialParticle(Particle.SOUL_FIRE_FLAME, player.getLocation(), 2, 0.1, 0.1, 0.1, 0.15).spawnAsPlayerActive(player);
 					if (mTicks >= 20) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), RADIUS, player)) {
 							DamageUtils.damage(player, mob, DamageType.OTHER, reflectedDamage, null, true);
@@ -55,18 +56,13 @@ public class Reflection implements Infusion {
 						world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
 						new BukkitRunnable() {
 							double mRadius = 0;
-							final Location mLoc = player.getLocation();
+							final Location mLoc = player.getLocation().add(0, 0.15, 0);
+
 							@Override
 							public void run() {
 								mRadius += 0.5;
-								for (double j = 0; j < 360; j += 36) {
-									double radian1 = Math.toRadians(j);
-									mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-									world.spawnParticle(Particle.SOUL_FIRE_FLAME, mLoc, 1, 0, 0, 0, 0.125);
-									world.spawnParticle(Particle.END_ROD, mLoc, 1, 0, 0, 0, 0.15);
-									mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-								}
-
+								new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).ringMode(true).count(10).extra(0.125).spawnAsPlayerActive(player);
+								new PPCircle(Particle.END_ROD, mLoc, mRadius).ringMode(true).count(10).extra(0.15).spawnAsPlayerActive(player);
 								if (mRadius >= RADIUS + 1) {
 									this.cancel();
 								}

@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -120,7 +121,7 @@ public class HolyJavelin extends Ability {
 		Location playerLoc = mPlayer.getEyeLocation();
 		Location location = playerLoc.clone();
 		Vector increment = location.getDirection();
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, location.clone().add(increment), 10, 0, 0, 0, 0.125f);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, location.clone().add(increment), 10, 0, 0, 0, 0.125f).spawnAsPlayerActive(mPlayer);
 
 		// Get a list of all the mobs this could possibly hit (that are within range of the player)
 		List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(location, RANGE + HITBOX_LENGTH, mPlayer);
@@ -128,8 +129,8 @@ public class HolyJavelin extends Ability {
 		for (double i = 0; i < RANGE; i += HITBOX_LENGTH) {
 			box.shift(increment);
 			Location loc = box.getCenter().toLocation(world);
-			world.spawnParticle(Particle.REDSTONE, loc, 22, 0.25, 0.25, 0.25, COLOR);
-			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0f, 0f, 0f, 0.025f);
+			new PartialParticle(Particle.REDSTONE, loc, 22, 0.25, 0.25, 0.25, COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0f, 0f, 0f, 0.025f).spawnAsPlayerActive(mPlayer);
 
 			Iterator<LivingEntity> iterator = potentialTargets.iterator();
 			while (iterator.hasNext()) {
@@ -153,7 +154,7 @@ public class HolyJavelin extends Ability {
 
 			if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
 				loc.subtract(increment.multiply(0.5));
-				world.spawnParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f);
+				new PartialParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f).spawnAsPlayerActive(mPlayer);
 				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
 				world.playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
 				break;

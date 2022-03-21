@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -35,8 +36,8 @@ public class AstralOmenBonusDamage extends Effect {
 			Location loc = entity.getLocation().add(0, 1, 0);
 			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1f, 1.25f);
 			world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, 1f, 1.75f);
-			world.spawnParticle(Particle.CRIT, loc, 8, 0.25, 0.5, 0.25, 0.4);
-			world.spawnParticle(Particle.REDSTONE, loc, 8, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE);
+			new PartialParticle(Particle.CRIT, loc, 8, 0.25, 0.5, 0.25, 0.4).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, loc, 8, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE).spawnAsPlayerActive(mPlayer);
 			event.setDamage(event.getDamage() * (1 + mAmount));
 		}
 	}
@@ -44,9 +45,8 @@ public class AstralOmenBonusDamage extends Effect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (fourHertz) {
-			World world = entity.getWorld();
 			Location loc = entity.getLocation().add(0, 1, 0);
-			world.spawnParticle(Particle.REDSTONE, loc, 8, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE);
+			new PartialParticle(Particle.REDSTONE, loc, 8, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE).spawnAsPlayerActive(mPlayer);
 		}
 	}
 

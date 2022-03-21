@@ -8,9 +8,10 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -110,17 +111,14 @@ public class FrostNova extends Ability {
 		World world = mPlayer.getWorld();
 		new BukkitRunnable() {
 			double mRadius = 0;
-			final Location mLoc = mPlayer.getLocation();
+			final Location mLoc = mPlayer.getLocation().add(0, 0.15, 0);
+
 			@Override
 			public void run() {
 				mRadius += 1.25;
-				for (double j = 0; j < 360; j += 18) {
-					double radian1 = Math.toRadians(j);
-					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-					world.spawnParticle(Particle.CLOUD, mLoc, 1, 0, 0, 0, 0.1);
-					world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 8, 0, 0, 0, 0.65);
-					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-				}
+
+				new PPCircle(Particle.CLOUD, mLoc, mRadius).ringMode(true).count(20).extra(0.1).spawnAsPlayerActive(mPlayer);
+				new PPCircle(Particle.CRIT_MAGIC, mLoc, mRadius).ringMode(true).count(160).extra(0.65).spawnAsPlayerActive(mPlayer);
 
 				if (mRadius >= SIZE + 1) {
 					this.cancel();
@@ -132,8 +130,8 @@ public class FrostNova extends Ability {
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.65f);
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.45f);
 		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
-		world.spawnParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.35);
-		world.spawnParticle(Particle.SPIT, loc, 35, 0, 0, 0, 0.45);
+		new PartialParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.35).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPIT, loc, 35, 0, 0, 0, 0.45).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1f);
 	}
 

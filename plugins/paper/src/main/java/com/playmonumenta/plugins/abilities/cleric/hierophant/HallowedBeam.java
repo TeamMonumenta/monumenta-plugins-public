@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -133,8 +134,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 							world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
 							for (int i = 0; i < CAST_RANGE; i++) {
 								loc.add(dir);
-								world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
-								world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
+								new PartialParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(mPlayer);
+								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f).spawnAsPlayerActive(mPlayer);
 								if (loc.distance(e.getEyeLocation()) < 1.25) {
 									loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.35f);
 									loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
@@ -142,8 +143,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 								}
 							}
 							Location eLoc = pe.getLocation().add(0, pe.getHeight() / 2, 0);
-							world.spawnParticle(Particle.SPELL_INSTANT, pe.getLocation(), 500, 2.5, 0.15f, 2.5, 1);
-							world.spawnParticle(Particle.VILLAGER_HAPPY, pe.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
+							new PartialParticle(Particle.SPELL_INSTANT, pe.getLocation(), 500, 2.5, 0.15f, 2.5, 1).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.VILLAGER_HAPPY, pe.getLocation(), 150, 2.55, 0.15f, 2.5, 1).spawnAsPlayerActive(mPlayer);
 							world.playSound(player.getEyeLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, 2, 1.5f);
 
 							PlayerUtils.healPlayer(mPlugin, pe, EntityUtils.getMaxHealth(pe) * HALLOWED_HEAL_PERCENT, mPlayer);
@@ -165,8 +166,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 							world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
 							for (int i = 0; i < CAST_RANGE; i++) {
 								loc.add(dir);
-								world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
-								world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
+								new PartialParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(mPlayer);
+								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f).spawnAsPlayerActive(mPlayer);
 								if (loc.distance(e.getEyeLocation()) < 1.25) {
 									loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.35f);
 									loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
@@ -179,8 +180,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 							DamageUtils.damage(mPlayer, applyE, DamageType.PROJECTILE_SKILL, damage, mInfo.mLinkedSpell, true, true);
 
 							Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
-							world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
-							world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
+							new PartialParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f).spawnAsPlayerActive(mPlayer);
 						} else if (EntityUtils.isHostileMob(applyE)) {
 							if (mMode == 1) {
 								incrementCharge();
@@ -191,8 +192,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 							world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
 							for (int i = 0; i < CAST_RANGE; i++) {
 								loc.add(dir);
-								world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
-								world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
+								new PartialParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(mPlayer);
+								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f).spawnAsPlayerActive(mPlayer);
 								if (loc.distance(e.getEyeLocation()) < 1.25) {
 									loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.35f);
 									loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
@@ -210,8 +211,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 								EntityUtils.applyFire(mPlugin, 20 * 15, applyE, player);
 							}
 							Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
-							world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
-							world.spawnParticle(Particle.CRIT_MAGIC, loc, 30, 1, 1, 1, 0.25);
+							new PartialParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.CRIT_MAGIC, loc, 30, 1, 1, 1, 0.25).spawnAsPlayerActive(mPlayer);
 						}
 						this.cancel();
 					}

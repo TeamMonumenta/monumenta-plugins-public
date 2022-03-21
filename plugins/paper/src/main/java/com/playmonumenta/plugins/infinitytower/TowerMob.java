@@ -2,9 +2,7 @@ package com.playmonumenta.plugins.infinitytower;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobAbility;
-import com.playmonumenta.plugins.infinitytower.mobs.TowerMobClass;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
-import com.playmonumenta.plugins.infinitytower.mobs.TowerMobRarity;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +13,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
@@ -77,49 +74,16 @@ public class TowerMob {
 	}
 
 	public ItemStack buildAtkItem(TowerGame game) {
-		ItemStack stack;
-
-		if (mInfo.mMobRarity == TowerMobRarity.COMMON) {
-			stack = new ItemStack(Material.WOODEN_SWORD);
-		} else if (mInfo.mMobRarity == TowerMobRarity.RARE) {
-			stack = new ItemStack(Material.STONE_SWORD);
-		} else if (mInfo.mMobRarity == TowerMobRarity.EPIC) {
-			stack = new ItemStack(Material.IRON_SWORD);
-		} else {
-			stack = new ItemStack(Material.DIAMOND_SWORD);
-		}
-		stack.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		ItemMeta meta = stack.getItemMeta();
-		meta.displayName(TowerGameUtils.getAtkComponent(mInfo.mMobStats.mAtk));
-
-		stack.setItemMeta(meta);
-		return stack;
+		return TowerMobInfo.buildAtkItem(mInfo);
 
 	}
 
 	public ItemStack buildHPItem(TowerGame game) {
-		ItemStack stack = new ItemStack(Material.HEART_OF_THE_SEA);
-		ItemMeta meta = stack.getItemMeta();
-		meta.displayName(TowerGameUtils.getHpComponent(mInfo.mMobStats.mHP));
-
-		stack.setItemMeta(meta);
-		return stack;
+		return TowerMobInfo.buildHPItem(mInfo);
 	}
 
 	public ItemStack buildSpellItem(TowerGame game, int i) {
-		if (i >= mAbilities.size()) {
-			return null;
-		}
-		ItemStack stack = new ItemStack(Material.ENCHANTED_BOOK);
-		ItemMeta meta = stack.getItemMeta();
-
-		meta.displayName(Component.text(mAbilities.get(i).mName, NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-
-		List<Component> list = new ArrayList<>();
-		list.addAll(TowerGameUtils.getGenericLoreComponent(mAbilities.get(i).mDescription));
-		meta.lore(list);
-		stack.setItemMeta(meta);
-		return stack;
+		return TowerMobInfo.buildSpellItem(mInfo, i);
 	}
 
 	public ItemStack buildLevelItem(TowerGame game) {
@@ -151,38 +115,7 @@ public class TowerMob {
 	}
 
 	public ItemStack buildClassItem(TowerGame game) {
-		ItemStack stack;
-		List<Component> list = new ArrayList<>();
-		if (mInfo.mMobClass == TowerMobClass.CASTER) {
-			stack = new ItemStack(Material.STICK);
-			ItemMeta meta = stack.getItemMeta();
-			meta.displayName(TowerGameUtils.getClassComponent(mInfo.mMobClass));
-			list.addAll(TowerGameUtils.getGenericLoreComponent("This unit deals " + (TowerConstants.DAMAGE_MLT_CLASS * 100 - 100) + "% more damage to Protectors"));
-			meta.lore(list);
-			stack.setItemMeta(meta);
-		} else if (mInfo.mMobClass == TowerMobClass.PROTECTOR) {
-			stack = new ItemStack(Material.SHIELD);
-			ItemMeta meta = stack.getItemMeta();
-			meta.displayName(TowerGameUtils.getClassComponent(mInfo.mMobClass));
-			list.addAll(TowerGameUtils.getGenericLoreComponent("This unit deals " + (TowerConstants.DAMAGE_MLT_CLASS * 100 - 100) + "% more damage to Fighters"));
-			meta.lore(list);
-			stack.setItemMeta(meta);
-		} else if (mInfo.mMobClass == TowerMobClass.FIGHTER) {
-			stack = new ItemStack(Material.GOLDEN_AXE);
-			ItemMeta meta = stack.getItemMeta();
-			meta.displayName(TowerGameUtils.getClassComponent(mInfo.mMobClass));
-			list.addAll(TowerGameUtils.getGenericLoreComponent("This unit deals " + (TowerConstants.DAMAGE_MLT_CLASS * 100 - 100) + "% more damage to Casters"));
-			meta.lore(list);
-			stack.setItemMeta(meta);
-		} else {
-			stack = new ItemStack(Material.POTION);
-			ItemMeta meta = stack.getItemMeta();
-			meta.displayName(TowerGameUtils.getClassComponent(mInfo.mMobClass));
-			meta.lore(list);
-			stack.setItemMeta(meta);
-		}
-
-		return stack;
+		return TowerMobInfo.buildClassItem(mInfo);
 	}
 
 

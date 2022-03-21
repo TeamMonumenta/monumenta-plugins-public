@@ -4,10 +4,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -17,14 +19,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
-
 public class PrismaticShield extends Ability {
 
 	private static final float RADIUS = 4.0f;
 	private static final int TRIGGER_HEALTH = 6;
-	private static final int ABSORPTION_HEALTH_1 = 8;
-	private static final int ABSORPTION_HEALTH_2 = 12;
+	private static final int ABSORPTION_HEALTH_1 = 4;
+	private static final int ABSORPTION_HEALTH_2 = 8;
 	private static final int DURATION = 12 * 20;
 	private static final int COOLDOWN_1 = 90 * 20;
 	private static final int COOLDOWN_2 = 70 * 20;
@@ -38,8 +38,8 @@ public class PrismaticShield extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.PRISMATIC_SHIELD;
 		mInfo.mScoreboardId = "Prismatic";
 		mInfo.mShorthandName = "PS";
-		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive 4 Absorption hearts which lasts up to 12 s. In addition enemies within four blocks are knocked back. Cooldown: 90s.");
-		mInfo.mDescriptions.add("The shield is improved to 6 Absorption hearts. Enemies within four blocks are knocked back and stunned for 1 s. Cooldown: 70s.");
+		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive 2 Absorption hearts which lasts up to 12 s. In addition enemies within four blocks are knocked back. Cooldown: 90s.");
+		mInfo.mDescriptions.add("The shield is improved to 4 Absorption hearts. Enemies within four blocks are knocked back and stunned for 1 s. Cooldown: 70s.");
 		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
 		mAbsorptionHealth = isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2;
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
@@ -81,8 +81,8 @@ public class PrismaticShield extends Ability {
 
 			AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, DURATION);
 			World world = mPlayer.getWorld();
-			world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
-			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
+			new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1).spawnAsPlayerActive(mPlayer);
 			world.playSound(mPlayer.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
 			MessagingUtils.sendActionBarMessage(mPlayer, "Prismatic Shield has been activated");
 

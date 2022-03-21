@@ -3,8 +3,8 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Davey;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -119,10 +119,8 @@ public class SpellVoidGrenades extends Spell {
 						Location alternateHeight = loc.clone();
 						alternateHeight.setY(loc.getY() + 0.5);
 						PartialParticle marker1 = new PartialParticle(Particle.SOUL, alternateHeight, 4, 1, 0.15, 1, 0.025);
-						PartialParticle marker2 = new PartialParticle(Particle.REDSTONE, alternateHeight, 10, 1, 0.15, BLACK_COLOR);
-						PPGroundCircle circle = new PPGroundCircle(Particle.REDSTONE, alternateHeight, 15, 0, 0, 0, 0, DARK_PURPLE_COLOR);
-						circle.radius(3);
-						circle.ringMode(true);
+						PartialParticle marker2 = new PartialParticle(Particle.REDSTONE, alternateHeight, 10, 1, 1, 1, 0.15, BLACK_COLOR);
+						PPCircle circle = new PPCircle(Particle.REDSTONE, alternateHeight, 3).ringMode(true).count(15).data(DARK_PURPLE_COLOR);
 
 						new BukkitRunnable() {
 							int mTicks = 0;

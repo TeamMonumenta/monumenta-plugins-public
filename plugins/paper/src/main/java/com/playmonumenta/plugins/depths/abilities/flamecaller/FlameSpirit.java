@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -81,7 +81,7 @@ public class FlameSpirit extends DepthsAbility {
 											FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.02,
 											FastUtils.sin(Math.toRadians(mRotationAngle)) * 2
 									), 1, 0, 0.01
-							).spawnAsPlayer(mPlayer, false);
+							).spawnAsPlayerActive(mPlayer);
 
 							new PartialParticle(
 									Particle.FLAME,
@@ -91,7 +91,7 @@ public class FlameSpirit extends DepthsAbility {
 											FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.02,
 											FastUtils.sin(Math.toRadians(mRotationAngle)) * -2
 									), 1, 0, 0.01
-								).spawnAsPlayer(mPlayer, false);
+							).spawnAsPlayerActive(mPlayer);
 
 							mTicksElapsed++;
 						}

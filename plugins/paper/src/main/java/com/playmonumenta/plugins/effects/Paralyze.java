@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -47,20 +47,21 @@ public class Paralyze extends Effect {
 				widerWidthDelta,
 				0,
 				COLOR_FAINT_YELLOW
-			).spawnAsEnemy();
-			partialParticle.mExtra = 1;
-			partialParticle.mData = COLOR_YELLOW;
-			partialParticle.spawnAsEnemy();
-			partialParticle.mParticle = Particle.FIREWORKS_SPARK;
-			partialParticle.mCount = 8;
-			partialParticle.mExtra = 0.4;
-			partialParticle.mData = null;
-			partialParticle.mDirectionalMode = true;
-			partialParticle.mExtraVariance = 0.1;
-			partialParticle.setDeltaVariance(PartialParticle.DeltaVarianceGroup.VARY_X, true);
-			partialParticle.setDeltaVariance(PartialParticle.DeltaVarianceGroup.VARY_Z, true);
-			partialParticle.mVaryPositiveY = true;
-			partialParticle.spawnAsEnemy();
+			).spawnAsEnemyBuff();
+
+			partialParticle.extra(1)
+				.data(COLOR_YELLOW)
+				.spawnAsEnemyBuff();
+
+			new PartialParticle(Particle.FIREWORKS_SPARK, halfHeightLocation)
+				.count(8)
+				.directionalMode(true)
+				.delta(widerWidthDelta, PartialParticle.getHeightDelta(le), widerWidthDelta)
+				.deltaVariance(true, false, true)
+				.deltaVariance(false, false, true, false, false, false)
+				.extra(0.4)
+				.extraVariance(0.1)
+				.spawnAsEnemyBuff();
 
 			World world = le.getWorld();
 			Location enemyLocation = le.getLocation();

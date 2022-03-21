@@ -2,9 +2,10 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.player.PPLightning;
-import com.playmonumenta.plugins.player.PPPillar;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPLightning;
+import com.playmonumenta.plugins.particle.PPPillar;
+import com.playmonumenta.plugins.particle.PartialParticle;
+import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -14,7 +15,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LightningFinisher {
 
@@ -34,25 +34,9 @@ public class LightningFinisher {
 		strikeLocation.setY(strikeLocation.getY());
 
 		// P: Danger, tall markers
-		PPPillar abovegroundMarker = new PPPillar(
-			Particle.REDSTONE,
-			strikeLocation,
-			2 * SHOCK_VERTICAL_RANGE,
-			0,
-			0,
-			DUST_YELLOW_SMALL
-		);
-		abovegroundMarker.init(SHOCK_VERTICAL_RANGE);
-		abovegroundMarker.spawnAsBoss();
-		PPPillar undergroundMarker = new PPPillar(
-			Particle.FIREWORKS_SPARK,
-			strikeLocation.clone().subtract(0, SHOCK_VERTICAL_RANGE, 0),
-			2 * SHOCK_VERTICAL_RANGE,
-			0,
-			0
-		);
-		undergroundMarker.init(SHOCK_VERTICAL_RANGE);
-		undergroundMarker.spawnAsBoss();
+		new PPPillar(Particle.REDSTONE, strikeLocation, SHOCK_VERTICAL_RANGE).count(2 * SHOCK_VERTICAL_RANGE).data(DUST_YELLOW_SMALL).spawnAsPlayerActive(p);
+		new PPPillar(Particle.FIREWORKS_SPARK, strikeLocation.clone().subtract(0, SHOCK_VERTICAL_RANGE, 0), SHOCK_VERTICAL_RANGE)
+			.count(2 * SHOCK_VERTICAL_RANGE).spawnAsPlayerActive(p);
 
 
 		// S: Thunder & distant sparks
@@ -114,15 +98,8 @@ public class LightningFinisher {
 				// Count of the tick this run, last being 1
 				if (mCountdownTicks == PPLightning.ANIMATION_TICKS) {
 					// P: Lightning starts
-					PPLightning lightning = new PPLightning(
-						Particle.END_ROD,
-						strikeLocation,
-						8,
-						0,
-						0
-					);
-					lightning.init(SHOCK_VERTICAL_RANGE, 2.5, 0.3, 0.15);
-					lightning.spawnAsBoss();
+					PPLightning lightning = new PPLightning(Particle.END_ROD, strikeLocation).init(SHOCK_VERTICAL_RANGE, 2.5, 0.3, 0.15);
+					lightning.spawnAsPlayerActive(p);
 					mInternalParticleRunnable = lightning.runnable();
 
 					// S: Electricity courses
@@ -163,8 +140,7 @@ public class LightningFinisher {
 						true,
 						0.05
 					);
-					sparks.setDeltaVariance(PartialParticle.DeltaVarianceGroup.VARY_X, true);
-					sparks.setDeltaVariance(PartialParticle.DeltaVarianceGroup.VARY_Z, true);
+					sparks.deltaVariance(true, false, true);
 					sparks.mVaryPositiveY = true;
 					sparks.spawnAsBoss();
 
@@ -174,7 +150,8 @@ public class LightningFinisher {
 						strikeLocation,
 						50,
 						1.5,
-						0,
+						1.5,
+						1.5,
 						DUST_LIGHT_YELLOW_SMALL
 					).spawnAsBoss();
 

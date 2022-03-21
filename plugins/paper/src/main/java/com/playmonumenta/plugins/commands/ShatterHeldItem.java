@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
@@ -15,10 +13,9 @@ public class ShatterHeldItem extends GenericCommand {
 		registerPlayerCommand("shatterhelditem", "monumenta.command.shatterhelditem", ShatterHeldItem::run);
 	}
 
-	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
+	private static void run(CommandSender sender, Player player) {
 		ItemStack item = player.getInventory().getItemInMainHand();
-		ItemStatUtils.shatter(item);
-		if (InventoryUtils.testForItemWithLore(item, (ChatColor.DARK_RED + "" + ChatColor.BOLD + "* SHATTERED *"))) {
+		if (ItemStatUtils.shatter(item)) {
 			player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 0.8f);
 			sender.sendMessage("Successfully shattered player's held item.");
 		} else {

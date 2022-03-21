@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.EnumSet;

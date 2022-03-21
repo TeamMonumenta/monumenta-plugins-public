@@ -169,6 +169,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		ItemStack mDM = loadItemTable(playerLoad, "epic:r2/depths/loot/voidstained_geode");
 		ItemStack mUP = loadItemTable(playerLoad, "epic:r1/dungeons/4/static_uncommons/unicorn_puke");
 		ItemStack mLi = loadItemTable(playerLoad, "epic:r2/lich/materials/ancestral_effigy");
+		ItemStack mDB = loadItemTable(playerLoad, "epic:r1/blitz/blitz_doubloon");
 
 		List<String> lore = new ArrayList<>();
 		Map<ItemStack, Integer> cost = new HashMap<>();
@@ -462,6 +463,42 @@ public final class ParrotCustomInventory extends CustomInventory {
 			ParrotManager.selectParrot(player, ParrotVariant.KAUL, mShoulderSelected);
 								return true;
 							}));
+
+		//Plunderer's Blitz
+		lore.clear();
+		lore.add("Requires having beaten the 50th round in Plunderer's Blitz");
+		int currentRound = ScoreboardUtils.getScoreboardValue(playerLoad, "Blitz").orElse(1);
+		lore.add("You have reached round " + (currentRound - 1));
+		ItemStack winBlitz = buildItem(Material.RED_WOOL, "Plushy Parrot", lore);
+		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 16, winBlitz, (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "Blitz").orElse(0) <= 50 && mShoulderSelected == PlayerShoulder.NONE;
+		}));
+
+		lore.clear();
+		lore.add("Click to buy!");
+		lore.add("128 Blitz Doubloon");
+		cost.clear();
+		cost.put(mDB, 128);
+		ItemStack buyBlitz = buildItem(Material.RED_WOOL, "Plushy Parrot", lore);
+		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 16, buyBlitz, new HashMap<>(cost), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "Blitz").orElse(0) > 50 && mShoulderSelected == PlayerShoulder.NONE;
+		}, (player, inv) -> {
+			ScoreboardUtils.setScoreboardValue(player, "ParrotBought19", (int) Instant.now().getEpochSecond());
+			return true;
+		}));
+
+		lore.clear();
+		lore.add("Owned");
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought19").orElse(0)*1000).toString());
+		ItemStack boughtBlitz = buildItem(Material.RED_WOOL, "Plushy Parrot", lore);
+		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 16, boughtBlitz, (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought19").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE; }));
+		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 16, boughtBlitz, (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought19").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE;
+		}, (player, inv) -> {
+			ParrotManager.selectParrot(player, ParrotVariant.BLITZ, mShoulderSelected);
+			return true;
+		}));
 
 		//==================================================================================================
 		//                                         R1 parrots end

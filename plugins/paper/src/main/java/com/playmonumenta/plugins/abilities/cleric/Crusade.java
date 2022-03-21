@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities.cleric;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Material;
@@ -66,7 +66,7 @@ public class Crusade extends Ability {
 				PartialParticle.getHeightDelta(enemy),
 				doubleWidthDelta,
 				0
-			).spawnAsPlayer(mPlayer);
+			).spawnAsPlayerActive(mPlayer);
 		}
 		return false; // only increases event damage
 	}

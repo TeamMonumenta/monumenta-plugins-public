@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPLine;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -80,17 +82,13 @@ public class DaggerThrow extends Ability {
 			for (int i = 0; i <= DAGGER_THROW_RANGE; i++) {
 				box.shift(newDir);
 				Location bLoc = box.getCenter().toLocation(world);
-				Location pLoc = bLoc.clone();
-				for (int t = 0; t < 10; t++) {
-					pLoc.add(newDir.clone().multiply(0.1));
-					world.spawnParticle(Particle.REDSTONE, pLoc, 1, 0.1, 0.1, 0.1, DAGGER_THROW_COLOR);
-				}
+				new PPLine(Particle.REDSTONE, bLoc, newDir, 0.9).countPerMeter(10).delta(0.1).data(DAGGER_THROW_COLOR).spawnAsPlayerActive(mPlayer);
 
 				for (LivingEntity mob : mobs) {
 					if (mob.getBoundingBox().overlaps(box)
 						&& MetadataUtils.checkOnceThisTick(mPlugin, mob, DAGGER_THROW_MOB_HIT_TICK)) {
 						bLoc.subtract(newDir.clone().multiply(0.5));
-						world.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);
+						new PartialParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer);
 						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
 
 						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell, true);
@@ -99,7 +97,7 @@ public class DaggerThrow extends Ability {
 
 					} else if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 						bLoc.subtract(newDir.clone().multiply(0.5));
-						world.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);
+						new PartialParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer);
 						break;
 					}
 				}

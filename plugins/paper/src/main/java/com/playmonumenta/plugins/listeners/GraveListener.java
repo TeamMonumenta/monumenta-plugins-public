@@ -147,11 +147,18 @@ public class GraveListener implements Listener {
 		if (event.getEntity() instanceof Item entity) {
 			EntityDamageEvent.DamageCause cause = event.getCause();
 			if ((entity.getScoreboardTags().contains("ExplosionImmune")
-				&& (cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION))) {
+				     && (cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION))) {
 				event.setCancelled(true);
 				return;
 			}
 			GraveManager.onDestroyItem(entity, event.getCause() == EntityDamageEvent.DamageCause.VOID);
+			if (entity.isValid()
+				    && event.getCause() != EntityDamageEvent.DamageCause.VOID
+				    && ItemStatUtils.getInfusionLevel(entity.getItemStack(), ItemStatUtils.InfusionType.HOPE) > 0) {
+				// If a hoped item isn't put into a grave (because graves are disabled), cancel all non-void damage.
+				event.setCancelled(true);
+				entity.setInvulnerable(true); // also make the item invulnerable to prevent this event from being spammed
+			}
 		} else if (GraveManager.isGrave(event.getEntity())) {
 			event.setCancelled(true);
 		}

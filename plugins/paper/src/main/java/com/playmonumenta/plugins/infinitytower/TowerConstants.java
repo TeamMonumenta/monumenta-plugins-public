@@ -12,7 +12,7 @@ public class TowerConstants {
 	public static int DESIGNED_FLOORS = 0;
 
 	//Coins
-	public static final int STARTING_GOLD = 5;
+	public static final int STARTING_GOLD = 6;
 
 	public static int getGoldWin(int floor) {
 		int q = floor / 10;

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -50,8 +51,8 @@ public class EnchantedPrayerAoE extends Effect {
 			World world = entity.getWorld();
 			world.playSound(enemy.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.9f);
 			world.playSound(enemy.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
-			world.spawnParticle(Particle.SPELL_INSTANT, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1);
-			world.spawnParticle(Particle.FIREWORKS_SPARK, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 75, 0, 0, 0, 0.3);
+			new PartialParticle(Particle.SPELL_INSTANT, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.FIREWORKS_SPARK, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 75, 0, 0, 0, 0.3).spawnAsPlayerActive(mPlayer);
 			for (LivingEntity le : EntityUtils.getNearbyMobs(enemy.getLocation(), 3.5)) {
 				DamageUtils.damage(mPlayer, le, DamageType.MAGIC, mDamageAmount, ClassAbility.ENCHANTED_PRAYER, true, true);
 			}
@@ -65,11 +66,10 @@ public class EnchantedPrayerAoE extends Effect {
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		Player p = (Player) entity;
 		if (fourHertz) {
-			World world = p.getWorld();
 			Location rightHand = PlayerUtils.getRightSide(p.getEyeLocation(), 0.45).subtract(0, .8, 0);
 			Location leftHand = PlayerUtils.getRightSide(p.getEyeLocation(), -0.45).subtract(0, .8, 0);
-			world.spawnParticle(Particle.SPELL_INSTANT, leftHand, 2, 0.05f, 0.05f, 0.05f, 0);
-			world.spawnParticle(Particle.SPELL_INSTANT, rightHand, 2, 0.05f, 0.05f, 0.05f, 0);
+			new PartialParticle(Particle.SPELL_INSTANT, leftHand, 2, 0.05f, 0.05f, 0.05f, 0).spawnAsPlayerActive(p);
+			new PartialParticle(Particle.SPELL_INSTANT, rightHand, 2, 0.05f, 0.05f, 0.05f, 0).spawnAsPlayerActive(p);
 		}
 	}
 

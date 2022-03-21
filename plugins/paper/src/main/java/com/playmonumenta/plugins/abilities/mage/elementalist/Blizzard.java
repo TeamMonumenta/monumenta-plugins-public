@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -106,9 +107,9 @@ public class Blizzard extends Ability {
 						}
 					}
 
-					world.spawnParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1);
-					world.spawnParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05);
-					world.spawnParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15);
+					new PartialParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					if (
 						mTicks >= DURATION_TICKS
 							|| AbilityManager.getManager().getPlayerAbility(mPlayer, Blizzard.class) == null

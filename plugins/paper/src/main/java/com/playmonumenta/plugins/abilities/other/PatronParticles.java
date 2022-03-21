@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -55,7 +55,7 @@ public abstract class PatronParticles extends Ability {
 			widthDelta,
 			0.01,
 			mParticleData
-		).spawnAsPlayer(mPlayer, true);
+		).spawnAsPlayerPassive(mPlayer);
 	}
 
 	// AbilityManager creates Ability objects in a specific order with player as null, just for reference.

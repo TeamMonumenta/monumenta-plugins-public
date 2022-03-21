@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpawnerListener implements Listener {
@@ -161,4 +162,10 @@ public class SpawnerListener implements Listener {
 		}
 	}
 
+	public void worldUnloadEvent(WorldUnloadEvent event) {
+		// Remove all mobs from worlds that unload
+		mMobInfos.entrySet().removeIf((entry) ->
+			entry.getValue().mMob == null || entry.getValue().mMob.getWorld().equals(event.getWorld())
+		);
+	}
 }

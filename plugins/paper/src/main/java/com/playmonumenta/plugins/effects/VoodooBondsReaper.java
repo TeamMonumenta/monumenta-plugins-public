@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -63,8 +64,8 @@ public class VoodooBondsReaper extends Effect {
 		Location loc = enemy.getLocation();
 		World world = loc.getWorld();
 		//replace with better particles
-		world.spawnParticle(Particle.SPELL_WITCH, loc, 65, 1, 0.5, 1, 0.001);
-		world.spawnParticle(Particle.REDSTONE, loc, 65, 1, 0.5, 1, 0, COLOR);
+		new PartialParticle(Particle.SPELL_WITCH, loc, 65, 1, 0.5, 1, 0.001).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, loc, 65, 1, 0.5, 1, 0, COLOR).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, 2f, 0.75f);
 		mDone = true;
 		setDuration(0);
@@ -94,8 +95,8 @@ public class VoodooBondsReaper extends Effect {
 
 			Location loc = mPlayer.getLocation();
 			World world = loc.getWorld();
-			world.spawnParticle(Particle.SPELL_WITCH, loc, 60, 0.5, 0.5, 0.5, 0.001);
-			world.spawnParticle(Particle.REDSTONE, loc, 60, 0.5, 0.5, 0.5, 0, COLOR);
+			new PartialParticle(Particle.SPELL_WITCH, loc, 60, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, loc, 60, 0.5, 0.5, 0.5, 0, COLOR).spawnAsPlayerActive(mPlayer);
 			world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, 1f, 0.75f);
 			world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, 1f, 0.6f);
 			world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, 1f, 0.5f);
@@ -110,13 +111,12 @@ public class VoodooBondsReaper extends Effect {
 		if (oneHertz) {
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, 0.5f);
 		}
-		World world = mPlayer.getLocation().getWorld();
 		Location rightHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), 0.45).subtract(0, .8, 0);
 		Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
-		world.spawnParticle(Particle.REDSTONE, leftHand, 2, 0.05f, 0.05f, 0.05f, 0, COLOR);
-		world.spawnParticle(Particle.SPELL_WITCH, leftHand, 1, 0.05, 0.05, 0.05, 0);
-		world.spawnParticle(Particle.REDSTONE, rightHand, 2, 0.05f, 0.05f, 0.05f, 0, COLOR);
-		world.spawnParticle(Particle.SPELL_WITCH, rightHand, 1, 0.05, 0.05, 0.05, 0);
+		new PartialParticle(Particle.REDSTONE, leftHand, 2, 0.05f, 0.05f, 0.05f, 0, COLOR).spawnAsEnemy();
+		new PartialParticle(Particle.SPELL_WITCH, leftHand, 1, 0.05, 0.05, 0.05, 0).spawnAsEnemy();
+		new PartialParticle(Particle.REDSTONE, rightHand, 2, 0.05f, 0.05f, 0.05f, 0, COLOR).spawnAsEnemy();
+		new PartialParticle(Particle.SPELL_WITCH, rightHand, 1, 0.05, 0.05, 0.05, 0).spawnAsEnemy();
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
 import java.util.List;
@@ -77,9 +78,9 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
-			world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 60, 0, 0, 0, 0.35);
-			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 60, 0.4, 0.4, 0.4, 1);
-			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 200, 5, 3, 5, 1);
+			new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 60, 0, 0, 0, 0.35).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 60, 0.4, 0.4, 0.4, 1).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 200, 5, 3, 5, 1).spawnAsPlayerActive(mPlayer);
 
 			//Reset timer and have 8 second cooldown
 			mSeconds = 0;
@@ -104,7 +105,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 				applyBuffs(PASSIVE_DURATION);
 			}
 			if (twoHertz) {
-				mPlayer.getWorld().spawnParticle(Particle.REDSTONE, mPlayer.getLocation(), 10, 0.4, 0.4, 0.4, COLOR);
+				new PartialParticle(Particle.REDSTONE, mPlayer.getLocation(), 10, 0.4, 0.4, 0.4, COLOR).spawnAsPlayerBuff(mPlayer);
 			}
 		}
 	}

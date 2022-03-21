@@ -29,7 +29,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class GenericTowerMob extends TowerAbility {
 
 	final Mob mBoss;
-	private LivingEntity mLastTarget = null;
+	public LivingEntity mLastTarget = null;
+	public boolean mCanChangeTarget = true;
 
 	public GenericTowerMob(Plugin plugin, String identityTag, Mob boss, TowerGame game, TowerMob mob, boolean isPlayerMob) {
 		super(plugin, identityTag, boss, game, mob, isPlayerMob);
@@ -42,6 +43,7 @@ public class GenericTowerMob extends TowerAbility {
 			@Override
 			public void run() {
 				if (mBoss.isDead() || !mBoss.isValid()) {
+					mGame.towerMobsDied(mBoss);
 					cancel();
 					return;
 				}
@@ -71,6 +73,8 @@ public class GenericTowerMob extends TowerAbility {
 				}
 
 				if (mGame.isTurnEnded()) {
+					mBoss.setTarget(null);
+					cancel();
 					return;
 				}
 
@@ -83,6 +87,7 @@ public class GenericTowerMob extends TowerAbility {
 
 
 				if (mLastTarget == null) {
+					mCanChangeTarget = true;
 					List<LivingEntity> targets = (mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs());
 					targets.removeIf(entity -> entity.getScoreboardTags().contains(TowerConstants.MOB_TAG_UNTARGETABLE));
 					Location loc = mBoss.getLocation();
@@ -137,6 +142,16 @@ public class GenericTowerMob extends TowerAbility {
 		if ((source.getScoreboardTags().contains(TowerConstants.MOB_TAG_FLOOR_TEAM) && !mIsPlayerMob) || (mIsPlayerMob && source.getScoreboardTags().contains(TowerConstants.MOB_TAG_PLAYER_TEAM))) {
 			event.setCancelled(true);
 			return;
+		}
+
+		if (mCanChangeTarget && source.isValid() && !source.isDead()) {
+			//if we can change the target (no taunt or others skill in use)
+			//check if the enemy is closer than my current target
+			double distanceToTarget = mLastTarget.getLocation().distance(mBoss.getLocation());
+			double distanceToDamager = source.getLocation().distance(mBoss.getLocation());
+			if (distanceToTarget > distanceToDamager) {
+				mLastTarget = source;
+			}
 		}
 
 

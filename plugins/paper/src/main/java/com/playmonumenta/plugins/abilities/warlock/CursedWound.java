@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -73,10 +74,12 @@ public class CursedWound extends Ability {
 			BlockData fallingDustData = Material.ANVIL.createBlockData();
 			World world = mPlayer.getWorld();
 			if (EntityUtils.isHostileMob(enemy)) {
-				world.spawnParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 3,
-					(enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, fallingDustData);
-				world.spawnParticle(Particle.SPELL_MOB, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 6,
-					(enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, 0);
+				new PartialParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 3,
+					(enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, fallingDustData)
+					.spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.SPELL_MOB, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 6,
+					(enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, 0)
+					.spawnAsPlayerActive(mPlayer);
 
 				int cooldowns = 0;
 				for (Ability ability : mAbilities) {
@@ -91,10 +94,12 @@ public class CursedWound extends Ability {
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
 				world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 0.75f);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CURSED_WOUND_RADIUS, mPlayer)) {
-					world.spawnParticle(Particle.FALLING_DUST, mob.getLocation().add(0, mob.getHeight() / 2, 0), 3,
-					                     (mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, fallingDustData);
-					world.spawnParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 6,
-					                     (mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, 0);
+					new PartialParticle(Particle.FALLING_DUST, mob.getLocation().add(0, mob.getHeight() / 2, 0), 3,
+						(mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, fallingDustData)
+						.spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 6,
+						(mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, 0)
+						.spawnAsPlayerActive(mPlayer);
 					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME, new CustomDamageOverTime(CURSED_WOUND_DURATION, CURSED_WOUND_DOT_DAMAGE, CURSED_WOUND_DOT_PERIOD, mPlayer, null, Particle.SQUID_INK));
 					if (isLevelTwo()) {
 						//Bleed interaction

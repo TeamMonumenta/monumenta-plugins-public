@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
@@ -62,24 +63,24 @@ public class RageOfTheKeter implements Enchantment {
 				(entity, fourHertz, twoHertz, oneHertz) -> {
 					// Tick effect
 					Location loc = player.getLocation().add(0, 1, 0);
-					world.spawnParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, GREEN_COLOR);
-					world.spawnParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, GREEN_COLOR);
-					world.spawnParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, OLIVE_COLOR);
+						new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, GREEN_COLOR).spawnAsPlayerBuff(player);
+						new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, GREEN_COLOR).spawnAsPlayerBuff(player);
+						new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, OLIVE_COLOR).spawnAsPlayerBuff(player);
 				}, (entity) -> {
 					// Lose effect
 					Location loc = player.getLocation();
 					world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1f, 0.65f);
-					world.spawnParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, OLIVE_COLOR);
-					world.spawnParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, GREEN_COLOR);
-					world.spawnParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, OLIVE_COLOR);
+					new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, OLIVE_COLOR).spawnAsPlayerBuff(player);
+					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, GREEN_COLOR).spawnAsPlayerBuff(player);
+					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, OLIVE_COLOR).spawnAsPlayerBuff(player);
 				})
 			);
 
 			player.setFoodLevel(Math.min(20, player.getFoodLevel() + 6));
 			player.setSaturation(Math.min(player.getFoodLevel(), Math.min(player.getSaturation() + 6, 20)));
 
-			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1, OLIVE_COLOR);
-			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1, GREEN_COLOR);
+			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1, OLIVE_COLOR).spawnAsPlayerBuff(player);
+			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1, GREEN_COLOR).spawnAsPlayerBuff(player);
 			world.playSound(player.getLocation(), Sound.ENTITY_STRIDER_EAT, 1, 0.85f);
 
 			player.setCooldown(event.getItem().getType(), COOLDOWN);

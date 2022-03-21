@@ -51,7 +51,8 @@ public class ParrotManager implements Listener {
 		DEPTHS_UPGRADE("Otherworldly Myiopsitta (u)", 15, Parrot.Variant.BLUE),
 		BEE("Bee Conure", 16, Parrot.Variant.CYAN),
 		RADIANT("Radiant Conure", 17, Parrot.Variant.CYAN),
-		HEKAWT("Veil Electus", 18, Parrot.Variant.BLUE);
+		HEKAWT("Veil Electus", 18, Parrot.Variant.BLUE),
+		BLITZ("Plushy Parrot", 19, Parrot.Variant.RED);
 
 
 		private String mName;

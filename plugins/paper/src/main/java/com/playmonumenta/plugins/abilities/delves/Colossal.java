@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.delves;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -9,7 +10,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -77,10 +77,9 @@ public class Colossal extends DelveModifier {
 		Block block = event.getBlock();
 		if (block.getType() == Material.SPAWNER && FastUtils.RANDOM.nextDouble() < mSpawnChance) {
 			Location loc = block.getLocation();
-			World world = loc.getWorld();
 
-			world.spawnParticle(Particle.FLASH, loc, 1, 0, 0, 0, 0);
-			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 100, 0.2, 0.2, 0.2, 0.2);
+			new PartialParticle(Particle.FLASH, loc, 1, 0, 0, 0, 0).spawnAsEnemy();
+			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 100, 0.2, 0.2, 0.2, 0.2).spawnAsEnemy();
 
 			new BukkitRunnable() {
 				@Override

@@ -32,8 +32,7 @@ public class TowerGameUtils {
 	public static void sellMob(TowerGame game, TowerMob mob) {
 		game.removeMob(mob);
 
-		int unitCost = mob.mInfo.mMobStats.mCost;
-		int refund = (unitCost / 2 > 0 ? unitCost / 2 : 1);
+		int refund = mob.mInfo.mMobStats.mCost;
 
 		Player player = game.mPlayer.mPlayer;
 
@@ -186,7 +185,7 @@ public class TowerGameUtils {
 	public static Component getMobNameComponent(String mobName, boolean playerMob) {
 		if (playerMob) {
 			return Component.empty().append(
-				Component.text(mobName, NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true));
+				Component.text(mobName, NamedTextColor.GREEN).decoration(TextDecoration.BOLD, true));
 		} else {
 			return Component.empty().append(
 				Component.text(mobName, NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
@@ -280,8 +279,7 @@ public class TowerGameUtils {
 
 		List<Component> lore = new ArrayList<>();
 
-		int unitCost = mob.mInfo.mMobStats.mCost;
-		int refund = (unitCost / 2 > 0 ? unitCost / 2 : 1);
+		int refund = mob.mInfo.mMobStats.mCost;
 
 		lore.add(Component.text("You will get " + refund + " Coin back", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 

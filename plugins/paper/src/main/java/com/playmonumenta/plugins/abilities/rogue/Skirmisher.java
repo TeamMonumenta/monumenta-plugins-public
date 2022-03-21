@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import javax.annotation.Nullable;
@@ -52,9 +53,9 @@ public class Skirmisher extends Ability {
 				world.playSound(loc, Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 0.5f);
 				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
 				loc.add(0, 1, 0);
-				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 10, 0.35, 0.5, 0.35, 0.05);
-				world.spawnParticle(Particle.SPELL_MOB, loc, 10, 0.35, 0.5, 0.35, 0.00001);
-				world.spawnParticle(Particle.CRIT, loc, 10, 0.25, 0.5, 0.25, 0.55);
+				new PartialParticle(Particle.SMOKE_NORMAL, loc, 10, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.SPELL_MOB, loc, 10, 0.35, 0.5, 0.35, 0.00001).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CRIT, loc, 10, 0.25, 0.5, 0.25, 0.55).spawnAsPlayerActive(mPlayer);
 
 				event.setDamage((event.getDamage() + mIsolatedFlatDamage) * (1 + mIsolatedPercentDamage));
 			}

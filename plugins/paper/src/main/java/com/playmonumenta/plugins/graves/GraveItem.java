@@ -98,6 +98,7 @@ public class GraveItem {
 	public @Nullable Integer mSlot;
 	@Nullable Status mStatus;
 	private int mTickLastStatusChange;
+	private boolean mLoggedOut = false;
 
 	private GraveItem(GraveManager manager, Grave grave, Player player, ItemStack item) {
 		mManager = manager;
@@ -222,7 +223,7 @@ public class GraveItem {
 	}
 
 	private boolean canSpawn() {
-		if (isInThisWorld() && mStatus == Status.DROPPED && (mEntity == null || !mEntity.isValid())) {
+		if (!mLoggedOut && isInThisWorld() && mStatus == Status.DROPPED && (mEntity == null || !mEntity.isValid())) {
 			mLocation.setWorld(mPlayer.getWorld());
 			return mLocation.isChunkLoaded();
 		}
@@ -350,6 +351,7 @@ public class GraveItem {
 				// Owner picked up full stack, mark as collected
 				mStatus = Status.COLLECTED;
 				mGrave.removeItem(this);
+				mManager.removeItem(event.getItem().getUniqueId());
 			} else {
 				// Owner couldn't pick up full stack, put in grave safe
 				remove(Status.SAFE);
@@ -418,6 +420,7 @@ public class GraveItem {
 	}
 
 	void onLogout() {
+		mLoggedOut = true;
 		remove(mStatus);
 		if (mLocation != null) {
 			mManager.removeUnloadedItem(Chunk.getChunkKey(mLocation), this);

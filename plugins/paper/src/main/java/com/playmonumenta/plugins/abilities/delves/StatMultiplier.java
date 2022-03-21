@@ -108,7 +108,7 @@ public class StatMultiplier extends DelveModifier {
 		if (isDepthsShard()) {
 			double basePoints = Math.min(25, depthPoints);
 			double bonusPoints = Math.max(0, (depthPoints - 25) / 2.0);
-			return 1 + ((basePoints + bonusPoints) * DAMAGE_MULTIPLIER_INCREMENT);
+			return 1 + ((basePoints + bonusPoints) * HEALTH_MULTIPLIER_INCREMENT);
 		}
 		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * HEALTH_MULTIPLIER_INCREMENT;
 	}
@@ -141,13 +141,12 @@ public class StatMultiplier extends DelveModifier {
 
 		String spellName = event.getBossSpellName();
 		if (spellName != null && (Arcanic.SPELL_NAMES.contains(spellName) || Infernal.SPELL_NAMES.contains(spellName) || Transcendent.SPELL_NAMES.contains(spellName))) {
-			// do not scale abilities from delve modifiers (no stat compensation, and they have their own region scaling)
-			return;
-		}
-
-		if (DelvesUtils.isDelveMob(source)) {
+			// Abilities from delve modifiers only scale based on points, and not from stat compensation or region scaling (they have their own region scaling)
+		} else if (DelvesUtils.isDelveMob(source)) {
+			// Delve mobs get point and region scaling
 			event.setDamage(event.getDamage() * mDelveMobStatMultiplier);
 		} else {
+			// Other entity damage gets scaled according to stat compensation as well as points
 			event.setDamage(event.getDamage() * mStatCompensation);
 		}
 

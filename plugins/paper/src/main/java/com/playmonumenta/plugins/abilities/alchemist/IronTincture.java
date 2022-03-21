@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -99,7 +100,7 @@ public class IronTincture extends Ability {
 
 			@Override
 			public void run() {
-				world.spawnParticle(Particle.SPELL, tincture.getLocation(), 3, 0, 0, 0, 0.1);
+				new PartialParticle(Particle.SPELL, tincture.getLocation(), 3, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
 
 				for (Player p : PlayerUtils.playersInRange(tincture.getLocation(), 1, true)) {
 					// Prevent players from picking up their own tincture instantly
@@ -108,8 +109,8 @@ public class IronTincture extends Ability {
 					}
 
 					world.playSound(tincture.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.85f);
-					world.spawnParticle(Particle.BLOCK_DUST, tincture.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData());
-					world.spawnParticle(Particle.FIREWORKS_SPARK, tincture.getLocation(), 30, 0.1, 0.1, 0.1, 0.2);
+					new PartialParticle(Particle.BLOCK_DUST, tincture.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData()).spawnAsPlayerActive(p);
+					new PartialParticle(Particle.FIREWORKS_SPARK, tincture.getLocation(), 30, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(p);
 					tincture.remove();
 
 					execute(mPlayer);
@@ -151,7 +152,7 @@ public class IronTincture extends Ability {
 
 		World world = player.getWorld();
 		world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
-		world.spawnParticle(Particle.FLAME, player.getLocation(), 30, 0.25, 0.1, 0.25, 0.125);
+		new PartialParticle(Particle.FLAME, player.getLocation(), 30, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(player);
 		new BukkitRunnable() {
 			double mRotation = 0;
 			double mY = 0.15;
@@ -164,8 +165,8 @@ public class IronTincture extends Ability {
 				for (int i = 0; i < 3; i++) {
 					double degree = Math.toRadians(mRotation + (i * 120));
 					loc.add(FastUtils.cos(degree) * mRadius, mY, FastUtils.sin(degree) * mRadius);
-					world.spawnParticle(Particle.FLAME, loc, 1, 0.05, 0.05, 0.05, 0.05);
-					world.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.05, 0.05, 0.05, 0);
+					new PartialParticle(Particle.FLAME, loc, 1, 0.05, 0.05, 0.05, 0.05).minimumMultiplier(false).spawnAsPlayerActive(player);
+					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.05, 0.05, 0.05, 0).minimumMultiplier(false).spawnAsPlayerActive(player);
 					loc.subtract(FastUtils.cos(degree) * mRadius, mY, FastUtils.sin(degree) * mRadius);
 				}
 

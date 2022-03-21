@@ -28,6 +28,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 	private static final ItemStack WHITE_BORDER_ITEM = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
 	private static final ItemStack WHITE_CENTER_ITEM = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
 	private static final ItemStack REFRESH_ITEM = new ItemStack(Material.BONE_MEAL);
+	private static final ItemStack FREE_REFRESH_ITEM = new ItemStack(Material.BONE_MEAL);
 
 	static {
 		ItemMeta meta = WHITE_BORDER_ITEM.getItemMeta();
@@ -43,6 +44,16 @@ public class TowerGuiBuyMob extends CustomInventory {
 
 		meta.lore(lore);
 		REFRESH_ITEM.setItemMeta(meta);
+
+		meta = FREE_REFRESH_ITEM.getItemMeta();
+		meta.displayName(Component.text("Refresh the shop!", NamedTextColor.AQUA).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		List<Component> lore2 = new ArrayList<>();
+		lore2.add(Component.text("1 free refresh!", NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false));
+		lore2.add(Component.empty());
+		lore2.add(Component.text("Each round from 1 to 5 have a free shop refresh", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+		meta.lore(lore2);
+		FREE_REFRESH_ITEM.setItemMeta(meta);
+
 	}
 
 	private static final int[] VALID_MOBS_SLOT = {
@@ -85,7 +96,12 @@ public class TowerGuiBuyMob extends CustomInventory {
 			for (TowerMobRarity rarity : TowerMobRarity.values()) {
 				rand -= rarity.getWeight(currentLvl - 1);
 				if (rand <= 0) {
-					mobs.add(TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(rarity).get(FastUtils.RANDOM.nextInt(TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(rarity).size())));
+					TowerMobInfo info = TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(rarity).get(FastUtils.RANDOM.nextInt(TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(rarity).size()));
+					if (mGame.mCurrentFloor == 0 && info.mLosName.equals("ITBabyMimic")) {
+						info = TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(TowerMobRarity.COMMON).get(0);
+						//at the first round don't take any BabyMimic
+					}
+					mobs.add(info);
 					break;
 				}
 			}
@@ -121,7 +137,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 
 		mInventory.setItem(21, TowerGameUtils.getXPItem(mGame));
 		mInventory.setItem(22, TowerGameUtils.getCoinItem(mGame));
-		mInventory.setItem(23, REFRESH_ITEM);
+		mInventory.setItem(23, mGame.mFreeRoll ? FREE_REFRESH_ITEM : REFRESH_ITEM);
 		mInventory.setItem(25, TowerGameUtils.getWeightItem(mGame));
 
 	}
@@ -144,11 +160,18 @@ public class TowerGuiBuyMob extends CustomInventory {
 
 		if (info != null) {
 			if (TowerGameUtils.canBuy(info, player)) {
-				if (mGame.canAdd(info)) {
-					ITEM_MAP.get(mGame).remove(info);
-					TowerGameUtils.pay(info, player);
-					mGame.addNewMob(info);
-					player.playSound(player.getEyeLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.MASTER, 10f, 0.6f);
+				if (mGame.canAddWeight(info)) {
+					if (mGame.canAddLimit(info)) {
+						ITEM_MAP.get(mGame).remove(info);
+						TowerGameUtils.pay(info, player);
+						mGame.addNewMob(info);
+						player.playSound(player.getEyeLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.MASTER, 10f, 0.6f);
+					} else {
+						player.sendMessage(Component.text("[Plunderer's Blitz]", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).append(
+							Component.text(" You can't use more then " + info.mMobStats.mLimit + " " + info.mDisplayName + " in the same team!", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)
+						));
+						//Limit of the same mob
+					}
 				} else {
 					player.sendMessage(Component.text("[Plunderer's Blitz]", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).append(
 											Component.text(" You don't have enough space inside the team", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)
@@ -170,10 +193,14 @@ public class TowerGuiBuyMob extends CustomInventory {
 			}
 
 			if (slot == 23) {
-				if (TowerGameUtils.canBuy(player, TowerConstants.COST_REROLL)) {
-					TowerGameUtils.pay(player, TowerConstants.COST_REROLL);
+				//do we have a free roll or we need to pay
+				if (mGame.mFreeRoll || TowerGameUtils.canBuy(player, TowerConstants.COST_REROLL)) {
+					if (!mGame.mFreeRoll) {
+						TowerGameUtils.pay(player, TowerConstants.COST_REROLL);
+					}
 					player.playSound(player.getEyeLocation(), Sound.UI_LOOM_SELECT_PATTERN, 1, 0.9f);
 					mGame.mRoll++;
+					mGame.mFreeRoll = false;
 				}
 			}
 

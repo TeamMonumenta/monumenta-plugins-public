@@ -273,8 +273,7 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(Orangyboi.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Orangyboi(p, e, s, l));
 		mStatefulBosses.put(Azacor.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Azacor(p, e, s, l));
 		mStatefulBosses.put(AzacorNormal.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new AzacorNormal(p, e, s, l));
-		mStatefulBosses.put(CShuraPhaseOne.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CShuraPhaseOne(p, e, s, l));
-		mStatefulBosses.put(CShuraPhaseTwo.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CShuraPhaseTwo(p, e, s, l));
+		mStatefulBosses.put(CShura.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CShura(p, e, s, l));
 		mStatefulBosses.put(SwordsageRichter.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new SwordsageRichter(p, e, s, l));
 		mStatefulBosses.put(Kaul.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Kaul(p, e, s, l));
 		mStatefulBosses.put(TCalin.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new TCalin(p, e, s, l));
@@ -338,8 +337,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(Orangyboi.identityTag, (Plugin p, LivingEntity e) -> Orangyboi.deserialize(p, e));
 		mBossDeserializers.put(Azacor.identityTag, (Plugin p, LivingEntity e) -> Azacor.deserialize(p, e));
 		mBossDeserializers.put(AzacorNormal.identityTag, (Plugin p, LivingEntity e) -> AzacorNormal.deserialize(p, e));
-		mBossDeserializers.put(CShuraPhaseOne.identityTag, (Plugin p, LivingEntity e) -> CShuraPhaseOne.deserialize(p, e));
-		mBossDeserializers.put(CShuraPhaseTwo.identityTag, (Plugin p, LivingEntity e) -> CShuraPhaseTwo.deserialize(p, e));
+		mBossDeserializers.put(CShura.identityTag, (Plugin p, LivingEntity e) -> CShura.deserialize(p, e));
 		mBossDeserializers.put(TsunamiChargerBoss.identityTag, (Plugin p, LivingEntity e) -> TsunamiChargerBoss.deserialize(p, e));
 		mBossDeserializers.put(BombTossBoss.identityTag, (Plugin p, LivingEntity e) -> BombTossBoss.deserialize(p, e));
 		mBossDeserializers.put(BombTossNoBlockBreakBoss.identityTag, (Plugin p, LivingEntity e) -> BombTossNoBlockBreakBoss.deserialize(p, e));

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.other;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -51,7 +52,7 @@ public class CluckingPotions extends Ability {
 		if (potion.hasMetadata("CluckingPotion")) {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
 				for (LivingEntity entity : affectedEntities) {
-					entity.getLocation().getWorld().spawnParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0);
+					new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
 					if (entity instanceof Player player) {
 						List<ItemStack> cluckingCandidates = new ArrayList<>();
 						for (ItemStack armor : player.getInventory().getArmorContents()) {

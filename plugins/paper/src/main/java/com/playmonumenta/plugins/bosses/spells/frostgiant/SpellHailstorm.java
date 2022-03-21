@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
@@ -43,8 +43,8 @@ public class SpellHailstorm extends Spell {
 	private final double mRadius;
 	private final List<Player> mWarned = new ArrayList<Player>();
 	private final Map<Player, BukkitRunnable> mDamage = new HashMap<>();
-	private final PPGroundCircle mInnerCircle;
-	private final PPGroundCircle mOuterCircle;
+	private final PPCircle mInnerCircle;
+	private final PPCircle mOuterCircle;
 
 	private @Nullable BukkitRunnable mDelay;
 
@@ -57,8 +57,8 @@ public class SpellHailstorm extends Spell {
 		mStartLoc = start;
 
 		Location loc = boss.getLocation();
-		mInnerCircle = new PPGroundCircle(Particle.REDSTONE, loc, 60, 0.1, 0.1, 0.1, 1, LIGHT_BLUE_COLOR).init(radius - 0.75, true);
-		mOuterCircle = new PPGroundCircle(Particle.CLOUD, loc, 30, 2, 2, 2, 0.075).init(radius + 5, true);
+		mInnerCircle = new PPCircle(Particle.REDSTONE, loc, radius - 0.75).ringMode(true).count(60).delta(0.1).extra(1).data(LIGHT_BLUE_COLOR);
+		mOuterCircle = new PPCircle(Particle.CLOUD, loc, radius + 5).ringMode(true).count(30).delta(2).extra(0.075);
 
 		new BukkitRunnable() {
 			@Override

@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
@@ -37,12 +37,13 @@ while in a pool.
  */
 public class SpellGraspingHands extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private ThreadLocalRandom mRand = ThreadLocalRandom.current();
-	private int mCap = 7;
+	private static final int CAP = 7;
+
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final ThreadLocalRandom mRand = ThreadLocalRandom.current();
 	private static final Particle.DustOptions GRASPING_HANDS_COLOR = new Particle.DustOptions(Color.fromRGB(0, 135, 96), 1.65f);
-	private ChargeUpManager mChargeUp;
+	private final ChargeUpManager mChargeUp;
 	private boolean mCanRun = true;
 	private double mDuration = 20 * 7.0d;
 	private int mHealCap = 75;
@@ -63,7 +64,7 @@ public class SpellGraspingHands extends Spell {
 		if (players.size() <= 2) {
 			targets = players;
 		} else {
-			int cap = (int) Math.min(mCap, Math.ceil(players.size() / 3));
+			int cap = (int) Math.min(CAP, Math.ceil(1.0 * players.size() / 3));
 			for (int i = 0; i < cap; i++) {
 				Player player = players.get(mRand.nextInt(players.size()));
 				if (targets.contains(player)) {
@@ -116,18 +117,19 @@ public class SpellGraspingHands extends Spell {
 		for (Player player : targets) {
 			player.playSound(player.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, SoundCategory.HOSTILE, 1, 0.75f);
 			player.sendMessage(ChatColor.AQUA
-	                   + "A pool forms under you.");
+				                   + "A pool forms under you.");
 			world.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, SoundCategory.HOSTILE, 1, 0.5f);
 			world.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, SoundCategory.HOSTILE, 1, 0.75f);
 
-			PPGroundCircle indicator = new PPGroundCircle(Particle.REDSTONE, player.getLocation(), 8, 0.25, 0.1, 0.25, 0, GRASPING_HANDS_COLOR).init(0, true);
-			PPGroundCircle indicator2 = new PPGroundCircle(Particle.SMOKE_NORMAL, player.getLocation(), 6, 0.2, 0, 0.2, 0).init(0, true);
-			PPGroundCircle indicator3 = new PPGroundCircle(Particle.DRAGON_BREATH, player.getLocation(), 4, 0.25, 0.1, 0.25, mRand.nextDouble(0.01, 0.05)).init(0, true);
+			PPCircle indicator = new PPCircle(Particle.REDSTONE, player.getLocation(), 0).ringMode(true).count(8).delta(0.25, 0.1, 0.25).data(GRASPING_HANDS_COLOR);
+			PPCircle indicator2 = new PPCircle(Particle.SMOKE_NORMAL, player.getLocation(), 0).ringMode(true).count(6).delta(0.2, 0, 0.2);
+			PPCircle indicator3 = new PPCircle(Particle.DRAGON_BREATH, player.getLocation(), 0).ringMode(true).count(4).delta(0.25, 0.1, 0.25).extraRange(0.01, 0.05);
 
 			BukkitRunnable runC = new BukkitRunnable() {
 				int mT = 0;
 				Location mLoc = player.getLocation();
-				double mRadius = 5;
+				final double mRadius = 5;
+
 				@Override
 				public void run() {
 					mT++;

@@ -220,6 +220,7 @@ public class SpellBaseLaser extends Spell {
 					startLocation.distance(targetedLocation),
 					vector,
 					CHECK_INCREMENT,
+					false,
 					mParticleAction,
 					mParticleFrequency,
 					mParticleChance

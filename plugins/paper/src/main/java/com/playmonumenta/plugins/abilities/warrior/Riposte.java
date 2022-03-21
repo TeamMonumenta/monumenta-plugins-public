@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -86,9 +87,9 @@ public class Riposte extends Ability {
 				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.8f);
 				Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation().add(0, 1, 0), source.getLocation().add(0, source.getHeight() / 2, 0));
 				Location loc = mPlayer.getLocation().add(0, 1, 0).subtract(dir);
-				world.spawnParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001);
-				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
-				world.spawnParticle(Particle.CRIT, loc, 75, 0.1, 0.1, 0.1, 0.6);
+				new PartialParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CRIT, loc, 75, 0.1, 0.1, 0.1, 0.6).spawnAsPlayerActive(mPlayer);
 				putOnCooldown();
 				event.setCancelled(true);
 			}

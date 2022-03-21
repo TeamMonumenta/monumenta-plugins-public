@@ -4,12 +4,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -38,9 +38,8 @@ public class WardingRemedyNonApothecary extends Ability {
 			if (level > 0) {
 				double multiplier = level == 1 ? WARDING_REMEDY_1_DAMAGE_MULTIPLIER : WARDING_REMEDY_2_DAMAGE_MULTIPLIER;
 				Location loc = event.getDamagee().getLocation().add(0, 1, 0);
-				World world = mPlayer.getWorld();
-				world.spawnParticle(Particle.SPELL_WITCH, loc, 8, 0.3, 0.5, 0.3);
-				world.spawnParticle(Particle.REDSTONE, loc, 10, 0.4, 0.5, 0.4, APOTHECARY_DARK_COLOR);
+				new PartialParticle(Particle.SPELL_WITCH, loc, 8, 0.3, 0.5, 0.3).spawnAsPlayerBuff(mPlayer);
+				new PartialParticle(Particle.REDSTONE, loc, 10, 0.4, 0.5, 0.4, APOTHECARY_DARK_COLOR).spawnAsPlayerBuff(mPlayer);
 				event.setDamage(event.getDamage() * multiplier);
 			}
 		}

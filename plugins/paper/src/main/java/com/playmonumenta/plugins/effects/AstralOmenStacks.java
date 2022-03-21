@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
 
@@ -11,7 +11,7 @@ import org.bukkit.entity.Entity;
 public class AstralOmenStacks extends Effect {
 	public static final Particle.DustOptions COLOR_PURPLE = new Particle.DustOptions(Color.fromRGB(100, 50, 170), 1f);
 
-	private int mLevel;
+	private final int mLevel;
 
 	public AstralOmenStacks(int duration, int level) {
 		super(duration);
@@ -27,10 +27,9 @@ public class AstralOmenStacks extends Effect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (fourHertz) {
-			World world = entity.getWorld();
 			Location location = entity.getLocation().add(0, 1, 0);
-			world.spawnParticle(Particle.ENCHANTMENT_TABLE, location, 8, 0, 0, 0, 4);
-			world.spawnParticle(Particle.REDSTONE, location, 8, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE);
+			new PartialParticle(Particle.ENCHANTMENT_TABLE, location, 8, 0, 0, 0, 4).spawnAsEnemyBuff();
+			new PartialParticle(Particle.REDSTONE, location, 8, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE).spawnAsEnemyBuff();
 		}
 	}
 

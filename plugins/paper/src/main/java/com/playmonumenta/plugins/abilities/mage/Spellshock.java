@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SpellShockStatic;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -97,8 +98,8 @@ public class Spellshock extends Ability {
 
 					Location loc = enemy.getLocation().add(0, 1, 0);
 					World world = mPlayer.getWorld();
-					world.spawnParticle(Particle.SPELL_WITCH, loc, 60, 1, 1, 1, 0.001);
-					world.spawnParticle(Particle.CRIT_MAGIC, loc, 45, 1, 1, 1, 0.25);
+					new PartialParticle(Particle.SPELL_WITCH, loc, 60, 1, 1, 1, 0.001).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.CRIT_MAGIC, loc, 45, 1, 1, 1, 0.25).spawnAsPlayerActive(mPlayer);
 					world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.5f);
 					world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.0f);
 					world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 1.5f);

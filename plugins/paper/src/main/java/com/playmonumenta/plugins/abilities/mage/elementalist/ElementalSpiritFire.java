@@ -10,7 +10,8 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPPeriodic;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -185,15 +186,15 @@ public class ElementalSpiritFire extends Ability {
 								} else {
 									// Else spawn particles at the new location and continue doing damage at this place the next tick
 									// These particles skip the first damage attempt
-									PartialParticle partialParticle = new PartialParticle(
-										Particle.FLAME,
-										newPotentialLocation,
-										4,
-										PartialParticle.getWidthDelta(HITBOX),
-										0.05
-									).spawnAsPlayer(mPlayer);
-									partialParticle.mParticle = Particle.SMOKE_LARGE;
-									partialParticle.spawnAsPlayer(mPlayer);
+									PartialParticle partialParticle = new PartialParticle(Particle.FLAME, newPotentialLocation)
+										.count(4)
+										.delta(PartialParticle.getWidthDelta(HITBOX))
+										.extra(0.05)
+										.minimumMultiplier(false)
+										.spawnAsPlayerActive(mPlayer);
+									partialParticle
+										.particle(Particle.SMOKE_LARGE)
+										.spawnAsPlayerActive(mPlayer);
 								}
 							}
 						}
@@ -208,18 +209,18 @@ public class ElementalSpiritFire extends Ability {
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		// Periodic trigger starts running again when the skill is off cooldown,
 		// which restarts these passive particles
-		if (mPlayerParticlesGenerator == null) {
+		if (mPlayerParticlesGenerator == null && mPlayer != null) {
 			mPlayerParticlesGenerator = new BukkitRunnable() {
 				double mVerticalAngle = 0;
 				double mRotationAngle = 0;
+				final PPPeriodic mParticle = new PPPeriodic(Particle.FLAME, mPlayer.getLocation()).extra(0.01);
 
 				@Override
 				public void run() {
-					if (
-						isTimerActive()
+					if (isTimerActive()
+						    || mPlayer == null
 							|| !mPlayer.isValid() // Ensure player is not dead, is still online?
-							|| PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)
-					) {
+						    || PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
 						this.cancel();
 						mPlayerParticlesGenerator = null;
 					}
@@ -229,19 +230,15 @@ public class ElementalSpiritFire extends Ability {
 					mVerticalAngle %= 360;
 					mRotationAngle %= 360;
 
-					new PartialParticle(
-						Particle.FLAME,
+					mParticle.location(
 						LocationUtils
 							.getHalfHeightLocation(mPlayer)
 							.add(
 								FastUtils.cos(Math.toRadians(mRotationAngle)),
 								FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.5,
 								FastUtils.sin(Math.toRadians(mRotationAngle))
-							),
-						1,
-						0,
-						0.01
-					).spawnAsPlayer(mPlayer, true);
+								))
+						.spawnAsPlayerPassive(mPlayer);
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
 		}

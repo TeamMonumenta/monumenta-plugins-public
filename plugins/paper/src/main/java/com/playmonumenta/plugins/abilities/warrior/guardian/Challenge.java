@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.EnumSet;
@@ -73,11 +74,11 @@ public class Challenge extends Ability {
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 1);
-		world.spawnParticle(Particle.FLAME, loc, 25, 0.4, 1, 0.4, 0.7f);
+		new PartialParticle(Particle.FLAME, loc, 25, 0.4, 1, 0.4, 0.7f).spawnAsPlayerActive(mPlayer);
 		loc.add(0, 1.25, 0);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 250, 0, 0, 0, 0.425);
-		world.spawnParticle(Particle.CRIT, loc, 300, 0, 0, 0, 1);
-		world.spawnParticle(Particle.CRIT_MAGIC, loc, 300, 0, 0, 0, 1);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 250, 0, 0, 0, 0.425).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CRIT, loc, 300, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CRIT_MAGIC, loc, 300, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHALLENGE_RANGE, mPlayer);
 		AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionPerMob * mobs.size(), mMaxAbsorption, DURATION);

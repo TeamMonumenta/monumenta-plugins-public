@@ -83,6 +83,7 @@ public final class Grave {
 	HashSet<GraveItem> mItems;
 	private @Nullable ArmorStand mEntity;
 	private final HashSet<UUID> mGraveMessageCooldown = new HashSet<>();
+	private boolean mLoggedOut = false;
 
 	boolean mAlertedSpawned = false;
 	boolean mAlertedLimbo = false;
@@ -223,7 +224,7 @@ public final class Grave {
 
 	private boolean canSpawn() {
 		World world = mPlayer.getWorld();
-		if ((mEntity == null || !mEntity.isValid()) && isInThisWorld()) {
+		if (!mLoggedOut && (mEntity == null || !mEntity.isValid()) && isInThisWorld()) {
 			mLocation.setWorld(world);
 			return mLocation.isChunkLoaded();
 		}
@@ -265,7 +266,7 @@ public final class Grave {
 						.append(Component.text(mLocation.getBlockX() + "," + mLocation.getBlockY() + "," + mLocation.getBlockZ()))
 						.append(Component.text(" with "))
 						.append(Component.text(mItems.size() == 1 ? "1 item." : mItems.size() + " items.")
-							.hoverEvent(HoverEvent.showText(getItemList())))
+							.hoverEvent(HoverEvent.showText(getItemList(false))))
 						.append(Component.text(" (/help death for more info)")
 							.clickEvent(ClickEvent.runCommand("/help death")))
 						.append(Component.text(" "))
@@ -403,6 +404,7 @@ public final class Grave {
 	}
 
 	void onLogout() {
+		mLoggedOut = true;
 		remove();
 		mManager.removeUnloadedGrave(Chunk.getChunkKey(mLocation), this);
 		for (GraveItem item : mItems) {
@@ -553,7 +555,7 @@ public final class Grave {
 						.append(Component.text(mLocation.getBlockX() + "," + mLocation.getBlockY() + "," + mLocation.getBlockZ(), NamedTextColor.AQUA))
 						.append(Component.text(" with ", NamedTextColor.AQUA))
 						.append(Component.text(getItems().size() + " item" + (getItems().size() > 1 ? "s" : ""), NamedTextColor.AQUA)
-							.hoverEvent(HoverEvent.showText(getItemList())))
+							.hoverEvent(HoverEvent.showText(getItemList(false))))
 						.append(Component.text(" has been located by another player! ", NamedTextColor.AQUA))
 						.append(Component.text("Click here to delete this grave permanently.", NamedTextColor.RED)
 							.hoverEvent(HoverEvent.showText(Component.text("Delete grave " + index, NamedTextColor.RED)))
@@ -765,14 +767,18 @@ public final class Grave {
 		return data;
 	}
 
-	public Component getItemList() {
+	public Component getItemList(boolean hovers) {
 		Component output = Component.text("");
 		for (GraveItem item : getItems()) {
 			if (!output.equals(Component.text(""))) {
 				output = output.append(Component.text(", ", NamedTextColor.WHITE));
 			}
 
-			output = output.append(ItemUtils.getItemNameComponentWithHover(item.getItem()));
+			if (hovers) {
+				output = output.append(ItemUtils.getItemNameComponentWithHover(item.getItem()));
+			} else {
+				output = output.append(ItemUtils.getItemNameComponent(item.getItem()));
+			}
 		}
 		return output;
 	}

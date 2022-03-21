@@ -1,15 +1,19 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Bukkit;
@@ -18,7 +22,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -35,15 +38,16 @@ import javax.annotation.Nullable;
 
 public class BodkinBlitz extends MultipleChargeAbility {
 
-	private static final int BODKINBLITZ_1_COOLDOWN = 20 * 20;
-	private static final int BODKINBLITZ_2_COOLDOWN = 20 * 18;
-	private static final int BODKINBLITZ_1_BONUS_DMG = 7;
-	private static final int BODKINBLITZ_2_BONUS_DMG = 14;
-	private static final int BODKINBLITZ_1_STEALTH_DURATION = 20;
-	private static final int BODKINBLITZ_2_STEALTH_DURATION = 30;
-	private static final int BODKINBLITZ_1_STEP = 25;
-	private static final int BODKINBLITZ_2_STEP = 35;
-	private static final int BODKINBLITZ_MAX_CHARGES = 2;
+	private static final int COOLDOWN_1 = 20 * 20;
+	private static final int COOLDOWN_2 = 20 * 18;
+	private static final int BONUS_DMG_1 = 7;
+	private static final int BONUS_DMG_2 = 14;
+	private static final int STEALTH_DURATION_1 = 20;
+	private static final int STEALTH_DURATION_2 = 30;
+	private static final int DISTANCE_1 = 10;
+	private static final int DISTANCE_2 = 14;
+	private static final int TELEPORT_TICKS = 4;
+	private static final int MAX_CHARGES = 2;
 
 	private final int mStealthDuration;
 	private final int mBonusDmg;
@@ -52,6 +56,8 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	private boolean mTeleporting = false;
 	private int mTicks;
 
+	private boolean mHasSmokescreen = false;
+
 	public BodkinBlitz(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Bodkin Blitz");
 		mInfo.mLinkedSpell = ClassAbility.BODKIN_BLITZ;
@@ -59,15 +65,19 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mInfo.mShorthandName = "BB";
 		mInfo.mDescriptions.add("Sneak right click while holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. Upon teleporting, your next melee attack deals 7 bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: 20s. Charges: 2.");
 		mInfo.mDescriptions.add("Range increased to 14 blocks, Stealth increased to 1.5 seconds. Upon teleporting, your next melee attack deals 14 bonus damage if your target is not focused on you. Cooldown: 18s.");
-		mInfo.mCooldown = isLevelOne() ? BODKINBLITZ_1_COOLDOWN : BODKINBLITZ_2_COOLDOWN;
+		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
-		mMaxCharges = BODKINBLITZ_MAX_CHARGES;
+		mMaxCharges = MAX_CHARGES;
 		mCharges = getTrackedCharges();
 
-		mStealthDuration = isLevelOne() ? BODKINBLITZ_1_STEALTH_DURATION : BODKINBLITZ_2_STEALTH_DURATION;
-		mBonusDmg = isLevelOne() ? BODKINBLITZ_1_BONUS_DMG : BODKINBLITZ_2_BONUS_DMG;
+		mStealthDuration = isLevelOne() ? STEALTH_DURATION_1 : STEALTH_DURATION_2;
+		mBonusDmg = isLevelOne() ? BONUS_DMG_1 : BONUS_DMG_2;
+
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+			mHasSmokescreen = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Smokescreen.class) != null;
+		});
 	}
 
 	@Override
@@ -79,7 +89,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 		Location loc = mPlayer.getLocation();
 		// Smokescreen trigger conflict
-		if (loc.getPitch() > 50) {
+		if (mHasSmokescreen && loc.getPitch() > 50) {
 			return;
 		}
 
@@ -94,85 +104,60 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 2f);
 
 		new BukkitRunnable() {
-			Location mTpLoc = mPlayer.getLocation();
-			final Vector mShiftVec = mPlayer.getLocation().getDirection().normalize().multiply(0.1);
 			final BoundingBox mPlayerBox = mPlayer.getBoundingBox();
+			final Vector mDirection = mPlayer.getLocation().getDirection().normalize();
+			final double mDistancePerTick = 1.0 * (isLevelOne() ? DISTANCE_1 : DISTANCE_2) / TELEPORT_TICKS;
 			int mTick = 0;
-			final int mStep = isLevelOne() ? BODKINBLITZ_1_STEP : BODKINBLITZ_2_STEP;
 
 			@Override
 			public void run() {
-				// Fire projectile.
-				for (int i = 0; i < mStep; i++) {
-					Location boxLoc = mPlayerBox.getCenter().toLocation(world);
-
-					boolean isBlocked = true;
-					BoundingBox testBox = mPlayerBox.clone();
-
-					// Preliminary check on the spot the player is standing on, before shifting locations.
-					if (testLocation(testBox, world)) {
-						mTpLoc = testBox.getCenter().toLocation(world).add(0, -testBox.getHeight() / 2, 0);
-						isBlocked = false;
-					}
-
-					if (isBlocked) {
-						testBox.shift(0, -1, 0);
-						for (int dy = 0; dy < 20; dy++) {
-							// Start by scanning along the y-axis, from -1 to +1, to find the lowest available space.
-							if (testLocation(testBox, world)) {
-								mTpLoc = testBox.getCenter().toLocation(world).add(0, -testBox.getHeight() / 2, 0);
-								isBlocked = false;
-								break;
-							}
-
-							testBox.shift(0, 0.1, 0);
-						}
-					}
-
-					if (isBlocked) {
-						// If no spot was found, then you've literally hit a wall. Stop iterating.
-						mTick = 4;
-						break;
-					}
-
-					world.spawnParticle(Particle.FALLING_DUST, boxLoc, 5, 0.15, 0.45, 0.1,
-						Bukkit.createBlockData("gray_concrete"));
-					world.spawnParticle(Particle.CRIT, boxLoc, 4, 0.25, 0.5, 0.25, 0);
-					world.spawnParticle(Particle.SMOKE_NORMAL, boxLoc, 5, 0.15, 0.45, 0.15, 0.01);
-
-					mPlayerBox.shift(mShiftVec);
-
+				// The teleport is run over multiple ticks so that we can have a small projectile animation.
+				BoundingBox travelBox = mPlayerBox.clone();
+				boolean isBlocked = LocationUtils.travelTillObstructed(world, travelBox,
+					mDistancePerTick, mDirection, 0.1, true,
+					loc -> {
+						new PartialParticle(Particle.FALLING_DUST, loc, 5, 0.15, 0.45, 0.1,
+							Bukkit.createBlockData("gray_concrete")).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CRIT, loc, 4, 0.25, 0.5, 0.25, 0).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SMOKE_NORMAL, loc, 5, 0.15, 0.45, 0.15, 0.01).spawnAsPlayerActive(mPlayer);
+					}, 1, 1);
+				Location tpLoc = travelBox.getCenter().toLocation(world).add(0, -travelBox.getHeight() / 2, 0);
+				if (isBlocked) {
+					// If no spot was found, then you've literally hit a wall. Stop iterating.
+					mTick = TELEPORT_TICKS;
+				} else {
+					// Shift player box by travel distance for next tick's check
+					// Does not use travelBox as that may have been shifted to evade obstacles
+					mPlayerBox.shift(mDirection.clone().multiply(mDistancePerTick));
 				}
-				mTick++;
-				// Each incrementation of j checks for 1.5 blocks, for a max of 4 (6 blocks).
-				// This is so that we can have a small projectile animation.
 
 				// Don't allow teleporting outside the world border
-				if (!mTpLoc.getWorld().getWorldBorder().isInside(mTpLoc)) {
+				if (!tpLoc.getWorld().getWorldBorder().isInside(tpLoc)) {
 					this.cancel();
 					return;
 				}
 
 				// Teleport player
-				if (mTick >= 4) {
-					mTpLoc.setDirection(mPlayer.getLocation().getDirection());
-					mTpLoc.add(0, 0.1, 0);
-					mPlayer.teleport(mTpLoc, TeleportCause.UNKNOWN);
+				mTick++;
+				if (mTick >= TELEPORT_TICKS) {
+					tpLoc.setDirection(mPlayer.getLocation().getDirection());
+					tpLoc.add(0, 0.1, 0);
+					mPlayer.teleport(tpLoc, TeleportCause.UNKNOWN);
 
 					mTeleporting = false;
 
-					world.playSound(mTpLoc, Sound.BLOCK_ENDER_CHEST_OPEN, 1f, 2f);
-					world.playSound(mTpLoc, Sound.ITEM_TRIDENT_RETURN, 1f, 0.8f);
-					world.playSound(mTpLoc, Sound.ITEM_TRIDENT_THROW, 1f, 0.5f);
-					world.playSound(mTpLoc, Sound.ITEM_TRIDENT_HIT, 1f, 1f);
-					world.playSound(mTpLoc, Sound.ENTITY_PHANTOM_HURT, 1f, 0.75f);
-					world.playSound(mTpLoc, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f);
+					world.playSound(tpLoc, Sound.BLOCK_ENDER_CHEST_OPEN, 1f, 2f);
+					world.playSound(tpLoc, Sound.ITEM_TRIDENT_RETURN, 1f, 0.8f);
+					world.playSound(tpLoc, Sound.ITEM_TRIDENT_THROW, 1f, 0.5f);
+					world.playSound(tpLoc, Sound.ITEM_TRIDENT_HIT, 1f, 1f);
+					world.playSound(tpLoc, Sound.ENTITY_PHANTOM_HURT, 1f, 0.75f);
+					world.playSound(tpLoc, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f);
 
-					world.spawnParticle(Particle.SMOKE_LARGE, mTpLoc.clone().add(0, 1, 0), 30, 0.25, 0.5, 0.25, 0.18);
-					world.spawnParticle(Particle.SMOKE_LARGE, mTpLoc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.04);
-					world.spawnParticle(Particle.SPELL_WITCH, mTpLoc.clone().add(0, 1, 0), 15, 0.5, 0.5, 0.5, 0);
-					world.spawnParticle(Particle.SMOKE_NORMAL, mTpLoc.clone().add(0, 1, 0), 50, 0.75, 0.5, 0.75, 0.05);
-					world.spawnParticle(Particle.CRIT, mTpLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.3);
+					new PartialParticle(Particle.SMOKE_LARGE, tpLoc.clone().add(0, 1, 0), 30, 0.25, 0.5, 0.25, 0.18).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SMOKE_LARGE, tpLoc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.04).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SPELL_WITCH, tpLoc.clone().add(0, 1, 0), 15, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SMOKE_NORMAL, tpLoc.clone().add(0, 1, 0), 50, 0.75, 0.5, 0.75, 0.05).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.CRIT, tpLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.3).spawnAsPlayerActive(mPlayer);
 
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 						new PotionEffect(PotionEffectType.FAST_DIGGING, 5, 19, true, false));
@@ -184,7 +169,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 						mRunnable = new BukkitRunnable() {
 							@Override
 							public void run() {
-								world.spawnParticle(Particle.FALLING_DUST, mPlayer.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, Bukkit.createBlockData("gray_concrete"));
+								new PartialParticle(Particle.FALLING_DUST, mPlayer.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, Bukkit.createBlockData("gray_concrete")).spawnAsPlayerActive(mPlayer);
 								if (mTicks <= 0) {
 									mTicks = 0;
 									this.cancel();
@@ -202,31 +187,6 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	private boolean testLocation(BoundingBox box, World world) {
-		for (int x = -1; x <= 1; x++) {
-			for (int z = -1; z <= 1; z++) {
-				for (int y = 0; y <= 2; y++) {
-					// Checking the blocks around the hitbox.
-					Location loc = box.getCenter().toLocation(world).add(x * 0.4, y * 0.975 - box.getHeight() / 2, z * 0.4);
-					if (!loc.isChunkLoaded()) {
-						// Somehow ended up in an unloaded area - not valid
-						return false;
-					}
-
-					Block block = loc.getBlock();
-					// A player's hitbox is 0.625 * 0.625 * 1.8125 blocks. Rounding up to 0.8 * 0.8 * 1.95 to be safe.
-
-					if (block.getType().isSolid() && block.getBoundingBox().overlaps(box)) {
-						// If a bad spot has already been found, then there's no need to check the rest-- this spot is invalid.
-						return false;
-					}
-				}
-			}
-		}
-
-		return true;
-	}
-
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mRunnable != null && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)) {
@@ -241,8 +201,8 @@ public class BodkinBlitz extends MultipleChargeAbility {
 					World world = entityLoc.getWorld();
 					world.playSound(entityLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 2f);
 					world.playSound(entityLoc, Sound.BLOCK_ANVIL_LAND, 0.8f, 2f);
-					world.spawnParticle(Particle.FALLING_DUST, entityLoc, 35, 0.35, 0.5, 0.35, Bukkit.createBlockData("gray_concrete"));
-					world.spawnParticle(Particle.BLOCK_CRACK, entityLoc, 20, 0.25, 0.25, 0.25, 1, Bukkit.createBlockData("redstone_block"));
+					new PartialParticle(Particle.FALLING_DUST, entityLoc, 35, 0.35, 0.5, 0.35, Bukkit.createBlockData("gray_concrete")).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.BLOCK_CRACK, entityLoc, 20, 0.25, 0.25, 0.25, 1, Bukkit.createBlockData("redstone_block")).spawnAsPlayerActive(mPlayer);
 
 					DamageUtils.damage(mPlayer, m, DamageType.MELEE_SKILL, mBonusDmg, mInfo.mLinkedSpell, true);
 				}

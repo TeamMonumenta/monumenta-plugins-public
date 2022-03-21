@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.EnumSet;
@@ -94,7 +95,7 @@ public class DarkPact extends Ability {
 			}
 
 			World world = mPlayer.getWorld();
-			world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 50, 0.2, 0.1, 0.2, 1);
+			new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 50, 0.2, 0.1, 0.2, 1).spawnAsPlayerActive(mPlayer);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.5f, 1.25f);
 			world.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1, 0.5f);
 
@@ -104,7 +105,7 @@ public class DarkPact extends Ability {
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RESIST));
 			mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(DURATION,
 					(entity, fourHertz, twoHertz, oneHertz) -> {
-						world.spawnParticle(Particle.SPELL_WITCH, entity.getLocation(), 3, 0.2, 0.2, 0.2, 0.2);
+					new PartialParticle(Particle.SPELL_WITCH, entity.getLocation(), 3, 0.2, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
 					},
 					(entity) -> {
 						world.playSound(entity.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.3f, 0.75f);

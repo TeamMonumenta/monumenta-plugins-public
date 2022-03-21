@@ -6,10 +6,10 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -178,18 +178,15 @@ public final class MeteorSlam extends Ability {
 			World world = mPlayer.getWorld();
 			Location location = mPlayer.getLocation().add(0, 0.15, 0);
 			world.playSound(location, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
-			world.spawnParticle(Particle.LAVA, location, 15, 1, 0f, 1, 0);
-			for (int i = 0; i < 30; i++) {
-				world.spawnParticle(
-					Particle.FLAME,
-					location,
-					0, // 0 particle count, deltas act as direction values instead of offsets
-					FastUtils.randomDoubleInRange(-3, 3),
-					0f,
-					FastUtils.randomDoubleInRange(-3, 3),
-					FastUtils.randomDoubleInRange(0.1, 0.3)
-				);
-			}
+			new PartialParticle(Particle.LAVA, location, 15, 1, 0f, 1, 0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.FLAME, location)
+				.count(30)
+				.delta(3, 0, 3)
+				.deltaVariance(true, false, true)
+				.extra(0.2)
+				.extraVariance(0.1)
+				.directionalMode(true)
+				.spawnAsPlayerActive(mPlayer);
 		}
 	}
 
@@ -233,8 +230,8 @@ public final class MeteorSlam extends Ability {
 		float volumeScale = (float) Math.min(0.1 + fallDistance / 16 * 0.9, 1);
 		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, volumeScale * 1.3f, 0);
 		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, volumeScale * 2, 1.25F);
-		world.spawnParticle(Particle.FLAME, location, 60, 0F, 0F, 0F, 0.2F);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, location, 20, 0F, 0F, 0F, 0.3F);
-		world.spawnParticle(Particle.LAVA, location, 3 * mLevelSize * mLevelSize, mLevelSize, 0.25f, mLevelSize, 0);
+		new PartialParticle(Particle.FLAME, location, 60, 0F, 0F, 0F, 0.2F).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, location, 20, 0F, 0F, 0F, 0.3F).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.LAVA, location, 3 * mLevelSize * mLevelSize, mLevelSize, 0.25f, mLevelSize, 0).spawnAsPlayerActive(mPlayer);
 	}
 }

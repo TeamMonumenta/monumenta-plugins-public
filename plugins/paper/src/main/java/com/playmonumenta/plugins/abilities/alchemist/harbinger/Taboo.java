@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -73,7 +74,7 @@ public class Taboo extends Ability {
 						mAlchemistPotions.decrementCharge();
 						PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * PERCENT_HEALTH_HEALING, mPlayer);
 						world.playSound(mPlayer.getLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, 1, 1.2f);
-						world.spawnParticle(Particle.HEART, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0);
+						new PartialParticle(Particle.HEART, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(mPlayer);
 					}
 				} else {
 					mAlchemistPotions.increaseChargeTime(CHARGE_TIME_REDUCTION);
@@ -96,8 +97,8 @@ public class Taboo extends Ability {
 				if (mPlayer.getHealth() > selfDamage) {
 					mPlayer.setHealth(mPlayer.getHealth() - selfDamage);
 					mPlayer.damage(0);
-					mPlayer.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0);
-					mPlayer.getWorld().spawnParticle(Particle.SQUID_INK, mPlayer.getEyeLocation(), 1, 0.2, 0.2, 0.2, 0);
+					new PartialParticle(Particle.DAMAGE_INDICATOR, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0).spawnAsPlayerBuff(mPlayer);
+					new PartialParticle(Particle.SQUID_INK, mPlayer.getEyeLocation(), 1, 0.2, 0.2, 0.2, 0).spawnAsPlayerBuff(mPlayer);
 					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 0.8f, 1);
 				}
 			}

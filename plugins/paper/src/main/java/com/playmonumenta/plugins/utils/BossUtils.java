@@ -125,30 +125,30 @@ public class BossUtils {
 		}
 	}*/
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, null);
 	}
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location) {
 		return bossDamagePercent(boss, target, percentHealth, location, false, null);
 	}
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw) {
 		return bossDamagePercent(boss, target, percentHealth, location, raw, null);
 	}
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, String cause) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, String cause) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, cause);
 	}
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, @Nullable String cause) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, @Nullable String cause) {
 		return bossDamagePercent(boss, target, percentHealth, location, false, cause);
 	}
 
 	/*
 	 * Returns whether or not the player survived (true) or was killed (false)
 	 */
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause) {
 		if (percentHealth <= 0) {
 			return true;
 		}
@@ -305,5 +305,49 @@ public class BossUtils {
 
 	public static String translateFieldNameToTag(String fieldName) {
 		return fieldName.toLowerCase().replaceAll("[^a-z0-9]", "");
+	}
+
+	public static boolean checkParametersStringProperty(String tag) throws Exception {
+		int roundBrackets = 0;
+		int squareBrackets = 0;
+		boolean doubleQuote = false;
+
+		for (int i = 0; i < tag.length(); i++) {
+			char c = tag.charAt(i);
+			switch (c) {
+				case '[' -> {
+					squareBrackets = doubleQuote ? squareBrackets : squareBrackets + 1;
+				}
+				case ']' -> {
+					squareBrackets = doubleQuote ? squareBrackets : squareBrackets - 1;
+				}
+				case '(' -> {
+					roundBrackets = doubleQuote ? roundBrackets : roundBrackets + 1;
+				}
+				case ')' -> {
+					roundBrackets = doubleQuote ? roundBrackets : roundBrackets - 1;
+				}
+				case '"' -> {
+					doubleQuote = !doubleQuote;
+				}
+				default -> {
+				}
+			}
+		}
+
+		if (roundBrackets != 0) {
+			throw new Exception("too many round brackets () " + roundBrackets);
+		}
+
+		if (squareBrackets != 0) {
+			throw new Exception("too many square brackets [] " + squareBrackets);
+		}
+
+		if (doubleQuote) {
+			throw new Exception("too many double_Quote \" ");
+		}
+
+		return true;
+
 	}
 }

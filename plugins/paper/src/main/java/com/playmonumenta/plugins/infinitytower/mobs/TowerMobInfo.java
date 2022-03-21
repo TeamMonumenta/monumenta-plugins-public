@@ -13,6 +13,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -173,8 +174,94 @@ public class TowerMobInfo {
 			return null;
 		}
 
+	}
+
+
+	public static ItemStack buildClassItem(TowerMobInfo info) {
+		ItemStack stack;
+		List<Component> list = new ArrayList<>();
+		if (info.mMobClass == TowerMobClass.CASTER) {
+			stack = new ItemStack(Material.STICK);
+			ItemMeta meta = stack.getItemMeta();
+			meta.displayName(TowerGameUtils.getClassComponent(info.mMobClass));
+			list.addAll(TowerGameUtils.getGenericLoreComponent("This unit deals " + (TowerConstants.DAMAGE_MLT_CLASS * 100 - 100) + "% more damage to Protectors"));
+			meta.lore(list);
+			stack.setItemMeta(meta);
+		} else if (info.mMobClass == TowerMobClass.PROTECTOR) {
+			stack = new ItemStack(Material.SHIELD);
+			ItemMeta meta = stack.getItemMeta();
+			meta.displayName(TowerGameUtils.getClassComponent(info.mMobClass));
+			list.addAll(TowerGameUtils.getGenericLoreComponent("This unit deals " + (TowerConstants.DAMAGE_MLT_CLASS * 100 - 100) + "% more damage to Fighters"));
+			meta.lore(list);
+			stack.setItemMeta(meta);
+		} else if (info.mMobClass == TowerMobClass.FIGHTER) {
+			stack = new ItemStack(Material.GOLDEN_AXE);
+			ItemMeta meta = stack.getItemMeta();
+			meta.displayName(TowerGameUtils.getClassComponent(info.mMobClass));
+			list.addAll(TowerGameUtils.getGenericLoreComponent("This unit deals " + (TowerConstants.DAMAGE_MLT_CLASS * 100 - 100) + "% more damage to Casters"));
+			meta.lore(list);
+			stack.setItemMeta(meta);
+		} else {
+			stack = new ItemStack(Material.POTION);
+			ItemMeta meta = stack.getItemMeta();
+			meta.displayName(TowerGameUtils.getClassComponent(info.mMobClass));
+			meta.lore(list);
+			stack.setItemMeta(meta);
+		}
+
+		return stack;
+	}
+
+	public static ItemStack buildSpellItem(TowerMobInfo info, int index) {
+		if (index >= info.mAbilities.size()) {
+			return null;
+		}
+
+		TowerMobAbility ability = TowerMobAbility.fromString(info.mAbilities.get(index));
+
+		if (ability.mDescription.contains("FAIL!")) {
+			return null;
+		}
+		ItemStack stack = new ItemStack(Material.ENCHANTED_BOOK);
+		ItemMeta meta = stack.getItemMeta();
+
+		meta.displayName(Component.text(ability.mName, NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+
+		List<Component> list = new ArrayList<>(TowerGameUtils.getGenericLoreComponent(ability.mDescription));
+		meta.lore(list);
+		stack.setItemMeta(meta);
+		return stack;
 
 	}
 
+
+	public static ItemStack buildHPItem(TowerMobInfo info) {
+		ItemStack stack = new ItemStack(Material.HEART_OF_THE_SEA);
+		ItemMeta meta = stack.getItemMeta();
+		meta.displayName(TowerGameUtils.getHpComponent(info.mMobStats.mHP));
+
+		stack.setItemMeta(meta);
+		return stack;
+	}
+
+	public static ItemStack buildAtkItem(TowerMobInfo info) {
+		ItemStack stack;
+
+		if (info.mMobRarity == TowerMobRarity.COMMON) {
+			stack = new ItemStack(Material.WOODEN_SWORD);
+		} else if (info.mMobRarity == TowerMobRarity.RARE) {
+			stack = new ItemStack(Material.STONE_SWORD);
+		} else if (info.mMobRarity == TowerMobRarity.EPIC) {
+			stack = new ItemStack(Material.IRON_SWORD);
+		} else {
+			stack = new ItemStack(Material.DIAMOND_SWORD);
+		}
+		stack.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		ItemMeta meta = stack.getItemMeta();
+		meta.displayName(TowerGameUtils.getAtkComponent(info.mMobStats.mAtk));
+
+		stack.setItemMeta(meta);
+		return stack;
+	}
 
 }

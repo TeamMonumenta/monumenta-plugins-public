@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -79,9 +80,9 @@ public class WitheringGaze extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 					Location l = loc.clone().add(vec);
-					world.spawnParticle(Particle.SPELL_WITCH, l, 3, 0.15, 0.15, 0.15, 0.15);
-					world.spawnParticle(Particle.SPELL_MOB, l, 3, 0.15, 0.15, 0.15, 0);
-					world.spawnParticle(Particle.SMOKE_NORMAL, l, 2, 0.15, 0.15, 0.15, 0.05);
+					new PartialParticle(Particle.SPELL_WITCH, l, 3, 0.15, 0.15, 0.15, 0.15).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SPELL_MOB, l, 3, 0.15, 0.15, 0.15, 0).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SMOKE_NORMAL, l, 2, 0.15, 0.15, 0.15, 0.05).spawnAsPlayerActive(mPlayer);
 				}
 				mR += 0.55;
 

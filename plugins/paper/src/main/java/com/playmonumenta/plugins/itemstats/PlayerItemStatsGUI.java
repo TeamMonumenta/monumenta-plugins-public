@@ -427,7 +427,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		TEMPO(8, Material.CLOCK, EnchantmentType.TEMPO, false, """
 			Gain (Level*20%) effective Agility
 			on the first hit taken after
-			4 seconds of taking no damage.""");
+			4 seconds of taking no damage.
+			Half of the bonus is granted after
+			2 seconds of taking no damage.""");
 
 		private final int mSlot;
 		private final Material mIcon;

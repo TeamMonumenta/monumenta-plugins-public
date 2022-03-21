@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -55,7 +56,8 @@ public class BladeDance extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer == null) {
+		if (mPlayer == null
+		) {
 			return;
 		}
 
@@ -63,9 +65,9 @@ public class BladeDance extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RETURN, 1f, 0.75f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 2f);
-		world.spawnParticle(Particle.VILLAGER_ANGRY, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0);
-		world.spawnParticle(Particle.CLOUD, mPlayer.getLocation().clone().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 0.15);
-		world.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0, SWORDSAGE_COLOR);
+		new PartialParticle(Particle.VILLAGER_ANGRY, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CLOUD, mPlayer.getLocation().clone().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 0.15).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0, SWORDSAGE_COLOR).spawnAsPlayerActive(mPlayer);
 		mPlayer.setInvulnerable(true);
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -76,9 +78,9 @@ public class BladeDance extends Ability {
 				mTicks += 1;
 				Location loc = mPlayer.getLocation();
 				double r = DANCE_RADIUS - (3 * mPitch);
-				world.spawnParticle(Particle.SWEEP_ATTACK, loc, 3, r, 2, r, 0);
-				world.spawnParticle(Particle.REDSTONE, loc, 4, r, 2, r, 0, SWORDSAGE_COLOR);
-				world.spawnParticle(Particle.CLOUD, loc, 4, r, 2, r, 0);
+				new PartialParticle(Particle.SWEEP_ATTACK, loc, 3, r, 2, r, 0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, loc, 4, r, 2, r, 0, SWORDSAGE_COLOR).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CLOUD, loc, 4, r, 2, r, 0).spawnAsPlayerActive(mPlayer);
 				if (mTicks % 2 == 0) {
 					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, mPitch);
 					mPitch += 0.1f;
@@ -90,7 +92,7 @@ public class BladeDance extends Ability {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 2f);
 					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
 
-					world.spawnParticle(Particle.VILLAGER_ANGRY, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0);
+					new PartialParticle(Particle.VILLAGER_ANGRY, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0).spawnAsPlayerActive(mPlayer);
 
 					int damage = isLevelOne() ? DANCE_1_DAMAGE : DANCE_2_DAMAGE;
 
@@ -103,9 +105,9 @@ public class BladeDance extends Ability {
 						EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenAmp, mob);
 
 						Location mobLoc = mob.getLocation().add(0, 1, 0);
-						world.spawnParticle(Particle.SWEEP_ATTACK, mobLoc, 5, 0.35, 0.5, 0.35, 0);
-						world.spawnParticle(Particle.CRIT, mobLoc, 10, 0.25, 0.5, 0.25, 0.3);
-						world.spawnParticle(Particle.REDSTONE, mobLoc, 15, 0.35, 0.5, 0.35, 0, SWORDSAGE_COLOR);
+						new PartialParticle(Particle.SWEEP_ATTACK, mobLoc, 5, 0.35, 0.5, 0.35, 0).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CRIT, mobLoc, 10, 0.25, 0.5, 0.25, 0.3).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, mobLoc, 15, 0.35, 0.5, 0.35, 0, SWORDSAGE_COLOR).spawnAsPlayerActive(mPlayer);
 					}
 
 					new BukkitRunnable() {
@@ -117,9 +119,9 @@ public class BladeDance extends Ability {
 							Vector vec = new Vector(FastUtils.cos(mRadians) * DANCE_RADIUS / 1.5, 0, FastUtils.sin(mRadians) * DANCE_RADIUS / 1.5);
 
 							Location loc2 = mPlayer.getEyeLocation().add(vec);
-							world.spawnParticle(Particle.SWEEP_ATTACK, loc2, 5, 1, 0.25, 1, 0);
-							world.spawnParticle(Particle.CRIT, loc2, 10, 1, 0.25, 1, 0.3);
-							world.spawnParticle(Particle.REDSTONE, loc2, 10, 1, 0.25, 1, 0, SWORDSAGE_COLOR);
+							new PartialParticle(Particle.SWEEP_ATTACK, loc2, 5, 1, 0.25, 1, 0).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.CRIT, loc2, 10, 1, 0.25, 1, 0.3).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.REDSTONE, loc2, 10, 1, 0.25, 1, 0, SWORDSAGE_COLOR).spawnAsPlayerActive(mPlayer);
 							world.playSound(loc2, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1.5f);
 
 							if (mTicks >= 5) {

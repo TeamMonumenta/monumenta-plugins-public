@@ -5,8 +5,9 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -61,7 +62,7 @@ public class DefensiveLine extends Ability {
 					World world = mPlayer.getWorld();
 					world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.25f, 1.35f);
 					world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
-					world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 35, 0.2, 0, 0.2, 0.25);
+					new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 35, 0.2, 0, 0.2, 0.25).spawnAsPlayerActive(mPlayer);
 
 					List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true);
 
@@ -72,7 +73,7 @@ public class DefensiveLine extends Ability {
 						}
 
 						Location loc = player.getLocation().add(0, 1, 0);
-						world.spawnParticle(Particle.SPELL_INSTANT, loc, 35, 0.4, 0.4, 0.4, 0.25);
+						new PartialParticle(Particle.SPELL_INSTANT, loc, 35, 0.4, 0.4, 0.4, 0.25).spawnAsPlayerActive(mPlayer);
 
 						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION, mPercentDamageReceived));
 
@@ -89,15 +90,6 @@ public class DefensiveLine extends Ability {
 						public void run() {
 							mY += 0.2;
 
-							// Store calculations instead of doing them again for each player
-							double[] dx = new double[20];
-							double[] dz = new double[20];
-							for (int i = 0; i < 20; i++) {
-								double radians = Math.toRadians(i * 18);
-								dx[i] = FastUtils.cos(radians) * mRadius;
-								dz[i] = FastUtils.sin(radians) * mRadius;
-							}
-
 							Iterator<Player> iter = mPlayers.iterator();
 							while (iter.hasNext()) {
 								Player player = iter.next();
@@ -107,12 +99,8 @@ public class DefensiveLine extends Ability {
 								} else {
 									Location loc = player.getLocation().add(0, mY, 0);
 
-									for (int i = 0; i < 20; i++) {
-										loc.add(dx[i], 0, dz[i]);
-										world.spawnParticle(Particle.CRIT_MAGIC, loc, 3, 0.1, 0.1, 0.1, 0.125);
-										world.spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
-										loc.subtract(dx[i], 0, dz[i]);
-									}
+									new PPCircle(Particle.CRIT_MAGIC, loc, mRadius).count(60).delta(0.1).extra(0.125).spawnAsPlayerBuff(player);
+									new PPCircle(Particle.SPELL_INSTANT, loc, mRadius).count(20).spawnAsPlayerBuff(player);
 								}
 							}
 

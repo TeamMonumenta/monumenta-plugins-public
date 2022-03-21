@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.infinitytower;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.playmonumenta.libraryofsouls.SoulEntry;
 import com.playmonumenta.libraryofsouls.SoulsDatabase;
 import com.playmonumenta.plugins.Plugin;
@@ -184,6 +186,76 @@ public class TowerCommands {
 		List<Argument> arguments = new ArrayList<>();
 
 		Argument mobLosNameArgument = new StringArgument("los name").includeSuggestions(info -> TowerFileUtils.TOWER_MOBS_INFO.stream().map(item -> item.mLosName).toArray(String[]::new));
+
+		arguments.add(new MultiLiteralArgument("stats"));
+		arguments.add(new MultiLiteralArgument("round"));
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+
+				JsonObject obj = new JsonObject();
+				JsonArray arr = new JsonArray();
+				obj.add("wavesStat", arr);
+
+				int floor = 1;
+				int weight = 0;
+				int lvl = 0;
+				int totalGold = TowerConstants.STARTING_GOLD;
+				int totalHP = 0;
+				int totalATK = 0;
+				int totalMob = 0;
+				int totalAbility = 0;
+				JsonObject jb;
+				for (TowerTeam round : TowerFileUtils.DEFAULT_TEAMS) {
+					jb = new JsonObject();
+					for (TowerMob mob : round.mMobs) {
+						weight += mob.mInfo.mMobStats.mWeight;
+						lvl += mob.mMobLevel;
+						totalHP = (int) (totalHP + mob.mInfo.mMobStats.mHP);
+						totalATK += mob.mInfo.mMobStats.mAtk;
+						totalMob++;
+						totalAbility += mob.mAbilities.size();
+					}
+					if (floor > 1) {
+						totalGold += TowerConstants.getGoldWin(floor - 1);
+					}
+					jb.addProperty("Round", floor);
+					jb.addProperty("Tw", weight);
+					jb.addProperty("Tl", lvl);
+					jb.addProperty("Thp", totalHP);
+					jb.addProperty("Tatk", totalATK);
+					jb.addProperty("Tm", totalMob);
+					jb.addProperty("Tab", totalAbility);
+					jb.addProperty("PTg", totalGold);
+					arr.add(jb);
+
+					floor++;
+					weight = 0;
+					lvl = 0;
+					totalHP = 0;
+					totalATK = 0;
+					totalMob = 0;
+					totalAbility = 0;
+				}
+				TowerFileUtils.saveFile(obj, "TowerStats.json");
+
+
+			}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("save"));
+		arguments.add(new MultiLiteralArgument("all"));
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+					TowerFileUtils.saveDefaultTower();
+					TowerFileUtils.saveTowerMobs();
+					TowerGameUtils.sendMessage(player, "All file saved!");
+				});
+			}).register();
 
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("auto"));
@@ -664,7 +736,6 @@ public class TowerCommands {
 			}).register();
 
 	}
-
 
 
 	private static void updateMobs(Player player) {

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -19,9 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import javax.annotation.Nullable;
-
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 public class ByMyBlade extends Ability {
@@ -62,11 +61,11 @@ public class ByMyBlade extends Ability {
 			loc.add(0, 1, 0);
 			int count = 15;
 			if (isLevelTwo()) {
-				world.spawnParticle(Particle.SPELL_WITCH, loc, 45, 0.2, 0.65, 0.2, 1.0);
+				new PartialParticle(Particle.SPELL_WITCH, loc, 45, 0.2, 0.65, 0.2, 1.0).spawnAsPlayerActive(mPlayer);
 				count = 30;
 			}
-			world.spawnParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);
-			world.spawnParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);
+			new PartialParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
 			world.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 			putOnCooldown();
 		}

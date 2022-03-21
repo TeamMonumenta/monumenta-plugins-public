@@ -4,8 +4,8 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -63,14 +63,15 @@ public class SpellDesecrate extends Spell {
 		mChargeUp.setTime(0);
 		World world = mBoss.getWorld();
 
-		PPGroundCircle indicator = new PPGroundCircle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 12, 0.2, 0, 0.2, 0).init(0, true);
-		PPGroundCircle indicator2 = new PPGroundCircle(Particle.SPELL_WITCH, mBoss.getLocation(), 12, 0.2, 0, 0.2, 0).init(0, true);
+		PPCircle indicator = new PPCircle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 0).ringMode(true).count(12).delta(0.2, 0, 0.2);
+		PPCircle indicator2 = new PPCircle(Particle.SPELL_WITCH, mBoss.getLocation(), 0).ringMode(true).count(12).delta(0.2, 0, 0.2);
 
-		PPGroundCircle indicator3 = new PPGroundCircle(Particle.SMOKE_LARGE, mBoss.getLocation(), 15, 0.2, 0, 0.2, 0).init(0, true);
-		PPGroundCircle indicator4 = new PPGroundCircle(Particle.DRAGON_BREATH, mBoss.getLocation(), 15, 0.2, 0.2, 0.2, 0).init(0, true);
+		PPCircle indicator3 = new PPCircle(Particle.SMOKE_LARGE, mBoss.getLocation(), 0).ringMode(true).count(15).delta(0.2, 0, 0.2);
+		PPCircle indicator4 = new PPCircle(Particle.DRAGON_BREATH, mBoss.getLocation(), 0).ringMode(true).count(15).delta(0.2, 0.2, 0.2);
 
 		BukkitRunnable runA = new BukkitRunnable() {
 			double mRadius = 12;
+
 			@Override
 			public void run() {
 				float fTick = mChargeUp.getTime();

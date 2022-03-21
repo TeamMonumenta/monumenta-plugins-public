@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -104,9 +104,9 @@ public class DivineJustice extends Ability {
 				PartialParticle.getHeightDelta(enemy),
 				widerWidthDelta,
 				0.05
-			).spawnAsPlayer(mPlayer);
+			).spawnAsPlayerActive(mPlayer);
 			partialParticle.mParticle = Particle.FLAME;
-			partialParticle.spawnAsPlayer(mPlayer);
+			partialParticle.spawnAsPlayerActive(mPlayer);
 
 			// /playsound block.anvil.land master @p ~ ~ ~ 0.15 1.5
 			mPlayer.getWorld().playSound(

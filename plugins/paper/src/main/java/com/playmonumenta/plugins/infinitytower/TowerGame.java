@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
@@ -24,7 +23,7 @@ import org.bukkit.util.Vector;
 
 public class TowerGame {
 
-	private static final int COOLDOWN_TURNS = 60;
+	private static final int COOLDOWN_TURNS = 90;
 	//in sec
 
 	public int mPlayerLevel = 1;
@@ -33,7 +32,9 @@ public class TowerGame {
 	public int mRoll = 0;
 	//mRoll is used so even if the player open the gui multiple times its always keep the same item
 
-	protected int mCurrentFloor;
+	public boolean mFreeRoll = true;
+
+	public int mCurrentFloor;
 
 	public TowerPlayer mPlayer;
 	protected TowerTeam mFloorTeam;
@@ -89,9 +90,24 @@ public class TowerGame {
 			forceStopGame();
 			return;
 		}
-		Item item = mPlayer.mPlayer.getWorld().dropItemNaturally(new Location(mPlayer.mPlayer.getWorld(), mFloor.mVector.getX() + (((float) mFloor.mXSize) / 4), mFloor.mVector.getY() + 5, mFloor.mVector.getZ() + ((float) mFloor.mZSize) / 2), stack);
-		item.setCanMobPickup(false);
-		item.setGlowing(true);
+		boolean dropBook = true;
+
+		for (ItemStack itemStack : mPlayer.mPlayer.getInventory()) {
+			if (itemStack != null && itemStack.isSimilar(stack)) {
+				dropBook = false;
+				break;
+			}
+		}
+
+		if (dropBook) {
+			TowerGameUtils.sendMessage(mPlayer.mPlayer, "Take the book to play!");
+			Item item = mPlayer.mPlayer.getWorld().dropItemNaturally(new Location(mPlayer.mPlayer.getWorld(), mFloor.mVector.getX() + (((float) mFloor.mXSize) / 4), mFloor.mVector.getY() + 5, mFloor.mVector.getZ() + ((float) mFloor.mZSize) / 2), stack);
+			item.setCanMobPickup(false);
+			item.setGlowing(true);
+		} else {
+			TowerGameUtils.sendMessage(mPlayer.mPlayer, "You can use the Blitz Master Guide in your inventory to play");
+		}
+
 	}
 
 	public void setFloor(TowerFloor floor) {
@@ -143,6 +159,8 @@ public class TowerGame {
 		mCurrentFloor++;
 		mRoll++;
 		//refresh the roll for the shop mobs gui
+
+		mFreeRoll = mCurrentFloor < 5;
 
 		TowerGameUtils.sendMessage(mPlayer.mPlayer, "You are now at round: " + (mCurrentFloor + 1));
 		TowerGameUtils.addGold(mPlayer.mPlayer, TowerConstants.getGoldWin(mCurrentFloor));
@@ -272,14 +290,14 @@ public class TowerGame {
 		new TowerGuiBuyMob(mPlayer.mPlayer, this).openInventory(mPlayer.mPlayer, TowerManager.mPlugin);
 	}
 
-	public boolean canAdd(TowerMobInfo info) {
+	public boolean canAddWeight(TowerMobInfo info) {
 		int size = info.mMobStats.mWeight;
 		int currentSize = mPlayer.mTeam.mCurrentSize;
 		int maxSize = TowerConstants.STARTING_TEAM_SIZE + (mPlayerLevel > 1 ? (mPlayerLevel - 1) * TowerConstants.LEVEL_UP_TEAM_SIZE_INCREASE : 0);
-		if (currentSize + size > maxSize) {
-			return false;
-		}
+		return currentSize + size <= maxSize;
+	}
 
+	public boolean canAddLimit(TowerMobInfo info) {
 		int limit = info.mMobStats.mLimit;
 		for (TowerMob mob : mPlayer.mTeam.mMobs) {
 			if (mob.isSameBaseMob(info)) {
@@ -315,11 +333,16 @@ public class TowerGame {
 	}
 
 	public void stop() {
+		clearPlayer(mPlayer.mPlayer);
 		if (!mIsGameEnded) {
 			mIsGameEnded = true;
 			mIsTurnEnded = true;
-			mAesthetics.cancel();
-			mCountDown.cancel();
+			if (mAesthetics != null) {
+				mAesthetics.cancel();
+			}
+			if (mCountDown != null) {
+				mCountDown.cancel();
+			}
 			clearMobs();
 		}
 		if (mCurrentFloor > TowerConstants.DESIGNED_FLOORS - 1 && mFloor != null) {
@@ -330,10 +353,9 @@ public class TowerGame {
 				TowerFileUtils.convertPlayerTeamLocation(this);
 				TowerFileUtils.savePlayerTeam(mPlayer.mTeam, mCurrentFloor - 1);
 			}
-			TowerGameUtils.sendMessage(mPlayer.mPlayer, "Congratulations! your team will now defend " + (mCurrentFloor + 1) + "th round");
+			TowerGameUtils.sendMessage(mPlayer.mPlayer, "Congratulations! your team will now defend round " + (mCurrentFloor + 1));
 		}
 
-		clearPlayer(mPlayer.mPlayer);
 		TowerGameUtils.giveLoot(this);
 		forceStopGame();
 
@@ -440,7 +462,7 @@ public class TowerGame {
 				if (mPlayer != null) {
 					World world = mPlayer.mPlayer.getWorld();
 					for (TowerMob playerMob : mPlayer.mTeam.mMobs) {
-						world.spawnParticle(Particle.REDSTONE, playerMob.getSpawnLocation(INSTANCE), 80, 0, 0.5, 0, 1, new DustOptions(Color.ORANGE, 0.5f));
+						world.spawnParticle(Particle.REDSTONE, playerMob.getSpawnLocation(INSTANCE), 80, 0, 0.5, 0, 1, new DustOptions(playerMob.mInfo.mMobRarity.getColor(), 0.5f));
 					}
 				}
 
