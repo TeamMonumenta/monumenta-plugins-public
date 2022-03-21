@@ -517,7 +517,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onRegain(Plugin plugin, Player player, EntityRegainHealthEvent event) {
+	public void playerRegainHealthEvent(Plugin plugin, Player player, EntityRegainHealthEvent event) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onRegain(plugin, player, entry.getValue(), event);

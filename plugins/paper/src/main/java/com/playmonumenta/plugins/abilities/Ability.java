@@ -26,6 +26,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -286,6 +287,10 @@ public abstract class Ability {
 	}
 
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+
+	}
+
+	public void playerRegainHealthEvent(EntityRegainHealthEvent event) {
 
 	}
 

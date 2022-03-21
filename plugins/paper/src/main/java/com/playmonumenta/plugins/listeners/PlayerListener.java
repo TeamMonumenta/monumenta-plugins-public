@@ -1084,9 +1084,9 @@ public class PlayerListener implements Listener {
 	//Player is healed.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onRegain(EntityRegainHealthEvent event) {
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
-			mPlugin.mItemStatManager.onRegain(mPlugin, player, event);
+		if (event.getEntity() instanceof Player player) {
+			mPlugin.mItemStatManager.playerRegainHealthEvent(mPlugin, player, event);
+			mPlugin.mAbilityManager.playerRegainHealthEvent(player, event);
 		}
 	}
 

@@ -180,6 +180,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -785,6 +786,10 @@ public class AbilityManager {
 
 	public void playerSwapHandItemsEvent(Player player, PlayerSwapHandItemsEvent event) {
 		conditionalCast(player, (ability) -> ability.playerSwapHandItemsEvent(event));
+	}
+
+	public void playerRegainHealthEvent(Player player, EntityRegainHealthEvent event) {
+		conditionalCast(player, (ability) -> ability.playerRegainHealthEvent(event));
 	}
 
 	public void playerQuitEvent(Player player, PlayerQuitEvent event) {
