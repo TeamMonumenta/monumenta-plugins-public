@@ -129,6 +129,10 @@ public class MessagingUtils {
 		return MINIMESSAGE_ALL.parse(miniMessageText);
 	}
 
+	public static String toMiniMessage(Component component) {
+		return MINIMESSAGE_ALL.serialize(component);
+	}
+
 	public static Component parseComponent(String json) {
 		return GSON_SERIALIZER.deserialize(json);
 	}
