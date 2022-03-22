@@ -137,7 +137,7 @@ public class DivineJustice extends Ability {
 				PlayerUtils.healPlayer(
 					mPlugin,
 					otherPlayer,
-					EntityUtils.getMaxHealth(mPlayer),
+					EntityUtils.getMaxHealth(mPlayer) * HEALING_MULTIPLIER_OTHER,
 					mPlayer
 				);
 			}
