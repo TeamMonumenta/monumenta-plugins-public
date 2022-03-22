@@ -22,60 +22,69 @@ public class SpellVerdantProtection extends SpellBaseAoE {
 	private static final int DAMAGE = 20;
 	private static final Particle.DustOptions VERDANT_PROTECTION_COLOR = new Particle.DustOptions(Color.fromRGB(20, 200, 20), 1f);
 
-	private RKitxet mRKitxet;
+	private final RKitxet mRKitxet;
 
 	public SpellVerdantProtection(Plugin plugin, LivingEntity launcher, int radius, int time, int cooldown, RKitxet rKitxet) {
-		super(plugin, launcher, radius, time, cooldown, false, Sound.BLOCK_ROOTS_BREAK,
-			(Location loc) -> {
-				World world = loc.getWorld();
-				world.spawnParticle(Particle.CRIMSON_SPORE, loc, 1, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2);
-				world.spawnParticle(Particle.COMPOSTER, loc, 1, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2, 0.05);
-
-			},
-			(Location loc) -> {
-				World world = loc.getWorld();
-				world.spawnParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, VERDANT_PROTECTION_COLOR);
-				world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 2, 0), 1, 0.25, 0.25, 0.25, VERDANT_PROTECTION_COLOR);
-				world.spawnParticle(Particle.COMPOSTER, loc, 1, 0.25, 0.25, 0.25, 0.1);
-			},
-			(Location loc) -> {
-				World world = loc.getWorld();
-				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 2.0f, 0.65F);
-			},
-			(Location loc) -> {
-				World world = loc.getWorld();
-				world.spawnParticle(Particle.COMPOSTER, loc, 1, 0.1, 0.1, 0.1, 0.3);
-				world.spawnParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, 0.1, VERDANT_PROTECTION_COLOR);
-			},
-			(Location loc) -> {
-				rKitxet.useSpell("Verdant Protection");
-
-				boolean hasHit = false;
-				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
-					BossUtils.blockableDamage(launcher, player, DamageType.MAGIC, DAMAGE, "Verdant Protection", launcher.getLocation());
-
-					double distance = player.getLocation().distance(loc);
-					if (distance < radius / 3.0) {
-						MovementUtils.knockAway(launcher, player, 2.25f);
-					} else if (distance < (radius * 2.0) / 3.0) {
-						MovementUtils.knockAway(launcher, player, 1.575f);
-					} else if (distance < radius) {
-						MovementUtils.knockAway(launcher, player, 0.9f);
-					}
-
-					hasHit = true;
-				}
-
-				if (hasHit) {
-					rKitxet.mShieldSpell.applyShield(true);
-				}
-			}
-		);
+		super(plugin, launcher, radius, time, cooldown, false, Sound.BLOCK_ROOTS_BREAK);
 		mRKitxet = rKitxet;
 	}
 
 	public SpellVerdantProtection(Plugin plugin, LivingEntity launcher, int cooldown, RKitxet rKitxet) {
 		this(plugin, launcher, RADIUS, DURATION, cooldown, rKitxet);
+	}
+
+	@Override
+	protected void chargeAuraAction(Location loc) {
+		World world = loc.getWorld();
+		world.spawnParticle(Particle.CRIMSON_SPORE, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0);
+		world.spawnParticle(Particle.COMPOSTER, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05);
+
+	}
+
+	@Override
+	protected void chargeCircleAction(Location loc) {
+		World world = loc.getWorld();
+		world.spawnParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, VERDANT_PROTECTION_COLOR);
+		world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 2, 0), 1, 0.25, 0.25, 0.25, VERDANT_PROTECTION_COLOR);
+		world.spawnParticle(Particle.COMPOSTER, loc, 1, 0.25, 0.25, 0.25, 0.1);
+	}
+
+	@Override
+	protected void outburstAction(Location loc) {
+		World world = loc.getWorld();
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 2.0f, 0.65F);
+	}
+
+	@Override
+	protected void circleOutburstAction(Location loc) {
+		World world = loc.getWorld();
+		world.spawnParticle(Particle.COMPOSTER, loc, 1, 0.1, 0.1, 0.1, 0.3);
+		world.spawnParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, 0.1, VERDANT_PROTECTION_COLOR);
+	}
+
+	@Override
+	protected void dealDamageAction(Location loc) {
+		mRKitxet.useSpell("Verdant Protection");
+
+		boolean hasHit = false;
+		for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius, true)) {
+			BossUtils.blockableDamage(mLauncher, player, DamageType.MAGIC, DAMAGE, "Verdant Protection", mLauncher.getLocation());
+
+			double distance = player.getLocation().distance(loc);
+			if (distance < mRadius / 3.0) {
+				MovementUtils.knockAway(mLauncher, player, 2.25f);
+			} else if (distance < (mRadius * 2.0) / 3.0) {
+				MovementUtils.knockAway(mLauncher, player, 1.575f);
+			} else if (distance < mRadius) {
+				MovementUtils.knockAway(mLauncher, player, 0.9f);
+			}
+
+			hasHit = true;
+		}
+
+		if (hasHit) {
+			mRKitxet.mShieldSpell.applyShield(true);
+		}
 	}
 
 	@Override

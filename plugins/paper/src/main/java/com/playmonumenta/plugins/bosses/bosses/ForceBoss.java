@@ -7,12 +7,10 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellForce;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class ForceBoss extends BossAbilityGroup {
@@ -82,36 +80,47 @@ public class ForceBoss extends BossAbilityGroup {
 			//by default Force boss hit all the player in range even the players in stealth
 		}
 		final double currentRadius = p.TARGETS.getRange();
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellForce(plugin, boss, (int) currentRadius, p.DURATION, p.COOLDOWN, p.NEED_PLAYERS,
-			(Location loc) -> {
-				p.PARTICLE_AIR.spawn(loc, currentRadius / 2, currentRadius / 2, currentRadius / 2, 0.05);
-			},
-			(Location loc) -> {
-				p.PARTICLE_CIRCLE.spawn(loc, 0.25, 0.25, 0.25, 0.1);
-			},
-			(Location loc) -> {
-				p.PARTICLE_EXPLODE.spawn(loc, 0.5, 0, 0.5, 0.8f);
-				p.SOUND_EXPLODE.play(loc, 1.0f, 0.7f);
-			},
-			(Location loc) -> {
-				p.PARTICLE_CIRCLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
-			},
-			(Location loc) -> {
-				for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
+		SpellManager activeSpells = new SpellManager(List.of(
+			new SpellForce(plugin, boss, (int) currentRadius, p.DURATION, p.COOLDOWN, p.NEED_PLAYERS) {
 
-					double distance = target.getLocation().distance(loc);
-					if (distance < p.RADIUS / 3.0) {
-						p.EFFECTS_NEAR.apply(target, boss);
-					} else if (distance < (p.RADIUS * 2.0) / 3.0) {
-						p.EFFECTS_MIDDLE.apply(target, boss);
-					} else if (distance < p.RADIUS) {
-						p.EFFECTS_LIMIT.apply(target, boss);
-					}
-					p.PARTICLE_HIT.spawn(target.getEyeLocation(), 0.25, 0.5, 0.25, 0);
+				@Override
+				protected void chargeAuraAction(Location loc) {
+					p.PARTICLE_AIR.spawn(loc, currentRadius / 2, currentRadius / 2, currentRadius / 2, 0.05);
 				}
-			}
-			)));
+
+				@Override
+				protected void chargeCircleAction(Location loc) {
+					p.PARTICLE_CIRCLE.spawn(loc, 0.25, 0.25, 0.25, 0.1);
+				}
+
+				@Override
+				protected void outburstAction(Location loc) {
+					p.PARTICLE_EXPLODE.spawn(loc, 0.5, 0, 0.5, 0.8f);
+					p.SOUND_EXPLODE.play(loc, 1.0f, 0.7f);
+				}
+
+				@Override
+				protected void circleOutburstAction(Location loc) {
+					p.PARTICLE_CIRCLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
+				}
+
+				@Override
+				protected void dealDamageAction(Location loc) {
+					for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
+
+						double distance = target.getLocation().distance(loc);
+						if (distance < p.RADIUS / 3.0) {
+							p.EFFECTS_NEAR.apply(target, boss);
+						} else if (distance < (p.RADIUS * 2.0) / 3.0) {
+							p.EFFECTS_MIDDLE.apply(target, boss);
+						} else if (distance < p.RADIUS) {
+							p.EFFECTS_LIMIT.apply(target, boss);
+						}
+						p.PARTICLE_HIT.spawn(target.getEyeLocation(), 0.25, 0.5, 0.25, 0);
+					}
+				}
+
+			}));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}

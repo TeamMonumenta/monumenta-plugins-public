@@ -7,11 +7,11 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseNova;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -85,32 +85,42 @@ public final class NovaBoss extends BossAbilityGroup {
 		} else {
 			p.NEED_LINE_OF_SIGHT = false;
 		}
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseNova(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE,
-			(Location loc) -> {
-				p.PARTICLE_AIR.spawn(loc, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, 0.05);
-			},
-			(Location loc) -> {
-				p.PARTICLE_LOAD.spawn(loc, 0.25d, 0.25d, 0.25d, 0.0d);
-			},
-			(Location loc) -> {
-				p.SOUND_CAST.play(loc, 1.5f, 0.65f);
-			},
-			(Location loc) -> {
-				p.PARTICLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
-			},
-			(Location loc) -> {
-				for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
-					if (p.DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
-					}
-
-					if (p.DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
-					}
-					p.EFFECTS.apply(target, mBoss);
+		SpellManager activeSpells = new SpellManager(List.of(
+			new SpellBaseAoE(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE) {
+				@Override
+				protected void chargeAuraAction(Location loc) {
+					p.PARTICLE_AIR.spawn(loc, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, 0.05);
 				}
-			})));
+
+				@Override
+				protected void chargeCircleAction(Location loc) {
+					p.PARTICLE_LOAD.spawn(loc, 0.25d, 0.25d, 0.25d, 0.0d);
+				}
+
+				@Override
+				protected void outburstAction(Location loc) {
+					p.SOUND_CAST.play(loc, 1.5f, 0.65f);
+				}
+
+				@Override
+				protected void circleOutburstAction(Location loc) {
+					p.PARTICLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
+				}
+
+				@Override
+				protected void dealDamageAction(Location loc) {
+					for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
+						if (p.DAMAGE > 0) {
+							BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+						}
+
+						if (p.DAMAGE_PERCENTAGE > 0.0) {
+							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+						}
+						p.EFFECTS.apply(target, mBoss);
+					}
+				}
+			}));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}

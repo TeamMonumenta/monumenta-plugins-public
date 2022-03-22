@@ -157,7 +157,7 @@ public class Masked extends BossAbilityGroup {
 		));
 
 		SpellManager activeSpells2 = new SpellManager(Arrays.asList(
-			new SpellFrostNova(mPlugin, mBoss, 9, 12, 6),
+			new SpellFrostNova(mPlugin, mBoss, 9, 6, 12),
 			new SpellShadowGlade(mPlugin, mSpawnLoc, 2),
 			new SpellSummonBlazes(mPlugin, mBoss)
 		));

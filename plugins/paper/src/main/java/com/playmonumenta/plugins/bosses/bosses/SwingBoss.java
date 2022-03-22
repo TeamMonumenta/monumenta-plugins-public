@@ -70,36 +70,50 @@ public class SwingBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-				new SpellBaseAoE(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN, true, p.SOUND,
-						(Location loc) -> {
-							boss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 1, 2));
-							p.PARTICLE_CHARGE.spawn(loc, ((double) p.RADIUS) / 3, ((double) p.RADIUS) / 3, ((double) p.RADIUS) / 3, 0.05);
-						}, (Location loc) -> {
-							p.PARTICLE_CIRCLE.spawn(loc, 0.25, 0.25, 0.25, 0.05);
-						}, (Location loc) -> {
-							p.SOUND_EXPLODE.play(loc, 1.5f, 0.65F);
-						}, (Location loc) -> {
-							p.PARTICLE_CIRCLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
-						}, (Location loc) -> {
-							double bossY = boss.getLocation().getY();
-							for (Player player : PlayerUtils.playersInRange(boss.getLocation(), p.RADIUS, true)) {
-								double playerY = player.getLocation().getY();
-								//if the player is on ground increase the size of the swing to avoid slab cheating
-								if ((playerY + player.getHeight() < bossY) || (player.isOnGround() ? bossY + 0.7 < playerY : bossY + 0.1 < playerY)) {
-									continue;
-								}
+			new SpellBaseAoE(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN, true, p.SOUND) {
+				@Override
+				protected void chargeAuraAction(Location loc) {
+					boss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 1, 2));
+					p.PARTICLE_CHARGE.spawn(loc, ((double) p.RADIUS) / 3, ((double) p.RADIUS) / 3, ((double) p.RADIUS) / 3, 0.05);
+				}
 
-								if (p.DAMAGE > 0) {
-									BossUtils.blockableDamage(boss, player, DamageType.MELEE, p.DAMAGE);
-								}
+				@Override
+				protected void chargeCircleAction(Location loc) {
+					p.PARTICLE_CIRCLE.spawn(loc, 0.25, 0.25, 0.25, 0.05);
+				}
 
-								if (p.DAMAGE_PERCENT > 0.0) {
-									BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENT);
-								}
+				@Override
+				protected void outburstAction(Location loc) {
+					p.SOUND_EXPLODE.play(loc, 1.5f, 0.65F);
+				}
 
-								p.EFFECTS.apply(player, mBoss);
-							}
-						})));
+				@Override
+				protected void circleOutburstAction(Location loc) {
+					p.PARTICLE_CIRCLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
+				}
+
+				@Override
+				protected void dealDamageAction(Location loc) {
+					double bossY = boss.getLocation().getY();
+					for (Player player : PlayerUtils.playersInRange(boss.getLocation(), p.RADIUS, true)) {
+						double playerY = player.getLocation().getY();
+						//if the player is on ground increase the size of the swing to avoid slab cheating
+						if ((playerY + player.getHeight() < bossY) || (player.isOnGround() ? bossY + 0.7 < playerY : bossY + 0.1 < playerY)) {
+							continue;
+						}
+
+						if (p.DAMAGE > 0) {
+							BossUtils.blockableDamage(boss, player, DamageType.MELEE, p.DAMAGE);
+						}
+
+						if (p.DAMAGE_PERCENT > 0.0) {
+							BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENT);
+						}
+
+						p.EFFECTS.apply(player, mBoss);
+					}
+				}
+			}));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}

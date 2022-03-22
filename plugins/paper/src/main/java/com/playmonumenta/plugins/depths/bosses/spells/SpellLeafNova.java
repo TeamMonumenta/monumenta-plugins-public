@@ -25,40 +25,49 @@ public class SpellLeafNova extends SpellBaseAoE {
 	private int mCooldownTicks;
 
 	public SpellLeafNova(Plugin plugin, LivingEntity launcher, int radius, int time, int cooldown) {
-		super(plugin, launcher, radius, time, cooldown, false, Sound.BLOCK_BAMBOO_BREAK,
-			(Location loc) -> {
-				World world = loc.getWorld();
-				world.spawnParticle(Particle.REDSTONE, loc, 1, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2, LEAF_COLOR);
-				world.spawnParticle(Particle.COMPOSTER, loc, 1, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2, 0.05);
-
-			},
-			(Location loc) -> {
-				World world = loc.getWorld();
-				world.spawnParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, LEAF_COLOR);
-				world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 2, 0), 1, 0.25, 0.25, 0.25, LEAF_COLOR);
-				world.spawnParticle(Particle.COMPOSTER, loc, 1, 0.25, 0.25, 0.25, 0.1);
-			},
-			(Location loc) -> {
-				World world = loc.getWorld();
-				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 2.0f, 0.65F);
-			},
-			(Location loc) -> {
-				World world = loc.getWorld();
-				world.spawnParticle(Particle.COMPOSTER, loc, 1, 0.1, 0.1, 0.1, 0.3);
-				world.spawnParticle(Particle.SLIME, loc, 2, 0.25, 0.25, 0.25, 0.1);
-			},
-			(Location loc) -> {
-				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
-					DamageUtils.damage(launcher, player, DamageType.MAGIC, DAMAGE, null, false, true, "Leaf Nova");
-					player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 20 * 6, 4));
-				}
-			}
-		);
+		super(plugin, launcher, radius, time, cooldown, false, Sound.BLOCK_BAMBOO_BREAK);
 	}
 
 	public SpellLeafNova(Plugin plugin, LivingEntity launcher, int cooldown) {
 		this(plugin, launcher, RADIUS, DURATION, cooldown);
 		mCooldownTicks = cooldown;
+	}
+
+	@Override
+	protected void chargeAuraAction(Location loc) {
+		World world = loc.getWorld();
+		world.spawnParticle(Particle.REDSTONE, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, LEAF_COLOR);
+		world.spawnParticle(Particle.COMPOSTER, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05);
+
+	}
+
+	@Override
+	protected void chargeCircleAction(Location loc) {
+		World world = loc.getWorld();
+		world.spawnParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, LEAF_COLOR);
+		world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 2, 0), 1, 0.25, 0.25, 0.25, LEAF_COLOR);
+		world.spawnParticle(Particle.COMPOSTER, loc, 1, 0.25, 0.25, 0.25, 0.1);
+	}
+
+	@Override
+	protected void outburstAction(Location loc) {
+		World world = loc.getWorld();
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 2.0f, 0.65F);
+	}
+
+	@Override
+	protected void circleOutburstAction(Location loc) {
+		World world = loc.getWorld();
+		world.spawnParticle(Particle.COMPOSTER, loc, 1, 0.1, 0.1, 0.1, 0.3);
+		world.spawnParticle(Particle.SLIME, loc, 2, 0.25, 0.25, 0.25, 0.1);
+	}
+
+	@Override
+	protected void dealDamageAction(Location loc) {
+		for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius, true)) {
+			DamageUtils.damage(mLauncher, player, DamageType.MAGIC, DAMAGE, null, false, true, "Leaf Nova");
+			player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 20 * 6, 4));
+		}
 	}
 
 	@Override
