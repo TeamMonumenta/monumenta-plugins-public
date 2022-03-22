@@ -3,7 +3,6 @@ package com.playmonumenta.bungeecord;
 import com.playmonumenta.bungeecord.commands.Vote;
 import com.playmonumenta.bungeecord.integrations.NetworkRelayIntegration;
 import com.playmonumenta.bungeecord.listeners.EventListener;
-import com.playmonumenta.bungeecord.listeners.NameListener;
 import com.playmonumenta.bungeecord.reconnect.MonumentaReconnectHandler;
 import com.playmonumenta.bungeecord.voting.VoteManager;
 import java.io.File;
@@ -46,9 +45,6 @@ public class Main extends Plugin {
 				getLogger().log(Level.WARNING, "Failed to initialize voting system:", ex);
 			}
 		}
-
-		/* Create and register a new name listener, which is self contained */
-		new NameListener(this);
 
 		manager.registerListener(this, new EventListener(this));
 

@@ -336,15 +336,9 @@ public class PlotManager {
 		if (score <= 0) {
 			CommandAPI.fail("You don't currently have a plot to add someone to");
 		} else {
-			try {
-				MonumentaRedisSyncAPI.setRemoteData(ownerUUID, "myplotaccess|" + addedUUID, Long.toString(expiration));
-				MonumentaRedisSyncAPI.setRemoteData(addedUUID, "otherplotaccess|" + ownerUUID, Integer.toString(score) + "," + Long.toString(expiration));
-			} catch (Exception ex) {
-				String msg = "Caught exception while adding plot access. owner=" + ownerUUID + " other=" + addedUUID;
-				Plugin.getInstance().getLogger().severe(msg);
-				ex.printStackTrace();
-				CommandAPI.fail(msg);
-			}
+			/* TODO: Someday would be nice to actually check these succeeded */
+			MonumentaRedisSyncAPI.remoteDataSet(ownerUUID, "myplotaccess|" + addedUUID, Long.toString(expiration));
+			MonumentaRedisSyncAPI.remoteDataSet(addedUUID, "otherplotaccess|" + ownerUUID, Integer.toString(score) + "," + Long.toString(expiration));
 		}
 
 		owner.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.AQUA + addedName + ChatColor.GREEN + " to access your plot");
@@ -368,13 +362,9 @@ public class PlotManager {
 	}
 
 	private static void plotAccessRemove(UUID ownerUUID, UUID otherUUID) {
-		try {
-			MonumentaRedisSyncAPI.delRemoteData(ownerUUID, "myplotaccess|" + otherUUID);
-			MonumentaRedisSyncAPI.delRemoteData(otherUUID, "otherplotaccess|" + ownerUUID);
-		} catch (Exception ex) {
-			Plugin.getInstance().getLogger().severe("Caught exception while removing plot access. owner=" + ownerUUID + " other=" + otherUUID);
-			ex.printStackTrace();
-		}
+		/* TODO: Someday would be nice to actually check these succeeded */
+		MonumentaRedisSyncAPI.remoteDataDel(ownerUUID, "myplotaccess|" + otherUUID);
+		MonumentaRedisSyncAPI.remoteDataDel(otherUUID, "otherplotaccess|" + ownerUUID);
 	}
 
 	public static void sendPlayerToPlot(Player player) {
@@ -495,7 +485,7 @@ public class PlotManager {
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			try {
-				Map<String, String> allRemoteData = MonumentaRedisSyncAPI.getAllRemoteData(ownerUUID).get();
+				Map<String, String> allRemoteData = MonumentaRedisSyncAPI.remoteDataGetAll(ownerUUID).get();
 
 				/* If the player wasn't online, fetching scores already started, need to complete that and get the specific interesting values */
 				final int finalPlot;

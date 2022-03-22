@@ -184,7 +184,7 @@ public class Plugin extends JavaPlugin {
 		MonumentaReload.register(this);
 		MonumentaDebug.register(this);
 		RestartEmptyCommand.register(this);
-		RedeemVoteRewards.register(this.getLogger());
+		RedeemVoteRewards.register(this);
 		BossFight.register();
 		SpellDetectionCircle.registerCommand(this);
 		SkillDescription.register(this);
@@ -452,7 +452,7 @@ public class Plugin extends JavaPlugin {
 
 		// Hook into Monumenta Network Relay for message brokering if available
 		if (Bukkit.getPluginManager().isPluginEnabled("MonumentaNetworkRelay")) {
-			manager.registerEvents(new MonumentaNetworkRelayIntegration(this.getLogger()), this);
+			new MonumentaNetworkRelayIntegration(this.getLogger());
 		}
 
 		// Hook into Library of Souls for mob management if available

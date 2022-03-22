@@ -1,21 +1,18 @@
 package com.playmonumenta.bungeecord.voting;
 
-import com.playmonumenta.bungeecord.listeners.NameListener;
+import com.playmonumenta.bungeecord.integrations.NetworkRelayIntegration;
+import com.playmonumenta.redissync.RedisAPI;
 import com.vexsoftware.votifier.bungee.events.VotifierEvent;
 import com.vexsoftware.votifier.model.Vote;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -31,20 +28,18 @@ public class VoteManager implements Listener {
 
 	private static VoteManager MANAGER = null;
 
-	/* This lock protects all member variables in this class, but does not protect VoteContext */
-	private final ReadWriteLock mLock = new ReentrantReadWriteLock();
 	private final Plugin mPlugin;
 	private final Logger mLogger;
-	private final HashMap<UUID, VoteContext> mContexts = new HashMap<UUID, VoteContext>();
+	private final Map<UUID, VoteContext> mContexts = new ConcurrentHashMap<>();
 	private final ScheduledTask mTickTask;
-	private final Map<String, String> mAlternateNames = new HashMap<String, String>();
+	private final Map<String, String> mAlternateNames = new HashMap<>();
 
 	/*
 	 * The time in minutes between allowed votes on these sites.
 	 * Not padded - exact times
 	 * Padding will be handled in the task that notifies players they became eligible to vote
 	 */
-	private static final Map<String, Long> SITE_TIMERS = new HashMap<String, Long>();
+	private static final Map<String, Long> SITE_TIMERS = new HashMap<>();
 
 	public VoteManager(Plugin plugin, Configuration config) throws IllegalArgumentException {
 		MANAGER = this;
@@ -86,31 +81,21 @@ public class VoteManager implements Listener {
 	public void postLoginEvent(PostLoginEvent event) {
 		ProxiedPlayer player = event.getPlayer();
 		UUID uuid = player.getUniqueId();
-		try {
-			VoteContext context = VoteContext.load(mPlugin, uuid);
-			/* Tick the task to make sure times are current */
-			long currentTime = LocalDateTime.now(ZoneId.systemDefault()).toInstant(ZoneOffset.UTC).getEpochSecond();
-			context.tick(currentTime);
 
-			/* Tell the player their vote info and remind them about voting */
-			context.sendVoteInfoShort(player);
+		VoteContext context = new VoteContext(mPlugin, uuid);
+		/* Tick the task to make sure times are current */
+		long currentTime = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC);
+		context.tick(currentTime);
 
-			mLock.writeLock().lock();
-			mContexts.put(uuid, context);
-			mLock.writeLock().unlock();
-		} catch (Exception ex) {
-			mLogger.warning("Failed to load vote context for player '" + player.getName() + "':");
-			ex.printStackTrace();
-		}
+		/* Tell the player their vote info and remind them about voting */
+		context.sendVoteInfoShort(player);
+
+		mContexts.put(uuid, context);
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerDisconnectEvent(PlayerDisconnectEvent event) {
-		UUID uuid = event.getPlayer().getUniqueId();
-
-		mLock.writeLock().lock();
-		mContexts.remove(uuid);
-		mLock.writeLock().unlock();
+		mContexts.remove(event.getPlayer().getUniqueId());
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -138,46 +123,63 @@ public class VoteManager implements Listener {
 			}
 		}
 		if (matchingSite == null) {
-			mLogger.severe("Got vote with no matching site : " + vote.toString());
+			mLogger.severe("Got vote with no matching site : " + vote);
 			return;
 		}
 
-		UUID uuid = NameListener.name2uuid(playerName);
-		if (uuid == null) {
-			// Nothing to do - this player hasn't ever logged in here. Ignore the vote
-			mLogger.warning("Got vote for unknown player '" + playerName + "'");
-			return;
-		}
+		final String finalMatchingSite = matchingSite;
+		final long finalCooldown = cooldown;
 
-		mLock.readLock().lock();
-		VoteContext context = mContexts.get(uuid);
-		mLock.readLock().unlock();
+		// TODO: This needs to be updated once the redis sync API works correctly from bungee
+		// The line actually used here is copied from there because the API is broken on bungee and fixing it is annoying
+		// The whole name thing needs refactoring for bungee support...
+		// MonumentaRedisSyncAPI.nameToUUID(playerName).whenComplete((uuid, ex) -> {
+		RedisAPI.getInstance().async().hget("name2uuid", playerName).thenApply((uuid) -> UUID.fromString(uuid)).toCompletableFuture().whenComplete((uuid, ex) -> {
+			if (ex != null) {
+				mLogger.warning("Failed to look up name2uuid for " + playerName + "': " + ex.getMessage());
+			} else {
+				if (uuid == null) {
+					mLogger.warning("Got vote for unknown player '" + playerName + "'");
+				} else {
+					VoteContext context = mContexts.get(uuid);
+					if (context == null) {
+						/* Player is not online - load their vote context or create & initialize a new one */
+						context = new VoteContext(mPlugin, uuid);
+						// Intentionally don't add the context to mContexts - they're not online.
+					}
 
-		try {
-			if (context == null) {
-				/* Player is not online - load their vote context or create & initialize a new one */
-				context = VoteContext.load(mPlugin, uuid);
+					context.voteReceived(finalMatchingSite, finalCooldown); // Note that this will save internally
+
+					// Broadcast an update to other bungee servers to update & potentially notify the player
+					NetworkRelayIntegration.sendVoteNotifyPacket(uuid, finalMatchingSite, finalCooldown);
+				}
 			}
+		});
+	}
 
-			context.voteReceived(matchingSite, cooldown);
-		} catch (Exception ex) {
-			mLogger.warning("Failed to process vote for player '" + playerName + "':");
-			ex.printStackTrace();
+	public static void gotVoteNotifyMessage(UUID playerUUID, String matchingSite, long cooldownMinutes) {
+		if (MANAGER != null) {
+			VoteContext context = MANAGER.mContexts.get(playerUUID);
+			if (context != null) {
+				/* Only need to notify the player if they're online on this bungee instance */
+				context.voteNotify(matchingSite, cooldownMinutes); // Note that this will save internally
+			}
 		}
 	}
 
 	public void onVoteCmd(ProxiedPlayer player) {
 		VoteContext context = mContexts.get(player.getUniqueId());
 		if (context == null) {
-			player.sendMessage(new ComponentBuilder("BUG! You don't have a vote context. Please report this!").color(ChatColor.RED).create());
-			return;
+			// This is weird, they're online, but they don't have a vote context. Might as well just load it and add to the map
+			context = new VoteContext(mPlugin, player.getUniqueId());
+			mContexts.put(player.getUniqueId(), context);
 		}
 
 		context.sendVoteInfoLong(player);
 	}
 
 	private void tick() {
-		long currentTime = LocalDateTime.now(ZoneId.systemDefault()).toInstant(ZoneOffset.UTC).getEpochSecond();
+		long currentTime = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC);
 
 		for (ProxiedPlayer player : mPlugin.getProxy().getPlayers()) {
 			VoteContext context = mContexts.get(player.getUniqueId());
@@ -187,28 +189,6 @@ public class VoteManager implements Listener {
 					context.sendVoteInfoShort(player);
 				}
 			}
-		}
-	}
-
-	public static void gotShardVoteCountRequest(String senderName, UUID uuid, int votesUnclaimed) {
-		if (MANAGER != null) {
-			VoteContext context = MANAGER.mContexts.get(uuid);
-			if (context == null) {
-				MANAGER.mPlugin.getLogger().warning("Got vote count request for player " + uuid.toString() + " who has no vote context");
-				return;
-			}
-			context.gotShardVoteCountRequest(senderName, uuid, votesUnclaimed);
-		}
-	}
-
-	public static void gotShardRaffleEligibilityRequest(String senderName, UUID uuid, boolean claimReward, boolean eligible) {
-		if (MANAGER != null) {
-			VoteContext context = MANAGER.mContexts.get(uuid);
-			if (context == null) {
-				MANAGER.mPlugin.getLogger().warning("Got raffle eligibility request for player " + uuid.toString() + " who has no vote context");
-				return;
-			}
-			context.gotShardRaffleEligibilityRequest(senderName, uuid, claimReward, eligible);
 		}
 	}
 
