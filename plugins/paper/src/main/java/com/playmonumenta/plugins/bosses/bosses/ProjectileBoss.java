@@ -126,6 +126,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 		if (p.SPELL_DELAY == Integer.MAX_VALUE) {
 			p.SPELL_DELAY = p.DELAY;
 		}
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.COOLDOWN, p.SPELL_DELAY,
 					p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS, 0, p.COLLIDES_WITH_OTHERS,
