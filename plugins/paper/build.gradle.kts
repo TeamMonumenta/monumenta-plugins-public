@@ -171,6 +171,19 @@ tasks.create("dev4-deploy") {
     }
 }
 
+tasks.create("futurama-deploy") {
+    val shadowJar by tasks.named<ShadowJar>("shadowJar")
+    dependsOn(shadowJar)
+    doLast {
+        ssh.runSessions {
+            session(basicssh) {
+                execute("cd /home/epic/futurama_shard_plugins && rm -f Monumenta*.jar")
+                put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/futurama_shard_plugins")
+            }
+        }
+    }
+}
+
 tasks.create("mobs-deploy") {
     val shadowJar by tasks.named<ShadowJar>("shadowJar")
     dependsOn(shadowJar)
