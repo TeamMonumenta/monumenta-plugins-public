@@ -75,7 +75,7 @@ bungee {
     name = "Monumenta-Bungee"
     main = "com.playmonumenta.bungeecord.Main"
     author = "The Monumenta Team"
-    softDepends = setOf("MonumentaNetworkRelay", "Votifier", "SuperVanish", "PremiumVanish", "BungeeTabListPlus", "LuckPerms")
+    softDepends = setOf("MonumentaNetworkRelay", "MonumentaRedisSync", "Votifier", "SuperVanish", "PremiumVanish", "BungeeTabListPlus", "LuckPerms")
 }
 
 tasks.withType<JavaCompile>().configureEach {
