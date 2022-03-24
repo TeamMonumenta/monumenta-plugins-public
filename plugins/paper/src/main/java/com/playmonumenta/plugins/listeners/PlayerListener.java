@@ -162,14 +162,18 @@ public class PlayerListener implements Listener {
 		runTeleportRunnable(player, loc);
 
 		// add player to the players team (and create the team if it doesn't exist already)
-		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-		Team playersTeam = scoreboard.getTeam(PLAYERS_TEAM_NAME);
-		if (playersTeam == null) {
-			playersTeam = scoreboard.registerNewTeam(PLAYERS_TEAM_NAME);
-			playersTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
-			playersTeam.setCanSeeFriendlyInvisibles(false);
-		}
-		playersTeam.addEntry(player.getName());
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+			Team playersTeam = scoreboard.getTeam(PLAYERS_TEAM_NAME);
+			if (playersTeam == null) {
+				playersTeam = scoreboard.registerNewTeam(PLAYERS_TEAM_NAME);
+				playersTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+				playersTeam.setCanSeeFriendlyInvisibles(false);
+			}
+			if (!playersTeam.hasEntry(player.getName())) {
+				playersTeam.addEntry(player.getName());
+			}
+		}, 1);
 
 		// transform old NO_SELF_PARTICLES tag into new partial particle option
 		// can be removed after a while
