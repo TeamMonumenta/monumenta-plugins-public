@@ -243,6 +243,8 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(MobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> new MobRisingBoss(p, e));
 		mStatelessBosses.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> new GrenadeLauncherBoss(p, e));
 		mStatelessBosses.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> new SizeChangerBoss(p, e));
+		mStatelessBosses.put(DeathSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new DeathSummonBoss(p, e));
+		mStatelessBosses.put(SummonOnExplosionBoss.identityTag, (Plugin p, LivingEntity e) -> new SummonOnExplosionBoss(p, e));
 
 		mStatelessBosses.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> new LichMageBoss(p, e));
 		mStatelessBosses.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> new LichRogueBoss(p, e));
@@ -454,6 +456,8 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(MobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> MobRisingBoss.deserialize(p, e));
 		mBossDeserializers.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> GrenadeLauncherBoss.deserialize(p, e));
 		mBossDeserializers.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> SizeChangerBoss.deserialize(p, e));
+		mBossDeserializers.put(DeathSummonBoss.identityTag, (Plugin p, LivingEntity e) -> DeathSummonBoss.deserialize(p, e));
+		mBossDeserializers.put(SummonOnExplosionBoss.identityTag, (Plugin p, LivingEntity e) -> SummonOnExplosionBoss.deserialize(p, e));
 
 		mBossDeserializers.put(Lich.identityTag, (Plugin p, LivingEntity e) -> Lich.deserialize(p, e));
 		mBossDeserializers.put(LichAlchBoss.identityTag, (Plugin p, LivingEntity e) -> LichAlchBoss.deserialize(p, e));
@@ -511,6 +515,8 @@ public class BossManager implements Listener {
 		mBossParameters.put(SizeChangerBoss.identityTag, new SizeChangerBoss.Parameters());
 		mBossParameters.put(WrathBoss.identityTag, new WrathBoss.Parameters());
 		mBossParameters.put(ThrowSummonBoss.identityTag, new ThrowSummonBoss.Parameters());
+		mBossParameters.put(DeathSummonBoss.identityTag, new DeathSummonBoss.Parameters());
+		mBossParameters.put(SummonOnExplosionBoss.identityTag, new SummonOnExplosionBoss.Parameters());
 	}
 
 	/********************************************************************************
