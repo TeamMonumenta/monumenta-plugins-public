@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.infinitytower;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobClass;
@@ -7,6 +8,7 @@ import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobRarity;
 import com.playmonumenta.plugins.infinitytower.mobs.abilities.GenericTowerMob;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -16,12 +18,17 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -98,7 +105,11 @@ public class TowerGameUtils {
 
 	public static int getNextLevelCost(TowerMob towerMob) {
 		int lvl = towerMob.mMobLevel;
-		return (int) (Math.pow(2, towerMob.mInfo.mMobRarity.getIndex()) * lvl);
+		if (lvl <= 2) {
+			return (int) (Math.pow(2, towerMob.mInfo.mMobRarity.getIndex()) * lvl * 0.5);
+		} else {
+			return (int) (Math.pow(2, towerMob.mInfo.mMobRarity.getIndex()) * lvl * 0.7);
+		}
 	}
 
 
@@ -305,7 +316,7 @@ public class TowerGameUtils {
 		}
 
 		if (floor >= 50) {
-			MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [{\"text\":\"" + game.mPlayer.mPlayer.getName() + "\",\"color\":\"gold\",\"bold\":true,\"italic\":false},{\"text\":\" has reached the " + (floor + 1) + "th round in Plunderer's Blitz\",\"color\":\"white\",\"bold\":false}]");
+			MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [{\"text\":\"" + game.mPlayer.mPlayer.getName() + "\",\"color\":\"gold\",\"bold\":true,\"italic\":false},{\"text\":\" has beaten Plunderer's Blitz (round reached: " + (floor + 1) + ")\",\"color\":\"white\",\"italic\":\"true\",\"bold\":false}]");
 		}
 
 		if (floor > 50) {
@@ -320,6 +331,19 @@ public class TowerGameUtils {
 		}
 		stack.setAmount(loot);
 		game.mPlayer.mPlayer.getInventory().addItem(stack);
+
+	}
+
+	public static void launchFirework(Location location) {
+
+		Firework fw = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK);
+		FireworkMeta meta = fw.getFireworkMeta();
+
+		meta.addEffect(FireworkEffect.builder().withColor(Color.RED, Color.ORANGE, Color.GREEN).with(FireworkEffect.Type.BALL_LARGE).trail(true).build());
+		meta.setPower(1);
+		fw.setFireworkMeta(meta);
+
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), fw::detonate, FastUtils.RANDOM.nextInt(15));
 
 	}
 

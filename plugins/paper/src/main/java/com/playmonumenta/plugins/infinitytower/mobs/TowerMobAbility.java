@@ -304,7 +304,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Forceful Grip",
-			"Throws an hook to the farthest enemy that deals 20 damage, silences for 5s and pulls the target to him, then Varcosa switches aggro to it. 8s cooldown",
+			"Throws a hook to the farthest enemy that deals 20 damage, silences for 5s and pulls the target to him, then Varcosa switches aggro to it. 8s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				//Frost nova ability
 				if (BossManager.getInstance() != null) {
@@ -447,7 +447,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Ancestral Sorcery",
-			"Hekawt, instead of using his normal attacks, has 2 unique attacks, depending on the range of the target : Ranged attack shoots a projectile that deals 12 damage and increases damage taken on the target by 10% permanently, hitting the same target again will increase the damage taken further. Melee attack : charges a cone attack in front of him that deals 15 damage and pushes enemies away 3s cooldown.",
+			"Hekawt, instead of using his normal attacks, has 2 unique attacks, depending on the range of the target : Ranged attack shoots a projectile that deals 13 damage and increases damage taken on the target by 10% permanently, hitting the same target again will increase the damage taken further. Melee attack : charges a cone attack in front of him that deals 15 damage and pushes enemies away. 2.5s cooldown.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new AutoAttackTowerAbility(TowerManager.mPlugin, "Ancestral Sorcery", mob, game, towerMob, playerMob));
@@ -457,7 +457,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Phylactery",
-			"When Hekawt dies, it revives after 8s.",
+			"When Hekawt dies, it revives after 6s.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new PhylacteryTowerAbility(TowerManager.mPlugin, "Pylacetry", mob, game, towerMob, playerMob));
@@ -467,11 +467,11 @@ public class TowerMobAbility {
 
 
 		ABILITIES.add(new Tuple(
-			"Earth's wrath",
-			"Generates an aoe attack in every direction that deals 20 damage and roots every mob that first goes into it for 3s. ",
+			"Earth's Wrath",
+			"Generates an aoe attack in every direction that deals 20 damage and roots every mob that goes into it for 3s. ",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new EarthsWrathTowerAbility(TowerManager.mPlugin, "Earth's wrath", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new EarthsWrathTowerAbility(TowerManager.mPlugin, "Earth's Wrath", mob, game, towerMob, playerMob));
 				}
 			}
 		));
