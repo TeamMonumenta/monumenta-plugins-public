@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.destroystokyo.paper.event.block.TNTPrimeEvent;
-import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -29,6 +28,7 @@ import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -41,21 +41,26 @@ public class WorldListener implements Listener {
 		mPlugin = plugin;
 	}
 
+	//  A Chunk Loaded.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
-		Entity entity = event.getEntity();
+	public void chunkLoadEvent(ChunkLoadEvent event) {
+		Entity[] entities = event.getChunk().getEntities();
 
-		mPlugin.mTrackingManager.addEntity(entity);
+		for (Entity entity : entities) {
+			mPlugin.mTrackingManager.addEntity(entity);
 
-		if (entity instanceof Monster mob) {
-			int timer = mPlugin.mCombatLoggingTimers.getTimer(entity.getUniqueId());
-			if (timer >= 0) {
-				Set<String> tags = mob.getScoreboardTags();
-				if (!tags.contains("Elite") && !tags.contains("Boss")) {
-					mob.setRemoveWhenFarAway(false);
+			if (entity instanceof Monster) {
+				Monster mob = (Monster)entity;
+
+				int timer = mPlugin.mCombatLoggingTimers.getTimer(entity.getUniqueId());
+				if (timer >= 0) {
+					Set<String> tags = mob.getScoreboardTags();
+					if (!tags.contains("Elite") && !tags.contains("Boss")) {
+						mob.setRemoveWhenFarAway(false);
+					}
+
+					mPlugin.mCombatLoggingTimers.removeTimer(entity.getUniqueId());
 				}
-
-				mPlugin.mCombatLoggingTimers.removeTimer(entity.getUniqueId());
 			}
 		}
 	}

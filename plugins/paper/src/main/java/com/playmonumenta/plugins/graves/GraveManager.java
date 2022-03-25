@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.graves;
 
-import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -157,18 +156,17 @@ public class GraveManager {
 		}
 	}
 
-	public static void onEntityAddToWorld(EntityAddToWorldEvent event) {
-		/*
-		 * Graves are not saved in the chunks they are in - if one chunk loads in, it's because the server crashed.
-		 * These graves should be removed, as they're also saved on the player and will be respawned.
-		 * Note that while this event is called for newly created graves as well, those graves don't have the Grave tag when they spawn so this won't remove them.
-		 */
-		if (event.getEntity() instanceof ArmorStand armorStand && armorStand.getScoreboardTags().contains("Grave") && !GRAVES.containsKey(armorStand.getUniqueId())) {
-			armorStand.remove();
-		}
-	}
-
 	public static void onChunkLoad(ChunkLoadEvent event) {
+		/*
+		 * Graves are not saved in the chunks they are in - if one chunk loads in, it's because the server crashed
+		 * These graves should be removed, as they're also saved on the player and will be respawned
+		 */
+		for (Entity entity : event.getChunk().getEntities()) {
+			if (entity instanceof ArmorStand && entity.getScoreboardTags().contains("Grave") && !GRAVES.containsKey(entity.getUniqueId())) {
+				entity.remove();
+			}
+		}
+
 		HashSet<Grave> graves = new HashSet<>(getUnloadedGraves(event.getChunk().getChunkKey()));
 		for (Grave grave : graves) {
 			grave.onChunkLoad();

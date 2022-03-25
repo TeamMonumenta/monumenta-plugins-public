@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.listeners;
 
-import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.GraveCommand;
@@ -119,11 +118,6 @@ public class GraveListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void chunkLoad(ChunkLoadEvent event) {
 		GraveManager.onChunkLoad(event);
-	}
-
-	@EventHandler(ignoreCancelled = true)
-	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
-		GraveManager.onEntityAddToWorld(event);
 	}
 
 	@EventHandler(ignoreCancelled = true)
