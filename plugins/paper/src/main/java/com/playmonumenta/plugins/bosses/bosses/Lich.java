@@ -138,6 +138,9 @@ public final class Lich extends BossAbilityGroup {
 	private double mDefenseScaling;
 	private static final int MAX_HEALTH = 4000;
 	private static final int PHYLACT_HP = 1250;
+	private static final double SCALING_X = 0.7;
+	private static final double SCALING_Y = 0.575;
+
 	private double mPhylactHealth = 0.0;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -157,7 +160,7 @@ public final class Lich extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
-		mDefenseScaling = BossUtils.getDefenseScalingRatio(mPlayerCount, MAX_HEALTH);
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 
 		for (Entity e : mBoss.getNearbyEntities(detectionRange, detectionRange, detectionRange)) {
 			if (e.getScoreboardTags().contains(START_TAG) && e instanceof LivingEntity) {
@@ -213,7 +216,7 @@ public final class Lich extends BossAbilityGroup {
 			UUID keyUUID = mKey.getUniqueId();
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join lichphylactery " + keyUUID);
 			mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
-			mDefenseScaling = BossUtils.getDefenseScalingRatio(mPlayerCount, MAX_HEALTH);
+			mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 			mPhylactHealth = PHYLACT_HP * mDefenseScaling;
 			EntityUtils.setAttributeBase(mKey, Attribute.GENERIC_MAX_HEALTH, mPhylactHealth);
 			mKey.setHealth(PHYLACT_HP);
@@ -899,7 +902,7 @@ public final class Lich extends BossAbilityGroup {
 	@Override
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
-		mDefenseScaling = BossUtils.getDefenseScalingRatio(mPlayerCount, MAX_HEALTH);
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 		Player player = event.getEntity();
 		World world = player.getWorld();
 		world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 10, 0.4, 0.45, 0.4,

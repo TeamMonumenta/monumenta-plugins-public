@@ -204,6 +204,8 @@ public class FrostGiant extends BossAbilityGroup {
 	private double mDefenseScaling;
 
 	private static final int MAX_HEALTH = 5012;
+	private static final double SCALING_X = 0.6;
+	private static final double SCALING_Y = 0.35;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -260,7 +262,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 		mStartLoc = mStart.getLocation();
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mStartLoc, detectionRange);
-		mDefenseScaling = BossUtils.getDefenseScalingRatio(mPlayerCount, MAX_HEALTH);
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 
 		//Adds directions of the arena that seismic ruin destroys
 		List<Character> directions = new ArrayList<>();
@@ -1004,7 +1006,7 @@ public class FrostGiant extends BossAbilityGroup {
 	@Override
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mStartLoc, detectionRange);
-		mDefenseScaling = BossUtils.getDefenseScalingRatio(mPlayerCount, MAX_HEALTH);
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 	}
 
 	@Override

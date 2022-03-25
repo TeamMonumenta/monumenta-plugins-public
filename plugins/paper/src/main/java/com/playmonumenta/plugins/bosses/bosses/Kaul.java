@@ -133,6 +133,8 @@ public class Kaul extends BossAbilityGroup {
 	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_4 = 6;
 
 	private static final int MAX_HEALTH = 2048;
+	private static final double SCALING_X = 0.7;
+	private static final double SCALING_Y = 0.65;
 
 	// At the centre of the Kaul shrine,
 	// upon the height of most of the arena's surface
@@ -174,7 +176,7 @@ public class Kaul extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mPlayerCount = getArenaParticipants().size();
-		mDefenseScaling = BossUtils.getDefenseScalingRatio(mPlayerCount, MAX_HEALTH);
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 		mBoss.setRemoveWhenFarAway(false);
 		World world = boss.getWorld();
 		mBoss.addScoreboardTag("Boss");
@@ -873,7 +875,7 @@ public class Kaul extends BossAbilityGroup {
 	@Override
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
 		mPlayerCount = getArenaParticipants().size();
-		mDefenseScaling = BossUtils.getDefenseScalingRatio(mPlayerCount, MAX_HEALTH);
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 	}
 
 	private @Nullable LivingEntity spawnPrimordial(Location loc) {
