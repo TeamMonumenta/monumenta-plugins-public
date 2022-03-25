@@ -362,11 +362,11 @@ public final class Grave {
 		}
 	}
 
-	private int collectItem(Player player, GraveItem item) {
+	int collectItem(Player player, GraveItem item) {
 		int slot = player.getInventory().firstEmpty();
 		if (slot != -1) {
 			Item entity = player.getWorld().dropItem(getLocation(), item.getItem());
-			int remaining = Plugin.getInstance().mDeathItemListener.pickupItem(player, entity, item);
+			int remaining = DeathSort.pickupItem(player, entity, item);
 			item.collect(remaining);
 			return remaining;
 		}

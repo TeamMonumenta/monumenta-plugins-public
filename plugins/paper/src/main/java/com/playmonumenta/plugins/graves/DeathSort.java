@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.listeners;
+package com.playmonumenta.plugins.graves;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.graves.GraveItem;
@@ -17,59 +17,13 @@ import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 
 
-public class DeathItemListener implements Listener {
+public class DeathSort {
 	private static final String DEATH_SORT_TAG = "DeathSortTag";
-
-	private final Plugin mPlugin;
-
-	public DeathItemListener(Plugin plugin) {
-		mPlugin = plugin;
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void checkItemEvent(EntityPickupItemEvent event) {
-		if (!(event.getEntity() instanceof Player player) || !event.getEntity().getScoreboardTags().contains(DEATH_SORT_TAG)) {
-			return; // not a player, or they don't have death sort enabled
-		}
-
-		//Get the item picked up
-		PlayerInventory inventory = player.getInventory();
-		Item entity = event.getItem();
-		GraveItem graveItem = GraveManager.getGraveItem(entity);
-
-		// Try putting the item back in its slot if it is an item from a grave
-		if (graveItem != null && graveItem.mSlot != null) {
-			if (insertIntoSlot(player, entity, graveItem.mSlot)) {
-				event.setCancelled(true);
-				return; // Nothing left to do, this item is handled
-			} else {
-				// Combine item with the same item if it can be stacked into it (do nothing)
-				ItemStack invItem = inventory.getItem(graveItem.mSlot);
-				if (invItem != null && !invItem.getType().isAir() && invItem.getAmount() < invItem.getMaxStackSize() && invItem.isSimilar(entity.getItemStack())) {
-					// Item picked up will stack with one already in inventory - don't need to do anything
-					return;
-				}
-			}
-		}
-
-		// Attempt to place this in an empty inventory slot that was empty before recent deaths
-		if (pickupIntoEmptySlot(player, entity, true)) {
-			event.setCancelled(true);
-			return; // Nothing left to do, this item is handled
-		}
-
-		//Failed to put it on an existing stack, or where it was before, or in an empty slot before death.
-		//Just let normal item pickup do its thing
-	}
 
 	//Makes the item seem like it was picked up by the player animation wise, and then deletes it
 	private static void simulatePickup(Item item, Player player) {
@@ -87,7 +41,7 @@ public class DeathItemListener implements Listener {
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.25f, (float) FastUtils.randomDoubleInRange(1, 2));
 	}
 
-	public int pickupItem(Player player, Item entity, GraveItem graveItem) {
+	public static int pickupItem(Player player, Item entity, GraveItem graveItem) {
 		PlayerInventory inventory = player.getInventory();
 		ItemStack item = entity.getItemStack();
 
@@ -120,7 +74,7 @@ public class DeathItemListener implements Listener {
 	 *
 	 * @return Whether teh item was put into the slot
 	 */
-	private boolean insertIntoSlot(Player player, Item entity, int slot) {
+	private static boolean insertIntoSlot(Player player, Item entity, int slot) {
 		PlayerInventory inventory = player.getInventory();
 		ItemStack invItem = inventory.getItem(slot);
 		if (invItem != null && !invItem.getType().isAir()) {
@@ -135,8 +89,8 @@ public class DeathItemListener implements Listener {
 
 			//Simulate item pickup
 			inventory.setItem(slot, item);
-			InventoryUtils.scheduleDelayedEquipmentSlotCheck(mPlugin, player, slot);
-			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStats(player);
+			InventoryUtils.scheduleDelayedEquipmentSlotCheck(Plugin.getInstance(), player, slot);
+			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
 				playerItemStats.updateStats(player, true);
 			}
@@ -154,7 +108,7 @@ public class DeathItemListener implements Listener {
 	 *
 	 * @return Whether the item was picked up completely
 	 */
-	private boolean pickupIntoEmptySlot(Player player, Item entity, boolean doNothingIfNoRecentGraves) {
+	private static boolean pickupIntoEmptySlot(Player player, Item entity, boolean doNothingIfNoRecentGraves) {
 		PlayerInventory inventory = player.getInventory();
 
 		Set<Integer> reservedItemSlots = null;
@@ -203,7 +157,7 @@ public class DeathItemListener implements Listener {
 
 					//Simulate item pickup
 					inventory.setItem(slot, entity.getItemStack());
-					InventoryUtils.scheduleDelayedEquipmentSlotCheck(mPlugin, player, slot);
+					InventoryUtils.scheduleDelayedEquipmentSlotCheck(Plugin.getInstance(), player, slot);
 					simulatePickup(entity, player);
 
 					return true;
