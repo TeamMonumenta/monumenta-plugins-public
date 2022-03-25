@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.parrots;
 
 import com.playmonumenta.plugins.parrots.ParrotManager.ParrotVariant;
-import org.bukkit.Location;
+import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
@@ -18,17 +18,19 @@ public class ParrotPet {
 		mVariant = variant.getVariant();
 	}
 
-	public Parrot spawnParrot(Location location) {
-		Parrot parrot = (Parrot) location.getWorld().spawnEntity(location, EntityType.PARROT);
+	public Parrot spawnParrot() {
+		Parrot parrot = (Parrot) mPlayer.getWorld().spawnEntity(mPlayer.getLocation().add(0, -256, 0), EntityType.PARROT);
+		parrot.addScoreboardTag(ParrotManager.PARROT_TAG);
 		parrot.setCustomName(mName);
 		parrot.setVariant(mVariant);
+		parrot.remove();
 		parrot.setSilent(true);
 		parrot.setCustomNameVisible(false);
 		parrot.setSitting(true);
-		parrot.setOwner(mPlayer);
+		parrot.setOwner((AnimalTamer) mPlayer);
 		parrot.setTamed(true);
 		parrot.setAI(true);
-		parrot.setLootTable(null);
+		parrot.setInvisible(true);
 		return parrot;
 	}
 

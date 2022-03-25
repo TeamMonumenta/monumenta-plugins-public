@@ -13,7 +13,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.EntityDamageSource;
-import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
@@ -24,13 +23,11 @@ import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftMob;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftParrot;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
-import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
@@ -249,11 +246,6 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 	@Override
 	public int getEntityTypeRegistryId(Entity entity) {
 		return Registry.ENTITY_TYPE.getId(((CraftEntity) entity).getHandle().getType());
-	}
-
-	@Override
-	public void disablePerching(Parrot parrot) {
-		((CraftParrot) parrot).getHandle().goalSelector.getAvailableGoals().removeIf(w -> w.getGoal() instanceof LandOnOwnersShoulderGoal);
 	}
 
 }

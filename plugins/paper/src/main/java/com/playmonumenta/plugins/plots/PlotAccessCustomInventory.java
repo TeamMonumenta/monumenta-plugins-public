@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.plots;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.plots.PlotManager.PlotInfo;
 import com.playmonumenta.plugins.plots.PlotManager.PlotInfo.OtherAccessRecord;
 import com.playmonumenta.plugins.utils.GUIUtils;
@@ -90,9 +89,9 @@ public class PlotAccessCustomInventory extends CustomInventory {
 			Player player = (Player) event.getWhoClicked();
 			PlotEntry targetLoc = mAccessList.get(whichHead);
 			if (targetLoc.mSelf) {
-				ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, mInfo.mOwnedPlotId);
+				ScoreboardUtils.setScoreboardValue(player, "CurrentPlot", mInfo.mOwnedPlotId);
 			} else if (targetLoc.mEntry != null) {
-				ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, targetLoc.mEntry.mPlotId);
+				ScoreboardUtils.setScoreboardValue(player, "CurrentPlot", targetLoc.mEntry.mPlotId);
 			}
 			PlotManager.sendPlayerToPlot(player);
 			player.closeInventory();

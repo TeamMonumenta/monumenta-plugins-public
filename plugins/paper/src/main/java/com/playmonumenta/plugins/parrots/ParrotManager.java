@@ -1,11 +1,8 @@
 package com.playmonumenta.plugins.parrots;
 
-import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
-import com.playmonumenta.plugins.listeners.EntityListener;
-import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,14 +12,12 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
@@ -33,8 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class ParrotManager implements Listener {
 
-	protected static final String SHOULDER_PARROT_TAG = "ParrotPet";
-	protected static final String PLACED_PARROT_TAG = "PlacedParrotPet";
+	protected static final String PARROT_TAG = "ParrotPet";
 
 	public enum ParrotVariant {
 		//minecraft default
@@ -166,22 +160,16 @@ public class ParrotManager implements Listener {
 	}
 
 	private static void respawnParrots(Player player) {
-		Location spawnLocation = player.getLocation().add(0, -256, 0);
-
 		ParrotVariant leftParrot = mLeftShoulders.get(player);
 		if (leftParrot != null) {
-			Parrot parrot = new ParrotPet(leftParrot, player).spawnParrot(spawnLocation);
-			parrot.addScoreboardTag(ParrotManager.SHOULDER_PARROT_TAG);
-			parrot.setInvisible(true);
-			player.setShoulderEntityLeft(parrot);
+			ParrotPet pp = new ParrotPet(leftParrot, player);
+			player.setShoulderEntityLeft(pp.spawnParrot());
 		}
 
 		ParrotVariant rightParrot = mRightShoulders.get(player);
 		if (rightParrot != null) {
-			Parrot parrot = new ParrotPet(rightParrot, player).spawnParrot(spawnLocation);
-			parrot.addScoreboardTag(ParrotManager.SHOULDER_PARROT_TAG);
-			parrot.setInvisible(true);
-			player.setShoulderEntityRight(parrot);
+			ParrotPet pp = new ParrotPet(rightParrot, player);
+			player.setShoulderEntityRight(pp.spawnParrot());
 		}
 	}
 
@@ -303,52 +291,12 @@ public class ParrotManager implements Listener {
 		return ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_BOTH).orElse(0) > 0;
 	}
 
-	/**
-	 * Spawns a parrot as a standalone entity, not on a player's shoulders.
-	 */
-	public static void spawnParrot(Player player, ParrotVariant variant) {
-		if (!EntityListener.maySummonPlotAnimal(player.getLocation())) {
-			// sends an error message already
-			return;
-		}
-		// only one parrot of each type is allowed per plot, so remove any matching existing ones first
-		for (Parrot parrot : player.getWorld().getEntitiesByClass(Parrot.class)) {
-			if (parrot.getVariant() == variant.getVariant()
-				    && parrot.getScoreboardTags().contains(PLACED_PARROT_TAG)
-				    && variant.getName().equals(parrot.getCustomName())) {
-				parrot.remove();
-			}
-		}
-		Parrot parrot = new ParrotPet(variant, player).spawnParrot(player.getLocation());
-		parrot.addScoreboardTag(ParrotManager.PLACED_PARROT_TAG);
-		NmsUtils.getVersionAdapter().disablePerching(parrot);
-	}
-
-	// need to re-disable the perching when a parrot is loaded again
-	@EventHandler(ignoreCancelled = true)
-	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
-		if (event.getEntity() instanceof Parrot parrot && parrot.getScoreboardTags().contains(PLACED_PARROT_TAG)) {
-			NmsUtils.getVersionAdapter().disablePerching(parrot);
-		}
-	}
-
-	// remove drops from spawned parrots (exp, feathers)
-	@EventHandler(ignoreCancelled = true)
-	public void entityDeathEvent(EntityDeathEvent event) {
-		if (event.getEntity() instanceof Parrot parrot
-			    && parrot.getScoreboardTags().contains(PLACED_PARROT_TAG)) {
-			event.setDroppedExp(0);
-			event.getDrops().clear();
-		}
-	}
-
-	// Called when a parrot leaves a player's shoulder
 	@EventHandler(ignoreCancelled = true)
 	public void parrotSpawnEvent(EntitySpawnEvent event) {
 		Entity entity = event.getEntity();
 
 		if (entity instanceof Parrot parrot) {
-			if (entity.getScoreboardTags().contains(SHOULDER_PARROT_TAG)) {
+			if (entity.getScoreboardTags().contains(PARROT_TAG)) {
 				event.setCancelled(true);
 				return;
 			}

@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.plots;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -133,7 +132,7 @@ public class PlotManager {
 				.executes((sender, args) -> {
 					for (Player player : (List<Player>)args[0]) {
 						try {
-							ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, (Integer) args[1]);
+							ScoreboardUtils.setScoreboardValue(player, "CurrentPlot", (Integer)args[1]);
 							sendPlayerToPlot(player);
 						} catch (Exception ex) {
 							sender.sendMessage(ChatColor.RED + "Failed to send player to plot '" + player.getName() + "': " + ex.getMessage());
@@ -169,8 +168,8 @@ public class PlotManager {
 						return;
 					}
 					for (Player player : (List<Player>)args[0]) {
-						int plot = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
-						int currentplot = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.CURRENT_PLOT).orElse(0);
+						int plot = ScoreboardUtils.getScoreboardValue(player, "Plot").orElse(0);
+						int currentplot = ScoreboardUtils.getScoreboardValue(player, "CurrentPlot").orElse(0);
 						if (plot != currentplot) {
 							sender.sendMessage(ChatColor.RED + "Only the owner of this plot can change its border");
 							player.sendMessage(ChatColor.RED + "Only the owner of this plot can change its border");
@@ -190,7 +189,7 @@ public class PlotManager {
 				.executes((sender, args) -> {
 					for (Player player : (List<Player>)args[0]) {
 						try {
-							int score = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
+							int score = ScoreboardUtils.getScoreboardValue(player, "Plot").orElse(0);
 							if (score > 0) {
 								sender.sendMessage(ChatColor.RED + "Can't create new plot for player that has nonzero Plot score");
 								player.sendMessage(ChatColor.RED + "Can't create new plot for you because you have a nonzero Plot score. This is a bug, please report it.");
@@ -202,8 +201,8 @@ public class PlotManager {
 											player.sendMessage(ChatColor.RED + "Failed to get new plot score, please report this: " + ex.getMessage());
 											ex.printStackTrace();
 										} else {
-											ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.OWN_PLOT, newInstance.intValue());
-											ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, newInstance.intValue());
+											ScoreboardUtils.setScoreboardValue(player, "Plot", newInstance.intValue());
+											ScoreboardUtils.setScoreboardValue(player, "CurrentPlot", newInstance.intValue());
 											sendPlayerToPlot(player);
 										}
 									});
@@ -222,13 +221,13 @@ public class PlotManager {
 				.withArguments(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS))
 				.executes((sender, args) -> {
 					for (Player player : (List<Player>)args[0]) {
-						int score = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
+						int score = ScoreboardUtils.getScoreboardValue(player, "Plot").orElse(0);
 						if (score == 0) {
 							sender.sendMessage(ChatColor.RED + "Can't reset plot for player that has a Plot score of zero");
 							player.sendMessage(ChatColor.RED + "Can't reset your plot because your Plot score is zero. This is a bug, please report it.");
 						} else {
-							ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.OWN_PLOT, 0);
-							ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, 0);
+							ScoreboardUtils.setScoreboardValue(player, "Plot", 0);
+							ScoreboardUtils.setScoreboardValue(player, "CurrentPlot", 0);
 							getPlotInfo(player.getUniqueId()).whenComplete((info, ex) -> {
 								if (ex != null) {
 									Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + player.getName() + " : " + ex.getMessage());
@@ -333,7 +332,7 @@ public class PlotManager {
 		}
 
 		UUID ownerUUID = owner.getUniqueId();
-		int score = ScoreboardUtils.getScoreboardValue(owner, Constants.Objectives.OWN_PLOT).orElse(0);
+		int score = ScoreboardUtils.getScoreboardValue(owner, "Plot").orElse(0);
 		if (score <= 0) {
 			CommandAPI.fail("You don't currently have a plot to add someone to");
 		} else {
@@ -474,8 +473,8 @@ public class PlotManager {
 
 		Player owner = Bukkit.getPlayer(ownerUUID);
 		if (owner != null) {
-			plot = ScoreboardUtils.getScoreboardValue(owner, Constants.Objectives.OWN_PLOT).orElse(0);
-			currentPlot = ScoreboardUtils.getScoreboardValue(owner, Constants.Objectives.CURRENT_PLOT).orElse(0);
+			plot = ScoreboardUtils.getScoreboardValue(owner, "Plot").orElse(0);
+			currentPlot = ScoreboardUtils.getScoreboardValue(owner, "CurrentPlot").orElse(0);
 			scoresFuture = null;
 		} else {
 			// These two values will be overwritten by the scores future
@@ -493,8 +492,8 @@ public class PlotManager {
 				final int finalCurrentPlot;
 				if (scoresFuture != null) {
 					Map<String, Integer> scores = scoresFuture.get();
-					finalPlot = scores.getOrDefault(Constants.Objectives.OWN_PLOT, 0);
-					finalCurrentPlot = scores.getOrDefault(Constants.Objectives.CURRENT_PLOT, 0);
+					finalPlot = scores.getOrDefault("Plot", 0);
+					finalCurrentPlot = scores.getOrDefault("CurrentPlot", 0);
 				} else {
 					finalPlot = plot;
 					finalCurrentPlot = currentPlot;

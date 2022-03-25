@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.custominventories;
 
 import java.util.Map;
-import java.util.function.BiPredicate;
+import java.util.function.BiFunction;
 import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -13,10 +13,10 @@ public class GuiItem {
 	private final int mSlot;
 	private final ItemStack mShowedItem;
 	private final @Nullable Map<ItemStack, Integer> mCost;
-	private final @Nullable BiPredicate<Player, Inventory> mAfterClickFunction;
-	private final @Nullable BiPredicate<Player, Inventory> mCondition;
+	private final @Nullable BiFunction<Player, Inventory, Boolean> mAfterClickFunction;
+	private final @Nullable BiFunction<Player, Inventory, Boolean> mCondition;
 
-	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable BiPredicate<Player, Inventory> cond, @Nullable BiPredicate<Player, Inventory> afterClick) {
+	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable BiFunction<Player, Inventory, Boolean> cond, @Nullable BiFunction<Player, Inventory, Boolean> afterClick) {
 		this.mPage = page;
 		this.mSlot = slot;
 		this.mShowedItem = showedItem;
@@ -25,11 +25,11 @@ public class GuiItem {
 		this.mAfterClickFunction = afterClick;
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable BiPredicate<Player, Inventory> cond) {
+	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable BiFunction<Player, Inventory, Boolean> cond) {
 		this(page, slot, showedItem, cost, cond, null);
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable BiPredicate<Player, Inventory> cond, @Nullable BiPredicate<Player, Inventory> afterClick) {
+	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable BiFunction<Player, Inventory, Boolean> cond, @Nullable BiFunction<Player, Inventory, Boolean> afterClick) {
 		this(page, slot, showedItem, null, cond, afterClick);
 	}
 
@@ -45,7 +45,7 @@ public class GuiItem {
 		this(0, slot, showedItemStack, (Map<ItemStack, Integer>) null);
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItemStack, @Nullable BiPredicate<Player, Inventory> cond) {
+	public GuiItem(int page, int slot, ItemStack showedItemStack, @Nullable BiFunction<Player, Inventory, Boolean> cond) {
 		this(page, slot, showedItemStack, (Map<ItemStack, Integer>) null, cond);
 	}
 
@@ -62,12 +62,12 @@ public class GuiItem {
 	}
 
 	public boolean isVisible(Player player, Inventory inventory) {
-		return mCondition == null || mCondition.test(player, inventory);
+		return mCondition == null || mCondition.apply(player, inventory);
 	}
 
 	public boolean afterClick(Player player, Inventory inventory) {
 		if (mAfterClickFunction != null) {
-			return mAfterClickFunction.test(player, inventory);
+			return mAfterClickFunction.apply(player, inventory);
 		}
 		return true;
 	}

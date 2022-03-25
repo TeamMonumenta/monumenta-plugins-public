@@ -112,10 +112,6 @@ public class Constants {
 
 		// PlayerData
 		public static final String PATREON_DOLLARS = "Patreon";
-
-		// plots
-		public static final String OWN_PLOT = "Plot";
-		public static final String CURRENT_PLOT = "CurrentPlot";
 	}
 
 	public static class Tags {
