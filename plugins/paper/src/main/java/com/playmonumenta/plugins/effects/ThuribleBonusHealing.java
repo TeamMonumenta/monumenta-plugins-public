@@ -1,21 +1,13 @@
 package com.playmonumenta.plugins.effects;
 
-public class ThuribleBonusHealing extends Effect {
+public class ThuribleBonusHealing extends SingleArgumentEffect {
 
-	private final double mLevel;
-
-	public ThuribleBonusHealing(int duration, double level) {
-		super(duration);
-		mLevel = level;
-	}
-
-	@Override
-	public double getMagnitude() {
-		return mLevel;
+	public ThuribleBonusHealing(int duration, double amount) {
+		super(duration, amount);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("ThuribleBonusHealing duration=%d healing=%f", this.getDuration(), mLevel);
+		return String.format("ThuribleBonusHealing duration=%d healing=%f", this.getDuration(), mAmount);
 	}
 }

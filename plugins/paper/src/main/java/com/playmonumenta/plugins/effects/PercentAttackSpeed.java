@@ -7,6 +7,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
 
 public class PercentAttackSpeed extends Effect {
+	public static final String GENERIC_NAME = "PercentAttackSpeed";
 
 	private final double mAmount;
 	private final String mModifierName;
@@ -24,15 +25,15 @@ public class PercentAttackSpeed extends Effect {
 
 	@Override
 	public void entityGainEffect(Entity entity) {
-		if (entity instanceof Attributable) {
-			EntityUtils.addAttribute((Attributable) entity, Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		if (entity instanceof Attributable attributable) {
+			EntityUtils.addAttribute(attributable, Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 
 	@Override
 	public void entityLoseEffect(Entity entity) {
-		if (entity instanceof Attributable) {
-			EntityUtils.removeAttribute((Attributable) entity, Attribute.GENERIC_ATTACK_SPEED, mModifierName);
+		if (entity instanceof Attributable attributable) {
+			EntityUtils.removeAttribute(attributable, Attribute.GENERIC_ATTACK_SPEED, mModifierName);
 		}
 	}
 

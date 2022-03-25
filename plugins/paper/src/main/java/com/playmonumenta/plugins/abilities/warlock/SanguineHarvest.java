@@ -159,7 +159,7 @@ public class SanguineHarvest extends Ability {
 		if (event.getAbility() == null) {
 			return false;
 		}
-		EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel, enemy);
+		EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel * 0.1, enemy);
 		return false; // applies bleed on damage to all mobs hit, causes no recursion
 	}
 }

@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
-public class OnHitTimerEffect extends Effect {
+public class OnHitTimerEffect extends ZeroArgumentEffect {
 
 	public OnHitTimerEffect(int duration) {
 		super(duration);

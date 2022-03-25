@@ -10,26 +10,23 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class Bleed extends Effect {
+public class Bleed extends SingleArgumentEffect {
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
 
 	private static final String PERCENT_SPEED_EFFECT_NAME = "BleedPercentSpeed";
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "BleedPercentDamageDealt";
-	private static final double EFFECT_AMOUNT_PER_LEVEL = -0.1;
 
-	private final int mLevel;
 	private final Plugin mPlugin;
 
-	public Bleed(int duration, int level, Plugin plugin) {
-		super(duration);
-		mLevel = level;
+	public Bleed(int duration, double amount, Plugin plugin) {
+		super(duration, amount);
 		mPlugin = plugin;
 	}
 
 	@Override
 	public double getMagnitude() {
-		return mLevel;
+		return mAmount / 0.1;
 	}
 
 	@Override
@@ -44,9 +41,9 @@ public class Bleed extends Effect {
 						@Override
 						public void run() {
 							mPlugin.mEffectManager.addEffect(le, PERCENT_SPEED_EFFECT_NAME,
-							                                 new PercentSpeed(20, mLevel * EFFECT_AMOUNT_PER_LEVEL, PERCENT_SPEED_EFFECT_NAME));
+							                                 new PercentSpeed(20, -mAmount, PERCENT_SPEED_EFFECT_NAME));
 							mPlugin.mEffectManager.addEffect(le, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
-									new PercentDamageDealt(20, mLevel * EFFECT_AMOUNT_PER_LEVEL));
+									new PercentDamageDealt(20, -mAmount));
 						}
 					}.runTaskLater(mPlugin, 0);
 				}
@@ -56,6 +53,6 @@ public class Bleed extends Effect {
 
 	@Override
 	public String toString() {
-		return String.format("Bleed duration:%d modifier:%s level:%d", this.getDuration(), "Bleed", mLevel);
+		return String.format("Bleed duration:%d modifier:%s amount:%f", this.getDuration(), "Bleed", mAmount);
 	}
 }

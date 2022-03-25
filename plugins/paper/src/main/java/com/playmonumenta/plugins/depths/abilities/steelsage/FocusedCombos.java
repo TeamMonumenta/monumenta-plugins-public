@@ -6,9 +6,9 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,7 +22,7 @@ public class FocusedCombos extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Focused Combos";
 	public static final double[] DAMAGE = {1.20, 1.25, 1.30, 1.35, 1.40, 1.50};
-	public static final int BLEED_LEVEL = 2;
+	public static final double BLEED_AMOUNT = 0.2;
 	public static final int BLEED_DURATION = 20 * 3;
 
 	private int mComboCount = 0;
@@ -35,12 +35,12 @@ public class FocusedCombos extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getDamager() instanceof AbstractArrow proj && event.getType() == DamageType.PROJECTILE && proj != null && (proj.isCritical() || proj instanceof Trident)) {
+		if (event.getDamager() instanceof AbstractArrow proj && event.getType() == DamageType.PROJECTILE && (proj.isCritical() || proj instanceof Trident)) {
 			mComboCount++;
 
 			if (mComboCount >= 3) {
 				mComboCount = 0;
-				mPlugin.mEffectManager.addEffect(enemy, ABILITY_NAME, new Bleed(BLEED_DURATION, BLEED_LEVEL, mPlugin));
+				EntityUtils.applyBleed(mPlugin, BLEED_DURATION, BLEED_AMOUNT, enemy);
 				event.setDamage(event.getDamage() * DAMAGE[mRarity - 1]);
 
 				Location playerLoc = mPlayer.getLocation();
@@ -60,7 +60,7 @@ public class FocusedCombos extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Every third critical arrow shot deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " times damage and applies Bleed " + BLEED_LEVEL + " for " + BLEED_DURATION / 20 + " seconds. Additionally, arrows you shoot bypass arrow immunity.";
+		return "Every third critical arrow shot deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " times damage and applies " + DepthsUtils.roundPercent(BLEED_AMOUNT) + "% Bleed for " + BLEED_DURATION / 20 + " seconds. Additionally, arrows you shoot bypass arrow immunity.";
 	}
 
 	@Override

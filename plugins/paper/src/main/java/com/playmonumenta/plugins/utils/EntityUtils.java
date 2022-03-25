@@ -664,8 +664,8 @@ public class EntityUtils {
 
 	private static final String BLEED_EFFECT_NAME = "BleedEffect";
 
-	public static void applyBleed(Plugin plugin, int ticks, int level, LivingEntity mob) {
-		plugin.mEffectManager.addEffect(mob, BLEED_EFFECT_NAME, new Bleed(ticks, level, plugin));
+	public static void applyBleed(Plugin plugin, int ticks, double amount, LivingEntity mob) {
+		plugin.mEffectManager.addEffect(mob, BLEED_EFFECT_NAME, new Bleed(ticks, amount, plugin));
 	}
 
 	public static boolean isBleeding(Plugin plugin, LivingEntity mob) {
@@ -747,7 +747,11 @@ public class EntityUtils {
 		);
 
 	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob) {
-		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_NAME, new PercentDamageDealt(ticks, -amount, WEAKEN_EFFECT_AFFECTED_DAMAGE_TYPES));
+		applyWeaken(plugin, ticks, amount, mob, WEAKEN_EFFECT_AFFECTED_DAMAGE_TYPES);
+	}
+
+	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob, @Nullable EnumSet affectedDamageTypes) {
+		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_NAME, new PercentDamageDealt(ticks, -amount, affectedDamageTypes));
 		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_AESTHETICS_NAME, new Aesthetics(ticks,
 			(entity, fourHertz, twoHertz, oneHertz) -> {
 				if (fourHertz) {

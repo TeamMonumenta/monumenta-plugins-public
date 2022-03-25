@@ -2,12 +2,11 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import org.jetbrains.annotations.NotNull;
 
 public class FeatherFalling extends Protection {
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Feather Falling";
 	}
 

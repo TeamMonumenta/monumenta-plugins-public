@@ -191,7 +191,7 @@ public class JudgementChain extends Ability {
 										EntityUtils.applyWeaken(mPlugin, BUFF_DURATION, EntityUtils.getWeakenAmount(mPlugin, mTarget), m);
 									}
 									if (EntityUtils.isBleeding(mPlugin, mTarget)) {
-										EntityUtils.applyBleed(mPlugin, BUFF_DURATION, EntityUtils.getBleedLevel(mPlugin, mTarget), m);
+										EntityUtils.applyBleed(mPlugin, BUFF_DURATION, EntityUtils.getBleedLevel(mPlugin, mTarget) * 0.1, m);
 									}
 									if (mTarget.getFireTicks() > 0 && (m.getFireTicks() <= 0 && !Inferno.hasInferno(mPlugin, m)
 											&& (!EntityUtils.isFireResistant(m) || mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.INFERNO) > 0)

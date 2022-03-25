@@ -8,19 +8,17 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 
-public class ScorchedEarthDamage extends Effect {
-	private double mBonusDamage;
+public class ScorchedEarthDamage extends SingleArgumentEffect {
 
-	public ScorchedEarthDamage(int duration, double damage) {
-		super(duration);
-		mBonusDamage = damage;
+	public ScorchedEarthDamage(int duration, double amount) {
+		super(duration, amount);
 	}
 
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
 		DamageType type = event.getType();
 		if (type != DamageType.AILMENT && type != DamageType.FIRE && type != DamageType.OTHER) {
-			event.setDamage(event.getDamage() + mBonusDamage);
+			event.setDamage(event.getDamage() + mAmount);
 			World world = entity.getWorld();
 			Location loc = entity.getLocation().clone().add(0, 1, 0);
 			world.spawnParticle(Particle.FLAME, loc, 5, 0.25, 0.5, 0.25, 0.05);
@@ -32,10 +30,5 @@ public class ScorchedEarthDamage extends Effect {
 	@Override
 	public String toString() {
 		return String.format("ScorchedEarthDamage duration=%d", this.getDuration());
-	}
-
-	@Override
-	public double getMagnitude() {
-		return mBonusDamage;
 	}
 }

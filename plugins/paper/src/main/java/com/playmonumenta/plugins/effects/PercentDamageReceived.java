@@ -8,6 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PercentDamageReceived extends Effect {
+	public static final String GENERIC_NAME = "PercentDamageReceived";
 
 	private final double mAmount;
 	private final @Nullable EnumSet<DamageType> mAffectedDamageTypes;

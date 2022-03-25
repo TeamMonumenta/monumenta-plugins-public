@@ -2,18 +2,10 @@ package com.playmonumenta.plugins.effects;
 
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 
-public class PercentHeal extends Effect {
-
-	private final double mAmount;
+public class PercentHeal extends SingleArgumentEffect {
 
 	public PercentHeal(int duration, double amount) {
-		super(duration);
-		mAmount = amount;
-	}
-
-	@Override
-	public double getMagnitude() {
-		return Math.abs(mAmount);
+		super(duration, amount);
 	}
 
 	@Override

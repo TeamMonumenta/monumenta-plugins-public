@@ -227,6 +227,7 @@ public class Plugin extends JavaPlugin {
 		TellMiniMessage.register();
 		RunWithPlaceholdersCommand.register();
 		PartialParticleCommand.register();
+		CustomEffect.register();
 
 
 		try {

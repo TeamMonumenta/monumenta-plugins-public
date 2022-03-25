@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class PercentSpeed extends Effect {
+	public static final String GENERIC_NAME = "PercentSpeed";
 
 	private final double mAmount;
 	private final String mModifierName;
@@ -29,15 +30,15 @@ public class PercentSpeed extends Effect {
 
 	@Override
 	public void entityGainEffect(Entity entity) {
-		if (entity instanceof Attributable && (!(entity instanceof Player) || !ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES))) {
-			EntityUtils.addAttribute((Attributable) entity, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		if (entity instanceof Attributable attributable && (!(entity instanceof Player) || !ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES))) {
+			EntityUtils.addAttribute(attributable, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 
 	@Override
 	public void entityLoseEffect(Entity entity) {
-		if (entity instanceof Attributable) {
-			EntityUtils.removeAttribute((Attributable) entity, Attribute.GENERIC_MOVEMENT_SPEED, mModifierName);
+		if (entity instanceof Attributable attributable) {
+			EntityUtils.removeAttribute(attributable, Attribute.GENERIC_MOVEMENT_SPEED, mModifierName);
 		}
 	}
 

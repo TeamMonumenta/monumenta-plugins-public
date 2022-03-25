@@ -37,6 +37,7 @@ public class RingOfFlames extends DepthsAbility {
 	private static final int[] DAMAGE = {4, 5, 6, 7, 8, 10};
 	private static final int[] DURATION = {8 * 20, 9 * 20, 10 * 20, 11 * 20, 12 * 20, 14 * 20};
 	private static final int EFFECT_DURATION = 4 * 20;
+	private static final double BLEED_AMOUNT = 0.2;
 
 	public RingOfFlames(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -114,7 +115,7 @@ public class RingOfFlames extends DepthsAbility {
 								}
 								world.spawnParticle(Particle.SOUL_FIRE_FLAME, e.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
 								EntityUtils.applyFire(mPlugin, EFFECT_DURATION, e, mPlayer);
-								EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, 2, e);
+								EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, BLEED_AMOUNT, e);
 
 								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false);
 
@@ -144,7 +145,7 @@ public class RingOfFlames extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to summon a ring of flames around you that lasts for " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Enemies on the flame perimeter are dealt " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage every second, and they are inflicted with Bleed 1 and set on fire for " + EFFECT_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Left click while sneaking and holding a weapon to summon a ring of flames around you that lasts for " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Enemies on the flame perimeter are dealt " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage every second, and they are inflicted with " + DepthsUtils.roundPercent(BLEED_AMOUNT) + "% Bleed and set on fire for " + EFFECT_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

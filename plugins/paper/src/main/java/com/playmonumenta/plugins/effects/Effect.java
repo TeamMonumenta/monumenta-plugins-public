@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.events.DamageEvent;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 
 /* NOTE:
  *
@@ -67,6 +71,18 @@ public abstract class Effect implements Comparable<Effect> {
 	}
 
 	public void onHurtByEntityWithSource(LivingEntity entity, DamageEvent event, Entity damager, LivingEntity source) {
+
+	}
+
+	public void onExpChange(Player player, PlayerExpChangeEvent event) {
+
+	}
+
+	public void onProjectileLaunch(Player player, AbstractArrow arrow) {
+
+	}
+
+	public void onDurabilityDamage(Player player, PlayerItemDamageEvent event) {
 
 	}
 
