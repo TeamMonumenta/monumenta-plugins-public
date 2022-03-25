@@ -2,7 +2,8 @@ package com.playmonumenta.bungeecord.reconnect;
 
 import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
-import io.lettuce.core.api.sync.RedisCommands;
+import io.lettuce.core.api.async.RedisAsyncCommands;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ProxyServer;
@@ -13,7 +14,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 public class MonumentaReconnectHandler implements ReconnectHandler {
 
 	private final @Nullable String mDefaultServer;
-	private final RedisCommands<String, String> mAPI = RedisAPI.getInstance().sync();
+	private final RedisAsyncCommands<String, String> mAPI = RedisAPI.getInstance().async();
 
 	public MonumentaReconnectHandler(@Nullable String defaultServer) {
 		mDefaultServer = defaultServer;
@@ -23,7 +24,13 @@ public class MonumentaReconnectHandler implements ReconnectHandler {
 	public ServerInfo getServer(ProxiedPlayer player) {
 		ServerInfo server = null;
 
-		String storedServerName = mAPI.hget(locationsKey(), player.getUniqueId().toString());
+		String storedServerName = null;
+		try {
+			storedServerName = mAPI.hget(locationsKey(), player.getUniqueId().toString()).get(8, TimeUnit.SECONDS);
+		} catch (Exception ex) {
+			ProxyServer.getInstance().getLogger().log(Level.WARNING, "Exception while getting player location for '" + player.getName() + "': " + ex.getMessage());
+			ex.printStackTrace();
+		}
 
 		if (storedServerName == null) {
 			/* Player has never connected before */
