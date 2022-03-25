@@ -238,6 +238,20 @@ public class BossUtils {
 		return PlayerUtils.playersInRange(loc, radius, true).size();
 	}
 
+	public static double getDefenseScalingRatio(int playerCount, int maxHealth) {
+		if (playerCount < 1) {
+			return 1.0;
+		}
+		int bossTargetHp = 0;
+		int hpDelta = maxHealth;
+		while (playerCount > 0) {
+			bossTargetHp = bossTargetHp + hpDelta;
+			hpDelta = hpDelta / 2 + 24;
+			playerCount--;
+		}
+		return bossTargetHp / (double) maxHealth;
+	}
+
 	/**
 	 * Adds modifiers to the existing map from the string
 	 * @param s a string like "[damage=10, cooldown=60, detectionrange=80, singletarget=true....]

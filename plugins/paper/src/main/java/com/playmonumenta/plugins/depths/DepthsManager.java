@@ -1230,7 +1230,7 @@ public class DepthsManager {
 		}
 		for (DepthsAbility da : getAbilities()) {
 			if (da.getDisplayName().equals(removedAbility)) {
-				if (!(dp.mEligibleTrees.contains(da.getDepthsTree()))) {
+				if (!dp.mEligibleTrees.contains(da.getDepthsTree())) {
 					isMutated = true;
 				}
 			}

@@ -58,6 +58,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -131,6 +132,8 @@ public class Kaul extends BossAbilityGroup {
 	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_3 = 10;
 	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_4 = 6;
 
+	private static final int MAX_HEALTH = 2048;
+
 	// At the centre of the Kaul shrine,
 	// upon the height of most of the arena's surface
 	private @Nullable LivingEntity mShrineMarker;
@@ -145,6 +148,8 @@ public class Kaul extends BossAbilityGroup {
 	private boolean mCooldown = false;
 	private boolean mPrimordialPhase = false;
 	private int mHits = 0;
+	private int mPlayerCount;
+	private double mDefenseScaling;
 
 	private static final String LIGHTNING_STORM_TAG = "KaulLightningStormTag";
 	private static final String PUTRID_PLAGUE_TAG_RED = "KaulPutridPlagueRed";
@@ -168,6 +173,8 @@ public class Kaul extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
+		mPlayerCount = getArenaParticipants().size();
+		mDefenseScaling = BossUtils.getDefenseScalingRatio(mPlayerCount, MAX_HEALTH);
 		mBoss.setRemoveWhenFarAway(false);
 		World world = boss.getWorld();
 		mBoss.addScoreboardTag("Boss");
@@ -853,6 +860,22 @@ public class Kaul extends BossAbilityGroup {
 		}
 	}
 
+	@Override
+	public void onHurt(DamageEvent event) {
+		event.setDamage(event.getDamage() / mDefenseScaling);
+	}
+
+	@Override
+	public boolean hasNearbyPlayerDeathTrigger() {
+		return true;
+	}
+
+	@Override
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		mPlayerCount = getArenaParticipants().size();
+		mDefenseScaling = BossUtils.getDefenseScalingRatio(mPlayerCount, MAX_HEALTH);
+	}
+
 	private @Nullable LivingEntity spawnPrimordial(Location loc) {
 		LivingEntity entity = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, primordial);
 		return entity;
@@ -1018,13 +1041,10 @@ public class Kaul extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hpDelta = 2048;
-		double finalHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.7, 0.65);
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, finalHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, MAX_HEALTH);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(finalHp);
+		mBoss.setHealth(MAX_HEALTH);
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			if (player.hasPotionEffect(PotionEffectType.GLOWING)) {
