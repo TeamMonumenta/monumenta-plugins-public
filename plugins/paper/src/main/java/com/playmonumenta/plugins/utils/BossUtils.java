@@ -27,7 +27,7 @@ public class BossUtils {
 	 * @param y Player count exponent, decrease Y to increase health scaling. range = [0 < Y < 1]
 	 */
 	public static double healthScalingCoef(int playerCount, double x, double y) {
-		double scalingCoef = 0;
+		double scalingCoef = 1;
 		// calculates smallest scaling increase first. largest scaling increase last.
 		while (playerCount > 0) {
 			double iterCoef = Math.pow(x, Math.pow(playerCount - 1, y));

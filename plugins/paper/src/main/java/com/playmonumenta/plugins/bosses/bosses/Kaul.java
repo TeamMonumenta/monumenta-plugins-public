@@ -175,17 +175,18 @@ public class Kaul extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
-		mPlayerCount = getArenaParticipants().size();
-		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
-		mBoss.setRemoveWhenFarAway(false);
-		World world = boss.getWorld();
-		mBoss.addScoreboardTag("Boss");
+
 		for (Entity e : boss.getWorld().getEntities()) {
 			if (e.getScoreboardTags().contains(LIGHTNING_STORM_TAG) && e instanceof LivingEntity) {
 				mShrineMarker = (LivingEntity) e;
 				break;
 			}
 		}
+		mPlayerCount = getArenaParticipants().size();
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
+		mBoss.setRemoveWhenFarAway(false);
+		World world = boss.getWorld();
+		mBoss.addScoreboardTag("Boss");
 
 		new BukkitRunnable() {
 			@Override
