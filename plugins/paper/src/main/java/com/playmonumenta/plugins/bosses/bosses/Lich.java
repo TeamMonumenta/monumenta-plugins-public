@@ -215,11 +215,9 @@ public final class Lich extends BossAbilityGroup {
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color white");
 			UUID keyUUID = mKey.getUniqueId();
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join lichphylactery " + keyUUID);
-			mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
-			mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 			mPhylactHealth = PHYLACT_HP * mDefenseScaling;
 			EntityUtils.setAttributeBase(mKey, Attribute.GENERIC_MAX_HEALTH, mPhylactHealth);
-			mKey.setHealth(PHYLACT_HP);
+			mKey.setHealth(mPhylactHealth);
 		}
 
 		mDefeated = false;
