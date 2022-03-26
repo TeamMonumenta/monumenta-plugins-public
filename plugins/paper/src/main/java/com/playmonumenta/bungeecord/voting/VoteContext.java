@@ -10,6 +10,7 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
@@ -46,39 +47,38 @@ public class VoteContext {
 	 * Map of the time when a site will go off cooldown
 	 * Entries are removed as time has been passed
 	 */
-	private final Map<String, Long> mOffCooldownTimes = new HashMap<>();
+	private final Map<String, Long> mOffCooldownTimes;
 
 	/*
 	 * Creates a new VoteContext for the player, loading their current off cooldown times if they exist
 	 *
 	 * Will block for a single round trip to redis
 	 */
-	protected VoteContext(Plugin plugin, UUID uuid) {
+	private VoteContext(Plugin plugin, UUID uuid, HashMap<String, Long> offCooldownTimes) {
 		mPlugin = plugin;
 		mUUID = uuid;
+		mOffCooldownTimes = offCooldownTimes;
+	}
 
-		/*
-		 * Attempt to load the offCooldownTimes for the player from their remote data.
-		 * If something goes wrong, oh well, it's not critical.
-		 */
-		try {
-			String data = RemoteDataAPI.get(uuid, VOTES_OFF_COOLDOWN_TIMES).get();
+	protected static CompletableFuture<VoteContext> getVoteContext(Plugin plugin, UUID uuid) {
+		return RemoteDataAPI.get(uuid, VOTES_OFF_COOLDOWN_TIMES).thenApply((data) -> {
+			HashMap<String, Long> offCooldownTimes = new HashMap<>();
+
 			if (data != null && !data.isEmpty()) {
 				Gson gson = new Gson();
 				JsonObject object = gson.fromJson(data, JsonObject.class);
 				for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
 					if (VoteManager.getSiteTimers().containsKey(entry.getKey())) {
-						// No lock needed in constructor
-						mOffCooldownTimes.put(entry.getKey(), entry.getValue().getAsLong());
+						offCooldownTimes.put(entry.getKey(), entry.getValue().getAsLong());
 					} else {
 						plugin.getLogger().warning("Failed to load offCooldownTimes entry '" + entry.getKey() +
-							                           "' for player '" + uuid.toString() + "'");
+													   "' for player '" + uuid.toString() + "'");
 					}
 				}
 			}
-		} catch (Exception ex) {
-			plugin.getLogger().warning("Failed to load offCooldownTimes for player '" + uuid.toString() + "': " + ex.getMessage());
-		}
+
+			return new VoteContext(plugin, uuid, offCooldownTimes);
+		});
 	}
 
 	private void saveOffCooldownTimes() {
