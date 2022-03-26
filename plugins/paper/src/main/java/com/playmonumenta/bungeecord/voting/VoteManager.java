@@ -134,7 +134,7 @@ public class VoteManager implements Listener {
 		// The line actually used here is copied from there because the API is broken on bungee and fixing it is annoying
 		// The whole name thing needs refactoring for bungee support...
 		// MonumentaRedisSyncAPI.nameToUUID(playerName).whenComplete((uuid, ex) -> {
-		RedisAPI.getInstance().async().hget("name2uuid", playerName).thenApply((uuid) -> UUID.fromString(uuid)).toCompletableFuture().whenComplete((uuid, ex) -> {
+		RedisAPI.getInstance().async().hget("name2uuid", playerName).thenApply((uuid) -> (uuid == null || uuid.isEmpty()) ? null : UUID.fromString(uuid)).toCompletableFuture().whenComplete((uuid, ex) -> {
 			if (ex != null) {
 				mLogger.warning("Failed to look up name2uuid for " + playerName + "': " + ex.getMessage());
 			} else {
