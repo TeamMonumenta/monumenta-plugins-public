@@ -82,15 +82,20 @@ public class VoteManager implements Listener {
 		ProxiedPlayer player = event.getPlayer();
 		UUID uuid = player.getUniqueId();
 
-		VoteContext context = new VoteContext(mPlugin, uuid);
-		/* Tick the task to make sure times are current */
-		long currentTime = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC);
-		context.tick(currentTime);
+		VoteContext.getVoteContext(mPlugin, uuid).whenComplete((context, ex) -> {
+			if (ex != null) {
+				mLogger.severe("Exception getting vote context after login: " + ex.getMessage());
+			} else {
+				/* Tick the task to make sure times are current */
+				long currentTime = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC);
+				context.tick(currentTime);
 
-		/* Tell the player their vote info and remind them about voting */
-		context.sendVoteInfoShort(player);
+				/* Tell the player their vote info and remind them about voting */
+				context.sendVoteInfoShort(player);
 
-		mContexts.put(uuid, context);
+				mContexts.put(uuid, context);
+			}
+		});
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
@@ -142,16 +147,25 @@ public class VoteManager implements Listener {
 					mLogger.warning("Got vote for unknown player '" + playerName + "'");
 				} else {
 					VoteContext context = mContexts.get(uuid);
-					if (context == null) {
-						/* Player is not online - load their vote context or create & initialize a new one */
-						context = new VoteContext(mPlugin, uuid);
-						// Intentionally don't add the context to mContexts - they're not online.
+					if (context != null) {
+						context.voteReceived(finalMatchingSite, finalCooldown); // Note that this will save internally
+
+						// Broadcast an update to other bungee servers to update & potentially notify the player
+						NetworkRelayIntegration.sendVoteNotifyPacket(uuid, finalMatchingSite, finalCooldown);
+					} else {
+						/* Player is not online on this proxy - load their vote context or create & initialize a new one */
+						VoteContext.getVoteContext(mPlugin, uuid).whenComplete((ctx, e) -> {
+							if (e != null) {
+								mLogger.severe("Exception getting vote context for offline vote: " + e.getMessage());
+							} else {
+								// Intentionally don't add the context to mContexts - they're (probably) not online.
+								ctx.voteReceived(finalMatchingSite, finalCooldown); // Note that this will save internally
+
+								// Broadcast an update to other bungee servers to update & potentially notify the player
+								NetworkRelayIntegration.sendVoteNotifyPacket(uuid, finalMatchingSite, finalCooldown);
+							}
+						});
 					}
-
-					context.voteReceived(finalMatchingSite, finalCooldown); // Note that this will save internally
-
-					// Broadcast an update to other bungee servers to update & potentially notify the player
-					NetworkRelayIntegration.sendVoteNotifyPacket(uuid, finalMatchingSite, finalCooldown);
 				}
 			}
 		});
@@ -168,14 +182,21 @@ public class VoteManager implements Listener {
 	}
 
 	public void onVoteCmd(ProxiedPlayer player) {
-		VoteContext context = mContexts.get(player.getUniqueId());
-		if (context == null) {
+		UUID uuid = player.getUniqueId();
+		VoteContext context = mContexts.get(uuid);
+		if (context != null) {
+			context.sendVoteInfoLong(player);
+		} else {
 			// This is weird, they're online, but they don't have a vote context. Might as well just load it and add to the map
-			context = new VoteContext(mPlugin, player.getUniqueId());
-			mContexts.put(player.getUniqueId(), context);
+			VoteContext.getVoteContext(mPlugin, uuid).whenComplete((ctx, e) -> {
+				if (e != null) {
+					mLogger.severe("Exception getting vote context for /vote command: " + e.getMessage());
+				} else {
+					mContexts.put(uuid, ctx);
+					ctx.sendVoteInfoLong(player);
+				}
+			});
 		}
-
-		context.sendVoteInfoLong(player);
 	}
 
 	private void tick() {
