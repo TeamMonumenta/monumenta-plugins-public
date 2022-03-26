@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.itemstats;
 
+import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
@@ -47,7 +48,6 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -63,7 +63,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -558,22 +557,13 @@ public class ItemStatManager implements Listener {
 	}
 
 	/*
-	 * Watch for spawned items
+	 * Watch for spawned or loaded items
 	 */
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void itemSpawnEvent(ItemSpawnEvent event) {
-		checkSpawnedItem(event.getEntity());
-	}
-
-	/*
-	 * Chunk loading an item entity also counts as spawning
-	 */
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void chunkLoadEvent(ChunkLoadEvent event) {
-		for (Entity entity : event.getChunk().getEntities()) {
-			if (entity instanceof Item) {
-				checkSpawnedItem((Item)entity);
-			}
+	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
+		if (event.getEntity() instanceof Item item) {
+			// delayed to not run in the EntityAddToWorldEvent which is finicky
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> checkSpawnedItem(item));
 		}
 	}
 
