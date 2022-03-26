@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
@@ -58,5 +59,11 @@ public interface VersionAdapter {
 	Entity spawnWorldlessEntity(EntityType type, World world);
 
 	int getEntityTypeRegistryId(Entity entity);
+
+	/**
+	 * Prevents the given parrot from moving onto a player's shoulders.
+	 * This is not persistent and needs to be re-applied whenever the parrot is loaded again.
+	 */
+	void disablePerching(Parrot parrot);
 
 }

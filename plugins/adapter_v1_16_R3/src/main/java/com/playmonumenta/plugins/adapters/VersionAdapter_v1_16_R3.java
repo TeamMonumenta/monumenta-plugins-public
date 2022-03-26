@@ -15,6 +15,7 @@ import net.minecraft.server.v1_16_R3.EntityTypes;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.PathfinderGoalPerch;
 import net.minecraft.server.v1_16_R3.Vec3D;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -24,11 +25,13 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMob;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftParrot;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
@@ -247,6 +250,11 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	@Override
 	public int getEntityTypeRegistryId(Entity entity) {
 		return IRegistry.ENTITY_TYPE.a(((CraftEntity) entity).getHandle().getEntityType());
+	}
+
+	@Override
+	public void disablePerching(Parrot parrot) {
+		((CraftParrot) parrot).getHandle().goalSelector.getTasks().removeIf(w -> w.getGoal() instanceof PathfinderGoalPerch);
 	}
 
 }
