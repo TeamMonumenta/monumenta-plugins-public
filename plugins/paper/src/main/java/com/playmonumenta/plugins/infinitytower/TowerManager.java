@@ -87,7 +87,13 @@ public class TowerManager implements Listener {
 		Player player = event.getPlayer();
 		if (player.getScoreboardTags().contains(TowerConstants.PLAYER_TAG)) {
 			UUID uuid = player.getUniqueId();
-			GAMES.get(uuid).stop();
+			if (GAMES.containsKey(uuid)) {
+				GAMES.get(uuid).stop();
+			} else {
+				//somehow the game don't exist but the player has the tags? probably a crash
+				TowerGame.clearPlayer(player);
+				//clearing all the tags
+			}
 		}
 	}
 

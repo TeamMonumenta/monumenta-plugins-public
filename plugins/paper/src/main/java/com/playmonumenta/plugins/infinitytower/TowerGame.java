@@ -53,6 +53,7 @@ public class TowerGame {
 
 	private boolean mIsGameEnded = false;
 	private boolean mIsTurnEnded = false;
+	private boolean mPlayerLose = false;
 
 	protected final int ID;
 	private final TowerGame INSTANCE;
@@ -149,7 +150,7 @@ public class TowerGame {
 	public void playerLoseTurn() {
 		//set scoreboard for result
 		TowerGameUtils.sendMessage(mPlayer.mPlayer, "You lose at round: " + (mCurrentFloor + 1));
-
+		mPlayerLose = true;
 		stop();
 	}
 
@@ -346,7 +347,17 @@ public class TowerGame {
 		if (mCurrentFloor > TowerConstants.DESIGNED_FLOORS - 1 && mFloor != null) {
 			Collection<ArmorStand> armorStand = mPlayer.mPlayer.getWorld().getNearbyEntitiesByType(ArmorStand.class, mPlayer.mPlayer.getLocation(), 150, 150, 150);
 			armorStand.removeIf(armor -> !armor.getScoreboardTags().contains(TowerConstants.TAG_FIREWORK_ARMORSTAND));
-			TowerGameUtils.sendMessage(mPlayer.mPlayer, "Congratulations! your team will now defend round " + (mCurrentFloor + 1));
+			if (mPlayerLose) {
+				TowerGameUtils.sendMessage(mPlayer.mPlayer, "Congratulations on defeating Plunderer's Blitz!");
+				//if mCurrentFloor == 50 -> player lose at round 51 -> his team will not be saved
+				if (mCurrentFloor != 50) {
+					TowerGameUtils.sendMessage(mPlayer.mPlayer, "Your team will now defend round " + mCurrentFloor);
+				}
+			} else {
+				//the player has reached the final round
+				TowerGameUtils.sendMessage(mPlayer.mPlayer, "Congratulations on defeating Plunderer's Blitz!");
+				TowerGameUtils.sendMessage(mPlayer.mPlayer, "Your team will now defend round " + (mCurrentFloor + 1));
+			}
 			new BukkitRunnable() {
 				int mTimes = 0;
 				@Override public void run() {
@@ -360,6 +371,7 @@ public class TowerGame {
 							TowerFileUtils.convertPlayerTeamLocation(INSTANCE);
 							TowerFileUtils.savePlayerTeam(mPlayer.mTeam, mCurrentFloor - 1);
 						}
+						TowerGameUtils.giveLoot(INSTANCE);
 						clearPlayer(mPlayer.mPlayer);
 						forceStopGame();
 					}
