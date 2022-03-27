@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -28,10 +29,13 @@ public class ElementalArrows extends Ability {
 
 	public static final double DAMAGE_MULTIPLIER_1 = 0.1;
 	public static final double DAMAGE_MULTIPLIER_2 = 0.2;
+	public static final double DAMAGE_MULTIPLIER_3 = 0.3;
 	public static final int ELEMENTAL_ARROWS_BONUS_DAMAGE = 8;
 	public static final int ELEMENTAL_ARROWS_DURATION = 20 * 6;
 	public static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
 	public static final double SLOW_AMPLIFIER = 0.2;
+	public static final int ENHANCED_ARROW_COOLDOWN = 10 * Constants.TICKS_PER_SECOND;
+	public static final int ENHANCED_ARROW_STUN_DURATION = 1 * Constants.TICKS_PER_SECOND;
 
 	private double mLastDamage = 0;
 	private double mDamageMultiplier;
@@ -44,8 +48,10 @@ public class ElementalArrows extends Ability {
 		mInfo.mShorthandName = "EA";
 		mInfo.mDescriptions.add("Your fully drawn arrows and tridents are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with 20% Slowness for 6 seconds. Fire and Ice arrows deal 10% extra damage. Ice arrows deal 8 extra damage to Blazes. Fire arrows deal 8 extra damage to strays. This skill can not apply Spellshock.");
 		mInfo.mDescriptions.add("Your fire arrows also set nearby enemies within a radius of 3 blocks on fire when they hit a target. Your ice arrows also slow nearby enemies within a radius of 3 blocks when they hit a target. Both area of effect effects do 20% bow damage to all targets affected.");
+		mInfo.mDescriptions.add("Your next elemental arrow every 10s stuns non elite enemies hit for 1s and deals an extra 30% bow damage to affected enemies.");
 		mDisplayItem = new ItemStack(Material.SPECTRAL_ARROW, 1);
-
+		mInfo.mCooldown = ENHANCED_ARROW_COOLDOWN;
+		mInfo.mIgnoreCooldown = true;
 		mDamageMultiplier = isLevelOne() ? DAMAGE_MULTIPLIER_1 : DAMAGE_MULTIPLIER_2;
 	}
 
@@ -85,6 +91,12 @@ public class ElementalArrows extends Ability {
 			EntityUtils.applySlow(mPlugin, ELEMENTAL_ARROWS_DURATION, SLOW_AMPLIFIER, enemy);
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, ABILITY_ICE);
 			mLastDamage = event.getDamage();
+		} else if (arrow.hasMetadata("ElementalArrowsThunderArrow")) {
+			damage = event.getDamage() * DAMAGE_MULTIPLIER_3;
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), ELEMENTAL_ARROWS_RADIUS, enemy)) {
+				EntityUtils.applyStun(mPlugin, ENHANCED_ARROW_STUN_DURATION, mob);
+				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, ABILITY, true);
+			}
 		}
 		return true; // creates new damage instances
 	}
@@ -99,7 +111,12 @@ public class ElementalArrows extends Ability {
 			return true;
 		}
 		if (arrow.isCritical() || arrow instanceof Trident) {
-			if (mPlayer.isSneaking()) {
+			if (isEnhanced() && !isOnCooldown()) {
+				arrow.setMetadata("ElementalArrowsThunderArrow", new FixedMetadataValue(mPlugin, 0));
+				arrow.setFireTicks(0);
+				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.END_ROD);
+				putOnCooldown();
+			} else if (mPlayer.isSneaking()) {
 				arrow.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
 				arrow.setFireTicks(0);
 				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SNOW_SHOVEL);

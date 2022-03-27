@@ -41,6 +41,9 @@ public class FrostNova extends Ability {
 	public static final double SLOW_MULTIPLIER_1 = 0.2;
 	public static final double SLOW_MULTIPLIER_2 = 0.4;
 	public static final double REDUCTION_MULTIPLIER = 0.1;
+	public static final double ENHANCED_DAMAGE_MODIFIER = 1.15;
+	public static final double ENHANCED_COOLDOWN_REDUCTION = 0.9;
+	public static final int ENHANCED_FROZEN_DURATION = 2 * Constants.TICKS_PER_SECOND;
 	public static final int DURATION_TICKS = 4 * Constants.TICKS_PER_SECOND;
 	public static final int COOLDOWN_TICKS = 18 * Constants.TICKS_PER_SECOND;
 
@@ -73,11 +76,15 @@ public class FrostNova extends Ability {
 				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_2)
 			)
 		);
-		mInfo.mCooldown = COOLDOWN_TICKS;
+		mInfo.mDescriptions.add(
+			"Damage is increased by 15% and cooldown is decreased by 10%. Non elites and bosses are frozen for 2s, having their AI and gravity removed."
+		);
+		mInfo.mCooldown = isEnhanced() ? (int) (COOLDOWN_TICKS * ENHANCED_COOLDOWN_REDUCTION) : COOLDOWN_TICKS;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.ICE, 1);
 
-		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		int damage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mLevelDamage = isEnhanced() ? (int) (damage * ENHANCED_DAMAGE_MODIFIER) : damage;
 		mLevelSlowMultiplier = isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2;
 	}
 
@@ -93,6 +100,19 @@ public class FrostNova extends Ability {
 				EntityUtils.applySlow(mPlugin, DURATION_TICKS, mLevelSlowMultiplier - REDUCTION_MULTIPLIER, mob);
 			} else {
 				EntityUtils.applySlow(mPlugin, DURATION_TICKS, mLevelSlowMultiplier, mob);
+				if (isEnhanced()) {
+					mob.setAI(false);
+					mob.setGravity(false);
+					new BukkitRunnable() {
+
+						@Override
+						public void run() {
+							mob.setAI(true);
+							mob.setGravity(true);
+						}
+
+					}.runTaskLater(mPlugin, ENHANCED_FROZEN_DURATION);
+				}
 			}
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
 

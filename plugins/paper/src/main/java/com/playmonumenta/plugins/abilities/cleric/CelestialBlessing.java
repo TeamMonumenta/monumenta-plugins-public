@@ -30,11 +30,13 @@ import org.bukkit.inventory.ItemStack;
 public class CelestialBlessing extends Ability {
 
 	private static final int CELESTIAL_COOLDOWN = 40 * 20;
+	private static final int CELESTIAL_COOLDOWN_ENHANCED = 30 * 20;
 	private static final int CELESTIAL_1_DURATION = 10 * 20;
 	private static final int CELESTIAL_2_DURATION = 12 * 20;
 	private static final double CELESTIAL_RADIUS = 12;
 	private static final double CELESTIAL_1_EXTRA_DAMAGE = 0.20;
 	private static final double CELESTIAL_2_EXTRA_DAMAGE = 0.35;
+	private static final double CELESTIAL_ENHANCED_DAMAGE = 0.25;
 	private static final double CELESTIAL_EXTRA_SPEED = 0.20;
 	private static final String ATTR_NAME = "CelestialBlessingExtraSpeedAttr";
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
@@ -42,6 +44,9 @@ public class CelestialBlessing extends Ability {
 			DamageType.MELEE_SKILL,
 			DamageType.MELEE_ENCH,
 			DamageType.PROJECTILE
+	);
+	private static final EnumSet<DamageType> ENHANCED_AFFECTED_DAMAGE_TYPES = EnumSet.of(
+			DamageType.MAGIC
 	);
 	public static final String DAMAGE_EFFECT_NAME = "CelestialBlessingExtraDamage";
 
@@ -55,7 +60,8 @@ public class CelestialBlessing extends Ability {
 		mInfo.mShorthandName = "CB";
 		mInfo.mDescriptions.add("When you strike while sneaking, you and all other players in a 12 block radius gain +20% melee and projectile damage and +20% speed for 10 s. Cooldown: 40s.");
 		mInfo.mDescriptions.add("Increases the buff to +35% damage for 12 s.");
-		mInfo.mCooldown = CELESTIAL_COOLDOWN;
+		mInfo.mDescriptions.add("Ability damage is now also increased by 25%. Cooldown: 30s.");
+		mInfo.mCooldown = isEnhanced() ? CELESTIAL_COOLDOWN_ENHANCED : CELESTIAL_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.SUGAR, 1);
 
@@ -78,6 +84,9 @@ public class CelestialBlessing extends Ability {
 
 		// Give these players the metadata tag that boosts their damage
 		for (Player p : affectedPlayers) {
+			if (isEnhanced()) {
+				mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME + "Magic", new PercentDamageDealt(mDuration, CELESTIAL_ENHANCED_DAMAGE, ENHANCED_AFFECTED_DAMAGE_TYPES));
+			}
 			mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME, new PercentDamageDealt(mDuration, mExtraDamage, AFFECTED_DAMAGE_TYPES));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraSpeed", new PercentSpeed(mDuration, CELESTIAL_EXTRA_SPEED, ATTR_NAME));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingParticles", new Aesthetics(mDuration,

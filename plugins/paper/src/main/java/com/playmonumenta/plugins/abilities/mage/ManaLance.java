@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.mage;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
@@ -29,7 +30,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 
-public class ManaLance extends Ability {
+public class ManaLance extends MultipleChargeAbility {
 
 	private static final float DAMAGE_1 = 6.0f;
 	private static final float DAMAGE_2 = 7.0f;
@@ -46,10 +47,12 @@ public class ManaLance extends Ability {
 		mInfo.mShorthandName = "ML";
 		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 6 magic damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: 5s.");
 		mInfo.mDescriptions.add("The beam instead deals 7 damage. Cooldown: 3s.");
+		mInfo.mDescriptions.add("Mana lance now has two charges.");
 		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.TRIDENT, 1);
-
+		mMaxCharges = isEnhanced() ? 2 : 1;
+		mCharges = getTrackedCharges();
 		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 	}
 
