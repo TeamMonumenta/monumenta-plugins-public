@@ -175,6 +175,7 @@ public class DepthsRoomRepository {
 		mF2EliteRooms.add(new DepthsRoom("depths/f2r43", DepthsRoomType.ABILITY, new Vector(51, 50, 70), new Vector(1.0, -38.0, -8.0), 18, RoomDirection.DOWN));
 		mF2EliteRooms.add(new DepthsRoom("depths/f2r44", DepthsRoomType.ABILITY, new Vector(46, 55, 65), new Vector(1.0, -40.0, -13.0), 27, RoomDirection.DOWN));
 		mF2EliteRooms.add(new DepthsRoom("depths/f2r48", DepthsRoomType.ABILITY, new Vector(50, 30, 51), new Vector(1.0, -5.0, -25.0), 30, RoomDirection.EVEN));
+		mF2EliteRooms.add(new DepthsRoom("depths/f2r49", DepthsRoomType.ABILITY, new Vector(54, 42, 68), new Vector(1.0, -2.0, -22.0), 31, RoomDirection.UP));
 
 		//F2 twisted rooms
 		mF2TwistedRooms.add(new DepthsRoom("depths/f2r33", DepthsRoomType.TWISTED, new Vector(57, 58, 57), new Vector(1.0, -25.0, -48.0), 51, RoomDirection.DOWN));

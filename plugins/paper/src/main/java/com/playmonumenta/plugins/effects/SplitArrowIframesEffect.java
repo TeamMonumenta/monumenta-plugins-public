@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
-public class SplitArrowIframesEffect extends Effect {
+public class SplitArrowIframesEffect extends ZeroArgumentEffect {
 
 	public SplitArrowIframesEffect(int duration) {
 		super(duration);

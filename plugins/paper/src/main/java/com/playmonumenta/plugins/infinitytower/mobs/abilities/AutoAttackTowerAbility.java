@@ -28,10 +28,10 @@ import org.bukkit.util.Vector;
 
 public class AutoAttackTowerAbility extends TowerAbility {
 
-	private static final int TICKS = 20 * 3;
+	private static final int TICKS = (int) (20 * 2.5);
 	private static final double DISTANCE_MELEE_ATK = 6;
 	private static final int MELEE_DAMAGE = 15;
-	private static final int RANGED_DAMAGE = 12;
+	private static final int RANGED_DAMAGE = 13;
 
 	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
 	private static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.0f);

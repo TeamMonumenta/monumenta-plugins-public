@@ -14,7 +14,7 @@ public class StasisCommand extends GenericCommand {
 	}
 
 	private static void run(Player entity) {
-		Plugin.getInstance().mEffectManager.addEffect(entity, Stasis.STASIS_NAME, new Stasis(120));
+		Plugin.getInstance().mEffectManager.addEffect(entity, Stasis.GENERIC_NAME, new Stasis(120));
 	}
 
 }

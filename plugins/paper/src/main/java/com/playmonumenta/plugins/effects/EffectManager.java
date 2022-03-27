@@ -13,6 +13,7 @@ import java.util.NavigableSet;
 import java.util.TreeSet;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -21,6 +22,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -488,6 +492,46 @@ public final class EffectManager implements Listener {
 						}
 						effectGroup.last().onDamage(source, event, damagee);
 					}
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void expChangeEvent(PlayerExpChangeEvent event) {
+		Player player = event.getPlayer();
+		Effects effects = mEntities.get(player);
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					effectGroup.last().onExpChange(player, event);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
+		if (event.getEntity() instanceof AbstractArrow arrow && arrow.getShooter() instanceof Player player) {
+			Effects effects = mEntities.get(player);
+			if (effects != null) {
+				for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+					for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+						effectGroup.last().onProjectileLaunch(player, arrow);
+					}
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
+		Player player = event.getPlayer();
+		Effects effects = mEntities.get(player);
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					effectGroup.last().onDurabilityDamage(player, event);
 				}
 			}
 		}

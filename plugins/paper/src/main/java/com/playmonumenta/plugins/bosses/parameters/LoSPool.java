@@ -14,7 +14,7 @@ import org.bukkit.entity.Entity;
 
 public class LoSPool {
 
-	private String mPoolName;
+	private final String mPoolName;
 
 	public LoSPool(String poolName) {
 		mPoolName = poolName;

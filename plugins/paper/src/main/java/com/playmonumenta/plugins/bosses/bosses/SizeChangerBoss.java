@@ -11,6 +11,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Slime;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -54,18 +55,25 @@ public class SizeChangerBoss extends BossAbilityGroup {
 	private int mTimes = 0;
 	private final Parameters mParams;
 	private final Slime mSlime;
+	private final Phantom mPhantom;
 
 	public SizeChangerBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 
-		if (!(boss instanceof Slime slime)) {
-			throw new Exception("This boss ability can only be used on Slimes or MagmaCube");
+		if (boss instanceof Slime slime) {
+			mSlime = slime;
+			mPhantom = null;
+			mCurrentSize = mSlime.getSize();
+		} else if (boss instanceof Phantom phantom) {
+			mSlime = null;
+			mPhantom = phantom;
+			mCurrentSize = mPhantom.getSize();
+		} else {
+			throw new Exception("This boss ability can only be used on Slimes or MagmaCube or phantom");
 		}
 
 		mParams = BossParameters.getParameters(mBoss, identityTag, new Parameters());
 
-		mSlime = slime;
-		mCurrentSize = slime.getSize();
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), mParams.DETECTION, null);
 
 	}
@@ -96,7 +104,11 @@ public class SizeChangerBoss extends BossAbilityGroup {
 
 		if (shouldChangeSize) {
 			//change the size
-			mSlime.setSize(mCurrentSize);
+			if (mSlime != null) {
+				mSlime.setSize(mCurrentSize);
+			} else {
+				mPhantom.setSize(mCurrentSize);
+			}
 
 			mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
 			mBoss.setHealth(currentHealth);

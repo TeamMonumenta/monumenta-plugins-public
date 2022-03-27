@@ -1,11 +1,11 @@
-import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import net.ltgt.gradle.errorprone.CheckSeverity
+import net.ltgt.gradle.errorprone.errorprone
+import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import org.hidetake.groovy.ssh.core.Remote
 import org.hidetake.groovy.ssh.core.RunHandler
 import org.hidetake.groovy.ssh.core.Service
 import org.hidetake.groovy.ssh.session.SessionHandler
-import net.ltgt.gradle.errorprone.errorprone
-import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
@@ -36,7 +36,7 @@ dependencies {
     compileOnly("net.luckperms:api:5.3")
     compileOnly("net.coreprotect:coreprotect:2.15.0")
     compileOnly("com.playmonumenta:scripted-quests:5.1")
-    compileOnly("com.playmonumenta:redissync:2.8")
+    compileOnly("com.playmonumenta:redissync:3.6")
     compileOnly("com.playmonumenta:monumenta-network-relay:1.0")
     compileOnly("com.playmonumenta:structures:7.2")
     compileOnly("com.playmonumenta:worlds:1.6")
@@ -75,7 +75,7 @@ bungee {
     name = "Monumenta-Bungee"
     main = "com.playmonumenta.bungeecord.Main"
     author = "The Monumenta Team"
-    softDepends = setOf("MonumentaNetworkRelay", "Votifier", "SuperVanish", "PremiumVanish", "BungeeTabListPlus", "LuckPerms")
+    softDepends = setOf("MonumentaNetworkRelay", "MonumentaRedisSync", "Votifier", "SuperVanish", "PremiumVanish", "BungeeTabListPlus", "LuckPerms")
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -107,16 +107,18 @@ val basicssh = remotes.create("basicssh") {
     host = "admin-eu.playmonumenta.com"
     port = 8822
     user = "epic"
-    agent = true
     knownHosts = allowAnyHosts
+    agent = System.getenv("IDENTITY_FILE") == null
+    identity = if (System.getenv("IDENTITY_FILE") == null) null else file(System.getenv("IDENTITY_FILE"))
 }
 
 val adminssh = remotes.create("adminssh") {
     host = "admin-eu.playmonumenta.com"
     port = 9922
     user = "epic"
-    agent = true
     knownHosts = allowAnyHosts
+    agent = System.getenv("IDENTITY_FILE") == null
+    identity = if (System.getenv("IDENTITY_FILE") == null) null else file(System.getenv("IDENTITY_FILE"))
 }
 
 tasks.create("dev1-deploy") {
@@ -166,6 +168,19 @@ tasks.create("dev4-deploy") {
             session(basicssh) {
                 execute("cd /home/epic/dev4_shard_plugins && rm -f Monumenta*.jar")
                 put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/dev4_shard_plugins")
+            }
+        }
+    }
+}
+
+tasks.create("futurama-deploy") {
+    val shadowJar by tasks.named<ShadowJar>("shadowJar")
+    dependsOn(shadowJar)
+    doLast {
+        ssh.runSessions {
+            session(basicssh) {
+                execute("cd /home/epic/futurama_shard_plugins && rm -f Monumenta*.jar")
+                put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/futurama_shard_plugins")
             }
         }
     }

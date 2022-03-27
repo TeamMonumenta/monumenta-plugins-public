@@ -83,52 +83,66 @@ public class TealQuestBoss extends BossAbilityGroup {
 					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
 					world.spawnParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0);
 				}, (World world, Location loc) -> {
-					world.playSound(loc, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
-					world.spawnParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0);
-				}, (World world, Location loc) -> {
-					world.spawnParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f));
-				}, (World world, Player player, Location loc, Vector dir) -> {
-					ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
-							Arrays.asList(
-									new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
-										world.spawnParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.1);
-										world.spawnParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.1);
-									})
-							));
+				world.playSound(loc, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
+				world.spawnParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0);
+			}, (World world, Location loc) -> {
+				world.spawnParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f));
+			}, (World world, Player player, Location loc, Vector dir) -> {
+				ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
+					Arrays.asList(
+						new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
+							world.spawnParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.1);
+							world.spawnParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.1);
+						})
+					));
 
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.3F, 0);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2, 1.25F);
-					world.spawnParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
-					world.spawnParticle(Particle.LAVA, loc, 3 * (int)(DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0);
-					if (player != null) {
-						BossUtils.bossDamagePercent(mBoss, player, DAMAGE_PERCENT);
-						return;
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.3F, 0);
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2, 1.25F);
+				world.spawnParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F);
+				world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
+				world.spawnParticle(Particle.LAVA, loc, 3 * (int) (DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0);
+				if (player != null) {
+					BossUtils.bossDamagePercent(mBoss, player, DAMAGE_PERCENT);
+					return;
+				}
+				for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
+					BossUtils.bossDamagePercent(mBoss, players, DAMAGE_PERCENT);
+				}
+			}),
+			new SpellBaseAoE(plugin, boss, RADIUS, DURATION, COOLDOWN_SWING, false, Sound.ENTITY_PLAYER_ATTACK_SWEEP) {
+				@Override
+				protected void chargeAuraAction(Location loc) {
+					boss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 1, 2));
+					World world = loc.getWorld();
+					world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, ((double) RADIUS) / 3, ((double) RADIUS) / 3, ((double) RADIUS) / 3, 0.05);
+				}
+
+				@Override
+				protected void chargeCircleAction(Location loc) {
+					World world = loc.getWorld();
+					world.spawnParticle(Particle.CRIT, loc, 1, 0.25, 0.25, 0.25, 0.05);
+				}
+
+				@Override
+				protected void outburstAction(Location loc) {
+					World world = loc.getWorld();
+					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1.5f, 0.65F);
+				}
+
+				@Override
+				protected void circleOutburstAction(Location loc) {
+					World world = loc.getWorld();
+					world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0.1, 0.1, 0.1, 0.3);
+					world.spawnParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, REDSTONE_COLOR_SWING);
+				}
+
+				@Override
+				protected void dealDamageAction(Location loc) {
+					for (Player player : PlayerUtils.playersInRange(boss.getLocation(), RADIUS, false)) {
+						BossUtils.blockableDamage(boss, player, DamageType.MELEE, 35);
 					}
-					for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
-						BossUtils.bossDamagePercent(mBoss, players, DAMAGE_PERCENT);
-					}
-					}),
-					new SpellBaseAoE(plugin, boss, RADIUS, DURATION, COOLDOWN_SWING, false, Sound.ENTITY_PLAYER_ATTACK_SWEEP,
-						(Location loc) -> {
-							boss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 1, 2));
-							World world = loc.getWorld();
-							world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, ((double) RADIUS) / 3, ((double) RADIUS) / 3, ((double) RADIUS) / 3, 0.05);
-						}, (Location loc) -> {
-							World world = loc.getWorld();
-							world.spawnParticle(Particle.CRIT, loc, 1, 0.25, 0.25, 0.25, 0.05);
-						}, (Location loc) -> {
-							World world = loc.getWorld();
-							world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1.5f, 0.65F);
-						}, (Location loc) -> {
-							World world = loc.getWorld();
-							world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0.1, 0.1, 0.1, 0.3);
-							world.spawnParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, REDSTONE_COLOR_SWING);
-						}, (Location loc) -> {
-							for (Player player : PlayerUtils.playersInRange(boss.getLocation(), RADIUS, false)) {
-								BossUtils.blockableDamage(boss, player, DamageType.MELEE, 35);
-							}
-						})));
+				}
+			}));
 
 		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, mBoss, detectionRange, RECHARGE_TIME, HITS_TO_BREAK, false,
 				(Location loc) -> {

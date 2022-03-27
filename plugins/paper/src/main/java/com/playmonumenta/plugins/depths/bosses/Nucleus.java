@@ -200,14 +200,14 @@ public final class Nucleus extends BossAbilityGroup {
 		events.put(60, (mBoss) -> {
 			mCooldownTicks -= 30;
 			changePhase(phase2Spells, phase2Passives, null);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Gyrheaddant Nucleus]\",\"color\":\"gold\"},{\"text\":\" Beyond... I \",\"color\":\"red\"},{\"text\":\"nb\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\" push further into \",\"color\":\"red\"},{\"text\":\"nbff\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"this reality... Quickness... Yes... \",\"color\":\"red\"},{\"text\":\"hggghg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\" Sink...\",\"color\":\"red\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Gyrhaeddant Nucleus]\",\"color\":\"gold\"},{\"text\":\" Beyond... I \",\"color\":\"red\"},{\"text\":\"nb\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\" push further into \",\"color\":\"red\"},{\"text\":\"nbff\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"this reality... Quickness... Yes... \",\"color\":\"red\"},{\"text\":\"hggghg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\" Sink...\",\"color\":\"red\"}]");
 			forceCastSpell(SpellTectonicDevastation.class);
 			hide();
 		});
 		events.put(20, (mBoss) -> {
 			mCooldownTicks -= 30;
 			changePhase(phase3Spells, phase3Passives, null);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Gyrheaddant Nucleus]\",\"color\":\"gold\"},{\"text\":\" This \",\"color\":\"red\"},{\"text\":\"ygg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"Void sustains me... Faster now... \",\"color\":\"red\"},{\"text\":\"hfhu\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"Faster...\",\"color\":\"red\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Gyrhaeddant Nucleus]\",\"color\":\"gold\"},{\"text\":\" This \",\"color\":\"red\"},{\"text\":\"ygg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"Void sustains me... Faster now... \",\"color\":\"red\"},{\"text\":\"hfhu\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"Faster...\",\"color\":\"red\"}]");
 			forceCastSpell(SpellTectonicDevastation.class);
 			hide();
 		});
@@ -356,7 +356,7 @@ public final class Nucleus extends BossAbilityGroup {
 	@Override
 	public void death(EntityDeathEvent event) {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Gyrheaddant Nucleus]\",\"color\":\"gold\"},{\"text\":\" B\",\"color\":\"red\"},{\"text\":\"ngrbgg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"A\",\"color\":\"red\"},{\"text\":\"gbg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"C\",\"color\":\"red\"},{\"text\":\"bggbg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"K!!! AWAY!!! This world... \",\"color\":\"red\"},{\"text\":\"hhgg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"is poison...\",\"color\":\"red\"}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Gyrhaeddant Nucleus]\",\"color\":\"gold\"},{\"text\":\" B\",\"color\":\"red\"},{\"text\":\"ngrbgg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"A\",\"color\":\"red\"},{\"text\":\"gbg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"C\",\"color\":\"red\"},{\"text\":\"bggbg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"K!!! AWAY!!! This world... \",\"color\":\"red\"},{\"text\":\"hhgg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"is poison...\",\"color\":\"red\"}]");
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));

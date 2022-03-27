@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.bosses;
 
+import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.*;
 import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
@@ -66,7 +68,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
@@ -78,8 +79,6 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
@@ -244,6 +243,8 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(MobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> new MobRisingBoss(p, e));
 		mStatelessBosses.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> new GrenadeLauncherBoss(p, e));
 		mStatelessBosses.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> new SizeChangerBoss(p, e));
+		mStatelessBosses.put(DeathSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new DeathSummonBoss(p, e));
+		mStatelessBosses.put(SummonOnExplosionBoss.identityTag, (Plugin p, LivingEntity e) -> new SummonOnExplosionBoss(p, e));
 
 		mStatelessBosses.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> new LichMageBoss(p, e));
 		mStatelessBosses.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> new LichRogueBoss(p, e));
@@ -455,6 +456,8 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(MobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> MobRisingBoss.deserialize(p, e));
 		mBossDeserializers.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> GrenadeLauncherBoss.deserialize(p, e));
 		mBossDeserializers.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> SizeChangerBoss.deserialize(p, e));
+		mBossDeserializers.put(DeathSummonBoss.identityTag, (Plugin p, LivingEntity e) -> DeathSummonBoss.deserialize(p, e));
+		mBossDeserializers.put(SummonOnExplosionBoss.identityTag, (Plugin p, LivingEntity e) -> SummonOnExplosionBoss.deserialize(p, e));
 
 		mBossDeserializers.put(Lich.identityTag, (Plugin p, LivingEntity e) -> Lich.deserialize(p, e));
 		mBossDeserializers.put(LichAlchBoss.identityTag, (Plugin p, LivingEntity e) -> LichAlchBoss.deserialize(p, e));
@@ -511,7 +514,9 @@ public class BossManager implements Listener {
 		mBossParameters.put(GrenadeLauncherBoss.identityTag, new GrenadeLauncherBoss.Parameters());
 		mBossParameters.put(SizeChangerBoss.identityTag, new SizeChangerBoss.Parameters());
 		mBossParameters.put(WrathBoss.identityTag, new WrathBoss.Parameters());
-		mBossParameters.put(ThrowSummonBoss.identityTag, new WrathBoss.Parameters());
+		mBossParameters.put(ThrowSummonBoss.identityTag, new ThrowSummonBoss.Parameters());
+		mBossParameters.put(DeathSummonBoss.identityTag, new DeathSummonBoss.Parameters());
+		mBossParameters.put(SummonOnExplosionBoss.identityTag, new SummonOnExplosionBoss.Parameters());
 	}
 
 	/********************************************************************************
@@ -545,32 +550,17 @@ public class BossManager implements Listener {
 	 * Event Handlers
 	 *******************************************************************************/
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void creatureSpawnEvent(CreatureSpawnEvent event) {
-		processEntity(event.getEntity());
-	}
-
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void chunkLoadEvent(ChunkLoadEvent event) {
-		for (Entity entity : event.getChunk().getEntities()) {
-			if (!(entity instanceof LivingEntity)) {
-				continue;
-			}
-
-			processEntity((LivingEntity)entity);
+	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
+		if (event.getEntity() instanceof LivingEntity living) {
+			processEntity(living);
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void chunkUnloadEvent(ChunkUnloadEvent event) {
-		Entity[] entities = event.getChunk().getEntities();
-
-		for (Entity entity : entities) {
-			if (!(entity instanceof LivingEntity)) {
-				continue;
-			}
-
-			unload((LivingEntity)entity, false);
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
+		if (event.getEntity() instanceof LivingEntity living) {
+			unload(living, false);
 		}
 	}
 

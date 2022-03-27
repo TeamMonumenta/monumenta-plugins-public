@@ -37,7 +37,6 @@ import com.playmonumenta.plugins.listeners.BlockInteractionsListener;
 import com.playmonumenta.plugins.listeners.BrewingListener;
 import com.playmonumenta.plugins.listeners.CrossbowListener;
 import com.playmonumenta.plugins.listeners.DamageListener;
-import com.playmonumenta.plugins.listeners.DeathItemListener;
 import com.playmonumenta.plugins.listeners.DelvesListener;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.ExceptionListener;
@@ -83,7 +82,6 @@ import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import java.io.File;
 import java.io.IOException;
@@ -141,7 +139,6 @@ public class Plugin extends JavaPlugin {
 	public ChessManager mChessManager;
 	public TowerManager mTowerManager;
 	public SignUtils mSignUtils;
-	public DeathItemListener mDeathItemListener;
 	public ItemOverrides mItemOverrides;
 	public CosmeticsManager mCosmeticsManager;
 	public SeasonalEventManager mSeasonalEventManager;
@@ -184,7 +181,7 @@ public class Plugin extends JavaPlugin {
 		MonumentaReload.register(this);
 		MonumentaDebug.register(this);
 		RestartEmptyCommand.register(this);
-		RedeemVoteRewards.register(this.getLogger());
+		RedeemVoteRewards.register(this);
 		BossFight.register();
 		SpellDetectionCircle.registerCommand(this);
 		SkillDescription.register(this);
@@ -230,6 +227,7 @@ public class Plugin extends JavaPlugin {
 		TellMiniMessage.register();
 		RunWithPlaceholdersCommand.register();
 		PartialParticleCommand.register();
+		CustomEffect.register();
 
 
 		try {
@@ -297,7 +295,6 @@ public class Plugin extends JavaPlugin {
 		mShulkerInventoryManager = new ShulkerInventoryManager(this);
 		mBossManager = new BossManager(this);
 		mEffectManager = new EffectManager(this);
-		mDeathItemListener = new DeathItemListener(this);
 		mParrotManager = new ParrotManager(this);
 		mItemStatManager = new ItemStatManager(this);
 		mChessManager = new ChessManager(this);
@@ -351,7 +348,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new PortableEnderListener(), this);
 		manager.registerEvents(new ShatteredEquipmentListener(), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);
-		manager.registerEvents(mDeathItemListener, this);
 		manager.registerEvents(new ZoneListener(), this);
 		manager.registerEvents(new TridentListener(), this);
 		manager.registerEvents(new CrossbowListener(this), this);
@@ -452,7 +448,7 @@ public class Plugin extends JavaPlugin {
 
 		// Hook into Monumenta Network Relay for message brokering if available
 		if (Bukkit.getPluginManager().isPluginEnabled("MonumentaNetworkRelay")) {
-			manager.registerEvents(new MonumentaNetworkRelayIntegration(this.getLogger()), this);
+			new MonumentaNetworkRelayIntegration(this.getLogger());
 		}
 
 		// Hook into Library of Souls for mob management if available

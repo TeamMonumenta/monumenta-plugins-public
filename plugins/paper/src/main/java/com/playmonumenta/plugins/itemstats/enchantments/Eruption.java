@@ -82,7 +82,7 @@ public class Eruption implements Enchantment {
 					Decay.apply(plugin, mob, Decay.DURATION, decay, player);
 				}
 				if (bleed > 0) {
-					EntityUtils.applyBleed(plugin, 100, (int) level, mob);
+					EntityUtils.applyBleed(plugin, Bleeding.DURATION, bleed * Bleeding.AMOUNT_PER_LEVEL, mob);
 				}
 			}
 

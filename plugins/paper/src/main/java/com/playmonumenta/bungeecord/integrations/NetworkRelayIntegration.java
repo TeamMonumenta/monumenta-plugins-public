@@ -11,8 +11,7 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
 public class NetworkRelayIntegration implements Listener {
-	public static final String GET_VOTES_UNCLAIMED_CHANNEL = "Monumenta.Bungee.GetVotesUnclaimed";
-	public static final String CHECK_RAFFLE_ELIGIBILITY_CHANNEL = "Monumenta.Bungee.CheckRaffleEligibility";
+	public static final String VOTE_NOTIFY_CHANNEL = "Monumenta.Bungee.VoteNotify";
 
 	private final Logger mLogger;
 	private static NetworkRelayIntegration INSTANCE = null;
@@ -25,109 +24,48 @@ public class NetworkRelayIntegration implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void networkRelayMessageEventBungee(NetworkRelayMessageEventBungee event) {
-		switch (event.getChannel()) {
-		case GET_VOTES_UNCLAIMED_CHANNEL: {
+		if (event.getChannel().equals(VOTE_NOTIFY_CHANNEL)) {
 			JsonObject data = event.getData();
 			if (!data.has("playerUUID") ||
 				!data.get("playerUUID").isJsonPrimitive() ||
 				!data.getAsJsonPrimitive("playerUUID").isString()) {
-				mLogger.severe("CommandPacket failed to parse required string field 'playerUUID'");
+				mLogger.severe("VOTE_NOTIFY_CHANNEL failed to parse required string field 'playerUUID'");
 				return;
 			}
 
-			if (!data.has("votesUnclaimed") ||
-				!data.get("votesUnclaimed").isJsonPrimitive() ||
-				!data.getAsJsonPrimitive("votesUnclaimed").isNumber()) {
-				mLogger.severe("CommandPacket failed to parse required int field 'votesUnclaimed'");
+			if (!data.has("matchingSite") ||
+				!data.get("matchingSite").isJsonPrimitive() ||
+				!data.getAsJsonPrimitive("matchingSite").isString()) {
+				mLogger.severe("VOTE_NOTIFY_CHANNEL failed to parse required int field 'matchingSite'");
 				return;
 			}
 
-			UUID uuid = UUID.fromString(data.get("playerUUID").getAsString());
-			int count = data.get("votesUnclaimed").getAsInt();
-
-			VoteManager.gotShardVoteCountRequest(event.getSource(), uuid, count);
-			break;
-		}
-		case CHECK_RAFFLE_ELIGIBILITY_CHANNEL: {
-			JsonObject data = event.getData();
-			if (!data.has("playerUUID") ||
-				!data.get("playerUUID").isJsonPrimitive() ||
-				!data.getAsJsonPrimitive("playerUUID").isString()) {
-				mLogger.severe("CheckRaffleEligibilityPacket failed to parse required string field 'playerUUID'");
-				return;
-			}
-
-			if (!data.has("claimReward") ||
-				!data.get("claimReward").isJsonPrimitive() ||
-				!data.getAsJsonPrimitive("claimReward").isBoolean()) {
-				mLogger.severe("CheckRaffleEligibilityPacket failed to parse required int field 'claimReward'");
-				return;
-			}
-
-			if (!data.has("eligible") ||
-				!data.get("eligible").isJsonPrimitive() ||
-				!data.getAsJsonPrimitive("eligible").isBoolean()) {
-				mLogger.severe("CheckRaffleEligibilityPacket failed to parse required int field 'eligible'");
+			if (!data.has("cooldownMinutes") ||
+					!data.get("cooldownMinutes").isJsonPrimitive() ||
+					!data.getAsJsonPrimitive("cooldownMinutes").isNumber()) {
+				mLogger.severe("VOTE_NOTIFY_CHANNEL failed to parse required int field 'cooldownMinutes'");
 				return;
 			}
 
 			UUID uuid = UUID.fromString(data.get("playerUUID").getAsString());
-			boolean claimReward = data.get("claimReward").getAsBoolean();
-			boolean eligible = data.get("eligible").getAsBoolean();
+			String matchingSite = data.get("matchingSite").getAsString();
+			long cooldownMinutes = data.get("cooldownMinutes").getAsLong();
 
-			VoteManager.gotShardRaffleEligibilityRequest(event.getSource(), uuid, claimReward, eligible);
-			break;
-		}
-		default:
-			break;
+			VoteManager.gotVoteNotifyMessage(uuid, matchingSite, cooldownMinutes);
 		}
 	}
 
-	/*
-	 * Server -> Bungee
-	 *   claimReward = false -> This is just a test to see if the player is eligible (raffle rewards > 0)
-	 *   claimReward = true -> Bungee should subtract 1 from the player's raffle rewards score
-	 *   eligible = true -> Player previously tried to claim a raffle but item wasn't eligible - add back the raffle point
-	 *   eligible = false -> Regular request
-	 *
-	 *   eligible == true && claimReward == true -> Undefined
-	 *
-	 * Bungee -> Server
-	 *   claimReward same as request
-	 *   eligible = Is the player eligible to claim a raffle reward.
-	 *   If claimReward and eligible, attempt to grant raffle reward
-	 */
-	public static void sendCheckRaffleEligibilityPacket(String destination, UUID playerUUID, boolean claimReward, boolean addBack) {
+	public static void sendVoteNotifyPacket(UUID playerUUID, String matchingSite, long cooldownMinutes) {
 		if (INSTANCE != null) {
 			JsonObject data = new JsonObject();
 			data.addProperty("playerUUID", playerUUID.toString());
-			data.addProperty("claimReward", claimReward);
-			data.addProperty("eligible", addBack);
+			data.addProperty("matchingSite", matchingSite);
+			data.addProperty("cooldownMinutes", cooldownMinutes);
 			try {
-				NetworkRelayAPI.sendMessage(destination, CHECK_RAFFLE_ELIGIBILITY_CHANNEL, data);
+				/* Send this message to whatever this shard is called (likely "bungee") */
+				NetworkRelayAPI.sendMessage(NetworkRelayAPI.getShardName(), VOTE_NOTIFY_CHANNEL, data);
 			} catch (Exception ex) {
-				INSTANCE.mLogger.severe("Failed to send check raffle eligibility message: " + ex.getMessage());
-				ex.printStackTrace();
-			}
-		}
-	}
-
-	/*
-	 * For Server -> Bungee:
-	 *   if votesUnclaimed == 0, request the count of eligible voting rewards
-	 *   if votesUnclaimed > 0, return these votes back to bungee for storage
-	 * For Bungee -> Server
-	 *   Decrement storage, and send votes as votesUnclaimed
-	 */
-	public static void sendGetVotesUnclaimedPacket(String destination, UUID playerUUID, int count) {
-		if (INSTANCE != null) {
-			JsonObject data = new JsonObject();
-			data.addProperty("playerUUID", playerUUID.toString());
-			data.addProperty("votesUnclaimed", count);
-			try {
-				NetworkRelayAPI.sendMessage(destination, GET_VOTES_UNCLAIMED_CHANNEL, data);
-			} catch (Exception ex) {
-				INSTANCE.mLogger.severe("Failed to send get votes unclaimed message: " + ex.getMessage());
+				INSTANCE.mLogger.severe("Failed to send vote notify message: " + ex.getMessage());
 				ex.printStackTrace();
 			}
 		}

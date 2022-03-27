@@ -8,6 +8,7 @@ import java.time.Duration;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.transformation.TransformationRegistry;
 import net.kyori.adventure.text.minimessage.transformation.TransformationType;
@@ -93,6 +94,10 @@ public class MessagingUtils {
 		e.printStackTrace();
 	}
 
+	public static void sendError(CommandSender receiver, String message) {
+		receiver.sendMessage(Component.text(message).color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+	}
+
 	/* Gets the difference between now and the specified time in a pretty string like 4h30m */
 	public static String getTimeDifferencePretty(long time) {
 		Duration remaining = Duration.ofSeconds(time - java.time.Instant.now().getEpochSecond());
@@ -127,6 +132,10 @@ public class MessagingUtils {
 
 	public static Component fromMiniMessage(String miniMessageText) {
 		return MINIMESSAGE_ALL.parse(miniMessageText);
+	}
+
+	public static String toMiniMessage(Component component) {
+		return MINIMESSAGE_ALL.serialize(component);
 	}
 
 	public static Component parseComponent(String json) {

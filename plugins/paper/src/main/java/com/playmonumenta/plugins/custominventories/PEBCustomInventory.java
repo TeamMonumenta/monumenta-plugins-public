@@ -485,13 +485,11 @@ public class PEBCustomInventory extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
-		if (event.getWhoClicked() != mPlayer) {
+		if (event.getWhoClicked() != mPlayer
+			    || event.getClickedInventory() != mInventory) {
 			return;
 		}
 		ItemStack clickedItem = event.getCurrentItem();
-		if (event.getClickedInventory() != mInventory) {
-			return;
-		}
 		if (clickedItem != null && clickedItem.getType() != FILLER) {
 			int chosenSlot = event.getSlot();
 			for (PebItem item : PEB_ITEMS.get(mCurrentPage)) {
@@ -507,8 +505,8 @@ public class PEBCustomInventory extends CustomInventory {
 					if (item.mAction != null) {
 						item.mAction.accept(this, event);
 					}
+					return;
 				}
-				return;
 			}
 		}
 	}

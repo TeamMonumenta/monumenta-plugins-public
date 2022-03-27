@@ -87,7 +87,13 @@ public class TowerManager implements Listener {
 		Player player = event.getPlayer();
 		if (player.getScoreboardTags().contains(TowerConstants.PLAYER_TAG)) {
 			UUID uuid = player.getUniqueId();
-			GAMES.get(uuid).stop();
+			if (GAMES.containsKey(uuid)) {
+				GAMES.get(uuid).stop();
+			} else {
+				//somehow the game don't exist but the player has the tags? probably a crash
+				TowerGame.clearPlayer(player);
+				//clearing all the tags
+			}
 		}
 	}
 
@@ -118,7 +124,7 @@ public class TowerManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public static void onChunUnloadEvent(ChunkUnloadEvent event) {
+	public static void onChunkUnloadEvent(ChunkUnloadEvent event) {
 		for (Entity entity : List.of(event.getChunk().getEntities())) {
 			if (entity != null && entity.getScoreboardTags().contains(TowerConstants.TAG_UNLOAD_ENTITY)) {
 				entity.remove();

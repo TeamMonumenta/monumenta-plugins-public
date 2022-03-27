@@ -15,38 +15,53 @@ import org.bukkit.potion.PotionEffectType;
 
 public class SpellFrostNova extends SpellBaseAoE {
 
-	public SpellFrostNova(Plugin plugin, LivingEntity launcher, int radius, float maxDamage, float minDamage, int duration, int cooldown) {
-		super(plugin, launcher, radius, duration, cooldown, false, Sound.ENTITY_SNOWBALL_THROW,
-			(Location loc) -> {
-				World world = loc.getWorld();
-				world.spawnParticle(Particle.CLOUD, loc, 7, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2, 0.05);
-			},
-			(Location loc) -> {
-				World world = loc.getWorld();
-				world.spawnParticle(Particle.SNOWBALL, loc, 1, 0.25, 0.25, 0.25, 0);
-			},
-			(Location loc) -> {
-				World world = loc.getWorld();
-				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 0.77F);
-				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 0.5F);
-				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 0.65F);
-			},
-			(Location loc) -> {
-				World world = loc.getWorld();
-				world.spawnParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.2);
-				world.spawnParticle(Particle.SNOWBALL, loc, 1, 0.25, 0.25, 0.25, 0);
-			},
-			(Location loc) -> {
-				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
-					double distance = player.getLocation().distance(launcher.getLocation());
-					BossUtils.blockableDamage(launcher, player, DamageType.MAGIC, ((maxDamage - minDamage) * ((radius - distance) / radius)) + minDamage);
-					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 3));
-				}
-			}
-		);
+	private final float mMinDamage;
+	private final float mMaxDamage;
+
+	public SpellFrostNova(Plugin plugin, LivingEntity launcher, int radius, float minDamage, float maxDamage, int duration, int cooldown) {
+		super(plugin, launcher, radius, duration, cooldown, false, Sound.ENTITY_SNOWBALL_THROW);
+		mMinDamage = minDamage;
+		mMaxDamage = maxDamage;
 	}
 
-	public SpellFrostNova(Plugin plugin, LivingEntity launcher, int radius, float maxDamage, float minDamage) {
-		this(plugin, launcher, radius, maxDamage, minDamage, 80, 160);
+	public SpellFrostNova(Plugin plugin, LivingEntity launcher, int radius, float minDamage, float maxDamage) {
+		this(plugin, launcher, radius, minDamage, maxDamage, 80, 160);
 	}
+
+	@Override
+	protected void chargeAuraAction(Location loc) {
+		World world = loc.getWorld();
+		world.spawnParticle(Particle.CLOUD, loc, 7, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05);
+	}
+
+	@Override
+	protected void chargeCircleAction(Location loc) {
+		World world = loc.getWorld();
+		world.spawnParticle(Particle.SNOWBALL, loc, 1, 0.25, 0.25, 0.25, 0);
+	}
+
+	@Override
+	protected void outburstAction(Location loc) {
+		World world = loc.getWorld();
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 0.77F);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 0.5F);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 0.65F);
+	}
+
+	@Override
+	protected void circleOutburstAction(Location loc) {
+		World world = loc.getWorld();
+		world.spawnParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.2);
+		world.spawnParticle(Particle.SNOWBALL, loc, 1, 0.25, 0.25, 0.25, 0);
+	}
+
+	@Override
+	protected void dealDamageAction(Location loc) {
+		for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius, true)) {
+			double distance = player.getLocation().distance(mLauncher.getLocation());
+			BossUtils.blockableDamage(mLauncher, player, DamageType.MAGIC, ((mMaxDamage - mMinDamage) * ((mRadius - distance) / mRadius)) + mMinDamage);
+			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 3));
+		}
+	}
+
 }

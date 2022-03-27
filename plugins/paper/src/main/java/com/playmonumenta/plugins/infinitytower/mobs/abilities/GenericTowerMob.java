@@ -147,9 +147,13 @@ public class GenericTowerMob extends TowerAbility {
 		if (mCanChangeTarget && source.isValid() && !source.isDead()) {
 			//if we can change the target (no taunt or others skill in use)
 			//check if the enemy is closer than my current target
-			double distanceToTarget = mLastTarget.getLocation().distance(mBoss.getLocation());
-			double distanceToDamager = source.getLocation().distance(mBoss.getLocation());
-			if (distanceToTarget > distanceToDamager) {
+			if (mLastTarget != null) {
+				double distanceToTarget = mLastTarget.getLocation().distance(mBoss.getLocation());
+				double distanceToDamager = source.getLocation().distance(mBoss.getLocation());
+				if (distanceToTarget > distanceToDamager) {
+					mLastTarget = source;
+				}
+			} else {
 				mLastTarget = source;
 			}
 		}

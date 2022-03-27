@@ -13,15 +13,15 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
-import org.jetbrains.annotations.NotNull;
 
 public class Bleeding implements Enchantment {
 
 	public static final int DURATION = 20 * 5;
+	public static final double AMOUNT_PER_LEVEL = 0.1;
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Bleeding";
 	}
 
@@ -41,17 +41,16 @@ public class Bleeding implements Enchantment {
 	}
 
 	@Override
-	public void onDamage(@NotNull Plugin plugin, @NotNull Player player, double value, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
-		double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.BLEEDING);
+	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
-			apply(plugin, player, level, (int) (DURATION * player.getCooledAttackStrength(0)), enemy);
+			apply(plugin, player, value, (int) (DURATION * player.getCooledAttackStrength(0)), enemy);
 		} else if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
-			apply(plugin, player, level, DURATION, enemy);
+			apply(plugin, player, value, DURATION, enemy);
 		}
 	}
 
-	public static void apply(Plugin plugin, Player player, double level, int duration, LivingEntity enemy) {
-		EntityUtils.applyBleed(plugin, duration, (int) level, enemy);
+	public static void apply(Plugin plugin, Player player, double value, int duration, LivingEntity enemy) {
+		EntityUtils.applyBleed(plugin, duration, value * AMOUNT_PER_LEVEL, enemy);
 		player.getWorld().spawnParticle(Particle.REDSTONE, enemy.getLocation().add(0, 1, 0), 8, 0.3, 0.6, 0.3, COLOR);
 	}
 

@@ -54,6 +54,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Guardian;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -217,9 +218,8 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 			}
 
-			// TODO: add a mob ability that does thorns based on DamageType instead of this janky check, which no longer works
-			if (event.getCause() == DamageCause.THORNS && MetadataUtils.happenedThisTick(damagee, "LastMagicUseTime", 0)) {
-				// Check that thorns isn't being caused by 'magic'; if it is, cancel the damage
+			// Disable thorns damage from guardians
+			if (event.getCause() == DamageCause.THORNS && damager instanceof Guardian) {
 				event.setCancelled(true);
 			}
 		} else {

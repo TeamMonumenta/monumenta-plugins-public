@@ -343,13 +343,14 @@ public class GraveItem {
 	}
 
 	void onAttemptPickupItem(PlayerAttemptPickupItemEvent event) {
+		// This event should always be cancelled, items are not picked up directly
+		// They are either placed in the grave directly, or the pickup is simulated via DeathItemListener
+		event.setCancelled(true);
 		Player player = event.getPlayer();
 		if (player == mPlayer) {
 			// Owner picking up items
-			if (event.getRemaining() == 0) {
-				// Owner picking up full stack, will be marked collected in onPickupItem
-				// Owner picked up full stack, mark as collected
-				mStatus = Status.COLLECTED;
+			if (mGrave.collectItem(player, this) == 0) {
+				// Owner picking up full stack
 				mGrave.removeItem(this);
 				mManager.removeItem(event.getItem().getUniqueId());
 			} else {
@@ -357,7 +358,6 @@ public class GraveItem {
 				remove(Status.SAFE);
 				player.spawnParticle(Particle.VILLAGER_HAPPY, mLocation, 1);
 				player.playSound(mLocation, Sound.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 1f, 0.5f);
-				event.setCancelled(true);
 				//TODO alert player the item wouldn't fit in their inventory so it was put in their grave
 			}
 		} else {
@@ -365,7 +365,6 @@ public class GraveItem {
 			remove(Status.SAFE);
 			player.spawnParticle(Particle.VILLAGER_HAPPY, mLocation, 1);
 			player.playSound(mLocation, Sound.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 1f, 0.5f);
-			event.setCancelled(true);
 			//TODO alert player the item belonged to another player and was placed in their grave
 			//TODO alert owner their item was picked up and safely put in their grave
 		}

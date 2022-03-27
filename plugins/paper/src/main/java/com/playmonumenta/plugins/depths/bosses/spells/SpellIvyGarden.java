@@ -1,11 +1,6 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.ChargeAuraAction;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.ChargeCircleAction;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.CircleOutburstAction;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.DealDamageAction;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.OutburstAction;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -14,6 +9,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -110,8 +106,8 @@ public class SpellIvyGarden extends Spell {
 
 
 	public void runForce(Plugin plugin, Entity launcher, int radius, int duration, int cooldown, boolean canMoveWhileCasting, boolean needLineOfSight,
-			Sound chargeSound, float soundVolume, int soundDensity, ChargeAuraAction chargeAuraAction, ChargeCircleAction chargeCircleAction,
-			OutburstAction outburstAction, CircleOutburstAction circleOutburstAction, DealDamageAction dealDamageAction) {
+	                     Sound chargeSound, float soundVolume, int soundDensity, Consumer<Location> chargeAuraAction, Consumer<Location> chargeCircleAction,
+	                     Consumer<Location> outburstAction, Consumer<Location> circleOutburstAction, Consumer<Location> dealDamageAction) {
 		if (needLineOfSight) {
 			// Don't cast if no player in sight, e.g. should not initiate cast through a wall
 			boolean hasLineOfSight = false;
@@ -147,25 +143,26 @@ public class SpellIvyGarden extends Spell {
 					return;
 				}
 				mTicks++;
-				chargeAuraAction.run(loc.clone().add(0, 1, 0));
+				chargeAuraAction.accept(loc.clone().add(0, 1, 0));
 				if (mTicks <= (duration - 5) && mTicks % soundDensity == 0) {
 					mWorld.playSound(launcher.getLocation(), chargeSound, SoundCategory.HOSTILE, soundVolume, 0.25f + (mTicks / 100));
 				}
 				for (double i = 0; i < 360; i += 30) {
 					double radian1 = Math.toRadians(i);
 					loc.add(FastUtils.cos(radian1) * mCurrentRadius, 0, FastUtils.sin(radian1) * mCurrentRadius);
-					chargeCircleAction.run(loc);
+					chargeCircleAction.accept(loc);
 					loc.subtract(FastUtils.cos(radian1) * mCurrentRadius, 0, FastUtils.sin(radian1) * mCurrentRadius);
 				}
 				mCurrentRadius -= (mRadius / ((double) duration));
 				if (mCurrentRadius <= 0) {
 					this.cancel();
-					dealDamageAction.run(loc);
-					outburstAction.run(loc);
+					dealDamageAction.accept(loc);
+					outburstAction.accept(loc);
 
 					new BukkitRunnable() {
 						Location mLoc = launcher.getLocation();
 						double mBurstRadius = 0;
+
 						@Override
 						public void run() {
 							for (int j = 0; j < 2; j++) {
@@ -173,7 +170,7 @@ public class SpellIvyGarden extends Spell {
 								for (double i = 0; i < 360; i += 15) {
 									double radian1 = Math.toRadians(i);
 									mLoc.add(FastUtils.cos(radian1) * mBurstRadius, 0, FastUtils.sin(radian1) * mBurstRadius);
-									circleOutburstAction.run(mLoc);
+									circleOutburstAction.accept(mLoc);
 									mLoc.subtract(FastUtils.cos(radian1) * mBurstRadius, 0, FastUtils.sin(radian1) * mBurstRadius);
 								}
 							}

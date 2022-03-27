@@ -11,7 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class PhylacteryTowerAbility extends TowerAbility {
 
-	private static final int TIMER_RESPAWN = 20 * 8;
+	private static final int TIMER_RESPAWN = 20 * 6;
 
 	public PhylacteryTowerAbility(Plugin plugin, String identityTag, LivingEntity boss, TowerGame game, TowerMob mob, boolean isPlayerMob) {
 		super(plugin, identityTag, boss, game, mob, isPlayerMob);

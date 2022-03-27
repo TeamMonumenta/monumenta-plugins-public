@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
@@ -66,6 +67,11 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	@Override
 	public int getEntityTypeRegistryId(Entity entity) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void disablePerching(Parrot parrot) {
+
 	}
 
 }

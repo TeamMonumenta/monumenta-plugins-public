@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.infinitytower;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiBuyMob;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -13,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -50,6 +53,7 @@ public class TowerGame {
 
 	private boolean mIsGameEnded = false;
 	private boolean mIsTurnEnded = false;
+	private boolean mPlayerLose = false;
 
 	protected final int ID;
 	private final TowerGame INSTANCE;
@@ -144,13 +148,10 @@ public class TowerGame {
 	}
 
 	public void playerLoseTurn() {
-		mIsGameEnded = true;
 		//set scoreboard for result
 		TowerGameUtils.sendMessage(mPlayer.mPlayer, "You lose at round: " + (mCurrentFloor + 1));
-
-		TowerGameUtils.giveLoot(this);
-		clearPlayer(mPlayer.mPlayer);
-		forceStopGame();
+		mPlayerLose = true;
+		stop();
 	}
 
 	public void playerWinTurn() {
@@ -276,7 +277,6 @@ public class TowerGame {
 		mPlayer.mPlayer.removeScoreboardTag(TowerConstants.TAG_BOOK);
 		mPlayer.mPlayer.addScoreboardTag(TowerConstants.TAG_IN_BATTLE);
 
-		//we may want to use 2 runnable (one for each group of mobs) so it would be faster?
 		mPlayer.mTeam.summonAll(this, mPlayerMobs, true);
 		mFloorTeam.summonAll(this, mFloorMobs, false);
 
@@ -333,7 +333,6 @@ public class TowerGame {
 	}
 
 	public void stop() {
-		clearPlayer(mPlayer.mPlayer);
 		if (!mIsGameEnded) {
 			mIsGameEnded = true;
 			mIsTurnEnded = true;
@@ -346,19 +345,49 @@ public class TowerGame {
 			clearMobs();
 		}
 		if (mCurrentFloor > TowerConstants.DESIGNED_FLOORS - 1 && mFloor != null) {
-			if (mFloorTeam == null) {
-				TowerFileUtils.convertPlayerTeamLocation(this);
-				TowerFileUtils.savePlayerTeam(mPlayer.mTeam, mCurrentFloor);
-			} else if (mCurrentFloor > TowerConstants.DESIGNED_FLOORS + 1) {
-				TowerFileUtils.convertPlayerTeamLocation(this);
-				TowerFileUtils.savePlayerTeam(mPlayer.mTeam, mCurrentFloor - 1);
+			Collection<ArmorStand> armorStand = mPlayer.mPlayer.getWorld().getNearbyEntitiesByType(ArmorStand.class, mPlayer.mPlayer.getLocation(), 150, 150, 150);
+			armorStand.removeIf(armor -> !armor.getScoreboardTags().contains(TowerConstants.TAG_FIREWORK_ARMORSTAND));
+			if (mPlayerLose) {
+				TowerGameUtils.sendMessage(mPlayer.mPlayer, "Congratulations on defeating Plunderer's Blitz!");
+				//if mCurrentFloor == 50 -> player lose at round 51 -> his team will not be saved
+				if (mCurrentFloor != 50) {
+					TowerGameUtils.sendMessage(mPlayer.mPlayer, "Your team will now defend round " + mCurrentFloor);
+				}
+			} else {
+				//the player has reached the final round
+				TowerGameUtils.sendMessage(mPlayer.mPlayer, "Congratulations on defeating Plunderer's Blitz!");
+				TowerGameUtils.sendMessage(mPlayer.mPlayer, "Your team will now defend round " + (mCurrentFloor + 1));
 			}
-			TowerGameUtils.sendMessage(mPlayer.mPlayer, "Congratulations! your team will now defend round " + (mCurrentFloor + 1));
+			new BukkitRunnable() {
+				int mTimes = 0;
+				@Override public void run() {
+
+					if (mTimes >= 5) {
+						cancel();
+						if (mFloorTeam == null) {
+							TowerFileUtils.convertPlayerTeamLocation(INSTANCE);
+							TowerFileUtils.savePlayerTeam(mPlayer.mTeam, mCurrentFloor);
+						} else if (mCurrentFloor > TowerConstants.DESIGNED_FLOORS + 1) {
+							TowerFileUtils.convertPlayerTeamLocation(INSTANCE);
+							TowerFileUtils.savePlayerTeam(mPlayer.mTeam, mCurrentFloor - 1);
+						}
+						TowerGameUtils.giveLoot(INSTANCE);
+						clearPlayer(mPlayer.mPlayer);
+						forceStopGame();
+					}
+
+					for (ArmorStand armor : armorStand) {
+						TowerGameUtils.launchFirework(armor.getLocation());
+					}
+					mTimes++;
+				}
+			}.runTaskTimer(Plugin.getInstance(), 0, 20);
+
+		} else {
+			TowerGameUtils.giveLoot(this);
+			clearPlayer(mPlayer.mPlayer);
+			forceStopGame();
 		}
-
-		TowerGameUtils.giveLoot(this);
-		forceStopGame();
-
 	}
 
 	public void forceStopGame() {

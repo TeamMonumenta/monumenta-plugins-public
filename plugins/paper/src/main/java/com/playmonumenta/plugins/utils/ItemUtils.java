@@ -427,8 +427,6 @@ public class ItemUtils {
 			case EVENT:
 			case SHULKER_BOX:
 				return ItemDeathResult.SHATTER;
-			case KEYTIER:
-				return ItemDeathResult.SAFE;
 			default:
 				return ItemDeathResult.LOSE;
 			}

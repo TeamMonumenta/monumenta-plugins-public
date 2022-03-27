@@ -134,6 +134,14 @@ public final class Lich extends BossAbilityGroup {
 	private boolean mCutscene = false;
 	private static boolean mDead = false;
 	private static boolean mPhaseCD = false;
+	private int mPlayerCount;
+	private double mDefenseScaling;
+	private static final int MAX_HEALTH = 4000;
+	private static final int PHYLACT_HP = 1250;
+	private static final double SCALING_X = 0.7;
+	private static final double SCALING_Y = 0.575;
+
+	private double mPhylactHealth = 0.0;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -151,6 +159,8 @@ public final class Lich extends BossAbilityGroup {
 
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
+		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 
 		for (Entity e : mBoss.getNearbyEntities(detectionRange, detectionRange, detectionRange)) {
 			if (e.getScoreboardTags().contains(START_TAG) && e instanceof LivingEntity) {
@@ -205,11 +215,9 @@ public final class Lich extends BossAbilityGroup {
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color white");
 			UUID keyUUID = mKey.getUniqueId();
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join lichphylactery " + keyUUID);
-			int playercount = playersInRange(mBoss.getLocation(), detectionRange, true).size();
-			double hpdel = 1800;
-			double hp = hpdel * BossUtils.healthScalingCoef(playercount, 0.7, 0.575);
-			EntityUtils.setAttributeBase(mKey, Attribute.GENERIC_MAX_HEALTH, hp);
-			mKey.setHealth(hp);
+			mPhylactHealth = PHYLACT_HP * mDefenseScaling;
+			EntityUtils.setAttributeBase(mKey, Attribute.GENERIC_MAX_HEALTH, mPhylactHealth);
+			mKey.setHealth(mPhylactHealth);
 		}
 
 		mDefeated = false;
@@ -255,11 +263,10 @@ public final class Lich extends BossAbilityGroup {
 				// key glow color + prevent log spam
 				if (mKey != null) {
 					double health = mKey.getHealth();
-					double maxHealth = EntityUtils.getMaxHealth(mKey);
-					if (health / maxHealth <= 0.34 && mColor == 1) {
+					if (health / mPhylactHealth <= 0.34 && mColor == 1) {
 						mColor++;
 						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color red");
-					} else if (health / maxHealth <= 0.67 && mColor == 0) {
+					} else if (health / mPhylactHealth <= 0.67 && mColor == 0) {
 						mColor++;
 						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color yellow");
 					}
@@ -892,6 +899,8 @@ public final class Lich extends BossAbilityGroup {
 	// resurrection pt 1
 	@Override
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 		Player player = event.getEntity();
 		World world = player.getWorld();
 		world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 10, 0.4, 0.45, 0.4,
@@ -915,17 +924,17 @@ public final class Lich extends BossAbilityGroup {
 
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+		event.setDamage(event.getDamage() / mDefenseScaling);
 		mGotHit = true;
 
 		// ridiculous burst prevention, 1% above the next health action
-		double damage = event.getFinalDamage(true);
-		double maxHealth = EntityUtils.getMaxHealth(mBoss);
-		if (mPhase == 1 && mBoss.getHealth() - damage <= maxHealth * 0.51) {
-			event.setDamage(mBoss.getHealth() - maxHealth * 0.51);
-		} else if (mPhase == 2 && mBoss.getHealth() - damage <= maxHealth * 0.34) {
-			event.setDamage(mBoss.getHealth() - maxHealth * 0.34);
-		} else if (mPhase == 3 && mBoss.getHealth() - damage <= maxHealth * 0.31) {
-			event.setDamage(mBoss.getHealth() - maxHealth * 0.31);
+		double damage = event.getDamage();
+		if (mPhase == 1 && mBoss.getHealth() - damage <= MAX_HEALTH * 0.51) {
+			event.setDamage(mBoss.getHealth() - MAX_HEALTH * 0.51);
+		} else if (mPhase == 2 && mBoss.getHealth() - damage <= MAX_HEALTH * 0.34) {
+			event.setDamage(mBoss.getHealth() - MAX_HEALTH * 0.34);
+		} else if (mPhase == 3 && mBoss.getHealth() - damage <= MAX_HEALTH * 0.31) {
+			event.setDamage(mBoss.getHealth() - MAX_HEALTH * 0.31);
 		}
 
 		// death check
@@ -935,7 +944,7 @@ public final class Lich extends BossAbilityGroup {
 			mBoss.setHealth(100);
 			if (!mActivated) {
 				if (mKey != null && mKey.isValid()) {
-					mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * 0.15);
+					mBoss.setHealth(MAX_HEALTH * 0.15);
 
 
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5.0f, 0.75f);
@@ -2064,14 +2073,10 @@ public final class Lich extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int playercount = playersInRange(mBoss.getLocation(), detectionRange, true).size();
-		double hpdel = 4000;
-		// 25 player health = 30k when x = 0.7 y = 0.5758790007
-		double bossTargetHp = hpdel * BossUtils.healthScalingCoef(playercount, 0.7, 0.5758790007);
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, MAX_HEALTH);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(bossTargetHp);
+		mBoss.setHealth(MAX_HEALTH);
 		mBoss.setPersistent(true);
 	}
 }

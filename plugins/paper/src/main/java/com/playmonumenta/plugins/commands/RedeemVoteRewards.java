@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -9,50 +10,16 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.FunctionArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.logging.Logger;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
-/*
- * This is obnoxiously complicated.
- *
- * 1) A command is run on the player like: /redeemvoterewards @p temp monumenta:reward_function
- * 2) The run() method executes here to handle that command
- * 3) The function is cached here, and the player's UUID is sent to bungee to retrieve rewards
- * 4) Bungee retrieves the vote rewards and sends back a message with the player's UUID and reward count
- * 5) The player's reward count is saved into the specified scoreboard and the function is retrieved and executed
- */
 public class RedeemVoteRewards extends GenericCommand {
-	private static class PendingRewardContext {
-		private final Player mPlayer;
-		private final String mScoreboardName;
-		private final FunctionWrapper[] mFunctions;
+	private static final String VOTES_UNCLAIMED = "votesUnclaimed";
 
-		private PendingRewardContext(Player player, String scoreboardName, FunctionWrapper[] functions) {
-			mPlayer = player;
-			mScoreboardName = scoreboardName;
-			mFunctions = functions;
-		}
-
-		private void run(int rewardCount) {
-			if (mPlayer.isOnline() && mPlayer.isValid()) {
-				ScoreboardUtils.setScoreboardValue(mPlayer, mScoreboardName, rewardCount);
-				for (FunctionWrapper func : mFunctions) {
-					func.runAs(mPlayer);
-				}
-			}
-		}
-	}
-
-	private static final Map<UUID, PendingRewardContext> mPendingRewards = new HashMap<UUID, PendingRewardContext>();
-
-	public static void register(Logger logger) {
+	public static void register(Plugin plugin) {
 		List<Argument> arguments = new ArrayList<>();
 
 		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
@@ -63,31 +30,70 @@ public class RedeemVoteRewards extends GenericCommand {
 			.withPermission(CommandPermission.fromString("monumenta.command.redeemvoterewards"))
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run(logger, (Player)args[0], (String)args[1], (FunctionWrapper[])args[2]);
+				run(plugin, (Player)args[0], (String)args[1], (FunctionWrapper[])args[2]);
 			})
 			.register();
 	}
 
-	private static void run(Logger logger, Player player, String scoreboardName, FunctionWrapper[] functions) throws WrapperCommandSyntaxException {
-		PendingRewardContext context = new PendingRewardContext(player, scoreboardName, functions);
+	private static void run(Plugin plugin, Player player, String scoreboardName, FunctionWrapper[] functions) {
+		MonumentaRedisSyncAPI.runOnMainThreadWhenComplete(plugin, MonumentaRedisSyncAPI.remoteDataGet(player.getUniqueId(), VOTES_UNCLAIMED), (data, ex) -> {
+			if (ex != null) {
+				MessagingUtils.sendError(player, "Failed to get unclaimed vote rewards: " + ex.getMessage());
+			} else {
+				int amountAvailable = 0;
+				if (data != null) {
+					try {
+						amountAvailable = Integer.parseInt(data);
+					} catch (Exception e) {
+						MessagingUtils.sendError(player, "Failed to parse unclaimed vote rewards as int: " + data);
+						return;
+					}
+				}
 
-		mPendingRewards.put(player.getUniqueId(), context);
+				if (!player.isOnline() || !player.isValid()) {
+					// Silently abort, the player left
+					return;
+				}
 
-		// Count = 0 means request count
-		MonumentaNetworkRelayIntegration.sendGetVotesUnclaimedPacket(player.getUniqueId(), 0);
+				if (amountAvailable <= 0) {
+					// No vote rewards - abort early. Still run the function so that it can tell the player there were none
+					ScoreboardUtils.setScoreboardValue(player, scoreboardName, 0);
+					for (FunctionWrapper func : functions) {
+						func.runAs(player);
+					}
+					return;
+				}
 
-		logger.info("Requested vote rewards for " + player.getName());
-	}
+				// amountAvailable stores last snapshot value at this point, which might have been modified since retrieved
+				final int amountRedeemed = amountAvailable;
 
-	public static void gotVoteRewardMessage(Logger logger, UUID uuid, int rewardCount) {
-		PendingRewardContext context = mPendingRewards.get(uuid);
+				// Now try to atomically remove that many unclaimed rewards from that value
+				MonumentaRedisSyncAPI.runOnMainThreadWhenComplete(plugin, MonumentaRedisSyncAPI.remoteDataIncrement(player.getUniqueId(), VOTES_UNCLAIMED, -1 * amountRedeemed), (resultRemaining, resultEx) -> {
+					if (resultEx != null) {
+						MessagingUtils.sendError(player, "Failed to decrement unclaimed vote rewards: " + resultEx.getMessage());
+					} else {
+						if (resultRemaining == null) {
+							MessagingUtils.sendError(player, "Somehow got null despite decrementing vote value - maybe try again?");
+							return;
+						}
 
-		if (context != null) {
-			context.run(rewardCount);
-			mPendingRewards.remove(uuid);
-		} else if (rewardCount > 0) {
-			MonumentaNetworkRelayIntegration.sendGetVotesUnclaimedPacket(uuid, rewardCount);
-			logger.info("Sending " + Integer.toString(rewardCount) + " votes back to bungee for " + uuid.toString());
-		}
+						if (resultRemaining < 0 || !player.isOnline() || !player.isValid()) {
+							// This can happen if you try to claim the rewards twice at the same time - need to abort this attempt and re-add the values
+							if (player.isOnline()) {
+								MessagingUtils.sendError(player, "Got negative remaining vote rewards after redeeming - be patient and only try once at a time");
+							}
+							// Put the amount redeemed back to redis
+							MonumentaRedisSyncAPI.remoteDataIncrement(player.getUniqueId(), VOTES_UNCLAIMED, amountRedeemed);
+						} else {
+							// Hooray, successfully claimed rewards
+							ScoreboardUtils.setScoreboardValue(player, scoreboardName, amountRedeemed);
+							for (FunctionWrapper func : functions) {
+								func.runAs(player);
+							}
+						}
+					}
+				});
+			}
+		});
 	}
 }

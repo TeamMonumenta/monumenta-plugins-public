@@ -111,15 +111,13 @@ public class Effect {
 		PotionManager manager = plugin.mPotionManager;
 
 		for (Entity e : entities) {
-			if (e instanceof Player && manager != null) {
+			if (e instanceof Player player && manager != null) {
 				// This is a player - use the potion manager
-				Player player = (Player)e;
 
 				/* Apply potion via potion manager */
 				manager.addPotion(player, PotionID.APPLIED_POTION,
 				                  new PotionEffect(type, seconds * 20, amplifier, true, !hideParticles));
-			} else if (e instanceof LivingEntity) {
-				LivingEntity entity = (LivingEntity)e;
+			} else if (e instanceof LivingEntity entity) {
 				// Not a player - apply the effect directly
 				entity.addPotionEffect(new PotionEffect(type, seconds * 20, amplifier, false, !hideParticles));
 			}
@@ -135,9 +133,8 @@ public class Effect {
 		World world = null;
 		for (Entity e : entities) {
 			world = e.getWorld();
-			if (e instanceof Player && manager != null) {
+			if (e instanceof Player player && manager != null) {
 				// This is a player - use the potion manager
-				Player player = (Player) e;
 
 				if (type == null) {
 					// Clear all effects
@@ -146,8 +143,7 @@ public class Effect {
 					// Clear one effect
 					manager.clearPotionEffectType(player, type);
 				}
-			} else if (e instanceof LivingEntity) {
-				LivingEntity entity = (LivingEntity)e;
+			} else if (e instanceof LivingEntity entity) {
 				// Not a player - clear the effect directly
 				if (type == null) {
 					// Clear all effects

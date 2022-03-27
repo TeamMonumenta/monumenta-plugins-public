@@ -49,6 +49,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -895,6 +896,10 @@ public class ItemStatUtils {
 		}
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
+	public static List<Component> getLore(final ItemStack item) {
+		return getLore(new NBTItem(item));
 	}
 
 	public static List<Component> getLore(final NBTItem nbt) {
@@ -1744,6 +1749,28 @@ public class ItemStatUtils {
 			addLore(item, index, MessagingUtils.fromMiniMessage(lore));
 
 			generateItemStats(item);
+		}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("list"));
+
+		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			List<Component> lore = getLore(item);
+			for (int i = 0; i < lore.size(); i++) {
+				Component line = lore.get(i);
+				player.sendMessage(line.clickEvent(ClickEvent.suggestCommand("/editlore replace " + i + " " + MessagingUtils.toMiniMessage(line))));
+			}
 		}).register();
 
 		arguments.clear();

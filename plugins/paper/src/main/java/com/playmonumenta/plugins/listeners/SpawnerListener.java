@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,9 +17,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpawnerListener implements Listener {
@@ -141,31 +140,21 @@ public class SpawnerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void chunkUnloadEvent(ChunkUnloadEvent event) {
+	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
 		// Mark the mob as unloaded by setting the entity object to null
-		for (Entity entity : event.getChunk().getEntities()) {
-			MobInfo mobInfo = mMobInfos.get(entity.getUniqueId());
-			if (mobInfo != null) {
-				mobInfo.mMob = null;
-			}
+		MobInfo mobInfo = mMobInfos.get(event.getEntity().getUniqueId());
+		if (mobInfo != null) {
+			mobInfo.mMob = null;
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void chunkLoadEvent(ChunkLoadEvent event) {
-		// Mark the mob as loaded by setting the entity object to the newly generated one
-		for (Entity entity : event.getChunk().getEntities()) {
-			MobInfo mobInfo = mMobInfos.get(entity.getUniqueId());
-			if (mobInfo != null) {
-				mobInfo.mMob = entity;
-			}
+	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
+		// Mark the mob as loaded by setting the entity object to the newly loaded one
+		MobInfo mobInfo = mMobInfos.get(event.getEntity().getUniqueId());
+		if (mobInfo != null) {
+			mobInfo.mMob = event.getEntity();
 		}
 	}
 
-	public void worldUnloadEvent(WorldUnloadEvent event) {
-		// Remove all mobs from worlds that unload
-		mMobInfos.entrySet().removeIf((entry) ->
-			entry.getValue().mMob == null || entry.getValue().mMob.getWorld().equals(event.getWorld())
-		);
-	}
 }

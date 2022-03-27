@@ -7,7 +7,6 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class WindBombAirTag extends Effect {
 
@@ -32,7 +31,7 @@ public class WindBombAirTag extends Effect {
 	}
 
 	@Override
-	public void onHurtByEntityWithSource(@NotNull LivingEntity entity, @NotNull DamageEvent event, @NotNull Entity damager, @NotNull LivingEntity source) {
+	public void onHurtByEntityWithSource(LivingEntity entity, DamageEvent event, Entity damager, LivingEntity source) {
 		if (mPlayer.equals(source)) {
 			event.setDamage(event.getDamage() * (1 + mAmount));
 		}

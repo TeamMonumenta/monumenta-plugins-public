@@ -10,7 +10,8 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-public class AbilitySilence extends Effect {
+public class AbilitySilence extends ZeroArgumentEffect {
+	public static final String GENERIC_NAME = "Silence";
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.0f);
 
@@ -26,18 +27,18 @@ public class AbilitySilence extends Effect {
 
 	@Override
 	public void entityGainEffect(Entity entity) {
-		if (entity instanceof Player) {
-			entity.sendActionBar(Component.text("You are silenced! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
-			AbilityManager.getManager().getPlayerAbilities((Player) entity).silence();
-			ClientModHandler.silenced((Player) entity, getDuration());
+		if (entity instanceof Player player) {
+			player.sendActionBar(Component.text("You are silenced! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
+			AbilityManager.getManager().getPlayerAbilities(player).silence();
+			ClientModHandler.silenced(player, getDuration());
 		}
 	}
 
 	@Override
 	public void entityLoseEffect(Entity entity) {
-		if (entity instanceof Player) {
-			AbilityManager.getManager().getPlayerAbilities((Player) entity).unsilence();
-			ClientModHandler.silenced((Player) entity, 0);
+		if (entity instanceof Player player) {
+			AbilityManager.getManager().getPlayerAbilities(player).unsilence();
+			ClientModHandler.silenced(player, 0);
 		}
 	}
 

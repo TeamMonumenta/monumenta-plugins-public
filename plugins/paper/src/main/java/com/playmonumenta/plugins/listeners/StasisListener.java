@@ -31,7 +31,7 @@ public class StasisListener implements Listener {
 		if (entity == null || !(entity instanceof Player)) {
 			return false;
 		}
-		return Plugin.getInstance().mEffectManager.hasEffect(entity, Stasis.STASIS_NAME);
+		return Plugin.getInstance().mEffectManager.hasEffect(entity, Stasis.GENERIC_NAME);
 	}
 
 	@EventHandler (priority = EventPriority.LOWEST, ignoreCancelled = false)
