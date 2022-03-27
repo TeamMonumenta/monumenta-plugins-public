@@ -6,9 +6,11 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.effects.SpellShockExplosion;
 import com.playmonumenta.plugins.effects.SpellShockStatic;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -40,6 +42,7 @@ public class Spellshock extends Ability {
 	public static final String SPELL_SHOCK_STATIC_EFFECT_NAME = "SpellShockStaticEffect";
 	public static final String PERCENT_SPEED_EFFECT_NAME = "SpellShockPercentSpeedEffect";
 	public static final String PERCENT_SLOW_EFFECT_NAME = "SpellShockPercentSlowEffect";
+	public static final String ENHANCEMENT_EFFECT_NAME = "SpellShockEnhancementEffect";
 
 	public static final float DAMAGE_1 = 0.20f;
 	public static final float DAMAGE_2 = 0.30f;
@@ -50,6 +53,8 @@ public class Spellshock extends Ability {
 	public static final int DURATION_TICKS = 6 * 20;
 	public static final int SLOW_DURATION = 10;
 	public static final double SLOW_MULTIPLIER = -0.3;
+	public static final int ENHANCEMENT_DAMAGE = 4;
+	public static final int ENHANCEMENT_RADIUS = 2;
 
 	private final float mLevelDamage;
 	private final float mMeleeBonus;
@@ -62,6 +67,10 @@ public class Spellshock extends Ability {
 		mInfo.mShorthandName = "SS";
 		mInfo.mDescriptions.add("Hitting an enemy with a spell inflicts static for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 20% of the triggering spell's damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick. If a static mob is struck by a melee attack, it takes 10% more damage on the hit and is slowed by 30% for 0.5 seconds, clearing the static.");
 		mInfo.mDescriptions.add("Damage is increased to 30% for spells and 15% for melee. Additionally, gain +20% speed for 2 seconds whenever a spellshock is triggered.");
+		mInfo.mDescriptions.add(
+			String.format("If an enemy that had static applied on them at one point dies, they explode, dealing %s damage in a %s block radius, bypassing iframes.",
+				ENHANCEMENT_DAMAGE,
+				ENHANCEMENT_RADIUS));
 		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
 
 		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
@@ -163,6 +172,10 @@ public class Spellshock extends Ability {
 					}
 				} else {
 					mPlugin.mEffectManager.addEffect(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION_TICKS));
+					if (!mPlugin.mEffectManager.hasEffect(enemy, ENHANCEMENT_EFFECT_NAME)) {
+						mPlugin.mEffectManager.addEffect(enemy, ENHANCEMENT_EFFECT_NAME,
+							new SpellShockExplosion(mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer), SpellPower.getSpellDamage(mPlugin, mPlayer, ENHANCEMENT_DAMAGE), mPlayer.getUniqueId()));
+					}
 				}
 			}
 		}

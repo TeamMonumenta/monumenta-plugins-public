@@ -39,11 +39,16 @@ public class FireAspect implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE || event.getDamager() instanceof Trident) {
-			EntityUtils.applyFire(plugin, (int) (FIRE_ASPECT_DURATION * level), enemy, player);
-			// So that fire resistant mobs don't get fire particles
-			if (enemy.getFireTicks() > 0) {
-				player.getWorld().spawnParticle(Particle.FLAME, enemy.getLocation().add(0, 1, 0), 6, 0.5, 0.5, 0.5, 0.001);
-			}
+			apply(plugin, player, level, enemy);
 		}
 	}
+
+	public static void apply(Plugin plugin, Player player, double level, LivingEntity enemy) {
+		EntityUtils.applyFire(plugin, (int) (FIRE_ASPECT_DURATION * level), enemy, player);
+		// So that fire resistant mobs don't get fire particles
+		if (enemy.getFireTicks() > 0) {
+			player.getWorld().spawnParticle(Particle.FLAME, enemy.getLocation().add(0, 1, 0), 6, 0.5, 0.5, 0.5, 0.001);
+		}
+	}
+
 }

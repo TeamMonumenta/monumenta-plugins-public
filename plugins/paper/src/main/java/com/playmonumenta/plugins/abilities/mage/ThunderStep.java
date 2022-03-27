@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,7 +27,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
+import org.jetbrains.annotations.Nullable;
 
 
 public class ThunderStep extends Ability {
@@ -59,9 +58,20 @@ public class ThunderStep extends Ability {
 	public static final int COOLDOWN_SECONDS = 22;
 	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
 
+	public static final double BACK_TELEPORT_MAX_DISTANCE = 64;
+	public static final int BACK_TELEPORT_MAX_DELAY = 3 * 20;
+	public static final float BACK_TELEPORT_DAMAGE_MULTIPLIER = 0.5f;
+	public static final int ENHANCEMENT_BONUS_DAMAGE_TIMER = 30 * 20;
+	public static final float ENHANCEMENT_BONUS_DAMAGE_MULTIPLIER = 1.5f;
+	public static final int ENHANCEMENT_PARALYZE_DURATION = 5 * 20;
+
 	private final int mLevelDamage;
 	private final int mLevelDistance;
 	private final boolean mDoStun;
+
+	private int mLastCastTick = -1;
+	private @Nullable Location mLastCastLocation = null;
+	private boolean mCanParalyze = false;
 
 	public ThunderStep(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
@@ -71,7 +81,10 @@ public class ThunderStep extends Ability {
 		mInfo.mShorthandName = "TS";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While holding a wand while sneaking, pressing the swap key materializes a flash of thunder, dealing %s magic damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
+				"While holding a wand while sneaking, pressing the swap key materializes a flash of thunder," +
+					" dealing %s magic damage to all enemies in a %s-block cube around you and knocking them away." +
+					" The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block," +
+					" and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
 				DISTANCE_1,
@@ -86,6 +99,17 @@ public class ThunderStep extends Ability {
 				DAMAGE_2,
 				DISTANCE_1,
 				DISTANCE_2
+			)
+		);
+		mInfo.mDescriptions.add(
+			String.format("You are now able to recast this skill after the original cast within %ss." +
+				              " If you do, you get teleported back to the original starting location and %s%% of the original damage is dealt again." +
+				              " If you instead choose to not recast the skill, your next Thunder Step within %ss will deal %s%% extra damage and paralyze enemies for %ss.",
+				BACK_TELEPORT_MAX_DELAY / 20,
+				(int) (100 * BACK_TELEPORT_DAMAGE_MULTIPLIER),
+				ENHANCEMENT_BONUS_DAMAGE_TIMER / 20,
+				(int) (100 * ENHANCEMENT_BONUS_DAMAGE_MULTIPLIER - 100),
+				ENHANCEMENT_PARALYZE_DURATION / 20
 			)
 		);
 		mInfo.mCooldown = COOLDOWN_TICKS;
@@ -112,14 +136,48 @@ public class ThunderStep extends Ability {
 		if (mPlayer != null && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
 			event.setCancelled(true);
 
-			if (!isTimerActive()
-				    && mPlayer.isSneaking()
+			if (mPlayer.isSneaking()
 				    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+
+				// if enhanced, can teleport back within a short time frame (regardless of if on cooldown or not)
+				if (isEnhanced()
+					    && mPlayer.getTicksLived() <= mLastCastTick + BACK_TELEPORT_MAX_DELAY
+					    && mLastCastLocation != null
+					    && mLastCastLocation.getWorld() == mPlayer.getWorld()
+					    && mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
+
+					float spellDamage = BACK_TELEPORT_DAMAGE_MULTIPLIER * SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+					doDamage(mPlayer.getLocation(), spellDamage, false);
+					mLastCastLocation.setDirection(mPlayer.getLocation().getDirection());
+					mPlayer.teleport(mLastCastLocation, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+					doDamage(mLastCastLocation, spellDamage, false);
+
+					// prevent further back teleports as well as paralyze of any further casts
+					mLastCastLocation = null;
+					mLastCastTick = -1;
+					mCanParalyze = false;
+					return;
+				}
+
+				// on cooldown and didn't teleport back: stop here
+				if (isTimerActive()) {
+					return;
+				}
+
+				boolean doParalyze = isEnhanced() && mCanParalyze && mPlayer.getTicksLived() <= mLastCastTick + ENHANCEMENT_BONUS_DAMAGE_TIMER;
+				mCanParalyze = !doParalyze;
+
 				putOnCooldown();
+				mLastCastLocation = mPlayer.getLocation();
+				mLastCastTick = mPlayer.getTicksLived();
+
+				float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+				if (doParalyze) {
+					spellDamage *= ENHANCEMENT_BONUS_DAMAGE_MULTIPLIER;
+				}
 
 				Location playerStartLocation = mPlayer.getLocation();
-				float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-				doDamage(playerStartLocation, spellDamage);
+				doDamage(playerStartLocation, spellDamage, doParalyze);
 
 				World world = mPlayer.getWorld();
 				BoundingBox movingPlayerBox = mPlayer.getBoundingBox();
@@ -139,17 +197,18 @@ public class ThunderStep extends Ability {
 					.toLocation(world)
 					.setDirection(vector);
 
-				if (!playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)) {
+				if (!playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)
+					    || ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 					return;
 				}
 
 				mPlayer.teleport(playerEndLocation, PlayerTeleportEvent.TeleportCause.UNKNOWN);
-				doDamage(playerEndLocation, spellDamage);
+				doDamage(playerEndLocation, spellDamage, doParalyze);
 			}
 		}
 	}
 
-	private void doDamage(Location location, float spellDamage) {
+	private void doDamage(Location location, float spellDamage, boolean enhancementParalyze) {
 		World world = location.getWorld();
 		world.playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 1.5f);
 		new PartialParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
@@ -167,6 +226,9 @@ public class ThunderStep extends Ability {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, spellDamage, ABILITY, true);
 			if (mDoStun && !EntityUtils.isBoss(enemy)) {
 				EntityUtils.applyStun(mPlugin, STUN_TICKS, enemy);
+			}
+			if (enhancementParalyze && !EntityUtils.isBoss(enemy)) {
+				EntityUtils.paralyze(mPlugin, ENHANCEMENT_PARALYZE_DURATION, enemy);
 			}
 
 			Location enemyParticleLocation = enemy.getLocation().add(0, enemy.getHeight() / 2, 0);

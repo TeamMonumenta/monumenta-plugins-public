@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentAbilityDamageReceived;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -16,6 +18,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.EnumSet;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -48,6 +51,11 @@ public class MagmaShield extends Ability {
 	public static final int ANGLE = 70;
 	public static final int COOLDOWN_SECONDS = 12;
 	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
+	public static final float ENHANCEMENT_FIRE_DAMAGE_BONUS = 1;
+	public static final float ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS = 0.2f;
+	public static final String ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME = "MagmaShieldFireDamageBonus";
+	public static final String ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME = "MagmaShieldFireAbilityDamageBonus";
+	public static final int ENHANCEMENT_BONUS_DURATION = 8 * 20;
 
 	private final int mLevelDamage;
 
@@ -73,6 +81,14 @@ public class MagmaShield extends Ability {
 				"Damage is increased from %s to %s.",
 				DAMAGE_1,
 				DAMAGE_2
+			)
+		);
+		mInfo.mDescriptions.add(
+			String.format(
+				"Enemies hit by this ability take %s%% extra damage by fire and %s%% by fire based abilities for %ss.",
+				(int) (100 * ENHANCEMENT_FIRE_DAMAGE_BONUS),
+				(int) (100 * ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS),
+				ENHANCEMENT_BONUS_DURATION / 20
 			)
 		);
 		mInfo.mCooldown = COOLDOWN_TICKS;
@@ -110,6 +126,14 @@ public class MagmaShield extends Ability {
 				EntityUtils.applyFire(mPlugin, FIRE_TICKS, potentialTarget, mPlayer);
 				DamageUtils.damage(mPlayer, potentialTarget, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
 				MovementUtils.knockAway(mPlayer, potentialTarget, KNOCKBACK, true);
+				if (isEnhanced()) {
+					mPlugin.mEffectManager.addEffect(potentialTarget, ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME,
+						new PercentDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_DAMAGE_BONUS, EnumSet.of(DamageType.FIRE)));
+					mPlugin.mEffectManager.addEffect(potentialTarget, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME,
+						new PercentAbilityDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS,
+							EnumSet.of(ClassAbility.MAGMA_SHIELD, ClassAbility.ELEMENTAL_ARROWS_FIRE, ClassAbility.ELEMENTAL_SPIRIT_FIRE,
+								ClassAbility.STARFALL, ClassAbility.CHOLERIC_FLAMES)));
+				}
 			}
 		}
 
@@ -151,9 +175,6 @@ public class MagmaShield extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer != null && mPlayer.isSneaking() && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand()) && !(mHasBlizzard && mPlayer.getLocation().getPitch() < Blizzard.ANGLE)) {
-			return true;
-		}
-		return false;
+		return mPlayer != null && mPlayer.isSneaking() && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand()) && !(mHasBlizzard && mPlayer.getLocation().getPitch() < Blizzard.ANGLE);
 	}
 }

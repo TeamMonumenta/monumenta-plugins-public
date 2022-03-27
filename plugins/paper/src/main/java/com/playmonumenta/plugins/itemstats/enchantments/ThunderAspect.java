@@ -46,24 +46,28 @@ public class ThunderAspect implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE || event.getDamager() instanceof Trident) {
-			double rand = FastUtils.RANDOM.nextDouble();
-			World world = enemy.getWorld();
+			apply(plugin, player, level, enemy);
+		}
+	}
 
-			if (rand < (level * 0.1 * player.getCooledAttackStrength(0))) {
-				if (EntityUtils.isElite(enemy)) {
-					EntityUtils.applyStun(plugin, 10, enemy);
-				} else {
-					EntityUtils.applyStun(plugin, 50, enemy);
-				}
+	public static void apply(Plugin plugin, Player player, double level, LivingEntity enemy) {
+		double rand = FastUtils.RANDOM.nextDouble();
+		World world = enemy.getWorld();
 
-				if (!(EntityUtils.isBoss(enemy) || enemy.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
-					Location loc = enemy.getLocation();
-					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.65f, 1.5f);
-					loc = loc.add(0, 1, 0);
-					world.spawnParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, YELLOW_1_COLOR);
-					world.spawnParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, YELLOW_2_COLOR);
-					world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 15, 0, 0, 0, 0.15);
-				}
+		if (rand < (level * 0.1 * player.getCooledAttackStrength(0))) {
+			if (EntityUtils.isElite(enemy)) {
+				EntityUtils.applyStun(plugin, 10, enemy);
+			} else {
+				EntityUtils.applyStun(plugin, 50, enemy);
+			}
+
+			if (!(EntityUtils.isBoss(enemy) || enemy.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
+				Location loc = enemy.getLocation();
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.65f, 1.5f);
+				loc = loc.add(0, 1, 0);
+				world.spawnParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, YELLOW_1_COLOR);
+				world.spawnParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, YELLOW_2_COLOR);
+				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 15, 0, 0, 0, 0.15);
 			}
 		}
 	}
