@@ -40,9 +40,13 @@ public class EnergizingElixir extends Ability {
 	private static final double DAMAGE_AMPLIFIER_2 = 0.1;
 	private static final String PERCENT_DAMAGE_EFFECT_NAME = "EnergizingElixirPercentDamageEffect";
 
+	private static final double ENCHANTED_BONUS = 0.03;
+	private static final int ENCHANTED_MAX_STACK = 4;
+
 	private final double mSpeedAmp;
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private @Nullable UnstableAmalgam mUnstableAmalgam;
+	private int mStacks;
 
 	public EnergizingElixir(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Energizing Elixir");
@@ -51,11 +55,13 @@ public class EnergizingElixir extends Ability {
 		mInfo.mShorthandName = "EE";
 		mInfo.mDescriptions.add("Left click while holding an Alchemist's Bag to consume a potion to apply 10% Speed and Jump Boost 2 to yourself for 6s. Cooldown: 2s.");
 		mInfo.mDescriptions.add("Speed is increased to 20%; additionally, gain a 10% damage buff from all sources for the same duration.");
+		mInfo.mDescriptions.add("Recasting this ability while the buff is still active refreshes the duration and increases the damage bonus and speed by 3%, up to 4 stacks.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.RABBIT_FOOT, 1);
 
 		mSpeedAmp = isLevelOne() ? SPEED_AMPLIFIER_1 : SPEED_AMPLIFIER_2;
+		mStacks = 0;
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 			mUnstableAmalgam = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, UnstableAmalgam.class);
@@ -73,10 +79,18 @@ public class EnergizingElixir extends Ability {
 					return;
 			}
 
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, mSpeedAmp, PERCENT_SPEED_EFFECT_NAME));
+			if (isEnhanced()) {
+				if (mPlugin.mEffectManager.hasEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME)) {
+					mStacks = Math.min(ENCHANTED_MAX_STACK, mStacks + 1);
+				} else {
+					mStacks = 0;
+				}
+			}
+
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, mSpeedAmp * (1 + (ENCHANTED_BONUS * mStacks)), PERCENT_SPEED_EFFECT_NAME));
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION, JUMP_LEVEL));
 			if (isLevelTwo()) {
-				mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_EFFECT_NAME, new PercentDamageDealt(DURATION, DAMAGE_AMPLIFIER_2));
+				mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_EFFECT_NAME, new PercentDamageDealt(DURATION, DAMAGE_AMPLIFIER_2 * (1 + (ENCHANTED_BONUS * mStacks))));
 			}
 
 			World world = mPlayer.getWorld();

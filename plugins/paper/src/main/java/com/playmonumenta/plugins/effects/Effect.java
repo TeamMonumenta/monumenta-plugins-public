@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
  */
 public abstract class Effect implements Comparable<Effect> {
 
-	private int mDuration;
+	protected int mDuration;
 
 	public Effect(int duration) {
 		mDuration = duration;

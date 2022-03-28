@@ -13,11 +13,11 @@ import org.bukkit.entity.Player;
 
 public class CustomDamageOverTime extends Effect {
 
-	private final double mDamage;
-	private final int mPeriod;
-	private final @Nullable Player mPlayer;
-	private final @Nullable ClassAbility mSpell;
-	private final Particle mParticle;
+	protected final double mDamage;
+	protected final int mPeriod;
+	protected final @Nullable Player mPlayer;
+	protected final @Nullable ClassAbility mSpell;
+	protected final Particle mParticle;
 	private int mTicks;
 
 	public CustomDamageOverTime(int duration, double damage, int period, @Nullable Player player, @Nullable ClassAbility spell, Particle particle) {

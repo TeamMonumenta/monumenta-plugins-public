@@ -9,9 +9,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class PercentDamageDealt extends Effect {
 	public static final String GENERIC_NAME = "PercentDamageDealt";
 
-	private final double mAmount;
-	private final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
-	private final int mPriority;
+	protected final double mAmount;
+	protected final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
+	protected final int mPriority;
 
 	public PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority) {
 		super(duration);

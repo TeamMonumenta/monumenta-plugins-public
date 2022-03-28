@@ -18,7 +18,11 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -28,12 +32,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import javax.annotation.Nullable;
 
 public class UnstableAmalgam extends Ability {
 
@@ -45,6 +48,7 @@ public class UnstableAmalgam extends Ability {
 	private static final int UNSTABLE_AMALGAM_DURATION = 3 * 20;
 	private static final int UNSTABLE_AMALGAM_RADIUS = 4;
 	private static final float UNSTABLE_AMALGAM_KNOCKBACK_SPEED = 2.5f;
+	private static final int UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION = 20 * 8;
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private @Nullable Slime mAmalgam;
@@ -57,6 +61,7 @@ public class UnstableAmalgam extends Ability {
 		mInfo.mShorthandName = "UA";
 		mInfo.mDescriptions.add("Shift left click while holding an Alchemist's Bag to consume a potion to place an Amalgam with 1 health at the location you are looking, up to 7 blocks away. When the Amalgam dies, or after 3 seconds, it explodes, dealing your Alchemist Potion's damage + 12 magic damage to mobs in a 4 block radius and applying potion effects from all abilities. Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion. Cooldown: 20s.");
 		mInfo.mDescriptions.add("The damage is increased to 20 and the cooldown is reduced to 16s.");
+		mInfo.mDescriptions.add("Enemies hit in the area become unstable for 8s. When an unstable mob dies, a potion that deals 40% of your potion damage is splashed at that location, on the next hit from an unstable ally, they will spawn a potion that deals 40% of your potion damage at the location. These potions apply all \"on hits\" of Brutal and Gruesome");
 		mInfo.mCooldown = isLevelOne() ? UNSTABLE_AMALGAM_1_COOLDOWN : UNSTABLE_AMALGAM_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.GUNPOWDER, 1);
@@ -141,8 +146,13 @@ public class UnstableAmalgam extends Ability {
 		if (mPlayer == null || !mPlayer.isOnline() || mAlchemistPotions == null) {
 			return;
 		}
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, UNSTABLE_AMALGAM_RADIUS, mAmalgam);
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, UNSTABLE_AMALGAM_RADIUS, mAmalgam)) {
+		if (isEnhanced() && !mobs.isEmpty()) {
+			unstableMobs(mobs);
+		}
+
+		for (LivingEntity mob : mobs) {
 			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), mDamage + mAlchemistPotions.getDamage(), true, true, false);
 
 			mAlchemistPotions.applyEffects(mob, false);
@@ -171,6 +181,32 @@ public class UnstableAmalgam extends Ability {
 		new PartialParticle(Particle.FLAME, loc, 115, 0.02, 0.02, 0.02, 0.2).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SMOKE_LARGE, loc, 40, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(mPlayer);
+	}
+
+	private void unstableMobs(List<LivingEntity> mobs) {
+		new BukkitRunnable() {
+			int mTimes = 0;
+			@Override public void run() {
+				mTimes++;
+
+				for (LivingEntity mob : new ArrayList<>(mobs)) {
+					new PartialParticle(Particle.REDSTONE, mob.getEyeLocation(), 40, 0.5, 0.5, 0.5, 0.3, new Particle.DustOptions(Color.WHITE, 0.8f)).spawnAsPlayerActive(mPlayer);
+
+					if (mob.isDead()) {
+						mobs.remove(mob);
+						ThrownPotion potion = mPlayer.launchProjectile(ThrownPotion.class);
+						potion.teleport(mob.getEyeLocation());
+						potion.setVelocity(new Vector(0, -1, 0));
+						mAlchemistPotions.setPotionToAlchemistPotion(potion);
+
+					}
+				}
+
+				if (mobs.isEmpty() || mTimes >= UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION) {
+					cancel();
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	@Override
