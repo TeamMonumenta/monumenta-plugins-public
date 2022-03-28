@@ -43,7 +43,7 @@ public class PhylacteryTowerAbility extends TowerAbility {
 					if (mIsPlayerMob) {
 						mGame.mPlayerMobs.add(mMob.spawn(mGame, true));
 					} else {
-						mGame.mPlayerMobs.add(mMob.spawn(mGame, false));
+						mGame.mFloorMobs.add(mMob.spawn(mGame, false));
 					}
 				}
 
