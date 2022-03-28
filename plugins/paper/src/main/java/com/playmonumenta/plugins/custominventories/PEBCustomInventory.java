@@ -368,7 +368,7 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.GOLD_NUGGET, false).playerCommand("pickup interesting"),
 			new PebItem(41, "All",
 				"Pick up anything and everything, matching vanilla functionality.", ChatColor.LIGHT_PURPLE,
-				Material.DIRT, false).playerCommand("p.pickup all"),
+				Material.DIRT, false).playerCommand("pickup all"),
 			new PebItem(43, "Threshold",
 				"Set the minimum size of a stack of uninteresting items to pick up.", ChatColor.LIGHT_PURPLE,
 				Material.OAK_SIGN, false)
