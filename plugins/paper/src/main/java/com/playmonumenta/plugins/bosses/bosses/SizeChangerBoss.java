@@ -92,6 +92,7 @@ public class SizeChangerBoss extends BossAbilityGroup {
 		double healthWithDamage = mBoss.getHealth() - event.getFinalDamage(true);
 		double currentHealth = mBoss.getHealth();
 		double maxHealth = mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+		double atkDamage = mBoss.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getValue();
 		boolean shouldChangeSize = false;
 
 		while (1f - (healthWithDamage / maxHealth) - (mTimes * mParams.SPEED) >= mParams.SPEED) {
@@ -111,6 +112,7 @@ public class SizeChangerBoss extends BossAbilityGroup {
 			}
 
 			mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+			mBoss.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(atkDamage);
 			mBoss.setHealth(currentHealth);
 
 			mParams.EFFECTS.apply(mBoss, mBoss);

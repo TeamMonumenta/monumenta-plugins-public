@@ -39,6 +39,12 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		@BossParam(help = "if explodeOnTouch ?  ticks to wait before checking for entity overlap to this block : ticks to wait before the lob explode when hitting the ground")
 		public int EXPLOSION_DELAY = 20;
 
+		@BossParam(help = "lobs for target.")
+		public int LOBS = 1;
+
+		@BossParam(help = "lobs delay")
+		public int LOBS_DELAY = 10;
+
 		@BossParam(help = "The material used for the grenade")
 		public Material BOMB_MATERIAL = Material.TNT;
 
@@ -108,6 +114,8 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 				p.BOMB_MATERIAL,
 				p.EXPLODE_ON_TOUCH,
 				p.EXPLOSION_DELAY,
+				p.LOBS,
+				p.LOBS_DELAY,
 				p.DURATION,
 				p.COOLDOWN,
 				p.LINGERING_DURATION,

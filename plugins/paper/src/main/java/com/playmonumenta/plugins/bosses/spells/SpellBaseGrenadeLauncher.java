@@ -19,6 +19,8 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	private final Material mGrenadeMaterial;
 	private final Boolean mExplodeOnTouch;
 	private final int mExplodeDelay;
+	private final int mLobs;
+	private final int mLobsDelay;
 	private final int mDuration;
 	private final int mCooldown;
 	private final GetSpellTargets<LivingEntity> mGrenadeTargets;
@@ -61,6 +63,8 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	 * @param grenadeMaterial Material for the grenade
 	 * @param explodeOnTouch if the grenade should explode before touching the ground when hit another entity
 	 * @param explodeDelay if not explodeOnTouch ?  ticks to wait before checking for entity overlap to this block (explode) : ticks to wait before the lob explode when hitting the gound
+	 * @param lobs number of lobs casted per target
+	 * @param lobsDelay ticks between each lobs
 	 * @param duration the max duration of the grenade
 	 * @param cooldown cooldown of this spell
 	 * @param lingeringDuration the duration of the lingering
@@ -81,6 +85,8 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		Material grenadeMaterial,
 		Boolean explodeOnTouch,
 		int explodeDelay,
+		int lobs,
+		int lobsDelay,
 		int duration,
 		int cooldown,
 
@@ -105,6 +111,8 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			mGrenadeMaterial = grenadeMaterial;
 			mExplodeOnTouch = explodeOnTouch;
 			mExplodeDelay = explodeDelay;
+			mLobs = lobs;
+			mLobsDelay = lobsDelay;
 			mDuration = duration;
 			mCooldown = cooldown;
 			mGrenadeTargets = grenadeTargets;
@@ -134,7 +142,16 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		if (!targets.isEmpty()) {
 			mAestheticsBoss.launch(mBoss, bossLocation);
 			for (LivingEntity target : targets) {
-				launchGrenade(bossLocation, target);
+				new BukkitRunnable() {
+					int mLobsLaunched = 0;
+					@Override public void run() {
+						launchGrenade(bossLocation, target);
+						mLobsLaunched++;
+						if (mLobsLaunched >= mLobs) {
+							cancel();
+						}
+					}
+				}.runTaskTimer(mPlugin, 0, mLobsDelay);
 			}
 		}
 	}

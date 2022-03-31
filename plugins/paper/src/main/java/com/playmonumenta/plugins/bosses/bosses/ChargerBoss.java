@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.plugin.Plugin;
 
 public class ChargerBoss extends BossAbilityGroup {
@@ -55,6 +56,9 @@ public class ChargerBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Let you choose the targets of this spell")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
+
+		@BossParam(help = "Whenever this mob should change target to charge target after casting")
+		public boolean CHANGE_TARGET = true;
 
 		//Particle & Sounds!
 		@BossParam(help = "Particle summoned at boss location when starting the ability")
@@ -128,6 +132,10 @@ public class ChargerBoss extends BossAbilityGroup {
 
 				if (p.DAMAGE_PERCENTAGE > 0.0) {
 					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+				}
+
+				if (p.CHANGE_TARGET && mBoss instanceof Mob mobAI) {
+					mobAI.setTarget(target);
 				}
 
 				p.EFFECTS.apply(target, mBoss);
