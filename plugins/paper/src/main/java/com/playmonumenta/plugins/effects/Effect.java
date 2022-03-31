@@ -86,8 +86,12 @@ public abstract class Effect implements Comparable<Effect> {
 
 	}
 
-	public boolean entityKilledEvent(EntityDeathEvent event) {
-		return true;
+	public void onDeath(EntityDeathEvent event) {
+
+	}
+
+	public void onKill(EntityDeathEvent event) {
+
 	}
 
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {

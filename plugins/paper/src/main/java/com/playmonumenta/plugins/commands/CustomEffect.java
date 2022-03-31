@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.ArrowSaving;
+import com.playmonumenta.plugins.effects.BonusSoulThreads;
 import com.playmonumenta.plugins.effects.DurabilitySaving;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -47,6 +48,7 @@ public class CustomEffect {
 		singleArgumentEffects.put("knockbackresist", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, PercentKnockbackResist.GENERIC_NAME, new PercentKnockbackResist(duration, amount, PercentKnockbackResist.GENERIC_NAME)));
 		singleArgumentEffects.put("arrowsaving", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, ArrowSaving.GENERIC_NAME, new ArrowSaving(duration, amount)));
 		singleArgumentEffects.put("durabilitysaving", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, DurabilitySaving.GENERIC_NAME, new DurabilitySaving(duration, amount)));
+		singleArgumentEffects.put("soul", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, BonusSoulThreads.GENERIC_NAME, new BonusSoulThreads(duration, amount)));
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(

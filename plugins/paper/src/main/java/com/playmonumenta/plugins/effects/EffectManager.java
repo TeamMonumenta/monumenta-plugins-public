@@ -440,19 +440,28 @@ public final class EffectManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-	public boolean entityDeathEvent(EntityDeathEvent event) {
-		Effects effects = mEntities.get(event.getEntity());
-		if (effects != null) {
-			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+	public void entityDeathEvent(EntityDeathEvent event) {
+		LivingEntity killed = event.getEntity();
+		Effects killedEffects = mEntities.get(killed);
+		if (killedEffects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : killedEffects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
-					if (!effectGroup.last().entityKilledEvent(event)) {
-						return false;
-					}
+					effectGroup.last().onDeath(event);
 				}
 			}
 		}
 
-		return true;
+		Player killer = killed.getKiller();
+		if (killer != null) {
+			Effects killerEffects = mEntities.get(killer);
+			if (killerEffects != null) {
+				for (Map<String, NavigableSet<Effect>> priorityEffects : killerEffects.mPriorityMap.values()) {
+					for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+						effectGroup.last().onKill(event);
+					}
+				}
+			}
+		}
 	}
 
 	//@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
