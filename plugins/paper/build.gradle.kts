@@ -29,6 +29,7 @@ dependencies {
     implementation("net.kyori:adventure-text-minimessage:4.2-ab62718")
     implementation("com.opencsv:opencsv:5.5")
     implementation("dev.jaqobb:namemcapi:2.0.7")
+    compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.destroystokyo.paper:paper:1.16.5-R0.1-SNAPSHOT")
     compileOnly("dev.jorel.CommandAPI:commandapi-core:6.0.0")
     compileOnly("me.clip:placeholderapi:2.10.4")
