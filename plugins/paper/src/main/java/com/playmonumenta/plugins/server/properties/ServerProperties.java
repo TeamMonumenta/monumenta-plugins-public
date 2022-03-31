@@ -28,6 +28,7 @@ public class ServerProperties {
 	private boolean mIsTownWorld = false;
 	// Height of plots in Sierhaven so that players under plots stay in adventure
 	private int mPlotSurvivalMinHeight = 256;
+	private int mLootScalingRadius = 128;
 
 	private boolean mIsSleepingEnabled = true;
 	private boolean mKeepLowTierInventory = false;
@@ -64,6 +65,10 @@ public class ServerProperties {
 
 	public static int getPlotSurvivalMinHeight() {
 		return INSTANCE.mPlotSurvivalMinHeight;
+	}
+
+	public static int getLootScalingRadius() {
+		return INSTANCE.mLootScalingRadius;
 	}
 
 	public static boolean getIsSleepingEnabled() {
@@ -132,6 +137,7 @@ public class ServerProperties {
 			mJoinMessagesEnabled = getPropertyValueBool(object, "joinMessagesEnabled", mJoinMessagesEnabled);
 			mIsTownWorld = getPropertyValueBool(object, "isTownWorld", mIsTownWorld);
 			mPlotSurvivalMinHeight = getPropertyValueInt(object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
+			mLootScalingRadius = getPropertyValueInt(object, "lootScalingRadius", mLootScalingRadius);
 
 			mIsSleepingEnabled = getPropertyValueBool(object, "isSleepingEnabled", mIsSleepingEnabled);
 			mKeepLowTierInventory = getPropertyValueBool(object, "keepLowTierInventory", mKeepLowTierInventory);

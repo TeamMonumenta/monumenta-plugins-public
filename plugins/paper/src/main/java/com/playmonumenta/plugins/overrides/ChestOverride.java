@@ -88,15 +88,15 @@ public class ChestOverride extends BaseOverride {
 			return false;
 		}
 
-		if (player != null && player.getGameMode() != GameMode.SPECTATOR) {
-			ChestUtils.chestScalingLuck(plugin, player, block);
-		}
-
 		if (player == null) {
 			return true;
 		} else if (player.getGameMode() != GameMode.SPECTATOR) {
 			DelvesUtils.setDelveLootTable(player, block);
-			return TOVUtils.setTOVLootTable(plugin, player, block);
+			boolean retval = TOVUtils.setTOVLootTable(plugin, player, block);
+			if (retval == true) {
+				// This will be allowed, should just generate the loot directly before the player actually finishes opening
+				ChestUtils.generateContainerLootWithScaling(player, block);
+			}
 		}
 
 		/* Only spectating players get to here */
@@ -126,7 +126,7 @@ public class ChestOverride extends BaseOverride {
 		}
 
 		DelvesUtils.setDelveLootTable(player, block);
-		ChestUtils.generateContainerLootWithScaling(player, block, plugin);
+		ChestUtils.generateContainerLootWithScaling(player, block);
 		return TOVUtils.canBreak(plugin, player, block, event);
 	}
 
@@ -144,7 +144,7 @@ public class ChestOverride extends BaseOverride {
 		if (!players.isEmpty()) {
 			Player player = players.get(0);
 			DelvesUtils.setDelveLootTable(player, block);
-			ChestUtils.generateContainerLootWithScaling(player, block, plugin);
+			ChestUtils.generateContainerLootWithScaling(player, block);
 		}
 
 		return true;
