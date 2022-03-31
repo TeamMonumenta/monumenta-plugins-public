@@ -238,6 +238,7 @@ public class Plugin extends JavaPlugin {
 		RunWithPlaceholdersCommand.register();
 		PartialParticleCommand.register();
 		CustomEffect.register();
+		EffectFromPotionCommand.register(this);
 
 
 		try {
