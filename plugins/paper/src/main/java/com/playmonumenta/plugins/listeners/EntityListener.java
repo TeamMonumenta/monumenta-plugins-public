@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -16,6 +17,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
@@ -55,6 +57,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Guardian;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -62,6 +65,7 @@ import org.bukkit.entity.Painting;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Ravager;
 import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.ThrownPotion;
@@ -933,4 +937,14 @@ public class EntityListener implements Listener {
 
 		return animalsRemaining >= 0;
 	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
+		if (event.getEntity() instanceof IronGolem golem) {
+			NmsUtils.getVersionAdapter().setAttackRange(golem, 2.5, 1);
+		} else if (event.getEntity() instanceof Ravager ravager) {
+			NmsUtils.getVersionAdapter().setAttackRange(ravager, 2.5, 0);
+		}
+	}
+
 }

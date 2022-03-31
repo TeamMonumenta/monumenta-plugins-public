@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import net.minecraft.server.v1_16_R3.ChatMessage;
 import net.minecraft.server.v1_16_R3.DamageSource;
+import net.minecraft.server.v1_16_R3.EntityCreature;
 import net.minecraft.server.v1_16_R3.EntityDamageSource;
 import net.minecraft.server.v1_16_R3.EntityLiving;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
@@ -15,18 +16,22 @@ import net.minecraft.server.v1_16_R3.EntityTypes;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.PathfinderGoalMeleeAttack;
 import net.minecraft.server.v1_16_R3.PathfinderGoalPerch;
+import net.minecraft.server.v1_16_R3.PathfinderGoalWrapped;
 import net.minecraft.server.v1_16_R3.Vec3D;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftCreature;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftParrot;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -255,6 +260,17 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	@Override
 	public void disablePerching(Parrot parrot) {
 		((CraftParrot) parrot).getHandle().goalSelector.getTasks().removeIf(w -> w.getGoal() instanceof PathfinderGoalPerch);
+	}
+
+	@Override
+	public void setAttackRange(Creature entity, double attackRange, double attackHeight) {
+		EntityCreature entityCreature = ((CraftCreature) entity).getHandle();
+		Optional<PathfinderGoalWrapped> oldGoal = entityCreature.goalSelector.getTasks().stream().filter(task -> task.getGoal() instanceof PathfinderGoalMeleeAttack).findFirst();
+		if (oldGoal.isPresent()) {
+			PathfinderGoalWrapped goal = oldGoal.get();
+			entityCreature.goalSelector.getTasks().remove(goal);
+			entityCreature.goalSelector.addGoal(goal.getPriority(), new CustomPathfinderGoalMeleeAttack16(entityCreature, 1.0, true, attackRange, attackHeight));
+		}
 	}
 
 }
