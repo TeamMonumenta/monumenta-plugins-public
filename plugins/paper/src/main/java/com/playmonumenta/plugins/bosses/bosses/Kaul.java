@@ -195,7 +195,7 @@ public class Kaul extends BossAbilityGroup {
 					if (player.isSleeping()) {
 						DamageUtils.damage(mBoss, player, DamageType.OTHER, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
-						player.sendMessage(ChatColor.DARK_GREEN + "THE JUNGLE FORBIDS YOU TO DREAM.");
+						player.sendMessage(ChatColor.DARK_GREEN + "THE TOPPINGS FORBIDS YOU TO DREAM.");
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 0.85f);
 					}
 				}
@@ -348,9 +348,9 @@ public class Kaul extends BossAbilityGroup {
 		events.put(100, mBoss -> {
 			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 			if (players.size() == 1) {
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL NOT ALLOW A LONE MORTAL LIKE YOU TO LIVE. PERISH, FOOLISH USURPER!\",\"color\":\"dark_green\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"ONLY ONE OF YOU? I SWORE I ORDERED WAY MORE PIZZAS THAN THAT. AH WELL, I'LL TAKE WHAT I CAN GET. LIKE PINEAPPLE ON PIZZA, YOU MUST BE DESTROYED!\",\"color\":\"dark_green\"}]");
 			} else {
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL TAKE YOUR PRESENCE NO MORE. PERISH, USURPERS.\",\"color\":\"dark_green\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I WILL TAKE THOSE PIZZAS AND EAT THEM... ALONG WITH YOU! I'M HUNGRY, DON'T JUDGE.\",\"color\":\"dark_green\"}]");
 			}
 		});
 
@@ -465,7 +465,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL DEVOUR YOU. ALL RETURNS TO ROT.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"OKAY I'M REALLY HUNGRY NOW. I'LL EVEN TAKE ANCHOVIES AT THIS POINT.\",\"color\":\"dark_green\"}]");
 		});
 
 		// Forcecast Raise Jungle
@@ -507,6 +507,7 @@ public class Kaul extends BossAbilityGroup {
 						world.spawnParticle(Particle.BLOCK_CRACK, mLoc, 150, 0.1, 0.1, 0.1, 0.5,
 						                    Material.DIRT.createBlockData());
 						LivingEntity miniboss = spawnPrimordial(mLoc);
+						miniboss.setCustomName("Pizza Elemental");
 						new BukkitRunnable() {
 
 							@Override
@@ -543,7 +544,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE SAUCE AND THE BODY MUST BE ENTWINED. I SUMMON FORTH MY PIZZA ELEMENTAL TO HELP. HE WILL GRIND YOU INTO MUSH...ROOMS.\",\"color\":\"dark_green\"}]");
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
@@ -693,7 +694,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU'RE REALLY MAKING ME FIGHT FOR MY FOOD. I WILL REIGN SUPREME THOUGH!\",\"color\":\"dark_green\"}]");
 		});
 
 
@@ -701,7 +702,7 @@ public class Kaul extends BossAbilityGroup {
 		//Summons a Immortal Elemental at 30% HP
 		events.put(30, mBoss -> {
 			summonImmortal(plugin, world);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN, NOW AS UNDYING AND EVERLASTING AS THE MOUNTAIN.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PIZZA ELEMENTAL, RETURN. TAKE DOWN THESE MEAT LOVERS FOR ME.\",\"color\":\"dark_green\"}]");
 		});
 
 
@@ -713,7 +714,7 @@ public class Kaul extends BossAbilityGroup {
 		events.put(10, mBoss -> {
 			changePhase(phase4Spells, phase4PassiveSpells, null);
 			forceCastSpell(SpellVolcanicDemise.class);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE VALLEY RUNS RED WITH BLOOD TODAY. LET THIS BLASPHEMY END. PREDATORS, FACE THE FULL WILL OF THE JUNGLE. COME.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE PEPPERONI SHALL RAIN DOWN UPON YOU, LIKE METEORS FROM THE HEAVENS. FACE MY HUNGER, ZA-LORDS.\",\"color\":\"dark_green\"}]");
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
@@ -752,6 +753,7 @@ public class Kaul extends BossAbilityGroup {
 					world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
 					world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1);
 					LivingEntity miniboss = spawnImmortal(mLoc);
+					miniboss.setCustomName("Immortal Pizza Elemental");
 					if (miniboss != null) {
 						EntityUtils.setAttributeBase(miniboss, Attribute.GENERIC_MOVEMENT_SPEED, EntityUtils.getAttributeBaseOrDefault(miniboss, Attribute.GENERIC_MOVEMENT_SPEED, 0) + 0.01);
 						miniboss.setInvulnerable(true);
@@ -933,9 +935,9 @@ public class Kaul extends BossAbilityGroup {
 			return;
 		}
 		String[] dio = new String[] {
-			"AS ALL RETURNS TO ROT, SO TOO HAS THIS ECHO FALLEN.",
-			"DO NOT THINK THIS ABSOLVES YOUR BLASPHEMY. RETURN HERE AGAIN, AND YOU WILL PERISH.",
-			"NOW... THE JUNGLE... MUST SLEEP...",
+			"AS PIZZA WOULD ENTER MY STOMACH, SO TOO MUST I REENTER THE GROUND.",
+			"I AM VANQUISHED; AN EMPTY TRAY. I SHALL REST AND BE MADE ANEW, LIKE DOUGH IN THE OVEN.",
+			"NOW... I MUST... BAKE..."
 		};
 		mDefeated = true;
 		knockback(mPlugin, 10);
@@ -1075,8 +1077,8 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
 				String[] dio = new String[] {
-					"THE JUNGLE'S WILL IS UNASSAILABLE, YET YOU SCURRY ACROSS MY SHRINE LIKE ANTS.",
-					"IS THE DEFILEMENT OF THE DREAM NOT ENOUGH!?",
+					"ARE YOU MY PIZZA DELIVERY PEOPLE? I ORDERED IT AGES AGO.",
+					"THE APP SAID 35 MINUTES, AND IT'S BEEN LIKE 40 YEARS."
 				};
 
 				new BukkitRunnable() {
