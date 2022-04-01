@@ -34,23 +34,22 @@ public class TOVUtils {
 		return true;
 	}
 
+	public static boolean isUnopenedTovLootCache(Block block) {
+		return block.getState() instanceof Chest chest && UNOPENED_CACHE_NAME.equals(chest.getCustomName());
+	}
+
 	public static boolean setTOVLootTable(Plugin plugin, Player player, Block block) {
-		BlockState blockState = block.getState();
-		if (blockState instanceof Chest) {
-			Chest chest = (Chest) blockState;
-			String name = ((Chest) blockState).getCustomName();
-			if (UNOPENED_CACHE_NAME.equals(name)) {
-				if (!canOpen(plugin, player)) {
-					return false;
-				}
-
-				chest.setCustomName(OPENED_CACHE_NAME);
-				chest.setLootTable(Bukkit.getLootTable(NamespacedKeyUtils.fromString("epic:" + CACHE_LOOT_TABLE)));
-				chest.update();
+		if (block.getState() instanceof Chest chest && UNOPENED_CACHE_NAME.equals(chest.getCustomName())) {
+			if (!canOpen(plugin, player)) {
+				return false;
 			}
-		}
 
-		return true;
+			chest.setCustomName(OPENED_CACHE_NAME);
+			chest.setLootTable(Bukkit.getLootTable(NamespacedKeyUtils.fromString("epic:" + CACHE_LOOT_TABLE)));
+			chest.update();
+			return true;
+		}
+		return false;
 	}
 
 	private static boolean canOpen(Plugin plugin, Player player) {
