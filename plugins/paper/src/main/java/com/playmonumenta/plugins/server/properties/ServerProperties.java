@@ -179,6 +179,7 @@ public class ServerProperties {
 		out.add("joinMessagesEnabled = " + mJoinMessagesEnabled);
 		out.add("isTownWorld = " + mIsTownWorld);
 		out.add("plotSurvivalMinHeight = " + mPlotSurvivalMinHeight);
+		out.add("lootScalingRadius = " + mLootScalingRadius);
 
 		out.add("isSleepingEnabled = " + mIsSleepingEnabled);
 		out.add("keepLowTierInventory = " + mKeepLowTierInventory);
