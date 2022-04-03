@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.utils.ChestUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import javax.annotation.Nullable;
@@ -93,10 +94,29 @@ public class ShulkerShortcutListener implements Listener {
 				event.setCancelled(true);
 			} else if (itemClicked != null &&
 				click == ClickType.RIGHT &&
-				(isPurpleTesseractContainer(itemClicked) || ChestUtils.isLootBox(itemClicked))) {
-				// Right clicked a purple tesseract shulker or lootbox that can't be opened
+				isPurpleTesseractContainer(itemClicked)) {
+				// Right clicked a purple tesseract shulker that can't be opened
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "This container must be placed to access its items");
+				event.setCancelled(true);
+			} else if (itemClicked != null &&
+				click == ClickType.RIGHT &&
+				ChestUtils.isLootBox(itemClicked)) {
+				// Right clicked a lootbox - dump contents into player's inventory
+				ItemStack[] items = ChestUtils.removeOneLootshareFromLootbox(itemClicked);
+				if (items == null) {
+					// Lootbox empty
+					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				} else {
+					// Non-empty, got some items, drop them on the player
+					// /playsound minecraft:block.chest.open player @s ~ ~ ~ 0.6 1
+					player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, SoundCategory.PLAYERS, 0.6f, 1f);
+					for (ItemStack item : items) {
+						if (item != null && !item.getType().isAir()) {
+							InventoryUtils.dropTempOwnedItem(item, player.getLocation(), player);
+						}
+					}
+				}
 				event.setCancelled(true);
 			} else if (itemClicked != null && ItemUtils.isShulkerBox(itemClicked.getType()) &&
 			           !ShulkerEquipmentListener.isEquipmentBox(itemClicked) &&
