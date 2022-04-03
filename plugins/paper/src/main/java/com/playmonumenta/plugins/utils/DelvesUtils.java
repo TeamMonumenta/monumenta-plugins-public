@@ -410,6 +410,7 @@ public class DelvesUtils {
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("depths", "DDDelve");
 	}
 
+	@SuppressWarnings("PMD.AvoidUsingOctalValues")
 	public static long getDelveScore(Player player, String dungeon) {
 		// Get around the reference abilities with null player in the AbilityManager
 		if (player == null) {

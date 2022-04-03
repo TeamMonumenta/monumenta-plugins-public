@@ -223,7 +223,7 @@ public class TowerCommands {
 				int lvl = 0;
 				int totalGold = TowerConstants.STARTING_GOLD;
 				int totalHP = 0;
-				int totalATK = 0;
+				double totalATK = 0;
 				int totalMob = 0;
 				int totalAbility = 0;
 				JsonObject jb;
@@ -244,7 +244,7 @@ public class TowerCommands {
 					jb.addProperty("Tw", weight);
 					jb.addProperty("Tl", lvl);
 					jb.addProperty("Thp", totalHP);
-					jb.addProperty("Tatk", totalATK);
+					jb.addProperty("Tatk", (int)totalATK);
 					jb.addProperty("Tm", totalMob);
 					jb.addProperty("Tab", totalAbility);
 					jb.addProperty("PTg", totalGold);

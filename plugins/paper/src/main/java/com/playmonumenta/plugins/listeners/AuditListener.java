@@ -283,7 +283,7 @@ public class AuditListener implements Listener {
 		}
 
 		log(String.format(
-			"GameMode: %s | %s → %s",
+			"GameMode: %s | %s -> %s",
 			player.getName(),
 			oldGameMode,
 			newGameMode

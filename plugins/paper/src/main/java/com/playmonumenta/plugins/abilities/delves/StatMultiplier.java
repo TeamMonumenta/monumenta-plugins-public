@@ -133,6 +133,7 @@ public class StatMultiplier extends DelveModifier {
 	}
 
 	@Override
+	@SuppressWarnings("PMD.EmptyIfStmt")
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (source == null) {
 			// only scale entity damage, not environmental damage

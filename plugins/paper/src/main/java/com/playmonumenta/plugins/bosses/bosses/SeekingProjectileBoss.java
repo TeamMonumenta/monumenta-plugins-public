@@ -52,7 +52,7 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
-		com.playmonumenta.plugins.Plugin customEffectInstance = com.playmonumenta.plugins.Plugin.getInstance();
+		Plugin customEffectInstance = Plugin.getInstance();
 		int lifetimeTicks = (int) (p.DISTANCE/p.SPEED);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(

@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class OnHitBoss extends BossAbilityGroup {

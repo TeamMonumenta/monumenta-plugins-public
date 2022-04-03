@@ -28,52 +28,49 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class GenericTowerMob extends TowerAbility {
 
-	final Mob mBoss;
 	public LivingEntity mLastTarget = null;
 	public boolean mCanChangeTarget = true;
 
 	public GenericTowerMob(Plugin plugin, String identityTag, Mob boss, TowerGame game, TowerMob mob, boolean isPlayerMob) {
 		super(plugin, identityTag, boss, game, mob, isPlayerMob);
 
-		mBoss = boss;
-
 		//used a runnable so even if the mob is silenced, this "spell" will still get cast.
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				if (mBoss.isDead() || !mBoss.isValid()) {
-					mGame.towerMobsDied(mBoss);
+				if (boss.isDead() || !boss.isValid()) {
+					mGame.towerMobsDied(boss);
 					cancel();
 					return;
 				}
 
 				if (mGame.isGameEnded()) {
-					TowerFileUtils.warning("Game ended but mob still loaded: " + mBoss.getCustomName() + " Unloading..");
+					TowerFileUtils.warning("Game ended but mob still loaded: " + boss.getCustomName() + " Unloading..");
 					cancel();
 					return;
 				}
 
-				if (mBoss.getTarget() != null && mBoss.getTarget().getScoreboardTags().contains(TowerConstants.MOB_TAG_UNTARGETABLE)) {
-					mBoss.setTarget(null);
+				if (boss.getTarget() != null && boss.getTarget().getScoreboardTags().contains(TowerConstants.MOB_TAG_UNTARGETABLE)) {
+					boss.setTarget(null);
 					mLastTarget = null;
 				}
 
-				if (mBoss.getTarget() != null && mBoss.getTarget() instanceof Player) {
-					mBoss.setTarget(mLastTarget);
+				if (boss.getTarget() != null && boss.getTarget() instanceof Player) {
+					boss.setTarget(mLastTarget);
 				}
 
-				if (mBoss.getTarget() != null && (mBoss.getTarget().isDead() || !mBoss.getTarget().isValid())) {
-					mBoss.setTarget(mLastTarget);
+				if (boss.getTarget() != null && (boss.getTarget().isDead() || !boss.getTarget().isValid())) {
+					boss.setTarget(mLastTarget);
 				}
 
-				if (mLastTarget != null && ((mIsPlayerMob && mLastTarget.getScoreboardTags().contains(TowerConstants.MOB_TAG_PLAYER_TEAM) || (!mIsPlayerMob && mLastTarget.getScoreboardTags().contains(TowerConstants.MOB_TAG_FLOOR_TEAM))))) {
+				if (mLastTarget != null && ((mIsPlayerMob && mLastTarget.getScoreboardTags().contains(TowerConstants.MOB_TAG_PLAYER_TEAM)) || (!mIsPlayerMob && mLastTarget.getScoreboardTags().contains(TowerConstants.MOB_TAG_FLOOR_TEAM)))) {
 					mLastTarget = null;
-					mBoss.setTarget(null);
+					boss.setTarget(null);
 				}
 
 				if (mGame.isTurnEnded()) {
-					mBoss.setTarget(null);
+					boss.setTarget(null);
 					cancel();
 					return;
 				}
@@ -81,7 +78,7 @@ public class GenericTowerMob extends TowerAbility {
 				if (mLastTarget != null) {
 					if (!mLastTarget.isValid() || mLastTarget.isDead() || (mIsPlayerMob && mGame.mPlayerMobs.contains(mLastTarget)) || (!mIsPlayerMob && mGame.mFloorMobs.contains(mLastTarget))) {
 						mLastTarget = null;
-						mBoss.setTarget(null);
+						boss.setTarget(null);
 					}
 				}
 
@@ -90,17 +87,17 @@ public class GenericTowerMob extends TowerAbility {
 					mCanChangeTarget = true;
 					List<LivingEntity> targets = (mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs());
 					targets.removeIf(entity -> entity.getScoreboardTags().contains(TowerConstants.MOB_TAG_UNTARGETABLE));
-					Location loc = mBoss.getLocation();
+					Location loc = boss.getLocation();
 					targets.sort((a, b) -> (int) (loc.distance(a.getLocation()) - loc.distance(b.getLocation())));
 
 					if (targets.size() > 0) {
-						mBoss.setTarget(targets.get(0));
+						boss.setTarget(targets.get(0));
 						mLastTarget = targets.get(0);
 					} else {
-						mBoss.setTarget(null);
+						boss.setTarget(null);
 					}
 				} else {
-					mBoss.setTarget(mLastTarget);
+					boss.setTarget(mLastTarget);
 				}
 			}
 

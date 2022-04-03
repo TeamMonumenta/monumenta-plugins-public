@@ -71,13 +71,10 @@ public class Blizzard extends Ability {
 		mLevelSlowMultiplier = isUpgraded ? SLOW_MULTIPLIER_2 : SLOW_MULTIPLIER_1;
 	}
 
-	private boolean mActive = false;
-
 	@Override
 	public void cast(Action action) {
 		if (mPlayer != null) {
 			putOnCooldown();
-			mActive = true;
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 			World world = mPlayer.getWorld();
@@ -120,7 +117,6 @@ public class Blizzard extends Ability {
 							|| !mPlayer.isValid() // Ensure player is not dead, is still online?
 					) {
 						this.cancel();
-						mActive = false;
 					}
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
