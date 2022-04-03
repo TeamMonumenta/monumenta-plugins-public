@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.infinitytower;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiItem;
@@ -7,6 +8,9 @@ import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobRarity;
 import com.playmonumenta.plugins.utils.FileUtils;
+import com.playmonumenta.redissync.ConfigAPI;
+import com.playmonumenta.redissync.RedisAPI;
+
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTListCompound;
@@ -18,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -92,7 +98,7 @@ public class TowerFileUtils {
 	}
 
 	public static void loadPlayerTeams() {
-		JsonObject tower = readFile("InfinityTowerPlayer.json");
+		JsonObject tower = readFileRedis("InfinityTowerPlayer.json");
 		PLAYERS_DEFENDERS_TEAM.clear();
 		try {
 			JsonArray teams = tower.getAsJsonArray("playersteams");
@@ -199,7 +205,7 @@ public class TowerFileUtils {
 			arr.add(obj);
 		}
 
-		saveFile(tower, "InfinityTowerPlayer.json");
+		saveFileRedis(tower, "InfinityTowerPlayer.json");
 	}
 
 	public static void saveDefaultTower() {
@@ -302,12 +308,29 @@ public class TowerFileUtils {
 		return item.getItem();
 	}
 
+	private static String getRedisPath(String fileName) {
+		return ConfigAPI.getServerDomain() + ":infinitytower:" + fileName;
+
+	}
 
 	public static JsonObject readFile(String fileName) {
 		try {
 			return FileUtils.readJson(TowerManager.mPlugin.getDataFolder() + File.separator + "InfinityTower" + File.separator + fileName);
 		} catch (Exception e) {
 			warning("exception while reading file: " + fileName + " Reason: " + e.getMessage());
+		}
+		return null;
+	}
+
+	public static JsonObject readFileRedis(String fileName) {
+		try {
+			String data = RedisAPI.getInstance().async().get(getRedisPath(fileName)).get(15, TimeUnit.SECONDS);
+			if (data == null) {
+				warning("Tried to read file '" + fileName + "' from redis but it was empty");
+			}
+			return new Gson().fromJson(data, JsonObject.class);
+		} catch (Exception e) {
+			warning("exception while reading redis file: " + fileName + " Reason: " + e.getMessage());
 		}
 		return null;
 	}
@@ -320,7 +343,13 @@ public class TowerFileUtils {
 		}
 	}
 
-
+	public static void saveFileRedis(JsonObject obj, String fileName) {
+		RedisAPI.getInstance().async().set(getRedisPath(fileName), new Gson().toJson(obj)).whenComplete((unused, ex) -> {
+			if (ex != null) {
+				warning("exception while save redis file : " + ex.getMessage());
+			}
+		});
+	}
 
 	public static TowerMobInfo getMobInfo(String losName) {
 		for (TowerMobInfo item : TOWER_MOBS_INFO) {
