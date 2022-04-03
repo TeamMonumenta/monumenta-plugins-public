@@ -10,6 +10,7 @@ import net.minecraft.server.v1_16_R3.ChatMessage;
 import net.minecraft.server.v1_16_R3.DamageSource;
 import net.minecraft.server.v1_16_R3.EntityCreature;
 import net.minecraft.server.v1_16_R3.EntityDamageSource;
+import net.minecraft.server.v1_16_R3.EntityHuman;
 import net.minecraft.server.v1_16_R3.EntityLiving;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.EntityTypes;
@@ -17,6 +18,7 @@ import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.PathfinderGoalMeleeAttack;
+import net.minecraft.server.v1_16_R3.PathfinderGoalNearestAttackableTarget;
 import net.minecraft.server.v1_16_R3.PathfinderGoalPerch;
 import net.minecraft.server.v1_16_R3.PathfinderGoalWrapped;
 import net.minecraft.server.v1_16_R3.Vec3D;
@@ -263,6 +265,12 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	}
 
 	@Override
+	public void setAggressive(Creature entity, DamageAction action) {
+		EntityCreature entityCreature = ((CraftCreature) entity).getHandle();
+		entityCreature.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack16(entityCreature, action));
+		entityCreature.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget(entityCreature, EntityHuman.class, true));
+	}
+
 	public void setAttackRange(Creature entity, double attackRange, double attackHeight) {
 		EntityCreature entityCreature = ((CraftCreature) entity).getHandle();
 		Optional<PathfinderGoalWrapped> oldGoal = entityCreature.goalSelector.getTasks().stream().filter(task -> task.getGoal() instanceof PathfinderGoalMeleeAttack).findFirst();

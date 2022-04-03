@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.commands.BossTagCommand.TypeAndDesc;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import dev.jorel.commandapi.Tooltip;
 import java.lang.reflect.Field;
@@ -269,6 +270,12 @@ public abstract class BossParameters {
 						validType.getField().set(parameters, result.getResult());
 					} else if (validTypeClass == EntityTargets.class) {
 						ParseResult<EntityTargets> result = EntityTargets.fromReader(reader, validType.getDesc());
+						if (result.getTooltip() != null) {
+							return ParseResult.of(result.getTooltip());
+						}
+						validType.getField().set(parameters, result.getResult());
+					} else if (validTypeClass == DamageEvent.DamageType.class) {
+						ParseResult<DamageEvent.DamageType> result = DamageEvent.DamageType.fromReader(reader, validType.getDesc());
 						if (result.getTooltip() != null) {
 							return ParseResult.of(result.getTooltip());
 						}

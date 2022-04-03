@@ -17,6 +17,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
@@ -262,6 +263,12 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 	}
 
 	@Override
+	public void setAggressive(Creature entity, DamageAction action) {
+		PathfinderMob mob = ((CraftCreature) entity).getHandle();
+		mob.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(mob, action));
+		mob.targetSelector.addGoal(2, new NearestAttackableTargetGoal<net.minecraft.world.entity.player.Player>(mob, net.minecraft.world.entity.player.Player.class, true));
+	}
+
 	public void setAttackRange(Creature entity, double attackRange, double attackHeight) {
 		PathfinderMob mob = ((CraftCreature) entity).getHandle();
 		Optional<WrappedGoal> oldGoal = mob.goalSelector.getAvailableGoals().stream().filter(goal -> goal.getGoal() instanceof MeleeAttackGoal).findFirst();

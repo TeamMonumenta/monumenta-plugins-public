@@ -68,6 +68,18 @@ public interface VersionAdapter {
 	void disablePerching(Parrot parrot);
 
 	/**
+	 * Make entity agro players
+	 *
+	 * @param entity       The entity who should agro players
+	 * @param action       Damage action when this entity hit a player
+	 */
+	void setAggressive(Creature entity, DamageAction action);
+
+	interface DamageAction {
+		void damage(LivingEntity entity);
+	}
+
+	/**
 	 * Changes the melee attack range of the given entity.
 	 * <b>Note that this overrides any custom melee attack</b>, so care should be taken to only apply it to mobs with a basic melee attack.
 	 * This needs to be verified by looking at the pathfinder goals of the entity.
@@ -78,5 +90,6 @@ public interface VersionAdapter {
 	 * @param attackHeight Vertical offset to calculate distance from instead of from the feet
 	 */
 	void setAttackRange(Creature entity, double attackRange, double attackHeight);
+
 
 }
