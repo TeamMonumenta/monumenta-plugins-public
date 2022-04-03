@@ -191,7 +191,7 @@ public class ItemStatManager implements Listener {
 				newArmorMultiplyStats = mArmorMultiplyStats;
 			}
 
-			if (mainhand != null && mainhand.getType() != Material.AIR && !ItemUtils.isArmorOrWearable(mainhand)) {
+			if (mainhand != null && mainhand.getType() != Material.AIR && !ItemUtils.isArmorOrWearable(mainhand) && !ItemStatUtils.isShattered(mainhand)) {
 				NBTItem nbt = new NBTItem(mainhand);
 				NBTCompound enchantments = ItemStatUtils.getEnchantments(nbt);
 				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
@@ -613,5 +613,12 @@ public class ItemStatManager implements Listener {
 			mPlayerItemStatsMappings.put(player.getUniqueId(), stats);
 		}
 		return new PlayerItemStats(stats);
+	}
+
+	public void updateStats(Player player) {
+		PlayerItemStats stats = getPlayerItemStats(player);
+		if (stats != null) {
+			stats.updateStats(player, true);
+		}
 	}
 }

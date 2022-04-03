@@ -134,6 +134,7 @@ public class ReforgeInventory extends GenericCommand {
 				for (ItemStack item : toReforge) {
 					ItemStatUtils.reforge(item);
 				}
+				Plugin.getInstance().mItemStatManager.updateStats(player);
 				player.sendMessage("All of your items have been reforged!");
 			} else {
 				player.sendMessage("You can't afford that");

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Sound;
@@ -16,6 +17,7 @@ public class ShatterHeldItem extends GenericCommand {
 	private static void run(CommandSender sender, Player player) {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		if (ItemStatUtils.shatter(item)) {
+			Plugin.getInstance().mItemStatManager.updateStats(player);
 			player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 0.8f);
 			sender.sendMessage("Successfully shattered player's held item.");
 		} else {
