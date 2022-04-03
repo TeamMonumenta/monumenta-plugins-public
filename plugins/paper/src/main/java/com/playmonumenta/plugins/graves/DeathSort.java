@@ -1,9 +1,8 @@
 package com.playmonumenta.plugins.graves;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.graves.GraveItem;
-import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.infusions.Hope;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -27,7 +26,6 @@ public class DeathSort {
 
 	//Makes the item seem like it was picked up by the player animation wise, and then deletes it
 	private static void simulatePickup(Item item, Player player) {
-
 		//Prevent the item from being picked up normally
 		item.setCanMobPickup(false);
 		item.setCanPlayerPickup(false);
@@ -35,6 +33,8 @@ public class DeathSort {
 		//Make the item despawn in the next tick
 		NBTEntity nbte = new NBTEntity(item);
 		nbte.setShort("Age", (short) 11999);
+		//Prevents Hope from overwriting the Age
+		item.addScoreboardTag(Hope.NO_AGE_CHANGE_TAG);
 
 		//Play pickup animation and sound
 		player.playPickupItemAnimation(item);
