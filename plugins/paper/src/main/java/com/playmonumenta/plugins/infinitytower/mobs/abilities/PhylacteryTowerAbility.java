@@ -23,9 +23,21 @@ public class PhylacteryTowerAbility extends TowerAbility {
 	public void death(EntityDeathEvent event) {
 		super.death(event);
 
+		List<LivingEntity> mobs = mIsPlayerMob ? mGame.getPlayerMobs() : mGame.getFloorMobs();
+
+		for (LivingEntity mob : mobs) {
+			if (!mob.isDead() && mob.isValid()) {
+				castReborn();
+				return;
+			}
+		}
+
+
+	}
+
+	private void castReborn() {
 		List<LivingEntity> list = new ArrayList<>();
 		mMob.spawnPuppet(mGame, list, mIsPlayerMob);
-
 		new BukkitRunnable() {
 			int mTimer = 0;
 			@Override
@@ -59,5 +71,6 @@ public class PhylacteryTowerAbility extends TowerAbility {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 10);
+
 	}
 }
