@@ -196,7 +196,7 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 
 	// To find the new field name, see which field is reset by EntityHuman.resetAttackCooldown
 	// If the field's type changed from int to another type, update the type used by the getAttackCooldown/setAttackCooldown methods in this class accordingly.
-	private static final Field attackCooldownField = getField(net.minecraft.world.entity.LivingEntity.class, "at");
+	private static final Field attackCooldownField = getField(net.minecraft.world.entity.LivingEntity.class, "attackStrengthTicker");
 
 	@SuppressWarnings("unboxing.of.nullable")
 	public int getAttackCooldown(LivingEntity entity) {
