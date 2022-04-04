@@ -93,7 +93,7 @@ public class ElementalArrows extends Ability {
 			mLastDamage = event.getDamage();
 		} else if (arrow.hasMetadata("ElementalArrowsThunderArrow")) {
 			damage = event.getDamage() * DAMAGE_MULTIPLIER_3;
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), ELEMENTAL_ARROWS_RADIUS, enemy)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), ELEMENTAL_ARROWS_RADIUS)) {
 				EntityUtils.applyStun(mPlugin, ENHANCED_ARROW_STUN_DURATION, mob);
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, ABILITY, true);
 			}
@@ -111,7 +111,7 @@ public class ElementalArrows extends Ability {
 			return true;
 		}
 		if (arrow.isCritical() || arrow instanceof Trident) {
-			if (isEnhanced() && !isOnCooldown()) {
+			if (isEnhanced() && !isTimerActive()) {
 				arrow.setMetadata("ElementalArrowsThunderArrow", new FixedMetadataValue(mPlugin, 0));
 				arrow.setFireTicks(0);
 				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.END_ROD);

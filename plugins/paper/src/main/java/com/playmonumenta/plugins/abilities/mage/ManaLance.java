@@ -39,6 +39,7 @@ public class ManaLance extends MultipleChargeAbility {
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
 
 	private float mDamage;
+	private int mLastCastTicks = 0;
 
 	public ManaLance(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Mana Lance");
@@ -63,8 +64,12 @@ public class ManaLance extends MultipleChargeAbility {
 		}
 
 		double damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mDamage);
-
-		putOnCooldown();
+		int ticks = mPlayer.getTicksLived();
+		// Prevent double casting on accident
+		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
+			return;
+		}
+		mLastCastTicks = ticks;
 
 		Location loc = mPlayer.getEyeLocation();
 		BoundingBox box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
