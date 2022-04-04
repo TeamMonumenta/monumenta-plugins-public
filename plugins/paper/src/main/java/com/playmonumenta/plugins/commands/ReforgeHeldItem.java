@@ -111,6 +111,7 @@ public class ReforgeHeldItem extends GenericCommand {
 					return;
 				}
 				ItemStatUtils.reforge(item);
+				Plugin.getInstance().mItemStatManager.updateStats(player);
 				player.sendMessage("Your item has been reforged!");
 				if (sender != player) {
 					sender.sendMessage("Successfully reforged the player's held item");

@@ -37,14 +37,13 @@ public class SanguineMark extends Effect {
 	}
 
 	@Override
-	public boolean entityKilledEvent(EntityDeathEvent event) {
+	public void onDeath(EntityDeathEvent event) {
 		if (event.getEntity().getKiller() != null) {
 			 Player player = event.getEntity().getKiller();
 			 double maxHealth = EntityUtils.getMaxHealth(player);
 			 PlayerUtils.healPlayer(mPlugin, player, mHealPercent * maxHealth, mPlayer);
 			 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH_SMALL, 1.0f, 0.8f);
 		}
-		return true;
 	}
 
 	@Override

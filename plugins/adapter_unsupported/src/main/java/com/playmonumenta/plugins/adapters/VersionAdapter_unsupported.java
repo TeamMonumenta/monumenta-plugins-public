@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.adapters;
 
 import javax.annotation.Nullable;
 import org.bukkit.World;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -74,4 +75,12 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 
 	}
 
+	@Override
+	public void setAggressive(Creature entity, DamageAction action) {
+
+	}
+
+	public void setAttackRange(Creature entity, double attackRange, double attackHeight) {
+
+	}
 }

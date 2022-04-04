@@ -137,6 +137,9 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(21, "Toggle Darksight",
 				"Click to toggle whether Darksight provides Night Vision", ChatColor.LIGHT_PURPLE,
 				Material.LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/darksight_toggle"),
+			new PebItem(22, "Kick someone!",
+				"Kicks someone randomly from the server.", ChatColor.LIGHT_PURPLE,
+				Material.RABBIT_FOOT, true).serverCommand("kick @S You really thought I'd let you kick someone other than yourself?"),
 			new PebItem(23, "Dailies",
 				"Click to see what daily content you have and haven't done today.", ChatColor.LIGHT_PURPLE,
 				Material.ACACIA_BOAT, true).playerCommand("clickable peb_dailies"),
@@ -368,7 +371,7 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.GOLD_NUGGET, false).playerCommand("pickup interesting"),
 			new PebItem(41, "All",
 				"Pick up anything and everything, matching vanilla functionality.", ChatColor.LIGHT_PURPLE,
-				Material.DIRT, false).playerCommand("p.pickup all"),
+				Material.DIRT, false).playerCommand("pickup all"),
 			new PebItem(43, "Threshold",
 				"Set the minimum size of a stack of uninteresting items to pick up.", ChatColor.LIGHT_PURPLE,
 				Material.OAK_SIGN, false)

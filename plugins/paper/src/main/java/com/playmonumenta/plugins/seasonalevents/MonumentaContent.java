@@ -22,6 +22,7 @@ public enum MonumentaContent {
 	PINK("pink", ContentType.DUNGEON, 2),
 	GRAY("gray", ContentType.DUNGEON, 2),
 	LIGHT_GRAY("lightgray", ContentType.DUNGEON, 2),
+	CYAN("cyan", ContentType.DUNGEON, 2),
 	PURPLE("purple", ContentType.DUNGEON, 2),
 	TEAL("teal", ContentType.DUNGEON, 2),
 	FORUM("forum", ContentType.DUNGEON, 2),

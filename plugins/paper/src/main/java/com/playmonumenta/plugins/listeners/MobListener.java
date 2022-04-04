@@ -29,6 +29,7 @@ import org.bukkit.entity.Evoker;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -161,6 +162,11 @@ public class MobListener implements Listener {
 		if (event.getDamager() instanceof Firework) {
 			event.setCancelled(true);
 			return;
+		}
+
+		// Disable the randomness of Iron Golems' attacks
+		if (event.getDamager() instanceof IronGolem golem) {
+			event.setDamage(EntityUtils.getAttributeOrDefault(golem, Attribute.GENERIC_ATTACK_DAMAGE, 0));
 		}
 
 		if (event.getEntity() instanceof Player) {

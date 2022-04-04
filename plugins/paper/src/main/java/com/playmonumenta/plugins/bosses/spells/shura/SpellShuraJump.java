@@ -204,7 +204,7 @@ public class SpellShuraJump extends Spell {
 							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 7, true)) {
 								if (player.getBoundingBox().overlaps(box)) {
 									MovementUtils.knockAway(mBoss.getLocation(), player, 0.75f, 0.5f);
-									BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MELEE, 20);
+									BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MELEE, 25, "Corrupted Strike", mBoss.getLocation());
 								}
 							}
 						}

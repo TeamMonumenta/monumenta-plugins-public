@@ -4,9 +4,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -32,6 +33,8 @@ public class MobRisingBoss extends BossAbilityGroup {
 
 		public EntityTargets TARGETS = EntityTargets.GENERIC_SELF_TARGET;
 
+		public SoundsList SOUNDS = SoundsList.EMPTY;
+
 	}
 
 
@@ -46,7 +49,7 @@ public class MobRisingBoss extends BossAbilityGroup {
 		final Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		if (p.MOB_POOL != LoSPool.EMPTY) {
-			SpellManager activeSpells = new SpellManager(Arrays.asList(
+			SpellManager activeSpells = new SpellManager(List.of(
 				new SpellBaseSummon(
 					plugin,
 					boss,
@@ -69,6 +72,10 @@ public class MobRisingBoss extends BossAbilityGroup {
 					(LivingEntity bos, Location loc, int ticks) -> {
 						if (ticks == 0) {
 							bos.setGlowing(true);
+						}
+
+						if (p.SOUNDS != SoundsList.EMPTY) {
+							p.SOUNDS.play(bos.getLocation());
 						}
 
 						loc.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0);

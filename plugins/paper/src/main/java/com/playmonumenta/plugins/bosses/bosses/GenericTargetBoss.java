@@ -26,9 +26,6 @@ public class GenericTargetBoss extends BossAbilityGroup {
 
 	}
 
-
-	final Mob mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new GenericTargetBoss(plugin, boss);
 	}
@@ -43,7 +40,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 			boss.setRemoveWhenFarAway(true);
 		}
 
-		mBoss = (Mob)boss;
+		Mob mob = (Mob)boss;
 
 		final Parameters param = BossParameters.getParameters(boss, identityTag, new Parameters());
 
@@ -52,27 +49,27 @@ public class GenericTargetBoss extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				if (EntityUtils.isStunned(mBoss)) {
+				if (EntityUtils.isStunned(mob)) {
 					return;
 				}
 
 				//may we want a check for confusion?
-				if (mLastTarget != mBoss.getTarget() && mBoss.getTarget() != null) {
-					mLastTarget = mBoss.getTarget();
+				if (mLastTarget != mob.getTarget() && mob.getTarget() != null) {
+					mLastTarget = mob.getTarget();
 				}
 
 				if (mLastTarget != null) {
 					if (!mLastTarget.isValid() || mLastTarget.isDead()) {
 						mLastTarget = null;
-						mBoss.setTarget(null);
+						mob.setTarget(null);
 					}
 				} else {
-					List<? extends LivingEntity> targets = param.TARGETS.getTargetsList(mBoss);
+					List<? extends LivingEntity> targets = param.TARGETS.getTargetsList(mob);
 					if (targets.size() > 0) {
-						mBoss.setTarget(targets.get(0));
+						mob.setTarget(targets.get(0));
 						mLastTarget = targets.get(0);
 					} else {
-						mBoss.setTarget(null);
+						mob.setTarget(null);
 					}
 				}
 			}

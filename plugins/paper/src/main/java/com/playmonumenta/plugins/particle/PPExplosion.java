@@ -45,15 +45,6 @@ public class PPExplosion extends AbstractPartialParticle<PPExplosion> {
 		return this;
 	}
 
-	/**
-	 * this method does nothing - this PP is always in directional mode.
-	 */
-	@Deprecated
-	@Override
-	public PPExplosion directionalMode(boolean directionalMode) {
-		return this;
-	}
-
 	@Override
 	protected void doSpawn(ParticleBuilder packagedValues) {
 		mDirectionalMode = true;

@@ -16,6 +16,7 @@ public class Hope implements Infusion {
 	/* How much longer an item lasts per level */
 	private static final int EXTRA_MINUTES_PER_LEVEL = 5;
 	private static final int TICK_PERIOD = 6;
+	public static final String NO_AGE_CHANGE_TAG = "NoHopeAgeChange";
 
 	@Override
 	public String getName() {
@@ -29,8 +30,11 @@ public class Hope implements Infusion {
 
 	@Override
 	public void onSpawn(Plugin plugin, Item item, double value) {
-		NBTEntity nbt = new NBTEntity(item);
-		nbt.setShort("Age", (short) (-1 * EXTRA_MINUTES_PER_LEVEL * Constants.TICKS_PER_MINUTE * value));
+		// Do not set the age if DeathSort has set the age to despawn next tick
+		if (!item.getScoreboardTags().contains(NO_AGE_CHANGE_TAG)) {
+			NBTEntity nbt = new NBTEntity(item);
+			nbt.setShort("Age", (short) (-1 * EXTRA_MINUTES_PER_LEVEL * Constants.TICKS_PER_MINUTE * value));
+		}
 
 		new BukkitRunnable() {
 			int mNumTicks = 0;

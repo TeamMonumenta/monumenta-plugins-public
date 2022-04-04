@@ -167,6 +167,7 @@ public class ShulkerEquipmentListener implements Listener {
 		return SWAP_SLOTS.get(playerInventorySlot);
 	}
 
+	@SuppressWarnings("PMD.EmptyIfStmt")
 	private void swap(Player player, PlayerInventory pInv, ShulkerBox sbox) {
 		/* Prevent swapping/nesting shulkers */
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {

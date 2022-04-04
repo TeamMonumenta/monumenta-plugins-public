@@ -1,8 +1,13 @@
 package com.playmonumenta.plugins.events;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.parameters.ParseResult;
+import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import dev.jorel.commandapi.Tooltip;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
@@ -96,6 +101,20 @@ public class DamageEvent extends Event implements Cancellable {
 
 		public boolean isDefendable() {
 			return mIsDefendable;
+		}
+
+		public static ParseResult<DamageType> fromReader(StringReader reader, String hoverDescription) {
+			DamageType type = reader.readEnum(DamageType.values());
+			if (type == null) {
+				List<Tooltip<String>> suggArgs = new ArrayList<>(DamageType.values().length);
+				String soFar = reader.readSoFar();
+				for (DamageType valid : DamageType.values()) {
+					suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+				}
+				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
+			}
+
+			return ParseResult.of(type);
 		}
 	}
 

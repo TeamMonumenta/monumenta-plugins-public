@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -56,6 +57,8 @@ public class SpellShuraAS extends Spell {
 			world.spawnParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f);
 			world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 			mBoss.teleport(mCenter.clone().add(0, -10, 0));
+			mTarget.sendMessage(ChatColor.AQUA + "A chill runs down your spine.");
+			mTarget.playSound(mTarget.getLocation(), Sound.ENTITY_GUARDIAN_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
 
 			BukkitRunnable tp = new BukkitRunnable() {
 				int mT = 0;
@@ -63,7 +66,7 @@ public class SpellShuraAS extends Spell {
 				@Override
 				public void run() {
 					mT += 10;
-					world.spawnParticle(Particle.REDSTONE, mTarget.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0, DARK_RED);
+					world.spawnParticle(Particle.REDSTONE, mTarget.getLocation().add(0, 1.5, 0), 6, 0.5, 0.5, 0.5, 0, DARK_RED);
 					if (mT >= 2 * 20 && mTrigger) {
 						mTrigger = false;
 						//tp behind
@@ -80,7 +83,7 @@ public class SpellShuraAS extends Spell {
 					}
 					if (mT >= 7 * 20) {
 						mMarked = false;
-						world.playSound(mTarget.getLocation(), Sound.ENTITY_GUARDIAN_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
+						mTarget.playSound(mTarget.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1.25f);
 						this.cancel();
 					}
 				}
@@ -101,7 +104,7 @@ public class SpellShuraAS extends Spell {
 				int mT = 0;
 				@Override public void run() {
 					mT++;
-					BossUtils.blockableDamage(mBoss, damagee, DamageEvent.DamageType.MAGIC, 10);
+					BossUtils.blockableDamage(mBoss, damagee, DamageEvent.DamageType.MAGIC, 10, "Advancing Shadows", null);
 					if (mT >= 6) {
 						this.cancel();
 						damagee.removePotionEffect(PotionEffectType.WITHER);

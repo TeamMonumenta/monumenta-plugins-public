@@ -15,7 +15,7 @@ public class AntiRangeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_antirange";
 	public static final int detectionRange = 40;
 
-	private static final int ANTI_RANGE_DISTANCE = 6;
+	private static final int ANTI_RANGE_DISTANCE = 8;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new AntiRangeBoss(plugin, boss);

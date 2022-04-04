@@ -410,6 +410,7 @@ public class DelvesUtils {
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("depths", "DDDelve");
 	}
 
+	@SuppressWarnings("PMD.AvoidUsingOctalValues")
 	public static long getDelveScore(Player player, String dungeon) {
 		// Get around the reference abilities with null player in the AbilityManager
 		if (player == null) {
@@ -612,7 +613,7 @@ public class DelvesUtils {
 		BlockState blockState = block.getState();
 		if (blockState instanceof Chest) {
 			setDelveLootTable(DelvesUtils.getDelveInfo(player).getDepthPoints(),
-					PlayerUtils.playersInRange(player.getLocation(), ChestUtils.CHEST_LUCK_RADIUS, true).size(),
+					PlayerUtils.playersInRange(player.getLocation(), ServerProperties.getLootScalingRadius(), true).size(),
 					(Chest) blockState);
 		}
 	}

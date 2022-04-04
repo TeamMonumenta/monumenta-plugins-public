@@ -41,7 +41,7 @@ public class SpellShuraDagger extends Spell {
 	private static final double HITBOX_LENGTH = 0.5;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
 	private static final boolean LINGERS = true;
-	private static final int DAMAGE = 15;
+	private static final int DAMAGE = 20;
 
 	public SpellShuraDagger(LivingEntity boss, Plugin plugin) {
 		mBoss = boss;

@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
@@ -190,7 +191,7 @@ public class ItemStatManager implements Listener {
 				newArmorMultiplyStats = mArmorMultiplyStats;
 			}
 
-			if (mainhand != null && mainhand.getType() != Material.AIR && !ItemUtils.isArmorOrWearable(mainhand)) {
+			if (mainhand != null && mainhand.getType() != Material.AIR && !ItemUtils.isArmorOrWearable(mainhand) && !ItemStatUtils.isShattered(mainhand)) {
 				NBTItem nbt = new NBTItem(mainhand);
 				NBTCompound enchantments = ItemStatUtils.getEnchantments(nbt);
 				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
@@ -570,24 +571,35 @@ public class ItemStatManager implements Listener {
 	private void checkSpawnedItem(Item item) {
 		if (item != null) {
 			ItemStack stack = item.getItemStack();
-			if (stack != null) {
-				NBTItem nbt = new NBTItem(stack);
-				NBTCompound enchantments = ItemStatUtils.getEnchantments(nbt);
-
-				for (ItemStatUtils.EnchantmentType ench : ItemStatUtils.EnchantmentType.SPAWNABLE_ENCHANTMENTS) {
-					int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
-					if (level > 0) {
-						ench.getItemStat().onSpawn(mPlugin, item, level);
+			if (stack.getType().isAir()) {
+				UUID throwerUUID = item.getThrower();
+				if (throwerUUID != null) {
+					Entity thrower = Bukkit.getEntity(throwerUUID);
+					if (thrower != null) {
+						MMLog.warning("Item spawned into world, but is air. Thrown by " + thrower);
+						return;
 					}
 				}
+				MMLog.warning("Item spawned into world, but is air.");
+				return;
+			}
 
-				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
+			NBTItem nbt = new NBTItem(stack);
+			NBTCompound enchantments = ItemStatUtils.getEnchantments(nbt);
 
-				for (ItemStatUtils.InfusionType infusion : ItemStatUtils.InfusionType.SPAWNABLE_INFUSIONS) {
-					int level = ItemStatUtils.getInfusionLevel(infusions, infusion);
-					if (level > 0) {
-						infusion.getItemStat().onSpawn(mPlugin, item, level);
-					}
+			for (ItemStatUtils.EnchantmentType ench : ItemStatUtils.EnchantmentType.SPAWNABLE_ENCHANTMENTS) {
+				int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
+				if (level > 0) {
+					ench.getItemStat().onSpawn(mPlugin, item, level);
+				}
+			}
+
+			NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
+
+			for (ItemStatUtils.InfusionType infusion : ItemStatUtils.InfusionType.SPAWNABLE_INFUSIONS) {
+				int level = ItemStatUtils.getInfusionLevel(infusions, infusion);
+				if (level > 0) {
+					infusion.getItemStat().onSpawn(mPlugin, item, level);
 				}
 			}
 		}
@@ -601,5 +613,12 @@ public class ItemStatManager implements Listener {
 			mPlayerItemStatsMappings.put(player.getUniqueId(), stats);
 		}
 		return new PlayerItemStats(stats);
+	}
+
+	public void updateStats(Player player) {
+		PlayerItemStats stats = getPlayerItemStats(player);
+		if (stats != null) {
+			stats.updateStats(player, true);
+		}
 	}
 }

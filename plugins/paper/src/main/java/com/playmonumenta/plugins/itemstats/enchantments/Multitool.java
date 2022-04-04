@@ -42,8 +42,9 @@ public class Multitool implements Enchantment {
 		//Material of the block clicked
 		Material eventMat = event.getClickedBlock() == null ? null : event.getClickedBlock().getType();
 		//Does not swap when clicking an interactable
+		// The clicked block may be air if something deleted the block in an event handler, but didn't cancel the event, e.g. opening strike chests.
 		if (event.getAction() == Action.RIGHT_CLICK_AIR
-				|| (event.getAction() == Action.RIGHT_CLICK_BLOCK && (!ItemUtils.interactableBlocks.contains(eventMat) || eventMat == Material.PUMPKIN))) {
+			    || (event.getAction() == Action.RIGHT_CLICK_BLOCK && (!ItemUtils.interactableBlocks.contains(eventMat) || eventMat == Material.PUMPKIN) && eventMat != Material.AIR)) {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			//Does not swap when player is sneaking
 			if (player.isSneaking()) {

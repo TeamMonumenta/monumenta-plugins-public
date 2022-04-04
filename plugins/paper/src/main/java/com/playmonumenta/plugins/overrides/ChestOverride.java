@@ -88,21 +88,23 @@ public class ChestOverride extends BaseOverride {
 			return false;
 		}
 
-		if (player != null && player.getGameMode() != GameMode.SPECTATOR) {
-			ChestUtils.chestScalingLuck(plugin, player, block);
-		}
-
 		if (player == null) {
 			return true;
 		} else if (player.getGameMode() != GameMode.SPECTATOR) {
 			DelvesUtils.setDelveLootTable(player, block);
-			return TOVUtils.setTOVLootTable(plugin, player, block);
+			if (TOVUtils.isUnopenedTovLootCache(block)) {
+				// This returns directly - TOV caches do not get loot scaling,
+				// and it's also important for the loot table to generate the vanilla way for the functions to trigger.
+				return TOVUtils.setTOVLootTable(plugin, player, block);
+			}
+			// This will be allowed, should just generate the loot directly before the player actually finishes opening
+			ChestUtils.generateContainerLootWithScaling(player, block);
+			return true;
 		}
 
 		/* Only spectating players get to here */
 		BlockState state = block.getState();
-		if (state instanceof Chest) {
-			Chest chest = (Chest)state;
+		if (state instanceof Chest chest) {
 			LootTable table = chest.getLootTable();
 			if (table != null) {
 				player.sendMessage(ChatColor.GOLD + "This chest has loot table: " + table.getKey().toString());
@@ -126,7 +128,7 @@ public class ChestOverride extends BaseOverride {
 		}
 
 		DelvesUtils.setDelveLootTable(player, block);
-		ChestUtils.generateContainerLootWithScaling(player, block, plugin);
+		ChestUtils.generateContainerLootWithScaling(player, block);
 		return TOVUtils.canBreak(plugin, player, block, event);
 	}
 
@@ -144,7 +146,7 @@ public class ChestOverride extends BaseOverride {
 		if (!players.isEmpty()) {
 			Player player = players.get(0);
 			DelvesUtils.setDelveLootTable(player, block);
-			ChestUtils.generateContainerLootWithScaling(player, block, plugin);
+			ChestUtils.generateContainerLootWithScaling(player, block);
 		}
 
 		return true;

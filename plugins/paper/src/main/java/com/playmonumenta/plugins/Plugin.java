@@ -43,6 +43,7 @@ import com.playmonumenta.plugins.listeners.ExceptionListener;
 import com.playmonumenta.plugins.listeners.GraveListener;
 import com.playmonumenta.plugins.listeners.ItemDropListener;
 import com.playmonumenta.plugins.listeners.JunkItemListener;
+import com.playmonumenta.plugins.listeners.LootTableManager;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.listeners.PortableEnderListener;
@@ -86,6 +87,8 @@ import com.playmonumenta.plugins.utils.SignUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -142,6 +145,7 @@ public class Plugin extends JavaPlugin {
 	public ItemOverrides mItemOverrides;
 	public CosmeticsManager mCosmeticsManager;
 	public SeasonalEventManager mSeasonalEventManager;
+	private @Nullable CustomLogger mLogger = null;
 
 	// INSTANCE is set if the plugin is properly enabled
 	@SuppressWarnings("initialization.static.field.uninitialized")
@@ -158,6 +162,10 @@ public class Plugin extends JavaPlugin {
 
 	@Override
 	public void onLoad() {
+		if (mLogger == null) {
+			mLogger = new CustomLogger(super.getLogger(), Level.INFO);
+		}
+
 		NmsUtils.loadVersionAdapter(this.getServer().getClass(), getLogger());
 
 		/*
@@ -165,6 +173,7 @@ public class Plugin extends JavaPlugin {
 		 *
 		 * These need to register immediately on load to prevent function loading errors
 		 */
+		ChangeLogLevel.register();
 		StasisCommand.register();
 		GiveSoulbound.register();
 		ClaimRaffle.register(this);
@@ -228,6 +237,7 @@ public class Plugin extends JavaPlugin {
 		RunWithPlaceholdersCommand.register();
 		PartialParticleCommand.register();
 		CustomEffect.register();
+		EffectFromPotionCommand.register(this);
 
 
 		try {
@@ -374,6 +384,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new WitchListener(this), this);
 		manager.registerEvents(new SeasonalEventListener(), this);
 		manager.registerEvents(CosmeticsManager.getInstance(), this);
+		manager.registerEvents(new LootTableManager(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")
@@ -530,5 +541,13 @@ public class Plugin extends JavaPlugin {
 	/* Sender will be sent debugging info if non-null */
 	public void reloadMonumentaConfig(CommandSender sender) {
 		ServerProperties.load(this, sender);
+	}
+
+	@Override
+	public Logger getLogger() {
+		if (mLogger == null) {
+			mLogger = new CustomLogger(super.getLogger(), Level.INFO);
+		}
+		return mLogger;
 	}
 }

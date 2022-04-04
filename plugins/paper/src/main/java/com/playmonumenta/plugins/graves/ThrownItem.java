@@ -10,7 +10,6 @@ import de.tr7zw.nbtapi.NBTItem;
 import javax.annotation.Nullable;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;

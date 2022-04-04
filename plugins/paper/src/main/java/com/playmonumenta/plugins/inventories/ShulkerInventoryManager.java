@@ -321,36 +321,38 @@ public class ShulkerInventoryManager {
 	 * @param shulkerItem Shulker Box in ItemStack form.
 	 * @return True if shulker is open and in use.
 	 */
-	public boolean isShulkerInUse(ItemStack shulkerItem) {
-		if (shulkerItem != null && ItemUtils.isShulkerBox(shulkerItem.getType())) {
-			BlockStateMeta shulkerMeta = (BlockStateMeta) shulkerItem.getItemMeta();
-			ShulkerBox shulkerBox = (ShulkerBox) shulkerMeta.getBlockState();
-			if (shulkerBox.getLock().startsWith("ShulkerShortcut:")) {
-				// Shulker Box was opened via shortcut
-				UUID lockUUID = UUID.fromString(shulkerBox.getLock().substring(16));
-				if (mInventories.containsKey(lockUUID) &&
-				    mInventories.get(lockUUID).getViewers().size() > 0) {
-					// Someone is currently using the shulker.
-					return true;
+	public static boolean isShulkerInUse(ItemStack shulkerItem) {
+		if (INSTANCE != null) {
+			if (shulkerItem != null && ItemUtils.isShulkerBox(shulkerItem.getType())) {
+				BlockStateMeta shulkerMeta = (BlockStateMeta) shulkerItem.getItemMeta();
+				ShulkerBox shulkerBox = (ShulkerBox) shulkerMeta.getBlockState();
+				if (shulkerBox.getLock().startsWith("ShulkerShortcut:")) {
+					// Shulker Box was opened via shortcut
+					UUID lockUUID = UUID.fromString(shulkerBox.getLock().substring(16));
+					if (INSTANCE.mInventories.containsKey(lockUUID) &&
+						INSTANCE.mInventories.get(lockUUID).getViewers().size() > 0) {
+						// Someone is currently using the shulker.
+						return true;
+					}
+					// The shulker was opened via shortcut but nobody is using it now. Release the lock.
+					shulkerBox.setLock(null);
+					shulkerMeta.setBlockState(shulkerBox);
+					shulkerItem.setItemMeta(shulkerMeta);
+					INSTANCE.closeShulker(lockUUID);
+				} else if (shulkerBox.getLock().startsWith("ShulkerDeposit:")) {
+					// Shulker Box was opened via shortcut for deposit
+					UUID lockUUID = UUID.fromString(shulkerBox.getLock().substring(15));
+					if (INSTANCE.mDepositInventories.containsKey(lockUUID) &&
+						!INSTANCE.mDepositInventories.get(lockUUID).isDepositComplete()) {
+						// This shulker is about to have an item deposited in it
+						return true;
+					}
+					// The shulker was opened via shortcut but the deposit is complete. Release the lock.
+					shulkerBox.setLock(null);
+					shulkerMeta.setBlockState(shulkerBox);
+					shulkerItem.setItemMeta(shulkerMeta);
+					INSTANCE.closeDepositShulker(lockUUID);
 				}
-				// The shulker was opened via shortcut but nobody is using it now. Release the lock.
-				shulkerBox.setLock(null);
-				shulkerMeta.setBlockState(shulkerBox);
-				shulkerItem.setItemMeta(shulkerMeta);
-				closeShulker(lockUUID);
-			} else if (shulkerBox.getLock().startsWith("ShulkerDeposit:")) {
-				// Shulker Box was opened via shortcut for deposit
-				UUID lockUUID = UUID.fromString(shulkerBox.getLock().substring(15));
-				if (mDepositInventories.containsKey(lockUUID) &&
-				    !mDepositInventories.get(lockUUID).isDepositComplete()) {
-					// This shulker is about to have an item deposited in it
-					return true;
-				}
-				// The shulker was opened via shortcut but the deposit is complete. Release the lock.
-				shulkerBox.setLock(null);
-				shulkerMeta.setBlockState(shulkerBox);
-				shulkerItem.setItemMeta(shulkerMeta);
-				closeDepositShulker(lockUUID);
 			}
 		}
 		// Item is either not a shulker or is not being used.
@@ -365,33 +367,35 @@ public class ShulkerInventoryManager {
 	 * @param shulkerBlock Shulker Box in Block form.
 	 * @return True if shulker is open and in use.
 	 */
-	public boolean isShulkerInUse(Block shulkerBlock) {
-		if (shulkerBlock != null && ItemUtils.isShulkerBox(shulkerBlock.getType())) {
-			ShulkerBox shulkerBox = (ShulkerBox) shulkerBlock.getState();
-			if (shulkerBox.getLock().startsWith("ShulkerShortcut:")) {
-				// Shulker Box was opened via shortcut
-				UUID lockUUID = UUID.fromString(shulkerBox.getLock().substring(16));
-				if (mInventories.containsKey(lockUUID) &&
-					mInventories.get(lockUUID).getViewers().size() > 0) {
-					// Someone is currently using the shulker.
-					return true;
+	public static boolean isShulkerInUse(Block shulkerBlock) {
+		if (INSTANCE != null) {
+			if (shulkerBlock != null && ItemUtils.isShulkerBox(shulkerBlock.getType())) {
+				ShulkerBox shulkerBox = (ShulkerBox) shulkerBlock.getState();
+				if (shulkerBox.getLock().startsWith("ShulkerShortcut:")) {
+					// Shulker Box was opened via shortcut
+					UUID lockUUID = UUID.fromString(shulkerBox.getLock().substring(16));
+					if (INSTANCE.mInventories.containsKey(lockUUID) &&
+						INSTANCE.mInventories.get(lockUUID).getViewers().size() > 0) {
+						// Someone is currently using the shulker.
+						return true;
+					}
+					// The shulker was opened via shortcut but nobody is using it now. Release the lock.
+					shulkerBox.setLock(null);
+					shulkerBox.update();
+					INSTANCE.closeShulker(lockUUID);
+				} else if (shulkerBox.getLock().startsWith("ShulkerDeposit:")) {
+					// Shulker Box was opened via shortcut for deposit
+					UUID lockUUID = UUID.fromString(shulkerBox.getLock().substring(15));
+					if (INSTANCE.mDepositInventories.containsKey(lockUUID) &&
+						!INSTANCE.mDepositInventories.get(lockUUID).isDepositComplete()) {
+						// This shulker is about to have an item deposited in it
+						return true;
+					}
+					// The shulker was opened via shortcut but the deposit is complete. Release the lock.
+					shulkerBox.setLock(null);
+					shulkerBox.update();
+					INSTANCE.closeDepositShulker(lockUUID);
 				}
-				// The shulker was opened via shortcut but nobody is using it now. Release the lock.
-				shulkerBox.setLock(null);
-				shulkerBox.update();
-				closeShulker(lockUUID);
-			} else if (shulkerBox.getLock().startsWith("ShulkerDeposit:")) {
-				// Shulker Box was opened via shortcut for deposit
-				UUID lockUUID = UUID.fromString(shulkerBox.getLock().substring(15));
-				if (mDepositInventories.containsKey(lockUUID) &&
-					!mDepositInventories.get(lockUUID).isDepositComplete()) {
-					// This shulker is about to have an item deposited in it
-					return true;
-				}
-				// The shulker was opened via shortcut but the deposit is complete. Release the lock.
-				shulkerBox.setLock(null);
-				shulkerBox.update();
-				closeDepositShulker(lockUUID);
 			}
 		}
 		// Item is either not a shulker or is not being used.

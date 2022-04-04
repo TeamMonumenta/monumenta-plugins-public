@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.adapters;
 
 import javax.annotation.Nullable;
 import org.bukkit.World;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -65,5 +66,30 @@ public interface VersionAdapter {
 	 * This is not persistent and needs to be re-applied whenever the parrot is loaded again.
 	 */
 	void disablePerching(Parrot parrot);
+
+	/**
+	 * Make entity agro players
+	 *
+	 * @param entity       The entity who should agro players
+	 * @param action       Damage action when this entity hit a player
+	 */
+	void setAggressive(Creature entity, DamageAction action);
+
+	interface DamageAction {
+		void damage(LivingEntity entity);
+	}
+
+	/**
+	 * Changes the melee attack range of the given entity.
+	 * <b>Note that this overrides any custom melee attack</b>, so care should be taken to only apply it to mobs with a basic melee attack.
+	 * This needs to be verified by looking at the pathfinder goals of the entity.
+	 * This is not persistent and needs to be re-applied whenever the entity is loaded again.
+	 *
+	 * @param entity       The entity whose attack range should be changed
+	 * @param attackRange  Attack range of the entity (calculated from feet to feet)
+	 * @param attackHeight Vertical offset to calculate distance from instead of from the feet
+	 */
+	void setAttackRange(Creature entity, double attackRange, double attackHeight);
+
 
 }

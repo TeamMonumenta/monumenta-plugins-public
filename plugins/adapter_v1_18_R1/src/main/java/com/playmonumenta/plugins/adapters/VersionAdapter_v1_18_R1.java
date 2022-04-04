@@ -13,7 +13,11 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
@@ -21,11 +25,13 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftCreature;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftParrot;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -190,7 +196,7 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 
 	// To find the new field name, see which field is reset by EntityHuman.resetAttackCooldown
 	// If the field's type changed from int to another type, update the type used by the getAttackCooldown/setAttackCooldown methods in this class accordingly.
-	private static final Field attackCooldownField = getField(net.minecraft.world.entity.LivingEntity.class, "at");
+	private static final Field attackCooldownField = getField(net.minecraft.world.entity.LivingEntity.class, "attackStrengthTicker");
 
 	@SuppressWarnings("unboxing.of.nullable")
 	public int getAttackCooldown(LivingEntity entity) {
@@ -254,6 +260,23 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 	@Override
 	public void disablePerching(Parrot parrot) {
 		((CraftParrot) parrot).getHandle().goalSelector.getAvailableGoals().removeIf(w -> w.getGoal() instanceof LandOnOwnersShoulderGoal);
+	}
+
+	@Override
+	public void setAggressive(Creature entity, DamageAction action) {
+		PathfinderMob mob = ((CraftCreature) entity).getHandle();
+		mob.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(mob, action));
+		mob.targetSelector.addGoal(2, new NearestAttackableTargetGoal<net.minecraft.world.entity.player.Player>(mob, net.minecraft.world.entity.player.Player.class, true));
+	}
+
+	public void setAttackRange(Creature entity, double attackRange, double attackHeight) {
+		PathfinderMob mob = ((CraftCreature) entity).getHandle();
+		Optional<WrappedGoal> oldGoal = mob.goalSelector.getAvailableGoals().stream().filter(goal -> goal.getGoal() instanceof MeleeAttackGoal).findFirst();
+		if (oldGoal.isPresent()) {
+			WrappedGoal goal = oldGoal.get();
+			mob.goalSelector.getAvailableGoals().remove(goal);
+			mob.goalSelector.addGoal(goal.getPriority(), new CustomPathfinderGoalMeleeAttack18(mob, 1.0, true, attackRange, attackHeight));
+		}
 	}
 
 }

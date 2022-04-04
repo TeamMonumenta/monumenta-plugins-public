@@ -17,13 +17,6 @@ public class PPPeriodic extends AbstractPartialParticle<PPPeriodic> {
 		mMinimumMultiplier = true;
 	}
 
-	// makes no sense for this particle type
-	@Deprecated
-	@Override
-	public PPPeriodic minimumMultiplier(boolean minimumMultiplier) {
-		return this;
-	}
-
 	@Override
 	protected void prepareSpawn() {
 		mPeriod++;
