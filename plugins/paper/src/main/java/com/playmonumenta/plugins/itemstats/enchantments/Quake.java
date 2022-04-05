@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -8,6 +9,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Color;
@@ -16,9 +18,8 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
-
+import org.bukkit.metadata.FixedMetadataValue;
 
 
 public class Quake implements Enchantment {
@@ -28,7 +29,8 @@ public class Quake implements Enchantment {
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
-
+	private static final String MELEE_DAMAGE_DEALT_METADATA = "QuakeMeleeDamageDealt";
+	private static final String MELEED_THIS_TICK_METADATA = "QuakeMeleeThisTick";
 
 	@Override
 	public String getName() {
@@ -40,9 +42,10 @@ public class Quake implements Enchantment {
 		return EnumSet.of(Slot.MAINHAND);
 	}
 
+	// After all damage multipliers for the onDamage() storage portion. onKill() should not have any ordering issues
 	@Override
 	public double getPriorityAmount() {
-		return 31;
+		return 5001;
 	}
 
 	@Override
@@ -53,7 +56,16 @@ public class Quake implements Enchantment {
 	@Override
 	public void onKill(Plugin plugin, Player player, double level, EntityDeathEvent event, LivingEntity target) {
 		EntityDamageEvent e = target.getLastDamageCause();
-		if (e != null && (e.getCause() == DamageCause.ENTITY_ATTACK)) {
+		if (e != null) {
+			double damage;
+			if (e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+				damage = e.getDamage();
+			} else if (MetadataUtils.happenedThisTick(target, MELEED_THIS_TICK_METADATA) && target.hasMetadata(MELEE_DAMAGE_DEALT_METADATA)) {
+				damage = target.getMetadata(MELEE_DAMAGE_DEALT_METADATA).get(0).asDouble();
+			} else {
+				return;
+			}
+
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(target.getLocation(), RADIUS);
 
 			//Get enchant levels on weapon
@@ -67,7 +79,7 @@ public class Quake implements Enchantment {
 			*Need to cast it because the methods only take integers
 			*/
 			for (LivingEntity mob : mobs) {
-				DamageUtils.damage(player, mob, DamageType.OTHER, e.getDamage() * DAMAGE_MODIFIER_PER_LEVEL * level, null, false, true);
+				DamageUtils.damage(player, mob, DamageType.OTHER, damage * DAMAGE_MODIFIER_PER_LEVEL * level, null, false, true);
 				if (fire > 0) {
 					EntityUtils.applyFire(plugin, 80 * fire, mob, player);
 				}
@@ -109,6 +121,18 @@ public class Quake implements Enchantment {
 				player.playSound(player.getLocation(), Sound.BLOCK_SLIME_BLOCK_BREAK, 1f, 0.8f);
 				new PartialParticle(Particle.REDSTONE, target.getLocation(), 25, 1.5, 1.5, 1.5, BLEED_COLOR).spawnAsPlayerActive(player);
 			}
+		}
+	}
+
+	@Override
+	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
+			//Store the highest melee damage dealt with a quake weapon this tick
+			double damage = event.getDamage();
+			if (MetadataUtils.checkOnceThisTick(plugin, enemy, MELEED_THIS_TICK_METADATA) && enemy.hasMetadata(MELEE_DAMAGE_DEALT_METADATA) && enemy.getMetadata(MELEE_DAMAGE_DEALT_METADATA).get(0).asDouble() > damage) {
+				return;
+			}
+			enemy.setMetadata(MELEE_DAMAGE_DEALT_METADATA, new FixedMetadataValue(plugin, damage));
 		}
 	}
 }

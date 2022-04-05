@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import javax.annotation.Nullable;
@@ -63,20 +64,19 @@ public class CoupDeGrace extends Ability {
 			double maxHealth = EntityUtils.getMaxHealth(enemy);
 			if (EntityUtils.isElite(enemy)) {
 				if (enemy.getHealth() - event.getFinalDamage(true) < maxHealth * mEliteThreshold) {
-					execute(event);
+					execute(enemy);
 				}
 			} else if (!EntityUtils.isBoss(enemy)) {
 				if (enemy.getHealth() - event.getFinalDamage(true) < maxHealth * mNormalThreshold) {
-					execute(event);
+					execute(enemy);
 				}
 			}
 		}
 		return false; // only increases event damage, thus no recursion
 	}
 
-	private void execute(DamageEvent event) {
-		LivingEntity le = event.getDamagee();
-		event.setDamage(event.getDamage() + 9001);
+	private void execute(LivingEntity le) {
+		DamageUtils.damage(mPlayer, le, DamageType.OTHER, 9001, null, true, false);
 		World world = mPlayer.getWorld();
 		world.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);
 		world.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.5f);
