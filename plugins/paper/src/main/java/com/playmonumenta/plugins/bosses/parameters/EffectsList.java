@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -189,7 +190,11 @@ public class EffectsList {
 
 		public void apply(LivingEntity p, LivingEntity boss) {
 			if (mEffect != null) {
-				p.addPotionEffect(new PotionEffect(mEffect, mDurationTicks, mAmplifier, true, false, true));
+				if (p instanceof Player player) {
+					Plugin.getInstance().mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(mEffect, mDurationTicks, mAmplifier, true, false, true));
+				} else {
+					p.addPotionEffect(new PotionEffect(mEffect, mDurationTicks, mAmplifier, true, false, true));
+				}
 			} else {
 				EffectRunner runner = EFFECT_RUNNER.get(mName);
 				if (runner != null) {

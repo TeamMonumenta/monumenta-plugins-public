@@ -88,38 +88,39 @@ public class PotionUtils {
 	}
 
 	public static class PotionInfo {
-		public static final PotionInfo HEALING = new PotionInfo(PotionEffectType.HEAL, 0, 0, false, true);
-		public static final PotionInfo HEALING_STRONG = new PotionInfo(PotionEffectType.HEAL, 0, 1, false, true);
+		public static final PotionInfo HEALING = new PotionInfo(PotionEffectType.HEAL, 0, 0, false, true, true);
+		public static final PotionInfo HEALING_STRONG = new PotionInfo(PotionEffectType.HEAL, 0, 1, false, true, true);
 
-		public static final PotionInfo REGENERATION = new PotionInfo(PotionEffectType.REGENERATION, SECONDS_45, 0, false, true);
-		public static final PotionInfo REGENERATION_LONG = new PotionInfo(PotionEffectType.REGENERATION, MINUTES_1_HALF, 0, false, true);
-		public static final PotionInfo REGENERATION_STRONG = new PotionInfo(PotionEffectType.REGENERATION, SECONDS_22_HALF, 1, false, true);
+		public static final PotionInfo REGENERATION = new PotionInfo(PotionEffectType.REGENERATION, SECONDS_45, 0, false, true, true);
+		public static final PotionInfo REGENERATION_LONG = new PotionInfo(PotionEffectType.REGENERATION, MINUTES_1_HALF, 0, false, true, true);
+		public static final PotionInfo REGENERATION_STRONG = new PotionInfo(PotionEffectType.REGENERATION, SECONDS_22_HALF, 1, false, true, true);
 
-		public static final PotionInfo SWIFTNESS = new PotionInfo(PotionEffectType.SPEED, MINUTES_3, 0, false, true);
-		public static final PotionInfo SWIFTNESS_LONG = new PotionInfo(PotionEffectType.SPEED, MINUTES_8, 0, false, true);
-		public static final PotionInfo SWIFTNESS_STRONG = new PotionInfo(PotionEffectType.SPEED, MINUTES_1_HALF, 1, false, true);
+		public static final PotionInfo SWIFTNESS = new PotionInfo(PotionEffectType.SPEED, MINUTES_3, 0, false, true, true);
+		public static final PotionInfo SWIFTNESS_LONG = new PotionInfo(PotionEffectType.SPEED, MINUTES_8, 0, false, true, true);
+		public static final PotionInfo SWIFTNESS_STRONG = new PotionInfo(PotionEffectType.SPEED, MINUTES_1_HALF, 1, false, true, true);
 
-		public static final PotionInfo STRENGTH = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_3, 0, false, true);
-		public static final PotionInfo STRENGTH_LONG = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_8, 0, false, true);
-		public static final PotionInfo STRENGTH_STRONG = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_1_HALF, 1, false, true);
+		public static final PotionInfo STRENGTH = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_3, 0, false, true, true);
+		public static final PotionInfo STRENGTH_LONG = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_8, 0, false, true, true);
+		public static final PotionInfo STRENGTH_STRONG = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_1_HALF, 1, false, true, true);
 
-		public static final PotionInfo LEAPING = new PotionInfo(PotionEffectType.JUMP, MINUTES_3, 0, false, true);
-		public static final PotionInfo LEAPING_LONG = new PotionInfo(PotionEffectType.JUMP, MINUTES_8, 0, false, true);
-		public static final PotionInfo LEAPING_STRONG = new PotionInfo(PotionEffectType.JUMP, MINUTES_1_HALF, 1, false, true);
+		public static final PotionInfo LEAPING = new PotionInfo(PotionEffectType.JUMP, MINUTES_3, 0, false, true, true);
+		public static final PotionInfo LEAPING_LONG = new PotionInfo(PotionEffectType.JUMP, MINUTES_8, 0, false, true, true);
+		public static final PotionInfo LEAPING_STRONG = new PotionInfo(PotionEffectType.JUMP, MINUTES_1_HALF, 1, false, true, true);
 
-		public static final PotionInfo NIGHT_VISION = new PotionInfo(PotionEffectType.NIGHT_VISION, MINUTES_3, 0, false, true);
-		public static final PotionInfo NIGHT_VISION_LONG = new PotionInfo(PotionEffectType.NIGHT_VISION, MINUTES_8, 0, false, true);
+		public static final PotionInfo NIGHT_VISION = new PotionInfo(PotionEffectType.NIGHT_VISION, MINUTES_3, 0, false, true, true);
+		public static final PotionInfo NIGHT_VISION_LONG = new PotionInfo(PotionEffectType.NIGHT_VISION, MINUTES_8, 0, false, true, true);
 
-		public static final PotionInfo FIRE_RESISTANCE = new PotionInfo(PotionEffectType.FIRE_RESISTANCE, MINUTES_3, 0, false, true);
-		public static final PotionInfo FIRE_RESISTANCE_LONG = new PotionInfo(PotionEffectType.FIRE_RESISTANCE, MINUTES_8, 0, false, true);
+		public static final PotionInfo FIRE_RESISTANCE = new PotionInfo(PotionEffectType.FIRE_RESISTANCE, MINUTES_3, 0, false, true, true);
+		public static final PotionInfo FIRE_RESISTANCE_LONG = new PotionInfo(PotionEffectType.FIRE_RESISTANCE, MINUTES_8, 0, false, true, true);
 
-		public static final PotionInfo LUCK = new PotionInfo(PotionEffectType.LUCK, MINUTES_5, 0, false, true);
+		public static final PotionInfo LUCK = new PotionInfo(PotionEffectType.LUCK, MINUTES_5, 0, false, true, true);
 
 		public @Nullable PotionEffectType mType;
 		public int mDuration;
 		public int mAmplifier;
 		public boolean mAmbient;
 		public boolean mShowParticles;
+		public boolean mShowIcon;
 
 		public PotionInfo() {
 		}
@@ -130,16 +131,17 @@ public class PotionUtils {
 			mAmplifier = effect.getAmplifier();
 			mAmbient = effect.isAmbient();
 			mShowParticles = effect.hasParticles();
+			mShowIcon = effect.hasIcon();
 		}
 
 		public PotionInfo(@Nullable PotionEffectType type, int duration, int amplifier, boolean ambient,
-		                  boolean showParticles) {
+		                  boolean showParticles, boolean showIcon) {
 			mType = type;
 			mDuration = duration;
 			mAmplifier = amplifier;
 			mAmbient = ambient;
 			mShowParticles = showParticles;
-
+			mShowIcon = showIcon;
 		}
 
 		public JsonObject getAsJsonObject() {
@@ -180,28 +182,28 @@ public class PotionUtils {
 
 		if (type.isInstant()) {
 			if (isUpgraded) {
-				newInfo = new PotionInfo(type.getEffectType(), 0, 1, false, true);
+				newInfo = new PotionInfo(type.getEffectType(), 0, 1, false, true, true);
 			} else {
-				newInfo = new PotionInfo(type.getEffectType(), 0, 0, false, true);
+				newInfo = new PotionInfo(type.getEffectType(), 0, 0, false, true, true);
 			}
 		} else {
 			if (type == PotionType.REGEN || type == PotionType.POISON) {
 				if (isExtended) {
-					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF / dividend, 0, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF / dividend, 0, false, true, true);
 				} else if (isUpgraded) {
-					newInfo = new PotionInfo(type.getEffectType(), SECONDS_22_HALF / dividend, 1, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), SECONDS_22_HALF / dividend, 1, false, true, true);
 				} else {
-					newInfo = new PotionInfo(type.getEffectType(), SECONDS_45 / dividend, 0, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), SECONDS_45 / dividend, 0, false, true, true);
 				}
 			} else if (type == PotionType.LUCK) {
-				newInfo = new PotionInfo(type.getEffectType(), MINUTES_5 / dividend, 0, false, true);
+				newInfo = new PotionInfo(type.getEffectType(), MINUTES_5 / dividend, 0, false, true, true);
 			} else {
 				if (isExtended) {
-					newInfo = new PotionInfo(type.getEffectType(), MINUTES_8 / dividend, 0, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), MINUTES_8 / dividend, 0, false, true, true);
 				} else if (isUpgraded) {
-					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF / dividend, 1, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF / dividend, 1, false, true, true);
 				} else {
-					newInfo = new PotionInfo(type.getEffectType(), MINUTES_3 / dividend, 0, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), MINUTES_3 / dividend, 0, false, true, true);
 				}
 			}
 		}
