@@ -429,7 +429,7 @@ public class DepthsManager {
 				e.printStackTrace();
 			}
 		}
-		AbilityManager.getManager().updatePlayerAbilities(p);
+		AbilityManager.getManager().updatePlayerAbilities(p, false);
 	}
 
 	/**
@@ -759,7 +759,7 @@ public class DepthsManager {
 			mAbilityOfferings.remove(p.getUniqueId());
 			mUpgradeOfferings.remove(p.getUniqueId());
 
-			AbilityManager.getManager().updatePlayerAbilities(p);
+			AbilityManager.getManager().updatePlayerAbilities(p, true);
 			//Reset delve player info
 			DelvesUtils.setDelveScore(p, ServerProperties.getShardName(), 0);
 			DelvesUtils.removeDelveInfo(p);

@@ -652,7 +652,7 @@ public class PlayerListener implements Listener {
 
 		// Clear effects
 		mPlugin.mPotionManager.clearAllPotions(player);
-		mPlugin.mAbilityManager.updatePlayerAbilities(player);
+		mPlugin.mAbilityManager.updatePlayerAbilities(player, true);
 	}
 
 	// The player has respawned.
@@ -667,7 +667,7 @@ public class PlayerListener implements Listener {
 				Player player = Bukkit.getPlayer(name);
 				if (player != null) {
 					mPlugin.mPotionManager.clearAllPotions(player);
-					mPlugin.mAbilityManager.updatePlayerAbilities(player);
+					mPlugin.mAbilityManager.updatePlayerAbilities(player, true);
 
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 				}
@@ -1193,7 +1193,7 @@ public class PlayerListener implements Listener {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						plugin.mAbilityManager.updatePlayerAbilities(player);
+						plugin.mAbilityManager.updatePlayerAbilities(player, true);
 					}
 				}.runTaskLater(plugin, 0);
 			}

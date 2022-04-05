@@ -16,7 +16,7 @@ public class RefreshClass extends GenericCommand {
 
 	private static void run(Plugin plugin, CommandSender sender, Player player) {
 		if (plugin.mAbilityManager != null) {
-			plugin.mAbilityManager.updatePlayerAbilities(player);
+			plugin.mAbilityManager.updatePlayerAbilities(player, true);
 		}
 		InventoryUtils.scheduleDelayedEquipmentCheck(plugin, player, null);
 		sender.sendMessage(ChatColor.GOLD + "Refreshed class for player '" + player.getName() + "'");

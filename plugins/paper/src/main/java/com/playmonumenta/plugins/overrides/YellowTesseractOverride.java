@@ -251,7 +251,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			player.sendMessage(Component.text("You have additional skill points to spend!", NamedTextColor.YELLOW));
 		}
 
-		AbilityManager.getManager().updatePlayerAbilities(player);
+		AbilityManager.getManager().updatePlayerAbilities(player, true);
 
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);

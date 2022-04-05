@@ -89,7 +89,7 @@ public class DepthsEndlessDifficulty {
 		for (DepthsPlayer dp : depthsPlayers) {
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
 			if (p != null && p.isOnline()) {
-				AbilityManager.getManager().updatePlayerAbilities(p);
+				AbilityManager.getManager().updatePlayerAbilities(p, true);
 			}
 		}
 	}

@@ -53,7 +53,7 @@ public class Stasis extends ZeroArgumentEffect {
 	public void entityLoseEffect(Entity entity) {
 		if (entity instanceof Player player) {
 			entity.removeScoreboardTag(Constants.Tags.STASIS);
-			AbilityManager.getManager().updatePlayerAbilities(player);
+			AbilityManager.getManager().updatePlayerAbilities(player, false);
 			AbilityManager.getManager().getPlayerAbilities(player).unsilence();
 		}
 	}

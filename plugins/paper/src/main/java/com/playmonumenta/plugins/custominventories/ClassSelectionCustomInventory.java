@@ -286,7 +286,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				}
 				makePageTwo(oneClass, player);
 				if (AbilityManager.getManager() != null) {
-					AbilityManager.getManager().updatePlayerAbilities(player);
+					AbilityManager.getManager().updatePlayerAbilities(player, true);
 				}
 				return;
 			}
@@ -330,7 +330,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			makePageThree(theClass, spec, player);
 		}
 		if (AbilityManager.getManager() != null) {
-			AbilityManager.getManager().updatePlayerAbilities(player);
+			AbilityManager.getManager().updatePlayerAbilities(player, true);
 		}
 	}
 

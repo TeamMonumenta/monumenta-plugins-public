@@ -424,7 +424,7 @@ public class EntityListener implements Listener {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					mPlugin.mAbilityManager.updatePlayerAbilities(player);
+					mPlugin.mAbilityManager.updatePlayerAbilities(player, false);
 				}
 			}.runTaskLater(mPlugin, 1);
 		}
