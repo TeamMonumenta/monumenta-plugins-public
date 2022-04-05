@@ -1298,6 +1298,11 @@ public class DepthsManager {
 		if (partyFloor == 3 && !party.mEndlessMode) {
 			List<DepthsPlayer> playersToLoop = new ArrayList<>(party.mPlayersInParty);
 			for (DepthsPlayer playerInParty : playersToLoop) {
+				if (playerInParty.hasDied()) {
+					//The player died before the rest of the party won, and has not yet respawned
+					continue;
+				}
+				playerInParty.setDeathRoom(30);
 				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
 				if (player != null) {
 					DepthsUtils.storetoFile(dp, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats"); //Save the player's stats

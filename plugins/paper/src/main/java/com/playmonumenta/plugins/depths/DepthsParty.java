@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -420,15 +421,13 @@ public class DepthsParty {
 	//Sends player to, and fills, the next open loot room
 	public void populateLootRoom(Player p, boolean victory) {
 		if (mLootRoomLocations.size() > mLootRoomsUsed && MAX_LOOT_ROOMS > mLootRoomsUsed) {
-			int roomReached = mRoomNumber;
 			Location lootRoomLoc = new Location(p.getWorld(), mLootRoomLocations.get(mLootRoomsUsed).getX(), mLootRoomLocations.get(mLootRoomsUsed).getY(), mLootRoomLocations.get(mLootRoomsUsed).getZ());
 			p.teleport(lootRoomLoc);
 			p.setBedSpawnLocation(lootRoomLoc, true);
 			p.addScoreboardTag(Constants.Tags.NO_TRANSPOSING);
 			mLootRoomsUsed++;
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Sending you to loot room " + mLootRoomsUsed);
-			//Calculate their treasure score, remove them from the depths system/party, spawn loot into the room
-			int treasureScore = -1;
+
 			//Remove delve score if applicable
 			new BukkitRunnable() {
 
@@ -441,21 +440,26 @@ public class DepthsParty {
 			}.runTaskLater(Plugin.getInstance(), 80);
 
 			p.removeScoreboardTag(DepthsManager.ENDLESS_MODE_STRING);
+
 			DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(p.getUniqueId());
-			if (dp != null) {
-				treasureScore = dp.mFinalTreasureScore;
-				if (treasureScore == -1) {
-					//Player beat floor 3- give them the party's current treasure score
-					treasureScore = mTreasureScore;
-				}
-				DepthsManager.getInstance().deletePlayer(p);
-				mPlayersInParty.remove(dp);
-				if (roomReached > 120) {
-					DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), treasureScore, p, true);
-				} else {
-					DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), treasureScore, p, false);
-				}
+			if (dp == null) {
+				// This should be very impossible
+				MMLog.warning(p.getName() + " respawned in Depths while being in a party but not in the depths system");
+				return;
 			}
+
+			int treasureScore = dp.mFinalTreasureScore;
+			if (treasureScore == -1) {
+				//Player beat floor 3 - give them the party's current treasure score
+				treasureScore = mTreasureScore;
+			}
+
+			int roomReached = dp.getDeathRoom();
+
+			DepthsManager.getInstance().deletePlayer(p);
+			mPlayersInParty.remove(dp);
+			DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), treasureScore, p, roomReached > 120);
+
 			//Set their highest room score and do announcements
 			int highestRoom = ScoreboardUtils.getScoreboardValue(p, "DepthsEndless").orElse(0);
 			if (roomReached > highestRoom) {
