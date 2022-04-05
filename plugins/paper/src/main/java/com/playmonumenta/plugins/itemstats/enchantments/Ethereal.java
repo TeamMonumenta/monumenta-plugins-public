@@ -11,7 +11,6 @@ import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class Ethereal implements Enchantment {
 
@@ -20,7 +19,7 @@ public class Ethereal implements Enchantment {
 	private static final String ETHEREAL_EFFECT_NAME = "EtherealEffect";
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Ethereal";
 	}
 
@@ -31,6 +30,9 @@ public class Ethereal implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (event.isBlocked()) {
+			return;
+		}
 		if (plugin.mEffectManager.getEffects(player, ETHEREAL_EFFECT_NAME) != null) {
 			plugin.mEffectManager.clearEffects(player, ETHEREAL_EFFECT_NAME);
 		}

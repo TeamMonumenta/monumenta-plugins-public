@@ -32,6 +32,9 @@ public class Tempo implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (event.isBlocked()) {
+			return;
+		}
 		if (event.getType() == DamageEvent.DamageType.FIRE || event.getType() == DamageEvent.DamageType.FALL || event.getType() == DamageEvent.DamageType.AILMENT) {
 			return;
 		}

@@ -36,12 +36,13 @@ public class Reflection implements Infusion {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (event.getType() == DamageType.MAGIC && !event.isBlocked()) {
+		DamageType type = event.getType();
+		if ((type == DamageType.MAGIC || type == DamageType.BLAST) && !event.isBlocked()) {
 			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 			double reflectedDamage = modifiedLevel * REFLECT_PCT_PER_LEVEL * event.getOriginalDamage();
 			World world = player.getWorld();
-			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.6f);
-			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.4f);
+			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.8f, 0.6f);
+			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.8f, 0.4f);
 			new BukkitRunnable() {
 				int mTicks = 0;
 
@@ -61,8 +62,8 @@ public class Reflection implements Infusion {
 							@Override
 							public void run() {
 								mRadius += 0.5;
-								new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).ringMode(true).count(10).extra(0.125).spawnAsPlayerActive(player);
-								new PPCircle(Particle.END_ROD, mLoc, mRadius).ringMode(true).count(10).extra(0.15).spawnAsPlayerActive(player);
+								new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).ringMode(true).count(6).extra(0.125).spawnAsPlayerActive(player);
+								new PPCircle(Particle.END_ROD, mLoc, mRadius).ringMode(true).count(6).extra(0.15).spawnAsPlayerActive(player);
 								if (mRadius >= RADIUS + 1) {
 									this.cancel();
 								}
