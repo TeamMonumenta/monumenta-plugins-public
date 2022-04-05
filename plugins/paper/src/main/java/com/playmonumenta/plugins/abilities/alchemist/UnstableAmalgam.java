@@ -147,7 +147,7 @@ public class UnstableAmalgam extends Ability {
 			mAlchemistPotions.applyEffects(mob, false);
 			mAlchemistPotions.applyEffects(mob, true);
 
-			MovementUtils.knockAwayRealistic(loc, mob, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 2f);
+			MovementUtils.knockAwayRealistic(loc, mob, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 2f, true);
 			mAlchemistPotions.incrementCharge();
 		}
 
@@ -155,10 +155,10 @@ public class UnstableAmalgam extends Ability {
 			for (Player player : PlayerUtils.playersInRange(loc, UNSTABLE_AMALGAM_RADIUS, true)) {
 				if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 					if (!player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(0) == 100) {
-						MovementUtils.knockAwayRealistic(loc, player, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 2f);
+						MovementUtils.knockAwayRealistic(loc, player, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 2f, false);
 					} else if (player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(1) > 0) {
 						//by default any Alch can use Rocket Jump with his UA
-						MovementUtils.knockAwayRealistic(loc, player, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 2f);
+						MovementUtils.knockAwayRealistic(loc, player, UNSTABLE_AMALGAM_KNOCKBACK_SPEED, 2f, false);
 					}
 				}
 			}

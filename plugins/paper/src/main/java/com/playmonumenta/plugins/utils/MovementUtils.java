@@ -62,7 +62,7 @@ public class MovementUtils {
 		}
 	}
 
-	public static void knockAwayRealistic(Location loc, LivingEntity target, float speed, float y) {
+	public static void knockAwayRealistic(Location loc, LivingEntity target, float speed, float y, boolean useKnockbackRes) {
 		if (EntityUtils.isBoss(target)) {
 			speed /= 2;
 		}
@@ -72,7 +72,7 @@ public class MovementUtils {
 		if (y != 0) {
 			dir.setY(y);
 		}
-		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
+		double mult = useKnockbackRes ? 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0) : 1;
 		if (mult > 0) {
 			dir.multiply(mult);
 
