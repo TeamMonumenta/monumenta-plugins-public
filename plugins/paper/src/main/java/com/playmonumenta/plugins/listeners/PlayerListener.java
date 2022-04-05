@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.ParticleCategory;
@@ -673,6 +674,8 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}, 0);
+
+		Phylactery.applyStoredEffects(mPlugin, player);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
