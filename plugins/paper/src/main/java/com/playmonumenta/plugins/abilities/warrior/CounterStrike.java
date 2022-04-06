@@ -8,6 +8,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.HashMap;
+import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -17,8 +19,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
-
 public class CounterStrike extends Ability {
 
 	private static final int COUNTER_STRIKE_1_DAMAGE = 1;
@@ -26,9 +26,14 @@ public class CounterStrike extends Ability {
 	private static final double COUNTER_STRIKE_1_REFLECT = 0.2;
 	private static final double COUNTER_STRIKE_2_REFLECT = 0.4;
 	private static final float COUNTER_STRIKE_RADIUS = 3.0f;
+	private static final int REDUCTION_DURATION = 10 * 20;
+	private static final double DAMAGE_REDUCTION_PER_STACK = 0.05;
+	private static final int MAX_STACKS = 3;
 
 	private final double mReflect;
 	private final int mDamage;
+	private final HashMap<LivingEntity, Integer> mLastDamageTime = new HashMap<>();
+	private final HashMap<LivingEntity, Integer> mStacks = new HashMap<>();
 
 	public CounterStrike(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Counter Strike");
@@ -36,6 +41,7 @@ public class CounterStrike extends Ability {
 		mInfo.mShorthandName = "CS";
 		mInfo.mDescriptions.add("When you take melee damage, deal melee damage equal to 1 + 20% of pre-mitigation damage taken to all mobs in a 3 block radius.");
 		mInfo.mDescriptions.add("The damage is increased to 2 + 40% of pre-mitigation damage.");
+		mInfo.mDescriptions.add("When this ability activates, gain 5% damage reduction against future melee damage from the mob that activated it for 10 seconds. This effect stacks up to 3 times (15% damage reduction).");
 		mInfo.mLinkedSpell = ClassAbility.COUNTER_STRIKE;
 		mDisplayItem = new ItemStack(Material.CACTUS, 1);
 		mReflect = isLevelOne() ? COUNTER_STRIKE_1_REFLECT : COUNTER_STRIKE_2_REFLECT;
@@ -57,6 +63,32 @@ public class CounterStrike extends Ability {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
 				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage + eventDamage, mInfo.mLinkedSpell, true);
 			}
+
+			if (isEnhanced()) {
+				// Remove any old mobs from the list so they don't pile up. There should never be too many at once so this shouldn't be intensive
+				mLastDamageTime.forEach(this::clearIfExpired);
+				Integer stacks = mStacks.get(source);
+				Integer lastDamageTime = mLastDamageTime.get(source);
+				if (stacks != null) {
+					if (lastDamageTime != null) {
+						event.setDamage(event.getDamage() * (1 - stacks * DAMAGE_REDUCTION_PER_STACK));
+						mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHAIN_PLACE, 0.5f + 0.1f * stacks, 2.5f - 0.5f * stacks);
+						if (stacks < MAX_STACKS) {
+							mStacks.put(source, stacks + 1);
+						}
+					}
+				} else {
+					mStacks.put(source, 1);
+				}
+				mLastDamageTime.put(source, mPlayer.getTicksLived());
+			}
+		}
+	}
+
+	private void clearIfExpired(LivingEntity mob, Integer time) {
+		if (time < mPlayer.getTicksLived() - REDUCTION_DURATION) {
+			mLastDamageTime.remove(mob);
+			mStacks.remove(mob);
 		}
 	}
 }
