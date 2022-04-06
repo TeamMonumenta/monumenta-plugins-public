@@ -148,13 +148,17 @@ public abstract class Ability {
 	}
 
 	public void putOnCooldown() {
+		putOnCooldown(getModifiedCooldown());
+	}
+
+	public void putOnCooldown(int cooldown) {
 		if (mPlayer == null) {
 			return;
 		}
 		AbilityInfo info = getInfo();
 		if (info.mLinkedSpell != null) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.mLinkedSpell)) {
-				mPlugin.mTimers.addCooldown(mPlayer, info.mLinkedSpell, getModifiedCooldown());
+				mPlugin.mTimers.addCooldown(mPlayer, info.mLinkedSpell, cooldown);
 				PlayerUtils.callAbilityCastEvent(mPlayer, info.mLinkedSpell);
 			}
 		}

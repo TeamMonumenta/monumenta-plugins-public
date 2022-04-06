@@ -5,14 +5,14 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.function.ToIntFunction;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 public class PlayerPotionInfo {
 	//  Effect Type / Potion List
-	private final HashMap<PotionEffectType, PotionMap> mPotionInfo = new HashMap<PotionEffectType, PotionMap>();
+	private final HashMap<PotionEffectType, PotionMap> mPotionInfo = new HashMap<>();
 
 	protected void addPotionInfo(Player player, PotionID id, PotionInfo info) {
 		if (info.mType == null) {
@@ -36,22 +36,24 @@ public class PlayerPotionInfo {
 	}
 
 	protected void clearPotionIDType(Player player, PotionID id) {
-		Iterator<Entry<PotionEffectType, PotionMap>> potionMapIter = mPotionInfo.entrySet().iterator();
-		while (potionMapIter.hasNext()) {
-			Entry<PotionEffectType, PotionMap> potionEntry = potionMapIter.next();
+		for (Entry<PotionEffectType, PotionMap> potionEntry : mPotionInfo.entrySet()) {
 			potionEntry.getValue().removePotionMap(player, id);
 		}
 	}
 
-	protected void clearPotionEffectType(Player player, PotionEffectType type) {
+	protected void clearPotionEffectType(PotionEffectType type) {
 		mPotionInfo.remove(type);
 	}
 
 	protected void updatePotionStatus(Player player, int ticks) {
-		Iterator<Entry<PotionEffectType, PotionMap>> potionMapIter = mPotionInfo.entrySet().iterator();
-		while (potionMapIter.hasNext()) {
-			Entry<PotionEffectType, PotionMap> potionEntry = potionMapIter.next();
+		for (Entry<PotionEffectType, PotionMap> potionEntry : mPotionInfo.entrySet()) {
 			potionEntry.getValue().updatePotionStatus(player, ticks);
+		}
+	}
+
+	public void modifyPotionDuration(Player player, ToIntFunction<PotionInfo> function) {
+		for (PotionMap potionMap : mPotionInfo.values()) {
+			potionMap.modifyPotionDuration(player, function);
 		}
 	}
 

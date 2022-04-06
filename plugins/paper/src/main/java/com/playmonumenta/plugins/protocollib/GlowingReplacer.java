@@ -8,11 +8,13 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.commands.GlowingCommand;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collection;
 import java.util.List;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
 /**
@@ -52,14 +54,13 @@ public class GlowingReplacer extends PacketAdapter {
 
 		Player player = event.getPlayer();
 		int playerSettings = ScoreboardUtils.getScoreboardValue(player, GlowingCommand.SCOREBOARD_OBJECTIVE).orElse(0);
-		if (playerSettings == 0) { // everything enabled, nothing to do
-			return;
-		}
 
 		// check if glowing is disabled for the entity's type.
 		if (playerSettings != 0xFFFFFFFF) { // If all glowing is disabled, this check can be skipped.
 			Entity entity = packet.getEntityModifier(event).read(0); // NB: this is the first int, not (just) the first entity in the packet.
-			if (entity == null || GlowingCommand.isGlowingEnabled(player, playerSettings, entity)) {
+			if (entity == null || GlowingCommand.isGlowingEnabled(player, playerSettings, entity)
+				                      // Purified Ash can only be picked up by clerics, so it doesn't make sense to highlight them for other players
+				                      && !(entity instanceof Item item && DivineJustice.isAsh(item) && !DivineJustice.canPickUpAsh(player))) {
 				return;
 			}
 		}

@@ -94,13 +94,14 @@ public final class EffectManager implements Listener {
 			return null;
 		}
 
-		public NavigableSet<? extends Effect> getEffects(Class<? extends Effect> cls) {
-			NavigableSet<Effect> effectSet = new TreeSet<Effect>();
+		@SuppressWarnings("unchecked")
+		public <T extends Effect> NavigableSet<T> getEffects(Class<T> cls) {
+			NavigableSet<T> effectSet = new TreeSet<>();
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
 				for (NavigableSet<Effect> effects : priorityEffects.values()) {
 					for (Effect effect : effects) {
 						if (cls.isInstance(effect)) {
-							effectSet.add(effect);
+							effectSet.add((T) effect);
 						}
 					}
 				}
@@ -342,7 +343,7 @@ public final class EffectManager implements Listener {
 	 * @param type   the class of effect
 	 * @return the set of effects if they exist, an empty set otherwise
 	 */
-	public NavigableSet<? extends Effect> getEffects(Entity entity, Class<? extends Effect> type) {
+	public <T extends Effect> NavigableSet<T> getEffects(Entity entity, Class<T> type) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.getEffects(type);

@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import java.util.function.ToIntFunction;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 public class PotionManager {
 	//  Player ID / Player Potion Info
@@ -120,7 +121,7 @@ public class PotionManager {
 	public void clearPotionEffectType(Player player, PotionEffectType type) {
 		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
 		if (potionInfo != null) {
-			potionInfo.clearPotionEffectType(player, type);
+			potionInfo.clearPotionEffectType(type);
 		}
 		player.removePotionEffect(type);
 	}
@@ -129,6 +130,13 @@ public class PotionManager {
 		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
 		if (potionInfo != null) {
 			potionInfo.updatePotionStatus(player, ticks);
+		}
+	}
+
+	public void modifyPotionDuration(Player player, ToIntFunction<PotionInfo> function) {
+		PlayerPotionInfo info = mPlayerPotions.get(player.getUniqueId());
+		if (info != null) {
+			info.modifyPotionDuration(player, function);
 		}
 	}
 

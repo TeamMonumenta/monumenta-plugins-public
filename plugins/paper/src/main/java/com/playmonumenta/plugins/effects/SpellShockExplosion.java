@@ -36,13 +36,13 @@ public class SpellShockExplosion extends Effect {
 	}
 
 	@Override
-	public boolean entityKilledEvent(EntityDeathEvent event) {
+	public void onDeath(EntityDeathEvent event) {
 		LivingEntity entity = event.getEntity();
 		Location loc = entity.getLocation();
 		World world = loc.getWorld();
 		Player player = Bukkit.getPlayer(mPlayerUuid);
 		if (player == null) { // player logged off, don't do any damage
-			return true;
+			return;
 		}
 		new PartialParticle(Particle.SPELL_WITCH, loc, 60, 1, 1, 1, 0.001).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, loc, 45, 1, 1, 1, 0.25).spawnAsPlayerActive(player);
@@ -54,7 +54,6 @@ public class SpellShockExplosion extends Effect {
 				DamageUtils.damage(player, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, ClassAbility.SPELLSHOCK, mPlayerItemStats), mDamage, true, false, false);
 			}
 		}
-		return true;
 	}
 
 	@Override

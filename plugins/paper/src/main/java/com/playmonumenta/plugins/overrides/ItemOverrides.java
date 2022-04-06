@@ -232,6 +232,7 @@ public final class ItemOverrides {
 		mItems.put(Material.FLINT_AND_STEEL, new FlintAndSteelOverride());
 		mItems.put(Material.PUFFERFISH, new PufferfishOverride());
 		mItems.put(Material.END_CRYSTAL, new EndCrystalOverride());
+		mItems.put(Material.QUARTZ, new QuartzOverride());
 
 		BaseOverride signOverride = new SignOverride();
 		mItems.put(Material.ACACIA_SIGN, signOverride);

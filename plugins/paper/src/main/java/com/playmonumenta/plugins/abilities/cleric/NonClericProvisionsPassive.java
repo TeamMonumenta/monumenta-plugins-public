@@ -11,6 +11,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 
@@ -45,6 +46,16 @@ public class NonClericProvisionsPassive extends Ability {
 		} else {
 			return false;
 		}
+	}
+
+	public static boolean testEnhanced(Player player) {
+		for (Player p : PlayerUtils.playersInRange(player.getLocation(), PROVISIONS_RANGE, true)) {
+			Ability provisions = AbilityManager.getManager().getPlayerAbility(p, SacredProvisions.class);
+			if (provisions.isEnhanced()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -94,4 +105,12 @@ public class NonClericProvisionsPassive extends Ability {
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, 0.65f, 2f);
 	}
 
+	@Override
+	public void playerRegainHealthEvent(EntityRegainHealthEvent event) {
+		if (event.getEntity() instanceof Player player) {
+			if (player.getFoodLevel() >= SacredProvisions.ENHANCEMENT_HEALING_HUNGER_REQUIREMENT && testEnhanced(player)) {
+				event.setAmount(event.getAmount() * (1 + SacredProvisions.ENHANCEMENT_HEALING_BONUS));
+			}
+		}
+	}
 }

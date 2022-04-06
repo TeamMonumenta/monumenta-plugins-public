@@ -52,12 +52,15 @@ public class HandOfLight extends Ability {
 	private static final int DAMAGE_PER_2 = 3;
 	private static final int DAMAGE_MAX_1 = 8;
 	private static final int DAMAGE_MAX_2 = 9;
+	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED = 0.025;
+	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_MAX = 0.5;
+	private static final int ENHANCEMENT_UNDEAD_STUN_DURATION = 10;
 	public static final String DAMAGE_MODE_TAG = "ClericHOLDamageMode";
 
-	private int mFlat;
-	private double mPercent;
-	private int mDamagePer;
-	private int mDamageMax;
+	private final int mFlat;
+	private final double mPercent;
+	private final int mDamagePer;
+	private final int mDamageMax;
 	private boolean mDamageMode;
 
 	private @Nullable Crusade mCrusade;
@@ -71,6 +74,14 @@ public class HandOfLight extends Ability {
 		mInfo.mShorthandName = "HoL";
 		mInfo.mDescriptions.add("Right click while holding a weapon or tool to heal all other players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. If holding a shield, the trigger is changed to crouch + right click. Additionally, swap hands while looking up and not sneaking to change to damage mode. In damage mode, instead of healing players, damage all mobs in a 6 block radius in front of you magic damage equal to 2 times the number of undead mobs in the range, up to 8 damage. Cooldown: 14s.");
 		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health. In damage mode, deal 3 damage per undead mob, up to 9 damage. Cooldown: 10s.");
+		mInfo.mDescriptions.add(
+			String.format("The cone is changed to a sphere of equal range, centered on the Cleric." +
+				              " The cooldown is reduced by %s%% for each 4 health healed, capped at %s%% cooldown." +
+				              " All Undead caught in the radius are stunned for %ss",
+				(int) (ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED * 100),
+				(int) (ENHANCEMENT_COOLDOWN_REDUCTION_MAX * 100),
+				ENHANCEMENT_UNDEAD_STUN_DURATION / 20.0
+			));
 		mInfo.mCooldown = isLevelOne() ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.PINK_DYE, 1);
@@ -97,7 +108,7 @@ public class HandOfLight extends Ability {
 			return;
 		}
 
-		if (isTimerActive() || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (isTimerActive()) {
 			return;
 		}
 
@@ -129,11 +140,15 @@ public class HandOfLight extends Ability {
 
 		if (!mDamageMode) {
 			List<Player> nearbyPlayers = PlayerUtils.otherPlayersInRange(mPlayer, HEALING_RADIUS, true);
-			nearbyPlayers.removeIf(p -> (playerDir.dot(p.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && p.getLocation().distance(userLoc) > 2) || p.getScoreboardTags().contains("disable_class"));
+			nearbyPlayers.removeIf(p -> (!isEnhanced() && playerDir.dot(p.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && p.getLocation().distance(userLoc) > 2)
+				                            || p.getScoreboardTags().contains("disable_class"));
 			if (nearbyPlayers.size() > 0) {
+				double healthHealed = 0;
 				for (Player p : nearbyPlayers) {
 					double maxHealth = EntityUtils.getMaxHealth(p);
+					double healthBeforeHeal = p.getHealth();
 					PlayerUtils.healPlayer(mPlugin, p, mFlat + mPercent * maxHealth, mPlayer);
+					healthHealed += p.getHealth() - healthBeforeHeal;
 
 					Location loc = p.getLocation();
 					mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, 20 * 4, 1, true, true));
@@ -146,11 +161,17 @@ public class HandOfLight extends Ability {
 				world.playSound(userLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
 				world.playSound(userLoc, Sound.ENTITY_PLAYER_LEVELUP, 0.05f, 1.0f);
 				ParticleUtils.explodingConeEffect(mPlugin, mPlayer, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
-				putOnCooldown();
+
+				int cooldown = getModifiedCooldown();
+				if (isEnhanced()) {
+					cooldown *= 1 - Math.min((healthHealed / 4) * ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED, ENHANCEMENT_COOLDOWN_REDUCTION_MAX);
+				}
+				putOnCooldown(cooldown);
 			}
 		} else {
 			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(userLoc, DAMAGE_RADIUS);
-			nearbyMobs.removeIf(mob -> (playerDir.dot(mob.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && mob.getLocation().distance(userLoc) > 2) || mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+			nearbyMobs.removeIf(mob -> (!isEnhanced() && playerDir.dot(mob.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && mob.getLocation().distance(userLoc) > 2)
+				                           || mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
 			List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
 			undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob, mCrusade));
@@ -170,6 +191,12 @@ public class HandOfLight extends Ability {
 				ParticleUtils.explodingConeEffect(mPlugin, mPlayer, DAMAGE_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
 				putOnCooldown();
 			}
+		}
+		if (isEnhanced()) {
+			EntityUtils.getNearbyMobs(userLoc, DAMAGE_RADIUS).stream()
+				.filter(mob -> mob.getLocation().distanceSquared(userLoc) <= DAMAGE_RADIUS * DAMAGE_RADIUS)
+				.filter(mob -> Crusade.enemyTriggersAbilities(mob, mCrusade))
+				.forEach(mob -> EntityUtils.applyStun(mPlugin, ENHANCEMENT_UNDEAD_STUN_DURATION, mob));
 		}
 	}
 

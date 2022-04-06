@@ -26,9 +26,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.annotation.Nullable;
-import java.util.Collection;
-
 
 public final class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 
@@ -38,6 +35,9 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0.05;
 	private static final int HEAVENLY_BOON_1_DURATION = 20 * 20;
 	private static final int HEAVENLY_BOON_2_DURATION = 50 * 20;
+	private static final double ENHANCEMENT_POTION_EFFECT_BONUS = 0.2;
+	private static final int ENHANCEMENT_POTION_EFFECT_MAX_BOOST = 24 * 20;
+	private static final int ENHANCEMENT_POTION_EFFECT_MAX_DURATION = 3 * 60 * 20;
 
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
@@ -51,6 +51,14 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		mInfo.mShorthandName = "HB";
 		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob or deal damage to a boss (R1 100/R2 200), you have a 8% chance to be splashed with an Instant Health I potion, as well as either a Speed I, Regen I, or Absorption I potion with 20 second duration.");
 		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 16%, the effect potions can now also be Strength and Resistance, and the durations of each are increased to 50 seconds.");
+		mInfo.mDescriptions.add(
+			String.format(
+				"When a potion is created by this skill, also increase all current positive potion durations by %s%%" +
+					" (capped at +%ss, and up to a maximum of %s minutes) on all players in the radius.",
+				(int) (ENHANCEMENT_POTION_EFFECT_BONUS * 100),
+				ENHANCEMENT_POTION_EFFECT_MAX_BOOST / 20,
+				ENHANCEMENT_POTION_EFFECT_MAX_DURATION / (60 * 20)
+			));
 		mTracker = new KillTriggeredAbilityTracker(this);
 		mChance = isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE;
 		mDuration = isLevelOne() ? HEAVENLY_BOON_1_DURATION : HEAVENLY_BOON_2_DURATION;
@@ -158,7 +166,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 					                                         "Splash Potion of Strength");
 				} else {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.DAMAGE_RESISTANCE, 1, mDuration, 0,
-					                                         "Splash Potion of Resistance");
+						"Splash Potion of Resistance");
 				}
 			}
 
@@ -166,6 +174,20 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 			Location pos = mPlayer.getLocation().add(0, 1, 0);
 			EntityUtils.spawnCustomSplashPotion(mPlayer, potions, pos);
+
+			if (isEnhanced()) {
+				for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), HEAVENLY_BOON_RADIUS, true)) {
+					mPlugin.mPotionManager.modifyPotionDuration(p,
+						potionInfo -> {
+							if (potionInfo.mDuration > ENHANCEMENT_POTION_EFFECT_MAX_DURATION
+								    || potionInfo.mType == null
+								    || !PotionUtils.hasPositiveEffects(potionInfo.mType)) {
+								return potionInfo.mDuration;
+							}
+							return Math.min(potionInfo.mDuration + Math.min((int) (potionInfo.mDuration * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_BOOST), ENHANCEMENT_POTION_EFFECT_MAX_DURATION);
+						});
+				}
+			}
 		}
 	}
 }

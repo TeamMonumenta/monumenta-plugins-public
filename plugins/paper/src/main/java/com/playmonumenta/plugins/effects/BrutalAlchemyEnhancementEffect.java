@@ -16,12 +16,11 @@ public class BrutalAlchemyEnhancementEffect extends CustomDamageOverTime {
 	}
 
 	@Override
-	public boolean entityKilledEvent(EntityDeathEvent event) {
+	public void onDeath(EntityDeathEvent event) {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(event.getEntity().getLocation(), BrutalAlchemy.BRUTAL_ALCHEMY_ENHANCEMENT_RANGE)) {
 			if (!Plugin.getInstance().mEffectManager.hasEffect(mob, BrutalAlchemy.BRUTAL_ALCHEMY_DOT_EFFECT_NAME)) {
 				Plugin.getInstance().mEffectManager.addEffect(mob, BrutalAlchemy.BRUTAL_ALCHEMY_DOT_EFFECT_NAME, new BrutalAlchemyEnhancementEffect(mDuration, mDamage, mPeriod, mPlayer, mSpell, mParticle));
 			}
 		}
-		return true;
 	}
 }
