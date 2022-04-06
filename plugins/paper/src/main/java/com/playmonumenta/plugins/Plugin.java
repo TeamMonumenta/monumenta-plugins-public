@@ -174,7 +174,6 @@ public class Plugin extends JavaPlugin {
 		 * These need to register immediately on load to prevent function loading errors
 		 */
 		ChangeLogLevel.register();
-		StasisCommand.register();
 		GiveSoulbound.register();
 		ClaimRaffle.register(this);
 		ShatterHeldItem.register();

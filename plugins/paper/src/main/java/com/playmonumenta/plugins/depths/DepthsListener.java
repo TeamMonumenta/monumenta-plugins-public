@@ -206,10 +206,14 @@ public class DepthsListener implements Listener {
 		//Set treasure score at death time, so they can't just wait around in death screen for party to get more rewards
 		DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(event.getEntity().getUniqueId());
 
-		if (dp != null && DepthsManager.getInstance().getPartyFromId(dp) != null) {
-			dp.mFinalTreasureScore = DepthsManager.getInstance().getPartyFromId(dp).mTreasureScore;
-			event.getEntity().sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
-			event.getEntity().sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You reached room " + DepthsManager.getInstance().getPartyFromId(dp).mRoomNumber + "!");
+		if (dp != null) {
+			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp);
+			if (party != null) {
+				dp.mFinalTreasureScore = party.mTreasureScore;
+				dp.setDeathRoom(party.getRoomNumber());
+				event.getEntity().sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
+				event.getEntity().sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You reached room " + party.mRoomNumber + "!");
+			}
 		}
 	}
 

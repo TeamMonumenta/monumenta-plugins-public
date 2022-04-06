@@ -137,7 +137,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack lgItem = new ItemStack(Material.LIGHT_GRAY_WOOL);
 		ItemMeta lgMeta = lgItem.getItemMeta();
 		lgMeta.displayName(Component.text("Reflection", TextColor.fromCSSHexString("#AAAAAA")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(lgMeta, "1 second after taking ability damage, deal 6% per level of the spell's damage to all mobs in a 4 block radius.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(lgMeta, "1 second after taking magic or blast damage, deal 6% per level of the spell's damage to all mobs in a 4 block radius.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		lgItem.setItemMeta(lgMeta);
 		mDelvePannelList.add(lgItem);
 

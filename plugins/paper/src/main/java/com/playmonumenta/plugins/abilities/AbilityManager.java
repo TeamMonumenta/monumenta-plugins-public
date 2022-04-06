@@ -448,7 +448,7 @@ public class AbilityManager {
 		return mManager;
 	}
 
-	public AbilityCollection updatePlayerAbilities(Player player) {
+	public AbilityCollection updatePlayerAbilities(Player player, boolean resetAbsorption) {
 		// Clear self-given potions
 		mPlugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_SELF);
 
@@ -519,8 +519,11 @@ public class AbilityManager {
 
 		player.setWalkSpeed(DEFAULT_WALK_SPEED);
 		player.setInvulnerable(false);
+
 		// The absorption tracker may lose track of the player when doing things like shard transfers, so reset absorption
-		AbsorptionUtils.setAbsorption(player, 0, -1);
+		if (resetAbsorption) {
+			AbsorptionUtils.setAbsorption(player, 0, -1);
+		}
 
 		// Reset the DelveInfo mapping so a new one is generated
 		DelvesUtils.removeDelveInfo(player);
@@ -887,7 +890,7 @@ public class AbilityManager {
 	public AbilityCollection getPlayerAbilities(Player player) {
 		AbilityCollection collection = mAbilities.get(player.getUniqueId());
 		if (collection == null) {
-			return updatePlayerAbilities(player);
+			return updatePlayerAbilities(player, true);
 		}
 		return collection;
 	}
@@ -914,7 +917,7 @@ public class AbilityManager {
 		ScoreboardUtils.setScoreboardValue(player, "SkillSpec", spec);
 
 		// Run updatePlayerAbilities to clear existing ability effects.
-		updatePlayerAbilities(player);
+		updatePlayerAbilities(player, true);
 	}
 
 	public void trackCharges(Player player, ClassAbility ability, int charges) {

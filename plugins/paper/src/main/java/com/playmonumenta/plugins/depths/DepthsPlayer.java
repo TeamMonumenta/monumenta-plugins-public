@@ -37,6 +37,8 @@ public class DepthsPlayer {
 	public int mFinalTreasureScore;
 	//Reward queue implementation to let the player catch up on reward chests they have missed later
 	public Queue<DepthsRewardType> mEarnedRewards;
+	//The room on which the player died. -1 if the player has not died
+	public int mDeathRoom;
 
 	public DepthsPlayer(Player p) {
 		mPlayerId = p.getUniqueId();
@@ -55,6 +57,8 @@ public class DepthsPlayer {
 		mFinalTreasureScore = -1;
 
 		mEarnedRewards = new ConcurrentLinkedQueue<>();
+
+		mDeathRoom = -1;
 
 		ScoreboardUtils.setScoreboardValue(p, "DDDelve1", 0);
 		ScoreboardUtils.setScoreboardValue(p, "DDDelve2", 0);
@@ -136,6 +140,18 @@ public class DepthsPlayer {
 		}
 
 		return randomTrees;
+	}
+
+	public void setDeathRoom(int room) {
+		mDeathRoom = room;
+	}
+
+	public int getDeathRoom() {
+		return mDeathRoom;
+	}
+
+	public boolean hasDied() {
+		return mDeathRoom >= 0;
 	}
 
 }

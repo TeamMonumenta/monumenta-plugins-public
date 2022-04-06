@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.effects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import java.util.EnumSet;
+import java.util.function.BiPredicate;
 import org.bukkit.entity.LivingEntity;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -12,20 +13,22 @@ public class PercentDamageDealt extends Effect {
 	protected final double mAmount;
 	protected final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
 	protected final int mPriority;
+	private @Nullable BiPredicate<LivingEntity, LivingEntity> mPredicate = null;
 
-	public PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority) {
+	public PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate) {
 		super(duration);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;
 		mPriority = priority;
+		mPredicate = predicate;
 	}
 
 	public PercentDamageDealt(int duration, double amount) {
-		this(duration, amount, null, 0);
+		this(duration, amount, null, 0, null);
 	}
 
 	public PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes) {
-		this(duration, amount, affectedDamageTypes, 0);
+		this(duration, amount, affectedDamageTypes, 0, null);
 	}
 
 	// This needs to trigger before any flat damage
@@ -51,6 +54,9 @@ public class PercentDamageDealt extends Effect {
 
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
+		if (mPredicate != null && !mPredicate.test(entity, enemy)) {
+			return;
+		}
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			event.setDamage(event.getDamage() * Math.max(0, 1 + mAmount));
 		}

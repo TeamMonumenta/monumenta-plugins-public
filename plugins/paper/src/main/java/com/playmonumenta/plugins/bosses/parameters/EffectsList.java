@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -38,7 +39,7 @@ public class EffectsList {
 			EFFECT_RUNNER.put("pullforce", (p, boss, duration) -> MovementUtils.pullTowards(boss, p, duration));
 			EFFECT_RUNNER.put("pull", (p, boss, duration) -> MovementUtils.pullTowardsByUnit(boss, p, duration));
 			EFFECT_RUNNER.put("pushforce", (p, boss, duration) -> MovementUtils.knockAway(boss, p, duration, false));
-			EFFECT_RUNNER.put("push", (p, boss, duration) -> MovementUtils.knockAwayRealistic(boss.getLocation(), p, duration, 0.5f));
+			EFFECT_RUNNER.put("push", (p, boss, duration) -> MovementUtils.knockAwayRealistic(boss.getLocation(), p, duration, 0.5f, true));
 
 			CUSTOM_EFFECT_RUNNER = new HashMap<>();
 			CUSTOM_EFFECT_RUNNER.put("CustomSpeed", (target, boss, duration, strength, effectName) -> {
@@ -189,7 +190,11 @@ public class EffectsList {
 
 		public void apply(LivingEntity p, LivingEntity boss) {
 			if (mEffect != null) {
-				p.addPotionEffect(new PotionEffect(mEffect, mDurationTicks, mAmplifier, true, false, true));
+				if (p instanceof Player player) {
+					Plugin.getInstance().mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(mEffect, mDurationTicks, mAmplifier, true, false, true));
+				} else {
+					p.addPotionEffect(new PotionEffect(mEffect, mDurationTicks, mAmplifier, true, false, true));
+				}
 			} else {
 				EffectRunner runner = EFFECT_RUNNER.get(mName);
 				if (runner != null) {

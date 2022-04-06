@@ -16,7 +16,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 public class Shielding implements Enchantment {
 
 	public static final double ARMOR_BONUS_PER_LEVEL = 0.2;
-	private static final double DISTANCE = 2;
+	private static final double DISTANCE = 2.5;
 	private static final int DISABLE_DURATION = 5 * 20;
 	private static final String DISABLE_METAKEY = "ShieldingDisabled";
 

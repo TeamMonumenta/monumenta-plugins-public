@@ -97,13 +97,13 @@ public class DelvesListener implements Listener {
 
 				// Try refreshing class and rerunning the check if we found a mismatch
 				if (mismatch) {
-					AbilityManager.getManager().updatePlayerAbilities(player);
+					AbilityManager.getManager().updatePlayerAbilities(player, false);
 
 					for (Class<? extends DelveModifier> cls : DelvesUtils.getDelveInfo(player).getActiveModifiers(player)) {
 						if (AbilityManager.getManager().getPlayerAbility(player, cls) == null) {
 							// Reset delve points to prevent cases like broken modifiers but loot still being boosted
 							DelvesUtils.setDelveScore(player, ServerProperties.getShardName(), 0);
-							AbilityManager.getManager().updatePlayerAbilities(player);
+							AbilityManager.getManager().updatePlayerAbilities(player, false);
 
 							Plugin.getInstance().getLogger().log(Level.SEVERE, "Plugin thinks that " + player.getName() + " has delve modifier " + cls.getName() + " but not the corresponding ability.");
 							MessagingUtils.sendRawMessage(player, "Something went wrong and your delve modifiers have been reset. Please ask a moderator for help reselecting your delve modifiers.");

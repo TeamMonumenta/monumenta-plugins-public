@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.ParticleCategory;
@@ -652,7 +653,7 @@ public class PlayerListener implements Listener {
 
 		// Clear effects
 		mPlugin.mPotionManager.clearAllPotions(player);
-		mPlugin.mAbilityManager.updatePlayerAbilities(player);
+		mPlugin.mAbilityManager.updatePlayerAbilities(player, true);
 	}
 
 	// The player has respawned.
@@ -667,12 +668,14 @@ public class PlayerListener implements Listener {
 				Player player = Bukkit.getPlayer(name);
 				if (player != null) {
 					mPlugin.mPotionManager.clearAllPotions(player);
-					mPlugin.mAbilityManager.updatePlayerAbilities(player);
+					mPlugin.mAbilityManager.updatePlayerAbilities(player, true);
 
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 				}
 			}
 		}, 0);
+
+		Phylactery.applyStoredEffects(mPlugin, player);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -1193,7 +1196,7 @@ public class PlayerListener implements Listener {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						plugin.mAbilityManager.updatePlayerAbilities(player);
+						plugin.mAbilityManager.updatePlayerAbilities(player, true);
 					}
 				}.runTaskLater(plugin, 0);
 			}

@@ -161,7 +161,7 @@ public class PotionMap {
 		if (bestEffect != null) {
 			// Effects over 100 "mask" all other effects of that type
 			if (bestEffect.mAmplifier < 100) {
-				PotionEffect effect = new PotionEffect(mType, bestEffect.mDuration, bestEffect.mAmplifier, bestEffect.mAmbient, bestEffect.mShowParticles);
+				PotionEffect effect = new PotionEffect(mType, bestEffect.mDuration, bestEffect.mAmplifier, bestEffect.mAmbient, bestEffect.mShowParticles, bestEffect.mShowIcon);
 				player.addPotionEffect(effect);
 			}
 		}

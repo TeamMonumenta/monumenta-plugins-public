@@ -397,7 +397,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private enum SecondaryStat {
 		SHIELDING(0, Material.NAUTILUS_SHELL, EnchantmentType.SHIELDING, true, """
 			Gain (Level*20%) effective Armor
-			when taking damage from an enemy within 2 blocks.
+			when taking damage from an enemy within 2.5 blocks.
 			Taking damage that would stun a shield
 			disables Shielding for 5 seconds."""),
 		POISE(1, Material.LILY_OF_THE_VALLEY, EnchantmentType.POISE, true, """
@@ -409,10 +409,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			(Melee, Projectile, Blast, or Magic)."""),
 		STEADFAST(3, Material.LEAD, EnchantmentType.STEADFAST, true, """
 			Scaling with percent health missing,
-			gain up to (Level*20%) effective Armor,
-			but lose up to (Level*10%) Speed
-			(0.25% armor and -0.125% speed per 1% health lost,
-			up to 20% armor and -10% speed).
+			gain up to (Level*20%) effective Armor
+			(0.25% armor per 1% health lost, up to 20% armor).
 			Also calculates bonus from Second Wind when enabled."""),
 		ETHEREAL(5, Material.PHANTOM_MEMBRANE, EnchantmentType.ETHEREAL, false, """
 			Gain (Level*20%) effective Agility

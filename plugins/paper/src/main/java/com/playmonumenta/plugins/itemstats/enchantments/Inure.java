@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class Inure implements Enchantment {
 
@@ -24,7 +23,7 @@ public class Inure implements Enchantment {
 	private static final String INURE_BLAST_NAME = "BlastInureEffect";
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Inure";
 	}
 
@@ -35,6 +34,9 @@ public class Inure implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (event.isBlocked()) {
+			return;
+		}
 		if (event.getType() == DamageType.MELEE) {
 			clearInure(plugin, player);
 			plugin.mEffectManager.addEffect(player, INURE_MELEE_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME));

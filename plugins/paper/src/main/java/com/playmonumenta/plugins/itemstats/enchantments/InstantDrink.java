@@ -48,7 +48,7 @@ public class InstantDrink implements Enchantment {
 				if (meta.hasCustomEffects()) {
 					for (PotionEffect effect : meta.getCustomEffects()) {
 						if (effect.getType().equals(PotionEffectType.HEAL) || effect.getType().equals(PotionEffectType.HARM)) {
-							PotionUtils.apply(player, new PotionInfo(effect.getType(), effect.getDuration() + 1, effect.getAmplifier(), false, false));
+							PotionUtils.apply(player, new PotionInfo(effect.getType(), effect.getDuration() + 1, effect.getAmplifier(), false, false, false));
 						} else {
 							plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
 						}
