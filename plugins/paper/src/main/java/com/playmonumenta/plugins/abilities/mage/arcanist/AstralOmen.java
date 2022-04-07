@@ -39,10 +39,8 @@ public class AstralOmen extends Ability {
 	public static final int SIZE = 3;
 	public static final double BONUS_MULTIPLIER_1 = 0.2;
 	public static final double BONUS_MULTIPLIER_2 = 0.3;
-	public static final double SLOW_MULTIPLIER = 0.1;
 	public static final int STACK_TICKS = 10 * Constants.TICKS_PER_SECOND;
 	public static final int BONUS_TICKS = 8 * Constants.TICKS_PER_SECOND;
-	public static final int SLOW_TICKS = 8 * Constants.TICKS_PER_SECOND;
 	public static final float PULL_SPEED = 0.175f;
 	public static final int STACK_THRESHOLD = 3;
 
@@ -68,9 +66,7 @@ public class AstralOmen extends Ability {
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"The implosion now pulls all enemies inwards and afflicts them with %s%% slowness for %ss. Bonus damage taken is increased from %s%% to %s%%.",
-				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER),
-				StringUtils.ticksToSeconds(SLOW_TICKS),
+				"The implosion now pulls all enemies inwards. Bonus damage taken is increased from %s%% to %s%%.",
 				StringUtils.multiplierToPercentage(BONUS_MULTIPLIER_1),
 				StringUtils.multiplierToPercentage(BONUS_MULTIPLIER_2)
 			)
@@ -103,7 +99,6 @@ public class AstralOmen extends Ability {
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, spellDamage, mInfo.mLinkedSpell, true);
 					if (mDoPull) {
 						MovementUtils.pullTowards(enemy, mob, PULL_SPEED);
-						EntityUtils.applySlow(mPlugin, SLOW_TICKS, SLOW_MULTIPLIER, mob);
 					}
 
 					new PartialParticle(Particle.REDSTONE, enemy.getLocation(), 10, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE).spawnAsPlayerActive(mPlayer);
