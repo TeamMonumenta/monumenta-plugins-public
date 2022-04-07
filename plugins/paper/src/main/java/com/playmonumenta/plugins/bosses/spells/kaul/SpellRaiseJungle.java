@@ -106,7 +106,6 @@ public class SpellRaiseJungle extends Spell {
 					}
 					Location spawn = sLoc.clone().subtract(0, 1.75, 0); // should end up 1.5 blocks below the arena floor
 					LivingEntity ele = (LivingEntity)LibraryOfSoulsIntegration.summon(spawn, "EarthElemental");
-					ele.setCustomName("Mushroom Elemental");
 					Location scLoc = sLoc.clone();
 					if (ele != null && !mSummoned.contains(ele.getUniqueId())) {
 						mSummoned.add(ele.getUniqueId());
