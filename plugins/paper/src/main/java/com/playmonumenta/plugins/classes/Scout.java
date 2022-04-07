@@ -40,7 +40,7 @@ public class Scout extends PlayerClass {
 		mChatColor = ChatColor.AQUA;
 		mDisplayItem = new ItemStack(Material.BOW, 1);
 		mClassDescription = "Scouts are agile masters of archery and exploration.";
-		mClassPassiveDescription = "Whenever you fire a bow, you have a 20% chance to not consume the arrow.";
+		mClassPassiveDescription = "You gain 20% of your Bow Damage % as Attack Damage and you gain 20% of your Attack Damage % as Bow Damage.";
 
 		mSpecOne.mAbilities.add(new Quickdraw(plugin, player));
 		mSpecOne.mAbilities.add(new WhirlingBlade(plugin, player));

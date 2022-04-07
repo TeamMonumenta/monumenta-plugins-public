@@ -2,21 +2,21 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import javax.annotation.Nullable;
-import org.bukkit.Sound;
-import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 /*
- * Scout Passive: 20% chance to not consume an arrow when shooting a non-infinity bow
+ * Scout Passive:
  */
 
 public class ScoutPassive extends Ability {
 
-	private static final float PASSIVE_ARROW_SAVE = 0.20f;
+	private static final float DAMAGE_MULTIPLY_MELEE = 0.2f;
+	private static final float DAMAGE_MULTIPLY_PROJ = 0.2f;
 
 	public ScoutPassive(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
@@ -28,14 +28,21 @@ public class ScoutPassive extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (mPlayer != null && FastUtils.RANDOM.nextDouble() < PASSIVE_ARROW_SAVE) {
-			boolean refunded = AbilityUtils.refundArrow(mPlayer, arrow);
-			if (refunded) {
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageEvent.DamageType.MELEE || event.getType() == DamageEvent.DamageType.MELEE_SKILL || event.getType() == DamageEvent.DamageType.MELEE_ENCH) {
+			double currentdamage = event.getDamage();
+			double percentproj = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
+			if (percentproj > 0) {
+				event.setDamage(currentdamage * (1 + (percentproj - 1) * DAMAGE_MULTIPLY_MELEE));
+			}
+		} else if (event.getType() == DamageEvent.DamageType.PROJECTILE || event.getType() == DamageEvent.DamageType.PROJECTILE_SKILL) {
+			double currentdamage = event.getDamage();
+			double percentatk = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.ATTACK_DAMAGE_MULTIPLY);
+			if (percentatk > 0) {
+				event.setDamage(currentdamage * (1 + (percentatk - 1) * DAMAGE_MULTIPLY_PROJ));
 			}
 		}
 		return true;
-	}
 
+	}
 }
