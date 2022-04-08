@@ -5,9 +5,9 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellDreadnaughtParticle;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -20,7 +20,8 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_dreadnaughtparticle";
 	public static final int detectionRange = 40;
 
-	private static final String DREADLING_SOUL_NAME = "Dreadling";
+	private static final String DREADLING_TERRAIN_SOUL_NAME = "Dreadling";
+	private static final String DREADLING_WATER_SOUL_NAME = "Hydraling";
 
 	private static final int DAMAGE_IMMUNE_DISTANCE = 6;
 
@@ -32,7 +33,7 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 
 	public DreadnaughtParticleBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellDreadnaughtParticle(boss)
 		);
 
@@ -57,9 +58,15 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 		if (mDamageCounter >= 80) {
 			mDamageCounter -= 80;
 
-			LibraryOfSoulsIntegration.summon(loc, DREADLING_SOUL_NAME);
-			LibraryOfSoulsIntegration.summon(loc, DREADLING_SOUL_NAME);
-			LibraryOfSoulsIntegration.summon(loc, DREADLING_SOUL_NAME);
+			if (loc.getBlock().getType() == Material.WATER) {
+				LibraryOfSoulsIntegration.summon(loc, DREADLING_WATER_SOUL_NAME);
+				LibraryOfSoulsIntegration.summon(loc, DREADLING_WATER_SOUL_NAME);
+				LibraryOfSoulsIntegration.summon(loc, DREADLING_WATER_SOUL_NAME);
+			} else {
+				LibraryOfSoulsIntegration.summon(loc, DREADLING_TERRAIN_SOUL_NAME);
+				LibraryOfSoulsIntegration.summon(loc, DREADLING_TERRAIN_SOUL_NAME);
+				LibraryOfSoulsIntegration.summon(loc, DREADLING_TERRAIN_SOUL_NAME);
+			}
 
 			loc.add(0, 1, 0);
 
