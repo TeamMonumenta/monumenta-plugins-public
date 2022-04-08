@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.effects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import org.bukkit.entity.LivingEntity;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -41,6 +42,11 @@ public class PercentDamageReceived extends Effect {
 			}
 			event.setDamage(event.getDamage() * (1 + amount));
 		}
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return StringUtils.doubleToColoredAndSignedPercentage(-mAmount) + " Resistance";
 	}
 
 	@Override

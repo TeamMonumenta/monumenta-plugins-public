@@ -2,8 +2,10 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BonusSoulThreads extends SingleArgumentEffect {
 	public static final String GENERIC_NAME = "BonusSoulThreads";
@@ -23,6 +25,11 @@ public class BonusSoulThreads extends SingleArgumentEffect {
 				return;
 			}
 		}
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Soul Thread Drops";
 	}
 
 	@Override

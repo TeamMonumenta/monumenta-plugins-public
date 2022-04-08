@@ -34,6 +34,11 @@ public class FlatDamageDealt extends Effect {
 	}
 
 	@Override
+	public @Nullable String getSpecificDisplay() {
+		return "+" + mAmount + " Flat Damage Dealt";
+	}
+
+	@Override
 	public String toString() {
 		String types = "any";
 		if (mAffectedDamageTypes != null) {

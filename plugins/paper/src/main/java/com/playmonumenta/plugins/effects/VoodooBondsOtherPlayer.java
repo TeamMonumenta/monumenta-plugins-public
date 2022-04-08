@@ -117,6 +117,11 @@ public class VoodooBondsOtherPlayer extends Effect {
 	}
 
 	@Override
+	public @Nullable String getSpecificDisplay() {
+		return "Voodoo Bonds";
+	}
+
+	@Override
 	public String toString() {
 		return String.format("VoodooBondsOtherPlayer duration:%d", this.getDuration());
 	}

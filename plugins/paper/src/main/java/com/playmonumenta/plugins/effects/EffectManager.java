@@ -4,10 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeSet;
@@ -72,7 +75,22 @@ public final class EffectManager implements Listener {
 
 			if (!effectGroup.isEmpty()) {
 				Effect currentEffect = effectGroup.last();
-				effectGroup.add(effect);
+
+				// Iterate through effectGroup to check if there is already an effect with existing magnitude and less duration.
+				boolean foundEffect = false;
+				for (Effect effectIter : effectGroup) {
+					if (effectIter.compareTo(effect) == 0 && effectIter.getDuration() < effect.getDuration()) {
+						effectIter.setDuration(effect.getDuration());
+						foundEffect = true;
+						break;
+					}
+				}
+
+				// If effect with same magnitude is not found, simply add the effect
+				if (!foundEffect) {
+					effectGroup.add(effect);
+				}
+
 				if (effectGroup.last() == effect) {
 					currentEffect.entityLoseEffect(mEntity);
 					effect.entityGainEffect(mEntity);
@@ -179,7 +197,8 @@ public final class EffectManager implements Listener {
 
 	private final Map<Entity, Effects> mEntities = new HashMap<Entity, Effects>();
 	private final BukkitRunnable mTimer;
-	private static @Nullable EffectManager INSTANCE = null;
+	private static @Nullable
+	EffectManager INSTANCE = null;
 
 	@SuppressWarnings("unchecked")
 	public EffectManager(Plugin plugin) {
@@ -203,7 +222,7 @@ public final class EffectManager implements Listener {
 					for (Map.Entry<Entity, Effects> entry : mEntities.entrySet()) {
 						for (HashMap<String, NavigableSet<Effect>> priorityEffects : entry.getValue().mPriorityMap.values()) {
 							// Have to make a copy of the map to prevent concurrent modification exceptions in case ticking changes the effects :(
-							for (NavigableSet<Effect> effectGroup : ((HashMap<String, NavigableSet<Effect>>)priorityEffects.clone()).values()) {
+							for (NavigableSet<Effect> effectGroup : ((HashMap<String, NavigableSet<Effect>>) priorityEffects.clone()).values()) {
 								try {
 									effectGroup.last().entityTickEffect(entry.getKey(), fourHertz, twoHertz, oneHertz);
 								} catch (Exception ex) {
@@ -294,6 +313,13 @@ public final class EffectManager implements Listener {
 		mTimer.runTaskTimer(plugin, 0, PERIOD);
 	}
 
+	public static class SortEffectsByDuration implements Comparator<Effect> {
+		@Override
+		public int compare(Effect effect1, Effect effect2) {
+			return effect2.getDuration() - effect1.getDuration();
+		}
+	}
+
 	public static EffectManager getInstance() {
 		return INSTANCE;
 	}
@@ -326,7 +352,8 @@ public final class EffectManager implements Listener {
 	 * @param source the source of effects to be retrieved
 	 * @return the set of effects if they exist, null otherwise
 	 */
-	public @Nullable NavigableSet<Effect> getEffects(Entity entity, String source) {
+	public @Nullable
+	NavigableSet<Effect> getEffects(Entity entity, String source) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.getEffects(source);
@@ -351,12 +378,12 @@ public final class EffectManager implements Listener {
 	}
 
 	/**
-     * Returns if an entity has an effect source or not.
-     *
-     * @param  entity the entity being checked
-     * @param  source the source of effects to be checked
-     * @return whether the entity has the effect or not
-     */
+	 * Returns if an entity has an effect source or not.
+	 *
+	 * @param entity the entity being checked
+	 * @param source the source of effects to be checked
+	 * @return whether the entity has the effect or not
+	 */
 	public boolean hasEffect(Entity entity, String source) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
@@ -366,18 +393,31 @@ public final class EffectManager implements Listener {
 	}
 
 	/**
-     * Returns if an entity has an effect source or not.
-     *
-     * @param  entity the entity being checked
-     * @param  type the class of effect
-     * @return whether the entity has the effect or not
-     */
+	 * Returns if an entity has an effect source or not.
+	 *
+	 * @param entity the entity being checked
+	 * @param type   the class of effect
+	 * @return whether the entity has the effect or not
+	 */
 	public boolean hasEffect(Entity entity, Class<? extends Effect> type) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.hasEffect(type);
 		}
 		return false;
+	}
+
+	public List<Effect> getPriorityEffects(Entity entity) {
+		EffectManager.Effects effects = mEntities.get(entity);
+		List<Effect> output = new ArrayList<>();
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					output.add(effectGroup.last());
+				}
+			}
+		}
+		return output;
 	}
 
 
@@ -388,7 +428,8 @@ public final class EffectManager implements Listener {
 	 * @param source the source of effects to be cleared
 	 * @return the set of effects if effects were removed, null otherwise
 	 */
-	public @Nullable NavigableSet<Effect> clearEffects(Entity entity, String source) {
+	public @Nullable
+	NavigableSet<Effect> clearEffects(Entity entity, String source) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.clearEffects(source);

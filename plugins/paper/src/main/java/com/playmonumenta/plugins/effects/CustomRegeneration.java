@@ -33,6 +33,11 @@ public class CustomRegeneration extends Effect {
 	}
 
 	@Override
+	public @Nullable String getSpecificDisplay() {
+		return "+" + mAmount + " Regeneration Per Second";
+	}
+
+	@Override
 	public String toString() {
 		return String.format("CustomRegeneration duration:%d amount:%f", this.getDuration(), mAmount);
 	}

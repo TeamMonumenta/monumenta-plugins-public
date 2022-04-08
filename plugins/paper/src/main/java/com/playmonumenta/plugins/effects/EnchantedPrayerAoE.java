@@ -16,6 +16,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EnchantedPrayerAoE extends Effect {
 
@@ -71,6 +72,11 @@ public class EnchantedPrayerAoE extends Effect {
 			new PartialParticle(Particle.SPELL_INSTANT, leftHand, 2, 0.05f, 0.05f, 0.05f, 0).spawnAsPlayerActive(p);
 			new PartialParticle(Particle.SPELL_INSTANT, rightHand, 2, 0.05f, 0.05f, 0.05f, 0).spawnAsPlayerActive(p);
 		}
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return "Enchanted Prayer";
 	}
 
 	@Override
