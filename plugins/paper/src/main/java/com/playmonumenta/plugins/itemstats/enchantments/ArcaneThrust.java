@@ -50,9 +50,8 @@ public class ArcaneThrust implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
-			if (PlayerUtils.isSweepingAttack(player, enemy)) {
-				double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ARCANE_THRUST);
-				double damage = 1 + (event.getDamage() * (level / (level + 1)));
+			if (player.getCooledAttackStrength(0.5f) > 0.9) {
+				double damage = 1 + (event.getDamage() * (value / (value + 1) * (PlayerUtils.isCriticalAttack(player) ? 1.5 : 1)));
 
 				Location loc = player.getEyeLocation();
 				BoundingBox box = BoundingBox.of(loc, 0.6, 0.6, 0.6);
