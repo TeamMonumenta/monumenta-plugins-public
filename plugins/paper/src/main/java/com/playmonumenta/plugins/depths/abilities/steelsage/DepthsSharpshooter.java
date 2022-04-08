@@ -20,17 +20,20 @@ import org.bukkit.entity.Trident;
 public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChargesOrStacks {
 
 	public static final String ABILITY_NAME = "Sharpshooter";
-	public static final double[] DAMAGE_PER_STACK = {0.025, 0.032, 0.038, 0.044, 0.050, 0.062};
+	public static final double[] DAMAGE_PER_STACK = {0.025, 0.032, 0.038, 0.044, 0.050, 0.07};
 	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 4;
+	private static final int TWISTED_SHARPSHOOTER_DECAY_TIMER = 20 * 6;
 	private static final int MAX_STACKS = 8;
 
 	private int mStacks = 0;
 	private int mTicksToStackDecay = 0;
+	private int mDecayTimerLength;
 
 	public DepthsSharpshooter(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayMaterial = Material.TARGET;
 		mTree = DepthsTree.METALLIC;
+		mDecayTimerLength = mRarity >= 6 ? TWISTED_SHARPSHOOTER_DECAY_TIMER : SHARPSHOOTER_DECAY_TIMER;
 	}
 
 	@Override
@@ -42,7 +45,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 			if ((arrow.isCritical() || arrow instanceof Trident)
 				    && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getFinalDamage(false))
 				    && !arrow.hasMetadata("RapidFireArrow")) {
-				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
+				mTicksToStackDecay = mDecayTimerLength;
 
 				if (mStacks < MAX_STACKS) {
 					mStacks++;
@@ -63,7 +66,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 			mTicksToStackDecay -= 5;
 
 			if (mTicksToStackDecay <= 0) {
-				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
+				mTicksToStackDecay = mDecayTimerLength;
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlayer, "Sharpshooter Stacks: " + mStacks);
 				ClientModHandler.updateAbility(mPlayer, this);
@@ -82,6 +85,9 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 	@Override
 	public String getDescription(int rarity) {
+		if (rarity == 6) {
+			return "Each enemy hit with a critical arrow or trident gives you a stack of Sharpshooter, up to " + MAX_STACKS + ". Stacks decay after " + DepthsUtils.getRarityColor(rarity) + TWISTED_SHARPSHOOTER_DECAY_TIMER / 20 + ChatColor.WHITE + " seconds of not gaining a stack. Each stack increases your arrow and trident damage by " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(DAMAGE_PER_STACK[rarity - 1]) + "%" + ChatColor.WHITE + ".";
+		}
 		return "Each enemy hit with a critical arrow or trident gives you a stack of Sharpshooter, up to " + MAX_STACKS + ". Stacks decay after " + SHARPSHOOTER_DECAY_TIMER / 20 + " seconds of not gaining a stack. Each stack increases your arrow and trident damage by " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(DAMAGE_PER_STACK[rarity - 1]) + "%" + ChatColor.WHITE + ".";
 	}
 

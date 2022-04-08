@@ -19,6 +19,7 @@ public class Permafrost extends DepthsAbility {
 	public static final String ABILITY_NAME = "Permafrost";
 	public static final int[] ICE_TICKS = {8 * 20, 11 * 20, 14 * 20, 17 * 20, 20 * 20, 26 * 20};
 	public static final int[] ICE_BONUS_DURATION_SECONDS = {2, 3, 4, 5, 6, 8};
+	public static final Material PERMAFROST_ICE_MATERIAL = Material.PACKED_ICE;
 
 	public Permafrost(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -60,6 +61,9 @@ public class Permafrost extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
+		if (rarity >= 6) {
+			return "Breaking a spawner spawns ice around it that lasts for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. All ice you place with abilities lasts " + DepthsUtils.getRarityColor(rarity) + ICE_BONUS_DURATION_SECONDS[rarity - 1] + ChatColor.WHITE + " seconds longer." + DepthsUtils.getRarityColor(rarity) + " Additionally, all ice you place is packed ice, which when Avalanched becomes normal ice.";
+		}
 		return "Breaking a spawner spawns ice around it that lasts for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. All ice you place with abilities lasts " + DepthsUtils.getRarityColor(rarity) + ICE_BONUS_DURATION_SECONDS[rarity - 1] + ChatColor.WHITE + " seconds longer.";
 	}
 

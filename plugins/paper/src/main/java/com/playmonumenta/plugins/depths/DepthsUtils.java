@@ -263,8 +263,10 @@ public class DepthsUtils {
 			ticks += (Permafrost.ICE_BONUS_DURATION_SECONDS[playerPermLevel - 1] * 20);
 		}
 
+		Material iceMaterial = playerPermLevel >= 6 ? Permafrost.PERMAFROST_ICE_MATERIAL : ICE_MATERIAL;
+
 		BlockData bd = l.getWorld().getBlockAt(l).getBlockData();
-		l.getBlock().setType(ICE_MATERIAL);
+		l.getBlock().setType(iceMaterial);
 		iceActive.put(l, bd);
 		iceBarrier.put(l, isBarrier);
 
@@ -274,7 +276,7 @@ public class DepthsUtils {
 				if (iceActive.containsKey(l)) {
 					if (l.isChunkLoaded()) {
 						Block b = l.getBlock();
-						if (b.getType() == ICE_MATERIAL) {
+						if (isIce(b.getType())) {
 							b.setBlockData(bd);
 						}
 					}
@@ -283,6 +285,10 @@ public class DepthsUtils {
 				}
 			}
 		}.runTaskLater(Plugin.getInstance(), ticks);
+	}
+
+	public static boolean isIce(Material material) {
+		return material == ICE_MATERIAL || material == Permafrost.PERMAFROST_ICE_MATERIAL;
 	}
 
 	/**

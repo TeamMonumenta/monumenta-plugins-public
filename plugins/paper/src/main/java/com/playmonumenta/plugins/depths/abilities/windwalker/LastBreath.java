@@ -25,6 +25,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 public class LastBreath extends DepthsAbility {
@@ -32,7 +34,8 @@ public class LastBreath extends DepthsAbility {
 	public static final int COOLDOWN = 60 * 20;
 	private static final double TRIGGER_HEALTH = 0.4;
 	public static final double[] COOLDOWN_REDUCTION = {0.4, 0.5, 0.6, 0.7, 0.8, 1.0};
-	private static final double[] SPEED = {0.1, 0.125, 0.15, 0.175, 0.2, 0.25};
+	private static final double[] SPEED = {0.1, 0.125, 0.15, 0.175, 0.2, 0.35};
+	private static final int[] RESISTANCE_TICKS = {30, 35, 40, 45, 50, 70};
 	private static final int SPEED_DURATION = 6 * 20;
 	private static final String SPEED_EFFECT_NAME = "LastBreathSpeedEffect";
 	public static final int RADIUS = 5;
@@ -95,6 +98,7 @@ public class LastBreath extends DepthsAbility {
 		World world = mPlayer.getWorld();
 
 		mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(SPEED_DURATION, SPEED[mRarity - 1], SPEED_EFFECT_NAME));
+		mPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, RESISTANCE_TICKS[mRarity - 1], 4));
 		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, RADIUS)) {
 			if (!DepthsUtils.isPlant(e)) {
 				Vector knockback = e.getVelocity().add(e.getLocation().toVector().subtract(loc.toVector()).normalize().multiply(KNOCKBACK_SPEED));
@@ -117,7 +121,7 @@ public class LastBreath extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, all your other Windwalker abilities' cooldowns are reset, and abilities from other trees have their cooldowns reduced by " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(COOLDOWN_REDUCTION[rarity - 1]) + "%" + ChatColor.WHITE + ". You gain " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED[rarity - 1]) + "%" + ChatColor.WHITE + " speed for " + SPEED_DURATION / 20 + " seconds and mobs within " + RADIUS + " blocks are knocked away. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, all your other Windwalker abilities' cooldowns are reset, and abilities from other trees have their cooldowns reduced by " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(COOLDOWN_REDUCTION[rarity - 1]) + "%" + ChatColor.WHITE + ". You gain " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED[rarity - 1]) + "%" + ChatColor.WHITE + " speed for " + SPEED_DURATION / 20 + " seconds, Resistance V for " + DepthsUtils.getRarityColor(rarity) + (RESISTANCE_TICKS[rarity - 1] / 20) + ChatColor.WHITE + " seconds, and mobs within " + RADIUS + " blocks are knocked away. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

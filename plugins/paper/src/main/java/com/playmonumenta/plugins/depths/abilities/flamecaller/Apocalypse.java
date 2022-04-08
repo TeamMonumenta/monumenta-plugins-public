@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -30,7 +31,9 @@ public class Apocalypse extends DepthsAbility {
 	private static final double TRIGGER_HEALTH = 0.25;
 	public static final int[] DAMAGE = {40, 50, 60, 70, 80, 100};
 	public static final int RADIUS = 5;
-	public static final double HEALING = 0.1; //percent health per kill
+	public static final double HEALING = 0.3; //percent health per kill
+	public static final double MAX_ABSORPTION = 0.25;
+	public static final int ABSORPTION_DURATION = 30 * 20;
 
 	public Apocalypse(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -71,7 +74,15 @@ public class Apocalypse extends DepthsAbility {
 			}
 		}
 
+		double totalHealing = maxHealth * count * HEALING;
+		double absorption = 0;
+		double remainingHealth = maxHealth - mPlayer.getHealth();
+		if (totalHealing > remainingHealth) {
+			absorption = Math.min(totalHealing - remainingHealth, maxHealth * MAX_ABSORPTION);
+		}
+
 		PlayerUtils.healPlayer(mPlugin, mPlayer, maxHealth * count * HEALING);
+		AbsorptionUtils.addAbsorption(mPlayer, absorption, absorption, ABSORPTION_DURATION);
 
 		World world = mPlayer.getWorld();
 		world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 10, 2, 2, 2);
@@ -92,7 +103,7 @@ public class Apocalypse extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, ignore the hit and instead deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + RADIUS + " block radius. For each mob that is killed, heal " + (int) DepthsUtils.roundPercent(HEALING) + "% of your max health. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, ignore the hit and instead deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + RADIUS + " block radius. For each mob that is killed, heal " + (int) DepthsUtils.roundPercent(HEALING) + "% of your max health. Healing above your max health is converted into absorption, up to absorption equal to " + (int) DepthsUtils.roundPercent(MAX_ABSORPTION) + " of your max health that lasts " + ABSORPTION_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

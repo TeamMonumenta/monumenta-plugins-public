@@ -19,6 +19,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -50,7 +51,7 @@ public class Avalanche extends DepthsAbility {
 			Location loc = mPlayer.getLocation();
 
 			HashSet<Location> iceToBreak = new HashSet<>(DepthsUtils.iceActive.keySet());
-			iceToBreak.removeIf(l -> l.getWorld() != loc.getWorld() || l.distance(loc) > RADIUS || l.getBlock().getType() != DepthsUtils.ICE_MATERIAL);
+			iceToBreak.removeIf(l -> l.getWorld() != loc.getWorld() || l.distance(loc) > RADIUS || !DepthsUtils.isIce(l.getBlock().getType()));
 
 			if (iceToBreak.size() == 0) {
 				return;
@@ -66,7 +67,7 @@ public class Avalanche extends DepthsAbility {
 
 			world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1f);
 
-			List<LivingEntity> hitMobs = new ArrayList<LivingEntity>();
+			List<LivingEntity> hitMobs = new ArrayList<>();
 
 			//Shatter all nearby ice
 			for (Location l : iceToBreak) {
@@ -80,8 +81,15 @@ public class Avalanche extends DepthsAbility {
 						hitMobs.add(mob);
 					}
 				}
-				mPlayer.getWorld().getBlockAt(l).setBlockData(DepthsUtils.iceActive.get(l));
-				DepthsUtils.iceActive.remove(l);
+
+				Block b = l.getBlock();
+				if (b.getType() == Permafrost.PERMAFROST_ICE_MATERIAL) {
+					//If special permafrost ice, set to normal ice instead of destroying
+					b.setType(DepthsUtils.ICE_MATERIAL);
+				} else {
+					b.setBlockData(DepthsUtils.iceActive.get(l));
+					DepthsUtils.iceActive.remove(l);
+				}
 
 				world.spawnParticle(Particle.REDSTONE, aboveLoc, 15, 0.5, 0.5, 0.5, ICE_PARTICLE_COLOR);
 				world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, aboveLoc, 2, 0.5, 0.25, 0.5);

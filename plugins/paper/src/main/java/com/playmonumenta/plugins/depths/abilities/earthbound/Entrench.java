@@ -22,7 +22,7 @@ public class Entrench extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Entrench";
 
-	public static final int[] DURATION = {20, 25, 30, 35, 40, 50};
+	public static final int[] DURATION = {20, 25, 30, 35, 40, 60};
 	public static final int RADIUS = 6;
 	public static final double SLOW_MODIFIER = 0.99;
 
