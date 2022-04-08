@@ -14,7 +14,7 @@ public class PercentExperience extends SingleArgumentEffect {
 
 	@Override
 	public void onExpChange(Player player, PlayerExpChangeEvent event) {
-		event.setAmount((int) (event.getAmount() * mAmount));
+		event.setAmount((int) (event.getAmount() * (1 + mAmount)));
 	}
 
 	@Override
