@@ -79,6 +79,8 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
@@ -564,6 +566,30 @@ public class BossManager implements Listener {
 	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
 		if (event.getEntity() instanceof LivingEntity living) {
 			unload(living, false);
+		}
+	}
+
+	// Some entities seem to persist despite their chunk being unloaded,
+	// so we manually load/unload their boss data when the chunk is loaded/unloaded.
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void chunkLoadEvent(ChunkLoadEvent event) {
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			for (Entity entity : event.getChunk().getEntities()) {
+				if (entity instanceof LivingEntity living
+					    && mBosses.get(entity.getUniqueId()) == null) {
+					processEntity(living);
+				}
+			}
+		}, 1);
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void chunkUnloadEvent(ChunkUnloadEvent event) {
+		for (Entity entity : event.getChunk().getEntities()) {
+			if (entity instanceof LivingEntity living) {
+				unload(living, false);
+			}
 		}
 	}
 
