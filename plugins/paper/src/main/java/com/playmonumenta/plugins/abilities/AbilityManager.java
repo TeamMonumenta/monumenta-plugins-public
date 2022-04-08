@@ -59,8 +59,8 @@ import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.abilities.mage.ThunderStep;
 import com.playmonumenta.plugins.abilities.mage.arcanist.AstralOmen;
+import com.playmonumenta.plugins.abilities.mage.arcanist.CosmicMoonblade;
 import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
-import com.playmonumenta.plugins.abilities.mage.arcanist.SpatialShatter;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
@@ -327,7 +327,7 @@ public class AbilityManager {
 			new Starfall(mPlugin, null),
 
 			// ARCANIST
-			new SpatialShatter(mPlugin, null),
+			new CosmicMoonblade(mPlugin, null),
 			new AstralOmen(mPlugin, null),
 			new SagesInsight(mPlugin, null),
 
