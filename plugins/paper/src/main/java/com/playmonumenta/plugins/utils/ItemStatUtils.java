@@ -358,8 +358,6 @@ public class ItemStatUtils {
 		ICE_ASPECT(new IceAspect(), true, false, false),
 		FIRE_ASPECT(new FireAspect(), true, false, false),
 		THUNDER_ASPECT(new ThunderAspect(), true, false, false),
-		FLAME(new Flame(), false, false, false),
-		FROST(new Frost(), false, false, false),
 		GILLS(new Gills(), false, false, false),
 		HEX_EATER(new HexEater(), true, false, false),
 		INFERNO(new Inferno(), true, false, false),
@@ -383,7 +381,6 @@ public class ItemStatUtils {
 		SLAYER(new Slayer(), true, false, false),
 		SMITE(new Smite(), true, false, false),
 		SNIPER(new Sniper(), true, false, false),
-		SPARK(new Spark(), false, false, false),
 		STARVATION(new Starvation(), false, true, false),
 		SUSTENANCE(new Sustenance(), true, false, false),
 		WEIGHTLESS(new Weightless(), false, false, false),
@@ -2026,5 +2023,9 @@ public class ItemStatUtils {
 
 	public static boolean isMaterial(@Nullable ItemStack item) {
 		return item != null && getEnchantmentLevel(item, EnchantmentType.MATERIAL) > 0;
+	}
+
+	public static boolean hasMeleeDamage(@Nullable ItemStack item) {
+		return item != null && getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0;
 	}
 }

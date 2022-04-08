@@ -114,7 +114,7 @@ public class RingOfFlames extends DepthsAbility {
 									world.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.PLAYERS, 0.8f, 1f);
 								}
 								world.spawnParticle(Particle.SOUL_FIRE_FLAME, e.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
-								EntityUtils.applyFire(mPlugin, EFFECT_DURATION, e, mPlayer);
+								EntityUtils.applyFire(mPlugin, EFFECT_DURATION, e, mPlayer, playerItemStats);
 								EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, BLEED_AMOUNT, e);
 
 								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false);

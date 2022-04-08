@@ -104,7 +104,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 				for (Ability ability : abilities) {
 					if (ability != null && plugin.mTimers.isAbilityOnCooldown(p.getUniqueId(), ability.getInfo().mLinkedSpell)) {
 						if (ability.getInfo().mLinkedSpell == ClassAbility.CHOLERIC_FLAMES) {
-							damagee.setFireTicks(duration);
+							EntityUtils.applyFire(plugin, duration, damagee, p, playerItemStats);
 							if (ability.getAbilityScore() == 2) {
 								PotionUtils.applyPotion(p, damagee, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true));
 							}

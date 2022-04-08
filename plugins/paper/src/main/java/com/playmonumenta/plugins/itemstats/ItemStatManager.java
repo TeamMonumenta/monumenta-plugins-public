@@ -411,27 +411,36 @@ public class ItemStatManager implements Listener {
 	}
 
 	public double getEnchantmentLevel(Player player, EnchantmentType type) {
-		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-			return mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats().get(type.getItemStat());
-		} else {
-			return 0;
-		}
+		return getEnchantmentLevel(getPlayerItemStats(player), type);
 	}
 
-	public double getInfusionLevel(Player player, InfusionType type) {
-		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-			return mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats().get(type.getItemStat());
-		} else {
+	public int getEnchantmentLevel(@Nullable PlayerItemStats playerItemStats, EnchantmentType type) {
+		if (playerItemStats == null) {
 			return 0;
 		}
+		return (int) playerItemStats.getItemStats().get(type.getItemStat());
+	}
+
+	public int getInfusionLevel(Player player, InfusionType type) {
+		return getInfusionLevel(getPlayerItemStats(player), type);
+	}
+
+	public int getInfusionLevel(@Nullable PlayerItemStats playerItemStats, InfusionType type) {
+		if (playerItemStats == null) {
+			return 0;
+		}
+		return (int) playerItemStats.getItemStats().get(type.getItemStat());
 	}
 
 	public double getAttributeAmount(Player player, AttributeType type) {
-		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-			return mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats().get(type.getItemStat());
-		} else {
+		return getAttributeAmount(getPlayerItemStats(player), type);
+	}
+
+	public double getAttributeAmount(@Nullable PlayerItemStats playerItemStats, AttributeType type) {
+		if (playerItemStats == null) {
 			return 0;
 		}
+		return playerItemStats.getItemStats().get(type.getItemStat());
 	}
 
 	public void tick(Plugin plugin, Player player, PlayerItemStats stats, boolean twoHz, boolean oneHz) {

@@ -4,19 +4,29 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.EnumSet;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
 
 public class IceAspect implements Enchantment {
-	public static final int ICE_ASPECT_DURATION = 20 * 5;
-	public static final String LEVEL_METAKEY = "IceAspectLevelMetakey";
+	public static final int ICE_ASPECT_DURATION = 20 * 4;
+	public static final double SLOW_PER_LEVEL = 0.1;
+
+	private static final Particle.DustOptions COLOR_LIGHT_BLUE = new Particle.DustOptions(Color.fromRGB(85, 170, 255), 0.75f);
 
 	@Override
 	public String getName() {
@@ -39,10 +49,81 @@ public class IceAspect implements Enchantment {
 	}
 
 	@Override
-	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE || event.getDamager() instanceof Trident) {
-			EntityUtils.applySlow(plugin, (int)(ICE_ASPECT_DURATION * player.getCooledAttackStrength(0)), level * 0.1, enemy);
-			player.getWorld().spawnParticle(Particle.SNOWBALL, enemy.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
+	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+		DamageType type = event.getType();
+		if ((type == DamageType.MELEE && ItemStatUtils.hasMeleeDamage(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
+			int duration = (int) (ICE_ASPECT_DURATION * (type == DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
+			if (type == DamageType.MELEE) {
+				player.getWorld().spawnParticle(Particle.SNOWBALL, enemy.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
+			} else {
+				double widthDelta = PartialParticle.getWidthDelta(enemy);
+				double widerWidthDelta = widthDelta * 1.5;
+				double doubleWidthDelta = widthDelta * 2;
+				double heightDelta = PartialParticle.getHeightDelta(enemy);
+				// /particle falling_dust light_blue_concrete 7053 78.9 7069 0.225 0.45 0.225 1 15
+				new PartialParticle(
+					Particle.FALLING_DUST,
+					LocationUtils.getHalfHeightLocation(enemy),
+					15,
+					widerWidthDelta,
+					heightDelta,
+					widerWidthDelta,
+					1,
+					Material.LIGHT_BLUE_CONCRETE.createBlockData()
+				).spawnAsEnemy();
+				// /particle dust 0.333 0.667 1 0.75 7053 78.45 7069 0.3 0.225 0.3 1 10
+				PartialParticle partialParticle = new PartialParticle(
+					Particle.REDSTONE,
+					LocationUtils.getHeightLocation(enemy, 0.25),
+					10,
+					doubleWidthDelta,
+					heightDelta / 2,
+					doubleWidthDelta,
+					1,
+					COLOR_LIGHT_BLUE
+				).spawnAsEnemy();
+				// /particle dolphin 7053 78 7069 0.3 0.225 0.3 0 50
+				partialParticle.mParticle = Particle.DOLPHIN;
+				partialParticle.mLocation = enemy.getLocation();
+				// Dolphin particles are small
+				partialParticle.mCount *= 5;
+				partialParticle.mExtra = 0;
+				partialParticle.mData = null;
+				partialParticle.spawnAsEnemy();
+				// /particle item_snowball 7053 78 7069 0.3 0.225 0.3 0 10
+				partialParticle.mParticle = Particle.SNOWBALL;
+				partialParticle.mCount = 10;
+				partialParticle.spawnAsEnemy();
+
+				World world = enemy.getWorld();
+				Location enemyLocation = enemy.getLocation();
+				// /playsound block.soul_sand.place master @p ~ ~ ~ 1 0.5
+				world.playSound(
+					enemyLocation,
+					Sound.BLOCK_SOUL_SAND_PLACE,
+					SoundCategory.PLAYERS,
+					1f,
+					0.5f
+				);
+				// /playsound block.glass.break master @p ~ ~ ~ 0.75 1.1
+				world.playSound(
+					enemyLocation,
+					Sound.BLOCK_GLASS_BREAK,
+					SoundCategory.PLAYERS,
+					0.75f,
+					1.1f
+				);
+				// /playsound block.glass.break master @p ~ ~ ~ 0.5 1.3
+				world.playSound(
+					enemyLocation,
+					Sound.BLOCK_GLASS_BREAK,
+					SoundCategory.PLAYERS,
+					0.5f,
+					1.3f
+				);
+			}
+
+			EntityUtils.applySlow(plugin, duration, value * SLOW_PER_LEVEL, enemy);
 
 			if (enemy instanceof Blaze) {
 				event.setDamage(event.getDamage() + 1.0);
