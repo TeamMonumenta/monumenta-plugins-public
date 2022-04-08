@@ -233,15 +233,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		if (playerItemStats != null) {
 			createAura(potion.getLocation());
 
-			if (potion.hasMetadata(TransmutationRing.TRANSMUTATION_POTION_TAG)) {
-				for (PotionAbility potionAbility : mPotionAbilities) {
-					if (potionAbility instanceof TransmutationRing transmutationRing) {
-						transmutationRing.applyTransmutationPotion(affectedEntities);
-						return true;
-					}
-				}
-			}
-
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
 				boolean isGruesome = isGruesome(potion);
 				for (LivingEntity entity : affectedEntities) {
