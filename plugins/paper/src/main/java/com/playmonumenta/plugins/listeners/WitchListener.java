@@ -26,7 +26,7 @@ public class WitchListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void potionSplashEvent(PotionSplashEvent event) {
 		// Does damage to user equal to witch's attack statistic
 		if (event.getPotion().getShooter() instanceof Witch witch) {
