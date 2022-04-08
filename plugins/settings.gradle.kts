@@ -1,4 +1,4 @@
-rootProject.name = "parent"
+rootProject.name = "monumenta-plugins"
 include(":adapter_api")
 include(":adapter_unsupported")
 include(":adapter_v1_16_R3")
