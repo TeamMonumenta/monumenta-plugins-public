@@ -47,9 +47,9 @@ public class CosmicMoonblade extends Ability {
 	private final int mLevelCap;
 
 	public CosmicMoonblade(Plugin plugin, Player player) {
-		super(plugin, player, "Flash Sword");
+		super(plugin, player, "Cosmic Moonblade");
 		mInfo.mScoreboardId = "CosmicMoonblade";
-		mInfo.mShorthandName = "FS";
+		mInfo.mShorthandName = "CM";
 		mInfo.mDescriptions.add("Swap with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 2 times (5 damage per hit) in rapid succession that if each land, reduce all your other skill cooldowns by 5% (Max 0.5s). Cooldown: 8s.");
 		mInfo.mDescriptions.add("Cooldown reduction is increased to 10% (Max 1s) for blade.");
 		mInfo.mLinkedSpell = ABILITY;
