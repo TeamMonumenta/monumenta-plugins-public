@@ -5,16 +5,19 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -85,6 +88,7 @@ public class Shatter extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
 			float mPitch = 0;
+
 			@Override
 			public void run() {
 				mT += 2;
@@ -122,7 +126,7 @@ public class Shatter extends Spell {
 										}
 										//Once it leaves the arena, stop iterating
 										if ((l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
-												|| l.distance(mStartLoc) > FrostGiant.fighterRange) {
+											|| l.distance(mStartLoc) > FrostGiant.fighterRange) {
 											continue;
 										}
 										//Move up one block if on barrier or bedrock level
@@ -190,6 +194,12 @@ public class Shatter extends Spell {
 								MovementUtils.knockAway(loc, player, mKnockback, 0.5f, false);
 								AbilityUtils.silencePlayer(player, 20 * 5);
 								hitPlayers.add(player);
+
+								// If Eldrask is in the 4th phase (checked if material of weapon is Iron Hoe)
+								// Add FGShatterLP tag (For Shattered Yet Standing advancement)
+								if (EntityUtils.getMaxHealth(mBoss) * 0.15 > mBoss.getHealth()) {
+									player.addScoreboardTag("FGShatterLP");
+								}
 							}
 						}
 					}
@@ -199,6 +209,7 @@ public class Shatter extends Spell {
 					if (!mOldBlocks.isEmpty()) {
 						BukkitRunnable runnable = new BukkitRunnable() {
 							int mTicks = 0;
+
 							@Override
 							public void run() {
 								mTicks++;
