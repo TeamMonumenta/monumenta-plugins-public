@@ -521,6 +521,7 @@ public class ItemStatUtils {
 		REFLECTION(new Reflection(), "", true, false, false),
 		TENACITY(new Tenacity(), "", true, false, false),
 		UNDERSTANDING(new Understanding(), "", true, false, false),
+		UNYIELDING(new Unyielding(), "", true, false, false),
 		USURPER(new Usurper(), "", true, false, false),
 		VIGOR(new Vigor(), "", true, false, false),
 		VITALITY(new Vitality(), "", true, false, false),
