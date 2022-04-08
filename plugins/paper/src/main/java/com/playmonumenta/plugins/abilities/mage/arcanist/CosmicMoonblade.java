@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -65,6 +67,8 @@ public class CosmicMoonblade extends Ability {
 			event.setCancelled(true);
 			if (!isTimerActive() && !mPlayer.isSneaking()) {
 				putOnCooldown();
+				float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, DAMAGE);
+				ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 				new BukkitRunnable() {
 					int mTimes = 0;
@@ -85,7 +89,7 @@ public class CosmicMoonblade extends Ability {
 							}
 							Vector toMobVector = mob.getLocation().toVector().subtract(origin.toVector()).normalize();
 							if (playerDir.dot(toMobVector) > DOT_ANGLE) {
-								DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, DAMAGE, mInfo.mLinkedSpell, true);
+								DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, false, false);
 							}
 						}
 
