@@ -27,6 +27,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public final class DelveInfusionCustomInventory extends CustomInventory {
@@ -532,7 +533,11 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			@Override
 			public void run() {
 				ItemStack itemStack = new ItemStack(infusedItem.getType());
+				ItemMeta originalMeta = infusedItem.getItemMeta();
 				ItemMeta meta = itemStack.getItemMeta();
+				if (originalMeta instanceof LeatherArmorMeta oldLeather && meta instanceof LeatherArmorMeta newLeather) {
+					newLeather.setColor(oldLeather.getColor());
+				}
 				meta.displayName(Component.text("Placeholder", TextColor.fromCSSHexString("000000"))
 					                 .decoration(TextDecoration.BOLD, true)
 					                 .decoration(TextDecoration.ITALIC, false));
