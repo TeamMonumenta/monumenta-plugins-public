@@ -214,7 +214,11 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			} else {
 				try {
 					int index = Integer.parseInt(identifier.substring("effect_".length())) - 1;
-					return effectDisplays.get(index);
+					if (effectDisplays.size() > index) {
+						return effectDisplays.get(index);
+					} else {
+						return "";
+					}
 				} catch (NumberFormatException numberFormatException) {
 					MMLog.warning("Failed to find integer after 'effect_' on tab list");
 				}
