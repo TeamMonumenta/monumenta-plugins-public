@@ -799,7 +799,7 @@ public final class Lich extends BossAbilityGroup {
 							world.spawnParticle(Particle.EXPLOSION_HUGE, mStart.getLocation().add(0, 18, 0), 10, 4, 4,
 									4, 0);
 							mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
-							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 1000, 100));
+							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 14, 100));
 							mBoss.getEquipment().setArmorContents(a);
 							mBoss.getEquipment().setItemInMainHand(m);
 							mBoss.getEquipment().setItemInOffHand(o);
