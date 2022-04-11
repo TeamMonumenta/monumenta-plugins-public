@@ -47,9 +47,11 @@ public class FireAspect implements Enchantment {
 		DamageType type = event.getType();
 		if ((type == DamageType.MELEE && ItemStatUtils.hasMeleeDamage(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
 			int duration = (int) (FIRE_ASPECT_DURATION * value * (type == DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
-			ItemStatManager.PlayerItemStats playerItemStats = null;
+			ItemStatManager.PlayerItemStats playerItemStats;
 			if (event.getDamager() instanceof Projectile proj) {
 				playerItemStats = DamageListener.getProjectileItemStats(proj);
+			} else {
+				playerItemStats = plugin.mItemStatManager.getPlayerItemStats(player);
 			}
 			EntityUtils.applyFire(plugin, duration, enemy, player, playerItemStats);
 			// So that fire resistant mobs don't get fire particles
