@@ -16,9 +16,11 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+
 import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Nullable;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class AdvancingShadows extends Ability {
@@ -43,11 +46,14 @@ public class AdvancingShadows extends Ability {
 	private static final double DAMAGE_BONUS_1 = 0.3;
 	private static final double DAMAGE_BONUS_2 = 0.4;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
+	private static final double ENHANCEMENT_BONUS_DAMAGE = 0.2;
+	private static final long ENHANCEMENT_BONUS_DAMAGE_DURATION = 20 * 5;
 
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "AdvancingShadowsPercentDamageDealtEffect";
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE, DamageType.MELEE_ENCH, DamageType.MELEE_SKILL);
 
 	private @Nullable LivingEntity mTarget = null;
+	LivingEntity mMarked = null;
 	private @Nullable BladeDance mBladeDance;
 
 	private final double mPercentDamageDealt;
@@ -60,8 +66,10 @@ public class AdvancingShadows extends Ability {
 		mInfo.mShorthandName = "AS";
 		mInfo.mCooldown = ADVANCING_SHADOWS_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mIgnoreCooldown = true;
 		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within " + (ADVANCING_SHADOWS_RANGE_1 - 1) + " blocks and gain +30% Melee Damage for 5 seconds. Cooldown: 20s.");
 		mInfo.mDescriptions.add("Damage increased to +40% Melee Damage for 5s, teleport range is increased to " + (ADVANCING_SHADOWS_RANGE_2 - 1) + " blocks and all hostile non-target mobs within " + ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE + " blocks are knocked away from the target.");
+		mInfo.mDescriptions.add("You deal " + ENHANCEMENT_BONUS_DAMAGE * 100 + "% extra damage for " + ENHANCEMENT_BONUS_DAMAGE_DURATION / 20 + "s to the target.");
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
 		mPercentDamageDealt = isLevelOne() ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2;
 		mActivationRange = isLevelOne() ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
@@ -75,7 +83,7 @@ public class AdvancingShadows extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer == null || mTarget == null) {
+		if (mPlayer == null || mTarget == null || isTimerActive()) {
 			return;
 		}
 		LivingEntity entity = mTarget;
@@ -152,11 +160,21 @@ public class AdvancingShadows extends Ability {
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES));
 			if (isLevelTwo()) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
-						ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
+					ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
 					if (mob != entity) {
 						MovementUtils.knockAway(entity, mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED, true);
 					}
 				}
+			}
+
+			if (isEnhanced()) {
+				mMarked = mTarget;
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						mMarked = null;
+					}
+				}.runTaskLater(mPlugin, ENHANCEMENT_BONUS_DAMAGE_DURATION);
 			}
 
 			new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0).spawnAsPlayerActive(mPlayer);
@@ -199,6 +217,17 @@ public class AdvancingShadows extends Ability {
 				}
 			}
 		}
+		return false;
+	}
+
+	@Override
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		// If enemy to be damaged is the same as marked enemy
+		if (mMarked != null && mMarked.equals(enemy)) {
+			event.setDamage(event.getDamage() * (1 + ENHANCEMENT_BONUS_DAMAGE));
+		}
+
+		// Increases event damage and simply stops.
 		return false;
 	}
 }

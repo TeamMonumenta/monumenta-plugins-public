@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -35,14 +36,19 @@ public class EscapeDeath extends Ability {
 	private static final String PERCENT_SPEED_EFFECT_NAME = "EscapeDeathPercentSpeedEffect";
 	private static final int JUMP_BOOST_AMPLIFIER = 2;
 	private static final int COOLDOWN = 90 * 20;
+	private static final int ENHANCEMENT_DURATION = 4 * 20;
+	private static final double ENHANCEMENT_HEAL_PERCENT = 0.05;
+	private static final String ESCAPE_DEATH_ENHANCEMENT_REGEN = "EscapeDeathEnhancementRegenEffect";
 
 	public EscapeDeath(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Escape Death");
 		mInfo.mLinkedSpell = ClassAbility.ESCAPE_DEATH;
 		mInfo.mScoreboardId = "EscapeDeath";
 		mInfo.mShorthandName = "ED";
+		mInfo.mIgnoreCooldown = true;
 		mInfo.mDescriptions.add("When taking damage from a mob leaves you below 5 hearts, throw a paralyzing grenade that stuns all enemies within 5 blocks for 3 seconds. Cooldown: 90s.");
 		mInfo.mDescriptions.add("When this skill is triggered, also gain 4 Absorption hearts for 8 seconds, 30% Speed, and Jump Boost III. If damage taken would kill you but could have been prevented by this skill it will instead do so.");
+		mInfo.mDescriptions.add("When this skill is triggered, gain a regenerating effect that heals you for " + ENHANCEMENT_HEAL_PERCENT * 100 + "% hp every second for " + ENHANCEMENT_DURATION / 20 + "s, if an enemy hits you during the regeneration, the effect stops.");
 		mInfo.mCooldown = COOLDOWN;
 		mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
 	}
@@ -54,7 +60,13 @@ public class EscapeDeath extends Ability {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (!event.isBlocked() && mPlayer != null) {
+		if (mPlugin.mEffectManager.hasEffect(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN)
+			&& !event.isBlocked()
+			&& event.getSource() != null
+			&& EntityUtils.isHostileMob(event.getSource())) {
+			mPlugin.mEffectManager.clearEffects(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN);
+		}
+		if (!event.isBlocked() && !isTimerActive()) {
 			double newHealth = mPlayer.getHealth() - event.getFinalDamage(true);
 			boolean dealDamageLater = newHealth < 0 && newHealth > -ABSORPTION_HEALTH && isLevelTwo();
 			if (newHealth <= TRIGGER_THRESHOLD_HEALTH && (newHealth > 0 || dealDamageLater)) {
@@ -71,7 +83,13 @@ public class EscapeDeath extends Ability {
 					AbsorptionUtils.addAbsorption(mPlayer, ABSORPTION_HEALTH, ABSORPTION_HEALTH, BUFF_DURATION);
 					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(BUFF_DURATION, SPEED_PERCENT, PERCENT_SPEED_EFFECT_NAME));
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-							new PotionEffect(PotionEffectType.JUMP, BUFF_DURATION, JUMP_BOOST_AMPLIFIER, true, true));
+						new PotionEffect(PotionEffectType.JUMP, BUFF_DURATION, JUMP_BOOST_AMPLIFIER, true, true));
+				}
+
+				if (isEnhanced()) {
+					// This check ensures that no "dupe" regeneration runnables occurs.
+					// If escape death somehow "double procs", simply reset the ticks variable.
+					mPlugin.mEffectManager.addEffect(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN, new CustomRegeneration(ENHANCEMENT_DURATION, ENHANCEMENT_HEAL_PERCENT * EntityUtils.getMaxHealth(mPlayer), mPlugin));
 				}
 
 				Location loc = mPlayer.getLocation();

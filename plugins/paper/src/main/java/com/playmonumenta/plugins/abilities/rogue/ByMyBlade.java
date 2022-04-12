@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
@@ -20,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 
@@ -31,6 +33,8 @@ public class ByMyBlade extends Ability {
 	private static final int BY_MY_BLADE_1_DAMAGE = 10;
 	private static final int BY_MY_BLADE_2_DAMAGE = 20;
 	private static final int BY_MY_BLADE_COOLDOWN = 10 * 20;
+	private static final double ENHANCEMENT_HEAL_PERCENT = 0.05;
+	private static final double ENHANCEMENT_HEAL_PERCENT_ELITE = 0.15;
 
 	private final int mDamageBonus;
 
@@ -41,6 +45,7 @@ public class ByMyBlade extends Ability {
 		mInfo.mShorthandName = "BmB";
 		mInfo.mDescriptions.add("While holding two swords, attacking an enemy with a critical attack deals an extra 10 melee damage to that enemy, and grants you Haste 2 for 4s. Cooldown: 10s.");
 		mInfo.mDescriptions.add("Damage is increased from 10 to 20. Haste level is increased from 2 to 4.");
+		mInfo.mDescriptions.add("Killing an enemy with this ability heals you for " + ENHANCEMENT_HEAL_PERCENT * 100 + "% of your max health, increased to " + ENHANCEMENT_HEAL_PERCENT_ELITE * 100 + "% if the target was an elite or boss.");
 		mInfo.mCooldown = BY_MY_BLADE_COOLDOWN;
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 		mDamageBonus = isLevelOne() ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE;
@@ -63,6 +68,25 @@ public class ByMyBlade extends Ability {
 			if (isLevelTwo()) {
 				new PartialParticle(Particle.SPELL_WITCH, loc, 45, 0.2, 0.65, 0.2, 1.0).spawnAsPlayerActive(mPlayer);
 				count = 30;
+			}
+			if (isEnhanced()) {
+				// This might be a bit scuffed... but hopefully it feels better this way.
+				// As BMB applies first before melee hit, if the enemy survives BMB but dies to melee
+				// It doesn't heal the player. So we delay this check by 1 tick.
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						if (enemy.isDead() || !enemy.isValid()) {
+							// Heal Player - 5% normal, 15% elite or boss
+							if (EntityUtils.isElite(enemy) || EntityUtils.isBoss(enemy)) {
+								PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * ENHANCEMENT_HEAL_PERCENT_ELITE);
+							} else {
+								PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * ENHANCEMENT_HEAL_PERCENT);
+							}
+							new PartialParticle(Particle.HEART, mPlayer.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
+						}
+					}
+				}.runTaskLater(mPlugin, 1);
 			}
 			new PartialParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
