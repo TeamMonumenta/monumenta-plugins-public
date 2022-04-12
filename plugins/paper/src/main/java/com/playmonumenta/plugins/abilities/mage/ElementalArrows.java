@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import javax.annotation.Nullable;
@@ -57,16 +59,16 @@ public class ElementalArrows extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer == null || !(event.getDamager() instanceof AbstractArrow)) {
+		if (mPlayer == null || !(event.getDamager() instanceof AbstractArrow arrow)) {
 			return false;
 		}
-		AbstractArrow arrow = (AbstractArrow) event.getDamager();
 
 		double damage = mDamageMultiplier * event.getDamage();
 		if (arrow.hasMetadata("ElementalArrowsFireArrow")) {
+			ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(arrow);
 			if (isLevelTwo()) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), ELEMENTAL_ARROWS_RADIUS, enemy)) {
-					EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, mob, mPlayer);
+					EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, mob, mPlayer, playerItemStats);
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, ABILITY_FIRE, true);
 				}
 			}
@@ -74,7 +76,7 @@ public class ElementalArrows extends Ability {
 				damage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
 			}
 
-			EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, enemy, mPlayer);
+			EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, enemy, mPlayer, playerItemStats);
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, ABILITY_FIRE);
 			mLastDamage = event.getDamage();
 		} else if (arrow.hasMetadata("ElementalArrowsIceArrow")) {

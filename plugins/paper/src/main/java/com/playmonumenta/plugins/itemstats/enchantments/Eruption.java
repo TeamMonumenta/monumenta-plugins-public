@@ -20,7 +20,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 public class Eruption implements Enchantment {
 
@@ -32,12 +31,8 @@ public class Eruption implements Enchantment {
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
-	private static final String PERCENT_SPEED_EFFECT_NAME = "AdrenalinePercentSpeedEffect";
-	private static final double PERCENT_SPEED_PER_LEVEL = 0.1;
-	private static final int SPEED_DURATION = 20 * 6;
-
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Eruption";
 	}
 
@@ -47,7 +42,7 @@ public class Eruption implements Enchantment {
 	}
 
 	@Override
-	public void onBlockBreak(@NotNull Plugin plugin, @NotNull Player player, double value, @NotNull BlockBreakEvent event) {
+	public void onBlockBreak(Plugin plugin, Player player, double value, BlockBreakEvent event) {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER) {
 			double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ERUPTION);
@@ -59,12 +54,8 @@ public class Eruption implements Enchantment {
 			int thunder = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.THUNDER_ASPECT);
 			int decay = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.DECAY);
 			int bleed = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.BLEEDING);
-			int sapper = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SAPPER);
-			int adrenaline = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADRENALINE);
-			if (ItemUtils.isPickaxe(player.getInventory().getItem(45))) {
-				sapper -= ItemStatUtils.getEnchantmentLevel(player.getInventory().getItem(45), EnchantmentType.SAPPER);
-				adrenaline -= ItemStatUtils.getEnchantmentLevel(player.getInventory().getItem(45), EnchantmentType.ADRENALINE);
-			}
+			int sapper = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SAPPER) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SAPPER) : 0;
+			int adrenaline = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.ADRENALINE) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADRENALINE) : 0;
 
 			//Damage any mobs in the area
 			for (LivingEntity mob : mobs) {
@@ -107,7 +98,7 @@ public class Eruption implements Enchantment {
 						continue;
 					}
 					p.getWorld().spawnParticle(Particle.REDSTONE, p.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
-					plugin.mEffectManager.addEffect(p, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(SPEED_DURATION, PERCENT_SPEED_PER_LEVEL * adrenaline * 0.5, PERCENT_SPEED_EFFECT_NAME));
+					plugin.mEffectManager.addEffect(p, Adrenaline.PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(Adrenaline.SPAWNER_DURATION, Adrenaline.PERCENT_SPEED_PER_LEVEL * adrenaline, Adrenaline.PERCENT_SPEED_EFFECT_NAME));
 				}
 			}
 

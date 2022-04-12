@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.Collections;
@@ -105,14 +106,8 @@ public abstract class BossAbilityGroup {
 					mMissingTicks = 0;
 					/* Check if somehow the boss entity is missing even though this is still running */
 					if (isBossMissing()) {
-						mPlugin.getLogger().warning("Boss " + mIdentityTag + " is missing but still registered as an active boss. Unloading...");
-						this.cancel();
-						BossManager mgr = BossManager.getInstance();
-						if (mgr != null) {
-							BossManager.getInstance().unload(mBoss, false);
-						}
-						// Just in case for some reason the boss is no longer registered with the manager...
-						unload();
+						handleMissingBoss();
+						cancel();
 						return;
 					}
 				}
@@ -152,14 +147,8 @@ public abstract class BossAbilityGroup {
 					mMissingTicks = 0;
 					/* Check if somehow the boss entity is missing even though this is still running */
 					if (isBossMissing()) {
-						mPlugin.getLogger().warning("Boss " + mIdentityTag + " is missing but still registered as an active boss. Unloading...");
-						this.cancel();
-						BossManager mgr = BossManager.getInstance();
-						if (mgr != null) {
-							mgr.unload(mBoss, false);
-						}
-						// Just in case for some reason the boss is no longer registered with the manager...
-						unload();
+						handleMissingBoss();
+						cancel();
 						return;
 					}
 				}
@@ -207,6 +196,19 @@ public abstract class BossAbilityGroup {
 
 	public String getIdentityTag() {
 		return mIdentityTag;
+	}
+
+	private void handleMissingBoss() {
+		MMLog.warning("Boss " + mIdentityTag + " is missing " + (mBoss.isValid() ? " (but valid)" : "") + " but still registered as an active boss. Unloading...");
+		BossManager mgr = BossManager.getInstance();
+		if (mgr != null) {
+			mgr.unload(mBoss, false);
+		}
+		// Just in case for some reason the boss is no longer registered with the manager...
+		if (!mUnloaded) {
+			MMLog.warning("Boss " + mIdentityTag + " was not unloaded by mgr.unload()!");
+		}
+		unload();
 	}
 
 	/********************************************************************************

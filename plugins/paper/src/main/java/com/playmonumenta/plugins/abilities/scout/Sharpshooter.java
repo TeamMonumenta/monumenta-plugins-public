@@ -7,15 +7,17 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import javax.annotation.Nullable;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
 	private static final double PERCENT_BASE_DAMAGE = 0.2;
@@ -24,6 +26,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	private static final double PERCENT_DAMAGE_PER_STACK = 0.035;
 	private static final double DAMAGE_PER_BLOCK = 0.02;
 	private static final double MAX_DISTANCE = 16;
+	private static final double ARROW_SAVE_CHANCE = 0.2;
 
 	public Sharpshooter(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Sharpshooter");
@@ -32,6 +35,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		mInfo.mDescriptions.add("Your arrows deal 20% more damage.");
 		mInfo.mDescriptions.add("Each enemy hit with a critical arrow or trident gives you a stack of Sharpshooter, up to 8. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows and tridents deal +3.5% damage.");
 		mInfo.mDescriptions.add("Your arrows and tridents deal an extra 2% per block of distance between you and the target, up to 16 blocks.");
+		mInfo.mDescriptions.add("Each enemy hit with a critical arrow or trident gives you a stack of Sharpshooter, up to 8. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows and tridents deal +3.5% damage. Additionally, passively gain a 20% chance to not consume arrows when shot.");
 		mDisplayItem = new ItemStack(Material.TARGET, 1);
 	}
 
@@ -76,6 +80,16 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
+	}
+
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
+		if (getAbilityScore() > 1 && mPlayer != null && FastUtils.RANDOM.nextDouble() < ARROW_SAVE_CHANCE) {
+			boolean refunded = AbilityUtils.refundArrow(mPlayer, arrow);
+			if (refunded) {
+				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
+			}
+		}
+		return true;
 	}
 
 	public static void addStacks(Player player, int stacks) {

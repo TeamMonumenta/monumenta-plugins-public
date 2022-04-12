@@ -37,8 +37,7 @@ public class Icebreaker extends DepthsAbility {
 
 	private boolean isOnIce(LivingEntity entity) {
 		Location loc = entity.getLocation();
-		return loc.getBlock().getRelative(BlockFace.DOWN).getType() == DepthsUtils.ICE_MATERIAL
-			       && DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
+		return DepthsUtils.isIce(loc.getBlock().getRelative(BlockFace.DOWN).getType()) && DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
 	}
 
 	private double getMultiplier(LivingEntity entity) {

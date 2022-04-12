@@ -89,12 +89,13 @@ public class ArcaneStrike extends Ability {
 					}
 					int ice = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.ICE_ASPECT);
 					if (ice > 0) {
-						IceAspect.apply(mPlugin, mPlayer, ice, mob);
+						IceAspect.apply(mPlugin, mPlayer, ice, IceAspect.ICE_ASPECT_DURATION, mob, true);
 						dmg += IceAspect.getBonusDamage(mob);
 					}
 					int thunder = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.THUNDER_ASPECT);
 					if (thunder > 0) {
 						ThunderAspect.apply(mPlugin, mPlayer, thunder, mob);
+						dmg += ThunderAspect.getBonusDamage(mob);
 					}
 					int decay = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.DECAY);
 					if (decay > 0) {

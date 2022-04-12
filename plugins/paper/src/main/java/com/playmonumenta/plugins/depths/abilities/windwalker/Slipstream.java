@@ -28,7 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Slipstream extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Slipstream";
-	public static final int[] COOLDOWN = {16, 14, 12, 10, 8, 4};
+	public static final int[] COOLDOWN = {16, 14, 12, 10, 8, 6};
 	private static final int DURATION = 8 * 20;
 	private static final double SPEED_AMPLIFIER = 0.2;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "SlipstreamSpeedEffect";
@@ -50,8 +50,11 @@ public class Slipstream extends DepthsAbility {
 		putOnCooldown();
 
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, SPEED_AMPLIFIER, PERCENT_SPEED_EFFECT_NAME));
-		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION, JUMP_AMPLIFIER));
-
+		if (mRarity == 6) {
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION, JUMP_AMPLIFIER + 1));
+		} else {
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION, JUMP_AMPLIFIER));
+		}
 		Location loc = mPlayer.getEyeLocation();
 		Location pLoc = loc;
 		pLoc.add(0, -0.75, 0);
@@ -85,6 +88,9 @@ public class Slipstream extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
+		if (rarity == 6) {
+			return "Right click to knock all enemies within " + RADIUS + " blocks away from you and gain Jump Boost " + DepthsUtils.getRarityColor(rarity) + "IV" + ChatColor.WHITE + " and " + (int) DepthsUtils.roundPercent(SPEED_AMPLIFIER) + "% speed for " + DURATION / 20 + " seconds. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] + "s" + ChatColor.WHITE + ".";
+		}
 		return "Right click to knock all enemies within " + RADIUS + " blocks away from you and gain Jump Boost " + (JUMP_AMPLIFIER + 1) + " and " + (int) DepthsUtils.roundPercent(SPEED_AMPLIFIER) + "% speed for " + DURATION / 20 + " seconds. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] + "s" + ChatColor.WHITE + ".";
 	}
 

@@ -84,6 +84,9 @@ public class SpellGravityWell extends Spell {
 
 		List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 		players.removeIf(p -> SpellDimensionDoor.getShadowed().contains(p));
+		if (players.size() < 1) {
+			return;
+		}
 		Collections.shuffle(players);
 		Player p = players.get(0);
 		world.playSound(p.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 2.0f, 0.5f);

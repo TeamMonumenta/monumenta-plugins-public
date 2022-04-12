@@ -10,8 +10,8 @@ import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.abilities.mage.ThunderStep;
 import com.playmonumenta.plugins.abilities.mage.arcanist.AstralOmen;
+import com.playmonumenta.plugins.abilities.mage.arcanist.CosmicMoonblade;
 import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
-import com.playmonumenta.plugins.abilities.mage.arcanist.SpatialShatter;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
@@ -45,7 +45,7 @@ public class Mage extends PlayerClass {
 		mClassPassiveDescription = "After casting a spell, your next melee attack with a wand deals 20% more damage.";
 
 		mSpecOne.mAbilities.add(new AstralOmen(plugin, player));
-		mSpecOne.mAbilities.add(new SpatialShatter(plugin, player));
+		mSpecOne.mAbilities.add(new CosmicMoonblade(plugin, player));
 		mSpecOne.mAbilities.add(new SagesInsight(plugin, player));
 		mSpecOne.mSpecQuestScoreboard = "Quest103i";
 		mSpecOne.mSpecialization = 1;

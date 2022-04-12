@@ -3,11 +3,14 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -39,7 +42,8 @@ public class ArmorOfFrost extends Spell {
 	private final List<Player> mWarned = new ArrayList<Player>();
 	//Gets frostArmorActive, which determines whether or not the permafrost armor is up
 	private final FrostGiant mBossClass;
-	private @Nullable BukkitRunnable mCooldown;
+	private @Nullable
+	BukkitRunnable mCooldown;
 	private final int mMaxLevel;
 	private int mLevel;
 	//Whether or not the immune armor regenerates after 45 seconds
@@ -111,6 +115,8 @@ public class ArmorOfFrost extends Spell {
 	//Set armor from icicle hit
 	public void hitByIcicle() {
 		World world = mBoss.getWorld();
+		// For Icicle Crash advancement
+		CommandUtils.runCommandViaConsole("function monumenta:frost_giant/fight/icicles_hit_count");
 
 		if (mBossClass.mFrostArmorActive) {
 			world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0);

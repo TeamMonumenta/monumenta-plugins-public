@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -9,6 +11,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /* NOTE:
  *
@@ -115,6 +118,19 @@ public abstract class Effect implements Comparable<Effect> {
 	public boolean tick(int ticks) {
 		mDuration -= ticks;
 		return mDuration <= 0;
+	}
+
+	//Display used by tab list; return null to not display
+	public @Nullable String getSpecificDisplay() {
+		return null;
+	}
+
+	public final @Nullable String getDisplay() {
+		String specificDisplay = getSpecificDisplay();
+		if (specificDisplay != null) {
+			return ChatColor.GREEN + specificDisplay + " " + ChatColor.GRAY + StringUtils.intToMinuteAndSeconds(mDuration / 20);
+		}
+		return null;
 	}
 
 	/* Must implement this method to print info about what the effect does for debug */

@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -26,8 +27,11 @@ public class Dreadful extends DelveModifier {
 
 	private static final String[] DREADNAUGHTS = {
 		"DreadnaughtofDoom",
-		"DreadnaughtofSorrow"
+		"DreadnaughtofSorrow",
+		"DreadnaughtofSubjugation"
 	};
+
+	private static final String DREADNAUGHT_WATER = "LeviathanofDoom";
 
 	public static final String DESCRIPTION = "Dying elites transform into new enemies.";
 
@@ -69,7 +73,11 @@ public class Dreadful extends DelveModifier {
 		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob)) {
 			if (FastUtils.RANDOM.nextDouble() < mSpawnChance) {
 				Location loc = mob.getLocation();
-				LibraryOfSoulsIntegration.summon(loc, DREADNAUGHTS[FastUtils.RANDOM.nextInt(DREADNAUGHTS.length)]);
+				if (loc.getBlock().getType() == Material.WATER) {
+					LibraryOfSoulsIntegration.summon(loc, DREADNAUGHT_WATER);
+				} else {
+					LibraryOfSoulsIntegration.summon(loc, DREADNAUGHTS[FastUtils.RANDOM.nextInt(DREADNAUGHTS.length)]);
+				}
 
 				loc.add(0, 1, 0);
 				new PartialParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.1).spawnAsEnemy();

@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.abilities.mage.ThunderStep;
 import com.playmonumenta.plugins.abilities.mage.arcanist.AstralOmen;
-import com.playmonumenta.plugins.abilities.mage.arcanist.SpatialShatter;
+import com.playmonumenta.plugins.abilities.mage.arcanist.CosmicMoonblade;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
@@ -36,7 +36,7 @@ public enum ClassAbility {
 
 	// Arcanist
 	ASTRAL_OMEN(AstralOmen.NAME),
-	SPATIAL_SHATTER(SpatialShatter.NAME),
+	COSMIC_MOONBLADE(CosmicMoonblade.NAME),
 
 	// Elementalist
 	BLIZZARD(Blizzard.NAME),

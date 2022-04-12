@@ -3,12 +3,16 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.listeners.StasisListener;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -64,6 +68,7 @@ public class SpellTitanicRupture extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;
@@ -105,7 +110,7 @@ public class SpellTitanicRupture extends Spell {
 
 		//Call growable to create the Titanic Rupture Icicle 20 blocks above the player
 		com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
-		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin)Bukkit.getPluginManager().getPlugin("ScriptedQuests");
+		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager().getPlugin("ScriptedQuests");
 		try {
 			scriptedQuestsPlugin.mGrowableManager.grow("titanicruptureicicle", loc.clone().add(0, 20, 0), 1, 10, true);
 		} catch (Exception e) {
@@ -119,6 +124,7 @@ public class SpellTitanicRupture extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
 			float mPitch = 1;
+
 			@Override
 			public void run() {
 				if (mT >= 40) {
@@ -151,6 +157,11 @@ public class SpellTitanicRupture extends Spell {
 						if (smallBox.overlaps(player.getBoundingBox())) {
 							BossUtils.bossDamagePercent(mBoss, player, 1, "Titanic Rupture");
 							player.damage(420, mBoss);
+
+							// If player is in Stasis, grant advancement of Lonely Soloist
+							if (StasisListener.isInStasis(player)) {
+								CommandUtils.runCommandViaConsole("advancement grant " + player.getName() + " only monumenta:challenges/r2/fg/lonely_soloist");
+							}
 						}
 					}
 					//The particles that damage after 2 seconds, in the larger hitbox

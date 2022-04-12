@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -28,6 +29,8 @@ public class WardingRemedy extends Ability {
 	public static final int WARDING_REMEDY_PULSE_DELAY = 10;
 	public static final int WARDING_REMEDY_MAX_ABSORPTION = 6;
 	public static final int WARDING_REMEDY_ABSORPTION_DURATION = 20 * 30;
+	private static final int WARDING_REMEDY_RANGE = 12;
+	private static final double WARDING_REMEDY_HEAL_MULTIPLIER = 0.1;
 	public static final double WARDING_REMEDY_ACTIVE_RADIUS = 6;
 	private static final Color APOTHECARY_LIGHT_COLOR = Color.fromRGB(255, 255, 100);
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.5f);
@@ -38,8 +41,8 @@ public class WardingRemedy extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.WARDING_REMEDY;
 		mInfo.mCooldown = isLevelOne() ? WARDING_REMEDY_1_COOLDOWN : WARDING_REMEDY_2_COOLDOWN;
 		mInfo.mShorthandName = "WR";
-		mInfo.mDescriptions.add("You and allies in a 12 block radius passively gain +5% damage from all sources while having absorption health. Swap hands while sneaking and holding an Alchemist's Bag to give players (including yourself) within a 6 block radius 1 absorption health per 0.5 seconds for 6 seconds, lasting 30 seconds, up to 6 absorption health. Cooldown: 30s.");
-		mInfo.mDescriptions.add("The damage bonus is increased to 10%, and cooldown decreased to 25s.");
+		mInfo.mDescriptions.add("Swap hands while sneaking and holding an Alchemist's Bag to give players (including yourself) within a 6 block radius 1 absorption health per 0.5 seconds for 6 seconds, lasting 30 seconds, up to 6 absorption health. Cooldown: 30s.");
+		mInfo.mDescriptions.add("You and allies in a 12 block radius passively gain 10% increased healing while having absorption health, and cooldown decreased to 25s.");
 		mDisplayItem = new ItemStack(Material.GOLDEN_CARROT, 1);
 	}
 
@@ -103,6 +106,21 @@ public class WardingRemedy extends Ability {
 				mTick++;
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+	}
+
+	@Override
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		//Triggers four times a second
+
+		if (mPlayer == null || getAbilityScore() == 1) {
+			return;
+		}
+
+		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), WARDING_REMEDY_RANGE, true).stream().filter(player -> AbsorptionUtils.getAbsorption(player) > 0).toList()) {
+			mPlugin.mEffectManager.addEffect(p, "WardingRemedy", new PercentHeal(20 * 1, WARDING_REMEDY_HEAL_MULTIPLIER));
+			new PartialParticle(Particle.SPELL_WITCH, p.getLocation().add(0, 1, 0), 2, 0.3, 0.5, 0.3).spawnAsPlayerBuff(mPlayer);
+			new PartialParticle(Particle.REDSTONE, p.getLocation().add(0, 1, 0), 3, 0.4, 0.5, 0.4, APOTHECARY_DARK_COLOR).spawnAsPlayerBuff(mPlayer);
+		}
 	}
 
 }

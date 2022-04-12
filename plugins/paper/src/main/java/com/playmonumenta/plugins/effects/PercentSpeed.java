@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.attribute.Attributable;
@@ -8,6 +9,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PercentSpeed extends Effect {
 	public static final String GENERIC_NAME = "PercentSpeed";
@@ -55,6 +57,11 @@ public class PercentSpeed extends Effect {
 
 			mWasInNoMobilityZone = isInNoMobilityZone;
 		}
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Speed";
 	}
 
 	@Override

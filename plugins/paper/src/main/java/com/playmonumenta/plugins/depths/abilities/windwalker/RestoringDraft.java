@@ -25,7 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public final class RestoringDraft extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Restoring Draft";
-	public static final double[] HEALING = {0.1, 0.15, 0.2, 0.25, 0.3, 0.4};
+	public static final double[] HEALING = {0.1, 0.15, 0.2, 0.25, 0.3, 0.75};
 	public static final int HEIGHT_CAP = 12;
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "RestoringDraftTickSlammed";
 	public static final int AUTOMATIC_THRESHOLD = 4;

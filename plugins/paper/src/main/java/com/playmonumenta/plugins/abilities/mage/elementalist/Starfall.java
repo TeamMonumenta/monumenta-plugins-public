@@ -133,7 +133,7 @@ public class Starfall extends Ability {
 							this.cancel();
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, SIZE, mPlayer)) {
-								EntityUtils.applyFire(mPlugin, FIRE_TICKS, e, mPlayer);
+								EntityUtils.applyFire(mPlugin, FIRE_TICKS, e, mPlayer, playerItemStats);
 								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, false);
 								MovementUtils.knockAway(loc, e, KNOCKBACK, true);
 							}

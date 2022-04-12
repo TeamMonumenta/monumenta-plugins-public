@@ -44,8 +44,11 @@ public class SoothingCombos extends DepthsAbility {
 			if (mComboCount >= 3 && mRarity > 0) {
 
 				mComboCount = 0;
-
 				PotionEffect hasteEffect = new PotionEffect(PotionEffectType.FAST_DIGGING, (int) (20 * DURATION[mRarity - 1]), 0, false, true);
+
+				if (mRarity == 6) {
+					hasteEffect = new PotionEffect(PotionEffectType.FAST_DIGGING, (int) (20 * DURATION[mRarity - 1]), 1, false, true);
+				}
 				List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), RANGE, true);
 
 				for (Player p : players) {
@@ -67,6 +70,9 @@ public class SoothingCombos extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
+		if (rarity == 6) {
+			return "Every third melee attack applies " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED_PERCENT[rarity - 1]) + "%" + ChatColor.WHITE + " speed and Haste " + DepthsUtils.getRarityColor(rarity) + "II" + ChatColor.WHITE + " for " + DepthsUtils.getRarityColor(rarity) + (int) DURATION[rarity - 1] + ChatColor.WHITE + " seconds to players within " + RANGE + " blocks, including the user.";
+		}
 		return "Every third melee attack applies " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED_PERCENT[rarity - 1]) + "%" + ChatColor.WHITE + " speed and Haste I for " + DepthsUtils.getRarityColor(rarity) + (int) DURATION[rarity - 1] + ChatColor.WHITE + " seconds to players within " + RANGE + " blocks, including the user.";
 	}
 

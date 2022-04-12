@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -28,7 +29,13 @@ public class Spectral extends DelveModifier {
 
 	private static final String[] SPECTERS = {
 		"SpecterofFury",
-		"SpecterofSilence"
+		"SpecterofSilence",
+		"SpecterofIgnorance"
+	};
+
+	private static final String[] SPECTERS_WATER = {
+		"LeviathanofSilence",
+		"LeviathanofFury"
 	};
 
 	public static final String DESCRIPTION = "Dying enemies transform into new enemies.";
@@ -78,7 +85,11 @@ public class Spectral extends DelveModifier {
 		if (!EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob) && EntityUtils.isHostileMob(mob)) {
 			if (FastUtils.RANDOM.nextDouble() < mSpawnChance) {
 				Location loc = mob.getLocation();
-				LibraryOfSoulsIntegration.summon(loc, SPECTERS[FastUtils.RANDOM.nextInt(SPECTERS.length)]);
+				if (loc.getBlock().getType() == Material.WATER) {
+					LibraryOfSoulsIntegration.summon(loc, SPECTERS_WATER[FastUtils.RANDOM.nextInt(SPECTERS_WATER.length)]);
+				} else {
+					LibraryOfSoulsIntegration.summon(loc, SPECTERS[FastUtils.RANDOM.nextInt(SPECTERS.length)]);
+				}
 
 				loc.add(0, 1, 0);
 				new PartialParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.5).spawnAsEnemy();

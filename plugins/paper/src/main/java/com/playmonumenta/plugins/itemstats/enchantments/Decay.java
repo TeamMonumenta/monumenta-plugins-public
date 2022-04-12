@@ -5,13 +5,13 @@ import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import java.util.EnumSet;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
 
 public class Decay implements Enchantment {
 
@@ -40,11 +40,10 @@ public class Decay implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.DECAY);
-		if (event.getType() == DamageType.MELEE) {
-			apply(plugin, enemy, (int) (DURATION * player.getCooledAttackStrength(0)), (int) level, player);
-		} else if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
-			apply(plugin, enemy, DURATION, (int) level, player);
+		DamageType type = event.getType();
+		if ((type == DamageType.MELEE && ItemStatUtils.hasMeleeDamage(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
+			int duration = (int) (DURATION * (type == DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
+			apply(plugin, enemy, duration, (int) value, player);
 		}
 	}
 

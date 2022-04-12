@@ -5,10 +5,12 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class AbilitySilence extends ZeroArgumentEffect {
 	public static final String GENERIC_NAME = "Silence";
@@ -53,6 +55,11 @@ public class AbilitySilence extends ZeroArgumentEffect {
 		if (fourHertz) {
 			new PartialParticle(Particle.REDSTONE, entity.getLocation().add(0, 0.5, 0), 4, 0.2, 0.4, 0.2, 0, COLOR).spawnAsEntityBuff(entity);
 		}
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return ChatColor.RED + "Silence";
 	}
 
 	@Override

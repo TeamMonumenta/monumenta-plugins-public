@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Stasis extends ZeroArgumentEffect {
 
@@ -56,6 +57,11 @@ public class Stasis extends ZeroArgumentEffect {
 			AbilityManager.getManager().updatePlayerAbilities(player, false);
 			AbilityManager.getManager().getPlayerAbilities(player).unsilence();
 		}
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return "Stasis";
 	}
 
 	@Override

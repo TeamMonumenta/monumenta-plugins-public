@@ -73,31 +73,32 @@ public class SanctifiedArmor extends Ability {
 			    && source != null
 			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)
 			    && Crusade.enemyTriggersAbilities(source, mCrusade)
-			    && !EntityUtils.isBoss(source)
-			    && !event.isBlocked()) {
+			    && !EntityUtils.isBoss(source)) {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
 			new PartialParticle(Particle.FIREWORKS_SPARK, loc.add(0, source.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125).spawnAsPlayerPassive(mPlayer);
 			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
 
-			double damage = mPercentDamageReturned * event.getFinalDamage(false);
 			MovementUtils.knockAway(mPlayer, source, KNOCKBACK_SPEED, KNOCKBACK_SPEED, true);
-			mLastAffectedMob = null;
-			DamageUtils.damage(mPlayer, source, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true);
-
-			if (isEnhanced() && source.isValid()) {
-				Optional<SanctifiedArmorHeal> existingEffect = mPlugin.mEffectManager.getEffects(source, SanctifiedArmorHeal.class).stream().findFirst();
-				if (existingEffect.isPresent()) {
-					existingEffect.get().addPlayer(mPlayer);
-				} else {
-					mPlugin.mEffectManager.addEffect(source, ENHANCEMENT_EFFECT_NAME, new SanctifiedArmorHeal(mPlayer.getUniqueId()));
-				}
-				mLastAffectedMob = source.getUniqueId();
-				mLastDamage = event.getFinalDamage(false);
-			}
-
 			if (isLevelTwo()) {
 				EntityUtils.applySlow(mPlugin, SLOWNESS_DURATION, SLOWNESS_AMPLIFIER_2, source);
+			}
+
+			if (!event.isBlocked()) {
+				double damage = mPercentDamageReturned * event.getFinalDamage(false);
+				mLastAffectedMob = null;
+				DamageUtils.damage(mPlayer, source, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true);
+
+				if (isEnhanced() && source.isValid()) {
+					Optional<SanctifiedArmorHeal> existingEffect = mPlugin.mEffectManager.getEffects(source, SanctifiedArmorHeal.class).stream().findFirst();
+					if (existingEffect.isPresent()) {
+						existingEffect.get().addPlayer(mPlayer);
+					} else {
+						mPlugin.mEffectManager.addEffect(source, ENHANCEMENT_EFFECT_NAME, new SanctifiedArmorHeal(mPlayer.getUniqueId()));
+					}
+					mLastAffectedMob = source.getUniqueId();
+					mLastDamage = event.getFinalDamage(false);
+				}
 			}
 		}
 	}

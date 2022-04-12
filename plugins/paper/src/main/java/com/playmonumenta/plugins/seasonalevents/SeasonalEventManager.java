@@ -384,7 +384,7 @@ public class SeasonalEventManager {
 		ScoreboardUtils.setScoreboardValue(p.getName(), scoreboard, Math.min(mission.mAmount, score + amount));
 		if (score + amount >= mission.mAmount) {
 			//Play an animation and notify player
-			p.sendMessage(Component.text("You completed a weekly mission!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+			p.sendMessage(Component.text("You completed a weekly mission! Open the Seasonal Pass menu to claim your progress!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			animate(p);
 		}
 	}

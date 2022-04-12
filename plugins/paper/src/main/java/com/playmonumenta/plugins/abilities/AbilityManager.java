@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.abilities.alchemist.UnstableAmalgam;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedyNonApothecary;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
@@ -60,8 +59,8 @@ import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.abilities.mage.ThunderStep;
 import com.playmonumenta.plugins.abilities.mage.arcanist.AstralOmen;
+import com.playmonumenta.plugins.abilities.mage.arcanist.CosmicMoonblade;
 import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
-import com.playmonumenta.plugins.abilities.mage.arcanist.SpatialShatter;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
@@ -329,7 +328,7 @@ public class AbilityManager {
 			new Starfall(mPlugin, null),
 
 			// ARCANIST
-			new SpatialShatter(mPlugin, null),
+			new CosmicMoonblade(mPlugin, null),
 			new AstralOmen(mPlugin, null),
 			new SagesInsight(mPlugin, null),
 
@@ -401,8 +400,7 @@ public class AbilityManager {
 			// APOTHECARY
 			new Panacea(mPlugin, null),
 			new TransmutationRing(mPlugin, null),
-			new WardingRemedy(mPlugin, null),
-			new WardingRemedyNonApothecary(mPlugin, null)
+			new WardingRemedy(mPlugin, null)
 		);
 
 		if (ServerProperties.getShardName().contains("depths") || ServerProperties.getShardName().contains("dev")) {

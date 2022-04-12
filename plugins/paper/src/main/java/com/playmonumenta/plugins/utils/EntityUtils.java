@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -824,11 +825,15 @@ public class EntityUtils {
 	}
 
 	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player) {
+		applyFire(plugin, fireTicks, target, player, plugin.mItemStatManager.getPlayerItemStats(player));
+	}
+
+	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player, @Nullable ItemStatManager.PlayerItemStats playerItemStats) {
 		if (target instanceof ArmorStand || target.isInvulnerable()) {
 			return;
 		}
 
-		int inferno = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.INFERNO);
+		int inferno = plugin.mItemStatManager.getEnchantmentLevel(playerItemStats, EnchantmentType.INFERNO);
 		if (inferno > 0) {
 			Inferno.apply(plugin, player, inferno, target, fireTicks);
 		}

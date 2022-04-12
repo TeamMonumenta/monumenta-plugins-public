@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -26,6 +28,9 @@ public class SignOverride extends BaseOverride {
 				continue;
 			}
 			line = line.replaceAll("[${}]", "");
+			if (component.hasDecoration(TextDecoration.OBFUSCATED)) {
+				line = ChatColor.MAGIC + line + ChatColor.RESET;
+			}
 			display += line + " ";
 		}
 

@@ -27,6 +27,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public final class DelveInfusionCustomInventory extends CustomInventory {
@@ -99,6 +100,14 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		splitLoreLine(yellowMeta, "Deal 1% additional damage per level to any mob that is on fire, slowed, or stunned.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		yellowItem.setItemMeta(yellowMeta);
 		mDelvePannelList.add(yellowItem);
+
+		//Bonus
+		ItemStack bonusItem = new ItemStack(Material.MOSSY_COBBLESTONE);
+		ItemMeta bonusMeta = bonusItem.getItemMeta();
+		bonusMeta.displayName(Component.text("Unyielding", TextColor.fromCSSHexString("#006400")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		splitLoreLine(bonusMeta, "Gain 0.4 Knockback Resistance per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		bonusItem.setItemMeta(bonusMeta);
+		mDelvePannelList.add(bonusItem);
 
 		//Reverie
 		ItemStack reverieItem = new ItemStack(Material.NETHER_WART_BLOCK);
@@ -248,6 +257,18 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			yellowItems.add(pannel);
 		}
 		mDelveInfusionPannelsMap.put(DelveInfusionSelection.CHOLER, yellowItems);
+
+		//bonus
+		List<ItemStack> bonusItems = new ArrayList<>();
+		for (int i = 0; i < 4; i++) {
+			ItemStack pannel = new ItemStack(Material.MOSSY_COBBLESTONE, 1);
+			ItemMeta meta = pannel.getItemMeta();
+			meta.displayName(Component.text("Unyielding level " + (i + 1), TextColor.fromCSSHexString("#006400")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+			splitLoreLine(meta, "Gain " + String.format("%,.1f", (0.4 * (i + 1))) + " Knockback Resistance", MAX_LORE_LENGHT, ChatColor.GRAY);
+			pannel.setItemMeta(meta);
+			bonusItems.add(pannel);
+		}
+		mDelveInfusionPannelsMap.put(DelveInfusionSelection.UNYIELDING, bonusItems);
 
 		//reverie
 		List<ItemStack> reverieItems = new ArrayList<>();
@@ -443,6 +464,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		mDelveMatsMap.put(DelveInfusionSelection.AURA, "Plagueroot Saps");
 		mDelveMatsMap.put(DelveInfusionSelection.EXPEDITE, "Arcane Crystals");
 		mDelveMatsMap.put(DelveInfusionSelection.CHOLER, "Season's Wraths");
+		mDelveMatsMap.put(DelveInfusionSelection.UNYIELDING, "Remnants of Reality");
 		mDelveMatsMap.put(DelveInfusionSelection.USURPER, "Nightmare Fuels");
 		//r2
 		mDelveMatsMap.put(DelveInfusionSelection.EMPOWERED, "Refound Knowledge");
@@ -511,7 +533,11 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			@Override
 			public void run() {
 				ItemStack itemStack = new ItemStack(infusedItem.getType());
+				ItemMeta originalMeta = infusedItem.getItemMeta();
 				ItemMeta meta = itemStack.getItemMeta();
+				if (originalMeta instanceof LeatherArmorMeta oldLeather && meta instanceof LeatherArmorMeta newLeather) {
+					newLeather.setColor(oldLeather.getColor());
+				}
 				meta.displayName(Component.text("Placeholder", TextColor.fromCSSHexString("000000"))
 					                 .decoration(TextDecoration.BOLD, true)
 					                 .decoration(TextDecoration.ITALIC, false));
@@ -525,14 +551,14 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		mInventory.setItem(19, mDelvePannelList.get(0));
 		mInventory.setItem(20, mDelvePannelList.get(1));
 		mInventory.setItem(21, mDelvePannelList.get(2));
-		//white space
-		mInventory.setItem(23, mDelvePannelList.get(3));
-		mInventory.setItem(24, mDelvePannelList.get(4));
-		mInventory.setItem(25, mDelvePannelList.get(5));
+		mInventory.setItem(22, mDelvePannelList.get(3));
+		mInventory.setItem(23, mDelvePannelList.get(4));
+		mInventory.setItem(24, mDelvePannelList.get(5));
+		mInventory.setItem(25, mDelvePannelList.get(6));
 
 		//R2
 		int index = 27;
-		for (int i = 6; i < mDelvePannelList.size(); i++) {
+		for (int i = 7; i < mDelvePannelList.size(); i++) {
 			mInventory.setItem(index++, mDelvePannelList.get(i));
 		}
 
@@ -563,12 +589,16 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.AURA);
 		});
 
-		mMapFunction.put(23, (p, inventory, slot) -> {
+		mMapFunction.put(22, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.EXPEDITE);
 		});
 
-		mMapFunction.put(24, (p, inventory, slot) -> {
+		mMapFunction.put(23, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.CHOLER);
+		});
+
+		mMapFunction.put(24, (p, inventory, slot) -> {
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.UNYIELDING);
 		});
 
 		mMapFunction.put(25, (p, inventory, slot) -> {

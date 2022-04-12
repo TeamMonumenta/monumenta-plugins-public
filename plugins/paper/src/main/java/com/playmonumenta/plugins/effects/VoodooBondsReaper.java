@@ -120,6 +120,11 @@ public class VoodooBondsReaper extends Effect {
 	}
 
 	@Override
+	public @Nullable String getSpecificDisplay() {
+		return "Voodoo Bonds";
+	}
+
+	@Override
 	public String toString() {
 		return String.format("VoodooBondsReaper duration:%d", this.getDuration());
 	}

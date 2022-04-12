@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -86,8 +87,8 @@ public class Quake implements Enchantment {
 				if (ice > 0) {
 					EntityUtils.applySlow(plugin, IceAspect.ICE_ASPECT_DURATION, ice * 0.1, mob);
 				}
-				if (thunder > 0) {
-					EntityUtils.applyStun(plugin, 10 * thunder, mob);
+				if (thunder > 0 && FastUtils.RANDOM.nextDouble() < thunder * ThunderAspect.CHANCE) {
+					EntityUtils.applyStun(plugin, ThunderAspect.DURATION_MELEE, mob);
 				}
 				if (decay > 0) {
 					Decay.apply(plugin, mob, Decay.DURATION, decay, player);

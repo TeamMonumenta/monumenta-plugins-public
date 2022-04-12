@@ -45,7 +45,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final int HALLOWED_2_MAX_CHARGES = 3;
 	private static final int HALLOWED_1_COOLDOWN = 20 * 16;
 	private static final int HALLOWED_2_COOLDOWN = 20 * 12;
-	private static final double HALLOWED_HEAL_PERCENT = 0.2;
+	private static final double HALLOWED_HEAL_PERCENT = 0.3;
 	private static final double HALLOWED_DAMAGE_REDUCTION_PERCENT = 0.1;
 	private static final int HALLOWED_DAMAGE_REDUCTION_DURATION = 20 * 5;
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "HallowedPercentDamageResistEffect";
@@ -64,7 +64,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		super(plugin, player, "Hallowed Beam");
 		mInfo.mScoreboardId = "HallowedBeam";
 		mInfo.mShorthandName = "HB";
-		mInfo.mDescriptions.add("Left-click with a bow or crossbow while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 20% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals projectile damage equal to the used weapon's projectile damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a bow will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). Cooldown: 16s each charge.");
+		mInfo.mDescriptions.add("Left-click with a bow or crossbow while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 30% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals projectile damage equal to the used weapon's projectile damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a bow will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). Cooldown: 16s each charge.");
 		mInfo.mDescriptions.add("Hallowed Beam gains a third charge, the cooldown is reduced to 12 seconds, and players healed by it gain 10% damage resistance for 5 seconds.");
 		mInfo.mLinkedSpell = ClassAbility.HALLOWED_BEAM;
 		mInfo.mCooldown = isLevelOne() ? HALLOWED_1_COOLDOWN : HALLOWED_2_COOLDOWN;

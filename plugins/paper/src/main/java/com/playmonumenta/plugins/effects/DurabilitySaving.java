@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class DurabilitySaving extends SingleArgumentEffect {
 	public static final String GENERIC_NAME = "DurabilitySaving";
@@ -16,6 +18,11 @@ public class DurabilitySaving extends SingleArgumentEffect {
 		if (FastUtils.RANDOM.nextDouble() < mAmount) {
 			event.setCancelled(true);
 		}
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Durability Saving";
 	}
 
 	@Override

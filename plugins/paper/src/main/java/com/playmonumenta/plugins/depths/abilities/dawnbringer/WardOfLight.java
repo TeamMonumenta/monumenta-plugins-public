@@ -25,7 +25,7 @@ import org.bukkit.util.Vector;
 public class WardOfLight extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Ward of Light";
-	public static final double[] HEAL = {0.32, 0.4, 0.48, 0.56, 0.64, 0.8};
+	public static final double[] HEAL = {0.32, 0.4, 0.48, 0.56, 0.64, 1.0};
 	private static final int HEALING_RADIUS = 12;
 	private static final double HEALING_DOT_ANGLE = 0.33;
 	private static final int COOLDOWN = 12 * 20;

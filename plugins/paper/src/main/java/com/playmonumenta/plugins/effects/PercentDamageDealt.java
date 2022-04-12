@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.function.BiPredicate;
 import org.bukkit.entity.LivingEntity;
@@ -60,6 +61,11 @@ public class PercentDamageDealt extends Effect {
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			event.setDamage(event.getDamage() * Math.max(0, 1 + mAmount));
 		}
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Damage Dealt";
 	}
 
 	@Override

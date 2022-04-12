@@ -16,10 +16,10 @@ import org.bukkit.event.block.BlockBreakEvent;
 
 public class Adrenaline implements Enchantment {
 
-	private static final String PERCENT_SPEED_EFFECT_NAME = "AdrenalinePercentSpeedEffect";
-	private static final int DURATION = 20 * 3;
-	private static final int SPAWNER_DURATION = 20 * 6;
-	private static final double PERCENT_SPEED_PER_LEVEL = 0.1;
+	public static final String PERCENT_SPEED_EFFECT_NAME = "AdrenalinePercentSpeedEffect";
+	public static final int DURATION = 20 * 3;
+	public static final int SPAWNER_DURATION = 20 * 6;
+	public static final double PERCENT_SPEED_PER_LEVEL = 0.1;
 
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 

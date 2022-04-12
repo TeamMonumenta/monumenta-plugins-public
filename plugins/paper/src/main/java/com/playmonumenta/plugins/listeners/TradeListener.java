@@ -184,7 +184,7 @@ public class TradeListener implements Listener {
 		NBTCompound enchantments2 = ItemStatUtils.getEnchantments(nbt2);
 		for (EnchantmentType ench : EnchantmentType.values()) {
 			// Divine Aura is a bonus enchantment for Kaul reskins, so ignore it
-			if (ench == EnchantmentType.DIVINE_AURA) {
+			if (ench == EnchantmentType.DIVINE_AURA || ench == EnchantmentType.UNBREAKABLE) {
 				continue;
 			}
 			if (ItemStatUtils.getEnchantmentLevel(enchantments1, ench) != ItemStatUtils.getEnchantmentLevel(enchantments2, ench)) {

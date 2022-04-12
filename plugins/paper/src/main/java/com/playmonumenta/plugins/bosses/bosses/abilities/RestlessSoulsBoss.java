@@ -33,11 +33,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Stream;
-
 public class RestlessSoulsBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_restlesssouls";
 	public static final int detectionRange = 64;
@@ -109,7 +104,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 				for (Ability ability : abilities) {
 					if (ability != null && plugin.mTimers.isAbilityOnCooldown(p.getUniqueId(), ability.getInfo().mLinkedSpell)) {
 						if (ability.getInfo().mLinkedSpell == ClassAbility.CHOLERIC_FLAMES) {
-							damagee.setFireTicks(duration);
+							EntityUtils.applyFire(plugin, duration, damagee, p, playerItemStats);
 							if (ability.isLevelTwo()) {
 								PotionUtils.applyPotion(p, damagee, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true));
 							}

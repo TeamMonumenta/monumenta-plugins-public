@@ -49,7 +49,7 @@ public class PlayerUtils {
 		player.sendMessage(ChatColor.YELLOW + "There is no further punishment, but please do follow the rules.");
 
 		plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION,
-		                                new PotionEffect(PotionEffectType.SLOW, 5 * 20 * 60, 3, false, true));
+			new PotionEffect(PotionEffectType.SLOW, 5 * 20 * 60, 3, false, true));
 
 		player.teleport(player.getWorld().getSpawnLocation());
 	}
@@ -125,7 +125,7 @@ public class PlayerUtils {
 				continue;
 			}
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-			                                   "execute as " + player.getUniqueId() + " at @s run " + command);
+				"execute as " + player.getUniqueId() + " at @s run " + command);
 		}
 	}
 
@@ -162,8 +162,8 @@ public class PlayerUtils {
 		//     flag2 = flag2 && !this.isSprinting();
 		return (
 			isFallingAttack(player)
-			&& !player.isInWater()
-			&& !player.isSprinting()
+				&& !player.isInWater()
+				&& !player.isSprinting()
 		);
 	}
 
@@ -207,10 +207,6 @@ public class PlayerUtils {
 	 * Whether the player meets the conditions for a sweeping attack,
 	 * emulating the vanilla check, except the on ground,
 	 * movement increment limit, sword, and proximity requirements.
-	 *
-	 * Used as the custom Arcane Thrust requirement,
-	 * similar to how enchant/ability falling attack requirements are a subset
-	 * of crit requirements.
 	 */
 	public static boolean isNonFallingAttack(
 		Player player,
@@ -218,8 +214,8 @@ public class PlayerUtils {
 	) {
 		return (
 			player.getCooledAttackStrength(0.5f) > 0.9
-			&& !isCriticalAttack(player)
-			&& !player.isSprinting()
+				&& !isCriticalAttack(player)
+				&& !player.isSprinting()
 			// Last check on horizontal movement increment requires an internal
 			// vanilla collision adjustment Vec3D.
 			// It is not simply player.getVelocity(); that is used elsewhere
@@ -253,7 +249,7 @@ public class PlayerUtils {
 		//     List<EntityLiving> list = this.world.a(EntityLiving.class, entity.getBoundingBox().grow(1.0D, 0.25D, 1.0D));
 		return (
 			isNonFallingAttack(player, enemy)
-			&& player.isOnGround()
+				&& player.isOnGround()
 		);
 	}
 

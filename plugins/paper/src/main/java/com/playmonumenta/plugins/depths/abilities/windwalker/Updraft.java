@@ -38,7 +38,7 @@ public class Updraft extends DepthsAbility {
 	private static final int RADIUS = 3;
 	private static final double[] KNOCKBACK_SPEED = {1.1, 1.2, 1.3, 1.4, 1.5, 1.7};
 	private static final int SLOW_FALLING_LEVEL = 0;
-	private static final double[] VULNERABILITY = {0.15, 0.175, 0.2, 0.225, 0.25, 0.3};
+	private static final double[] VULNERABILITY = {0.15, 0.175, 0.2, 0.225, 0.25, 0.4};
 	private static final int DURATION = 5 * 20;
 	private static final double VELOCITY = 1.5;
 

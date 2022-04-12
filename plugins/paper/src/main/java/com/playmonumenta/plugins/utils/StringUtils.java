@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import java.text.DecimalFormat;
 import java.util.TreeMap;
+import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 
 public class StringUtils {
@@ -150,5 +151,14 @@ public class StringUtils {
 	// Converts to 2dp with no trailing zeros, for display purposes
 	public static String to2DP(double value) {
 		return new DecimalFormat("#.##").format(value);
+	}
+
+	public static String doubleToColoredAndSignedPercentage(double d) {
+		String percent = multiplierToPercentage(d);
+		if (d < 0) {
+			return ChatColor.RED + percent + "%";
+		} else {
+			return ChatColor.GREEN + "+" + percent + "%";
+		}
 	}
 }
