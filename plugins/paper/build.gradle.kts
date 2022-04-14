@@ -46,6 +46,7 @@ dependencies {
     compileOnly("com.goncalomb.bukkit:nbteditor:3.2")
     compileOnly("de.tr7zw:item-nbt-api-plugin:2.3.1")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
+    compileOnly("io.prometheus:simpleclient:0.11.0")
     errorprone("com.google.errorprone:error_prone_core:2.10.0")
     errorprone("com.uber.nullaway:nullaway:0.9.5")
 
@@ -68,7 +69,22 @@ bukkit {
     name = "Monumenta"
     authors = listOf("The Monumenta Team")
     depend = listOf("CommandAPI", "ScriptedQuests", "NBTAPI")
-    softDepend = listOf("MonumentaRedisSync", "PlaceholderAPI", "ChestSort", "LuckPerms", "CoreProtect", "NBTEditor", "LibraryOfSouls", "BKCommonLib", "MonumentaNetworkRelay", "PremiumVanish", "ProtocolLib", "MonumentaStructureManagement", "MonumentaWorldManagement")
+    softDepend = listOf(
+        "MonumentaRedisSync",
+        "PlaceholderAPI",
+        "ChestSort",
+        "LuckPerms",
+        "CoreProtect",
+        "NBTEditor",
+        "LibraryOfSouls",
+        "BKCommonLib",
+        "MonumentaNetworkRelay",
+        "PremiumVanish",
+        "ProtocolLib",
+        "PrometheusExporter",
+        "MonumentaStructureManagement",
+        "MonumentaWorldManagement"
+    )
 }
 
 // Configure bungee.yml generation

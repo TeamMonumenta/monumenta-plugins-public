@@ -146,6 +146,7 @@ public class Plugin extends JavaPlugin {
 	public CosmeticsManager mCosmeticsManager;
 	public SeasonalEventManager mSeasonalEventManager;
 	private @Nullable CustomLogger mLogger = null;
+	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
 	// INSTANCE is set if the plugin is properly enabled
 	@SuppressWarnings("initialization.static.field.uninitialized")
@@ -489,7 +490,10 @@ public class Plugin extends JavaPlugin {
 
 		// Hook into ProtocolLib if present
 		if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
-			new ProtocolLibIntegration(this);
+			mProtocolLibIntegration = new ProtocolLibIntegration(this);
+			if (Bukkit.getPluginManager().isPluginEnabled("PrometheusExporter")) {
+				PacketMonitoringCommand.register(this);
+			}
 		}
 
 		// Register the explosion repair mechanism if BKCommonLib is present
