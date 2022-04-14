@@ -2025,7 +2025,8 @@ public class ItemStatUtils {
 		return item != null && getEnchantmentLevel(item, EnchantmentType.MATERIAL) > 0;
 	}
 
-	public static boolean hasMeleeDamage(@Nullable ItemStack item) {
-		return item != null && getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0;
+	// Returns true if the item has mainhand attack damage OR doesn't have mainhand projectile damage (i.e. any ranged weapon that is not also a melee weapon)
+	public static boolean isNotExlusivelyRanged(@Nullable ItemStack item) {
+		return item != null && (getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0 || getAttributeAmount(item, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) == 0);
 	}
 }
