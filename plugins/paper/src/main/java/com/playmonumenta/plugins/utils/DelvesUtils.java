@@ -596,7 +596,8 @@ public class DelvesUtils {
 		new DelveLootTableGroup("r2/delves/purple/base_temple", "r2/delves/purple/dmat_temple", "r2/delves/purple/cmat_temple", "r2/dungeons/purple/chesttemple").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r2/delves/purple/base_final", "r2/delves/purple/dmat_final", "r2/delves/purple/cmat_final", "r2/dungeons/purple/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
-		new DelveLootTableGroup("r2/delves/teal/base_chest", "r2/delves/teal/dmat_chest", "r2/delves/teal/cmat_chest", "r2/dungeons/teal/ruined", "r2/dungeons/teal/eroded", "r2/dungeons/teal/pristine", "r2/dungeons/teal/colosseum").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/teal/base_chest", "r2/delves/teal/dmat_chest", "r2/delves/teal/cmat_chest", "r2/dungeons/teal/ruined", "r2/dungeons/teal/eroded", "r2/dungeons/teal/pristine").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/teal/base_colosseum", "r2/delves/teal/dmat_chest", "r2/delves/teal/cmat_chest", "r2/dungeons/teal/colosseum").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r2/delves/teal/base_escape", "r2/delves/teal/dmat_escape", "r2/delves/teal/cmat_escape", "r2/dungeons/teal/escape").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r2/delves/teal/base_final", "r2/delves/teal/dmat_final", "r2/delves/teal/cmat_final", "r2/dungeons/teal/final").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
@@ -605,7 +606,8 @@ public class DelvesUtils {
 		new DelveLootTableGroup("r2/delves/forum/base_conservatory", "r2/delves/forum/dmat_conservatory", "r2/delves/forum/cmat_conservatory", "r2/dungeons/forum/conservatory").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r2/delves/forum/base_conscriptorium", "r2/delves/forum/dmat_conscriptorium", "r2/delves/forum/cmat_conscriptorium", "r2/dungeons/forum/conscriptorium").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
-		new DelveLootTableGroup("r2/delves/shiftingcity/base_chest", "r2/delves/shiftingcity/dmat_chest", "r2/delves/shiftingcity/cmat_chest", "r2/dungeons/fred/normal_city", "r2/dungeons/fred/objective_city", "r2/dungeons/fred/normal_lush", "r2/dungeons/fred/objective_lush", "r2/dungeons/fred/normal_water", "r2/dungeons/fred/objective_water", "r2/dungeons/fred/challenge").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/shiftingcity/base_chest", "r2/delves/shiftingcity/dmat_chest", "r2/delves/shiftingcity/cmat_chest", "r2/dungeons/fred/normal_city", "r2/dungeons/fred/objective_city", "r2/dungeons/fred/normal_lush", "r2/dungeons/fred/objective_lush", "r2/dungeons/fred/normal_water", "r2/dungeons/fred/objective_water").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/shiftingcity/base_challenge", "r2/delves/shiftingcity/dmat_chest", "r2/delves/shiftingcity/cmat_chest", "r2/dungeons/fred/challenge").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r2/delves/shiftingcity/base_final", "r2/delves/shiftingcity/dmat_final", "r2/delves/shiftingcity/cmat_final", "r2/dungeons/fred/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 	}
 
