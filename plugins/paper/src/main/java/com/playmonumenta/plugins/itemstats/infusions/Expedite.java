@@ -20,6 +20,7 @@ public class Expedite implements Infusion {
 	private static final double PERCENT_SPEED_PER_LEVEL = 0.0125;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "ExpeditePercentSpeedEffect";
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "ExpediteTick";
+	private static final int MAX_STACKS = 3;
 
 	@Override
 	public String getName() {
@@ -45,7 +46,7 @@ public class Expedite implements Infusion {
 				NavigableSet<Effect> speedEffects = new TreeSet<>(oldEffects);
 				for (Effect effect : speedEffects) {
 					double mag = effect.getMagnitude() / percentSpeed;
-					if (effect.getMagnitude() == percentSpeed * Math.min(5, mag + 1)) {
+					if (effect.getMagnitude() == percentSpeed * Math.min(MAX_STACKS, mag + 1)) {
 						effect.setDuration(DURATION);
 					} else {
 						effect.setDuration(1);
