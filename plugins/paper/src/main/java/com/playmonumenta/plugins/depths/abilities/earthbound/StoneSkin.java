@@ -24,7 +24,7 @@ public class StoneSkin extends DepthsAbility {
 	public static final String ABILITY_NAME = "Stone Skin";
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "StoneSkinPercentDamageReceivedEffect";
 	private static final double[] PERCENT_DAMAGE_RECEIVED = {-.15, -.18, -.22, -.26, -.30, -.38};
-	private static final String KNOCKBACK_RESISTANCE_EFFECT_NAME = "StoneSkinPercentDamageReceivedEffect";
+	private static final String KNOCKBACK_RESISTANCE_EFFECT_NAME = "StoneSkinKnockbackResistanceEffect";
 	private static final double[] KNOCKBACK_RESISTANCE = {0.4, 0.5, 0.6, 0.7, 0.8, 1.0};
 	private static final int DURATION = 20 * 5;
 	private static final int COOLDOWN = 20 * 12;
