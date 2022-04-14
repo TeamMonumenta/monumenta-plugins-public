@@ -202,18 +202,20 @@ public class ItemUpdateManager implements Listener {
 		path.add("in ItemStack " + ItemUtils.getGiveCommand(item));
 
 		try {
-			if (item.hasItemMeta()) {
-				ItemMeta itemMeta = item.getItemMeta();
-				if (itemMeta.hasLore()) {
-					for (Component loreLine : itemMeta.lore()) {
-						if (ItemUtils.toPlainTagText(loreLine).contains("This is a placeholder item.")) {
-							return;
-						}
+			if (ItemStatUtils.isClean(item)) {
+				return;
+			}
+
+			ItemMeta itemMeta = item.getItemMeta();
+			if (itemMeta.hasLore()) {
+				for (Component loreLine : itemMeta.lore()) {
+					if (ItemUtils.toPlainTagText(loreLine).contains("This is a placeholder item.")) {
+						return;
 					}
 				}
-				if (ItemUtils.getPlainLore(item, false).contains("This is a placeholder item.")) {
-					return;
-				}
+			}
+			if (ItemUtils.getPlainLore(item, false).contains("This is a placeholder item.")) {
+				return;
 			}
 
 			ItemUtils.setPlainTag(item);
@@ -224,6 +226,8 @@ public class ItemUpdateManager implements Listener {
 			if (monumenta != null) {
 				ItemStatUtils.generateItemStats(item);
 			}
+
+			ItemStatUtils.markClean(item);
 		} catch (Exception e) {
 			logNestedException(path, e);
 		}
