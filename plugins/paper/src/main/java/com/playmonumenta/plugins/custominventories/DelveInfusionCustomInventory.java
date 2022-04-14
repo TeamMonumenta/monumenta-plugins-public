@@ -464,7 +464,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		mDelveMatsMap.put(DelveInfusionSelection.AURA, "Plagueroot Saps");
 		mDelveMatsMap.put(DelveInfusionSelection.EXPEDITE, "Arcane Crystals");
 		mDelveMatsMap.put(DelveInfusionSelection.CHOLER, "Season's Wraths");
-		mDelveMatsMap.put(DelveInfusionSelection.UNYIELDING, "Remnants of Reality");
+		mDelveMatsMap.put(DelveInfusionSelection.UNYIELDING, "Echoes of the Veil");
 		mDelveMatsMap.put(DelveInfusionSelection.USURPER, "Nightmare Fuels");
 		//r2
 		mDelveMatsMap.put(DelveInfusionSelection.EMPOWERED, "Refound Knowledge");
