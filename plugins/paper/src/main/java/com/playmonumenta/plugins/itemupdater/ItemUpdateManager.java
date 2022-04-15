@@ -233,8 +233,7 @@ public class ItemUpdateManager implements Listener {
 
 			// Only generate item stats on items with Monumenta tag
 			NBTItem nbt = new NBTItem(item);
-			NBTCompound monumenta = nbt.getCompound(ItemStatUtils.getMonumentaKey());
-			if (monumenta != null) {
+			if (nbt.hasKey(ItemStatUtils.MONUMENTA_KEY)) {
 				ItemStatUtils.generateItemStats(item);
 			}
 		} catch (Exception e) {
