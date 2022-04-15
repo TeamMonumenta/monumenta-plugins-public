@@ -46,7 +46,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final int HALLOWED_1_COOLDOWN = 20 * 16;
 	private static final int HALLOWED_2_COOLDOWN = 20 * 12;
 	private static final double HALLOWED_HEAL_PERCENT = 0.3;
-	private static final double HALLOWED_DAMAGE_REDUCTION_PERCENT = 0.1;
+	private static final double HALLOWED_DAMAGE_REDUCTION_PERCENT = -0.1;
 	private static final int HALLOWED_DAMAGE_REDUCTION_DURATION = 20 * 5;
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "HallowedPercentDamageResistEffect";
 	private static final int HALLOWED_RADIUS = 4;

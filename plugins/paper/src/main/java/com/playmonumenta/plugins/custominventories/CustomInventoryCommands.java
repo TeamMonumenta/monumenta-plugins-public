@@ -1,9 +1,16 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.IntegerArgument;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -167,6 +174,32 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				new ClassSelectionCustomInventory(player).openInventory(player, plugin);
+			})
+			.register();
+
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new IntegerArgument("region #"));
+		arguments.add(new IntegerArgument("level"));
+
+		List<String> questScore = new ArrayList<>(Arrays.asList("DailyQuest", "Daily2Quest"));
+		List<String> rewardScore = new ArrayList<>(Arrays.asList("DailyReward", "Daily2Reward"));
+
+		new CommandAPICommand("openbountygui")
+			.withPermission("monumenta.command.openbountygui")
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				try {
+					Player player = (Player) args[0];
+					int region = (int) args[1];
+					int level = (int) args[2];
+					if (ScoreboardUtils.getScoreboardValue(player, questScore.get(region - 1)).orElse(0) == 0 &&
+						ScoreboardUtils.getScoreboardValue(player, rewardScore.get(region - 1)).orElse(0) == 0) {
+						new BountyCustomInventory(player, region, level).openInventory(player, plugin);
+					}
+				} catch (Exception e) {
+					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), e);
+				}
 			})
 			.register();
 	}

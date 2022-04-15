@@ -52,7 +52,7 @@ public class IceAspect implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		DamageType type = event.getType();
-		if ((type == DamageType.MELEE && ItemStatUtils.hasMeleeDamage(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
+		if ((type == DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
 			int duration = (int) (ICE_ASPECT_DURATION * (type == DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
 			if (type == DamageType.PROJECTILE) {
 				double widthDelta = PartialParticle.getWidthDelta(enemy);

@@ -45,7 +45,7 @@ public class FireAspect implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		DamageType type = event.getType();
-		if ((type == DamageType.MELEE && ItemStatUtils.hasMeleeDamage(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
+		if ((type == DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
 			int duration = (int) (FIRE_ASPECT_DURATION * level * (type == DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
 			ItemStatManager.PlayerItemStats playerItemStats;
 			if (event.getDamager() instanceof Projectile proj) {

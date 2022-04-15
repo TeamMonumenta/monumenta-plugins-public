@@ -205,7 +205,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 				int extra = effectDisplays.size() - 10;
 				if (extra == 1) {
 					//Show 11th if there are exactly 11
-					return effectDisplays.get(11);
+					return effectDisplays.get(10);
 				} else if (extra > 0) {
 					return ChatColor.GRAY + "... and " + extra + " more effects";
 				} else {

@@ -5,28 +5,35 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import java.util.EnumSet;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class StatTrackBoss implements Infusion {
+public class StatTrackProjectile implements Infusion {
+
+	private static final EnumSet<DamageEvent.DamageType> TYPES = EnumSet.of(DamageEvent.DamageType.PROJECTILE, DamageEvent.DamageType.PROJECTILE_SKILL);
 
 	@Override
 	public String getName() {
-		return "Boss Damage Dealt";
+		return "Projectile Damage Dealt";
 	}
 
 	@Override
 	public InfusionType getInfusionType() {
-		return InfusionType.STAT_TRACK_BOSS;
+		return InfusionType.STAT_TRACK_PROJECTILE;
+	}
+
+	@Override
+	public double getPriorityAmount() {
+		return 6000; // after all damage modifiers
 	}
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		//Track damage dealt to bosses
-		if (EntityUtils.isBoss(enemy) && !EntityUtils.isTrainingDummy(enemy)) {
+		if (TYPES.contains(event.getType()) && !EntityUtils.isTrainingDummy(enemy)) {
 			ItemStack is = player.getInventory().getItemInMainHand();
-			StatTrackManager.incrementStat(is, player, InfusionType.STAT_TRACK_BOSS, (int) event.getFinalDamage(false));
+			StatTrackManager.incrementStat(is, player, InfusionType.STAT_TRACK_PROJECTILE, (int) event.getFinalDamage(false));
 		}
 	}
 }

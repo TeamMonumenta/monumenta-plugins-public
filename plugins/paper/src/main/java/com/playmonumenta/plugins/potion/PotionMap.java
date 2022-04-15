@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -106,6 +108,14 @@ public class PotionMap {
 		if (changed) {
 			applyBestPotionEffect(player);
 		}
+	}
+
+	protected Collection<PotionInfo> getPotionInfos(PotionID id) {
+		TreeMap<Integer, PotionInfo> tree = mPotionMap.get(id);
+		if (tree != null) {
+			return tree.values();
+		}
+		return new ArrayList<PotionInfo>();
 	}
 
 	protected void updatePotionStatus(Player player, int ticks) {

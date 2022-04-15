@@ -77,6 +77,7 @@ public class ItemStatUtils {
 	static final String ATTRIBUTE_NAME_KEY = "AttributeName";
 	static final String AMOUNT_KEY = "Amount";
 	static final String SHATTERED_KEY = "Shattered";
+	static final String DIRTY_KEY = "Dirty";
 
 	static final Component DUMMY_LORE_TO_REMOVE = Component.text("DUMMY LORE TO REMOVE", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
 
@@ -535,7 +536,10 @@ public class ItemStatUtils {
 		// Stat tracking stuff
 		STAT_TRACK(new StatTrack(), "Tracked", false, false, false),
 		STAT_TRACK_KILLS(new StatTrackKills(), "", true, false, true),
+		STAT_TRACK_DAMAGE(new StatTrackDamage(), "", true, false, true),
 		STAT_TRACK_MELEE(new StatTrackMelee(), "", true, false, true),
+		STAT_TRACK_PROJECTILE(new StatTrackProjectile(), "", true, false, true),
+		STAT_TRACK_MAGIC(new StatTrackMagic(), "", true, false, true),
 		STAT_TRACK_BOSS(new StatTrackBoss(), "", true, false, true),
 		STAT_TRACK_SPAWNER(new StatTrackSpawners(), "", true, false, true),
 		STAT_TRACK_CONSUMED(new StatTrackConsumed(), "", true, false, true),
@@ -1286,6 +1290,39 @@ public class ItemStatUtils {
 		return Tier.NONE;
 	}
 
+	public static boolean isClean(final @Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return true;
+		}
+		NBTItem nbt = new NBTItem(item);
+
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return true;
+		}
+
+		return !monumenta.hasKey(DIRTY_KEY);
+	}
+
+	public static void markClean(final @Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return;
+		}
+
+		if (!monumenta.hasKey(DIRTY_KEY)) {
+			return;
+		}
+
+		monumenta.removeKey(DIRTY_KEY);
+		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
 	public static boolean isShattered(final @Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return false;
@@ -2025,7 +2062,8 @@ public class ItemStatUtils {
 		return item != null && getEnchantmentLevel(item, EnchantmentType.MATERIAL) > 0;
 	}
 
-	public static boolean hasMeleeDamage(@Nullable ItemStack item) {
-		return item != null && getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0;
+	// Returns true if the item has mainhand attack damage OR doesn't have mainhand projectile damage (i.e. any ranged weapon that is not also a melee weapon)
+	public static boolean isNotExclusivelyRanged(@Nullable ItemStack item) {
+		return item != null && (getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0 || getAttributeAmount(item, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) == 0);
 	}
 }

@@ -7,15 +7,13 @@ import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.potion.PotionEffect;
 
 public class Phylactery implements Infusion {
 
@@ -23,7 +21,7 @@ public class Phylactery implements Infusion {
 	public static final double DURATION_KEPT = 0.1;
 	public static final String SCOREBOARD = "PhylacteryXP";
 
-	private static HashMap<UUID, Collection<PotionEffect>> EFFECTS_MAP = new HashMap<>();
+	private static HashMap<UUID, HashMap<PotionManager.PotionID, List<PotionUtils.PotionInfo>>> EFFECTS_MAP = new HashMap<>();
 
 	@Override
 	public String getName() {
@@ -48,15 +46,21 @@ public class Phylactery implements Infusion {
 			player.sendMessage(ChatColor.GOLD + "" + (int) (100 * value * XP_KEPT) + "% of your experience has been stored. Collect your grave to retrieve it.");
 		}
 
-		Collection<PotionEffect> effects = new ArrayList<>();
-		for (PotionEffect effect : player.getActivePotionEffects()) {
-			if (PotionUtils.hasPositiveEffects(effect.getType())) {
-				effects.add(effect.withDuration((int) (effect.getDuration() * value * DURATION_KEPT)));
+		HashMap<PotionManager.PotionID, List<PotionUtils.PotionInfo>> infoMap = new HashMap<>(plugin.mPotionManager.getAllPotionInfos(player));
+		infoMap.remove(PotionManager.PotionID.SAFE_ZONE);
+		infoMap.remove(PotionManager.PotionID.ABILITY_SELF);
+
+		for (List<PotionUtils.PotionInfo> infoList : infoMap.values()) {
+			for (PotionUtils.PotionInfo info : infoList) {
+				if (PotionUtils.hasNegativeEffects(info.mType)) {
+					infoList.remove(info);
+				} else {
+					info.mDuration = (int) (info.mDuration * value * DURATION_KEPT);
+				}
 			}
 		}
-		if (!effects.isEmpty()) {
-			EFFECTS_MAP.put(player.getUniqueId(), effects);
-		}
+
+		EFFECTS_MAP.put(player.getUniqueId(), infoMap);
 	}
 
 	//Called when the final item in a grave is picked up or claimed
@@ -69,11 +73,14 @@ public class Phylactery implements Infusion {
 		}
 	}
 
+	// Called by PlayerListener
 	public static void applyStoredEffects(Plugin plugin, Player player) {
-		Collection<PotionEffect> effects = EFFECTS_MAP.remove(player.getUniqueId());
+		HashMap<PotionManager.PotionID, List<PotionUtils.PotionInfo>> effects = EFFECTS_MAP.remove(player.getUniqueId());
 		if (effects != null) {
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, effects);
+				for (PotionManager.PotionID id : effects.keySet()) {
+					plugin.mPotionManager.addPotionInfos(player, id, effects.get(id));
+				}
 			}, 1);
 		}
 	}

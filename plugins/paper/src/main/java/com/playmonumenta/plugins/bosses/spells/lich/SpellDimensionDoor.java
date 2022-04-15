@@ -7,14 +7,17 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -57,13 +60,13 @@ public class SpellDimensionDoor extends Spell {
 	private int mCap = 15;
 	private boolean mCanRun = true;
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
-			Material.COMMAND_BLOCK,
-			Material.CHAIN_COMMAND_BLOCK,
-			Material.REPEATING_COMMAND_BLOCK,
-			Material.BEDROCK,
-			Material.BARRIER,
-			Material.END_PORTAL
-		);
+		Material.COMMAND_BLOCK,
+		Material.CHAIN_COMMAND_BLOCK,
+		Material.REPEATING_COMMAND_BLOCK,
+		Material.BEDROCK,
+		Material.BARRIER,
+		Material.END_PORTAL
+	);
 	private ChargeUpManager mChargeUp;
 
 	public SpellDimensionDoor(Plugin plugin, LivingEntity boss, Location spawnLoc, double range) {
@@ -186,8 +189,8 @@ public class SpellDimensionDoor extends Spell {
 					//move portal center to ground, stop above bedrock so it doesn't replace bedrock
 					Location locdown = mLoc.clone().subtract(0, 1, 0);
 					while ((mLoc.getBlock().isPassable() || mLoc.getBlock().isLiquid()
-							|| mLoc.getBlock().isEmpty()) && locdown.getBlock().getType() != Material.BEDROCK
-							&& mLoc.getY() > mSpawnLoc.getY() - 5 && mT <= 5) {
+						|| mLoc.getBlock().isEmpty()) && locdown.getBlock().getType() != Material.BEDROCK
+						&& mLoc.getY() > mSpawnLoc.getY() - 5 && mT <= 5) {
 						mLoc.setY(mLoc.getY() - 1);
 						locdown = mLoc.clone().subtract(0, 1, 0);
 					}
@@ -317,11 +320,11 @@ public class SpellDimensionDoor extends Spell {
 		p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
 		mShadowed.add(p);
 
-		String[] dio = new String[] {
-				"There's something moving in the darkness! It looks like... me?!",
-				"This darkness is dangerous. I need to find a way out!",
-				"What is that pulsating mass in the center of the arena?"
-				};
+		String[] dio = new String[]{
+			"There's something moving in the darkness! It looks like... me?!",
+			"This darkness is dangerous. I need to find a way out!",
+			"What is that pulsating mass in the center of the arena?"
+		};
 
 		//do different stuff for different entry method
 		int t = 20 * 20;
@@ -397,6 +400,11 @@ public class SpellDimensionDoor extends Spell {
 				}
 
 				if (spectre.isDead() || !spectre.isValid() || Lich.phase3over() || mBoss.isDead() || !mBoss.isValid()) {
+					// Death Report Advancement. If player escapes with less than 1 second.
+					if (mT <= 20) {
+						CommandUtils.runCommandViaConsole("advancement grant " + p.getName() + " only monumenta:challenges/r2/lich/death_report");
+					}
+
 					bar.setVisible(false);
 					bar.removeAll();
 					this.cancel();

@@ -32,13 +32,16 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,6 +53,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -79,6 +83,7 @@ import org.bukkit.entity.Ghast;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.WitherSkull;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
@@ -249,8 +254,8 @@ public final class Lich extends BossAbilityGroup {
 				} else if (!mCutscene) {
 					mT += 5;
 					if (mT >= 20 * 9
-							&& mBoss.getLocation().getY() <= mStart.getLocation().getY() + 3
-							&& !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
+						&& mBoss.getLocation().getY() <= mStart.getLocation().getY() + 3
+						&& !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
 						mT = 0;
 						Collections.shuffle(mTp);
 						World world = mBoss.getWorld();
@@ -339,60 +344,60 @@ public final class Lich extends BossAbilityGroup {
 		 */
 
 		SpellManager phase1Spells = new SpellManager(
-				Arrays.asList(
-						new SpellGraspingHands(mPlugin, mBoss),
-						new SpellRaiseDead(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
-						new SpellSalientOfDecay(mPlugin, mBoss),
-						new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling)));
+			Arrays.asList(
+				new SpellGraspingHands(mPlugin, mBoss),
+				new SpellRaiseDead(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
+				new SpellSalientOfDecay(mPlugin, mBoss),
+				new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling)));
 
 		SpellManager phase2Spells = new SpellManager(
-				Arrays.asList(
-						new SpellGraspingHands(mPlugin, mBoss),
-						new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
-						new SpellRaiseDead(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
-						new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal)));
+			Arrays.asList(
+				new SpellGraspingHands(mPlugin, mBoss),
+				new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
+				new SpellRaiseDead(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
+				new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal)));
 
 		SpellManager phase3Spells = new SpellManager(
-				Arrays.asList(
-						new SpellGraspingHands(mPlugin, mBoss),
-						new SpellDesecrate(mPlugin, mBoss),
-						new SpellGravityWell(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-						new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal),
-						new SpellDarkOmen(mPlugin, mBoss, mStart.getLocation(), detectionRange) // ult + dialogue?
-				));
+			Arrays.asList(
+				new SpellGraspingHands(mPlugin, mBoss),
+				new SpellDesecrate(mPlugin, mBoss),
+				new SpellGravityWell(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+				new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal),
+				new SpellDarkOmen(mPlugin, mBoss, mStart.getLocation(), detectionRange) // ult + dialogue?
+			));
 
 		/*
 		 * Passive starts here
 		 */
 
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
-				new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
-				new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-				new SpellPurgeNegatives(mBoss, 4 * 20),
-				new SpellShadowRealm(mStart.getLocation(), detectionRange),
-				new SpellEdgeKill(mBoss, mStart.getLocation()),
-				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 1));
+			new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
+			new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
+			new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+			new SpellPurgeNegatives(mBoss, 4 * 20),
+			new SpellShadowRealm(mStart.getLocation(), detectionRange),
+			new SpellEdgeKill(mBoss, mStart.getLocation()),
+			new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 1));
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
-				new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
-				new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
-				new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-				new SpellPurgeNegatives(mBoss, 3 * 20),
-				new SpellShadowRealm(mStart.getLocation(), detectionRange),
-				new SpellEdgeKill(mBoss, mStart.getLocation()),
-				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 2),
-				new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
+			new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
+			new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
+			new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+			new SpellPurgeNegatives(mBoss, 3 * 20),
+			new SpellShadowRealm(mStart.getLocation(), detectionRange),
+			new SpellEdgeKill(mBoss, mStart.getLocation()),
+			new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 2),
+			new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
 
 		List<Spell> phase3PassiveSpells = Arrays.asList(
-				new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
-				new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
-				new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-				new SpellPurgeNegatives(mBoss, 2 * 20),
-				new SpellShadowRealm(mStart.getLocation(), detectionRange),
-				new SpellEdgeKill(mBoss, mStart.getLocation()),
-				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 3),
-				new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
+			new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
+			new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
+			new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+			new SpellPurgeNegatives(mBoss, 2 * 20),
+			new SpellShadowRealm(mStart.getLocation(), detectionRange),
+			new SpellEdgeKill(mBoss, mStart.getLocation()),
+			new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 3),
+			new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
@@ -418,10 +423,10 @@ public final class Lich extends BossAbilityGroup {
 			mBoss.setAI(false);
 			mBoss.setGravity(false);
 			// dialogue?
-			String[] dio = new String[] {
-					"I PROMISED THAT IF I SAW YOU AGAIN, I WOULD DESTROY YOU.",
-					"WHY DO YOU PERSIST?"
-					};
+			String[] dio = new String[]{
+				"I PROMISED THAT IF I SAW YOU AGAIN, I WOULD DESTROY YOU.",
+				"WHY DO YOU PERSIST?"
+			};
 
 			// phase transition animation
 			new BukkitRunnable() {
@@ -465,18 +470,18 @@ public final class Lich extends BossAbilityGroup {
 										world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3.0f, 1.0f);
 										try {
 											mSkull = EntityUtils.getSummonEntityAt(
-													startLoc.clone().add(vec.multiply(2 / distance)),
-													EntityType.WITHER_SKULL,
-													"{power:[" + vec.getX() * distance / 9.5 + ","
-															+ vec.getY() * distance / 9.5 + ","
-															+ vec.getZ() * distance / 9.5 + "]}");
+												startLoc.clone().add(vec.multiply(2 / distance)),
+												EntityType.WITHER_SKULL,
+												"{power:[" + vec.getX() * distance / 9.5 + ","
+													+ vec.getY() * distance / 9.5 + ","
+													+ vec.getZ() * distance / 9.5 + "]}");
 											((WitherSkull) mSkull).setCharged(true);
 										} catch (Exception e) {
 											e.printStackTrace();
 										}
 									}
 									world.spawnParticle(Particle.SOUL_FIRE_FLAME, mSkull.getLocation(), 4, 0, 0, 0,
-											0.03);
+										0.03);
 
 									// slight delay to prevent exploding too early incase the wither skull somehow
 									// despawned
@@ -504,7 +509,7 @@ public final class Lich extends BossAbilityGroup {
 											b.setType(Material.AIR);
 										}
 										world.spawnParticle(Particle.EXPLOSION_NORMAL, endLoc.clone().add(0, 2, 0), 96,
-												2, 2, 2, 0);
+											2, 2, 2, 0);
 										world.playSound(endLoc, Sound.ENTITY_GENERIC_EXPLODE, 2.5f, 1.0f);
 										// spawn the crystal for holy chest
 										List<Location> loc = new ArrayList<Location>();
@@ -563,12 +568,12 @@ public final class Lich extends BossAbilityGroup {
 			mBoss.setAI(false);
 			mBoss.setGravity(false);
 			// dialogue?
-			String[] dio = new String[] {
-					"ENOUGH. YOU CANNOT DEFEAT ME.",
-					"MY SEARCH IS FAR TOO IMPORTANT FOR YOUR MEDDLING.",
-					"THE VEIL IS RIPPING APART AND I SEEK THE SOURCE.",
-					"REALITY STILL HIDES FROM MY GRASP."
-					};
+			String[] dio = new String[]{
+				"ENOUGH. YOU CANNOT DEFEAT ME.",
+				"MY SEARCH IS FAR TOO IMPORTANT FOR YOUR MEDDLING.",
+				"THE VEIL IS RIPPING APART AND I SEEK THE SOURCE.",
+				"REALITY STILL HIDES FROM MY GRASP."
+			};
 			// phase change animation
 			new BukkitRunnable() {
 				int mT = 0;
@@ -621,16 +626,16 @@ public final class Lich extends BossAbilityGroup {
 						// put out torches by growables
 						com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
 						scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager()
-								.getPlugin("ScriptedQuests");
+							.getPlugin("ScriptedQuests");
 						try {
 							scriptedQuestsPlugin.mGrowableManager.grow("LichNoFlamePxPz",
-									mStart.getLocation().add(23, 21, 23), 1, 3, false);
+								mStart.getLocation().add(23, 21, 23), 1, 3, false);
 							scriptedQuestsPlugin.mGrowableManager.grow("LichNoFlameNxPz",
-									mStart.getLocation().add(-23, 21, 23), 1, 3, false);
+								mStart.getLocation().add(-23, 21, 23), 1, 3, false);
 							scriptedQuestsPlugin.mGrowableManager.grow("LichNoFlameNxNz",
-									mStart.getLocation().add(-23, 21, -23), 1, 3, false);
+								mStart.getLocation().add(-23, 21, -23), 1, 3, false);
 							scriptedQuestsPlugin.mGrowableManager.grow("LichNoFlamePxNz",
-									mStart.getLocation().add(23, 21, -23), 1, 3, false);
+								mStart.getLocation().add(23, 21, -23), 1, 3, false);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -755,11 +760,11 @@ public final class Lich extends BossAbilityGroup {
 		mBoss.setInvulnerable(true);
 		mBoss.teleport(mStart.getLocation().add(0, 17, 0));
 		// new spawn animation
-		String[] ani = new String[] { "loadstructure \"isles/lich/Spawn1\" ~-17 ~6 ~-17",
-				"loadstructure \"isles/lich/Spawn2\" ~-17 ~6 ~-17",
-				"loadstructure \"isles/lich/Spawn3\" ~-17 ~6 ~-17", };
-		String[] end = new String[] { "loadstructure \"isles/lich/Spawn4\" ~-17 ~6 ~-17",
-				"loadstructure \"isles/lich/clear\" ~-17 ~6 ~-17", };
+		String[] ani = new String[]{"loadstructure \"isles/lich/Spawn1\" ~-17 ~6 ~-17",
+			"loadstructure \"isles/lich/Spawn2\" ~-17 ~6 ~-17",
+			"loadstructure \"isles/lich/Spawn3\" ~-17 ~6 ~-17"};
+		String[] end = new String[]{"loadstructure \"isles/lich/Spawn4\" ~-17 ~6 ~-17",
+			"loadstructure \"isles/lich/clear\" ~-17 ~6 ~-17"};
 
 		EntityEquipment equips = mBoss.getEquipment();
 		ItemStack[] a = equips.getArmorContents();
@@ -784,20 +789,20 @@ public final class Lich extends BossAbilityGroup {
 						if (mT < ani.length) {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 0.75f);
 							String cmd = "execute positioned " + mStart.getLocation().getX() + " "
-									+ mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
-									+ ani[mT];
+								+ mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
+								+ ani[mT];
 							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 							mT++;
 						} else {
 							this.cancel();
 							String cmd = "execute positioned " + mStart.getLocation().getX() + " "
-									+ mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
-									+ end[0];
+								+ mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
+								+ end[0];
 							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 							// make boss visible
 							new PartialParticle(Particle.END_ROD, mStart.getLocation().add(0, 17, 0), 750, 6, 6, 6, 0).spawnAsBoss();
 							world.spawnParticle(Particle.EXPLOSION_HUGE, mStart.getLocation().add(0, 18, 0), 10, 4, 4,
-									4, 0);
+								4, 0);
 							mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
 							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 14, 100));
 							mBoss.getEquipment().setArmorContents(a);
@@ -817,20 +822,20 @@ public final class Lich extends BossAbilityGroup {
 								@Override
 								public void run() {
 									String cmd = "execute positioned " + mStart.getLocation().getX() + " "
-											+ mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
-											+ end[1];
+										+ mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
+										+ end[1];
 									Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 									world.playSound(mStart.getLocation().add(0, 17, 0), Sound.BLOCK_ENDER_CHEST_CLOSE,
-											10.0f, 0.5f);
+										10.0f, 0.5f);
 								}
 							}.runTaskLater(mPlugin, 50);
 
 							// dialogue functions
-							String[] dio = new String[] {
-									"AH, THE SWEET SMELL OF THE DESERT. HOW I HAVE MISSED THIS.",
-									"MY MONTHS AWAY FROM THE SANDS HAVE TAKEN A TOLL.",
-									"NOW, I BELIEVE YOU HAVE DISTURBED MY SEARCH."
-									};
+							String[] dio = new String[]{
+								"AH, THE SWEET SMELL OF THE DESERT. HOW I HAVE MISSED THIS.",
+								"MY MONTHS AWAY FROM THE SANDS HAVE TAKEN A TOLL.",
+								"NOW, I BELIEVE YOU HAVE DISTURBED MY SEARCH."
+							};
 							new BukkitRunnable() {
 								int mIter = 0;
 
@@ -850,13 +855,13 @@ public final class Lich extends BossAbilityGroup {
 										mPhase = 1;
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 											p.sendTitle(ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Hekawt, The Eternal",
-													ChatColor.GRAY + "" + ChatColor.BOLD + "Inheritor of Eternity", 10, 70, 20);
+												ChatColor.GRAY + "" + ChatColor.BOLD + "Inheritor of Eternity", 10, 70, 20);
 											p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 0.75f);
 											p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 										}
 
 										BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange,
-												BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
+											BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
 										constructBoss(phase1Spells, passiveSpells, detectionRange, bossBar);
 										this.cancel();
 									}
@@ -904,12 +909,23 @@ public final class Lich extends BossAbilityGroup {
 		Player player = event.getEntity();
 		World world = player.getWorld();
 		world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 10, 0.4, 0.45, 0.4,
-				Material.MELON.createBlockData());
+			Material.MELON.createBlockData());
 		new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 30, 0.45, 0.45, 0.45, 0.15).spawnAsBoss();
 		Location spawnLoc = player.getLocation();
 		if (player.getLocation().getY() <= mStart.getLocation().getY()) {
 			spawnLoc.setY(mStart.getLocation().getY());
 		}
+
+		// If the player got killed by a spectre, give the spectre owner the Player Slayer advancement
+		if (player.getLastDamageCause() instanceof EntityDamageByEntityEvent damageByEntityEvent) {
+			for (Player p : world.getPlayers()) {
+				if (damageByEntityEvent.getDamager().getScoreboardTags().contains("Undead" + p.getName())) {
+					CommandUtils.runCommandViaConsole("advancement grant " + p.getName() + " only monumenta:challenges/r2/lich/player_slayer");
+					break;
+				}
+			}
+		}
+
 		summonSpectre(player, spawnLoc);
 	}
 
@@ -949,31 +965,31 @@ public final class Lich extends BossAbilityGroup {
 
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5.0f, 0.75f);
 					SpellManager phase3Spells = new SpellManager(
-							Arrays.asList(
-									new SpellGraspingHands(mPlugin, mBoss),
-									new SpellDesecrate(mPlugin, mBoss),
-									new SpellGravityWell(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-									new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal),
-									new SpellDarkOmen(mPlugin, mBoss, mStart.getLocation(), detectionRange) // ult + dialogue?
-							));
+						Arrays.asList(
+							new SpellGraspingHands(mPlugin, mBoss),
+							new SpellDesecrate(mPlugin, mBoss),
+							new SpellGravityWell(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+							new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal),
+							new SpellDarkOmen(mPlugin, mBoss, mStart.getLocation(), detectionRange) // ult + dialogue?
+						));
 
 					SpellManager keyAlive = new SpellManager(
-							Arrays.asList(
-									new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal),
-									new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
-									new SpellRaiseDead(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
-									new SpellDarkOmen(mPlugin, mBoss, mStart.getLocation(), detectionRange) // ult + dialogue?
-							));
+						Arrays.asList(
+							new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal),
+							new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
+							new SpellRaiseDead(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
+							new SpellDarkOmen(mPlugin, mBoss, mStart.getLocation(), detectionRange) // ult + dialogue?
+						));
 
 					List<Spell> phase3PassiveSpells = Arrays.asList(
-							new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
-							new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
-							new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-							new SpellPurgeNegatives(mBoss, 2 * 20),
-							new SpellShadowRealm(mStart.getLocation(), detectionRange),
-							new SpellEdgeKill(mBoss, mStart.getLocation()),
-							new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 3),
-							new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
+						new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
+						new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
+						new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+						new SpellPurgeNegatives(mBoss, 2 * 20),
+						new SpellShadowRealm(mStart.getLocation(), detectionRange),
+						new SpellEdgeKill(mBoss, mStart.getLocation()),
+						new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 3),
+						new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
 
 					changePhase(keyAlive, Collections.emptyList(), null);
 					forceCastSpell(SpellDarkOmen.class);
@@ -1059,9 +1075,9 @@ public final class Lich extends BossAbilityGroup {
 		mTotalDamage += event.getDamage();
 		Location loc = mBoss.getLocation();
 		if (mTotalDamage / EntityUtils.getMaxHealth(mBoss) >= 0.04
-				&& !mActivated
-				&& !mCutscene
-				&& !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
+			&& !mActivated
+			&& !mCutscene
+			&& !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
 			World world = mBoss.getWorld();
 			mTotalDamage = 0;
 			boolean locFound = false;
@@ -1149,6 +1165,9 @@ public final class Lich extends BossAbilityGroup {
 		} else {
 			undead.setCustomName(ChatColor.GOLD + player.getName());
 		}
+
+		undead.addScoreboardTag("LichSpectre");
+		undead.addScoreboardTag("Undead" + player.getName());
 		undead.setCustomNameVisible(true);
 
 		ItemStack helm = null;
@@ -1167,7 +1186,7 @@ public final class Lich extends BossAbilityGroup {
 		if (inv.getBoots() != null) {
 			boots = inv.getBoots().clone();
 		}
-		ItemStack[] items = new ItemStack[] { helm, chest, legs, boots };
+		ItemStack[] items = new ItemStack[]{helm, chest, legs, boots};
 		for (ItemStack item : items) {
 			if (item == null) {
 				continue;
@@ -1191,22 +1210,22 @@ public final class Lich extends BossAbilityGroup {
 				if (meta.getAttributeModifiers(EquipmentSlot.HEAD) != null) {
 					meta.removeAttributeModifier(EquipmentSlot.HEAD);
 					meta.addAttributeModifier(Attribute.GENERIC_ARMOR,
-							new AttributeModifier("Armor", 0, AttributeModifier.Operation.ADD_NUMBER));
+						new AttributeModifier("Armor", 0, AttributeModifier.Operation.ADD_NUMBER));
 				}
 				if (meta.getAttributeModifiers(EquipmentSlot.CHEST) != null) {
 					meta.removeAttributeModifier(EquipmentSlot.CHEST);
 					meta.addAttributeModifier(Attribute.GENERIC_ARMOR,
-							new AttributeModifier("Armor", 0, AttributeModifier.Operation.ADD_NUMBER));
+						new AttributeModifier("Armor", 0, AttributeModifier.Operation.ADD_NUMBER));
 				}
 				if (meta.getAttributeModifiers(EquipmentSlot.LEGS) != null) {
 					meta.removeAttributeModifier(EquipmentSlot.LEGS);
 					meta.addAttributeModifier(Attribute.GENERIC_ARMOR,
-							new AttributeModifier("Armor", 0, AttributeModifier.Operation.ADD_NUMBER));
+						new AttributeModifier("Armor", 0, AttributeModifier.Operation.ADD_NUMBER));
 				}
 				if (meta.getAttributeModifiers(EquipmentSlot.FEET) != null) {
 					meta.removeAttributeModifier(EquipmentSlot.FEET);
 					meta.addAttributeModifier(Attribute.GENERIC_ARMOR,
-							new AttributeModifier("Armor", 0, AttributeModifier.Operation.ADD_NUMBER));
+						new AttributeModifier("Armor", 0, AttributeModifier.Operation.ADD_NUMBER));
 				}
 			}
 			item.setItemMeta(meta);
@@ -1219,7 +1238,6 @@ public final class Lich extends BossAbilityGroup {
 
 		return undead;
 	}
-
 
 
 	public static Location getLichSpawn() {
@@ -1266,6 +1284,10 @@ public final class Lich extends BossAbilityGroup {
 	}
 
 	public static void cursePlayer(Plugin plugin, Player p, int time) {
+		// Add to scoreboard for AccursedOne scoreboard.
+		int score = ScoreboardUtils.getScoreboardValue(p, "LichAccursedOne").isPresent() ? ScoreboardUtils.getScoreboardValue(p, "LichAccursedOne").get() : 0;
+		ScoreboardUtils.setScoreboardValue(p, "LichAccursedOne", score + 1);
+
 		//don't add repeat instances of cursed players
 		if (!mCursed.contains(p)) {
 			mCursed.add(p);
@@ -1330,10 +1352,10 @@ public final class Lich extends BossAbilityGroup {
 			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 17, 10));
 			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.REGENERATION, 20 * 17, 1));
 		}
-		String[] dio1 = new String[] {
-				"I... WILL... NOT... BE... DESTROYED...",
-				"NO! I MUST... SPEAK... THE PARTING VEIL..."
-				};
+		String[] dio1 = new String[]{
+			"I... WILL... NOT... BE... DESTROYED...",
+			"NO! I MUST... SPEAK... THE PARTING VEIL..."
+		};
 		new BukkitRunnable() {
 			int mT = 0;
 
@@ -1467,7 +1489,7 @@ public final class Lich extends BossAbilityGroup {
 						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 							p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.MASTER, 100f, 0.8f);
 							p.sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "VICTORY",
-									ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Hekawt, The Eternal", 10, 80, 10);
+								ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Hekawt, The Eternal", 10, 80, 10);
 						}
 
 						new BukkitRunnable() {
@@ -1488,10 +1510,10 @@ public final class Lich extends BossAbilityGroup {
 
 	private void surprise() {
 		mDefeated = false;
-		String[] dio = new String[] {
-				"...THE PARTING VEIL GRANTS ME STRENGTH.",
-				"IT SUSTAINS ME. I HAVE NO TIME FOR DEATH."
-				};
+		String[] dio = new String[]{
+			"...THE PARTING VEIL GRANTS ME STRENGTH.",
+			"IT SUSTAINS ME. I HAVE NO TIME FOR DEATH."
+		};
 		World world = mStart.getWorld();
 
 		mBoss.teleport(mStart.getLocation().subtract(0, 0.5, 0));
@@ -1501,17 +1523,17 @@ public final class Lich extends BossAbilityGroup {
 
 		//prevent players above the barrier ceiling from seeing title
 		String title = ChatColor.GOLD + "" + ChatColor.BOLD + "VI" +
-				ChatColor.GOLD + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "C" +
-				ChatColor.GOLD + "" + ChatColor.BOLD + "T" +
-				ChatColor.GOLD + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "OR" +
-				ChatColor.GOLD + "" + ChatColor.BOLD + "Y";
+			ChatColor.GOLD + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "C" +
+			ChatColor.GOLD + "" + ChatColor.BOLD + "T" +
+			ChatColor.GOLD + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "OR" +
+			ChatColor.GOLD + "" + ChatColor.BOLD + "Y";
 
 		String subtitle = ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "H" +
-				ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "ek" +
-				ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "aw" +
-				ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "t, Th" +
-				ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "e" +
-				ChatColor.DARK_GRAY + "" + ChatColor.BOLD + " Eternal";
+			ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "ek" +
+			ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "aw" +
+			ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "t, Th" +
+			ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "e" +
+			ChatColor.DARK_GRAY + "" + ChatColor.BOLD + " Eternal";
 
 		for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 			p.sendTitle(title, subtitle, 0, 80, 20);
@@ -1556,6 +1578,7 @@ public final class Lich extends BossAbilityGroup {
 				boolean mTrigger = false;
 				Location mStart = p.getLocation().add(0, 1, 0);
 				Vector mVec = LocationUtils.getVectorTo(mBoss.getLocation().add(0, 1, 0), mStart).multiply(1.0 / (20.0 * 4.0d));
+
 				@Override
 				public void run() {
 					if (!mTrigger) {
@@ -1589,44 +1612,45 @@ public final class Lich extends BossAbilityGroup {
 		}
 
 		List<Spell> death0Passives = Arrays.asList(
-				new SpellEdgeKill(mBoss, mStart.getLocation()),
-				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
-				new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
-				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
-				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 5, detectionRange, mCeiling, 4));
+			new SpellEdgeKill(mBoss, mStart.getLocation()),
+			new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
+			new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
+			new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
+			new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 5, detectionRange, mCeiling, 4));
 		List<Spell> death1Passives = Arrays.asList(
-				new SpellEdgeKill(mBoss, mStart.getLocation()),
-				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
-				new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
-				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
-				new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 4));
+			new SpellEdgeKill(mBoss, mStart.getLocation()),
+			new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
+			new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
+			new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
+			new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+			new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 4));
 		List<Spell> death2Passives = Arrays.asList(
-				new SpellEdgeKill(mBoss, mStart.getLocation()),
-				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
-				new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
-				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
-				new SpellFinalHeatMech(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-				new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 3, detectionRange, mCeiling, 4));
+			new SpellEdgeKill(mBoss, mStart.getLocation()),
+			new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
+			new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
+			new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
+			new SpellFinalHeatMech(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+			new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+			new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 3, detectionRange, mCeiling, 4));
 		List<Spell> death3Passives = Arrays.asList(
-				new SpellEdgeKill(mBoss, mStart.getLocation()),
-				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
-				new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
-				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
-				new SpellFinalHeatMech(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-				new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 2, detectionRange, mCeiling, 4));
+			new SpellEdgeKill(mBoss, mStart.getLocation()),
+			new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
+			new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
+			new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
+			new SpellFinalHeatMech(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+			new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+			new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 2, detectionRange, mCeiling, 4));
 
 		// partial respawn arena
 		String cmd = "execute positioned " + mStart.getLocation().getX() + " " + mStart.getLocation().getY() + " "
-				+ mStart.getLocation().getZ() + " run loadstructure \"isles/lich/LichPhase4\" ~-30 ~-2 ~-30";
+			+ mStart.getLocation().getZ() + " run loadstructure \"isles/lich/LichPhase4\" ~-30 ~-2 ~-30";
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 
 		//warning smoke ring
 		PPCircle indicator = new PPCircle(Particle.SMOKE_LARGE, mStart.getLocation(), 8).ringMode(true).count(20).delta(0.1);
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				indicator.spawnAsBoss();
@@ -1824,12 +1848,12 @@ public final class Lich extends BossAbilityGroup {
 					// Grow the lich flame using growables
 					com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
 					scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager()
-							.getPlugin("ScriptedQuests");
+						.getPlugin("ScriptedQuests");
 
 					try {
 						if (scriptedQuestsPlugin != null) {
 							scriptedQuestsPlugin.mGrowableManager.grow("LichFlame", tower.get(top).clone().add(0, 3, 0), 1,
-							                                           4, false);
+								4, false);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -1847,7 +1871,7 @@ public final class Lich extends BossAbilityGroup {
 							}
 							tower.get(top).getBlock().setType(Material.END_GATEWAY);
 							world.playSound(tower.get(top), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED,
-									SoundCategory.HOSTILE, 5, 1);
+								SoundCategory.HOSTILE, 5, 1);
 							mTowerGroup.remove(tower);
 							mTrigger = false;
 						}
@@ -1877,17 +1901,17 @@ public final class Lich extends BossAbilityGroup {
 			public void run() {
 				mDead = true;
 				World world = mBoss.getWorld();
-				String[] finaldio = new String[] {
-						"I SHOULD NOT HAVE EMERGED... THE VEIL IS FRAYING.",
-						"THERE IS POWER OUT THERE THAT COULD BE MINE, IF ONLY I HAD REMAINED.",
-						"SEARCHING... SOMETHING HAS BROKEN..."
-						};
-				String[] enddio = new String[] {
-						"REALITY...",
-						"WOULD...",
-						"BE...",
-						"MINE..."
-						};
+				String[] finaldio = new String[]{
+					"I SHOULD NOT HAVE EMERGED... THE VEIL IS FRAYING.",
+					"THERE IS POWER OUT THERE THAT COULD BE MINE, IF ONLY I HAD REMAINED.",
+					"SEARCHING... SOMETHING HAS BROKEN..."
+				};
+				String[] enddio = new String[]{
+					"REALITY...",
+					"WOULD...",
+					"BE...",
+					"MINE..."
+				};
 				// beams
 				Collection<EnderCrystal> crystals = new ArrayList<EnderCrystal>();
 				spawnCrystal(mPassive2Loc, 4, "WarpedCrystal");
@@ -1925,7 +1949,7 @@ public final class Lich extends BossAbilityGroup {
 							block.remove();
 							new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 2, 0.5, 0.5, 0.5, 0).spawnAsBoss();
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE,
-									15, 0.8f);
+								15, 0.8f);
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SKELETON_DEATH, 15, 0.75f);
 
 							// Lich BEGONE
@@ -2007,6 +2031,7 @@ public final class Lich extends BossAbilityGroup {
 							new BukkitRunnable() {
 								int mT = 0;
 								int mDio = 0;
+
 								@Override
 								public void run() {
 									if (mT != 1 && mDio < enddio.length) {
@@ -2027,7 +2052,7 @@ public final class Lich extends BossAbilityGroup {
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 											p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.MASTER, 100f, 0.8f);
 											p.sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "VICTORY",
-													ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Hekawt, The Eternal", 10, 80, 10);
+												ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Hekawt, The Eternal", 10, 80, 10);
 										}
 										mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 

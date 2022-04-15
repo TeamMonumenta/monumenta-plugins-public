@@ -103,7 +103,7 @@ public class Apocalypse extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, ignore the hit and instead deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + RADIUS + " block radius. For each mob that is killed, heal " + (int) DepthsUtils.roundPercent(HEALING) + "% of your max health. Healing above your max health is converted into absorption, up to absorption equal to " + (int) DepthsUtils.roundPercent(MAX_ABSORPTION) + " of your max health that lasts " + ABSORPTION_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, ignore the hit and instead deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + RADIUS + " block radius. For each mob that is killed, heal " + (int) DepthsUtils.roundPercent(HEALING) + "% of your max health. Healing above your max health is converted into absorption, up to absorption equal to " + (int) DepthsUtils.roundPercent(MAX_ABSORPTION) + "% of your max health that lasts " + ABSORPTION_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

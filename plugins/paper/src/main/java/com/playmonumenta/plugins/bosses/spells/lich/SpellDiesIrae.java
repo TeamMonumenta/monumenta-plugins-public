@@ -8,11 +8,13 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -54,9 +56,11 @@ public class SpellDiesIrae extends Spell {
 	private final PartialParticle mSoul;
 	private final PartialParticle mBreath1;
 	private final PartialParticle mBreath2;
-	private @Nullable PartialParticle mBreath3;
+	private @Nullable
+	PartialParticle mBreath3;
 	private final PartialParticle mExpL1;
-	private @Nullable PartialParticle mExpL2;
+	private @Nullable
+	PartialParticle mExpL2;
 	private final PartialParticle mHeart;
 
 	public SpellDiesIrae(Plugin plugin, LivingEntity boss, LivingEntity key, Location loc, double range, int ceil, List<Location> crystalLoc, String crystalnbt) {
@@ -120,6 +124,7 @@ public class SpellDiesIrae extends Spell {
 		BukkitRunnable runA = new BukkitRunnable() {
 			double mT;
 			int mCount = mCrystal.size();
+
 			@Override
 			public void run() {
 				//keep boss in place in case of tp function
@@ -187,6 +192,7 @@ public class SpellDiesIrae extends Spell {
 	}
 
 	private void attack() {
+		int countCrystal = mCrystal.size();
 		World world = mBoss.getWorld();
 		mCrystalDmg = Math.min(1.2, mCrystal.size() * 0.2);
 		int debuffTicks = mCrystal.size() * 5 * 20;
@@ -218,6 +224,7 @@ public class SpellDiesIrae extends Spell {
 		//heal boss + damage with delay (only once)
 		BukkitRunnable runB = new BukkitRunnable() {
 			int mInc = 0;
+
 			@Override
 			public void run() {
 				mInc++;
@@ -265,6 +272,11 @@ public class SpellDiesIrae extends Spell {
 						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.SLOW, debuffTicks, 0));
 						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.WEAKNESS, debuffTicks, 1));
 						world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.5f);
+
+						// If the attack was larger than 5, mark the player with a scoreboard tag for DayOfWrath
+						if (countCrystal >= 5) {
+							p.addScoreboardTag("LichDayOfWrath");
+						}
 					}
 				}
 				if (mInc >= 20 * (4 + 2)) {

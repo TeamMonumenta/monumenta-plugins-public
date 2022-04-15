@@ -50,7 +50,7 @@ public class Bulwark extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "You block the next melee attack that would have hit you, nullifying the damage. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + ChatColor.WHITE + "s.";
+		return "You block the next melee attack that would have hit you, nullifying the damage. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
 	}
 
 	@Override

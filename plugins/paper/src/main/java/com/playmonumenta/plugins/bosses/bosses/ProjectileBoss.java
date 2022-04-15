@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -72,7 +73,8 @@ public class ProjectileBoss extends BossAbilityGroup {
 		public int SPELL_DELAY = Integer.MAX_VALUE;
 
 		@BossParam(help = "Let you choose the targets of this spell")
-		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT;
+		//note: this object is only used to show the default value while using /bosstag add boss_projectile[targets=[...]]
 
 		@BossParam(help = "Effects applied to the player when he got hit")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
@@ -115,12 +117,12 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		int lifetimeTicks = (int) (p.DISTANCE/p.SPEED);
 
-		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET) {
+		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT) {
 			//same object
 			//probably an older mob version?
 			//build a new target from others config
-			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL));
-			//by default LaserBoss don't take player in stealt.
+			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+			//by default ProjectileBoss doesn't take player in stealth and need line of sight.
 		}
 
 		if (p.SPELL_DELAY == Integer.MAX_VALUE) {

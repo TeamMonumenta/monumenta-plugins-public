@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.List;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
@@ -103,7 +104,7 @@ public class ShulkerShortcutListener implements Listener {
 				click == ClickType.RIGHT &&
 				ChestUtils.isLootBox(itemClicked)) {
 				// Right clicked a lootbox - dump contents into player's inventory
-				ItemStack[] items = ChestUtils.removeOneLootshareFromLootbox(itemClicked);
+				List<ItemStack> items = ChestUtils.removeOneLootshareFromLootbox(itemClicked);
 				if (items == null) {
 					// Lootbox empty
 					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
@@ -312,7 +313,7 @@ public class ShulkerShortcutListener implements Listener {
 				event.setBuild(false);
 
 				ItemStack item = event.getItemInHand();
-				@Nullable ItemStack[] contents = ChestUtils.removeOneLootshareFromLootbox(item);
+				@Nullable List<ItemStack> contents = ChestUtils.removeOneLootshareFromLootbox(item);
 				if (contents == null) {
 					// LootBox is empty
 					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
@@ -328,7 +329,7 @@ public class ShulkerShortcutListener implements Listener {
 						chest.update();
 
 						chest = (Chest)block.getState();
-						chest.getInventory().setContents(contents);
+						ChestUtils.generateLootInventory(contents, chest.getInventory(), player, true);
 					}
 				});
 			}

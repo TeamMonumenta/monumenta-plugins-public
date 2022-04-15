@@ -21,7 +21,7 @@ import org.bukkit.inventory.ItemStack;
 public class PhlegmaticResolve extends Ability {
 
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "PhlegmaticPercentDamageResistEffect";
-	private static final String KNOCKBACK_RESIST_EFFECT_NAME = "PhlegmaticPercentDamageResistEffect";
+	private static final String KNOCKBACK_RESIST_EFFECT_NAME = "PhlegmaticPercentKnockbackResistEffect";
 	private static final double PERCENT_DAMAGE_RESIST_1 = -0.03;
 	private static final double PERCENT_DAMAGE_RESIST_2 = -0.03;
 	private static final double PERCENT_KNOCKBACK_RESIST = 0.1;
@@ -64,14 +64,17 @@ public class PhlegmaticResolve extends Ability {
 				cooldowns++;
 			}
 		}
+		if (cooldowns == 0) {
+			return;
+		}
 
-		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(6, mPercentDamageResist * cooldowns));
-		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(6, PERCENT_KNOCKBACK_RESIST * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME));
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns));
+		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, PERCENT_KNOCKBACK_RESIST * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME));
 
 		if (isLevelTwo()) {
 			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, false)) {
-				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(6, mPercentDamageResist * cooldowns / 3.0));
-				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(6, PERCENT_KNOCKBACK_RESIST * cooldowns / 3.0, KNOCKBACK_RESIST_EFFECT_NAME));
+				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns / 3.0));
+				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, PERCENT_KNOCKBACK_RESIST * cooldowns / 3.0, KNOCKBACK_RESIST_EFFECT_NAME));
 			}
 		}
 	}

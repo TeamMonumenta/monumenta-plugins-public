@@ -89,8 +89,7 @@ public class LootChestsInInventory implements Listener {
 		LootContext.Builder builder = new LootContext.Builder(player.getLocation());
 		Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, builder.build());
 		item.subtract();
-		//I hate this, but its the only way for it to work :(
-		ChestUtils.generateLootInventory(loot, inventory, player);
+		ChestUtils.generateLootInventory(loot, inventory, player, true);
 
 		addOrInitializePlayer(player);
 		player.closeInventory(Reason.OPEN_NEW);

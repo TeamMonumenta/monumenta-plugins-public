@@ -18,6 +18,8 @@ public class OneWithTheWind extends DepthsAbility {
 	public static final double[] SPEED = {0.16, 0.2, 0.24, 0.28, 0.32, 0.4};
 	public static final double[] PERCENT_DAMAGE_RECEIVED = {-.08, -.10, -.12, -.14, -.16, -.20};
 	public static final int RANGE = 10;
+	public static final String SPEED_EFFECT_NAME = "OneWithTheWindSpeedEffect";
+	public static final String RESISTANCE_EFFECT_NAME = "OneWithTheWindResistanceEffect";
 
 	public OneWithTheWind(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -28,8 +30,8 @@ public class OneWithTheWind extends DepthsAbility {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mPlayer != null && PlayerUtils.otherPlayersInRange(mPlayer, RANGE, true).size() == 0) {
-			Plugin.getInstance().mEffectManager.addEffect(mPlayer, ABILITY_NAME, new PercentSpeed(40, SPEED[mRarity - 1], ABILITY_NAME));
-			mPlugin.mEffectManager.addEffect(mPlayer, ABILITY_NAME, new PercentDamageReceived(40, PERCENT_DAMAGE_RECEIVED[mRarity - 1]));
+			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(40, SPEED[mRarity - 1], ABILITY_NAME));
+			mPlugin.mEffectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME, new PercentDamageReceived(40, PERCENT_DAMAGE_RECEIVED[mRarity - 1]));
 		}
 	}
 

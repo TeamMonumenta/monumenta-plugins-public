@@ -28,6 +28,11 @@ public class CustomLogger extends Logger {
 	}
 
 	@Override
+	public Level getLevel() {
+		return mLevel;
+	}
+
+	@Override
 	public void finest(Supplier<String> msg) {
 		if (mLevel.equals(Level.FINEST)) {
 			mLogger.info(msg);

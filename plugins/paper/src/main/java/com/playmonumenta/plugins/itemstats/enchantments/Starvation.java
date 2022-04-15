@@ -30,16 +30,17 @@ public class Starvation implements Enchantment {
 
 	@Override
 	public void onConsume(Plugin plugin, Player player, double level, PlayerItemConsumeEvent event) {
-		if (ItemStatUtils.getEnchantmentLevel(event.getItem(), EnchantmentType.STARVATION) > 0) {
-			apply(player, level);
+		int starvation = ItemStatUtils.getEnchantmentLevel(event.getItem(), EnchantmentType.STARVATION);
+		if (starvation > 0) {
+			apply(player, starvation);
 		}
 	}
 
-	public static void apply(Player player, double level) {
+	public static void apply(Player player, int level) {
 		int currFood = player.getFoodLevel();
 		float currSat = player.getSaturation();
-		float newSat = (float) Math.max(0, currSat - level);
-		float remainder = (float) Math.max(0, level - currSat);
+		float newSat = Math.max(0, currSat - level);
+		float remainder = Math.max(0, level - currSat);
 		int newFood = Math.max(0, (int) (currFood - remainder));
 		player.setSaturation(newSat);
 		player.setFoodLevel(newFood);
