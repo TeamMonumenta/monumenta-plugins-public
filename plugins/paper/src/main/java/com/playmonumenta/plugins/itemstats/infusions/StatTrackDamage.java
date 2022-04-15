@@ -9,24 +9,28 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class StatTrackBoss implements Infusion {
+public class StatTrackDamage implements Infusion {
 
 	@Override
 	public String getName() {
-		return "Boss Damage Dealt";
+		return "Damage Dealt";
 	}
 
 	@Override
 	public InfusionType getInfusionType() {
-		return InfusionType.STAT_TRACK_BOSS;
+		return InfusionType.STAT_TRACK_DAMAGE;
+	}
+
+	@Override
+	public double getPriorityAmount() {
+		return 6000; // after all damage modifiers
 	}
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		//Track damage dealt to bosses
-		if (EntityUtils.isBoss(enemy) && !EntityUtils.isTrainingDummy(enemy)) {
+		if (!EntityUtils.isTrainingDummy(enemy)) {
 			ItemStack is = player.getInventory().getItemInMainHand();
-			StatTrackManager.incrementStat(is, player, InfusionType.STAT_TRACK_BOSS, (int) event.getFinalDamage(false));
+			StatTrackManager.incrementStat(is, player, InfusionType.STAT_TRACK_DAMAGE, (int) event.getFinalDamage(false));
 		}
 	}
 }

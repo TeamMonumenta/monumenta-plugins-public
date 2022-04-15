@@ -3,13 +3,16 @@ package com.playmonumenta.plugins.itemstats.infusions;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import java.util.Set;
+import java.util.EnumSet;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class StatTrackMelee implements Infusion {
+
+	private static final EnumSet<DamageEvent.DamageType> TYPES = EnumSet.of(DamageEvent.DamageType.MELEE, DamageEvent.DamageType.MELEE_ENCH, DamageEvent.DamageType.MELEE_SKILL);
 
 	@Override
 	public String getName() {
@@ -28,15 +31,9 @@ public class StatTrackMelee implements Infusion {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		ItemStack is = player.getInventory().getItemInMainHand();
-
-		if (!isTrainingDummy(enemy)) {
+		if (TYPES.contains(event.getType()) && !EntityUtils.isTrainingDummy(enemy)) {
+			ItemStack is = player.getInventory().getItemInMainHand();
 			StatTrackManager.incrementStat(is, player, InfusionType.STAT_TRACK_MELEE, (int) event.getFinalDamage(false));
 		}
-	}
-
-	public boolean isTrainingDummy(LivingEntity e) {
-		Set<String> tags = e.getScoreboardTags();
-		return tags.contains("boss_training_dummy");
 	}
 }

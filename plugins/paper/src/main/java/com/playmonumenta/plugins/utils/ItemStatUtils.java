@@ -536,7 +536,10 @@ public class ItemStatUtils {
 		// Stat tracking stuff
 		STAT_TRACK(new StatTrack(), "Tracked", false, false, false),
 		STAT_TRACK_KILLS(new StatTrackKills(), "", true, false, true),
+		STAT_TRACK_DAMAGE(new StatTrackDamage(), "", true, false, true),
 		STAT_TRACK_MELEE(new StatTrackMelee(), "", true, false, true),
+		STAT_TRACK_PROJECTILE(new StatTrackProjectile(), "", true, false, true),
+		STAT_TRACK_MAGIC(new StatTrackMagic(), "", true, false, true),
 		STAT_TRACK_BOSS(new StatTrackBoss(), "", true, false, true),
 		STAT_TRACK_SPAWNER(new StatTrackSpawners(), "", true, false, true),
 		STAT_TRACK_CONSUMED(new StatTrackConsumed(), "", true, false, true),

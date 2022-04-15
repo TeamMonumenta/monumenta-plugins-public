@@ -43,7 +43,10 @@ public class StatTrackItem extends GenericCommand {
 
 		HashMap<String, InfusionType> options = new HashMap<>();
 		options.put("kills", InfusionType.STAT_TRACK_KILLS);
+		options.put("damage", InfusionType.STAT_TRACK_DAMAGE);
 		options.put("melee", InfusionType.STAT_TRACK_MELEE);
+		options.put("projectile", InfusionType.STAT_TRACK_PROJECTILE);
+		options.put("magic", InfusionType.STAT_TRACK_MAGIC);
 		options.put("boss", InfusionType.STAT_TRACK_BOSS);
 		options.put("spawners", InfusionType.STAT_TRACK_SPAWNER);
 		options.put("consumed", InfusionType.STAT_TRACK_CONSUMED);

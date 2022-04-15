@@ -1127,5 +1127,8 @@ public class EntityUtils {
 		return ratio * (baseDamage - 1) + 1;
 	}
 
-
+	public static boolean isTrainingDummy(LivingEntity e) {
+		Set<String> tags = e.getScoreboardTags();
+		return tags.contains("boss_training_dummy");
+	}
 }
