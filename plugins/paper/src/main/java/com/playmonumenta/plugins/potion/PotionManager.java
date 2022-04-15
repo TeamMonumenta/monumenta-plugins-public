@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Player;
@@ -94,6 +95,16 @@ public class PotionManager {
 		}
 	}
 
+	public void addPotionInfos(Player player, PotionID id, Collection<PotionInfo> infos) {
+		for (PotionInfo info : infos) {
+			addPotion(player, id, info);
+		}
+	}
+
+	public @Nullable PlayerPotionInfo getPlayerPotionInfo(Player player) {
+		return mPlayerPotions.get(player.getUniqueId());
+	}
+
 	public void removePotion(Player player, PotionID id, PotionEffectType type) {
 		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
 		if (potionInfo != null) {
@@ -123,6 +134,22 @@ public class PotionManager {
 			potionInfo.clearPotionEffectType(player, type);
 		}
 		player.removePotionEffect(type);
+	}
+
+	public HashMap<PotionID, List<PotionInfo>> getAllPotionInfos(Player player) {
+		HashMap<PotionID, List<PotionInfo>> infos = new HashMap<>();
+		for (PotionID id : PotionID.values()) {
+			infos.put(id, new ArrayList<>());
+		}
+		PlayerPotionInfo playerPotionInfo = getPlayerPotionInfo(player);
+		if (playerPotionInfo != null) {
+			for (PotionMap potionMap : playerPotionInfo.getAllPotionMaps()) {
+				for (PotionID id : PotionID.values()) {
+					infos.get(id).addAll(potionMap.getPotionInfos(id));
+				}
+			}
+		}
+		return infos;
 	}
 
 	public void updatePotionStatus(Player player, int ticks) {
