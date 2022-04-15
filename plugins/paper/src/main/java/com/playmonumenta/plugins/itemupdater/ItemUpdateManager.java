@@ -215,6 +215,7 @@ public class ItemUpdateManager implements Listener {
 			if (ItemStatUtils.isClean(item)) {
 				return;
 			}
+			ItemStatUtils.markClean(item);
 
 			ItemMeta itemMeta = item.getItemMeta();
 			if (itemMeta.hasLore()) {
@@ -236,8 +237,6 @@ public class ItemUpdateManager implements Listener {
 			if (monumenta != null) {
 				ItemStatUtils.generateItemStats(item);
 			}
-
-			ItemStatUtils.markClean(item);
 		} catch (Exception e) {
 			logNestedException(path, e);
 		}
