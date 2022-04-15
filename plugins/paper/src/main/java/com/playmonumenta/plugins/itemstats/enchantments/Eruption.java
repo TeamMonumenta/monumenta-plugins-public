@@ -42,10 +42,9 @@ public class Eruption implements Enchantment {
 	}
 
 	@Override
-	public void onBlockBreak(Plugin plugin, Player player, double value, BlockBreakEvent event) {
+	public void onBlockBreak(Plugin plugin, Player player, double level, BlockBreakEvent event) {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER) {
-			double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ERUPTION);
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(event.getBlock().getLocation(), RADIUS);
 
 			//Get enchant levels on pickaxe
@@ -59,7 +58,7 @@ public class Eruption implements Enchantment {
 
 			//Damage any mobs in the area
 			for (LivingEntity mob : mobs) {
-				DamageUtils.damage(player, mob, DamageType.OTHER, DAMAGE_PER_LEVEL * level);
+				DamageUtils.damage(player, mob, DamageType.OTHER, DAMAGE_PER_LEVEL * level, null, false, true);
 				if (fire > 0) {
 					EntityUtils.applyFire(plugin, 80 * fire, mob, player);
 				}
