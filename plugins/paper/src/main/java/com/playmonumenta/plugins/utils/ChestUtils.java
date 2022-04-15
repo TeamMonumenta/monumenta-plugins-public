@@ -3,11 +3,17 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.LootTableManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTCompoundList;
+import de.tr7zw.nbtapi.NBTItem;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -30,6 +36,8 @@ import org.bukkit.loot.LootTable;
 import org.bukkit.loot.Lootable;
 
 public class ChestUtils {
+	private static final int LOOTBOX_EPIC_MAX_SIZE = 100;
+	private static final int LOOTBOX_WARN_FREE_SPACES = 6;
 
 	private static final double[] BONUS_ITEMS = {
 			0, // Dummy value, this is a player count indexed array
@@ -133,7 +141,7 @@ public class ChestUtils {
 				}
 
 				// Put the remainder of the loot in the original container
-				ChestUtils.generateLootInventory(itemsForOrigContainer, inventory, player);
+				ChestUtils.generateLootInventory(itemsForOrigContainer, inventory, player, true);
 			}
 		}
 	}
@@ -180,13 +188,57 @@ public class ChestUtils {
 			}
 
 			// Pull off that many items from the input list and put them in a bucket
-			buckets.add(loot.subList(itemsMoved, itemsMoved + itemsToMove));
+			buckets.add(new ArrayList<>(loot.subList(itemsMoved, itemsMoved + itemsToMove)));
 
 			itemsMoved += itemsToMove;
 		}
 
 		// Shuffle the buckets themselves so the 1st player isn't more likely to get +1 item
 		Collections.shuffle(buckets, FastUtils.RANDOM);
+
+		MMLog.finer("LOOTBOX: Attempting to merge items in " + buckets.size() + " buckets");
+
+		// Compact the buckets down to save space. Every little bit helps with the big lootbox
+		// For example: compacting two CXP items into one CXP item with count 2
+		for (List<ItemStack> bucket : buckets) {
+			if (MMLog.isLevelEnabled(Level.FINER)) {
+				MMLog.finer("LOOTBOX: Processing bucket which contains:");
+				bucket.forEach((item) -> MMLog.finer("LOOTBOX:     " + item.toString()));
+			}
+
+			// Iterate from the end of the bucket backwards, attempting to merge each item
+			// with the items that came before it
+			for (int testIdx = bucket.size() - 1; testIdx >= 0; testIdx--) {
+				// Get the item to try to merge into those before it
+				ItemStack testItemToMerge = bucket.get(testIdx);
+
+				// Iterate over all items before this one, trying to merge into them
+				for (int baseIdx = 0; baseIdx < testIdx; baseIdx++) {
+					ItemStack mergeToCandidate = bucket.get(baseIdx);
+
+					if (mergeToCandidate.isSimilar(testItemToMerge) &&
+						(mergeToCandidate.getAmount() + testItemToMerge.getAmount()) <= testItemToMerge.getMaxStackSize()) {
+						// These items are the same and they can be combined without exceeding stack size - merge them
+
+						MMLog.finer("LOOTBOX:   Merging item in slot " + testIdx + " into " + baseIdx);
+
+						// Increment the earlier item
+						mergeToCandidate.add(testItemToMerge.getAmount());
+
+						// Remove the item that was merged
+						bucket.remove(testIdx);
+
+						// No more merge attempts needed for this item
+						break;
+					}
+				}
+			}
+
+			if (MMLog.isLevelEnabled(Level.FINER)) {
+				MMLog.finer("LOOTBOX: Bucket resulting contents:");
+				bucket.forEach((item) -> MMLog.finer("LOOTBOX:     " + item.toString()));
+			}
+		}
 
 		return buckets;
 	}
@@ -207,34 +259,96 @@ public class ChestUtils {
 		ItemStack lootShare = new ItemStack(Material.CHEST);
 		if (lootShare.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof Chest chestMeta) {
 			blockMeta.displayName(Component.text("Loot Share").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.LIGHT_PURPLE));
-			ChestUtils.generateLootInventory(loot, chestMeta.getInventory(), player);
+			ChestUtils.generateLootInventory(loot, chestMeta.getInventory(), player, false);
 			blockMeta.setBlockState(chestMeta);
 			lootShare.setItemMeta(blockMeta);
 		}
 		ItemUtils.setPlainTag(lootShare);
 
-		// Add the item to the lootbox
-		// Note that if we got here, that lootbox always has space available
-		if (lootBox.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
-			// Update the lootbox's inventory with the added item
-			shulkerMeta.getInventory().addItem(lootShare);
-			blockMeta.setBlockState(shulkerMeta);
-			lootBox.setItemMeta(blockMeta);
+		if (isEpicLootBox(lootBox)) {
+			// Add the item to the epic lootbox's Monumenta.Items[] inventory
+			NBTItem nbt = new NBTItem(lootBox);
+			NBTCompound monumenta = nbt.addCompound(ItemStatUtils.getMonumentaKey());
+			NBTCompoundList items = monumenta.getCompoundList("Items");
+			items.addCompound(NBTItem.convertItemtoNBT(lootShare));
+
+			// Refresh the lootbox item
+			lootBox.setItemMeta(nbt.getItem().getItemMeta());
 
 			// Update the lore text with the new count
-			int emptySpaces = countEmptySpaces(shulkerMeta.getInventory());
-			if (ItemStatUtils.getLore(lootBox).size() >= 3) {
-				ItemStatUtils.removeLore(lootBox, 2);
+			updateLootBoxSharesLore(lootBox, items.size(), LOOTBOX_EPIC_MAX_SIZE);
+		} else {
+			// Add the item to the normal lootbox's shulker inventory
+			// Note that if we got here, that lootbox always has space available
+			if (lootBox.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
+				// Update the lootbox's inventory with the added item
+				shulkerMeta.getInventory().addItem(lootShare);
+				blockMeta.setBlockState(shulkerMeta);
+				lootBox.setItemMeta(blockMeta);
+
+				// Update the lore text with the new count
+				updateLootBoxSharesLore(lootBox, 27 - countEmptyNormalLootboxSpaces(shulkerMeta.getInventory()), 27);
 			}
-			ItemStatUtils.addLore(lootBox, 2, Component.text((27 - emptySpaces) + "/27 shares").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE));
-			ItemStatUtils.generateItemStats(lootBox);
 		}
 
 		return true;
 	}
 
-	public static @Nullable ItemStack[] removeOneLootshareFromLootbox(ItemStack lootBox) {
-		@Nullable ItemStack[] returnContents = null;
+	public static @Nullable List<ItemStack> removeOneLootshareFromLootbox(ItemStack lootBox) {
+		if (isEpicLootBox(lootBox)) {
+			return removeOneLootshareFromEpicLootbox(lootBox);
+		} else {
+			return removeOneLootshareFromNormalLootbox(lootBox);
+		}
+	}
+
+	private static @Nullable List<ItemStack> removeOneLootshareFromEpicLootbox(ItemStack lootBox) {
+		@Nullable List<ItemStack> returnContents = null;
+
+		NBTItem nbt = new NBTItem(lootBox);
+		NBTCompound monumenta = nbt.getCompound(ItemStatUtils.getMonumentaKey());
+		if (monumenta == null) {
+			return null;
+		}
+
+		// The epic stores items only in {Monumenta:{Items:[{item}]}}, it does not use the normal shulker contents at all
+		NBTCompoundList items = monumenta.getCompoundList("Items");
+		if (items == null || items.isEmpty()) {
+			return null;
+		}
+
+		// Remove the first item from the list
+		ItemStack lootShare = NBTItem.convertNBTtoItem(items.remove(0));
+		if (lootShare == null) {
+			return null;
+		}
+
+		// Update the lootbox to remove the item
+		lootBox.setItemMeta(nbt.getItem().getItemMeta());
+
+		// Get the contents of the removed chest
+		if (lootShare.getItemMeta() instanceof BlockStateMeta shareBlockMeta && shareBlockMeta.getBlockState() instanceof Chest chestMeta) {
+			returnContents = Arrays.stream(chestMeta.getInventory().getContents())
+				.filter((item) -> item != null && !item.getType().isAir())
+				.collect(Collectors.toList());
+		}
+
+		// Update the lore text with the new count
+		updateLootBoxSharesLore(lootBox, items.size(), LOOTBOX_EPIC_MAX_SIZE);
+
+		return returnContents;
+	}
+
+	private static void updateLootBoxSharesLore(ItemStack lootBox, int amount, int max) {
+		if (ItemStatUtils.getLore(lootBox).size() >= 3) {
+			ItemStatUtils.removeLore(lootBox, 2);
+		}
+		ItemStatUtils.addLore(lootBox, 2, Component.text(amount + "/" + max + " shares").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE));
+		ItemStatUtils.generateItemStats(lootBox);
+	}
+
+	private static @Nullable List<ItemStack> removeOneLootshareFromNormalLootbox(ItemStack lootBox) {
+		@Nullable List<ItemStack> returnContents = null;
 
 		if (lootBox.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
 			@Nullable ItemStack[] lootBoxContents = shulkerMeta.getInventory().getContents();
@@ -254,7 +368,9 @@ public class ChestUtils {
 			}
 
 			if (lootShare.getItemMeta() instanceof BlockStateMeta shareBlockMeta && shareBlockMeta.getBlockState() instanceof Chest chestMeta) {
-				returnContents = chestMeta.getInventory().getContents();
+				returnContents = Arrays.stream(chestMeta.getInventory().getContents())
+					.filter((item) -> item != null && !item.getType().isAir())
+					.collect(Collectors.toList());
 			}
 
 			// Remove this lootshare item from the lootbox
@@ -265,18 +381,13 @@ public class ChestUtils {
 			lootBox.setItemMeta(blockMeta);
 
 			// Update the lore text with the new count
-			int emptySpaces = countEmptySpaces(shulkerMeta.getInventory());
-			if (ItemStatUtils.getLore(lootBox).size() >= 3) {
-				ItemStatUtils.removeLore(lootBox, 2);
-			}
-			ItemStatUtils.addLore(lootBox, 2, Component.text((27 - emptySpaces) + "/27 shares").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE));
-			ItemStatUtils.generateItemStats(lootBox);
+			updateLootBoxSharesLore(lootBox, 27 - countEmptyNormalLootboxSpaces(shulkerMeta.getInventory()), 27);
 		}
 
 		return returnContents;
 	}
 
-	private static int countEmptySpaces(Inventory inventory) {
+	private static int countEmptyNormalLootboxSpaces(Inventory inventory) {
 		int empty = 0;
 		for (ItemStack subitem : inventory.getContents()) {
 			if (subitem == null || subitem.getType().isAir()) {
@@ -286,7 +397,7 @@ public class ChestUtils {
 		return empty;
 	}
 
-	public static @Nullable ItemStack getNextLootboxWithSpace(Player player) {
+	private static @Nullable ItemStack getNextLootboxWithSpace(Player player) {
 		ItemStack lootBox = null;
 		int numAvailSpaces = 0;
 		boolean foundLootBox = false;
@@ -295,22 +406,38 @@ public class ChestUtils {
 			if (isLootBox(item)) {
 				foundLootBox = true;
 
-				if (item.getItemMeta() instanceof BlockStateMeta blockmeta) {
-					if (blockmeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
-						int availSpaces = countEmptySpaces(shulkerMeta.getInventory());
+				if (isEpicLootBox(item)) {
+					// Epic lootbox
+					NBTItem nbt = new NBTItem(item);
+					NBTCompound monumenta = nbt.addCompound(ItemStatUtils.getMonumentaKey());
+					NBTCompoundList items = monumenta.getCompoundList("Items");
+					if (items != null) {
+						int availSpaces = LOOTBOX_EPIC_MAX_SIZE - items.size();
 						// Will return the first available box
 						if (availSpaces > 0 && lootBox == null) {
 							lootBox = item;
 						}
 						numAvailSpaces += availSpaces;
 					}
+				} else if (item.getItemMeta() instanceof BlockStateMeta blockmeta && blockmeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
+					// Normal lootbox
+					int availSpaces = countEmptyNormalLootboxSpaces(shulkerMeta.getInventory());
+					// Will return the first available box
+					if (availSpaces > 0 && lootBox == null) {
+						lootBox = item;
+					}
+					numAvailSpaces += availSpaces;
 				}
 
+				if (numAvailSpaces > LOOTBOX_WARN_FREE_SPACES) {
+					// No reason to keep examining boxes, there's at least the threshold number remaining to not complain about space
+					break;
+				}
 			}
 		}
 
 		if (foundLootBox) {
-			if (numAvailSpaces > 6) {
+			if (numAvailSpaces > LOOTBOX_WARN_FREE_SPACES) {
 				// Plenty of space
 				// /playsound minecraft:block.note_block.chime player @s ~ ~ ~ 0.8 1.2
 				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 0.8f, 1.2f);
@@ -332,11 +459,28 @@ public class ChestUtils {
 	}
 
 	public static boolean isLootBox(ItemStack item) {
-		return item != null &&
-			   ItemUtils.isShulkerBox(item.getType()) &&
-			   item.hasItemMeta() &&
-			   item.getItemMeta().hasDisplayName() &&
-			   ItemUtils.getPlainName(item).startsWith("LOOTBOX");
+		if (item == null || !ItemUtils.isShulkerBox(item.getType()) || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
+			return false;
+		}
+
+		String plainName = ItemUtils.getPlainName(item);
+		return plainName.equals("LOOTBOX") || plainName.equals("Box of Endless Echoes");
+	}
+
+	public static boolean isEpicLootBox(ItemStack item) {
+		if (item == null || !ItemUtils.isShulkerBox(item.getType()) || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
+			return false;
+		}
+
+		return ItemUtils.getPlainName(item).equals("Box of Endless Echoes");
+	}
+
+	public static boolean isNormalLootBox(ItemStack item) {
+		if (item == null || !ItemUtils.isShulkerBox(item.getType()) || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
+			return false;
+		}
+
+		return ItemUtils.getPlainName(item).equals("LOOTBOX");
 	}
 
 	public static boolean isLootShare(ItemStack item) {
@@ -347,21 +491,20 @@ public class ChestUtils {
 			   ItemUtils.getPlainName(item).equals("Loot Share");
 	}
 
-	public static void generateLootInventory(Collection<ItemStack> populatedLoot, Inventory inventory, Player player) {
-		ArrayList<ItemStack> lootList = new ArrayList<>();
-		for (ItemStack i : populatedLoot) {
-			if (i == null) {
-				i = new ItemStack(Material.AIR);
-			}
-			lootList.add(i);
-		}
+	public static void generateLootInventory(Collection<ItemStack> populatedLoot, Inventory inventory, Player player, boolean randomlyDistribute) {
+		List<ItemStack> lootList = populatedLoot.stream()
+			.filter((item) -> item != null && !item.getType().isAir())
+			.collect(Collectors.toList());
 
 		List<Integer> freeSlots = new ArrayList<>(27);
 		for (int i = 0; i < 27; i++) {
 			freeSlots.add(i);
 		}
-		Collections.shuffle(freeSlots);
+		if (randomlyDistribute) {
+			Collections.shuffle(freeSlots);
+		}
 
+		MMLog.finer("generateLootInventory: Started with " + lootList.size() + " items and randomlyDistribute=" + randomlyDistribute);
 		ArrayDeque<Integer> slotsWithMultipleItems = new ArrayDeque<>();
 		for (ItemStack lootItem : lootList) {
 			if (freeSlots.size() == 0) {
@@ -371,25 +514,41 @@ public class ChestUtils {
 			}
 			int slot = freeSlots.remove(0);
 			inventory.setItem(slot, lootItem);
+			if (MMLog.isLevelEnabled(Level.FINER)) { // Performance optimization to avoid calling lootItem.toString() when this log level is disabled
+				MMLog.finer("generateLootInventory: Putting item in slot " + slot + ": " + lootItem.toString());
+			}
 			if (lootItem.getAmount() > 1) {
+				MMLog.finer("generateLootInventory: Adding slot " + slot + " to multiple items list");
 				slotsWithMultipleItems.add(slot);
 			}
 		}
 
-		while (freeSlots.size() > 1 && slotsWithMultipleItems.size() > 0) {
-			int splitslot = slotsWithMultipleItems.getFirst();
+		while (randomlyDistribute && freeSlots.size() > 1 && slotsWithMultipleItems.size() > 0) {
+			int splitslot = slotsWithMultipleItems.remove();
 			int slot = freeSlots.remove(0);
 
 			ItemStack toSplitItem = inventory.getItem(splitslot);
 			ItemStack splitItem = toSplitItem.clone();
 			int amountToSplit = toSplitItem.getAmount() / 2;
+			int amountRemaining = toSplitItem.getAmount() - amountToSplit;
 
-			toSplitItem.setAmount(toSplitItem.getAmount() - amountToSplit);
+			if (MMLog.isLevelEnabled(Level.FINER)) {
+				MMLog.finer("generateLootInventory: Splitting item type " + toSplitItem.getType().toString() +
+				            " with count " + toSplitItem.getAmount() + " in slot " + splitslot +
+							" into count " + amountRemaining + " and " + amountToSplit + " in slot " + slot);
+			}
+
+			toSplitItem.setAmount(amountRemaining);
 			splitItem.setAmount(amountToSplit);
 			inventory.setItem(slot, splitItem);
 
 			if (amountToSplit > 1) {
+				MMLog.finer("generateLootInventory: Adding slot " + slot + " to multiple items list");
 				slotsWithMultipleItems.add(slot);
+		    }
+			if (amountRemaining > 1) {
+				MMLog.finer("generateLootInventory: Adding slot " + splitslot + " to multiple items list");
+				slotsWithMultipleItems.add(splitslot);
 		    }
 		}
 	}

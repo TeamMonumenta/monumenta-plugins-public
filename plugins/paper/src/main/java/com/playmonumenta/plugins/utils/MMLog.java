@@ -13,6 +13,14 @@ public class MMLog {
 		}
 	}
 
+	public static boolean isLevelEnabled(Level level) {
+		Logger logger = CustomLogger.getInstance();
+		if (logger != null) {
+			return level.intValue() >= logger.getLevel().intValue();
+		}
+		return true;
+	}
+
 	public static void finest(Supplier<String> msg) {
 		Logger logger = CustomLogger.getInstance();
 		if (logger != null) {
