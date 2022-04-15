@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.itemupdater;
 
+import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -193,6 +194,15 @@ public class ItemUpdateManager implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
+		if (event.getEntity() instanceof Merchant) {
+			List<String> path = new ArrayList<>();
+			path.add("EntityAddToWorldEvent");
+			updateNested(path, event.getEntity());
+		}
+	}
+
 	public static void updateNested(List<String> path, @Nullable ItemStack item) {
 		if (item == null || !item.hasItemMeta()) {
 			return;
@@ -319,6 +329,19 @@ public class ItemUpdateManager implements Listener {
 					logNestedException(path, e);
 				}
 			}
+		}
+
+		if (entity instanceof Merchant merchant) {
+			List<MerchantRecipe> offers = merchant.getRecipes();
+			for (MerchantRecipe offer : offers) {
+				List<ItemStack> items = offer.getIngredients();
+				for (ItemStack item : items) {
+					updateNested(path, item);
+				}
+				updateNested(path, offer.getResult());
+				offer.setIngredients(items);
+			}
+			merchant.setRecipes(offers);
 		}
 
 		if (entity instanceof EnderSignal) {
