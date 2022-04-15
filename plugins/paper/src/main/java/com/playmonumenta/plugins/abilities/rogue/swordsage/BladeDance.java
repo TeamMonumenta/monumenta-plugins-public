@@ -97,7 +97,7 @@ public class BladeDance extends Ability {
 					new PartialParticle(Particle.VILLAGER_ANGRY, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0).spawnAsPlayerActive(mPlayer);
 
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DANCE_RADIUS)) {
-						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.mLinkedSpell, true);
+						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell, true);
 						MovementUtils.knockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED, true);
 
 						if (!EntityUtils.isBoss(mob)) {

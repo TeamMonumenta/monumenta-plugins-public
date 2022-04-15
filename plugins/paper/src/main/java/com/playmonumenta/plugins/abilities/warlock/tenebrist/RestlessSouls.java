@@ -6,15 +6,15 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
 import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
 import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,7 +62,6 @@ public class RestlessSouls extends Ability {
 
 	public RestlessSouls(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Restless Souls");
-		//TODO add scoreboard "RestlessSouls"
 		mInfo.mScoreboardId = "RestlessSouls";
 		mInfo.mShorthandName = "RS";
 		mInfo.mDescriptions.add("Whenever an enemy dies within " + RANGE + " blocks of you, a glowing invisible invulnerable vex spawns. The vex targets your enemies and possesses them, dealing " + DAMAGE_1 + " damage and silences the target for " + SILENCE_DURATION_1 / 20 + " seconds. Vex count is capped at " + VEX_CAP_1 + " and each lasts for " + VEX_DURATION / 20 + " seconds. Each vex can only possess 1 enemy. Enemies killed by the vex will not spawn additional vexes.");
@@ -117,23 +116,18 @@ public class RestlessSouls extends Ability {
 		if (mVexList.size() < mVexCap) {
 			mVex = (Vex) LibraryOfSoulsIntegration.summon(summonLoc.clone(), VEX_NAME);
 			if (mVex == null) {
+				MMLog.warning("Failed to summon RestlessSoul");
 				return;
 			}
 			mVexList.add(mVex);
 
-			BossManager bossManager = BossManager.getInstance();
-			if (bossManager != null) {
-				List<BossAbilityGroup> abilities = bossManager.getAbilities(mVex);
-				if (abilities != null) {
-					for (BossAbilityGroup ability : abilities) {
-						if (ability instanceof RestlessSoulsBoss restlessSoulsBoss) {
-							ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-							restlessSoulsBoss.spawn(mPlayer, mDamage, mSilenceTime, DEBUFF_DURATION, mLevel, playerItemStats);
-							break;
-						}
-					}
-				}
+			RestlessSoulsBoss restlessSoulsBoss = BossUtils.getBossOfClass(mVex, RestlessSoulsBoss.class);
+			if (restlessSoulsBoss == null) {
+				MMLog.warning("Failed to get RestlessSoulsBoss");
+				return;
 			}
+			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+			restlessSoulsBoss.spawn(mPlayer, mDamage, mSilenceTime, DEBUFF_DURATION, mLevel, playerItemStats);
 
 			mParticle1 = new PartialParticle(Particle.SOUL, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
 			mParticle2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
@@ -175,7 +169,7 @@ public class RestlessSouls extends Ability {
 					if ((target == null || target.isDead() || target.getHealth() <= 0) && mTicksElapsed >= TICK_INTERVAL * 2) {
 						Location pLoc = mPlayer.getLocation();
 						List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(pLoc, DETECTION_RANGE, mBoss);
-						if (nearbyMobs != null && nearbyMobs.size() > 0) {
+						if (!nearbyMobs.isEmpty()) {
 							nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 							Collections.shuffle(nearbyMobs);
 							// check mob count again after removal of vexes

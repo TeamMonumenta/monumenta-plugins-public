@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses.abilities;
 
+import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -29,14 +30,16 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 
 	private @Nullable Player mPlayer;
 	private double mDamage = 0;
-	private int mStunTime = 0;
+	private int mStunDuration = 0;
+	private int mBleedDuration = 0;
+	private double mBleedAmount = 0;
 	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new HuntingCompanionBoss(plugin, boss);
 	}
 
-	public HuntingCompanionBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public HuntingCompanionBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		mStunnedMobs = new ArrayList<>();
@@ -45,10 +48,12 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
-	public void spawn(Player player, double damage, int stunTime, ItemStatManager.PlayerItemStats playerItemStats) {
+	public void spawn(Player player, double damage, int stunDuration, int bleedDuration, double bleedAmount, ItemStatManager.PlayerItemStats playerItemStats) {
 		mPlayer = player;
 		mDamage = damage;
-		mStunTime = stunTime;
+		mStunDuration = stunDuration;
+		mBleedDuration = bleedDuration;
+		mBleedAmount = bleedAmount;
 		mPlayerItemStats = playerItemStats;
 	}
 
@@ -59,11 +64,18 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 
 			DamageUtils.damage(mPlayer, damagee, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, ClassAbility.HUNTING_COMPANION, mPlayerItemStats), mDamage, true, true, false);
 
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_FOX_BITE, 1.5f, 1.0f);
-			UUID uuid = damagee.getUniqueId();
-			if (!mStunnedMobs.contains(uuid)) {
-				EntityUtils.applyStun(com.playmonumenta.plugins.Plugin.getInstance(), mStunTime, damagee);
-				mStunnedMobs.add(uuid);
+			if (mStunDuration > 0) {
+				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_FOX_BITE, 1.5f, 1.0f);
+				UUID uuid = damagee.getUniqueId();
+				if (!mStunnedMobs.contains(uuid)) {
+					EntityUtils.applyStun(com.playmonumenta.plugins.Plugin.getInstance(), mStunDuration, damagee);
+					mStunnedMobs.add(uuid);
+				}
+			}
+
+			if (mBleedDuration > 0) {
+				HuntingCompanion.eagleSounds(mBoss.getLocation());
+				EntityUtils.applyBleed(com.playmonumenta.plugins.Plugin.getInstance(), mBleedDuration, mBleedAmount, damagee);
 			}
 		}
 	}
@@ -71,7 +83,7 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 	@Override
 	public void bossChangedTarget(EntityTargetEvent event) {
 		Entity target = event.getTarget();
-		if (!EntityUtils.isHostileMob(target) || (target != null && target.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))) {
+		if (!EntityUtils.isHostileMob(target) || target.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			event.setCancelled(true);
 		}
 	}

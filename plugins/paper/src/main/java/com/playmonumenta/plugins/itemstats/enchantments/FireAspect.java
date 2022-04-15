@@ -53,15 +53,15 @@ public class FireAspect implements Enchantment {
 			} else {
 				playerItemStats = plugin.mItemStatManager.getPlayerItemStats(player);
 			}
-			apply(plugin, playerItemStats, duration, enemy);
+			apply(plugin, player, playerItemStats, duration, enemy);
 		}
 	}
 
 	public static void apply(Plugin plugin, Player player, int duration, LivingEntity enemy) {
-		apply(plugin, player, playerItemStats = plugin.mItemStatManager.getPlayerItemStats(player), duration, enemy);
+		apply(plugin, player, plugin.mItemStatManager.getPlayerItemStats(player), duration, enemy);
 	}
 
-	public static void apply(Plugin plugin, Player player, PlayerItemStats playerItemStats, int duration, LivingEntity enemy) {
+	public static void apply(Plugin plugin, Player player, ItemStatManager.PlayerItemStats playerItemStats, int duration, LivingEntity enemy) {
 		EntityUtils.applyFire(plugin, duration, enemy, player, playerItemStats);
 		// So that fire resistant mobs don't get fire particles
 		if (enemy.getFireTicks() > 0) {

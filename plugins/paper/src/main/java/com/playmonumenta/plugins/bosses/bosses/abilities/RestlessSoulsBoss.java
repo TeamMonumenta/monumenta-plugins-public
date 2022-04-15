@@ -52,7 +52,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		return new RestlessSoulsBoss(plugin, boss);
 	}
 
-	public RestlessSoulsBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public RestlessSoulsBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		boss.setInvulnerable(true);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);

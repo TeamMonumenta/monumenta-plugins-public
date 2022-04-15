@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
@@ -14,7 +12,9 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -80,20 +80,14 @@ public class Metalmancy extends DepthsAbility {
 			}
 			mGolem.setVelocity(facingDirection.multiply(VELOCITY));
 
-			BossManager bossManager = BossManager.getInstance();
-			if (bossManager != null) {
-				List<BossAbilityGroup> abilities = bossManager.getAbilities(mGolem);
-				if (abilities != null) {
-					for (BossAbilityGroup ability : abilities) {
-						if (ability instanceof MetalmancyBoss metalmancyBoss) {
-							ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-
-							metalmancyBoss.spawn(mPlayer, DAMAGE[mRarity - 1], playerItemStats);
-							break;
-						}
-					}
-				}
+			MetalmancyBoss metalmancyBoss = BossUtils.getBossOfClass(mGolem, MetalmancyBoss.class);
+			if (metalmancyBoss == null) {
+				MMLog.warning("Failed to get MetalamcnyBoss");
+				return;
 			}
+
+			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+			metalmancyBoss.spawn(mPlayer, DAMAGE[mRarity - 1], playerItemStats);
 
 			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, 1.0f, 1.0f);
 			world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, 1.0f, 1.0f);
@@ -154,7 +148,7 @@ public class Metalmancy extends DepthsAbility {
 
 		World world = mPlayer.getWorld();
 		mTarget = enemy;
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
+		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
 		PotionUtils.applyPotion(mPlayer, mTarget, new PotionEffect(PotionEffectType.GLOWING, DURATION[mRarity - 1], 0, true, false));
 		world.spawnParticle(Particle.VILLAGER_ANGRY, mGolem.getEyeLocation(), 15);
 		return true; // only one retarget per tick
