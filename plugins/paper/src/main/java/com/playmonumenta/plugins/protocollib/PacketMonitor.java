@@ -51,7 +51,11 @@ public class PacketMonitor implements PacketListener {
 	public ListeningWhitelist getSendingWhitelist() {
 		return ListeningWhitelist.newBuilder()
 			.gamePhase(GamePhase.PLAYING)
-			.types(PacketType.Play.Server.getInstance().values().stream().filter(PacketType::isSupported).toList())
+			.types(PacketType.Play.Server.getInstance().values().stream()
+				.filter(type -> type.isSupported()
+					                && !type.isDeprecated()
+					                && !type.equals(PacketType.Play.Server.TAB_COMPLETE))
+				.toList())
 			.monitor()
 			.build();
 	}
