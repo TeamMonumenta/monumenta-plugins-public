@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -215,6 +214,7 @@ public class ItemUpdateManager implements Listener {
 			if (ItemStatUtils.isClean(item)) {
 				return;
 			}
+			ItemStatUtils.markClean(item);
 
 			ItemMeta itemMeta = item.getItemMeta();
 			if (itemMeta.hasLore()) {
@@ -232,12 +232,9 @@ public class ItemUpdateManager implements Listener {
 
 			// Only generate item stats on items with Monumenta tag
 			NBTItem nbt = new NBTItem(item);
-			NBTCompound monumenta = nbt.getCompound(ItemStatUtils.getMonumentaKey());
-			if (monumenta != null) {
+			if (nbt.hasKey(ItemStatUtils.MONUMENTA_KEY)) {
 				ItemStatUtils.generateItemStats(item);
 			}
-
-			ItemStatUtils.markClean(item);
 		} catch (Exception e) {
 			logNestedException(path, e);
 		}

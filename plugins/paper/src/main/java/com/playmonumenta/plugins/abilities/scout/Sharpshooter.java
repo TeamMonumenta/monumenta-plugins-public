@@ -82,6 +82,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		}
 	}
 
+	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		if (getAbilityScore() > 1 && mPlayer != null && FastUtils.RANDOM.nextDouble() < ARROW_SAVE_CHANCE) {
 			boolean refunded = AbilityUtils.refundArrow(mPlayer, arrow);

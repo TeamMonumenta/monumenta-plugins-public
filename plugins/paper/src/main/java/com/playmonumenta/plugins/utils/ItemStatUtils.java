@@ -68,7 +68,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class ItemStatUtils {
 
 	static final String MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME = "MMDummy";
-	static final String MONUMENTA_KEY = "Monumenta";
+	public static final String MONUMENTA_KEY = "Monumenta";
 	static final String LORE_KEY = "Lore";
 	static final String STOCK_KEY = "Stock";
 	static final String PLAYER_MODIFIED_KEY = "PlayerModified";
@@ -1296,10 +1296,10 @@ public class ItemStatUtils {
 		}
 		NBTItem nbt = new NBTItem(item);
 
-		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
+		if (!nbt.hasKey(MONUMENTA_KEY)) {
 			return true;
 		}
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 
 		return !monumenta.hasKey(DIRTY_KEY);
 	}
@@ -1310,16 +1310,19 @@ public class ItemStatUtils {
 		}
 		NBTItem nbt = new NBTItem(item);
 
-		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
+		if (!nbt.hasKey(MONUMENTA_KEY)) {
 			return;
 		}
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 
 		if (!monumenta.hasKey(DIRTY_KEY)) {
 			return;
 		}
-
 		monumenta.removeKey(DIRTY_KEY);
+		if (monumenta.getKeys().isEmpty()) {
+			nbt.removeKey(MONUMENTA_KEY);
+		}
+
 		item.setItemMeta(nbt.getItem().getItemMeta());
 	}
 

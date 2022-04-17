@@ -368,4 +368,8 @@ public class PlayerUtils {
 		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
 		return opt.orElse(0) == 7;
 	}
+
+	public static void resetAttackCooldown(Player player) {
+		NmsUtils.getVersionAdapter().setAttackCooldown(player, 0);
+	}
 }

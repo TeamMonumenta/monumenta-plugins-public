@@ -103,7 +103,7 @@ public class Hedera extends BossAbilityGroup {
 		}
 
 		//Set/remove blocks
-		if (spawnLoc.getBlock().getType() == Material.STONE_BUTTON) {
+		if (spawnLoc.isChunkLoaded() && spawnLoc.getBlock().getType() == Material.STONE_BUTTON) {
 			spawnLoc.getBlock().setType(Material.AIR);
 		}
 

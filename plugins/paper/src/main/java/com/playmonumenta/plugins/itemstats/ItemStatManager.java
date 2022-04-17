@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
@@ -364,12 +365,15 @@ public class ItemStatManager implements Listener {
 			for (ItemStat stat : ITEM_STATS) {
 				stat.onEquipmentUpdate(mPlugin, player);
 			}
+			PlayerUtils.resetAttackCooldown(player);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		updateStatsDelayed(event.getPlayer());
+		Player player = event.getPlayer();
+		updateStatsDelayed(player);
+		PlayerUtils.resetAttackCooldown(player);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
