@@ -91,11 +91,13 @@ public final class Nucleus extends BossAbilityGroup {
 		mBoss.addScoreboardTag("Boss");
 
 		//Set/remove blocks
-		if (spawnLoc.getBlock().getType() == Material.STONE_BUTTON) {
-			spawnLoc.getBlock().setType(Material.AIR);
-		}
-		if (spawnLoc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.BEDROCK) {
-			spawnLoc.getBlock().getRelative(BlockFace.DOWN).setType(Material.SHROOMLIGHT);
+		if (spawnLoc.isChunkLoaded()) {
+			if (spawnLoc.getBlock().getType() == Material.STONE_BUTTON) {
+				spawnLoc.getBlock().setType(Material.AIR);
+			}
+			if (spawnLoc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.BEDROCK) {
+				spawnLoc.getBlock().getRelative(BlockFace.DOWN).setType(Material.SHROOMLIGHT);
+			}
 		}
 
 		//Switch mCooldownTicks depending on floor of party
