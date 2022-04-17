@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import java.io.PrintWriter;
 import java.io.StringWriter;

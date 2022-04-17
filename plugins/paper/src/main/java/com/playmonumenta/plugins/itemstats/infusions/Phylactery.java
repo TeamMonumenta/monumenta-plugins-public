@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -50,10 +51,12 @@ public class Phylactery implements Infusion {
 		infoMap.remove(PotionManager.PotionID.SAFE_ZONE);
 		infoMap.remove(PotionManager.PotionID.ABILITY_SELF);
 
-		for (List<PotionUtils.PotionInfo> infoList : infoMap.values()) {
+		Iterator<List<PotionUtils.PotionInfo>> iter = infoMap.values().iterator();
+		while (iter.hasNext()) {
+			List<PotionUtils.PotionInfo> infoList = iter.next();
 			for (PotionUtils.PotionInfo info : infoList) {
 				if (PotionUtils.hasNegativeEffects(info.mType)) {
-					infoList.remove(info);
+					iter.remove();
 				} else {
 					info.mDuration = (int) (info.mDuration * value * DURATION_KEPT);
 				}

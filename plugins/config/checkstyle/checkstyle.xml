@@ -201,11 +201,6 @@
 			<property name="ignoreComments" value="true"/>
 		</module>
 		<module name="RegexpSinglelineJava">
-			<property name="format" value="[^\n\r\t -~]"/>
-			<property name="message" value="Non-ascii characters should not be used"/>
-			<property name="ignoreComments" value="true"/>
-		</module>
-		<module name="RegexpSinglelineJava">
 			<property name="format" value="@EventHandler(?!.*ignoreCancelled.*)"/>
 			<property name="ignoreComments" value="true"/>
 			<property name="message" value="Event handlers must specify ignoreCancelled"/>
