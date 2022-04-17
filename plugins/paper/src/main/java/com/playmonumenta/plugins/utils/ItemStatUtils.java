@@ -185,10 +185,54 @@ public class ItemStatUtils {
 		}
 	}
 
+	public enum Masterwork {
+		NONE("none", DUMMY_LORE_TO_REMOVE),
+		ZERO("0", Component.text("", NamedTextColor.DARK_GRAY).append(Component.text("☆☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		I("1", Component.text("★", TextColor.fromHexString("#4AC2E5")).append(Component.text("☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		II("2", Component.text("★★", TextColor.fromHexString("#00CFDE")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		ERROR("error", Component.text("ERROR", TextColor.fromHexString("#704C8A")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true));
+
+		static final String KEY = "Masterwork";
+
+		final String mName;
+		final Component mDisplay;
+		final String mPlainDisplay;
+
+		Masterwork(String name, Component display) {
+			mName = name;
+			mDisplay = display;
+			mPlainDisplay = MessagingUtils.plainText(display);
+		}
+
+		public String getName() {
+			return mName;
+		}
+
+		public Component getDisplay() {
+			return mDisplay;
+		}
+
+		public String getPlainDisplay() {
+			return mPlainDisplay;
+		}
+
+		public static Masterwork getMasterwork(String name) {
+			for (Masterwork m : Masterwork.values()) {
+				if (m.getName().equals(name)) {
+					return m;
+				}
+			}
+
+			return Masterwork.NONE;
+		}
+	}
+
 	public enum Location {
 		NONE("none", DUMMY_LORE_TO_REMOVE),
 		OVERWORLD1("overworld1", Component.text("King's Valley Overworld", TextColor.fromHexString("#DCAE32")).decoration(TextDecoration.ITALIC, false)),
 		OVERWORLD2("overworld2", Component.text("Celsian Isles Overworld", TextColor.fromHexString("#32D7DC")).decoration(TextDecoration.ITALIC, false)),
+		FOREST("forest", Component.text("R3 Forest biome", TextColor.fromHexString("#4C8F4D")).decoration(TextDecoration.ITALIC, false)),
+		KEEP("keep", Component.text("Pelias' Keep", TextColor.fromHexString("#C4BBA5")).decoration(TextDecoration.ITALIC, false)),
 		CASINO1("casino1", Component.text("Rock's Little Casino", TextColor.fromHexString("#EDC863")).decoration(TextDecoration.ITALIC, false)),
 		CASINO2("casino2", Component.text("Monarch's Cozy Casino", TextColor.fromHexString("#1773B1")).decoration(TextDecoration.ITALIC, false)),
 		LABS("labs", Component.text("Alchemy Labs", TextColor.fromHexString("#B4ACC3")).decoration(TextDecoration.ITALIC, false)),
@@ -250,15 +294,16 @@ public class ItemStatUtils {
 		HOLIDAYSKIN("holidayskin", Component.text("Holiday Skin", TextColor.fromHexString("#B00C2F")).decoration(TextDecoration.ITALIC, false)),
 		TRANSMOG("transmogrifier", Component.text("Transmogrifier", TextColor.fromHexString("#6F2DA8")).decoration(TextDecoration.ITALIC, false)),
 		UGANDA("uganda", Component.text("Uganda 2018", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
-		BLUE("blue", Component.text("You're only here to try and sneak leaks in the code", TextColor.fromHexString("#0C2CA2")).decoration(TextDecoration.ITALIC, false)),
-		BROWN("brown", Component.text("Hellborn Skylands", TextColor.fromHexString("#65350F")).decoration(TextDecoration.ITALIC, false)),
-		GREEN("green", Component.text("Skyborn Helllands", TextColor.fromHexString("#4D6E23")).decoration(TextDecoration.ITALIC, false)),
-		RED("red", Component.text("Region 3 duh", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
-		BLACK("black", Component.text("Calder's House", TextColor.fromHexString("#000000")).decoration(TextDecoration.ITALIC, false)),
+		BLUE("blue", Component.text("Blue Dungeon", TextColor.fromHexString("#0C2CA2")).decoration(TextDecoration.ITALIC, false)),
+		BROWN("brown", Component.text("Brown Dungeon", TextColor.fromHexString("#703608")).decoration(TextDecoration.ITALIC, false)),
+		GREEN("green", Component.text("Green Dungeon", TextColor.fromHexString("#4D6E23")).decoration(TextDecoration.ITALIC, false)),
+		RED("red", Component.text("Red Dungeon", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
+		BLACK("black", Component.text("Black Dungeon", TextColor.fromHexString("#454040")).decoration(TextDecoration.ITALIC, false)),
 		LIGHT("light", Component.text("Arena of Terth", TextColor.fromHexString("#FFFFAA")).decoration(TextDecoration.ITALIC, false)),
 		PASS("seasonpass", Component.text("Seasonal Pass", TextColor.fromHexString("#FFF63C")).decoration(TextDecoration.ITALIC, false)),
 		BLITZ("blitz", Component.text("Plunderer's Blitz", TextColor.fromHexString("#DAAD3E")).decoration(TextDecoration.ITALIC, false)),
 		SOULTHREAD("soul", Component.text("Soulwoven", TextColor.fromHexString("#7FFFD4")).decoration(TextDecoration.ITALIC, false)),
+		SCIENCE("science", Component.text("item name color", TextColor.fromHexString("#DCE8E3")).decoration(TextDecoration.ITALIC, false)),
 		AMBER("amber", Component.text("item name color", TextColor.fromHexString("#FFBF00")).decoration(TextDecoration.ITALIC, false)),
 		GOLD("gold", Component.text("item name color", TextColor.fromHexString("#FFD700")).decoration(TextDecoration.ITALIC, false)),
 		SILVER("silver", Component.text("item name color", TextColor.fromHexString("#C0C0C0")).decoration(TextDecoration.ITALIC, false)),
@@ -359,6 +404,9 @@ public class ItemStatUtils {
 		ICE_ASPECT(new IceAspect(), true, false, false),
 		FIRE_ASPECT(new FireAspect(), true, false, false),
 		THUNDER_ASPECT(new ThunderAspect(), true, false, false),
+		WIND_ASPECT(new WindAspect(), true, false, false),
+		EARTH_ASPECT(new EarthAspect(), true, false, false),
+		FIRST_STRIKE(new FirstStrike(), true, true, false),
 		GILLS(new Gills(), false, false, false),
 		HEX_EATER(new HexEater(), true, false, false),
 		INFERNO(new Inferno(), true, false, false),
@@ -382,15 +430,18 @@ public class ItemStatUtils {
 		SLAYER(new Slayer(), true, false, false),
 		SMITE(new Smite(), true, false, false),
 		SNIPER(new Sniper(), true, false, false),
+		STAMINA(new Stamina(), true, true, false),
 		STARVATION(new Starvation(), false, true, false),
 		SUSTENANCE(new Sustenance(), true, false, false),
 		WEIGHTLESS(new Weightless(), false, false, false),
 		THROWING_KNIFE(new ThrowingKnife(), false, false, false),
 		TRIAGE(new Triage(), true, false, false),
+		TRIVIUM(new Trivium(), true, false, false),
 		// Curses
 		CURSE_OF_ANEMIA(new CurseOfAnemia(), true, true, false),
 		CURSE_OF_BINDING(Enchantment.BINDING_CURSE, "Curse of Binding", false, true, false),
 		CURSE_OF_VANISHING(Enchantment.VANISHING_CURSE, "Curse of Vanishing", false, true, false),
+		CURSE_OF_INSTABILITY(new CurseOfInstability(), false, true, false),
 		CURSE_OF_IRREPARIBILITY(new CurseOfIrreparability(), false, true, false),
 		CURSE_OF_CRIPPLING(new CurseOfCrippling(), false, true, false),
 		CURSE_OF_CORRUPTION(new CurseOfCorruption(), false, true, false),
@@ -841,7 +892,7 @@ public class ItemStatUtils {
 		return ROMAN_NUMERAL_VALUES.get(nextNumeralValue) + toRomanNumerals(value - nextNumeralValue);
 	}
 
-	public static void editItemInfo(final ItemStack item, final Region region, final Tier tier, final Location location) {
+	public static void editItemInfo(final ItemStack item, final Region region, final Tier tier, final Masterwork masterwork, final Location location) {
 		if (item.getType() == Material.AIR) {
 			return;
 		}
@@ -858,6 +909,12 @@ public class ItemStatUtils {
 			monumenta.removeKey(Tier.KEY);
 		} else {
 			monumenta.setString(Tier.KEY, tier.getName());
+		}
+
+		if (masterwork == Masterwork.NONE) {
+			monumenta.removeKey(Masterwork.KEY);
+		} else {
+			monumenta.setString(Masterwork.KEY, masterwork.getName());
 		}
 
 		if (location == Location.NONE) {
@@ -1290,6 +1347,28 @@ public class ItemStatUtils {
 		return Tier.NONE;
 	}
 
+	public static Masterwork getMasterwork(final @Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return Masterwork.NONE;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return Masterwork.NONE;
+		}
+
+		if (getRegion(item) != Region.RING) {
+			return Masterwork.NONE;
+		}
+
+		String tierString = monumenta.getString(Masterwork.KEY);
+		if (tierString != null) {
+			return Masterwork.getMasterwork(tierString);
+		}
+
+		return Masterwork.NONE;
+	}
+
 	public static boolean isClean(final @Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return true;
@@ -1517,6 +1596,11 @@ public class ItemStatUtils {
 					}
 				}
 
+				Masterwork masterwork = Masterwork.getMasterwork(monumenta.getString(Masterwork.KEY));
+				if (masterwork != null && masterwork != Masterwork.NONE) {
+					lore.add(Component.text("Masterwork : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(masterwork.getDisplay()));
+				}
+
 				Location location = Location.getLocation(monumenta.getString(Location.KEY));
 				if (location != null) {
 					lore.add(location.getDisplay());
@@ -1666,6 +1750,12 @@ public class ItemStatUtils {
 			tiers[i] = tiersRaw[i].getName();
 		}
 
+		Masterwork[] masterworkRaw = Masterwork.values();
+		String[] ms = new String[masterworkRaw.length];
+		for (int i = 0; i < ms.length; i++) {
+			ms[i] = masterworkRaw[i].getName();
+		}
+
 		Location[] locationsRaw = Location.values();
 		String[] locations = new String[locationsRaw.length];
 		for (int i = 0; i < locations.length; i++) {
@@ -1676,6 +1766,7 @@ public class ItemStatUtils {
 		arguments.add(new StringArgument("region").overrideSuggestions(regions));
 		arguments.add(new StringArgument("tier").overrideSuggestions(tiers));
 		arguments.add(new StringArgument("location").overrideSuggestions(locations));
+		arguments.add(new StringArgument("masterwork").overrideSuggestions(ms));
 
 		new CommandAPICommand("editinfo").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
 			if (player.getGameMode() != GameMode.CREATIVE) {
@@ -1685,13 +1776,14 @@ public class ItemStatUtils {
 			Region region = Region.getRegion((String) args[0]);
 			Tier tier = Tier.getTier((String) args[1]);
 			Location location = Location.getLocation((String) args[2]);
+			Masterwork m = Masterwork.getMasterwork((String) args[3]);
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
 
-			editItemInfo(item, region, tier, location);
+			editItemInfo(item, region, tier, m, location);
 
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
@@ -2051,7 +2143,7 @@ public class ItemStatUtils {
 				}
 			}
 
-			editItemInfo(item, Region.NONE, Tier.NONE, Location.NONE);
+			editItemInfo(item, Region.NONE, Tier.NONE, Masterwork.NONE, Location.NONE);
 
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
