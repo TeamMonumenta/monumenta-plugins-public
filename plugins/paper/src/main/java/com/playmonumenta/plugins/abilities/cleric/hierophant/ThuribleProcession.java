@@ -26,10 +26,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
-import java.util.EnumSet;
-import java.util.List;
-
 public class ThuribleProcession extends Ability implements AbilityWithChargesOrStacks {
 
 	private static final int EFFECTS_DURATION = 20 * 8;

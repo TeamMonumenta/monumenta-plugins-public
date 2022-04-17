@@ -162,11 +162,11 @@ public class HandOfLight extends Ability {
 				world.playSound(userLoc, Sound.ENTITY_PLAYER_LEVELUP, 0.05f, 1.0f);
 				ParticleUtils.explodingConeEffect(mPlugin, mPlayer, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
 
-				int cooldown = getModifiedCooldown();
+				double cooldown = getModifiedCooldown();
 				if (isEnhanced()) {
 					cooldown *= 1 - Math.min((healthHealed / 4) * ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED, ENHANCEMENT_COOLDOWN_REDUCTION_MAX);
 				}
-				putOnCooldown(cooldown);
+				putOnCooldown((int)cooldown);
 			}
 		} else {
 			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(userLoc, DAMAGE_RADIUS);

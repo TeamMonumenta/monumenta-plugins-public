@@ -27,9 +27,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
-import java.util.NavigableSet;
-
 public class AstralOmen extends Ability {
 	public static final String NAME = "Astral Omen";
 	public static final ClassAbility ABILITY = ClassAbility.ASTRAL_OMEN;

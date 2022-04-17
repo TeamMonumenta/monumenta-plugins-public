@@ -21,12 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
-
-
-
 public class PinningShot extends Ability {
 
 	private static final double PINNING_SHOT_1_DAMAGE_MULTIPLIER = 0.1;

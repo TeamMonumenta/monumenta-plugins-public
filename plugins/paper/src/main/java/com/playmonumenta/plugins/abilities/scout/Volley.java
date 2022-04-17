@@ -28,9 +28,6 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import javax.annotation.Nullable;
-import java.util.List;
-
 public class Volley extends Ability {
 
 	private static final String VOLLEY_METAKEY = "VolleyArrowMetakey";

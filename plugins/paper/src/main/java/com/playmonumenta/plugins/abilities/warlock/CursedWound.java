@@ -30,11 +30,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.annotation.Nullable;
-import java.util.stream.Stream;
-
-
-
 public class CursedWound extends Ability {
 
 	private static final int CURSED_WOUND_DOT_DAMAGE = 1;

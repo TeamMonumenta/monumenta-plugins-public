@@ -59,7 +59,7 @@ public class Toughness extends Ability {
 	@Override
 	public void playerRegainHealthEvent(EntityRegainHealthEvent event) {
 		if (isEnhanced() && mPlayer.getHealth() <= EntityUtils.getMaxHealth(mPlayer) * HEALTH_THRESHHOLD) {
-			event.setAmount(event.getAmount () * (1 + HEALING_INCREASE));
+			event.setAmount(event.getAmount() * (1 + HEALING_INCREASE));
 		}
 	}
 

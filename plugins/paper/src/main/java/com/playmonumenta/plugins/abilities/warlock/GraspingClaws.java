@@ -29,11 +29,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
-import java.util.WeakHashMap;
-
-
-
 public class GraspingClaws extends Ability {
 
 	private static final int RADIUS = 8;

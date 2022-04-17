@@ -27,10 +27,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nullable;
-import java.util.Iterator;
-import java.util.List;
-
 public class WindWalk extends MultipleChargeAbility {
 
 	private static final int WIND_WALK_COOLDOWN = 20 * 25;

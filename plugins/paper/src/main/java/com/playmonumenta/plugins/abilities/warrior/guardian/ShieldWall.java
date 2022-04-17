@@ -34,12 +34,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-
-
-
 public class ShieldWall extends Ability {
 
 	private static final int SHIELD_WALL_1_DURATION = 8 * 30;

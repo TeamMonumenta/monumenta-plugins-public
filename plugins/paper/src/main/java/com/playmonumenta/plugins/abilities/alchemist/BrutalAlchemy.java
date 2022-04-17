@@ -53,7 +53,7 @@ public class BrutalAlchemy extends PotionAbility {
 
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			mAlchPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, AlchemistPotions.class);
-		},5);
+		}, 5);
 	}
 
 	@Override

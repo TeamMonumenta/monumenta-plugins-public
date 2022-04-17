@@ -18,8 +18,6 @@ import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
-
 public class MessagingUtils {
 	public static final Gson GSON = new Gson();
 	public static final MiniMessage MINIMESSAGE_ALL = MiniMessage.builder()

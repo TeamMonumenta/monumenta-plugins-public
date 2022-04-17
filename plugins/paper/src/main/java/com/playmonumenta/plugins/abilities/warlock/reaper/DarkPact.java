@@ -28,11 +28,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
-import java.util.EnumSet;
-import java.util.NavigableSet;
-
-
 public class DarkPact extends Ability {
 
 	public static final String PERCENT_HEAL_EFFECT_NAME = "DarkPactPercentHealEffect";

@@ -30,12 +30,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nullable;
-import java.util.HashSet;
-import java.util.Set;
-
-
-
 public class ElementalSpiritIce extends Ability {
 	public static final int DAMAGE_1 = 4;
 	public static final int DAMAGE_2 = 6;
