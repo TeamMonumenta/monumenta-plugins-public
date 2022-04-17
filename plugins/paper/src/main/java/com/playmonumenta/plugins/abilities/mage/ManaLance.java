@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -31,6 +32,7 @@ import org.bukkit.util.Vector;
 
 public class ManaLance extends MultipleChargeAbility {
 
+	public static final String CHARM_DAMAGE = "Mana Lance Damage";
 	private static final float DAMAGE_1 = 6.0f;
 	private static final float DAMAGE_2 = 7.0f;
 	private static final int COOLDOWN_1 = 5 * 20;
@@ -62,7 +64,9 @@ public class ManaLance extends MultipleChargeAbility {
 			return;
 		}
 
-		double damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mDamage);
+		float damage = mDamage;
+		damage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
+		damage = SpellPower.getSpellDamage(mPlugin, mPlayer, damage);
 		int ticks = mPlayer.getTicksLived();
 		// Prevent double casting on accident
 		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {

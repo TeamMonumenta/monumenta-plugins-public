@@ -75,6 +75,8 @@ public class ItemStatUtils {
 	static final String LEVEL_KEY = "Level";
 	static final String INFUSER_KEY = "Infuser";
 	static final String ATTRIBUTE_NAME_KEY = "AttributeName";
+	static final String CHARM_KEY = "CharmText";
+	static final String CHARM_POWER_KEY = "CharmPower";
 	static final String AMOUNT_KEY = "Amount";
 	static final String SHATTERED_KEY = "Shattered";
 	static final String DIRTY_KEY = "Dirty";
@@ -148,6 +150,7 @@ public class ItemStatUtils {
 		TROPHY("trophy", Component.text("Trophy", TextColor.fromHexString("#CAFFFD")).decoration(TextDecoration.ITALIC, false)),
 		OBFUSCATED("obfuscated", Component.text("Stick_:)", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true)),
 		SHULKER_BOX("shulker", Component.text("Invalid Type", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false)),
+		CHARM("charm", Component.text("Charm", TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false)),
 		QUEST_COMPASS("quest_compass", Component.text("Invalid Type", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false));
 
 		static final String KEY = "Tier";
@@ -977,6 +980,97 @@ public class ItemStatUtils {
 		return plainLore;
 	}
 
+	public static void addCharmEffect(final ItemStack item, final int index, final Component line) {
+		if (item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTList<String> charmLore = nbt.addCompound(MONUMENTA_KEY).getStringList(CHARM_KEY);
+		String serializedLine = MessagingUtils.toGson(line).toString();
+		if (index < charmLore.size()) {
+			charmLore.add(index, serializedLine);
+		} else {
+			charmLore.add(serializedLine);
+		}
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
+	public static void removeCharmEffect(final ItemStack item, final int index) {
+		if (item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTList<String> lore = nbt.addCompound(MONUMENTA_KEY).getStringList(CHARM_KEY);
+		if (lore.size() > 0 && index < lore.size()) {
+			lore.remove(index);
+		} else if (lore.size() > 0) {
+			lore.remove(lore.size() - 1);
+		}
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
+	public static List<Component> getCharmEffects(final ItemStack item) {
+		return getCharmEffects(new NBTItem(item));
+	}
+
+	public static List<Component> getCharmEffects(final NBTItem nbt) {
+		List<Component> lore = new ArrayList<>();
+		for (String serializedLine : nbt.addCompound(MONUMENTA_KEY).getStringList(CHARM_KEY)) {
+			lore.add(MessagingUtils.fromGson(serializedLine));
+		}
+		return lore;
+	}
+
+	public static List<String> getPlainCharmLore(final NBTItem nbt) {
+		List<String> plainLore = new ArrayList<>();
+		for (Component line : getCharmEffects(nbt)) {
+			plainLore.add(MessagingUtils.plainText(line));
+		}
+		return plainLore;
+	}
+
+	public static void setCharmPower(final ItemStack item, final int level) {
+		if (item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound charmPower = nbt.addCompound(MONUMENTA_KEY);
+		charmPower.setInteger(CHARM_POWER_KEY, level);
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
+	public static void removeCharmPower(final ItemStack item) {
+		if (item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound charmPower = nbt.getCompound(CHARM_POWER_KEY);
+		if (charmPower == null) {
+			return;
+		}
+		charmPower.removeKey(CHARM_POWER_KEY);
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
+	public static int getCharmPower(final ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return 0;
+		}
+		return getCharmPower(new NBTItem(item));
+	}
+
+	public static int getCharmPower(final NBTItem nbt) {
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return 0;
+		}
+		return monumenta.getInteger(CHARM_POWER_KEY);
+	}
+
 	public static @Nullable NBTCompound getEnchantments(final NBTItem nbt) {
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
@@ -1596,6 +1690,17 @@ public class ItemStatUtils {
 					}
 				}
 
+				if (getTier(item) == Tier.CHARM) {
+					int charmPower = getCharmPower(item);
+					if (charmPower > 0) {
+						String starString = "";
+						for (int i = 0; i < charmPower; i++) {
+							starString += "★";
+						}
+						lore.add(Component.text("Charm Power : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false)));
+					}
+				}
+
 				Masterwork masterwork = Masterwork.getMasterwork(monumenta.getString(Masterwork.KEY));
 				if (masterwork != null && masterwork != Masterwork.NONE) {
 					lore.add(Component.text("Masterwork : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(masterwork.getDisplay()));
@@ -1692,6 +1797,16 @@ public class ItemStatUtils {
 						}
 					}
 				}
+			}
+		}
+
+		NBTList<String> charmLore = monumenta.getStringList(CHARM_KEY);
+		if (charmLore != null) {
+			lore.add(Component.empty());
+			lore.add(Component.text("When in Charm Slot:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			for (String serializedLine : charmLore) {
+				Component lineAdd = MessagingUtils.fromGson(serializedLine);
+				lore.add(lineAdd);
 			}
 		}
 
@@ -1927,6 +2042,141 @@ public class ItemStatUtils {
 			for (Component c : oldLore) {
 				addLore(item, loreIdx, c);
 				loreIdx++;
+			}
+
+			generateItemStats(item);
+		}).register();
+	}
+
+	public static void registerCharmCommand() {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.editcharm");
+
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new MultiLiteralArgument("add"));
+		arguments.add(new IntegerArgument("index", 0));
+
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			addCharmEffect(item, index, Component.empty());
+
+			generateItemStats(item);
+		}).register();
+
+		arguments.add(new GreedyStringArgument("charm"));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			String lore = (String) args[2];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+			String hexColor = "#C8A2C8";
+			if (lore.charAt(0) == '+') {
+				if (lore.contains("Cooldown")) {
+					hexColor = "#D02E28";
+				} else {
+					hexColor = "#4AC2E5";
+				}
+			} else if (lore.charAt(0) == '-') {
+				if (lore.contains("Cooldown")) {
+					hexColor = "#4AC2E5";
+				} else {
+					hexColor = "#D02E28";
+				}
+			}
+
+			Component text = Component.text(lore, TextColor.fromHexString(hexColor)).decoration(TextDecoration.ITALIC, false);
+			addCharmEffect(item, index, text);
+
+			generateItemStats(item);
+		}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("del"));
+		arguments.add(new IntegerArgument("index", 0));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			removeCharmEffect(item, index);
+
+			generateItemStats(item);
+		}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("power"));
+		arguments.add(new IntegerArgument("amount", 0));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer power = (Integer) args[1];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			if (power > 0) {
+				setCharmPower(item, power);
+			} else {
+				removeCharmPower(item);
+			}
+
+			generateItemStats(item);
+		}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("replace"));
+		arguments.add(new IntegerArgument("index", 0));
+		arguments.add(new GreedyStringArgument("charm"));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			String lore = (String) args[2];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			removeLore(item, index);
+			if (lore.charAt(0) == '+') {
+				Component text = Component.text(lore, TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false);
+				addCharmEffect(item, index, text);
+			} else if (lore.charAt(0) == '-') {
+				Component text = Component.text(lore, TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false);
+				addCharmEffect(item, index, text);
+			} else {
+				Component text = Component.text(lore, TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false);
+				addCharmEffect(item, index, text);
 			}
 
 			generateItemStats(item);

@@ -25,6 +25,10 @@ public class PercentSpeed extends Effect {
 		mModifierName = modifierName;
 	}
 
+	public boolean isSlow() {
+		return mAmount < 0;
+	}
+
 	@Override
 	public double getMagnitude() {
 		return Math.abs(mAmount);

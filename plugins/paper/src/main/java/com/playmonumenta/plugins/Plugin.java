@@ -30,36 +30,9 @@ import com.playmonumenta.plugins.inventories.LootChestsInInventory;
 import com.playmonumenta.plugins.inventories.PlayerInventoryView;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
-import com.playmonumenta.plugins.listeners.ArrowListener;
-import com.playmonumenta.plugins.listeners.AuditListener;
-import com.playmonumenta.plugins.listeners.BlockInteractionsListener;
-import com.playmonumenta.plugins.listeners.BrewingListener;
-import com.playmonumenta.plugins.listeners.CrossbowListener;
-import com.playmonumenta.plugins.listeners.DamageListener;
-import com.playmonumenta.plugins.listeners.DelvesListener;
-import com.playmonumenta.plugins.listeners.EntityListener;
-import com.playmonumenta.plugins.listeners.ExceptionListener;
-import com.playmonumenta.plugins.listeners.GraveListener;
-import com.playmonumenta.plugins.listeners.ItemDropListener;
-import com.playmonumenta.plugins.listeners.JunkItemListener;
-import com.playmonumenta.plugins.listeners.LootTableManager;
-import com.playmonumenta.plugins.listeners.MobListener;
-import com.playmonumenta.plugins.listeners.PlayerListener;
-import com.playmonumenta.plugins.listeners.PortableEnderListener;
-import com.playmonumenta.plugins.listeners.PotionConsumeListener;
-import com.playmonumenta.plugins.listeners.RepairExplosionsListener;
-import com.playmonumenta.plugins.listeners.ShatteredEquipmentListener;
-import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
-import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
-import com.playmonumenta.plugins.listeners.SpawnerListener;
-import com.playmonumenta.plugins.listeners.StasisListener;
-import com.playmonumenta.plugins.listeners.TradeListener;
-import com.playmonumenta.plugins.listeners.TridentListener;
-import com.playmonumenta.plugins.listeners.VehicleListener;
-import com.playmonumenta.plugins.listeners.WitchListener;
-import com.playmonumenta.plugins.listeners.WorldListener;
-import com.playmonumenta.plugins.listeners.ZoneListener;
+import com.playmonumenta.plugins.listeners.*;
 import com.playmonumenta.plugins.minigames.chess.ChessManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
@@ -142,6 +115,7 @@ public class Plugin extends JavaPlugin {
 	public ChessManager mChessManager;
 	public TowerManager mTowerManager;
 	public SignUtils mSignUtils;
+	public CharmManager mCharmManager;
 	public ItemOverrides mItemOverrides;
 	public CosmeticsManager mCosmeticsManager;
 	public SeasonalEventManager mSeasonalEventManager;
@@ -218,11 +192,13 @@ public class Plugin extends JavaPlugin {
 		ItemStatUtils.registerNameCommand();
 		ItemStatUtils.registerEnchCommand();
 		ItemStatUtils.registerAttrCommand();
+		ItemStatUtils.registerCharmCommand();
 		ItemStatUtils.registerRemoveCommand();
 		PlayerItemStatsGUICommand.register(this);
 		AuditLogCommand.register();
 		PickLevelAfterAnvils.register();
 		GenerateItems.register();
+		GenerateCharms.register();
 		JingleBells.register();
 		Stuck.register(this);
 		GlowingCommand.register();
@@ -238,6 +214,7 @@ public class Plugin extends JavaPlugin {
 		PartialParticleCommand.register();
 		CustomEffect.register();
 		EffectFromPotionCommand.register(this);
+		CharmsCommand.register(this);
 
 
 		try {
@@ -314,6 +291,8 @@ public class Plugin extends JavaPlugin {
 		mSeasonalEventManager = new SeasonalEventManager();
 
 		new ClientModHandler(this);
+		mCharmManager = CharmManager.getInstance();
+
 		DailyReset.startTimer(this);
 
 		//  Load info.
@@ -385,6 +364,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new SeasonalEventListener(), this);
 		manager.registerEvents(CosmeticsManager.getInstance(), this);
 		manager.registerEvents(new LootTableManager(), this);
+		manager.registerEvents(new CharmListener(this), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")
