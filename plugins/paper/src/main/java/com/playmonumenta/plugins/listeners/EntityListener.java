@@ -554,7 +554,7 @@ public class EntityListener implements Listener {
 		affectedEntities.removeIf(entity -> (entity instanceof Villager));
 
 		// Don't apply effects to invulnerable entities
-		affectedEntities.removeIf(entity -> entity.isInvulnerable());
+		affectedEntities.removeIf(Entity::isInvulnerable);
 
 		/* If a potion has negative effects, don't apply them to any players except the thrower (if applicable) */
 		if (source instanceof Player && PotionUtils.hasNegativeEffects(potion.getItem())) {
@@ -592,6 +592,13 @@ public class EntityListener implements Listener {
 			}
 		}
 
+		// Run each custom effect on each afflicted entity
+		for (LivingEntity entity : affectedEntities) {
+			if (entity instanceof Player player) {
+				ItemStatUtils.applyCustomEffects(mPlugin, player, potion.getItem());
+			}
+		}
+
 		for (Player p : affectedPlayers) {
 			Collection<PotionEffect> appliedEffects = p.getActivePotionEffects();
 			for (PotionEffect pe : appliedEffects) {
@@ -617,13 +624,13 @@ public class EntityListener implements Listener {
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
 
 		// Don't apply to players in stasis
-		affectedEntities.removeIf(l -> StasisListener.isInStasis(l));
+		affectedEntities.removeIf(StasisListener::isInStasis);
 
 		// Never apply effects to villagers
 		affectedEntities.removeIf(entity -> (entity instanceof Villager));
 
 		// Don't apply effects to invulnerable entities
-		affectedEntities.removeIf(entity -> entity.isInvulnerable());
+		affectedEntities.removeIf(Entity::isInvulnerable);
 
 		// Don't apply effects to dead entities
 		affectedEntities.removeIf(entity -> (entity.isDead() || entity.getHealth() <= 0));

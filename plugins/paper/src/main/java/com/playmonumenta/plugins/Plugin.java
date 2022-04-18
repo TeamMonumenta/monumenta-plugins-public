@@ -193,6 +193,7 @@ public class Plugin extends JavaPlugin {
 		ItemStatUtils.registerEnchCommand();
 		ItemStatUtils.registerAttrCommand();
 		ItemStatUtils.registerCharmCommand();
+		ItemStatUtils.registerConsumeCommand();
 		ItemStatUtils.registerRemoveCommand();
 		PlayerItemStatsGUICommand.register(this);
 		AuditLogCommand.register();

@@ -12,10 +12,13 @@ import com.playmonumenta.plugins.effects.PercentExperience;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.Stasis;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.DoubleArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.ObjectiveArgument;
+import dev.jorel.commandapi.arguments.ScoreHolderArgument;
 import java.util.Collection;
 import java.util.HashMap;
 import org.bukkit.entity.Entity;
@@ -72,5 +75,77 @@ public class CustomEffect {
 					singleArgumentEffects.get((String) args[1]).run(entity, (int) (((double) args[2]) * 20), (double) args[3]);
 				}
 			}).register();
+
+		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
+			.withArguments(
+				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new MultiLiteralArgument(zeroArgumentEffects.keySet().toArray(String[]::new)),
+				new ObjectiveArgument("objective"),
+				new MultiLiteralArgument("minutes", "seconds", "ticks")
+			).executes((sender, args) -> {
+				for (Entity entity : (Collection<Entity>) args[0]) {
+					int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue(entity, (String) args[2]).orElse(0));
+					if (duration > 0) {
+						zeroArgumentEffects.get((String) args[1]).run(entity, duration);
+					}
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
+			.withArguments(
+				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new MultiLiteralArgument(singleArgumentEffects.keySet().toArray(String[]::new)),
+				new ObjectiveArgument("objective"),
+				new MultiLiteralArgument("minutes", "seconds", "ticks"),
+				new DoubleArgument("amount")
+			).executes((sender, args) -> {
+				for (Entity entity : (Collection<Entity>) args[0]) {
+					int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue(entity, (String) args[2]).orElse(0));
+					if (duration > 0) {
+						singleArgumentEffects.get((String) args[1]).run(entity, duration, (double) args[4]);
+					}
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
+			.withArguments(
+				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new MultiLiteralArgument(zeroArgumentEffects.keySet().toArray(String[]::new)),
+				new ObjectiveArgument("objective"),
+				new MultiLiteralArgument("minutes", "seconds", "ticks"),
+				new ScoreHolderArgument("scoreholder", ScoreHolderArgument.ScoreHolderType.SINGLE)
+			).executes((sender, args) -> {
+				int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue((String) args[4], (String) args[2]).orElse(0));
+				for (Entity entity : (Collection<Entity>) args[0]) {
+					if (duration > 0) {
+						zeroArgumentEffects.get((String) args[1]).run(entity, duration);
+					}
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
+			.withArguments(
+				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new MultiLiteralArgument(singleArgumentEffects.keySet().toArray(String[]::new)),
+				new ObjectiveArgument("objective"),
+				new MultiLiteralArgument("minutes", "seconds", "ticks"),
+				new ScoreHolderArgument("scoreholder", ScoreHolderArgument.ScoreHolderType.SINGLE),
+				new DoubleArgument("amount")
+			).executes((sender, args) -> {
+				int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue((String) args[4], (String) args[2]).orElse(0));
+				for (Entity entity : (Collection<Entity>) args[0]) {
+					if (duration > 0) {
+						singleArgumentEffects.get((String) args[1]).run(entity, duration, (double) args[5]);
+					}
+				}
+			}).register();
+	}
+
+	private static int getDuration(String timeValue, double num) {
+		return switch (timeValue) {
+			case "minutes" -> (int) (num * 60 * 20);
+			case "seconds" -> (int) (num * 20);
+			default -> (int) num;
+		};
 	}
 }

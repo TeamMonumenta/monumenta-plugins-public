@@ -350,6 +350,12 @@ public class PotionConsumeListener implements Listener {
 				event.setCancelled(true);
 			}
 		}
+
+		/*if (event.getAction() == EntityPotionEffectEvent.Action.ADDED) {
+			if (EffectType.convertPotionEffect(event)) {
+				event.setCancelled(true);
+			}
+		}*/
 	}
 
 	//Set cooldown to prevent spam

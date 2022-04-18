@@ -725,6 +725,8 @@ public class PlayerListener implements Listener {
 			StatTrackManager.incrementStat(event.getItem(), player, InfusionType.STAT_TRACK_CONSUMED, 1);
 		}
 
+		ItemStatUtils.applyCustomEffects(mPlugin, player, event.getItem());
+
 		mPlugin.mItemStatManager.onConsume(mPlugin, player, event);
 
 		for (PotionEffect effect : PotionUtils.getEffects(event.getItem())) {
