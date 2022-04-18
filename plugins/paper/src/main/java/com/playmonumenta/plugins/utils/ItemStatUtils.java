@@ -1099,6 +1099,7 @@ public class ItemStatUtils {
 			return 0;
 		}
 		return monumenta.getInteger(CHARM_POWER_KEY);
+	}
 
 	public static void addConsumeEffect(final ItemStack item, final EffectType type, final double strength, final int duration, @Nullable String source) {
 		if (item == null || item.getType() == Material.AIR) {
