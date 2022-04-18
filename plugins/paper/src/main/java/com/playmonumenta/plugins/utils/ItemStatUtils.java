@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
+import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.attributes.Agility;
@@ -77,6 +78,10 @@ public class ItemStatUtils {
 	static final String ATTRIBUTE_NAME_KEY = "AttributeName";
 	static final String AMOUNT_KEY = "Amount";
 	static final String SHATTERED_KEY = "Shattered";
+	static final String EFFECT_TYPE_KEY = "EffectType";
+	static final String EFFECT_DURATION_KEY = "EffectDuration";
+	static final String EFFECT_STRENGTH_KEY = "EffectStrength";
+	static final String EFFECT_SOURCE_KEY = "EffectSource";
 	static final String DIRTY_KEY = "Dirty";
 
 	static final Component DUMMY_LORE_TO_REMOVE = Component.text("DUMMY LORE TO REMOVE", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
@@ -775,6 +780,7 @@ public class ItemStatUtils {
 		CHEST(EquipmentSlot.CHEST, "chest", Component.text("When on Chest:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)),
 		LEGS(EquipmentSlot.LEGS, "legs", Component.text("When on Legs:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)),
 		FEET(EquipmentSlot.FEET, "feet", Component.text("When on Feet:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+
 		static final String KEY = "Slot";
 
 		final EquipmentSlot mEquipmentSlot;
@@ -808,6 +814,30 @@ public class ItemStatUtils {
 
 			return null;
 		}
+	}
+
+	public static void applyCustomEffects(Plugin plugin, Player player, ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+		NBTCompoundList effects = getEffects(new NBTItem(item));
+
+		if (effects == null || effects.isEmpty()) {
+			return;
+		}
+
+		for (NBTListCompound effect : effects) {
+			String type = effect.getString(EFFECT_TYPE_KEY);
+			int duration = effect.getInteger(EFFECT_DURATION_KEY);
+			double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
+			String source = effect.getString(EFFECT_SOURCE_KEY);
+
+			EffectType effectType = EffectType.fromType(type);
+			if (effectType != null) {
+				EffectType.applyEffect(effectType, player, duration, strength, source);
+			}
+		}
+
 	}
 
 	static final DecimalFormat NUMBER_FORMATTER = new DecimalFormat("0.###");
@@ -918,6 +948,40 @@ public class ItemStatUtils {
 			plainLore.add(MessagingUtils.plainText(line));
 		}
 		return plainLore;
+	}
+
+	public static void addConsumeEffect(final ItemStack item, final EffectType type, final double strength, final int duration, @Nullable String source) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+
+		NBTItem nbt = new NBTItem(item);
+		NBTCompoundList effects = nbt.addCompound(MONUMENTA_KEY).addCompound(STOCK_KEY).getCompoundList(EffectType.KEY);
+		NBTListCompound effect = effects.addCompound();
+		effect.setString(EFFECT_TYPE_KEY, type.getType());
+		effect.setDouble(EFFECT_STRENGTH_KEY, strength);
+		effect.setInteger(EFFECT_DURATION_KEY, duration);
+		if (source != null) {
+			effect.setString(EFFECT_SOURCE_KEY, source);
+		}
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+
+		generateItemStats(item);
+	}
+
+	public static NBTCompoundList getEffects(final NBTItem nbt) {
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return null;
+		}
+
+		NBTCompound stock = monumenta.getCompound(STOCK_KEY);
+		if (stock == null) {
+			return null;
+		}
+
+		return stock.getCompoundList(EffectType.KEY);
 	}
 
 	public static @Nullable NBTCompound getEnchantments(final NBTItem nbt) {
@@ -1408,6 +1472,11 @@ public class ItemStatUtils {
 					stock.removeKey(AttributeType.KEY);
 				}
 
+				NBTCompoundList effects = stock.getCompoundList(EffectType.KEY);
+				if (effects != null && effects.isEmpty()) {
+					stock.removeKey(EffectType.KEY);
+				}
+
 				keys = stock.getKeys();
 				if (keys == null || keys.isEmpty()) {
 					monumenta.removeKey(STOCK_KEY);
@@ -1537,6 +1606,28 @@ public class ItemStatUtils {
 			lore.add(Component.text("* SHATTERED *", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			lore.add(Component.text("Maybe a Master Repairman", NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false));
 			lore.add(Component.text("could reforge it...", NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false));
+		}
+
+
+		NBTCompoundList effects = getEffects(nbt);
+		if (effects != null && !effects.isEmpty()) {
+
+			lore.add(Component.empty());
+			lore.add(Component.text("When Consumed:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+
+			for (NBTListCompound effect : effects) {
+				String type = effect.getString(EFFECT_TYPE_KEY);
+				int duration = effect.getInteger(EFFECT_DURATION_KEY);
+				double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
+
+				EffectType effectType = EffectType.fromType(type);
+				if (effectType != null) {
+					Component comp = EffectType.getComponent(effectType, strength, duration);
+					if (!lore.contains(comp)) {
+						lore.add(comp);
+					}
+				}
+			}
 		}
 
 		NBTCompoundList attributes = getAttributes(nbt);
@@ -1875,6 +1966,38 @@ public class ItemStatUtils {
 			itemMeta.displayName(Component.text(name, TextColor.fromHexString(location.getDisplay().color().asHexString())).decoration(TextDecoration.BOLD, bold).decoration(TextDecoration.UNDERLINED, underline).decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(itemMeta);
 
+		}).register();
+	}
+
+	public static void registerConsumeCommand() {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.editconsume");
+
+		String[] effects = new String[EffectType.values().length];
+		int i = 0;
+		for (EffectType type : EffectType.values()) {
+			effects[i++] = type.getType();
+		}
+
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new StringArgument("enchantment").includeSuggestions(info -> effects));
+		arguments.add(new IntegerArgument("duration", 0));
+		arguments.add(new DoubleArgument("strength", 0));
+
+		new CommandAPICommand("editconsume").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			String type = (String) args[0];
+			int duration = (int) args[1];
+			double strength = (double) args[2];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			addConsumeEffect(item, EffectType.fromType(type), strength, duration, null);
 		}).register();
 	}
 
