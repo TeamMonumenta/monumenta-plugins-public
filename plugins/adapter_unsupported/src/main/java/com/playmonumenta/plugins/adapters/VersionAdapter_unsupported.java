@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.adapters;
 
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.bukkit.World;
 import org.bukkit.entity.Creature;
@@ -80,7 +81,15 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 
 	}
 
+	@Override
+	public void setFriendly(Creature entity, DamageAction action, Predicate<LivingEntity> predicate, double attackRange) {
+
+	}
+
+
 	public void setAttackRange(Creature entity, double attackRange, double attackHeight) {
 
 	}
+
+
 }

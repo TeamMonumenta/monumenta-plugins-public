@@ -9,8 +9,8 @@ public class CustomMobAgroMeleeAttack16 extends PathfinderGoalMeleeAttack {
 
 	private final VersionAdapter.DamageAction mDamageAction;
 
-	public CustomMobAgroMeleeAttack16(EntityCreature creature, VersionAdapter.DamageAction action) {
-		super(creature, 1.0, false);
+	public CustomMobAgroMeleeAttack16(EntityCreature creature, VersionAdapter.DamageAction action, double speedModifier) {
+		super(creature, speedModifier, false);
 		mDamageAction = action;
 	}
 

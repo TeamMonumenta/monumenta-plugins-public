@@ -3,8 +3,10 @@ package com.playmonumenta.plugins.adapters;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -16,6 +18,7 @@ import net.minecraft.world.damagesource.EntityDamageSource;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.item.ItemStack;
@@ -266,7 +269,51 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 	public void setAggressive(Creature entity, DamageAction action) {
 		PathfinderMob mob = ((CraftCreature) entity).getHandle();
 		mob.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(mob, action));
-		mob.targetSelector.addGoal(2, new NearestAttackableTargetGoal<net.minecraft.world.entity.player.Player>(mob, net.minecraft.world.entity.player.Player.class, true));
+		mob.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(mob, net.minecraft.world.entity.player.Player.class, true));
+	}
+
+	@Override
+	public void setFriendly(Creature entity, DamageAction action, Predicate<LivingEntity> predicate, double attackRange) {
+		PathfinderMob entityCreature = ((CraftCreature) entity).getHandle();
+
+		//removing panic mode
+		Optional<WrappedGoal> oldGoal = entityCreature.goalSelector.getAvailableGoals().stream().filter(task -> task.getGoal() instanceof PanicGoal).findFirst();
+		if (oldGoal.isPresent()) {
+			WrappedGoal goal = oldGoal.get();
+			entityCreature.goalSelector.removeGoal(goal);
+		}
+
+		//removing others NearestAttackableTargetGoal
+		List<WrappedGoal> list = entityCreature.targetSelector.getAvailableGoals().stream().filter(task -> task.getGoal() instanceof NearestAttackableTargetGoal).toList();
+		for (WrappedGoal wrapped : list) {
+			entityCreature.targetSelector.removeGoal(wrapped);
+		}
+
+
+		entityCreature.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(entityCreature, action) {
+			@Override
+			protected double getAttackReachSqr(net.minecraft.world.entity.LivingEntity target) {
+				double x = mob.getX();
+				double y = mob.getY() + 1;
+				double z = mob.getZ();
+				if (target.distanceToSqr(x, y, z) <= attackRange * attackRange) {
+					return Double.POSITIVE_INFINITY;
+				} else {
+					return Double.NEGATIVE_INFINITY;
+				}
+			}
+		});
+		entityCreature.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entityCreature, net.minecraft.world.entity.LivingEntity.class, 10, false, false, entityLiving -> predicate.test(getLivingEntity(entityLiving))));
+
+
+	}
+
+	private LivingEntity getLivingEntity(net.minecraft.world.entity.LivingEntity nmsEntity) {
+		try {
+			return nmsEntity.getBukkitLivingEntity();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public void setAttackRange(Creature entity, double attackRange, double attackHeight) {
