@@ -12,14 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
-import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -46,18 +44,6 @@ public class WorldListener implements Listener {
 		Entity entity = event.getEntity();
 
 		mPlugin.mTrackingManager.addEntity(entity);
-
-		if (entity instanceof Monster mob) {
-			int timer = mPlugin.mCombatLoggingTimers.getTimer(entity.getUniqueId());
-			if (timer >= 0) {
-				Set<String> tags = mob.getScoreboardTags();
-				if (!tags.contains("Elite") && !tags.contains("Boss")) {
-					mob.setRemoveWhenFarAway(false);
-				}
-
-				mPlugin.mCombatLoggingTimers.removeTimer(entity.getUniqueId());
-			}
-		}
 	}
 
 	// Convenience list of offsets to get adjacent blocks
