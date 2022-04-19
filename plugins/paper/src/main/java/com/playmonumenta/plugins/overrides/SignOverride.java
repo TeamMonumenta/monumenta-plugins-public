@@ -21,7 +21,12 @@ public class SignOverride extends BaseOverride {
 		Sign sign = (Sign) block.getState();
 		String display = "";
 
+		boolean output = item == null || !(item.hasItemMeta() && item.getItemMeta().hasLore() && ItemUtils.isDye(item.getType()));
+
 		for (Component component : sign.lines()) {
+			if (component.clickEvent() != null) {
+				return output;
+			}
 			String line = MessagingUtils.PLAIN_SERIALIZER.serialize(component).trim();
 			if (line.matches("^[-=+~]*$")) {
 				//When dumping signs to chat, skip decoration lines
@@ -37,6 +42,6 @@ public class SignOverride extends BaseOverride {
 		if (!display.toLowerCase().contains("click") && !display.toLowerCase().contains("leaderboard") && !display.isEmpty()) {
 			player.sendMessage(display);
 		}
-		return item == null || !(item.hasItemMeta() && item.getItemMeta().hasLore() && ItemUtils.isDye(item.getType()));
+		return output;
 	}
 }
