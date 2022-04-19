@@ -211,13 +211,6 @@ public class PlayerListener implements Listener {
 
 		mPlugin.mTrackingManager.removeEntity(player);
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), 20)) {
-			if (!mob.isPersistent()) {
-				mPlugin.mCombatLoggingTimers.addTimer(mob.getUniqueId(), Constants.TEN_MINUTES);
-				mob.setRemoveWhenFarAway(false);
-			}
-		}
-
 		Team playersTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(PLAYERS_TEAM_NAME);
 		if (playersTeam != null) {
 			playersTeam.removeEntry(player.getName());
