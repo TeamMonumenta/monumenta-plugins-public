@@ -212,6 +212,7 @@ public class ItemStatUtils {
 		WILLOWS("willows", Component.text("The Black Willows", TextColor.fromHexString("#006400")).decoration(TextDecoration.ITALIC, false)),
 		WILLOWSKIN("willowskin", Component.text("Storied Skin", TextColor.fromHexString("#006400")).decoration(TextDecoration.ITALIC, false)),
 		EPHEMERAL("ephemeral", Component.text("Ephemeral Corridors", TextColor.fromHexString("#8B0000")).decoration(TextDecoration.ITALIC, false)),
+		EPHEMERAL_ENHANCEMENTS("ephemeralenhancements", Component.text("Ephemeral Enhancements", TextColor.fromHexString("#8B0000")).decoration(TextDecoration.ITALIC, false)),
 		SANCTUM("sanctum", Component.text("Forsworn Sanctum", TextColor.fromHexString("#52AA00")).decoration(TextDecoration.ITALIC, false)),
 		VERDANT("verdant", Component.text("Verdant Remnants", TextColor.fromHexString("#158315")).decoration(TextDecoration.ITALIC, false)),
 		VERDANTSKIN("verdantskin", Component.text("Threadwarped Skin", TextColor.fromHexString("#704C8A")).decoration(TextDecoration.ITALIC, false)),
