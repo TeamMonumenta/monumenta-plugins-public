@@ -15,9 +15,10 @@ import net.kyori.adventure.text.minimessage.transformation.TransformationType;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 public class MessagingUtils {
@@ -140,6 +141,15 @@ public class MessagingUtils {
 
 	public static Component parseComponent(String json) {
 		return GSON_SERIALIZER.deserialize(json);
+	}
+
+	public static void sendTitle(Player player, @Nullable String title, @Nullable String subtitle) {
+		// Default values used by /title
+		player.sendTitle(title, subtitle, 10, 70, 20);
+	}
+
+	public static void sendBoldTitle(Player player, @Nullable String title, @Nullable String subtitle) {
+		sendTitle(player, title == null ? null : ChatColor.BOLD + title, subtitle == null ? null : ChatColor.BOLD + subtitle);
 	}
 
 }

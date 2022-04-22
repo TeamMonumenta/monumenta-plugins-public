@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameGolemNecr
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameOrb;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.PassiveVoidRift;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -171,9 +173,10 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 					BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.PURPLE, BarStyle.SEGMENTED_10, events);
 					constructBoss(normalSpells, passiveNormalSpells, detectionRange, bossBar, 20 * 10);
 
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s title [\"\",{\"text\":\"???\",\"color\":\"dark_red\",\"bold\":true}]");
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s subtitle [\"\",{\"text\":\"Beast of the Blackflame\",\"color\":\"red\",\"bold\":true}]");
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.75");
+					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "???", ChatColor.RED + "Beast of the Blackflame");
+						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.75f);
+					}
 				} else if (mTicks >= 20 * 2 && mBoss.getLocation().getY() < mSpawnLoc.getY()) {
 					mBoss.teleport(mBoss.getLocation().add(0, mYInc, 0));
 				}
@@ -259,9 +262,10 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:ui.toast.challenge_complete master @s ~ ~ ~ 100 0.8");
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"VICTORY\",\"color\":\"gray\",\"bold\":true}]");
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Ghalkor, Svalgot, and The Beast\",\"color\":\"dark_gray\",\"bold\":true}]");
+							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+								MessagingUtils.sendBoldTitle(player, ChatColor.GRAY + "VICTORY", ChatColor.DARK_GRAY + "Ghalkor, Svalgot, and The Beast");
+								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 0.8f);
+							}
 						}
 					}.runTaskLater(mPlugin, 20 * 3);
 				}

@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
@@ -246,9 +247,11 @@ public class SnowSpirit extends BossAbilityGroup {
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:ui.toast.challenge_complete master @s ~ ~ ~ 100 0.8");
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"VICTORY\",\"color\":\"red\",\"bold\":true}]");
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Snow Spirit, Remnant of Snow\",\"color\":\"dark_red\",\"bold\":true}]");
+							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+								MessagingUtils.sendBoldTitle(player, ChatColor.RED + "VICTORY", ChatColor.DARK_RED + "Snow Spirit, Remnant of Snow");
+								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 0.8f);
+							}
+
 							mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 						}
 					}.runTaskLater(mPlugin, 20 * 3);

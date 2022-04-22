@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -243,17 +244,17 @@ public class RKitxet extends BossAbilityGroup {
 					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 					int playerCount = players.size();
 					double hp = RKITXET_HEALTH * BossUtils.healthScalingCoef(playerCount, 0.5, 0.35);
-					mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(hp);
+					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, hp);
 					mBoss.setHealth(hp);
 					mBoss.setInvulnerable(false);
 					mBoss.setAI(true);
-					mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
+					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 
-					//launch event related spawn commands
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"R'Kitxet\",\"color\":\"dark_green\",\"bold\":true}]");
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Forsaken Elder\",\"color\":\"light_green\",\"bold\":true}]");
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GREEN + "R'Kitxet", ChatColor.GREEN + "Forsaken Elder");
+						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
+						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+					}
 
 					changePhase(phase1Actives, phase1Passives, null);
 					this.cancel();

@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -1027,9 +1028,10 @@ public class Kaul extends BossAbilityGroup {
 								mBoss.setInvulnerable(true);
 								if (mT >= 100) {
 									this.cancel();
-									PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:ui.toast.challenge_complete master @s ~ ~ ~ 100 0.8");
-									PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"VICTORY\",\"color\":\"green\",\"bold\":true}]");
-									PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Kaul, Soul of the Jungle\",\"color\":\"dark_green\",\"bold\":true}]");
+									for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+										MessagingUtils.sendBoldTitle(player, ChatColor.GREEN + "VICTORY", ChatColor.DARK_GREEN + "Kaul, Soul of the Jungle");
+										player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 0.8f);
+									}
 									mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 									mBoss.remove();
 								}
@@ -1115,9 +1117,10 @@ public class Kaul extends BossAbilityGroup {
 							mBoss.getEquipment().setItemInMainHand(m);
 							mBoss.getEquipment().setItemInOffHand(o);
 
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Kaul\",\"color\":\"dark_green\",\"bold\":true}]");
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Soul of the Jungle\",\"color\":\"green\",\"bold\":true}]");
+							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+								MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GREEN + "Kaul", ChatColor.GREEN + "Soul of the Jungle");
+								player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
+							}
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 5, 0f);
 						}
 

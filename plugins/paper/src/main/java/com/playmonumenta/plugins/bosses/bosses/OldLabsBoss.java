@@ -9,20 +9,24 @@ import com.playmonumenta.plugins.bosses.spells.oldslabsbos.SpellWhirlwind;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -99,10 +103,11 @@ public class OldLabsBoss extends BossAbilityGroup {
 						mBoss.getWorld().spawnParticle(Particle.CLOUD, loc, 10, 0.2, 0.45, 0.2, 0.125);
 						mBoss.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 75, 0.2, 0.45, 0.2, 0.2);
 						mBoss.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0.2, 0.45, 0.2, 0.15);
-						PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s title [\"\",{\"text\":\"Elcard\",\"color\":\"gold\",\"bold\":true}]");
-						PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s subtitle [\"\",{\"text\":\"The Ignoble\",\"color\":\"red\",\"bold\":true}]");
-						PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.blaze.shoot master @s ~ ~ ~ 10 1.65");
-						PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.witch.ambient master @s ~ ~ ~ 10 0.6");
+						for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+							MessagingUtils.sendBoldTitle(player, ChatColor.GOLD + "Elcard", ChatColor.RED + "The Ignoable");
+							player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 10, 1.65f);
+							player.playSound(player.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 10, 0.6f);
+						}
 
 						resumeBossFight(plugin, boss);
 					}

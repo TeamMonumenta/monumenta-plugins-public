@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -698,9 +700,12 @@ public class FrostGiant extends BossAbilityGroup {
 										mCutsceneDone = true;
 										world.playSound(mStartLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 6, 0.5f);
 										world.playSound(mStartLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 6, 0.5f);
-										PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "title @s title [\"\",{\"text\":\"Eldrask\",\"color\":\"aqua\",\"bold\":true}]");
-										PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "title @s subtitle [\"\",{\"text\":\"The Waking Giant\",\"color\":\"blue\",\"bold\":true}]");
-										PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.75");
+
+										for (Player player : PlayerUtils.playersInRange(mStartLoc, detectionRange, true)) {
+											MessagingUtils.sendBoldTitle(player, ChatColor.AQUA + "Eldrask", ChatColor.BLUE + "The Waking Giant");
+											player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.75f);
+										}
+
 										BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events, false);
 										constructBoss(phase1Spells, phase1PassiveSpells, detectionRange, bossBar, 20 * 10);
 
@@ -890,9 +895,11 @@ public class FrostGiant extends BossAbilityGroup {
 					}
 
 					this.cancel();
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), fighterRange, "playsound minecraft:ui.toast.challenge_complete master @s ~ ~ ~ 100 0.8");
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), fighterRange, "title @s title [\"\",{\"text\":\"VICTORY\",\"color\":\"aqua\",\"bold\":true}]");
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), fighterRange, "title @s subtitle [\"\",{\"text\":\"Eldrask, The Waking Giant\",\"color\":\"dark_aqua\",\"bold\":true}]");
+
+					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, fighterRange, true)) {
+						MessagingUtils.sendBoldTitle(player, ChatColor.AQUA + "VICTORY", ChatColor.DARK_AQUA + "Eldrask, The Waking Giant");
+						player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 0.8f);
+					}
 					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
 					for (Player player : players) {

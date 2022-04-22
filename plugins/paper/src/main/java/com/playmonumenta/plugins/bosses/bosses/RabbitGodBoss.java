@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
@@ -24,6 +25,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -462,18 +466,14 @@ public final class RabbitGodBoss extends BossAbilityGroup {
 							player.removePotionEffect(PotionEffectType.SPEED);
 						}
 					}
-					new BukkitRunnable() {
 
-						@Override
-						public void run() {
-							mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:ui.toast.challenge_complete master @s ~ ~ ~ 100 1.15");
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"VICTORY\",\"color\":\"green\",\"bold\":true}]");
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"April Clucking Fools\",\"color\":\"dark_green\",\"bold\":true}]");
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+						mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+							MessagingUtils.sendBoldTitle(player, ChatColor.GREEN + "VICTORY", ChatColor.DARK_GREEN + "April Clucking Fools");
+							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 1.15f);
 						}
-
-					}.runTaskLater(mPlugin, 20 * 3);
-
+					}, 20 * 3);
 				}
 			}
 
@@ -494,9 +494,11 @@ public final class RabbitGodBoss extends BossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(bossTargetHp);
 		mBoss.setCustomName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "The Pig God");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK OINK!!! OINK OINK, OINK OINK OINK!?!?\",\"color\":\"dark_red\"}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"The Pig God\",\"color\":\"dark_red\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"A Broken Clucking Boss\",\"color\":\"red\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 1.25");
+
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			player.sendMessage(Component.text("OINK OINK!!! OINK OINK, OINK OINK OINK!?!?", NamedTextColor.DARK_RED));
+			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "The Pig God", ChatColor.RED + "A Broken Clucking Boss");
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 1.25f);
+		}
 	}
 }
