@@ -144,24 +144,68 @@ public class Davey extends BossAbilityGroup {
 			}
 		}
 
-		//Summon vexes
-		mVexes.add((LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(5, 3, 5), VEX_LOS));
-		mVexes.add((LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(-5, 3, -5), VEX_LOS));
+		// Added to a SpellManager later, once the vexes are properly added in
+		List<Spell> spells = Arrays.asList(
+			new SpellLinkBeyondLife(mBoss, mCooldownTicks, ((party == null ? 0 : party.getFloor() - 1) / 3) + 1),
+			new SpellAbyssalLeap(plugin, mBoss, mCooldownTicks),
+			new SpellAbyssalCharge(mBoss, mCooldownTicks),
+			new SpellVoidGrenades(mPlugin, mBoss, detectionRange, mCooldownTicks)
+		);
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-				new SpellLinkBeyondLife(mBoss, mCooldownTicks, ((party == null ? 0 : party.getFloor() - 1) / 3) + 1),
-				new SpellVoidBlast(plugin, mVexes.get(0), mCooldownTicks / 2),
-				new SpellVoidBlast(plugin, mVexes.get(1), mCooldownTicks / 2),
-				new SpellAbyssalLeap(plugin, mBoss, mCooldownTicks),
-				new SpellAbyssalCharge(mBoss, mCooldownTicks),
-				new SpellVoidGrenades(mPlugin, mBoss, detectionRange, mCooldownTicks)
-		));
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellDaveyAnticheese(mBoss, mSpawnLoc),
 			new SpellAbyssalSpawnPassive(mBoss, mVexes),
 			new SpellShieldStun(20 * 30)
 		);
+
+		//Summon vexes
+		Location vex1 = spawnLoc.clone().add(5, 3, 5);
+		Location vex2 = spawnLoc.clone().add(-5, 3, -5);
+
+		if (vex1.isChunkLoaded()) {
+			LivingEntity vex = (LivingEntity) LibraryOfSoulsIntegration.summon(vex1, VEX_LOS);
+			mVexes.add(vex);
+			spells.add(new SpellVoidBlast(plugin, vex, mCooldownTicks / 2));
+		} else {
+			// Chunk was not loaded, likely because shard was just restarted.
+			// Wait a second to attempt to spawn the vex again when the chunk is loaded, and add the corresponding spell
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (vex1.isChunkLoaded()) {
+						LivingEntity vex = (LivingEntity) LibraryOfSoulsIntegration.summon(vex1, VEX_LOS);
+						mVexes.add(vex);
+						spells.add(new SpellVoidBlast(plugin, vex, mCooldownTicks / 2));
+						changePhase(new SpellManager(spells), passiveSpells, null);
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 20, 20);
+		}
+
+		if (vex2.isChunkLoaded()) {
+			LivingEntity vex = (LivingEntity) LibraryOfSoulsIntegration.summon(vex2, VEX_LOS);
+			mVexes.add(vex);
+			spells.add(new SpellVoidBlast(plugin, vex, mCooldownTicks / 2));
+		} else {
+			// Chunk was not loaded, likely because shard was just restarted.
+			// Wait a second to attempt to spawn the vex again when the chunk is loaded, and add the corresponding spell
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (vex2.isChunkLoaded()) {
+						LivingEntity vex = (LivingEntity) LibraryOfSoulsIntegration.summon(vex2, VEX_LOS);
+						mVexes.add(vex);
+						spells.add(new SpellVoidBlast(plugin, vex, mCooldownTicks / 2));
+						changePhase(new SpellManager(spells), passiveSpells, null);
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 20, 20);
+		}
+
+		SpellManager activeSpells = new SpellManager(spells);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
