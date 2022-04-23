@@ -70,6 +70,7 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.Vindicator;
 import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -951,6 +952,9 @@ public class EntityListener implements Listener {
 			NmsUtils.getVersionAdapter().setAttackRange(golem, 2.5, 1);
 		} else if (event.getEntity() instanceof Ravager ravager) {
 			NmsUtils.getVersionAdapter().setAttackRange(ravager, 2.5, 0);
+		} else if (event.getEntity() instanceof Vindicator vindicator) {
+			// Remove the bonus range Vindicators get when riding Ravagers
+			NmsUtils.getVersionAdapter().setAttackRange(vindicator, 1.43, 0);
 		}
 	}
 
