@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
 import org.bukkit.Location;
@@ -91,8 +92,7 @@ public class SizeChangerBoss extends BossAbilityGroup {
 
 		double healthWithDamage = mBoss.getHealth() - event.getFinalDamage(true);
 		double currentHealth = mBoss.getHealth();
-		double maxHealth = mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-		double atkDamage = mBoss.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getValue();
+		double maxHealth = EntityUtils.getMaxHealth(mBoss);
 		boolean shouldChangeSize = false;
 
 		while (1f - (healthWithDamage / maxHealth) - (mTimes * mParams.SPEED) >= mParams.SPEED) {
@@ -104,6 +104,10 @@ public class SizeChangerBoss extends BossAbilityGroup {
 		mCurrentSize = Math.min(mParams.MAX_SIZE, Math.max(mParams.MIN_SIZE, mCurrentSize));
 
 		if (shouldChangeSize) {
+			double maxHealthBase = EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 0);
+			double atkDamage = EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, 0);
+			double armor = EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_ARMOR, 0);
+
 			//change the size
 			if (mSlime != null) {
 				mSlime.setSize(mCurrentSize);
@@ -111,8 +115,9 @@ public class SizeChangerBoss extends BossAbilityGroup {
 				mPhantom.setSize(mCurrentSize);
 			}
 
-			mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
-			mBoss.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(atkDamage);
+			EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, maxHealthBase);
+			EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, atkDamage);
+			EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_ARMOR, armor);
 			mBoss.setHealth(currentHealth);
 
 			mParams.EFFECTS.apply(mBoss, mBoss);
@@ -122,7 +127,7 @@ public class SizeChangerBoss extends BossAbilityGroup {
 
 			if (!mParams.PARTICLES.isEmpty()) {
 				new BukkitRunnable() {
-					final Location mLoc = mBoss.getLocation().clone().add(0, height/2, 0);
+					final Location mLoc = mBoss.getLocation().clone().add(0, height / 2, 0);
 					@Override
 					public void run() {
 						for (int i = 0; i < 360; i = (int) (i + 20 * (2f/mCurrentSize))) {
@@ -136,11 +141,7 @@ public class SizeChangerBoss extends BossAbilityGroup {
 				}.runTaskLater(mPlugin, 1);
 			}
 
-
 		}
-
-
-
 
 	}
 }
