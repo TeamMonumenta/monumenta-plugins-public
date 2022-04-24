@@ -37,6 +37,8 @@ public class Volley extends Ability {
 	private static final int VOLLEY_2_ARROW_COUNT = 11;
 	private static final double VOLLEY_1_DAMAGE_MULTIPLIER = 1.3;
 	private static final double VOLLEY_2_DAMAGE_MULTIPLIER = 1.5;
+	private static final double ENHANCEMENT_BLEED_POTENCY = 0.1;
+	private static final int ENHANCEMENT_BLEED_DURATION = 4 * 20;
 
 	public Volley(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Volley");
@@ -45,6 +47,7 @@ public class Volley extends Ability {
 		mInfo.mShorthandName = "Vly";
 		mInfo.mDescriptions.add("When you shoot an arrow or trident while sneaking, you shoot a volley consisting of 7 projectiles instead. Only one arrow is consumed, and each projectile deals 30% bonus damage. Cooldown: 15s.");
 		mInfo.mDescriptions.add("Increases the number of projectiles to 11 and enhances the bonus damage to 50%.");
+		mInfo.mDescriptions.add("Volley now fires in a 360 degree arc and the arrows inflicting 20% Bleed for 4s.");
 		mInfo.mCooldown = VOLLEY_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.ARROW, 1);
@@ -58,8 +61,8 @@ public class Volley extends Ability {
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		if (mPlayer == null
-			    || !mPlayer.isSneaking()
-			    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+			|| !mPlayer.isSneaking()
+			|| mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			/* This ability is actually on cooldown - event proceeds as normal */
 			return true;
 		}
@@ -94,7 +97,12 @@ public class Volley extends Ability {
 					}
 				}
 
-				List<AbstractArrow> projectiles = EntityUtils.spawnArrowVolley(mPlayer, numArrows, arrowSpeed, 5, arrow.getClass());
+				List<AbstractArrow> projectiles;
+				if (!isEnhanced()) {
+					projectiles = EntityUtils.spawnArrowVolley(mPlayer, numArrows, arrowSpeed, 5, arrow.getClass());
+				} else {
+					projectiles = EntityUtils.spawnArrowVolleyEnhanced(mPlayer, numArrows, arrowSpeed, 5, arrow.getClass());
+				}
 
 				for (AbstractArrow proj : projectiles) {
 					proj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
@@ -134,6 +142,10 @@ public class Volley extends Ability {
 			if (MetadataUtils.checkOnceThisTick(mPlugin, enemy, VOLLEY_HIT_METAKEY)) {
 				double damageMultiplier = isLevelOne() ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
 				event.setDamage(event.getDamage() * damageMultiplier);
+
+				if (isEnhanced()) {
+					EntityUtils.applyBleed(mPlugin, ENHANCEMENT_BLEED_DURATION, ENHANCEMENT_BLEED_POTENCY, enemy);
+				}
 			} else {
 				// Only let one Volley arrow hit a given mob
 				event.setCancelled(true);

@@ -16,13 +16,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class SwiftCuts extends Ability {
-
 	private static final double CONSECUTIVE_PERCENT_DAMAGE_1 = 0.2;
 	private static final double CONSECUTIVE_PERCENT_DAMAGE_2 = 0.35;
+	private static final double ENHANCEMENT_DAMAGE_PERCENT = 0.35;
 
 	private final double mConsecutivePercentDamage;
 
 	private @Nullable LivingEntity mLastTarget = null;
+	private int mEnhancementHits = 0;
 
 	public SwiftCuts(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Swift Cuts");
@@ -30,22 +31,46 @@ public class SwiftCuts extends Ability {
 		mInfo.mShorthandName = "SC";
 		mInfo.mDescriptions.add("If you perform a melee attack on the same mob 2 or more times in a row, each hit after the first does +20% damage.");
 		mInfo.mDescriptions.add("Bonus damage increased to +35%.");
+		mInfo.mDescriptions.add("Every third fully charged melee attack in a row against the same mob deals " + ENHANCEMENT_DAMAGE_PERCENT * 100 + "% more damage.");
 		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
 		mConsecutivePercentDamage = isLevelOne() ? CONSECUTIVE_PERCENT_DAMAGE_1 : CONSECUTIVE_PERCENT_DAMAGE_2;
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) {
-			if (enemy.equals(mLastTarget)) {
-				Location loc = enemy.getLocation();
-				World world = mPlayer.getWorld();
-				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.5f, 1.5f);
-				new PartialParticle(Particle.SWEEP_ATTACK, loc, 2, 0.25, 0.35, 0.25, 0.001).spawnAsPlayerActive(mPlayer);
+		if (mPlayer != null) {
+			if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) {
+				if (enemy.equals(mLastTarget)) {
+					Location loc = enemy.getLocation();
+					World world = mPlayer.getWorld();
+					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.5f, 1.5f);
+					new PartialParticle(Particle.SWEEP_ATTACK, loc, 2, 0.25, 0.35, 0.25, 0.001).spawnAsPlayerActive(mPlayer);
 
-				event.setDamage(event.getDamage() * (1 + mConsecutivePercentDamage));
-			} else {
-				mLastTarget = enemy;
+					event.setDamage(event.getDamage() * (1 + mConsecutivePercentDamage));
+
+					if (isEnhanced()) {
+						// If swung with full charge
+						if (mPlayer.getAttackCooldown() == 1.0) {
+							mEnhancementHits += 1;
+						}
+
+						if (mEnhancementHits == 3) {
+							event.setDamage(event.getDamage() * (1 + ENHANCEMENT_DAMAGE_PERCENT));
+							mEnhancementHits = 0;
+						}
+					}
+				} else {
+					mLastTarget = enemy;
+
+					if (isEnhanced()) {
+						mEnhancementHits = 0;
+
+						// If swung with full charge
+						if (mPlayer.getAttackCooldown() == 1.0) {
+							mEnhancementHits += 1;
+						}
+					}
+				}
 			}
 		}
 		return false; // only changes event damage

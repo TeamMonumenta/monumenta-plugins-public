@@ -56,82 +56,82 @@ import org.bukkit.util.Vector;
 public class EntityUtils {
 
 	private static final EnumSet<EntityType> UNDEAD_MOBS = EnumSet.of(
-			EntityType.ZOMBIE,
-			EntityType.ZOMBIE_VILLAGER,
-			EntityType.ZOMBIFIED_PIGLIN,
-			EntityType.HUSK,
-		    EntityType.SKELETON,
-		    EntityType.WITHER_SKELETON,
-		    EntityType.STRAY,
-		    EntityType.WITHER,
-		    EntityType.ZOMBIE_HORSE,
-		    EntityType.SKELETON_HORSE,
-		    EntityType.PHANTOM,
-		    EntityType.DROWNED
+		EntityType.ZOMBIE,
+		EntityType.ZOMBIE_VILLAGER,
+		EntityType.ZOMBIFIED_PIGLIN,
+		EntityType.HUSK,
+		EntityType.SKELETON,
+		EntityType.WITHER_SKELETON,
+		EntityType.STRAY,
+		EntityType.WITHER,
+		EntityType.ZOMBIE_HORSE,
+		EntityType.SKELETON_HORSE,
+		EntityType.PHANTOM,
+		EntityType.DROWNED
 	);
 
 	private static final EnumSet<EntityType> ARTHROPOD_MOBS = EnumSet.of(
-			EntityType.SPIDER,
-			EntityType.CAVE_SPIDER,
-			EntityType.SILVERFISH,
-			EntityType.ENDERMITE,
-			EntityType.BEE
+		EntityType.SPIDER,
+		EntityType.CAVE_SPIDER,
+		EntityType.SILVERFISH,
+		EntityType.ENDERMITE,
+		EntityType.BEE
 	);
 
 	private static final EnumSet<EntityType> AQUATIC_MOBS = EnumSet.of(
-			EntityType.GUARDIAN,
-			EntityType.ELDER_GUARDIAN,
-			EntityType.SQUID,
-			EntityType.TURTLE,
-			EntityType.COD,
-			EntityType.SALMON,
-			EntityType.TROPICAL_FISH,
-			EntityType.PUFFERFISH
+		EntityType.GUARDIAN,
+		EntityType.ELDER_GUARDIAN,
+		EntityType.SQUID,
+		EntityType.TURTLE,
+		EntityType.COD,
+		EntityType.SALMON,
+		EntityType.TROPICAL_FISH,
+		EntityType.PUFFERFISH
 	);
 
 	private static final EnumSet<EntityType> BEAST_MOBS = EnumSet.of(
-			EntityType.CREEPER,
-			EntityType.BLAZE,
-			EntityType.GHAST,
-			EntityType.ENDERMAN,
-			EntityType.ENDER_DRAGON,
-			EntityType.WOLF,
-			EntityType.OCELOT,
-			EntityType.HOGLIN,
-			EntityType.RAVAGER,
-			EntityType.SLIME,
-			EntityType.MAGMA_CUBE,
-			EntityType.SHULKER,
-			EntityType.SPIDER,
-			EntityType.CAVE_SPIDER,
-			EntityType.SILVERFISH,
-			EntityType.ENDERMITE,
-			EntityType.BEE,
-			EntityType.POLAR_BEAR,
-			EntityType.BAT,
-			EntityType.CAT,
-			EntityType.CHICKEN,
-			EntityType.COW,
-			EntityType.DONKEY,
-			EntityType.FOX,
-			EntityType.HORSE,
-			EntityType.LLAMA,
-			EntityType.MULE,
-			EntityType.MUSHROOM_COW,
-			EntityType.PANDA,
-			EntityType.PARROT,
-			EntityType.PIG,
-			EntityType.RABBIT,
-			EntityType.SHEEP,
-			EntityType.DOLPHIN,
-			EntityType.GUARDIAN,
-			EntityType.ELDER_GUARDIAN,
-			EntityType.SQUID,
-			EntityType.TURTLE,
-			EntityType.COD,
-			EntityType.SALMON,
-			EntityType.TROPICAL_FISH,
-			EntityType.PUFFERFISH
+		EntityType.CREEPER,
+		EntityType.BLAZE,
+		EntityType.GHAST,
+		EntityType.ENDERMAN,
+		EntityType.ENDER_DRAGON,
+		EntityType.WOLF,
+		EntityType.OCELOT,
+		EntityType.HOGLIN,
+		EntityType.RAVAGER,
+		EntityType.SLIME,
+		EntityType.MAGMA_CUBE,
+		EntityType.SHULKER,
+		EntityType.SPIDER,
+		EntityType.CAVE_SPIDER,
+		EntityType.SILVERFISH,
+		EntityType.ENDERMITE,
+		EntityType.BEE,
+		EntityType.POLAR_BEAR,
+		EntityType.BAT,
+		EntityType.CAT,
+		EntityType.CHICKEN,
+		EntityType.COW,
+		EntityType.DONKEY,
+		EntityType.FOX,
+		EntityType.HORSE,
+		EntityType.LLAMA,
+		EntityType.MULE,
+		EntityType.MUSHROOM_COW,
+		EntityType.PANDA,
+		EntityType.PARROT,
+		EntityType.PIG,
+		EntityType.RABBIT,
+		EntityType.SHEEP,
+		EntityType.DOLPHIN,
+		EntityType.GUARDIAN,
+		EntityType.ELDER_GUARDIAN,
+		EntityType.SQUID,
+		EntityType.TURTLE,
+		EntityType.COD,
+		EntityType.SALMON,
+		EntityType.TROPICAL_FISH,
+		EntityType.PUFFERFISH
 	);
 
 	// This list is hardcoded for Crusade description & Duelist advancement
@@ -308,9 +308,9 @@ public class EntityUtils {
 		}
 		if (!entity.getScoreboardTags().contains("SkillImmune")) {
 			if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear
-					|| entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
-					|| entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant
-					|| entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
+				|| entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
+				|| entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant
+				|| entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
 				return true;
 			} else if (entity instanceof Wolf) {
 				return (((Wolf) entity).isAngry() && ((Wolf) entity).getOwner() != null) || entity.getScoreboardTags().contains("boss_targetplayer");
@@ -329,7 +329,7 @@ public class EntityUtils {
 
 	public static boolean isFireResistant(LivingEntity mob) {
 		return mob instanceof Blaze || mob instanceof Ghast || mob instanceof MagmaCube || mob instanceof PigZombie || mob instanceof Wither
-		       || mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
+			|| mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
 	}
 
 	public static boolean isStillLoaded(Entity entity) {
@@ -395,8 +395,8 @@ public class EntityUtils {
 				double ez = loc.getZ();
 
 				if ((bx - 0.75D <= ex) && (ex <= bx + 1.75D)
-				    && (bz - 0.75D <= ez) && (ez <= bz + 1.75D)
-				    && (by - 1.0D <= ey) && (ey <= by + 2.5D)) {
+					&& (bz - 0.75D <= ez) && (ez <= bz + 1.75D)
+					&& (by - 1.0D <= ey) && (ey <= by + 2.5D)) {
 
 					//  We got our target.
 					return e;
@@ -443,8 +443,26 @@ public class EntityUtils {
 		return projectiles;
 	}
 
+	public static List<AbstractArrow> spawnArrowVolleyEnhanced(LivingEntity player, int numProjectiles, float speed, double spacing, Class<? extends AbstractArrow> arrowClass) {
+		List<AbstractArrow> projectiles = new ArrayList<>();
+
+		for (int i = 0; i < numProjectiles; i++) {
+			double yaw = spacing * (i - (numProjectiles - 1) / 2f);
+			AbstractArrow arrow = spawnArrow(player, yaw, 0.0, new Vector(0, 0, 0), speed, arrowClass);
+			projectiles.add(arrow);
+			AbstractArrow arrow2 = spawnArrow(player, yaw + 90, 0.0, new Vector(0, 0, 0), speed, arrowClass);
+			projectiles.add(arrow2);
+			AbstractArrow arrow3 = spawnArrow(player, yaw + 180, 0.0, new Vector(0, 0, 0), speed, arrowClass);
+			projectiles.add(arrow3);
+			AbstractArrow arrow4 = spawnArrow(player, yaw + 270, 0.0, new Vector(0, 0, 0), speed, arrowClass);
+			projectiles.add(arrow4);
+		}
+
+		return projectiles;
+	}
+
 	public static AreaEffectCloud spawnAreaEffectCloud(World world, Location loc, Collection<PotionEffect> effects, float radius, int duration) {
-		AreaEffectCloud cloud = (AreaEffectCloud)world.spawnEntity(loc, EntityType.AREA_EFFECT_CLOUD);
+		AreaEffectCloud cloud = (AreaEffectCloud) world.spawnEntity(loc, EntityType.AREA_EFFECT_CLOUD);
 
 		for (PotionEffect effect : effects) {
 			cloud.addCustomEffect(effect, false);
@@ -457,7 +475,7 @@ public class EntityUtils {
 	}
 
 	public static ThrownPotion spawnCustomSplashPotion(Player player, ItemStack potionStack, Location loc) {
-		ThrownPotion potion = (ThrownPotion)loc.getWorld().spawnEntity(loc.add(0, 0.5, 0), EntityType.SPLASH_POTION);
+		ThrownPotion potion = (ThrownPotion) loc.getWorld().spawnEntity(loc.add(0, 0.5, 0), EntityType.SPLASH_POTION);
 		potion.setShooter(player);
 		potion.setItem(potionStack);
 
@@ -485,7 +503,7 @@ public class EntityUtils {
 	 * @param ry    distance from center to faces perpendicular to y-axis
 	 * @param rz    distance from center to faces perpendicular to z-axis
 	 * @param types List of EntityTypes to be returned, defaults to hostile mobs if null
-	 * @return      List of LivingEntity objects of the specified type within the bounding box
+	 * @return List of LivingEntity objects of the specified type within the bounding box
 	 */
 	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz, EnumSet<EntityType> types) {
 		Collection<LivingEntity> entities = loc.getWorld().getNearbyEntitiesByType(LivingEntity.class, loc, rx, ry, rz);
@@ -743,9 +761,9 @@ public class EntityUtils {
 	private static final String WEAKEN_EFFECT_AESTHETICS_NAME = "WeakenEffectAesthetics";
 
 	private static final EnumSet<DamageType> WEAKEN_EFFECT_AFFECTED_DAMAGE_TYPES = EnumSet.of(
-			DamageType.MELEE,
-			DamageType.PROJECTILE
-		);
+		DamageType.MELEE,
+		DamageType.PROJECTILE
+	);
 
 	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob) {
 		applyWeaken(plugin, ticks, amount, mob, WEAKEN_EFFECT_AFFECTED_DAMAGE_TYPES);
@@ -845,7 +863,7 @@ public class EntityUtils {
 
 	public static void applyTaunt(Plugin plugin, LivingEntity tauntedEntity, Player targetedPlayer) {
 		if (!tauntedEntity.getScoreboardTags().contains(IGNORE_TAUNT_TAG)) {
-			Mob tauntedMob = (Mob)tauntedEntity;
+			Mob tauntedMob = (Mob) tauntedEntity;
 			tauntedMob.setTarget(targetedPlayer);
 			new PartialParticle(Particle.REDSTONE, tauntedEntity.getEyeLocation().add(0, 0.5, 0), 12, 0.4, 0.5, 0.4, TAUNT_COLOR).spawnAsPlayerActive(targetedPlayer);
 
@@ -998,7 +1016,7 @@ public class EntityUtils {
 		World world = proj.getWorld();
 		BoundingBox hitbox = proj.getBoundingBox();
 		Vector increment = proj.getVelocity();
-		int increments = (int)(increment.length() * 15);
+		int increments = (int) (increment.length() * 15);
 		increment.normalize().multiply(0.1);
 
 		Block block = event.getHitBlock();
@@ -1023,7 +1041,7 @@ public class EntityUtils {
 		}
 
 		addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
-				new AttributeModifier(modifierName, modifierPercent, Operation.MULTIPLY_SCALAR_1));
+			new AttributeModifier(modifierName, modifierPercent, Operation.MULTIPLY_SCALAR_1));
 		mob.setHealth(mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 	}
 

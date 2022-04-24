@@ -10,7 +10,10 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.List;
 import javax.annotation.Nullable;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -22,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 
 public class EagleEye extends Ability {
 
@@ -31,8 +35,11 @@ public class EagleEye extends Ability {
 	private static final double EAGLE_EYE_1_VULN_LEVEL = 0.2;
 	private static final double EAGLE_EYE_2_VULN_LEVEL = 0.35;
 	private static final int EAGLE_EYE_RADIUS = 20;
+	private static final double ENHANCEMENT_DAMAGE_PERCENT = 0.3;
 
 	private double mVulnLevel;
+	private Team mEagleEyeTeam = null;
+	private List<LivingEntity> mEntitiesAffected = null; // Used for tracking Entities on a first hit.
 
 	public EagleEye(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Eagle Eye");
@@ -41,18 +48,21 @@ public class EagleEye extends Ability {
 		mInfo.mShorthandName = "EE";
 		mInfo.mDescriptions.add("When you left-click while sneaking you reveal all enemies in a 20 block radius, giving them the glowing effect for 10 seconds. Affected enemies have 20% Vulnerability. If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by 2 seconds. This skill can not be activated if you have a pickaxe in your mainhand. Cooldown: 24s.");
 		mInfo.mDescriptions.add("The effect is increased to 35% Vulnerability.");
+		mInfo.mDescriptions.add("Your first attack against every enemy affected by this ability will deal " + ENHANCEMENT_DAMAGE_PERCENT * 100 + "% extra damage.");
 		mInfo.mCooldown = EAGLE_EYE_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
+		mInfo.mIgnoreCooldown = true;
 
 		mVulnLevel = isLevelOne() ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
+		createTeams();
 	}
 
 
 	@Override
 	public void cast(Action action) {
 		Player player = mPlayer;
-		if (player == null) {
+		if (player == null || isTimerActive() || !mPlayer.isSneaking()) {
 			return;
 		}
 
@@ -60,14 +70,23 @@ public class EagleEye extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1.5f, 1.25f);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.25f);
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), EAGLE_EYE_RADIUS, mPlayer)) {
+		mEntitiesAffected = EntityUtils.getNearbyMobs(player.getLocation(), EAGLE_EYE_RADIUS, mPlayer);
+
+		for (LivingEntity mob : mEntitiesAffected) {
 			// Don't apply vulnerability to arena mobs
 			if (mob.getScoreboardTags().contains("arena_mob")) {
 				continue;
 			}
 
+			// Only change glowing color if:
+			// isEnhanced
+			// mob not in a team
+			if (isEnhanced() && Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(mob.getUniqueId().toString()) == null) {
+				mEagleEyeTeam.addEntry(mob.getUniqueId().toString());
+			}
+
 			PotionUtils.applyPotion(mPlayer, mob,
-			                        new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
+				new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
 			EntityUtils.applyVulnerability(mPlugin, EAGLE_EYE_DURATION, mVulnLevel, mob);
 
 			new BukkitRunnable() {
@@ -81,7 +100,12 @@ public class EagleEye extends Ability {
 						this.cancel();
 					}
 					if (mTicks >= EAGLE_EYE_DURATION) {
+						if (mEagleEyeTeam.hasEntry(mob.getUniqueId().toString())) {
+							mEagleEyeTeam.removeEntry(mob.getUniqueId().toString());
+						}
+
 						this.cancel();
+						mEntitiesAffected.clear();
 					}
 				}
 
@@ -95,9 +119,20 @@ public class EagleEye extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
+		if (event.getType() == DamageType.MELEE && mPlayer.isSneaking()) {
 			cast(Action.LEFT_CLICK_AIR);
 		}
+
+		if (isEnhanced() && mEntitiesAffected.contains(enemy)) {
+			event.setDamage(event.getDamage() * (1 + ENHANCEMENT_DAMAGE_PERCENT));
+			mEntitiesAffected.remove(enemy);
+
+			// Revert glowing color to normal white
+			if (mEagleEyeTeam.hasEntry(enemy.getUniqueId().toString())) {
+				mEagleEyeTeam.removeEntry(enemy.getUniqueId().toString());
+			}
+		}
+
 		return false;
 	}
 
@@ -107,6 +142,15 @@ public class EagleEye extends Ability {
 			return false;
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSneaking() && !ItemUtils.isPickaxe(inMainHand) && inMainHand.getType() != Material.HEART_OF_THE_SEA;
+		return !ItemUtils.isPickaxe(inMainHand) && inMainHand.getType() != Material.HEART_OF_THE_SEA;
+	}
+
+	private void createTeams() {
+		mEagleEyeTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("eagleEyeColor");
+
+		if (mEagleEyeTeam == null) {
+			mEagleEyeTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("eagleEyeColor");
+			mEagleEyeTeam.color(NamedTextColor.YELLOW);
+		}
 	}
 }
