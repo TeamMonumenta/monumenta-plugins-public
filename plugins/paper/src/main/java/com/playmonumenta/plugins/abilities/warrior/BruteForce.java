@@ -10,7 +10,9 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import javax.annotation.Nullable;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,6 +27,7 @@ public class BruteForce extends Ability {
 	private static final int BRUTE_FORCE_DAMAGE = 2;
 	private static final double BRUTE_FORCE_2_MODIFIER = 0.1;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
+	private static final double ENHANCEMENT_DAMAGE_INCREASE = 0.25;
 
 	private double mMultiplier;
 
@@ -36,6 +39,7 @@ public class BruteForce extends Ability {
 		mInfo.mShorthandName = "BF";
 		mInfo.mDescriptions.add("Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2-block cube around it, and knocks all non-boss enemies away from you.");
 		mInfo.mDescriptions.add("Damage is increased to 10 percent of the attack's damage plus 2.");
+		mInfo.mDescriptions.add("Attack damage is increased by " + ENHANCEMENT_DAMAGE_INCREASE * 100 + "% on critical hits while running or sprinting.");
 		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
 
 		mMultiplier = isLevelOne() ? 0 : BRUTE_FORCE_2_MODIFIER;
@@ -43,6 +47,12 @@ public class BruteForce extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		// If Player is enhanced, melee strike, and is a critical or sprinting attack
+		// Boost damage by 25%
+		if (mPlayer != null && isEnhanced() && event.getType() == DamageType.MELEE && (PlayerUtils.isCriticalAttack(mPlayer) || mPlayer.isSprinting())) {
+			event.setDamage(event.getDamage() * (1 + ENHANCEMENT_DAMAGE_INCREASE));
+		}
+
 		if (mPlayer != null && event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
 			double damageBonus = BRUTE_FORCE_DAMAGE + event.getDamage() * mMultiplier;
 			event.setDamage(event.getDamage() + damageBonus);
