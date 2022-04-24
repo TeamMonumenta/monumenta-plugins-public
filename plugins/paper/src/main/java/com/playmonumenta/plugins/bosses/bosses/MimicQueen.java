@@ -133,8 +133,6 @@ public final class MimicQueen extends BossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
 
-		Location loc = mBoss.getLocation();
-
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_PURPLE + "Mimic Queen", ChatColor.LIGHT_PURPLE + "Varcosa's Plunder Protector");
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
