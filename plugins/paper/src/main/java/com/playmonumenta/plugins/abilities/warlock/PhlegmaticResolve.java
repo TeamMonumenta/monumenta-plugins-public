@@ -22,7 +22,7 @@ public class PhlegmaticResolve extends Ability {
 
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "PhlegmaticPercentDamageResistEffect";
 	private static final String KNOCKBACK_RESIST_EFFECT_NAME = "PhlegmaticPercentKnockbackResistEffect";
-	private static final double PERCENT_DAMAGE_RESIST_1 = -0.03;
+	private static final double PERCENT_DAMAGE_RESIST_1 = -0.02;
 	private static final double PERCENT_DAMAGE_RESIST_2 = -0.03;
 	private static final double PERCENT_KNOCKBACK_RESIST = 0.1;
 	private static final int RADIUS = 7;
