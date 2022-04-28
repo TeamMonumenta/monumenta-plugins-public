@@ -23,6 +23,12 @@ public class EliteFinishers {
 			case VictoryThemeFinisher.NAME:
 				VictoryThemeFinisher.run(p, killedMob, loc);
 				break;
+			case BirthdayThemeFinisher.NAME:
+				BirthdayThemeFinisher.run(p, killedMob, loc);
+				break;
+			case CakeifyFinisher.NAME:
+				CakeifyFinisher.run(p, killedMob, loc);
+				break;
 			default:
 				break;
 		}
