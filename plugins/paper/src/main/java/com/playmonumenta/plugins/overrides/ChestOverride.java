@@ -96,6 +96,9 @@ public class ChestOverride extends BaseOverride {
 				// This returns directly - TOV caches do not get loot scaling,
 				// and it's also important for the loot table to generate the vanilla way for the functions to trigger.
 				return TOVUtils.setTOVLootTable(plugin, player, block);
+			} else if (TOVUtils.isOpenedTovLootCache(block)) {
+				// same as above, except nothing to do here as the loot table is already set (and possibly already rolled as well)
+				return true;
 			}
 			// This will be allowed, should just generate the loot directly before the player actually finishes opening
 			ChestUtils.generateContainerLootWithScaling(player, block);
