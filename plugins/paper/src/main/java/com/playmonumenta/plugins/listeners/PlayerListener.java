@@ -61,7 +61,6 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -277,6 +276,7 @@ public class PlayerListener implements Listener {
 		}
 
 		// Immediately load crossbows when the right mouse button is held down for long enough instead of only when released.
+		// Also send an inventory update when a crossbow is released.
 		// This prevents "ghost" loading crossbows, where the client thinks the button was held for long enough, but the server disagrees.
 		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
 			    && event.useItemInHand() != Event.Result.DENY
@@ -292,6 +292,7 @@ public class PlayerListener implements Listener {
 						    || !item.equals(player.getActiveItem())
 						    || !player.isHandRaised()) {
 						this.cancel();
+						player.updateInventory();
 						return;
 					}
 					if (player.getItemUseRemainingTime() <= 0) {
