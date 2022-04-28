@@ -5,7 +5,9 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.ListIterator;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
@@ -54,8 +57,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 
 public class MobListener implements Listener {
+
 	static final int SPAWNER_DROP_THRESHOLD = 20;
 	static final int ALCH_PASSIVE_RADIUS = 12;
+	private static final NamespacedKey ARMED_ARMOR_STAND_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/armed_armor_stand");
+
 	private final Plugin mPlugin;
 
 	public MobListener(Plugin plugin) {
@@ -337,6 +343,17 @@ public class MobListener implements Listener {
 							return;
 						}
 					}
+				}
+			}
+		}
+
+		// Drop armed armor stands from armed variants
+		if (livingEntity instanceof ArmorStand armorStand && armorStand.hasArms()) {
+			List<ItemStack> drops = event.getDrops();
+			if (drops.size() > 0 && drops.get(0).equals(new ItemStack(Material.ARMOR_STAND, 1))) {
+				ItemStack armedArmorStand = InventoryUtils.getItemFromLootTable(event.getEntity(), ARMED_ARMOR_STAND_LOOT_TABLE);
+				if (armedArmorStand != null) {
+					drops.set(0, armedArmorStand);
 				}
 			}
 		}
