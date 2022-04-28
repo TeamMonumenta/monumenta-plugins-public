@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import java.util.EnumSet;
@@ -19,6 +20,7 @@ import org.bukkit.entity.Trident;
 public class Sniper implements Enchantment {
 	public static final int DISTANCE = 16;
 	public static final int DAMAGE_PER_LEVEL = 2;
+	public static final String CHARM_DAMAGE = "Sniper Damage";
 
 	@Override
 	public String getName() {
@@ -50,7 +52,8 @@ public class Sniper implements Enchantment {
 			Location loca = player.getLocation();
 
 			if (loca.distance(enemy.getLocation()) > DISTANCE) {
-				event.setDamage(event.getDamage() + level * DAMAGE_PER_LEVEL);
+				double sniperDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * DAMAGE_PER_LEVEL);
+				event.setDamage(event.getDamage() + sniperDamage);
 				particles(enemy.getEyeLocation(), player);
 			}
 		}

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -28,6 +29,8 @@ public class IceAspect implements Enchantment {
 	public static final float BONUS_DAMAGE = 1.0f;
 	private static final Particle.DustOptions COLOR_LIGHT_BLUE = new Particle.DustOptions(Color.fromRGB(85, 170, 255), 0.75f);
 	public static final String LEVEL_METAKEY = "IceAspectLevelMetakey";
+	public static final String CHARM_SLOW = "Ice Aspect Slow Amplifier";
+	public static final String CHARM_DURATION = "Ice Aspect Slow Duration";
 
 	@Override
 	public String getName() {
@@ -131,7 +134,7 @@ public class IceAspect implements Enchantment {
 	}
 
 	public static void apply(Plugin plugin, Player player, double level, int duration, LivingEntity enemy, boolean particles) {
-		EntityUtils.applySlow(plugin, duration, level * SLOW_PER_LEVEL, enemy);
+		EntityUtils.applySlow(plugin, duration + CharmManager.getExtraDuration(player, CHARM_DURATION), (level * SLOW_PER_LEVEL) + CharmManager.getLevelPercent(player, CHARM_SLOW), enemy);
 		if (particles) {
 			player.getWorld().spawnParticle(Particle.SNOWBALL, enemy.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
 		}

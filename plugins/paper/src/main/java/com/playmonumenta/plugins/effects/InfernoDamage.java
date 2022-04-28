@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.effects;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -30,7 +32,7 @@ public class InfernoDamage extends Effect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (oneHertz && entity instanceof LivingEntity le) {
-			double damage = mLevel;
+			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, Inferno.CHARM_DAMAGE, mLevel);
 			if (le.getFireTicks() <= 0 || EntityUtils.isFireResistant(le)) {
 				damage *= 0.5;
 			}

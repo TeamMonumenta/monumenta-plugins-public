@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -26,6 +27,8 @@ import org.bukkit.util.Vector;
 public class ArcaneThrust implements Enchantment {
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(24, 216, 224), 1.0f);
+	public static final String CHARM_DAMAGE = "Arcane Thrust Damage";
+	public static final String CHARM_KNOCKBACK = "Arcane Thrust Knockback";
 
 	@Override
 	public String getName() {
@@ -51,7 +54,8 @@ public class ArcaneThrust implements Enchantment {
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
 			if (player.getCooledAttackStrength(0.5f) > 0.9) {
-				double damage = 1 + (event.getDamage() * (value / (value + 1) * (PlayerUtils.isCriticalAttack(player) ? 1.5 : 1)));
+				double damageMult = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, (value / (value + 1)));
+				double damage = 1 + (event.getDamage() * damageMult * (PlayerUtils.isCriticalAttack(player) ? 1.5 : 1));
 
 				Location loc = player.getEyeLocation();
 				BoundingBox box = BoundingBox.of(loc, 0.6, 0.6, 0.6);
@@ -74,7 +78,8 @@ public class ArcaneThrust implements Enchantment {
 						if (box.overlaps(mob.getBoundingBox())) {
 							if (mob != enemy) {
 								DamageUtils.damage(player, mob, DamageType.MELEE_ENCH, damage);
-								MovementUtils.knockAway(player.getLocation(), mob, 0.25f, 0.25f);
+								float knockback = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_KNOCKBACK, 0.25);
+								MovementUtils.knockAway(player.getLocation(), mob, knockback, knockback);
 							}
 							iter.remove();
 						}

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -20,6 +21,8 @@ public class JunglesNourishment implements Enchantment {
 	private static final double PERCENT_DAMAGE_RECEIVED = -0.2;
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "JunglesNourishmentResistance";
 	private static final int COOLDOWN = 20 * 25;
+	public static final String CHARM_COOLDOWN = "Jungle's Nourishment Cooldown";
+	public static final String CHARM_HEALTH = "Jungle's Nourishment Health";
 
 	@Override
 	public String getName() {
@@ -38,9 +41,11 @@ public class JunglesNourishment implements Enchantment {
 	@Override
 	public void onConsume(Plugin plugin, Player player, double level, PlayerItemConsumeEvent event) {
 		if (ItemStatUtils.getEnchantmentLevel(event.getItem(), EnchantmentType.JUNGLES_NOURISHMENT) > 0) {
-			PlayerUtils.healPlayer(plugin, player, HEAL, player);
+			double heal = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEALTH, HEAL);
+			PlayerUtils.healPlayer(plugin, player, heal, player);
 			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RECEIVED));
-			player.setCooldown(event.getItem().getType(), COOLDOWN);
+			int cooldown = (int) CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
+			player.setCooldown(event.getItem().getType(), cooldown);
 			player.setFoodLevel(24);
 			World world = player.getWorld();
 			world.spawnParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1);

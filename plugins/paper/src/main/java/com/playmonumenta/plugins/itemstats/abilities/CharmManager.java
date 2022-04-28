@@ -10,6 +10,29 @@ import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.itemstats.enchantments.Abyssal;
+import com.playmonumenta.plugins.itemstats.enchantments.Adrenaline;
+import com.playmonumenta.plugins.itemstats.enchantments.ArcaneThrust;
+import com.playmonumenta.plugins.itemstats.enchantments.Decay;
+import com.playmonumenta.plugins.itemstats.enchantments.Duelist;
+import com.playmonumenta.plugins.itemstats.enchantments.Eruption;
+import com.playmonumenta.plugins.itemstats.enchantments.HexEater;
+import com.playmonumenta.plugins.itemstats.enchantments.IceAspect;
+import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
+import com.playmonumenta.plugins.itemstats.enchantments.LifeDrain;
+import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
+import com.playmonumenta.plugins.itemstats.enchantments.Quake;
+import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
+import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
+import com.playmonumenta.plugins.itemstats.enchantments.Regicide;
+import com.playmonumenta.plugins.itemstats.enchantments.Retrieval;
+import com.playmonumenta.plugins.itemstats.enchantments.Sapper;
+import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
+import com.playmonumenta.plugins.itemstats.enchantments.Slayer;
+import com.playmonumenta.plugins.itemstats.enchantments.Smite;
+import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
+import com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -72,10 +95,43 @@ public class CharmManager {
 	public void loadCharmEffects() {
 		//TODO load new charm effects here
 		mCharmEffectList = Arrays.asList(
-				ManaLance.CHARM_DAMAGE,
-				"Eruption Damage",
-				"charm3"
-				);
+			// Custom Enchantments
+			Inferno.CHARM_DAMAGE,
+			ThunderAspect.CHARM_STUN_CHANCE,
+			IceAspect.CHARM_DURATION,
+			IceAspect.CHARM_SLOW,
+			Decay.CHARM_DAMAGE,
+			Decay.CHARM_DURATION,
+			Sapper.CHARM_HEAL,
+			HexEater.CHARM_DAMAGE,
+			LifeDrain.CHARM_HEAL,
+			Retrieval.CHARM_CHANCE,
+			Regicide.CHARM_DAMAGE,
+			SecondWind.CHARM_RESISTANCE,
+			SecondWind.CHARM_THRESHOLD,
+			Sniper.CHARM_DAMAGE,
+			PointBlank.CHARM_DAMAGE,
+			Adrenaline.CHARM_SPEED,
+			Quake.CHARM_DAMAGE,
+			Quake.CHARM_RADIUS,
+			JunglesNourishment.CHARM_COOLDOWN,
+			JunglesNourishment.CHARM_HEALTH,
+			RageOfTheKeter.CHARM_COOLDOWN,
+			RageOfTheKeter.CHARM_DAMAGE,
+			RageOfTheKeter.CHARM_SPEED,
+			Regeneration.CHARM_HEAL,
+			Smite.CHARM_DAMAGE,
+			Slayer.CHARM_DAMAGE,
+			Duelist.CHARM_DAMAGE,
+			ArcaneThrust.CHARM_DAMAGE,
+			ArcaneThrust.CHARM_KNOCKBACK,
+			Abyssal.CHARM_DAMAGE,
+			Eruption.CHARM_DAMAGE,
+			Eruption.CHARM_RADIUS,
+			// Classes
+			// Mage
+			ManaLance.CHARM_DAMAGE
+		);
 	}
 
 	public boolean addCharm(Player p, ItemStack charm) {
@@ -157,7 +213,6 @@ public class CharmManager {
 	}
 
 	public boolean removeCharm(Player p, ItemStack charm) {
-		p.sendMessage(charm.displayName());
 		if (p != null && mPlayerCharms.get(p.getUniqueId()) != null) {
 			//TODO make sure this actually removes the right charm (due to how the itemstack equals method works)
 
@@ -511,9 +566,9 @@ public class CharmManager {
 		return level;
 	}
 
-	public static double getExtraDuration(Player player, String charmEffectName) {
+	public static int getExtraDuration(Player player, String charmEffectName) {
 		double level = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName);
-		return level * 20;
+		return (int) (level * 20);
 	}
 
 	public static double getExtraPercentDamage(Player player, String charmEffectName, double baseDamage) {
@@ -527,8 +582,11 @@ public class CharmManager {
 	}
 
 	public static double getLevel(Player player, String charmEffectName) {
-		double level = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName);
-		return level;
+		return CharmManager.getInstance().getValueOfAttribute(player, charmEffectName);
+	}
+
+	public static double getLevelPercent(Player player, String charmEffectName) {
+		return CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
 	}
 
 	public static double getExtraPercentHealing(Player player, String charmEffectName, double baseHealing) {

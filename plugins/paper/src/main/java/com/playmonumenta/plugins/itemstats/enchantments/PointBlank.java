@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import java.util.EnumSet;
@@ -19,6 +20,7 @@ import org.bukkit.entity.Trident;
 public class PointBlank implements Enchantment {
 	public static final int DISTANCE = 8;
 	public static final int DAMAGE_PER_LEVEL = 2;
+	public static final String CHARM_DAMAGE = "Point Blank Damage";
 
 	@Override
 	public String getName() {
@@ -50,7 +52,8 @@ public class PointBlank implements Enchantment {
 			Location loc = player.getLocation();
 
 			if (loc.distance(target.getLocation()) < DISTANCE) {
-				event.setDamage(event.getDamage() + value * DAMAGE_PER_LEVEL);
+				double pbDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, value * DAMAGE_PER_LEVEL);
+				event.setDamage(event.getDamage() + pbDamage);
 				particles(target.getEyeLocation(), player);
 			}
 		}

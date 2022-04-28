@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 public class Inferno implements Enchantment {
 
 	private static final String INFERNO_EFFECT_NAME = "Inferno";
+	public static final String CHARM_DAMAGE = "Inferno Damage";
 
 	@Override
 	public String getName() {

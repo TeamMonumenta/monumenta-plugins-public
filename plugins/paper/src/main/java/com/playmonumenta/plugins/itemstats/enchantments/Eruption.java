@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -30,6 +31,8 @@ public class Eruption implements Enchantment {
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
+	public static final String CHARM_DAMAGE = "Eruption Damage";
+	public static final String CHARM_RADIUS = "Eruption Radius";
 
 	@Override
 	public String getName() {
@@ -45,7 +48,7 @@ public class Eruption implements Enchantment {
 	public void onBlockBreak(Plugin plugin, Player player, double level, BlockBreakEvent event) {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER) {
-			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(event.getBlock().getLocation(), RADIUS);
+			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(event.getBlock().getLocation(), CharmManager.getRadius(player, CHARM_RADIUS, RADIUS));
 
 			//Get enchant levels on pickaxe
 			int fire = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.FIRE_ASPECT);
@@ -58,12 +61,13 @@ public class Eruption implements Enchantment {
 
 			//Damage any mobs in the area
 			for (LivingEntity mob : mobs) {
-				DamageUtils.damage(player, mob, DamageType.OTHER, DAMAGE_PER_LEVEL * level, null, false, true);
+				double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_PER_LEVEL * level);
+				DamageUtils.damage(player, mob, DamageType.OTHER, damage, null, false, true);
 				if (fire > 0) {
 					EntityUtils.applyFire(plugin, 80 * fire, mob, player);
 				}
 				if (ice > 0) {
-					EntityUtils.applySlow(plugin, IceAspect.ICE_ASPECT_DURATION, ice * 0.1, mob);
+					EntityUtils.applySlow(plugin, IceAspect.ICE_ASPECT_DURATION + CharmManager.getExtraDuration(player, IceAspect.CHARM_DURATION), (ice * 0.1) + CharmManager.getLevelPercent(player, IceAspect.CHARM_SLOW), mob);
 				}
 				if (thunder > 0) {
 					EntityUtils.applyStun(plugin, 10 * thunder, mob);
@@ -86,7 +90,8 @@ public class Eruption implements Enchantment {
 					if (p == player) {
 						continue;
 					}
-					PlayerUtils.healPlayer(plugin, p, sapper, player);
+					double heal = CharmManager.calculateFlatAndPercentValue(player, Sapper.CHARM_HEAL, sapper);
+					PlayerUtils.healPlayer(plugin, p, heal, player);
 				}
 			}
 
@@ -97,7 +102,8 @@ public class Eruption implements Enchantment {
 						continue;
 					}
 					p.getWorld().spawnParticle(Particle.REDSTONE, p.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
-					plugin.mEffectManager.addEffect(p, Adrenaline.PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(Adrenaline.SPAWNER_DURATION, Adrenaline.PERCENT_SPEED_PER_LEVEL * adrenaline, Adrenaline.PERCENT_SPEED_EFFECT_NAME));
+					double speed = CharmManager.calculateFlatAndPercentValue(player, Adrenaline.CHARM_SPEED, Adrenaline.PERCENT_SPEED_PER_LEVEL * adrenaline);
+					plugin.mEffectManager.addEffect(p, Adrenaline.PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(Adrenaline.SPAWNER_DURATION, speed, Adrenaline.PERCENT_SPEED_EFFECT_NAME));
 				}
 			}
 

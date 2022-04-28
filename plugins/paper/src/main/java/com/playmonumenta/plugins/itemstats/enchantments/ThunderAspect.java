@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -32,6 +33,7 @@ public class ThunderAspect implements Enchantment {
 	public static final int DURATION_PROJ = 10;
 	public static final int DURATION_MELEE_ELITE = 10;
 	public static final float BONUS_DAMAGE = 1;
+	public static final String CHARM_STUN_CHANCE = "Thunder Aspect Stun Chance";
 
 	private static final Particle.DustOptions COLOR_YELLOW = new Particle.DustOptions(Color.fromRGB(251, 231, 30), 1f);
 	private static final Particle.DustOptions COLOR_FAINT_YELLOW = new Particle.DustOptions(Color.fromRGB(255, 241, 110), 1f);
@@ -73,7 +75,7 @@ public class ThunderAspect implements Enchantment {
 				apply(plugin, player, level, enemy);
 			} else {
 
-				double chance = CHANCE * level;
+				double chance = (CHANCE * level) + CharmManager.getLevelPercent(player, CHARM_STUN_CHANCE);
 
 				if (FastUtils.RANDOM.nextDouble() < chance) {
 					if (!EntityUtils.isElite(enemy) && !(EntityUtils.isBoss(enemy) && !enemy.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
@@ -132,7 +134,7 @@ public class ThunderAspect implements Enchantment {
 	}
 
 	public static void apply(Plugin plugin, Player player, double level, LivingEntity enemy) {
-		double chance = CHANCE * level * player.getCooledAttackStrength(0);
+		double chance = ((CHANCE * level) + CharmManager.getLevelPercent(player, CHARM_STUN_CHANCE)) * player.getCooledAttackStrength(0);
 		if (FastUtils.RANDOM.nextDouble() < chance) {
 			if (EntityUtils.isElite(enemy)) {
 				EntityUtils.applyStun(plugin, DURATION_MELEE_ELITE, enemy);

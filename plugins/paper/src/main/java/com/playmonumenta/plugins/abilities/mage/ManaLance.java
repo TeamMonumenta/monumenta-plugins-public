@@ -54,6 +54,7 @@ public class ManaLance extends MultipleChargeAbility {
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.TRIDENT, 1);
 		mMaxCharges = isEnhanced() ? 2 : 1;
+		mInfo.mIgnoreCooldown = true;
 		mCharges = getTrackedCharges();
 		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 	}
