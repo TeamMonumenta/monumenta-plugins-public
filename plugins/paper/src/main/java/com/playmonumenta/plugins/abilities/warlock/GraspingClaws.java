@@ -25,6 +25,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -45,7 +46,7 @@ public class GraspingClaws extends Ability {
 
 	private final double mAmplifier;
 	private final int mDamage;
-	private WeakHashMap<Arrow, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	private final WeakHashMap<AbstractArrow, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public GraspingClaws(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Grasping Claws");
@@ -70,7 +71,8 @@ public class GraspingClaws extends Ability {
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && ItemUtils.isBowOrTrident(inMainHand) && !ItemStatUtils.isShattered(inMainHand)) {
-			Arrow arrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 1.5f, 0, Arrow.class);
+			AbstractArrow arrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 1.5f, 0,
+				(Class<? extends AbstractArrow>) (inMainHand.getType() == Material.TRIDENT ? Trident.class : Arrow.class));
 			arrow.setShooter(mPlayer);
 			arrow.setDamage(0);
 			arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
