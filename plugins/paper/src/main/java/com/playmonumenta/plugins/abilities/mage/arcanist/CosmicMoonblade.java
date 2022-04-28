@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -118,6 +119,8 @@ public class CosmicMoonblade extends Ability {
 									}
 									mInit = true;
 								}
+								PPPeriodic particle1 = new PPPeriodic(Particle.REDSTONE, mPlayer.getLocation()).count(1).delta(0.1, 0.1, 0.1).data(FSWORD_COLOR1);
+								PPPeriodic particle2 = new PPPeriodic(Particle.REDSTONE, mPlayer.getLocation()).count(1).delta(0.1, 0.1, 0.1).data(FSWORD_COLOR2);
 								if (mI % 2 == 0) {
 									Vector vec;
 									for (double r = 1; r < 5; r += 0.5) {
@@ -129,8 +132,8 @@ public class CosmicMoonblade extends Ability {
 											vec = VectorUtils.rotateYAxis(vec, origin.getYaw());
 
 											Location l = origin.clone().add(0, 1.25, 0).add(vec);
-											world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR1);
-											world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
+											particle1.location(l).spawnAsPlayerActive(mPlayer);
+											particle2.location(l).spawnAsPlayerActive(mPlayer);
 										}
 									}
 
@@ -147,8 +150,8 @@ public class CosmicMoonblade extends Ability {
 
 											Location l = origin.clone().add(0, 1.25, 0).add(vec);
 											l.setPitch(-l.getPitch());
-											world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR1);
-											world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
+											particle1.location(l).spawnAsPlayerActive(mPlayer);
+											particle2.location(l).spawnAsPlayerActive(mPlayer);
 										}
 									}
 									mD -= 30;
