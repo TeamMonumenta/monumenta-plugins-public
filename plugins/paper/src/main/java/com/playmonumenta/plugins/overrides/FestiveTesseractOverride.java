@@ -107,7 +107,8 @@ public class FestiveTesseractOverride extends BaseOverride {
 		int rnd;
 		for (int i = 0; i < 6; i++) {
 			rnd = FastUtils.RANDOM.nextInt(4);
-			summons[i] = ((LivingEntity) LibraryOfSoulsIntegration.summon(loc, currentSummons.get(rnd)));
+			Location spawnLoc = loc.clone().add(-0.1 + 0.2 * Math.floor(i / 3.0), 0, -0.1 + 0.1 * (i % 3));
+			summons[i] = ((LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc, currentSummons.get(rnd)));
 		}
 
 		for (LivingEntity summon : summons) {
