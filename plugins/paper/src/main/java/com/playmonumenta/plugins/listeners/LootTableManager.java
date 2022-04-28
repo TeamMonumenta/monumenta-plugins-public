@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import io.papermc.paper.event.server.ServerResourcesReloadedEvent;
 import java.io.File;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,6 +20,22 @@ import org.bukkit.event.Listener;
 
 public class LootTableManager implements Listener {
 	private static LootTableManager INSTANCE = null;
+
+	private static final Set<NamespacedKey> BUILTIN_LOOT_TABLES;
+
+	static {
+		Set<NamespacedKey> builtinLootTables;
+		try {
+			builtinLootTables = Set.of(
+				NamespacedKey.fromString("minecraft:empty")
+			);
+		} catch (Exception ex) {
+			MMLog.severe("Failed to load list of built-in loot tables.");
+			MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
+			builtinLootTables = Set.of();
+		}
+		BUILTIN_LOOT_TABLES = builtinLootTables;
+	}
 
 	public static final class LootTableEntry {
 		private final Set<NamespacedKey> mParents = new HashSet<>();
@@ -141,7 +159,7 @@ public class LootTableManager implements Listener {
 															if (child != null) {
 																child.addParent(mKey);
 																mChildren.add(childKey);
-															} else {
+															} else if (!BUILTIN_LOOT_TABLES.contains(childKey)) {
 																MMLog.warning("Found strange loot table that specifies nonexistent child '" + childKey + "': " + path);
 															}
 														} else {
@@ -165,7 +183,7 @@ public class LootTableManager implements Listener {
 								MMLog.warning("Found strange loot table with 'pools' entry that is not an object: " + path);
 							}
 						}
-					} else {
+					} else if (!path.contains("/datapacks/vanilla/")) {
 						MMLog.warning("Found strange loot table missing 'pools': " + path);
 					}
 				} catch (Exception ex) {
