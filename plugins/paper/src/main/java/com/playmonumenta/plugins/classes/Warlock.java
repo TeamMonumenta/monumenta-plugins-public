@@ -48,7 +48,7 @@ public class Warlock extends PlayerClass {
 		mSpecOne.mAbilities.add(new DarkPact(plugin, player));
 		mSpecOne.mAbilities.add(new JudgementChain(plugin, player));
 		mSpecOne.mAbilities.add(new VoodooBonds(plugin, player));
-		mSpecOne.mSpecQuestScoreboard = "Quest103g";
+		mSpecOne.mSpecQuestScoreboard = "Quest103n";
 		mSpecOne.mSpecialization = 13;
 		mSpecOne.mSpecName = "Reaper";
 		mSpecOne.mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
@@ -57,7 +57,7 @@ public class Warlock extends PlayerClass {
 		mSpecTwo.mAbilities.add(new HauntingShades(plugin, player));
 		mSpecTwo.mAbilities.add(new RestlessSouls(plugin, player));
 		mSpecTwo.mAbilities.add(new WitheringGaze(plugin, player));
-		mSpecTwo.mSpecQuestScoreboard = "Quest103n";
+		mSpecTwo.mSpecQuestScoreboard = "Quest103g";
 		mSpecTwo.mSpecialization = 14;
 		mSpecTwo.mSpecName = "Tenebrist";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.CRIMSON_NYLIUM, 1);
