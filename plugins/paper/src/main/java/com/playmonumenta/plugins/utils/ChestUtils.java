@@ -312,8 +312,13 @@ public class ChestUtils {
 			return null;
 		}
 
+		NBTCompound playerModified = monumenta.getCompound(ItemStatUtils.getPlayerModifiedKey());
+		if (playerModified == null) {
+			return null;
+		}
+
 		// The epic stores items only in {Monumenta:{Items:[{item}]}}, it does not use the normal shulker contents at all
-		NBTCompoundList items = monumenta.getCompoundList("Items");
+		NBTCompoundList items = playerModified.getCompoundList("Items");
 		if (items == null || items.isEmpty()) {
 			return null;
 		}
