@@ -90,6 +90,10 @@ public class ItemStatUtils {
 		return MONUMENTA_KEY;
 	}
 
+	public static String getPlayerModifiedKey() {
+		return PLAYER_MODIFIED_KEY;
+	}
+
 	public enum Region {
 		NONE("none", DUMMY_LORE_TO_REMOVE),
 		VALLEY("valley", Component.text("King's Valley : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)),
