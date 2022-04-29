@@ -204,7 +204,6 @@
 			<property name="format" value="@EventHandler(?!.*ignoreCancelled.*)"/>
 			<property name="ignoreComments" value="true"/>
 			<property name="message" value="Event handlers must specify ignoreCancelled"/>
-			<property name="severity" value="error"/>
 		</module>
 		<module name="Regexp">
 			<property name="format" value="[ \t]+$"/>
