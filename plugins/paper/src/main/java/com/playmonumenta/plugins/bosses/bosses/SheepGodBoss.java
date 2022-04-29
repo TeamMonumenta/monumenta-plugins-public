@@ -53,7 +53,7 @@ public class SheepGodBoss extends BossAbilityGroup {
 		mEndLoc = endLoc;
 		mPhase2 = false;
 		boss.setRemoveWhenFarAway(false);
-		constructBoss(null, null, 20, null);
+		constructBoss(SpellManager.EMPTY, Collections.emptyList(), 20, null);
 	}
 
 	@Override

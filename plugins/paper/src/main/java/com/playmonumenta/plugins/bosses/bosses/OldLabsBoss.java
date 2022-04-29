@@ -165,7 +165,7 @@ public class OldLabsBoss extends BossAbilityGroup {
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events);
-		constructBoss(phase1Spells, null, detectionRange, bossBar);
+		constructBoss(phase1Spells, Collections.emptyList(), detectionRange, bossBar);
 	}
 
 	@Override
