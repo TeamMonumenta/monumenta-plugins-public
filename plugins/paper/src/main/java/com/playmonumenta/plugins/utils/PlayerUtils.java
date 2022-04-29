@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +30,9 @@ import org.bukkit.util.Vector;
 
 
 public class PlayerUtils {
+	// 512 >> 9 == 1
+	public static final int REGION_COORDINATE_SHIFT = 9;
+
 	public static void callAbilityCastEvent(Player player, ClassAbility spell) {
 		AbilityCastEvent event = new AbilityCastEvent(player, spell);
 		Bukkit.getPluginManager().callEvent(event);
@@ -52,6 +56,31 @@ public class PlayerUtils {
 			new PotionEffect(PotionEffectType.SLOW, 5 * 20 * 60, 3, false, true));
 
 		player.teleport(player.getWorld().getSpawnLocation());
+	}
+
+	public static List<Player> playersInLootScalingRange(Location loc) {
+		int range = ServerProperties.getLootScalingRadius();
+		if (range <= 0) {
+			return new ArrayList<>();
+		}
+
+		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
+		if (isDungeon) {
+			List<Player> players = new ArrayList<>();
+			int rx = loc.getBlockX() >> REGION_COORDINATE_SHIFT;
+			int rz = loc.getBlockZ() >> REGION_COORDINATE_SHIFT;
+			for (Player player : loc.getWorld().getPlayers()) {
+				Location loc2 = player.getLocation();
+				int rx2 = loc2.getBlockX() >> REGION_COORDINATE_SHIFT;
+				int rz2 = loc2.getBlockZ() >> REGION_COORDINATE_SHIFT;
+				if (rx == rx2 && rz == rz2) {
+					players.add(player);
+				}
+			}
+			return players;
+		} else {
+			return playersInRange(loc, range, true);
+		}
 	}
 
 	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable) {
