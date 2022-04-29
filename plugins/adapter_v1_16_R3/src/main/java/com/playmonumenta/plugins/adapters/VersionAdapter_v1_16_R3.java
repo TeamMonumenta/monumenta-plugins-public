@@ -18,12 +18,14 @@ import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.EntityTypes;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.MinecraftKey;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.PathfinderGoalMeleeAttack;
 import net.minecraft.server.v1_16_R3.PathfinderGoalNearestAttackableTarget;
 import net.minecraft.server.v1_16_R3.PathfinderGoalPanic;
 import net.minecraft.server.v1_16_R3.PathfinderGoalPerch;
 import net.minecraft.server.v1_16_R3.PathfinderGoalWrapped;
+import net.minecraft.server.v1_16_R3.ResourceKey;
 import net.minecraft.server.v1_16_R3.Vec3D;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -318,8 +320,6 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 		}
 	}
 
-
-
 	public void setAttackRange(Creature entity, double attackRange, double attackHeight) {
 		EntityCreature entityCreature = ((CraftCreature) entity).getHandle();
 		Optional<PathfinderGoalWrapped> oldGoal = entityCreature.goalSelector.getTasks().stream().filter(task -> task.getGoal() instanceof PathfinderGoalMeleeAttack).findFirst();
@@ -328,6 +328,16 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 			entityCreature.goalSelector.getTasks().remove(goal);
 			entityCreature.goalSelector.addGoal(goal.getPriority(), new CustomPathfinderGoalMeleeAttack16(entityCreature, 1.0, true, attackRange, attackHeight));
 		}
+	}
+
+	@Override
+	public Class<?> getResourceKeyClass() {
+		return ResourceKey.class;
+	}
+
+	@Override
+	public Object createDimensionTypeResourceKey(String namespace, String key) {
+		return ResourceKey.newResourceKey(IRegistry.K, new MinecraftKey(namespace, key));
 	}
 
 }

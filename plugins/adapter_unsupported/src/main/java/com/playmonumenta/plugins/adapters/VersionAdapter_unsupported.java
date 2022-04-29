@@ -86,9 +86,18 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 
 	}
 
-
 	public void setAttackRange(Creature entity, double attackRange, double attackHeight) {
 
+	}
+
+	@Override
+	public Class<?> getResourceKeyClass() {
+		return null;
+	}
+
+	@Override
+	public Object createDimensionTypeResourceKey(String namespace, String key) {
+		return null;
 	}
 
 

@@ -12,6 +12,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.EntityDamageSource;
@@ -324,6 +326,16 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 			mob.goalSelector.getAvailableGoals().remove(goal);
 			mob.goalSelector.addGoal(goal.getPriority(), new CustomPathfinderGoalMeleeAttack18(mob, 1.0, true, attackRange, attackHeight));
 		}
+	}
+
+	@Override
+	public Class<?> getResourceKeyClass() {
+		return ResourceKey.class;
+	}
+
+	@Override
+	public Object createDimensionTypeResourceKey(String namespace, String key) {
+		return ResourceKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(namespace, key));
 	}
 
 }

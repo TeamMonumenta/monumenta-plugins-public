@@ -104,5 +104,16 @@ public interface VersionAdapter {
 	 */
 	void setAttackRange(Creature entity, double attackRange, double attackHeight);
 
+	/**
+	 * Returns the NMS class representing a ResourceKey (for use in packet handlers). A resource key is a pair of identifiers,
+	 * with the first one representing the type of resource, and the second one identifying the resource,
+	 * e.g. the resource key "minecraft:dimension_type / minecraft:overworld" represents the vanilla overworld dimension type.
+	 */
+	Class<?> getResourceKeyClass();
+
+	/**
+	 * Creates a ResourceKey of type "minecraft:dimension_type" with the provided namespace and key as identifier.
+	 */
+	Object createDimensionTypeResourceKey(String namespace, String key);
 
 }
