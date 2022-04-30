@@ -38,6 +38,10 @@ public class TOVUtils {
 		return block.getState() instanceof Chest chest && UNOPENED_CACHE_NAME.equals(chest.getCustomName());
 	}
 
+	public static boolean isOpenedTovLootCache(Block block) {
+		return block.getState() instanceof Chest chest && OPENED_CACHE_NAME.equals(chest.getCustomName());
+	}
+
 	public static boolean setTOVLootTable(Plugin plugin, Player player, Block block) {
 		if (block.getState() instanceof Chest chest && UNOPENED_CACHE_NAME.equals(chest.getCustomName())) {
 			if (!canOpen(plugin, player)) {

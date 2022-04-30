@@ -40,7 +40,7 @@ public class SpellManager {
 
 	public List<Spell> getSpells() {
 		if (mIsEmpty) {
-			return new ArrayList<>(0);
+			return Collections.emptyList();
 		}
 
 		List<Spell> spells = new ArrayList<Spell>();

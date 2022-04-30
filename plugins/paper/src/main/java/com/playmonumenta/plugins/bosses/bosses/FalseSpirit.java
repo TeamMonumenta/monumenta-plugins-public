@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
@@ -29,6 +30,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -289,12 +293,11 @@ public final class FalseSpirit extends BossAbilityGroup {
 			}
 		}.runTaskTimer(mPlugin, 0, 20);
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I am deeper than the power of Malkus... I shall take you into the nothingness from which you came.\",\"color\":\"dark_red\"}]");
-
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s title [\"\",{\"text\":\"False Spirit\",\"color\":\"red\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s subtitle [\"\",{\"text\":\"Remnant of Olive\",\"color\":\"dark_red\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.75");
-
+		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+			player.sendMessage(Component.text("I am deeper than the power of Malkus... I shall take you into the nothingness from which you came.", NamedTextColor.DARK_RED));
+			MessagingUtils.sendBoldTitle(player, ChatColor.RED + "False Spirit", ChatColor.DARK_RED + "Remnant of Olive");
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.75f);
+		}
 	}
 
 	@Override
@@ -400,9 +403,11 @@ public final class FalseSpirit extends BossAbilityGroup {
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:ui.toast.challenge_complete master @s ~ ~ ~ 100 0.8");
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"VICTORY\",\"color\":\"red\",\"bold\":true}]");
-							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"False Spirit, Remnant of Olive\",\"color\":\"dark_red\",\"bold\":true}]");
+							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+								MessagingUtils.sendBoldTitle(player, ChatColor.RED + "VICTORY", ChatColor.DARK_RED + "False Spirit, Remnant of Olive");
+								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 0.8f);
+							}
+
 							mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 						}
 					}.runTaskLater(mPlugin, 20 * 3);

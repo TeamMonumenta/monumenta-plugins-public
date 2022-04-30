@@ -48,7 +48,6 @@ import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
-import com.playmonumenta.plugins.timers.CombatLoggingTimers;
 import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
@@ -97,7 +96,6 @@ public class Plugin extends JavaPlugin {
 
 	public CooldownTimers mTimers;
 	public ProjectileEffectTimers mProjectileEffectTimers;
-	public CombatLoggingTimers mCombatLoggingTimers;
 
 	public JunkItemListener mJunkItemsListener;
 	public ItemDropListener mItemDropListener;
@@ -216,6 +214,7 @@ public class Plugin extends JavaPlugin {
 		CustomEffect.register();
 		EffectFromPotionCommand.register(this);
 		CharmsCommand.register(this);
+		WorldNameCommand.register();
 
 
 		try {
@@ -272,7 +271,6 @@ public class Plugin extends JavaPlugin {
 
 		//  Initialize Variables.
 		mTimers = new CooldownTimers(this);
-		mCombatLoggingTimers = new CombatLoggingTimers();
 
 		mProjectileEffectTimers = new ProjectileEffectTimers(this);
 
@@ -405,12 +403,6 @@ public class Plugin extends JavaPlugin {
 
 					try {
 						mTrackingManager.update(Constants.QUARTER_TICKS_PER_SECOND);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					try {
-						mCombatLoggingTimers.update(Constants.QUARTER_TICKS_PER_SECOND);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

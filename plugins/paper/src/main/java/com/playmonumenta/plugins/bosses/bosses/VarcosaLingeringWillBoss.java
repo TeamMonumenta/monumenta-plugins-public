@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSwitcheroo;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -40,6 +42,8 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
@@ -159,9 +163,11 @@ public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(finalHp);
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Lingering Will\",\"color\":\"dark_red\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "Lingering Will", null);
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
+		}
 
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(0, 0, 11.5));
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(0, 0, -11.5));

@@ -360,11 +360,16 @@ public class ItemStatManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerItemHeldEvent(PlayerItemHeldEvent event) {
 		Player player = event.getPlayer();
+		PlayerInventory inv = player.getInventory();
+		ItemStack oldItem = inv.getItem(event.getPreviousSlot());
+		ItemStack newItem = inv.getItem(event.getNewSlot());
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-			mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(player.getInventory().getItem(event.getNewSlot()), null, null, null, null, null, false);
+			mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(newItem, null, null, null, null, null, false);
 			for (ItemStat stat : ITEM_STATS) {
 				stat.onEquipmentUpdate(mPlugin, player);
 			}
+		}
+		if (newItem != null && oldItem != null && newItem.getType() == oldItem.getType()) {
 			PlayerUtils.resetAttackCooldown(player);
 		}
 	}

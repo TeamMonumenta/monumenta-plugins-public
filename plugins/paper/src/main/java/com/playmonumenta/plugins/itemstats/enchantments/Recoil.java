@@ -4,12 +4,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.EnumSet;
-import org.bukkit.entity.AbstractArrow;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -34,14 +32,15 @@ public class Recoil implements Enchantment {
 
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, double level, ProjectileLaunchEvent event, Projectile proj) {
-		if (event.getEntity() instanceof AbstractArrow && !ItemUtils.isShootableItem(player.getInventory().getItemInOffHand())) {
-			if (player.isSneaking()) {
-				player.setCooldown(player.getInventory().getItemInMainHand().getType(), 10);
-			} else if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-				Vector velocity = NmsUtils.getVersionAdapter().getActualDirection(player).multiply(-0.5 * Math.sqrt(level));
-				velocity.setY(Math.max(0.1, velocity.getY()));
-				player.setVelocity(velocity);
+		if (player.isSneaking()) {
+			Material type = player.getInventory().getItemInMainHand().getType();
+			if (player.getCooldown(type) < 10) {
+				player.setCooldown(type, 10);
 			}
+		} else if (!ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && player.getLocation().getY() >= 0) {
+			Vector velocity = NmsUtils.getVersionAdapter().getActualDirection(player).multiply(-0.5 * Math.sqrt(level));
+			velocity.setY(Math.max(0.1, velocity.getY()));
+			player.setVelocity(velocity);
 		}
 	}
 

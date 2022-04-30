@@ -427,7 +427,7 @@ public class SpellDimensionDoor extends Spell {
 					bar.removeAll();
 					this.cancel();
 				}
-				if (p.getLastDamageCause().getCause() != null && p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.SUFFOCATION && !mTrigger) {
+				if (p.getLastDamageCause() != null && p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.SUFFOCATION && !mTrigger) {
 					//something went wrong with the other check, catching wrong tp
 					p.teleport(shadowLoc.clone().add(-5, 0, 0));
 					spectre.teleport(shadowLoc.clone().add(5, 0, 0));

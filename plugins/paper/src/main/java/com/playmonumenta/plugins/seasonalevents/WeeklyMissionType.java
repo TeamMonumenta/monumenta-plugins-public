@@ -24,6 +24,8 @@ public enum WeeklyMissionType {
 	DELVE_POINTS("delve_points"), //Also checks content array
 	ROD_WAVES("rod_waves"),
 	DEPTHS_ROOMS("depths_rooms"),
+	DAILY_BOUNTY("daily_bounty"),
+	DELVE_BOUNTY("delve_bounty"),
 	REGIONAL_CONTENT("regional_content");
 
 	private final String mType;

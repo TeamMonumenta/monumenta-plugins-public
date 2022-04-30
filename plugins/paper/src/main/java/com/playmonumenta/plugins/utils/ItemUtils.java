@@ -112,13 +112,11 @@ public class ItemUtils {
 		Material.CAKE,
 		Material.CHAIN_COMMAND_BLOCK,
 		Material.CHEST,
-		Material.CHIPPED_ANVIL,
 		Material.COMMAND_BLOCK,
 		Material.COMPARATOR,
 		Material.CRAFTING_TABLE,
 		Material.CYAN_BED,
 		Material.CYAN_SHULKER_BOX,
-		Material.DAMAGED_ANVIL,
 		Material.DARK_OAK_BUTTON,
 		Material.DARK_OAK_DOOR,
 		Material.DARK_OAK_FENCE_GATE,
@@ -209,7 +207,13 @@ public class ItemUtils {
 		Material.SMITHING_TABLE,
 		Material.STONECUTTER,
 		Material.BELL,
-		Material.COMPOSTER
+		Material.COMPOSTER,
+		Material.WARPED_DOOR,
+		Material.WARPED_TRAPDOOR,
+		Material.WARPED_FENCE_GATE,
+		Material.CRIMSON_DOOR,
+		Material.CRIMSON_TRAPDOOR,
+		Material.CRIMSON_FENCE_GATE
 	);
 
 	public static final Set<Material> carpet = EnumSet.of(

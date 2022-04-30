@@ -13,12 +13,14 @@ import com.playmonumenta.plugins.bosses.spells.masked.SpellShadowGlade;
 import com.playmonumenta.plugins.bosses.spells.masked.SpellSummonBlazes;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -29,6 +31,7 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -50,9 +53,6 @@ public class Masked extends BossAbilityGroup {
 	private static final String BEGIN_DIALOG_COMMAND = "tellraw @s [\"\",{\"text\":\"[Masked Man]\",\"color\":\"gold\"},{\"text\":\" However, you have interfered with our plans. Nothing will stop us! Die!\"}]";
 	private static final String PHASE_CHANGE_DIALOG_COMMAND = "tellraw @s [\"\",{\"text\":\"[Masked Man]\",\"color\":\"gold\"},{\"text\":\" Know that even with my death our plans will not stop. The Masked are unstoppable!\"}]";
 	private static final String DEATH_DIALOG_COMMAND = "tellraw @s [\"\",{\"text\":\"[Masked Man]\",\"color\":\"gold\"},{\"text\":\" Hah... My death won't stop the shard... We will not fail... We will not fail Lord Calder...\"}]";
-	private static final String TITLE_TIME_COMMAND = "title @s times 15 100 15";
-	private static final String TITLE_SUBTITLE_COMMAND = "title @s subtitle {\"text\":\"Harbinger of Shadow\",\"color\":\"light_purple\"}";
-	private static final String TITLE_TITLE_COMMAND = "title @s title {\"text\":\"The Masked Man\",\"bold\":true,\"color\":\"light_purple\"}";
 
 	private final World mWorld;
 	private final Location mSpawnLoc;
@@ -84,8 +84,8 @@ public class Masked extends BossAbilityGroup {
 
 		mBoss.setGravity(false);
 		mBoss.setInvulnerable(true);
-		mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 
 		mBoss.addScoreboardTag("Boss");
 
@@ -99,9 +99,9 @@ public class Masked extends BossAbilityGroup {
 					mWorld.spawnParticle(Particle.DRAGON_BREATH, mSpawnLoc, 50, 0.5, 0.5, 0.5, 0.02);
 					mWorld.playSound(mSpawnLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 2f, 1f);
 				} else if (mT == TIME_TITLE) {
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, TITLE_TIME_COMMAND);
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, TITLE_SUBTITLE_COMMAND);
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, TITLE_TITLE_COMMAND);
+					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, DETECTION_RANGE, true)) {
+						player.sendTitle(ChatColor.BOLD + "" + ChatColor.LIGHT_PURPLE + "The Masked Man", ChatColor.LIGHT_PURPLE + "Harbinger of Shadow", 15, 100, 15);
+					}
 				} else if (mT == TIME_BEGIN) {
 					mBoss.setGravity(true);
 					mBoss.setInvulnerable(false);
@@ -124,7 +124,7 @@ public class Masked extends BossAbilityGroup {
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, DETECTION_RANGE);
 		int health = (int)((1 - Math.pow(0.5, playerCount)) * MAXIMUM_BASE_HEALTH);
 
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, health);
 		mBoss.setHealth(health);
 	}
 
@@ -194,8 +194,8 @@ public class Masked extends BossAbilityGroup {
 
 		events.put(50, mBoss -> {
 			changePhase(activeSpells2, passiveSpells2, null);
-			mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(MOVEMENT_SPEED);
-			mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0);
+			EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, MOVEMENT_SPEED);
+			EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
 			// Put sword back in mainhand
 			mBoss.getEquipment().setItemInMainHand(mMeleeWeapon);
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, PHASE_CHANGE_DIALOG_COMMAND);

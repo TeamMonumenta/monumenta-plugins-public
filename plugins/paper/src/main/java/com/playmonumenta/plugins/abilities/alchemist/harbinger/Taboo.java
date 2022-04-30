@@ -28,7 +28,7 @@ import org.bukkit.inventory.ItemStack;
 public class Taboo extends Ability {
 	private static final int CHARGE_TIME_REDUCTION = 10;
 	private static final double PERCENT_HEALTH_DAMAGE = 0.05;
-	private static final double PERCENT_KNOCKBACK_RESIST = 5;
+	private static final double PERCENT_KNOCKBACK_RESIST = 0.5;
 	private static final String KNOCKBACK_RESIST_EFFECT_NAME = "TabooKnockbackResistanceEffect";
 	private static final double MAGIC_DAMAGE_INCREASE_1 = 0.15;
 	private static final double MAGIC_DAMAGE_INCREASE_2 = 0.25;

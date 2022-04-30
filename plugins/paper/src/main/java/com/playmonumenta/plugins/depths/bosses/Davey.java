@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
@@ -30,8 +31,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -141,24 +144,68 @@ public class Davey extends BossAbilityGroup {
 			}
 		}
 
-		//Summon vexes
-		mVexes.add((LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(5, 3, 5), VEX_LOS));
-		mVexes.add((LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(-5, 3, -5), VEX_LOS));
-
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-				new SpellLinkBeyondLife(mBoss, mCooldownTicks, ((party == null ? 0 : party.getFloor() - 1) / 3) + 1),
-				new SpellVoidBlast(plugin, mVexes.get(0), mCooldownTicks / 2),
-				new SpellVoidBlast(plugin, mVexes.get(1), mCooldownTicks / 2),
-				new SpellAbyssalLeap(plugin, mBoss, mCooldownTicks),
-				new SpellAbyssalCharge(mBoss, mCooldownTicks),
-				new SpellVoidGrenades(mPlugin, mBoss, detectionRange, mCooldownTicks)
+		// Added to a SpellManager later, once the vexes are properly added in
+		List<Spell> spells = new ArrayList<> (Arrays.asList(
+			new SpellLinkBeyondLife(mBoss, mCooldownTicks, ((party == null ? 0 : party.getFloor() - 1) / 3) + 1),
+			new SpellAbyssalLeap(plugin, mBoss, mCooldownTicks),
+			new SpellAbyssalCharge(mBoss, mCooldownTicks),
+			new SpellVoidGrenades(mPlugin, mBoss, detectionRange, mCooldownTicks)
 		));
+
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellDaveyAnticheese(mBoss, mSpawnLoc),
 			new SpellAbyssalSpawnPassive(mBoss, mVexes),
 			new SpellShieldStun(20 * 30)
 		);
+
+		//Summon vexes
+		Location vex1 = spawnLoc.clone().add(5, 3, 5);
+		Location vex2 = spawnLoc.clone().add(-5, 3, -5);
+
+		if (vex1.isChunkLoaded()) {
+			LivingEntity vex = (LivingEntity) LibraryOfSoulsIntegration.summon(vex1, VEX_LOS);
+			mVexes.add(vex);
+			spells.add(new SpellVoidBlast(plugin, vex, mCooldownTicks / 2));
+		} else {
+			// Chunk was not loaded, likely because shard was just restarted.
+			// Wait a second to attempt to spawn the vex again when the chunk is loaded, and add the corresponding spell
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (vex1.isChunkLoaded()) {
+						LivingEntity vex = (LivingEntity) LibraryOfSoulsIntegration.summon(vex1, VEX_LOS);
+						mVexes.add(vex);
+						spells.add(new SpellVoidBlast(plugin, vex, mCooldownTicks / 2));
+						changePhase(new SpellManager(spells), passiveSpells, null);
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 20, 20);
+		}
+
+		if (vex2.isChunkLoaded()) {
+			LivingEntity vex = (LivingEntity) LibraryOfSoulsIntegration.summon(vex2, VEX_LOS);
+			mVexes.add(vex);
+			spells.add(new SpellVoidBlast(plugin, vex, mCooldownTicks / 2));
+		} else {
+			// Chunk was not loaded, likely because shard was just restarted.
+			// Wait a second to attempt to spawn the vex again when the chunk is loaded, and add the corresponding spell
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (vex2.isChunkLoaded()) {
+						LivingEntity vex = (LivingEntity) LibraryOfSoulsIntegration.summon(vex2, VEX_LOS);
+						mVexes.add(vex);
+						spells.add(new SpellVoidBlast(plugin, vex, mCooldownTicks / 2));
+						changePhase(new SpellManager(spells), passiveSpells, null);
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 20, 20);
+		}
+
+		SpellManager activeSpells = new SpellManager(spells);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
@@ -173,11 +220,11 @@ public class Davey extends BossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 
-		//launch event related spawn commands
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Lieutenant Davey\",\"color\":\"dark_gray\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Void Herald\",\"color\":\"gray\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GRAY + "Lieutenant Davey", ChatColor.GRAY + "Void Herald");
+			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+		}
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\", \"color\":\"gold\"},{\"text\":\" Ahoy! Ye have the stink of the Veil upon ye. She won't be likin' this... Sink!\",\"color\":\"blue\"}]");
 		mMusicRunnable.runTaskTimer(mPlugin, 0, MUSIC_DURATION * 20 + 20);
 	}

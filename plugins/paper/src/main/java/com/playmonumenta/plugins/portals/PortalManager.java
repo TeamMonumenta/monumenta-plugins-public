@@ -274,11 +274,11 @@ public class PortalManager {
 		int mapNum = portalNum + getMapNum(mCurrentShard);
 
 		if (portalNum == 1) {
-			CommandUtils.runCommandViaConsole("summon item_frame " + mPortal1.mLocation1.getX() + " " + mPortal1.mLocation1.getY() + " " + mPortal1.mLocation1.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation1 + "b,Invisible:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
-			CommandUtils.runCommandViaConsole("summon item_frame " + mPortal1.mLocation2.getX() + " " + mPortal1.mLocation2.getY() + " " + mPortal1.mLocation2.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation2 + "b,Invisible:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
+			CommandUtils.runCommandViaConsole("summon item_frame " + mPortal1.mLocation1.getX() + " " + mPortal1.mLocation1.getY() + " " + mPortal1.mLocation1.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation1 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
+			CommandUtils.runCommandViaConsole("summon item_frame " + mPortal1.mLocation2.getX() + " " + mPortal1.mLocation2.getY() + " " + mPortal1.mLocation2.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation2 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
 		} else if (portalNum == 2) {
-			CommandUtils.runCommandViaConsole("summon item_frame " + mPortal2.mLocation1.getX() + " " + mPortal2.mLocation1.getY() + " " + mPortal2.mLocation1.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation1 + "b,Invisible:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
-			CommandUtils.runCommandViaConsole("summon item_frame " + mPortal2.mLocation2.getX() + " " + mPortal2.mLocation2.getY() + " " + mPortal2.mLocation2.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation2 + "b,Invisible:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
+			CommandUtils.runCommandViaConsole("summon item_frame " + mPortal2.mLocation1.getX() + " " + mPortal2.mLocation1.getY() + " " + mPortal2.mLocation1.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation1 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
+			CommandUtils.runCommandViaConsole("summon item_frame " + mPortal2.mLocation2.getX() + " " + mPortal2.mLocation2.getY() + " " + mPortal2.mLocation2.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation2 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
 		}
 
 		//Activate teleport logic

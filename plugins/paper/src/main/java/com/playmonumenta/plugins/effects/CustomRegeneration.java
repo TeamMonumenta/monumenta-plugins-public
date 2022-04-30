@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -34,7 +35,7 @@ public class CustomRegeneration extends Effect {
 
 	@Override
 	public @Nullable String getSpecificDisplay() {
-		return "+" + mAmount + " Regeneration Per Second";
+		return "+" + StringUtils.to2DP(mAmount) + " Regeneration Per Second";
 	}
 
 	@Override

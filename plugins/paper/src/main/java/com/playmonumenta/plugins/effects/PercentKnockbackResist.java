@@ -41,7 +41,7 @@ public class PercentKnockbackResist extends Effect {
 
 	@Override
 	public @Nullable String getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Knockback Resistance";
+		return StringUtils.to2DP(mAmount) + " Knockback Resistance";
 	}
 
 	@Override

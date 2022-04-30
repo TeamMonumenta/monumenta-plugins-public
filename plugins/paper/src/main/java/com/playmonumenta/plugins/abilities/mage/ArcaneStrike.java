@@ -67,7 +67,7 @@ public class ArcaneStrike extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && mPlayer != null) {
+		if (event.getType() == DamageType.MELEE && mPlayer != null && mPlayer.getCooledAttackStrength(0) == 1) {
 			putOnCooldown();
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), RADIUS, mPlayer)) {

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.adapters;
 
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.bukkit.World;
 import org.bukkit.entity.Creature;
@@ -75,6 +76,18 @@ public interface VersionAdapter {
 	 */
 	void setAggressive(Creature entity, DamageAction action);
 
+	/**
+	 * Make this entity lose all desire to attack any Entity and make this only attack entities accepted by the predicate
+	 *
+	 *
+	 * @param entity        The entity
+	 * @param action        The damage action that will cat when this entity hit someone
+	 * @param predicate     Predicate used for check which entity attack and which not
+	 * @param attackRange   Attack range of this entity
+	 */
+	void setFriendly(Creature entity, DamageAction action, Predicate<LivingEntity> predicate, double attackRange);
+
+
 	interface DamageAction {
 		void damage(LivingEntity entity);
 	}
@@ -91,5 +104,16 @@ public interface VersionAdapter {
 	 */
 	void setAttackRange(Creature entity, double attackRange, double attackHeight);
 
+	/**
+	 * Returns the NMS class representing a ResourceKey (for use in packet handlers). A resource key is a pair of identifiers,
+	 * with the first one representing the type of resource, and the second one identifying the resource,
+	 * e.g. the resource key "minecraft:dimension_type / minecraft:overworld" represents the vanilla overworld dimension type.
+	 */
+	Class<?> getResourceKeyClass();
+
+	/**
+	 * Creates a ResourceKey of type "minecraft:dimension_type" with the provided namespace and key as identifier.
+	 */
+	Object createDimensionTypeResourceKey(String namespace, String key);
 
 }

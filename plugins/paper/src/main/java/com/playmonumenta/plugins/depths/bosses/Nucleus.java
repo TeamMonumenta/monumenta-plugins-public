@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.SpellVolcanicDeepmise;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
@@ -341,10 +342,11 @@ public final class Nucleus extends BossAbilityGroup {
 				//launch event related spawn commands
 				if (mTicks >= 6 * 20) {
 					this.cancel();
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Gyrhaeddant\",\"color\":\"dark_red\",\"bold\":true}]");
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"The Nucleus\",\"color\":\"dark_red\",\"bold\":true}]");
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "Gyrhaeddant", ChatColor.DARK_RED + "The Nucleus");
+						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
+						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+					}
 					mMusicRunnable.runTaskTimer(mPlugin, 0, MUSIC_DURATION * 20 + 20);
 				}
 

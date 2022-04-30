@@ -36,12 +36,10 @@ public class MonsterEggOverride extends BaseOverride {
 		}
 
 		// Only allow creative players or players in their plots (in capital and survival) to use spawn eggs
-		if ((player.getGameMode() == GameMode.CREATIVE)) {
+		if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		}
-		if (ZoneUtils.isInPlot(player)) {
-			return EntityListener.maySummonPlotAnimal(player.getLocation());
-		}
+
 		return false;
 	}
 

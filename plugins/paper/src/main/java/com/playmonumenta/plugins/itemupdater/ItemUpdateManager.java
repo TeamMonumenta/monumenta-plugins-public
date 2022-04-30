@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemupdater;
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
+import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTItem;
@@ -229,6 +230,9 @@ public class ItemUpdateManager implements Listener {
 			}
 
 			ItemUtils.setPlainTag(item);
+
+			// Internally checks if the item is a loot box before updating
+			ChestUtils.updateLootBoxSharesLore(item);
 
 			// Only generate item stats on items with Monumenta tag
 			NBTItem nbt = new NBTItem(item);

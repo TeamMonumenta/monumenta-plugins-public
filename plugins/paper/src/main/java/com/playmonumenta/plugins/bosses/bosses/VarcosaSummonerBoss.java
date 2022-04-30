@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellJibberJabber;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSummonConstantly;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -26,6 +28,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -139,8 +142,10 @@ public final class VarcosaSummonerBoss extends BossAbilityGroup {
 
 		mBoss.setHealth(bossTargetHp);
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Varcosa\",\"color\":\"red\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Mighty Pirate Captain\",\"color\":\"dark_red\",\"bold\":true}]");
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			MessagingUtils.sendBoldTitle(player, ChatColor.RED + "Varcosa", ChatColor.DARK_RED + "Mighty Pirate Captain");
+		}
+
 		mActive = true;
 	}
 

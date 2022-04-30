@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.bosses.spells.sealedremorse.GhalkorForwardSweep
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -218,9 +220,10 @@ public final class Ghalkor extends BossAbilityGroup {
 						mBoss.getWorld().playSound(mSvalgot.getLocation(), Sound.ENTITY_VINDICATOR_CELEBRATE, 5, 1f);
 					}
 
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s title [\"\",{\"text\":\"Ghalkhor & Svalgot\",\"color\":\"dark_gray\",\"bold\":true}]");
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s subtitle [\"\",{\"text\":\"Speakers of Remorse\",\"color\":\"gray\",\"bold\":true}]");
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.75");
+					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GRAY + "Ghalkor & Svalgot", ChatColor.GRAY + "Speakers of Remorse");
+						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.75f);
+					}
 				}
 
 				mTicks += 10;

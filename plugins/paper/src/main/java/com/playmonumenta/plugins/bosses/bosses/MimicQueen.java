@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.bosses.spells.mimicqueen.SpellSummonMiniboss;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -20,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -30,6 +32,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -130,13 +133,11 @@ public final class MimicQueen extends BossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
 
-		Location loc = mBoss.getLocation();
-
-		//launch event related spawn commands
-		PlayerUtils.executeCommandOnNearbyPlayers(loc, detectionRange + 20, "effect give @s minecraft:blindness 2 2");
-		PlayerUtils.executeCommandOnNearbyPlayers(loc, detectionRange + 20, "title @s title [\"\",{\"text\":\"Mimic Queen\",\"color\":\"dark_purple\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(loc, detectionRange + 20, "title @s subtitle [\"\",{\"text\":\"Varcosa's Plunder Protector\",\"color\":\"purple\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(loc, detectionRange + 20, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_PURPLE + "Mimic Queen", ChatColor.LIGHT_PURPLE + "Varcosa's Plunder Protector");
+			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+		}
 	}
 
 	@Override

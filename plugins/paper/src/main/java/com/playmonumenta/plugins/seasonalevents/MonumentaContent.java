@@ -33,7 +33,10 @@ public enum MonumentaContent {
 	HORSEMAN("horseman", ContentType.BOSS, 2),
 	ELDRASK("eldrask", ContentType.BOSS, 2),
 	HEKAWT("hekawt", ContentType.BOSS, 2),
-	RUSH("rush", ContentType.OTHER, 2);
+	RUSH("rush", ContentType.OTHER, 2),
+	KINGS_BOUNTY("r1daily", ContentType.OTHER, 0),
+	CELSIAN_BOUNTY("r2daily", ContentType.OTHER, 0),
+	DELVE_BOUNTY("delvebounty", ContentType.OTHER, 0);
 
 	private final int mRegion;
 	private final String mLabel;
