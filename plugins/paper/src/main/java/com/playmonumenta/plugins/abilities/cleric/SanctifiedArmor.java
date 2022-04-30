@@ -40,7 +40,7 @@ public class SanctifiedArmor extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.SANCTIFIED_ARMOR;
 		mInfo.mScoreboardId = "Sanctified";
 		mInfo.mShorthandName = "Sa";
-		mInfo.mDescriptions.add("Whenever you are damaged by melee or projectile hits from non-boss enemies, the enemy will take 1.5 times the damage you took, as magic damage.");
+		mInfo.mDescriptions.add("Whenever you are damaged by melee or projectile hits from non-boss undead, the enemy will take 1.5 times the damage you took, as magic damage.");
 		mInfo.mDescriptions.add("Deal 2.5 times the final damage instead, and the undead enemy is also afflicted with 20% Slowness for 3 seconds.");
 		mPercentDamageReturned = getAbilityScore() == 1 ? PERCENT_DAMAGE_RETURNED_1 : PERCENT_DAMAGE_RETURNED_2;
 		mDisplayItem = new ItemStack(Material.IRON_CHESTPLATE, 1);
