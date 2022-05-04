@@ -20,25 +20,21 @@ import org.bukkit.inventory.ItemStack;
 
 public class CounterStrike extends Ability {
 
-	private static final int COUNTER_STRIKE_1_DAMAGE = 1;
-	private static final int COUNTER_STRIKE_2_DAMAGE = 2;
 	private static final double COUNTER_STRIKE_1_REFLECT = 0.2;
 	private static final double COUNTER_STRIKE_2_REFLECT = 0.4;
 	private static final float COUNTER_STRIKE_RADIUS = 3.0f;
 
 	private final double mReflect;
-	private final int mDamage;
 
 	public CounterStrike(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Counter Strike");
 		mInfo.mScoreboardId = "CounterStrike";
 		mInfo.mShorthandName = "CS";
-		mInfo.mDescriptions.add("When you take melee damage, deal melee damage equal to 1 + 20% of pre-mitigation damage taken to all mobs in a 3 block radius.");
-		mInfo.mDescriptions.add("The damage is increased to 2 + 40% of pre-mitigation damage.");
+		mInfo.mDescriptions.add("When you take melee damage, deal melee damage equal to 20% of pre-mitigation damage taken to all mobs in a 3 block radius.");
+		mInfo.mDescriptions.add("The damage is increased to 40% of pre-mitigation damage.");
 		mInfo.mLinkedSpell = ClassAbility.COUNTER_STRIKE;
 		mDisplayItem = new ItemStack(Material.CACTUS, 1);
 		mReflect = getAbilityScore() == 1 ? COUNTER_STRIKE_1_REFLECT : COUNTER_STRIKE_2_REFLECT;
-		mDamage = getAbilityScore() == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
 	}
 
 	@Override
@@ -46,7 +42,9 @@ public class CounterStrike extends Ability {
 		if (event.getType() == DamageType.MELEE
 			    && source != null
 			    && !event.isBlocked()
-			    && mPlayer != null) {
+			    && mPlayer != null
+				&& mPlayer.getNoDamageTicks() == 0) {
+
 			Location loc = mPlayer.getLocation().add(0, 1, 0);
 			new PartialParticle(Particle.SWEEP_ATTACK, loc, 6, 0.75, 0.5, 0.75, 0.001).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.FIREWORKS_SPARK, loc, 8, 0.75, 0.5, 0.75, 0.1).spawnAsPlayerActive(mPlayer);
@@ -54,7 +52,7 @@ public class CounterStrike extends Ability {
 			double eventDamage = event.getOriginalDamage() * mReflect;
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
-				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage + eventDamage, mInfo.mLinkedSpell, true, true);
+				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, eventDamage, mInfo.mLinkedSpell, true, true);
 			}
 		}
 	}

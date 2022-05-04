@@ -23,27 +23,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 
 
 public class Quickdraw extends Ability {
 
-	private static final int QUICKDRAW_1_COOLDOWN = 20 * 15;
-	private static final int QUICKDRAW_2_COOLDOWN = 20 * 7;
-	private static final int QUICKDRAW_SLOWNESS_DURATION = 20 * 2;
-	private static final int QUICKDRAW_SLOWNESS_LEVEL = 1;
-	private static final int QUICKDRAW_PIERCING_BONUS = 1;
+	private static final int QUICKDRAW_1_COOLDOWN = 20 * 6;
+	private static final int QUICKDRAW_2_COOLDOWN = 20 * 3;
 
 	public Quickdraw(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Quickdraw");
 		mInfo.mLinkedSpell = ClassAbility.QUICKDRAW;
 		mInfo.mScoreboardId = "Quickdraw";
 		mInfo.mShorthandName = "Qd";
-		mInfo.mDescriptions.add("Left-clicking with a bow instantly fires a fully charged arrow with +1 Piercing that afflicts Slowness 2 for 2 seconds. Cooldown: 15s.");
-		mInfo.mDescriptions.add("Cooldown: 7s.");
+		mInfo.mDescriptions.add("Left-clicking with a bow instantly fires a fully charged arrow. (This Arrow does not activate recoil) Cooldown: 6s.");
+		mInfo.mDescriptions.add("Cooldown: 3s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? QUICKDRAW_1_COOLDOWN : QUICKDRAW_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
@@ -85,14 +80,11 @@ public class Quickdraw extends Ability {
 			direction.rotateAroundY(deviation * 10.0 * Math.PI / 180);
 		}
 		Arrow arrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), direction, 3.0f, 0, Arrow.class);
+		arrow.addScoreboardTag("NoRecoil");
 		arrow.setShooter(mPlayer);
-		if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
-			arrow.setFireTicks(20 * 15);
-		}
-		arrow.setPierceLevel(inMainHand.getEnchantmentLevel(Enchantment.PIERCING) + QUICKDRAW_PIERCING_BONUS);
+		arrow.setPierceLevel(inMainHand.getEnchantmentLevel(Enchantment.PIERCING));
 		arrow.setCritical(true);
 		arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-		arrow.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, QUICKDRAW_SLOWNESS_DURATION, QUICKDRAW_SLOWNESS_LEVEL), false);
 
 		ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
 		Bukkit.getPluginManager().callEvent(eventLaunch);

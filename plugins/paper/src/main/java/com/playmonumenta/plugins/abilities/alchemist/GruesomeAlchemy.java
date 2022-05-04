@@ -25,7 +25,7 @@ public class GruesomeAlchemy extends PotionAbility {
 	private static final double GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER = 0.2;
 	private static final double GRUESOME_ALCHEMY_WEAKEN_AMPLIFIER = 0.1;
 
-	public static final double GRUESOME_POTION_DAMAGE_MULTIPLIER = 0.6;
+	public static final double GRUESOME_POTION_DAMAGE_MULTIPLIER = 0.8;
 
 	private final double mSlownessAmount;
 	private final double mVulnerabilityAmount;
@@ -41,7 +41,7 @@ public class GruesomeAlchemy extends PotionAbility {
 		super(plugin, player, "Gruesome Alchemy", 0, 0);
 		mInfo.mScoreboardId = "GruesomeAlchemy";
 		mInfo.mShorthandName = "GA";
-		mInfo.mDescriptions.add("Swap hands while holding an Alchemist's Bag to switch to Gruesome potions. These potions deal 60% of the damage of your Brutal potions and do not afflict damage over time. Instead, they apply 10% Slow, 10% Vulnerability, and 10% Weaken for 8 seconds. If Alchemical Artillery is active, left clicking while holding a bow, crossbow, or trident will also swap modes.");
+		mInfo.mDescriptions.add("Swap hands while holding an Alchemist's Bag to switch to Gruesome potions. These potions deal 80% of the damage of your Brutal potions and do not afflict damage over time. Instead, they apply 10% Slow, 10% Vulnerability, and 10% Weaken for 8 seconds. If Alchemical Artillery is active, left clicking while holding a bow, crossbow, or trident will also swap modes.");
 		mInfo.mDescriptions.add("The Slow and Vulnerability are increased to 20%.");
 
 		//This is just for the Alchemical Artillery integration
