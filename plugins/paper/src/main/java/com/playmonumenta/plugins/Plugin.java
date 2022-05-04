@@ -223,6 +223,7 @@ public class Plugin extends JavaPlugin {
 		PickLevelAfterAnvils.register();
 		GenerateItems.register();
 		JingleBells.register();
+		Spawn.register();
 		Stuck.register(this);
 		GlowingCommand.register();
 		VirtualFirmament.register();
