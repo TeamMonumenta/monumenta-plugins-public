@@ -1,22 +1,20 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import javax.annotation.Nullable;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class CurseOfCrippling implements Enchantment {
-	private static final int DURATION = 3 * 20;
-	private static final double PERCENT_SPEED = -0.3;
+	private static final int EFFECT_DURATION = 10;
+	private static final double PERCENT_SPEED_PER_LEVEL = -0.1;
+	private static final double PERCENT_DAMAGE_PER_LEVEL = -0.1;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "CripplingPercentSpeedEffect";
+	private static final String PERCENT_DAMAGE_EFFECT_NAME = "CripplingPercentDamageEffect";
+	private static final double MIN_HEALTH_PERCENT = 0.5;
 
 	@Override
 	public String getName() {
@@ -28,14 +26,15 @@ public class CurseOfCrippling implements Enchantment {
 		return EnchantmentType.CURSE_OF_CRIPPLING;
 	}
 
-
 	@Override
-	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (source == null || event.getType() != DamageEvent.DamageType.MELEE || event.getDamage() <= 0) {
-			return;
+	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
+		double health = player.getHealth() / EntityUtils.getMaxHealth(player);
+		if (health <= MIN_HEALTH_PERCENT) {
+			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(EFFECT_DURATION, value * PERCENT_SPEED_PER_LEVEL, PERCENT_SPEED_EFFECT_NAME));
+			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME, new PercentDamageDealt(EFFECT_DURATION, value * PERCENT_DAMAGE_PER_LEVEL));
+		} else {
+			plugin.mEffectManager.clearEffects(player, PERCENT_SPEED_EFFECT_NAME);
+			plugin.mEffectManager.clearEffects(player, PERCENT_DAMAGE_EFFECT_NAME);
 		}
-		plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, PERCENT_SPEED, PERCENT_SPEED_EFFECT_NAME));
-		player.getWorld().spawnParticle(Particle.CRIT, player.getLocation().add(0, 1, 0), 16, 0.4, 0.5, 0.4);
-		player.playSound(player.getLocation(), Sound.ENTITY_EVOKER_FANGS_ATTACK, SoundCategory.HOSTILE, 0.25f, 0.8f);
 	}
 }

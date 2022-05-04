@@ -402,7 +402,7 @@ public class ItemStatUtils {
 		CURSE_OF_BINDING(Enchantment.BINDING_CURSE, "Curse of Binding", false, true, false),
 		CURSE_OF_VANISHING(Enchantment.VANISHING_CURSE, "Curse of Vanishing", false, true, false),
 		CURSE_OF_IRREPARIBILITY(new CurseOfIrreparability(), false, true, false),
-		CURSE_OF_CRIPPLING(new CurseOfCrippling(), false, true, false),
+		CURSE_OF_CRIPPLING(new CurseOfCrippling(), true, true, false),
 		CURSE_OF_CORRUPTION(new CurseOfCorruption(), false, true, false),
 		CURSE_OF_EPHEMERALITY(new CurseOfEphemerality(), false, true, true),
 		CURSE_OF_SHRAPNEL(new CurseOfShrapnel(), true, true, false),
