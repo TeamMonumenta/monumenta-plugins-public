@@ -42,7 +42,6 @@ public class GraspingClaws extends Ability {
 	private static final int DAMAGE_2 = 8;
 	private static final int DURATION = 8 * 20;
 	private static final int COOLDOWN_1 = 16 * 20;
-	private static final int COOLDOWN_2 = 12 * 20;
 
 	private final double mAmplifier;
 	private final int mDamage;
@@ -55,7 +54,7 @@ public class GraspingClaws extends Ability {
 		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow or crossbow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given 20% Slowness for 8 seconds and take 3 magic damage. Cooldown: 16s.");
 		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, and their Slowness is increased to 30%.");
 		mInfo.mLinkedSpell = ClassAbility.GRASPING_CLAWS;
-		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = COOLDOWN_1;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BOW, 1);
