@@ -135,9 +135,7 @@ public final class MeteorSlam extends Ability {
 
 					// If first tick landing, should still have old mFallFromY to calculate using
 					// Therefore can damage if eligible
-					if (
-						calculateFallDistance() > AUTOMATIC_THRESHOLD
-					) {
+					if (calculateFallDistance() > AUTOMATIC_THRESHOLD) {
 						// Only for checking in LivingEntityDamagedByPlayerEvent below,
 						// so doesn't slam twice, since this doesn't yet set fall distance to 0
 						MetadataUtils.checkOnceThisTick(plugin, player, SLAM_ONCE_THIS_TICK_METAKEY);
@@ -202,9 +200,9 @@ public final class MeteorSlam extends Ability {
 		if (mPlayer == null) {
 			return;
 		}
-		double currentY = mPlayer.getLocation().getY();
-		double fallDistance = mPlayer.getFallDistance();
-		mFallFromY = currentY + fallDistance;
+		// player.getFallDistance() is unreliable (e.g. does not get reset while in a bed, despite player.isOnGround() being true),
+		// thus we calculate the fall distance ourselves.
+		mFallFromY = Math.max(mFallFromY, mPlayer.getLocation().getY());
 	}
 
 	private double calculateFallDistance() {
