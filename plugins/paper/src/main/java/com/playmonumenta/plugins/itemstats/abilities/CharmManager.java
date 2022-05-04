@@ -64,7 +64,7 @@ public class CharmManager {
 	public static final String KEY_PLUGIN_DATA = "R3Charms";
 	public static final String KEY_CHARMS = "charms";
 	public static final String KEY_ITEM = "item";
-	public static final int MAX_CHARM_COUNT = 5;
+	public static final int MAX_CHARM_COUNT = 7;
 	private static final String CHARM_EFFECT_NAME = "CHARM EFFECT";
 
 	public static CharmManager mInstance;

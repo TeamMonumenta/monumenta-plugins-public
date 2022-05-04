@@ -22,7 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class CharmsGUI extends CustomInventory {
 	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<Integer>(Arrays.asList(45, 48, 50, 53));
-	private static final int START_OF_CHARMS = 47;
+	private static final int START_OF_CHARMS = 45;
 	private static final int EXIT_BUTTON_LOC = 53;
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final Material RED_FILLER = Material.RED_STAINED_GLASS_PANE;
@@ -79,7 +79,7 @@ public class CharmsGUI extends CustomInventory {
 				p.closeInventory();
 			}
 			// It's in the charms gui, check clicked charms to remove them
-			if (event.getCurrentItem().getType() != Material.RED_STAINED_GLASS && event.getSlot() >= 47 && event.getSlot() < 52) {
+			if (event.getCurrentItem().getType() != Material.RED_STAINED_GLASS && event.getSlot() >= START_OF_CHARMS && event.getSlot() < 52) {
 
 				ItemStack item = mInventory.getItem(event.getSlot());
 				if (item == null || item.getType() == Material.AIR) {

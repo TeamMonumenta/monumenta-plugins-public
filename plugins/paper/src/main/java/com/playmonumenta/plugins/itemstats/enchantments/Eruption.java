@@ -103,7 +103,8 @@ public class Eruption implements Enchantment {
 					}
 					p.getWorld().spawnParticle(Particle.REDSTONE, p.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
 					double speed = CharmManager.calculateFlatAndPercentValue(player, Adrenaline.CHARM_SPEED, Adrenaline.PERCENT_SPEED_PER_LEVEL * adrenaline);
-					plugin.mEffectManager.addEffect(p, Adrenaline.PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(Adrenaline.SPAWNER_DURATION, speed, Adrenaline.PERCENT_SPEED_EFFECT_NAME));
+					int duration = (int) CharmManager.calculateFlatAndPercentValue(player, Adrenaline.CHARM_DURATION, Adrenaline.SPAWNER_DURATION);
+					plugin.mEffectManager.addEffect(p, Adrenaline.PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(duration, speed, Adrenaline.PERCENT_SPEED_EFFECT_NAME));
 				}
 			}
 

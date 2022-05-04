@@ -22,6 +22,7 @@ public class Adrenaline implements Enchantment {
 	public static final int SPAWNER_DURATION = 20 * 6;
 	public static final double PERCENT_SPEED_PER_LEVEL = 0.1;
 	public static final String CHARM_SPEED = "Adrenaline Speed";
+	public static final String CHARM_DURATION = "Adrenaline Duration";
 
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
@@ -40,7 +41,8 @@ public class Adrenaline implements Enchantment {
 		if (event.getType() == DamageType.MELEE) {
 			player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
 			double speedAmount = CharmManager.calculateFlatAndPercentValue(player, CHARM_SPEED, PERCENT_SPEED_PER_LEVEL * value);
-			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, speedAmount, PERCENT_SPEED_EFFECT_NAME));
+			int duration = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_DURATION, DURATION);
+			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(duration, speedAmount, PERCENT_SPEED_EFFECT_NAME));
 		}
 	}
 
@@ -49,7 +51,8 @@ public class Adrenaline implements Enchantment {
 		if (ItemUtils.isPickaxe(player.getItemInHand()) && event.getBlock().getType() == Material.SPAWNER) {
 			player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
 			double speedAmount = CharmManager.calculateFlatAndPercentValue(player, CHARM_SPEED, PERCENT_SPEED_PER_LEVEL * value * 0.5);
-			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(SPAWNER_DURATION, speedAmount, PERCENT_SPEED_EFFECT_NAME));
+			int duration = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_DURATION, SPAWNER_DURATION);
+			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(duration, speedAmount, PERCENT_SPEED_EFFECT_NAME));
 		}
 	}
 }
