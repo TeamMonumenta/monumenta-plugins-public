@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 public class Unyielding implements Infusion {
 
 	public static final String MODIFIER = "UnyieldingMod";
-	private static final double KB_PER_LEVEL = 0.4;
+	private static final double KB_PER_LEVEL = 0.04;
 
 	@Override
 	public String getName() {
