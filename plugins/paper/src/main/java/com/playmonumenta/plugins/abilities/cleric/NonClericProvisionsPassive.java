@@ -51,7 +51,7 @@ public class NonClericProvisionsPassive extends Ability {
 	public static boolean testEnhanced(Player player) {
 		for (Player p : PlayerUtils.playersInRange(player.getLocation(), PROVISIONS_RANGE, true)) {
 			Ability provisions = AbilityManager.getManager().getPlayerAbility(p, SacredProvisions.class);
-			if (provisions.isEnhanced()) {
+			if (provisions != null && provisions.isEnhanced()) {
 				return true;
 			}
 		}
