@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +50,7 @@ public class ArcaneThrust implements Enchantment {
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
 			if (player.getCooledAttackStrength(0.5f) > 0.9) {
-				double damage = 1 + (event.getDamage() * (value / (value + 1) * (PlayerUtils.isCriticalAttack(player) ? 1.5 : 1)));
+				double damage = 1 + (event.getDamage() * (value / (value + 1)));
 
 				Location loc = player.getEyeLocation();
 				BoundingBox box = BoundingBox.of(loc, 0.6, 0.6, 0.6);
