@@ -43,6 +43,7 @@ public class GruesomeAlchemy extends PotionAbility {
 		mInfo.mShorthandName = "GA";
 		mInfo.mDescriptions.add("Swap hands while holding an Alchemist's Bag to switch to Gruesome potions. These potions deal 60% of the damage of your Brutal potions and do not afflict damage over time. Instead, they apply 10% Slow, 10% Vulnerability, and 10% Weaken for 8 seconds. If Alchemical Artillery is active, left clicking while holding a bow, crossbow, or trident will also swap modes.");
 		mInfo.mDescriptions.add("The Slow and Vulnerability are increased to 20%.");
+		mInfo.mDescriptions.add("Your Gruesome potions now additionally paralyze mobs for 8s.");
 
 		//This is just for the Alchemical Artillery integration
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -67,6 +68,9 @@ public class GruesomeAlchemy extends PotionAbility {
 			EntityUtils.applySlow(mPlugin, GRUESOME_ALCHEMY_DURATION, mSlownessAmount, mob);
 			EntityUtils.applyVulnerability(mPlugin, GRUESOME_ALCHEMY_DURATION, mVulnerabilityAmount, mob);
 			EntityUtils.applyWeaken(mPlugin, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_WEAKEN_AMPLIFIER, mob);
+			if (isEnhanced()) {
+				EntityUtils.paralyze(mPlugin, GRUESOME_ALCHEMY_DURATION, mob);
+			}
 		}
 	}
 
