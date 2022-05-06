@@ -26,12 +26,15 @@ import net.minecraft.server.v1_16_R3.PathfinderGoalPanic;
 import net.minecraft.server.v1_16_R3.PathfinderGoalPerch;
 import net.minecraft.server.v1_16_R3.PathfinderGoalWrapped;
 import net.minecraft.server.v1_16_R3.ResourceKey;
+import net.minecraft.server.v1_16_R3.TileEntityCommand;
 import net.minecraft.server.v1_16_R3.Vec3D;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftCreature;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
@@ -338,6 +341,13 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	@Override
 	public Object createDimensionTypeResourceKey(String namespace, String key) {
 		return ResourceKey.newResourceKey(IRegistry.K, new MinecraftKey(namespace, key));
+	}
+
+	@Override
+	public void executeCommandAsBlock(Block block, String command) {
+		TileEntityCommand tileEntity = new TileEntityCommand();
+		tileEntity.setLocation(((CraftBlock) block).getCraftWorld().getHandle(), ((CraftBlock) block).getPosition());
+		Bukkit.dispatchCommand(tileEntity.getCommandBlock().getBukkitSender(tileEntity.getCommandBlock().getWrapper()), command);
 	}
 
 }

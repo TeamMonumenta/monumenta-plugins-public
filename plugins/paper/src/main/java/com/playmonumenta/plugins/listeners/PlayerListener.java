@@ -944,26 +944,20 @@ public class PlayerListener implements Listener {
 					// Adjust for player teleports being off-center
 					Location teleLoc = new Location(world, pt.mX - 0.5, pt.mY, pt.mZ - 0.5, yaw, pitch);
 
-					//Records player's previous spawnpoint - either their bed spawn point if it exists (and is not this bed), or the world spawn otherwise
-					Location tempSpawnLoc = player.getBedSpawnLocation();
-					if (tempSpawnLoc == null || tempSpawnLoc.equals(loc)) {
-						tempSpawnLoc = world.getSpawnLocation();
-					}
-					final Location playerSpawn = tempSpawnLoc;
+					final Location oldPlayerSpawn = player.getBedSpawnLocation();
 
 					// Create a deferred task to eject player and teleport them after a short sleep
 					new BukkitRunnable() {
+						static final int BED_TELE_TIME = 20 * 3;
 						int mTicks = 0;
 
 						@Override
 						public void run() {
 							GameMode mode;
-							final int BED_TELE_TIME = 20 * 3;
 
 							if (mTicks == 0) {
 								//Set player's spawnpoint back to whatever it was
-								String cmd = String.format("spawnpoint %s %d %d %d", player.getName(), playerSpawn.getBlockX(), playerSpawn.getBlockY(), playerSpawn.getBlockZ());
-								Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);
+								player.setBedSpawnLocation(oldPlayerSpawn, true);
 							}
 
 

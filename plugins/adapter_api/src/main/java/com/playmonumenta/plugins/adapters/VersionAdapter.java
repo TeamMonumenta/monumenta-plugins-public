@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.adapters;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -115,5 +116,10 @@ public interface VersionAdapter {
 	 * Creates a ResourceKey of type "minecraft:dimension_type" with the provided namespace and key as identifier.
 	 */
 	Object createDimensionTypeResourceKey(String namespace, String key);
+
+	/**
+	 * Executes a command as a block. The block does not need to be a command block.
+	 */
+	void executeCommandAsBlock(Block block, String command);
 
 }

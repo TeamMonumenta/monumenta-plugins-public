@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.TOVUtils;
 import java.util.Arrays;
@@ -11,7 +12,6 @@ import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -84,7 +84,7 @@ public class ChestOverride extends BaseOverride {
 			}
 		}
 
-		if (player != null && !player.getGameMode().equals(GameMode.SPECTATOR) && !event.isCancelled() && !command_chest(block)) {
+		if (player != null && !player.getGameMode().equals(GameMode.SPECTATOR) && !event.isCancelled() && !commandChest(block)) {
 			return false;
 		}
 
@@ -110,7 +110,7 @@ public class ChestOverride extends BaseOverride {
 		if (state instanceof Chest chest) {
 			LootTable table = chest.getLootTable();
 			if (table != null) {
-				player.sendMessage(ChatColor.GOLD + "This chest has loot table: " + table.getKey().toString());
+				player.sendMessage(ChatColor.GOLD + "This chest has loot table: " + table.getKey());
 				return false;
 			}
 		}
@@ -121,7 +121,7 @@ public class ChestOverride extends BaseOverride {
 	/* Chests placed on barriers can not be broken */
 	@Override
 	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block, BlockBreakEvent event) {
-		if (!event.isCancelled() && !command_chest(block)) {
+		if (!event.isCancelled() && !commandChest(block)) {
 			return false;
 		} else if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
@@ -137,7 +137,7 @@ public class ChestOverride extends BaseOverride {
 
 	@Override
 	public boolean blockExplodeInteraction(Plugin plugin, Block block) {
-		if (!command_chest(block)) {
+		if (!commandChest(block)) {
 			return false;
 		} else if (!breakable(block)) {
 			return false;
@@ -164,35 +164,27 @@ public class ChestOverride extends BaseOverride {
 	}
 
 	// If this returns false, the caller should also return false and stop processing the chest
-	private boolean command_chest(Block block) {
-		BlockState state = block.getState();
-		if (state != null && state instanceof Chest) {
-			Chest chest = (Chest)state;
+	private boolean commandChest(Block block) {
+		if (block.getState() instanceof Chest chest) {
 			String name = chest.getCustomName();
-			if (name != null && (name.toLowerCase().equals("trap") || name.toLowerCase().equals("function"))) {
+			if (name != null && (name.equalsIgnoreCase("trap") || name.equalsIgnoreCase("function"))) {
 				// This is a function chest - run it!
 				// Run the first command block found in the 10 blocks under this block
 				Location loc = block.getLocation();
 				for (int y = 0; y < 10; y++) {
 					loc = loc.subtract(0, 1, 0);
 					Block testBlock = loc.getBlock();
-					BlockState testState = testBlock.getState();
 
 					if (testBlock.getType().equals(Material.COMMAND_BLOCK)
-					    && testState instanceof CommandBlock) {
+						    && testBlock.getState() instanceof CommandBlock commandBlock) {
 
 						// Run the command positioned at the chest block
-						String command = "execute positioned " +
-						                 Integer.toString((int)chest.getLocation().getX()) + " " +
-						                 Integer.toString((int)chest.getLocation().getY()) + " " +
-						                 Integer.toString((int)chest.getLocation().getZ()) + " run " +
-						                 ((CommandBlock)testState).getCommand();
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+						NmsUtils.getVersionAdapter().executeCommandAsBlock(block, commandBlock.getCommand());
 						break;
 					}
 				}
 
-				if (name.toLowerCase().equals("trap")) {
+				if (name.equalsIgnoreCase("trap")) {
 					// This was a trapped chest - clear its name and still let the player open it
 					chest.setCustomName(null);
 					chest.update();
