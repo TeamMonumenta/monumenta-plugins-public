@@ -1,13 +1,9 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -37,11 +33,6 @@ public class BrutalAlchemy extends PotionAbility {
 
 		mPeriod = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_1_PERIOD : BRUTAL_ALCHEMY_2_PERIOD;
 		mDOTDamage = BRUTAL_ALCHEMY_DOT_DAMAGE;
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			if (ServerProperties.getClassSpecializationsEnabled() && AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EsotericEnhancements.class) != null) {
-				mDOTDamage = EsotericEnhancements.BRUTAL_DOT_DAMAGE;
-			}
-		});
 	}
 
 	@Override

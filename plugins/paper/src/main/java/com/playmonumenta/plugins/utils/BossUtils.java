@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
@@ -352,5 +355,20 @@ public class BossUtils {
 
 		return true;
 
+	}
+
+	public static @Nullable <T extends BossAbilityGroup> T getBossOfClass(Entity entity, Class<T> cls) {
+		BossManager bossManager = BossManager.getInstance();
+		if (bossManager != null) {
+			List<BossAbilityGroup> abilities = BossManager.getInstance().getAbilities(entity);
+			if (abilities != null) {
+				for (BossAbilityGroup ability : abilities) {
+					if (ability.getClass() == cls) {
+						return (T) ability;
+					}
+				}
+			}
+		}
+		return null;
 	}
 }

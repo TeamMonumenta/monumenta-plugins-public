@@ -159,10 +159,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 								mPotionAbilities.add(potionAbility);
 								mDamage += potionAbility.getDamage();
 							}
-
-							if (specAbility instanceof EsotericEnhancements && abilityScore > 1) {
-								mMaxCharges += EsotericEnhancements.POTION_CAP_INCREASE_2;
-							}
 						}
 					}
 				}
@@ -265,7 +261,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public void apply(LivingEntity mob, ThrownPotion potion, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {
-		if (mPlayer != null && MetadataUtils.checkOnceThisTick(mPlugin, mob, "AlchemistPotionApplying")) {
+		if (mPlayer != null && MetadataUtils.checkOnceThisTick(mPlugin, mob, "AlchemistPotionApplying") && !mob.isDead()) {
 			double damage = mDamage;
 
 			if (isGruesome) {
@@ -285,7 +281,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, false);
 			mMobsIframeMap.put(mob.getUniqueId(), mPlayer.getTicksLived());
-
 
 			// Intentionally apply effects after damage
 			applyEffects(mob, isGruesome);

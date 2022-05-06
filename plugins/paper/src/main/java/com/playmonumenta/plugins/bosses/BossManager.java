@@ -5,6 +5,7 @@ import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.*;
+import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
@@ -268,6 +269,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(HuntingCompanionBoss.identityTag, (Plugin p, LivingEntity e) -> new HuntingCompanionBoss(p, e));
 		mStatelessBosses.put(MetalmancyBoss.identityTag, (Plugin p, LivingEntity e) -> new MetalmancyBoss(p, e));
 		mStatelessBosses.put(RestlessSoulsBoss.identityTag, (Plugin p, LivingEntity e) -> new RestlessSoulsBoss(p, e));
+		mStatelessBosses.put(AlchemicalAberrationBoss.identityTag, (Plugin p, LivingEntity e) -> new AlchemicalAberrationBoss(p, e));
 		mStatelessBosses.put(ThrowSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new ThrowSummonBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -482,6 +484,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(HuntingCompanionBoss.identityTag, (Plugin p, LivingEntity e) -> HuntingCompanionBoss.deserialize(p, e));
 		mBossDeserializers.put(MetalmancyBoss.identityTag, (Plugin p, LivingEntity e) -> MetalmancyBoss.deserialize(p, e));
 		mBossDeserializers.put(RestlessSoulsBoss.identityTag, (Plugin p, LivingEntity e) -> RestlessSoulsBoss.deserialize(p, e));
+		mBossDeserializers.put(AlchemicalAberrationBoss.identityTag, (Plugin p, LivingEntity e) -> AlchemicalAberrationBoss.deserialize(p, e));
 		mBossDeserializers.put(ThrowSummonBoss.identityTag, (Plugin p, LivingEntity e) -> ThrowSummonBoss.deserialize(p, e));
 		mBossDeserializers.put(HostileBoss.identityTag, (Plugin p, LivingEntity e) -> HostileBoss.deserialize(p, e));
 		mBossDeserializers.put(FriendlyBoss.identityTag, (Plugin p, LivingEntity e) -> FriendlyBoss.deserialize(p, e));
@@ -885,6 +888,15 @@ public class BossManager implements Listener {
 
 		if (boss != null) {
 			boss.customEffectAppliedToBoss(event);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = false)
+	public void bossExploded(EntityExplodeEvent event) {
+		Boss boss = mBosses.get(event.getEntity().getUniqueId());
+
+		if (boss != null) {
+			boss.bossExploded(event);
 		}
 	}
 

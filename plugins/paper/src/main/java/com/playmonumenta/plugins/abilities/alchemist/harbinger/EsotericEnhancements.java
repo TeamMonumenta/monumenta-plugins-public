@@ -1,37 +1,142 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
+import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class EsotericEnhancements extends PotionAbility {
-	private static final int PARALYZE_DURATION = 8 * 20;
+	private static final String ABERRATION_LOS = "Alchemicalaberration";
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 0.8;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1.2;
+	private static final double ABERRATION_DAMAGE_RADIUS = 3;
+	private static final int ABERRATION_SUMMON_DURATION = 30;
+	private static final double ABERRATION_BLEED_AMOUNT = 0.2;
+	private static final int ABERRATION_BLEED_DURATION = 4 * 20;
+	private static final int ABERRATION_COOLDOWN = 5 * 20;
+	private static final double ABERRATION_TARGET_RADIUS = 8;
+	private static final int ABERRATION_LIFETIME = 15 * 20;
+	private static final int TICK_INTERVAL = 5;
 
-	public static final double BRUTAL_DOT_DAMAGE = 3;
-	public static final int POTION_CAP_INCREASE_2 = 2;
+	private @Nullable AlchemistPotions mAlchemistPotions;
+	private double mDamageMultiplier;
+
+	private HashMap<LivingEntity, Integer> mAppliedMobs;
 
 	public EsotericEnhancements(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Esoteric Enhancements", 0, 0);
 		mInfo.mLinkedSpell = ClassAbility.ESOTERIC_ENHANCEMENTS;
 		mInfo.mScoreboardId = "Esoteric";
 		mInfo.mShorthandName = "Es";
-		mInfo.mDescriptions.add("Your Brutal Alchemy damage over time is increased to 3 damage. Your Gruesome Alchemy potions now afflict Paralyze (25% to be slowed by 100% for 1s every 1s) for 8s.");
-		mInfo.mDescriptions.add("Your max potion charges is increased by 2.");
-		mDisplayItem = new ItemStack(Material.BREWING_STAND, 1);
+		mInfo.mDescriptions.add("When afflicting a mob with a Brutal potion within 1.5s of afflicting that mob with a Gruesome potion, summon an Alchemical Aberration. The Aberration targets the mob with the highest health within 8 blocks and explodes on that mob, dealing 80% of your potion damage and applying 20% Bleed for 4s to all mobs in a 3 block radius. Cooldown: 5s.");
+		mInfo.mDescriptions.add("Damage is increased to 120% of your potion damage.");
+		mDisplayItem = new ItemStack(Material.CREEPER_HEAD, 1);
+
+		mInfo.mCooldown = ABERRATION_COOLDOWN;
+		mInfo.mIgnoreCooldown = true;
+		mInfo.mLinkedSpell = ClassAbility.ESOTERIC_ENHANCEMENTS;
+
+		mAppliedMobs = new HashMap<>();
+
+		mDamageMultiplier = getAbilityScore() == 1 ? ABERRATION_POTION_DAMAGE_MULTIPLIER_1 : ABERRATION_POTION_DAMAGE_MULTIPLIER_2;
+
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+		});
 	}
 
 	@Override
 	public void apply(LivingEntity mob, boolean isGruesome) {
-		// Brutal effect handled in BrutalAlchemy
-		if (isGruesome && !EntityUtils.isBoss(mob)) {
-			EntityUtils.paralyze(mPlugin, PARALYZE_DURATION, mob);
+		if (isGruesome) {
+			mAppliedMobs.put(mob, mob.getTicksLived());
+		} else if (!isTimerActive()) {
+			// Clear out list so it doesn't build up
+			mAppliedMobs.keySet().removeIf((entity) -> (entity.getTicksLived() - mAppliedMobs.get(entity) > ABERRATION_SUMMON_DURATION));
+
+			// If it's still in the list, it was applied recently enough
+			if (mAppliedMobs.containsKey(mob)) {
+				summonAbberation(mob.getLocation());
+				putOnCooldown();
+			}
 		}
+	}
+
+	private void summonAbberation(Location loc) {
+
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			Creeper aberration = (Creeper) LibraryOfSoulsIntegration.summon(loc, ABERRATION_LOS);
+			if (aberration == null) {
+				MMLog.warning("Failed to spawn Alchemical Aberration from Library of Souls");
+				return;
+			}
+
+			AlchemicalAberrationBoss alchemicalAbberationBoss = BossUtils.getBossOfClass(aberration, AlchemicalAberrationBoss.class);
+			if (alchemicalAbberationBoss == null) {
+				MMLog.warning("Failed to get AlchemicalAberrationBoss for Alchemicalaberration");
+				return;
+			}
+			alchemicalAbberationBoss.spawn(mPlayer, mAlchemistPotions.getDamage() * mDamageMultiplier, ABERRATION_DAMAGE_RADIUS, ABERRATION_BLEED_DURATION, ABERRATION_BLEED_AMOUNT, mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
+
+			if (getAbilityScore() == 2) {
+				aberration.setPowered(true);
+			}
+
+			new BukkitRunnable() {
+				int mTicks = 0;
+				LivingEntity mTarget = null;
+				@Override
+				public void run() {
+					if (mTicks >= ABERRATION_LIFETIME || !mPlayer.isOnline() || mPlayer.isDead() || aberration.isDead()) {
+						aberration.remove();
+						this.cancel();
+						return;
+					}
+
+					if (mTarget == null || mTarget.isDead()) {
+						mTarget = getHealthiestMob(aberration);
+					}
+
+					if (mTarget != null) {
+						aberration.setTarget(mTarget);
+					}
+
+					mTicks += TICK_INTERVAL;
+				}
+			}.runTaskTimer(mPlugin, 0, TICK_INTERVAL);
+
+		}, 1);
+	}
+
+	private @Nullable LivingEntity getHealthiestMob(LivingEntity aberration) {
+		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(aberration.getLocation(), ABERRATION_TARGET_RADIUS, aberration);
+		nearbyMobs.removeIf(Entity::isInvulnerable);
+		nearbyMobs.removeIf((mob) -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+		nearbyMobs.sort(Comparator.comparingDouble(Damageable::getHealth));
+		if (!nearbyMobs.isEmpty()) {
+			return nearbyMobs.get(nearbyMobs.size() - 1);
+		}
+		return null;
 	}
 
 }
