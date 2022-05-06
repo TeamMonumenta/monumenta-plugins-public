@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
 import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
@@ -403,6 +404,11 @@ public class EntityListener implements Listener {
 				if (player.getGameMode() == GameMode.ADVENTURE) {
 					event.setCancelled(true);
 				}
+			}
+		} else if (damager instanceof Creeper creeper) {
+			//TODO - make this part a bit more generalized, maybe with a zone check?
+			if (creeper.getScoreboardTags().contains(AlchemicalAberrationBoss.identityTag)) {
+				event.setCancelled(true);
 			}
 		}
 	}
