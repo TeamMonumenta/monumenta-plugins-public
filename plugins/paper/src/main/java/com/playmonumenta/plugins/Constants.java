@@ -92,8 +92,6 @@ public class Constants {
 	// Plots gold → diamond block
 	public static final int PATREON_TIER_5 = 30;
 
-	public static final int DUNGEON_INSTANCE_MODULUS = 10000;
-
 	static {
 		Materials.WEARABLE.addAll(Materials.ARMOR);
 	}

@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.graves;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTEntity;
 import de.tr7zw.nbtapi.NBTItem;
@@ -78,7 +77,6 @@ public class GraveItem {
 	private static final String KEY_STATUS = "status";
 	private static final String KEY_LOCATION = "location";
 	private static final String KEY_VELOCITY = "velocity";
-	private static final String KEY_INSTANCE = "instance";
 	private static final String KEY_NBT = "nbt";
 	private static final String KEY_AGE = "age";
 	private static final String KEY_SLOT = "slot";
@@ -93,7 +91,6 @@ public class GraveItem {
 	private @Nullable Item mEntity;
 	private @Nullable Location mLocation;
 	private @Nullable Vector mVelocity;
-	private @Nullable Integer mDungeonInstance;
 	private @Nullable Short mAge;
 	public @Nullable Integer mSlot;
 	@Nullable Status mStatus;
@@ -108,7 +105,6 @@ public class GraveItem {
 		mEntity = null;
 		mLocation = null;
 		mVelocity = null;
-		mDungeonInstance = null;
 		mAge = null;
 		mSlot = null;
 		mStatus = null;
@@ -117,16 +113,14 @@ public class GraveItem {
 	}
 
 	// Full GraveItem from deserialized data
-	public GraveItem(GraveManager manager, Grave grave, Player player, ItemStack item, Status status, Integer instance, Location location, Vector velocity, Short age, Integer slot) {
+	public GraveItem(GraveManager manager, Grave grave, Player player, ItemStack item, Status status, Location location, Vector velocity, Short age, Integer slot) {
 		this(manager, grave, player, item);
 		mStatus = status;
 		mLocation = location != null ? location : mGrave.getLocation();
 		mVelocity = velocity;
 		mAge = age;
 		mSlot = slot;
-		mDungeonInstance = instance;
-		if (mStatus == Status.DROPPED && isInThisWorld()) {
-			updateInstance();
+		if (mStatus == Status.DROPPED && isOnThisShard()) {
 			mManager.addUnloadedItem(Chunk.getChunkKey(mLocation), this);
 		}
 	}
@@ -144,11 +138,10 @@ public class GraveItem {
 		default:
 			mStatus = Status.DROPPED;
 		}
-		mDungeonInstance = grave.mDungeonInstance;
 		mLocation = grave.getLocation();
 		mVelocity = null;
 		mSlot = slot;
-		if (mStatus == Status.DROPPED && isInThisWorld()) {
+		if (mStatus == Status.DROPPED && isOnThisShard()) {
 			mManager.addUnloadedItem(Chunk.getChunkKey(mLocation), this);
 			spawn();
 		}
@@ -172,7 +165,6 @@ public class GraveItem {
 					mStatus = Status.LIMBO;
 				}
 		}
-		mDungeonInstance = grave.mDungeonInstance;
 		mLocation = grave.getLocation();
 	}
 
@@ -218,12 +210,12 @@ public class GraveItem {
 		}
 	}
 
-	private boolean isInThisWorld() {
-		return mPlayer.getWorld().getName().equals(mGrave.mWorldName);
+	private boolean isOnThisShard() {
+		return ServerProperties.getShardName().equals(mGrave.mShardName);
 	}
 
 	private boolean canSpawn() {
-		if (!mLoggedOut && isInThisWorld() && mStatus == Status.DROPPED && (mEntity == null || !mEntity.isValid())) {
+		if (!mLoggedOut && isOnThisShard() && mStatus == Status.DROPPED && (mEntity == null || !mEntity.isValid())) {
 			mLocation.setWorld(mPlayer.getWorld());
 			return mLocation.isChunkLoaded();
 		}
@@ -286,18 +278,6 @@ public class GraveItem {
 				mAge = nbt.getShort(KEY_AGE);
 			} else if (mStatus == Status.DROPPED) {
 				delete();
-			}
-		}
-	}
-
-	private void updateInstance() {
-		if (isInThisWorld() && mDungeonInstance != null) {
-			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess").orElse(0);
-			if (instance != 0 && instance != mDungeonInstance) {
-				int x = 512 * ((instance / Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance / Constants.DUNGEON_INSTANCE_MODULUS));
-				int z = 512 * ((instance % Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance % Constants.DUNGEON_INSTANCE_MODULUS));
-				mLocation.add(x, 0, z);
-				mDungeonInstance = instance;
 			}
 		}
 	}
@@ -387,7 +367,7 @@ public class GraveItem {
 	}
 
 	void onDeath() {
-		if (isInThisWorld() && mStatus == Status.LIMBO) {
+		if (isOnThisShard() && mStatus == Status.LIMBO) {
 			if (Math.abs(mTickLastStatusChange - Bukkit.getCurrentTick()) < 40) {
 				Plugin.getInstance().getLogger().warning("Tried to shatter an item due to death that was just placed in limbo <2s ago, ignoring");
 				return;
@@ -444,7 +424,6 @@ public class GraveItem {
 	static @Nullable GraveItem deserialize(GraveManager manager, Grave grave, Player player, JsonObject data) {
 		ItemStack item = null;
 		Status status = null;
-		Integer instance = null;
 		Short age = null;
 		Integer slot = null;
 		Location location = null;
@@ -458,9 +437,6 @@ public class GraveItem {
 		}
 		if (data.has(KEY_STATUS) && data.get(KEY_STATUS).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_STATUS).isString()) {
 			status = GraveItem.Status.fromString(data.getAsJsonPrimitive(KEY_STATUS).getAsString());
-		}
-		if (data.has(KEY_INSTANCE) && data.get(KEY_INSTANCE).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_INSTANCE).isNumber()) {
-			instance = data.getAsJsonPrimitive(KEY_INSTANCE).getAsInt();
 		}
 		if (data.has(KEY_AGE) && data.get(KEY_AGE).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_AGE).isNumber()) {
 			age = data.getAsJsonPrimitive(KEY_AGE).getAsShort();
@@ -483,7 +459,7 @@ public class GraveItem {
 			velocity = new Vector(x, y, z);
 		}
 
-		return new GraveItem(manager, grave, player, item, status, instance, location, velocity, age, slot);
+		return new GraveItem(manager, grave, player, item, status, location, velocity, age, slot);
 	}
 
 	@Nullable JsonObject serialize() {
@@ -494,7 +470,6 @@ public class GraveItem {
 		JsonObject data = new JsonObject();
 		data.addProperty(KEY_NBT, NBTItem.convertItemtoNBT(mItem).toString());
 		data.addProperty(KEY_STATUS, mStatus == null ? null : mStatus.toString());
-		data.addProperty(KEY_INSTANCE, mDungeonInstance);
 		data.addProperty(KEY_AGE, mAge);
 		data.addProperty(KEY_SLOT, mSlot);
 

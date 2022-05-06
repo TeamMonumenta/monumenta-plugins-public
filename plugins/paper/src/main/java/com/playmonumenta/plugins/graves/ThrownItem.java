@@ -1,9 +1,8 @@
 package com.playmonumenta.plugins.graves;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTEntity;
 import de.tr7zw.nbtapi.NBTItem;
@@ -21,8 +20,7 @@ import org.bukkit.util.Vector;
 public class ThrownItem {
 	private static final String KEY_LOCATION = "location";
 	private static final String KEY_VELOCITY = "velocity";
-	private static final String KEY_INSTANCE = "instance";
-	private static final String KEY_WORLD = "world";
+	private static final String KEY_SHARD = "shard";
 	private static final String KEY_NBT = "nbt";
 	private static final String KEY_AGE = "age";
 	private static final String KEY_X = "x";
@@ -34,27 +32,24 @@ public class ThrownItem {
 	Player mPlayer;
 	ItemStack mItem;
 	private @Nullable Item mEntity;
-	String mWorldName;
+	String mShardName;
 	Location mLocation;
 	private Vector mVelocity;
-	Integer mDungeonInstance;
 	private Short mAge;
 	private boolean mValid;
 	private boolean mLoggedOut = false;
 
 	// Full ThrownItem from deserialization
-	public ThrownItem(GraveManager manager, Player player, ItemStack item, String world, Location location, Vector velocity, Integer instance, Short age) {
+	public ThrownItem(GraveManager manager, Player player, ItemStack item, String shard, Location location, Vector velocity, Short age) {
 		mManager = manager;
 		mPlayer = player;
 		mItem = item;
-		mWorldName = world;
+		mShardName = shard;
 		mLocation = location;
 		mVelocity = velocity;
-		mDungeonInstance = instance;
 		mAge = age;
 		mValid = true;
-		if (isInThisWorld()) {
-			updateInstance();
+		if (isOnThisShard()) {
 			mManager.addUnloadedItem(Chunk.getChunkKey(mLocation), this);
 		}
 	}
@@ -65,15 +60,11 @@ public class ThrownItem {
 		mPlayer = player;
 		mItem = entity.getItemStack();
 		mEntity = entity;
-		mWorldName = entity.getWorld().getName();
+		mShardName = ServerProperties.getShardName();
 		mLocation = entity.getLocation().clone();
 		mVelocity = entity.getVelocity().clone();
 		mAge = new NBTEntity(entity).getShort("Age");
 		mValid = true;
-		mDungeonInstance = null;
-		if (ScoreboardUtils.getScoreboardValue("$Shard", "const").orElse(0) > 0) {
-			mDungeonInstance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess").orElse(0);
-		}
 		// Item dropping for first time, make immune to explosions for 5 seconds.
 		// This prevents shattering due to double-creepers and TNT traps.
 		mEntity.addScoreboardTag("ExplosionImmune");
@@ -90,12 +81,12 @@ public class ThrownItem {
 		startTracking();
 	}
 
-	private boolean isInThisWorld() {
-		return mPlayer.getWorld().getName().equals(mWorldName);
+	private boolean isOnThisShard() {
+		return ServerProperties.getShardName().equals(mShardName);
 	}
 
 	private boolean canSpawn() {
-		if (!mLoggedOut && isInThisWorld() && (mEntity == null || !mEntity.isValid())) {
+		if (!mLoggedOut && isOnThisShard() && (mEntity == null || !mEntity.isValid())) {
 			mLocation.setWorld(mPlayer.getWorld());
 			return mLocation.isChunkLoaded();
 		}
@@ -216,33 +207,17 @@ public class ThrownItem {
 		}
 	}
 
-	private void updateInstance() {
-		if (isInThisWorld() && mDungeonInstance != null) {
-			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess").orElse(0);
-			if (instance != 0 && instance != mDungeonInstance) {
-				int x = 512 * ((instance / Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance / Constants.DUNGEON_INSTANCE_MODULUS));
-				int z = 512 * ((instance % Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance % Constants.DUNGEON_INSTANCE_MODULUS));
-				mLocation.add(x, 0, z);
-				mDungeonInstance = instance;
-			}
-		}
-	}
-
 	static ThrownItem deserialize(GraveManager manager, Player player, JsonObject data) {
 		ItemStack item = null;
-		String world = null;
-		Integer instance = null;
+		String shard = null;
 		Short age = null;
 		Location location = null;
 		Vector velocity = null;
 		if (data.has(KEY_NBT) && data.get(KEY_NBT).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_NBT).isString()) {
 			item = NBTItem.convertNBTtoItem(new NBTContainer(data.getAsJsonPrimitive(KEY_NBT).getAsString()));
 		}
-		if (data.has(KEY_WORLD) && data.get(KEY_WORLD).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_WORLD).isString()) {
-			world = data.getAsJsonPrimitive(KEY_WORLD).getAsString();
-		}
-		if (data.has(KEY_INSTANCE) && data.get(KEY_INSTANCE).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_INSTANCE).isNumber()) {
-			instance = data.getAsJsonPrimitive(KEY_INSTANCE).getAsInt();
+		if (data.has(KEY_SHARD) && data.get(KEY_SHARD).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_SHARD).isString()) {
+			shard = data.getAsJsonPrimitive(KEY_SHARD).getAsString();
 		}
 		if (data.has(KEY_AGE) && data.get(KEY_AGE).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_AGE).isNumber()) {
 			age = data.getAsJsonPrimitive(KEY_AGE).getAsShort();
@@ -262,7 +237,7 @@ public class ThrownItem {
 			velocity = new Vector(x, y, z);
 		}
 
-		return new ThrownItem(manager, player, item, world, location, velocity, instance, age);
+		return new ThrownItem(manager, player, item, shard, location, velocity, age);
 	}
 
 	@Nullable JsonObject serialize() {
@@ -272,8 +247,7 @@ public class ThrownItem {
 		}
 		JsonObject data = new JsonObject();
 		data.addProperty(KEY_NBT, NBTItem.convertItemtoNBT(mItem).toString());
-		data.addProperty(KEY_WORLD, mWorldName);
-		data.addProperty(KEY_INSTANCE, mDungeonInstance);
+		data.addProperty(KEY_SHARD, mShardName);
 		data.addProperty(KEY_AGE, mAge);
 
 		if (mLocation != null) {
