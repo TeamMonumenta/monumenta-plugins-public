@@ -59,19 +59,15 @@ public final class EffectManager implements Listener {
 
 		public Effects(Entity entity) {
 			mEntity = entity;
-			mPriorityMap.put(EffectPriority.EARLY, new HashMap<String, NavigableSet<Effect>>());
-			mPriorityMap.put(EffectPriority.NORMAL, new HashMap<String, NavigableSet<Effect>>());
-			mPriorityMap.put(EffectPriority.LATE, new HashMap<String, NavigableSet<Effect>>());
+			mPriorityMap.put(EffectPriority.EARLY, new HashMap<>());
+			mPriorityMap.put(EffectPriority.NORMAL, new HashMap<>());
+			mPriorityMap.put(EffectPriority.LATE, new HashMap<>());
 		}
 
 		public void addEffect(String source, Effect effect) {
 			Map<String, NavigableSet<Effect>> priorityEffects = mPriorityMap.get(effect.getPriority());
 
-			NavigableSet<Effect> effectGroup = priorityEffects.get(source);
-			if (effectGroup == null) {
-				effectGroup = new TreeSet<Effect>();
-				priorityEffects.put(source, effectGroup);
-			}
+			NavigableSet<Effect> effectGroup = priorityEffects.computeIfAbsent(source, k -> new TreeSet<>());
 
 			if (!effectGroup.isEmpty()) {
 				Effect currentEffect = effectGroup.last();
@@ -195,7 +191,7 @@ public final class EffectManager implements Listener {
 
 	private static final int PERIOD = 5;
 
-	private final Map<Entity, Effects> mEntities = new HashMap<Entity, Effects>();
+	private final HashMap<Entity, Effects> mEntities = new HashMap<>();
 	private final BukkitRunnable mTimer;
 	private static @Nullable
 	EffectManager INSTANCE = null;
@@ -219,7 +215,7 @@ public final class EffectManager implements Listener {
 
 				// Periodic trigger for Effects in case they need stuff like particles
 				try {
-					for (Map.Entry<Entity, Effects> entry : mEntities.entrySet()) {
+					for (Map.Entry<Entity, Effects> entry : ((HashMap<Entity, Effects>) mEntities.clone()).entrySet()) {
 						for (HashMap<String, NavigableSet<Effect>> priorityEffects : entry.getValue().mPriorityMap.values()) {
 							// Have to make a copy of the map to prevent concurrent modification exceptions in case ticking changes the effects :(
 							for (NavigableSet<Effect> effectGroup : ((HashMap<String, NavigableSet<Effect>>) priorityEffects.clone()).values()) {

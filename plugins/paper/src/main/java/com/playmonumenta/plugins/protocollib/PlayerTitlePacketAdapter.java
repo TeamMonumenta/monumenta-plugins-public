@@ -122,7 +122,9 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 			// doc: https://wiki.vg/Protocol#Destroy_Entities
 
 			// Remove the fake entities along with the player
-			int[] originalEntityIds = event.getPacket().getIntegerArrays().read(0);
+			int[] originalEntityIds = event.getPacket().getIntegerArrays().size() > 0
+				                          ? event.getPacket().getIntegerArrays().read(0) // 1.16
+				                          : event.getPacket().getIntLists().read(0).stream().mapToInt(i -> i).toArray(); // 1.18
 			IntArrayList entityIds = new IntArrayList(originalEntityIds);
 			boolean changed = false;
 			for (int eid : originalEntityIds) {
@@ -140,7 +142,11 @@ public class PlayerTitlePacketAdapter extends PacketAdapter {
 					event.setCancelled(true);
 					return;
 				}
-				event.getPacket().getIntegerArrays().write(0, entityIds.toIntArray());
+				if (event.getPacket().getIntegerArrays().size() > 0) {
+					event.getPacket().getIntegerArrays().write(0, entityIds.toIntArray());
+				} else {
+					event.getPacket().getIntLists().write(0, entityIds);
+				}
 			}
 		}
 	}

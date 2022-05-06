@@ -13,7 +13,7 @@ public class PacketMonitoringCommand {
 		}
 
 		new CommandAPICommand("packetmonitoring")
-			.withPermission("monumenta.command.-packetmonitoring")
+			.withPermission("monumenta.command.packetmonitoring")
 			.withArguments(new MultiLiteralArgument("off", "simple", "full"))
 			.executes((sender, args) -> {
 				String reporting = (String) args[0];
