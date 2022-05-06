@@ -63,6 +63,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private static final double DAMAGE_PER_SKILL_POINT = 0.5;
 	private static final double DAMAGE_PER_SPEC_POINT = 2.5;
 	private static final String POTION_SCOREBOARD = "StoredPotions";
+	private static final double RADIUS = 4;
 
 
 	private List<PotionAbility> mPotionAbilities = new ArrayList<PotionAbility>();
@@ -231,18 +232,19 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(potion);
 		if (playerItemStats != null) {
-			createAura(potion.getLocation());
+			Location loc = potion.getLocation();
 
-			if (affectedEntities != null && !affectedEntities.isEmpty()) {
-				boolean isGruesome = isGruesome(potion);
-				for (LivingEntity entity : affectedEntities) {
-					if (EntityUtils.isHostileMob(entity)) {
-						apply(entity, potion, isGruesome, playerItemStats);
-					}
+			createAura(loc);
 
-					if (entity instanceof Player player && player != mPlayer) {
-						applyToPlayer(player, potion, isGruesome);
-					}
+			boolean isGruesome = isGruesome(potion);
+
+			for (LivingEntity entity : EntityUtils.getNearbyMobs(loc, RADIUS)) {
+				if (EntityUtils.isHostileMob(entity)) {
+					apply(entity, potion, isGruesome, playerItemStats);
+				}
+
+				if (entity instanceof Player player && player != mPlayer) {
+					applyToPlayer(player, potion, isGruesome);
 				}
 			}
 		}
