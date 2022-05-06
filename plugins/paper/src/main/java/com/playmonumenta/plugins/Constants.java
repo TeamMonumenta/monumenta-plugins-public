@@ -260,5 +260,10 @@ public class Constants {
 			Material.SPLASH_POTION,
 			Material.LINGERING_POTION
 		);
+		public static final EnumSet<Material> ARROWS = EnumSet.of(
+			Material.ARROW,
+			Material.SPECTRAL_ARROW,
+			Material.TIPPED_ARROW
+		);
 	}
 }

@@ -83,6 +83,8 @@ public class ItemStatUtils {
 	static final String EFFECT_STRENGTH_KEY = "EffectStrength";
 	static final String EFFECT_SOURCE_KEY = "EffectSource";
 	static final String DIRTY_KEY = "Dirty";
+	static final String SHULKER_SLOTS_KEY = "ShulkerSlots";
+	static final String IS_QUIVER_KEY = "IsQuiver";
 
 	static final Component DUMMY_LORE_TO_REMOVE = Component.text("DUMMY LORE TO REMOVE", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
 
@@ -1302,7 +1304,7 @@ public class ItemStatUtils {
 		NBTItem nbt = new NBTItem(item);
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
-			return Region.NONE;
+			return ItemUtils.isShulkerBox(item.getType()) ? Region.SHULKER_BOX : Region.NONE;
 		}
 
 		ItemMeta meta = item.getItemMeta();
@@ -1336,7 +1338,7 @@ public class ItemStatUtils {
 		NBTItem nbt = new NBTItem(item);
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
-			return Tier.NONE;
+			return ItemUtils.isShulkerBox(item.getType()) ? Tier.SHULKER_BOX : Tier.NONE;
 		}
 
 		ItemMeta meta = item.getItemMeta();
@@ -1447,6 +1449,46 @@ public class ItemStatUtils {
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
 		generateItemStats(item);
+	}
+
+	public static int getShulkerSlots(@Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return 27;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return 27;
+		}
+
+		NBTCompound stock = monumenta.getCompound(STOCK_KEY);
+		if (stock == null) {
+			return 27;
+		}
+
+		Integer slots = stock.getInteger(SHULKER_SLOTS_KEY);
+		return slots == null ? 27 : slots;
+	}
+
+	/**
+	 * Checks if an item is a quiver, i.e. is a shulker box with the tag Monumenta.Stock.IsQuiver set to true.
+	 */
+	public static boolean isQuiver(@Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR || !ItemUtils.isShulkerBox(item.getType())) {
+			return false;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return false;
+		}
+
+		NBTCompound stock = monumenta.getCompound(STOCK_KEY);
+		if (stock == null) {
+			return false;
+		}
+
+		return Boolean.TRUE.equals(stock.getBoolean(IS_QUIVER_KEY));
 	}
 
 	public static void generateItemStats(final ItemStack item) {

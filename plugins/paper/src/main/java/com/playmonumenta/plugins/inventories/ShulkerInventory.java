@@ -2,10 +2,14 @@ package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -15,11 +19,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * This class allows one Shulker Box to be accessed without being placed.
  */
+@SuppressWarnings("checkstyle:EmptyLineSeparator")
 public class ShulkerInventory {
 	private final Plugin mPlugin;
 	private final Player mPlayer;
@@ -30,15 +36,24 @@ public class ShulkerInventory {
 	private final Inventory mParentInventory;
 	private final int mParentSlot;
 	private final int mDepositLimit;
+	private final int mSlots;
 	private int mDepositCount;
+
+	private static final ItemStack FILLER = new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1);
+
+	static {
+		ItemMeta meta = FILLER.getItemMeta();
+		meta.displayName(Component.empty());
+		FILLER.setItemMeta(meta);
+	}
 
 	/**
 	 * Create a new ShulkerInventory to allow players to access a Shulker Box without being placed.
 	 *
-	 * @param plugin The Plugin to manage scheduling tasks.
-	 * @param player The Player who is opening this Shulker Box.
+	 * @param plugin          The Plugin to manage scheduling tasks.
+	 * @param player          The Player who is opening this Shulker Box.
 	 * @param parentInventory The inventory the Shulker Box item is in.
-	 * @param parentSlot The slot the Shulker Box is in.
+	 * @param parentSlot      The slot the Shulker Box is in.
 	 * @see #ShulkerInventory(Plugin, Player, Inventory, int, int)
 	 */
 	ShulkerInventory(Plugin plugin, Player player, Inventory parentInventory, int parentSlot) throws Exception {
@@ -72,14 +87,37 @@ public class ShulkerInventory {
 		mDepositLimit = depositLimit;
 		mShulkerMeta = (BlockStateMeta) mShulkerItem.getItemMeta();
 		mShulkerState = (ShulkerBox) mShulkerMeta.getBlockState();
+		mSlots = ItemStatUtils.getShulkerSlots(mShulkerItem);
+		int size = Math.max(9, Math.min(((mSlots + 8) / 9) * 9, 27));
+		Component name = null;
 		if (mShulkerState.getCustomName() != null) {
-			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, mShulkerState.customName());
+			name = mShulkerState.customName();
 		} else if (ShulkerShortcutListener.isEnderExpansion(mShulkerItem)) {
-			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, mShulkerItem.getItemMeta().displayName());
-		} else {
-			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX);
+			name = mShulkerItem.getItemMeta().displayName();
 		}
-		mInventory.setContents(mShulkerState.getInventory().getContents());
+		if (name == null) {
+			if (size == 27) {
+				mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX);
+			} else {
+				mInventory = Bukkit.createInventory(mPlayer, size);
+			}
+		} else {
+			if (size == 27) {
+				mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, name);
+			} else {
+				mInventory = Bukkit.createInventory(mPlayer, size, name);
+			}
+		}
+		if (mSlots == 27) {
+			mInventory.setContents(mShulkerState.getInventory().getContents());
+		} else {
+			ItemStack[] contents = mShulkerState.getInventory().getContents();
+			contents = Arrays.copyOfRange(contents, 0, size);
+			for (int i = mSlots; i < size; i++) { // put filler items in blocked slots
+				contents[i] = FILLER.clone();
+			}
+			mInventory.setContents(contents);
+		}
 	}
 
 	/**
@@ -127,7 +165,13 @@ public class ShulkerInventory {
 			if (unlock) {
 				mShulkerState.setLock(null);
 			}
-			mShulkerState.getInventory().setContents(mInventory.getContents());
+			if (mSlots == 27) {
+				mShulkerState.getInventory().setContents(mInventory.getContents());
+			} else {
+				for (int i = 0; i < mSlots; i++) {
+					mShulkerState.getInventory().setItem(i, mInventory.getItem(i));
+				}
+			}
 			mShulkerMeta.setBlockState(mShulkerState);
 			mShulkerItem.setItemMeta(mShulkerMeta);
 			mParentInventory.setItem(mParentSlot, mShulkerItem);
@@ -211,5 +255,17 @@ public class ShulkerInventory {
 
 	public boolean isDepositComplete() {
 		return mDepositCount >= mDepositLimit;
+	}
+
+	public Inventory getInventory() {
+		return mInventory;
+	}
+
+	public int getSlots() {
+		return mSlots;
+	}
+
+	public ItemStack getShulkerItem() {
+		return mShulkerItem;
 	}
 }

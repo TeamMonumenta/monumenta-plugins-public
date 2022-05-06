@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.ShulkerBox;
@@ -17,6 +17,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class allows Shulker Boxes to be opened directly from inventories,
@@ -29,6 +30,8 @@ public class ShulkerInventoryManager {
 	private static final String ERROR_SHULKER_ALREADY_OPEN = ChatColor.RED + "This shulker is already open";
 	private static final String ERROR_SHULKER_ZONE_BLOCKED = ChatColor.RED + "Shulkers can not be opened here";
 	private static final String ERROR_SHULKER_RATE_LIMITED = ChatColor.RED + "Too fast! Please try again";
+	private static final String ERROR_ONLY_ARROWS_IN_QUIVER = ChatColor.RED + "Only arrows can be put into a quiver";
+	private static final String ERROR_NOT_A_SHULKER = ChatColor.RED + "How did you...? That isn't a shulker. Please report this";
 	private static @Nullable ShulkerInventoryManager INSTANCE = null;
 	private final Plugin mPlugin;
 	private final HashMap<UUID, ShulkerInventory> mInventories = new HashMap<>();
@@ -138,7 +141,8 @@ public class ShulkerInventoryManager {
 	 */
 	public int addItemToShulker(Player player, Inventory parentInventory, int parentSlot, ItemStack item) {
 		if (mRateLimited.contains(player.getUniqueId())) {
-			return -5;
+			player.sendMessage(ERROR_SHULKER_RATE_LIMITED);
+			return -1;
 		}
 		mRateLimited.add(player.getUniqueId());
 		new BukkitRunnable() {
@@ -165,6 +169,7 @@ public class ShulkerInventoryManager {
 					if (mInventories.containsKey(lockUUID)) {
 						if (mInventories.get(lockUUID).getViewers().size() != 0) {
 							// Someone has this shulker open already.
+							player.sendMessage(ERROR_SHULKER_ALREADY_OPEN);
 							return -1;
 						}
 						// This shulker is stuck in an open state but no players have access.
@@ -176,6 +181,7 @@ public class ShulkerInventoryManager {
 					if (mDepositInventories.containsKey(lockUUID)) {
 						if (mDepositInventories.get(lockUUID).isDepositComplete()) {
 							// Someone is using this shulker for deposit.
+							player.sendMessage(ERROR_SHULKER_ALREADY_OPEN);
 							return -1;
 						}
 						// This shulker is stuck in an open state but the deposit was already completed.
@@ -183,11 +189,16 @@ public class ShulkerInventoryManager {
 						shulkerBox.setLock(null);
 					}
 				} else {
-					return -2;
+					player.sendMessage(ERROR_SHULKER_LOCKED);
+					return -1;
 				}
 			}
 			if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
-				return -4;
+				player.sendMessage(ERROR_SHULKER_ZONE_BLOCKED);
+			}
+			if (ItemStatUtils.isQuiver(shulkerItem) && !ItemUtils.isArrow(item)) {
+				player.sendMessage(ERROR_ONLY_ARROWS_IN_QUIVER);
+				return -1;
 			}
 			shulkerBox.setLock("ShulkerDeposit:" + player.getUniqueId());
 			shulkerMeta.setBlockState(shulkerBox);
@@ -204,7 +215,8 @@ public class ShulkerInventoryManager {
 				mPlugin.getLogger().warning("Failed to open shulker via shortcut: " + e.getMessage());
 			}
 		}
-		return -3;
+		player.sendMessage(ERROR_NOT_A_SHULKER);
+		return -1;
 	}
 
 	/**
@@ -413,6 +425,16 @@ public class ShulkerInventoryManager {
 			return INSTANCE.mInventories.containsKey(player.getUniqueId());
 		}
 		return false;
+	}
+
+	public static @Nullable ShulkerInventory getOpenShulkerInventory(HumanEntity player, Inventory inventory) {
+		if (INSTANCE != null && player != null) {
+			ShulkerInventory inv = INSTANCE.mInventories.get(player.getUniqueId());
+			if (inv != null && inv.getInventory() == inventory) {
+				return inv;
+			}
+		}
+		return null;
 	}
 
 	/**
