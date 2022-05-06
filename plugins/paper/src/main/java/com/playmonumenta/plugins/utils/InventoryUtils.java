@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -404,6 +405,13 @@ public class InventoryUtils {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Checks whether an inventory is full, i.e. has at least one item in every slot. Does not check if the stacks are at max size.
+	 */
+	public static boolean isFull(Inventory inventory) {
+		return Arrays.stream(inventory.getStorageContents()).noneMatch(ItemUtils::isNullOrAir);
 	}
 
 	/**

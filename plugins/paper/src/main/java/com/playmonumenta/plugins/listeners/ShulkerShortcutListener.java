@@ -101,6 +101,20 @@ public class ShulkerShortcutListener implements Listener {
 		if (shulkerInventory != null) {
 			boolean quiver = ItemStatUtils.isQuiver(shulkerInventory.getShulkerItem());
 			if (quiver || shulkerInventory.getInventory().getType() != InventoryType.SHULKER_BOX) {
+				// Disallow sorting partial inventories to prevent it duping the filler items and moving items into slots where they shouldn't be
+				if (shulkerInventory.getSlots() % 9 != 0
+					    && event.getClick().isRightClick()
+					    && ItemUtils.isNullOrAir(event.getCursor())
+					    && ItemUtils.isNullOrAir(event.getCurrentItem())) {
+					event.setCancelled(true);
+					return;
+				}
+				// prevent picking up the filler items if the player for some reason has some
+				if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR
+					    && ShulkerInventory.FILLER.isSimilar(event.getCursor())) {
+					event.setCancelled(true);
+					return;
+				}
 				// Quiver or modified shulker inventory is involved
 				// For quivers, make sure only arrows can be put in it
 				// For modified shulker inventories, prevent putting shulkers in

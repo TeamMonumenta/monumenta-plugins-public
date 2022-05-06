@@ -92,21 +92,23 @@ public class QuiverListener implements Listener {
 
 			// No arrows found in the inventory - the last arrow of its type was used up.
 			// Search for a quiver and take out the first stack of arrows.
-			for (ItemStack quiver : inventory) {
-				if (!ItemStatUtils.isQuiver(quiver)
-					    || !(quiver.getItemMeta() instanceof BlockStateMeta blockStateMeta)
-					    || !(blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox)) {
-					continue;
-				}
-				for (ItemStack arrow : shulkerBox.getInventory()) {
-					if (!ItemUtils.isArrow(arrow)) {
+			if (!InventoryUtils.isFull(inventory)) {
+				for (ItemStack quiver : inventory) {
+					if (!ItemStatUtils.isQuiver(quiver)
+						    || !(quiver.getItemMeta() instanceof BlockStateMeta blockStateMeta)
+						    || !(blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox)) {
 						continue;
 					}
-					inventory.addItem(arrow.clone());
-					arrow.setAmount(0);
-					blockStateMeta.setBlockState(shulkerBox);
-					quiver.setItemMeta(blockStateMeta);
-					return; // can directly return from here
+					for (ItemStack arrow : shulkerBox.getInventory()) {
+						if (!ItemUtils.isArrow(arrow)) {
+							continue;
+						}
+						inventory.addItem(arrow.clone());
+						arrow.setAmount(0);
+						blockStateMeta.setBlockState(shulkerBox);
+						quiver.setItemMeta(blockStateMeta);
+						return; // can directly return from here
+					}
 				}
 			}
 		});

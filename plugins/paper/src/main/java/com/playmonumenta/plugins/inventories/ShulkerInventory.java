@@ -39,7 +39,7 @@ public class ShulkerInventory {
 	private final int mSlots;
 	private int mDepositCount;
 
-	private static final ItemStack FILLER = new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1);
+	public static final ItemStack FILLER = new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1);
 
 	static {
 		ItemMeta meta = FILLER.getItemMeta();
