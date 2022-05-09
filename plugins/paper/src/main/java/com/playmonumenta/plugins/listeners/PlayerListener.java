@@ -16,18 +16,8 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.protocollib.VirtualFirmamentReplacer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
-import com.playmonumenta.plugins.utils.ChestUtils;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.*;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
@@ -57,11 +47,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -623,6 +609,18 @@ public class PlayerListener implements Listener {
 
 		if (player.getHealth() > 0) {
 			return;
+		}
+
+		//Cleanse mobs around player in dungeon if running solo
+		if (Plugin.IS_PLAY_SERVER && ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
+			if (PlayerUtils.otherPlayersInRange(event.getEntity(), 48, true).size() == 0) {
+				List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(event.getEntity().getLocation(), 20);
+				for (LivingEntity entity : nearbyEntities) {
+					if (entity.getRemoveWhenFarAway()) {
+						entity.remove();
+					}
+				}
+			}
 		}
 
 		// Prevent an inescapable death loop by overriding KeepInventory if your Max Health is 0
