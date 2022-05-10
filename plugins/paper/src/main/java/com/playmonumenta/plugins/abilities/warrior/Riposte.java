@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -30,6 +31,9 @@ public class Riposte extends Ability {
 	private static final int RIPOSTE_SWORD_DURATION = 2 * 20;
 	private static final int RIPOSTE_AXE_DURATION = 3 * 20;
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
+	private static final double ENHANCEMENT_DAMAGE = 10;
+	private static final double ENHANCEMENT_RADIUS = 3;
+	private static final int ENHANCEMENT_ROOT_DURATION = 30;
 
 	private @Nullable BukkitRunnable mSwordTimer = null;
 
@@ -40,6 +44,7 @@ public class Riposte extends Ability {
 		mInfo.mShorthandName = "Rip";
 		mInfo.mDescriptions.add("While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: 15s.");
 		mInfo.mDescriptions.add("Cooldown lowered to 12s and if you block an attack with Riposte's effect while holding a sword, your next sword attack within 2s deals double damage. If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 3s.");
+		mInfo.mDescriptions.add("When Riposte activates, deal 10 melee damage to all mobs in a 3 block radius and root them for 1.5s.");
 		mInfo.mCooldown = isLevelOne() ? RIPOSTE_1_COOLDOWN : RIPOSTE_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
@@ -80,15 +85,24 @@ public class Riposte extends Ability {
 				}
 
 				World world = mPlayer.getWorld();
-				world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.2f);
-				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.8f);
-				Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation().add(0, 1, 0), source.getLocation().add(0, source.getHeight() / 2, 0));
+				Location playerLoc = mPlayer.getLocation();
+				world.playSound(playerLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.2f);
+				world.playSound(playerLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.8f);
+				Vector dir = LocationUtils.getDirectionTo(playerLoc.clone().add(0, 1, 0), source.getLocation().add(0, source.getHeight() / 2, 0));
 				Location loc = mPlayer.getLocation().add(0, 1, 0).subtract(dir);
 				new PartialParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.CRIT, loc, 75, 0.1, 0.1, 0.1, 0.6).spawnAsPlayerActive(mPlayer);
 				putOnCooldown();
 				event.setCancelled(true);
+
+				if (isEnhanced()) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(playerLoc, ENHANCEMENT_RADIUS)) {
+						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, ENHANCEMENT_DAMAGE, ClassAbility.RIPOSTE, true, true);
+						EntityUtils.applySlow(mPlugin, ENHANCEMENT_ROOT_DURATION, 1.0f, mob);
+					}
+					world.playSound(playerLoc, Sound.BLOCK_ANVIL_FALL, 0.5f, 0.5f);
+				}
 			}
 		}
 	}
