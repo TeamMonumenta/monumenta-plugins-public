@@ -50,6 +50,7 @@ public class HuntingCompanion extends Ability {
 	private static final int STUN_TIME_2 = 3 * 20;
 	private static final double VELOCITY = 0.9;
 	private static final double JUMP_HEIGHT = 0.8;
+	private static final double MAX_TARGET_Y = 4;
 
 	private @Nullable Fox mFox;
 	private @Nullable LivingEntity mTarget;
@@ -185,6 +186,7 @@ public class HuntingCompanion extends Ability {
 						Location foxLoc = mFox.getLocation();
 						List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(foxLoc, DETECTION_RANGE, mFox);
 						nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) || mob.isInvulnerable());
+						nearbyMobs.removeIf((mob) -> Math.abs(mob.getLocation().getY() - foxLoc.getY()) > MAX_TARGET_Y);
 						LivingEntity nearestMob = EntityUtils.getNearestMob(foxLoc, nearbyMobs);
 						if (nearestMob != null) {
 							mFox.setTarget(nearestMob);

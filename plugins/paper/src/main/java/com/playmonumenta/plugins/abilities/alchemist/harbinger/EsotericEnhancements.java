@@ -38,6 +38,7 @@ public class EsotericEnhancements extends PotionAbility {
 	private static final double ABERRATION_TARGET_RADIUS = 8;
 	private static final int ABERRATION_LIFETIME = 15 * 20;
 	private static final int TICK_INTERVAL = 5;
+	private static final double MAX_TARGET_Y = 4;
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private double mDamageMultiplier;
@@ -132,6 +133,7 @@ public class EsotericEnhancements extends PotionAbility {
 		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(aberration.getLocation(), ABERRATION_TARGET_RADIUS, aberration);
 		nearbyMobs.removeIf(Entity::isInvulnerable);
 		nearbyMobs.removeIf((mob) -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+		nearbyMobs.removeIf((mob) -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) > MAX_TARGET_Y);
 		nearbyMobs.sort(Comparator.comparingDouble(Damageable::getHealth));
 		if (!nearbyMobs.isEmpty()) {
 			return nearbyMobs.get(nearbyMobs.size() - 1);
