@@ -3,10 +3,10 @@ package com.playmonumenta.plugins.graves;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -44,8 +44,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class Grave {
 	private static final String KEY_TIME = "time";
 	private static final String KEY_LOCATION = "location";
-	private static final String KEY_WORLD = "world";
-	private static final String KEY_INSTANCE = "instance";
+	private static final String KEY_SHARD = "shard";
 	private static final String KEY_POSE = "pose";
 	private static final String KEY_EQUIPMENT = "equipment";
 	private static final String KEY_ITEMS = "items";
@@ -75,8 +74,7 @@ public final class Grave {
 	Player mPlayer;
 	private final Instant mDeathTime;
 	private final boolean mSmall;
-	String mWorldName;
-	Integer mDungeonInstance;
+	String mShardName;
 	Location mLocation;
 	private @Nullable HashMap<String, EulerAngle> mPose;
 	private final HashMap<String, ItemStack> mEquipment;
@@ -91,15 +89,14 @@ public final class Grave {
 	boolean mAlertedLost = false;
 
 	// For deserializing a grave from data
-	private Grave(GraveManager manager, Player player, String world, Integer instance,
+	private Grave(GraveManager manager, Player player, String shard,
 	              Instant time, boolean small, Location location, @Nullable HashMap<String, EulerAngle> pose,
 	              HashMap<String, ItemStack> equipment, JsonArray items) {
 		mManager = manager;
 		mPlayer = player;
 		mDeathTime = time;
 		mSmall = small;
-		mWorldName = world;
-		mDungeonInstance = instance;
+		mShardName = shard;
 		mLocation = location;
 		mPose = pose;
 		mEquipment = equipment;
@@ -111,8 +108,7 @@ public final class Grave {
 				mItems.add(item);
 			}
 		}
-		if (isInThisWorld() && !isEmpty()) {
-			updateInstance();
+		if (isOnThisShard() && !isEmpty()) {
 			mManager.addUnloadedGrave(Chunk.getChunkKey(mLocation), this);
 		}
 	}
@@ -123,11 +119,7 @@ public final class Grave {
 		mPlayer = player;
 		mDeathTime = Instant.now();
 		mSmall = false;
-		mWorldName = mPlayer.getWorld().getName();
-		mDungeonInstance = null;
-		if (ScoreboardUtils.getScoreboardValue("$Shard", "const").orElse(0) > 0) {
-			mDungeonInstance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess").orElse(0);
-		}
+		mShardName = ServerProperties.getShardName();
 		mLocation = mPlayer.getLocation().clone();
 		if (mLocation.getY() < 1) {
 			mLocation.setY(1);
@@ -156,8 +148,7 @@ public final class Grave {
 		mManager = item.mManager;
 		mPlayer = item.mPlayer;
 		mDeathTime = Instant.now();
-		mWorldName = item.mWorldName;
-		mDungeonInstance = item.mDungeonInstance;
+		mShardName = item.mShardName;
 		mLocation = item.mLocation.clone();
 		if (mLocation.getY() < 1) {
 			mLocation.setY(1);
@@ -218,13 +209,13 @@ public final class Grave {
 		return mItems.isEmpty();
 	}
 
-	private boolean isInThisWorld() {
-		return mPlayer.getWorld().getName().equals(mWorldName);
+	private boolean isOnThisShard() {
+		return ServerProperties.getShardName().equals(mShardName);
 	}
 
 	private boolean canSpawn() {
 		World world = mPlayer.getWorld();
-		if (!mLoggedOut && (mEntity == null || !mEntity.isValid()) && isInThisWorld()) {
+		if (!mLoggedOut && (mEntity == null || !mEntity.isValid()) && isOnThisShard()) {
 			mLocation.setWorld(world);
 			return mLocation.isChunkLoaded();
 		}
@@ -376,7 +367,7 @@ public final class Grave {
 	void summon(Location location) {
 		remove();
 		mLocation = location;
-		mWorldName = location.getWorld().getName();
+		mShardName = ServerProperties.getShardName();
 		spawn();
 		for (GraveItem item : mItems) {
 			if (item.mStatus == GraveItem.Status.DROPPED) {
@@ -628,21 +619,8 @@ public final class Grave {
 		}
 	}
 
-	private void updateInstance() {
-		if (isInThisWorld() && mDungeonInstance != null) {
-			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess").orElse(0);
-			if (instance != 0 && instance != mDungeonInstance) {
-				int x = 512 * ((instance / Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance / Constants.DUNGEON_INSTANCE_MODULUS));
-				int z = 512 * ((instance % Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance % Constants.DUNGEON_INSTANCE_MODULUS));
-				mLocation.add(x, 0, z);
-				mDungeonInstance = instance;
-			}
-		}
-	}
-
 	static Grave deserialize(GraveManager manager, Player player, JsonObject data) {
-		String world = null;
-		Integer instance = null;
+		String shard = null;
 		Instant time = null;
 		boolean small = false;
 		Location location = null;
@@ -655,11 +633,8 @@ public final class Grave {
 		for (String key : KEYS_EQUIPMENT_PARTS) {
 			equipment.put(key, null);
 		}
-		if (data.has(KEY_WORLD) && data.get(KEY_WORLD).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_WORLD).isString()) {
-			world = data.getAsJsonPrimitive(KEY_WORLD).getAsString();
-		}
-		if (data.has(KEY_INSTANCE) && data.getAsJsonPrimitive(KEY_INSTANCE).isNumber()) {
-			instance = data.getAsJsonPrimitive(KEY_INSTANCE).getAsInt();
+		if (data.has(KEY_SHARD) && data.get(KEY_SHARD).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_SHARD).isString()) {
+			shard = data.getAsJsonPrimitive(KEY_SHARD).getAsString();
 		}
 		if (data.has(KEY_TIME) && data.getAsJsonPrimitive(KEY_TIME).isNumber()) {
 			time = Instant.ofEpochMilli(data.getAsJsonPrimitive(KEY_TIME).getAsInt());
@@ -704,14 +679,13 @@ public final class Grave {
 		if (data.has(KEY_ITEMS) && data.get(KEY_ITEMS).isJsonArray()) {
 			items.addAll(data.getAsJsonArray(KEY_ITEMS));
 		}
-		return new Grave(manager, player, world, instance, time, small, location, pose, equipment, items);
+		return new Grave(manager, player, shard, time, small, location, pose, equipment, items);
 	}
 
 	public @Nullable JsonObject serialize() {
 		JsonObject data = new JsonObject();
 
-		data.addProperty(KEY_WORLD, mWorldName);
-		data.addProperty(KEY_INSTANCE, mDungeonInstance);
+		data.addProperty(KEY_SHARD, mShardName);
 		data.addProperty(KEY_SMALL, mSmall);
 
 		if (mDeathTime != null) {

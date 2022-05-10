@@ -45,6 +45,7 @@ public class Metalmancy extends DepthsAbility {
 	public static final double VELOCITY = 2;
 	public static final int DETECTION_RANGE = 32;
 	public static final int TICK_INTERVAL = 5;
+	private static final double MAX_TARGET_Y = 4;
 
 	private @Nullable Mob mGolem;
 	private @Nullable LivingEntity mTarget;
@@ -128,6 +129,7 @@ public class Metalmancy extends DepthsAbility {
 						Location golemLoc = mGolem.getLocation();
 						List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(golemLoc, DETECTION_RANGE, mGolem);
 						nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) || mob.isInvulnerable());
+						nearbyMobs.removeIf((mob) -> Math.abs(mob.getLocation().getY() - golemLoc.getY()) > MAX_TARGET_Y);
 						LivingEntity nearestMob = EntityUtils.getNearestMob(golemLoc, nearbyMobs);
 						if (nearestMob != null) {
 							mGolem.setTarget(nearestMob);

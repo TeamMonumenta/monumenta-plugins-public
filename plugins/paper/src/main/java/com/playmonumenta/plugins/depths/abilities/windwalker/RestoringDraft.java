@@ -104,9 +104,7 @@ public final class RestoringDraft extends DepthsAbility {
 		if (mPlayer == null) {
 			return;
 		}
-		double currentY = mPlayer.getLocation().getY();
-		double fallDistance = mPlayer.getFallDistance();
-		mFallFromY = currentY + fallDistance;
+		mFallFromY = Math.max(mFallFromY, mPlayer.getLocation().getY());
 	}
 
 	private double calculateFallDistance() {

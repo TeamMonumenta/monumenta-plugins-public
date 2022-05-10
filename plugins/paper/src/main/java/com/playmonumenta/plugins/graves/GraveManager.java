@@ -392,7 +392,7 @@ public class GraveManager {
 			Grave grave = mGraves.get(index);
 			Component itemList = grave.getItemList(false);
 			return Component.text("World: (", NamedTextColor.GRAY)
-				.append(Component.text(grave.mWorldName.replace("Project_Epic-", ""), NamedTextColor.WHITE))
+				.append(Component.text(grave.mShardName, NamedTextColor.WHITE))
 				.append(Component.text(") Loc: (", NamedTextColor.GRAY))
 				.append(Component.text(grave.mLocation.getBlockX() + "," + grave.mLocation.getBlockY() + "," + grave.mLocation.getBlockZ(), NamedTextColor.WHITE))
 				.append(Component.text(") ", NamedTextColor.GRAY))

@@ -2,11 +2,9 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.BrutalAlchemyEnhancementEffect;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -28,7 +26,6 @@ public class BrutalAlchemy extends PotionAbility {
 
 	private int mPeriod;
 	private double mDOTDamage;
-	private boolean mEnhanced;
 	private AlchemistPotions mAlchPotions;
 
 	public BrutalAlchemy(Plugin plugin, @Nullable Player player) {
@@ -42,14 +39,7 @@ public class BrutalAlchemy extends PotionAbility {
 		mDisplayItem = new ItemStack(Material.REDSTONE, 1);
 
 		mPeriod = isLevelOne() ? BRUTAL_ALCHEMY_1_PERIOD : BRUTAL_ALCHEMY_2_PERIOD;
-		mEnhanced = isEnhanced();
 		mDOTDamage = BRUTAL_ALCHEMY_DOT_DAMAGE;
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			if (ServerProperties.getClassSpecializationsEnabled() && AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EsotericEnhancements.class) != null) {
-				mDOTDamage = EsotericEnhancements.BRUTAL_DOT_DAMAGE;
-			}
-
-		});
 
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			mAlchPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, AlchemistPotions.class);
@@ -59,7 +49,7 @@ public class BrutalAlchemy extends PotionAbility {
 	@Override
 	public void apply(LivingEntity mob, boolean isGruesome) {
 		if (!isGruesome) {
-			if (mEnhanced) {
+			if (isEnhanced()) {
 				if (mAlchPotions != null) {
 					mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, new BrutalAlchemyEnhancementEffect(BRUTAL_ALCHEMY_DURATION, mDOTDamage + (mAlchPotions.getDamage() * BRUTAL_ALCHEMY_ENHANCEMENT_DAMAGE_POTION), mPeriod, mPlayer, mInfo.mLinkedSpell, Particle.SQUID_INK));
 					return;

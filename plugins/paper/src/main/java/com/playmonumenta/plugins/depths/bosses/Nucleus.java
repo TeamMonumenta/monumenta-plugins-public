@@ -322,13 +322,13 @@ public final class Nucleus extends BossAbilityGroup {
 	public void init() {
 		mBoss.setAI(false);
 
-		// Health is scaled by 1.5 times each time you fight the boss
+		// Health is scaled by 1.15 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
 		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.15, party == null ? 0 : (party.getFloor() - 1) / 3));
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 
-		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "growable grow " + (int) (mSpawnLoc.getX() - 1) + " " + (int) (mSpawnLoc.getY() + 21) + " " + (int) (mSpawnLoc.getZ() - 1) + " jellyfish 1 20 true");
+		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "execute at " + mBoss.getUniqueId() + " run growable grow " + (int) (mSpawnLoc.getX() - 1) + " " + (int) (mSpawnLoc.getY() + 21) + " " + (int) (mSpawnLoc.getZ() - 1) + " jellyfish 1 20 true");
 
 		new BukkitRunnable() {
 

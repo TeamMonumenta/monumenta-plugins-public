@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.inventories.ShulkerInventory;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.utils.ChestUtils;
@@ -70,134 +71,178 @@ public class ShulkerShortcutListener implements Listener {
 		int slotClicked = event.getSlot();
 		Inventory topInventory = event.getView().getTopInventory();
 		Inventory clickedInventory = event.getClickedInventory();
-		if (event.getWhoClicked() instanceof Player && clickedInventory != null) {
-			// A player clicked inside an inventory window
-			Player player = (Player)event.getWhoClicked();
-			if (topInventory.getType() == InventoryType.SHULKER_BOX &&           // Player has Shulker open
-			    ShulkerInventoryManager.playerHasShulkerOpen(player) &&          // Shulker was opened via shortcut
-			    !mPlugin.mShulkerInventoryManager.updateShulker(player)) {       // Try to update Shulker if it still exists.
-				// The currently open shulker no longer exists, cancel the click and close the inventory.
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "Shulker no longer available");
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						player.closeInventory(InventoryCloseEvent.Reason.CANT_USE);
-					}
-				}.runTask(mPlugin);
-			} else if (itemClicked != null &&
-				click == ClickType.RIGHT &&
-				isEnderExpansion(itemClicked) &&
-				!clickedInventory.getType().equals(InventoryType.ENDER_CHEST)) {
-				// Right clicked an Ender Chest Expansion shulker outside an ender chest
-				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				player.sendMessage(ChatColor.RED + "This item only works in an ender chest");
-				event.setCancelled(true);
-			} else if (itemClicked != null &&
-				click == ClickType.RIGHT &&
-				isPurpleTesseractContainer(itemClicked)) {
-				// Right clicked a purple tesseract shulker that can't be opened
-				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				player.sendMessage(ChatColor.RED + "This container must be placed to access its items");
-				event.setCancelled(true);
-			} else if (itemClicked != null &&
-				click == ClickType.RIGHT &&
-				ChestUtils.isLootBox(itemClicked)) {
-				// Right clicked a lootbox - dump contents into player's inventory
-				List<ItemStack> items = ChestUtils.removeOneLootshareFromLootbox(itemClicked);
-				if (items == null) {
-					// Lootbox empty
-					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				} else {
-					// Non-empty, got some items, drop them on the player
-					// /playsound minecraft:block.chest.open player @s ~ ~ ~ 0.6 1
-					player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, SoundCategory.PLAYERS, 0.6f, 1f);
-					for (ItemStack item : items) {
-						if (item != null && !item.getType().isAir()) {
-							InventoryUtils.dropTempOwnedItem(item, player.getLocation(), player);
+		if (!(event.getWhoClicked() instanceof Player player) || clickedInventory == null) {
+			return;
+		}
+		// A player clicked inside an inventory window
+
+		// check if a shulker inventory is open
+		ShulkerInventory shulkerInventory = ShulkerInventoryManager.getOpenShulkerInventory(player, topInventory);
+		if (shulkerInventory != null // Shulker was opened via shortcut
+			    && !mPlugin.mShulkerInventoryManager.updateShulker(player)) { // Try to update Shulker if it still exists.
+			// The currently open shulker no longer exists, cancel the click and close the inventory.
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "Shulker no longer available");
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					player.closeInventory(InventoryCloseEvent.Reason.CANT_USE);
+				}
+			}.runTask(mPlugin);
+			return;
+		}
+		if (shulkerInventory != null
+			    && event.getClickedInventory() == shulkerInventory.getInventory()
+			    && event.getSlot() >= shulkerInventory.getSlots()) {
+			// clicked on a reserved slot of a reduced-size shulker box
+			event.setCancelled(true);
+			return;
+		}
+		if (shulkerInventory != null) {
+			boolean quiver = ItemStatUtils.isQuiver(shulkerInventory.getShulkerItem());
+			if (quiver || shulkerInventory.getInventory().getType() != InventoryType.SHULKER_BOX) {
+				// Disallow sorting partial inventories to prevent it duping the filler items and moving items into slots where they shouldn't be
+				if (shulkerInventory.getSlots() % 9 != 0
+					    && event.getClick().isRightClick()
+					    && ItemUtils.isNullOrAir(event.getCursor())
+					    && ItemUtils.isNullOrAir(event.getCurrentItem())) {
+					event.setCancelled(true);
+					return;
+				}
+				// prevent picking up the filler items if the player for some reason has some
+				if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR
+					    && ShulkerInventory.FILLER.isSimilar(event.getCursor())) {
+					event.setCancelled(true);
+					return;
+				}
+				// Quiver or modified shulker inventory is involved
+				// For quivers, make sure only arrows can be put in it
+				// For modified shulker inventories, prevent putting shulkers in
+				ItemStack deposited = null;
+				switch (event.getAction()) {
+					case PLACE_ALL, PLACE_SOME, PLACE_ONE, SWAP_WITH_CURSOR -> {
+						if (event.getClickedInventory() == shulkerInventory.getInventory()) {
+							deposited = event.getCursor();
 						}
+					}
+					case MOVE_TO_OTHER_INVENTORY -> {
+						if (event.getClickedInventory() != shulkerInventory.getInventory()) {
+							deposited = event.getCurrentItem();
+						}
+					}
+					case HOTBAR_SWAP -> {
+						if (event.getClickedInventory() == shulkerInventory.getInventory()) {
+							deposited = event.getClick() == ClickType.SWAP_OFFHAND ? player.getInventory().getItemInOffHand() : player.getInventory().getItem(event.getHotbarButton());
+						}
+					}
+					case UNKNOWN -> { // unknown click (modded?): disallow
+						event.setCancelled(true);
+						return;
+					}
+					default -> {
+						// nothing deposited for other actions
 					}
 				}
+				if (deposited != null && deposited.getType() != Material.AIR) {
+					if (ItemUtils.isShulkerBox(deposited.getType())) {
+						event.setCancelled(true);
+						return;
+					}
+					if (quiver && !ItemUtils.isArrow(deposited)) {
+						player.sendMessage(ChatColor.RED + "Only arrows can be put into a quiver");
+						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						event.setCancelled(true);
+						return;
+					}
+				}
+			}
+		}
+		if (itemClicked != null
+			    && click == ClickType.RIGHT
+			    && isEnderExpansion(itemClicked)
+			    && !clickedInventory.getType().equals(InventoryType.ENDER_CHEST)) {
+			// Right clicked an Ender Chest Expansion shulker outside an ender chest
+			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			player.sendMessage(ChatColor.RED + "This item only works in an ender chest");
+			event.setCancelled(true);
+		} else if (itemClicked != null
+			           && click == ClickType.RIGHT
+			           && isPurpleTesseractContainer(itemClicked)) {
+			// Right clicked a purple tesseract shulker that can't be opened
+			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			player.sendMessage(ChatColor.RED + "This container must be placed to access its items");
+			event.setCancelled(true);
+		} else if (itemClicked != null
+			           && click == ClickType.RIGHT
+			           && ChestUtils.isLootBox(itemClicked)) {
+			// Right clicked a lootbox - dump contents into player's inventory
+			List<ItemStack> items = ChestUtils.removeOneLootshareFromLootbox(itemClicked);
+			if (items == null) {
+				// Lootbox empty
+				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			} else {
+				// Non-empty, got some items, drop them on the player
+				// /playsound minecraft:block.chest.open player @s ~ ~ ~ 0.6 1
+				player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, SoundCategory.PLAYERS, 0.6f, 1f);
+				for (ItemStack item : items) {
+					if (item != null && !item.getType().isAir()) {
+						InventoryUtils.dropTempOwnedItem(item, player.getLocation(), player);
+					}
+				}
+			}
+			event.setCancelled(true);
+		} else if (itemClicked != null && ItemUtils.isShulkerBox(itemClicked.getType())
+			           && !ShulkerEquipmentListener.isEquipmentBox(itemClicked)
+			           && !PortableEnderListener.isPortableEnder(itemClicked)
+			           && !ItemStatUtils.isShattered(itemClicked)) {
+			// Player clicked a non-shattered non-equipment shulker box in an inventory.
+			if (ShulkerInventoryManager.isShulkerInUse(itemClicked)) {
+				// A currently open shulker box was clicked, cancel.
+				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				player.sendMessage(ChatColor.RED + "That shulker is open");
 				event.setCancelled(true);
-			} else if (itemClicked != null && ItemUtils.isShulkerBox(itemClicked.getType()) &&
-			           !ShulkerEquipmentListener.isEquipmentBox(itemClicked) &&
-			           !PortableEnderListener.isPortableEnder(itemClicked) &&
-			           !ItemStatUtils.isShattered(itemClicked)) {
-				// Player clicked a non-shattered non-equipment shulker box in an inventory.
-				if (ShulkerInventoryManager.isShulkerInUse(itemClicked)) {
-					// A currently open shulker box was clicked, cancel.
-					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-					player.sendMessage(ChatColor.RED + "That shulker is open");
-					event.setCancelled(true);
-				} else {
-					// A shulker box that isn't currently open was clicked.
-					if (player.hasPermission(PERMISSION)) {
-						if (click == ClickType.RIGHT && action == InventoryAction.SWAP_WITH_CURSOR &&
-							itemHeld != null && !ItemUtils.isShulkerBox(itemHeld.getType()) &&
-							!CurseOfEphemerality.isEphemeral(itemHeld)) {
+			} else {
+				// A shulker box that isn't currently open was clicked.
+				if (player.hasPermission(PERMISSION)) {
+					if (click == ClickType.RIGHT && action == InventoryAction.SWAP_WITH_CURSOR &&
+						    itemHeld != null && !ItemUtils.isShulkerBox(itemHeld.getType()) &&
+						    !CurseOfEphemerality.isEphemeral(itemHeld)) {
 
-							// Player right-clicked shulker while holding an item on their cursor.
-							event.setCancelled(true);
-							int starting = itemHeld.getAmount();
-							int remaining = mPlugin.mShulkerInventoryManager.addItemToShulker(player, clickedInventory, slotClicked, itemHeld);
-							switch (remaining) {
-								case -5:
-									// Rate limited
-									player.sendMessage(ChatColor.RED + "Too fast! Please try again");
-									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-									break;
-								case -4:
-									// Shulker blocked by zone property
-									player.sendMessage(ChatColor.RED + "Shulkers can not be opened here");
-									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-									break;
-								case -3:
-									// Somehow that wasn't a shulker
-									player.sendMessage(ChatColor.RED + "How did you...? That isn't a shulker. Please report this");
-									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-									break;
-								case -2:
-									// Shulker is locked
-									player.sendMessage(ChatColor.RED + "That shulker is locked");
-									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-									break;
-								case -1:
-									// Shulker is already open
-									player.sendMessage(ChatColor.RED + "That shulker is already open");
-									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-									break;
-								case 0:
-									// All items were inserted successfully.
-									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-									player.sendMessage(ChatColor.GOLD + "Item deposited into shulker.");
-									event.getView().setCursor(null);
-									break;
-								default:
-									if (remaining == starting) {
-										// No items were placed, shulker is full.
-										player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-										player.sendMessage(ChatColor.RED + "That shulker is full.");
-									} else {
-										// Items were inserted, but not all
-										player.sendMessage(ChatColor.RED + "That shulker was too full to accept the full stack.");
-										player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-									}
-							}
-						} else if (click == ClickType.RIGHT && action == InventoryAction.PICKUP_HALF) {
-							// Player right-clicked shulker with an empty cursor.
-							if (mPlugin.mShulkerInventoryManager.openShulker(player, clickedInventory, slotClicked)) {
-								// Shulker was successfully opened
-								player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-							} else {
-								// Shulker couldn't be opened
-								player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-							}
-							event.setCancelled(true);
-						} else if (ShulkerInventoryManager.playerIsShulkerRateLimited(player)) {
-							player.sendMessage(ChatColor.RED + "Too fast! Please try again");
+						// Player right-clicked shulker while holding an item on their cursor.
+						event.setCancelled(true);
+						int starting = itemHeld.getAmount();
+						int remaining = mPlugin.mShulkerInventoryManager.addItemToShulker(player, clickedInventory, slotClicked, itemHeld);
+						if (remaining < 0) {
+							// An error occurred (error message already sent to the player)
 							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-							event.setCancelled(true);
+						} else if (remaining == 0) {
+							// All items were inserted successfully.
+							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+							player.sendMessage(ChatColor.GOLD + "Item deposited into shulker.");
+							event.getView().setCursor(null);
+						} else if (remaining == starting) {
+							// No items were placed, shulker is full.
+							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+							player.sendMessage(ChatColor.RED + "That shulker is full.");
+						} else {
+							// Items were inserted, but not all
+							player.sendMessage(ChatColor.RED + "That shulker was too full to accept the full stack.");
+							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						}
+					} else if (click == ClickType.RIGHT && action == InventoryAction.PICKUP_HALF) {
+						// Player right-clicked shulker with an empty cursor.
+						if (mPlugin.mShulkerInventoryManager.openShulker(player, clickedInventory, slotClicked)) {
+							// Shulker was successfully opened
+							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						} else {
+							// Shulker couldn't be opened
+							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						}
+						event.setCancelled(true);
+					} else if (ShulkerInventoryManager.playerIsShulkerRateLimited(player)) {
+						player.sendMessage(ChatColor.RED + "Too fast! Please try again");
+						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						event.setCancelled(true);
 					}
 				}
 			}
@@ -212,20 +257,27 @@ public class ShulkerShortcutListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void inventoryDragEvent(InventoryDragEvent event) {
-		if (event.getWhoClicked() instanceof Player) {
-			Player player = (Player)event.getWhoClicked();
-			if (event.getView().getTopInventory().getType() == InventoryType.SHULKER_BOX && // Player has Shulker open
-				ShulkerInventoryManager.playerHasShulkerOpen(player) && // Shulker was opened via shortcut
-				!mPlugin.mShulkerInventoryManager.updateShulker(player)) { // Try to update Shulker if it still exists.
-				// The currently open shulker no longer exists, cancel the click and close the inventory.
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "Shulker no longer available");
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						player.closeInventory(InventoryCloseEvent.Reason.CANT_USE);
-					}
-				}.runTask(mPlugin);
+		if (event.getWhoClicked() instanceof Player player) {
+			ShulkerInventory shulkerInventory = ShulkerInventoryManager.getOpenShulkerInventory(player, event.getInventory());
+			if (shulkerInventory != null) { // Shulker was opened via shortcut
+				if (!acceptsItem(shulkerInventory, event.getOldCursor())
+					    && event.getRawSlots().stream().anyMatch(slot -> event.getView().getInventory(slot) == shulkerInventory.getInventory())) {
+					player.sendMessage(ChatColor.RED + "Only arrows can be put into a quiver");
+					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+					event.setCancelled(true);
+					return;
+				}
+				if (!mPlugin.mShulkerInventoryManager.updateShulker(player)) { // Try to update Shulker if it still exists.
+					// The currently open shulker no longer exists, cancel the click and close the inventory.
+					event.setCancelled(true);
+					player.sendMessage(ChatColor.RED + "Shulker no longer available");
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							player.closeInventory(InventoryCloseEvent.Reason.CANT_USE);
+						}
+					}.runTask(mPlugin);
+				}
 			}
 		}
 	}
@@ -238,8 +290,7 @@ public class ShulkerShortcutListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
-		if (event.getPlayer() instanceof Player) {
-			Player player = (Player)event.getPlayer();
+		if (event.getPlayer() instanceof Player player) {
 			mPlugin.mShulkerInventoryManager.closeShulker(player);
 		}
 	}
@@ -252,10 +303,12 @@ public class ShulkerShortcutListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockDispenseEvent(BlockDispenseEvent event) {
-		if (ItemUtils.isShulkerBox(event.getItem().getType()) &&
-			(ShulkerInventoryManager.isShulkerInUse(event.getItem()) ||
-				isPurpleTesseractContainer(event.getItem()) ||
-				isEnderExpansion(event.getItem()))) {
+		ItemStack item = event.getItem();
+		if (ItemUtils.isShulkerBox(item.getType())
+			    && (ShulkerInventoryManager.isShulkerInUse(item)
+				        || isPurpleTesseractContainer(item)
+				        || isEnderExpansion(item)
+				        || ItemStatUtils.getTier(item) != ItemStatUtils.Tier.SHULKER_BOX)) {
 			event.getBlock().getWorld().playSound(event.getBlock().getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			event.setCancelled(true);
 		}
@@ -359,18 +412,22 @@ public class ShulkerShortcutListener implements Listener {
 
 	public static boolean isPurpleTesseractContainer(ItemStack item) {
 		return item != null &&
-		       ItemUtils.isShulkerBox(item.getType()) &&
-			   item.hasItemMeta() &&
-			   item.getItemMeta().hasDisplayName() &&
-			   (ItemUtils.getPlainName(item).contains("Carrier of Emotion")
-			    || ItemUtils.getPlainName(item).contains("Carrier of Festivity"));
+			       ItemUtils.isShulkerBox(item.getType()) &&
+			       item.hasItemMeta() &&
+			       item.getItemMeta().hasDisplayName() &&
+			       (ItemUtils.getPlainName(item).contains("Carrier of Emotion")
+				        || ItemUtils.getPlainName(item).contains("Carrier of Festivity"));
 	}
 
 	public static boolean isEnderExpansion(ItemStack item) {
 		return item != null &&
-		       ItemUtils.isShulkerBox(item.getType()) &&
-			   item.hasItemMeta() &&
-			   item.getItemMeta().hasDisplayName() &&
-			   ItemUtils.getPlainName(item).contains("Ender Chest Expansion");
+			       ItemUtils.isShulkerBox(item.getType()) &&
+			       item.hasItemMeta() &&
+			       item.getItemMeta().hasDisplayName() &&
+			       ItemUtils.getPlainName(item).contains("Ender Chest Expansion");
+	}
+
+	private static boolean acceptsItem(ShulkerInventory shulkerInventory, ItemStack item) {
+		return !ItemStatUtils.isQuiver(shulkerInventory.getShulkerItem()) || ItemUtils.isArrow(item);
 	}
 }

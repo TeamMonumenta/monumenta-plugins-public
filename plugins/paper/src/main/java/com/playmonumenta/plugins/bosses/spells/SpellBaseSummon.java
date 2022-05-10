@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Spawn mobs around boss locations
@@ -42,7 +43,7 @@ public class SpellBaseSummon extends Spell {
 		 *
 		 * Must return the entity spawned for cancellation purposes
 		 */
-		Entity run(Location loc, int times);
+		@Nullable Entity run(Location loc, int times);
 	}
 
 	@FunctionalInterface
@@ -67,6 +68,8 @@ public class SpellBaseSummon extends Spell {
 
 	//keep track of how many times the spell cast
 	private int mTimes = 0;
+	private int mSummonNum = 0;
+	private List<Location> mLocations = new ArrayList<>();
 
 	/**
 	 * @param plugin                Plugin
@@ -138,21 +141,25 @@ public class SpellBaseSummon extends Spell {
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mSummoningDuration, 100));
 		}
 
-		List<Location> locations = mSpawningLocations.run();
-		int mSummonNum = mSummonQuantity.run();
-
 		aestheticBoss();
 
 		if (mSingleTarget) {
-			Collections.shuffle(locations);
-			Location summonLoc = locations.get(0);
+			Collections.shuffle(mLocations);
+			Location summonLoc = mLocations.get(0);
 			summoningRunnable(mSummonNum, summonLoc);
 		} else {
-			for (Location summonLoc : locations) {
+			for (Location summonLoc : mLocations) {
 				summoningRunnable(mSummonNum, summonLoc);
 			}
 		}
 
+	}
+
+	@Override
+	public boolean canRun() {
+		mSummonNum = mSummonQuantity.run();
+		mLocations = mSpawningLocations.run();
+		return mSummonNum > 0 && mLocations != null && !mLocations.isEmpty();
 	}
 
 	@Override
@@ -167,12 +174,12 @@ public class SpellBaseSummon extends Spell {
 
 			@Override
 			public void run() {
-				if (mBoss == null || !mBoss.isValid() || mBoss.isDead()) {
+				if (mBoss == null || !mBoss.isValid()) {
 					this.cancel();
 					return;
 				}
 
-				if (mCanBeStopped && EntityUtils.isStunned(mBoss)) {
+				if (mCanBeStopped && (EntityUtils.isStunned(mBoss) || mBoss.isDead())) {
 					this.cancel();
 					return;
 				}
@@ -231,12 +238,12 @@ public class SpellBaseSummon extends Spell {
 
 					@Override
 					public void run() {
-						if (mBoss == null || !mBoss.isValid() || mBoss.isDead()) {
+						if (mBoss == null || !mBoss.isValid()) {
 							this.cancel();
 							return;
 						}
 
-						if (mCanBeStopped && EntityUtils.isStunned(mBoss)) {
+						if (mCanBeStopped && (EntityUtils.isStunned(mBoss) || mBoss.isDead())) {
 							this.cancel();
 							return;
 						}

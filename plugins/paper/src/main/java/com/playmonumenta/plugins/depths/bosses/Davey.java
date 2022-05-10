@@ -145,7 +145,7 @@ public class Davey extends BossAbilityGroup {
 		}
 
 		// Added to a SpellManager later, once the vexes are properly added in
-		List<Spell> spells = new ArrayList<> (Arrays.asList(
+		List<Spell> spells = new ArrayList<>(Arrays.asList(
 			new SpellLinkBeyondLife(mBoss, mCooldownTicks, ((party == null ? 0 : party.getFloor() - 1) / 3) + 1),
 			new SpellAbyssalLeap(plugin, mBoss, mCooldownTicks),
 			new SpellAbyssalCharge(mBoss, mCooldownTicks),

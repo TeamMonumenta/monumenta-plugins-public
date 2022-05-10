@@ -17,6 +17,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -207,6 +208,12 @@ public class Boss {
 	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.customEffectAppliedToBoss(event);
+		}
+	}
+
+	public void bossExploded(EntityExplodeEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossExploded(event);
 		}
 	}
 

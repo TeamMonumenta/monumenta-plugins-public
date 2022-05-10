@@ -14,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 
@@ -75,6 +76,15 @@ public class ZoneListener implements Listener {
 	public void blockFromToEvent(BlockFromToEvent event) {
 		if (event.getBlock().getType() == Material.DRAGON_EGG
 			&& ZoneUtils.hasZoneProperty(event.getToBlock().getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entityDamageEvent(EntityDamageEvent event) {
+		if (event.getEntity() instanceof Player player &&
+			    ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_FALL_DAMAGE) &&
+			    event.getCause() == EntityDamageEvent.DamageCause.FALL) {
 			event.setCancelled(true);
 		}
 	}

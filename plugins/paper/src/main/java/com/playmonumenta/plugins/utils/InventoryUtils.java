@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +16,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Entity;
@@ -403,5 +405,49 @@ public class InventoryUtils {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Checks whether an inventory is full, i.e. has at least one item in every slot. Does not check if the stacks are at max size.
+	 */
+	public static boolean isFull(Inventory inventory) {
+		return Arrays.stream(inventory.getStorageContents()).noneMatch(ItemUtils::isNullOrAir);
+	}
+
+	/**
+	 * Inserts an item stack into an inventory, using only the first {@code size} slots of the inventory.
+	 *
+	 * @param inventory The inventory to put the item into
+	 * @param size      Maximum number of inventory slots to use
+	 * @param itemStack The item stack to insert. This will be modified and will hold the number of items not inserted.
+	 */
+	public static void insertItemIntoLimitedInventory(Inventory inventory, int size, ItemStack itemStack) {
+		if (itemStack == null || itemStack.getType() == Material.AIR) {
+			return;
+		}
+		// fill existing stacks first
+		for (int i = 0; i < size; i++) {
+			ItemStack invItem = inventory.getItem(i);
+			if (invItem != null
+				    && invItem.getAmount() < invItem.getMaxStackSize()
+				    && invItem.isSimilar(itemStack)) {
+				int deposited = Math.min(itemStack.getAmount(), invItem.getMaxStackSize() - invItem.getAmount());
+				itemStack.subtract(deposited);
+				invItem.add(deposited);
+				inventory.setItem(i, invItem);
+				if (itemStack.getAmount() == 0) {
+					return;
+				}
+			}
+		}
+		// put remaining items into first available slot
+		for (int i = 0; i < size; i++) {
+			ItemStack invItem = inventory.getItem(i);
+			if (invItem == null || invItem.getType() == Material.AIR) {
+				inventory.setItem(i, itemStack);
+				itemStack.setAmount(0);
+				return;
+			}
+		}
 	}
 }

@@ -1079,6 +1079,10 @@ public class ItemUtils {
 		}
 	}
 
+	public static boolean isArrow(@Nullable ItemStack itemStack) {
+		return itemStack != null && Materials.ARROWS.contains(itemStack.getType());
+	}
+
 	public static int getMiningSpeed(@Nullable ItemStack itemStack) {
 		if (itemStack == null) {
 			return 1;

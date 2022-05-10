@@ -16,18 +16,8 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.protocollib.VirtualFirmamentReplacer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
-import com.playmonumenta.plugins.utils.ChestUtils;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.*;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
@@ -57,11 +47,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -625,6 +611,18 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
+		//Cleanse mobs around player in dungeon if running solo
+		if (Plugin.IS_PLAY_SERVER && ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
+			if (PlayerUtils.otherPlayersInRange(event.getEntity(), 48, true).size() == 0) {
+				List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(event.getEntity().getLocation(), 20);
+				for (LivingEntity entity : nearbyEntities) {
+					if (entity.getRemoveWhenFarAway()) {
+						entity.remove();
+					}
+				}
+			}
+		}
+
 		// Prevent an inescapable death loop by overriding KeepInventory if your Max Health is 0
 		if (event.getKeepInventory()) {
 			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
@@ -944,26 +942,20 @@ public class PlayerListener implements Listener {
 					// Adjust for player teleports being off-center
 					Location teleLoc = new Location(world, pt.mX - 0.5, pt.mY, pt.mZ - 0.5, yaw, pitch);
 
-					//Records player's previous spawnpoint - either their bed spawn point if it exists (and is not this bed), or the world spawn otherwise
-					Location tempSpawnLoc = player.getBedSpawnLocation();
-					if (tempSpawnLoc == null || tempSpawnLoc.equals(loc)) {
-						tempSpawnLoc = world.getSpawnLocation();
-					}
-					final Location playerSpawn = tempSpawnLoc;
+					final Location oldPlayerSpawn = player.getBedSpawnLocation();
 
 					// Create a deferred task to eject player and teleport them after a short sleep
 					new BukkitRunnable() {
+						static final int BED_TELE_TIME = 20 * 3;
 						int mTicks = 0;
 
 						@Override
 						public void run() {
 							GameMode mode;
-							final int BED_TELE_TIME = 20 * 3;
 
 							if (mTicks == 0) {
 								//Set player's spawnpoint back to whatever it was
-								String cmd = String.format("spawnpoint %s %d %d %d", player.getName(), playerSpawn.getBlockX(), playerSpawn.getBlockY(), playerSpawn.getBlockZ());
-								Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);
+								player.setBedSpawnLocation(oldPlayerSpawn, true);
 							}
 
 

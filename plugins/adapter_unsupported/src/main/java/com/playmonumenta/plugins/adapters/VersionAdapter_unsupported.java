@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.adapters;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -100,5 +101,9 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 		return null;
 	}
 
+	@Override
+	public void executeCommandAsBlock(Block block, String command) {
+
+	}
 
 }

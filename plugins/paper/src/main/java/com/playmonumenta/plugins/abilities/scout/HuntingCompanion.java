@@ -33,6 +33,7 @@ import org.bukkit.entity.Fox;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Vex;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
@@ -56,6 +57,7 @@ public class HuntingCompanion extends Ability {
 	private static final double BLEED_AMOUNT = 0.2;
 	private static final double VELOCITY = 0.9;
 	private static final double JUMP_HEIGHT = 0.8;
+	private static final double MAX_TARGET_Y = 4;
 
 	private HashMap<Mob, LivingEntity> mSummons;
 	private final double mDamageFraction;
@@ -309,10 +311,14 @@ public class HuntingCompanion extends Ability {
 	}
 
 	private @Nullable LivingEntity findNearestNonTargetedMob(LivingEntity summon) {
+		Location summonLoc = summon.getLocation();
 		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(summon.getLocation(), DETECTION_RANGE);
 
 		nearbyMobs.removeIf(Entity::isInvulnerable);
 		nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+		if (!(summon instanceof Vex)) {
+			nearbyMobs.removeIf((mob) -> Math.abs(mob.getLocation().getY() - summonLoc.getY()) > MAX_TARGET_Y);
+		}
 		for (Mob otherSummon : mSummons.keySet()) {
 			LivingEntity otherTarget = otherSummon.getTarget();
 			if (otherTarget != null) {

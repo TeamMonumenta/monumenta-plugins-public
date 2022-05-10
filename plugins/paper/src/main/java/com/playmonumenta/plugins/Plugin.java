@@ -199,6 +199,7 @@ public class Plugin extends JavaPlugin {
 		GenerateItems.register();
 		GenerateCharms.register();
 		JingleBells.register();
+		Spawn.register();
 		Stuck.register(this);
 		GlowingCommand.register();
 		VirtualFirmament.register();
@@ -364,6 +365,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(CosmeticsManager.getInstance(), this);
 		manager.registerEvents(new LootTableManager(), this);
 		manager.registerEvents(new CharmListener(this), this);
+		manager.registerEvents(new QuiverListener(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")

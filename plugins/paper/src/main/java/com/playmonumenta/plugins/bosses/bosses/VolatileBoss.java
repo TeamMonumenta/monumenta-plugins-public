@@ -35,7 +35,7 @@ public class VolatileBoss extends BossAbilityGroup {
 
 	@Override
 	public void onHurt(DamageEvent event) {
-		if (event.getType() == DamageType.BLAST) {
+		if (event.getType() == DamageType.BLAST && event.getDamage() > 0 && !event.isCancelled()) {
 			mCreeper.explode();
 		}
 	}

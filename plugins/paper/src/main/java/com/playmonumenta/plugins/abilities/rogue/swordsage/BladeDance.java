@@ -33,11 +33,10 @@ public class BladeDance extends Ability {
 	private static final double SLOWNESS_AMPLIFIER = 1;
 	private static final int SLOW_DURATION_1 = 2 * 20;
 	private static final int SLOW_DURATION_2 = (int) (2.5 * 20);
-	private static final int SILENCE_DURATION = 20 * 1;
 	private static final int DANCE_RADIUS = 4;
 	private static final float DANCE_KNOCKBACK_SPEED = 0.2f;
-	private static final int COOLDOWN_1 = 14 * 20;
-	private static final int COOLDOWN_2 = 12 * 20;
+	private static final int COOLDOWN_1 = 18 * 20;
+	private static final int COOLDOWN_2 = 16 * 20;
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 
 	private final int mDamage;
@@ -47,8 +46,8 @@ public class BladeDance extends Ability {
 		super(plugin, player, "Blade Dance");
 		mInfo.mScoreboardId = "BladeDance";
 		mInfo.mShorthandName = "BD";
-		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 4 melee damage to enemies in a 4 block radius. Damaged enemies are rooted for 2 seconds and silenced for 1 second. Cooldown: 14s.");
-		mInfo.mDescriptions.add("The area attack now deals 7 damage and roots for 2.5. Cooldown: 12s.");
+		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 4 melee damage to enemies in a 4 block radius. Damaged enemies are rooted for 2 seconds. Cooldown: 18s.");
+		mInfo.mDescriptions.add("The area attack now deals 7 damage and roots for 2.5. Cooldown: 16s.");
 		mInfo.mLinkedSpell = ClassAbility.BLADE_DANCE;
 		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -102,7 +101,6 @@ public class BladeDance extends Ability {
 
 						if (!EntityUtils.isBoss(mob)) {
 							EntityUtils.applySlow(mPlugin, mSlowDuration, SLOWNESS_AMPLIFIER, mob);
-							EntityUtils.applySilence(mPlugin, SILENCE_DURATION, mob);
 						}
 
 						Location mobLoc = mob.getLocation().add(0, 1, 0);

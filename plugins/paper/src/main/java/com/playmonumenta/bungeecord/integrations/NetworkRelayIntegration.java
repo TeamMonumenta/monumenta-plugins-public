@@ -63,7 +63,7 @@ public class NetworkRelayIntegration implements Listener {
 			data.addProperty("cooldownMinutes", cooldownMinutes);
 			try {
 				/* Send this message to whatever this shard is called (likely "bungee") */
-				NetworkRelayAPI.sendMessage(NetworkRelayAPI.getShardName(), VOTE_NOTIFY_CHANNEL, data);
+				NetworkRelayAPI.sendBroadcastMessage(VOTE_NOTIFY_CHANNEL, data);
 			} catch (Exception ex) {
 				INSTANCE.mLogger.severe("Failed to send vote notify message: " + ex.getMessage());
 				ex.printStackTrace();

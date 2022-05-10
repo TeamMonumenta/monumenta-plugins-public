@@ -37,7 +37,7 @@ public class Recoil implements Enchantment {
 			if (player.getCooldown(type) < 10) {
 				player.setCooldown(type, 10);
 			}
-		} else if (!ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && player.getLocation().getY() >= 0) {
+		} else if (!ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && player.getLocation().getY() >= 0 && !proj.getScoreboardTags().contains("NoRecoil")) {
 			Vector velocity = NmsUtils.getVersionAdapter().getActualDirection(player).multiply(-0.5 * Math.sqrt(level));
 			velocity.setY(Math.max(0.1, velocity.getY()));
 			player.setVelocity(velocity);

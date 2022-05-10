@@ -92,8 +92,6 @@ public class Constants {
 	// Plots gold → diamond block
 	public static final int PATREON_TIER_5 = 30;
 
-	public static final int DUNGEON_INSTANCE_MODULUS = 10000;
-
 	static {
 		Materials.WEARABLE.addAll(Materials.ARMOR);
 	}
@@ -259,6 +257,11 @@ public class Constants {
 			Material.POTION,
 			Material.SPLASH_POTION,
 			Material.LINGERING_POTION
+		);
+		public static final EnumSet<Material> ARROWS = EnumSet.of(
+			Material.ARROW,
+			Material.SPECTRAL_ARROW,
+			Material.TIPPED_ARROW
 		);
 	}
 }
