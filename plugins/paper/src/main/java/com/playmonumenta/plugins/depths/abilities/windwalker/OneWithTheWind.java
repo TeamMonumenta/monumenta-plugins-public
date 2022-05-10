@@ -7,10 +7,12 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class OneWithTheWind extends DepthsAbility {
 
@@ -21,6 +23,8 @@ public class OneWithTheWind extends DepthsAbility {
 	public static final String SPEED_EFFECT_NAME = "OneWithTheWindSpeedEffect";
 	public static final String RESISTANCE_EFFECT_NAME = "OneWithTheWindResistanceEffect";
 
+	private boolean mActive = false;
+
 	public OneWithTheWind(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayMaterial = Material.LIGHT_GRAY_BANNER;
@@ -29,9 +33,16 @@ public class OneWithTheWind extends DepthsAbility {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		boolean wasActive = mActive;
 		if (mPlayer != null && PlayerUtils.otherPlayersInRange(mPlayer, RANGE, true).size() == 0) {
 			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(40, SPEED[mRarity - 1], ABILITY_NAME));
 			mPlugin.mEffectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME, new PercentDamageReceived(40, PERCENT_DAMAGE_RECEIVED[mRarity - 1]));
+			mActive = true;
+		} else {
+			mActive = mPlugin.mEffectManager.hasEffect(mPlayer, RESISTANCE_EFFECT_NAME);
+		}
+		if (wasActive != mActive) {
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 	}
 
@@ -48,6 +59,11 @@ public class OneWithTheWind extends DepthsAbility {
 	@Override
 	public DepthsTrigger getTrigger() {
 		return DepthsTrigger.PASSIVE;
+	}
+
+	@Override
+	public @Nullable String getMode() {
+		return mActive ? "active" : null;
 	}
 }
 

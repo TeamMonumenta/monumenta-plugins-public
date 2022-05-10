@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.itemstats.infusions.Epoch;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collection;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -35,6 +34,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 
 public abstract class Ability {
@@ -355,4 +355,12 @@ public abstract class Ability {
 	public void invalidate() {
 
 	}
+
+	/**
+	 * Return the current mode of this ability, or null for default mode or no modes. This is used by the client mod to display different icons for different modes.
+	 */
+	public @Nullable String getMode() {
+		return null;
+	}
+
 }

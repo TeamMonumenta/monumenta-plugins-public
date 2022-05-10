@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -49,6 +48,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 /*
  * Handles giving potions and the direct damage aspect
@@ -409,6 +409,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		mPlayer.sendActionBar(ChatColor.YELLOW + "Alchemist's Potions swapped to " + mode + " mode");
 		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 0.9f, 1);
 		updateAlchemistItem(mPlayer.getInventory().getItem(mSlot), mCharges);
+		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	public boolean isGruesomeMode() {
@@ -467,5 +468,10 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 
 		return false;
+	}
+
+	@Override
+	public @Nullable String getMode() {
+		return mGruesomeMode ? "gruesome" : null;
 	}
 }

@@ -5,19 +5,22 @@ import com.google.gson.GsonBuilder;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
+import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.windwalker.OneWithTheWind;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Handles communication with an (optional) client mod.
@@ -70,6 +73,7 @@ public class ClientModHandler {
 		packet.name = getAbilityName(ability);
 		packet.remainingCooldown = remainingCooldown;
 		packet.remainingCharges = charges;
+		packet.mode = ability.getMode();
 		INSTANCE.sendPacket(player, packet);
 	}
 
@@ -98,6 +102,7 @@ public class ClientModHandler {
 				info.initialCooldown = ability.getInfo().mCooldown;
 				info.remainingCharges = charges;
 				info.maxCharges = maxCharges;
+				info.mode = ability.getMode();
 				return info;
 			})
 			.sorted(Comparator.comparing(i -> i.name == null ? "" : i.name))
@@ -125,7 +130,9 @@ public class ClientModHandler {
 	 * @return Whether we're sending data for the given ability to clients
 	 */
 	private static boolean shouldHandleAbility(Ability ability) {
-		return ability != null && (ability.getInfo().mCooldown > 0 || ability instanceof AbilityWithChargesOrStacks);
+		return ability != null
+			       && (ability.getInfo().mCooldown > 0 || ability instanceof AbilityWithChargesOrStacks
+				           || ability instanceof AlchemicalArtillery || ability instanceof Swiftness || ability instanceof OneWithTheWind); // these are passives with modes
 	}
 
 	private static @Nullable String getAbilityName(Ability ability) {
@@ -189,6 +196,8 @@ public class ClientModHandler {
 			int remainingCharges;
 			int maxCharges;
 
+			@Nullable String mode;
+
 		}
 
 	}
@@ -207,6 +216,8 @@ public class ClientModHandler {
 		int remainingCooldown;
 
 		int remainingCharges;
+
+		@Nullable String mode;
 
 	}
 

@@ -9,11 +9,11 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -23,6 +23,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 
 public class Taboo extends Ability {
@@ -80,11 +81,13 @@ public class Taboo extends Ability {
 					mAlchemistPotions.increaseChargeTime(CHARGE_TIME_REDUCTION);
 					mActive = false;
 					world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_BURP, 0.8f, 1.2f);
+					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			} else if (mAlchemistPotions.decrementCharge()) {
 				mAlchemistPotions.reduceChargeTime(CHARGE_TIME_REDUCTION);
 				mActive = true;
 				world.playSound(mPlayer.getLocation(), Sound.ENTITY_WANDERING_TRADER_DRINK_POTION, 1, 0.9f);
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 	}
@@ -112,5 +115,10 @@ public class Taboo extends Ability {
 			event.setDamage(event.getDamage() * (1 + mMagicDamageIncrease));
 		}
 		return false;
+	}
+
+	@Override
+	public @Nullable String getMode() {
+		return mActive ? "active" : null;
 	}
 }

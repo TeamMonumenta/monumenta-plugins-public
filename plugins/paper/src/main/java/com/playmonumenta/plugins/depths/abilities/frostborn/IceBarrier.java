@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import java.util.ArrayList;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -21,7 +22,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class IceBarrier extends DepthsAbility {
 
@@ -70,6 +71,7 @@ public class IceBarrier extends DepthsAbility {
 			if (!mIsPrimed || mPrimedLoc == null) {
 				mIsPrimed = true;
 				mPrimedLoc = block.getLocation();
+				ClientModHandler.updateAbility(mPlayer, this);
 
 				new BukkitRunnable() {
 
@@ -87,8 +89,8 @@ public class IceBarrier extends DepthsAbility {
 				}.runTaskLater(mPlugin, CAST_TIME);
 			} else {
 				//Build the wall
-				putOnCooldown();
 				mIsPrimed = false;
+				putOnCooldown();
 
 				ArrayList<Block> blocksToIce = new ArrayList<>();
 
@@ -133,5 +135,9 @@ public class IceBarrier extends DepthsAbility {
 		return DepthsTrigger.SHIFT_RIGHT_CLICK;
 	}
 
+	@Override
+	public @Nullable String getMode() {
+		return mIsPrimed ? "primed" : null;
+	}
 }
 

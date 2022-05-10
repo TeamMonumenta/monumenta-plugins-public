@@ -2,13 +2,13 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 public class Swiftness extends Ability {
 
@@ -83,15 +84,20 @@ public class Swiftness extends Ability {
 			MessagingUtils.sendActionBarMessage(mPlayer, "Jump Boost has been turned on");
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 1.6f);
 		}
+		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	private static void addModifier(Player player) {
 		EntityUtils.addAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED,
-				new AttributeModifier(SWIFTNESS_SPEED_MODIFIER, SWIFTNESS_SPEED_BONUS, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			new AttributeModifier(SWIFTNESS_SPEED_MODIFIER, SWIFTNESS_SPEED_BONUS, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 	}
 
 	private static void removeModifier(Player player) {
 		EntityUtils.removeAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, SWIFTNESS_SPEED_MODIFIER);
 	}
 
+	@Override
+	public @Nullable String getMode() {
+		return mJumpBoost ? null : "disabled";
+	}
 }

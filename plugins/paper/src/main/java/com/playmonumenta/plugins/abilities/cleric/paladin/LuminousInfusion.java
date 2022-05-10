@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -15,7 +16,6 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,6 +27,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 
 public class LuminousInfusion extends Ability {
@@ -79,9 +80,8 @@ public class LuminousInfusion extends Ability {
 			!isTimerActive()
 			&& mPlayer.isSneaking()
 		) {
-			putOnCooldown();
-
 			mActive = true;
+			putOnCooldown();
 			MessagingUtils.sendActionBarMessage(mPlayer, "Holy energy radiates from your hands...");
 
 			World world = mPlayer.getWorld();
@@ -101,6 +101,7 @@ public class LuminousInfusion extends Ability {
 					if (mT >= COOLDOWN || !mActive) {
 						if (mT >= COOLDOWN) {
 							MessagingUtils.sendActionBarMessage(mPlayer, EXPIRATION_MESSAGE);
+							ClientModHandler.updateAbility(mPlayer, LuminousInfusion.this);
 						}
 						mActive = false;
 						this.cancel();
@@ -143,6 +144,7 @@ public class LuminousInfusion extends Ability {
 
 	public void execute(LivingEntity damagee) {
 		mActive = false;
+		ClientModHandler.updateAbility(mPlayer, this);
 
 		DamageUtils.damage(mPlayer, damagee, DamageType.MAGIC, DAMAGE_UNDEAD_1, mInfo.mLinkedSpell);
 
@@ -184,5 +186,10 @@ public class LuminousInfusion extends Ability {
 			}
 			MovementUtils.knockAway(loc, e, KNOCKBACK_SPEED, KNOCKBACK_SPEED / 2, true);
 		}
+	}
+
+	@Override
+	public @Nullable String getMode() {
+		return mActive ? "active" : null;
 	}
 }

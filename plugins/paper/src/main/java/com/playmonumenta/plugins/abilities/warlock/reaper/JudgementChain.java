@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.JudgementChainMobEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -17,7 +18,6 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,6 +34,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 
 
@@ -80,6 +81,7 @@ public class JudgementChain extends Ability {
 			if (mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50.0) {
 				breakChain(true);
 				mTarget = null;
+				ClientModHandler.updateAbility(mPlayer, this);
 			} else if (!mPlayer.isSneaking() && mPlayer.isOnGround()) {
 				summonChain();
 			}
@@ -213,12 +215,14 @@ public class JudgementChain extends Ability {
 						this.cancel();
 						if (mTarget != null) {
 							breakChain(false);
+							mTarget = null;
+							ClientModHandler.updateAbility(mPlayer, JudgementChain.this);
 						}
-						mTarget = null;
 					} else if (l.distance(mTarget.getLocation()) > RANGE) {
 						this.cancel();
 						breakChain(true);
 						mTarget = null;
+						ClientModHandler.updateAbility(mPlayer, JudgementChain.this);
 					}
 				}
 
@@ -273,5 +277,10 @@ public class JudgementChain extends Ability {
 			effects.put(PotionEffectType.INCREASE_DAMAGE, EntityUtils.getBleedLevel(mPlugin, e) - 1);
 		}
 		return effects;
+	}
+
+	@Override
+	public @Nullable String getMode() {
+		return mTarget != null ? "active" : null;
 	}
 }
