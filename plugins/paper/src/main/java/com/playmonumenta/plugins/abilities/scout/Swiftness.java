@@ -2,17 +2,25 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import javax.annotation.Nullable;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
@@ -24,6 +32,7 @@ public class Swiftness extends Ability {
 	private static final String SWIFTNESS_SPEED_MODIFIER = "SwiftnessSpeedModifier";
 	private static final double SWIFTNESS_SPEED_BONUS = 0.2;
 	private static final int SWIFTNESS_EFFECT_JUMP_LVL = 2;
+	private static final double DODGE_CHANCE = 0.1;
 
 	private boolean mWasInNoMobilityZone = false;
 	private boolean mJumpBoost = true;
@@ -34,9 +43,24 @@ public class Swiftness extends Ability {
 		mInfo.mShorthandName = "Swf";
 		mInfo.mDescriptions.add("Gain +20% Speed when you are not inside a town.");
 		mInfo.mDescriptions.add("In addition, gain Jump Boost III when you are not inside a town. Swap hands looking up, not sneaking, and not holding a bow, crossbow, or trident to toggle the Jump Boost.");
+		mInfo.mDescriptions.add("You now have a 10% chance to dodge any projectile or melee attack.");
 		mDisplayItem = new ItemStack(Material.RABBIT_FOOT, 1);
 		if (player != null) {
 			addModifier(player);
+		}
+	}
+
+	@Override
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		DamageEvent.DamageType type = event.getType();
+		if ((type == DamageEvent.DamageType.MELEE || type == DamageEvent.DamageType.PROJECTILE) && isEnhanced() && FastUtils.RANDOM.nextDouble() < DODGE_CHANCE) {
+			event.setCancelled(true);
+
+			//TODO stolen from rogue dodging, should probably be made unique
+			Location loc = mPlayer.getLocation();
+			World world = mPlayer.getWorld();
+			new PartialParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
+			world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
 		}
 	}
 
