@@ -681,6 +681,16 @@ public class EntityUtils {
 		}
 	}
 
+	public static int getVulnTicks(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> vulns = plugin.mEffectManager.getEffects(mob, VULNERABILITY_EFFECT_NAME);
+		if (vulns != null) {
+			Effect vuln = vulns.last();
+			return vuln.getDuration();
+		} else {
+			return 0;
+		}
+	}
+
 	private static final String BLEED_EFFECT_NAME = "BleedEffect";
 
 	public static void applyBleed(Plugin plugin, int ticks, double amount, LivingEntity mob) {

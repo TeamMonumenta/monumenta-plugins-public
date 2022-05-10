@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -27,7 +28,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 
-
 public class MelancholicLament extends Ability {
 
 	private static final int DURATION = 20 * 8;
@@ -42,6 +42,8 @@ public class MelancholicLament extends Ability {
 	private final double mWeakenEffect;
 	private @Nullable JudgementChain mJudgementChain;
 
+	private int mEnhancementBonusDamage;
+
 
 	public MelancholicLament(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Melancholic Lament");
@@ -50,6 +52,7 @@ public class MelancholicLament extends Ability {
 		mInfo.mShorthandName = "MLa";
 		mInfo.mDescriptions.add("Press the swap key while sneaking and holding a scythe to recite a haunting song, causing all mobs within 7 blocks to target the user and afflicting them with 20% Weaken for 8 seconds. Cooldown: 16s.");
 		mInfo.mDescriptions.add("Increase the Weaken to 30% and decrease the duration of all negative potion effects on players in the radius by 10s.");
+		mInfo.mDescriptions.add("When cast, also cleanse all potion debuffs. Then, your next non-ailment damage deals +1 damage per debuff cleansed.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
@@ -92,6 +95,19 @@ public class MelancholicLament extends Ability {
 				EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
 			}
 
+			if (isEnhanced()) {
+				mEnhancementBonusDamage = 0;
+				for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, mPlayer)) {
+					PotionEffect effect = mPlayer.getPotionEffect(effectType);
+					if (effect != null) {
+						mPlayer.removePotionEffect(effectType);
+						mEnhancementBonusDamage += 1;
+
+						// mPlayer.sendMessage("Removed " + effectType);
+					}
+				}
+			}
+
 			if (isLevelTwo()) {
 				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true)) {
 					new PartialParticle(Particle.REDSTONE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
@@ -111,5 +127,16 @@ public class MelancholicLament extends Ability {
 			}
 			putOnCooldown();
 		}
+	}
+
+	@Override
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() != DamageEvent.DamageType.AILMENT
+			&& mEnhancementBonusDamage > 0) {
+			event.setDamage(event.getDamage() + mEnhancementBonusDamage);
+			mEnhancementBonusDamage = 0;
+		}
+
+		return false;
 	}
 }
