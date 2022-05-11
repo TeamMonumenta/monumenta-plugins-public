@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,6 +123,10 @@ public class HuntingCompanion extends Ability {
 			mFox = (Fox) LibraryOfSoulsIntegration.summon(loc.clone().add(sideOffset).add(facingDirection.clone().setY(0).normalize().multiply(-0.25)), FOX_NAME); // adds facing direction so golem doesn't spawn inside user
 			if (mFox == null) {
 				return;
+			}
+
+			if (LocationUtils.isInSnowyBiome(mFox.getLocation())) {
+				mFox.setFoxType(Fox.Type.SNOW);
 			}
 
 			double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
