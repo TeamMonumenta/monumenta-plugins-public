@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -40,6 +41,7 @@ public class PinningShot extends Ability {
 		super(plugin, player, "Pinning Shot");
 		mInfo.mScoreboardId = "PinningShot";
 		mInfo.mShorthandName = "PSh";
+		mInfo.mLinkedSpell = ClassAbility.PINNING_SHOT;
 		mInfo.mDescriptions.add("The first time you shoot a non-boss enemy, pin it for 2.5s. Pinned enemies are afflicted with 100% Slowness and 30% Weaken (Bosses receive 30% Slowness and no Weaken). Shooting a pinned non-boss enemy deals 10% of its max health on top of regular damage and removes the pin. A mob cannot be pinned more than once.");
 		mInfo.mDescriptions.add("Weaken increased to 60% and bonus damage increased to 20% max health.");
 		mDisplayItem = new ItemStack(Material.CROSSBOW, 1);

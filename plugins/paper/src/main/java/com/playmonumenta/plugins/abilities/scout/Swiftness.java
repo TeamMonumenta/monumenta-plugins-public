@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -107,15 +108,20 @@ public class Swiftness extends Ability {
 			MessagingUtils.sendActionBarMessage(mPlayer, "Jump Boost has been turned on");
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 1.6f);
 		}
+		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	private static void addModifier(Player player) {
 		EntityUtils.addAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED,
-				new AttributeModifier(SWIFTNESS_SPEED_MODIFIER, SWIFTNESS_SPEED_BONUS, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			new AttributeModifier(SWIFTNESS_SPEED_MODIFIER, SWIFTNESS_SPEED_BONUS, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 	}
 
 	private static void removeModifier(Player player) {
 		EntityUtils.removeAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, SWIFTNESS_SPEED_MODIFIER);
 	}
 
+	@Override
+	public @Nullable String getMode() {
+		return mJumpBoost ? null : "disabled";
+	}
 }

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -19,7 +20,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -35,6 +35,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 
 public class HandOfLight extends Ability {
@@ -216,6 +217,7 @@ public class HandOfLight extends Ability {
 			mode = "healing";
 		}
 		mPlayer.sendActionBar(ChatColor.YELLOW + "Hand of Light has been set to " + mode + " mode!");
+		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	@Override
@@ -228,10 +230,15 @@ public class HandOfLight extends Ability {
 
 		//Must be holding weapon, tool, or shield
 		if (ItemUtils.isSomeBow(mainhand) || ItemUtils.isSomePotion(mainhand) || mainhand.getType().isBlock()
-			|| mainhand.getType().isEdible() || mainhand.getType() == Material.TRIDENT || mainhand.getType() == Material.COMPASS) {
+			    || mainhand.getType().isEdible() || mainhand.getType() == Material.TRIDENT || mainhand.getType() == Material.COMPASS) {
 			return false;
 		}
 
 		return true;
+	}
+
+	@Override
+	public @Nullable String getMode() {
+		return mDamageMode ? "damage" : null;
 	}
 }

@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -18,7 +19,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import javax.annotation.Nullable;
+import java.util.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -36,6 +37,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 
 
@@ -57,7 +59,11 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 	private @Nullable Crusade mCrusade;
 
-	private int mMode = 0;
+	private enum Mode {
+		DEFAULT, HEALING, ATTACK
+	}
+
+	private Mode mMode = Mode.DEFAULT;
 	private int mLastCastTicks = 0;
 
 	public HallowedBeam(Plugin plugin, @Nullable Player player) {
@@ -75,7 +81,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 		mMaxCharges = getAbilityScore() == 1 ? HALLOWED_1_MAX_CHARGES : HALLOWED_2_MAX_CHARGES;
 		mCharges = getTrackedCharges();
 		if (player != null) {
-			mMode = ScoreboardUtils.getScoreboardValue(player, MODE_SCOREBOARD).orElse(0);
+			int modeIndex = ScoreboardUtils.getScoreboardValue(player, MODE_SCOREBOARD).orElse(0);
+			mMode = Mode.values()[Math.max(0, Math.min(modeIndex, Mode.values().length - 1))];
 		}
 
 		if (player != null) {
@@ -125,7 +132,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 							}
 						}
 						if (applyE instanceof Player pe && pe.getGameMode() != GameMode.SPECTATOR) {
-							if (mMode == 2) {
+							if (mMode == Mode.ATTACK) {
 								incrementCharge();
 								this.cancel();
 								return;
@@ -157,7 +164,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 							}
 
 						} else if (Crusade.enemyTriggersAbilities(applyE, mCrusade)) {
-							if (mMode == 1) {
+							if (mMode == Mode.HEALING) {
 								incrementCharge();
 								this.cancel();
 								return;
@@ -183,7 +190,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 							new PartialParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f).spawnAsPlayerActive(mPlayer);
 							new PartialParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f).spawnAsPlayerActive(mPlayer);
 						} else if (EntityUtils.isHostileMob(applyE)) {
-							if (mMode == 1) {
+							if (mMode == Mode.HEALING) {
 								incrementCharge();
 								this.cancel();
 								return;
@@ -239,17 +246,23 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 		if (ItemUtils.isBowOrTrident(inMainHand) && !mPlayer.isSneaking()) {
 			event.setCancelled(true);
-			if (mMode == 0) {
-				mMode = 1;
+			if (mMode == Mode.DEFAULT) {
+				mMode = Mode.HEALING;
 				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Mode: " + "Healing");
-			} else if (mMode == 1) {
-				mMode = 2;
+			} else if (mMode == Mode.HEALING) {
+				mMode = Mode.ATTACK;
 				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Mode: " + "Attack");
 			} else {
-				mMode = 0;
+				mMode = Mode.DEFAULT;
 				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Mode: " + "Default");
 			}
-			ScoreboardUtils.setScoreboardValue(mPlayer, MODE_SCOREBOARD, mMode);
+			ScoreboardUtils.setScoreboardValue(mPlayer, MODE_SCOREBOARD, mMode.ordinal());
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
+	}
+
+	@Override
+	public @Nullable String getMode() {
+		return mMode.name().toLowerCase(Locale.ROOT);
 	}
 }

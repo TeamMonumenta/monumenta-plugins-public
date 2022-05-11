@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
@@ -122,6 +123,7 @@ public class AlchemicalArtillery extends Ability {
 			}
 			mPlayer.sendActionBar(ChatColor.YELLOW + "Alchemical Artillery has been " + active + "!");
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 0.9f, 1.2f);
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 	}
 
@@ -146,5 +148,10 @@ public class AlchemicalArtillery extends Ability {
 
 	public boolean isActive() {
 		return mActive;
+	}
+
+	@Override
+	public @Nullable String getMode() {
+		return mActive ? "active" : null;
 	}
 }

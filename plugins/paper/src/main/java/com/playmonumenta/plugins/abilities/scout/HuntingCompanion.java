@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -229,10 +230,14 @@ public class HuntingCompanion extends Ability {
 
 		loc.add(sideOffset).add(facingDirection.clone().setY(0).normalize().multiply(-0.25));
 
-		Mob fox = (Mob) LibraryOfSoulsIntegration.summon(loc, FOX_NAME);
+		Fox fox = (Fox) LibraryOfSoulsIntegration.summon(loc, FOX_NAME);
 		if (fox == null) {
 			MMLog.warning("Failed to spawn FoxCompanion from Library of Souls");
 			return;
+		}
+
+		if (LocationUtils.isInSnowyBiome(loc)) {
+			fox.setFoxType(Fox.Type.SNOW);
 		}
 
 		fox.setVelocity(facingDirection.clone().setY(JUMP_HEIGHT).normalize().multiply(VELOCITY));

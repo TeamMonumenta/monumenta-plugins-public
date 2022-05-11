@@ -4,11 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
@@ -1257,5 +1259,29 @@ public class LocationUtils {
 		 * @param location Valid Location interval to run your code off
 		 */
 		void run(Location location);
+	}
+
+	private static EnumSet<Biome> SNOWY_BIOMES = EnumSet.of(
+		Biome.DEEP_FROZEN_OCEAN,
+		Biome.FROZEN_OCEAN,
+		Biome.FROZEN_RIVER,
+		Biome.ICE_SPIKES,
+		Biome.SNOWY_BEACH,
+		Biome.SNOWY_MOUNTAINS,
+		Biome.SNOWY_TAIGA,
+		Biome.SNOWY_TUNDRA,
+		Biome.SNOWY_TAIGA_HILLS,
+		Biome.SNOWY_TAIGA_MOUNTAINS,
+		Biome.TAIGA,
+		Biome.TAIGA_HILLS,
+		Biome.TAIGA_MOUNTAINS,
+		Biome.GIANT_SPRUCE_TAIGA,
+		Biome.GIANT_SPRUCE_TAIGA_HILLS,
+		Biome.GIANT_TREE_TAIGA,
+		Biome.GIANT_TREE_TAIGA_HILLS
+	);
+
+	public static boolean isInSnowyBiome(Location loc) {
+		return SNOWY_BIOMES.contains(loc.getBlock().getBiome());
 	}
 }

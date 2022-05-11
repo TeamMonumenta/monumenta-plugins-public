@@ -11,12 +11,12 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.EnumSet;
 import java.util.NavigableSet;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -27,6 +27,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class DarkPact extends Ability {
 
@@ -50,8 +51,8 @@ public class DarkPact extends Ability {
 
 	private final double mPercentDamageDealt;
 	private final double mPercentAtks;
-	private int mTicks = 0;
 	private @Nullable JudgementChain mJudgementChain;
+	private boolean mActive = false;
 
 	public DarkPact(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Dark Pact");
@@ -106,7 +107,6 @@ public class DarkPact extends Ability {
 
 			putOnCooldown();
 
-			mTicks = DURATION;
 		}
 	}
 
@@ -114,9 +114,6 @@ public class DarkPact extends Ability {
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		if (mPlayer == null) {
 			return;
-		}
-		if (mTicks != 0) {
-			mTicks += DURATION_INCREASE_ON_KILL;
 		}
 		NavigableSet<Effect> aestheticsEffects = mPlugin.mEffectManager.getEffects(mPlayer, AESTHETICS_EFFECT_NAME);
 		if (aestheticsEffects != null) {
@@ -143,5 +140,19 @@ public class DarkPact extends Ability {
 				effect.setDuration(effect.getDuration() + DURATION_INCREASE_ON_KILL);
 			}
 		}
+	}
+
+	@Override
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		boolean wasActive = mActive;
+		mActive = mPlugin.mEffectManager.hasEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME);
+		if (wasActive != mActive) {
+			ClientModHandler.updateAbility(mPlayer, this);
+		}
+	}
+
+	@Override
+	public @Nullable String getMode() {
+		return mActive ? "active" : null;
 	}
 }

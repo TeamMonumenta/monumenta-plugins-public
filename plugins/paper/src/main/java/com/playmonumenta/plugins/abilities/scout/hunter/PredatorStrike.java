@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -13,10 +14,8 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -31,6 +30,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 
 public class PredatorStrike extends Ability {
@@ -45,7 +45,7 @@ public class PredatorStrike extends Ability {
 	private static final double HITBOX_LENGTH = 0.5;
 
 	private boolean mActive = false;
-	private double mDistanceScale;
+	private final double mDistanceScale;
 
 	public PredatorStrike(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Predator Strike");
@@ -68,6 +68,7 @@ public class PredatorStrike extends Ability {
 			if (ItemUtils.isBowOrTrident(mainHand)) {
 				Player player = mPlayer;
 				mActive = true;
+				ClientModHandler.updateAbility(mPlayer, this);
 				World world = mPlayer.getWorld();
 				world.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, 1, 1.0f);
 				new BukkitRunnable() {
@@ -80,6 +81,7 @@ public class PredatorStrike extends Ability {
 						if (!mActive || mTicks >= 20 * 5) {
 							mActive = false;
 							this.cancel();
+							ClientModHandler.updateAbility(mPlayer, PredatorStrike.this);
 						}
 					}
 				}.runTaskTimer(mPlugin, 0, 1);
@@ -90,10 +92,10 @@ public class PredatorStrike extends Ability {
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		if (mPlayer != null && mActive && (arrow.isCritical() || arrow instanceof Trident)) {
+			mActive = false;
 			putOnCooldown();
 			arrow.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
-			mActive = false;
 
 			Location loc = mPlayer.getEyeLocation();
 			Vector direction = loc.getDirection();
@@ -118,9 +120,7 @@ public class PredatorStrike extends Ability {
 					return true;
 				}
 
-				Iterator<LivingEntity> iter = nearbyMobs.iterator();
-				while (iter.hasNext()) {
-					LivingEntity mob = iter.next();
+				for (LivingEntity mob : nearbyMobs) {
 					if (mob.getBoundingBox().overlaps(box)) {
 						if (EntityUtils.isHostileMob(mob)) {
 							explode(bLoc);
@@ -154,5 +154,10 @@ public class PredatorStrike extends Ability {
 			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE, damage, mInfo.mLinkedSpell, true);
 		}
 		Sharpshooter.addStacks(mPlayer, mobs.size());
+	}
+
+	@Override
+	public @Nullable String getMode() {
+		return mActive ? "active" : null;
 	}
 }
