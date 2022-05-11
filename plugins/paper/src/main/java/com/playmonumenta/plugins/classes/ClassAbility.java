@@ -87,6 +87,7 @@ public enum ClassAbility {
 	// Hunter
 	PREDATOR_STRIKE("Predator Strike"),
 	SPLIT_ARROW("Split Arrow"),
+	PINNING_SHOT("Pinning Shot"),
 
 	// Ranger
 	TACTICAL_MANEUVER("Tactical Maneuver"),
