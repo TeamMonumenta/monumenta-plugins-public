@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.WindBombAirTag;
 import com.playmonumenta.plugins.listeners.DamageListener;
@@ -37,6 +38,13 @@ public class WindBomb extends Ability {
 	private static final double MIDAIR_DAMAGE_BONUS = 0.2;
 	private static final int RADIUS = 3;
 	private static final double VELOCITY = 1.5;
+	private static final String AIR_TAG = "WindBombAirTag";
+
+	private static final int PULL_INTERVAL = 10;
+	private static final double PULL_VELOCITY = 0.35;
+	private static final double PULL_RADIUS = 16;
+	private static final int PULL_DURATION = 3 * 20;
+	private static final double PULL_RATIO = 0.12;
 
 	private @Nullable Snowball mProj = null;
 
@@ -47,6 +55,7 @@ public class WindBomb extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.WIND_BOMB;
 		mInfo.mDescriptions.add("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, launches mobs in a 3 block radius into the air, giving them Slow Falling and 20% Weaken for 4s. Cannot be used while holding a trident or snowball. Cooldown: 15s.");
 		mInfo.mDescriptions.add("The cooldown is reduced to 10s. Additionally, you deal 20% more damage to enemies made airborne by this skill, until they hit the ground.");
+		mInfo.mDescriptions.add("On impact, generate a vortex that pulls mobs within 16 blocks toward the center for 3 seconds.");
 		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.TNT, 1);
@@ -105,8 +114,45 @@ public class WindBomb extends Ability {
 				}
 				EntityUtils.applyWeaken(mPlugin, DURATION, WEAKEN_EFFECT, mob);
 				if (isLevelTwo()) {
-					mPlugin.mEffectManager.addEffect(mob, "WindBombAirTag", new WindBombAirTag(DURATION * 2, MIDAIR_DAMAGE_BONUS, mPlayer));
+					mPlugin.mEffectManager.addEffect(mob, AIR_TAG, new WindBombAirTag(DURATION * 2, MIDAIR_DAMAGE_BONUS, mPlayer));
 				}
+			}
+
+			if (isEnhanced()) {
+				loc.add(0, 2, 0);
+				world.spawnParticle(Particle.CLOUD, loc, 35, 4, 4, 4, 0.125);
+				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 25, 2, 2, 2, 0.125);
+				world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.8f, 1f);
+				world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, 0.8f, 1);
+
+				new BukkitRunnable() {
+					int mTicks = 0;
+
+					@Override
+					public void run() {
+						mTicks++;
+						if (mTicks % PULL_INTERVAL == 0) {
+							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, PULL_RADIUS)) {
+								if (!(EntityUtils.isBoss(mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
+									Vector vector = mob.getLocation().toVector().subtract(loc.toVector());
+									double ratio = PULL_RATIO + vector.length() / PULL_RADIUS;
+									Vector velocity = mob.getVelocity().add(vector.normalize().multiply(PULL_VELOCITY).multiply(-ratio).add(new Vector(0, 0.1 + 0.2 * ratio, 0)));
+									if (mPlugin.mEffectManager.hasEffect(mob, AIR_TAG)) {
+										// If mob was launched by the ability, don't change their Y
+										velocity.setY(mob.getVelocity().getY());
+									}
+									mob.setVelocity(velocity);
+								}
+							}
+						}
+						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 6, 2, 2, 2, 0.1);
+						world.spawnParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05);
+						world.spawnParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15);
+						if (mTicks >= PULL_DURATION) {
+							this.cancel();
+						}
+					}
+				}.runTaskTimer(mPlugin, 0, 1);
 			}
 
 			proj.remove();
