@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ProtocolLibIntegration {
 
-	private final PlayerTitlePacketAdapter mPlayerTitlePacketAdapter;
+	private final PlayerTitleManager mPlayerTitleManager;
 
 	private @Nullable PacketMonitor mPacketMonitor;
 
@@ -37,10 +37,9 @@ public class ProtocolLibIntegration {
 		syncManager.addPacketListener(new EntityEquipmentReplacer(plugin));
 		syncManager.addPacketListener(new WorldNameReplacer(plugin));
 
-		mPlayerTitlePacketAdapter = new PlayerTitlePacketAdapter(syncManager, plugin);
-		syncManager.addPacketListener(mPlayerTitlePacketAdapter);
+		mPlayerTitleManager = new PlayerTitleManager(syncManager);
 
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::tick, 2, 2);
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::tick, 1, 1);
 
 		if (Bukkit.getPluginManager().isPluginEnabled("PrometheusExporter")) {
 			mPacketMonitor = new PacketMonitor(plugin);
@@ -48,9 +47,9 @@ public class ProtocolLibIntegration {
 		}
 	}
 
-	// called every 2 ticks
+	// called every tick
 	private void tick() {
-		mPlayerTitlePacketAdapter.tick();
+		mPlayerTitleManager.tick();
 	}
 
 	public void enablePacketMonitor(CommandSender sender, boolean enable, boolean fullReporting) {
