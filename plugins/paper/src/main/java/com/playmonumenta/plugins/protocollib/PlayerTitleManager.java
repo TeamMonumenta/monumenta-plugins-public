@@ -87,14 +87,18 @@ public class PlayerTitleManager {
 		for (Player player : onlinePlayers) {
 			PlayerMetadata metadata = METADATA.get(player.getUniqueId());
 
-			// If the player became invalid (died, maybe more) or became spectator/vanished remove all titles
-			if (!player.isValid() || PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
+			// If the player became invalid (died, maybe more), logged out (despite being online?), or became spectator/vanished remove all titles
+			if (!player.isValid() || !player.isOnline() || PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
 				if (metadata != null) {
 					METADATA.remove(player.getUniqueId());
 					if (!metadata.mVisibleToPlayers.isEmpty()) {
 						PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
 						packet.getIntegerArrays().write(0, metadata.mLines.stream().mapToInt(line -> line.mArmorStand.mId).toArray());
-						broadcastPacketNoFilters(packet, player, metadata.mVisibleToPlayers);
+						for (Player otherPlayer : Bukkit.getOnlinePlayers()) {
+							if (metadata.mVisibleToPlayers.contains(otherPlayer.getUniqueId())) {
+								sendPacketNoFilters(otherPlayer, packet);
+							}
+						}
 					}
 				}
 				continue;
@@ -113,7 +117,13 @@ public class PlayerTitleManager {
 			}
 
 			// remove entities from players no longer in range
-			List<Player> trackers = mProtocolManager.getEntityTrackers(player);
+			List<Player> trackers;
+			try {
+				trackers = mProtocolManager.getEntityTrackers(player);
+			} catch (IllegalArgumentException e) {
+				// ProtocolLib sometimes throws this if it cannot find trackers. Appears to happen near logout.
+				continue;
+			}
 			for (Iterator<UUID> iterator = metadata.mVisibleToPlayers.iterator(); iterator.hasNext(); ) {
 				UUID visibleToPlayer = iterator.next();
 				if (trackers.stream().noneMatch(tracker -> tracker.getUniqueId().equals(visibleToPlayer))) {
