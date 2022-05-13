@@ -1,5 +1,6 @@
 package com.playmonumenta.bungeecord;
 
+import com.playmonumenta.bungeecord.commands.Proxy;
 import com.playmonumenta.bungeecord.commands.Vote;
 import com.playmonumenta.bungeecord.integrations.NetworkRelayIntegration;
 import com.playmonumenta.bungeecord.listeners.EventListener;
@@ -32,6 +33,7 @@ public class Main extends Plugin {
 		// Hook into Monumenta Network Relay for message brokering if available
 		if (manager.getPlugin("MonumentaNetworkRelay") != null) {
 			manager.registerListener(this, new NetworkRelayIntegration(this.getLogger()));
+			manager.registerCommand(this, new Proxy());
 		}
 
 		if (!mConfig.contains("voting")) {
