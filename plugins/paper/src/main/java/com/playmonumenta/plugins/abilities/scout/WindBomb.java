@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,7 +43,7 @@ public class WindBomb extends Ability {
 
 	private static final int PULL_INTERVAL = 10;
 	private static final double PULL_VELOCITY = 0.35;
-	private static final double PULL_RADIUS = 16;
+	private static final double PULL_RADIUS = 8;
 	private static final int PULL_DURATION = 3 * 20;
 	private static final double PULL_RATIO = 0.12;
 
@@ -55,7 +56,7 @@ public class WindBomb extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.WIND_BOMB;
 		mInfo.mDescriptions.add("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, launches mobs in a 3 block radius into the air, giving them Slow Falling and 20% Weaken for 4s. Cannot be used while holding a trident or snowball. Cooldown: 15s.");
 		mInfo.mDescriptions.add("The cooldown is reduced to 10s. Additionally, you deal 20% more damage to enemies made airborne by this skill, until they hit the ground.");
-		mInfo.mDescriptions.add("On impact, generate a vortex that pulls mobs within 16 blocks toward the center for 3 seconds.");
+		mInfo.mDescriptions.add("On impact, generate a vortex that pulls mobs within 8 blocks toward the center for 3 seconds.");
 		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.TNT, 1);
@@ -133,7 +134,7 @@ public class WindBomb extends Ability {
 						mTicks++;
 						if (mTicks % PULL_INTERVAL == 0) {
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, PULL_RADIUS)) {
-								if (!(EntityUtils.isBoss(mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
+								if (!(EntityUtils.isBoss(mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag) || ZoneUtils.hasZoneProperty(mob.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES))) {
 									Vector vector = mob.getLocation().toVector().subtract(loc.toVector());
 									double ratio = PULL_RATIO + vector.length() / PULL_RADIUS;
 									Vector velocity = mob.getVelocity().add(vector.normalize().multiply(PULL_VELOCITY).multiply(-ratio).add(new Vector(0, 0.1 + 0.2 * ratio, 0)));
