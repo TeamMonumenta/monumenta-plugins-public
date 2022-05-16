@@ -858,6 +858,8 @@ public class PlayerListener implements Listener {
 		if (!cause.equals(TeleportCause.UNKNOWN) && !cause.equals(TeleportCause.ENDER_PEARL) && !player.getGameMode().equals(GameMode.SPECTATOR) && !cause.equals(TeleportCause.SPECTATE)) {
 			runTeleportRunnable(player, loc);
 		}
+
+		mPlugin.mAbilityManager.playerTeleportEvent(player, event);
 	}
 
 	public void runTeleportRunnable(Player player, Location loc) {

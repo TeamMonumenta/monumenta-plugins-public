@@ -34,7 +34,7 @@ public class PrismaticShield extends Ability {
 	private static final int COOLDOWN_2 = 70 * 20;
 	private static final float KNOCKBACK_SPEED = 0.7f;
 	private static final int STUN_DURATION = 20;
-	private static final int HEAL_DURATION = 5 * 20;
+	private static final int HEAL_DURATION = 3 * 20;
 	private static final int HEAL_PERCENT = 5;
 	private static final String HEALED_THIS_TICK_METAKEY = "PrismaticShieldHealedThisTick";
 

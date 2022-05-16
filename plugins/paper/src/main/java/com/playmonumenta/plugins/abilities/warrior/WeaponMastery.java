@@ -41,6 +41,7 @@ public class WeaponMastery extends Ability {
 		mInfo.mShorthandName = "WM";
 		mInfo.mDescriptions.add("You gain 10% damage resistance while holding a sword. Additionally, your axe damage is increased by +2 plus 5% of final damage done.");
 		mInfo.mDescriptions.add("Increase axe damage by +4 plus 10% of final damage done and increase sword damage by +1 plus 10% of final damage done.");
+		mInfo.mDescriptions.add("Gain +15% attack when using an axe. Deal +10% final damage and apply 10% weaken for 4s when using a sword.");
 		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
 		mDamageBonusAxeFlat = isLevelOne() ? AXE_1_DAMAGE_FLAT : AXE_2_DAMAGE_FLAT;
 		mDamageBonusSwordFlat = isLevelOne() ? 0 : SWORD_2_DAMAGE_FLAT;

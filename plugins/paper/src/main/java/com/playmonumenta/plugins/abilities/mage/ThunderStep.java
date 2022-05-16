@@ -60,9 +60,7 @@ public class ThunderStep extends Ability {
 
 	public static final double BACK_TELEPORT_MAX_DISTANCE = 64;
 	public static final int BACK_TELEPORT_MAX_DELAY = 3 * 20;
-	public static final float BACK_TELEPORT_DAMAGE_MULTIPLIER = 0.5f;
 	public static final int ENHANCEMENT_BONUS_DAMAGE_TIMER = 30 * 20;
-	public static final float ENHANCEMENT_BONUS_DAMAGE_MULTIPLIER = 1.5f;
 	public static final int ENHANCEMENT_PARALYZE_DURATION = 5 * 20;
 
 	private final int mLevelDamage;
@@ -103,12 +101,10 @@ public class ThunderStep extends Ability {
 		);
 		mInfo.mDescriptions.add(
 			String.format("You are now able to recast this skill after the original cast within %ss." +
-				              " If you do, you get teleported back to the original starting location and %s%% of the original damage is dealt again." +
-				              " If you instead choose to not recast the skill, your next Thunder Step within %ss will deal %s%% extra damage and paralyze enemies for %ss.",
+				              " If you do, you get teleported back to the original starting location, stunning but not damaging nearby mobs." +
+				              " If you instead choose to not recast the skill, your next Thunder Step within %ss will paralyze enemies for %ss.",
 				BACK_TELEPORT_MAX_DELAY / 20,
-				(int) (100 * BACK_TELEPORT_DAMAGE_MULTIPLIER),
 				ENHANCEMENT_BONUS_DAMAGE_TIMER / 20,
-				(int) (100 * ENHANCEMENT_BONUS_DAMAGE_MULTIPLIER - 100),
 				ENHANCEMENT_PARALYZE_DURATION / 20
 			)
 		);
@@ -146,11 +142,10 @@ public class ThunderStep extends Ability {
 					    && mLastCastLocation.getWorld() == mPlayer.getWorld()
 					    && mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
 
-					float spellDamage = BACK_TELEPORT_DAMAGE_MULTIPLIER * SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-					doDamage(mPlayer.getLocation(), spellDamage, false);
+					doDamage(mPlayer.getLocation(), 0, false);
 					mLastCastLocation.setDirection(mPlayer.getLocation().getDirection());
 					mPlayer.teleport(mLastCastLocation, PlayerTeleportEvent.TeleportCause.UNKNOWN);
-					doDamage(mLastCastLocation, spellDamage, false);
+					doDamage(mLastCastLocation, 0, false);
 
 					// prevent further back teleports as well as paralyze of any further casts
 					mLastCastLocation = null;
@@ -172,9 +167,6 @@ public class ThunderStep extends Ability {
 				mLastCastTick = mPlayer.getTicksLived();
 
 				float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-				if (doParalyze) {
-					spellDamage *= ENHANCEMENT_BONUS_DAMAGE_MULTIPLIER;
-				}
 
 				Location playerStartLocation = mPlayer.getLocation();
 				doDamage(playerStartLocation, spellDamage, doParalyze);
@@ -223,7 +215,10 @@ public class ThunderStep extends Ability {
 		);
 
 		for (LivingEntity enemy : enemies) {
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, spellDamage, ABILITY, true);
+			if (spellDamage > 0) {
+				DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, spellDamage, ABILITY, true);
+			}
+
 			if (mDoStun && !EntityUtils.isBoss(enemy)) {
 				EntityUtils.applyStun(mPlugin, STUN_TICKS, enemy);
 			}
@@ -235,6 +230,12 @@ public class ThunderStep extends Ability {
 			new PartialParticle(Particle.CLOUD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.END_ROD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
 		}
+	}
+
+	@Override
+	public void playerTeleportEvent(PlayerTeleportEvent event) {
+		// Might trigger too often
+		mLastCastLocation = null;
 	}
 
 }

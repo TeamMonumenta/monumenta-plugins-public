@@ -190,6 +190,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class AbilityManager {
 
@@ -791,6 +792,10 @@ public class AbilityManager {
 
 	public void playerRegainHealthEvent(Player player, EntityRegainHealthEvent event) {
 		conditionalCast(player, (ability) -> ability.playerRegainHealthEvent(event));
+	}
+
+	public void playerTeleportEvent(Player player, PlayerTeleportEvent event) {
+		conditionalCast(player, (ability) -> ability.playerTeleportEvent(event));
 	}
 
 	public void playerQuitEvent(Player player, PlayerQuitEvent event) {

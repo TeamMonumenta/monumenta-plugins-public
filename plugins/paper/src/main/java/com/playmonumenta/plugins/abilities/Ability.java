@@ -35,6 +35,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -299,6 +300,10 @@ public abstract class Ability {
 	}
 
 	public void playerQuitEvent(PlayerQuitEvent event) {
+
+	}
+
+	public void playerTeleportEvent(PlayerTeleportEvent event) {
 
 	}
 
