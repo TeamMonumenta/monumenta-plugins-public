@@ -4,6 +4,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -49,7 +50,12 @@ public class ProtocolLibIntegration {
 
 	// called every tick
 	private void tick() {
-		mPlayerTitleManager.tick();
+		try {
+			mPlayerTitleManager.tick();
+		} catch (Exception e) {
+			MMLog.severe("Exception in ProtocolLibIntegration.tick():");
+			e.printStackTrace();
+		}
 	}
 
 	public void enablePacketMonitor(CommandSender sender, boolean enable, boolean fullReporting) {

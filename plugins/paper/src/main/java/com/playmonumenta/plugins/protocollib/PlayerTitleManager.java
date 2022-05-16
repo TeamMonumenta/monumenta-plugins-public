@@ -16,6 +16,7 @@ import io.papermc.paper.adventure.AdventureComponent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -87,22 +88,19 @@ public class PlayerTitleManager {
 		for (Player player : onlinePlayers) {
 			PlayerMetadata metadata = METADATA.get(player.getUniqueId());
 
-			// If the player became invalid (died, maybe more) or became spectator/vanished remove all titles
-			if (!player.isValid() || PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
+			// If the player became invalid (died, maybe more), logged out (despite being online?), or became spectator/vanished remove all titles
+			if (!player.isValid() || !player.isOnline() || PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
 				if (metadata != null) {
 					METADATA.remove(player.getUniqueId());
-					if (!metadata.mVisibleToPlayers.isEmpty()) {
-						PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
-						packet.getIntegerArrays().write(0, metadata.mLines.stream().mapToInt(line -> line.mArmorStand.mId).toArray());
-						broadcastPacketNoFilters(packet, player, metadata.mVisibleToPlayers);
-					}
+					destroyEntities(metadata);
 				}
 				continue;
 			}
 
-			// Force new entities to be created when the player switches worlds
-			if (metadata != null && !player.getWorld().equals(metadata.mLastLocation.getWorld())) {
+			// Force new entities to be created when the player switches worlds or teleports a large distance (> 100 blocks)
+			if (metadata != null && (!player.getWorld().equals(metadata.mLastLocation.getWorld()) || metadata.mLastLocation.distanceSquared(player.getLocation()) > 10000)) {
 				METADATA.remove(player.getUniqueId());
+				destroyEntities(metadata);
 				metadata = null;
 			}
 
@@ -113,7 +111,7 @@ public class PlayerTitleManager {
 			}
 
 			// remove entities from players no longer in range
-			List<Player> trackers = mProtocolManager.getEntityTrackers(player);
+			List<Player> trackers = getEntityTrackers(player);
 			for (Iterator<UUID> iterator = metadata.mVisibleToPlayers.iterator(); iterator.hasNext(); ) {
 				UUID visibleToPlayer = iterator.next();
 				if (trackers.stream().noneMatch(tracker -> tracker.getUniqueId().equals(visibleToPlayer))) {
@@ -139,7 +137,7 @@ public class PlayerTitleManager {
 					}
 					List<PacketContainer> packets = getSpawnLinesPackets(player, metadata, existingSize);
 					for (PacketContainer packet : packets) {
-						broadcastPacketNoFilters(packet, player, metadata.mVisibleToPlayers);
+						broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
 					}
 				}
 
@@ -149,7 +147,7 @@ public class PlayerTitleManager {
 
 					PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
 					packet.getIntegerArrays().write(0, subList.stream().mapToInt(line -> line.mArmorStand.mId).toArray());
-					broadcastPacketNoFilters(packet, player, metadata.mVisibleToPlayers);
+					broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
 
 					subList.clear();
 				}
@@ -173,7 +171,7 @@ public class PlayerTitleManager {
 							PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
 							packet.getIntegers().write(0, armorStand.mId);
 							packet.getWatchableCollectionModifier().write(0, new ArrayList<>(List.of(nameWatchableObject))); // protocollib needs an ArrayList
-							broadcastPacketNoFilters(packet, player, metadata.mVisibleToPlayers);
+							broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
 						}
 					}
 				}
@@ -199,7 +197,7 @@ public class PlayerTitleManager {
 						packet.getShorts().write(0, (short) ((location.getX() - metadata.mLastLocation.getX()) * 32 * 128))
 							.write(1, (short) ((location.getY() - metadata.mLastLocation.getY()) * 32 * 128))
 							.write(2, (short) ((location.getZ() - metadata.mLastLocation.getZ()) * 32 * 128));
-						broadcastPacketNoFilters(packet, player, metadata.mVisibleToPlayers);
+						broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
 					}
 				} else {
 					for (LineMetadata line : metadata.mLines) {
@@ -209,7 +207,7 @@ public class PlayerTitleManager {
 						packet.getDoubles().write(0, location.getX())
 							.write(1, location.getY() + line.mHeight)
 							.write(2, location.getZ());
-						broadcastPacketNoFilters(packet, player, metadata.mVisibleToPlayers);
+						broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
 					}
 				}
 				metadata.mLastLocation = location;
@@ -232,14 +230,7 @@ public class PlayerTitleManager {
 			if (Bukkit.getPlayer(entry.getKey()) == null) {
 				iterator.remove();
 				PlayerMetadata metadata = entry.getValue();
-				PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
-				packet.getIntegerArrays().write(0, metadata.mLines.stream().mapToInt(line -> line.mArmorStand.mId).toArray());
-				for (UUID visibleToPlayer : metadata.mVisibleToPlayers) {
-					Player player = Bukkit.getPlayer(visibleToPlayer);
-					if (player != null) {
-						sendPacketNoFilters(player, packet);
-					}
-				}
+				destroyEntities(metadata);
 			}
 		}
 
@@ -297,7 +288,7 @@ public class PlayerTitleManager {
 		armorStand.setCollidable(false);
 		EntityMetadata armorStandMetadata = new EntityMetadata(armorStand);
 
-		double height = 0.1 + index * 0.25;
+		double height = 0.15 + index * 0.25;
 
 		return new LineMetadata(armorStandMetadata, height);
 	}
@@ -328,17 +319,23 @@ public class PlayerTitleManager {
 		return result;
 	}
 
+	private void destroyEntities(PlayerMetadata metadata) {
+		if (!metadata.mVisibleToPlayers.isEmpty()) {
+			PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
+			packet.getIntegerArrays().write(0, metadata.mLines.stream().mapToInt(line -> line.mArmorStand.mId).toArray());
+			broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
+			metadata.mVisibleToPlayers.clear();
+		}
+	}
+
+
 	/**
-	 * Broadcasts a packet to all trackers of the given entity that are also in the given set, ignoring packet filters/listeners.
+	 * Broadcasts a packet to all player in the given set, ignoring packet filters/listeners.
 	 */
-	private void broadcastPacketNoFilters(PacketContainer packet, Entity entity, Set<UUID> visibleToPlayers) {
-		for (Player tracker : mProtocolManager.getEntityTrackers(entity)) {
-			if (visibleToPlayers.contains(tracker.getUniqueId())) {
-				try {
-					mProtocolManager.sendServerPacket(tracker, packet, false);
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-				}
+	private void broadcastPacketNoFilters(PacketContainer packet, Set<UUID> visibleToPlayers) {
+		for (Player otherPlayer : Bukkit.getOnlinePlayers()) {
+			if (visibleToPlayers.contains(otherPlayer.getUniqueId())) {
+				sendPacketNoFilters(otherPlayer, packet);
 			}
 		}
 	}
@@ -348,6 +345,15 @@ public class PlayerTitleManager {
 			mProtocolManager.sendServerPacket(receiver, packet, false);
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private List<Player> getEntityTrackers(Entity entity) {
+		try {
+			return mProtocolManager.getEntityTrackers(entity);
+		} catch (IllegalArgumentException e) {
+			// ProtocolLib sometimes throws this if it cannot find trackers. Appears to happen near logout.
+			return Collections.emptyList();
 		}
 	}
 
