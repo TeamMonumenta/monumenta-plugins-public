@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -59,6 +60,13 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final int CAST_RANGE = 30;
 	private static final String MODE_SCOREBOARD = "HallowedBeamMode";
 
+	public static final String CHARM_DAMAGE = "Hallowed Beam Damage";
+	public static final String CHARM_COOLDOWN = "Hallowed Beam Cooldown";
+	public static final String CHARM_HEAL = "Hallowed Beam Healing";
+	public static final String CHARM_DISTANCE = "Hallowed Beam Distance";
+	public static final String CHARM_STUN = "Hallowed Beam Stun Duration";
+	public static final String CHARM_CHARGE = "Hallowed Beam Charge";
+
 	private @Nullable Crusade mCrusade;
 
 	private enum Mode {
@@ -75,12 +83,11 @@ public class HallowedBeam extends MultipleChargeAbility {
 		mInfo.mDescriptions.add("Left-click with a bow or crossbow while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 30% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals projectile damage equal to the used weapon's projectile damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a bow will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). This skill can only apply Recoil twice before touching the ground. Cooldown: 16s each charge.");
 		mInfo.mDescriptions.add("Hallowed Beam gains a third charge (and can apply Recoil three times before touching the ground), the cooldown is reduced to 12 seconds, and players healed by it gain 10% damage resistance for 5 seconds.");
 		mInfo.mLinkedSpell = ClassAbility.HALLOWED_BEAM;
-		mInfo.mCooldown = isLevelOne() ? HALLOWED_1_COOLDOWN : HALLOWED_2_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? HALLOWED_1_COOLDOWN : HALLOWED_2_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BOW, 1);
-		mMaxCharges = isLevelOne() ? HALLOWED_1_MAX_CHARGES : HALLOWED_2_MAX_CHARGES;
-		mMaxCharges = getAbilityScore() == 1 ? HALLOWED_1_MAX_CHARGES : HALLOWED_2_MAX_CHARGES;
+		mMaxCharges = (int) CharmManager.getLevel(player, CHARM_CHARGE) + (isLevelOne() ? HALLOWED_1_MAX_CHARGES : HALLOWED_2_MAX_CHARGES);
 		mCharges = getTrackedCharges();
 		if (player != null) {
 			int modeIndex = ScoreboardUtils.getScoreboardValue(player, MODE_SCOREBOARD).orElse(0);
@@ -99,7 +106,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		if (mPlayer == null) {
 			return;
 		}
-		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, CAST_RANGE, true, true, true);
+		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, (int) CharmManager.getRadius(mPlayer, CHARM_DISTANCE, CAST_RANGE), true, true, true);
 		if (e instanceof Player || EntityUtils.isHostileMob(e)) {
 			Player player = mPlayer;
 
@@ -156,7 +163,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 							new PartialParticle(Particle.VILLAGER_HAPPY, pe.getLocation(), 150, 2.55, 0.15f, 2.5, 1).spawnAsPlayerActive(mPlayer);
 							world.playSound(player.getEyeLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, 2, 1.5f);
 
-							PlayerUtils.healPlayer(mPlugin, pe, EntityUtils.getMaxHealth(pe) * HALLOWED_HEAL_PERCENT, mPlayer);
+							PlayerUtils.healPlayer(mPlugin, pe, EntityUtils.getMaxHealth(pe) * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + HALLOWED_HEAL_PERCENT), mPlayer);
 
 							if (isLevelTwo()) {
 								mPlugin.mEffectManager.addEffect(pe, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(HALLOWED_DAMAGE_REDUCTION_DURATION, HALLOWED_DAMAGE_REDUCTION_PERCENT));
@@ -187,7 +194,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 							}
 
 							double damage = ItemStatUtils.getAttributeAmount(player.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
-
+							damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 							DamageUtils.damage(mPlayer, applyE, DamageType.PROJECTILE_SKILL, damage, mInfo.mLinkedSpell, true, true);
 
 							Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
@@ -215,9 +222,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 							}
 
 							if (Crusade.enemyTriggersAbilities(applyE, mCrusade)) {
-								EntityUtils.applyStun(mPlugin, HALLOWED_UNDEAD_STUN, applyE);
+								EntityUtils.applyStun(mPlugin, HALLOWED_UNDEAD_STUN + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), applyE);
 							} else {
-								EntityUtils.applyStun(mPlugin, HALLOWED_LIVING_STUN, applyE);
+								EntityUtils.applyStun(mPlugin, HALLOWED_LIVING_STUN + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), applyE);
 							}
 
 							if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {

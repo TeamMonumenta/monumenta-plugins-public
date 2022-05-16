@@ -86,7 +86,7 @@ public class RageOfTheKeter implements Enchantment {
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1, OLIVE_COLOR).spawnAsPlayerBuff(player);
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1, GREEN_COLOR).spawnAsPlayerBuff(player);
 			world.playSound(player.getLocation(), Sound.ENTITY_STRIDER_EAT, 1, 0.85f);
-			int cooldown = (int) CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
+			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 			player.setCooldown(event.getItem().getType(), cooldown);
 		}
 	}

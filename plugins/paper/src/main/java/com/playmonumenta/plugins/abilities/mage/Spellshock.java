@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.effects.SpellShockExplosion;
 import com.playmonumenta.plugins.effects.SpellShockStatic;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -55,6 +56,10 @@ public class Spellshock extends Ability {
 	public static final double SLOW_MULTIPLIER = -0.3;
 	public static final int ENHANCEMENT_DAMAGE = 4;
 	public static final int ENHANCEMENT_RADIUS = 2;
+	public static final String CHARM_SPELL = "Spellshock Spell Amplifier";
+	public static final String CHARM_MELEE = "Spellshock Melee Amplifier";
+	public static final String CHARM_SPEED = "Spellshock Speed Amplifier";
+	public static final String CHARM_SLOW = "Spellshock Slowness Amplifier";
 
 	private final float mLevelDamage;
 	private final float mMeleeBonus;
@@ -73,8 +78,8 @@ public class Spellshock extends Ability {
 				ENHANCEMENT_RADIUS));
 		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
 
-		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mMeleeBonus = isLevelOne() ? MELEE_BONUS_1 : MELEE_BONUS_2;
+		mLevelDamage = (isLevelOne() ? DAMAGE_1 : DAMAGE_2) + (float) CharmManager.getLevelPercentDecimal(player, CHARM_SPELL);
+		mMeleeBonus = (isLevelOne() ? MELEE_BONUS_1 : MELEE_BONUS_2) + (float) CharmManager.getLevelPercentDecimal(player, CHARM_MELEE);
 	}
 
 	@Override
@@ -87,7 +92,7 @@ public class Spellshock extends Ability {
 			NavigableSet<Effect> effectGroupOriginal = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
 			if (effectGroupOriginal != null) {
 				event.setDamage(event.getDamage() * (1 + mMeleeBonus));
-				mPlugin.mEffectManager.addEffect(enemy, PERCENT_SLOW_EFFECT_NAME, new PercentSpeed(SLOW_DURATION, SLOW_MULTIPLIER, PERCENT_SLOW_EFFECT_NAME));
+				mPlugin.mEffectManager.addEffect(enemy, PERCENT_SLOW_EFFECT_NAME, new PercentSpeed(SLOW_DURATION, SLOW_MULTIPLIER - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), PERCENT_SLOW_EFFECT_NAME));
 				for (Effect e : effectGroupOriginal) {
 					e.clearEffect();
 				}
@@ -102,7 +107,7 @@ public class Spellshock extends Ability {
 					effectOriginal.trigger();
 
 					if (isLevelTwo()) {
-						mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION_TICKS, SPEED_MULTIPLIER, PERCENT_SPEED_EFFECT_NAME));
+						mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION_TICKS, SPEED_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), PERCENT_SPEED_EFFECT_NAME));
 					}
 
 					Location loc = enemy.getLocation().add(0, 1, 0);

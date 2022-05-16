@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -58,6 +59,11 @@ public class DivineJustice extends Ability {
 	public static final String ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME = "DivineJusticeBonusDamageEffect";
 	public static final Material ASH_MATERIAL = Material.GUNPOWDER;
 	public static final String ASH_NAME = "Purified Ash";
+
+	public static final String CHARM_DAMAGE = "Divine Justice Damage";
+	public static final String CHARM_SELF = "Divine Justice Self Heal";
+	public static final String CHARM_ALLY = "Divine Justice Ally Heal";
+
 
 	private final boolean mDoHealingAndMultiplier;
 
@@ -122,7 +128,7 @@ public class DivineJustice extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer != null && event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer) && Crusade.enemyTriggersAbilities(enemy, mCrusade)) {
 			double originalDamage = event.getDamage();
-			double damage = DAMAGE;
+			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
 			if (mDoHealingAndMultiplier) {
 				// Use the whole melee damage here
 				damage += originalDamage * DAMAGE_MULTIPLIER;
@@ -166,14 +172,14 @@ public class DivineJustice extends Ability {
 			PlayerUtils.healPlayer(
 				mPlugin,
 				mPlayer,
-				EntityUtils.getMaxHealth(mPlayer) * HEALING_MULTIPLIER_OWN
+				EntityUtils.getMaxHealth(mPlayer) * (HEALING_MULTIPLIER_OWN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SELF))
 			);
 			List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, RADIUS, true);
 			for (Player otherPlayer : players) {
 				PlayerUtils.healPlayer(
 					mPlugin,
 					otherPlayer,
-					EntityUtils.getMaxHealth(mPlayer) * HEALING_MULTIPLIER_OTHER,
+					EntityUtils.getMaxHealth(mPlayer) * (HEALING_MULTIPLIER_OTHER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY)),
 					mPlayer
 				);
 			}

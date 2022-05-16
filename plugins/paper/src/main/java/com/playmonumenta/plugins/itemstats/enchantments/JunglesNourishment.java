@@ -44,7 +44,7 @@ public class JunglesNourishment implements Enchantment {
 			double heal = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEALTH, HEAL);
 			PlayerUtils.healPlayer(plugin, player, heal, player);
 			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RECEIVED));
-			int cooldown = (int) CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
+			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 			player.setCooldown(event.getItem().getType(), cooldown);
 			player.setFoodLevel(24);
 			World world = player.getWorld();

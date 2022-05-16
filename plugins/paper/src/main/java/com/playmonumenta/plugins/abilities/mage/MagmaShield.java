@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentAbilityDamageReceived;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -57,7 +58,14 @@ public class MagmaShield extends Ability {
 	public static final String ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME = "MagmaShieldFireAbilityDamageBonus";
 	public static final int ENHANCEMENT_BONUS_DURATION = 8 * 20;
 
-	private final int mLevelDamage;
+	public static final String CHARM_DAMAGE = "Magma Shield Damage";
+	public static final String CHARM_RANGE = "Magma Shield Range";
+	public static final String CHARM_COOLDOWN = "Magma Shield Cooldown";
+	public static final String CHARM_DURATION = "Magma Shield Fire Duration";
+	public static final String CHARM_KNOCKBACK = "Magma Shield Knockback";
+	public static final String CHARM_CONE = "Magma Shield Cone";
+
+	private final float mLevelDamage;
 
 	private boolean mHasBlizzard;
 
@@ -91,11 +99,11 @@ public class MagmaShield extends Ability {
 				ENHANCEMENT_BONUS_DURATION / 20
 			)
 		);
-		mInfo.mCooldown = COOLDOWN_TICKS;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN_TICKS);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.MAGMA_CREAM, 1);
 
-		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 
 		mHasBlizzard = false;
 		if (ServerProperties.getClassSpecializationsEnabled()) {
@@ -114,18 +122,18 @@ public class MagmaShield extends Ability {
 
 		float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 		Vector flattenedLookDirection = mPlayer.getEyeLocation().getDirection().setY(0);
-		for (LivingEntity potentialTarget : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
+		for (LivingEntity potentialTarget : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE), mPlayer)) {
 			Vector flattenedTargetVector = potentialTarget.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0);
 			if (
 				VectorUtils.isAngleWithin(
 					flattenedLookDirection,
 					flattenedTargetVector,
-					ANGLE
+					CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, ANGLE)
 				)
 			) {
-				EntityUtils.applyFire(mPlugin, FIRE_TICKS, potentialTarget, mPlayer);
+				EntityUtils.applyFire(mPlugin, FIRE_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), potentialTarget, mPlayer);
 				DamageUtils.damage(mPlayer, potentialTarget, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
-				MovementUtils.knockAway(mPlayer, potentialTarget, KNOCKBACK, true);
+				MovementUtils.knockAway(mPlayer, potentialTarget, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK), true);
 				if (isEnhanced()) {
 					mPlugin.mEffectManager.addEffect(potentialTarget, ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME,
 						new PercentDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_DAMAGE_BONUS, EnumSet.of(DamageType.FIRE)));
@@ -161,7 +169,7 @@ public class MagmaShield extends Ability {
 					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 				}
 
-				if (mRadius >= SIZE + 1) {
+				if (mRadius >= CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE + 1)) {
 					this.cancel();
 				}
 			}

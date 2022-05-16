@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -43,6 +44,12 @@ public class CosmicMoonblade extends Ability {
 	public static final int CAP_TICKS_2 = (int)(1 * Constants.TICKS_PER_SECOND);
 	private static final Particle.DustOptions FSWORD_COLOR1 = new Particle.DustOptions(Color.fromRGB(106, 203, 255), 1.0f);
 	private static final Particle.DustOptions FSWORD_COLOR2 = new Particle.DustOptions(Color.fromRGB(168, 226, 255), 1.0f);
+	public static final String CHARM_DAMAGE = "Cosmic Moonblade Damage";
+	public static final String CHARM_SPELL_COOLDOWN = "Cosmic Moonblade Cooldown Reduction";
+	public static final String CHARM_COOLDOWN = "Cosmic Moonblade Cooldown";
+	public static final String CHARM_CAP = "Cosmic Moonblade Cooldown Cap";
+	public static final String CHARM_RANGE = "Cosmic Moonblade Range";
+	public static final String CHARM_SLASH = "Cosmic Moonblade Slashes";
 
 	private final double mLevelReduction;
 	private final int mLevelCap;
@@ -54,11 +61,11 @@ public class CosmicMoonblade extends Ability {
 		mInfo.mDescriptions.add("Swap with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 2 times (5 damage per hit) in rapid succession that if each land, reduce all your other skill cooldowns by 5% (Max 0.5s). Cooldown: 8s.");
 		mInfo.mDescriptions.add("Cooldown reduction is increased to 10% (Max 1s) for blade.");
 		mInfo.mLinkedSpell = ABILITY;
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.DIAMOND_SWORD, 1);
-		mLevelReduction = getAbilityScore() == 1 ? REDUCTION_MULTIPLIER_1 : REDUCTION_MULTIPLIER_2;
-		mLevelCap = getAbilityScore() == 1 ? CAP_TICKS_1 : CAP_TICKS_2;
+		mLevelReduction = (getAbilityScore() == 1 ? REDUCTION_MULTIPLIER_1 : REDUCTION_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SPELL_COOLDOWN);
+		mLevelCap = (getAbilityScore() == 1 ? CAP_TICKS_1 : CAP_TICKS_2) + CharmManager.getExtraDuration(player, CHARM_CAP);
 	}
 
 
@@ -68,7 +75,10 @@ public class CosmicMoonblade extends Ability {
 			event.setCancelled(true);
 			if (!isTimerActive() && !mPlayer.isSneaking()) {
 				putOnCooldown();
-				float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, DAMAGE);
+				float charmDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
+				float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, charmDamage);
+				double range = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS);
+				int swings = (int) CharmManager.getLevel(mPlayer, CHARM_SLASH) + SWINGS;
 				ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 				new BukkitRunnable() {
@@ -83,7 +93,7 @@ public class CosmicMoonblade extends Ability {
 						Vector playerDir = mPlayer.getEyeLocation().getDirection().normalize();
 						Location origin = mPlayer.getLocation();
 						boolean cdr = true;
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(origin, RADIUS)) {
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(origin, range)) {
 							if (cdr) {
 								cdr = false;
 								updateCooldowns(mLevelReduction);
@@ -94,7 +104,7 @@ public class CosmicMoonblade extends Ability {
 							}
 						}
 
-						if (mTimes >= SWINGS) {
+						if (mTimes >= swings) {
 							mPitch = 1.45f;
 						}
 						World world = mPlayer.getWorld();
@@ -123,7 +133,7 @@ public class CosmicMoonblade extends Ability {
 								PPPeriodic particle2 = new PPPeriodic(Particle.REDSTONE, mPlayer.getLocation()).count(1).delta(0.1, 0.1, 0.1).data(FSWORD_COLOR2);
 								if (mI % 2 == 0) {
 									Vector vec;
-									for (double r = 1; r < 5; r += 0.5) {
+									for (double r = 1; r < range; r += 0.5) {
 										for (double degree = mD; degree < mD + 30; degree += 5) {
 											double radian1 = Math.toRadians(degree);
 											vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
@@ -163,7 +173,7 @@ public class CosmicMoonblade extends Ability {
 							}
 
 						}.runTaskTimer(mPlugin, 0, 1);
-						if (mTimes >= SWINGS) {
+						if (mTimes >= swings) {
 							this.cancel();
 						}
 					}

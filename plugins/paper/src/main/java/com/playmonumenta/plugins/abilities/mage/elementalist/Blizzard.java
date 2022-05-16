@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -47,8 +48,14 @@ public class Blizzard extends Ability {
 	public static final int COOLDOWN_TICKS_2 = 25 * Constants.TICKS_PER_SECOND;
 	public static final int ANGLE = -45; // Looking straight up is -90. This is 45 degrees of pitch allowance
 
-	private final int mLevelDamage;
-	private final int mLevelSize;
+	public static final String CHARM_DAMAGE = "Blizzard Damage";
+	public static final String CHARM_COOLDOWN = "Blizzard Cooldown";
+	public static final String CHARM_RANGE = "Blizzard Range";
+	public static final String CHARM_DURATION = "Blizzard Duration";
+	public static final String CHARM_SLOW = "Blizzard Slowness Amplifier";
+
+	private final float mLevelDamage;
+	private final float mLevelSize;
 	private final double mLevelSlowMultiplier;
 
 	public Blizzard(Plugin plugin, @Nullable Player player) {
@@ -63,11 +70,11 @@ public class Blizzard extends Ability {
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.SNOWBALL, 1);
 
-		mInfo.mCooldown = isLevelOne() ? COOLDOWN_TICKS_1 : COOLDOWN_TICKS_2;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_TICKS_1 : COOLDOWN_TICKS_2);
 
-		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mLevelSize = isLevelOne() ? SIZE_1 : SIZE_2;
-		mLevelSlowMultiplier = isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2;
+		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mLevelSize = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, isLevelOne() ? SIZE_1 : SIZE_2);
+		mLevelSlowMultiplier = (isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SLOW);
 	}
 
 	@Override
@@ -111,7 +118,7 @@ public class Blizzard extends Ability {
 					new PartialParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					if (
-						mTicks >= DURATION_TICKS
+						mTicks >= DURATION_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION)
 							|| AbilityManager.getManager().getPlayerAbility(mPlayer, Blizzard.class) == null
 							|| !mPlayer.isValid() // Ensure player is not dead, is still online?
 					) {

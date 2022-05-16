@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager;
@@ -57,11 +58,15 @@ public class HandOfLight extends Ability {
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_MAX = 0.5;
 	private static final int ENHANCEMENT_UNDEAD_STUN_DURATION = 10;
 	public static final String DAMAGE_MODE_TAG = "ClericHOLDamageMode";
+	public static final String CHARM_DAMAGE = "Hand of Light Damage";
+	public static final String CHARM_COOLDOWN = "Hand of Light Cooldown";
+	public static final String CHARM_RANGE = "Hand of Light Range";
+	public static final String CHARM_HEALING = "Hand of Light Healing";
 
 	private final int mFlat;
 	private final double mPercent;
-	private final int mDamagePer;
-	private final int mDamageMax;
+	private final double mDamagePer;
+	private final double mDamageMax;
 	private boolean mDamageMode;
 
 	private @Nullable Crusade mCrusade;
@@ -83,15 +88,15 @@ public class HandOfLight extends Ability {
 				(int) (ENHANCEMENT_COOLDOWN_REDUCTION_MAX * 100),
 				ENHANCEMENT_UNDEAD_STUN_DURATION / 20.0
 			));
-		mInfo.mCooldown = isLevelOne() ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.PINK_DYE, 1);
 		mInfo.mIgnoreCooldown = true;
 
 		mFlat = isLevelOne() ? FLAT_1 : FLAT_2;
-		mPercent = isLevelOne() ? PERCENT_1 : PERCENT_2;
-		mDamagePer = isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2;
-		mDamageMax = isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
+		mPercent = CharmManager.getLevelPercentDecimal(player, CHARM_HEALING) + (isLevelOne() ? PERCENT_1 : PERCENT_2);
+		mDamagePer = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2);
+		mDamageMax = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2);
 
 		mDamageMode = player != null && player.getScoreboardTags().contains(DAMAGE_MODE_TAG);
 
@@ -140,7 +145,7 @@ public class HandOfLight extends Ability {
 		Location userLoc = mPlayer.getLocation();
 
 		if (!mDamageMode) {
-			List<Player> nearbyPlayers = PlayerUtils.otherPlayersInRange(mPlayer, HEALING_RADIUS, true);
+			List<Player> nearbyPlayers = PlayerUtils.otherPlayersInRange(mPlayer, CharmManager.getRadius(mPlayer, CHARM_RANGE, HEALING_RADIUS), true);
 			nearbyPlayers.removeIf(p -> (!isEnhanced() && playerDir.dot(p.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && p.getLocation().distance(userLoc) > 2)
 				                            || p.getScoreboardTags().contains("disable_class"));
 			if (nearbyPlayers.size() > 0) {
@@ -161,7 +166,7 @@ public class HandOfLight extends Ability {
 
 				world.playSound(userLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
 				world.playSound(userLoc, Sound.ENTITY_PLAYER_LEVELUP, 0.05f, 1.0f);
-				ParticleUtils.explodingConeEffect(mPlugin, mPlayer, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
+				ParticleUtils.explodingConeEffect(mPlugin, mPlayer, (float) CharmManager.getRadius(mPlayer, CHARM_RANGE, HEALING_RADIUS), Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
 
 				double cooldown = getModifiedCooldown();
 				if (isEnhanced()) {
@@ -170,13 +175,13 @@ public class HandOfLight extends Ability {
 				putOnCooldown((int)cooldown);
 			}
 		} else {
-			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(userLoc, DAMAGE_RADIUS);
+			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(userLoc, CharmManager.getRadius(mPlayer, CHARM_RANGE, DAMAGE_RADIUS));
 			nearbyMobs.removeIf(mob -> (!isEnhanced() && playerDir.dot(mob.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && mob.getLocation().distance(userLoc) > 2)
 				                           || mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
 			List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
 			undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob, mCrusade));
-			int damage = Math.min(undeadMobs.size() * mDamagePer, mDamageMax);
+			double damage = Math.min(undeadMobs.size() * mDamagePer, mDamageMax);
 
 			if (damage > 0) {
 				for (LivingEntity mob : nearbyMobs) {
@@ -189,13 +194,14 @@ public class HandOfLight extends Ability {
 				}
 
 				world.playSound(userLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 0.8f);
-				ParticleUtils.explodingConeEffect(mPlugin, mPlayer, DAMAGE_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
+				ParticleUtils.explodingConeEffect(mPlugin, mPlayer, (float) CharmManager.getRadius(mPlayer, CHARM_RANGE, DAMAGE_RADIUS), Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
 				putOnCooldown();
 			}
 		}
 		if (isEnhanced()) {
-			EntityUtils.getNearbyMobs(userLoc, DAMAGE_RADIUS).stream()
-				.filter(mob -> mob.getLocation().distanceSquared(userLoc) <= DAMAGE_RADIUS * DAMAGE_RADIUS)
+			double radius = CharmManager.getRadius(mPlayer, CHARM_RANGE, DAMAGE_RADIUS);
+			EntityUtils.getNearbyMobs(userLoc, radius).stream()
+				.filter(mob -> mob.getLocation().distanceSquared(userLoc) <= radius * radius)
 				.filter(mob -> Crusade.enemyTriggersAbilities(mob, mCrusade))
 				.forEach(mob -> EntityUtils.applyStun(mPlugin, ENHANCEMENT_UNDEAD_STUN_DURATION, mob));
 		}

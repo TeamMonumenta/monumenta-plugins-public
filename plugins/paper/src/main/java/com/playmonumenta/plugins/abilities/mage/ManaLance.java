@@ -33,10 +33,14 @@ import org.bukkit.util.Vector;
 public class ManaLance extends MultipleChargeAbility {
 
 	public static final String CHARM_DAMAGE = "Mana Lance Damage";
+	public static final String CHARM_COOLDOWN = "Mana Lance Cooldown";
+	public static final String CHARM_RANGE = "Mana Lance Range";
+	public static final String CHARM_CHARGES = "Mana Lance Charge";
 	private static final float DAMAGE_1 = 6.0f;
 	private static final float DAMAGE_2 = 7.0f;
 	private static final int COOLDOWN_1 = 5 * 20;
 	private static final int COOLDOWN_2 = 3 * 20;
+	private static final int RANGE = 8;
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
 
 	private float mDamage;
@@ -50,10 +54,10 @@ public class ManaLance extends MultipleChargeAbility {
 		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 6 magic damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: 5s.");
 		mInfo.mDescriptions.add("The beam instead deals 7 damage. Cooldown: 3s.");
 		mInfo.mDescriptions.add("Mana lance now has two charges.");
-		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.TRIDENT, 1);
-		mMaxCharges = isEnhanced() ? 2 : 1;
+		mMaxCharges = (isEnhanced() ? 2 : 1) + (int) CharmManager.getLevel(player, CHARM_CHARGES);
 		mInfo.mIgnoreCooldown = true;
 		mCharges = getTrackedCharges();
 		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
@@ -83,8 +87,8 @@ public class ManaLance extends MultipleChargeAbility {
 		World world = mPlayer.getWorld();
 
 		Location endLoc = loc;
-
-		for (int i = 0; i < 8; i++) {
+		int range = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RANGE);
+		for (int i = 0; i < range; i++) {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(world);
 			endLoc = bLoc;

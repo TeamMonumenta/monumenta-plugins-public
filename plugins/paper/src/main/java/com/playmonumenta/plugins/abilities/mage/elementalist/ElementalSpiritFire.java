@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -46,7 +47,11 @@ public class ElementalSpiritFire extends Ability {
 	public static final double HITBOX = 1.5;
 	public static final int COOLDOWN_TICKS = 10 * Constants.TICKS_PER_SECOND;
 
-	private final int mLevelDamage;
+	public static final String CHARM_DAMAGE = "Elemental Spirits Damage";
+	public static final String CHARM_COOLDOWN = "Elemental Spirits Cooldown";
+	public static final String CHARM_SIZE = "Elemental Spirits Size";
+
+	private final float mLevelDamage;
 	private final double mLevelBowMultiplier;
 	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
 
@@ -88,10 +93,10 @@ public class ElementalSpiritFire extends Ability {
 				StringUtils.multiplierToPercentage(ElementalSpiritIce.BOW_MULTIPLIER_2)
 			)
 		);
-		mInfo.mCooldown = COOLDOWN_TICKS;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN_TICKS);
 		mDisplayItem = new ItemStack(Material.SUNFLOWER, 1);
 
-		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mLevelBowMultiplier = isLevelOne() ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
 
 		// Task runs on the next server tick. Need to wait for entire AbilityCollection to be initialised to properly getPlayerAbility()
@@ -136,13 +141,14 @@ public class ElementalSpiritFire extends Ability {
 							Location endLocation = LocationUtils.getHalfHeightLocation(farthestEnemy);
 
 							World world = mPlayer.getWorld();
-							BoundingBox movingSpiritBox = BoundingBox.of(mPlayer.getEyeLocation(), HITBOX, HITBOX, HITBOX);
+							double size = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, HITBOX);
+							BoundingBox movingSpiritBox = BoundingBox.of(mPlayer.getEyeLocation(), size, size, size);
 							double maxDistanceSquared = startLocation.distanceSquared(endLocation);
 							double maxDistance = Math.sqrt(maxDistanceSquared);
 							Vector vector = endLocation.clone().subtract(startLocation).toVector();
 							double increment = 0.2;
 
-							List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + HITBOX);
+							List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + size);
 							float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 							Vector vectorIncrement = vector.normalize().multiply(increment);
 

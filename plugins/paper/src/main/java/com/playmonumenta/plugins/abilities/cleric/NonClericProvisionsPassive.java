@@ -16,9 +16,6 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 
 public class NonClericProvisionsPassive extends Ability {
-	private static final int PROVISIONS_RANGE = 30;
-	private static final float PROVISIONS_1_CHANCE = 0.2f;
-	private static final float PROVISIONS_2_CHANCE = 0.4f;
 
 	public NonClericProvisionsPassive(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
@@ -30,28 +27,25 @@ public class NonClericProvisionsPassive extends Ability {
 	}
 
 	public static boolean testRandomChance(Player player) {
-		int level = 0;
-		for (Player p : PlayerUtils.playersInRange(player.getLocation(), PROVISIONS_RANGE, true)) {
-			Ability provisions = AbilityManager.getManager().getPlayerAbility(p, SacredProvisions.class);
-			if (provisions != null) {
-				if (provisions.isLevelTwo()) {
-					return FastUtils.RANDOM.nextDouble() < PROVISIONS_2_CHANCE;
-				} else {
-					level = 1;
+		double bestChance = 0;
+
+		for (Player p : PlayerUtils.playersInRange(player.getLocation(), 100, true)) {
+			SacredProvisions provisions = AbilityManager.getManager().getPlayerAbility(p, SacredProvisions.class);
+			if (provisions != null && provisions.isInRange(player)) {
+				double chance = provisions.getChance();
+				if (chance > bestChance) {
+					bestChance = chance;
 				}
 			}
 		}
-		if (level == 1) {
-			return FastUtils.RANDOM.nextDouble() < PROVISIONS_1_CHANCE;
-		} else {
-			return false;
-		}
+
+		return bestChance > 0 && FastUtils.RANDOM.nextDouble() < bestChance;
 	}
 
 	public static boolean testEnhanced(Player player) {
-		for (Player p : PlayerUtils.playersInRange(player.getLocation(), PROVISIONS_RANGE, true)) {
-			Ability provisions = AbilityManager.getManager().getPlayerAbility(p, SacredProvisions.class);
-			if (provisions != null && provisions.isEnhanced()) {
+		for (Player p : PlayerUtils.playersInRange(player.getLocation(), 100, true)) {
+			SacredProvisions provisions = AbilityManager.getManager().getPlayerAbility(p, SacredProvisions.class);
+			if (provisions != null && provisions.isEnhanced() && provisions.isInRange(player)) {
 				return true;
 			}
 		}

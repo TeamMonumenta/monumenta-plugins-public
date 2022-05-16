@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -44,8 +45,12 @@ public class HolyJavelin extends Ability {
 	private static final int FIRE_DURATION = 5 * 20;
 	private static final int COOLDOWN = 12 * 20;
 
-	private final int mDamage;
-	private final int mUndeadDamage;
+	private final double mDamage;
+	private final double mUndeadDamage;
+
+	public static final String CHARM_DAMAGE = "Holy Javelin Damage";
+	public static final String CHARM_COOLDOWN = "Holy Javelin Cooldown";
+	public static final String CHARM_RANGE = "Holy Javelin Range";
 
 	private @Nullable Crusade mCrusade;
 	private @Nullable DivineJustice mDivineJustice;
@@ -58,11 +63,11 @@ public class HolyJavelin extends Ability {
 		mInfo.mShorthandName = "HJ";
 		mInfo.mDescriptions.add("While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to 12 blocks or until it hits a solid block. It deals 18 magic damage to all enemies in a 0.75-block cube around it along its path, or 9 magic damage to non-undead, and sets them all on fire for 5s. Cooldown: 12s.");
 		mInfo.mDescriptions.add("Attacking an undead enemy with that left-click now transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. Damage is increased from 18 to 24, and from 9 to 18 against non-undead.");
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.TRIDENT, 1);
-		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mUndeadDamage = isLevelOne() ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2;
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mUndeadDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2);
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -114,6 +119,7 @@ public class HolyJavelin extends Ability {
 			return;
 		}
 		putOnCooldown();
+		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
@@ -124,9 +130,9 @@ public class HolyJavelin extends Ability {
 		new PartialParticle(Particle.EXPLOSION_NORMAL, location.clone().add(increment), 10, 0, 0, 0, 0.125f).spawnAsPlayerActive(mPlayer);
 
 		// Get a list of all the mobs this could possibly hit (that are within range of the player)
-		List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(location, RANGE + HITBOX_LENGTH, mPlayer);
+		List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(location, range + HITBOX_LENGTH, mPlayer);
 		BoundingBox box = BoundingBox.of(playerLoc, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
-		for (double i = 0; i < RANGE; i += HITBOX_LENGTH) {
+		for (double i = 0; i < range; i += HITBOX_LENGTH) {
 			box.shift(increment);
 			Location loc = box.getCenter().toLocation(world);
 			new PartialParticle(Particle.REDSTONE, loc, 22, 0.25, 0.25, 0.25, COLOR).spawnAsPlayerActive(mPlayer);

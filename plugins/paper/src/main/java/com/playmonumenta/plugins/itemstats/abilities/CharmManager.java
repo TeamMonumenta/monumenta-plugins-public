@@ -6,7 +6,34 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
+import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
+import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
+import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
+import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
+import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
+import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
+import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
+import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
+import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
+import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
+import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
+import com.playmonumenta.plugins.abilities.mage.FrostNova;
+import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
+import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
+import com.playmonumenta.plugins.abilities.mage.Spellshock;
+import com.playmonumenta.plugins.abilities.mage.ThunderStep;
+import com.playmonumenta.plugins.abilities.mage.arcanist.AstralOmen;
+import com.playmonumenta.plugins.abilities.mage.arcanist.CosmicMoonblade;
+import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
+import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
+import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
+import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -130,7 +157,126 @@ public class CharmManager {
 			Eruption.CHARM_RADIUS,
 			// Classes
 			// Mage
-			ManaLance.CHARM_DAMAGE
+			ManaLance.CHARM_DAMAGE,
+			ManaLance.CHARM_CHARGES,
+			ManaLance.CHARM_COOLDOWN,
+			ManaLance.CHARM_RANGE,
+			ThunderStep.CHARM_DAMAGE,
+			ThunderStep.CHARM_COOLDOWN,
+			ThunderStep.CHARM_DISTANCE,
+			ThunderStep.CHARM_STUN,
+			ThunderStep.CHARM_SIZE,
+			PrismaticShield.CHARM_DURATION,
+			PrismaticShield.CHARM_KNOCKBACK,
+			PrismaticShield.CHARM_STUN,
+			PrismaticShield.CHARM_ABSORPTION,
+			PrismaticShield.CHARM_TRIGGER,
+			PrismaticShield.CHARM_COOLDOWN,
+			FrostNova.CHARM_DAMAGE,
+			FrostNova.CHARM_DURATION,
+			FrostNova.CHARM_RANGE,
+			FrostNova.CHARM_SLOW,
+			FrostNova.CHARM_COOLDOWN,
+			FrostNova.CHARM_FROZEN,
+			MagmaShield.CHARM_DAMAGE,
+			MagmaShield.CHARM_DURATION,
+			MagmaShield.CHARM_KNOCKBACK,
+			MagmaShield.CHARM_RANGE,
+			MagmaShield.CHARM_CONE,
+			MagmaShield.CHARM_COOLDOWN,
+			ArcaneStrike.CHARM_DAMAGE,
+			ArcaneStrike.CHARM_RANGE,
+			ArcaneStrike.CHARM_BONUS,
+			ArcaneStrike.CHARM_COOLDOWN,
+			ElementalArrows.CHARM_DAMAGE,
+			ElementalArrows.CHARM_DURATION,
+			ElementalArrows.CHARM_RANGE,
+			Spellshock.CHARM_SPEED,
+			Spellshock.CHARM_SLOW,
+			Spellshock.CHARM_SPELL,
+			Spellshock.CHARM_MELEE,
+			AstralOmen.CHARM_DAMAGE,
+			AstralOmen.CHARM_RANGE,
+			AstralOmen.CHARM_MODIFIER,
+			AstralOmen.CHARM_STACK,
+			CosmicMoonblade.CHARM_CAP,
+			CosmicMoonblade.CHARM_DAMAGE,
+			CosmicMoonblade.CHARM_RANGE,
+			CosmicMoonblade.CHARM_COOLDOWN,
+			CosmicMoonblade.CHARM_SPELL_COOLDOWN,
+			CosmicMoonblade.CHARM_SLASH,
+			SagesInsight.CHARM_SPEED,
+			SagesInsight.CHARM_ABILITY,
+			SagesInsight.CHARM_DECAY,
+			SagesInsight.CHARM_STACKS,
+			Blizzard.CHARM_COOLDOWN,
+			Blizzard.CHARM_SLOW,
+			Blizzard.CHARM_DURATION,
+			Blizzard.CHARM_RANGE,
+			Blizzard.CHARM_DAMAGE,
+			Starfall.CHARM_COOLDOWN,
+			Starfall.CHARM_DAMAGE,
+			Starfall.CHARM_RANGE,
+			Starfall.CHARM_FIRE,
+			ElementalSpiritFire.CHARM_COOLDOWN,
+			ElementalSpiritFire.CHARM_DAMAGE,
+			ElementalSpiritFire.CHARM_SIZE,
+
+			//Cleric
+			CelestialBlessing.CHARM_COOLDOWN,
+			CelestialBlessing.CHARM_DAMAGE,
+			CelestialBlessing.CHARM_DURATION,
+			CelestialBlessing.CHARM_SPEED,
+			CelestialBlessing.CHARM_RANGE,
+			DivineJustice.CHARM_DAMAGE,
+			DivineJustice.CHARM_ALLY,
+			DivineJustice.CHARM_SELF,
+			HeavenlyBoon.CHARM_CHANCE,
+			HeavenlyBoon.CHARM_DURATION,
+			SacredProvisions.CHARM_CHANCE,
+			SacredProvisions.CHARM_RANGE,
+			CleansingRain.CHARM_COOLDOWN,
+			CleansingRain.CHARM_RANGE,
+			CleansingRain.CHARM_REDUCTION,
+			CleansingRain.CHARM_DURATION,
+			HandOfLight.CHARM_COOLDOWN,
+			HandOfLight.CHARM_DAMAGE,
+			HandOfLight.CHARM_HEALING,
+			HandOfLight.CHARM_RANGE,
+			SanctifiedArmor.CHARM_DAMAGE,
+			SanctifiedArmor.CHARM_DURATION,
+			SanctifiedArmor.CHARM_SLOW,
+			HolyJavelin.CHARM_COOLDOWN,
+			HolyJavelin.CHARM_DAMAGE,
+			HolyJavelin.CHARM_RANGE,
+			ChoirBells.CHARM_COOLDOWN,
+			ChoirBells.CHARM_RANGE,
+			ChoirBells.CHARM_SLOW,
+			ChoirBells.CHARM_DAMAGE,
+			ChoirBells.CHARM_VULN,
+			ChoirBells.CHARM_WEAKEN,
+			ChoirBells.CHARM_SLOW,
+			LuminousInfusion.CHARM_COOLDOWN,
+			LuminousInfusion.CHARM_RANGE,
+			LuminousInfusion.CHARM_DAMAGE,
+			EnchantedPrayer.CHARM_COOLDOWN,
+			EnchantedPrayer.CHARM_DAMAGE,
+			EnchantedPrayer.CHARM_RANGE,
+			EnchantedPrayer.CHARM_EFFECT_RANGE,
+			EnchantedPrayer.CHARM_HEAL,
+			ThuribleProcession.CHARM_COOLDOWN,
+			ThuribleProcession.CHARM_EFFECT_DURATION,
+			ThuribleProcession.CHARM_DAMAGE,
+			ThuribleProcession.CHARM_SPEED,
+			ThuribleProcession.CHARM_ATTACK,
+			ThuribleProcession.CHARM_HEAL,
+			HallowedBeam.CHARM_CHARGE,
+			HallowedBeam.CHARM_COOLDOWN,
+			HallowedBeam.CHARM_DAMAGE,
+			HallowedBeam.CHARM_DISTANCE,
+			HallowedBeam.CHARM_STUN,
+			HallowedBeam.CHARM_HEAL
+
 		);
 	}
 
@@ -323,6 +469,8 @@ public class CharmManager {
 		}
 		//Store to local map
 		mPlayerAbilityEffectMap.put(p.getUniqueId(), abilityEffects);
+		//Refresh class of player
+		AbilityManager.getManager().updatePlayerAbilities(p, false);
 	}
 
 	//Helper method to parse item for charm effects
@@ -373,7 +521,7 @@ public class CharmManager {
 	 */
 	public double getValueOfAttribute(Player p, String charmAttribute) {
 		//Check if charms are enabled (r3 shard), if not, return zero as the net effect
-		if (!ServerProperties.getCharmsEnabled()) {
+		if (!ServerProperties.getCharmsEnabled() || p == null) {
 			return 0;
 		}
 
@@ -576,9 +724,9 @@ public class CharmManager {
 		return baseDamage * (1 + (percentage / 100.0));
 	}
 
-	public static double getCooldown(Player player, String charmEffectName, double baseCooldown) {
+	public static int getCooldown(Player player, String charmEffectName, int baseCooldown) {
 		double level = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
-		return baseCooldown * ((level / 100.0) + 1);
+		return (int) (baseCooldown * ((level / 100.0) + 1));
 	}
 
 	public static double getLevel(Player player, String charmEffectName) {
@@ -587,6 +735,10 @@ public class CharmManager {
 
 	public static double getLevelPercent(Player player, String charmEffectName) {
 		return CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
+	}
+
+	public static double getLevelPercentDecimal(Player player, String charmEffectName) {
+		return CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%") / 100.0;
 	}
 
 	public static double getExtraPercentHealing(Player player, String charmEffectName, double baseHealing) {

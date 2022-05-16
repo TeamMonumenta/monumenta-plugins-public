@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -62,8 +63,13 @@ public class ThunderStep extends Ability {
 	public static final int BACK_TELEPORT_MAX_DELAY = 3 * 20;
 	public static final int ENHANCEMENT_BONUS_DAMAGE_TIMER = 30 * 20;
 	public static final int ENHANCEMENT_PARALYZE_DURATION = 5 * 20;
+	public static final String CHARM_DAMAGE = "Thunder Step Damage";
+	public static final String CHARM_STUN = "Thunder Step Stun Duration";
+	public static final String CHARM_COOLDOWN = "Thunder Step Cooldown";
+	public static final String CHARM_SIZE = "Thunder Step Effect Size";
+	public static final String CHARM_DISTANCE = "Thunder Step Distance";
 
-	private final int mLevelDamage;
+	private final float mLevelDamage;
 	private final int mLevelDistance;
 	private final boolean mDoStun;
 
@@ -108,12 +114,12 @@ public class ThunderStep extends Ability {
 				ENHANCEMENT_PARALYZE_DURATION / 20
 			)
 		);
-		mInfo.mCooldown = COOLDOWN_TICKS;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN_TICKS);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.HORN_CORAL, 1);
 
-		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mLevelDistance = isLevelOne() ? DISTANCE_1 : DISTANCE_2;
+		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mLevelDistance = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
 		mDoStun = isLevelTwo();
 	}
 
@@ -206,8 +212,8 @@ public class ThunderStep extends Ability {
 		new PartialParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_AQUA).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10).spawnAsPlayerActive(mPlayer);
-
-		List<LivingEntity> enemies = EntityUtils.getNearbyMobs(location, SIZE);
+		double size = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, SIZE);
+		List<LivingEntity> enemies = EntityUtils.getNearbyMobs(location, size);
 		// The more enemies, the fewer particles for each one
 		int mobParticles = Math.max(
 			1,
@@ -220,7 +226,8 @@ public class ThunderStep extends Ability {
 			}
 
 			if (mDoStun && !EntityUtils.isBoss(enemy)) {
-				EntityUtils.applyStun(mPlugin, STUN_TICKS, enemy);
+				int charmStunTicks = CharmManager.getExtraDuration(mPlayer, CHARM_STUN);
+				EntityUtils.applyStun(mPlugin, STUN_TICKS + charmStunTicks, enemy);
 			}
 			if (enhancementParalyze && !EntityUtils.isBoss(enemy)) {
 				EntityUtils.paralyze(mPlugin, ENHANCEMENT_PARALYZE_DURATION, enemy);

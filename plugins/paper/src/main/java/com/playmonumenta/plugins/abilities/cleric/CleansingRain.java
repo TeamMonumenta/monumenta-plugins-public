@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -35,8 +36,12 @@ public class CleansingRain extends Ability {
 	private static final int CLEANSING_2_COOLDOWN = 30 * 20;
 	private static final int ANGLE = -45; // Looking straight up is -90. This is 45 degrees of pitch allowance
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "CleansingPercentDamageResistEffect";
+	public static final String CHARM_REDUCTION = "Cleansing Rain Damage Reduction";
+	public static final String CHARM_DURATION = "Cleansing Rain Duration";
+	public static final String CHARM_RANGE = "Cleansing Rain Range";
+	public static final String CHARM_COOLDOWN = "Cleansing Rain Cooldown";
 
-	private int mRadius;
+	private double mRadius;
 
 	public CleansingRain(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Cleansing Rain");
@@ -46,9 +51,9 @@ public class CleansingRain extends Ability {
 		mInfo.mDescriptions.add("Right click while sneaking and looking upwards to summon a \"cleansing rain\" that follows you, removing negative effects from players within 4 blocks, including yourself, and lasts for 15 seconds. (Cooldown: 45 seconds)");
 		mInfo.mDescriptions.add("Additionally grants 20% Damage Reduction to all players in the radius. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The radius increases to 6 blocks, and each player touched by the rain keeps its effect for the cast duration.");
-		mInfo.mCooldown = isLevelOne() ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mRadius = isEnhanced() ? CLEANSING_RADIUS_ENHANCED : CLEANSING_RADIUS;
+		mRadius = CharmManager.getRadius(player, CHARM_RANGE, isEnhanced() ? CLEANSING_RADIUS_ENHANCED : CLEANSING_RADIUS);
 		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
 	}
 
@@ -92,7 +97,7 @@ public class CleansingRain extends Ability {
 					}
 
 					if (isLevelTwo()) {
-						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(CLEANSING_EFFECT_DURATION, PERCENT_DAMAGE_RESIST));
+						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(CLEANSING_EFFECT_DURATION, PERCENT_DAMAGE_RESIST - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION)));
 					}
 				}
 				//Loop through already affected players for enhanced cleansing rain
@@ -113,7 +118,7 @@ public class CleansingRain extends Ability {
 				}
 
 				mTicks += CLEANSING_APPLY_PERIOD;
-				if (mTicks > CLEANSING_DURATION) {
+				if (mTicks > CLEANSING_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION)) {
 					this.cancel();
 				}
 			}

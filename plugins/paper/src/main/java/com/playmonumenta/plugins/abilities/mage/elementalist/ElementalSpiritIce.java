@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -40,7 +41,7 @@ public class ElementalSpiritIce extends Ability {
 	public static final int PULSES = 3;
 	public static final int COOLDOWN_TICKS = ElementalSpiritFire.COOLDOWN_TICKS;
 
-	private final int mLevelDamage;
+	private final float mLevelDamage;
 	private final double mLevelBowMultiplier;
 	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
 
@@ -58,9 +59,9 @@ public class ElementalSpiritIce extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.ELEMENTAL_SPIRIT_ICE;
 
 		mInfo.mScoreboardId = "ElementalSpirit";
-		mInfo.mCooldown = COOLDOWN_TICKS;
+		mInfo.mCooldown = CharmManager.getCooldown(player, ElementalSpiritFire.CHARM_COOLDOWN, COOLDOWN_TICKS);
 
-		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, ElementalSpiritFire.CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mLevelBowMultiplier = isLevelOne() ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
 
 		if (player != null) {
@@ -109,7 +110,7 @@ public class ElementalSpiritIce extends Ability {
 								@Override
 								public void run() {
 									// Damage actions
-									for (LivingEntity mob : EntityUtils.getNearbyMobs(centre, SIZE)) {
+									for (LivingEntity mob : EntityUtils.getNearbyMobs(centre, CharmManager.calculateFlatAndPercentValue(mPlayer, ElementalSpiritFire.CHARM_SIZE, SIZE))) {
 										double finalDamage = spellDamage;
 										if (
 											ClassAbility.ELEMENTAL_ARROWS_ICE.equals(ability)
@@ -125,7 +126,7 @@ public class ElementalSpiritIce extends Ability {
 									// Ice spirit effects
 									PartialParticle partialParticle = new PartialParticle(Particle.SNOWBALL, centre)
 										.count(150)
-										.delta(PartialParticle.getWidthDelta(SIZE))
+										.delta(PartialParticle.getWidthDelta(CharmManager.calculateFlatAndPercentValue(mPlayer, ElementalSpiritFire.CHARM_SIZE, SIZE)))
 										.extra(0.1)
 										.spawnAsPlayerActive(mPlayer);
 									//TODO falling dust

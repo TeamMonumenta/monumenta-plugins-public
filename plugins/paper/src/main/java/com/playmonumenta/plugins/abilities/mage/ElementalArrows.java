@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -39,6 +40,10 @@ public class ElementalArrows extends Ability {
 	public static final int ENHANCED_ARROW_COOLDOWN = 10 * Constants.TICKS_PER_SECOND;
 	public static final int ENHANCED_ARROW_STUN_DURATION = 1 * Constants.TICKS_PER_SECOND;
 
+	public static final String CHARM_DAMAGE = "Elemental Arrows Damage";
+	public static final String CHARM_DURATION = "Elemental Arrows Duration";
+	public static final String CHARM_RANGE = "Elemental Arrows Range";
+
 	private double mLastDamage = 0;
 	private double mDamageMultiplier;
 
@@ -54,7 +59,7 @@ public class ElementalArrows extends Ability {
 		mDisplayItem = new ItemStack(Material.SPECTRAL_ARROW, 1);
 		mInfo.mCooldown = ENHANCED_ARROW_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
-		mDamageMultiplier = isLevelOne() ? DAMAGE_MULTIPLIER_1 : DAMAGE_MULTIPLIER_2;
+		mDamageMultiplier = (isLevelOne() ? DAMAGE_MULTIPLIER_1 : DAMAGE_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE);
 	}
 
 	@Override
@@ -63,12 +68,15 @@ public class ElementalArrows extends Ability {
 			return false;
 		}
 
+		double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, ELEMENTAL_ARROWS_RADIUS);
+		int duration = ELEMENTAL_ARROWS_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+
 		double damage = mDamageMultiplier * event.getDamage();
 		if (arrow.hasMetadata("ElementalArrowsFireArrow")) {
 			ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(arrow);
 			if (isLevelTwo()) {
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), ELEMENTAL_ARROWS_RADIUS, enemy)) {
-					EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, mob, mPlayer, playerItemStats);
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius, enemy)) {
+					EntityUtils.applyFire(mPlugin, duration, mob, mPlayer, playerItemStats);
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, ABILITY_FIRE, true);
 				}
 			}
@@ -76,13 +84,13 @@ public class ElementalArrows extends Ability {
 				damage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
 			}
 
-			EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, enemy, mPlayer, playerItemStats);
+			EntityUtils.applyFire(mPlugin, duration, enemy, mPlayer, playerItemStats);
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, ABILITY_FIRE);
 			mLastDamage = event.getDamage();
 		} else if (arrow.hasMetadata("ElementalArrowsIceArrow")) {
 			if (isLevelTwo()) {
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), ELEMENTAL_ARROWS_RADIUS, enemy)) {
-					EntityUtils.applySlow(mPlugin, ELEMENTAL_ARROWS_DURATION, SLOW_AMPLIFIER, mob);
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius, enemy)) {
+					EntityUtils.applySlow(mPlugin, duration, SLOW_AMPLIFIER, mob);
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, ABILITY_ICE, true);
 				}
 			}
@@ -90,12 +98,12 @@ public class ElementalArrows extends Ability {
 				damage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
 			}
 
-			EntityUtils.applySlow(mPlugin, ELEMENTAL_ARROWS_DURATION, SLOW_AMPLIFIER, enemy);
+			EntityUtils.applySlow(mPlugin, duration, SLOW_AMPLIFIER, enemy);
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, ABILITY_ICE);
 			mLastDamage = event.getDamage();
 		} else if (arrow.hasMetadata("ElementalArrowsThunderArrow")) {
-			damage = event.getDamage() * DAMAGE_MULTIPLIER_3;
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), ELEMENTAL_ARROWS_RADIUS)) {
+			damage = event.getDamage() * (DAMAGE_MULTIPLIER_3 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE));
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius)) {
 				EntityUtils.applyStun(mPlugin, ENHANCED_ARROW_STUN_DURATION, mob);
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, ABILITY, true);
 			}

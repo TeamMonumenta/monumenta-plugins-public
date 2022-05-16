@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -49,6 +50,11 @@ public class CelestialBlessing extends Ability {
 			DamageType.MAGIC
 	);
 	public static final String DAMAGE_EFFECT_NAME = "CelestialBlessingExtraDamage";
+	public static final String CHARM_DAMAGE = "Celestial Blessing Damage Modifier";
+	public static final String CHARM_COOLDOWN = "Celestial Blessing Damage Cooldown";
+	public static final String CHARM_RANGE = "Celestial Blessing Range";
+	public static final String CHARM_SPEED = "Celestial Blessing Speed Amplifier";
+	public static final String CHARM_DURATION = "Celestial Blessing Duration";
 
 	private int mDuration;
 	private double mExtraDamage;
@@ -61,12 +67,12 @@ public class CelestialBlessing extends Ability {
 		mInfo.mDescriptions.add("When you strike while sneaking, you and all other players in a 12 block radius gain +20% melee and projectile damage and +20% speed for 10 s. Cooldown: 40s.");
 		mInfo.mDescriptions.add("Increases the buff to +35% damage for 12 s.");
 		mInfo.mDescriptions.add("Ability damage is now also increased by 25%. Cooldown: 30s.");
-		mInfo.mCooldown = isEnhanced() ? CELESTIAL_COOLDOWN_ENHANCED : CELESTIAL_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isEnhanced() ? CELESTIAL_COOLDOWN_ENHANCED : CELESTIAL_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.SUGAR, 1);
 
-		mDuration = isLevelOne() ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
-		mExtraDamage = isLevelOne() ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE;
+		mDuration = CharmManager.getExtraDuration(player, CHARM_DURATION) + (isLevelOne() ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION);
+		mExtraDamage = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE);
 	}
 
 	@Override
@@ -77,7 +83,7 @@ public class CelestialBlessing extends Ability {
 
 		World world = mPlayer.getWorld();
 
-		List<Player> affectedPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), CELESTIAL_RADIUS, true);
+		List<Player> affectedPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RANGE, CELESTIAL_RADIUS), true);
 
 		// Don't buff players that have their class disabled
 		affectedPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class"));
@@ -85,10 +91,10 @@ public class CelestialBlessing extends Ability {
 		// Give these players the metadata tag that boosts their damage
 		for (Player p : affectedPlayers) {
 			if (isEnhanced()) {
-				mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME + "Magic", new PercentDamageDealt(mDuration, CELESTIAL_ENHANCED_DAMAGE, ENHANCED_AFFECTED_DAMAGE_TYPES));
+				mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME + "Magic", new PercentDamageDealt(mDuration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + CELESTIAL_ENHANCED_DAMAGE, ENHANCED_AFFECTED_DAMAGE_TYPES));
 			}
 			mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME, new PercentDamageDealt(mDuration, mExtraDamage, AFFECTED_DAMAGE_TYPES));
-			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraSpeed", new PercentSpeed(mDuration, CELESTIAL_EXTRA_SPEED, ATTR_NAME));
+			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraSpeed", new PercentSpeed(mDuration, CELESTIAL_EXTRA_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), ATTR_NAME));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingParticles", new Aesthetics(mDuration,
 				(entity, fourHertz, twoHertz, oneHertz) -> {
 					// Tick effect

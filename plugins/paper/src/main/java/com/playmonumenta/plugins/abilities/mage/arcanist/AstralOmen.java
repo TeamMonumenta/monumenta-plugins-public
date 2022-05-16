@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.effects.AstralOmenStacks;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -43,6 +44,10 @@ public class AstralOmen extends Ability {
 	public static final int BONUS_TICKS = 8 * Constants.TICKS_PER_SECOND;
 	public static final float PULL_SPEED = 0.175f;
 	public static final int STACK_THRESHOLD = 3;
+	public static final String CHARM_DAMAGE = "Astral Omen Damage";
+	public static final String CHARM_MODIFIER = "Astral Omen Damage Modifier";
+	public static final String CHARM_STACK = "Astral Omen Stack Threshold";
+	public static final String CHARM_RANGE = "Astral Omen Range";
 
 	private final double mLevelBonusMultiplier;
 	private final boolean mDoPull;
@@ -73,7 +78,7 @@ public class AstralOmen extends Ability {
 		);
 		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
 
-		mLevelBonusMultiplier = isLevelOne() ? BONUS_MULTIPLIER_1 : BONUS_MULTIPLIER_2;
+		mLevelBonusMultiplier = (isLevelOne() ? BONUS_MULTIPLIER_1 : BONUS_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_MODIFIER);
 		mDoPull = isLevelTwo();
 	}
 
@@ -89,11 +94,12 @@ public class AstralOmen extends Ability {
 		if (stacks != null) {
 			mPlugin.mEffectManager.clearEffects(enemy, STACKS_SOURCE);
 		}
-
-		if (level >= STACK_THRESHOLD - 1) { // Adding 1 more stack would hit threshold, which removes all stacks anyway, so don't bother adding then removing
+		int stacksThreshold = STACK_THRESHOLD + (int) CharmManager.getLevel(mPlayer, CHARM_STACK);
+		if (level >= stacksThreshold - 1) { // Adding 1 more stack would hit threshold, which removes all stacks anyway, so don't bother adding then removing
 			World world = enemy.getWorld();
-			float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, DAMAGE);
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), SIZE)) {
+			float baseDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
+			float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, baseDamage);
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE))) {
 				if (MetadataUtils.checkOnceThisTick(mPlugin, mob, DAMAGED_THIS_TICK_METAKEY)) {
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, spellDamage, mInfo.mLinkedSpell, true);
 					if (mDoPull) {

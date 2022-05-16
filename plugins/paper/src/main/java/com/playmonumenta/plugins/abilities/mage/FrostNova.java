@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -43,8 +44,15 @@ public class FrostNova extends Ability {
 	public static final int ENHANCED_FROZEN_DURATION = 2 * Constants.TICKS_PER_SECOND;
 	public static final int DURATION_TICKS = 4 * Constants.TICKS_PER_SECOND;
 	public static final int COOLDOWN_TICKS = 18 * Constants.TICKS_PER_SECOND;
+	public static final String CHARM_DAMAGE = "Frost Nova Damage";
+	public static final String CHARM_COOLDOWN = "Frost Nova Cooldown";
+	public static final String CHARM_RANGE = "Frost Nova Range";
+	public static final String CHARM_SLOW = "Frost Nova Slowness Amplifier";
+	public static final String CHARM_DURATION = "Frost Nova Slowness Duration";
+	public static final String CHARM_FROZEN = "Frost Nova Frozen Duration";
 
-	private final int mLevelDamage;
+
+	private final float mLevelDamage;
 	private final double mLevelSlowMultiplier;
 
 	public FrostNova(Plugin plugin, @Nullable Player player) {
@@ -76,13 +84,13 @@ public class FrostNova extends Ability {
 		mInfo.mDescriptions.add(
 			"Damage is increased by 15% and cooldown is decreased by 10%. Non elites and bosses are frozen for 2s, having their AI and gravity removed."
 		);
-		mInfo.mCooldown = isEnhanced() ? (int) (COOLDOWN_TICKS * ENHANCED_COOLDOWN_REDUCTION) : COOLDOWN_TICKS;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isEnhanced() ? (int) (COOLDOWN_TICKS * ENHANCED_COOLDOWN_REDUCTION) : COOLDOWN_TICKS);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.ICE, 1);
 
 		int damage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mLevelDamage = isEnhanced() ? (int) (damage * ENHANCED_DAMAGE_MODIFIER) : damage;
-		mLevelSlowMultiplier = isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2;
+		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isEnhanced() ? (int) (damage * ENHANCED_DAMAGE_MODIFIER) : damage);
+		mLevelSlowMultiplier = (isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SLOW);
 	}
 
 	@Override
@@ -92,11 +100,14 @@ public class FrostNova extends Ability {
 		}
 		putOnCooldown();
 		float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
+		int duration = CharmManager.getExtraDuration(mPlayer, CHARM_DURATION) + DURATION_TICKS;
+		int frozenDuration = CharmManager.getExtraDuration(mPlayer, CHARM_FROZEN) + ENHANCED_FROZEN_DURATION;
+		double size = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE);
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), size, mPlayer)) {
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
-				EntityUtils.applySlow(mPlugin, DURATION_TICKS, mLevelSlowMultiplier - REDUCTION_MULTIPLIER, mob);
+				EntityUtils.applySlow(mPlugin, duration, mLevelSlowMultiplier - REDUCTION_MULTIPLIER, mob);
 			} else {
-				EntityUtils.applySlow(mPlugin, DURATION_TICKS, mLevelSlowMultiplier, mob);
+				EntityUtils.applySlow(mPlugin, duration, mLevelSlowMultiplier, mob);
 				if (isEnhanced()) {
 					mob.setAI(false);
 					mob.setGravity(false);
@@ -108,7 +119,7 @@ public class FrostNova extends Ability {
 							mob.setGravity(true);
 						}
 
-					}.runTaskLater(mPlugin, ENHANCED_FROZEN_DURATION);
+					}.runTaskLater(mPlugin, frozenDuration);
 				}
 			}
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
@@ -137,7 +148,7 @@ public class FrostNova extends Ability {
 				new PPCircle(Particle.CLOUD, mLoc, mRadius).ringMode(true).count(20).extra(0.1).spawnAsPlayerActive(mPlayer);
 				new PPCircle(Particle.CRIT_MAGIC, mLoc, mRadius).ringMode(true).count(160).extra(0.65).spawnAsPlayerActive(mPlayer);
 
-				if (mRadius >= SIZE + 1) {
+				if (mRadius >= size + 1) {
 					this.cancel();
 				}
 			}

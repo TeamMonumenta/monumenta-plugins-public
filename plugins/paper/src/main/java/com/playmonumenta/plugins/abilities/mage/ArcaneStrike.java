@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.itemstats.enchantments.Bleeding;
 import com.playmonumenta.plugins.itemstats.enchantments.Decay;
@@ -47,9 +48,13 @@ public class ArcaneStrike extends Ability {
 	private static final int BONUS_DAMAGE_2 = 3;
 	private static final int COOLDOWN = 5 * 20;
 	public static final ClassAbility ABILITY = ClassAbility.ARCANE_STRIKE;
+	public static final String CHARM_DAMAGE = "Arcane Strike Damage";
+	public static final String CHARM_RANGE = "Arcane Strike Range";
+	public static final String CHARM_BONUS = "Arcane Strike Bonus Damage";
+	public static final String CHARM_COOLDOWN = "Arcane Strike Cooldown";
 
-	private final int mDamageBonus;
-	private final int mDamageBonusAffected;
+	private final float mDamageBonus;
+	private final float mDamageBonusAffected;
 
 	public ArcaneStrike(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Arcane Strike");
@@ -59,10 +64,10 @@ public class ArcaneStrike extends Ability {
 		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 4 magic damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 5s.");
 		mInfo.mDescriptions.add("The damage is increased to 7. Mobs that are on fire or slowed take 3 additional damage.");
 		mInfo.mDescriptions.add("Your enchantment on-hit effects are now also applied to all other enemies hit in the radius.");
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
-		mDamageBonus = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mDamageBonusAffected = isLevelOne() ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2;
+		mDamageBonus = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mDamageBonusAffected = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_BONUS, isLevelOne() ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2);
 	}
 
 	@Override
@@ -70,7 +75,7 @@ public class ArcaneStrike extends Ability {
 		if (event.getType() == DamageType.MELEE && mPlayer != null && mPlayer.getCooledAttackStrength(0) == 1) {
 			putOnCooldown();
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), RADIUS, mPlayer)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS), mPlayer)) {
 				float dmg = SpellPower.getSpellDamage(mPlugin, mPlayer, mDamageBonus);
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.SanctifiedArmorHeal;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -36,6 +37,9 @@ public class SanctifiedArmor extends Ability {
 	private static final int SLOWNESS_DURATION = 20 * 3;
 	private static final float KNOCKBACK_SPEED = 0.4f;
 	private static final String ENHANCEMENT_EFFECT_NAME = "SanctifiedArmorHealEffect";
+	public static final String CHARM_DAMAGE = "Sanctified Armor Damage";
+	public static final String CHARM_SLOW = "Sanctified Armor Slowness Amplifier";
+	public static final String CHARM_DURATION = "Sanctified Armor Slowness Duration";
 
 	private final double mPercentDamageReturned;
 
@@ -81,11 +85,11 @@ public class SanctifiedArmor extends Ability {
 
 			MovementUtils.knockAway(mPlayer, source, KNOCKBACK_SPEED, KNOCKBACK_SPEED, true);
 			if (isLevelTwo()) {
-				EntityUtils.applySlow(mPlugin, SLOWNESS_DURATION, SLOWNESS_AMPLIFIER_2, source);
+				EntityUtils.applySlow(mPlugin, SLOWNESS_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), SLOWNESS_AMPLIFIER_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), source);
 			}
 
 			if (!event.isBlocked()) {
-				double damage = mPercentDamageReturned * event.getFinalDamage(false);
+				double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mPercentDamageReturned * event.getFinalDamage(false));
 				mLastAffectedMob = null;
 				DamageUtils.damage(mPlayer, source, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true);
 

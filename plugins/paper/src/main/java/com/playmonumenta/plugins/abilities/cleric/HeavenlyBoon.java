@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -38,6 +39,9 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private static final double ENHANCEMENT_POTION_EFFECT_BONUS = 0.2;
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_BOOST = 24 * 20;
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_DURATION = 3 * 60 * 20;
+	public static final String CHARM_CHANCE = "Heavenly Boon Potion Chance";
+	public static final String CHARM_DURATION = "Heavenly Boon Potion Duration";
+
 
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
@@ -60,8 +64,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				ENHANCEMENT_POTION_EFFECT_MAX_DURATION / (60 * 20)
 			));
 		mTracker = new KillTriggeredAbilityTracker(this);
-		mChance = isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE;
-		mDuration = isLevelOne() ? HEAVENLY_BOON_1_DURATION : HEAVENLY_BOON_2_DURATION;
+		mChance = CharmManager.getLevelPercentDecimal(player, CHARM_CHANCE) + (isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE);
+		mDuration = CharmManager.getExtraDuration(player, CHARM_DURATION) + (isLevelOne() ? HEAVENLY_BOON_1_DURATION : HEAVENLY_BOON_2_DURATION);
 		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
 
 		if (player != null) {

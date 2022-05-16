@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -37,8 +38,14 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(222, 219, 36), 1.0f);
 
 	private final int mResetSize;
+	private final int mMaxStacks;
 	private ClassAbility[] mResets;
 	private final double mSpeed;
+	public static String CHARM_STACKS = "Sage's Insight Stack Trigger Threshold";
+	public static String CHARM_DECAY = "Sage's Insight Decay Duration";
+	public static String CHARM_SPEED = "Sage's Insight Speed Amplifier";
+	public static String CHARM_ABILITY = "Sage's Insight Ability Count";
+
 
 	private HashMap<ClassAbility, Boolean> mStacksMap;
 
@@ -49,9 +56,10 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 		mInfo.mDescriptions.add("If an active spell hits an enemy, you gain an Arcane Insight. Insights stack up to 8, but decay every 4s of not gaining one. Once 8 Insights are revealed, the Arcanist gains 20% Speed for 8s and the cooldowns of the previous two spells cast are refreshed. This sets your Insights back to 0.");
 		mInfo.mDescriptions.add("Sage's Insight now grants 30% Speed and refreshes the cooldowns of your previous three spells upon activating.");
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
-		mResetSize = isLevelOne() ? ABILITIES_COUNT_1 : ABILITIES_COUNT_2;
+		mResetSize = (isLevelOne() ? ABILITIES_COUNT_1 : ABILITIES_COUNT_2) + (int) CharmManager.getLevel(player, CHARM_ABILITY);
+		mMaxStacks = (int) CharmManager.getLevel(player, CHARM_STACKS) + MAX_STACKS;
 		mResets = new ClassAbility[mResetSize];
-		mSpeed = isLevelOne() ? SPEED_1 : SPEED_2;
+		mSpeed = (isLevelOne() ? SPEED_1 : SPEED_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SPEED);
 		mStacksMap = new HashMap<>();
 	}
 
@@ -65,7 +73,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 			mTicksToStackDecay -= 5;
 
 			if (mTicksToStackDecay <= 0) {
-				mTicksToStackDecay = DECAY_TIMER;
+				mTicksToStackDecay = DECAY_TIMER + CharmManager.getExtraDuration(mPlayer, CHARM_DECAY);
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlayer, "Sage's Insight Stacks: " + mStacks);
 				ClientModHandler.updateAbility(mPlayer, this);
@@ -79,16 +87,17 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 		if (ability == null) {
 			return false;
 		}
-		mTicksToStackDecay = DECAY_TIMER;
+		mTicksToStackDecay = DECAY_TIMER + CharmManager.getExtraDuration(mPlayer, CHARM_DECAY);
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
 		Location locD = event.getDamagee().getLocation().add(0, 1, 0);
-		if (mStacks < MAX_STACKS) {
+
+		if (mStacks < mMaxStacks) {
 			Boolean bool = mStacksMap.get(ability);
 			if (bool != null && bool) {
 				mStacks++;
 				mStacksMap.put(ability, false);
-				if (mStacks == MAX_STACKS) {
+				if (mStacks == mMaxStacks) {
 					mPlugin.mEffectManager.addEffect(mPlayer, "SagesExtraSpeed", new PercentSpeed(SPEED_DURATION, mSpeed, ATTR_NAME));
 					new PartialParticle(Particle.REDSTONE, loc, 20, 1.4, 1.4, 1.4, COLOR).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 2.1, 0), 20, 0.5, 0.1, 0.5, 0.1).spawnAsPlayerActive(mPlayer);
@@ -152,7 +161,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public int getMaxCharges() {
-		return MAX_STACKS;
+		return mMaxStacks;
 	}
 
 }

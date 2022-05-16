@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -37,6 +38,12 @@ public class PrismaticShield extends Ability {
 	private static final int HEAL_DURATION = 3 * 20;
 	private static final int HEAL_PERCENT = 5;
 	private static final String HEALED_THIS_TICK_METAKEY = "PrismaticShieldHealedThisTick";
+	public static final String CHARM_ABSORPTION = "Prismatic Shield Absorption Health";
+	public static final String CHARM_COOLDOWN = "Prismatic Shield Cooldown";
+	public static final String CHARM_KNOCKBACK = "Prismatic Shield Knockback";
+	public static final String CHARM_STUN = "Prismatic Shield Stun Duration";
+	public static final String CHARM_DURATION = "Prismatic Shield Absorption Duration";
+	public static final String CHARM_TRIGGER = "Prismatic Shield Trigger Health";
 
 	private final int mAbsorptionHealth;
 
@@ -56,9 +63,9 @@ public class PrismaticShield extends Ability {
 				HEAL_DURATION / 20,
 				HEAL_PERCENT)
 		);
-		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mIgnoreCooldown = true;
-		mAbsorptionHealth = isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2;
+		mAbsorptionHealth = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 	}
 
@@ -78,7 +85,7 @@ public class PrismaticShield extends Ability {
 			boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -4 * (mAbsorptionHealth + 1);
 
 
-			if (healthRemaining > TRIGGER_HEALTH) {
+			if (healthRemaining > CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TRIGGER, TRIGGER_HEALTH)) {
 				return;
 			} else if (dealDamageLater) {
 				// The player has taken fatal damage BUT will be saved by the absorption, so set damage to 0 and compensate later
@@ -93,13 +100,14 @@ public class PrismaticShield extends Ability {
 
 			// Conditions match - prismatic shield
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
-				MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
+				float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK_SPEED);
+				MovementUtils.knockAway(mPlayer, mob, knockback, true);
 				if (isLevelTwo()) {
-					EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
+					EntityUtils.applyStun(mPlugin, STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), mob);
 				}
 			}
 
-			AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, DURATION);
+			AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION));
 			World world = mPlayer.getWorld();
 			new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1).spawnAsPlayerActive(mPlayer);
