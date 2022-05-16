@@ -17,8 +17,10 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -70,8 +72,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 		super(plugin, player, "Hallowed Beam");
 		mInfo.mScoreboardId = "HallowedBeam";
 		mInfo.mShorthandName = "HB";
-		mInfo.mDescriptions.add("Left-click with a bow or crossbow while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 30% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals projectile damage equal to the used weapon's projectile damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a bow will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). Cooldown: 16s each charge.");
-		mInfo.mDescriptions.add("Hallowed Beam gains a third charge, the cooldown is reduced to 12 seconds, and players healed by it gain 10% damage resistance for 5 seconds.");
+		mInfo.mDescriptions.add("Left-click with a bow or crossbow while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 30% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals projectile damage equal to the used weapon's projectile damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a bow will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). This skill can only apply Recoil twice before touching the ground. Cooldown: 16s each charge.");
+		mInfo.mDescriptions.add("Hallowed Beam gains a third charge (and can apply Recoil three times before touching the ground), the cooldown is reduced to 12 seconds, and players healed by it gain 10% damage resistance for 5 seconds.");
 		mInfo.mLinkedSpell = ClassAbility.HALLOWED_BEAM;
 		mInfo.mCooldown = isLevelOne() ? HALLOWED_1_COOLDOWN : HALLOWED_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -163,6 +165,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 								MovementUtils.knockAway(pe, le, 0.65f, true);
 							}
 
+							applyRecoil();
+
 						} else if (Crusade.enemyTriggersAbilities(applyE, mCrusade)) {
 							if (mMode == Mode.HEALING) {
 								incrementCharge();
@@ -189,6 +193,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 							Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
 							new PartialParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f).spawnAsPlayerActive(mPlayer);
 							new PartialParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f).spawnAsPlayerActive(mPlayer);
+
+							applyRecoil();
 						} else if (EntityUtils.isHostileMob(applyE)) {
 							if (mMode == Mode.HEALING) {
 								incrementCharge();
@@ -220,11 +226,27 @@ public class HallowedBeam extends MultipleChargeAbility {
 							Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
 							new PartialParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f).spawnAsPlayerActive(mPlayer);
 							new PartialParticle(Particle.CRIT_MAGIC, loc, 30, 1, 1, 1, 0.25).spawnAsPlayerActive(mPlayer);
+
+							applyRecoil();
 						}
 						this.cancel();
 					}
 				}.runTaskTimer(mPlugin, 0, 1);
 			}
+		}
+	}
+
+	public void applyRecoil() {
+		ItemStack item = mPlayer.getInventory().getItemInMainHand();
+		if (ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RECOIL) > 0) {
+			if (!EntityUtils.isRecoilDisable(mPlugin, mPlayer, mMaxCharges)) {
+				if (!mPlayer.isSneaking() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && mPlayer.getLocation().getY() >= 0) {
+					Vector velocity = NmsUtils.getVersionAdapter().getActualDirection(mPlayer).multiply(-0.5 * Math.sqrt(ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RECOIL)));
+					velocity.setY(Math.max(0.1, velocity.getY()));
+					mPlayer.setVelocity(velocity);
+				}
+			}
+			EntityUtils.applyRecoilDisable(mPlugin, 9999, (int) EntityUtils.getRecoilDisableAmount(mPlugin, mPlayer) + 1, mPlayer);
 		}
 	}
 

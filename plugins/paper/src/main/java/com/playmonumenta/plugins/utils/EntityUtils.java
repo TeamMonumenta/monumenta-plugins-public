@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.effects.Paralyze;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.effects.RecoilDisable;
 import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -955,6 +956,29 @@ public class EntityUtils {
 		if (t == null || t < ticks) {
 			STUNNED_MOBS.put(mob, ticks);
 		}
+	}
+
+	public static final String NO_RECOIL_EFFECT_NAME = "DisableRecoilMidair";
+
+	public static void applyRecoilDisable(Plugin plugin, int ticks, int amount, LivingEntity mob) {
+		plugin.mEffectManager.addEffect(mob, NO_RECOIL_EFFECT_NAME, new RecoilDisable(ticks, amount));
+	}
+
+	public static double getRecoilDisableAmount(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> disable = plugin.mEffectManager.getEffects(mob, NO_RECOIL_EFFECT_NAME);
+		if (disable != null) {
+			Effect d = disable.last();
+			return d.getMagnitude();
+		} else {
+			return 0;
+		}
+	}
+
+	public static boolean isRecoilDisable(Plugin plugin, LivingEntity mob, int amount) {
+		if (getRecoilDisableAmount(plugin, mob) >= amount) {
+			return true;
+		}
+		return false;
 	}
 
 	private static final String ARROW_IFRAMES_EFFECT_NAME = "SplitArrrowIframesEffect";

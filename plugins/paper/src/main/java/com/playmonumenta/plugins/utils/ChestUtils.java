@@ -92,8 +92,7 @@ public class ChestUtils {
 					MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey().toString() + "' which was scaled & distributed");
 
 					// Get all other players in range, excluding the source player
-					otherPlayers = PlayerUtils.playersInLootScalingRange(player.getLocation());
-					otherPlayers.remove(player);
+					otherPlayers = PlayerUtils.otherPlayersInLootScalingRange(player);
 
 					double bonusItems = BONUS_ITEMS[Math.min(BONUS_ITEMS.length - 1, otherPlayers.size() + 1)];
 					luckAmount = (int) bonusItems;

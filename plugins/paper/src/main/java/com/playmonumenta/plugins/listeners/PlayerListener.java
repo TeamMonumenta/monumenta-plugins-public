@@ -274,6 +274,11 @@ public class PlayerListener implements Listener {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
+					if (!player.isValid() || !player.isOnline()) {
+						this.cancel();
+						return;
+					}
+
 					if (slot != player.getInventory().getHeldItemSlot()
 						    || !item.equals(player.getActiveItem())
 						    || !player.isHandRaised()) {
@@ -573,16 +578,13 @@ public class PlayerListener implements Listener {
 		if (command.startsWith("nbte")
 		    || command.startsWith("nbti")
 		    || command.startsWith("nbtp")) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					ItemStack item = player.getEquipment().getItemInMainHand();
-					if (item != null && item.getAmount() > 0) {
-						ItemUtils.setPlainTag(item);
-						player.getEquipment().setItemInMainHand(item, true);
-					}
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				ItemStack item = player.getEquipment().getItemInMainHand();
+				if (item != null && item.getAmount() > 0) {
+					ItemUtils.setPlainTag(item);
+					player.getEquipment().setItemInMainHand(item, true);
 				}
-			}.runTaskLater(mPlugin, 0);
+			}, 0);
 		}
 	}
 
@@ -818,7 +820,7 @@ public class PlayerListener implements Listener {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (!player.isRiptiding()) {
+					if (!player.isRiptiding() || !player.isOnline() || !player.isValid()) {
 						this.cancel();
 						return;
 					}
@@ -864,6 +866,11 @@ public class PlayerListener implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
+				if (!player.isOnline()) {
+					this.cancel();
+					return;
+				}
+
 				Block block = player.getLocation().getBlock();
 				Block blockEye = player.getEyeLocation().getBlock();
 				if ((!block.getType().equals(Material.AIR) || !blockEye.getType().equals(Material.AIR))) {
@@ -897,7 +904,7 @@ public class PlayerListener implements Listener {
 				public void run() {
 					player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.MASTER, 1, mFreq);
 					mFreq += 0.05f;
-					if (mFreq > 1.5) {
+					if (!player.isOnline() || mFreq > 1.5) {
 						this.cancel();
 					}
 				}
@@ -978,7 +985,7 @@ public class PlayerListener implements Listener {
 								world.playSound(teleLoc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1.0f, 1.3f);
 
 								this.cancel();
-							} else if (!player.isSleeping()) {
+							} else if (!player.isSleeping() || !player.isOnline() || !player.isValid()) {
 								// Abort, player got out of bed early
 								this.cancel();
 								return;
@@ -1181,12 +1188,9 @@ public class PlayerListener implements Listener {
 		) {
 			Plugin plugin = Plugin.getInstance();
 			if (plugin != null) {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						plugin.mAbilityManager.updatePlayerAbilities(player, true);
-					}
-				}.runTaskLater(plugin, 0);
+				Bukkit.getScheduler().runTaskLater(plugin, () -> {
+					plugin.mAbilityManager.updatePlayerAbilities(player, true);
+				}, 0);
 			}
 		}
 	}

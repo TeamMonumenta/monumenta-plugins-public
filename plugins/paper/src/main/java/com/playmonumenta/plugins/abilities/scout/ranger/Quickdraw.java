@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import javax.annotation.Nullable;
@@ -35,7 +36,7 @@ public class Quickdraw extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.QUICKDRAW;
 		mInfo.mScoreboardId = "Quickdraw";
 		mInfo.mShorthandName = "Qd";
-		mInfo.mDescriptions.add("Left-clicking with a bow instantly fires a fully charged arrow. (This Arrow does not activate recoil) Cooldown: 6s.");
+		mInfo.mDescriptions.add("Left-clicking with a bow instantly fires a fully charged arrow. This skill can only apply Recoil once before touching the ground. Cooldown: 6s.");
 		mInfo.mDescriptions.add("Cooldown: 3s.");
 		mInfo.mCooldown = isLevelOne() ? QUICKDRAW_1_COOLDOWN : QUICKDRAW_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -73,12 +74,20 @@ public class Quickdraw extends Ability {
 		if (mPlayer == null) {
 			return true;
 		}
+
 		Vector direction = mPlayer.getLocation().getDirection();
 		if (deviation != 0) {
 			direction.rotateAroundY(deviation * 10.0 * Math.PI / 180);
 		}
 		Arrow arrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), direction, 3.0f, 0, Arrow.class);
-		arrow.addScoreboardTag("NoRecoil");
+
+		if (ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.RECOIL) > 0) {
+			if (EntityUtils.isRecoilDisable(mPlugin, mPlayer, 1)) {
+				arrow.addScoreboardTag("NoRecoil");
+			}
+			EntityUtils.applyRecoilDisable(mPlugin, 9999, 1, mPlayer);
+		}
+
 		arrow.setShooter(mPlayer);
 		arrow.setPierceLevel(inMainHand.getEnchantmentLevel(Enchantment.PIERCING));
 		arrow.setCritical(true);

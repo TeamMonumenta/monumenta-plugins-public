@@ -7,10 +7,12 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.structures.StructuresPlugin;
+import com.playmonumenta.structures.managers.RespawningStructure;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
@@ -58,29 +60,29 @@ public class PlayerUtils {
 		player.teleport(player.getWorld().getSpawnLocation());
 	}
 
-	public static List<Player> playersInLootScalingRange(Location loc) {
-		int range = ServerProperties.getLootScalingRadius();
-		if (range <= 0) {
-			return new ArrayList<>();
-		}
+	public static List<Player> otherPlayersInLootScalingRange(Player player) {
+		// In dungeons, all players in the same world (i.e. the entire dungeon) are in range
 
 		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
 		if (isDungeon) {
-			List<Player> players = new ArrayList<>();
-			int rx = loc.getBlockX() >> REGION_COORDINATE_SHIFT;
-			int rz = loc.getBlockZ() >> REGION_COORDINATE_SHIFT;
-			for (Player player : loc.getWorld().getPlayers()) {
-				Location loc2 = player.getLocation();
-				int rx2 = loc2.getBlockX() >> REGION_COORDINATE_SHIFT;
-				int rz2 = loc2.getBlockZ() >> REGION_COORDINATE_SHIFT;
-				if (rx == rx2 && rz == rz2) {
-					players.add(player);
-				}
-			}
-			return players;
-		} else {
-			return playersInRange(loc, range, true);
+			return player.getWorld().getPlayers().stream()
+				.filter(p -> p.getGameMode() != GameMode.SPECTATOR
+					             && !p.equals(player))
+				.toList();
 		}
+
+		// In a POI, all players within the same POI are in range
+		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(player.getLocation().toVector(), true);
+		if (!structures.isEmpty()) {
+			return player.getWorld().getPlayers().stream()
+				.filter(p -> p.getGameMode() != GameMode.SPECTATOR
+					             && !p.equals(player)
+					             && structures.stream().anyMatch(structure -> structure.isNearby(p)))
+				.toList();
+		}
+
+		// Otherwise, perform no loot scaling
+		return Collections.emptyList();
 	}
 
 	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable) {

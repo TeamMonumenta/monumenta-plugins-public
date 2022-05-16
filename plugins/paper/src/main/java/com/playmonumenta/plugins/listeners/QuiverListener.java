@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
+import java.util.Arrays;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.block.ShulkerBox;
@@ -17,6 +18,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -28,90 +30,116 @@ import org.bukkit.inventory.meta.BlockStateMeta;
  */
 public class QuiverListener implements Listener {
 
+	// Refill if the used arrow stack has less than this many arrows left.
+	private static final int REFILL_LOWER_THAN = 16;
+
+	// Refill arrows up to this amount. This is less than max stack size to prevent using an infinity crossbow (or multiple in a row) starting a new stack.
+	private static final int REFILL_UP_TO = 48;
+
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityShootBowEvent(EntityShootBowEvent event) {
 		if (event.getEntity() instanceof Player player) {
-			refillInventory(player);
+			refillInventoryDelayed(player);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityLoadCrossbowEvent(EntityLoadCrossbowEvent event) {
 		if (event.getEntity() instanceof Player player) {
-			refillInventory(player);
+			refillInventoryDelayed(player);
 		}
 	}
 
-	private void refillInventory(Player player) {
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+	public void playerInteractEvent(PlayerInteractEvent event) {
+		// When right-clicking with a bow or crossbow while having no arrows in the inventory, take some out of a quiver is available
+		Player player = event.getPlayer();
+		if ((ItemUtils.isSomeBow(player.getInventory().getItemInMainHand()) || ItemUtils.isSomeBow(player.getInventory().getItemInOffHand()))
+			    && Arrays.stream(player.getInventory().getContents()).noneMatch(ItemUtils::isArrow)) {
+			refillInventoryImmediately(player);
+		}
+	}
+
+	// Refill delayed to execute after the event for bow shot/crossbow load (top execute after the arrow has been used)
+	private void refillInventoryDelayed(Player player) {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			return;
 		}
-		// run delayed to execute after the bow has been shot (i.e. after the arrow has been used)
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			PlayerInventory inventory = player.getInventory();
-			for (ItemStack arrow : inventory) {
-				// Look for the first arrow stack in the player's inventory
-				if (!ItemUtils.isArrow(arrow)) {
-					continue;
-				}
-				// If that stack still has enough arrows, stop
-				if (arrow.getAmount() >= 16) {
-					return;
-				}
-				// Search for quivers in the inventory and use them to restock that stack
-				for (ItemStack quiver : inventory) {
-					if (!ItemStatUtils.isQuiver(quiver)
-						    || !(quiver.getItemMeta() instanceof BlockStateMeta blockStateMeta)
-						    || !(blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox)) {
-						continue;
-					}
-					boolean modified = false;
-					// Move matching arrows until the stack to refill is full
-					for (ItemStack quiverArrow : shulkerBox.getInventory()) {
-						if (arrow.isSimilar(quiverArrow)) {
-							int transferred = Math.min(arrow.getMaxStackSize() - arrow.getAmount(), quiverArrow.getAmount());
-							quiverArrow.subtract(transferred);
-							arrow.add(transferred);
-							modified = true;
-							if (arrow.getAmount() >= arrow.getMaxStackSize()) {
-								break;
-							}
-						}
-					}
-					if (modified) {
-						blockStateMeta.setBlockState(shulkerBox);
-						quiver.setItemMeta(blockStateMeta);
-					}
-					if (arrow.getAmount() >= arrow.getMaxStackSize()) {
-						return;
-					}
-				}
-				// no quiver found, or not enough arrows for a full stack - stop here.
+			refillInventoryImmediately(player);
+		});
+	}
+
+	// Refill immediately if the event allows
+	private void refillInventoryImmediately(Player player) {
+		if (player.getGameMode() == GameMode.CREATIVE) {
+			return;
+		}
+		PlayerInventory inventory = player.getInventory();
+		for (ItemStack arrow : inventory) {
+			// Look for the first arrow stack in the player's inventory
+			if (!ItemUtils.isArrow(arrow)) {
+				continue;
+			}
+			// If that stack still has enough arrows, stop
+			if (arrow.getAmount() >= REFILL_LOWER_THAN) {
 				return;
 			}
-
-			// No arrows found in the inventory - the last arrow of its type was used up.
-			// Search for a quiver and take out the first stack of arrows.
-			if (!InventoryUtils.isFull(inventory)) {
-				for (ItemStack quiver : inventory) {
-					if (!ItemStatUtils.isQuiver(quiver)
-						    || !(quiver.getItemMeta() instanceof BlockStateMeta blockStateMeta)
-						    || !(blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox)) {
-						continue;
-					}
-					for (ItemStack arrow : shulkerBox.getInventory()) {
-						if (!ItemUtils.isArrow(arrow)) {
-							continue;
+			// Search for quivers in the inventory and use them to restock that stack
+			for (ItemStack quiver : inventory) {
+				if (!ItemStatUtils.isQuiver(quiver)
+					    || !(quiver.getItemMeta() instanceof BlockStateMeta blockStateMeta)
+					    || !(blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox)) {
+					continue;
+				}
+				boolean modified = false;
+				// Move matching arrows until the stack to refill is almost full
+				for (ItemStack quiverArrow : shulkerBox.getInventory()) {
+					if (arrow.isSimilar(quiverArrow)) {
+						int transferred = Math.min(REFILL_UP_TO - arrow.getAmount(), quiverArrow.getAmount());
+						quiverArrow.subtract(transferred);
+						arrow.add(transferred);
+						modified = true;
+						if (arrow.getAmount() >= REFILL_UP_TO) {
+							break;
 						}
-						inventory.addItem(arrow.clone());
-						arrow.setAmount(0);
-						blockStateMeta.setBlockState(shulkerBox);
-						quiver.setItemMeta(blockStateMeta);
-						return; // can directly return from here
 					}
 				}
+				if (modified) {
+					blockStateMeta.setBlockState(shulkerBox);
+					quiver.setItemMeta(blockStateMeta);
+				}
+				if (arrow.getAmount() >= REFILL_UP_TO) {
+					return;
+				}
 			}
-		});
+			// no quiver found, or not enough arrows for a full stack - stop here.
+			return;
+		}
+
+		// No arrows found in the inventory - the last arrow of its type was used up.
+		// Search for a quiver and take out the first stack of arrows.
+		if (!InventoryUtils.isFull(inventory)) {
+			for (ItemStack quiver : inventory) {
+				if (!ItemStatUtils.isQuiver(quiver)
+					    || !(quiver.getItemMeta() instanceof BlockStateMeta blockStateMeta)
+					    || !(blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox)) {
+					continue;
+				}
+				for (ItemStack arrow : shulkerBox.getInventory()) {
+					if (!ItemUtils.isArrow(arrow)) {
+						continue;
+					}
+					ItemStack moved = arrow.clone();
+					moved.setAmount(Math.min(arrow.getAmount(), REFILL_UP_TO));
+					inventory.addItem(moved);
+					arrow.subtract(moved.getAmount());
+					blockStateMeta.setBlockState(shulkerBox);
+					quiver.setItemMeta(blockStateMeta);
+					return; // can directly return from here
+				}
+			}
+		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

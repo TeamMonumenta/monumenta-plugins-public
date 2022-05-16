@@ -6,6 +6,7 @@ import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEventBungee;
 import java.util.UUID;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
@@ -69,5 +70,21 @@ public class NetworkRelayIntegration implements Listener {
 				ex.printStackTrace();
 			}
 		}
+	}
+
+	public static String getProxyName() {
+		if (INSTANCE != null) {
+			@Nullable String shardName;
+			try {
+				shardName = NetworkRelayAPI.getShardName();
+			} catch (Exception exception) {
+				shardName = null;
+			}
+			if (shardName == null) {
+				return "Unknown";
+			}
+			return shardName;
+		}
+		return "No NetworkRelay integration";
 	}
 }
