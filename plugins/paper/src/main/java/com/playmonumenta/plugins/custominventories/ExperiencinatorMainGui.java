@@ -72,7 +72,7 @@ public final class ExperiencinatorMainGui extends CustomInventory {
 			ItemStack selectiveConvert = new ItemStack(Material.GOLD_NUGGET);
 			ItemMeta meta = selectiveConvert.getItemMeta();
 			meta.setDisplayName(GOLD + "" + BOLD + "Selective Conversion");
-			meta.setLore(List.of(GRAY + "Select which items to convert"));
+			meta.setLore(List.of(GRAY + "Convert specific items only"));
 			selectiveConvert.setItemMeta(meta);
 			mInventory.setItem(15, selectiveConvert);
 		}
