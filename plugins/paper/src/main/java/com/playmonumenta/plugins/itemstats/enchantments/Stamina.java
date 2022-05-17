@@ -1,10 +1,32 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import java.util.EnumSet;
+import java.util.NavigableSet;
+import javax.annotation.Nullable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+
 public class Stamina implements Enchantment {
+
+	private static final String STAMINA_EFFECT = "StaminaDamage";
+	private static final double DAMAGE_BONUS = 0.025;
+	private static final double DAMAGE_CAP = 0.1;
+	private static final int DURATION = 5 * 20;
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
+		DamageEvent.DamageType.MELEE,
+		DamageEvent.DamageType.MELEE_ENCH,
+		DamageEvent.DamageType.MELEE_SKILL,
+		DamageEvent.DamageType.PROJECTILE
+	);
 
 	@Override
 	public @NotNull String getName() {
@@ -14,6 +36,26 @@ public class Stamina implements Enchantment {
 	@Override
 	public EnchantmentType getEnchantmentType() {
 		return EnchantmentType.STAMINA;
+	}
+
+	@Override
+	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
+		applyStamina(plugin, player, level);
+	}
+
+	@Override
+	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		applyStamina(plugin, player, value);
+	}
+
+	private void applyStamina(Plugin plugin, Player player, double level) {
+		NavigableSet<Effect> s = plugin.mEffectManager.getEffects(player, STAMINA_EFFECT);
+		double currStamina = 0;
+		if (s != null) {
+			currStamina = s.last().getMagnitude();
+		}
+		// TODO: Sound + Particles
+		plugin.mEffectManager.addEffect(player, STAMINA_EFFECT, new PercentDamageDealt(DURATION, Math.min(currStamina + DAMAGE_BONUS, DAMAGE_CAP) * level, AFFECTED_DAMAGE_TYPES));
 	}
 
 }

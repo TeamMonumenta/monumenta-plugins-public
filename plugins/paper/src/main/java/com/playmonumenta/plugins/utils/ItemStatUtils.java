@@ -201,9 +201,10 @@ public class ItemStatUtils {
 
 	public enum Masterwork {
 		NONE("none", DUMMY_LORE_TO_REMOVE),
-		ZERO("0", Component.text("", NamedTextColor.DARK_GRAY).append(Component.text("☆☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		I("1", Component.text("★", TextColor.fromHexString("#4AC2E5")).append(Component.text("☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		II("2", Component.text("★★", TextColor.fromHexString("#00CFDE")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		ZERO("0", Component.text("", NamedTextColor.DARK_GRAY).append(Component.text("☆☆☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		I("1", Component.text("★", TextColor.fromHexString("#FFB43E")).append(Component.text("☆☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		II("2", Component.text("★★", TextColor.fromHexString("#FFB43E")).append(Component.text("☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		III("3", Component.text("★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
 		ERROR("error", Component.text("ERROR", TextColor.fromHexString("#704C8A")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true));
 
 		static final String KEY = "Masterwork";
@@ -318,7 +319,10 @@ public class ItemStatUtils {
 		PASS("seasonpass", Component.text("Seasonal Pass", TextColor.fromHexString("#FFF63C")).decoration(TextDecoration.ITALIC, false)),
 		BLITZ("blitz", Component.text("Plunderer's Blitz", TextColor.fromHexString("#DAAD3E")).decoration(TextDecoration.ITALIC, false)),
 		SOULTHREAD("soul", Component.text("Soulwoven", TextColor.fromHexString("#7FFFD4")).decoration(TextDecoration.ITALIC, false)),
-		SCIENCE("science", Component.text("item name color", TextColor.fromHexString("#DCE8E3")).decoration(TextDecoration.ITALIC, false)),
+		SCIENCE("science", Component.text("Portal Strike Name TBD", TextColor.fromHexString("#DCE8E3")).decoration(TextDecoration.ITALIC, false)),
+		BLUESTRIKE("bluestrike", Component.text("Blue Strike Name TBD", TextColor.fromHexString("#0C2CA2")).decoration(TextDecoration.ITALIC, false)),
+		GALLERYOFFEAR("gallerybase", Component.text("Gallery of Fear", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false)),
+		GOFMAPONE("gallery1", Component.text("Map 1", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false)),
 		AMBER("amber", Component.text("item name color", TextColor.fromHexString("#FFBF00")).decoration(TextDecoration.ITALIC, false)),
 		GOLD("gold", Component.text("item name color", TextColor.fromHexString("#FFD700")).decoration(TextDecoration.ITALIC, false)),
 		SILVER("silver", Component.text("item name color", TextColor.fromHexString("#C0C0C0")).decoration(TextDecoration.ITALIC, false)),
@@ -445,7 +449,7 @@ public class ItemStatUtils {
 		SLAYER(new Slayer(), true, false, false),
 		SMITE(new Smite(), true, false, false),
 		SNIPER(new Sniper(), true, false, false),
-		STAMINA(new Stamina(), true, true, false),
+		STAMINA(new Stamina(), true, false, false),
 		STARVATION(new Starvation(), false, true, false),
 		SUSTENANCE(new Sustenance(), true, false, false),
 		WEIGHTLESS(new Weightless(), false, false, false),
@@ -464,6 +468,12 @@ public class ItemStatUtils {
 		CURSE_OF_SHRAPNEL(new CurseOfShrapnel(), true, true, false),
 		TWO_HANDED(new TwoHanded(), false, true, false),
 		INEPTITUDE(new Ineptitude(), true, true, false),
+		MELEE_FRAGILITY(new MeleeFragility(), true, true, false),
+		BLAST_FRAGILITY(new BlastFragility(), true, true, false),
+		PROJECTILE_FRAGILITY(new ProjectileFragility(), true, true, false),
+		MAGIC_FRAGILITY(new MagicFragility(), true, true, false),
+		FIRE_FRAGILITY(new FireFragility(), true, true, false),
+		FALL_FRAGILITY(new FallFragility(), true, true, false),
 		// Durability
 		UNBREAKING(Enchantment.DURABILITY, "Unbreaking", true, false, false),
 		UNBREAKABLE(null, "Unbreakable", false, false, false),
@@ -924,6 +934,9 @@ public class ItemStatUtils {
 	}
 
 	static String toRomanNumerals(int value) {
+		if (value == 0) {
+			return "0";
+		}
 		int nextNumeralValue = ROMAN_NUMERAL_VALUES.floorKey(value);
 		if (value == nextNumeralValue) {
 			return ROMAN_NUMERAL_VALUES.get(value);
@@ -1939,7 +1952,7 @@ public class ItemStatUtils {
 		}
 
 		NBTList<String> charmLore = monumenta.getStringList(CHARM_KEY);
-		if (charmLore != null) {
+		if (charmLore != null && getTier(item) == Tier.CHARM) {
 			lore.add(Component.empty());
 			lore.add(Component.text("When in Charm Slot:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 			for (String serializedLine : charmLore) {
@@ -2225,13 +2238,13 @@ public class ItemStatUtils {
 			}
 			String hexColor = "#C8A2C8";
 			if (lore.charAt(0) == '+') {
-				if (lore.contains("Cooldown")) {
+				if (lore.endsWith("Cooldown")) {
 					hexColor = "#D02E28";
 				} else {
 					hexColor = "#4AC2E5";
 				}
 			} else if (lore.charAt(0) == '-') {
-				if (lore.contains("Cooldown")) {
+				if (lore.endsWith("Cooldown")) {
 					hexColor = "#4AC2E5";
 				} else {
 					hexColor = "#D02E28";

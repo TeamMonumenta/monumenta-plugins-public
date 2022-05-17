@@ -120,7 +120,7 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public static class Metadata {
 
-		private final DamageType mType;
+		private DamageType mType;
 		private final @Nullable ClassAbility mAbility;
 		private final @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 		private final @Nullable String mBossSpellName;
@@ -236,6 +236,10 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public DamageType getType() {
 		return mMetadata.mType;
+	}
+
+	public void setType(DamageType newType) {
+		mMetadata.mType = newType;
 	}
 
 	public @Nullable ClassAbility getAbility() {

@@ -62,12 +62,13 @@ public class GenerateCharms extends GenericCommand {
 				location = "none";
 			}
 			int power = Integer.parseInt(row.get(4));
-			String[] loreText = new String[5];
+			String[] loreText = new String[6];
 			loreText[0] = row.get(5);
 			loreText[1] = row.get(6);
 			loreText[2] = row.get(7);
 			loreText[3] = row.get(8);
 			loreText[4] = row.get(9);
+			loreText[5] = row.get(10);
 			for (int i = 0; i < loreText.length; i++) {
 				String line = loreText[i];
 				if (line == null || line.equals("")) {
