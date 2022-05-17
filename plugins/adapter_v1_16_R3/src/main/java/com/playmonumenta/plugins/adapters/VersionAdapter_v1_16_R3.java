@@ -315,6 +315,47 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 		entityCreature.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(entityCreature, EntityLiving.class, 10, false, false, entityLiving -> predicate.test(getLivingEntity(entityLiving))));
 	}
 
+	@Override
+	public void setEagleCompanion(Creature entity, DamageAction action, double attackRange) {
+		EntityCreature entityCreature = ((CraftCreature) entity).getHandle();
+
+		//removing panic mode
+		Optional<PathfinderGoalWrapped> oldGoal = entityCreature.goalSelector.getTasks().stream().filter(task -> task.getGoal() instanceof PathfinderGoalPanic).findFirst();
+		if (oldGoal.isPresent()) {
+			PathfinderGoalWrapped goal = oldGoal.get();
+			entityCreature.goalSelector.getTasks().remove(goal);
+		}
+
+		//removing others PathfinderGoalNearestAttackableTarget
+		List<PathfinderGoalWrapped> list = entityCreature.targetSelector.getTasks().stream().filter(task -> task.getGoal() instanceof PathfinderGoalNearestAttackableTarget).toList();
+		for (PathfinderGoalWrapped wrapped : list) {
+			entityCreature.targetSelector.getTasks().remove(wrapped);
+		}
+
+		oldGoal = entityCreature.goalSelector.getTasks().stream().filter(task -> task.getGoal() instanceof PathfinderGoalPanic).findFirst();
+		if (oldGoal.isPresent()) {
+			PathfinderGoalWrapped goal = oldGoal.get();
+			entityCreature.goalSelector.getTasks().remove(goal);
+		}
+
+		entityCreature.goalSelector.addGoal(1, new CustomMobAgroMeleeAttack16(entityCreature, action, 1.0) {
+			@Override
+			protected double a(EntityLiving target) {
+				// to make it possible for entities to not attack from their feet,
+				// calculate whether the attack can hit here and return positive or negative infinity to allow/disallow the attack.
+				double x = a.locX();
+				double y = a.locY() + 1;
+				double z = a.locZ();
+				if (target.h(x, y, z) <= attackRange * attackRange) {
+					return Double.POSITIVE_INFINITY;
+				} else {
+					return Double.NEGATIVE_INFINITY;
+				}
+			}
+		});
+
+	}
+
 	private LivingEntity getLivingEntity(EntityLiving nmsEntity) {
 		try {
 			return ((EntityLiving) nmsEntity).getBukkitLivingEntity();

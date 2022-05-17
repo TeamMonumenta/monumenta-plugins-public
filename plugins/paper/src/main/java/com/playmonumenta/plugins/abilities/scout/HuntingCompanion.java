@@ -12,11 +12,13 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.LivingEntity;
@@ -283,7 +286,17 @@ public class HuntingCompanion extends Ability {
 			MMLog.warning("Failed to spawn EagleCompanion from Library of Souls");
 			return;
 		}
+		try {
+			NmsUtils.getVersionAdapter().setEagleCompanion((Creature) eagle, (target) -> {
+				//this is just used to create a fake event that HuntingCompanionBoss will catch and handle using player stats
+				DamageUtils.damage(eagle, target, DamageType.MELEE, 1.0);
+				//if we want, we can move all the code of HuntingCompanionBoss.onDamage(..) here.
+			}, 4);
 
+		} catch (Exception e) {
+			MMLog.warning("Catch an exception while creating EagleCompanion. Reason: " + e.getMessage());
+			e.printStackTrace();
+		}
 		eagle.setVelocity(facingDirection.clone().setY(-JUMP_HEIGHT).normalize().multiply(VELOCITY));
 		eagle.teleport(eagle.getLocation().setDirection(facingDirection));
 

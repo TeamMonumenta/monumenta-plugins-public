@@ -87,6 +87,11 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 
 	}
 
+	@Override
+	public void setEagleCompanion(Creature entity, DamageAction action, double attackRange) {
+
+	}
+
 	public void setAttackRange(Creature entity, double attackRange, double attackHeight) {
 
 	}

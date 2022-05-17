@@ -310,7 +310,37 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 			}
 		});
 		entityCreature.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entityCreature, net.minecraft.world.entity.LivingEntity.class, 10, false, false, entityLiving -> predicate.test(getLivingEntity(entityLiving))));
+	}
 
+	@Override
+	public void setEagleCompanion(Creature entity, DamageAction action, double attackRange) {
+		PathfinderMob entityCreature = ((CraftCreature) entity).getHandle();
+
+		//removing panic mode
+		Optional<WrappedGoal> oldGoal = entityCreature.goalSelector.getAvailableGoals().stream().filter(task -> task.getGoal() instanceof PanicGoal).findFirst();
+		if (oldGoal.isPresent()) {
+			WrappedGoal goal = oldGoal.get();
+			entityCreature.goalSelector.removeGoal(goal);
+		}
+
+		//removing others NearestAttackableTargetGoal
+		List<WrappedGoal> list = entityCreature.targetSelector.getAvailableGoals().stream().filter(task -> task.getGoal() instanceof NearestAttackableTargetGoal).toList();
+		for (WrappedGoal wrapped : list) {
+			entityCreature.targetSelector.removeGoal(wrapped);
+		}
+		entityCreature.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(entityCreature, action) {
+			@Override
+			protected double getAttackReachSqr(net.minecraft.world.entity.LivingEntity target) {
+				double x = mob.getX();
+				double y = mob.getY() + 1;
+				double z = mob.getZ();
+				if (target.distanceToSqr(x, y, z) <= attackRange * attackRange) {
+					return Double.POSITIVE_INFINITY;
+				} else {
+					return Double.NEGATIVE_INFINITY;
+				}
+			}
+		});
 
 	}
 
