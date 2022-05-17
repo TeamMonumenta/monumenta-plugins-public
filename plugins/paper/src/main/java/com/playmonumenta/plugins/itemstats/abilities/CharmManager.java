@@ -478,7 +478,7 @@ public class CharmManager {
 		@NotNull List<@NotNull String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(itemStack));
 		for (@NotNull String plainLore : plainLoreLines) {
 			if (plainLore.contains(effect)) {
-				int value = parseValue(plainLore);
+				double value = parseValue(plainLore);
 				if (plainLore.contains("%")) {
 					return new CharmParsedInfo(value, true);
 				} else {
@@ -490,14 +490,29 @@ public class CharmManager {
 	}
 
 	//Helper method to parse lore line for charm effects
-	private int parseValue(String loreLine) {
+	private double parseValue(String loreLine) {
 		//Whether effect is being added to or subtracted
 		boolean add = loreLine.contains("+");
 		//Parse the value from the line
 
 		loreLine = loreLine.split("\\+|-")[1];
+
+		//First check for a double value in the lore line
+		String stippedLoreLine = loreLine.replace('%', ' ');
 		@SuppressWarnings("resource")
-		Scanner s = new Scanner(loreLine).useDelimiter("\\D+");
+		Scanner s = new Scanner(stippedLoreLine);
+		if (s.hasNextDouble()) {
+			double sint = s.nextDouble();
+			//If it's a negative effect
+			if (!add) {
+				sint = sint * -1.0;
+			}
+			s.close();
+			return sint;
+		}
+		s.close();
+		// If no double was found, check for just plain int
+		s = new Scanner(loreLine).useDelimiter("\\D+");
 		if (s.hasNextInt()) {
 			int sint = s.nextInt();
 			//If it's a negative effect
@@ -508,7 +523,6 @@ public class CharmManager {
 			return sint;
 		}
 		s.close();
-		// TODO: Error handling if enchant is malformed
 		return 0;
 	}
 
@@ -760,10 +774,10 @@ public class CharmManager {
 	}
 
 	private static class CharmParsedInfo {
-		public int mValue;
+		public double mValue;
 		public boolean mIsPercent;
 
-		public CharmParsedInfo(int value, boolean isPercent) {
+		public CharmParsedInfo(double value, boolean isPercent) {
 			mValue = value;
 			mIsPercent = isPercent;
 		}
