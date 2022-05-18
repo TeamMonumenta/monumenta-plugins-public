@@ -16,6 +16,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -54,7 +55,8 @@ public class QuiverListener implements Listener {
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		// When right-clicking with a bow or crossbow while having no arrows in the inventory, take some out of a quiver is available
 		Player player = event.getPlayer();
-		if ((ItemUtils.isSomeBow(player.getInventory().getItemInMainHand()) || ItemUtils.isSomeBow(player.getInventory().getItemInOffHand()))
+		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
+			    && (ItemUtils.isSomeBow(player.getInventory().getItemInMainHand()) || ItemUtils.isSomeBow(player.getInventory().getItemInOffHand()))
 			    && Arrays.stream(player.getInventory().getContents()).noneMatch(ItemUtils::isArrow)) {
 			refillInventoryImmediately(player);
 		}
