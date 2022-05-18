@@ -4,13 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeSet;
@@ -349,11 +347,19 @@ public final class EffectManager implements Listener {
 	 * @param source the source of effects to be retrieved
 	 * @return the set of effects if they exist, null otherwise
 	 */
-	public @Nullable
-	NavigableSet<Effect> getEffects(Entity entity, String source) {
+	public @Nullable NavigableSet<Effect> getEffects(Entity entity, String source) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.getEffects(source);
+		}
+
+		return null;
+	}
+
+	public @Nullable Effect getActiveEffect(Entity entity, String source) {
+		NavigableSet<Effect> effects = getEffects(entity, source);
+		if (effects != null) {
+			return effects.last();
 		}
 
 		return null;
@@ -404,13 +410,13 @@ public final class EffectManager implements Listener {
 		return false;
 	}
 
-	public List<Effect> getPriorityEffects(Entity entity) {
+	public HashMap<String, Effect> getPriorityEffects(Entity entity) {
 		EffectManager.Effects effects = mEntities.get(entity);
-		List<Effect> output = new ArrayList<>();
+		HashMap<String, Effect> output = new HashMap<>();
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
-				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
-					output.add(effectGroup.last());
+				for (String source : priorityEffects.keySet()) {
+					output.put(source, priorityEffects.get(source).last());
 				}
 			}
 		}
@@ -425,8 +431,7 @@ public final class EffectManager implements Listener {
 	 * @param source the source of effects to be cleared
 	 * @return the set of effects if effects were removed, null otherwise
 	 */
-	public @Nullable
-	NavigableSet<Effect> clearEffects(Entity entity, String source) {
+	public @Nullable NavigableSet<Effect> clearEffects(Entity entity, String source) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.clearEffects(source);
@@ -502,6 +507,7 @@ public final class EffectManager implements Listener {
 		}
 	}
 
+	//Called in DamageListener
 	//@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void damageEvent(DamageEvent event) {
 		if (event.isCancelled()) {

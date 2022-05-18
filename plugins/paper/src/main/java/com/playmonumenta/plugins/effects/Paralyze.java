@@ -30,6 +30,11 @@ public class Paralyze extends Effect {
 	}
 
 	@Override
+	public boolean isDebuff() {
+		return true;
+	}
+
+	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (oneHertz && entity instanceof LivingEntity le && FastUtils.randomDoubleInRange(0, 1) < CHANCE) {
 			EntityUtils.applySlow(mPlugin, 20, 1, le);

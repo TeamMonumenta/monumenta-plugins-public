@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -407,5 +408,67 @@ public class AbilityUtils {
 		default:
 			return 0;
 		}
+	}
+
+	public static final List<PotionEffectType> DEBUFFS = Arrays.asList(
+		PotionEffectType.WITHER,
+		PotionEffectType.SLOW,
+		PotionEffectType.SLOW_DIGGING,
+		PotionEffectType.POISON,
+		PotionEffectType.BLINDNESS,
+		PotionEffectType.CONFUSION,
+		PotionEffectType.HUNGER
+	);
+
+	public static int getDebuffCount(Plugin plugin, LivingEntity entity) {
+		int debuffCount = 0;
+		for (PotionEffectType effectType: DEBUFFS) {
+			PotionEffect effect = entity.getPotionEffect(effectType);
+			if (effect != null) {
+				debuffCount++;
+			}
+		}
+
+		if (entity.getFireTicks() > 0) {
+			debuffCount++;
+		}
+
+		if (EntityUtils.isStunned(entity)) {
+			debuffCount++;
+		}
+
+		if (EntityUtils.isParalyzed(plugin, entity)) {
+			debuffCount++;
+		}
+
+		if (EntityUtils.isSilenced(entity)) {
+			debuffCount++;
+		}
+
+		if (EntityUtils.isBleeding(plugin, entity)) {
+			debuffCount++;
+		}
+
+		//Custom slow effect interaction
+		if (EntityUtils.isSlowed(plugin, entity) && entity.getPotionEffect(PotionEffectType.SLOW) == null) {
+			debuffCount++;
+		}
+
+		//Custom weaken interaction
+		if (EntityUtils.isWeakened(plugin, entity)) {
+			debuffCount++;
+		}
+
+		//Custom vuln interaction
+		if (EntityUtils.isVulnerable(plugin, entity)) {
+			debuffCount++;
+		}
+
+		//Custom DoT interaction
+		if (EntityUtils.hasDamageOverTime(plugin, entity)) {
+			debuffCount++;
+		}
+
+		return debuffCount;
 	}
 }

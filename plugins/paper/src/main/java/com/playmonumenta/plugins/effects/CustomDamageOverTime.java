@@ -37,6 +37,11 @@ public class CustomDamageOverTime extends Effect {
 	}
 
 	@Override
+	public boolean isDebuff() {
+		return true;
+	}
+
+	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (fourHertz && entity instanceof LivingEntity le && !(entity instanceof ArmorStand)) {
 			mTicks += 5; //Activates 4 times a second

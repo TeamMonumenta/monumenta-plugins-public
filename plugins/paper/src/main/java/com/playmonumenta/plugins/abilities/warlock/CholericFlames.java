@@ -4,11 +4,16 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.SpreadEffectOnDeath;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import javax.annotation.Nullable;
@@ -34,6 +39,11 @@ public class CholericFlames extends Ability {
 	private static final int DAMAGE_2 = 5;
 	private static final int DURATION = 7 * 20;
 	private static final int COOLDOWN = 10 * 20;
+	private static final int MAX_DEBUFFS = 3;
+	private static final String SPREAD_EFFECT_ON_DEATH_EFFECT = "CholericFlamesSpreadEffectOnDeath";
+	private static final int SPREAD_EFFECT_DURATION = 30 * 20;
+	private static final int SPREAD_EFFECT_DURATION_APPLIED = 5 * 20;
+	private static final double SPREAD_EFFECT_RADIUS = 3;
 
 	private final int mDamage;
 
@@ -43,6 +53,7 @@ public class CholericFlames extends Ability {
 		mInfo.mShorthandName = "CF";
 		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 3 magic damage. Cooldown: 10s.");
 		mInfo.mDescriptions.add("The damage is increased to 5, and also afflict mobs with Hunger I.");
+		mInfo.mDescriptions.add("Mobs ignited by this ability are inflicted with an additional level of Inferno for each debuff they have prior to this ability, up to 3. Additionally, when these mobs die, they explode, applying all Inferno they have at the time of death to all mobs within a 3 block radius for 5s.");
 		mInfo.mLinkedSpell = ClassAbility.CHOLERIC_FLAMES;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -81,7 +92,17 @@ public class CholericFlames extends Ability {
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.mLinkedSpell, true);
-			EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
+
+			// Gets a copy so modifying the inferno level does not have effect elsewhere
+			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+			if (isEnhanced()) {
+				int debuffs = Math.min(AbilityUtils.getDebuffCount(mPlugin, mob), MAX_DEBUFFS);
+				if (debuffs > 0) {
+					playerItemStats.getItemStats().add(ItemStatUtils.EnchantmentType.INFERNO.getItemStat(), debuffs);
+					mPlugin.mEffectManager.addEffect(mob, SPREAD_EFFECT_ON_DEATH_EFFECT, new SpreadEffectOnDeath(SPREAD_EFFECT_DURATION, Inferno.INFERNO_EFFECT_NAME, SPREAD_EFFECT_RADIUS, SPREAD_EFFECT_DURATION_APPLIED));
+				}
+			}
+			EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer, playerItemStats);
 
 			if (isLevelTwo()) {
 				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, DURATION, 0, false, true));

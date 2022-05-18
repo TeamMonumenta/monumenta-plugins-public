@@ -98,6 +98,7 @@ public enum ClassAbility {
 	// [Warlock]
 	AMPLIFYING("Amplifying Hex"),
 	CHOLERIC_FLAMES("Choleric Flames"),
+	CURSED_WOUND("Cursed Wound"),
 	GRASPING_CLAWS("Grasping Claws"),
 	MELANCHOLIC_LAMENT("Melancholic Lament"),
 	SANGUINE_HARVEST("Sanguine Harvest"),

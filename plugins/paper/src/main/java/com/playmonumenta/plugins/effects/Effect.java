@@ -109,6 +109,12 @@ public abstract class Effect implements Comparable<Effect> {
 
 	}
 
+	// This is used by the Cursed Wound enhancement to determine if the effect should be stored and transferred
+	// Default to false, only make true for relatively simple effects
+	public boolean isDebuff() {
+		return false;
+	}
+
 	/**
 	 * Ticks the effect, called regularly
 	 *

@@ -29,6 +29,11 @@ public class PercentDamageReceived extends Effect {
 		return Math.abs(mAmount);
 	}
 
+	@Override
+	public boolean isDebuff() {
+		return mAmount < 0;
+	}
+
 	public EnumSet<DamageType> getAffectedDamageTypes() {
 		return mAffectedDamageTypes;
 	}

@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -19,8 +20,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
@@ -55,17 +54,6 @@ public class AmplifyingHex extends Ability {
 	private static final int COOLDOWN = 20 * 10;
 	private static final float KNOCKBACK_SPEED = 0.12f;
 	private static final String ENHANCED_DOT_EFFECT_NAME = "AmplifyingHexDamageOverTimeEffect";
-
-	private static final List<PotionEffectType> DEBUFFS = Arrays.asList(
-		PotionEffectType.WITHER,
-		PotionEffectType.SLOW,
-		PotionEffectType.WEAKNESS,
-		PotionEffectType.SLOW_DIGGING,
-		PotionEffectType.POISON,
-		PotionEffectType.BLINDNESS,
-		PotionEffectType.CONFUSION,
-		PotionEffectType.HUNGER
-	);
 
 	private final int mAmplifierDamage;
 	private final int mAmplifierCap;
@@ -145,7 +133,7 @@ public class AmplifyingHex extends Ability {
 			if (playerDir.dot(toMobVector) > DOT_ANGLE) {
 				int debuffCount = 0;
 				int amplifierCount = 0;
-				for (PotionEffectType effectType : DEBUFFS) {
+				for (PotionEffectType effectType : AbilityUtils.DEBUFFS) {
 					PotionEffect effect = mob.getPotionEffect(effectType);
 					if (effect != null) {
 						debuffCount++;
@@ -208,7 +196,7 @@ public class AmplifyingHex extends Ability {
 				}
 
 				//Custom weaken interaction
-				if (EntityUtils.isWeakened(mPlugin, mob) && mob.getPotionEffect(PotionEffectType.WEAKNESS) == null) {
+				if (EntityUtils.isWeakened(mPlugin, mob)) {
 					debuffCount++;
 					double weakAmp = EntityUtils.getWeakenAmount(mPlugin, mob);
 					int weakLevel = (int) Math.floor(weakAmp * 10);

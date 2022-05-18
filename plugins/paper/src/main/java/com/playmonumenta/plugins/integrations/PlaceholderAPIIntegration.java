@@ -191,7 +191,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 
 		if (identifier.startsWith("effect_")) {
 			List<String> effectDisplays = new ArrayList<>();
-			List<Effect> effects = mPlugin.mEffectManager.getPriorityEffects(player);
+			List<Effect> effects = new ArrayList<>(mPlugin.mEffectManager.getPriorityEffects(player).values());
 			effects.sort(new EffectManager.SortEffectsByDuration());
 
 			for (Effect effect : effects) {

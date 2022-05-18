@@ -52,6 +52,11 @@ public class Bleed extends SingleArgumentEffect {
 	}
 
 	@Override
+	public boolean isDebuff() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return String.format("Bleed duration:%d modifier:%s amount:%f", this.getDuration(), "Bleed", mAmount);
 	}
