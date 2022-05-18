@@ -692,6 +692,16 @@ public class EntityUtils {
 		}
 	}
 
+	private static final String BLIGHT_EFFECT_NAME = "SanguineHarvestBlightEffect";
+
+	public static boolean isBlighted(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> blight = plugin.mEffectManager.getEffects(mob, BLIGHT_EFFECT_NAME);
+		if (blight != null) {
+			return true;
+		}
+		return false;
+	}
+
 	private static final String BLEED_EFFECT_NAME = "BleedEffect";
 
 	public static void applyBleed(Plugin plugin, int ticks, double amount, LivingEntity mob) {

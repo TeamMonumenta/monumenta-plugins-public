@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.SanguineHarvestBlight;
 import com.playmonumenta.plugins.effects.SanguineMark;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -11,6 +12,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +25,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -43,6 +47,10 @@ public class SanguineHarvest extends Ability {
 	private static final int COOLDOWN = 20 * 20;
 	private static final double HITBOX_LENGTH = 0.55;
 
+	private static final double ENHANCEMENT_DMG_INCREASE = 0.05;
+	private static final int ENHANCEMENT_BLIGHT_DURATION = 20 * 6;
+	private static final String BLIGHT_EFFECT_NAME = "SanguineHarvestBlightEffect";
+
 	private static final String SANGUINE_NAME = "SanguineEffect";
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "SanguineHarvestTickRightClicked";
 
@@ -53,12 +61,15 @@ public class SanguineHarvest extends Ability {
 	private final double mHealPercent;
 	private int mRightClicks = 0;
 
+	private ArrayList<Location> mMarkedLocations = new ArrayList<>(); // To mark locations (Even if block is not replaced)
+
 	public SanguineHarvest(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Sanguine Harvest");
 		mInfo.mScoreboardId = "SanguineHarvest";
 		mInfo.mShorthandName = "SH";
 		mInfo.mDescriptions.add("Enemies you damage with an ability are afflicted with Bleed I for 10 seconds. Bleed gives mobs 10% Slowness and 10% Weaken per level if the mob is below 50% Max Health. Additionally, double right click while holding a scythe and not sneaking to fire a burst of darkness. This projectile travels up to 8 blocks and upon contact with a surface or an enemy, it explodes, knocking back and marking all mobs within 3 blocks of the explosion for a harvest. Any player that kills a marked mob is healed for 5% of max health. Cooldown: 20s.");
 		mInfo.mDescriptions.add("Increase passive Bleed level to II, and increase the radius to 4 blocks. Players killing a marked mob are healed by 10%.");
+		mInfo.mDescriptions.add("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. Mobs standing on these Blighted blocks take 5% extra damage per debuff. The Blight disappears after 6s and is not counted as a debuff.");
 		mInfo.mLinkedSpell = ClassAbility.SANGUINE_HARVEST;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -107,6 +118,44 @@ public class SanguineHarvest extends Ability {
 
 			Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(loc, RANGE));
 
+			if (isEnhanced()) {
+				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 1);
+				Vector v;
+				for (double degree = -40; degree < 40; degree += 10) {
+					for (double r = 0; r <= RANGE; r += 0.55) {
+						double radian = Math.toRadians(degree);
+						v = new Vector(Math.cos(radian) * r, 0, Math.sin(radian) * r);
+						v = VectorUtils.rotateZAxis(v, mPlayer.getLocation().getPitch());
+						v = VectorUtils.rotateYAxis(v, mPlayer.getLocation().getYaw() + 90);
+
+						Location location = mPlayer.getEyeLocation().clone().add(v);
+
+						Location marker = location.clone();
+
+						// If enhanced, we want to find where the lowest block is.
+						// First, search downwards by 5 blocks until a block is reached.
+						// And then set it to just above the block as the saved location.
+						while (marker.distance(location) <= 5) {
+							Block block = marker.getBlock();
+							if (block.isSolid()) {
+								// Success, add this location as cursed.
+								marker.setY(1.1 + (int) marker.getY());
+								mMarkedLocations.add(marker);
+								break;
+							} else {
+								marker.add(0, -1, 0);
+							}
+						}
+
+						if (location.getBlock().isSolid()) {
+							// Break here because I decided that this ability shouldn't pass through blocks.
+							// How mean!
+							break;
+						}
+					}
+				}
+			}
+
 			for (double r = 0; r < RANGE; r += HITBOX_LENGTH) {
 				Location bLoc = box.getCenter().toLocation(world);
 
@@ -116,6 +165,7 @@ public class SanguineHarvest extends Ability {
 				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 					bLoc.subtract(direction.multiply(0.5));
 					explode(bLoc);
+					runMarkerRunnable();
 					return;
 				}
 
@@ -125,12 +175,15 @@ public class SanguineHarvest extends Ability {
 					if (mob.getBoundingBox().overlaps(box)) {
 						if (EntityUtils.isHostileMob(mob)) {
 							explode(bLoc);
+							runMarkerRunnable();
 							return;
 						}
 					}
 				}
 				box.shift(shift);
 			}
+
+			runMarkerRunnable();
 		}
 	}
 
@@ -160,5 +213,40 @@ public class SanguineHarvest extends Ability {
 		}
 		EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel * 0.1, enemy);
 		return false; // applies bleed on damage to all mobs hit, causes no recursion
+	}
+
+	private void runMarkerRunnable() {
+		if (!mMarkedLocations.isEmpty() &&
+			isEnhanced()) {
+			new BukkitRunnable() {
+				int mTicks = 0;
+
+				@Override
+				public void run() {
+					if (mTicks > ENHANCEMENT_BLIGHT_DURATION || mMarkedLocations.isEmpty()) {
+						mMarkedLocations.clear();
+						this.cancel();
+						return;
+					}
+
+					for (Location location : mMarkedLocations) {
+						BoundingBox boundingBox = BoundingBox.of(location, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
+						new PartialParticle(Particle.REDSTONE, location, 5, 0.25, 0, 0.25, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
+
+						if (mTicks % 20 == 0) {
+							List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(location, 1);
+							for (LivingEntity mob : nearbyMobs) {
+								if (mob.getBoundingBox().overlaps(boundingBox) && !EntityUtils.isBlighted(mPlugin, mob)) {
+									// mPlayer.sendMessage("Marked: " + mob.getName());
+									mPlugin.mEffectManager.addEffect(mob, BLIGHT_EFFECT_NAME, new SanguineHarvestBlight(20, ENHANCEMENT_DMG_INCREASE, mPlugin));
+								}
+							}
+						}
+					}
+
+					mTicks += 10;
+				}
+			}.runTaskTimer(mPlugin, 0, 10);
+		}
 	}
 }
