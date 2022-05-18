@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -48,8 +49,14 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	private static final int TELEPORT_TICKS = 4;
 	private static final int MAX_CHARGES = 2;
 
+	public static final String CHARM_COOLDOWN = "Bodkin Blitz Cooldown";
+	public static final String CHARM_CHARGE = "Bodkin Blitz Charge";
+	public static final String CHARM_DAMAGE = "Bodkin Blitz Damage";
+	public static final String CHARM_STEALTH = "Bodkin Blitz Stealth Duration";
+	public static final String CHARM_DISTANCE = "Bodkin Blitz Distance";
+
 	private final int mStealthDuration;
-	private final int mBonusDmg;
+	private final double mBonusDmg;
 
 	private @Nullable BukkitRunnable mRunnable = null;
 	private boolean mTeleporting = false;
@@ -64,15 +71,15 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mInfo.mShorthandName = "BB";
 		mInfo.mDescriptions.add("Sneak right click while holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. Upon teleporting, your next melee attack deals 7 bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: 20s. Charges: 2.");
 		mInfo.mDescriptions.add("Range increased to 14 blocks, Stealth increased to 1.5 seconds. Upon teleporting, your next melee attack deals 14 bonus damage if your target is not focused on you. Cooldown: 18s.");
-		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
-		mMaxCharges = MAX_CHARGES;
+		mMaxCharges = MAX_CHARGES + (int) CharmManager.getLevel(player, CHARM_CHARGE);
 		mCharges = getTrackedCharges();
 
-		mStealthDuration = isLevelOne() ? STEALTH_DURATION_1 : STEALTH_DURATION_2;
-		mBonusDmg = isLevelOne() ? BONUS_DMG_1 : BONUS_DMG_2;
+		mStealthDuration = (isLevelOne() ? STEALTH_DURATION_1 : STEALTH_DURATION_2) + CharmManager.getExtraDuration(player, CHARM_STEALTH);
+		mBonusDmg = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? BONUS_DMG_1 : BONUS_DMG_2);
 
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mHasSmokescreen = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Smokescreen.class) != null;
@@ -105,7 +112,8 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		new BukkitRunnable() {
 			final BoundingBox mPlayerBox = mPlayer.getBoundingBox();
 			final Vector mDirection = mPlayer.getLocation().getDirection().normalize();
-			final double mDistancePerTick = 1.0 * (isLevelOne() ? DISTANCE_1 : DISTANCE_2) / TELEPORT_TICKS;
+			double mDistance = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, isLevelOne() ? BONUS_DMG_1 : BONUS_DMG_2);
+			final double mDistancePerTick = 1.0 * mDistance / TELEPORT_TICKS;
 			int mTick = 0;
 
 			@Override

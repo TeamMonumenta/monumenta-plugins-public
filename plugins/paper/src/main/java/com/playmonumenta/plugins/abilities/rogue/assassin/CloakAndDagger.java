@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTrigg
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -40,6 +41,10 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	public static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
 	private static final int STEALTH_DURATION = 50;
 
+	public static final String CHARM_DAMAGE = "Cloak And Dagger Damage";
+	public static final String CHARM_STACKS = "Cloak And Dagger Max Stacks";
+	public static final String CHARM_STEALTH = "Cloak And Dagger Stealth Duration";
+
 	private final KillTriggeredAbilityTracker mTracker;
 
 	private final double mDamageMultiplier;
@@ -58,8 +63,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		mInfo.mCooldown = 0;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
-		mDamageMultiplier = isLevelOne() ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER;
-		mMaxStacks = isLevelOne() ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS;
+		mDamageMultiplier = (isLevelOne() ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER) + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE);
+		mMaxStacks = (isLevelOne() ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS) + (int) CharmManager.getLevel(player, CHARM_STACKS);
 		mTracker = new KillTriggeredAbilityTracker(this, 300);
 	}
 
@@ -72,7 +77,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			mCloakOnActivation = mCloak;
 			mCloak = 0;
 			mActive = true;
-			AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION);
+			AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STEALTH));
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 			new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsPlayerActive(mPlayer);

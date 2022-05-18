@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -32,6 +33,12 @@ public class Smokescreen extends Ability {
 	private static final int ENHANCEMENT_SMOKECLOUD_EFFECT_DURATION = 2 * 20;
 	private static final int ENHANCEMENT_SMOKECLOUD_RADIUS = 4;
 
+	public static final String CHARM_SLOW = "Smokescreen Slowness Amplifier";
+	public static final String CHARM_WEAKEN = "Smokescreen Weakness Amplifier";
+	public static final String CHARM_COOLDOWN = "Smokescreen Cooldown";
+	public static final String CHARM_RANGE = "Smokescreen Range";
+
+
 	private final double mWeakenEffect;
 
 	public Smokescreen(Plugin plugin, @Nullable Player player) {
@@ -42,10 +49,10 @@ public class Smokescreen extends Ability {
 		mInfo.mDescriptions.add("When holding two swords, right-click while sneaking and looking down to release a cloud of smoke, afflicting all enemies in a 6 block radius with 8s of 20% Weaken and 20% Slowness. Cooldown: 20s.");
 		mInfo.mDescriptions.add("The Weaken debuff is increased to 40%.");
 		mInfo.mDescriptions.add("Leave a " + ENHANCEMENT_SMOKECLOUD_RADIUS + " block radius persistent cloud on the ground for " + ENHANCEMENT_SMOKECLOUD_DURATION / 20 + " seconds, enemies in the cloud gain the same debuffs for " + ENHANCEMENT_SMOKECLOUD_EFFECT_DURATION / 20 + " seconds, pulsing every second.");
-		mInfo.mCooldown = SMOKESCREEN_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, SMOKESCREEN_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.DEAD_TUBE_CORAL, 1);
-		mWeakenEffect = isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
+		mWeakenEffect = CharmManager.getLevelPercentDecimal(player, CHARM_WEAKEN) + (isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2);
 	}
 
 	@Override
@@ -55,8 +62,8 @@ public class Smokescreen extends Ability {
 		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 750, 4.5, 0.8, 4.5, 0.05).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 1500, 4.5, 0.2, 4.5, 0.1).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, SMOKESCREEN_RANGE, mPlayer)) {
-			EntityUtils.applySlow(mPlugin, SMOKESCREEN_DURATION, SMOKESCREEN_SLOWNESS_AMPLIFIER, mob);
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, SMOKESCREEN_RANGE), mPlayer)) {
+			EntityUtils.applySlow(mPlugin, SMOKESCREEN_DURATION, SMOKESCREEN_SLOWNESS_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), mob);
 			EntityUtils.applyWeaken(mPlugin, SMOKESCREEN_DURATION, mWeakenEffect, mob);
 		}
 		putOnCooldown();

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -30,6 +31,8 @@ public class Skirmisher extends Ability {
 	private static final int MOB_COUNT_CUTOFF = 1;
 	private static final double ENHANCEMENT_SPLASH_RADIUS = 3;
 	private static final double ENHANCEMENT_SPLASH_PERCENT_DAMAGE = 0.3;
+	public static final String CHARM_DAMAGE = "Skirmisher Damage Multiplier";
+	public static final String CHARM_RADIUS = "Skirmisher Damage Radius";
 
 	private final double mIsolatedPercentDamage;
 	private final double mIsolatedFlatDamage;
@@ -43,7 +46,7 @@ public class Skirmisher extends Ability {
 		mInfo.mDescriptions.add("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased to 2 + 15% final damage done.");
 		mInfo.mDescriptions.add("When you hit an enemy with a sword, the nearest enemy within " + ENHANCEMENT_SPLASH_RADIUS + " blocks takes " + ENHANCEMENT_SPLASH_PERCENT_DAMAGE * 100 + "% of the original attack's damage (ignores invulnerability frames).");
 		mDisplayItem = new ItemStack(Material.BONE, 1);
-		mIsolatedPercentDamage = isLevelOne() ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2;
+		mIsolatedPercentDamage = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2);
 		mIsolatedFlatDamage = isLevelOne() ? GROUPED_FLAT_DAMAGE : GROUPED_FLAT_DAMAGE_2;
 	}
 
@@ -54,7 +57,7 @@ public class Skirmisher extends Ability {
 
 			// If Enhanced and triggers on a melee strike,
 			if (isEnhanced() && event.getType() == DamageType.MELEE) {
-				LivingEntity selectedEnemy = EntityUtils.getNearestMob(loc, ENHANCEMENT_SPLASH_RADIUS, enemy);
+				LivingEntity selectedEnemy = EntityUtils.getNearestMob(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_SPLASH_RADIUS), enemy);
 
 				if (selectedEnemy != null) {
 					DamageUtils.damage(mPlayer, selectedEnemy, DamageType.OTHER, event.getOriginalDamage() * ENHANCEMENT_SPLASH_PERCENT_DAMAGE, mInfo.mLinkedSpell, true);
@@ -62,7 +65,7 @@ public class Skirmisher extends Ability {
 			}
 
 			if (event.getAbility() != mInfo.mLinkedSpell && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)) {
-				if (EntityUtils.getNearbyMobs(loc, SKIRMISHER_FRIENDLY_RADIUS, enemy).size() >= MOB_COUNT_CUTOFF
+				if (EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, SKIRMISHER_FRIENDLY_RADIUS), enemy).size() >= MOB_COUNT_CUTOFF
 					|| (isLevelTwo() && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
 					World world = mPlayer.getWorld();
 					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);

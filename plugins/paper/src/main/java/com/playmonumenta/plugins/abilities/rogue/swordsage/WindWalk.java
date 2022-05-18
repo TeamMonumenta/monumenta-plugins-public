@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -40,6 +41,9 @@ public class WindWalk extends MultipleChargeAbility {
 	private static final double WIND_WALK_Y_VELOCITY_MULTIPLIER = 0.2;
 	private static final double WIND_WALK_VELOCITY_BONUS = 1.5;
 
+	public static final String CHARM_COOLDOWN = "Wind Walk Cooldown";
+	public static final String CHARM_CHARGE = "Wind Walk Charge";
+
 	private final int mDuration;
 
 	private int mLastCastTicks = 0;
@@ -51,12 +55,12 @@ public class WindWalk extends MultipleChargeAbility {
 		mInfo.mShorthandName = "WW";
 		mInfo.mDescriptions.add("Press the swap key while holding two swords to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. Cooldown: 25s. Charges: 2.");
 		mInfo.mDescriptions.add("Now afflicts 30% Vulnerability; enemies are stunned and levitated for 4 seconds.");
-		mInfo.mCooldown = WIND_WALK_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, WIND_WALK_COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.QUARTZ, 1);
 		mDuration = isLevelOne() ? WIND_WALK_1_DURATION : WIND_WALK_2_DURATION;
-		mMaxCharges = WIND_WALK_MAX_CHARGES;
+		mMaxCharges = WIND_WALK_MAX_CHARGES + (int) CharmManager.getLevel(player, CHARM_CHARGE);
 		mCharges = getTrackedCharges();
 	}
 

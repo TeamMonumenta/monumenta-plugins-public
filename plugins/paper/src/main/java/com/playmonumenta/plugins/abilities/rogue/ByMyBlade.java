@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -36,7 +37,10 @@ public class ByMyBlade extends Ability {
 	private static final double ENHANCEMENT_HEAL_PERCENT = 0.05;
 	private static final double ENHANCEMENT_HEAL_PERCENT_ELITE = 0.15;
 
-	private final int mDamageBonus;
+	public static final String CHARM_DAMAGE = "By My Blade Damage";
+	public static final String CHARM_COOLDOWN = "By My Blade Cooldown";
+
+	private final double mDamageBonus;
 
 	public ByMyBlade(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "By My Blade");
@@ -46,9 +50,9 @@ public class ByMyBlade extends Ability {
 		mInfo.mDescriptions.add("While holding two swords, attacking an enemy with a critical attack deals an extra 10 melee damage to that enemy, and grants you Haste 2 for 4s. Cooldown: 10s.");
 		mInfo.mDescriptions.add("Damage is increased from 10 to 20. Haste level is increased from 2 to 4.");
 		mInfo.mDescriptions.add("Killing an enemy with this ability heals you for " + ENHANCEMENT_HEAL_PERCENT * 100 + "% of your max health, increased to " + ENHANCEMENT_HEAL_PERCENT_ELITE * 100 + "% if the target was an elite or boss.");
-		mInfo.mCooldown = BY_MY_BLADE_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, BY_MY_BLADE_COOLDOWN);
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
-		mDamageBonus = isLevelOne() ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE;
+		mDamageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE);
 	}
 
 	@Override

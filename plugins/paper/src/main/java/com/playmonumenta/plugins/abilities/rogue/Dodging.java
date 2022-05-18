@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -59,6 +60,8 @@ public class Dodging extends Ability {
 	private static final String ATTR_NAME = "DodgingExtraSpeed";
 	private static final int DODGING_COOLDOWN_1 = 12 * 20;
 	private static final int DODGING_COOLDOWN_2 = 10 * 20;
+	public static final String CHARM_COOLDOWN = "Dodging Cooldown";
+	public static final String CHARM_SPEED = "Dodging Speed Amplifier";
 
 	private int mTriggerTick = 0;
 
@@ -71,7 +74,7 @@ public class Dodging extends Ability {
 		mInfo.mDescriptions.add("The cooldown is reduced to 10 s. When this ability is triggered, you gain +20% Speed for 15s.");
 		mInfo.mDescriptions.add("The projectile you dodged is now reflected back to the enemy.");
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
-		mInfo.mCooldown = isLevelOne() ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2);
 		// NOTE: This skill will get events even when it is on cooldown!
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
@@ -231,7 +234,7 @@ public class Dodging extends Ability {
 		World world = mPlayer.getWorld();
 		if (isLevelTwo()) {
 			mPlugin.mEffectManager.addEffect(mPlayer, ATTR_NAME,
-				new PercentSpeed(DODGING_SPEED_EFFECT_DURATION, PERCENT_SPEED, ATTR_NAME));
+				new PercentSpeed(DODGING_SPEED_EFFECT_DURATION, PERCENT_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), ATTR_NAME));
 			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15).spawnAsPlayerActive(mPlayer);
 			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.35f);
 		}

@@ -34,6 +34,19 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
+import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
+import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
+import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
+import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
+import com.playmonumenta.plugins.abilities.rogue.Skirmisher;
+import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
+import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
+import com.playmonumenta.plugins.abilities.rogue.assassin.BodkinBlitz;
+import com.playmonumenta.plugins.abilities.rogue.assassin.CloakAndDagger;
+import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
+import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
+import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
+import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -275,7 +288,49 @@ public class CharmManager {
 			HallowedBeam.CHARM_DAMAGE,
 			HallowedBeam.CHARM_DISTANCE,
 			HallowedBeam.CHARM_STUN,
-			HallowedBeam.CHARM_HEAL
+			HallowedBeam.CHARM_HEAL,
+			AdvancingShadows.CHARM_COOLDOWN,
+			AdvancingShadows.CHARM_DAMAGE,
+			AdvancingShadows.CHARM_KNOCKBACK,
+			AdvancingShadows.CHARM_RANGE,
+			ByMyBlade.CHARM_COOLDOWN,
+			ByMyBlade.CHARM_DAMAGE,
+			DaggerThrow.CHARM_COOLDOWN,
+			DaggerThrow.CHARM_DAMAGE,
+			DaggerThrow.CHARM_RANGE,
+			DaggerThrow.CHARM_VULN,
+			DaggerThrow.CHARM_DAGGERS,
+			EscapeDeath.CHARM_ABSORPTION,
+			EscapeDeath.CHARM_COOLDOWN,
+			EscapeDeath.CHARM_SPEED,
+			EscapeDeath.CHARM_JUMP,
+			Skirmisher.CHARM_DAMAGE,
+			Skirmisher.CHARM_RADIUS,
+			Smokescreen.CHARM_COOLDOWN,
+			Smokescreen.CHARM_RANGE,
+			Smokescreen.CHARM_WEAKEN,
+			Smokescreen.CHARM_SLOW,
+			ViciousCombos.CHARM_CDR,
+			BladeDance.CHARM_COOLDOWN,
+			BladeDance.CHARM_DAMAGE,
+			BladeDance.CHARM_RADIUS,
+			BladeDance.CHARM_RESIST,
+			BladeDance.CHARM_ROOT,
+			DeadlyRonde.CHARM_DAMAGE,
+			DeadlyRonde.CHARM_RADIUS,
+			WindWalk.CHARM_CHARGE,
+			WindWalk.CHARM_COOLDOWN,
+			BodkinBlitz.CHARM_CHARGE,
+			BodkinBlitz.CHARM_COOLDOWN,
+			BodkinBlitz.CHARM_DAMAGE,
+			BodkinBlitz.CHARM_DISTANCE,
+			BodkinBlitz.CHARM_STEALTH,
+			CloakAndDagger.CHARM_DAMAGE,
+			CloakAndDagger.CHARM_STACKS,
+			CloakAndDagger.CHARM_STEALTH,
+			CoupDeGrace.CHARM_NORMAL,
+			CoupDeGrace.CHARM_THRESHOLD,
+			CoupDeGrace.CHARM_ELITE
 
 		);
 	}

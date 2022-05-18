@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -36,6 +37,10 @@ public class CoupDeGrace extends Ability {
 	private final double mNormalThreshold;
 	private final double mEliteThreshold;
 
+	public static final String CHARM_THRESHOLD = "Coup de Grace Threshold";
+	public static final String CHARM_NORMAL = "Coup de Grace Normal Enemy Threshold";
+	public static final String CHARM_ELITE = "Coup de Grace Elite Threshold";
+
 	public CoupDeGrace(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Coup de Grace");
 		mInfo.mScoreboardId = "CoupDeGrace";
@@ -43,8 +48,9 @@ public class CoupDeGrace extends Ability {
 		mInfo.mDescriptions.add("If melee damage you deal brings a normal mob under 10% health, they die instantly. The threshold for elites is 20% health.");
 		mInfo.mDescriptions.add("The health threshold is increased to 15% for normal enemies and 30% for elites.");
 		mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
-		mNormalThreshold = isLevelOne() ? COUP_1_NORMAL_THRESHOLD : COUP_2_NORMAL_THRESHOLD;
-		mEliteThreshold = isLevelOne() ? COUP_1_ELITE_THRESHOLD : COUP_2_ELITE_THRESHOLD;
+		double sharedThreshold = CharmManager.getLevelPercentDecimal(player, CHARM_THRESHOLD);
+		mNormalThreshold = (isLevelOne() ? COUP_1_NORMAL_THRESHOLD : COUP_2_NORMAL_THRESHOLD) + CharmManager.getLevelPercentDecimal(player, CHARM_NORMAL) + sharedThreshold;
+		mEliteThreshold = (isLevelOne() ? COUP_1_ELITE_THRESHOLD : COUP_2_ELITE_THRESHOLD) + CharmManager.getLevelPercentDecimal(player, CHARM_ELITE) + sharedThreshold;
 	}
 
 	@Override

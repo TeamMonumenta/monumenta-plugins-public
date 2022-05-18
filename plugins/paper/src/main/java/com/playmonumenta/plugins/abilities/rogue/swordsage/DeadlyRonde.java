@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -46,6 +47,9 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	private static final double RONDE_RADIUS = 4.5;
 	private static final double RONDE_DOT_COSINE = 0.33;
 	private static final float RONDE_KNOCKBACK_SPEED = 0.14f;
+
+	public static final String CHARM_DAMAGE = "Deadly Ronde Damage";
+	public static final String CHARM_RADIUS = "Deadly Ronde Radius";
 
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 
@@ -114,10 +118,10 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			    && event.getType() == DamageType.MELEE
 			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			Vector playerDirVector = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RONDE_RADIUS)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, RONDE_RADIUS))) {
 				Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 				if (playerDirVector.dot(toMobVector) > RONDE_DOT_COSINE) {
-					int damage = isLevelOne() ? RONDE_1_DAMAGE : RONDE_2_DAMAGE;
+					double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? RONDE_1_DAMAGE : RONDE_2_DAMAGE);
 					DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.mLinkedSpell, true);
 					MovementUtils.knockAway(mPlayer, mob, RONDE_KNOCKBACK_SPEED, true);
 				}

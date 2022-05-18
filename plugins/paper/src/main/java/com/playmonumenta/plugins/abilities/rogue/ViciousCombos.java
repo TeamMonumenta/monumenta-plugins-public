@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -33,6 +34,8 @@ public class ViciousCombos extends Ability {
 	private static final int ENHANCEMENT_COOLDOWN_REDUCTION = 1 * 20;
 	private static final int ENHANCEMENT_CHARGE_LIFETIME = 3 * 20;
 	private static final double ENHANCEMENT_DAMAGE_INCREASE = 0.1;
+
+	public static final String CHARM_CDR = "Vicious Combos Cooldown Reduction";
 
 	private ClassAbility mLastAbility = null;
 	private int mAbilityCastTime = 0;
@@ -88,6 +91,7 @@ public class ViciousCombos extends Ability {
 							timeReduction *= 2;
 						}
 
+						timeReduction += CharmManager.getExtraDuration(mPlayer, CHARM_CDR);
 						mPlugin.mTimers.updateCooldowns(mPlayer, timeReduction);
 
 						world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.5f);

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -39,7 +40,14 @@ public class BladeDance extends Ability {
 	private static final int COOLDOWN_2 = 16 * 20;
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 
-	private final int mDamage;
+	public static final String CHARM_DAMAGE = "Blade Dance Damage";
+	public static final String CHARM_ROOT = "Blade Dance Root Duration";
+	public static final String CHARM_RESIST = "Blade Dance Resistance Duration";
+	public static final String CHARM_COOLDOWN = "Blade Dance Cooldown";
+	public static final String CHARM_RADIUS = "Blade Dance Radius";
+
+
+	private final double mDamage;
 	private final int mSlowDuration;
 
 	public BladeDance(Plugin plugin, @Nullable Player player) {
@@ -49,11 +57,11 @@ public class BladeDance extends Ability {
 		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 4 melee damage to enemies in a 4 block radius. Damaged enemies are rooted for 2 seconds. Cooldown: 18s.");
 		mInfo.mDescriptions.add("The area attack now deals 7 damage and roots for 2.5. Cooldown: 16s.");
 		mInfo.mLinkedSpell = ClassAbility.BLADE_DANCE;
-		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.STRING, 1);
-		mDamage = isLevelOne() ? DANCE_1_DAMAGE : DANCE_2_DAMAGE;
-		mSlowDuration = isLevelOne() ? SLOW_DURATION_1 : SLOW_DURATION_2;
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DANCE_1_DAMAGE : DANCE_2_DAMAGE);
+		mSlowDuration = (isLevelOne() ? SLOW_DURATION_1 : SLOW_DURATION_2) + CharmManager.getExtraDuration(player, CHARM_ROOT);
 	}
 
 	@Override
@@ -87,7 +95,7 @@ public class BladeDance extends Ability {
 					mPitch += 0.1f;
 				}
 
-				if (mTicks >= 15) {
+				if (mTicks >= 15 + CharmManager.getExtraDuration(mPlayer, CHARM_RESIST)) {
 					mPlayer.setInvulnerable(false);
 					world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 2f);
@@ -95,7 +103,7 @@ public class BladeDance extends Ability {
 
 					new PartialParticle(Particle.VILLAGER_ANGRY, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0).spawnAsPlayerActive(mPlayer);
 
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DANCE_RADIUS)) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, DANCE_RADIUS))) {
 						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell, true);
 						MovementUtils.knockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED, true);
 
