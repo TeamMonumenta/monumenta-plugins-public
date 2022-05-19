@@ -255,9 +255,9 @@ public class GenerateItems extends GenericCommand {
 			player.getEquipment().setItemInMainHand(item, true);
 			player.updateInventory();
 
-			if (tier.equals("0") || tier.equals("1") || tier.equals("2") || tier.equals("3") || tier.equals("4") || (tier.equals("legacy") && nameColor.equals("none"))) {
+			if (tier.equals("0") || tier.equals("1") || tier.equals("2") || (tier.equals("3") && !region.equals("ring")) || tier.equals("4") || (tier.equals("legacy") && nameColor.equals("none"))) {
 				player.chat("/editname " + "white " + "false" + " false " + itemName);
-			} else if (tier.equals("5")) {
+			} else if (tier.equals("5") || tier.equals("3")) {
 				player.chat("/editname " + "lime " + "false" + " false " + itemName);
 			} else if (tier.equals("epic")) {
 				player.chat("/editname " + nameColor + " " + "true" + " true " + itemName);
