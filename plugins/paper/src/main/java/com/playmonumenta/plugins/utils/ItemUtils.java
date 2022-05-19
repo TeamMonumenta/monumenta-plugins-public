@@ -344,6 +344,25 @@ public class ItemUtils {
 		Material.WARPED_HYPHAE
 	);
 
+	public static final Set<Material> signs = EnumSet.of(
+		Material.ACACIA_SIGN,
+		Material.ACACIA_WALL_SIGN,
+		Material.BIRCH_SIGN,
+		Material.BIRCH_WALL_SIGN,
+		Material.CRIMSON_SIGN,
+		Material.CRIMSON_WALL_SIGN,
+		Material.DARK_OAK_SIGN,
+		Material.DARK_OAK_WALL_SIGN,
+		Material.JUNGLE_SIGN,
+		Material.JUNGLE_WALL_SIGN,
+		Material.OAK_SIGN,
+		Material.OAK_WALL_SIGN,
+		Material.SPRUCE_SIGN,
+		Material.SPRUCE_WALL_SIGN,
+		Material.WARPED_SIGN,
+		Material.WARPED_WALL_SIGN
+	);
+
 	// list of blocks that are supposedly used as limits to player movements
 	public static final Set<Material> noPassthrough = EnumSet.of(
 		Material.BARRIER,
@@ -664,6 +683,10 @@ public class ItemUtils {
 
 	public static boolean isStrippable(@Nullable Material mat) {
 		return mat != null && strippables.contains(mat);
+	}
+
+	public static boolean isSign(@Nullable Material mat) {
+		return mat != null && signs.contains(mat);
 	}
 
 	public static void damageItem(ItemStack item, int damage, boolean canBreak) {
