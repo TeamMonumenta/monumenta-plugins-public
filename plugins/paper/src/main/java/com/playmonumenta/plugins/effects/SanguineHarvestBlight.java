@@ -6,11 +6,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.List;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -24,17 +21,6 @@ public class SanguineHarvestBlight extends Effect {
 	private final double mAmount;
 	private final Plugin mPlugin;
 	private final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
-
-	private static final List<PotionEffectType> DEBUFFS = Arrays.asList(
-		PotionEffectType.WITHER,
-		PotionEffectType.SLOW,
-		PotionEffectType.WEAKNESS,
-		PotionEffectType.SLOW_DIGGING,
-		PotionEffectType.POISON,
-		PotionEffectType.BLINDNESS,
-		PotionEffectType.CONFUSION,
-		PotionEffectType.HUNGER
-	);
 
 	public SanguineHarvestBlight(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, Plugin plugin) {
 		super(duration);

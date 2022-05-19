@@ -356,15 +356,6 @@ public final class EffectManager implements Listener {
 		return null;
 	}
 
-	public @Nullable Effect getActiveEffect(Entity entity, String source) {
-		NavigableSet<Effect> effects = getEffects(entity, source);
-		if (effects != null) {
-			return effects.last();
-		}
-
-		return null;
-	}
-
 	/**
 	 * Returns effects of a given type from an entity.
 	 *
@@ -378,6 +369,15 @@ public final class EffectManager implements Listener {
 			return effects.getEffects(type);
 		}
 		return Collections.emptyNavigableSet();
+	}
+
+	public @Nullable Effect getActiveEffect(Entity entity, String source) {
+		NavigableSet<Effect> effects = getEffects(entity, source);
+		if (effects != null) {
+			return effects.last();
+		}
+
+		return null;
 	}
 
 	/**
