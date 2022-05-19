@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.NegateDamage;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -35,11 +36,17 @@ public class DefensiveLine extends Ability {
 	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_1 = -0.20;
 	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_2 = -0.30;
 	private static final int DURATION = 20 * 10;
-
 	private static final int COOLDOWN = 20 * 30;
 	private static final int RADIUS = 8;
 	private static final int KNOCK_AWAY_RADIUS = 3;
 	private static final float KNOCK_AWAY_SPEED = 0.25f;
+
+	public static final String CHARM_REDUCTION = "Defensive Line Resistance";
+	public static final String CHARM_DURATION = "Defensive Line Duration";
+	public static final String CHARM_COOLDOWN = "Defensive Line Cooldown";
+	public static final String CHARM_RADIUS = "Defensive Line Range";
+	public static final String CHARM_KNOCKBACK = "Defensive Line Knockback";
+	public static final String CHARM_NEGATIONS = "Defensive Line Damage Negation";
 
 	private final double mPercentDamageReceived;
 
@@ -51,10 +58,10 @@ public class DefensiveLine extends Ability {
 		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain 20% Resistance for 10 seconds. Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The effect is increased to 30% Resistance.");
 		mInfo.mDescriptions.add("Additionally, all affected players negate the next melee attack dealt to them within the duration.");
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.CHAIN, 1);
-		mPercentDamageReceived = isLevelOne() ? PERCENT_DAMAGE_RECEIVED_EFFECT_1 : PERCENT_DAMAGE_RECEIVED_EFFECT_2;
+		mPercentDamageReceived = (isLevelOne() ? PERCENT_DAMAGE_RECEIVED_EFFECT_1 : PERCENT_DAMAGE_RECEIVED_EFFECT_2) - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
 	}
 
 	@Override
@@ -65,29 +72,27 @@ public class DefensiveLine extends Ability {
 			public void run() {
 				if (mPlayer != null && mPlayer.isHandRaised()) {
 					World world = mPlayer.getWorld();
-					world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.25f, 1.35f);
-					world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
-					new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 35, 0.2, 0, 0.2, 0.25).spawnAsPlayerActive(mPlayer);
+					Location location = mPlayer.getLocation();
+					world.playSound(location, Sound.BLOCK_ANVIL_PLACE, 1.25f, 1.35f);
+					world.playSound(location, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
+					new PartialParticle(Particle.FIREWORKS_SPARK, location, 35, 0.2, 0, 0.2, 0.25).spawnAsPlayerActive(mPlayer);
 
-					List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true);
+					int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+
+					List<Player> players = PlayerUtils.playersInRange(location, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), true);
+					players.removeIf(player -> player.getScoreboardTags().contains("disable_class"));
 
 					for (Player player : players) {
-						// Don't buff players that have their class disabled
-						if (player.getScoreboardTags().contains("disable_class")) {
-							continue;
-						}
+						Location loc = player.getLocation();
+						new PartialParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 35, 0.4, 0.4, 0.4, 0.25).spawnAsPlayerActive(mPlayer);
 
-						Location loc = player.getLocation().add(0, 1, 0);
-						new PartialParticle(Particle.SPELL_INSTANT, loc, 35, 0.4, 0.4, 0.4, 0.25).spawnAsPlayerActive(mPlayer);
-
-						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION, mPercentDamageReceived));
+						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(duration, mPercentDamageReceived));
 						if (isEnhanced()) {
-							mPlugin.mEffectManager.addEffect(player, NEGATE_DAMAGE_EFFECT_NAME, new NegateDamage(DURATION, 1, EnumSet.of(DamageEvent.DamageType.MELEE)));
-
+							mPlugin.mEffectManager.addEffect(player, NEGATE_DAMAGE_EFFECT_NAME, new NegateDamage(duration, (int) (1 + CharmManager.getLevel(mPlayer, CHARM_NEGATIONS)), EnumSet.of(DamageEvent.DamageType.MELEE)));
 						}
 
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, KNOCK_AWAY_RADIUS, mPlayer)) {
-							MovementUtils.knockAway(player, mob, KNOCK_AWAY_SPEED, true);
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, KNOCK_AWAY_RADIUS), mPlayer)) {
+							MovementUtils.knockAway(player, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED), true);
 						}
 					}
 

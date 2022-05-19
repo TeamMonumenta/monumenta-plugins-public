@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -27,6 +28,12 @@ public class CounterStrike extends Ability {
 	private static final int REDUCTION_DURATION = 10 * 20;
 	private static final double DAMAGE_REDUCTION_PER_STACK = 0.05;
 	private static final int MAX_STACKS = 3;
+
+	public static final String CHARM_DAMAGE = "Counter Strike Damage";
+	public static final String CHARM_RADIUS = "Counter Strike Radius";
+	public static final String CHARM_DURATION = "Counter Strike Duration";
+	public static final String CHARM_DAMAGE_REDUCTION = "Counter Strike Damage Reduction";
+	public static final String CHARM_STACKS = "Counter Strike Stacks";
 
 	private final double mReflect;
 	private final HashMap<LivingEntity, Integer> mLastDamageTime = new HashMap<>();
@@ -56,9 +63,9 @@ public class CounterStrike extends Ability {
 			new PartialParticle(Particle.SWEEP_ATTACK, loc, 6, 0.75, 0.5, 0.75, 0.001).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.FIREWORKS_SPARK, loc, 8, 0.75, 0.5, 0.75, 0.1).spawnAsPlayerActive(mPlayer);
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.6f, 0.7f);
-			double eventDamage = event.getOriginalDamage() * mReflect;
+			double eventDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, event.getOriginalDamage() * mReflect);
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, COUNTER_STRIKE_RADIUS), mPlayer)) {
 				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, eventDamage, mInfo.mLinkedSpell, true, true);
 			}
 
@@ -69,9 +76,9 @@ public class CounterStrike extends Ability {
 				Integer lastDamageTime = mLastDamageTime.get(source);
 				if (stacks != null) {
 					if (lastDamageTime != null) {
-						event.setDamage(event.getDamage() * (1 - stacks * DAMAGE_REDUCTION_PER_STACK));
+						event.setDamage(event.getDamage() * (1 - stacks * (DAMAGE_REDUCTION_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_REDUCTION))));
 						mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHAIN_PLACE, 0.5f + 0.1f * stacks, 2.5f - 0.5f * stacks);
-						if (stacks < MAX_STACKS) {
+						if (stacks < MAX_STACKS + CharmManager.getLevel(mPlayer, CHARM_STACKS)) {
 							mStacks.put(source, stacks + 1);
 						}
 					}
@@ -84,7 +91,7 @@ public class CounterStrike extends Ability {
 	}
 
 	private void clearIfExpired(LivingEntity mob, Integer time) {
-		if (time < mPlayer.getTicksLived() - REDUCTION_DURATION) {
+		if (time < mPlayer.getTicksLived() - (REDUCTION_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION))) {
 			mLastDamageTime.remove(mob);
 			mStacks.remove(mob);
 		}

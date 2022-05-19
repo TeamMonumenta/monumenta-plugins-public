@@ -5,14 +5,13 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import javax.annotation.Nullable;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -28,6 +27,11 @@ public class BruteForce extends Ability {
 	private static final double BRUTE_FORCE_2_MODIFIER = 0.1;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
 	private static final double ENHANCEMENT_DAMAGE_INCREASE = 0.25;
+
+	public static final String CHARM_RADIUS = "Brute Force Radius";
+	public static final String CHARM_DAMAGE = "Brute Force Damage";
+	public static final String CHARM_KNOCKBACK = "Brute Force Knockback";
+	public static final String CHARM_BONUS_DAMAGE = "Brute Force Bonus Damage";
 
 	private double mMultiplier;
 
@@ -50,21 +54,24 @@ public class BruteForce extends Ability {
 		// If Player is enhanced, melee strike, and is a critical or sprinting attack
 		// Boost damage by 25%
 		if (mPlayer != null && isEnhanced() && event.getType() == DamageType.MELEE && (PlayerUtils.isCriticalAttack(mPlayer) || mPlayer.isSprinting())) {
-			event.setDamage(event.getDamage() * (1 + ENHANCEMENT_DAMAGE_INCREASE));
+			event.setDamage(event.getDamage() * (1 + ENHANCEMENT_DAMAGE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BONUS_DAMAGE)));
 		}
 
 		if (mPlayer != null && event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
 			double damageBonus = BRUTE_FORCE_DAMAGE + event.getDamage() * mMultiplier;
+			damageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damageBonus);
+
 			event.setDamage(event.getDamage() + damageBonus);
 
 			Location loc = enemy.getLocation().add(0, 0.75, 0);
 			new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.135).spawnAsPlayerActive(mPlayer);
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, BRUTE_FORCE_RADIUS, enemy)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, BRUTE_FORCE_RADIUS), enemy)) {
 				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damageBonus, mInfo.mLinkedSpell, true);
 				if (!EntityUtils.isBoss(mob)) {
-					MovementUtils.knockAway(mPlayer.getLocation(), mob, BRUTE_FORCE_KNOCKBACK_SPEED, BRUTE_FORCE_KNOCKBACK_SPEED / 2, true);
+					float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, BRUTE_FORCE_KNOCKBACK_SPEED);
+					MovementUtils.knockAway(mPlayer.getLocation(), mob, knockback, knockback / 2, true);
 				}
 			}
 			return true;

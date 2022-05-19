@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import javax.annotation.Nullable;
@@ -29,6 +30,11 @@ public class WeaponMastery extends Ability {
 	private static final int SWORD_WEAKEN_DURATION = 4 * 20;
 	private static final double AXE_ATTACK_SPEED = 0.15;
 	private static final String ATTACK_SPEED_EFFECT = "WeaponMasteryAttackSpeedEffect";
+
+	public static final String CHARM_REDUCTION = "Weapon Mastery Damage Reduction";
+	public static final String CHARM_WEAKEN = "Weapon Mastery Weaken";
+	public static final String CHARM_DURATION = "Weapon Mastery Duration";
+	public static final String CHARM_ATTACK_SPEED = "Weapon Mastery Attack Speed";
 
 	private final double mDamageBonusAxeFlat;
 	private final double mDamageBonusSwordFlat;
@@ -58,7 +64,7 @@ public class WeaponMastery extends Ability {
 			} else if (ItemUtils.isSword(mainHand)) {
 				event.setDamage((event.getDamage() + mDamageBonusSwordFlat) * (1 + mDamageBonusSword));
 				if (isEnhanced()) {
-					EntityUtils.applyWeaken(mPlugin, SWORD_WEAKEN_DURATION, SWORD_WEAKEN, enemy);
+					EntityUtils.applyWeaken(mPlugin, SWORD_WEAKEN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), SWORD_WEAKEN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN), enemy);
 				}
 			}
 		}
@@ -68,14 +74,14 @@ public class WeaponMastery extends Ability {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (isEnhanced() && mPlayer != null && ItemUtils.isAxe(mPlayer.getInventory().getItemInMainHand())) {
-			mPlugin.mEffectManager.addEffect(mPlayer, ATTACK_SPEED_EFFECT, new PercentAttackSpeed(6, AXE_ATTACK_SPEED, ATTACK_SPEED_EFFECT));
+			mPlugin.mEffectManager.addEffect(mPlayer, ATTACK_SPEED_EFFECT, new PercentAttackSpeed(6, AXE_ATTACK_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK_SPEED), ATTACK_SPEED_EFFECT));
 		}
 	}
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (mPlayer != null && ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
-			event.setDamage(event.getDamage() * (1 - WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE));
+			event.setDamage(event.getDamage() * (1 - (WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION))));
 		}
 	}
 }

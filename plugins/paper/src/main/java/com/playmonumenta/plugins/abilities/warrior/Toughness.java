@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Material;
@@ -27,6 +28,10 @@ public class Toughness extends Ability {
 	public static final double HEALING_INCREASE = 0.2;
 	public static final String TOUGHNESS_MODIFIER_NAME = "ToughnessPercentHealthModifier";
 
+	public static final String CHARM_HEALTH = "Toughness Health";
+	public static final String CHARM_REDUCTION = "Toughness Damage Reduction";
+	public static final String CHARM_HEALING = "Toughness Healing Increase";
+
 	private final double mDoTDamageReduction;
 
 	public Toughness(Plugin plugin, @Nullable Player player) {
@@ -37,13 +42,14 @@ public class Toughness extends Ability {
 		mInfo.mDescriptions.add("Gain +20% max health and damage from Poison, Wither, and Drowning is reduced by 40%.");
 		mInfo.mDescriptions.add("Gain an additional +5% max health. Additionally, when below 50% health, gain 20% healing.");
 		mDisplayItem = new ItemStack(Material.IRON_HELMET, 1);
-		mDoTDamageReduction = isLevelOne() ? DOT_DAMAGE_REDUCTION_1 : DOT_DAMAGE_REDUCTION_2;
+		mDoTDamageReduction = (isLevelOne() ? DOT_DAMAGE_REDUCTION_1 : DOT_DAMAGE_REDUCTION_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
 
 		if (player != null) {
 			double healthBoost = isLevelOne() ? PERCENT_HEALTH_1 : PERCENT_HEALTH_2;
 			if (isEnhanced()) {
 				healthBoost += PERCENT_HEALTH_ENHANCEMENT;
 			}
+			healthBoost += CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALTH);
 			EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH,
 					new AttributeModifier(TOUGHNESS_MODIFIER_NAME, healthBoost, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
@@ -59,7 +65,7 @@ public class Toughness extends Ability {
 	@Override
 	public void playerRegainHealthEvent(EntityRegainHealthEvent event) {
 		if (isEnhanced() && mPlayer.getHealth() <= EntityUtils.getMaxHealth(mPlayer) * HEALTH_THRESHHOLD) {
-			event.setAmount(event.getAmount() * (1 + HEALING_INCREASE));
+			event.setAmount(event.getAmount() * (1 + HEALING_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALING)));
 		}
 	}
 

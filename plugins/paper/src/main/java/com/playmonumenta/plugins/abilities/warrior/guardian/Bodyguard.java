@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -37,8 +38,17 @@ public class Bodyguard extends Ability {
 	private static final int ABSORPTION_HEALTH_2 = 12;
 	private static final int BUFF_DURATION = 20 * 10;
 	private static final int STUN_DURATION = 20 * 3;
+	private static final float KNOCKBACK = 0.45f;
 
-	private final int mAbsorptionHealth;
+	public static final String CHARM_COOLDOWN = "Bodyguard Cooldown";
+	public static final String CHARM_RANGE = "Bodyguard Range";
+	public static final String CHARM_RADIUS = "Bodyguard Stun Radius";
+	public static final String CHARM_ABSORPTION = "Bodyguard Absorption";
+	public static final String CHARM_ABSORPTION_DURATION = "Bodyguard Absorption Duration";
+	public static final String CHARM_STUN_DURATION = "Bodyguard Stun Duration";
+	public static final String CHARM_KNOCKBACK = "Bodyguard Knockback";
+
+	private final double mAbsorptionHealth;
 
 	private int mLeftClicks = 0;
 
@@ -49,11 +59,11 @@ public class Bodyguard extends Ability {
 		mInfo.mDescriptions.add("Left-click the air twice while looking directly at another player within 25 blocks to charge to them (cannot be used in safezones). Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain 4 Absorption hearts for 10 seconds. Left-click twice while looking down to cast on yourself. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Absorption increased to 6 hearts. Additionally, affected mobs are stunned for 3 seconds.");
 		mInfo.mLinkedSpell = ClassAbility.BODYGUARD;
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.IRON_CHESTPLATE, 1);
-		mAbsorptionHealth = isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2;
+		mAbsorptionHealth = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
 	}
 
 	@Override
@@ -70,9 +80,9 @@ public class Bodyguard extends Ability {
 		World world = mPlayer.getWorld();
 		boolean lookingDown = oLoc.getPitch() > 50;
 		Vector dir = oLoc.getDirection();
-		List<Player> players = PlayerUtils.playersInRange(mPlayer.getEyeLocation(), RANGE, true);
-		players.remove(mPlayer);
-		for (int i = 0; i < RANGE; i++) {
+		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
+		List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, range, true);
+		for (int i = 0; i < range; i++) {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(world);
 			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
@@ -148,7 +158,7 @@ public class Bodyguard extends Ability {
 					world.playSound(targetLoc, Sound.ENTITY_BLAZE_SHOOT, 0.75f, 0.75f);
 					world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.75f, 0.9f);
 
-					AbsorptionUtils.addAbsorption(player, mAbsorptionHealth, mAbsorptionHealth, BUFF_DURATION);
+					giveAbsorption(player);
 				}
 			}
 		}
@@ -163,13 +173,19 @@ public class Bodyguard extends Ability {
 		world.playSound(oLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
 		new PartialParticle(Particle.FLAME, oLoc.add(0, 0.15, 0), 25, 0.2, 0, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
 
-		AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, BUFF_DURATION);
+		giveAbsorption(mPlayer);
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS)) {
-			MovementUtils.knockAway(mPlayer, mob, 0.45f, true);
+		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK);
+		int duration = STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN_DURATION);
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS))) {
+			MovementUtils.knockAway(mPlayer, mob, knockback, true);
 			if (isLevelTwo()) {
-				EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
+				EntityUtils.applyStun(mPlugin, duration, mob);
 			}
 		}
+	}
+
+	private void giveAbsorption(Player player) {
+		AbsorptionUtils.addAbsorption(player, mAbsorptionHealth, mAbsorptionHealth, BUFF_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_ABSORPTION_DURATION));
 	}
 }

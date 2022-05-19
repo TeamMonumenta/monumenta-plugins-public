@@ -34,6 +34,19 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
+import com.playmonumenta.plugins.abilities.warrior.BruteForce;
+import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
+import com.playmonumenta.plugins.abilities.warrior.DefensiveLine;
+import com.playmonumenta.plugins.abilities.warrior.Frenzy;
+import com.playmonumenta.plugins.abilities.warrior.Riposte;
+import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
+import com.playmonumenta.plugins.abilities.warrior.Toughness;
+import com.playmonumenta.plugins.abilities.warrior.WeaponMastery;
+import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
+import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
+import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
+import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
+import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
 import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
@@ -289,6 +302,8 @@ public class CharmManager {
 			HallowedBeam.CHARM_DISTANCE,
 			HallowedBeam.CHARM_STUN,
 			HallowedBeam.CHARM_HEAL,
+
+			//Rogue
 			AdvancingShadows.CHARM_COOLDOWN,
 			AdvancingShadows.CHARM_DAMAGE,
 			AdvancingShadows.CHARM_KNOCKBACK,
@@ -330,8 +345,78 @@ public class CharmManager {
 			CloakAndDagger.CHARM_STEALTH,
 			CoupDeGrace.CHARM_NORMAL,
 			CoupDeGrace.CHARM_THRESHOLD,
-			CoupDeGrace.CHARM_ELITE
+			CoupDeGrace.CHARM_ELITE,
 
+			//Warrior
+			BruteForce.CHARM_DAMAGE,
+			BruteForce.CHARM_RADIUS,
+			BruteForce.CHARM_KNOCKBACK,
+			BruteForce.CHARM_BONUS_DAMAGE,
+			CounterStrike.CHARM_DAMAGE,
+			CounterStrike.CHARM_RADIUS,
+			CounterStrike.CHARM_DURATION,
+			CounterStrike.CHARM_STACKS,
+			CounterStrike.CHARM_DAMAGE_REDUCTION,
+			DefensiveLine.CHARM_COOLDOWN,
+			DefensiveLine.CHARM_DURATION,
+			DefensiveLine.CHARM_KNOCKBACK,
+			DefensiveLine.CHARM_REDUCTION,
+			DefensiveLine.CHARM_NEGATIONS,
+			Frenzy.CHARM_ATTACK_SPEED,
+			Frenzy.CHARM_SPEED,
+			Frenzy.CHARM_DURATION,
+			Frenzy.CHARM_BONUS_DAMAGE,
+			Riposte.CHARM_COOLDOWN,
+			Riposte.CHARM_KNOCKBACK,
+			Riposte.CHARM_BONUS_DAMAGE,
+			Riposte.CHARM_DAMAGE_DURATION,
+			Riposte.CHARM_STUN_DURATION,
+			Riposte.CHARM_ROOT_DURATION,
+			Riposte.CHARM_RADIUS,
+			Riposte.CHARM_DAMAGE,
+			ShieldBash.CHARM_DAMAGE,
+			ShieldBash.CHARM_COOLDOWN,
+			ShieldBash.CHARM_RANGE,
+			ShieldBash.CHARM_RADIUS,
+			ShieldBash.CHARM_DURATION,
+			Toughness.CHARM_HEALTH,
+			Toughness.CHARM_REDUCTION,
+			Toughness.CHARM_HEALING,
+			WeaponMastery.CHARM_REDUCTION,
+			WeaponMastery.CHARM_ATTACK_SPEED,
+			WeaponMastery.CHARM_WEAKEN,
+			WeaponMastery.CHARM_DURATION,
+			MeteorSlam.CHARM_COOLDOWN,
+			MeteorSlam.CHARM_DAMAGE,
+			MeteorSlam.CHARM_RADIUS,
+			MeteorSlam.CHARM_JUMP_BOOST,
+			MeteorSlam.CHARM_DURATION,
+			MeteorSlam.CHARM_THRESHOLD,
+			Rampage.CHARM_STACKS,
+			Rampage.CHARM_DAMAGE,
+			Rampage.CHARM_RADIUS,
+			Rampage.CHARM_HEALING,
+			Rampage.CHARM_THRESHOLD,
+			Rampage.CHARM_REDUCTION_PER_STACK,
+			//TODO reckless swings replacement charms
+			Bodyguard.CHARM_COOLDOWN,
+			Bodyguard.CHARM_RADIUS,
+			Bodyguard.CHARM_RANGE,
+			Bodyguard.CHARM_ABSORPTION,
+			Bodyguard.CHARM_ABSORPTION_DURATION,
+			Bodyguard.CHARM_STUN_DURATION,
+			Bodyguard.CHARM_KNOCKBACK,
+			Challenge.CHARM_COOLDOWN,
+			Challenge.CHARM_DAMAGE,
+			Challenge.CHARM_ABSORPTION_PER,
+			Challenge.CHARM_ABSORPTION_MAX,
+			Challenge.CHARM_DURATION,
+			Challenge.CHARM_RANGE,
+			ShieldWall.CHARM_DAMAGE,
+			ShieldWall.CHARM_COOLDOWN,
+			ShieldWall.CHARM_DURATION,
+			ShieldWall.CHARM_ANGLE,
+			ShieldWall.CHARM_KNOCKBACK
 		);
 	}
 

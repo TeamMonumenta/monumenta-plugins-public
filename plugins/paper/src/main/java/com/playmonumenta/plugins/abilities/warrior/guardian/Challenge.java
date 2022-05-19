@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -31,7 +32,9 @@ public class Challenge extends Ability {
 	private static final double PERCENT_DAMAGE_DEALT_EFFECT_1 = 0.15;
 	private static final double PERCENT_DAMAGE_DEALT_EFFECT_2 = 0.3;
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-			DamageType.MELEE
+		DamageType.MELEE,
+		DamageType.MELEE_SKILL,
+		DamageType.MELEE_ENCH
 	);
 
 	private static final int ABSORPTION_PER_MOB_1 = 1;
@@ -41,9 +44,16 @@ public class Challenge extends Ability {
 	private static final int CHALLENGE_RANGE = 12;
 	private static final int COOLDOWN = 20 * 20;
 
+	public static final String CHARM_DURATION = "Challenge Duration";
+	public static final String CHARM_DAMAGE = "Challenge Damage";
+	public static final String CHARM_ABSORPTION_PER = "Challenge Absorption Per Mob";
+	public static final String CHARM_ABSORPTION_MAX = "Challenge Max Absorption";
+	public static final String CHARM_RANGE = "Challenge Range";
+	public static final String CHARM_COOLDOWN = "Challenge Cooldown";
+
 	private final double mPercentDamageDealtEffect;
-	private final int mAbsorptionPerMob;
-	private final int mMaxAbsorption;
+	private final double mAbsorptionPerMob;
+	private final double mMaxAbsorption;
 
 	public Challenge(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Challenge");
@@ -52,41 +62,43 @@ public class Challenge extends Ability {
 		mInfo.mDescriptions.add("Left-clicking while sneaking makes all enemies within 12 blocks target you. You gain 1 Absorption per affected mob (up to 4 Absorption) for 10 seconds and +15% melee damage for 10 seconds. Cooldown: 20s.");
 		mInfo.mDescriptions.add("You gain 2 Absorption per affected mob (up to 8 Absorption) and +30% melee damage instead.");
 		mInfo.mCooldown = COOLDOWN;
-		mInfo.mIgnoreCooldown = true;
 		mInfo.mLinkedSpell = ClassAbility.CHALLENGE;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.IRON_AXE, 1);
-		mPercentDamageDealtEffect = isLevelOne() ? PERCENT_DAMAGE_DEALT_EFFECT_1 : PERCENT_DAMAGE_DEALT_EFFECT_2;
-		mAbsorptionPerMob = isLevelOne() ? ABSORPTION_PER_MOB_1 : ABSORPTION_PER_MOB_2;
-		mMaxAbsorption = isLevelOne() ? MAX_ABSORPTION_1 : MAX_ABSORPTION_2;
+		mPercentDamageDealtEffect = (isLevelOne() ? PERCENT_DAMAGE_DEALT_EFFECT_1 : PERCENT_DAMAGE_DEALT_EFFECT_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mAbsorptionPerMob = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_PER, isLevelOne() ? ABSORPTION_PER_MOB_1 : ABSORPTION_PER_MOB_2);
+		mMaxAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_MAX, isLevelOne() ? MAX_ABSORPTION_1 : MAX_ABSORPTION_2);
 	}
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer == null || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || !mPlayer.isSneaking()) {
+		if (mPlayer == null) {
 			return;
 		}
 
 		Location loc = mPlayer.getLocation();
-		World world = mPlayer.getWorld();
-		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 1);
-		new PartialParticle(Particle.FLAME, loc, 25, 0.4, 1, 0.4, 0.7f).spawnAsPlayerActive(mPlayer);
-		loc.add(0, 1.25, 0);
-		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 250, 0, 0, 0, 0.425).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIT, loc, 300, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIT_MAGIC, loc, 300, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, CHALLENGE_RANGE), mPlayer);
+		if (!mobs.isEmpty()) {
+			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+			AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionPerMob * mobs.size(), mMaxAbsorption, duration);
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(duration, mPercentDamageDealtEffect, AFFECTED_DAMAGE_TYPES));
 
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHALLENGE_RANGE, mPlayer);
-		AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionPerMob * mobs.size(), mMaxAbsorption, DURATION);
-		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealtEffect, AFFECTED_DAMAGE_TYPES));
-
-		for (LivingEntity mob : mobs) {
-			if (mob instanceof Mob) {
-				EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
+			for (LivingEntity mob : mobs) {
+				if (mob instanceof Mob) {
+					EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
+				}
 			}
-		}
 
-		putOnCooldown();
+			World world = mPlayer.getWorld();
+			world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 1);
+			new PartialParticle(Particle.FLAME, loc, 25, 0.4, 1, 0.4, 0.7f).spawnAsPlayerActive(mPlayer);
+			loc.add(0, 1.25, 0);
+			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 250, 0, 0, 0, 0.425).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CRIT, loc, 300, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CRIT_MAGIC, loc, 300, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
+
+			putOnCooldown();
+		}
 	}
 
 	@Override
@@ -95,5 +107,10 @@ public class Challenge extends Ability {
 			cast(Action.LEFT_CLICK_AIR);
 		}
 		return false;
+	}
+
+	@Override
+	public boolean runCheck() {
+		return mPlayer.isSneaking();
 	}
 }

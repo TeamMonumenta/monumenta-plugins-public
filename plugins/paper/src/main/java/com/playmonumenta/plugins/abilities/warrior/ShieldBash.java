@@ -6,16 +6,15 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-
 import java.util.List;
 import javax.annotation.Nullable;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -40,6 +39,12 @@ public class ShieldBash extends Ability {
 	private static final int ENHANCEMENT_COOLDOWN_REDUCTION = SHIELD_BASH_COOLDOWN / 2;
 	private static final int ENHANCEMENT_BLOCKING_DURATION = 10;
 
+	public static final String CHARM_DAMAGE = "Shield Bash Damage";
+	public static final String CHARM_DURATION = "Shield Bash Duration";
+	public static final String CHARM_COOLDOWN = "Shield Bash Cooldown";
+	public static final String CHARM_RADIUS = "Shield Bash Radius";
+	public static final String CHARM_RANGE = "Shield Bash Range";
+
 	private boolean mIsEnhancementUsed = true;
 
 	public ShieldBash(Plugin plugin, @Nullable Player player) {
@@ -50,7 +55,7 @@ public class ShieldBash extends Ability {
 		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to deal 5 melee damage, stun for 1 second, and taunt. Elites and bosses are rooted instead of stunned. Cooldown: 8s.");
 		mInfo.mDescriptions.add("Additionally, apply damage, stun, and taunt to all enemies in a 2 block radius from the enemy you are looking at.");
 		mInfo.mDescriptions.add("While Shield Bash is on cooldown, if you block damage with a shield within " + ENHANCEMENT_BLOCKING_DURATION / 20 + "s of blocking, 50% of the cooldown of this skill is refreshed.");
-		mInfo.mCooldown = SHIELD_BASH_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, SHIELD_BASH_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.IRON_DOOR, 1);
 		mInfo.mIgnoreCooldown = true;
@@ -66,7 +71,7 @@ public class ShieldBash extends Ability {
 					// Normal Shield bash cast
 					if (!isTimerActive()) {
 						Location eyeLoc = mPlayer.getEyeLocation();
-						Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), SHIELD_BASH_RANGE);
+						Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), (int) CharmManager.getRadius(mPlayer, CHARM_RANGE, SHIELD_BASH_RANGE));
 						ray.mThroughBlocks = false;
 						ray.mThroughNonOccluding = false;
 
@@ -87,7 +92,7 @@ public class ShieldBash extends Ability {
 									if (isLevelOne()) {
 										bash(mob);
 									} else {
-										for (LivingEntity le : EntityUtils.getNearbyMobs(mob.getLocation(), SHIELD_BASH_2_RADIUS)) {
+										for (LivingEntity le : EntityUtils.getNearbyMobs(mob.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, SHIELD_BASH_2_RADIUS))) {
 											bash(le);
 										}
 									}
@@ -106,16 +111,6 @@ public class ShieldBash extends Ability {
 			}
 		}.runTaskLater(mPlugin, 1);
 	}
-
-	/*
-	@Override
-	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		// Every 5 ticks (0.25 seconds), if isEnhanced and player is not blocking, reset blockingTick.
-		if (isEnhanced() && !mPlayer.isBlocking() && mStartBlockingTick > -1) {
-			mStartBlockingTick = -1;
-		}
-	}
-	*/
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
@@ -137,11 +132,12 @@ public class ShieldBash extends Ability {
 	}
 
 	private void bash(LivingEntity le) {
-		DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, SHIELD_BASH_DAMAGE, mInfo.mLinkedSpell, true, true);
+		DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_BASH_DAMAGE), mInfo.mLinkedSpell, true, true);
+		int duration = SHIELD_BASH_STUN + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 		if (EntityUtils.isBoss(le) || EntityUtils.isElite(le)) {
-			EntityUtils.applySlow(mPlugin, SHIELD_BASH_STUN, .99, le);
+			EntityUtils.applySlow(mPlugin, duration, .99, le);
 		} else {
-			EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, le);
+			EntityUtils.applyStun(mPlugin, duration, le);
 		}
 		if (le instanceof Mob mob) {
 			mob.setTarget(mPlayer);
