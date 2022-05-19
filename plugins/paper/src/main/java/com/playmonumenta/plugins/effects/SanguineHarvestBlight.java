@@ -3,13 +3,13 @@ package com.playmonumenta.plugins.effects;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -63,7 +63,7 @@ public class SanguineHarvestBlight extends Effect {
 			if (EntityUtils.isBoss(entity) && amount > 0) {
 				amount = amount / 2;
 			}
-			event.setDamage(event.getDamage() * (1 + amount * countDebuffs(entity)));
+			event.setDamage(event.getDamage() * (1 + amount * AbilityUtils.getDebuffCount(mPlugin, entity)));
 		}
 	}
 
@@ -85,57 +85,5 @@ public class SanguineHarvestBlight extends Effect {
 			}
 		}
 		return String.format("SanguineHarvestBlight duration:%d types:%s amount:%f", this.getDuration(), types, mAmount);
-	}
-
-	private int countDebuffs(LivingEntity mob) {
-		int debuffCount = 0;
-		for (PotionEffectType effectType : DEBUFFS) {
-			PotionEffect effect = mob.getPotionEffect(effectType);
-			if (effect != null) {
-				debuffCount++;
-			}
-		}
-
-		if (mob.getFireTicks() > 0) {
-			debuffCount++;
-		}
-
-		if (EntityUtils.isStunned(mob)) {
-			debuffCount++;
-		}
-
-		if (EntityUtils.isParalyzed(mPlugin, mob)) {
-			debuffCount++;
-		}
-
-		if (EntityUtils.isSilenced(mob)) {
-			debuffCount++;
-		}
-
-		if (EntityUtils.isBleeding(mPlugin, mob)) {
-			debuffCount++;
-		}
-
-		//Custom slow effect interaction
-		if (EntityUtils.isSlowed(mPlugin, mob) && mob.getPotionEffect(PotionEffectType.SLOW) == null) {
-			debuffCount++;
-		}
-
-		//Custom weaken interaction
-		if (EntityUtils.isWeakened(mPlugin, mob) && mob.getPotionEffect(PotionEffectType.WEAKNESS) == null) {
-			debuffCount++;
-		}
-
-		//Custom vuln interaction
-		if (EntityUtils.isVulnerable(mPlugin, mob)) {
-			debuffCount++;
-		}
-
-		//Custom DoT interaction
-		if (EntityUtils.hasDamageOverTime(mPlugin, mob)) {
-			debuffCount++;
-		}
-
-		return debuffCount;
 	}
 }
