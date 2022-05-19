@@ -31,6 +31,7 @@ public class RageOfTheKeter implements Enchantment {
 			DamageType.MELEE_ENCH,
 			DamageType.MELEE_SKILL,
 			DamageType.PROJECTILE,
+			DamageType.PROJECTILE_SKILL,
 			DamageType.MAGIC
 	);
 
