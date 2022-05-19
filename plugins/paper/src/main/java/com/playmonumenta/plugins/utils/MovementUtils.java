@@ -96,6 +96,22 @@ public class MovementUtils {
 		}
 	}
 
+	public static void pullTowards(Location location, LivingEntity target, float speed) {
+		if (EntityUtils.isBoss(target)) {
+			return;
+		}
+		Vector dir = target.getLocation().subtract(location.toVector()).toVector().multiply(-speed);
+		if (dir.getY() < 0) {
+			dir.setY(0.5f);
+		}
+		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
+		if (mult > 0) {
+			dir.multiply(mult);
+
+			target.setVelocity(dir);
+		}
+	}
+
 	public static void pullTowardsByUnit(Entity towardsEntity, LivingEntity target, float speed) {
 		if (EntityUtils.isBoss(target)) {
 			return;
