@@ -238,11 +238,11 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				if (EntityUtils.isHostileMob(entity)) {
 					apply(entity, potion, isGruesome, playerItemStats);
 				}
-
-				if (entity instanceof Player player && player != mPlayer) {
-					applyToPlayer(player, potion, isGruesome);
-				}
 			}
+
+			List<Player> players = PlayerUtils.playersInRange(loc, RADIUS, true);
+			players.removeIf(player -> player == mPlayer);
+			players.forEach(player -> applyToPlayer(player, potion, isGruesome));
 		}
 
 		return true;
