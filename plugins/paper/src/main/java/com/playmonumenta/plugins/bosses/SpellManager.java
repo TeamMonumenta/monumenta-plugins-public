@@ -39,11 +39,11 @@ public class SpellManager {
 	}
 
 	public List<Spell> getSpells() {
+		List<Spell> spells = new ArrayList<Spell>();
 		if (mIsEmpty) {
-			return Collections.emptyList();
+			return spells;
 		}
 
-		List<Spell> spells = new ArrayList<Spell>();
 		spells.addAll(mCooldownSpells);
 		spells.addAll(mReadySpells.values());
 		return spells;

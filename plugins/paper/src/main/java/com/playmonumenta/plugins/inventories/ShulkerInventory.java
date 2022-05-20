@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.Arrays;
@@ -89,24 +88,14 @@ public class ShulkerInventory {
 		mShulkerState = (ShulkerBox) mShulkerMeta.getBlockState();
 		mSlots = ItemStatUtils.getShulkerSlots(mShulkerItem);
 		int size = Math.max(9, Math.min(((mSlots + 8) / 9) * 9, 27));
-		Component name = null;
-		if (mShulkerState.getCustomName() != null) {
-			name = mShulkerState.customName();
-		} else if (ShulkerShortcutListener.isEnderExpansion(mShulkerItem)) {
-			name = mShulkerItem.getItemMeta().displayName();
-		}
+		Component name = mShulkerState.customName();
 		if (name == null) {
-			if (size == 27) {
-				mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX);
-			} else {
-				mInventory = Bukkit.createInventory(mPlayer, size);
-			}
+			name = ItemUtils.getDisplayName(mShulkerItem);
+		}
+		if (size == 27) {
+			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, name);
 		} else {
-			if (size == 27) {
-				mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, name);
-			} else {
-				mInventory = Bukkit.createInventory(mPlayer, size, name);
-			}
+			mInventory = Bukkit.createInventory(mPlayer, size, name);
 		}
 		if (mSlots == 27) {
 			mInventory.setContents(mShulkerState.getInventory().getContents());

@@ -344,6 +344,25 @@ public class ItemUtils {
 		Material.WARPED_HYPHAE
 	);
 
+	public static final Set<Material> signs = EnumSet.of(
+		Material.ACACIA_SIGN,
+		Material.ACACIA_WALL_SIGN,
+		Material.BIRCH_SIGN,
+		Material.BIRCH_WALL_SIGN,
+		Material.CRIMSON_SIGN,
+		Material.CRIMSON_WALL_SIGN,
+		Material.DARK_OAK_SIGN,
+		Material.DARK_OAK_WALL_SIGN,
+		Material.JUNGLE_SIGN,
+		Material.JUNGLE_WALL_SIGN,
+		Material.OAK_SIGN,
+		Material.OAK_WALL_SIGN,
+		Material.SPRUCE_SIGN,
+		Material.SPRUCE_WALL_SIGN,
+		Material.WARPED_SIGN,
+		Material.WARPED_WALL_SIGN
+	);
+
 	// list of blocks that are supposedly used as limits to player movements
 	public static final Set<Material> noPassthrough = EnumSet.of(
 		Material.BARRIER,
@@ -664,6 +683,10 @@ public class ItemUtils {
 
 	public static boolean isStrippable(@Nullable Material mat) {
 		return mat != null && strippables.contains(mat);
+	}
+
+	public static boolean isSign(@Nullable Material mat) {
+		return mat != null && signs.contains(mat);
 	}
 
 	public static void damageItem(ItemStack item, int damage, boolean canBreak) {
@@ -1238,7 +1261,12 @@ public class ItemUtils {
 		return "/give @s " + itemId + itemTag + " " + item.getAmount();
 	}
 
-	public static Component getItemNameComponent(ItemStack item) {
+	/**
+	 * Gets the plain display name of the given item, or the default name of the material if no custom name is set.
+	 *
+	 * @see #getDisplayName(ItemStack)
+	 */
+	public static Component getPlainNameComponent(ItemStack item) {
 		if (hasPlainName(item)) {
 			return Component.text(getPlainName(item));
 		} else {
@@ -1246,7 +1274,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static Component getItemNameComponentWithHover(ItemStack item) {
+	public static Component getPlainNameComponentWithHover(ItemStack item) {
 		ItemStack clone = item.clone();
 		if (clone.getItemMeta() instanceof BookMeta book) {
 			book.setPages();
@@ -1256,6 +1284,20 @@ public class ItemUtils {
 			blockStateMeta.setBlockState(shulker);
 			clone.setItemMeta(blockStateMeta);
 		}
-		return getItemNameComponent(item).hoverEvent(clone.asHoverEvent());
+		return getPlainNameComponent(item).hoverEvent(clone.asHoverEvent());
 	}
+
+	/**
+	 * Gets the (styled) display name of the given item, or the default name of the material if no custom name is set.
+	 *
+	 * @see #getPlainNameComponent(ItemStack)
+	 */
+	public static Component getDisplayName(ItemStack item) {
+		Component name = item.getItemMeta().displayName();
+		if (name != null) {
+			return name;
+		}
+		return Component.translatable(item.getType().getTranslationKey());
+	}
+
 }

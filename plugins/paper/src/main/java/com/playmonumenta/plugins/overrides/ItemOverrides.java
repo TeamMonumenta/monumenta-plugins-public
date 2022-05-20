@@ -33,45 +33,62 @@ public final class ItemOverrides {
 	 * tilling/stripping/making paths, even when the item has lore.
 	 */
 	public static final EnumSet<Material> EXCEPTION_LORED_MATERIALS = EnumSet.of(
-			Material.ANVIL,
-			Material.CHEST,
-			Material.FLINT_AND_STEEL,
-			Material.ENDER_CHEST,
+		Material.ANVIL,
+		Material.CHEST,
+		Material.FLINT_AND_STEEL,
+		Material.ENDER_CHEST,
 
-			Material.WHITE_BANNER,
-			Material.ORANGE_BANNER,
-			Material.MAGENTA_BANNER,
-			Material.LIGHT_BLUE_BANNER,
-			Material.YELLOW_BANNER,
-			Material.LIME_BANNER,
-			Material.PINK_BANNER,
-			Material.GRAY_BANNER,
-			Material.LIGHT_GRAY_BANNER,
-			Material.CYAN_BANNER,
-			Material.PURPLE_BANNER,
-			Material.BLUE_BANNER,
-			Material.BROWN_BANNER,
-			Material.GREEN_BANNER,
-			Material.RED_BANNER,
-			Material.BLACK_BANNER,
+		Material.WHITE_BANNER,
+		Material.ORANGE_BANNER,
+		Material.MAGENTA_BANNER,
+		Material.LIGHT_BLUE_BANNER,
+		Material.YELLOW_BANNER,
+		Material.LIME_BANNER,
+		Material.PINK_BANNER,
+		Material.GRAY_BANNER,
+		Material.LIGHT_GRAY_BANNER,
+		Material.CYAN_BANNER,
+		Material.PURPLE_BANNER,
+		Material.BLUE_BANNER,
+		Material.BROWN_BANNER,
+		Material.GREEN_BANNER,
+		Material.RED_BANNER,
+		Material.BLACK_BANNER,
 
-			Material.WHITE_WOOL,
-			Material.ORANGE_WOOL,
-			Material.MAGENTA_WOOL,
-			Material.LIGHT_BLUE_WOOL,
-			Material.YELLOW_WOOL,
-			Material.LIME_WOOL,
-			Material.PINK_WOOL,
-			Material.GRAY_WOOL,
-			Material.LIGHT_GRAY_WOOL,
-			Material.CYAN_WOOL,
-			Material.PURPLE_WOOL,
-			Material.BLUE_WOOL,
-			Material.BROWN_WOOL,
-			Material.GREEN_WOOL,
-			Material.RED_WOOL,
-			Material.BLACK_WOOL
-		);
+		Material.WHITE_WOOL,
+		Material.ORANGE_WOOL,
+		Material.MAGENTA_WOOL,
+		Material.LIGHT_BLUE_WOOL,
+		Material.YELLOW_WOOL,
+		Material.LIME_WOOL,
+		Material.PINK_WOOL,
+		Material.GRAY_WOOL,
+		Material.LIGHT_GRAY_WOOL,
+		Material.CYAN_WOOL,
+		Material.PURPLE_WOOL,
+		Material.BLUE_WOOL,
+		Material.BROWN_WOOL,
+		Material.GREEN_WOOL,
+		Material.RED_WOOL,
+		Material.BLACK_WOOL,
+
+		Material.ACACIA_SIGN,
+		Material.ACACIA_WALL_SIGN,
+		Material.BIRCH_SIGN,
+		Material.BIRCH_WALL_SIGN,
+		Material.CRIMSON_SIGN,
+		Material.CRIMSON_WALL_SIGN,
+		Material.DARK_OAK_SIGN,
+		Material.DARK_OAK_WALL_SIGN,
+		Material.JUNGLE_SIGN,
+		Material.JUNGLE_WALL_SIGN,
+		Material.OAK_SIGN,
+		Material.OAK_WALL_SIGN,
+		Material.SPRUCE_SIGN,
+		Material.SPRUCE_WALL_SIGN,
+		Material.WARPED_SIGN,
+		Material.WARPED_WALL_SIGN
+	);
 
 	public static final EnumMap<Material, String> EXCEPTION_PRECISE_LORED_MATERIALS = new EnumMap<>(Material.class);
 
@@ -412,7 +429,7 @@ public final class ItemOverrides {
 	                                     BlockPlaceEvent event) {
 		boolean eventCancelled = false;
 
-		//  If it's not not a certain lore item go ahead and run the normal override place interaction.
+		//  If it's not a certain lore item go ahead and run the normal override place interaction.
 		BaseOverride override = mItems.get(item.getType());
 		if (override != null) {
 			eventCancelled |= !override.blockPlaceInteraction(plugin, player, item, event);

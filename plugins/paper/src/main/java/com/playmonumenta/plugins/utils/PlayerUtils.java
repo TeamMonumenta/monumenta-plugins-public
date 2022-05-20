@@ -67,6 +67,7 @@ public class PlayerUtils {
 		if (isDungeon) {
 			return player.getWorld().getPlayers().stream()
 				.filter(p -> p.getGameMode() != GameMode.SPECTATOR
+					             && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER)
 					             && !p.equals(player))
 				.toList();
 		}
@@ -76,6 +77,7 @@ public class PlayerUtils {
 		if (!structures.isEmpty()) {
 			return player.getWorld().getPlayers().stream()
 				.filter(p -> p.getGameMode() != GameMode.SPECTATOR
+					             && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER)
 					             && !p.equals(player)
 					             && structures.stream().anyMatch(structure -> structure.isNearby(p)))
 				.toList();

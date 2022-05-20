@@ -7,13 +7,13 @@ import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -59,11 +59,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			if (item == null) {
 				return "";
 			} else {
-				Component name = item.getItemMeta().displayName();
-				if (name == null) {
-					name = Component.translatable(item.getType().getTranslationKey());
-				}
-				return MiniMessage.miniMessage().serialize(name.hoverEvent(item.asHoverEvent()));
+				return MiniMessage.miniMessage().serialize(ItemUtils.getDisplayName(item).hoverEvent(item.asHoverEvent()));
 			}
 		}
 

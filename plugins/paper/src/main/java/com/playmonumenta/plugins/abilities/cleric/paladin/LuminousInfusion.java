@@ -104,11 +104,11 @@ public class LuminousInfusion extends Ability {
 					new PartialParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					if (mT >= COOLDOWN || !mActive) {
+						mActive = false;
 						if (mT >= COOLDOWN) {
 							MessagingUtils.sendActionBarMessage(mPlayer, EXPIRATION_MESSAGE);
 							ClientModHandler.updateAbility(mPlayer, LuminousInfusion.this);
 						}
-						mActive = false;
 						this.cancel();
 					}
 				}

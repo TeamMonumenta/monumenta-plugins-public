@@ -12,16 +12,16 @@ public class EarthshakeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_earthshake";
 
 	public static class Parameters extends BossParameters {
-		@BossParam(help = "not written")
-		public int RADIUS = 2;
+		@BossParam(help = "Explosion radius of the spell")
+		public int RADIUS = 4;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Range at which the spell can be cast")
 		public int RANGE = 12;
 
 		@BossParam(help = "not written")
 		public int DELAY = 100;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Blast damage that this spell deals to players")
 		public int DAMAGE = 40;
 
 		@BossParam(help = "not written")
@@ -30,13 +30,13 @@ public class EarthshakeBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public int DETECTION = 20;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Time between casting the spell and the resulting explosion")
 		public int FUSE_TIME = 50;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Whether the explosion also makes blocks fly around")
 		public boolean FLY_BLOCKS = true;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Players hit will be pushed up by this amount, plus 0.5 if standing close to the center")
 		public double KNOCK_UP_SPEED = 1.0;
 
 		@BossParam(help = "not written")

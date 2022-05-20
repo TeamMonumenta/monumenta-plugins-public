@@ -749,9 +749,9 @@ public final class Grave {
 			}
 
 			if (hovers) {
-				output = output.append(ItemUtils.getItemNameComponentWithHover(item.getItem()));
+				output = output.append(ItemUtils.getPlainNameComponentWithHover(item.getItem()));
 			} else {
-				output = output.append(ItemUtils.getItemNameComponent(item.getItem()));
+				output = output.append(ItemUtils.getPlainNameComponent(item.getItem()));
 			}
 		}
 		return output;
