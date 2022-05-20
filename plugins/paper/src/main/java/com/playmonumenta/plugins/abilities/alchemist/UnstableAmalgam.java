@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.UnstableAmalgamEnhancementEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -19,7 +20,10 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -34,6 +38,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -49,10 +54,13 @@ public class UnstableAmalgam extends Ability {
 	private static final int UNSTABLE_AMALGAM_RADIUS = 4;
 	private static final float UNSTABLE_AMALGAM_KNOCKBACK_SPEED = 2.5f;
 	private static final int UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION = 20 * 8;
+	private static final double UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE = 0.4;
+	private static final String UNSTABLE_AMALGAM_ENHANCEMENT_EFFECT_NAME = "UnstableAmalgamEnhancementEffectName";
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private @Nullable Slime mAmalgam;
 	private int mDamage;
+	private final Map<ThrownPotion, ItemStatManager.PlayerItemStats> mEnhancementPotionPlayerStat;
 
 	public UnstableAmalgam(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Unstable Amalgam");
@@ -66,9 +74,12 @@ public class UnstableAmalgam extends Ability {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.GUNPOWDER, 1);
 
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-		});
+		if (player != null) {
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+			}, 5);
+		}
+		mEnhancementPotionPlayerStat = new HashMap<>();
 		mAmalgam = null;
 		mDamage = isLevelOne() ? UNSTABLE_AMALGAM_1_DAMAGE : UNSTABLE_AMALGAM_2_DAMAGE;
 	}
@@ -148,8 +159,14 @@ public class UnstableAmalgam extends Ability {
 		}
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, UNSTABLE_AMALGAM_RADIUS, mAmalgam);
 
-		if (isEnhanced() && !mobs.isEmpty()) {
-			unstableMobs(mobs);
+		if (isEnhanced()) {
+			if (!mobs.isEmpty()) {
+				unstableMobs(mobs, playerItemStats);
+			}
+
+			for (Player player : PlayerUtils.playersInRange(loc, UNSTABLE_AMALGAM_RADIUS, true)) {
+				unstableAllay(player, playerItemStats);
+			}
 		}
 
 		for (LivingEntity mob : mobs) {
@@ -183,7 +200,12 @@ public class UnstableAmalgam extends Ability {
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(mPlayer);
 	}
 
-	private void unstableMobs(List<LivingEntity> mobs) {
+
+	private void unstableMobs(List<LivingEntity> mobs, ItemStatManager.PlayerItemStats playerItemStats) {
+		if (mPlayer == null || mAlchemistPotions == null) {
+			return;
+		}
+
 		new BukkitRunnable() {
 			int mTimes = 0;
 			@Override public void run() {
@@ -197,8 +219,7 @@ public class UnstableAmalgam extends Ability {
 						ThrownPotion potion = mPlayer.launchProjectile(ThrownPotion.class);
 						potion.teleport(mob.getEyeLocation());
 						potion.setVelocity(new Vector(0, -1, 0));
-						mAlchemistPotions.setPotionToAlchemistPotion(potion);
-
+						setEnhancementThrowPotion(potion, playerItemStats);
 					}
 				}
 
@@ -207,6 +228,40 @@ public class UnstableAmalgam extends Ability {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+	}
+
+	private void unstableAllay(Player player, ItemStatManager.PlayerItemStats playerItemStats) {
+		if (mPlayer != null) {
+			mPlugin.mEffectManager.addEffect(player, UNSTABLE_AMALGAM_ENHANCEMENT_EFFECT_NAME, new UnstableAmalgamEnhancementEffect(UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION, mPlayer, this, playerItemStats));
+		}
+	}
+
+	public void setEnhancementThrowPotion(ThrownPotion potion, ItemStatManager.PlayerItemStats playerItemStats) {
+		mEnhancementPotionPlayerStat.put(potion, playerItemStats);
+		mAlchemistPotions.setPotionAlchemistPotionAesthetic(potion);
+	}
+
+
+	@Override
+	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
+		if (mAlchemistPotions == null) {
+			return true;
+		}
+		ItemStatManager.PlayerItemStats stats = mEnhancementPotionPlayerStat.get(potion);
+		if (isEnhanced() && stats != null) {
+			Location loc = potion.getLocation();
+
+			mAlchemistPotions.createAura(loc, mAlchemistPotions.getPotionRadius());
+
+			for (LivingEntity entity : EntityUtils.getNearbyMobs(loc, mAlchemistPotions.getPotionRadius())) {
+				DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, stats), mAlchemistPotions.getDamage() * UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE, true, true, false);
+				mAlchemistPotions.applyEffects(entity, true);
+				mAlchemistPotions.applyEffects(entity, false);
+			}
+		}
+		mEnhancementPotionPlayerStat.remove(potion);
+		mEnhancementPotionPlayerStat.keySet().removeIf(pot -> pot.isDead() || !pot.isValid());
+		return true;
 	}
 
 	@Override

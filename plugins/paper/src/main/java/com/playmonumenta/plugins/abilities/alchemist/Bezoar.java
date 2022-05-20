@@ -211,9 +211,7 @@ public class Bezoar extends Ability {
 		if (mPlayer == null) {
 			return;
 		}
-
-		AbsorptionUtils.addAbsorptionInstance(player, PHILOSOPHER_STONE_ABSORPTION_HEALTH, PHILOSOPHER_STONE_ABSORPTION_DURATION);
-
+		AbsorptionUtils.addAbsorption(player, PHILOSOPHER_STONE_ABSORPTION_HEALTH, PHILOSOPHER_STONE_ABSORPTION_HEALTH, PHILOSOPHER_STONE_ABSORPTION_DURATION);
 
 	}
 

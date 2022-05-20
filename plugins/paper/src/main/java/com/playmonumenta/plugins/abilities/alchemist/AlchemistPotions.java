@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -68,6 +69,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	private List<PotionAbility> mPotionAbilities = new ArrayList<PotionAbility>();
 	private double mDamage = 0;
+	private double mRadius = 0;
 	private int mTimer = 0;
 	private int mSlot;
 	private int mMaxCharges;
@@ -99,6 +101,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		mCharges = ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0);
 		mChargeTime = POTIONS_TIMER_BASE;
 		mMaxCharges = MAX_CHARGES;
+		mRadius = RADIUS;
 
 		mPlayerItemStatsMap = new WeakHashMap<>();
 		mMobsIframeMap = new HashMap<>();
@@ -187,6 +190,9 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		return true;
 	}
 
+	/**
+	 * This function will set the given ThrownPotion potion to an Alchemist Potion, with also the damage and if it's gruesome or brutal mode
+	 */
 	public void setPotionToAlchemistPotion(ThrownPotion potion) {
 		if (mPlayer == null) {
 			return;
@@ -197,6 +203,16 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			potion.setMetadata("GruesomeAlchemistPotion", new FixedMetadataValue(mPlugin, 0));
 		}
 
+		setPotionAlchemistPotionAesthetic(potion);
+	}
+
+	/**
+	 * This function will set the given ThrownPotion potion to an Alchemist Potion, ONLY to an aesthetic level
+	 */
+	public void setPotionAlchemistPotionAesthetic(ThrownPotion potion) {
+		if (mPlayer == null) {
+			return;
+		}
 		if (BRUTAL_POTION == null || GRUESOME_POTION == null) {
 			ItemStack basePotion = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKeyUtils.fromString("epic:r1/items/alchemists_potion"));
 			if (basePotion == null) {
@@ -220,7 +236,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		} else if (!mGruesomeMode && BRUTAL_POTION != null) {
 			potion.setItem(BRUTAL_POTION);
 		} else {
-			mPlugin.getLogger().severe("Failed to get alchemist's potion from loot table!");
+			MMLog.severe("Failed to get alchemist's potion from loot table!");
 		}
 	}
 
@@ -230,11 +246,11 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		if (playerItemStats != null) {
 			Location loc = potion.getLocation();
 
-			createAura(loc);
+			createAura(loc, getPotionRadius());
 
 			boolean isGruesome = isGruesome(potion);
 
-			for (LivingEntity entity : EntityUtils.getNearbyMobs(loc, RADIUS)) {
+			for (LivingEntity entity : EntityUtils.getNearbyMobs(loc, getPotionRadius())) {
 				if (EntityUtils.isHostileMob(entity)) {
 					apply(entity, potion, isGruesome, playerItemStats);
 				}
@@ -440,6 +456,10 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	@Override
 	public int getMaxCharges() {
 		return mMaxCharges;
+	}
+
+	public double getPotionRadius() {
+		return mRadius;
 	}
 
 	private boolean updateAlchemistItem(@Nullable ItemStack item, int count) {
