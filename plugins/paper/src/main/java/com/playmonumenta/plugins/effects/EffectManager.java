@@ -409,7 +409,9 @@ public final class EffectManager implements Listener {
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
-					output.add(effectGroup.last());
+					if (!effectGroup.isEmpty()) {
+						output.add(effectGroup.last());
+					}
 				}
 			}
 		}
