@@ -158,7 +158,7 @@ public class SignOverride extends BaseOverride {
 			if (item.getType().equals(Material.BOOK) && !meta.hasLore()) {
 				boolean isCreative = player.getGameMode().equals(GameMode.CREATIVE);
 				if (isCreative ||
-					ZoneUtils.playerCanInteractWithBlock(player, block)) {
+					ZoneUtils.playerCanMineBlock(player, block.getLocation())) {
 					SignUtils.edit(block, player, isCreative);
 				}
 			}

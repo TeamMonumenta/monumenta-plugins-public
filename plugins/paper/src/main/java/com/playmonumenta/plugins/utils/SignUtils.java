@@ -8,6 +8,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.google.gson.JsonElement;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -150,6 +151,7 @@ public final class SignUtils {
 						if (!(updatedBlockState instanceof Sign updatedSign)) {
 							return;
 						} else {
+							CoreProtectIntegration.logRemoval(player, signBlock);
 							for (int lineNum = 0; lineNum < updatedLines.length; ++lineNum) {
 								Component lineComponent;
 								if (allowColor) {
@@ -160,6 +162,7 @@ public final class SignUtils {
 								updatedSign.line(lineNum, lineComponent);
 							}
 							updatedSign.update();
+							CoreProtectIntegration.logPlacement(player, signBlock);
 						}
 					}
 				}.runTask(mPlugin);
