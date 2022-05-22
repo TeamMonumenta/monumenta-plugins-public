@@ -31,7 +31,10 @@ public class DeathSummonBoss extends BossAbilityGroup {
 		public int MOB_AI_DELAY = 10;
 
 		@BossParam(help = "if the mob spawned will have the same agro as the mob dead")
-		public boolean AUTO_AGRO = true;
+		public boolean AUTO_AGGRO = true;
+
+		@BossParam(help = "Number of mobs summoned")
+		public int MOB_COUNT = 1;
 
 	}
 
@@ -50,23 +53,19 @@ public class DeathSummonBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		Entity entity = mParam.POOL.spawn(mBoss.getLocation());
-		if (entity != null) {
-			mParam.PARTICLES.spawn(mBoss.getLocation().clone().add(0, 0.5, 0));
-			mParam.SOUNDS.play(mBoss.getLocation());
+		mParam.PARTICLES.spawn(mBoss.getLocation().clone().add(0, 0.5, 0));
+		mParam.SOUNDS.play(mBoss.getLocation());
+		for (int i = 0; i < mParam.MOB_COUNT; i++) {
+			Entity entity = mParam.POOL.spawn(mBoss.getLocation());
+			if (entity instanceof LivingEntity livingEntity) {
+				livingEntity.setAI(false);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					livingEntity.setAI(true);
+					if (mParam.AUTO_AGGRO && entity instanceof Mob newMob && mBoss instanceof Mob oldMob) {
+						newMob.setTarget(oldMob.getTarget());
+					}
+				}, mParam.MOB_AI_DELAY);
+			}
 		}
-
-		if (entity instanceof LivingEntity livingEntity) {
-			livingEntity.setAI(false);
-			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				livingEntity.setAI(true);
-				if (mParam.AUTO_AGRO && entity instanceof Mob newMob && mBoss instanceof Mob oldMob) {
-					newMob.setTarget(oldMob.getTarget());
-				}
-			}, mParam.MOB_AI_DELAY);
-		}
-
-
-
 	}
 }
