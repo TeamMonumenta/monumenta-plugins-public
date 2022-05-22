@@ -528,6 +528,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(HostileBoss.identityTag, new HostileBoss.Parameters());
 		mBossParameters.put(FriendlyBoss.identityTag, new FriendlyBoss.Parameters());
 		mBossParameters.put(RebornBoss.identityTag, new RebornBoss.Parameters());
+		mBossParameters.put(BlockBreakBoss.identityTag, new BlockBreakBoss.Parameters());
 	}
 
 	/********************************************************************************
