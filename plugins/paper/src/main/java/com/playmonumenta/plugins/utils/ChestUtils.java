@@ -275,7 +275,7 @@ public class ChestUtils {
 			lootBox.setItemMeta(nbt.getItem().getItemMeta());
 
 			// Update the lore text with the new count
-			updateLootBoxSharesLore(lootBox, items.size(), LOOTBOX_EPIC_MAX_SIZE);
+			updateLootBoxSharesLore(lootBox, items.size(), true);
 		} else {
 			// Add the item to the normal lootbox's shulker inventory
 			// Note that if we got here, that lootbox always has space available
@@ -286,7 +286,7 @@ public class ChestUtils {
 				lootBox.setItemMeta(blockMeta);
 
 				// Update the lore text with the new count
-				updateLootBoxSharesLore(lootBox, 27 - countEmptyNormalLootboxSpaces(shulkerMeta.getInventory()), 27);
+				updateLootBoxSharesLore(lootBox, 27 - countEmptyNormalLootboxSpaces(shulkerMeta.getInventory()), false);
 			}
 		}
 
@@ -338,7 +338,7 @@ public class ChestUtils {
 		}
 
 		// Update the lore text with the new count
-		updateLootBoxSharesLore(lootBox, items.size(), LOOTBOX_EPIC_MAX_SIZE);
+		updateLootBoxSharesLore(lootBox, items.size(), true);
 
 		return returnContents;
 	}
@@ -353,9 +353,9 @@ public class ChestUtils {
 			NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.getPlayerModifiedKey());
 			NBTCompoundList items = playerModified.getCompoundList("Items");
 			if (items != null) {
-				updateLootBoxSharesLore(lootBox, items.size(), LOOTBOX_EPIC_MAX_SIZE);
+				updateLootBoxSharesLore(lootBox, items.size(), true);
 			} else {
-				updateLootBoxSharesLore(lootBox, 0, LOOTBOX_EPIC_MAX_SIZE);
+				updateLootBoxSharesLore(lootBox, 0, true);
 			}
 		} else if (isNormalLootBox(lootBox)) {
 			int usedSlots = 0;
@@ -369,15 +369,17 @@ public class ChestUtils {
 					}
 				}
 			}
-			updateLootBoxSharesLore(lootBox, usedSlots, 27);
+			updateLootBoxSharesLore(lootBox, usedSlots, false);
 		}
 	}
 
-	private static void updateLootBoxSharesLore(ItemStack lootBox, int amount, int max) {
-		if (ItemStatUtils.getLore(lootBox).size() >= 3) {
-			ItemStatUtils.removeLore(lootBox, 2);
+	private static void updateLootBoxSharesLore(ItemStack lootBox, int amount, boolean isEpic) {
+		int max = isEpic ? LOOTBOX_EPIC_MAX_SIZE : 27;
+		int loreIndex = isEpic ? 5 : 2;
+		if (ItemStatUtils.getLore(lootBox).size() > loreIndex) {
+			ItemStatUtils.removeLore(lootBox, loreIndex);
 		}
-		ItemStatUtils.addLore(lootBox, 2, Component.text(amount + "/" + max + " shares").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE));
+		ItemStatUtils.addLore(lootBox, loreIndex, Component.text(amount + "/" + max + " shares").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE));
 		ItemStatUtils.generateItemStats(lootBox);
 	}
 
@@ -415,7 +417,7 @@ public class ChestUtils {
 			lootBox.setItemMeta(blockMeta);
 
 			// Update the lore text with the new count
-			updateLootBoxSharesLore(lootBox, 27 - countEmptyNormalLootboxSpaces(shulkerMeta.getInventory()), 27);
+			updateLootBoxSharesLore(lootBox, 27 - countEmptyNormalLootboxSpaces(shulkerMeta.getInventory()), false);
 		}
 
 		return returnContents;
