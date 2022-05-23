@@ -168,6 +168,9 @@ public class PlayerListener implements Listener {
 			ScoreboardUtils.setScoreboardValue(player, ParticleCategory.OWN_PASSIVE.mObjectiveName, 0);
 		}
 
+		//TODO: Remove this when custom effects logout handling is better dealt with
+		EntityUtils.applyRecoilDisable(mPlugin, 9999, 99, player);
+
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
