@@ -101,7 +101,7 @@ public class GenerateItems extends GenericCommand {
 			} else {
 				String fullText = "";
 				for (int i = 0; i < 6; i++) {
-					if (row.get(7 + i).equals("") || row.get(7 + i).equals("-") || row.get(7 + i) == null) {
+					if (row.get(7 + i).equals("") || row.get(7 + i) == null || row.get(7 + i).length() <= 1) {
 						continue;
 					} else {
 						fullText += " ";
