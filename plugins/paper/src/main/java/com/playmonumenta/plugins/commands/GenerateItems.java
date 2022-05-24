@@ -101,11 +101,11 @@ public class GenerateItems extends GenericCommand {
 			} else {
 				String fullText = "";
 				for (int i = 0; i < 6; i++) {
-					if (row.get(6 + i).equals("") || row.get(6 + i).equals("-") || row.get(6 + i) == null) {
+					if (row.get(7 + i).equals("") || row.get(7 + i).equals("-") || row.get(7 + i) == null) {
 						continue;
 					} else {
 						fullText += " ";
-						fullText += row.get(6 + i).replace('_', ',');
+						fullText += row.get(7 + i).replace('_', ',');
 						fullText = fullText.replace("  ", " ");
 						int fullLength = fullText.length();
 						int numLines = Math.min((fullLength / 40) + 1, 6);
