@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.SpreadEffectOnDeath;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -15,6 +16,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
@@ -44,8 +46,16 @@ public class CholericFlames extends Ability {
 	private static final int SPREAD_EFFECT_DURATION = 30 * 20;
 	private static final int SPREAD_EFFECT_DURATION_APPLIED = 5 * 20;
 	private static final double SPREAD_EFFECT_RADIUS = 3;
+	public static final float KNOCKBACK = 0.5f;
 
-	private final int mDamage;
+	public static final String CHARM_DAMAGE = "Choleric Flames Damage";
+	public static final String CHARM_RANGE = "Choleric Flames Range";
+	public static final String CHARM_COOLDOWN = "Choleric Flames Cooldown";
+	public static final String CHARM_FIRE = "Choleric Flames Fire Duration";
+	public static final String CHARM_HUNGER = "Choleric Flames Hunger Duration";
+	public static final String CHARM_KNOCKBACK = "Choleric Flames Knockback";
+
+	private final double mDamage;
 
 	public CholericFlames(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Choleric Flames");
@@ -55,10 +65,10 @@ public class CholericFlames extends Ability {
 		mInfo.mDescriptions.add("The damage is increased to 5, and also afflict mobs with Hunger I.");
 		mInfo.mDescriptions.add("Mobs ignited by this ability are inflicted with an additional level of Inferno for each debuff they have prior to this ability, up to 3. Additionally, when these mobs die, they explode, applying all Inferno they have at the time of death to all mobs within a 3 block radius for 5s.");
 		mInfo.mLinkedSpell = ClassAbility.CHOLERIC_FLAMES;
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.FIRE_CHARGE, 1);
-		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 	}
 
 	@Override
@@ -79,7 +89,7 @@ public class CholericFlames extends Ability {
 				new PPCircle(Particle.FLAME, mLoc, mRadius).ringMode(true).count(40).extra(0.125).spawnAsPlayerActive(mPlayer);
 				new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).ringMode(true).count(40).extra(0.125).spawnAsPlayerActive(mPlayer);
 				new PPCircle(Particle.SMOKE_NORMAL, mLoc, mRadius).ringMode(true).count(20).extra(0.15).spawnAsPlayerActive(mPlayer);
-				if (mRadius >= RADIUS + 1) {
+				if (mRadius >= CharmManager.getRadius(mPlayer, CHARM_RANGE, RADIUS) + 1) {
 					this.cancel();
 				}
 			}
@@ -92,6 +102,7 @@ public class CholericFlames extends Ability {
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.mLinkedSpell, true);
+			MovementUtils.knockAway(mPlayer, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK));
 
 			// Gets a copy so modifying the inferno level does not have effect elsewhere
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
@@ -102,10 +113,10 @@ public class CholericFlames extends Ability {
 					mPlugin.mEffectManager.addEffect(mob, SPREAD_EFFECT_ON_DEATH_EFFECT, new SpreadEffectOnDeath(SPREAD_EFFECT_DURATION, Inferno.INFERNO_EFFECT_NAME, SPREAD_EFFECT_RADIUS, SPREAD_EFFECT_DURATION_APPLIED));
 				}
 			}
-			EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer, playerItemStats);
+			EntityUtils.applyFire(mPlugin, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_FIRE), mob, mPlayer, playerItemStats);
 
 			if (isLevelTwo()) {
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, DURATION, 0, false, true));
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_HUNGER), 0, false, true));
 			}
 		}
 

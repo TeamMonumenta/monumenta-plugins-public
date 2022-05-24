@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.SanguineHarvestBlight;
 import com.playmonumenta.plugins.effects.SanguineMark;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -39,8 +40,8 @@ public class SanguineHarvest extends Ability {
 	private static final int RANGE = 8;
 	private static final int RADIUS_1 = 3;
 	private static final int RADIUS_2 = 4;
-	private static final int BLEED_LEVEL_1 = 1;
-	private static final int BLEED_LEVEL_2 = 2;
+	private static final double BLEED_LEVEL_1 = 0.1;
+	private static final double BLEED_LEVEL_2 = 0.2;
 	private static final double HEAL_PERCENT_1 = 0.05;
 	private static final double HEAL_PERCENT_2 = 0.1;
 	private static final int BLEED_DURATION = 10 * 20;
@@ -56,8 +57,14 @@ public class SanguineHarvest extends Ability {
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(179, 0, 0), 1.0f);
 
-	private final int mRadius;
-	private final int mBleedLevel;
+	public static final String CHARM_RADIUS = "Sanguine Harvest Radius";
+	public static final String CHARM_COOLDOWN = "Sanguine Harvest Cooldown";
+	public static final String CHARM_HEAL = "Sanguine Harvest Healing";
+	public static final String CHARM_KNOCKBACK = "Sanguine Harvest Knockback";
+	public static final String CHARM_BLEED = "Sanguine Harvest Bleed Amplifier";
+
+	private final double mRadius;
+	private final double mBleedLevel;
 	private final double mHealPercent;
 	private int mRightClicks = 0;
 
@@ -71,13 +78,13 @@ public class SanguineHarvest extends Ability {
 		mInfo.mDescriptions.add("Increase passive Bleed level to II, and increase the radius to 4 blocks. Players killing a marked mob are healed by 10%.");
 		mInfo.mDescriptions.add("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. Mobs standing on these Blighted blocks take 5% extra damage per debuff. The Blight disappears after 6s and is not counted as a debuff.");
 		mInfo.mLinkedSpell = ClassAbility.SANGUINE_HARVEST;
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
-		mRadius = isLevelOne() ? RADIUS_1 : RADIUS_2;
-		mHealPercent = isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2;
-		mBleedLevel = isLevelOne() ? BLEED_LEVEL_1 : BLEED_LEVEL_2;
+		mRadius = CharmManager.getRadius(player, CHARM_RADIUS, isLevelOne() ? RADIUS_1 : RADIUS_2);
+		mHealPercent = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2);
+		mBleedLevel = CharmManager.getLevelPercentDecimal(player, CHARM_BLEED) + (isLevelOne() ? BLEED_LEVEL_1 : BLEED_LEVEL_2);
 	}
 
 	@Override
@@ -201,7 +208,7 @@ public class SanguineHarvest extends Ability {
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius, mPlayer);
 		for (LivingEntity mob : mobs) {
-			MovementUtils.knockAway(loc, mob, 0.2f, 0.2f, true);
+			MovementUtils.knockAway(loc, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, 0.2f), 0.2f, true);
 			mPlugin.mEffectManager.addEffect(mob, SANGUINE_NAME, new SanguineMark(mHealPercent, 20 * 30, mPlayer, mPlugin));
 		}
 	}
@@ -211,7 +218,7 @@ public class SanguineHarvest extends Ability {
 		if (event.getAbility() == null) {
 			return false;
 		}
-		EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel * 0.1, enemy);
+		EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel, enemy);
 		return false; // applies bleed on damage to all mobs hit, causes no recursion
 	}
 

@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
@@ -49,6 +50,15 @@ public class DarkPact extends Ability {
 	private static final int MAX_ABSORPTION = 6;
 	private static final int COOLDOWN = 20 * 14;
 
+	public static final String CHARM_COOLDOWN = "Dark Pact Cooldown";
+	public static final String CHARM_DAMAGE = "Dark Pact Melee Damage";
+	public static final String CHARM_REFRESH = "Dark Pact Refresh";
+	public static final String CHARM_ATTACK_SPEED = "Dark Pact Attack Speed Amplifier";
+	public static final String CHARM_CAP = "Dark Pact Absorption Cap";
+	public static final String CHARM_DURATION = "Dark Pact Buff Duration";
+	public static final String CHARM_REDUCTION = "Dark Pact Damage Reduction";
+	public static final String CHARM_ABSORPTION = "Dark Pact Absorption Per Kill";
+
 	private final double mPercentDamageDealt;
 	private final double mPercentAtks;
 	private @Nullable JudgementChain mJudgementChain;
@@ -60,12 +70,12 @@ public class DarkPact extends Ability {
 		mInfo.mShorthandName = "DaP";
 		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain 10% damage reduction, +10% attack speed, and deal +30% melee damage on your scythe attacks. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
 		mInfo.mDescriptions.add("You gain +20% attack speed and attacks with a scythe deal +60% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.SOUL_SAND, 1);
-		mPercentDamageDealt = isLevelOne() ? PERCENT_DAMAGE_DEALT_1 : PERCENT_DAMAGE_DEALT_2;
-		mPercentAtks = isLevelOne() ? PERCENT_ATKS_1 : PERCENT_ATKS_2;
+		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? PERCENT_DAMAGE_DEALT_1 : PERCENT_DAMAGE_DEALT_2);
+		mPercentAtks = CharmManager.getLevelPercentDecimal(player, CHARM_ATTACK_SPEED) + (isLevelOne() ? PERCENT_ATKS_1 : PERCENT_ATKS_2);
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -92,12 +102,13 @@ public class DarkPact extends Ability {
 			new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 50, 0.2, 0.1, 0.2, 1).spawnAsPlayerActive(mPlayer);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.5f, 1.25f);
 			world.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1, 0.5f);
+			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES, 0, (entity, enemy) -> entity instanceof Player player && ItemUtils.isHoe(player.getInventory().getItemInMainHand())));
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_ATKS_EFFECT_NAME, new PercentAttackSpeed(DURATION, mPercentAtks, PERCENT_ATKS_EFFECT_NAME));
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(DURATION, PERCENT_HEAL));
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RESIST));
-			mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(DURATION,
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(duration, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES, 0, (entity, enemy) -> entity instanceof Player player && ItemUtils.isHoe(player.getInventory().getItemInMainHand())));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_ATKS_EFFECT_NAME, new PercentAttackSpeed(duration, mPercentAtks, PERCENT_ATKS_EFFECT_NAME));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(duration, PERCENT_HEAL));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(duration, PERCENT_DAMAGE_RESIST - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION)));
+			mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(duration,
 					(entity, fourHertz, twoHertz, oneHertz) -> {
 					new PartialParticle(Particle.SPELL_WITCH, entity.getLocation(), 3, 0.2, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
 					},
@@ -115,29 +126,32 @@ public class DarkPact extends Ability {
 		if (mPlayer == null) {
 			return;
 		}
+		int duration = DURATION_INCREASE_ON_KILL + CharmManager.getExtraDuration(mPlayer, CHARM_REFRESH);
+
+
 		NavigableSet<Effect> aestheticsEffects = mPlugin.mEffectManager.getEffects(mPlayer, AESTHETICS_EFFECT_NAME);
 		if (aestheticsEffects != null) {
-			AbsorptionUtils.addAbsorption(mPlayer, ABSORPTION_ON_KILL, MAX_ABSORPTION, aestheticsEffects.last().getDuration());
+			AbsorptionUtils.addAbsorption(mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, ABSORPTION_ON_KILL), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CAP, MAX_ABSORPTION), aestheticsEffects.last().getDuration());
 			for (Effect effect : aestheticsEffects) {
-				effect.setDuration(effect.getDuration() + DURATION_INCREASE_ON_KILL);
+				effect.setDuration(effect.getDuration() + duration);
 			}
 		}
 		NavigableSet<Effect> percentDamageEffects = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME);
 		if (percentDamageEffects != null) {
 			for (Effect effect : percentDamageEffects) {
-				effect.setDuration(effect.getDuration() + DURATION_INCREASE_ON_KILL);
+				effect.setDuration(effect.getDuration() + duration);
 			}
 		}
 		NavigableSet<Effect> percentAtksEffects = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_ATKS_EFFECT_NAME);
 		if (percentAtksEffects != null) {
 			for (Effect effect : percentAtksEffects) {
-				effect.setDuration(effect.getDuration() + DURATION_INCREASE_ON_KILL);
+				effect.setDuration(effect.getDuration() + duration);
 			}
 		}
 		NavigableSet<Effect> percentDefense = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME);
 		if (percentDefense != null) {
 			for (Effect effect : percentDefense) {
-				effect.setDuration(effect.getDuration() + DURATION_INCREASE_ON_KILL);
+				effect.setDuration(effect.getDuration() + duration);
 			}
 		}
 	}

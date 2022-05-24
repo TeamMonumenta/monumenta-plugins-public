@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.VoodooBondsOtherPlayer;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -37,8 +38,17 @@ public class VoodooBonds extends Ability {
 	private static final int PASSIVE_RADIUS = 3;
 	private static final double DAMAGE_1 = 0.2;
 	private static final double DAMAGE_2 = 0.3;
+	private static final int DURATION_1 = 20 * 5;
+	private static final int DURATION_2 = 20 * 7;
+
+	public static final String CHARM_COOLDOWN = "Voodoo Bonds Cooldown";
+	public static final String CHARM_TRANSFER_DAMAGE = "Voodoo Bonds Transfer Damage";
+	public static final String CHARM_TRANSFER_TIME = "Voodoo Bonds Transfer Time Limit";
+	public static final String CHARM_DAMAGE = "Voodoo Bonds Damage";
+	public static final String CHARM_RADIUS = "Voodoo Bonds Radius";
 
 	private final double mDamage;
+	private int mTransferDuration;
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
@@ -49,11 +59,12 @@ public class VoodooBonds extends Ability {
 		mInfo.mShorthandName = "VB";
 		mInfo.mDescriptions.add("Melee strikes to a mob apply 20% of the damage to all mobs of the same type within 3 blocks. Additionally, Right-click while sneaking and looking down to cast a protective spell on all players within an 8 block radius. The next hit every player (including the Reaper) takes has all damage ignored (or 50% if attack is from a Boss), but that damage will transfer to the Reaper in 5s unless it is passed on again. Passing that damage requires a melee strike, in which 33% of the initial damage blocked is added to the damage of the strike (Bosses are immune to this bonus). The damage directed to the Reaper is calculated by the percentage of health the initial hit would have taken from that player, and can never kill you, only leave you at 1 HP. Cooldown: 22s.");
 		mInfo.mDescriptions.add("The passive damage on similar mobs is increased to 30%, the duration before damage transfer increases to 7s, the on-hit damage when passing a hit increases to 66% of the blocked damage, and the cooldown is reduced to 12s.");
-		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.JACK_O_LANTERN, 1);
-		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mTransferDuration = CharmManager.getExtraDuration(player, CHARM_TRANSFER_TIME) + (isLevelOne() ? DURATION_1 : DURATION_2);
 	}
 
 	@Override
@@ -89,18 +100,18 @@ public class VoodooBonds extends Ability {
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 
 				}
-				if (mRadius >= ACTIVE_RADIUS) {
+				if (mRadius >= CharmManager.getRadius(mPlayer, CHARM_RADIUS, ACTIVE_RADIUS)) {
 					this.cancel();
 				}
 
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
-		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), ACTIVE_RADIUS, true)) {
+		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, ACTIVE_RADIUS), true)) {
 			//better effects
 			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 0.75f);
 			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01).spawnAsPlayerActive(mPlayer);
 			mPlugin.mEffectManager.addEffect(p, "VoodooBondsEffect",
-					new VoodooBondsOtherPlayer(mInfo.mCooldown, mPlayer, mPlugin));
+					new VoodooBondsOtherPlayer(mInfo.mCooldown, mTransferDuration, mPlayer, mPlugin));
 		}
 	}
 
@@ -109,7 +120,7 @@ public class VoodooBonds extends Ability {
 		if (event.getType() == DamageType.MELEE && mPlayer != null) {
 			EntityType type = enemy.getType();
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), PASSIVE_RADIUS, mPlayer)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, PASSIVE_RADIUS), mPlayer)) {
 				if (mob.getType().equals(type) && mob != enemy) {
 					Location mLoc = mob.getLocation();
 					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, event.getDamage() * mDamage, mInfo.mLinkedSpell, true);

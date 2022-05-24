@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -69,8 +70,18 @@ public class GraspingClaws extends Ability {
 		DamageType.MAGIC
 	);
 
+	public static final String CHARM_DAMAGE = "Grasping Claws Damage";
+	public static final String CHARM_COOLDOWN = "Grasping Claws Cooldown";
+	public static final String CHARM_PULL = "Grasping Claws Pull Strength";
+	public static final String CHARM_SLOW = "Grasping Claws Slowness Amplifier";
+	public static final String CHARM_RADIUS = "Grasping Claws Radius";
+	public static final String CHARM_DURATION = "Grasping Claws Slowness Duration";
+	public static final String CHARM_ARROW = "Grasping Claws Arrow Range";
+
+
+
 	private final double mAmplifier;
-	private final int mDamage;
+	private final double mDamage;
 	private final WeakHashMap<AbstractArrow, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public GraspingClaws(Plugin plugin, @Nullable Player player) {
@@ -85,8 +96,8 @@ public class GraspingClaws extends Ability {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BOW, 1);
-		mAmplifier = isLevelOne() ? AMPLIFIER_1 : AMPLIFIER_2;
-		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mAmplifier = CharmManager.getLevelPercentDecimal(player, CHARM_SLOW) + (isLevelOne() ? AMPLIFIER_1 : AMPLIFIER_2);
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
@@ -123,10 +134,10 @@ public class GraspingClaws extends Ability {
 			new PartialParticle(Particle.DRAGON_BREATH, loc, 85, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, CHAIN_PARTICLE).spawnAsPlayerActive(mPlayer);
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), mPlayer)) {
 				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), mDamage, true, true, false);
-				MovementUtils.pullTowards(proj, mob, PULL_SPEED);
-				EntityUtils.applySlow(mPlugin, DURATION, mAmplifier, mob);
+				MovementUtils.pullTowards(proj, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_SPEED));
+				EntityUtils.applySlow(mPlugin, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mAmplifier, mob);
 			}
 
 			if (isEnhanced()) {
@@ -151,6 +162,7 @@ public class GraspingClaws extends Ability {
 			final List<LivingEntity> mMobsHitThisTick = new ArrayList<>();
 			boolean mHitboxes = false;
 			World mWorld = loc.getWorld();
+			double mRadius = CharmManager.getRadius(mPlayer, CHARM_ARROW, CAGE_RADIUS);
 
 			List<Integer> mDegrees1 = new ArrayList<>();
 			List<Integer> mDegrees2 = new ArrayList<>();
@@ -165,7 +177,7 @@ public class GraspingClaws extends Ability {
 				for (int y = 0; y < 5; y++) {
 					for (double degree = 0; degree < 360; degree += 20) {
 						double radian1 = Math.toRadians(degree);
-						vec = new Vector(FastUtils.cos(radian1) * CAGE_RADIUS, y, FastUtils.sin(radian1) * CAGE_RADIUS);
+						vec = new Vector(FastUtils.cos(radian1) * mRadius, y, FastUtils.sin(radian1) * mRadius);
 						vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 						Location l = loc.clone().add(vec);
@@ -193,7 +205,7 @@ public class GraspingClaws extends Ability {
 								Vector v = le.getVelocity();
 
 								if (!e.getScoreboardTags().contains("Boss") && !e.getScoreboardTags().contains("boss_ccimmune")) {
-									if (loc.distance(eLoc) > CAGE_RADIUS) {
+									if (loc.distance(eLoc) > mRadius) {
 										MovementUtils.knockAway(loc, le, 0.3f, true);
 									} else {
 										MovementUtils.pullTowards(loc, le, 0.15f);

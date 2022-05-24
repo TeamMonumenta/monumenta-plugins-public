@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -55,11 +56,18 @@ public class AmplifyingHex extends Ability {
 	private static final float KNOCKBACK_SPEED = 0.12f;
 	private static final String ENHANCED_DOT_EFFECT_NAME = "AmplifyingHexDamageOverTimeEffect";
 
-	private final int mAmplifierDamage;
-	private final int mAmplifierCap;
-	private final int mRadius;
+	private final float mAmplifierDamage;
+	private final float mAmplifierCap;
+	private final float mRadius;
 	private float mRegionCap;
 	private float mDamage = 0f;
+
+	public static final String CHARM_DAMAGE = "Amplifying Hex Damage";
+	public static final String CHARM_RANGE = "Amplifying Hex Range";
+	public static final String CHARM_COOLDOWN = "Amplifying Hex Cooldown";
+	public static final String CHARM_CONE = "Amplifying Hex Cone";
+	public static final String CHARM_EFFECT = "Amplifying Hex Damage per Effect Potency";
+
 
 	public AmplifyingHex(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Amplifying Hex");
@@ -69,12 +77,12 @@ public class AmplifyingHex extends Ability {
 		mInfo.mDescriptions.add("The range is increased to 10 blocks, extra damage increased to +2 per extra level, and the extra level cap is increased to 3 extra levels.");
 		mInfo.mDescriptions.add("Debuffs on affected mobs are now amplified by one level, up to 3 levels (or 55% for vulnerability).");
 		mInfo.mLinkedSpell = ClassAbility.AMPLIFYING;
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
-		mAmplifierDamage = isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2;
-		mAmplifierCap = isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2;
-		mRadius = isLevelOne() ? RADIUS_1 : RADIUS_2;
+		mAmplifierDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2);
+		mAmplifierCap = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2);
+		mRadius = (float) CharmManager.getRadius(player, CHARM_RANGE, isLevelOne() ? RADIUS_1 : RADIUS_2);
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -130,7 +138,7 @@ public class AmplifyingHex extends Ability {
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius, mPlayer)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
-			if (playerDir.dot(toMobVector) > DOT_ANGLE) {
+			if (playerDir.dot(toMobVector) > CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, DOT_ANGLE)) {
 				int debuffCount = 0;
 				int amplifierCount = 0;
 				for (PotionEffectType effectType : AbilityUtils.DEBUFFS) {
@@ -251,7 +259,7 @@ public class AmplifyingHex extends Ability {
 				}
 
 				if (debuffCount > 0) {
-					float finalDamage = debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage;
+					double finalDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage);
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.mLinkedSpell, true);
 					MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
 				}

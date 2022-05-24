@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -50,8 +51,14 @@ public class RestlessSouls extends Ability {
 	private static final int DETECTION_RANGE = 24;
 	private static final int RANGE = 8;
 
+	public static final String CHARM_DAMAGE = "Restless Souls Damage";
+	public static final String CHARM_RADIUS = "Restless Souls Radius";
+	public static final String CHARM_DURATION = "Restless Souls Duration";
+	public static final String CHARM_CAP = "Restless Souls Vex Cap";
+
+
 	private final boolean mLevel;
-	private final int mDamage;
+	private final double mDamage;
 	private final int mSilenceTime;
 	private final int mVexCap;
 	private @Nullable Vex mVex;
@@ -71,9 +78,9 @@ public class RestlessSouls extends Ability {
 
 		boolean isLevelOne = isLevelOne();
 		mLevel = isLevelOne;
-		mDamage = isLevelOne ? DAMAGE_1 : DAMAGE_2;
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne ? DAMAGE_1 : DAMAGE_2);
 		mSilenceTime = isLevelOne ? SILENCE_DURATION_1 : SILENCE_DURATION_2;
-		mVexCap = isLevelOne ? VEX_CAP_1 : VEX_CAP_2;
+		mVexCap = (int) CharmManager.getLevel(player, CHARM_CAP) + (isLevelOne ? VEX_CAP_1 : VEX_CAP_2);
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
@@ -86,7 +93,7 @@ public class RestlessSouls extends Ability {
 
 	@Override
 	public double entityDeathRadius() {
-		return RANGE;
+		return CharmManager.getRadius(mPlayer, CHARM_RADIUS, RANGE);
 	}
 
 	@Override
@@ -142,7 +149,7 @@ public class RestlessSouls extends Ability {
 					mParticle1.location(loc).spawnAsPlayerActive(mPlayer);
 					mParticle2.location(loc).spawnAsPlayerActive(mPlayer);
 
-					boolean isOutOfTime = mTicksElapsed >= VEX_DURATION;
+					boolean isOutOfTime = mTicksElapsed >= VEX_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 					if (isOutOfTime || !mBoss.isValid()) {
 						if (isOutOfTime && mBoss.isValid()) {
 							Location vexLoc = mBoss.getLocation();

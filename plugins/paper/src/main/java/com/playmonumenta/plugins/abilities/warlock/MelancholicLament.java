@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -37,6 +38,12 @@ public class MelancholicLament extends Ability {
 	private static final int RADIUS = 7;
 	private static final int CLEANSE_REDUCTION = 20 * 10;
 
+	public static final String CHARM_RADIUS = "Melancholic Lament Radius";
+	public static final String CHARM_COOLDOWN = "Melancholic Lament Cooldown";
+	public static final String CHARM_WEAKNESS = "Melancholic Lament Weakness Amplifier";
+	public static final String CHARM_RECOVERY = "Melancholic Lament Negative Effect Recovery";
+
+
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(235, 235, 224), 1.0f);
 
 	private final double mWeakenEffect;
@@ -53,10 +60,10 @@ public class MelancholicLament extends Ability {
 		mInfo.mDescriptions.add("Press the swap key while sneaking and holding a scythe to recite a haunting song, causing all mobs within 7 blocks to target the user and afflicting them with 20% Weaken for 8 seconds. Cooldown: 16s.");
 		mInfo.mDescriptions.add("Increase the Weaken to 30% and decrease the duration of all negative potion effects on players in the radius by 10s.");
 		mInfo.mDescriptions.add("When cast, also cleanse all potion debuffs. Then, your next non-ailment damage deals +1 damage per debuff cleansed.");
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
-		mWeakenEffect = isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
+		mWeakenEffect = CharmManager.getLevelPercentDecimal(player, CHARM_WEAKNESS) + (isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2);
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				mJudgementChain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, JudgementChain.class);
@@ -109,20 +116,21 @@ public class MelancholicLament extends Ability {
 			}
 
 			if (isLevelTwo()) {
-				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true)) {
+				int reductionTime = CLEANSE_REDUCTION + CharmManager.getExtraDuration(mPlayer, CHARM_RECOVERY);
+				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), true)) {
 					new PartialParticle(Particle.REDSTONE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.ENCHANTMENT_TABLE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
 					for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, player)) {
 						PotionEffect effect = player.getPotionEffect(effectType);
 						if (effect != null) {
 							player.removePotionEffect(effectType);
-							if (effect.getDuration() - CLEANSE_REDUCTION > 0) {
-								player.addPotionEffect(new PotionEffect(effectType, effect.getDuration() - CLEANSE_REDUCTION, effect.getAmplifier()));
+							if (effect.getDuration() - reductionTime > 0) {
+								player.addPotionEffect(new PotionEffect(effectType, effect.getDuration() - reductionTime, effect.getAmplifier()));
 							}
 						}
 					}
-					EntityUtils.setWeakenTicks(mPlugin, player, Math.max(0, EntityUtils.getWeakenTicks(mPlugin, player) - CLEANSE_REDUCTION));
-					EntityUtils.setSlowTicks(mPlugin, player, Math.max(0, EntityUtils.getSlowTicks(mPlugin, player) - CLEANSE_REDUCTION));
+					EntityUtils.setWeakenTicks(mPlugin, player, Math.max(0, EntityUtils.getWeakenTicks(mPlugin, player) - reductionTime));
+					EntityUtils.setSlowTicks(mPlugin, player, Math.max(0, EntityUtils.getSlowTicks(mPlugin, player) - reductionTime));
 				}
 			}
 			putOnCooldown();

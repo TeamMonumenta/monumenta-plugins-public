@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -57,7 +58,7 @@ public class VoodooBondsReaper extends Effect {
 		if (mScore == 0) {
 			return;
 		}
-		double percent = mScore == 1 ? PERCENT_1 : PERCENT_2;
+		double percent = CharmManager.getLevelPercentDecimal(mPlayer, VoodooBonds.CHARM_TRANSFER_DAMAGE) + (mScore == 1 ? PERCENT_1 : PERCENT_2);
 		if (!EntityUtils.isBoss(enemy)) {
 			event.setDamage(event.getDamage() + mDamageTaken * percent);
 		}

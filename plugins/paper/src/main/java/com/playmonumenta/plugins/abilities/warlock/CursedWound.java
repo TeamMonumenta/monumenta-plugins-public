@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -55,6 +56,11 @@ public class CursedWound extends Ability {
 	private Ability[] mAbilities = {};
 	private double mCursedWoundCap;
 
+	public static final String CHARM_DAMAGE = "Cursed Wound Damage Modifier";
+	public static final String CHARM_RADIUS = "Cursed Wound Radius";
+	public static final String CHARM_CAP = "Cursed Wound Damage Cap";
+	public static final String CHARM_DOT = "Cursed Wound DoT";
+
 	private @Nullable Collection<PotionEffect> mStoredPotionEffects;
 	private @Nullable HashMap<String, Effect> mStoredCustomEffects;
 
@@ -68,7 +74,7 @@ public class CursedWound extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.CURSED_WOUND;
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
 
-		mCursedWoundCap = isLevelOne() ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP;
+		mCursedWoundCap = CharmManager.getLevelPercentDecimal(player, CHARM_CAP) + (isLevelOne() ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP);
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -88,7 +94,7 @@ public class CursedWound extends Ability {
 			if (isEnhanced() && mStoredPotionEffects != null && mStoredCustomEffects != null) {
 				double damage = DAMAGE_PER_EFFECT * (mStoredPotionEffects.size() + mStoredCustomEffects.size());
 				if (damage > 0) {
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CURSED_WOUND_RADIUS)) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, CURSED_WOUND_RADIUS))) {
 						 mStoredPotionEffects.forEach(mob::addPotionEffect);
 						 mStoredCustomEffects.forEach((source, effect) -> mPlugin.mEffectManager.addEffect(mob, source, effect));
 						 DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, true);
@@ -117,7 +123,7 @@ public class CursedWound extends Ability {
 					}
 				}
 
-				event.setDamage(event.getDamage() * (1 + Math.min(cooldowns * CURSED_WOUND_DAMAGE, mCursedWoundCap)));
+				event.setDamage(event.getDamage() * (1 + Math.min(cooldowns * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + CURSED_WOUND_DAMAGE), mCursedWoundCap)));
 			}
 
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
@@ -129,7 +135,7 @@ public class CursedWound extends Ability {
 					new PartialParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 6,
 						(mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, 0)
 						.spawnAsPlayerActive(mPlayer);
-					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME, new CustomDamageOverTime(CURSED_WOUND_DURATION, CURSED_WOUND_DOT_DAMAGE, CURSED_WOUND_DOT_PERIOD, mPlayer, null, Particle.SQUID_INK));
+					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME, new CustomDamageOverTime(CURSED_WOUND_DURATION, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT, CURSED_WOUND_DOT_DAMAGE), CURSED_WOUND_DOT_PERIOD, mPlayer, null, Particle.SQUID_INK));
 					if (isLevelTwo()) {
 						//Bleed interaction
 						if (EntityUtils.isBleeding(mPlugin, mob)) {

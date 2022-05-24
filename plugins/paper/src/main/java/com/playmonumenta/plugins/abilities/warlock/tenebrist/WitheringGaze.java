@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -36,7 +37,14 @@ public class WitheringGaze extends Ability {
 	private static final int WITHERING_GAZE_DOT_DAMAGE = 1;
 	private static final int WITHERING_GAZE_1_COOLDOWN = 20 * 30;
 	private static final int WITHERING_GAZE_2_COOLDOWN = 20 * 20;
+	private static final int WITHERING_GAZE_RANGE = 9;
 	private static final String DOT_EFFECT_NAME = "WitheringGazeDamageOverTimeEffect";
+
+	public static final String CHARM_STUN = "Withering Gaze Stun Duration";
+	public static final String CHARM_COOLDOWN = "Withering Gaze Cooldown";
+	public static final String CHARM_RANGE = "Withering Gaze Range";
+	public static final String CHARM_DOT = "Withering Gaze Dot Duration";
+	public static final String CHARM_DAMAGE = "Withering Gaze Damage";
 
 	private final int mDOTDuration;
 
@@ -47,10 +55,10 @@ public class WitheringGaze extends Ability {
 		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given 30% Slowness instead) and dealt 1 damage every half second for 6 seconds. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Your damage over time lasts for 8 seconds. Cooldown: 20s.");
 		mInfo.mLinkedSpell = ClassAbility.WITHERING_GAZE;
-		mInfo.mCooldown = isLevelOne() ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.WITHER_ROSE, 1);
-		mDOTDuration = isLevelOne() ? WITHERING_GAZE_DOT_DURATION_1 : WITHERING_GAZE_DOT_DURATION_2;
+		mDOTDuration = CharmManager.getExtraDuration(player, CHARM_DOT) + (isLevelOne() ? WITHERING_GAZE_DOT_DURATION_1 : WITHERING_GAZE_DOT_DURATION_2);
 	}
 
 	@Override
@@ -92,11 +100,11 @@ public class WitheringGaze extends Ability {
 						if (direction.dot(eVec) > 0.4) {
 							LivingEntity le = (LivingEntity) e;
 							if (EntityUtils.isElite(le) || EntityUtils.isBoss(le) || ((e instanceof Player) && AbilityManager.getManager().isPvPEnabled((Player)e))) {
-								EntityUtils.applySlow(mPlugin, WITHERING_GAZE_STUN_DURATION, 0.3, le);
+								EntityUtils.applySlow(mPlugin, WITHERING_GAZE_STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), 0.3, le);
 							} else {
-								EntityUtils.applyStun(mPlugin, WITHERING_GAZE_STUN_DURATION, le);
+								EntityUtils.applyStun(mPlugin, WITHERING_GAZE_STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), le);
 							}
-							mPlugin.mEffectManager.addEffect(le, DOT_EFFECT_NAME, new CustomDamageOverTime(mDOTDuration, WITHERING_GAZE_DOT_DAMAGE, WITHERING_GAZE_DOT_PERIOD, mPlayer, null, Particle.SQUID_INK));
+							mPlugin.mEffectManager.addEffect(le, DOT_EFFECT_NAME, new CustomDamageOverTime(mDOTDuration, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, WITHERING_GAZE_DOT_DAMAGE), WITHERING_GAZE_DOT_PERIOD, mPlayer, null, Particle.SQUID_INK));
 						}
 					}
 				}
@@ -107,7 +115,7 @@ public class WitheringGaze extends Ability {
 					this.cancel();
 				}
 
-				if (mT >= 9) {
+				if (mT >= CharmManager.getRadius(mPlayer, CHARM_RANGE, WITHERING_GAZE_RANGE)) {
 					this.cancel();
 
 				}

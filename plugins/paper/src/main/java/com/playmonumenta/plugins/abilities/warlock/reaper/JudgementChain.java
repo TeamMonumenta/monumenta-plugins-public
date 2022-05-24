@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.JudgementChainMobEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -50,6 +51,11 @@ public class JudgementChain extends Ability {
 	private static final double HITBOX_LENGTH = 0.5;
 	private static final String EFFECT_NAME = "JudgementChainEffectName";
 
+	public static final String CHARM_COOLDOWN = "Judgement Chain Cooldown";
+	public static final String CHARM_DAMAGE = "Judgement Chain Damage";
+	public static final String CHARM_RANGE = "Judgement Chain Range";
+	public static final String CHARM_DURATION = "Judgement Chain Buff Duration";
+
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(217, 217, 217), 1.0f);
 	private static final Particle.DustOptions DARK_COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
@@ -64,7 +70,7 @@ public class JudgementChain extends Ability {
 		mInfo.mShorthandName = "JC";
 		mInfo.mDescriptions.add("Press the swap key while not sneaking and looking at a non-boss hostile mob to conjure an unbreakable chain, linking the soul of the Reaper and the mob. The mob becomes immortal (as long as there is another mob within 8 blocks) for the next 20 seconds and will only target the Reaper it is chained to, but it is slowed by 25% and deals 50% less damage to the Reaper, and no damage to all other players. All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at level 1. Bosses cannot be chained. Shift + Swap while looking up, or move more than 16 blocks away from the mob, to break the chain and cancel the immortality on the mob, dealing 20 damage to it. Cooldown: 25s.");
 		mInfo.mDescriptions.add("Players that walk through the chain linking the mob and the Reaper are granted 10s of the inverted debuffs, and mobs that walk through the chain are given 10s of the debuffs on the mob. Additionally, the level of buffs and debuffs is preserved, up to level 2, except for Resistance and Regeneration, and the damage from the active chain break is now applied to all mobs in a 3 block radius of the chained mob.");
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.CHAIN, 1);
 		mAmplifierCap = isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2;
@@ -137,24 +143,25 @@ public class JudgementChain extends Ability {
 							particleReduce++;
 						}
 
+						int buffDuration = BUFF_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 						Map<PotionEffectType, Integer> effects = getOppositeEffects(mTarget);
 						if (EntityUtils.isSlowed(mPlugin, mTarget)) {
-							mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, BUFF_DURATION, Math.min(mAmplifierCap, (int) (EntityUtils.getSlowAmount(mPlugin, mTarget) * 10) - 1), true, true));
+							mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, buffDuration, Math.min(mAmplifierCap, (int) (EntityUtils.getSlowAmount(mPlugin, mTarget) * 10) - 1), true, true));
 						}
 						if (EntityUtils.isWeakened(mPlugin, mTarget)) {
-							mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, BUFF_DURATION, Math.min(mAmplifierCap, (int) (EntityUtils.getWeakenAmount(mPlugin, mTarget) * 10) - 1), true, true));
+							mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, buffDuration, Math.min(mAmplifierCap, (int) (EntityUtils.getWeakenAmount(mPlugin, mTarget) * 10) - 1), true, true));
 						}
 						for (Map.Entry<PotionEffectType, Integer> effect : effects.entrySet()) {
 							if (effect.getKey().equals(PotionEffectType.DAMAGE_RESISTANCE)) {
 								// Only do Resistance I regardless of Vulnerability level
-								mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, 0, true, true));
+								mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), buffDuration, 0, true, true));
 							} else if (effect.getKey().equals(PotionEffectType.REGENERATION)) {
 								// Only do Regeneration I regardless of Poison/Wither level
-								mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, 0, true, true));
+								mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), buffDuration, 0, true, true));
 								// Simulate Regen (1 health every 50 ticks = 1/50 health every tick) since constant application never heals
 								PlayerUtils.healPlayer(mPlugin, mPlayer, 1.0d / 50.0d, mPlayer);
 							} else {
-								mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, Math.min(mAmplifierCap, effect.getValue()), true, true));
+								mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), buffDuration, Math.min(mAmplifierCap, effect.getValue()), true, true));
 							}
 						}
 						if (isLevelTwo()) {
@@ -164,22 +171,22 @@ public class JudgementChain extends Ability {
 
 							for (Player pl : players) {
 								if (EntityUtils.isSlowed(mPlugin, mTarget)) {
-									mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, BUFF_DURATION, Math.min(mAmplifierCap, (int) (EntityUtils.getSlowAmount(mPlugin, mTarget) * 10) - 1), true, true));
+									mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, buffDuration, Math.min(mAmplifierCap, (int) (EntityUtils.getSlowAmount(mPlugin, mTarget) * 10) - 1), true, true));
 								}
 								if (EntityUtils.isWeakened(mPlugin, mTarget)) {
-									mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, BUFF_DURATION, Math.min(mAmplifierCap, (int) (EntityUtils.getWeakenAmount(mPlugin, mTarget) * 10) - 1), true, true));
+									mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, buffDuration, Math.min(mAmplifierCap, (int) (EntityUtils.getWeakenAmount(mPlugin, mTarget) * 10) - 1), true, true));
 								}
 								for (Map.Entry<PotionEffectType, Integer> effect : effects.entrySet()) {
 									if (effect.getKey().equals(PotionEffectType.DAMAGE_RESISTANCE)) {
 										// Only do Resistance I regardless of Vulnerability level
-										mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, 0, true, true));
+										mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), buffDuration, 0, true, true));
 									} else if (effect.getKey().equals(PotionEffectType.REGENERATION)) {
 										// Only do Regeneration I regardless of Poison/Wither level
-										mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, 0, true, true));
+										mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), buffDuration, 0, true, true));
 										// Simulate Regen (1 health every 50 ticks = 1/50 health every tick) since constant application never heals
 										PlayerUtils.healPlayer(mPlugin, pl, 1.0d / 50.0d, mPlayer);
 									} else {
-										mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, Math.min(mAmplifierCap, effect.getValue()), true, true));
+										mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), buffDuration, Math.min(mAmplifierCap, effect.getValue()), true, true));
 									}
 								}
 							}
@@ -187,24 +194,24 @@ public class JudgementChain extends Ability {
 							for (LivingEntity m : mobs) {
 								if (!(m instanceof Player)) {
 									if (EntityUtils.isSlowed(mPlugin, mTarget)) {
-										EntityUtils.applySlow(mPlugin, BUFF_DURATION, EntityUtils.getSlowAmount(mPlugin, mTarget), m);
+										EntityUtils.applySlow(mPlugin, buffDuration, EntityUtils.getSlowAmount(mPlugin, mTarget), m);
 									}
 									if (EntityUtils.isWeakened(mPlugin, mTarget)) {
-										EntityUtils.applyWeaken(mPlugin, BUFF_DURATION, EntityUtils.getWeakenAmount(mPlugin, mTarget), m);
+										EntityUtils.applyWeaken(mPlugin, buffDuration, EntityUtils.getWeakenAmount(mPlugin, mTarget), m);
 									}
 									if (EntityUtils.isBleeding(mPlugin, mTarget)) {
-										EntityUtils.applyBleed(mPlugin, BUFF_DURATION, EntityUtils.getBleedLevel(mPlugin, mTarget) * 0.1, m);
+										EntityUtils.applyBleed(mPlugin, buffDuration, EntityUtils.getBleedLevel(mPlugin, mTarget) * 0.1, m);
 									}
 									if (mTarget.getFireTicks() > 0 && (m.getFireTicks() <= 0 && !Inferno.hasInferno(mPlugin, m)
 											&& (!EntityUtils.isFireResistant(m) || mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.INFERNO) > 0)
 											&& m.getLocation().isChunkLoaded()
 											&& m.getLocation().getBlock().getType() != Material.WATER)) {
-										EntityUtils.applyFire(mPlugin, BUFF_DURATION, m, mPlayer);
+										EntityUtils.applyFire(mPlugin, buffDuration, m, mPlayer);
 									}
 									for (PotionEffect effect : mTarget.getActivePotionEffects()) {
 										PotionEffectType type = effect.getType();
 										if (PotionUtils.hasNegativeEffects(type)) {
-											PotionUtils.applyPotion(mPlayer, m, new PotionEffect(type, BUFF_DURATION, Math.min(mAmplifierCap, effect.getAmplifier()), true, true));
+											PotionUtils.applyPotion(mPlayer, m, new PotionEffect(type, buffDuration, Math.min(mAmplifierCap, effect.getAmplifier()), true, true));
 										}
 									}
 								}
@@ -241,17 +248,20 @@ public class JudgementChain extends Ability {
 			Location mLoc = mTarget.getLocation();
 			World world = mPlayer.getWorld();
 
-			new PartialParticle(Particle.REDSTONE, mLoc.add(0, mTarget.getHeight() / 2, 0), 15, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, 0.125, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.REDSTONE, mLoc.add(0, mTarget.getHeight() / 2, 0), 15, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, 0.125, DARK_COLOR).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CRIT, mLoc.add(0, mTarget.getHeight() / 2, 0), 30, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, CHAIN_BREAK_RANGE, 0.125).spawnAsPlayerActive(mPlayer);
+			double damageRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, CHAIN_BREAK_RANGE);
+
+			new PartialParticle(Particle.REDSTONE, mLoc.add(0, mTarget.getHeight() / 2, 0), 15, damageRadius, damageRadius, damageRadius, 0.125, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, mLoc.add(0, mTarget.getHeight() / 2, 0), 15, damageRadius, damageRadius, damageRadius, 0.125, DARK_COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CRIT, mLoc.add(0, mTarget.getHeight() / 2, 0), 30, damageRadius, damageRadius, damageRadius, 0.125).spawnAsPlayerActive(mPlayer);
 			world.playSound(mLoc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.7f, 0.6f);
 			world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.6f, 0.6f);
 
 			if (doDamage) {
-				DamageUtils.damage(mPlayer, mTarget, DamageType.MAGIC, CHAIN_BREAK_DAMAGE, mInfo.mLinkedSpell);
+				double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, CHAIN_BREAK_DAMAGE);
+				DamageUtils.damage(mPlayer, mTarget, DamageType.MAGIC, damage, mInfo.mLinkedSpell);
 				if (isLevelTwo()) {
-					for (LivingEntity m : EntityUtils.getNearbyMobs(mTarget.getLocation(), CHAIN_BREAK_RANGE, mTarget)) {
-						DamageUtils.damage(mPlayer, m, DamageType.MAGIC, CHAIN_BREAK_DAMAGE, mInfo.mLinkedSpell);
+					for (LivingEntity m : EntityUtils.getNearbyMobs(mTarget.getLocation(), damageRadius, mTarget)) {
+						DamageUtils.damage(mPlayer, m, DamageType.MAGIC, damage, mInfo.mLinkedSpell);
 					}
 				}
 			}

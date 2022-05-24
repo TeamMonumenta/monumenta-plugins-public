@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.stream.Stream;
@@ -34,10 +35,17 @@ public class PhlegmaticResolve extends Ability {
 	private static final double PERCENT_DAMAGE_RESIST_2 = -0.03;
 	private static final double PERCENT_KNOCKBACK_RESIST = 0.1;
 	private static final int RADIUS = 7;
+	private static final double ALLY_MODIFIER = 0.33;
 
 	private final double mPercentDamageResist;
 	private double[] mEnhancementDamageSpread = {0, 0, 0};
 	private double mLastMaxDamage = 0;
+	private double mKBR;
+
+	public static final String CHARM_RESIST = "Phlegmatic Resolve Resistance";
+	public static final String CHARM_KBR = "Phlegmatic Resolve Knockback Resistance";
+	public static final String CHARM_ALLY = "Phlegmatic Resolve Ally Modifier";
+	public static final String CHARM_RANGE = "Phlegmatic Resolve Radius";
 
 	private Ability[] mAbilities = {};
 
@@ -49,7 +57,8 @@ public class PhlegmaticResolve extends Ability {
 		mInfo.mDescriptions.add("Increase to +3% Damage Reduction per spell on cooldown, and players within 7 blocks are given 33% of your bonuses. (Does not stack with multiple Warlocks.)");
 		mInfo.mDescriptions.add("All non-ailment damage taken is instead converted into a short Damage-over-Time effect. A third of the damage stored is dealt every second for 3s.");
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
-		mPercentDamageResist = isLevelOne() ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2;
+		mPercentDamageResist = (isLevelOne() ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2) - CharmManager.getLevelPercentDecimal(player, CHARM_RESIST);
+		mKBR = (CharmManager.getLevelPercentDecimal(player, CHARM_KBR) + PERCENT_KNOCKBACK_RESIST);
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -122,12 +131,12 @@ public class PhlegmaticResolve extends Ability {
 		}
 
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns));
-		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, PERCENT_KNOCKBACK_RESIST * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME));
+		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME));
 
 		if (isLevelTwo()) {
-			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, false)) {
-				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns / 3.0));
-				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, PERCENT_KNOCKBACK_RESIST * cooldowns / 3.0, KNOCKBACK_RESIST_EFFECT_NAME));
+			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RANGE, RADIUS), false)) {
+				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY) + ALLY_MODIFIER)));
+				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY) + ALLY_MODIFIER), KNOCKBACK_RESIST_EFFECT_NAME));
 			}
 		}
 	}

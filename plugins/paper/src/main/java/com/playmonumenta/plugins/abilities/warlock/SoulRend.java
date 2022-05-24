@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -39,7 +40,13 @@ public class SoulRend extends Ability {
 	private static final int ABSORPTION_CAP = 4;
 	private static final int ABSORPTION_DURATION = 50;
 
-	private final int mHeal;
+	public static final String CHARM_RADIUS = "Soul Rend Radius";
+	public static final String CHARM_HEAL = "Soul Rend Healing";
+	public static final String CHARM_ALLY = "Soul Rend Ally Heal";
+	public static final String CHARM_COOLDOWN = "Soul Rend Cooldown";
+	public static final String CHARM_CAP = "Soul Rend Heal Cap";
+
+	private final double mHeal;
 
 	private @Nullable DarkPact mDarkPact;
 
@@ -51,9 +58,9 @@ public class SoulRend extends Ability {
 		mInfo.mDescriptions.add("Players within 7 blocks of you are now also healed. Flat healing is increased from 2 to 4 health.");
 		mInfo.mDescriptions.add("Healing above max health, as well as any healing from this skill that remains negated by Dark Pact, is converted into Absorption, up to 4 absorption health, for 2.5s.");
 		mInfo.mLinkedSpell = ClassAbility.SOUL_REND;
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mDisplayItem = new ItemStack(Material.POTION, 1);
-		mHeal = isLevelOne() ? HEAL_1 : HEAL_2;
+		mHeal = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, isLevelOne() ? HEAL_1 : HEAL_2);
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -66,7 +73,7 @@ public class SoulRend extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
 			double heal = mHeal + event.getDamage() * PERCENT_HEAL;
-			heal = Math.min(HEAL_CAP, heal);
+			heal = Math.min(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CAP, HEAL_CAP), heal);
 
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
@@ -119,9 +126,9 @@ public class SoulRend extends Ability {
 			}
 
 			if (isLevelTwo()) {
-				for (Player p : PlayerUtils.otherPlayersInRange(mPlayer, RADIUS, true)) {
+				for (Player p : PlayerUtils.otherPlayersInRange(mPlayer, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), true)) {
 					new PartialParticle(Particle.DAMAGE_INDICATOR, p.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0).spawnAsPlayerActive(mPlayer);
-					PlayerUtils.healPlayer(mPlugin, p, heal, mPlayer);
+					PlayerUtils.healPlayer(mPlugin, p, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, heal), mPlayer);
 				}
 			}
 

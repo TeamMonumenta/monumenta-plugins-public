@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -24,34 +22,21 @@ import org.bukkit.entity.Player;
 public class VoodooBondsOtherPlayer extends Effect {
 
 	private static final String SEND_EFFECT_NAME = "VoodooBondsDamageTaken";
-	private static final int DURATION_1 = 20 * 5;
-	private static final int DURATION_2 = 20 * 7;
 
 	private final Player mPlayer;
 	private final Plugin mPlugin;
 
-	private @Nullable VoodooBonds mVoodooBonds;
-	private int mScore;
 	int mRotation = 0;
+	private int mTransferDuration;
 	private boolean mTriggerTickParticle = false;
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
-	public VoodooBondsOtherPlayer(int duration, Player player, Plugin plugin) {
+	public VoodooBondsOtherPlayer(int duration, int transferDuration, Player player, Plugin plugin) {
 		super(duration);
 		mPlayer = player;
 		mPlugin = plugin;
-
-		if (player != null) {
-			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				mVoodooBonds = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, VoodooBonds.class);
-				if (mVoodooBonds != null) {
-					mScore = Math.min(mVoodooBonds.getAbilityScore(), 2);
-				} else {
-					mScore = 0;
-				}
-			});
-		}
+		mTransferDuration = transferDuration;
 	}
 
 	@Override
@@ -60,7 +45,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 			return;
 		}
 
-		int duration = mScore == 1 ? DURATION_1 : DURATION_2;
+		int duration = mTransferDuration;
 		double damage = event.getDamage();
 		double maxHealth = EntityUtils.getMaxHealth(entity);
 		double percentDamage = damage / maxHealth;
