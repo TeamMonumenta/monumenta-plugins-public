@@ -2,12 +2,6 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
-import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
-import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -16,9 +10,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import java.util.stream.Stream;
+import java.util.Objects;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -29,8 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-
 
 public class CursedWound extends Ability {
 
@@ -44,8 +35,6 @@ public class CursedWound extends Ability {
 	private static final int CURSED_WOUND_EXTENDED_DURATION = 2 * 20;
 	private static final String DOT_EFFECT_NAME = "CursedWoundDamageOverTimeEffect";
 
-	private Ability[] mAbilities = {};
-
 	public CursedWound(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Cursed Wound");
 		mInfo.mScoreboardId = "CursedWound";
@@ -53,15 +42,6 @@ public class CursedWound extends Ability {
 		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3-block cube around it with 1 damage every second for 6s. Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.");
 		mInfo.mDescriptions.add("Critical attacks now also extend all enemies' debuffs (except Stun, Silence, and Paralysis) by 2s. Damage cap is increased from 15% to 30%.");
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
-
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mAbilities = Stream.of(AmplifyingHex.class, CholericFlames.class, GraspingClaws.class, SoulRend.class,
-				                       SanguineHarvest.class, MelancholicLament.class, DarkPact.class, VoodooBonds.class,
-				                       JudgementChain.class, HauntingShades.class, WitheringGaze.class)
-					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
-			});
-		}
 	}
 
 	@Override
@@ -79,8 +59,8 @@ public class CursedWound extends Ability {
 					.spawnAsPlayerActive(mPlayer);
 
 				int cooldowns = 0;
-				for (Ability ability : mAbilities) {
-					if (ability != null && mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ability.getInfo().mLinkedSpell)) {
+				for (Integer ability : Objects.requireNonNull(mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId()))) {
+					if (ability > 0) {
 						cooldowns++;
 					}
 				}
