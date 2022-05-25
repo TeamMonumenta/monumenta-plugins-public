@@ -6,10 +6,11 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
@@ -48,6 +49,11 @@ public class AlchemicalArtillery extends Ability {
 	private static final float ENHANCEMENT_EXPLOSION_KNOCK_UP = 1.5f;
 	private static final double ENHANCEMENT_EXPLOSION_POT_PERCENT_DAMAGE = 0.15;
 
+	public static final String CHARM_MULTIPLIER = "Alchemical Artillery Projectile Damage Multiplier";
+	public static final String CHARM_DELAY = "Alchemical Artillery Delay";
+	public static final String CHARM_RADIUS = "Alchemical Artillery Radius";
+	public static final String CHARM_KNOCKBACK = "Alchemical Artillery Knockback";
+	public static final String CHARM_EXPLOSION_MULTIPLIER = "Alchemical Artillery Explosion Damage Multiplier";
 
 	private boolean mActive;
 	private @Nullable AlchemistPotions mAlchemistPotions;
@@ -84,7 +90,7 @@ public class AlchemicalArtillery extends Ability {
 			double bownus = 0;
 			if (isLevelTwo()) {
 				PlayerInventory inv = mPlayer.getInventory();
-				bownus = BOW_DAMAGE_MULTIPLIER * ItemStatUtils.getAttributeAmount(inv.getItemInMainHand(), AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
+				bownus = (BOW_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_MULTIPLIER)) * ItemStatUtils.getAttributeAmount(inv.getItemInMainHand(), AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
 				double offhand = ItemStatUtils.getAttributeAmount(inv.getItemInOffHand(), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.OFFHAND);
 				double head = ItemStatUtils.getAttributeAmount(inv.getHelmet(), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.HEAD);
 				double shoulders = ItemStatUtils.getAttributeAmount(inv.getChestplate(), AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.CHEST);
@@ -130,18 +136,20 @@ public class AlchemicalArtillery extends Ability {
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (isEnhanced() && potion.hasMetadata(ARTILLERY_POTION_TAG)) {
+			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_EXPLOSION_RADIUS);
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				Location loc = potion.getLocation();
 
-				new PartialParticle(Particle.EXPLOSION_HUGE, loc, 15, ENHANCEMENT_EXPLOSION_RADIUS, ENHANCEMENT_EXPLOSION_RADIUS / 2.0, ENHANCEMENT_EXPLOSION_RADIUS, 0.1).spawnAsPlayerActive(mPlayer);
-				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, ENHANCEMENT_EXPLOSION_RADIUS);
-				double damage = mAlchemistPotions.getDamage() * ENHANCEMENT_EXPLOSION_POT_PERCENT_DAMAGE;
+				new PartialParticle(Particle.EXPLOSION_HUGE, loc, (int) (15 * radius * radius / 9), radius, radius / 2.0, radius, 0.1).spawnAsPlayerActive(mPlayer);
+				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius);
+				double damage = mAlchemistPotions.getDamage() * (ENHANCEMENT_EXPLOSION_POT_PERCENT_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_EXPLOSION_MULTIPLIER));
+				float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, ENHANCEMENT_EXPLOSION_KNOCK_UP);
 				for (LivingEntity mob : mobs) {
 					DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
-					MovementUtils.knockAway(loc, mob, ENHANCEMENT_EXPLOSION_KNOCK_UP);
+					MovementUtils.knockAway(loc, mob, knockback);
 				}
 
-			}, ENHANCEMENT_EXPLOSION_DELAY);
+			}, ENHANCEMENT_EXPLOSION_DELAY + CharmManager.getExtraDuration(mPlayer, CHARM_DELAY));
 		}
 		return true;
 	}

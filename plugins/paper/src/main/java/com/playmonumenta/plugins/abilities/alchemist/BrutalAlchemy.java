@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.SpreadEffectOnDeath;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,16 +21,22 @@ public class BrutalAlchemy extends PotionAbility {
 	private static final double BRUTAL_ALCHEMY_DOT_DAMAGE = 1;
 	private static final int BRUTAL_ALCHEMY_1_PERIOD = 2 * 20;
 	private static final int BRUTAL_ALCHEMY_2_PERIOD = 1 * 20;
-	public static final String BRUTAL_ALCHEMY_DOT_EFFECT_NAME = "BrutalAlchemyDamageOverTimeEffect";
-	public static final String BRUTAL_ALCHEMY_SPREAD_EFFECT_NAME = "BrutalAlchemySpreadEffect";
+	private static final String BRUTAL_ALCHEMY_DOT_EFFECT_NAME = "BrutalAlchemyDamageOverTimeEffect";
+	private static final String BRUTAL_ALCHEMY_SPREAD_EFFECT_NAME = "BrutalAlchemySpreadEffect";
 	private static final double BRUTAL_ALCHEMY_ENHANCEMENT_DAMAGE_POTION = 0.2;
-	public static final double BRUTAL_ALCHEMY_ENHANCEMENT_RANGE = 3;
+	private static final double BRUTAL_ALCHEMY_ENHANCEMENT_RANGE = 3;
+
+	public static final String CHARM_POTION_DAMAGE = "Brutal Alchemy Potion Damage";
+	public static final String CHARM_DOT_DAMAGE = "Brutal Alchemy DoT Damage";
+	public static final String CHARM_DURATION = "Brutal Alchemy Duration";
+	public static final String CHARM_RADIUS = "Brutal Alchemy Spread Radius";
+	public static final String CHARM_MULTIPLIER = "Brutal Alchemy Potion Damage Multiplier";
 
 	private int mPeriod;
 	private double mDOTDamage;
 
 	public BrutalAlchemy(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Brutal Alchemy", BRUTAL_ALCHEMY_1_DAMAGE, BRUTAL_ALCHEMY_2_DAMAGE);
+		super(plugin, player, "Brutal Alchemy", CharmManager.calculateFlatAndPercentValue(player, CHARM_POTION_DAMAGE, BRUTAL_ALCHEMY_1_DAMAGE), CharmManager.calculateFlatAndPercentValue(player, CHARM_POTION_DAMAGE, BRUTAL_ALCHEMY_2_DAMAGE));
 		mInfo.mLinkedSpell = ClassAbility.BRUTAL_ALCHEMY;
 		mInfo.mScoreboardId = "BrutalAlchemy";
 		mInfo.mShorthandName = "BA";
@@ -39,13 +46,13 @@ public class BrutalAlchemy extends PotionAbility {
 		mDisplayItem = new ItemStack(Material.REDSTONE, 1);
 
 		mPeriod = isLevelOne() ? BRUTAL_ALCHEMY_1_PERIOD : BRUTAL_ALCHEMY_2_PERIOD;
-		mDOTDamage = BRUTAL_ALCHEMY_DOT_DAMAGE;
+		mDOTDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT_DAMAGE, BRUTAL_ALCHEMY_DOT_DAMAGE);
 
 		if (isEnhanced()) {
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
 				AlchemistPotions alchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, AlchemistPotions.class);
 				if (alchemistPotions != null) {
-					mDOTDamage += alchemistPotions.getDamage() * BRUTAL_ALCHEMY_ENHANCEMENT_DAMAGE_POTION;
+					mDOTDamage += alchemistPotions.getDamage() * (BRUTAL_ALCHEMY_ENHANCEMENT_DAMAGE_POTION + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_MULTIPLIER));
 				}
 			}, 5);
 		}
@@ -54,9 +61,10 @@ public class BrutalAlchemy extends PotionAbility {
 	@Override
 	public void apply(LivingEntity mob, boolean isGruesome) {
 		if (!isGruesome) {
-			mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, new CustomDamageOverTime(BRUTAL_ALCHEMY_DURATION, mDOTDamage, mPeriod, mPlayer, mInfo.mLinkedSpell, Particle.SQUID_INK));
+			int duration = BRUTAL_ALCHEMY_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+			mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, new CustomDamageOverTime(duration, mDOTDamage, mPeriod, mPlayer, mInfo.mLinkedSpell, Particle.SQUID_INK));
 			if (isEnhanced()) {
-				mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_SPREAD_EFFECT_NAME, new SpreadEffectOnDeath(BRUTAL_ALCHEMY_DURATION, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, BRUTAL_ALCHEMY_ENHANCEMENT_RANGE, BRUTAL_ALCHEMY_DURATION));
+				mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_SPREAD_EFFECT_NAME, new SpreadEffectOnDeath(duration, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, CharmManager.getRadius(mPlayer, CHARM_RADIUS, BRUTAL_ALCHEMY_ENHANCEMENT_RANGE), duration));
 			}
 		}
 	}

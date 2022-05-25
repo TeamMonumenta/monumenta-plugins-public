@@ -59,7 +59,7 @@ public class EnchantedPrayer extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.CHORUS_FRUIT, 1);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? ENCHANTED_PRAYER_1_DAMAGE : ENCHANTED_PRAYER_2_DAMAGE);
-		mHeal = CharmManager.getLevelPercentDecimal(player, CHARM_HEAL) + (isLevelOne() ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL);
+		mHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEAL, isLevelOne() ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL);
 	}
 
 	@Override

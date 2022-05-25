@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -35,11 +36,21 @@ public class TransmutationRing extends PotionAbility {
 	private static final int TRANSMUTATION_RING_DURATION = 10 * 20;
 	private static final String TRANSMUTATION_RING_DAMAGE_EFFECT_NAME = "TransmutationRingDamageEffect";
 	private static final double DAMAGE_AMPLIFIER = 0.15;
+	private static final double DAMAGE_PER_DEATH_AMPLIFIER = 0.01;
 	private static final int MAX_KILLS = 15;
 	private static final int DURATION_INCREASE = 7; // was 0.333333 seconds but minecraft tick system is bad
 	private static final int MAX_DURATION_INCREASE = 5 * 20;
 
 	public static final String TRANSMUTATION_POTION_METAKEY = "TransmutationRingPotion";
+
+	public static final String CHARM_COOLDOWN = "Transmutation Ring Cooldown";
+	public static final String CHARM_RADIUS = "Transmutation Ring Radius";
+	public static final String CHARM_DURATION = "Transmutation Ring Duration";
+	public static final String CHARM_DAMAGE_AMPLIFIER = "Transmutation Ring Damage Amplifier";
+	public static final String CHARM_PER_KILL_AMPLIFIER = "Transmutation Ring Per Death Amplifier";
+	public static final String CHARM_MAX_KILLS = "Transmutation Ring Max Kills";
+
+	private double mRadius;
 
 	private @Nullable Location mCenter;
 	private int mKills = 0;
@@ -53,8 +64,10 @@ public class TransmutationRing extends PotionAbility {
 		mInfo.mDescriptions.add("Mobs that die within this ring also increase the duration of the ring by 0.35 seconds per mob, up to 5 extra seconds. Cooldown: 20s.");
 		mDisplayItem = new ItemStack(Material.GOLD_NUGGET, 1);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mCooldown = isLevelOne() ? TRANSMUTATION_RING_1_COOLDOWN : TRANSMUTATION_RING_2_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? TRANSMUTATION_RING_1_COOLDOWN : TRANSMUTATION_RING_2_COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
+
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, TRANSMUTATION_RING_RADIUS);
 	}
 
 	@Override
@@ -74,9 +87,14 @@ public class TransmutationRing extends PotionAbility {
 
 			world.playSound(mCenter, Sound.ENTITY_PHANTOM_FLAP, 3f, 0.35f);
 
+			int duration = TRANSMUTATION_RING_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+			double amplifier = DAMAGE_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
+			double perKillAmplifier = DAMAGE_PER_DEATH_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_PER_KILL_AMPLIFIER);
+			int maxKills = MAX_KILLS + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_KILLS);
+
 			new BukkitRunnable() {
 				int mTicks = 0;
-				int mMaxTicks = TRANSMUTATION_RING_DURATION;
+				int mMaxTicks = duration;
 
 				List<Integer> mDegrees1 = new ArrayList<>();
 				List<Integer> mDegrees2 = new ArrayList<>();
@@ -84,8 +102,8 @@ public class TransmutationRing extends PotionAbility {
 
 				@Override
 				public void run() {
-					if (getAbilityScore() == 2) {
-						mMaxTicks = TRANSMUTATION_RING_DURATION + Math.min(mKills * DURATION_INCREASE, MAX_DURATION_INCREASE);
+					if (isLevelTwo()) {
+						mMaxTicks = duration + Math.min(mKills * DURATION_INCREASE, MAX_DURATION_INCREASE);
 					}
 
 					if (mTicks >= mMaxTicks || mCenter == null) {
@@ -95,33 +113,33 @@ public class TransmutationRing extends PotionAbility {
 						return;
 					}
 
-					double damageBoost = DAMAGE_AMPLIFIER + Math.min(mKills, MAX_KILLS) * 0.01;
-					List<Player> players = PlayerUtils.playersInRange(mCenter, TRANSMUTATION_RING_RADIUS, true);
+					double damageBoost = amplifier + Math.min(mKills, maxKills) * perKillAmplifier;
+					List<Player> players = PlayerUtils.playersInRange(mCenter, mRadius, true);
 					players.remove(mPlayer);
 					for (Player player : players) {
-						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(1 * 20, damageBoost));
+						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost));
 					}
 
 					List<Integer> degreesToKeep = new ArrayList<>();
 					for (int deg = 0; deg < 360; deg += 3) {
-						world.spawnParticle(Particle.REDSTONE, mCenter.clone().add(TRANSMUTATION_RING_RADIUS * FastUtils.cosDeg(deg), 0, TRANSMUTATION_RING_RADIUS * FastUtils.sinDeg(deg)), 1, GOLD_COLOR);
+						world.spawnParticle(Particle.REDSTONE, mCenter.clone().add(mRadius * FastUtils.cosDeg(deg), 0, mRadius * FastUtils.sinDeg(deg)), 1, GOLD_COLOR);
 
 						if (mDegrees1.contains(deg)) {
-							world.spawnParticle(Particle.REDSTONE, mCenter.clone().add(TRANSMUTATION_RING_RADIUS * FastUtils.cosDeg(deg), 0.5, TRANSMUTATION_RING_RADIUS * FastUtils.sinDeg(deg)), 1, GOLD_COLOR);
+							world.spawnParticle(Particle.REDSTONE, mCenter.clone().add(mRadius * FastUtils.cosDeg(deg), 0.5, mRadius * FastUtils.sinDeg(deg)), 1, GOLD_COLOR);
 							if (FastUtils.randomDoubleInRange(0, 1) < 0.5) {
 								mDegrees1.remove((Integer) deg);
 							}
 						}
 
 						if (mDegrees2.contains(deg)) {
-							world.spawnParticle(Particle.REDSTONE, mCenter.clone().add(TRANSMUTATION_RING_RADIUS * FastUtils.cosDeg(deg), 1, TRANSMUTATION_RING_RADIUS * FastUtils.sinDeg(deg)), 1, GOLD_COLOR);
+							world.spawnParticle(Particle.REDSTONE, mCenter.clone().add(mRadius * FastUtils.cosDeg(deg), 1, mRadius * FastUtils.sinDeg(deg)), 1, GOLD_COLOR);
 							if (FastUtils.randomDoubleInRange(0, 1) < 0.5) {
 								mDegrees2.remove((Integer) deg);
 							}
 						}
 
 						if (mDegrees3.contains(deg)) {
-							world.spawnParticle(Particle.REDSTONE, mCenter.clone().add(TRANSMUTATION_RING_RADIUS * FastUtils.cosDeg(deg), 1.75, TRANSMUTATION_RING_RADIUS * FastUtils.sinDeg(deg)), 1, GOLD_COLOR);
+							world.spawnParticle(Particle.REDSTONE, mCenter.clone().add(mRadius * FastUtils.cosDeg(deg), 1.75, mRadius * FastUtils.sinDeg(deg)), 1, GOLD_COLOR);
 						}
 
 						if (FastUtils.randomDoubleInRange(0, 1) < 0.25) {
@@ -148,7 +166,7 @@ public class TransmutationRing extends PotionAbility {
 
 	@Override
 	public double entityDeathRadius() {
-		return TRANSMUTATION_RING_RADIUS;
+		return mRadius;
 	}
 
 	@Override

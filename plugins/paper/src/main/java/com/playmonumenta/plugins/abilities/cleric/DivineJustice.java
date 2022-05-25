@@ -64,7 +64,6 @@ public class DivineJustice extends Ability {
 	public static final String CHARM_SELF = "Divine Justice Self Heal";
 	public static final String CHARM_ALLY = "Divine Justice Ally Heal";
 
-
 	private final boolean mDoHealingAndMultiplier;
 
 	// Passive damage to share with Holy Javelin
@@ -72,10 +71,7 @@ public class DivineJustice extends Ability {
 
 	private @Nullable Crusade mCrusade;
 
-	public DivineJustice(
-		Plugin plugin,
-		@Nullable Player player
-	) {
+	public DivineJustice(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
 
@@ -172,14 +168,14 @@ public class DivineJustice extends Ability {
 			PlayerUtils.healPlayer(
 				mPlugin,
 				mPlayer,
-				EntityUtils.getMaxHealth(mPlayer) * (HEALING_MULTIPLIER_OWN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SELF))
+				CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF, EntityUtils.getMaxHealth(mPlayer) * HEALING_MULTIPLIER_OWN)
 			);
 			List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, RADIUS, true);
 			for (Player otherPlayer : players) {
 				PlayerUtils.healPlayer(
 					mPlugin,
 					otherPlayer,
-					EntityUtils.getMaxHealth(mPlayer) * (HEALING_MULTIPLIER_OTHER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY)),
+					CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, EntityUtils.getMaxHealth(mPlayer) * HEALING_MULTIPLIER_OTHER),
 					mPlayer
 				);
 			}

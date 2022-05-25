@@ -112,8 +112,8 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		new BukkitRunnable() {
 			final BoundingBox mPlayerBox = mPlayer.getBoundingBox();
 			final Vector mDirection = mPlayer.getLocation().getDirection().normalize();
-			double mDistance = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, isLevelOne() ? BONUS_DMG_1 : BONUS_DMG_2);
-			final double mDistancePerTick = 1.0 * mDistance / TELEPORT_TICKS;
+			double mDistance = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
+			final double mDistancePerTick = mDistance / TELEPORT_TICKS;
 			int mTick = 0;
 
 			@Override

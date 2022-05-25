@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -66,8 +67,11 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private static final String POTION_SCOREBOARD = "StoredPotions";
 	private static final double RADIUS = 4;
 
+	public static final String CHARM_CHARGES = "Alchemist Potion Charges";
+	public static final String CHARM_DAMAGE = "Alchemist Potion Damage";
+	public static final String CHARM_RADIUS = "Alchemist Potion Radius";
 
-	private List<PotionAbility> mPotionAbilities = new ArrayList<PotionAbility>();
+	private List<PotionAbility> mPotionAbilities = new ArrayList<>();
 	private double mDamage = 0;
 	private double mRadius = 0;
 	private int mTimer = 0;
@@ -98,10 +102,10 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		 * initialize their damage values, but just give a few extra ticks for slight
 		 * future-proofing.
 		 */
-		mCharges = ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0);
 		mChargeTime = POTIONS_TIMER_BASE;
-		mMaxCharges = MAX_CHARGES;
-		mRadius = RADIUS;
+		mMaxCharges = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CHARGES, MAX_CHARGES);
+		mCharges = Math.min(ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0), mMaxCharges);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 
 		mPlayerItemStatsMap = new WeakHashMap<>();
 		mMobsIframeMap = new HashMap<>();
@@ -165,6 +169,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 						}
 					}
 				}
+
+				mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage);
 			}
 		}.runTaskLater(mPlugin, 5);
 
@@ -250,14 +256,15 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 			boolean isGruesome = isGruesome(potion);
 
-			for (LivingEntity entity : EntityUtils.getNearbyMobs(loc, getPotionRadius())) {
+			double radius = getPotionRadius();
+			for (LivingEntity entity : EntityUtils.getNearbyMobs(loc, radius)) {
 				if (EntityUtils.isHostileMob(entity)) {
 					apply(entity, potion, isGruesome, playerItemStats);
 				}
 			}
 
-			List<Player> players = PlayerUtils.playersInRange(loc, RADIUS, true);
-			players.removeIf(player -> player == mPlayer);
+			List<Player> players = PlayerUtils.playersInRange(loc, radius, true);
+			players.remove(mPlayer);
 			players.forEach(player -> applyToPlayer(player, potion, isGruesome));
 		}
 
@@ -281,7 +288,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			double damage = mDamage;
 
 			if (isGruesome) {
-				damage *= GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER;
+				damage *= GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_DAMAGE);
 			}
 
 			if (potion.hasMetadata(AlchemicalArtillery.ARTILLERY_POTION_TAG)) {
@@ -368,6 +375,12 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			return true;
 		}
 		return false;
+	}
+
+	public void incrementCharges(int charges) {
+		for (int i = 0; i < charges; i++) {
+			incrementCharge();
+		}
 	}
 
 	private boolean mOnCooldown = false;

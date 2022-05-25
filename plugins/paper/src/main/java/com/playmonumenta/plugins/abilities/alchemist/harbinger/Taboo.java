@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -36,6 +37,12 @@ public class Taboo extends Ability {
 	private static final double PERCENT_HEALTH_HEALING = 0.2;
 	private static final int COOLDOWN = 5 * 20;
 
+	public static final String CHARM_COOLDOWN = "Taboo Cooldown";
+	public static final String CHARM_SELF_DAMAGE = "Taboo Self Damage";
+	public static final String CHARM_KNOCKBACK_RESISTANCE = "Taboo Knockback Resistance";
+	public static final String CHARM_DAMAGE = "Taboo Damage Modifier";
+	public static final String CHARM_HEALING = "Taboo Healing";
+
 	private boolean mActive;
 	private double mMagicDamageIncrease;
 
@@ -49,12 +56,12 @@ public class Taboo extends Ability {
 		mInfo.mShorthandName = "Tb";
 		mInfo.mDescriptions.add("Swap hands while sneaking and holding an Alchemist's Bag to drink a potion. Drinking the potion causes you to recharge potions 0.5s faster and deal +15% magic damage. However, you lose 5% of your health per second, which bypasses resistances and absorption, but cannot kill you. Swapping hands while sneaking and holding an Alchemist's Bag disables the effect. Taboo can also be toggled by sneaking and swapping hands while holding a bow, crossbow, or trident while Alchemical Artillery is active.");
 		mInfo.mDescriptions.add("Extra magic damage increased to 25%. Additionally, while the effect is active, swap hands while looking down, sneaking, and holding an Alchemist's Bag to consume 2 potions and heal 20% of your health. This healing has a 5s cooldown.");
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.HONEY_BOTTLE, 1);
 
 		mActive = false;
-		mMagicDamageIncrease = isLevelOne() ? MAGIC_DAMAGE_INCREASE_1 : MAGIC_DAMAGE_INCREASE_2;
+		mMagicDamageIncrease = (isLevelOne() ? MAGIC_DAMAGE_INCREASE_1 : MAGIC_DAMAGE_INCREASE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 			mAlchemicalArtillery = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
@@ -73,7 +80,7 @@ public class Taboo extends Ability {
 						putOnCooldown();
 						mAlchemistPotions.decrementCharge();
 						mAlchemistPotions.decrementCharge();
-						PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * PERCENT_HEALTH_HEALING, mPlayer);
+						PlayerUtils.healPlayer(mPlugin, mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, EntityUtils.getMaxHealth(mPlayer) * PERCENT_HEALTH_HEALING), mPlayer);
 						world.playSound(mPlayer.getLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, 1, 1.2f);
 						new PartialParticle(Particle.HEART, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(mPlayer);
 					}
@@ -96,7 +103,7 @@ public class Taboo extends Ability {
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mActive && mPlayer != null) {
 			if (oneSecond) {
-				double selfDamage = EntityUtils.getMaxHealth(mPlayer) * PERCENT_HEALTH_DAMAGE;
+				double selfDamage = EntityUtils.getMaxHealth(mPlayer) * (PERCENT_HEALTH_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SELF_DAMAGE));
 				if (mPlayer.getHealth() > selfDamage) {
 					mPlayer.setHealth(mPlayer.getHealth() - selfDamage);
 					mPlayer.damage(0);
@@ -105,7 +112,7 @@ public class Taboo extends Ability {
 					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 0.8f, 1);
 				}
 			}
-			mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(6, PERCENT_KNOCKBACK_RESIST, KNOCKBACK_RESIST_EFFECT_NAME));
+			mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(6, PERCENT_KNOCKBACK_RESIST + CharmManager.getLevel(mPlayer, CHARM_KNOCKBACK_RESISTANCE) / 10, KNOCKBACK_RESIST_EFFECT_NAME));
 		}
 	}
 

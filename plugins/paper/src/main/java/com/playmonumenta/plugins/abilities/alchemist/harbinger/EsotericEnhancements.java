@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -18,6 +19,7 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
@@ -40,6 +42,16 @@ public class EsotericEnhancements extends PotionAbility {
 	private static final int TICK_INTERVAL = 5;
 	private static final double MAX_TARGET_Y = 4;
 
+	public static final String CHARM_DAMAGE = "Esoteric Enhancements Damage";
+	public static final String CHARM_RADIUS = "Esoteric Enhancements Radius";
+	public static final String CHARM_BLEED = "Esoteric Enhancements Bleed Amplifier";
+	public static final String CHARM_DURATION = "Esoteric Enhancements Bleed Duration";
+	public static final String CHARM_COOLDOWN = "Esoteric Enhancements Cooldown";
+	public static final String CHARM_CREEPER = "Esoteric Enhancements Creeper";
+	public static final String CHARM_REACTION_TIME = "Esoteric Enhancements Reaction Time";
+	public static final String CHARM_FUSE = "Esoteric Enhancements Fuse Time";
+	public static final String CHARM_SPEED = "Esoteric Enhancements Speed";
+
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private double mDamageMultiplier;
 
@@ -54,7 +66,7 @@ public class EsotericEnhancements extends PotionAbility {
 		mInfo.mDescriptions.add("Damage is increased to 120% of your potion damage.");
 		mDisplayItem = new ItemStack(Material.CREEPER_HEAD, 1);
 
-		mInfo.mCooldown = ABERRATION_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, ABERRATION_COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mLinkedSpell = ClassAbility.ESOTERIC_ENHANCEMENTS;
 
@@ -73,18 +85,21 @@ public class EsotericEnhancements extends PotionAbility {
 			mAppliedMobs.put(mob, mob.getTicksLived());
 		} else if (!isTimerActive()) {
 			// Clear out list so it doesn't build up
-			mAppliedMobs.keySet().removeIf((entity) -> (entity.getTicksLived() - mAppliedMobs.get(entity) > ABERRATION_SUMMON_DURATION));
+			int reactionTime = ABERRATION_SUMMON_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_REACTION_TIME);
+			mAppliedMobs.keySet().removeIf((entity) -> (entity.getTicksLived() - mAppliedMobs.get(entity) > reactionTime));
 
 			// If it's still in the list, it was applied recently enough
 			if (mAppliedMobs.containsKey(mob)) {
-				summonAbberation(mob.getLocation());
+				int num = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CREEPER);
+				for (int i = 0; i < num; i++) {
+					summonAbberation(mob.getLocation());
+				}
 				putOnCooldown();
 			}
 		}
 	}
 
 	private void summonAbberation(Location loc) {
-
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			Creeper aberration = (Creeper) LibraryOfSoulsIntegration.summon(loc, ABERRATION_LOS);
 			if (aberration == null) {
@@ -97,9 +112,14 @@ public class EsotericEnhancements extends PotionAbility {
 				MMLog.warning("Failed to get AlchemicalAberrationBoss for Alchemicalaberration");
 				return;
 			}
-			alchemicalAbberationBoss.spawn(mPlayer, mAlchemistPotions.getDamage() * mDamageMultiplier, ABERRATION_DAMAGE_RADIUS, ABERRATION_BLEED_DURATION, ABERRATION_BLEED_AMOUNT, mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
 
-			if (getAbilityScore() == 2) {
+			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ABERRATION_DAMAGE_RADIUS);
+			alchemicalAbberationBoss.spawn(mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * mDamageMultiplier), radius, ABERRATION_BLEED_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
+
+			aberration.setMaxFuseTicks(aberration.getFuseTicks() + CharmManager.getExtraDuration(mPlayer, CHARM_FUSE));
+			aberration.setExplosionRadius((int) radius);
+			EntityUtils.setAttributeBase(aberration, Attribute.GENERIC_MOVEMENT_SPEED, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SPEED, EntityUtils.getAttributeBaseOrDefault(aberration, Attribute.GENERIC_MOVEMENT_SPEED, 0)));
+			if (isLevelTwo()) {
 				aberration.setPowered(true);
 			}
 

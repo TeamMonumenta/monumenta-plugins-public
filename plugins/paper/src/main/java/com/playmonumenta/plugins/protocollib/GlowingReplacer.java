@@ -58,9 +58,9 @@ public class GlowingReplacer extends PacketAdapter {
 		// check if glowing is disabled for the entity's type.
 		if (playerSettings != 0xFFFFFFFF) { // If all glowing is disabled, this check can be skipped.
 			Entity entity = packet.getEntityModifier(event).read(0); // NB: this is the first int, not (just) the first entity in the packet.
-			if (entity == null || GlowingCommand.isGlowingEnabled(player, playerSettings, entity)
+			if (entity == null || (GlowingCommand.isGlowingEnabled(player, playerSettings, entity)
 				                      // Purified Ash can only be picked up by clerics, so it doesn't make sense to highlight them for other players
-				                      && !(entity instanceof Item item && DivineJustice.isAsh(item) && !DivineJustice.canPickUpAsh(player))) {
+				                      && !(entity instanceof Item item && DivineJustice.isAsh(item) && !DivineJustice.canPickUpAsh(player)))) {
 				return;
 			}
 		}

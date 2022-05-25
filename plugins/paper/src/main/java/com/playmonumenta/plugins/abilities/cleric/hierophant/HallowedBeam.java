@@ -163,7 +163,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 							new PartialParticle(Particle.VILLAGER_HAPPY, pe.getLocation(), 150, 2.55, 0.15f, 2.5, 1).spawnAsPlayerActive(mPlayer);
 							world.playSound(player.getEyeLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, 2, 1.5f);
 
-							PlayerUtils.healPlayer(mPlugin, pe, EntityUtils.getMaxHealth(pe) * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + HALLOWED_HEAL_PERCENT), mPlayer);
+							PlayerUtils.healPlayer(mPlugin, pe, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEAL, EntityUtils.getMaxHealth(pe) * HALLOWED_HEAL_PERCENT), mPlayer);
 
 							if (isLevelTwo()) {
 								mPlugin.mEffectManager.addEffect(pe, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(HALLOWED_DAMAGE_REDUCTION_DURATION, HALLOWED_DAMAGE_REDUCTION_PERCENT));

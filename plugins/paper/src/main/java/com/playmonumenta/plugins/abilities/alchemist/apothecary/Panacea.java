@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -53,21 +54,31 @@ public class Panacea extends Ability {
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
 	private static final int COOLDOWN = 24 * 20;
 
-	private final int mShield;
-	private int mSlowTicks;
+	public static final String CHARM_DAMAGE = "Panacea Damage";
+	public static final String CHARM_ABSORPTION = "Panacea Absorption Health";
+	public static final String CHARM_ABSORPTION_MAX = "Panacea Max Absorption";
+	public static final String CHARM_ABSORPTION_DURATION = "Panacea Absorption Duration";
+	public static final String CHARM_MOVEMENT_DURATION = "Panacea Movement Duration";
+	public static final String CHARM_MOVEMENT_SPEED = "Panacea Movement Speed";
+	public static final String CHARM_RADIUS = "Panacea Radius";
+	public static final String CHARM_SLOW_DURATION = "Panacea Slow Duration";
+	public static final String CHARM_COOLDOWN = "Panacea Cooldown";
+
+	private final double mShield;
+	private final int mSlowTicks;
 	private @Nullable AlchemistPotions mAlchemistPotions;
 
 	public Panacea(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Panacea");
 		mInfo.mScoreboardId = "Panacea";
 		mInfo.mShorthandName = "Pn";
-		mInfo.mDescriptions.add("Shift left click with a Bow to shoot a mixture that deals 60% of your potion damage and applies 100% Slow for 1.5s to every enemy touched and adds 2 absorption health to other players, lasting 24 seconds, maximum 16. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 24s.");
+		mInfo.mDescriptions.add("Shift left click with a bow, crossbow, or trident to shoot a mixture that deals 60% of your potion damage and applies 100% Slow for 1.5s to every enemy touched and adds 2 absorption health to other players, lasting 24 seconds, maximum 16. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 24s.");
 		mInfo.mDescriptions.add("Absorption health added is increased to 4, and Slow duration is increased to 2s.");
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mLinkedSpell = ClassAbility.PANACEA;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mSlowTicks = isLevelOne() ? PANACEA_1_SLOW_TICKS : PANACEA_2_SLOW_TICKS;
-		mShield = isLevelOne() ? PANACEA_1_SHIELD : PANACEA_2_SHIELD;
+		mSlowTicks = (isLevelOne() ? PANACEA_1_SLOW_TICKS : PANACEA_2_SLOW_TICKS) + CharmManager.getExtraDuration(mPlayer, CHARM_SLOW_DURATION);
+		mShield = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, isLevelOne() ? PANACEA_1_SHIELD : PANACEA_2_SHIELD);
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 		});
@@ -90,17 +101,24 @@ public class Panacea extends Ability {
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
+		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, PANACEA_RADIUS);
+		double moveSpeed = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MOVEMENT_SPEED, PANACEA_MOVE_SPEED);
+		int maxDuration = PANACEA_MAX_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_MOVEMENT_DURATION);
+
+		double maxAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_MAX, PANACEA_MAX_SHIELD);
+		int absorptionDuration = PANACEA_ABSORPTION_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_ABSORPTION_DURATION);
+
 		if (mAlchemistPotions != null) {
-			double damage = mAlchemistPotions.getDamage() * PANACEA_DAMAGE_FRACTION;
+			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * PANACEA_DAMAGE_FRACTION);
 
 			new BukkitRunnable() {
 				final Location mLoc = mPlayer.getEyeLocation();
-				final BoundingBox mBox = BoundingBox.of(mLoc, PANACEA_RADIUS, PANACEA_RADIUS, PANACEA_RADIUS);
-				Vector mIncrement = mLoc.getDirection().multiply(PANACEA_MOVE_SPEED);
+				final BoundingBox mBox = BoundingBox.of(mLoc, radius, radius, radius);
+				Vector mIncrement = mLoc.getDirection().multiply(moveSpeed);
 
 				// Convoluted range parameter makes sure we grab all possible entities to be hit without recalculating manually
-				List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(mLoc, PANACEA_MOVE_SPEED * PANACEA_MAX_DURATION + 2, mPlayer);
-				List<Player> mPlayers = PlayerUtils.otherPlayersInRange(mPlayer, PANACEA_MOVE_SPEED * PANACEA_MAX_DURATION + 2, true);
+				List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(mLoc, moveSpeed * maxDuration + 2);
+				List<Player> mPlayers = PlayerUtils.otherPlayersInRange(mPlayer, moveSpeed * maxDuration + 2, true);
 
 				int mTicks = 0;
 				int mReverseTick = 0;
@@ -127,9 +145,7 @@ public class Panacea extends Ability {
 					while (playerIter.hasNext()) {
 						Player player = playerIter.next();
 						if (mBox.overlaps(player.getBoundingBox())) {
-							if (player != mPlayer) {
-								AbsorptionUtils.addAbsorption(player, mShield, PANACEA_MAX_SHIELD, PANACEA_ABSORPTION_DURATION);
-							}
+							AbsorptionUtils.addAbsorption(player, mShield, maxAbsorption, absorptionDuration);
 							playerIter.remove();
 						}
 					}
@@ -149,9 +165,9 @@ public class Panacea extends Ability {
 					new PartialParticle(Particle.SPELL_INSTANT, mLoc, 5, 0.35, 0.35, 0.35, 1).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.SPELL_WITCH, mLoc, 5, 0.35, 0.35, 0.35, 1).spawnAsPlayerActive(mPlayer);
 
-					if (!mReverse && (!mLoc.isChunkLoaded() || LocationUtils.collidesWithSolid(mLoc, mLoc.getBlock()) || mTicks >= PANACEA_MAX_DURATION)) {
-						mMobs = EntityUtils.getNearbyMobs(mLoc, (0.3 + PANACEA_MOVE_SPEED) * PANACEA_MAX_DURATION + 2, mPlayer);
-						mPlayers = PlayerUtils.otherPlayersInRange(mPlayer, (0.3 + PANACEA_MOVE_SPEED) * PANACEA_MAX_DURATION + 2, true);
+					if (!mReverse && (!mLoc.isChunkLoaded() || LocationUtils.collidesWithSolid(mLoc, mLoc.getBlock()) || mTicks >= maxDuration)) {
+						mMobs = EntityUtils.getNearbyMobs(mLoc, (0.3 + moveSpeed) * maxDuration + 2, mPlayer);
+						mPlayers = PlayerUtils.otherPlayersInRange(mPlayer, (0.3 + moveSpeed) * maxDuration + 2, true);
 						mReverse = true;
 						mReverseTick = mTicks;
 					}
@@ -200,6 +216,6 @@ public class Panacea extends Ability {
 			return false;
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSneaking() && ItemUtils.isSomeBow(inMainHand);
+		return mPlayer.isSneaking() && ItemUtils.isBowOrTrident(inMainHand);
 	}
 }

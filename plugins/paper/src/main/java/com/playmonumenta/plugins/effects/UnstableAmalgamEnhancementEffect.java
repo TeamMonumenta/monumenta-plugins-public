@@ -8,15 +8,14 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 
 public class UnstableAmalgamEnhancementEffect extends Effect {
 
-	private final @NotNull Player mPlayer;
-	private final @NotNull UnstableAmalgam mUnstableAmalgam;
-	private final @NotNull ItemStatManager.PlayerItemStats mStats;
+	private final Player mPlayer;
+	private final UnstableAmalgam mUnstableAmalgam;
+	private final ItemStatManager.PlayerItemStats mStats;
 
-	public UnstableAmalgamEnhancementEffect(int duration, @NotNull Player alchemist, @NotNull UnstableAmalgam unstableAmalgam, @NotNull ItemStatManager.PlayerItemStats stats) {
+	public UnstableAmalgamEnhancementEffect(int duration, Player alchemist, UnstableAmalgam unstableAmalgam, ItemStatManager.PlayerItemStats stats) {
 		super(duration);
 		mPlayer = alchemist;
 		mUnstableAmalgam = unstableAmalgam;

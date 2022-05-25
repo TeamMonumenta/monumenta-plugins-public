@@ -43,7 +43,7 @@ public class Bodyguard extends Ability {
 	public static final String CHARM_COOLDOWN = "Bodyguard Cooldown";
 	public static final String CHARM_RANGE = "Bodyguard Range";
 	public static final String CHARM_RADIUS = "Bodyguard Stun Radius";
-	public static final String CHARM_ABSORPTION = "Bodyguard Absorption";
+	public static final String CHARM_ABSORPTION = "Bodyguard Absorption Health";
 	public static final String CHARM_ABSORPTION_DURATION = "Bodyguard Absorption Duration";
 	public static final String CHARM_STUN_DURATION = "Bodyguard Stun Duration";
 	public static final String CHARM_KNOCKBACK = "Bodyguard Knockback";

@@ -57,7 +57,8 @@ public class HandOfLight extends Ability {
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED = 0.025;
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_MAX = 0.5;
 	private static final int ENHANCEMENT_UNDEAD_STUN_DURATION = 10;
-	public static final String DAMAGE_MODE_TAG = "ClericHOLDamageMode";
+	private static final String DAMAGE_MODE_TAG = "ClericHOLDamageMode";
+
 	public static final String CHARM_DAMAGE = "Hand of Light Damage";
 	public static final String CHARM_COOLDOWN = "Hand of Light Cooldown";
 	public static final String CHARM_RANGE = "Hand of Light Range";
@@ -94,9 +95,9 @@ public class HandOfLight extends Ability {
 		mInfo.mIgnoreCooldown = true;
 
 		mFlat = isLevelOne() ? FLAT_1 : FLAT_2;
-		mPercent = CharmManager.getLevelPercentDecimal(player, CHARM_HEALING) + (isLevelOne() ? PERCENT_1 : PERCENT_2);
-		mDamagePer = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2);
-		mDamageMax = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2);
+		mPercent = isLevelOne() ? PERCENT_1 : PERCENT_2;
+		mDamagePer = isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2;
+		mDamageMax = isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
 
 		mDamageMode = player != null && player.getScoreboardTags().contains(DAMAGE_MODE_TAG);
 
@@ -153,7 +154,7 @@ public class HandOfLight extends Ability {
 				for (Player p : nearbyPlayers) {
 					double maxHealth = EntityUtils.getMaxHealth(p);
 					double healthBeforeHeal = p.getHealth();
-					PlayerUtils.healPlayer(mPlugin, p, mFlat + mPercent * maxHealth, mPlayer);
+					PlayerUtils.healPlayer(mPlugin, p, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, mFlat + mPercent * maxHealth), mPlayer);
 					healthHealed += p.getHealth() - healthBeforeHeal;
 
 					Location loc = p.getLocation();
@@ -182,6 +183,7 @@ public class HandOfLight extends Ability {
 			List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
 			undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob, mCrusade));
 			double damage = Math.min(undeadMobs.size() * mDamagePer, mDamageMax);
+			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 
 			if (damage > 0) {
 				for (LivingEntity mob : nearbyMobs) {
