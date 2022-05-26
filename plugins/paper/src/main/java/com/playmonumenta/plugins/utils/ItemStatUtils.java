@@ -425,7 +425,7 @@ public class ItemStatUtils {
 		THUNDER_ASPECT(new ThunderAspect(), true, false, false),
 		WIND_ASPECT(new WindAspect(), true, false, false),
 		EARTH_ASPECT(new EarthAspect(), true, false, false),
-		FIRST_STRIKE(new FirstStrike(), true, true, false),
+		FIRST_STRIKE(new FirstStrike(), true, false, false),
 		GILLS(new Gills(), false, false, false),
 		HEX_EATER(new HexEater(), true, false, false),
 		INFERNO(new Inferno(), true, false, false),
