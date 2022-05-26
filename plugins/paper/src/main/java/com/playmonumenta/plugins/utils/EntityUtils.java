@@ -468,7 +468,7 @@ public class EntityUtils {
 	public static boolean withinRangeOfMonster(Player player, double range) {
 		List<Entity> entities = player.getNearbyEntities(range, range, range);
 		for (Entity entity : entities) {
-			if (isHostileMob(entity)) {
+			if (isHostileMob(entity) && !entity.getScoreboardTags().contains("summon_ignore")) {
 				return true;
 			}
 		}
