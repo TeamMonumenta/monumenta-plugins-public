@@ -118,6 +118,7 @@ public class Dodging extends Ability {
 			arrow.setBasePotionData(new PotionData(PotionType.MUNDANE));
 			arrow.clearCustomEffects();
 		}
+		proj.remove();
 		return true;
 	}
 
