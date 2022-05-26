@@ -96,7 +96,8 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 
 		// %monumenta_level%
 		if (identifier.equalsIgnoreCase("level")) {
-			return Integer.toString(ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0));
+			return Integer.toString(ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0) +
+				                                    ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0));
 		}
 
 		if (identifier.equalsIgnoreCase("shard")) {
