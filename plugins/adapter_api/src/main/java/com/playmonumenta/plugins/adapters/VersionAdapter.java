@@ -12,6 +12,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public interface VersionAdapter {
@@ -121,5 +122,10 @@ public interface VersionAdapter {
 	 * Executes a command as a block. The block does not need to be a command block.
 	 */
 	void executeCommandAsBlock(Block block, String command);
+
+	/**
+	 * Checks if the given bounding box collides with any blocks or "hard-colliding" entities (e.g. boats, shulkers).
+	 */
+	boolean hasCollision(World world, BoundingBox aabb);
 
 }

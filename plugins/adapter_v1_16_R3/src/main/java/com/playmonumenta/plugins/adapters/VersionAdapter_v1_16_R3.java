@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import net.minecraft.server.v1_16_R3.AxisAlignedBB;
 import net.minecraft.server.v1_16_R3.ChatMessage;
 import net.minecraft.server.v1_16_R3.DamageSource;
 import net.minecraft.server.v1_16_R3.EntityCreature;
@@ -49,6 +50,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class VersionAdapter_v1_16_R3 implements VersionAdapter {
@@ -348,6 +350,11 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 		TileEntityCommand tileEntity = new TileEntityCommand();
 		tileEntity.setLocation(((CraftBlock) block).getCraftWorld().getHandle(), ((CraftBlock) block).getPosition());
 		Bukkit.dispatchCommand(tileEntity.getCommandBlock().getBukkitSender(tileEntity.getCommandBlock().getWrapper()), command);
+	}
+
+	@Override
+	public boolean hasCollision(World world, BoundingBox aabb) {
+		return !((CraftWorld) world).getHandle().b(new AxisAlignedBB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()));
 	}
 
 }

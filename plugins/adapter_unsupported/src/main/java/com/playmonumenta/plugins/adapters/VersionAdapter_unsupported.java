@@ -12,6 +12,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class VersionAdapter_unsupported implements VersionAdapter {
@@ -104,6 +105,11 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	@Override
 	public void executeCommandAsBlock(Block block, String command) {
 
+	}
+
+	@Override
+	public boolean hasCollision(World world, BoundingBox aabb) {
+		return false;
 	}
 
 }

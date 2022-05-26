@@ -107,6 +107,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 			final Vector mDirection = mPlayer.getLocation().getDirection().normalize();
 			final double mDistancePerTick = 1.0 * (getAbilityScore() == 1 ? DISTANCE_1 : DISTANCE_2) / TELEPORT_TICKS;
 			int mTick = 0;
+			Location mLastTpLoc = mPlayer.getLocation();
 
 			@Override
 			public void run() {
@@ -124,10 +125,14 @@ public class BodkinBlitz extends MultipleChargeAbility {
 				if (isBlocked) {
 					// If no spot was found, then you've literally hit a wall. Stop iterating.
 					mTick = TELEPORT_TICKS;
+					if (travelBox.equals(mPlayerBox)) { // started when already obstructed - use previous iteration's end location
+						tpLoc = mLastTpLoc;
+					}
 				} else {
 					// Shift player box by travel distance for next tick's check
 					// Does not use travelBox as that may have been shifted to evade obstacles
 					mPlayerBox.shift(mDirection.clone().multiply(mDistancePerTick));
+					mLastTpLoc = tpLoc;
 				}
 
 				// Don't allow teleporting outside the world border
@@ -140,7 +145,6 @@ public class BodkinBlitz extends MultipleChargeAbility {
 				mTick++;
 				if (mTick >= TELEPORT_TICKS) {
 					tpLoc.setDirection(mPlayer.getLocation().getDirection());
-					tpLoc.add(0, 0.1, 0);
 					mPlayer.teleport(tpLoc, TeleportCause.UNKNOWN);
 
 					mTeleporting = false;
