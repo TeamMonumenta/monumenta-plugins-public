@@ -474,4 +474,12 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	public @Nullable String getMode() {
 		return mGruesomeMode ? "gruesome" : null;
 	}
+
+	public boolean isAlchemistPotion(ThrownPotion potion) {
+		if (BRUTAL_POTION == null || GRUESOME_POTION == null) {
+			return false;
+		}
+
+		return potion.getItem().equals(BRUTAL_POTION) || potion.getItem().equals(GRUESOME_POTION);
+	}
 }

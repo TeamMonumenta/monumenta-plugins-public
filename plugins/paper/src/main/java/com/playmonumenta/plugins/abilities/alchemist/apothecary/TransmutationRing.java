@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -12,12 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
@@ -42,6 +39,7 @@ public class TransmutationRing extends PotionAbility {
 	public static final String TRANSMUTATION_POTION_METAKEY = "TransmutationRingPotion";
 
 	private @Nullable Location mCenter;
+	private @Nullable AlchemistPotions mAlchemistPotions;
 	private int mKills = 0;
 
 	public TransmutationRing(Plugin plugin, @Nullable Player player) {
@@ -55,11 +53,15 @@ public class TransmutationRing extends PotionAbility {
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mCooldown = getAbilityScore() == 1 ? TRANSMUTATION_RING_1_COOLDOWN : TRANSMUTATION_RING_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+		});
 	}
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (mPlayer != null && mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && !isTimerActive()) {
+		if (mPlayer != null && mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && !isTimerActive()
+			&& mAlchemistPotions.isAlchemistPotion(potion)) {
 			putOnCooldown();
 			potion.setMetadata(TRANSMUTATION_POTION_METAKEY, new FixedMetadataValue(mPlugin, null));
 		}
