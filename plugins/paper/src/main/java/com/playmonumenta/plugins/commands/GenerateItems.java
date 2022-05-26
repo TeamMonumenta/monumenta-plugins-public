@@ -50,7 +50,7 @@ public class GenerateItems extends GenericCommand {
 			String itemName = row.get(0);
 			String baseItem = row.get(1);
 			baseItem = baseItem.split(":", 2)[1].toUpperCase();
-			Boolean isMainhand = row.get(67).equals("1");
+			Boolean isMainhand = row.get(71).equals("1");
 			String slot;
 			if (isMainhand) {
 				slot = "mainhand";
