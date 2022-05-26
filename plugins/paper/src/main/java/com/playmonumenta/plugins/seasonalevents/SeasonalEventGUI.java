@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.seasonalevents;
 
+import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.redissync.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.time.LocalDateTime;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -26,25 +30,26 @@ public class SeasonalEventGUI extends CustomInventory {
 	private static final int LEVELS_PER_PAGE = 5;
 	private static final int LEVEL_PROGRESS_START = 18;
 	private static final int REWARD_START = 27;
-	private static final int MISSIONS_PER_WEEK = 3;
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private SeasonalPass mSeasonalPass;
 	private int mCurrentPage = 1;
 	private int mWeek;
 
-	public SeasonalEventGUI(Player player) {
-		this(player, player, -1);
+	public SeasonalEventGUI(SeasonalPass seasonalPass, Player player) {
+		this(seasonalPass, player, player, -1);
 	}
 
-	public SeasonalEventGUI(Player player, int week) {
-		this(player, player, week);
+	public SeasonalEventGUI(SeasonalPass seasonalPass, Player player, int week) {
+		this(seasonalPass, player, player, week);
 	}
 
-	public SeasonalEventGUI(Player requestingPlayer, Player targetPlayer, int week) {
-		super(requestingPlayer, 54, SeasonalEventManager.PASS_NAME);
-		SeasonalEventManager.updatePlayerPassProgress(targetPlayer);
-		int level = SeasonalEventManager.getLevelFromMP(SeasonalEventManager.getMP(targetPlayer));
+	public SeasonalEventGUI(SeasonalPass seasonalPass, Player requestingPlayer, Player targetPlayer, int week) {
+		super(requestingPlayer, 54, seasonalPass.mName);
+		seasonalPass.updatePlayerPassProgress(targetPlayer);
+		int level = seasonalPass.getLevelFromMP(seasonalPass.getMP(targetPlayer));
+		mSeasonalPass = seasonalPass;
 		mCurrentPage = Math.max(1, ((level - 1) / 5) + 1);
-		mWeek = week;
+		mWeek = week == -1 ? mSeasonalPass.getWeekOfPass() : week;
 		setUpPass(targetPlayer);
 	}
 
@@ -73,14 +78,16 @@ public class SeasonalEventGUI extends CustomInventory {
 	}
 
 	public Boolean setUpPass(Player targetPlayer) {
-		List<WeeklyMission> currentMissions = SeasonalEventManager.getActiveMissions();
+		List<WeeklyMission> currentMissions;
 		if (mWeek != -1) {
-			currentMissions = SeasonalEventManager.getMissionsInWeek(mWeek);
+			currentMissions = mSeasonalPass.getMissionsInWeek(mWeek);
+		} else {
+			currentMissions = mSeasonalPass.getActiveMissions();
 		}
-		List<SeasonalReward> rewards = SeasonalEventManager.PASS_REWARDS;
-		int playerLevel = SeasonalEventManager.getLevelFromMP(SeasonalEventManager.getMP(targetPlayer));
-		int playerMP = SeasonalEventManager.getMP(targetPlayer);
-		int mpToNextLevel = ((playerLevel + 1) * SeasonalEventManager.MP_PER_LEVEL) - playerMP;
+		List<SeasonalReward> rewards = mSeasonalPass.mRewards;
+		int playerMP = mSeasonalPass.getMP(targetPlayer);
+		int playerLevel = mSeasonalPass.getLevelFromMP(playerMP);
+		int mpToNextLevel = ((playerLevel + 1) * mSeasonalPass.MP_PER_LEVEL) - playerMP;
 
 		//Set inventory to filler to start
 		for (int i = 0; i < 54; i++) {
@@ -90,16 +97,16 @@ public class SeasonalEventGUI extends CustomInventory {
 		//Set up summary
 		ItemStack passSummary = new ItemStack(Material.SOUL_LANTERN, Math.min(64, Math.max(1, playerLevel)));
 		ItemMeta meta = passSummary.getItemMeta();
-		meta.displayName(Component.text(SeasonalEventManager.PASS_NAME, NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+		meta.displayName(Component.text(mSeasonalPass.mName, NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 
 		List<Component> lore = new ArrayList<>();
 		lore.add(Component.text(String.format("Your Level: %d", playerLevel), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 		lore.add(Component.text(String.format("Earned MP: %d", playerMP), NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
-		if (playerLevel < SeasonalEventManager.LEVEL_COUNT) {
+		if (playerLevel < mSeasonalPass.mRewards.size()) {
 			lore.add(Component.text(String.format("MP to Next Level: %d", mpToNextLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 		}
-		lore.add(Component.text(String.format("Pass ends in %dd %dh", SeasonalEventManager.getDaysUntilPassEnd(), SeasonalEventManager.getHoursUntilPassEnd()), NamedTextColor.BLUE).decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text(String.format("Pass ends in %dd %dh", mSeasonalPass.getDaysUntilPassEnd(), mSeasonalPass.getHoursUntilPassEnd()), NamedTextColor.BLUE).decoration(TextDecoration.ITALIC, false));
 
 		meta.lore(lore);
 		passSummary.setItemMeta(meta);
@@ -110,14 +117,37 @@ public class SeasonalEventGUI extends CustomInventory {
 		meta = missionSummary.getItemMeta();
 		meta.displayName(Component.text("Weekly Missions", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 		lore = new ArrayList<>();
-		lore.add(Component.text(String.format("Week %d", SeasonalEventManager.getWeekOfPass()), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text(String.format("Resets in %dd %dh", SeasonalEventManager.getDaysUntilMissionReset(), SeasonalEventManager.getHoursUntilMissionReset()), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		if (mSeasonalPass.isActive()) {
+			lore.add(Component.text(String.format("Week %d", mWeek), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(String.format("Resets in %dd %dh", mSeasonalPass.getDaysUntilMissionReset(), mSeasonalPass.getHoursUntilMissionReset()), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		} else {
+			LocalDateTime now = DateUtils.localDateTime();
+			LocalDateTime passStart = mSeasonalPass.mPassStart;
+			LocalDateTime passEnd = passStart.plusWeeks(mSeasonalPass.mNumberOfWeeks).minusDays(1);
+			if (now.compareTo(passStart) < 0) {
+				lore.add(Component.text(String.format("Week %d", mWeek), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text(String.format("Pass starts %s %d, %d",
+					passStart.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()),
+					passStart.getDayOfMonth(),
+					passStart.getYear()), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+			} else {
+				lore.add(Component.text(String.format("Week %d", mWeek), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text(String.format("Pass ran from %s %d, %d",
+					passStart.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()),
+					passStart.getDayOfMonth(),
+					passStart.getYear()), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text(String.format("through %s %d, %d",
+					passEnd.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()),
+					passEnd.getDayOfMonth(),
+					passEnd.getYear()), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+			}
+		}
 		meta.lore(lore);
 		missionSummary.setItemMeta(meta);
 		mInventory.setItem(WEEKLY_MISSION_LOC, missionSummary);
 
 		// Individual weekly mission display
-		for (int i = 0; i < MISSIONS_PER_WEEK; i++) {
+		for (int i = 0; i < Math.min(3, currentMissions.size()); i++) {
 			try {
 				WeeklyMission mission = currentMissions.get(i);
 				String missionScoreboard = SeasonalEventManager.MISSION_SCOREBOARD + (i + 1);
@@ -214,7 +244,7 @@ public class SeasonalEventGUI extends CustomInventory {
 			mInventory.setItem(PREV_PAGE_LOC, pageItem);
 		}
 
-		if (mCurrentPage < (SeasonalEventManager.LEVEL_COUNT / LEVELS_PER_PAGE)) {
+		if (mCurrentPage < (mSeasonalPass.mRewards.size() / LEVELS_PER_PAGE)) {
 			// Display next page
 			ItemStack pageItem = new ItemStack(Material.ARROW, 1);
 			meta = pageItem.getItemMeta();

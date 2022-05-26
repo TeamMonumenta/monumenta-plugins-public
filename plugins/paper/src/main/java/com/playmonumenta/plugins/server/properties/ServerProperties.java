@@ -23,7 +23,6 @@ public class ServerProperties {
 
 	private static final ServerProperties INSTANCE = new ServerProperties();
 
-	private boolean mDailyResetEnabled = false;
 	private boolean mJoinMessagesEnabled = false;
 	private boolean mIsTownWorld = false;
 	// Height of plots in Sierhaven so that players under plots stay in adventure
@@ -48,10 +47,6 @@ public class ServerProperties {
 	private final List<NamespacedKey> mEggifySpawnEggs = new ArrayList<>();
 
 	public ServerProperties() {
-	}
-
-	public static boolean getDailyResetEnabled() {
-		return INSTANCE.mDailyResetEnabled;
 	}
 
 	public static boolean getJoinMessagesEnabled() {
@@ -128,7 +123,6 @@ public class ServerProperties {
 
 	private void loadInternal(Plugin plugin, @Nullable CommandSender sender) {
 		QuestUtils.loadScriptedQuests(plugin, ".", sender, (object) -> {
-			mDailyResetEnabled = getPropertyValueBool(object, "dailyResetEnabled", mDailyResetEnabled);
 			mJoinMessagesEnabled = getPropertyValueBool(object, "joinMessagesEnabled", mJoinMessagesEnabled);
 			mIsTownWorld = getPropertyValueBool(object, "isTownWorld", mIsTownWorld);
 			mPlotSurvivalMinHeight = getPropertyValueInt(object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
@@ -169,7 +163,6 @@ public class ServerProperties {
 	private List<String> toDisplay() {
 		List<String> out = new ArrayList<>();
 
-		out.add("dailyResetEnabled = " + mDailyResetEnabled);
 		out.add("joinMessagesEnabled = " + mJoinMessagesEnabled);
 		out.add("isTownWorld = " + mIsTownWorld);
 		out.add("plotSurvivalMinHeight = " + mPlotSurvivalMinHeight);

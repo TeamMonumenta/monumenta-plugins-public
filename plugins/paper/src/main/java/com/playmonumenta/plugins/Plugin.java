@@ -147,6 +147,7 @@ public class Plugin extends JavaPlugin {
 		ChangeLogLevel.register();
 		GiveSoulbound.register();
 		ClaimRaffle.register(this);
+		DateVersionCommand.register();
 		ShatterHeldItem.register();
 		CalculateReforge.register();
 		ReforgeHeldItem.register();
