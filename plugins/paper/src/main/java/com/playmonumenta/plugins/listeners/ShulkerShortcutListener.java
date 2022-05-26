@@ -130,7 +130,7 @@ public class ShulkerShortcutListener implements Listener {
 							deposited = event.getCurrentItem();
 						}
 					}
-					case HOTBAR_SWAP -> {
+					case HOTBAR_SWAP, HOTBAR_MOVE_AND_READD -> {
 						if (event.getClickedInventory() == shulkerInventory.getInventory()) {
 							deposited = event.getClick() == ClickType.SWAP_OFFHAND ? player.getInventory().getItemInOffHand() : player.getInventory().getItem(event.getHotbarButton());
 						}
