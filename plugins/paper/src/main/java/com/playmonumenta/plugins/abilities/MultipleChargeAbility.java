@@ -24,7 +24,9 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 		if (mPlayer != null && mCharges > 0) {
 			mCharges--;
 			PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.mLinkedSpell);
-			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+			if (mMaxCharges > 1) {
+				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+			}
 			ClientModHandler.updateAbility(mPlayer, this);
 			AbilityManager.getManager().trackCharges(mPlayer, mInfo.mLinkedSpell, mCharges);
 
@@ -37,7 +39,11 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	protected boolean incrementCharge() {
 		if (mPlayer != null && mCharges < mMaxCharges) {
 			mCharges++;
-			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+			if (mMaxCharges > 1) {
+				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+			} else {
+				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " is now off cooldown!");
+			}
 			ClientModHandler.updateAbility(mPlayer, this);
 			AbilityManager.getManager().trackCharges(mPlayer, mInfo.mLinkedSpell, mCharges);
 
@@ -64,7 +70,11 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 		// Increment charges if last check was on cooldown, and now is off cooldown.
 		if (mCharges < mMaxCharges && mWasOnCooldown && !onCooldown) {
 			mCharges++;
-			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+			if (mMaxCharges > 1) {
+				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+			} else {
+				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " is now off cooldown!");
+			}
 			needsClientModUpdate = true;
 			AbilityManager.getManager().trackCharges(mPlayer, mInfo.mLinkedSpell, mCharges);
 		}
