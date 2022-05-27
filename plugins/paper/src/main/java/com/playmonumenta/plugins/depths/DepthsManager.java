@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -89,7 +90,6 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.Updraft;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -760,8 +760,7 @@ public class DepthsManager {
 
 			AbilityManager.getManager().updatePlayerAbilities(p, true);
 			//Reset delve player info
-			DelvesUtils.setDelveScore(p, ServerProperties.getShardName(), 0);
-			DelvesUtils.removeDelveInfo(p);
+			DelvesUtils.clearDelvePlayerByShard(null, p, ServerProperties.getShardName());
 		}
 	}
 

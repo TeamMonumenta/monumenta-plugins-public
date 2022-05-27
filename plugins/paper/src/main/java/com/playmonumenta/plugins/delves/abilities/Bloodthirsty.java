@@ -1,16 +1,11 @@
-package com.playmonumenta.plugins.abilities.delves;
+package com.playmonumenta.plugins.delves.abilities;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.CoordinatedAttackBoss;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import javax.annotation.Nullable;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
 
-public class Bloodthirsty extends DelveModifier {
+public class Bloodthirsty {
 
 	private static final double[] BLOODTHIRSTY_CHANCE = {
 			0.07,
@@ -36,22 +31,8 @@ public class Bloodthirsty extends DelveModifier {
 			}
 	};
 
-	private final double mBloodthirstyChance;
-
-	public Bloodthirsty(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, Modifier.BLOODTHIRSTY);
-
-		if (player != null) {
-			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.BLOODTHIRSTY);
-			mBloodthirstyChance = BLOODTHIRSTY_CHANCE[rank - 1];
-		} else {
-			mBloodthirstyChance = 0;
-		}
-	}
-
-	@Override
-	protected void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
-		if (FastUtils.RANDOM.nextDouble() < mBloodthirstyChance) {
+	public static void applyModifiers(LivingEntity mob, int level) {
+		if (FastUtils.RANDOM.nextDouble() < BLOODTHIRSTY_CHANCE[level - 1] && !DelvesUtils.isDelveMob(mob)) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
 			mob.addScoreboardTag(CoordinatedAttackBoss.identityTag);
 		}

@@ -1,23 +1,18 @@
-package com.playmonumenta.plugins.abilities.delves;
+package com.playmonumenta.plugins.delves.abilities;
 
 import com.google.common.collect.ImmutableSet;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.ChargerBoss;
 import com.playmonumenta.plugins.bosses.bosses.ProjectileBoss;
 import com.playmonumenta.plugins.bosses.bosses.RejuvenationBoss;
 import com.playmonumenta.plugins.bosses.bosses.TpBehindBoss;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
 
-public class Arcanic extends DelveModifier {
+public class Arcanic {
 
 	private static final double[] ABILITY_CHANCE = {
 		0.06,
@@ -113,22 +108,8 @@ public class Arcanic extends DelveModifier {
 			}
 	};
 
-	private final double mAbilityChance;
-
-	public Arcanic(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, Modifier.ARCANIC);
-
-		if (player != null) {
-			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.ARCANIC);
-			mAbilityChance = ABILITY_CHANCE[rank - 1];
-		} else {
-			mAbilityChance = 0;
-		}
-	}
-
-	@Override
-	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
-		if (FastUtils.RANDOM.nextDouble() < mAbilityChance) {
+	public static void applyModifiers(LivingEntity mob, int level) {
+		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE[level - 1] && !DelvesUtils.isDelveMob(mob)) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
 			List<List<String>> abilityPool = ServerProperties.getClassSpecializationsEnabled() ? ABILITY_POOL_R2 : ABILITY_POOL_R1;
 			List<String> ability = abilityPool.get(FastUtils.RANDOM.nextInt(abilityPool.size()));

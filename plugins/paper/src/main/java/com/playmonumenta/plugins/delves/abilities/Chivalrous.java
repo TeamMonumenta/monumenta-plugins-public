@@ -1,23 +1,17 @@
-package com.playmonumenta.plugins.abilities.delves;
+package com.playmonumenta.plugins.delves.abilities;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.AntiRangeChivalrousBoss;
-import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.EnumSet;
-import javax.annotation.Nullable;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
 
-public class Chivalrous extends DelveModifier {
+public class Chivalrous {
 
 	private static final double[] SPAWN_CHANCE = {
 			0.15,
@@ -47,7 +41,6 @@ public class Chivalrous extends DelveModifier {
 			}
 	};
 
-	private final double mSpawnChance;
 
 	private static final EnumSet<EntityType> CHIVALROUS_IMMUNE = EnumSet.of(
 			EntityType.GHAST,
@@ -57,29 +50,9 @@ public class Chivalrous extends DelveModifier {
 			EntityType.BLAZE
 	);
 
-	public Chivalrous(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, Modifier.CHIVALROUS);
-
-		if (player != null) {
-			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.CHIVALROUS);
-			mSpawnChance = SPAWN_CHANCE[rank - 1];
-		} else {
-			mSpawnChance = 0;
-		}
-	}
-
-	@Override
-	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		// Can't make magma cubes do 0 damage in Vanilla using attributes or Weakness
-		if (damager != null && MOUNT_NAMES[1].equals(damager.getCustomName())) {
-			event.setCancelled(true);
-		}
-	}
-
-	@Override
-	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
+	public static void applyModifiers(LivingEntity mob, int level) {
 		if (!mob.isInsideVehicle() && !CHIVALROUS_IMMUNE.contains(mob.getType()) && !EntityUtils.isBoss(mob) && !DelvesUtils.isDelveMob(mob)
-				&& FastUtils.RANDOM.nextDouble() < mSpawnChance) {
+				&& FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE[level - 1]) {
 			Entity mount = LibraryOfSoulsIntegration.summon(mob.getLocation(), MOUNTS[FastUtils.RANDOM.nextInt(MOUNTS.length)]);
 			if (mount != null) {
 				mount.addPassenger(mob);
@@ -90,6 +63,15 @@ public class Chivalrous extends DelveModifier {
 				}
 			}
 		}
+	}
+
+	public static boolean isChivalrousName(String name) {
+		for (String s : MOUNT_NAMES) {
+			if (s.equals(name)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

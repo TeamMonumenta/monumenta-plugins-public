@@ -1,0 +1,150 @@
+package com.playmonumenta.plugins.delves;
+
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.HashMap;
+import java.util.Map;
+import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
+import org.bukkit.entity.Player;
+import org.bukkit.loot.LootTable;
+
+public class DelveLootTableGroup {
+
+	public static final Map<String, DelveLootTableGroup> DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS = new HashMap<>();
+
+	static {
+		new DelveLootTableGroup("r1/delves/white/base_chest", "r1/delves/white/dmat_chest", "r1/delves/white/cmat_chest", "r1/dungeons/1/level_2_chest", "r1/dungeons/1/level_3_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r1/delves/white/base_final", "r1/delves/white/dmat_final", "r1/delves/white/cmat_final", "r1/dungeons/1/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r1/delves/orange/base_chest", "r1/delves/orange/dmat_chest", "r1/delves/orange/cmat_chest", "r1/dungeons/2/level_2_chest", "r1/dungeons/2/level_3_chest", "r1/dungeons/2/level_4_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r1/delves/orange/base_final", "r1/delves/orange/dmat_final", "r1/delves/orange/cmat_final", "r1/dungeons/2/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r1/delves/magenta/base_chest", "r1/delves/magenta/dmat_chest", "r1/delves/magenta/cmat_chest", "r1/dungeons/3/level_3_chest", "r1/dungeons/3/level_4_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r1/delves/magenta/base_final", "r1/delves/magenta/dmat_final", "r1/delves/magenta/cmat_final", "r1/dungeons/3/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r1/delves/lightblue/base_academy", "r1/delves/lightblue/dmat_academy", "r1/delves/lightblue/cmat_academy", "r1/dungeons/4/level_3_chest_u", "r1/dungeons/4/level_4_chest_u").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r1/delves/lightblue/base_bastion", "r1/delves/lightblue/dmat_bastion", "r1/delves/lightblue/cmat_bastion", "r1/dungeons/4/level_3_chest_a", "r1/dungeons/4/level_4_chest_a").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r1/delves/lightblue/base_final", "r1/delves/lightblue/dmat_final", "r1/delves/lightblue/cmat_final", "r1/dungeons/4/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r1/delves/yellow/base_seasons", "r1/delves/yellow/dmat_seasons", "r1/delves/yellow/cmat_seasons", "r1/dungeons/5/overgrown-man-1", "r1/dungeons/5/poison-man-1", "r1/dungeons/5/poison-man-2", "r1/dungeons/5/fish-1", "r1/dungeons/5/fish-2", "r1/dungeons/5/dragon-1", "r1/dungeons/5/dragon-2", "r1/dungeons/5/polar-1").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r1/delves/yellow/base_ender", "r1/delves/yellow/dmat_ender", "r1/delves/yellow/cmat_ender", "r1/dungeons/5/ender-1").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r1/delves/yellow/base_final", "r1/delves/yellow/dmat_final", "r1/delves/yellow/cmat_final", "r1/dungeons/5/overgrown-man-2").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r1/delves/willows/base_chest", "r1/delves/willows/dmat_chest", "r1/delves/willows/cmat_chest", "r1/dungeons/bonus/level_4_chest", "r1/dungeons/bonus/level_5_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r1/delves/willows/base_final", "r1/delves/willows/dmat_final", "r1/delves/willows/cmat_final", "r1/dungeons/bonus/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r1/delves/reverie/base_chest", "r1/delves/reverie/dmat_chest", "r1/delves/reverie/cmat_chest", "r1/dungeons/reverie/chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r2/delves/lime/base_chest", "r2/delves/lime/dmat_chest", "r2/delves/lime/cmat_chest", "r2/dungeons/lime/swamplevel_2_chest", "r2/dungeons/lime/citylevel_2_chest", "r2/dungeons/lime/citylevel_3_chest", "r2/dungeons/lime/librarylevel_2_chest", "r2/dungeons/lime/librarylevel_3_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/lime/base_final", "r2/delves/lime/dmat_final", "r2/delves/lime/cmat_final", "r2/dungeons/lime/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r2/delves/pink/base_temple", "r2/delves/pink/dmat_temple", "r2/delves/pink/cmat_temple", "r2/dungeons/pink/spring_chest", "r2/dungeons/pink/summer_chest", "r2/dungeons/pink/autumn_chest", "r2/dungeons/pink/winter_chest", "r2/dungeons/pink/temple_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/pink/base_dissonant", "r2/delves/pink/dmat_dissonant", "r2/delves/pink/cmat_dissonant", "r2/dungeons/pink/dissonant_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/pink/base_final", "r2/delves/pink/dmat_final", "r2/delves/pink/cmat_final", "r2/dungeons/pink/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r2/delves/gray/base_chest", "r2/delves/gray/dmat_chest", "r2/delves/gray/cmat_chest", "r2/dungeons/gray/chest_outside", "r2/dungeons/gray/chest_library", "r2/dungeons/gray/chest_labs").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/gray/base_final", "r2/delves/gray/dmat_final", "r2/delves/gray/cmat_final", "r2/dungeons/gray/chest_final").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r2/delves/lightgray/base_chest", "r2/delves/lightgray/dmat_chest", "r2/delves/lightgray/cmat_chest", "r2/dungeons/lightgray/level_3_chestoutside", "r2/dungeons/lightgray/level_4_chestoutside", "r2/dungeons/lightgray/level_3_chestpalace", "r2/dungeons/lightgray/level_4_chestpalace").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/lightgray/base_final", "r2/delves/lightgray/dmat_final", "r2/delves/lightgray/cmat_final", "r2/dungeons/lightgray/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r2/delves/cyan/base_mine", "r2/delves/cyan/dmat_mine", "r2/delves/cyan/cmat_mine", "r2/dungeons/cyan/level_3_chestmine", "r2/dungeons/cyan/level_4_chestmine").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/cyan/base_temple", "r2/delves/cyan/dmat_temple", "r2/delves/cyan/cmat_temple", "r2/dungeons/cyan/level_3_chesttemple", "r2/dungeons/cyan/level_4_chesttemple").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/cyan/base_final", "r2/delves/cyan/dmat_final", "r2/delves/cyan/cmat_final", "r2/dungeons/cyan/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r2/delves/purple/base_pirate", "r2/delves/purple/dmat_pirate", "r2/delves/purple/cmat_pirate", "r2/dungeons/purple/chestpirate").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/purple/base_temple", "r2/delves/purple/dmat_temple", "r2/delves/purple/cmat_temple", "r2/dungeons/purple/chesttemple").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/purple/base_final", "r2/delves/purple/dmat_final", "r2/delves/purple/cmat_final", "r2/dungeons/purple/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r2/delves/teal/base_chest", "r2/delves/teal/dmat_chest", "r2/delves/teal/cmat_chest", "r2/dungeons/teal/ruined", "r2/dungeons/teal/eroded", "r2/dungeons/teal/pristine").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/teal/base_colosseum", "r2/delves/teal/dmat_colosseum", "r2/delves/teal/cmat_colosseum", "r2/dungeons/teal/colosseum").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/teal/base_escape", "r2/delves/teal/dmat_escape", "r2/delves/teal/cmat_escape", "r2/dungeons/teal/escape").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/teal/base_final", "r2/delves/teal/dmat_final", "r2/delves/teal/cmat_final", "r2/dungeons/teal/final").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r2/delves/forum/base_forum", "r2/delves/forum/dmat_forum", "r2/delves/forum/cmat_forum", "r2/dungeons/forum/forum").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/forum/base_quarters", "r2/delves/forum/dmat_quarters", "r2/delves/forum/cmat_quarters", "r2/dungeons/forum/quarters").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/forum/base_conservatory", "r2/delves/forum/dmat_conservatory", "r2/delves/forum/cmat_conservatory", "r2/dungeons/forum/conservatory").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/forum/base_conscriptorium", "r2/delves/forum/dmat_conscriptorium", "r2/delves/forum/cmat_conscriptorium", "r2/dungeons/forum/conscriptorium").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		new DelveLootTableGroup("r2/delves/shiftingcity/base_chest", "r2/delves/shiftingcity/dmat_chest", "r2/delves/shiftingcity/cmat_chest", "r2/dungeons/fred/normal_city", "r2/dungeons/fred/objective_city", "r2/dungeons/fred/normal_lush", "r2/dungeons/fred/objective_lush", "r2/dungeons/fred/normal_water", "r2/dungeons/fred/objective_water").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/shiftingcity/base_challenge", "r2/delves/shiftingcity/dmat_challenge", "r2/delves/shiftingcity/cmat_challenge", "r2/dungeons/fred/challenge").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/shiftingcity/base_final", "r2/delves/shiftingcity/dmat_final", "r2/delves/shiftingcity/cmat_final", "r2/dungeons/fred/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+	}
+
+
+	private final String mBaseTable;
+	private final String mDelveMaterialTable;
+	private final String mCosmeticMaterialTable;
+
+	private final String[] mRegularTables;
+
+	public DelveLootTableGroup(String baseTable, String delveMaterialTable, String cosmeticMaterialTable, String... regularTables) {
+		mBaseTable = baseTable;
+		mDelveMaterialTable = delveMaterialTable;
+		mCosmeticMaterialTable = cosmeticMaterialTable;
+
+		mRegularTables = regularTables;
+	}
+
+	public static void setDelveLootTable(int depthPoints, int playerCount, Chest chest) {
+		LootTable lootTable = chest.getLootTable();
+		if (lootTable != null) {
+			String path = lootTable.getKey().getKey();
+
+			DelveLootTableGroup group = DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS.get(path);
+			if (group != null) {
+				String newPath = group.getDelveLootTable(depthPoints, playerCount);
+				if (newPath != null) {
+					chest.setLootTable(Bukkit.getLootTable(NamespacedKeyUtils.fromString("epic:" + newPath)));
+					chest.update();
+				}
+			}
+		}
+	}
+
+	public static void setDelveLootTable(Player player, Block block) {
+		BlockState blockState = block.getState();
+		if (blockState instanceof Chest) {
+			setDelveLootTable(DelvesUtils.getPlayerTotalDelvePoint(null, player, ServerProperties.getShardName()),
+					PlayerUtils.otherPlayersInLootScalingRange(player).size() + 1,
+					(Chest) blockState);
+		}
+	}
+
+	public @Nullable String getDelveLootTable(int depthPoints, int playerCount) {
+		if (depthPoints == 0) {
+			return null;
+		}
+
+		if (FastUtils.RANDOM.nextDouble() < getDelveMaterialTableChance(depthPoints, playerCount)) {
+			if (FastUtils.RANDOM.nextDouble() < getCosmeticMaterialTableChance(depthPoints)) {
+				return mCosmeticMaterialTable;
+			}
+
+			return mDelveMaterialTable;
+		}
+
+		return mBaseTable;
+	}
+
+	public static double getDelveMaterialTableChance(int depthPoints, int players) {
+		int edp = Math.min(DelvesUtils.getLootCapDepthPoints(players), depthPoints) - DelvesUtils.MINIMUM_DEPTH_POINTS;
+		return edp < 0 ? 0 : (0.3 + 0.05 * edp - 0.00075 * edp * edp);
+	}
+
+	public static double getCosmeticMaterialTableChance(int depthPoints) {
+		return Math.max(0, (double) (depthPoints - DelvesUtils.getLootCapDepthPoints(9001)) / (DelvesUtils.MAX_DEPTH_POINTS - DelvesUtils.getLootCapDepthPoints(9001)));
+	}
+
+	public void mapDelveLootTables(Map<String, DelveLootTableGroup> map) {
+		for (String regularTable : mRegularTables) {
+			map.put(regularTable, this);
+		}
+	}
+}

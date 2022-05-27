@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.delves.DelveLootTableGroup;
 import com.playmonumenta.plugins.utils.ChestUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -91,7 +91,7 @@ public class ChestOverride extends BaseOverride {
 		if (player == null) {
 			return true;
 		} else if (player.getGameMode() != GameMode.SPECTATOR) {
-			DelvesUtils.setDelveLootTable(player, block);
+			DelveLootTableGroup.setDelveLootTable(player, block);
 			if (TOVUtils.isUnopenedTovLootCache(block)) {
 				// This returns directly - TOV caches do not get loot scaling,
 				// and it's also important for the loot table to generate the vanilla way for the functions to trigger.
@@ -130,7 +130,7 @@ public class ChestOverride extends BaseOverride {
 			return false;
 		}
 
-		DelvesUtils.setDelveLootTable(player, block);
+		DelveLootTableGroup.setDelveLootTable(player, block);
 		ChestUtils.generateContainerLootWithScaling(player, block);
 		return TOVUtils.canBreak(plugin, player, block, event);
 	}
@@ -148,7 +148,7 @@ public class ChestOverride extends BaseOverride {
 		//Runs replacement with closest player
 		if (!players.isEmpty()) {
 			Player player = players.get(0);
-			DelvesUtils.setDelveLootTable(player, block);
+			DelveLootTableGroup.setDelveLootTable(player, block);
 			ChestUtils.generateContainerLootWithScaling(player, block);
 		}
 

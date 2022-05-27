@@ -2,14 +2,14 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.delves.DelvesModifier;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.events.MonumentaEvent;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -82,7 +82,7 @@ public class DepthsParty {
 	//Whether or not the party is playing with rigged talismans in endless
 	public boolean mIsRigged = false;
 	//Keep track of the delve modifiers for the party
-	public Map<Modifier, Integer> mDelveModifiers;
+	public Map<DelvesModifier, Integer> mDelveModifiers;
 	//Used to keep track of if you have beaten the boss (should spawn a room of next floor)
 	public boolean mBeatBoss = false;
 	//Used to track pickup of treasure rewards from rooms
@@ -433,8 +433,7 @@ public class DepthsParty {
 
 				@Override
 				public void run() {
-					DelvesUtils.setDelveScore(p, ServerProperties.getShardName(), 0);
-					DelvesUtils.removeDelveInfo(p);
+					DelvesUtils.clearDelvePlayerByShard(null, p, ServerProperties.getShardName());
 				}
 
 			}.runTaskLater(Plugin.getInstance(), 80);

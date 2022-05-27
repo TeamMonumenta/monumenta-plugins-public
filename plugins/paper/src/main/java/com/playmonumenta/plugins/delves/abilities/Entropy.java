@@ -1,11 +1,6 @@
-package com.playmonumenta.plugins.abilities.delves;
+package com.playmonumenta.plugins.delves.abilities;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
-import javax.annotation.Nullable;
-import org.bukkit.entity.Player;
-
-public class Entropy extends DelveModifier {
+public class Entropy {
 
 	private static final int[] DEPTH_POINTS_ASSIGNED = {
 			2,
@@ -30,10 +25,6 @@ public class Entropy extends DelveModifier {
 				DEPTH_POINTS_ASSIGNED[4] + " Depth Points are randomly assigned."
 			}
 	};
-
-	public Entropy(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, Modifier.ENTROPY);
-	}
 
 	public static int getDepthPointsAssigned(int rank) {
 		return rank == 0 ? 0 : DEPTH_POINTS_ASSIGNED[rank - 1];

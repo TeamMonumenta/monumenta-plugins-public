@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorCommand
 import com.playmonumenta.plugins.cosmetics.CosmeticsCommand;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.custominventories.CustomInventoryCommands;
+import com.playmonumenta.plugins.delves.DelvesCommands;
+import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.depths.DepthsCommand;
 import com.playmonumenta.plugins.depths.DepthsGUICommands;
 import com.playmonumenta.plugins.depths.DepthsListener;
@@ -174,8 +176,6 @@ public class Plugin extends JavaPlugin {
 		Portal2.register();
 		ClearPortals.register();
 		Launch.register();
-		OpenDelveModifierSelectionGUI.register();
-		GetDepthPoints.register();
 		Magnetize.register();
 		UnsignBook.register();
 		GetScoreCommand.register();
@@ -183,6 +183,7 @@ public class Plugin extends JavaPlugin {
 		StatTrackItem.register();
 		ToggleSwap.register(this);
 		CustomInventoryCommands.register(this);
+		DelvesCommands.register(this);
 		AdminNotify.register();
 		ItemStatUtils.registerInfoCommand();
 		ItemStatUtils.registerLoreCommand();
@@ -211,7 +212,6 @@ public class Plugin extends JavaPlugin {
 		PartialParticleCommand.register();
 		CustomEffect.register();
 		EffectFromPotionCommand.register(this);
-		WorldNameCommand.register();
 
 
 		try {
@@ -340,7 +340,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mBossManager, this);
 		manager.registerEvents(mEffectManager, this);
 		manager.registerEvents(mParrotManager, this);
-		manager.registerEvents(new DelvesListener(), this);
+		manager.registerEvents(new DelvesManager(), this);
 		manager.registerEvents(new SpawnerListener(this), this);
 		manager.registerEvents(new PlayerInventoryView(), this);
 		manager.registerEvents(new AnvilFixInInventory(this), this);
@@ -358,7 +358,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new SeasonalEventListener(), this);
 		manager.registerEvents(CosmeticsManager.getInstance(), this);
 		manager.registerEvents(new LootTableManager(), this);
-		manager.registerEvents(new QuiverListener(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")

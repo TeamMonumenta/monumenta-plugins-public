@@ -14,9 +14,10 @@ import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellFlamethrower;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellForceTwo;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellMultiEarthshake;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.TriplicateSlash;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -112,7 +113,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 		//Look to see if delves is enabled
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 100, true);
 		for (Player player : players) {
-			if (DelvesUtils.getDelveInfo(player).getDepthPoints() > 0) {
+			if (DelvesUtils.getPlayerTotalDelvePoint(null, player, ServerProperties.getShardName()) > 0) {
 				mDelve = true;
 
 				break;

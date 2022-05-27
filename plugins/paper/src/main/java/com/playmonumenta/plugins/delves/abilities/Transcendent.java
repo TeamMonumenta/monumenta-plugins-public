@@ -1,27 +1,22 @@
-package com.playmonumenta.plugins.abilities.delves;
+package com.playmonumenta.plugins.delves.abilities;
 
 import com.google.common.collect.ImmutableSet;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.CommanderBoss;
 import com.playmonumenta.plugins.bosses.bosses.ProjectileBoss;
 import com.playmonumenta.plugins.bosses.bosses.WrathBoss;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.entity.Evoker;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
-public class Transcendent extends DelveModifier {
+public class Transcendent {
 
 	private static final double[] ABILITY_CHANCE = {
 		0.15,
@@ -100,22 +95,8 @@ public class Transcendent extends DelveModifier {
 			}
 	};
 
-	private final double mAbilityChance;
-
-	public Transcendent(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, Modifier.TRANSCENDENT);
-
-		if (player != null) {
-			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.TRANSCENDENT);
-			mAbilityChance = ABILITY_CHANCE[rank - 1];
-		} else {
-			mAbilityChance = 0;
-		}
-	}
-
-	@Override
-	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
-		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob) && FastUtils.RANDOM.nextDouble() < mAbilityChance) {
+	public static void applyModifiers(LivingEntity mob, int level) {
+		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob) && FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE[level - 1]) {
 			EntityEquipment equipment = mob.getEquipment();
 			ItemStack mainhand = equipment == null ? null : equipment.getItemInMainHand();
 			Material material = mainhand == null ? null : mainhand.getType();

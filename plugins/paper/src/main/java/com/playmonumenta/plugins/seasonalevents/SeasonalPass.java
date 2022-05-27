@@ -6,8 +6,8 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.utils.DateUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -173,7 +173,7 @@ public class SeasonalPass {
 				if (toParse.get("delvemodifier") != null) {
 					// This compares using integers - in json need to list the number of the modifier, not the name!
 					int delveModifier = toParse.get("delvemodifier").getAsInt();
-					for (DelvesUtils.Modifier selection : DelvesUtils.Modifier.values()) {
+					for (DelvesModifier selection : DelvesModifier.values()) {
 						if (selection.getColumn() == delveModifier) {
 							mission.mDelveModifier = selection;
 						}

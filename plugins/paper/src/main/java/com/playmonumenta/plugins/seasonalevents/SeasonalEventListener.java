@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.seasonalevents;
 
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.MonumentaEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.redissync.utils.ScoreboardUtils;
 import java.util.Set;
 import org.bukkit.Material;
@@ -94,12 +94,11 @@ public class SeasonalEventListener implements Listener {
 					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
 				} else if ((mission.mType == WeeklyMissionType.DELVE_MODIFIER || mission.mType == WeeklyMissionType.DELVE_POINTS) && DelvesUtils.SHARD_SCOREBOARD_PREFIX_MAPPINGS.containsKey(content.getLabel())) {
 					// Content is eligible for delves- get scores and check for modifier
-					DelvesUtils.DelveInfo delveInfo = DelvesUtils.getDelveInfo(p, content.getLabel());
-					if (mission.mType == WeeklyMissionType.DELVE_POINTS && delveInfo.getDepthPoints() >= mission.mDelvePoints) {
+					if (mission.mType == WeeklyMissionType.DELVE_POINTS && DelvesUtils.getPlayerTotalDelvePoint(null, p, content.getLabel()) >= mission.mDelvePoints) {
 						if (mission.mContent == null || mission.mContent.contains(content)) {
 							SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
 						}
-					} else if (mission.mType == WeeklyMissionType.DELVE_MODIFIER && delveInfo.getRank(mission.mDelveModifier) >= mission.mModifierRank) {
+					} else if (mission.mType == WeeklyMissionType.DELVE_MODIFIER && DelvesUtils.getDelveModLevel(p, content.getLabel(), mission.mDelveModifier) >= mission.mModifierRank) {
 						if (mission.mContent == null || mission.mContent.contains(content)) {
 							SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
 						}

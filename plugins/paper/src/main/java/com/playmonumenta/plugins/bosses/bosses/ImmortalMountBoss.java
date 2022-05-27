@@ -4,8 +4,8 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.events.DamageEvent;
-import java.util.Arrays;
 import java.util.List;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -21,10 +21,17 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 	public ImmortalMountBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				if (boss.getPassengers().size() == 0) {
 					boss.setHealth(0);
+					boss.remove();
+				} else {
+					for (Entity entity : boss.getPassengers()) {
+						if (entity instanceof LivingEntity livingEntity && livingEntity.isDead()) {
+							boss.removePassenger(entity);
+						}
+					}
 				}
 			}, 1, true)
 		);

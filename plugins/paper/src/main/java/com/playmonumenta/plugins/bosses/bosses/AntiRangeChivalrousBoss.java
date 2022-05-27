@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.abilities.delves.Chivalrous;
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.Collections;
 import java.util.Set;

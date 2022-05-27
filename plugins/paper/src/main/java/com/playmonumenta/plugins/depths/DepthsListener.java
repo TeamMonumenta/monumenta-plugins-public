@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.depths;
 
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.delves.DelvesModifier;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Enlightenment;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
@@ -9,8 +11,8 @@ import com.playmonumenta.plugins.depths.abilities.flamecaller.Pyromania;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -293,15 +295,10 @@ public class DepthsListener implements Listener {
 			DepthsPlayer dp = manager.mPlayers.get(event.getPlayer().getUniqueId());
 			DepthsParty party = manager.getPartyFromId(dp);
 			if (party != null) {
-				Map<DelvesUtils.Modifier, Integer> delvePointsForParty = party.mDelveModifiers;
-				DelvesUtils.DelveInfo playerInfo = DelvesUtils.getDelveInfo(player);
-				for (DelvesUtils.Modifier m : DelvesUtils.Modifier.values()) {
-					if (delvePointsForParty.get(m) != null) {
-						playerInfo.setRank(m, delvePointsForParty.get(m).intValue());
-					} else {
-						playerInfo.setRank(m, 0);
-					}
-					playerInfo.storeDelveScore(player);
+				Map<DelvesModifier, Integer> delvePointsForParty = party.mDelveModifiers;
+				for (DelvesModifier m : DelvesModifier.values()) {
+					DelvesUtils.setDelvePoint(null, player, ServerProperties.getShardName(), m, delvePointsForParty.getOrDefault(m, 0));
+
 				}
 			}
 		}

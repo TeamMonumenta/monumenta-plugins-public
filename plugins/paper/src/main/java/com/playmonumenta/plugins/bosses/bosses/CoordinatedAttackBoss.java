@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.abilities.delves.DelveModifier;
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -85,7 +85,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 							if (!AbilityUtils.isStealthed(mTarget)) {
 								Set<String> tags = mob.getScoreboardTags();
 								// Don't set target of mobs with this ability, or else infinite loop
-								if (tags == null || (!tags.contains(identityTag) && !tags.contains(DelveModifier.AVOID_MODIFIERS))) {
+								if (tags == null || (!tags.contains(identityTag) && !tags.contains(DelvesManager.AVOID_MODIFIERS))) {
 									mob.setTarget(mTarget);
 
 									EffectManager.getInstance().addEffect(mob, PERCENT_SPEED_EFFECT_NAME,
