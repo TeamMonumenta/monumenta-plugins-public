@@ -41,7 +41,7 @@ public class FrostNova extends Ability {
 	public static final double REDUCTION_MULTIPLIER = 0.1;
 	public static final double ENHANCED_DAMAGE_MODIFIER = 1.15;
 	public static final double ENHANCED_COOLDOWN_REDUCTION = 0.9;
-	public static final int ENHANCED_FROZEN_DURATION = 2 * Constants.TICKS_PER_SECOND;
+	public static final int ENHANCED_FROZEN_DURATION = 1 * Constants.TICKS_PER_SECOND;
 	public static final int DURATION_TICKS = 4 * Constants.TICKS_PER_SECOND;
 	public static final int COOLDOWN_TICKS = 18 * Constants.TICKS_PER_SECOND;
 	public static final String CHARM_DAMAGE = "Frost Nova Damage";
