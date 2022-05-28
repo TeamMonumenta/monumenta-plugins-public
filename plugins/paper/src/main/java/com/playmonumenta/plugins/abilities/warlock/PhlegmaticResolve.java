@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.Objects;
 import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -41,7 +40,7 @@ public class PhlegmaticResolve extends Ability {
 		}
 
 		int cooldowns = 0;
-		for (Integer ability : Objects.requireNonNull(mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId()))) {
+		for (Integer ability : mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId())) {
 			if (ability > 0) {
 				cooldowns++;
 			}

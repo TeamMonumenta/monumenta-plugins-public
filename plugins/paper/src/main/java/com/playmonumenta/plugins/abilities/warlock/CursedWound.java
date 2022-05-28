@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import java.util.Objects;
 import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -59,7 +58,7 @@ public class CursedWound extends Ability {
 					.spawnAsPlayerActive(mPlayer);
 
 				int cooldowns = 0;
-				for (Integer ability : Objects.requireNonNull(mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId()))) {
+				for (Integer ability : mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId())) {
 					if (ability > 0) {
 						cooldowns++;
 					}
