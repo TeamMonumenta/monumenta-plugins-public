@@ -120,14 +120,14 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
-				new MultiLiteralArgument("set"),
-				new MultiLiteralArgument("mod"),
+				new MultiLiteralArgument("random"),
+				new MultiLiteralArgument("mods"),
 				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
 				dungeonArg,
-				delveModArg,
-				new IntegerArgument("rank", 0, 10)
+				new IntegerArgument("pointsToAssign", 0)
 			).executes((commandSender, args) -> {
-				return DelvesUtils.setDelvePoint(commandSender, (Player) args[2], (String) args[3], DelvesModifier.fromName((String) args[4]), (Integer) args[5]);
+				DelvesUtils.assignRandomDelvePoints((Player) args[2], (String) args[3], (Integer) args[4]);
+				return DelvesUtils.getPlayerTotalDelvePoint(commandSender, (Player) args[2], (String) args[3]);
 			}).register();
 
 		new CommandAPICommand(COMMAND)
