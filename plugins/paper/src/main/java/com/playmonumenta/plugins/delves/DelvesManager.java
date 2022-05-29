@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.delves;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Colossal;
 import com.playmonumenta.plugins.delves.abilities.Infernal;
@@ -23,6 +24,7 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -45,7 +47,7 @@ public class DelvesManager implements Listener {
 	 * This structure contains All the delves mods picked by online players (in this shard)
 	 *
 	 * it's structured in this way:
-	 * <PlayerID, <DungeonID, [TimeWhenStarted, <ModifierID, points>]>>
+	 * <PlayerID, <DungeonID, <ModifierID, points>>>
 	 */
 	public static final Map<UUID, Map<String, DungeonDelveInfo>> PLAYER_DELVE_DUNGEON_MOD_MAP = new HashMap<>();
 
@@ -292,8 +294,8 @@ public class DelvesManager implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
-		Player player = event.getPlayer();
-		PLAYER_DELVE_DUNGEON_MOD_MAP.remove(player.getUniqueId());
+		UUID playerUUID = event.getPlayer().getUniqueId();
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> PLAYER_DELVE_DUNGEON_MOD_MAP.remove(playerUUID), 5L);
 	}
 
 	@EventHandler(ignoreCancelled = true)

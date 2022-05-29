@@ -92,6 +92,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 	private static final int TOTAL_DELVE_MOD = DelvesModifier.values().length;
 
+	private final Player mOwner;
 	private final boolean mEditableDelvePoint;
 	private final String mDungeonName;
 	private int mPage = 0;
@@ -103,7 +104,7 @@ public class DelveCustomInventory extends CustomInventory {
 		super(owner, 54, "Delve Modifiers " + (editable ? "Selection" : "Selected"));
 		mEditableDelvePoint = editable;
 		mDungeonName = dungeon;
-
+		mOwner = owner;
 		for (DelvesModifier mod : DelvesModifier.values()) {
 			mPointSelected.put(mod, DelvesUtils.getDelveModLevel(owner, dungeon, mod));
 		}
@@ -315,7 +316,7 @@ public class DelveCustomInventory extends CustomInventory {
 		}
 		event.setCancelled(true);
 
-		Player player = (Player) event.getWhoClicked();
+		Player playerWhoClicked = (Player) event.getWhoClicked();
 		int slot = event.getSlot();
 
 		int column = slot % 9;
@@ -339,9 +340,9 @@ public class DelveCustomInventory extends CustomInventory {
 		if (slot == PAGE_RIGHT_SLOT) {
 			if (TOTAL_DELVE_MOD - ((mPage + 1) * 7) > 0) {
 				mPage++;
-				player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1f, 1.5f);
+				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1f, 1.5f);
 			} else if (mEditableDelvePoint) {
-				player.playSound(player.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
+				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
 				for (DelvesModifier mod : DelvesModifier.values()) {
 					mPointSelected.put(mod, DelvesUtils.getMaxPointAssignable(mod, 1000));
 				}
@@ -352,9 +353,9 @@ public class DelveCustomInventory extends CustomInventory {
 		if (slot == PAGE_LEFT_SLOT) {
 			if (mPage > 0) {
 				mPage--;
-				player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1f, 1.5f);
+				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1f, 1.5f);
 			} else if (mEditableDelvePoint) {
-				player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1f, 0.5f);
+				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1f, 0.5f);
 				mPointSelected.forEach((mod, value) -> mPointSelected.put(mod, 0));
 			}
 		}
@@ -387,21 +388,21 @@ public class DelveCustomInventory extends CustomInventory {
 					}
 				}
 
-				DelvesManager.savePlayerData(player, mDungeonName, mPointSelected);
+				DelvesManager.savePlayerData(mOwner, mDungeonName, mPointSelected);
 				mInventory.clear();
-				player.closeInventory();
-				String dungeonFunc = DUNGEON_FUNCTION_MAPPINGS.get(mDungeonName);
-				if (dungeonFunc == null) {
-					player.sendMessage(Component.text("There have been some problem, please contact the dev team, reason: DUNGEON_FUNCTION_MAPPINGS.get() is null", NamedTextColor.RED));
-				} else {
-					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-						Bukkit.getConsoleSender().getServer().dispatchCommand(Bukkit.getConsoleSender(),
-							"execute as " + player.getName() + " at @s run " + dungeonFunc);
-
-					}, 0);
+				playerWhoClicked.closeInventory();
+				if (!ServerProperties.getShardName().equals(mDungeonName)) {
+					//if we are not in the same shard (devX-depths-R3) means that the owner need to teleport to the selected shard
+					String dungeonFunc = DUNGEON_FUNCTION_MAPPINGS.get(mDungeonName);
+					if (dungeonFunc == null) {
+						playerWhoClicked.sendMessage(Component.text("There have been some problem, please contact the dev team, reason: DUNGEON_FUNCTION_MAPPINGS.get() is null", NamedTextColor.RED));
+					} else {
+						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getConsoleSender().getServer().dispatchCommand(Bukkit.getConsoleSender(),
+							"execute as " + mOwner.getName() + " at @s run " + dungeonFunc), 0);
+					}
 				}
 			} else {
-				player.sendMessage(Component.text("You need at least 5 delve point to start a delve", NamedTextColor.RED));
+				playerWhoClicked.sendMessage(Component.text("You need at least 5 delve point to start a delve", NamedTextColor.RED));
 			}
 		}
 		loadInv();

@@ -37,6 +37,16 @@ public class DelvesCommands {
 				new DelveCustomInventory((Player) args[0], (String) args[1], true).openInventory((Player) args[0], plugin);
 			}).register();
 
+		new CommandAPICommand("openmoderatordmsgui")
+			.withPermission(perms)
+			.withArguments(
+				new EntitySelectorArgument("moderator", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument("playerToDebug", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				dungeonArg)
+			.executes((sender, args) -> {
+				new DelveCustomInventory((Player) args[1], (String) args[2], true).openInventory((Player) args[0], plugin);
+			}).register();
+
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
