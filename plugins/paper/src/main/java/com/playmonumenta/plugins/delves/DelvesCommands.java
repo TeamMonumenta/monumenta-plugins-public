@@ -51,6 +51,17 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
+				new MultiLiteralArgument("utils"),
+				new MultiLiteralArgument("hasallpoints"),
+				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER)
+			).executes((commandSender, args) -> {
+				int currentPoint = DelvesUtils.getPlayerTotalDelvePoint(null, (Player) args[2], ServerProperties.getShardName());
+				return currentPoint == DelvesUtils.MAX_DEPTH_POINTS ? 1 : -1;
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
 				new MultiLiteralArgument("get"),
 				new MultiLiteralArgument("mod"),
 				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
