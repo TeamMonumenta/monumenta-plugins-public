@@ -82,7 +82,7 @@ public class FrostNova extends Ability {
 			)
 		);
 		mInfo.mDescriptions.add(
-			"Damage is increased by 15% and cooldown is decreased by 10%. Non elites and bosses are frozen for 2s, having their AI and gravity removed."
+			"Damage is increased by 15% and cooldown is decreased by 10%. Non elites and bosses are frozen for 1s, having their AI and gravity removed."
 		);
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isEnhanced() ? (int) (COOLDOWN_TICKS * ENHANCED_COOLDOWN_REDUCTION) : COOLDOWN_TICKS);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
