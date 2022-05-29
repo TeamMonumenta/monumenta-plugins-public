@@ -16,16 +16,16 @@ public class DelvesCommands {
 	private static final String COMMAND = "delves";
 
 	public static void register(Plugin plugin) {
-		 String perms = "monumenta.command.delves";
+		String perms = "monumenta.command.delves";
 
-		 String[] delvModNames = new String[DelvesModifier.values().length];
-		 int i = 0;
-		 for (DelvesModifier mod : DelvesModifier.values()) {
-			 delvModNames[i++] = mod.name();
-		 }
+		String[] delveModNames = new String[DelvesModifier.values().length];
+		int i = 0;
+		for (DelvesModifier mod : DelvesModifier.values()) {
+			delveModNames[i++] = mod.name();
+		}
 
 		Argument dungeonArg = new StringArgument("dungeon").includeSuggestions(info -> DelvesManager.DUNGEONS.toArray(new String[0]));
-		Argument delveModArg = new MultiLiteralArgument(delvModNames);
+		Argument delveModArg = new MultiLiteralArgument(delveModNames);
 
 		//this command is the old used to open Delve GUI
 		new CommandAPICommand("opendmsgui")
@@ -48,17 +48,17 @@ public class DelvesCommands {
 				new DelveCustomInventory((Player) args[2], (String) args[3], false).openInventory((Player) args[2], plugin);
 			}).register();
 
-		 new CommandAPICommand(COMMAND)
-			 .withPermission(perms)
-			 .withArguments(
-				 new MultiLiteralArgument("get"),
-				 new MultiLiteralArgument("mod"),
-				 new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
-				 dungeonArg,
-				 delveModArg
-			 ).executes((commandSender, args) -> {
-				 DelvesUtils.stampDelveInfo(commandSender, (Player) args[2], (String) args[3], DelvesModifier.fromName((String) args[4]));
-			 }).register();
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
+				new MultiLiteralArgument("get"),
+				new MultiLiteralArgument("mod"),
+				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				dungeonArg,
+				delveModArg
+			).executes((commandSender, args) -> {
+				return DelvesUtils.stampDelveInfo(commandSender, (Player) args[2], (String) args[3], DelvesModifier.fromName((String) args[4]));
+			}).register();
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
@@ -69,7 +69,7 @@ public class DelvesCommands {
 				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
 				dungeonArg
 			).executes((commandSender, args) -> {
-				DelvesUtils.getPlayerTotalDelvePoint(commandSender, (Player) args[3], (String) args[4]);
+				return DelvesUtils.getPlayerTotalDelvePoint(commandSender, (Player) args[3], (String) args[4]);
 			}).register();
 
 		new CommandAPICommand(COMMAND)
@@ -80,7 +80,7 @@ public class DelvesCommands {
 				new MultiLiteralArgument("points"),
 				new MultiLiteralArgument("range")
 			).executesPlayer((player, args) -> {
-				DelvesUtils.getTotalDelvePointInRange(player, player.getLocation());
+				return DelvesUtils.getTotalDelvePointInRange(player, player.getLocation());
 			}).register();
 
 		new CommandAPICommand(COMMAND)
@@ -93,7 +93,7 @@ public class DelvesCommands {
 				delveModArg,
 				new IntegerArgument("rank", 0, 10)
 			).executes((commandSender, args) -> {
-				DelvesUtils.setDelvePoint(commandSender, (Player) args[2], (String) args[3], DelvesModifier.fromName((String) args[4]), (Integer) args[5]);
+				return DelvesUtils.setDelvePoint(commandSender, (Player) args[2], (String) args[3], DelvesModifier.fromName((String) args[4]), (Integer) args[5]);
 			}).register();
 
 		new CommandAPICommand(COMMAND)
@@ -106,7 +106,7 @@ public class DelvesCommands {
 				delveModArg,
 				new IntegerArgument("rank", 0, 10)
 			).executes((commandSender, args) -> {
-				DelvesUtils.setDelvePoint(commandSender, (Player) args[2], (String) args[3], DelvesModifier.fromName((String) args[4]), (Integer) args[5]);
+				return DelvesUtils.setDelvePoint(commandSender, (Player) args[2], (String) args[3], DelvesModifier.fromName((String) args[4]), (Integer) args[5]);
 			}).register();
 
 		new CommandAPICommand(COMMAND)

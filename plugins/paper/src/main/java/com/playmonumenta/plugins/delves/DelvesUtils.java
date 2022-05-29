@@ -19,6 +19,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -106,25 +107,27 @@ public class DelvesUtils {
 		return Math.min(point, MODIFIER_RANK_CAPS.get(mod));
 	}
 
-	public static void stampDelveInfo(@Nullable CommandSender sender, @NotNull Player target, @NotNull String dungeonName, @Nullable DelvesModifier modifier) {
+	public static int stampDelveInfo(@Nullable CommandSender sender, @NotNull Player target, @NotNull String dungeonName, @Nullable DelvesModifier modifier) {
 		if (modifier == null) {
-			return;
+			return 0;
 		}
 
 		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(target.getUniqueId(), new HashMap<>());
 
 		if (!map.containsKey(dungeonName)) {
-			if (sender != null) {
+			if (sender != null && !(sender instanceof ProxiedCommandSender)) {
 				sender.sendMessage(Component.text("Player: " + target.getName() + " has no delve info for " + dungeonName, NamedTextColor.GOLD));
 			}
-			return;
+			return 0;
 		}
 
 		DelvesManager.DungeonDelveInfo info = map.get(dungeonName);
+		int points = info.get(modifier);
 
-		if (sender != null) {
-			sender.sendMessage(Component.text(modifier.name() + ": " + info.get(modifier), NamedTextColor.GOLD));
+		if (sender != null && !(sender instanceof ProxiedCommandSender)) {
+			sender.sendMessage(Component.text(modifier.name() + ": " + points, NamedTextColor.GOLD));
 		}
+		return points;
 	}
 
 	public static void copyDelvePoint(@Nullable CommandSender sender, @NotNull Player copyTarget, @NotNull Player target, @NotNull String dungeonName) {
@@ -136,16 +139,16 @@ public class DelvesUtils {
 		copyMap.putIfAbsent(dungeonName, new DelvesManager.DungeonDelveInfo());
 		targetMap.put(dungeonName, copyMap.get(dungeonName).cloneDelveInfo());
 
-		if (sender != null) {
+		if (sender != null && !(sender instanceof ProxiedCommandSender)) {
 			sender.sendMessage(Component.text("Copied delve info " + copyTarget.getName() + " -> " + target.getName() + " for shard " + dungeonName, NamedTextColor.GOLD));
 		}
 
 		updateDelveScoreBoard(target);
 	}
 
-	public static void setDelvePoint(@Nullable CommandSender sender, @NotNull Player target, @NotNull String dungeonName, @Nullable DelvesModifier modifier, int level) {
+	public static int setDelvePoint(@Nullable CommandSender sender, @NotNull Player target, @NotNull String dungeonName, @Nullable DelvesModifier modifier, int level) {
 		if (level < 0 || modifier == null) {
-			return;
+			return 0;
 		}
 
 		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(target.getUniqueId(), new HashMap<>());
@@ -186,11 +189,12 @@ public class DelvesUtils {
 
 		info.mTotalPoint = Math.min(info.mTotalPoint, MAX_DEPTH_POINTS);
 		info.put(modifier, level);
-		if (sender != null) {
+		if (sender != null && !(sender instanceof ProxiedCommandSender)) {
 			sender.sendMessage(Component.text(modifier.name() + ": " + info.get(modifier), NamedTextColor.GOLD));
 		}
 
 		updateDelveScoreBoard(target);
+		return level;
 	}
 
 	public static void clearDelvePlayerByShard(@Nullable CommandSender sender, @NotNull Player target, @NotNull String dungeonName) {
@@ -199,7 +203,7 @@ public class DelvesUtils {
 
 		map.remove(dungeonName);
 
-		if (sender != null) {
+		if (sender != null && !(sender instanceof ProxiedCommandSender)) {
 			sender.sendMessage(Component.text("Removed delves point of " + target.getName() + " for shard " + dungeonName, NamedTextColor.GOLD));
 		}
 
@@ -222,7 +226,7 @@ public class DelvesUtils {
 
 		DelvesManager.DungeonDelveInfo info = map.getOrDefault(dungeonName, new DelvesManager.DungeonDelveInfo());
 
-		if (sender != null) {
+		if (sender != null && !(sender instanceof ProxiedCommandSender)) {
 			sender.sendMessage(Component.text(target.getName() + " total delves point " + info.mTotalPoint + " in " + dungeonName, NamedTextColor.GOLD));
 		}
 
@@ -252,7 +256,7 @@ public class DelvesUtils {
 		totalLevel += (delvesApplied.getOrDefault(DelvesModifier.TWISTED, 0) * TWISTED_DEPTH_POINTS);
 
 		totalLevel = Math.min(totalLevel, MAX_DEPTH_POINTS);
-		if (sender != null) {
+		if (sender != null && !(sender instanceof ProxiedCommandSender)) {
 			sender.sendMessage(Component.text("Total delves point in range " + totalLevel, NamedTextColor.GOLD));
 		}
 
