@@ -51,8 +51,9 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.TWISTED, 1);
 
 		// Depths endless changes- use dev2 for testing
-		if (ServerProperties.getShardName().contains("depths")
-			    || ServerProperties.getShardName().equals("dev2")) {
+		if (ServerProperties.getShardName().startsWith("depths")
+			|| ServerProperties.getShardName().equals("dev2")
+			|| ServerProperties.getShardName().equals("corridors")) {
 			// Total of 72 points in depths
 			MODIFIER_RANK_CAPS.put(DelvesModifier.RELENTLESS, 5);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.ARCANIC, 7);

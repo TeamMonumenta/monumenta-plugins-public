@@ -77,6 +77,7 @@ public class DelvesManager implements Listener {
 		DUNGEONS.add("dev3");
 		DUNGEONS.add("mobs");
 		DUNGEONS.add("depths");
+		DUNGEONS.add("corridors");
 	}
 
 	private static final String HAS_DELVE_MODIFIER_TAG = "DelveModifiersApplied";

@@ -45,6 +45,7 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS.put("forum", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("shiftingcity", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("depths", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("corridors", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev1", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev2", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("mobs", 1.0);
@@ -81,7 +82,7 @@ public class StatMultiplier {
 	}
 
 	public static boolean isDepthsShard() {
-		return ServerProperties.getShardName().contains("depths")
+		return ServerProperties.getShardName().startsWith("depths")
 			|| ServerProperties.getShardName().equals("mobs")
 			|| ServerProperties.getShardName().startsWith("dev");
 	}
