@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.portals;
 
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -137,7 +138,8 @@ public class PortalTeleportCheck extends BukkitRunnable {
 			return;
 		}
 		UUID entityUuid = entity.getUniqueId();
-		if (entity instanceof Player && !entityUuid.equals(mPlayer.getUniqueId())) {
+		// Don't let players go through the portal if its not theirs, unless theyre in r3
+		if (entity instanceof Player && !entityUuid.equals(mPlayer.getUniqueId()) && !ServerProperties.getAbilityEnhancementsEnabled()) {
 			return;
 		}
 		if (mCooldowns.containsKey(entityUuid)) {
@@ -151,9 +153,17 @@ public class PortalTeleportCheck extends BukkitRunnable {
 		}
 		switch (to.mFacing) {
 		case UP:
+			if (ServerProperties.getAbilityEnhancementsEnabled()) {
+				mCooldowns.put(entityUuid, 25);
+				break;
+			}
 			mCooldowns.put(entityUuid, 8);
 			break;
 		case DOWN:
+			if (ServerProperties.getAbilityEnhancementsEnabled()) {
+				mCooldowns.put(entityUuid, 25);
+				break;
+			}
 			mCooldowns.put(entityUuid, 12);
 			break;
 		default:
