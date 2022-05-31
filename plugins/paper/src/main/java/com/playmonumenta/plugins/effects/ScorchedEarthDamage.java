@@ -17,7 +17,7 @@ public class ScorchedEarthDamage extends SingleArgumentEffect {
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
 		DamageType type = event.getType();
-		if (type != DamageType.AILMENT && type != DamageType.FIRE && type != DamageType.OTHER) {
+		if (type != DamageType.MAGIC && type != DamageType.FIRE && type != DamageType.OTHER) {
 			event.setDamage(event.getDamage() + mAmount);
 			World world = entity.getWorld();
 			Location loc = entity.getLocation().clone().add(0, 1, 0);
