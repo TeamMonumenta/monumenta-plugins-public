@@ -266,9 +266,9 @@ public class ChestUtils {
 		if (isEpicLootBox(lootBox)) {
 			// Add the item to the epic lootbox's Monumenta.Items[] inventory
 			NBTItem nbt = new NBTItem(lootBox);
-			NBTCompound monumenta = nbt.addCompound(ItemStatUtils.getMonumentaKey());
-			NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.getPlayerModifiedKey());
-			NBTCompoundList items = playerModified.getCompoundList("Items");
+			NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
+			NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+			NBTCompoundList items = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
 			items.addCompound(NBTItem.convertItemtoNBT(lootShare));
 
 			// Refresh the lootbox item
@@ -305,18 +305,18 @@ public class ChestUtils {
 		@Nullable List<ItemStack> returnContents = null;
 
 		NBTItem nbt = new NBTItem(lootBox);
-		NBTCompound monumenta = nbt.getCompound(ItemStatUtils.getMonumentaKey());
+		NBTCompound monumenta = nbt.getCompound(ItemStatUtils.MONUMENTA_KEY);
 		if (monumenta == null) {
 			return null;
 		}
 
-		NBTCompound playerModified = monumenta.getCompound(ItemStatUtils.getPlayerModifiedKey());
+		NBTCompound playerModified = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
 		if (playerModified == null) {
 			return null;
 		}
 
 		// The epic stores items only in {Monumenta:{Items:[{item}]}}, it does not use the normal shulker contents at all
-		NBTCompoundList items = playerModified.getCompoundList("Items");
+		NBTCompoundList items = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
 		if (items == null || items.isEmpty()) {
 			return null;
 		}
@@ -349,9 +349,9 @@ public class ChestUtils {
 		}
 		if (isEpicLootBox(lootBox)) {
 			NBTItem nbt = new NBTItem(lootBox);
-			NBTCompound monumenta = nbt.addCompound(ItemStatUtils.getMonumentaKey());
-			NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.getPlayerModifiedKey());
-			NBTCompoundList items = playerModified.getCompoundList("Items");
+			NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
+			NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+			NBTCompoundList items = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
 			if (items != null) {
 				updateLootBoxSharesLore(lootBox, items.size(), true);
 			} else {
@@ -445,9 +445,9 @@ public class ChestUtils {
 				if (isEpicLootBox(item)) {
 					// Epic lootbox
 					NBTItem nbt = new NBTItem(item);
-					NBTCompound monumenta = nbt.addCompound(ItemStatUtils.getMonumentaKey());
-					NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.getPlayerModifiedKey());
-					NBTCompoundList items = playerModified.getCompoundList("Items");
+					NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
+					NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+					NBTCompoundList items = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
 					if (items != null) {
 						int availSpaces = LOOTBOX_EPIC_MAX_SIZE - items.size();
 						// Will return the first available box

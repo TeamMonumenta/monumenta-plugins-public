@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.commands.*;
 import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorCommand;
 import com.playmonumenta.plugins.cosmetics.CosmeticsCommand;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.custominventories.CustomInventoryCommands;
 import com.playmonumenta.plugins.delves.DelvesCommands;
 import com.playmonumenta.plugins.delves.DelvesManager;
@@ -117,6 +118,7 @@ public class Plugin extends JavaPlugin {
 	public ItemOverrides mItemOverrides;
 	public CosmeticsManager mCosmeticsManager;
 	public SeasonalEventManager mSeasonalEventManager;
+	public VanityManager mVanityManager;
 	private @Nullable CustomLogger mLogger = null;
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
@@ -285,6 +287,7 @@ public class Plugin extends JavaPlugin {
 		mTowerManager = new TowerManager(this);
 		mCosmeticsManager = CosmeticsManager.getInstance();
 		mSeasonalEventManager = new SeasonalEventManager();
+		mVanityManager = new VanityManager();
 
 		new ClientModHandler(this);
 		DailyReset.startTimer(this);
@@ -358,6 +361,8 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new SeasonalEventListener(), this);
 		manager.registerEvents(CosmeticsManager.getInstance(), this);
 		manager.registerEvents(new LootTableManager(), this);
+		manager.registerEvents(new QuiverListener(), this);
+		manager.registerEvents(mVanityManager, this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")
