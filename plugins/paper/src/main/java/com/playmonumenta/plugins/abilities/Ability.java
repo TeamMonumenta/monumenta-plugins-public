@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
@@ -12,6 +13,8 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collection;
+import java.util.NavigableSet;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -37,8 +40,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
-
 
 public abstract class Ability {
 	protected final Plugin mPlugin;
@@ -138,7 +139,22 @@ public abstract class Ability {
 		double aptitudePercent = Aptitude.getCooldownPercentage(mPlugin, mPlayer);
 		double ineptitudePercent = Ineptitude.getCooldownPercentage(mPlugin, mPlayer);
 
-		return (int) (baseCooldown * (1 + epochPercent) * (1 + aptitudePercent) * (1 + ineptitudePercent));
+		//Potion effects
+		double effectPercent = 0;
+
+		NavigableSet<Effect> effInc = Plugin.getInstance().mEffectManager.getEffects(mPlayer, "AbilityCooldownIncrease");
+		if (effInc != null) {
+			Effect inc = effInc.last();
+			effectPercent += inc.getMagnitude(); // this is always positive
+		}
+
+		NavigableSet<Effect> effDec = Plugin.getInstance().mEffectManager.getEffects(mPlayer, "AbilityCooldownDecrease");
+		if (effDec != null) {
+			Effect dec = effDec.last();
+			effectPercent += dec.getMagnitude(); // this is always negative
+		}
+
+		return (int) (baseCooldown * (1 + epochPercent) * (1 + aptitudePercent) * (1 + ineptitudePercent) * (1 + effectPercent));
 	}
 
 	/**

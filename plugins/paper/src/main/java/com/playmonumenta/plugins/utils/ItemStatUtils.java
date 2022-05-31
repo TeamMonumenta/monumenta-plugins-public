@@ -939,7 +939,7 @@ public class ItemStatUtils {
 		ROMAN_NUMERAL_VALUES.put(1, "I");
 	}
 
-	static String toRomanNumerals(int value) {
+	public static String toRomanNumerals(int value) {
 		if (value == 0) {
 			return "0";
 		}
