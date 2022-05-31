@@ -218,6 +218,7 @@ public class Plugin extends JavaPlugin {
 		EffectFromPotionCommand.register(this);
 		CharmsCommand.register(this);
 		WorldNameCommand.register();
+		ToggleTrail.register();
 
 
 		try {
@@ -368,6 +369,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new LootTableManager(), this);
 		manager.registerEvents(new CharmListener(this), this);
 		manager.registerEvents(new QuiverListener(), this);
+		manager.registerEvents(new ToggleTrail(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")
