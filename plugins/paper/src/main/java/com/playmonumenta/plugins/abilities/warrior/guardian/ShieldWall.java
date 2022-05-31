@@ -38,7 +38,7 @@ public class ShieldWall extends Ability {
 
 	private static final int SHIELD_WALL_1_DURATION = 8 * 30;
 	private static final int SHIELD_WALL_2_DURATION = 10 * 20;
-	private static final int SHIELD_WALL_DAMAGE = 6;
+	private static final int SHIELD_WALL_DAMAGE = 3;
 	private static final int SHIELD_WALL_1_COOLDOWN = 20 * 30;
 	private static final int SHIELD_WALL_2_COOLDOWN = 20 * 20;
 	private static final int SHIELD_WALL_ANGLE = 180;
@@ -56,7 +56,7 @@ public class ShieldWall extends Ability {
 		super(plugin, player, "Shield Wall");
 		mInfo.mScoreboardId = "ShieldWall";
 		mInfo.mShorthandName = "SW";
-		mInfo.mDescriptions.add("Press the swap key while holding a shield in either hand to create a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 6 magic damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Press the swap key while holding a shield in either hand to create a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 3 melee damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The shield lasts 10 seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown: 20s.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN);
 		mInfo.mLinkedSpell = ClassAbility.SHIELD_WALL;
@@ -132,7 +132,7 @@ public class ShieldWall extends Ability {
 									mMobsAlreadyHit.add(le);
 									Vector v = le.getVelocity();
 
-									DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, false, true, false);
+									DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(DamageType.MELEE_SKILL, mInfo.mLinkedSpell, playerItemStats), damage, false, true, false);
 
 									//Bosses should not be affected by slowness or knockback.
 									if (knockback > 0 && !e.getScoreboardTags().contains("Boss")) {
