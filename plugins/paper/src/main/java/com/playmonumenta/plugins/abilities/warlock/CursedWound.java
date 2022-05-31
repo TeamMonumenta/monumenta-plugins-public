@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -13,7 +14,10 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.Collection;
+import java.util.HashMap;
 import javax.annotation.Nullable;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -39,7 +43,7 @@ public class CursedWound extends Ability {
 	private static final int CURSED_WOUND_EXTENDED_DURATION = 2 * 20;
 	private static final String DOT_EFFECT_NAME = "CursedWoundDamageOverTimeEffect";
 	private static final double DAMAGE_PER_EFFECT = 2;
-	
+
 	public static final String CHARM_DAMAGE = "Cursed Wound Damage Modifier";
 	public static final String CHARM_RADIUS = "Cursed Wound Radius";
 	public static final String CHARM_CAP = "Cursed Wound Damage Cap";
