@@ -425,6 +425,7 @@ public class ItemStatUtils {
 		DECAY(new Decay(), true, false, false),
 		DUELIST(new Duelist(), true, false, false),
 		ERUPTION(new Eruption(), true, false, false),
+		EXCAVATOR(new Excavator(), false, false, false),
 		ICE_ASPECT(new IceAspect(), true, false, false),
 		FIRE_ASPECT(new FireAspect(), true, false, false),
 		THUNDER_ASPECT(new ThunderAspect(), true, false, false),
