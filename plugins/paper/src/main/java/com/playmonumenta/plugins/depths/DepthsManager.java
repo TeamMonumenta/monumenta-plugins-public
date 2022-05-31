@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -88,9 +89,7 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.Slipstream;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Updraft;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -761,8 +760,7 @@ public class DepthsManager {
 
 			AbilityManager.getManager().updatePlayerAbilities(p, true);
 			//Reset delve player info
-			DelvesUtils.setDelveScore(p, ServerProperties.getShardName(), 0);
-			DelvesUtils.removeDelveInfo(p);
+			DelvesUtils.clearDelvePlayerByShard(null, p, ServerProperties.getShardName());
 		}
 	}
 
@@ -960,25 +958,27 @@ public class DepthsManager {
 	public void playerSelectedRoom(DepthsRoomType roomType, Player player) {
 		// Get the player
 		DepthsPlayer dp = mPlayers.get(player.getUniqueId());
-		if (dp == null || getPartyFromId(dp).mNextRoomChoices == null || getPartyFromId(dp).mNextRoomChoices.size() == 0) {
+		if (dp == null) {
 			return;
 		}
-		getPartyFromId(dp).mNextRoomChoices.clear();
+
+		DepthsParty party = getPartyFromId(dp);
+		if (party == null || party.mNextRoomChoices == null || party.mNextRoomChoices.size() == 0) {
+			return;
+		}
+		party.mNextRoomChoices.clear();
 
 		// Summon the boss room if they are on a boss room interval, regardless of whatever
 		// the players tried to pull with the gui
-		if (getPartyFromId(dp).mRoomNumber % 10 == 9) {
+		if (party.mRoomNumber % 10 == 9) {
 			roomType = DepthsRoomType.BOSS;
 		}
 
-		removeNearbyButton(getPartyFromId(dp).mRoomSpawnerLocation, player.getWorld());
+		removeNearbyButton(party.mRoomSpawnerLocation, player.getWorld());
 		//Remove the button later in case of structure bug
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				removeNearbyButton(getPartyFromId(dp).mRoomSpawnerLocation, player.getWorld());
-			}
-		}.runTaskLater(mPlugin, 10);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			removeNearbyButton(party.mRoomSpawnerLocation, player.getWorld());
+		}, 10);
 
 		// Generate the room
 		if (mRoomRepository == null) {
@@ -986,8 +986,8 @@ public class DepthsManager {
 		}
 
 		// Summon the new room and give it to the party
-		Location l = new Location(player.getWorld(), getPartyFromId(dp).mRoomSpawnerLocation.getX(), getPartyFromId(dp).mRoomSpawnerLocation.getY(), getPartyFromId(dp).mRoomSpawnerLocation.getZ());
-		getPartyFromId(dp).setNewRoom(mRoomRepository.summonRoom(l, roomType, getPartyFromId(dp)));
+		Location l = new Location(player.getWorld(), party.mRoomSpawnerLocation.getX(), party.mRoomSpawnerLocation.getY(), party.mRoomSpawnerLocation.getZ());
+		party.setNewRoom(mRoomRepository.summonRoom(l, roomType, party));
 	}
 
 	// Utility method to get rid of the button players use to select the next room
@@ -1344,7 +1344,7 @@ public class DepthsManager {
 		//Remove all mobs in the player's region
 		List<Entity> mobs = p.getWorld().getEntities();
 		for (Entity e : mobs) {
-			if (EntityUtils.isHostileMob(e) && (e.getLocation().getBlockX() / 512 == p.getLocation().getBlockX() / 512) && (e.getLocation().getBlockZ() / 512 == p.getLocation().getBlockZ())) {
+			if (EntityUtils.isHostileMob(e)) {
 				e.remove();
 			}
 		}

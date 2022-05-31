@@ -1,17 +1,12 @@
-package com.playmonumenta.plugins.abilities.delves;
+package com.playmonumenta.plugins.delves.abilities;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.BlockBreakBoss;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import javax.annotation.Nullable;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Vex;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
 
-public class Pernicious extends DelveModifier {
+public class Pernicious {
 
 	private static final double[] BLOCK_BREAK_CHANCE = {
 			0.05,
@@ -22,7 +17,6 @@ public class Pernicious extends DelveModifier {
 			0.3
 	};
 
-	private final double mBlockBreakChance;
 
 	public static final String DESCRIPTION = "Enemies can destroy terrain.";
 
@@ -42,20 +36,9 @@ public class Pernicious extends DelveModifier {
 			}
 	};
 
-	public Pernicious(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, Modifier.PERNICIOUS);
 
-		if (player != null) {
-			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.PERNICIOUS);
-			mBlockBreakChance = BLOCK_BREAK_CHANCE[rank - 1];
-		} else {
-			mBlockBreakChance = 0;
-		}
-	}
-
-	@Override
-	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
-		if (!(mob instanceof Vex) && FastUtils.RANDOM.nextDouble() < mBlockBreakChance) {
+	public static void applyModifiers(LivingEntity mob, int level) {
+		if (!(mob instanceof Vex) && FastUtils.RANDOM.nextDouble() < BLOCK_BREAK_CHANCE[level - 1] && !DelvesUtils.isDelveMob(mob)) {
 			mob.addScoreboardTag(BlockBreakBoss.identityTag);
 		}
 	}

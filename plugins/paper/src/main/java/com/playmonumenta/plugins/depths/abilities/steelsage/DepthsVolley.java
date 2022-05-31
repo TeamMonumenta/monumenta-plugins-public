@@ -10,8 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import java.util.List;
+import java.util.*;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -25,7 +24,6 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -33,12 +31,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class DepthsVolley extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Volley";
-	private static final String VOLLEY_METAKEY = "VolleyArrowMetakey";
-	private static final String VOLLEY_HIT_METAKEY = "VolleyMobHitTickMetakey";
 	private static final int COOLDOWN = 12 * 20;
 	public static final int[] ARROWS = {7, 10, 12, 15, 18, 24};
 	private static final double[] DAMAGE_MULTIPLIER = {1.6, 1.7, 1.8, 1.9, 2.0, 2.2};
-
+	public Set<AbstractArrow> mDepthsVolleyArrows;
+	public Map<LivingEntity, Integer> mDepthsVolleyHitMap;
 	public DepthsVolley(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mInfo.mCooldown = COOLDOWN;
@@ -46,6 +43,8 @@ public class DepthsVolley extends DepthsAbility {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayMaterial = Material.ARROW;
 		mTree = DepthsTree.METALLIC;
+		mDepthsVolleyArrows = new HashSet<>();
+		mDepthsVolleyHitMap = new HashMap<>();
 	}
 
 	@Override
@@ -68,6 +67,8 @@ public class DepthsVolley extends DepthsAbility {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.75f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.33f);
+		mDepthsVolleyArrows.clear();
+		mDepthsVolleyHitMap.clear();
 
 		float arrowSpeed = (float) arrow.getVelocity().length();
 		// Give time for other skills to set data
@@ -91,12 +92,12 @@ public class DepthsVolley extends DepthsAbility {
 
 				List<AbstractArrow> projectiles = EntityUtils.spawnArrowVolley(mPlayer, ARROWS[mRarity - 1], arrowSpeed, 5, arrow.getClass());
 				for (AbstractArrow proj : projectiles) {
+					mDepthsVolleyArrows.add(proj);
 					proj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 					if (fireticks > 0) {
 						proj.setFireTicks(fireticks);
 					}
 
-					proj.setMetadata(VOLLEY_METAKEY, new FixedMetadataValue(mPlugin, null));
 					proj.setCritical(arrow.isCritical());
 					proj.setPierceLevel(arrow.getPierceLevel());
 
@@ -123,8 +124,8 @@ public class DepthsVolley extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Arrow arrow && arrow.hasMetadata(VOLLEY_METAKEY)) {
-			if (MetadataUtils.checkOnceThisTick(mPlugin, enemy, VOLLEY_HIT_METAKEY)) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && mDepthsVolleyArrows.contains(arrow)) {
+			if (notBeenHit(enemy)) {
 				double damageMultiplier = DAMAGE_MULTIPLIER[mRarity - 1];
 				event.setDamage(event.getDamage() * damageMultiplier);
 			} else {
@@ -133,6 +134,15 @@ public class DepthsVolley extends DepthsAbility {
 			}
 		}
 		return false; // only changes event damage
+	}
+
+	private boolean notBeenHit(LivingEntity enemy) {
+		// Basically the same logic as with MetadataUtils.happenedThisTick but with a hashmap in its stead
+		if (mDepthsVolleyHitMap.get(enemy) != null && mDepthsVolleyHitMap.get(enemy) == enemy.getTicksLived()) {
+			return true;
+		}
+		mDepthsVolleyHitMap.put(enemy, enemy.getTicksLived());
+		return false;
 	}
 
 	@Override

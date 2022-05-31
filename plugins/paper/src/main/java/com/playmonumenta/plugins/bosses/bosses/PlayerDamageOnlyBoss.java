@@ -11,9 +11,6 @@ public class PlayerDamageOnlyBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_player_dmg_only";
 	public static final int detectionRange = 50;
 
-	//This tag is on mobs from summon abilities (Hunting Companion, Metalmancy, etc.)
-	public static final String bypassTag = "bypass_player_damage_only";
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new PlayerDamageOnlyBoss(plugin, boss);
 	}
@@ -24,8 +21,8 @@ public class PlayerDamageOnlyBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void onHurt(DamageEvent event) {
-		if (event.getSource() != null && !(event.getSource() instanceof Player) && !event.getSource().getScoreboardTags().contains(bypassTag)) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		if (!(damagee instanceof Player)) {
 			event.setCancelled(true);
 		}
 	}

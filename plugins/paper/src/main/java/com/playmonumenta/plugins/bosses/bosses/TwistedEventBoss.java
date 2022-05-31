@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.abilities.delves.Twisted;
+import com.playmonumenta.plugins.delves.abilities.Twisted;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;

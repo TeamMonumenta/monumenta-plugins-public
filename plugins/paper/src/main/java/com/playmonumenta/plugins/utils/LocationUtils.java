@@ -1083,19 +1083,7 @@ public class LocationUtils {
 	 * @return Whether the box collides with any blocks or is outside of loadied chunks
 	 */
 	public static boolean collidesWithBlocks(BoundingBox boundingBox, World world) {
-		ArrayList<Location> locationsTouching = getLocationsTouching(boundingBox, world);
-		for (Location location : locationsTouching) {
-			if (!location.isChunkLoaded()) {
-				return true;
-			}
-			Block block = location.getBlock();
-			if (block.getBoundingBox().overlaps(boundingBox) // Seems liquids have empty bounding boxes similar to air, so they won't count as overlapping
-				    && block.getType().isSolid()) { // Allow passing through non-solids like signs, grass, vines etc
-				// Obstructed by solid block
-				return true;
-			}
-		}
-		return false;
+		return NmsUtils.getVersionAdapter().hasCollision(world, boundingBox);
 	}
 
 	public static boolean travelTillObstructed(
@@ -1151,18 +1139,20 @@ public class LocationUtils {
 			}
 			if (collidesWithBlocks(testBox, world)) {
 				// Collision on path
-				// If wiggleY is enabled, look for a free spot up to 1 block below or above the blocked location
+				// If wiggleY is enabled, look for a free spot up to half of the bounding box height below or above the blocked location
 				if (wiggleY) {
 					boolean blocked = true;
 					BoundingBox wiggleBox = testBox.clone();
-					wiggleBox.shift(0, -1, 0);
-					for (int dy = 0; dy < 20; dy++) {
-						// Scan along the y-axis, from -1 to +1, to find the lowest available space.
+					double step = 0.1;
+					int steps = (int) (wiggleBox.getHeight() / step);
+					wiggleBox.shift(0, -wiggleBox.getHeight() / 2 + step / 2, 0);
+					for (int dy = 0; dy < steps; dy++) {
+						// Scan along the y-axis, from -height/2+step/2 to +height/2-step/2, to find the lowest available space.
 						if (!collidesWithBlocks(wiggleBox, world)) {
 							blocked = false;
 							break;
 						}
-						wiggleBox.shift(0, 0.1, 0);
+						wiggleBox.shift(0, step, 0);
 					}
 					if (blocked) {
 						return true;

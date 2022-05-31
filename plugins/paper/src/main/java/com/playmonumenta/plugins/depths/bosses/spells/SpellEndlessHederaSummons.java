@@ -2,9 +2,9 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.depths.bosses.Hedera;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;

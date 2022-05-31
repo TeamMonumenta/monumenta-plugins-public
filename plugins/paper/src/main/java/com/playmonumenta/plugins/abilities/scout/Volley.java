@@ -6,8 +6,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import java.util.List;
+import java.util.*;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,23 +14,16 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.*;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Volley extends Ability {
 
-	private static final String VOLLEY_METAKEY = "VolleyArrowMetakey";
-	private static final String VOLLEY_HIT_METAKEY = "VolleyMobHitTickMetakey";
 	private static final int VOLLEY_COOLDOWN = 15 * 20;
 	private static final int VOLLEY_1_ARROW_COUNT = 7;
 	private static final int VOLLEY_2_ARROW_COUNT = 11;
@@ -39,6 +31,9 @@ public class Volley extends Ability {
 	private static final double VOLLEY_2_DAMAGE_MULTIPLIER = 1.5;
 	private static final double ENHANCEMENT_BLEED_POTENCY = 0.1;
 	private static final int ENHANCEMENT_BLEED_DURATION = 4 * 20;
+	
+	public Set<AbstractArrow> mVolleyArrows;
+	private Map<LivingEntity, Integer> mVolleyHitMap;
 
 	public Volley(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Volley");
@@ -51,6 +46,8 @@ public class Volley extends Ability {
 		mInfo.mCooldown = VOLLEY_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.ARROW, 1);
+		mVolleyArrows = new HashSet<>();
+		mVolleyHitMap = new HashMap<>();
 	}
 
 	@Override
@@ -73,7 +70,9 @@ public class Volley extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.75f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.33f);
-
+		// Garbage Collector at home
+		mVolleyArrows.clear();
+		mVolleyHitMap.clear();
 		float arrowSpeed = (float) arrow.getVelocity().length();
 		// Give time for other skills to set data
 		new BukkitRunnable() {
@@ -105,12 +104,12 @@ public class Volley extends Ability {
 				}
 
 				for (AbstractArrow proj : projectiles) {
+					mVolleyArrows.add(proj);
 					proj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 					if (fireticks > 0) {
 						proj.setFireTicks(fireticks);
 					}
 
-					proj.setMetadata(VOLLEY_METAKEY, new FixedMetadataValue(mPlugin, null));
 					proj.setCritical(arrow.isCritical());
 					proj.setPierceLevel(arrow.getPierceLevel());
 
@@ -138,9 +137,9 @@ public class Volley extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity proj = event.getDamager();
-		if (event.getType() == DamageType.PROJECTILE && proj instanceof AbstractArrow && proj.hasMetadata(VOLLEY_METAKEY)) {
-			if (MetadataUtils.checkOnceThisTick(mPlugin, enemy, VOLLEY_HIT_METAKEY)) {
-				double damageMultiplier = isLevelOne() ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
+		if (event.getType() == DamageType.PROJECTILE && proj instanceof AbstractArrow && mVolleyArrows.contains(proj)) {
+			if (notBeenHit(enemy)) {
+				double damageMultiplier = getAbilityScore() == 1 ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
 				event.setDamage(event.getDamage() * damageMultiplier);
 
 				if (isEnhanced()) {
@@ -152,6 +151,15 @@ public class Volley extends Ability {
 			}
 		}
 		return false; // only changes event damage
+	}
+
+	private boolean notBeenHit(LivingEntity enemy) {
+		// Basically the same logic as with MetadataUtils.happenedThisTick but with a hashmap in its stead
+		if (mVolleyHitMap.get(enemy) != null && mVolleyHitMap.get(enemy) == enemy.getTicksLived()) {
+			return true;
+		}
+		mVolleyHitMap.put(enemy, enemy.getTicksLived());
+		return false;
 	}
 
 }

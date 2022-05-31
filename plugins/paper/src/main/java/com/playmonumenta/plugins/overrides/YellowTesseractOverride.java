@@ -139,10 +139,8 @@ public class YellowTesseractOverride extends BaseOverride {
 	}
 
 	private void resetTesseract(Player player, ItemStack item) {
-		ItemMeta meta = item.getItemMeta();
-
 		clearTesseractLore(item);
-
+		ItemMeta meta = item.getItemMeta();
 		meta.displayName(TESSERACT_NAME);
 		item.setItemMeta(meta);
 		ItemUtils.setPlainTag(item);

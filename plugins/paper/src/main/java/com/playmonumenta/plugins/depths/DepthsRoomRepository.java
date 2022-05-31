@@ -261,7 +261,9 @@ public class DepthsRoomRepository {
 		BoundingBox box = w.getBlockAt(spawn).getBoundingBox();
 		box.expand(BlockFace.EAST, room.mSize.getX());
 		box.expand(BlockFace.UP, room.mSize.getY());
-		box.expand(BlockFace.DOWN, room.mSize.getZ());
+		box.expand(BlockFace.DOWN, room.mSize.getY());
+		box.expand(BlockFace.NORTH, room.mSize.getZ());
+		box.expand(BlockFace.SOUTH, room.mSize.getZ());
 		for (Entity e: w.getNearbyEntities(box)) {
 			if (!(e instanceof Player)) {
 				e.remove();

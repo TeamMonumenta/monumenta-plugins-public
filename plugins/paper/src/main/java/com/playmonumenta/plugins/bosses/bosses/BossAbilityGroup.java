@@ -440,6 +440,9 @@ public abstract class BossAbilityGroup {
 	/* Check if somehow the boss entity is missing even though this is still running */
 	private boolean isBossMissing() {
 		Location bossLoc = mBoss.getLocation();
+		if (!bossLoc.isWorldLoaded() || !bossLoc.isChunkLoaded()) {
+			return true;
+		}
 		for (Entity entity : bossLoc.getWorld().getNearbyEntities(bossLoc, 4, 4, 4)) {
 			if (entity.getUniqueId().equals(mBoss.getUniqueId())) {
 				return false;

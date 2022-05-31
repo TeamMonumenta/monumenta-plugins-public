@@ -1,10 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -91,7 +92,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 		mPlayerCount = players.size();
 		if (mPlayerCount < 1) {
 			mPlayerCount = 1;
-		} else if (DelvesUtils.getDelveInfo(players.get(0)).getDepthPoints() > 0) {
+		} else if (DelvesUtils.getPlayerTotalDelvePoint(null, players.get(0), ServerProperties.getShardName()) > 0) {
 			mDelve = true;
 		}
 

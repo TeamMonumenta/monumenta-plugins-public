@@ -215,6 +215,11 @@ public class EntityListener implements Listener {
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
 
+		if (!EntityUtils.isHostileMob(damagee) && damager.getScoreboardTags().contains(AlchemicalAberrationBoss.identityTag)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		//  If the entity getting hurt is the player.
 		if (damagee instanceof Player) {
 			if (damager instanceof LivingEntity) {
@@ -226,10 +231,6 @@ public class EntityListener implements Listener {
 
 			// Disable thorns damage from guardians
 			if (event.getCause() == DamageCause.THORNS && damager instanceof Guardian) {
-				event.setCancelled(true);
-			}
-
-			if (damager.getScoreboardTags().contains(AlchemicalAberrationBoss.identityTag)) {
 				event.setCancelled(true);
 			}
 		} else {

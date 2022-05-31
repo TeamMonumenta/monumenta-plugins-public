@@ -91,6 +91,21 @@ public class ZoneUtils {
 		return player.getGameMode() != GameMode.SURVIVAL || !ZoneUtils.hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE) || ServerProperties.getIsTownWorld();
 	}
 
+	// Check that the player can break/place blocks
+	public static boolean playerCanMineBlock(Player player, Location loc) {
+		GameMode gameMode = player.getGameMode();
+		if (gameMode.equals(GameMode.ADVENTURE) || gameMode.equals(GameMode.SPECTATOR)) {
+			return false;
+		}
+		if (hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE)) {
+			if (isInPlot(loc)) {
+				return true;
+			}
+			return false;
+		}
+		return true;
+	}
+
 	public static boolean hasZoneProperty(Entity entity, ZoneProperty property) {
 		return hasZoneProperty(entity.getLocation(), property);
 	}

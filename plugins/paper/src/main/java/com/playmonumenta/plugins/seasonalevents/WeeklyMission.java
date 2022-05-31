@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.seasonalevents;
 
-import com.playmonumenta.plugins.utils.DelvesUtils;
+import com.playmonumenta.plugins.delves.DelvesModifier;
 import java.util.List;
 
 public class WeeklyMission {
@@ -23,7 +23,7 @@ public class WeeklyMission {
 	//Which mobs are eligible to kill for mission (Library of Souls)
 	public List<String> mEligibleMobs;
 	//Delve mission fields
-	public DelvesUtils.Modifier mDelveModifier;
+	public DelvesModifier mDelveModifier;
 	public int mModifierRank;
 	public int mDelvePoints;
 	//Region of content to clear (includes dungeon, strike, boss)

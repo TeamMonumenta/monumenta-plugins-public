@@ -32,6 +32,16 @@ public class SpellBlockBreak extends Spell {
 	//When true, mob breaks blocks at foot level
 	private boolean mFootLevelBreak;
 
+	//When true, use launcher bounding box as radius
+	private boolean mAdaptToBoundingBox = false;
+
+	public SpellBlockBreak(Entity launcher, boolean adaptboundingbox) {
+		mLauncher = launcher;
+		mAdaptToBoundingBox = adaptboundingbox;
+		mFootLevelBreak = false;
+		mNoBreak = Arrays.asList(Material.AIR);
+	}
+
 	public SpellBlockBreak(Entity launcher) {
 		this(launcher, 1, 3, 1);
 	}
@@ -69,11 +79,14 @@ public class SpellBlockBreak extends Spell {
 		/* Get a list of all blocks that impede the boss's movement */
 		List<Block> badBlockList = new ArrayList<Block>();
 		Location testloc = new Location(loc.getWorld(), 0, 0, 0);
-		for (int x = -mXRad; x <= mXRad; x++) {
+		int xRad = (int) (mAdaptToBoundingBox ? mLauncher.getBoundingBox().getWidthX() : mXRad);
+		int yRad = (int) (mAdaptToBoundingBox ? mLauncher.getBoundingBox().getHeight() + 1 : mYRad);
+		int zRad = (int) (mAdaptToBoundingBox ? mLauncher.getBoundingBox().getWidthZ() : mZRad);
+		for (int x = -xRad; x <= xRad; x++) {
 			testloc.setX(loc.getX() + x);
-			for (int y = 0; y <= mYRad; y++) {
+			for (int y = 0; y <= yRad; y++) {
 				testloc.setY(loc.getY() + y);
-				for (int z = -mZRad; z <= mZRad; z++) {
+				for (int z = -zRad; z <= zRad; z++) {
 					testloc.setZ(loc.getZ() + z);
 					Block block = testloc.getBlock();
 					Material material = block.getType();

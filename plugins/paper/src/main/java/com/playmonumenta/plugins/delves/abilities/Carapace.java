@@ -1,18 +1,13 @@
-package com.playmonumenta.plugins.abilities.delves;
+package com.playmonumenta.plugins.delves.abilities;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.BarrierBoss;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
 
-public class Carapace extends DelveModifier {
+public class Carapace {
 	private static final List<List<String>> ABILITY_POOL;
 	private static final double[] ABILITY_CHANCE = {
 		0.1,
@@ -68,22 +63,8 @@ public class Carapace extends DelveModifier {
 		}
 	};
 
-	private final double mAbilityChance;
-
-	public Carapace(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, Modifier.CARAPACE);
-
-		if (player != null) {
-			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.CARAPACE);
-			mAbilityChance = ABILITY_CHANCE[rank - 1];
-		} else {
-			mAbilityChance = 0;
-		}
-	}
-
-	@Override
-	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
-		if (FastUtils.RANDOM.nextDouble() < mAbilityChance) {
+	public static void applyModifiers(LivingEntity mob, int level) {
+		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE[level - 1] && !DelvesUtils.isDelveMob(mob)) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
 			List<String> ability = ABILITY_POOL.get(FastUtils.RANDOM.nextInt(ABILITY_POOL.size()));
 			for (String abilityTag : ability) {

@@ -344,7 +344,10 @@ public final class ItemOverrides {
 		mItems.put(Material.GOLDEN_CARROT, horseFoodOverride);
 		mItems.put(Material.HAY_BLOCK, horseFoodOverride);
 		mItems.put(Material.ENCHANTED_GOLDEN_APPLE, horseFoodOverride);
-		// GOLDEN_APPLE is in GOldenAppleOverride, which manually calls this override
+		// GOLDEN_APPLE is in GoldenAppleOverride, which manually calls this override
+
+		BaseOverride lodestoneOverride = new LodestoneOverride();
+		mItems.put(Material.LODESTONE, lodestoneOverride);
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, @Nullable Block block, PlayerInteractEvent event) {

@@ -1,27 +1,21 @@
-package com.playmonumenta.plugins.abilities.delves;
+package com.playmonumenta.plugins.delves.abilities;
 
 import com.google.common.collect.ImmutableSet;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.FireBombTossBoss;
 import com.playmonumenta.plugins.bosses.bosses.FlameTrailBoss;
 import com.playmonumenta.plugins.bosses.bosses.NovaBoss;
 import com.playmonumenta.plugins.bosses.bosses.ProjectileBoss;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import javax.annotation.Nullable;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
 
-public class Infernal extends DelveModifier {
+public class Infernal {
 
 	private static final EnumSet<DamageType> ENVIRONMENTAL_DAMAGE_CAUSES = EnumSet.of(
 			DamageType.AILMENT,
@@ -150,37 +144,20 @@ public class Infernal extends DelveModifier {
 			}
 	};
 
-	private final double mEnvironmentalDamageTakenMultiplier;
-	private final double mBurningDamageTakenMultiplier;
-	private final double mAbilityChance;
-
-	public Infernal(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, Modifier.INFERNAL);
-
-		if (player != null) {
-			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.INFERNAL);
-			mEnvironmentalDamageTakenMultiplier = ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[rank - 1];
-			mBurningDamageTakenMultiplier = BURNING_DAMAGE_TAKEN_MULTIPLIER[rank - 1];
-			mAbilityChance = ABILITY_CHANCE[rank - 1];
-		} else {
-			mEnvironmentalDamageTakenMultiplier = 0;
-			mBurningDamageTakenMultiplier = 0;
-			mAbilityChance = 0;
+	public static void applyDamageModifiers(DamageEvent event, int level) {
+		if (level == 0) {
+			return;
 		}
-	}
 
-	@Override
-	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.getType() == DamageType.FIRE) {
-			event.setDamage(event.getDamage() * mBurningDamageTakenMultiplier);
+			event.setDamage(event.getDamage() * BURNING_DAMAGE_TAKEN_MULTIPLIER[level - 1]);
 		} else if (ENVIRONMENTAL_DAMAGE_CAUSES.contains(event.getType())) {
-			event.setDamage(event.getDamage() * mEnvironmentalDamageTakenMultiplier);
+			event.setDamage(event.getDamage() * ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[level - 1]);
 		}
 	}
 
-	@Override
-	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
-		if (FastUtils.RANDOM.nextDouble() < mAbilityChance) {
+	public static void applyModifiers(LivingEntity mob, int level) {
+		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE[level - 1] && !DelvesUtils.isDelveMob(mob)) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
 			List<List<String>> abilityPool = ServerProperties.getClassSpecializationsEnabled() ? ABILITY_POOL_R2 : ABILITY_POOL_R1;
 			List<String> ability = abilityPool.get(FastUtils.RANDOM.nextInt(abilityPool.size()));

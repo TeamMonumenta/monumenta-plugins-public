@@ -2,22 +2,13 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
-import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
-import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -47,8 +38,6 @@ public class PhlegmaticResolve extends Ability {
 	public static final String CHARM_ALLY = "Phlegmatic Resolve Ally Modifier";
 	public static final String CHARM_RANGE = "Phlegmatic Resolve Radius";
 
-	private Ability[] mAbilities = {};
-
 	public PhlegmaticResolve(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Phlegmatic Resolve");
 		mInfo.mScoreboardId = "Phlegmatic";
@@ -59,15 +48,6 @@ public class PhlegmaticResolve extends Ability {
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 		mPercentDamageResist = (isLevelOne() ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2) - CharmManager.getLevelPercentDecimal(player, CHARM_RESIST);
 		mKBR = (CharmManager.getLevelPercentDecimal(player, CHARM_KBR) + PERCENT_KNOCKBACK_RESIST);
-
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mAbilities = Stream.of(AmplifyingHex.class, CholericFlames.class, GraspingClaws.class, SoulRend.class,
-						SanguineHarvest.class, MelancholicLament.class, DarkPact.class, VoodooBonds.class,
-						JudgementChain.class, HauntingShades.class, WitheringGaze.class)
-					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
-			});
-		}
 	}
 
 	@Override
@@ -121,8 +101,8 @@ public class PhlegmaticResolve extends Ability {
 		}
 
 		int cooldowns = 0;
-		for (Ability ability : mAbilities) {
-			if (ability != null && mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ability.getInfo().mLinkedSpell)) {
+		for (Integer ability : mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId())) {
+			if (ability > 0) {
 				cooldowns++;
 			}
 		}

@@ -2,13 +2,6 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
-import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
-import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
-import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -20,12 +13,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -39,7 +27,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-
 public class CursedWound extends Ability {
 
 	private static final int CURSED_WOUND_DOT_DAMAGE = 1;
@@ -52,15 +39,13 @@ public class CursedWound extends Ability {
 	private static final int CURSED_WOUND_EXTENDED_DURATION = 2 * 20;
 	private static final String DOT_EFFECT_NAME = "CursedWoundDamageOverTimeEffect";
 	private static final double DAMAGE_PER_EFFECT = 2;
-
-	private Ability[] mAbilities = {};
-	private double mCursedWoundCap;
-
+	
 	public static final String CHARM_DAMAGE = "Cursed Wound Damage Modifier";
 	public static final String CHARM_RADIUS = "Cursed Wound Radius";
 	public static final String CHARM_CAP = "Cursed Wound Damage Cap";
 	public static final String CHARM_DOT = "Cursed Wound DoT";
 
+	private double mCursedWoundCap;
 	private @Nullable Collection<PotionEffect> mStoredPotionEffects;
 	private @Nullable HashMap<String, Effect> mStoredCustomEffects;
 
@@ -73,17 +58,7 @@ public class CursedWound extends Ability {
 		mInfo.mDescriptions.add("When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, as well as 2 magic damage per effect.");
 		mInfo.mLinkedSpell = ClassAbility.CURSED_WOUND;
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
-
 		mCursedWoundCap = CharmManager.getLevelPercentDecimal(player, CHARM_CAP) + (isLevelOne() ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP);
-
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mAbilities = Stream.of(AmplifyingHex.class, CholericFlames.class, GraspingClaws.class, SoulRend.class,
-				                       SanguineHarvest.class, MelancholicLament.class, DarkPact.class, VoodooBonds.class,
-				                       JudgementChain.class, HauntingShades.class, WitheringGaze.class)
-					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
-			});
-		}
 	}
 
 	@Override
@@ -117,8 +92,8 @@ public class CursedWound extends Ability {
 					.spawnAsPlayerActive(mPlayer);
 
 				int cooldowns = 0;
-				for (Ability ability : mAbilities) {
-					if (ability != null && mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ability.getInfo().mLinkedSpell)) {
+				for (Integer ability : mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId())) {
+					if (ability > 0) {
 						cooldowns++;
 					}
 				}

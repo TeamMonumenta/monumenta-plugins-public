@@ -30,6 +30,9 @@ import com.playmonumenta.plugins.bosses.bosses.lich.LichStrifeBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichWarlockBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichWarriorBoss;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.delves.mobabilities.DreadfulSummonBoss;
+import com.playmonumenta.plugins.delves.mobabilities.SpectralSummonBoss;
+import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
 import com.playmonumenta.plugins.depths.bosses.Davey;
 import com.playmonumenta.plugins.depths.bosses.Hedera;
 import com.playmonumenta.plugins.depths.bosses.Nucleus;
@@ -38,6 +41,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.parrots.RainbowParrot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -249,6 +253,9 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(DeathSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new DeathSummonBoss(p, e));
 		mStatelessBosses.put(SummonOnExplosionBoss.identityTag, (Plugin p, LivingEntity e) -> new SummonOnExplosionBoss(p, e));
 		mStatelessBosses.put(HostileBoss.identityTag, (Plugin p, LivingEntity e) -> new HostileBoss(p, e));
+		mStatelessBosses.put(StatMultiplierBoss.identityTag, (Plugin p, LivingEntity e) -> new StatMultiplierBoss(p, e));
+		mStatelessBosses.put(SpectralSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new SpectralSummonBoss(p, e));
+		mStatelessBosses.put(DreadfulSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new DreadfulSummonBoss(p, e));
 		mStatelessBosses.put(FriendlyBoss.identityTag, (Plugin p, LivingEntity e) -> new FriendlyBoss(p, e));
 
 		mStatelessBosses.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> new LichMageBoss(p, e));
@@ -528,6 +535,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(HostileBoss.identityTag, new HostileBoss.Parameters());
 		mBossParameters.put(FriendlyBoss.identityTag, new FriendlyBoss.Parameters());
 		mBossParameters.put(RebornBoss.identityTag, new RebornBoss.Parameters());
+		mBossParameters.put(BlockBreakBoss.identityTag, new BlockBreakBoss.Parameters());
 	}
 
 	/********************************************************************************
@@ -1114,12 +1122,12 @@ public class BossManager implements Listener {
 	private void processEntity(LivingEntity entity) {
 		/* This should never happen */
 		if (mBosses.get(entity.getUniqueId()) != null) {
-			mPlugin.getLogger().log(Level.WARNING, "ProcessEntity: Attempted to add boss that was already tracked!");
+			MMLog.warning("[BossManager] ProcessEntity: " + entity.getName() + " Attempted to add boss that was already tracked!");
 			return;
 		}
 
 		Set<String> tags = entity.getScoreboardTags();
-		if (tags != null && !tags.isEmpty()) {
+		if (!tags.isEmpty()) {
 			Boss boss = null;
 			/*
 			 * Note - it is important to make a copy here to avoid concurrent modification exception

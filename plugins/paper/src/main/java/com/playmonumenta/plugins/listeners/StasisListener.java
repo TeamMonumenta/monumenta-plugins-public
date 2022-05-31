@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -69,24 +70,23 @@ public class StasisListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		ProjectileSource source = event.getEntity().getShooter();
-		if (source instanceof Player) {
-			if (isInStasis((Player) source)) {
-				event.setCancelled(true);
-			}
+		if (source instanceof Player player && isInStasis(player)) {
+			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void projectileHitEvent(ProjectileHitEvent event) {
-		ProjectileSource source = event.getEntity().getShooter();
-		if (source instanceof Player) {
-			if (isInStasis((Player) source)) {
-				event.setCancelled(true);
-			}
+		Projectile proj = event.getEntity();
+		ProjectileSource source = proj.getShooter();
+		if (source instanceof Player player && isInStasis(player)) {
+			event.setCancelled(true);
+			proj.remove();
 		}
 
 		if (isInStasis(event.getHitEntity())) {
 			event.setCancelled(true);
+			proj.remove();
 		}
 	}
 

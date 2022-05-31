@@ -5,10 +5,16 @@ import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.Arrays;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -24,6 +30,10 @@ import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Handles quivers, which are shulker boxes for arrows.
@@ -36,6 +46,37 @@ public class QuiverListener implements Listener {
 
 	// Refill arrows up to this amount. This is less than max stack size to prevent using an infinity crossbow (or multiple in a row) starting a new stack.
 	private static final int REFILL_UP_TO = 48;
+
+	public enum ArrowTransformMode {
+		NONE("disabled", null),
+		NORMAL("Normal Arrows", new ItemStack(Material.ARROW)),
+		SPECTRAL("Spectral Arrows", new ItemStack(Material.SPECTRAL_ARROW)),
+		WEAKNESS("Arrows of Weakness", makeTippedArrowStack(PotionType.WEAKNESS)),
+		SLOWNESS("Arrows of Slowness", makeTippedArrowStack(PotionType.SLOWNESS)),
+		POISON("Arrows of Poison", makeTippedArrowStack(PotionType.POISON)),
+		;
+
+		private final String mArrowName;
+
+		private final @Nullable ItemStack mItemStack;
+
+		ArrowTransformMode(String arrowName, @Nullable ItemStack itemStack) {
+			mArrowName = arrowName;
+			mItemStack = itemStack;
+		}
+
+		public String getArrowName() {
+			return mArrowName;
+		}
+	}
+
+	private static ItemStack makeTippedArrowStack(PotionType potionType) {
+		ItemStack result = new ItemStack(Material.TIPPED_ARROW);
+		PotionMeta meta = ((PotionMeta) result.getItemMeta());
+		meta.setBasePotionData(new PotionData(potionType));
+		result.setItemMeta(meta);
+		return result;
+	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityShootBowEvent(EntityShootBowEvent event) {
@@ -55,10 +96,27 @@ public class QuiverListener implements Listener {
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		// When right-clicking with a bow or crossbow while having no arrows in the inventory, take some out of a quiver is available
 		Player player = event.getPlayer();
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
-			    && (ItemUtils.isSomeBow(player.getInventory().getItemInMainHand()) || ItemUtils.isSomeBow(player.getInventory().getItemInOffHand()))
+			    && (ItemUtils.isSomeBow(mainHand) || ItemUtils.isSomeBow(player.getInventory().getItemInOffHand()))
 			    && Arrays.stream(player.getInventory().getContents()).noneMatch(ItemUtils::isArrow)) {
 			refillInventoryImmediately(player);
+		} else if ((event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_AIR)
+			           && ItemStatUtils.isArrowTransformingQuiver(mainHand)
+			           && MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, "QuiverSwapModeThisTick")) {
+			ArrowTransformMode mode = ItemStatUtils.getArrowTransformMode(mainHand);
+			ArrowTransformMode[] allModes = ArrowTransformMode.values();
+			ArrowTransformMode newMode = allModes[(mode.ordinal() + 1) % allModes.length];
+			ItemStack newStack = ItemStatUtils.setArrowTransformMode(mainHand, newMode);
+			ItemStatUtils.generateItemStats(newStack);
+			player.getInventory().setItemInMainHand(newStack);
+			player.playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.BLOCKS, 1, 1);
+			if (newMode == ArrowTransformMode.NONE) {
+				player.sendActionBar(Component.text("Quiver has been set to not transform arrows.", NamedTextColor.WHITE));
+			} else {
+				player.sendActionBar(Component.text("Quiver has been set to transform arrows to ", NamedTextColor.WHITE)
+					.append(Component.text(newMode.getArrowName(), NamedTextColor.GOLD)));
+			}
 		}
 	}
 
@@ -170,21 +228,36 @@ public class QuiverListener implements Listener {
 				    || ShulkerInventoryManager.isShulkerInUse(quiver)) {
 				continue;
 			}
-			int oldAmount = itemStack.getAmount();
-			InventoryUtils.insertItemIntoLimitedInventory(shulkerBox.getInventory(), ItemStatUtils.getShulkerSlots(quiver), itemStack);
-			if (oldAmount != itemStack.getAmount()) {
+			ItemStack transformedItemStack = getTransformedArrowStack(quiver, itemStack);
+			int oldAmount = transformedItemStack.getAmount();
+			InventoryUtils.insertItemIntoLimitedInventory(shulkerBox.getInventory(), ItemStatUtils.getShulkerSlots(quiver), transformedItemStack);
+			if (oldAmount != transformedItemStack.getAmount()) {
 				blockStateMeta.setBlockState(shulkerBox);
 				quiver.setItemMeta(blockStateMeta);
-				if (itemStack.getAmount() == 0) {
+				if (transformedItemStack.getAmount() == 0) {
 					event.setCancelled(true);
 					player.playPickupItemAnimation(item);
 					item.remove();
 					return;
 				} else {
+					itemStack.setAmount(transformedItemStack.getAmount());
 					item.setItemStack(itemStack);
 				}
 			}
 		}
+	}
+
+	public static ItemStack getTransformedArrowStack(ItemStack quiver, ItemStack arrows) {
+		if (Arrays.stream(ArrowTransformMode.values()).noneMatch(m -> arrows.isSimilar(m.mItemStack))) {
+			return arrows;
+		}
+		ArrowTransformMode mode = ItemStatUtils.getArrowTransformMode(quiver);
+		if (mode.mItemStack == null) { // i.e. not transformed
+			return arrows;
+		}
+		ItemStack transformed = mode.mItemStack.clone();
+		transformed.setAmount(arrows.getAmount());
+		return transformed;
 	}
 
 }

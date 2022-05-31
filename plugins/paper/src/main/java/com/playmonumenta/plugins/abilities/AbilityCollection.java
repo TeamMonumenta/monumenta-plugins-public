@@ -2,9 +2,9 @@ package com.playmonumenta.plugins.abilities;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.playmonumenta.plugins.abilities.delves.DelveModifier;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +22,6 @@ public class AbilityCollection {
 	 * Delve modifiers should probably not be piggybacking off the abilities
 	 * system, but that's a problem for another day
 	 */
-	private final Map<Class<? extends Ability>, Ability> mDelveModifiers = new LinkedHashMap<>();
 
 	private boolean mIsSilenced = false;
 
@@ -30,19 +29,14 @@ public class AbilityCollection {
 		for (Ability ability : abilities) {
 			mAbilities.put(ability.getClass(), ability);
 
-			if (ability instanceof DelveModifier) {
-				mDelveModifiers.put(ability.getClass(), ability);
-			}
 		}
 	}
 
 	public Collection<Ability> getAbilities() {
-		if (mIsSilenced) {
-			// A silenced player has no abilities
-			return mDelveModifiers.values();
-		} else {
+		if (!mIsSilenced) {
 			return mAbilities.values();
 		}
+		return Collections.EMPTY_SET;
 	}
 
 	public Collection<Ability> getAbilitiesIgnoringSilence() {
@@ -51,12 +45,11 @@ public class AbilityCollection {
 
 	@SuppressWarnings("unchecked")
 	public <T extends Ability> T getAbility(Class<T> cls) {
-		if (mIsSilenced) {
-			// A silenced player has no abilities
-			return (T) mDelveModifiers.get(cls);
-		} else {
+		if (!mIsSilenced) {
 			return (T) mAbilities.get(cls);
 		}
+		return null;
+
 	}
 
 	public @Nullable Ability getAbility(ClassAbility classAbility) {

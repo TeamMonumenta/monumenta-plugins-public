@@ -12,13 +12,18 @@ public class BlockBreakBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_blockbreak";
 	public static final int detectionRange = 40;
 
+	public static class Parameters extends BossParameters {
+		public boolean ADAPT_TO_BOUNDING_BOX = false;
+	}
+
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new BlockBreakBoss(plugin, boss);
 	}
 
 	public BlockBreakBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		List<Spell> passiveSpells = Arrays.asList(new SpellBlockBreak(boss));
+		Parameters p = Parameters.getParameters(boss, identityTag, new Parameters());
+		List<Spell> passiveSpells = Arrays.asList(p.ADAPT_TO_BOUNDING_BOX ? new SpellBlockBreak(boss, true) : new SpellBlockBreak(boss));
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}

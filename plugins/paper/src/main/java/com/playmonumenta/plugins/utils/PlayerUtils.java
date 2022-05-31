@@ -60,6 +60,29 @@ public class PlayerUtils {
 		player.teleport(player.getWorld().getSpawnLocation());
 	}
 
+	public static List<Player> playersInLootScalingRange(Location location) {
+		// In dungeons, all players in the same world (i.e. the entire dungeon) are in range
+
+		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
+		if (isDungeon) {
+			return location.getWorld().getPlayers().stream()
+				.filter(p -> p.getGameMode() != GameMode.SPECTATOR && p.getGameMode() != GameMode.CREATIVE)
+				.toList();
+		}
+
+		// In a POI, all players within the same POI are in range
+		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(location.toVector(), true);
+		if (!structures.isEmpty()) {
+			return location.getWorld().getPlayers().stream()
+				.filter(p -> p.getGameMode() != GameMode.SPECTATOR && p.getGameMode() != GameMode.CREATIVE
+					             && structures.stream().anyMatch(structure -> structure.isNearby(p)))
+				.toList();
+		}
+
+		// Otherwise, perform no loot scaling
+		return Collections.emptyList();
+	}
+
 	public static List<Player> otherPlayersInLootScalingRange(Player player) {
 		// In dungeons, all players in the same world (i.e. the entire dungeon) are in range
 

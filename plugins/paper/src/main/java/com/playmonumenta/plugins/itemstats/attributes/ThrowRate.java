@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.itemstats.attributes;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.scout.Volley;
+import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsVolley;
 import com.playmonumenta.plugins.itemstats.Attribute;
 import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
 import com.playmonumenta.plugins.listeners.DamageListener;
@@ -51,17 +53,23 @@ public class ThrowRate implements Attribute {
 			// Only run Throw Rate if the Infinity enchantment is not on the trident
 			if (item.getEnchantmentLevel(Enchantment.ARROW_INFINITE) <= 0 && value > 0) {
 				event.setCancelled(true);
+				// If a trident made from the volley skill, don't run sound/unbreaking
+				Volley volley = AbilityManager.getManager().getPlayerAbility(player, Volley.class);
+				DepthsVolley depthsVolley = AbilityManager.getManager().getPlayerAbility(player, DepthsVolley.class);
+				boolean isVolley = (volley != null && volley.mVolleyArrows.contains(trident))
+					|| (depthsVolley != null && depthsVolley.mDepthsVolleyArrows.contains(trident));
 
 				// Make trident unpickupable, set cooldown, damage trident based on Unbreaking enchant
-				player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 1);
-				player.setCooldown(item.getType(), (int) (20 / value));
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 2.0f, 1);
-					}
-				}.runTaskLater(plugin, (int) (20 / value));
-
+				if (!isVolley) {
+					player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 1);
+					player.setCooldown(item.getType(), (int) (20 / value));
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 2.0f, 1);
+						}
+					}.runTaskLater(plugin, (int) (20 / value));
+				}
 				// Duplicate the entity, then cancel the throw event so the trident doesn't leave inventory
 				Trident newProj = NmsUtils.getVersionAdapter().duplicateEntity(trident);
 
@@ -72,7 +80,7 @@ public class ThrowRate implements Attribute {
 				newProj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 
-				if (player.getGameMode() != GameMode.CREATIVE) {
+				if (player.getGameMode() != GameMode.CREATIVE && !isVolley) {
 					ItemUtils.damageItemWithUnbreaking(plugin, player, player.getInventory().getItemInMainHand(), 1, true);
 				}
 				AbilityManager.getManager().playerShotArrowEvent(player, newProj);

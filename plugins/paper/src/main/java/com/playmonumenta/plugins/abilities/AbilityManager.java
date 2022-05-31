@@ -34,21 +34,6 @@ import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
-import com.playmonumenta.plugins.abilities.delves.Arcanic;
-import com.playmonumenta.plugins.abilities.delves.Bloodthirsty;
-import com.playmonumenta.plugins.abilities.delves.Carapace;
-import com.playmonumenta.plugins.abilities.delves.Chivalrous;
-import com.playmonumenta.plugins.abilities.delves.Colossal;
-import com.playmonumenta.plugins.abilities.delves.Dreadful;
-import com.playmonumenta.plugins.abilities.delves.Entropy;
-import com.playmonumenta.plugins.abilities.delves.Infernal;
-import com.playmonumenta.plugins.abilities.delves.Legionary;
-import com.playmonumenta.plugins.abilities.delves.Pernicious;
-import com.playmonumenta.plugins.abilities.delves.Relentless;
-import com.playmonumenta.plugins.abilities.delves.Spectral;
-import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
-import com.playmonumenta.plugins.abilities.delves.Transcendent;
-import com.playmonumenta.plugins.abilities.delves.Twisted;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
@@ -146,7 +131,6 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -419,27 +403,6 @@ public class AbilityManager {
 			}
 		}
 
-
-		List<Ability> delveModifiers = Arrays.asList(
-			//********** DELVES **********//
-			new StatMultiplier(mPlugin, null),
-			new Legionary(mPlugin, null),
-			new Pernicious(mPlugin, null),
-			new Relentless(mPlugin, null),
-			new Arcanic(mPlugin, null),
-			new Infernal(mPlugin, null),
-			new Transcendent(mPlugin, null),
-			new Spectral(mPlugin, null),
-			new Dreadful(mPlugin, null),
-			new Colossal(mPlugin, null),
-			new Chivalrous(mPlugin, null),
-			new Bloodthirsty(mPlugin, null),
-			new Carapace(mPlugin, null),
-			new Entropy(mPlugin, null),
-			new Twisted(mPlugin, null)
-		);
-
-		mReferenceAbilities.addAll(delveModifiers);
 		mReferenceAbilities.sort(Comparator.comparingDouble(Ability::getPriorityAmount));
 	}
 
@@ -524,8 +487,6 @@ public class AbilityManager {
 			AbsorptionUtils.setAbsorption(player, 0, -1);
 		}
 
-		// Reset the DelveInfo mapping so a new one is generated
-		DelvesUtils.removeDelveInfo(player);
 
 		/* Get the old ability list and run invalidate() on all of them to clean up lingering runnables */
 		if (mAbilities.containsKey(player.getUniqueId())) {

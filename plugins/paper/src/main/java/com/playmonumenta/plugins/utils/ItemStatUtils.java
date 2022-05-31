@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.itemstats.attributes.ThornsDamage;
 import com.playmonumenta.plugins.itemstats.attributes.ThrowRate;
 import com.playmonumenta.plugins.itemstats.enchantments.*;
 import com.playmonumenta.plugins.itemstats.infusions.*;
+import com.playmonumenta.plugins.listeners.QuiverListener;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
@@ -42,6 +43,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
@@ -87,6 +89,7 @@ public class ItemStatUtils {
 	static final String DIRTY_KEY = "Dirty";
 	static final String SHULKER_SLOTS_KEY = "ShulkerSlots";
 	static final String IS_QUIVER_KEY = "IsQuiver";
+	static final String QUIVER_ARROW_TRANSFORM_MODE_KEY = "ArrowTransformMode";
 
 	static final Component DUMMY_LORE_TO_REMOVE = Component.text("DUMMY LORE TO REMOVE", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
 
@@ -1677,6 +1680,39 @@ public class ItemStatUtils {
 		return Boolean.TRUE.equals(stock.getBoolean(IS_QUIVER_KEY));
 	}
 
+	public static boolean isArrowTransformingQuiver(@Nullable ItemStack item) {
+		return isQuiver(item) && getEnchantmentLevel(item, EnchantmentType.PERSISTENCE) > 0;
+	}
+
+	public static ItemStack setArrowTransformMode(@Nullable ItemStack item, QuiverListener.ArrowTransformMode arrowTransformMode) {
+		if (item == null || item.getType() == Material.AIR) {
+			return item;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound playerModified = addPlayerModified(nbt);
+		playerModified.setString(QUIVER_ARROW_TRANSFORM_MODE_KEY, arrowTransformMode.name().toLowerCase(Locale.ROOT));
+		return nbt.getItem();
+	}
+
+	public static QuiverListener.ArrowTransformMode getArrowTransformMode(@Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return QuiverListener.ArrowTransformMode.NONE;
+		}
+		NBTCompound playerModified = getPlayerModified(new NBTItem(item));
+		if (playerModified == null) {
+			return QuiverListener.ArrowTransformMode.NONE;
+		}
+		String mode = playerModified.getString(QUIVER_ARROW_TRANSFORM_MODE_KEY);
+		if (mode == null || mode.isEmpty()) {
+			return QuiverListener.ArrowTransformMode.NONE;
+		}
+		try {
+			return QuiverListener.ArrowTransformMode.valueOf(mode.toUpperCase(Locale.ROOT));
+		} catch (IllegalArgumentException e) {
+			return QuiverListener.ArrowTransformMode.NONE;
+		}
+	}
+
 	public static void generateItemStats(final ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
@@ -1848,6 +1884,17 @@ public class ItemStatUtils {
 				Component lineAdd = Component.text("", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
 				lineAdd = lineAdd.append(MessagingUtils.fromGson(serializedLine));
 				lore.add(lineAdd);
+			}
+		}
+
+		if (isArrowTransformingQuiver(item)) {
+			QuiverListener.ArrowTransformMode transformMode = getArrowTransformMode(item);
+			if (transformMode == QuiverListener.ArrowTransformMode.NONE) {
+				lore.add(Component.text("Arrow transformation ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+					.append(Component.text("disabled", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+			} else {
+				lore.add(Component.text("Transforms arrows to ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+					.append(Component.text(transformMode.getArrowName(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 			}
 		}
 

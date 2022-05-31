@@ -4,10 +4,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Player;
@@ -176,12 +177,12 @@ public class CooldownTimers {
 		}
 	}
 
-	public @Nullable Set<ClassAbility> getCooldowns(UUID playerID) {
+	public Collection<Integer> getCooldowns(UUID playerID) {
 		HashMap<ClassAbility, Integer> player = mTimers.get(playerID);
 		if (player != null) {
-			return player.keySet();
+			return player.values();
 		} else {
-			return null;
+			return Collections.emptyList();
 		}
 	}
 
