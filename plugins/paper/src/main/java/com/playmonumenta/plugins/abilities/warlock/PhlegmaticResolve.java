@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import javax.annotation.Nullable;
-
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;

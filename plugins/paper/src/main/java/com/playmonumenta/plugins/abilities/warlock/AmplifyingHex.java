@@ -194,7 +194,7 @@ public class AmplifyingHex extends Ability {
 					debuffCount++;
 					double slowAmp = EntityUtils.getSlowAmount(mPlugin, mob);
 					int slowLevel = (int) Math.floor(slowAmp * 10);
-					amplifierCount += Math.min(mAmplifierCap, Math.max(slowLevel - 1, 0));
+					amplifierCount += Math.min((int) mAmplifierCap, Math.max(slowLevel - 1, 0));
 					// mPlayer.sendMessage("Before: Slowed at Level " + (slowLevel));
 
 					if (isEnhanced() && slowLevel < 3) {
@@ -208,7 +208,7 @@ public class AmplifyingHex extends Ability {
 					debuffCount++;
 					double weakAmp = EntityUtils.getWeakenAmount(mPlugin, mob);
 					int weakLevel = (int) Math.floor(weakAmp * 10);
-					amplifierCount += Math.min(mAmplifierCap, Math.max(weakLevel - 1, 0));
+					amplifierCount += Math.min((int) mAmplifierCap, Math.max(weakLevel - 1, 0));
 					// mPlayer.sendMessage("Before: Weakened at Level " + (weakLevel));
 
 					if (isEnhanced() && weakLevel < 3) {

@@ -31,7 +31,6 @@ public class Volley extends Ability {
 	private static final double VOLLEY_2_DAMAGE_MULTIPLIER = 1.5;
 	private static final double ENHANCEMENT_BLEED_POTENCY = 0.1;
 	private static final int ENHANCEMENT_BLEED_DURATION = 4 * 20;
-	
 	public Set<AbstractArrow> mVolleyArrows;
 	private Map<LivingEntity, Integer> mVolleyHitMap;
 
