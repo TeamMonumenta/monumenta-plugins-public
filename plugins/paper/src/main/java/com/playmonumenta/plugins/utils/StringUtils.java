@@ -161,4 +161,12 @@ public class StringUtils {
 			return ChatColor.GREEN + "+" + percent + "%";
 		}
 	}
+
+	public static String formatDecimal(double d) {
+		if (d == (int) d) {
+			return Integer.toString((int) d);
+		} else {
+			return Double.toString(d);
+		}
+	}
 }

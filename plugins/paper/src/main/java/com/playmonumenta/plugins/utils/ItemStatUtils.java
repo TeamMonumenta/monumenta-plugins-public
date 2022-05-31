@@ -28,6 +28,7 @@ import de.tr7zw.nbtapi.NBTList;
 import de.tr7zw.nbtapi.NBTListCompound;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.SuggestionInfo;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.DoubleArgument;
@@ -49,6 +50,7 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
@@ -2252,7 +2254,6 @@ public class ItemStatUtils {
 		List<Argument> arguments = new ArrayList<>();
 		arguments.add(new MultiLiteralArgument("add"));
 		arguments.add(new IntegerArgument("index", 0));
-
 		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
 			if (player.getGameMode() != GameMode.CREATIVE) {
 				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
@@ -2278,6 +2279,50 @@ public class ItemStatUtils {
 			}
 			Integer index = (Integer) args[1];
 			String lore = (String) args[2];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+			String hexColor = "#C8A2C8";
+			if (lore.charAt(0) == '+') {
+				if (lore.endsWith("Cooldown")) {
+					hexColor = "#D02E28";
+				} else {
+					hexColor = "#4AC2E5";
+				}
+			} else if (lore.charAt(0) == '-') {
+				if (lore.endsWith("Cooldown")) {
+					hexColor = "#4AC2E5";
+				} else {
+					hexColor = "#D02E28";
+				}
+			}
+
+			Component text = Component.text(lore, TextColor.fromHexString(hexColor)).decoration(TextDecoration.ITALIC, false);
+			addCharmEffect(item, index, text);
+
+			generateItemStats(item);
+		}).register();
+
+		Function<SuggestionInfo, String[]> suggestions = suggestionInfo -> Plugin.getInstance().mCharmManager.mCharmEffectList.toArray(String[]::new);
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("add"));
+		arguments.add(new IntegerArgument("index", 0));
+		arguments.add(new DoubleArgument("value"));
+		arguments.add(new MultiLiteralArgument("flat", "percent"));
+		arguments.add(new GreedyStringArgument("charm").includeSuggestions(suggestions));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			Double value = (Double) args[2];
+			String valueType = (String) args[3];
+			String charm = (String) args[4];
+			String lore = (value > 0 ? "+" : "") + StringUtils.formatDecimal(value) + (valueType.equals("percent") ? "%" : "") + " " + charm;
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
@@ -2359,6 +2404,43 @@ public class ItemStatUtils {
 			}
 			Integer index = (Integer) args[1];
 			String lore = (String) args[2];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			removeLore(item, index);
+			if (lore.charAt(0) == '+') {
+				Component text = Component.text(lore, TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false);
+				addCharmEffect(item, index, text);
+			} else if (lore.charAt(0) == '-') {
+				Component text = Component.text(lore, TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false);
+				addCharmEffect(item, index, text);
+			} else {
+				Component text = Component.text(lore, TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false);
+				addCharmEffect(item, index, text);
+			}
+
+			generateItemStats(item);
+		}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("replace"));
+		arguments.add(new IntegerArgument("index", 0));
+		arguments.add(new DoubleArgument("value"));
+		arguments.add(new MultiLiteralArgument("flat", "percent"));
+		arguments.add(new GreedyStringArgument("charm").includeSuggestions(suggestions));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			Double value = (Double) args[2];
+			String valueType = (String) args[3];
+			String charm = (String) args[4];
+			String lore = (value > 0 ? "+" : "") + StringUtils.formatDecimal(value) + (valueType.equals("percent") ? "%" : "") + " " + charm;
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
