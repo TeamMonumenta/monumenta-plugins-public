@@ -5,9 +5,13 @@ import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.structures.StructuresPlugin;
+import com.playmonumenta.structures.managers.RespawningStructure;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
@@ -23,6 +27,7 @@ public class StatMultiplier {
 	private static final double SPEED_MULTIPLIER_INCREMENT = 0.004;
 
 	private static final Map<String, Double> STAT_COMPENSATION_MAPPINGS = new HashMap<>();
+	private static final Map<String, Double> STAT_COMPENSATION_MAPPINGS_RING_POI = new HashMap<>();
 
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.5;
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
@@ -49,10 +54,28 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS.put("dev1", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev2", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("mobs", 1.0);
+
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("test", 2.0);
 	}
 
 	public static double getStatCompensation(String dungeon) {
 		return STAT_COMPENSATION_MAPPINGS.getOrDefault(dungeon, 1.0);
+	}
+
+	public static double getStatCompensation(String shard, Location loc) {
+		if (shard.equals("ring")) {
+			List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(loc.toVector(), false);
+			for (RespawningStructure rs : structures) {
+				String name = (String) rs.getConfig().get("name");
+				Double value = STAT_COMPENSATION_MAPPINGS_RING_POI.get(name);
+				if (value != null) {
+					return value;
+				}
+			}
+			//no match -> return default value from shard mapping
+		}
+
+		return STAT_COMPENSATION_MAPPINGS.getOrDefault(shard, 1.0);
 	}
 
 	public static double getDamageMultiplier(int depthPoints) {
@@ -77,10 +100,6 @@ public class StatMultiplier {
 		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * SPEED_MULTIPLIER_INCREMENT;
 	}
 
-	public static double getDelveMobStatMultiplier(int point) {
-		return STAT_COMPENSATION_MAPPINGS.get(ServerProperties.getShardName()) == null ? 1 : STAT_COMPENSATION_MAPPINGS.get(ServerProperties.getShardName());
-	}
-
 	public static boolean isDepthsShard() {
 		return ServerProperties.getShardName().startsWith("depths")
 			|| ServerProperties.getShardName().equals("mobs")
@@ -92,10 +111,13 @@ public class StatMultiplier {
 			//somehow we run a delve with 0 score delvescore
 			return;
 		}
+
+		double statCompensation = getStatCompensation(ServerProperties.getShardName(), mob.getLocation());
+
 		//stat
 		double healthMulti = DelvesUtils.isDelveMob(mob) ?
 			                    getHealthMultiplier(level) * (ServerProperties.getClassSpecializationsEnabled() ? DELVE_MOB_STAT_MULTIPLIER_R2 : DELVE_MOB_STAT_MULTIPLIER_R1) :
-			                    getHealthMultiplier(level) * STAT_COMPENSATION_MAPPINGS.getOrDefault(ServerProperties.getShardName(), 1.0);
+			                    getHealthMultiplier(level) * statCompensation;
 
 		EntityUtils.scaleMaxHealth(mob, healthMulti - 1, HEALTH_MODIFIER_NAME);
 
@@ -106,7 +128,7 @@ public class StatMultiplier {
 		}
 
 		mob.addScoreboardTag(StatMultiplierBoss.identityTag);
-		mob.addScoreboardTag(StatMultiplierBoss.identityTag + "[damagestatmult=" + getDelveMobStatMultiplier(level) + ",damagemult=" + getDamageMultiplier(level) + "]");
+		mob.addScoreboardTag(StatMultiplierBoss.identityTag + "[damagestatmult=" + statCompensation + ",damagemult=" + getDamageMultiplier(level) + "]");
 	}
 
 }
