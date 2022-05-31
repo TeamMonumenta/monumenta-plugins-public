@@ -501,7 +501,7 @@ public class ChestUtils {
 		}
 
 		String plainName = ItemUtils.getPlainName(item);
-		return plainName.equals("LOOTBOX") || plainName.equals("Box of Endless Echoes");
+		return plainName.equals("LOOTBOX") || plainName.equals("Box of Endless Echoes") || plainName.equals("Mouth of the Mimic");
 	}
 
 	public static boolean isEpicLootBox(ItemStack item) {
@@ -509,7 +509,8 @@ public class ChestUtils {
 			return false;
 		}
 
-		return ItemUtils.getPlainName(item).equals("Box of Endless Echoes");
+		String plainName = ItemUtils.getPlainName(item);
+		return plainName.equals("Box of Endless Echoes") || plainName.equals("Mouth of the Mimic");
 	}
 
 	public static boolean isNormalLootBox(ItemStack item) {
