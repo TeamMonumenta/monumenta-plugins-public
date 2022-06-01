@@ -426,6 +426,7 @@ public class ItemStatUtils {
 		DUELIST(new Duelist(), true, false, false),
 		ERUPTION(new Eruption(), true, false, false),
 		EXCAVATOR(new Excavator(), false, false, false),
+		EXPLODING(new Explosive(), true, false, false),
 		ICE_ASPECT(new IceAspect(), true, false, false),
 		FIRE_ASPECT(new FireAspect(), true, false, false),
 		THUNDER_ASPECT(new ThunderAspect(), true, false, false),
@@ -439,6 +440,7 @@ public class ItemStatUtils {
 		INTUITION(new Intuition(), false, false, false),
 		JUNGLES_NOURISHMENT(new JunglesNourishment(), false, false, false),
 		LIFE_DRAIN(new LifeDrain(), true, false, false),
+		MULTILOAD(new Multiload(), true, false, false),
 		MULTITOOL(new Multitool(), true, false, false),
 		RADIANT(new Radiant(), false, false, false),
 		REGENERATION(new Regeneration(), true, false, false),
@@ -553,15 +555,15 @@ public class ItemStatUtils {
 
 		public boolean isItemTypeEnchantment() {
 			return this == MAGIC_WAND
-				       || this == ALCHEMICAL_ALEMBIC;
+				|| this == ALCHEMICAL_ALEMBIC;
 		}
 
 		public boolean isHidden() {
 			return this == MAINHAND_OFFHAND_DISABLE
-				       || this == OFFHAND_MAINHAND_DISABLE
-				       || this == HIDE_ATTRIBUTES
-				       || this == HIDE_ENCHANTS
-				       || this == HIDE_INFO;
+				|| this == OFFHAND_MAINHAND_DISABLE
+				|| this == HIDE_ATTRIBUTES
+				|| this == HIDE_ENCHANTS
+				|| this == HIDE_INFO;
 		}
 
 		public Component getDisplay(int level) {

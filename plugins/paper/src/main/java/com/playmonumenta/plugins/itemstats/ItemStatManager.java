@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
+import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -51,6 +52,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -222,7 +224,7 @@ public class ItemStatManager implements Listener {
 					newStats.add(stat, (newArmorAddStats.get(stat) + newMainhandAddStats.get(stat)) * (1 + newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat)));
 				}
 				if (stat instanceof CritScaling || stat instanceof AntiCritScaling ||
-					    stat instanceof StrengthApply || stat instanceof StrengthCancel) {
+					stat instanceof StrengthApply || stat instanceof StrengthCancel) {
 					newStats.add(stat, 1);
 				}
 				if (stat instanceof RegionScalingDamageDealt && (ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.ISLES || ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.RING)) {
@@ -495,10 +497,26 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
+	public void onLoadCrossbow(Plugin plugin, Player player, EntityLoadCrossbowEvent event) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onLoadCrossbow(plugin, player, entry.getValue(), event);
+			}
+		}
+	}
+
 	public void onLaunchProjectile(Plugin plugin, Player player, ProjectileLaunchEvent event, Projectile projectile) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onLaunchProjectile(plugin, player, entry.getValue(), event, projectile);
+			}
+		}
+	}
+
+	public void onProjectileHit(Plugin plugin, Player player, ProjectileHitEvent event, Projectile projectile) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onProjectileHit(plugin, player, entry.getValue(), event, projectile);
 			}
 		}
 	}
