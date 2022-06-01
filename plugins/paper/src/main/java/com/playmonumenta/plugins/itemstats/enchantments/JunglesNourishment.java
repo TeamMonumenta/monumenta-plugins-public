@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -51,7 +52,7 @@ public class JunglesNourishment implements Enchantment {
 			ItemStack item = event.getItem();
 			String source = ItemCooldown.toSource(getEnchantmentType());
 			if (plugin.mEffectManager.hasEffect(player, source)) {
-				player.sendMessage(Component.text("Your " + ItemUtils.getPlainName(item) + " is still on cooldown!", NamedTextColor.AQUA));
+				player.sendMessage(Component.text("Your " + ItemUtils.getPlainName(item) + " is still on cooldown!", TextColor.fromHexString("#D02E28")));
 				event.setCancelled(true);
 				return;
 			}

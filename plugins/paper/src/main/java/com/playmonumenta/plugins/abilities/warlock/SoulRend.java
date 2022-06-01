@@ -128,6 +128,15 @@ public class SoulRend extends Ability {
 			if (isLevelTwo()) {
 				for (Player p : PlayerUtils.otherPlayersInRange(mPlayer, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), true)) {
 					new PartialParticle(Particle.DAMAGE_INDICATOR, p.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0).spawnAsPlayerActive(mPlayer);
+					if (isEnhanced()) {
+						double remainingHealth = EntityUtils.getMaxHealth(p) - p.getHealth();
+						if (heal > remainingHealth) {
+							double absorption = heal - remainingHealth;
+							heal = remainingHealth;
+							absorption = Math.min(ABSORPTION_CAP, absorption);
+							AbsorptionUtils.addAbsorption(p, absorption, absorption, ABSORPTION_DURATION);
+						}
+					}
 					PlayerUtils.healPlayer(mPlugin, p, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, heal), mPlayer);
 				}
 			}

@@ -56,12 +56,10 @@ public class Swiftness extends Ability {
 		DamageEvent.DamageType type = event.getType();
 		if ((type == DamageEvent.DamageType.MELEE || type == DamageEvent.DamageType.PROJECTILE) && isEnhanced() && FastUtils.RANDOM.nextDouble() < DODGE_CHANCE) {
 			event.setCancelled(true);
-
-			//TODO stolen from rogue dodging, should probably be made unique
 			Location loc = mPlayer.getLocation();
 			World world = mPlayer.getWorld();
-			new PartialParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
+			new PartialParticle(Particle.CLOUD, loc, 40, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
+			world.playSound(loc, Sound.ENTITY_WITCH_THROW, 1, 2f);
 		}
 	}
 

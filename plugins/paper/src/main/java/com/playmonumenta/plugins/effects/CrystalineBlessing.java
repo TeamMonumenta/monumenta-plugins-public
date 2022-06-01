@@ -14,8 +14,8 @@ import org.bukkit.entity.Player;
 
 public class CrystalineBlessing extends ZeroArgumentEffect {
 
-	int DUR = 3 * 20;
-	private static final double DAMAGE_PERCENT = 0.15;
+	private static final int DUR = 3 * 20;
+	private static final double DAMAGE_PERCENT = 0.2;
 	private static final String ATTR_NAME = "CrystalineBlessing";
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
 		DamageType.MELEE,

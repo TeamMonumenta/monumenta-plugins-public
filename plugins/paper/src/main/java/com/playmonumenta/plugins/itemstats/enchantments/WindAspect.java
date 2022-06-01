@@ -3,8 +3,10 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -40,12 +42,22 @@ public class WindAspect implements Enchantment {
 
 	private void launch(Entity e, double level) {
 		World world = e.getWorld();
-		Vector v = e.getVelocity();
-		v.setY(1 + (level * 0.2)); // TODO: Check height here
-		e.setVelocity(v);
-		world.spawnParticle(Particle.END_ROD, e.getLocation(), 3, 0, 0.5, 0, 0.5);
-		world.spawnParticle(Particle.BUBBLE_COLUMN_UP, e.getLocation(), 6, 0, 0, 0, 0.25);
-		world.playSound(e.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.20f);
+		world.playSound(e.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
+
+		double widthDelta = PartialParticle.getWidthDelta(e);
+		double doubleWidthDelta = widthDelta * 2;
+		double heightDelta = PartialParticle.getHeightDelta(e);
+
+		new PartialParticle(
+			Particle.CLOUD,
+			LocationUtils.getHeightLocation(e, 0.25),
+			10,
+			doubleWidthDelta,
+			heightDelta / 2,
+			doubleWidthDelta
+		).spawnAsEnemy();
+
+		e.setVelocity(new Vector(0.f, 1 + (level * 0.75), 0.f));
 	}
 
 }
