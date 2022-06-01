@@ -221,6 +221,9 @@ public class QuiverListener implements Listener {
 		if (!ItemUtils.isArrow(itemStack)) {
 			return;
 		}
+		if (ItemStatUtils.getEnchantmentLevel(itemStack, ItemStatUtils.EnchantmentType.THROWING_KNIFE) > 0) {
+			return;
+		}
 		for (ItemStack quiver : player.getInventory()) {
 			if (!ItemStatUtils.isQuiver(quiver)
 				    || !(quiver.getItemMeta() instanceof BlockStateMeta blockStateMeta)
