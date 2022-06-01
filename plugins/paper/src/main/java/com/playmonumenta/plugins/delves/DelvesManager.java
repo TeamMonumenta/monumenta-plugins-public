@@ -250,6 +250,21 @@ public class DelvesManager implements Listener {
 		PLAYER_DELVE_DUNGEON_MOD_MAP.put(player.getUniqueId(), playerDungeonInfo);
 	}
 
+	public static boolean validateDelvePreset(Player player, String dungeon) {
+		Map<String, DungeonDelveInfo> playerDungeonInfo = PLAYER_DELVE_DUNGEON_MOD_MAP.get(player.getUniqueId());
+
+		DungeonDelveInfo ddinfo = playerDungeonInfo.getOrDefault(dungeon, new DungeonDelveInfo());
+
+		int preset = ScoreboardUtils.getScoreboardValue(player, DelvePreset.PRESET_SCOREBOARD).orElse(0);
+		if (preset == 0) {
+			return true;
+		}
+		if (DelvePreset.validatePresetModifiers(ddinfo, DelvePreset.getDelvePreset(preset))) {
+			return true;
+		}
+		return false;
+	}
+
 	protected static JsonObject convertPlayerData(Player player) {
 		if (PLAYER_DELVE_DUNGEON_MOD_MAP.get(player.getUniqueId()) == null) {
 			return null;

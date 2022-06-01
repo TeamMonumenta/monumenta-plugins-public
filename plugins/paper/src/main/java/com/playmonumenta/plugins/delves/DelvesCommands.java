@@ -187,6 +187,22 @@ public class DelvesCommands {
 					DelvesUtils.copyDelvePoint(commandSender, (Player) args[2], target, ServerProperties.getShardName());
 				}
 			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
+				new MultiLiteralArgument("validate"),
+				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER), dungeonArg
+			).executes((commandSender, args) -> {
+				Player player = (Player) args[1];
+				String dungeon = (String) args[2];
+				if (dungeon.equals("ring")) {
+					if (DelvesManager.validateDelvePreset(player, dungeon)) {
+						return 1;
+					}
+				}
+				return 0;
+			}).register();
 	}
 
 }
