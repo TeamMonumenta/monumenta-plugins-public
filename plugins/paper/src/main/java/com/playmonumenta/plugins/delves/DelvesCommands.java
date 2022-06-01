@@ -2,11 +2,14 @@ package com.playmonumenta.plugins.delves;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.ObjectiveArgument;
+import dev.jorel.commandapi.arguments.ScoreHolderArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import java.util.Collection;
 import org.bukkit.entity.Player;
@@ -115,6 +118,26 @@ public class DelvesCommands {
 				new IntegerArgument("rank", 0, 10)
 			).executes((commandSender, args) -> {
 				return DelvesUtils.setDelvePoint(commandSender, (Player) args[2], (String) args[3], DelvesModifier.fromName((String) args[4]), (Integer) args[5]);
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
+				new MultiLiteralArgument("set"),
+				new MultiLiteralArgument("mod"),
+				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				dungeonArg,
+				delveModArg,
+				new MultiLiteralArgument("score"),
+				new ScoreHolderArgument("score holder"),
+				new ObjectiveArgument("objective")
+			).executes((commandSender, args) -> {
+				DelvesModifier mod = DelvesModifier.fromName((String) args[4]);
+				String scoreHolder = (String) args[6];
+				String objective = (String) args[7];
+				int rank = ScoreboardUtils.getScoreboardValue(scoreHolder, objective).orElse(0);
+				rank = DelvesUtils.getMaxPointAssignable(mod, rank);
+				return DelvesUtils.setDelvePoint(commandSender, (Player) args[2], (String) args[3], mod, rank);
 			}).register();
 
 		new CommandAPICommand(COMMAND)
