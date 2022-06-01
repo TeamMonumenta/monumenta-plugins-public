@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -65,6 +66,7 @@ public class SpellVolcanicDemise extends Spell {
 		for (Player player : players) {
 			player.sendMessage(ChatColor.GREEN + "SCATTER, INSECTS.");
 		}
+		CommandUtils.runCommandViaConsole("function monumenta:kaul/volcanic_demise_count"); // For the advancement "Such Devastation"
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 
@@ -94,6 +96,7 @@ public class SpellVolcanicDemise extends Spell {
 						int mI = 0;
 
 						int mMeteors = 0;
+
 						@Override
 						public void run() {
 							mI++;
