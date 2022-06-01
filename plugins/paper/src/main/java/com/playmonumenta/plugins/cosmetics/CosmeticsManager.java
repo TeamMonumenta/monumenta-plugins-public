@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics;
 
+import com.destroystokyo.paper.event.player.PlayerDataLoadEvent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,7 +23,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -50,7 +49,7 @@ public class CosmeticsManager implements Listener {
 	/**
 	 * Returns true if the list contains the cosmetic with given name and type
 	 */
-	private boolean listHasCosmetic(List<Cosmetic> cosmetics, String name, CosmeticType type) {
+	private boolean listHasCosmetic(List<Cosmetic> cosmetics, CosmeticType type, String name) {
 		for (Cosmetic c : cosmetics) {
 			if (c.getName().equals(name) && c.getType() == type) {
 				return true;
@@ -63,10 +62,10 @@ public class CosmeticsManager implements Listener {
 	 * Returns true if the player has unlocked the cosmetic with given name and type
 	 * This is called by external methods such as plot border GUI
 	 */
-	public boolean playerHasCosmetic(Player p, String name, CosmeticType type) {
-		List<Cosmetic> playerCosmetics = mPlayerCosmetics.get(p.getUniqueId());
+	public boolean playerHasCosmetic(Player player, CosmeticType type, String name) {
+		List<Cosmetic> playerCosmetics = mPlayerCosmetics.get(player.getUniqueId());
 		if (playerCosmetics != null) {
-			return listHasCosmetic(playerCosmetics, name, type);
+			return listHasCosmetic(playerCosmetics, type, name);
 		}
 		return false;
 	}
@@ -75,16 +74,13 @@ public class CosmeticsManager implements Listener {
 	 * Unlocks a new cosmetic for the player with given name and type.
 	 * Checks to make sure there isn't a duplicate.
 	 */
-	public boolean addCosmetic(Player p, CosmeticType type, String name) {
-		Cosmetic cosmetic = new Cosmetic(type, name);
-
-		if (p != null && mPlayerCosmetics.get(p.getUniqueId()) != null && !listHasCosmetic(mPlayerCosmetics.get(p.getUniqueId()), name, type)) {
-			mPlayerCosmetics.get(p.getUniqueId()).add(cosmetic);
-			return true;
-		} else if (p != null && mPlayerCosmetics.get(p.getUniqueId()) == null) {
-			List<Cosmetic> playerCosmetics = new ArrayList<>();
-			playerCosmetics.add(cosmetic);
-			mPlayerCosmetics.put(p.getUniqueId(), playerCosmetics);
+	public boolean addCosmetic(Player player, CosmeticType type, String name) {
+		if (player == null) {
+			return false;
+		}
+		List<Cosmetic> playerCosmetics = mPlayerCosmetics.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>());
+		if (!listHasCosmetic(playerCosmetics, type, name)) {
+			playerCosmetics.add(new Cosmetic(type, name));
 			return true;
 		}
 		return false;
@@ -93,11 +89,15 @@ public class CosmeticsManager implements Listener {
 	/**
 	 * Removes the cosmetic of given name from the player's collection
 	 */
-	public boolean removeCosmetic(Player p, String name) {
-		if (p != null && mPlayerCosmetics.get(p.getUniqueId()) != null) {
-			for (Cosmetic c : mPlayerCosmetics.get(p.getUniqueId())) {
-				if (c.getName().equals(name)) {
-					mPlayerCosmetics.get(p.getUniqueId()).remove(c);
+	public boolean removeCosmetic(Player player, CosmeticType type, String name) {
+		if (player == null) {
+			return false;
+		}
+		List<Cosmetic> playerCosmetics = mPlayerCosmetics.get(player.getUniqueId());
+		if (playerCosmetics != null) {
+			for (Cosmetic c : playerCosmetics) {
+				if (c.getType() == type && c.getName().equals(name)) {
+					playerCosmetics.remove(c);
 					return true;
 				}
 			}
@@ -106,39 +106,30 @@ public class CosmeticsManager implements Listener {
 	}
 
 	/**
-	 * Clears all the player's cosmetics (dangerous!)
+	 * Clears all the player's cosmetics of a certain type (dangerous!)
 	 */
-	public boolean clearCosmetics(Player p) {
-		List<Cosmetic> playerCosmetics = mPlayerCosmetics.get(p.getUniqueId());
+	public void clearCosmetics(Player player, CosmeticType type) {
+		List<Cosmetic> playerCosmetics = mPlayerCosmetics.get(player.getUniqueId());
 		if (playerCosmetics != null) {
-			mPlayerCosmetics.get(p.getUniqueId()).clear();
+			playerCosmetics.removeIf(c -> c.getType() == type);
 		}
-		return true;
 	}
 
 	/**
 	 * Gets a list of all unlocked cosmetics for the given player
 	 */
-	public @Nullable List<Cosmetic> getCosmetics(Player p) {
-		return mPlayerCosmetics.get(p.getUniqueId());
+	public List<Cosmetic> getCosmetics(Player player) {
+		return mPlayerCosmetics.getOrDefault(player.getUniqueId(), Collections.emptyList());
 	}
 
 	/**
 	 * Gets a list of unlocked cosmetic of certain type, sorted alphabetically by name
 	 */
-	public @Nullable List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player p, CosmeticType type) {
-		List<Cosmetic> playerCosmetics = mPlayerCosmetics.get(p.getUniqueId());
-		if (playerCosmetics == null || playerCosmetics.size() == 0) {
-			return null;
-		}
-		List<Cosmetic> filteredList = new ArrayList<>();
-		for (Cosmetic c : playerCosmetics) {
-			if (c.getType() == type) {
-				filteredList.add(c);
-			}
-		}
-		Collections.sort(filteredList, Comparator.comparing(Cosmetic::getName));
-		return filteredList;
+	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type) {
+		return getCosmetics(player).stream()
+			.filter(c -> c.getType() == type)
+			.sorted(Comparator.comparing(Cosmetic::getName))
+			.toList();
 	}
 
 	/**
@@ -146,8 +137,8 @@ public class CosmeticsManager implements Listener {
 	 * NOTE: If we add new types in the future with multiple equippable cosmetics,
 	 * we will need to add additional functionality
 	 */
-	public @Nullable Cosmetic getActiveCosmetic(Player p, CosmeticType type) {
-		List<Cosmetic> cosmetics = mPlayerCosmetics.get(p.getUniqueId());
+	public @Nullable Cosmetic getActiveCosmetic(Player player, CosmeticType type) {
+		List<Cosmetic> cosmetics = mPlayerCosmetics.get(player.getUniqueId());
 		if (cosmetics != null) {
 			for (Cosmetic c : cosmetics) {
 				if (c.getType() == type && c.isEquipped()) {
@@ -181,26 +172,20 @@ public class CosmeticsManager implements Listener {
 			JsonObject data = new JsonObject();
 			JsonArray cosmeticArray = new JsonArray();
 			data.add(KEY_COSMETICS, cosmeticArray);
-			Iterator<Cosmetic> iterCosmetics = cosmetics.iterator();
-			while (iterCosmetics.hasNext()) {
-				Cosmetic cosmetic = iterCosmetics.next();
-
+			for (Cosmetic cosmetic : cosmetics) {
 				JsonObject cosmeticObj = new JsonObject();
 				cosmeticObj.addProperty("name", cosmetic.getName());
 				cosmeticObj.addProperty("type", cosmetic.getType().getType());
 				cosmeticObj.addProperty("enabled", cosmetic.isEquipped());
-
-				if (cosmeticObj != null) {
-					cosmeticArray.add(cosmeticObj);
-				}
+				cosmeticArray.add(cosmeticObj);
 			}
 			event.setPluginData(KEY_PLUGIN_DATA, data);
 		}
 	}
 
 	//Load plugin data into local cosmetic data
-	@EventHandler(ignoreCancelled = true)
-	public void onJoin(PlayerJoinEvent event) {
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void playerDataLoadEvent(PlayerDataLoadEvent event) {
 		Player p = event.getPlayer();
 		JsonObject cosmeticData = MonumentaRedisSyncAPI.getPlayerPluginData(p.getUniqueId(), KEY_PLUGIN_DATA);
 		if (cosmeticData != null) {
@@ -220,6 +205,8 @@ public class CosmeticsManager implements Listener {
 				}
 			}
 		}
+		// call the "event listener" of the vanity manager after the cosmetics manager loaded cosmetics
+		Plugin.getInstance().mVanityManager.playerDataLoadEvent(event);
 	}
 
 	// Elite Finisher handler

@@ -1,26 +1,26 @@
 package com.playmonumenta.plugins.cosmetics;
 
+import java.util.Locale;
 import org.bukkit.Material;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public enum CosmeticType {
-	TITLE("title", "Player Title", Material.NAME_TAG),
-	ELITE_FINISHER("elite_finisher", "Elite Finisher", Material.FIREWORK_ROCKET),
-	PLOT_BORDER("plot_border", "Plot Border", Material.BARRIER);
+	TITLE("Player Title", Material.NAME_TAG),
+	ELITE_FINISHER("Elite Finisher", Material.FIREWORK_ROCKET),
+	PLOT_BORDER("Plot Border", Material.BARRIER),
+	VANITY("Vanity", Material.GOLDEN_CHESTPLATE),
+	;
 
-	private final String mType;
 	private final String mDisplayName;
 	private final Material mDisplayItem;
 
-
-	CosmeticType(String type, String displayName, Material material) {
-		mType = type;
+	CosmeticType(String displayName, Material material) {
 		mDisplayName = displayName;
 		mDisplayItem = material;
 	}
 
 	public String getType() {
-		return mType;
+		return name().toLowerCase(Locale.ROOT);
 	}
 
 	public String getDisplayName() {
@@ -29,6 +29,10 @@ public enum CosmeticType {
 
 	public Material getDisplayItem() {
 		return mDisplayItem;
+	}
+
+	public boolean isEquippable() {
+		return this != VANITY;
 	}
 
 	public static @Nullable CosmeticType getTypeSelection(String type) {

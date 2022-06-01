@@ -51,8 +51,9 @@ public class SeasonalPass {
 
 	/**
 	 * Loads a season pass for a given week from its two json files
+	 *
 	 * @param missionsJson The contents of a missions json file for this pass
-	 * @param rewardsJson The contents of a rewards json file for this pass
+	 * @param rewardsJson  The contents of a rewards json file for this pass
 	 * @throws Exception if the season pass has an invalid file
 	 */
 	public SeasonalPass(String startDateString, JsonObject missionsJson, JsonObject rewardsJson) throws Exception {
@@ -212,7 +213,7 @@ public class SeasonalPass {
 		}
 
 		// Special case - finished all missions
-		if (newMP == mTotalMp && !CosmeticsManager.getInstance().playerHasCosmetic(p, SeasonalEventManager.ALL_MISSIONS_TITLE_NAME, CosmeticType.TITLE)) {
+		if (newMP == mTotalMp && !CosmeticsManager.getInstance().playerHasCosmetic(p, CosmeticType.TITLE, SeasonalEventManager.ALL_MISSIONS_TITLE_NAME)) {
 			p.sendMessage(Component.text("You finished all the missions!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			animate(p);
 			CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.TITLE, SeasonalEventManager.ALL_MISSIONS_TITLE_NAME);
@@ -265,6 +266,7 @@ public class SeasonalPass {
 
 	/**
 	 * Note that this can give weeks outside the range of the season pass
+	 *
 	 * @return week number within or beyond a season pass
 	 */
 	public int getWeekOfPass() {

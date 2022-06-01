@@ -231,11 +231,11 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		for (TeleportEntry item : BORDER_ITEMS) {
 			if (item.mPage == commonPage) {
 				if (item.mPermType == PermType.COSMETIC_ITEM &&
-					(mOverridePermissions || cosmetics.playerHasCosmetic(player, item.mCosmeticString, CosmeticType.PLOT_BORDER))) {
+					    (mOverridePermissions || cosmetics.playerHasCosmetic(player, CosmeticType.PLOT_BORDER, item.mCosmeticString))) {
 					mInventory.setItem(item.mSlot, createCustomItem(item));
 				} else if (item.mPermType == PermType.SCOREBOARD &&
-						(item.mScoreboard == null || mOverridePermissions ||
-						ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired)) {
+					           (item.mScoreboard == null || mOverridePermissions ||
+						            ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired)) {
 					mInventory.setItem(item.mSlot, createCustomItem(item));
 				}
 			}
@@ -243,11 +243,11 @@ public class PlotBorderCustomInventory extends CustomInventory {
 			//intentionally not else, so overrides can happen
 			if (item.mPage == mCurrentPage) {
 				if (item.mPermType == PermType.COSMETIC_ITEM &&
-					cosmetics.playerHasCosmetic(player, item.mCosmeticString, CosmeticType.PLOT_BORDER)) {
+					    cosmetics.playerHasCosmetic(player, CosmeticType.PLOT_BORDER, item.mCosmeticString)) {
 					mInventory.setItem(item.mSlot, createCustomItem(item));
 				} else if (item.mPermType == PermType.SCOREBOARD &&
-						(item.mScoreboard == null || mOverridePermissions ||
-						ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired)) {
+					           (item.mScoreboard == null || mOverridePermissions ||
+						            ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired)) {
 					mInventory.setItem(item.mSlot, createCustomItem(item));
 				}
 			}

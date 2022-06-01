@@ -496,48 +496,58 @@ public class ItemUtils {
 			return item.getAmount() * 64 * 2;
 		case EPIC:
 			return item.getAmount() * 64 * 3;
-		default:
-			return 0;
+			default:
+				return 0;
 		}
 	}
 
 	public static EquipmentSlot getEquipmentSlot(ItemStack item) {
-		switch (item.getType()) {
-		case LEATHER_HELMET:
-		case CHAINMAIL_HELMET:
-		case IRON_HELMET:
-		case GOLDEN_HELMET:
-		case DIAMOND_HELMET:
-		case TURTLE_HELMET:
-		case PUMPKIN:
-		case CREEPER_HEAD:
-		case SKELETON_SKULL:
-		case WITHER_SKELETON_SKULL:
-		case ZOMBIE_HEAD:
-		case PLAYER_HEAD:
-			return EquipmentSlot.HEAD;
-		case LEATHER_CHESTPLATE:
-		case CHAINMAIL_CHESTPLATE:
-		case IRON_CHESTPLATE:
-		case GOLDEN_CHESTPLATE:
-		case DIAMOND_CHESTPLATE:
-			return EquipmentSlot.CHEST;
-		case LEATHER_LEGGINGS:
-		case CHAINMAIL_LEGGINGS:
-		case IRON_LEGGINGS:
-		case GOLDEN_LEGGINGS:
-		case DIAMOND_LEGGINGS:
-			return EquipmentSlot.LEGS;
-		case LEATHER_BOOTS:
-		case CHAINMAIL_BOOTS:
-		case IRON_BOOTS:
-		case GOLDEN_BOOTS:
-		case DIAMOND_BOOTS:
-			return EquipmentSlot.FEET;
-		case SHIELD:
-			return EquipmentSlot.OFF_HAND;
-		default:
+		if (item == null) {
 			return EquipmentSlot.HAND;
+		}
+		return getEquipmentSlot(item.getType());
+	}
+
+	public static EquipmentSlot getEquipmentSlot(Material material) {
+		if (material == null) {
+			return EquipmentSlot.HAND;
+		}
+		switch (material) {
+			case LEATHER_HELMET:
+			case CHAINMAIL_HELMET:
+			case IRON_HELMET:
+			case GOLDEN_HELMET:
+			case DIAMOND_HELMET:
+			case TURTLE_HELMET:
+			case CARVED_PUMPKIN:
+			case CREEPER_HEAD:
+			case SKELETON_SKULL:
+			case WITHER_SKELETON_SKULL:
+			case ZOMBIE_HEAD:
+			case PLAYER_HEAD:
+				return EquipmentSlot.HEAD;
+			case LEATHER_CHESTPLATE:
+			case CHAINMAIL_CHESTPLATE:
+			case IRON_CHESTPLATE:
+			case GOLDEN_CHESTPLATE:
+			case DIAMOND_CHESTPLATE:
+				return EquipmentSlot.CHEST;
+			case LEATHER_LEGGINGS:
+			case CHAINMAIL_LEGGINGS:
+			case IRON_LEGGINGS:
+			case GOLDEN_LEGGINGS:
+			case DIAMOND_LEGGINGS:
+				return EquipmentSlot.LEGS;
+			case LEATHER_BOOTS:
+			case CHAINMAIL_BOOTS:
+			case IRON_BOOTS:
+			case GOLDEN_BOOTS:
+			case DIAMOND_BOOTS:
+				return EquipmentSlot.FEET;
+			case SHIELD:
+				return EquipmentSlot.OFF_HAND;
+			default:
+				return EquipmentSlot.HAND;
 		}
 	}
 

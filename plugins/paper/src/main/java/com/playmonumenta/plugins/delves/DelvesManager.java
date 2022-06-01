@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -120,13 +122,16 @@ public class DelvesManager implements Listener {
 	}
 
 	private static void loadPlayerData(Player player) {
-		JsonObject obj;
-		try {
-			obj = MonumentaRedisSyncAPI.getPlayerPluginData(player.getUniqueId(), KEY_DELVES_PLUGIN_DATA);
-		} catch (Exception e) {
-			MMLog.warning("[DelveManager] error while loading player info. Reason: " + e.getMessage());
-			e.printStackTrace();
-			return;
+		@Nullable JsonObject obj = loadLegacyDelve(player);
+		if (obj.size() == 0) {
+			obj = null;
+			try {
+				obj = MonumentaRedisSyncAPI.getPlayerPluginData(player.getUniqueId(), KEY_DELVES_PLUGIN_DATA);
+			} catch (Exception e) {
+				MMLog.warning("[DelveManager] error while loading player info. Reason: " + e.getMessage());
+				e.printStackTrace();
+				return;
+			}
 		}
 
 		if (obj == null) {
@@ -175,6 +180,59 @@ public class DelvesManager implements Listener {
 				player.sendMessage(Component.text("Some of your delve data have not loaded correctly, try reloading!", NamedTextColor.RED).hoverEvent(HoverEvent.showText(Component.text(e.toString()))));
 			}
 		}
+	}
+
+	/*
+	 * Remove after this has been on the play server for 4 updates
+	 */
+	public static JsonObject loadLegacyDelve(Player player) {
+		JsonArray dungeonsArray = new JsonArray();
+		for (Map.Entry<String, String> legacyDungeonObjectives : DelvesUtils.SHARD_SCOREBOARD_PREFIX_MAPPINGS.entrySet()) {
+			String shard = legacyDungeonObjectives.getKey();
+
+			String prefix = legacyDungeonObjectives.getValue();
+			long msb = ScoreboardUtils.getScoreboardValue(player, prefix + 1).orElse(0);
+			long lsb = ScoreboardUtils.getScoreboardValue(player, prefix + 2).orElse(0);
+			ScoreboardUtils.setScoreboardValue(player, prefix + 1, 0);
+			ScoreboardUtils.setScoreboardValue(player, prefix + 2, 0);
+			// Shift MSB by only 31 bits because treating ints as 31 bit unsigned ints
+			long legacyDelveScore = (msb << 31) + lsb;
+			if (legacyDelveScore == 0) {
+				continue;
+			}
+
+			JsonArray delvesModsJson = new JsonArray();
+			int remainingLegacyMods = 14;
+			for (DelvesModifier mod : DelvesModifier.values()) {
+				--remainingLegacyMods;
+				if (remainingLegacyMods < 0) {
+					break;
+				}
+
+				int rank = DelvesUtils.getMaxPointAssignable(mod, (int) legacyDelveScore & 0x7);
+				legacyDelveScore >>= 3;
+				if (rank == 0) {
+					continue;
+				}
+
+				JsonObject delveModJson = new JsonObject();
+				delveModJson.addProperty("delveModLvl", rank);
+				delveModJson.addProperty("delveModName", mod.name());
+
+				delvesModsJson.add(delveModJson);
+			}
+
+			JsonObject dungeonObj = new JsonObject();
+			dungeonObj.add("delveMods", delvesModsJson);
+			dungeonObj.addProperty("dungeonName", shard);
+
+			dungeonsArray.add(dungeonObj);
+		}
+		JsonObject obj = new JsonObject();
+		if (dungeonsArray.size() > 0) {
+			obj.add("dungeons", dungeonsArray);
+		}
+		return obj;
 	}
 
 	public static void savePlayerData(Player player, String dungeon, Map<DelvesModifier, Integer> mods) {

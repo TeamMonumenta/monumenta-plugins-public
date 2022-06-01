@@ -33,8 +33,8 @@ public class ProtocolLibIntegration {
 			logger.info("Will not replace spawner entities on this shard");
 		}
 		syncManager.addPacketListener(new GlowingReplacer(plugin));
-		syncManager.addPacketListener(new VirtualFirmamentReplacer(plugin));
 		syncManager.addPacketListener(new VirtualFoodReplacer(plugin));
+		syncManager.addPacketListener(new VirtualItemsReplacer(plugin));
 		syncManager.addPacketListener(new FirmamentLagFix(plugin));
 		syncManager.addPacketListener(new EntityEquipmentReplacer(plugin));
 		syncManager.addPacketListener(new WorldNameReplacer(plugin));

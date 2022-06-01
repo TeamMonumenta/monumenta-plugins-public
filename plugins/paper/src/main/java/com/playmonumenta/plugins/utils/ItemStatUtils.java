@@ -74,9 +74,9 @@ public class ItemStatUtils {
 
 	static final String MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME = "MMDummy";
 	public static final String MONUMENTA_KEY = "Monumenta";
-	static final String LORE_KEY = "Lore";
-	static final String STOCK_KEY = "Stock";
-	static final String PLAYER_MODIFIED_KEY = "PlayerModified";
+	public static final String LORE_KEY = "Lore";
+	public static final String STOCK_KEY = "Stock";
+	public static final String PLAYER_MODIFIED_KEY = "PlayerModified";
 	static final String LEVEL_KEY = "Level";
 	static final String INFUSER_KEY = "Infuser";
 	static final String ATTRIBUTE_NAME_KEY = "AttributeName";
@@ -92,16 +92,10 @@ public class ItemStatUtils {
 	static final String SHULKER_SLOTS_KEY = "ShulkerSlots";
 	static final String IS_QUIVER_KEY = "IsQuiver";
 	static final String QUIVER_ARROW_TRANSFORM_MODE_KEY = "ArrowTransformMode";
+	public static final String ITEMS_KEY = "Items";
+	public static final String VANITY_ITEMS_KEY = "VanityItems";
 
 	static final Component DUMMY_LORE_TO_REMOVE = Component.text("DUMMY LORE TO REMOVE", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
-
-	public static String getMonumentaKey() {
-		return MONUMENTA_KEY;
-	}
-
-	public static String getPlayerModifiedKey() {
-		return PLAYER_MODIFIED_KEY;
-	}
 
 	public enum Region {
 		NONE("none", DUMMY_LORE_TO_REMOVE),

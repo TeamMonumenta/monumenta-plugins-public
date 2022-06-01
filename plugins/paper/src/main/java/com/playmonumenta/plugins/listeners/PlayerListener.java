@@ -13,11 +13,22 @@ import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.protocollib.VirtualFirmamentReplacer;
+import com.playmonumenta.plugins.protocollib.VirtualItemsReplacer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.ChestUtils;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
@@ -47,7 +58,12 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -1162,7 +1178,7 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void gamemodeChangeEvent(PlayerGameModeChangeEvent event) {
-		// When switching to creative, update the inventory to update any virtual Firmaments back into normal Firmaments to prevent breaking them
+		// When switching to creative, update the inventory to update any virtual items back into normal forms to prevent breaking them
 		if (event.getNewGameMode() == GameMode.CREATIVE) {
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> event.getPlayer().updateInventory(), 1);
 		}
@@ -1170,9 +1186,9 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void inventoryCreativeEvent(InventoryCreativeEvent event) {
-		// The inventory update initiated above takes a while, during which the Firmament can be broken anyway, so need to watch for these events as well
-		if ((event.getCurrentItem() != null && VirtualFirmamentReplacer.isVirtualFirmament(event.getCurrentItem()))
-			    || VirtualFirmamentReplacer.isVirtualFirmament(event.getCursor())) {
+		// The inventory update initiated above takes a while, during which the virtual items can become broken anyway, so need to watch for these events as well
+		if ((event.getCurrentItem() != null && VirtualItemsReplacer.isVirtualItem(event.getCurrentItem()))
+			    || VirtualItemsReplacer.isVirtualItem(event.getCursor())) {
 			event.setCancelled(true);
 		}
 	}

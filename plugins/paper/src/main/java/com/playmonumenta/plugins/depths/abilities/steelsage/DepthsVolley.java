@@ -139,10 +139,10 @@ public class DepthsVolley extends DepthsAbility {
 	private boolean notBeenHit(LivingEntity enemy) {
 		// Basically the same logic as with MetadataUtils.happenedThisTick but with a hashmap in its stead
 		if (mDepthsVolleyHitMap.get(enemy) != null && mDepthsVolleyHitMap.get(enemy) == enemy.getTicksLived()) {
-			return true;
+			return false;
 		}
 		mDepthsVolleyHitMap.put(enemy, enemy.getTicksLived());
-		return false;
+		return true;
 	}
 
 	@Override

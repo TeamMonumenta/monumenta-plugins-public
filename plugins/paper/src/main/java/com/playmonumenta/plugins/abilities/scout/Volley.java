@@ -155,10 +155,10 @@ public class Volley extends Ability {
 	private boolean notBeenHit(LivingEntity enemy) {
 		// Basically the same logic as with MetadataUtils.happenedThisTick but with a hashmap in its stead
 		if (mVolleyHitMap.get(enemy) != null && mVolleyHitMap.get(enemy) == enemy.getTicksLived()) {
-			return true;
+			return false;
 		}
 		mVolleyHitMap.put(enemy, enemy.getTicksLived());
-		return false;
+		return true;
 	}
 
 }

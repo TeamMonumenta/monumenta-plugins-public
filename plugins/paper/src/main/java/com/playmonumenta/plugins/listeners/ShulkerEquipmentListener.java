@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
+import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -10,9 +12,11 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTItem;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
@@ -31,6 +35,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -39,24 +44,24 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class ShulkerEquipmentListener implements Listener {
 	private static final String LOCK_STRING = "AdminEquipmentTool";
-	private static final Map<Integer, Integer> SWAP_SLOTS = new TreeMap<Integer, Integer>();
 
-	static {
-		SWAP_SLOTS.put(0, 0);
-		SWAP_SLOTS.put(1, 1);
-		SWAP_SLOTS.put(2, 2);
-		SWAP_SLOTS.put(3, 3);
-		SWAP_SLOTS.put(4, 4);
-		SWAP_SLOTS.put(5, 5);
-		SWAP_SLOTS.put(6, 6);
-		SWAP_SLOTS.put(7, 7);
-		SWAP_SLOTS.put(8, 8);
-		SWAP_SLOTS.put(36, 9);
-		SWAP_SLOTS.put(37, 10);
-		SWAP_SLOTS.put(38, 11);
-		SWAP_SLOTS.put(39, 12);
-		SWAP_SLOTS.put(40, 13);
-	}
+	private static final ImmutableMap<Integer, Integer> SWAP_SLOTS = ImmutableMap.<Integer, Integer>builder()
+		.put(0, 0)
+		.put(1, 1)
+		.put(2, 2)
+		.put(3, 3)
+		.put(4, 4)
+		.put(5, 5)
+		.put(6, 6)
+		.put(7, 7)
+		.put(8, 8)
+		.put(36, 9)
+		.put(37, 10)
+		.put(38, 11)
+		.put(39, 12)
+		.put(40, 13)
+		.build();
+
 
 	private final Plugin mPlugin;
 	private final Map<UUID, BukkitRunnable> mCooldowns = new HashMap<>();
@@ -123,14 +128,17 @@ public class ShulkerEquipmentListener implements Listener {
 					//check if swapped in radius of boss
 					Location loc = player.getLocation();
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 24)) {
-				        if (mob.getScoreboardTags().contains("Boss") && !mob.getScoreboardTags().contains(TrainingDummyBoss.identityTag)) {
-				            player.sendMessage(ChatColor.RED + "Close to boss - Lockbox on 15s cooldown!");
-				            setSwapCooldown(player);
-				        }
-				    }
+						if (mob.getScoreboardTags().contains("Boss") && !mob.getScoreboardTags().contains(TrainingDummyBoss.identityTag)) {
+							player.sendMessage(ChatColor.RED + "Close to boss - Lockbox on 15s cooldown!");
+							setSwapCooldown(player);
+						}
+					}
 
 					sMeta.setBlockState(sbox);
 					sboxItem.setItemMeta(sMeta);
+
+					swapVanity(player, sboxItem);
+
 					player.updateInventory();
 					event.setCancelled(true);
 					Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = mPlugin.mItemStatManager.getPlayerItemStatsMappings();
@@ -205,6 +213,36 @@ public class ShulkerEquipmentListener implements Listener {
 		ItemStatUtils.generateItemStats(toItem);
 		from.setItem(fromSlot, toItem);
 		to.setItem(toSlot, fromItem);
+	}
+
+	private void swapVanity(Player player, ItemStack shulkerBox) {
+		VanityManager.VanityData vanityData = mPlugin.mVanityManager.getData(player);
+		if (!vanityData.mLockboxSwapEnabled) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(shulkerBox, true);
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			if (slot == EquipmentSlot.HAND) {
+				continue;
+			}
+			NBTCompound vanityItems = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY).addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY).addCompound(ItemStatUtils.VANITY_ITEMS_KEY);
+			String slotKey = slot.name().toLowerCase(Locale.ROOT);
+			ItemStack newVanity = vanityItems.hasKey(slotKey) ? vanityItems.getItemStack(slotKey) : null;
+			if (newVanity != null && (newVanity.getType() == Material.AIR || !mPlugin.mVanityManager.hasVanityUnlocked(player, newVanity, slot))) {
+				newVanity = null;
+			} else if (newVanity != null && !ItemStatUtils.isClean(newVanity)) {
+				ItemUtils.setPlainTag(newVanity);
+				ItemStatUtils.generateItemStats(newVanity);
+				ItemStatUtils.markClean(newVanity);
+			}
+			ItemStack oldVanity = vanityData.getEquipped(slot);
+			if (oldVanity == null || oldVanity.getType() == Material.AIR) {
+				vanityItems.removeKey(slotKey);
+			} else {
+				vanityItems.setItemStack(slotKey, oldVanity);
+			}
+			vanityData.equip(slot, newVanity);
+		}
 	}
 
 	//Set cooldown after swapping in RADIUS 24 blocks of boss
