@@ -34,6 +34,7 @@ public class ProtocolLibIntegration {
 		}
 		syncManager.addPacketListener(new GlowingReplacer(plugin));
 		syncManager.addPacketListener(new VirtualFirmamentReplacer(plugin));
+		syncManager.addPacketListener(new VirtualFoodReplacer(plugin));
 		syncManager.addPacketListener(new FirmamentLagFix(plugin));
 		syncManager.addPacketListener(new EntityEquipmentReplacer(plugin));
 		syncManager.addPacketListener(new WorldNameReplacer(plugin));
