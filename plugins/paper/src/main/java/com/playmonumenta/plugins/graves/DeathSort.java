@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.infusions.Hope;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTEntity;
 import java.time.Instant;
@@ -48,6 +49,7 @@ public class DeathSort {
 		//Attempt to place this in an empty inventory slot where it previously was
 		if (player.getScoreboardTags().contains(DEATH_SORT_TAG)
 			    && graveItem.mSlot != null
+			    && (!InventoryUtils.isArmorSlotFromId(graveItem.mSlot) || !ItemStatUtils.isShattered(graveItem.mItem))
 			    && insertIntoSlot(player, entity, graveItem.mSlot)) {
 			return 0; //Nothing left to do, this item is handled
 		}
