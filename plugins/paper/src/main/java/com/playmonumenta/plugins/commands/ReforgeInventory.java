@@ -38,6 +38,7 @@ public class ReforgeInventory extends GenericCommand {
 				}
 			}
 			player.sendMessage("All of your items have been reforged!");
+			return;
 		}
 		if (player.hasMetadata("PlayerCanReforge")) {
 			player.removeMetadata("PlayerCanReforge", Plugin.getInstance());

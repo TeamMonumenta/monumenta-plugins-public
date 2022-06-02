@@ -1317,7 +1317,7 @@ public class ItemStatUtils {
 		}
 
 		String regionString = monumenta.getString(Region.KEY);
-		if (regionString != null) {
+		if (regionString != null && !regionString.isEmpty()) {
 			return Region.getRegion(regionString);
 		}
 
@@ -1347,7 +1347,7 @@ public class ItemStatUtils {
 		}
 
 		String tierString = monumenta.getString(Tier.KEY);
-		if (tierString != null) {
+		if (tierString != null && !tierString.isEmpty()) {
 			return Tier.getTier(tierString);
 		}
 
