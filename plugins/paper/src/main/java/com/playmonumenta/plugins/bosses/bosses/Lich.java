@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.bosses.spells.lich.SpellRaiseDead;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellSalientOfDecay;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellShadowRealm;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellSoulShackle;
+import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -35,6 +36,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -1168,21 +1170,26 @@ public final class Lich extends BossAbilityGroup {
 		undead.addScoreboardTag("Undead" + player.getName());
 		undead.setCustomNameVisible(true);
 
+		VanityManager.VanityData vanityData = com.playmonumenta.plugins.Plugin.getInstance().mVanityManager.getData(player);
 		ItemStack helm = null;
 		ItemStack chest = null;
 		ItemStack legs = null;
 		ItemStack boots = null;
 		if (inv.getHelmet() != null) {
-			helm = inv.getHelmet().clone();
+			ItemStack vanityHelmet = vanityData.getEquipped(EquipmentSlot.HEAD);
+			helm = ItemUtils.clone(vanityHelmet != null && !VanityManager.isInvisibleVanityItem(vanityHelmet) ? vanityHelmet : inv.getHelmet());
 		}
 		if (inv.getChestplate() != null) {
-			chest = inv.getChestplate().clone();
+			ItemStack vanityChestplate = vanityData.getEquipped(EquipmentSlot.CHEST);
+			chest = ItemUtils.clone(vanityChestplate != null && !VanityManager.isInvisibleVanityItem(vanityChestplate) ? vanityChestplate : inv.getChestplate());
 		}
 		if (inv.getLeggings() != null) {
-			legs = inv.getLeggings().clone();
+			ItemStack vanityLeggings = vanityData.getEquipped(EquipmentSlot.LEGS);
+			legs = ItemUtils.clone(vanityLeggings != null && !VanityManager.isInvisibleVanityItem(vanityLeggings) ? vanityLeggings : inv.getLeggings());
 		}
 		if (inv.getBoots() != null) {
-			boots = inv.getBoots().clone();
+			ItemStack vanityBoots = vanityData.getEquipped(EquipmentSlot.FEET);
+			boots = ItemUtils.clone(vanityBoots != null && !VanityManager.isInvisibleVanityItem(vanityBoots) ? vanityBoots : inv.getBoots());
 		}
 		ItemStack[] items = new ItemStack[]{helm, chest, legs, boots};
 		for (ItemStack item : items) {

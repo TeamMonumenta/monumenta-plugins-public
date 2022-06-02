@@ -409,6 +409,7 @@ public class CosmeticsGUI extends CustomInventory {
 				meta.lore(lore);
 				vanityItem.setItemMeta(meta);
 			} else {
+				vanityItem = ItemUtils.clone(vanityItem);
 				ItemMeta meta = vanityItem.getItemMeta();
 				List<Component> lore = new ArrayList<>();
 				if (VanityManager.isInvisibleVanityItem(vanityItem)) {
