@@ -414,12 +414,16 @@ public class AbilityManager {
 
 		AttributeInstance knockbackResistance = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 		AttributeInstance movementSpeed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+		AttributeInstance attackDamage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
 		AttributeInstance attackSpeed = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
 		AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 
 		// Reset passive buffs to player base attributes
 		if (knockbackResistance != null) {
 			knockbackResistance.setBaseValue(0);
+		}
+		if (attackDamage != null) {
+			attackDamage.setBaseValue(1.0);
 		}
 		if (attackSpeed != null) {
 			attackSpeed.setBaseValue(4.0);
@@ -455,6 +459,7 @@ public class AbilityManager {
 		 */
 		@Nullable AttributeInstance[] instances = {
 			knockbackResistance,
+			attackDamage,
 			attackSpeed,
 			movementSpeed,
 			maxHealth
