@@ -215,8 +215,7 @@ public class CosmeticsGUI extends CustomInventory {
 		} else {
 			// equip vanity equipment from inventory
 			if (mDisplayPage == null) {
-				item = ItemUtils.clone(item);
-				VanityManager.cleanForDisplay(item);
+				item = VanityManager.cleanForDisplay(item);
 				item.setAmount(1);
 				EquipmentSlot slot = ItemUtils.getEquipmentSlot(item);
 				if (slot == EquipmentSlot.HAND || event.getClick().isRightClick()) {

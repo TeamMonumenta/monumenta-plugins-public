@@ -125,7 +125,6 @@ public class VirtualItemsReplacer extends PacketAdapter {
 						}
 						return;
 					}
-					vanityItem = ItemUtils.clone(vanityItem);
 					ItemMeta vanityMeta = vanityItem.getItemMeta();
 					if (vanityMeta == null) {
 						return;

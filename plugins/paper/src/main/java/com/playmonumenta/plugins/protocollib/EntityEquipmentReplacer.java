@@ -50,7 +50,7 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 					}
 				}
 			}
-			VanityManager.cleanForDisplay(pair.getSecond());
+			pair.setSecond(VanityManager.cleanForDisplay(pair.getSecond()));
 		}
 		packet.getSlotStackPairLists().write(0, items);
 
