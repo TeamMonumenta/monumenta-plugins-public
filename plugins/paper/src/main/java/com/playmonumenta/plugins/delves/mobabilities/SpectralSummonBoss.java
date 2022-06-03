@@ -17,7 +17,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 public class SpectralSummonBoss extends BossAbilityGroup {
-	public static final String identityTag = "Dreadful";
+	public static final String identityTag = "Spectral";
 
 	private static final String[] SPECTERS = {
 		"SpecterofFury",
@@ -32,7 +32,7 @@ public class SpectralSummonBoss extends BossAbilityGroup {
 
 
 	public static class Parameters extends BossParameters {
-		public double SPAWN_CHANGE = 0;
+		public double SPAWN_CHANCE = 0;
 	}
 
 	final Parameters mParam;
@@ -46,7 +46,8 @@ public class SpectralSummonBoss extends BossAbilityGroup {
 	@Override
 	public void death(EntityDeathEvent event) {
 		if (!EntityUtils.isElite(mBoss) && !DelvesUtils.isDelveMob(mBoss) && EntityUtils.isHostileMob(mBoss)) {
-			if (FastUtils.RANDOM.nextDouble() < mParam.SPAWN_CHANGE) {
+			double chance = FastUtils.RANDOM.nextDouble();
+			if (chance < mParam.SPAWN_CHANCE) {
 				Location loc = mBoss.getLocation();
 				if (loc.getBlock().getType() == Material.WATER) {
 					LibraryOfSoulsIntegration.summon(loc, SPECTERS_WATER[FastUtils.RANDOM.nextInt(SPECTERS_WATER.length)]);
@@ -59,5 +60,9 @@ public class SpectralSummonBoss extends BossAbilityGroup {
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0).spawnAsEnemy();
 			}
 		}
+	}
+
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
+		return new SpectralSummonBoss(plugin, boss);
 	}
 }

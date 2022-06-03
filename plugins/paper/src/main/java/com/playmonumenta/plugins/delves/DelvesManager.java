@@ -326,7 +326,6 @@ public class DelvesManager implements Listener {
 
 				int totalLevel = 0;
 				List<DelvesModifier> mods = DelvesModifier.valuesList();
-				mods.remove(DelvesModifier.ENTROPY);
 				mods.remove(DelvesModifier.TWISTED);
 
 				for (DelvesModifier mod : mods) {
@@ -435,7 +434,7 @@ public class DelvesManager implements Listener {
 			for (Map.Entry<DelvesModifier, Integer> entry : mModifierPoint.entrySet()) {
 				if (entry.getKey() == DelvesModifier.TWISTED) {
 					mTotalPoint += DelvesUtils.TWISTED_DEPTH_POINTS;
-				} else if (entry.getKey() != DelvesModifier.ENTROPY) {
+				} else {
 					mTotalPoint += entry.getValue();
 				}
 			}

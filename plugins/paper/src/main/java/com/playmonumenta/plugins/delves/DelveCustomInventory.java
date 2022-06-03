@@ -116,7 +116,6 @@ public class DelveCustomInventory extends CustomInventory {
 		mTotalPoint = 0;
 		mInventory.clear();
 		List<DelvesModifier> mods = DelvesModifier.valuesList();
-		mods.remove(DelvesModifier.ENTROPY);
 		mods.remove(DelvesModifier.TWISTED);
 
 		for (DelvesModifier mod : mods) {

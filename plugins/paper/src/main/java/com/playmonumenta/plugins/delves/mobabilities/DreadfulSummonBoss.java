@@ -28,7 +28,7 @@ public class DreadfulSummonBoss extends BossAbilityGroup {
 	private static final String DREADNAUGHT_WATER = "LeviathanofDoom";
 
 	public static class Parameters extends BossParameters {
-		public double SPAWN_CHANGE = 0;
+		public double SPAWN_CHANCE = 0;
 	}
 
 	final Parameters mParam;
@@ -43,7 +43,7 @@ public class DreadfulSummonBoss extends BossAbilityGroup {
 	@Override
 	public void death(EntityDeathEvent event) {
 		if (EntityUtils.isElite(mBoss) && !DelvesUtils.isDelveMob(mBoss)) {
-			if (FastUtils.RANDOM.nextDouble() < mParam.SPAWN_CHANGE) {
+			if (FastUtils.RANDOM.nextDouble() < mParam.SPAWN_CHANCE) {
 				Location loc = mBoss.getLocation();
 				if (loc.getBlock().getType() == Material.WATER) {
 					LibraryOfSoulsIntegration.summon(loc, DREADNAUGHT_WATER);
@@ -56,5 +56,9 @@ public class DreadfulSummonBoss extends BossAbilityGroup {
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0).spawnAsEnemy();
 			}
 		}
+	}
+
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
+		return new DreadfulSummonBoss(plugin, boss);
 	}
 }

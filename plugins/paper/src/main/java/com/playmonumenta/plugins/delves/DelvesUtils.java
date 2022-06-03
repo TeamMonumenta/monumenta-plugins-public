@@ -238,7 +238,6 @@ public class DelvesUtils {
 		Map<DelvesModifier, Integer> delvesApplied = new HashMap<>();
 
 		List<DelvesModifier> mods = DelvesModifier.valuesList();
-		mods.remove(DelvesModifier.ENTROPY);
 		mods.remove(DelvesModifier.TWISTED);
 
 		for (Player delvePlayer : DelvesManager.getParty(loc)) {
@@ -252,8 +251,6 @@ public class DelvesUtils {
 			totalLevel += entry.getValue();
 		}
 
-		//entry point value double by its effect.
-		totalLevel += Entropy.getDepthPointsAssigned(delvesApplied.getOrDefault(DelvesModifier.ENTROPY, 0));
 		totalLevel += (delvesApplied.getOrDefault(DelvesModifier.TWISTED, 0) * TWISTED_DEPTH_POINTS);
 
 		totalLevel = Math.min(totalLevel, MAX_DEPTH_POINTS);
@@ -335,6 +332,8 @@ public class DelvesUtils {
 		duplicateLibraryOfSoulsMob(mob, mob.getLocation());
 	}
 
+	private static boolean IS_SPAWNING = false;
+
 	public static void duplicateLibraryOfSoulsMob(LivingEntity mob, Location loc) {
 		// Only the bottom mob's name is in the LoS
 		if (mob.isInsideVehicle()) {
@@ -347,16 +346,24 @@ public class DelvesUtils {
 			return;
 		}
 
-		if (name != null) {
-			StringBuilder soulNameBuilder = new StringBuilder();
-			for (int i = 0; i < name.length(); i++) {
-				char c = name.charAt(i);
-				if (Character.isLetter(c)) {
-					soulNameBuilder.append(c);
+		if (IS_SPAWNING) {
+			return;
+		}
+		IS_SPAWNING = true;
+		try {
+			if (name != null) {
+				StringBuilder soulNameBuilder = new StringBuilder();
+				for (int i = 0; i < name.length(); i++) {
+					char c = name.charAt(i);
+					if (Character.isLetter(c)) {
+						soulNameBuilder.append(c);
+					}
 				}
-			}
 
-			LibraryOfSoulsIntegration.summon(loc, soulNameBuilder.toString());
+				LibraryOfSoulsIntegration.summon(loc, soulNameBuilder.toString());
+			}
+		} finally {
+			IS_SPAWNING = false;
 		}
 	}
 
