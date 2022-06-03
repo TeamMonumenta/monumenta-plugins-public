@@ -53,7 +53,7 @@ public class VanityManager implements Listener {
 			if (item == null || item.getType() == Material.AIR) {
 				mEquipped.remove(slot);
 			} else {
-				cleanForDisplay(item);
+				item = cleanForDisplay(item);
 				item.setAmount(1);
 				mEquipped.put(slot, item);
 			}
@@ -147,24 +147,29 @@ public class VanityManager implements Listener {
 		Player player = event.getPlayer();
 		ItemStack offHand = player.getInventory().getItemInOffHand();
 		if ((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)
+			    && event.getHand() == EquipmentSlot.OFF_HAND
 			    && !ItemUtils.isNullOrAir(offHand)
 			    && offHand.getMaxItemUseDuration() == 0) { // don't update items that have a use time (and the vanity is the same type anyway)
 			VanityData data = getData(player);
 			if (data.mSelfVanityEnabled && !ItemUtils.isNullOrAir(data.getEquipped(EquipmentSlot.OFF_HAND))) {
-				player.getInventory().setItemInOffHand(null);
-				player.getInventory().setItemInOffHand(offHand);
+				player.updateInventory();
 			}
 		}
 	}
 
 	/**
 	 * Removes data from an item that is not needed to properly display it, for example shulker box contents.
+	 *
+	 * @return A copy of the passed item stack with some data removed
 	 */
-	public static void cleanForDisplay(ItemStack item) {
-		if (item == null || !item.hasItemMeta()) {
-			return;
+	public static ItemStack cleanForDisplay(ItemStack item) {
+		if (item == null) {
+			return null;
 		}
-		NBTItem nbtItem = new NBTItem(item, true);
+		if (!item.hasItemMeta()) {
+			return item.clone();
+		}
+		NBTItem nbtItem = new NBTItem(item);
 		if (item.getType() != Material.SHIELD && !ItemUtils.isBanner(item)) {
 			nbtItem.removeKey("BlockEntityTag"); // shulker contents, and also other invisible block entity data
 		}
@@ -185,6 +190,7 @@ public class VanityManager implements Listener {
 			monumenta.removeKey(ItemStatUtils.LORE_KEY);
 		}
 		nbtItem.removeKey("AttributeModifiers");
+		return nbtItem.getItem();
 	}
 
 	public static boolean isInvisibleVanityItem(ItemStack itemStack) {
