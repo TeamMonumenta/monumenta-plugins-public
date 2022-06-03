@@ -54,4 +54,8 @@ public class StatMultiplierBoss extends BossAbilityGroup {
 
 		event.setDamage(event.getDamage() * mDamageMultiplier);
 	}
+
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
+		return new StatMultiplierBoss(plugin, boss);
+	}
 }

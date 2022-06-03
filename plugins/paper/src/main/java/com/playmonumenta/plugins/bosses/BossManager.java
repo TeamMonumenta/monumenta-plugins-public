@@ -472,6 +472,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(DeathSummonBoss.identityTag, (Plugin p, LivingEntity e) -> DeathSummonBoss.deserialize(p, e));
 		mBossDeserializers.put(SpectralSummonBoss.identityTag, (Plugin p, LivingEntity e) -> SpectralSummonBoss.deserialize(p, e));
 		mBossDeserializers.put(DreadfulSummonBoss.identityTag, (Plugin p, LivingEntity e) -> DreadfulSummonBoss.deserialize(p, e));
+		mBossDeserializers.put(StatMultiplierBoss.identityTag, (Plugin p, LivingEntity e) -> StatMultiplierBoss.deserialize(p, e));
 		mBossDeserializers.put(SummonOnExplosionBoss.identityTag, (Plugin p, LivingEntity e) -> SummonOnExplosionBoss.deserialize(p, e));
 
 		mBossDeserializers.put(Lich.identityTag, (Plugin p, LivingEntity e) -> Lich.deserialize(p, e));
