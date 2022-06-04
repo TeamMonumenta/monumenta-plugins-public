@@ -36,6 +36,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -45,6 +46,12 @@ import org.bukkit.potion.PotionEffectType;
 public class DelvesManager implements Listener {
 	public static final String KEY_DELVES_PLUGIN_DATA = "MonumentaDelves";
 
+	private static final Set<CreatureSpawnEvent.SpawnReason> IGNORED_SPAWN_REASONS = Set.of(
+		CreatureSpawnEvent.SpawnReason.COMMAND,
+		CreatureSpawnEvent.SpawnReason.CUSTOM,
+		CreatureSpawnEvent.SpawnReason.DEFAULT
+	);
+
 	/**
 	 * This structure contains All the delves mods picked by online players (in this shard)
 	 *
@@ -52,7 +59,6 @@ public class DelvesManager implements Listener {
 	 * <PlayerID, <DungeonID, <ModifierID, points>>>
 	 */
 	public static final Map<UUID, Map<String, DungeonDelveInfo>> PLAYER_DELVE_DUNGEON_MOD_MAP = new HashMap<>();
-
 
 	public static final Set<String> DUNGEONS = new HashSet<>();
 
@@ -290,6 +296,9 @@ public class DelvesManager implements Listener {
 			return;
 		}
 		Entity entity = event.getEntity();
+		if (IGNORED_SPAWN_REASONS.contains(entity.getEntitySpawnReason())) {
+			return;
+		}
 
 		/*
 		 * Since this intercepts the CreatureSpawnEvent and SpawnerSpawnEvent,
