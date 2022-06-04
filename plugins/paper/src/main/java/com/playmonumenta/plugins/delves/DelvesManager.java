@@ -36,8 +36,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
@@ -46,11 +46,6 @@ import org.bukkit.potion.PotionEffectType;
 public class DelvesManager implements Listener {
 	public static final String KEY_DELVES_PLUGIN_DATA = "MonumentaDelves";
 
-	private static final Set<CreatureSpawnEvent.SpawnReason> IGNORED_SPAWN_REASONS = Set.of(
-		CreatureSpawnEvent.SpawnReason.COMMAND,
-		CreatureSpawnEvent.SpawnReason.CUSTOM,
-		CreatureSpawnEvent.SpawnReason.DEFAULT
-	);
 
 	/**
 	 * This structure contains All the delves mods picked by online players (in this shard)
@@ -296,9 +291,6 @@ public class DelvesManager implements Listener {
 			return;
 		}
 		Entity entity = event.getEntity();
-		if (IGNORED_SPAWN_REASONS.contains(entity.getEntitySpawnReason())) {
-			return;
-		}
 
 		/*
 		 * Since this intercepts the CreatureSpawnEvent and SpawnerSpawnEvent,
@@ -331,22 +323,42 @@ public class DelvesManager implements Listener {
 						delvesApplied.put(mod, Math.max(delvesApplied.getOrDefault(mod, 0), getRank(delvePlayer, mod)));
 					}
 				}
-
-
+				//check if this mob is summoned by command or by spawners
 				int totalLevel = 0;
-				List<DelvesModifier> mods = DelvesModifier.valuesList();
-				mods.remove(DelvesModifier.TWISTED);
+				if (event instanceof SpawnerSpawnEvent) {
+					//normal spawn - handle all the mods
+					List<DelvesModifier> mods = DelvesModifier.valuesList();
+					mods.remove(DelvesModifier.TWISTED);
 
-				for (DelvesModifier mod : mods) {
-					mod.applyDelve(livingEntity, delvesApplied.getOrDefault(mod, 0));
-					totalLevel += delvesApplied.getOrDefault(mod, 0);
+					for (DelvesModifier mod : mods) {
+						mod.applyDelve(livingEntity, delvesApplied.getOrDefault(mod, 0));
+						totalLevel += delvesApplied.getOrDefault(mod, 0);
+					}
+
+					DelvesModifier.TWISTED.applyDelve(livingEntity, delvesApplied.getOrDefault(DelvesModifier.TWISTED, 0));
+					totalLevel += (delvesApplied.getOrDefault(DelvesModifier.TWISTED, 0) * DelvesUtils.TWISTED_DEPTH_POINTS);
+					//twisted point value 5 time a normal one
+
+				} else {
+					//this mob is spawned by something that is not a spawner (plugin - command - egg)
+					//give only death trigger abilities
+
+					//calculate total points to use for StatMultiplier
+					List<DelvesModifier> mods = DelvesModifier.valuesList();
+					mods.remove(DelvesModifier.TWISTED);
+					for (DelvesModifier mod : mods) {
+						totalLevel += delvesApplied.getOrDefault(mod, 0);
+					}
+					totalLevel += (delvesApplied.getOrDefault(DelvesModifier.TWISTED, 0) * DelvesUtils.TWISTED_DEPTH_POINTS);
+
+					for (DelvesModifier mod : DelvesModifier.deathTriggerDelvesModifier()) {
+						mod.applyDelve(livingEntity, delvesApplied.getOrDefault(mod, 0));
+					}
 				}
-
-				DelvesModifier.TWISTED.applyDelve(livingEntity, delvesApplied.getOrDefault(DelvesModifier.TWISTED, 0));
-				totalLevel += (delvesApplied.getOrDefault(DelvesModifier.TWISTED, 0) * DelvesUtils.TWISTED_DEPTH_POINTS);
-				//twisted point value 5 time a normal one
+				//Giving tag so this function doesn't run twice on the same mob
 				livingEntity.addScoreboardTag(HAS_DELVE_MODIFIER_TAG);
 
+				//Mob stats should ALWAYS work on any mobs even if spawned by command plugin or spawners
 				StatMultiplier.applyModifiers(livingEntity, totalLevel);
 			}
 		}

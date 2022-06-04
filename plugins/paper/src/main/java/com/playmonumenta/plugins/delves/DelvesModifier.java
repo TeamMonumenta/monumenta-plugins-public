@@ -42,6 +42,9 @@ public enum DelvesModifier {
 	ENTROPY(13, null, createIcon(Material.STRUCTURE_VOID, Component.text("Entropy", NamedTextColor.BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Entropy.DESCRIPTION), Entropy.RANK_DESCRIPTIONS, 15),
 	TWISTED(14, Twisted::applyModifiers, createIcon(Material.TIPPED_ARROW, Component.text("Twisted", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Twisted.DESCRIPTION), Twisted.RANK_DESCRIPTIONS, 16);
 
+	private static final List<DelvesModifier> DEATH_TRIGGER_MODIFIERS = List.of(SPECTRAL, DREADFUL);
+	private static final List<DelvesModifier> SPAWN_TRIGGER_MODIFIERS = List.of(RELENTLESS, ARCANIC, INFERNAL, TRANSCENDENT, CHIVALROUS, BLOODTHIRSTY, PERNICIOUS, LEGIONARY, CARAPACE, TWISTED);
+
 	private final int mIndex;
 	private final BiConsumer<LivingEntity, Integer> mApplyFunc;
 	private final ItemStack mIcon;
@@ -97,6 +100,14 @@ public enum DelvesModifier {
 
 	public static List<DelvesModifier> valuesList() {
 		return new ArrayList<>(List.of(values()));
+	}
+
+	public static List<DelvesModifier> spawnTriggerDelvesModifier() {
+		return new ArrayList<>(SPAWN_TRIGGER_MODIFIERS);
+	}
+
+	public static List<DelvesModifier> deathTriggerDelvesModifier() {
+		return new ArrayList<>(DEATH_TRIGGER_MODIFIERS);
 	}
 
 	public static @Nullable DelvesModifier fromIndex(int index) {
