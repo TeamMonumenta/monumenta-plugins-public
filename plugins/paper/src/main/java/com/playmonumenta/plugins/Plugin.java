@@ -214,7 +214,7 @@ public class Plugin extends JavaPlugin {
 		PartialParticleCommand.register();
 		CustomEffect.register();
 		EffectFromPotionCommand.register(this);
-
+		WorldNameCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
