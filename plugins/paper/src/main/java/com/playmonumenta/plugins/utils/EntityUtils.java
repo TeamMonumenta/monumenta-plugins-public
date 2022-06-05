@@ -165,6 +165,18 @@ public class EntityUtils {
 		EntityType.VEX
 	);
 
+	private static final EnumSet<EntityType> WATER_MOBS = EnumSet.of(
+		EntityType.ELDER_GUARDIAN,
+		EntityType.GUARDIAN,
+		EntityType.DOLPHIN,
+		EntityType.TROPICAL_FISH,
+		EntityType.PUFFERFISH,
+		EntityType.SALMON,
+		EntityType.COD,
+		EntityType.DROWNED,
+		EntityType.SQUID
+	);
+
 	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";
 	private static final String STUN_ATTR_NAME = "StunSlownessAttr";
 	private static final String IGNORE_TAUNT_TAG = "taunt_ignore";
@@ -285,7 +297,19 @@ public class EntityUtils {
 	}
 
 	public static boolean isFlyingMob(LivingEntity mob) {
-		return FLYING_MOBS.contains(mob.getType());
+		return isFlyingMob(mob.getType());
+	}
+
+	public static boolean isFlyingMob(EntityType type) {
+		return FLYING_MOBS.contains(type);
+	}
+
+	public static boolean isWaterMob(LivingEntity mob) {
+		return isWaterMob(mob.getType());
+	}
+
+	public static boolean isWaterMob(EntityType type) {
+		return WATER_MOBS.contains(type);
 	}
 
 	// Affected by Abyssal

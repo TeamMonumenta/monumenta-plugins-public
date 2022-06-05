@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.destroystokyo.paper.event.entity.EntityZapEvent;
+import com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -22,6 +24,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.ArmorStand;
@@ -66,6 +69,43 @@ public class MobListener implements Listener {
 
 	public MobListener(Plugin plugin) {
 		mPlugin = plugin;
+	}
+
+	/**
+	 * This method handles spawner spawn rules. We use a Paper patch that disables all vanilla span rules for spawners,
+	 * so all types of mobs can spawn anywhere if there's enough space for the mob.
+	 */
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	void preSpawnerSpawnEvent(PreSpawnerSpawnEvent event) {
+
+		EntityType type = event.getType();
+		boolean inWater = LocationUtils.isLocationInWater(event.getSpawnLocation());
+
+		// water mobs: must spawn in water
+		if (EntityUtils.isWaterMob(type)) {
+			if (!inWater) {
+				event.setCancelled(true);
+			}
+			return;
+		}
+
+		// land & air mobs: must not spawn in water
+		if (inWater) {
+			event.setCancelled(true);
+			return;
+		}
+
+		// land mobs: must not spawn in the air (i.e. must have a block with collision below)
+		// creepers don't follow this rule so that they can be used in drop creeper traps
+		if (!EntityUtils.isFlyingMob(type) && type != EntityType.CREEPER) {
+			if (!event.getSpawnLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
+				event.setCancelled(true);
+			}
+			return;
+		}
+
+		// flying mobs: can spawn anywhere (except water), so no more checks
+
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
