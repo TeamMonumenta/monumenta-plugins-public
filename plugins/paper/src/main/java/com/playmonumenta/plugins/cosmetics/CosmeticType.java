@@ -8,7 +8,7 @@ public enum CosmeticType {
 	TITLE("Player Title", Material.NAME_TAG),
 	ELITE_FINISHER("Elite Finisher", Material.FIREWORK_ROCKET),
 	PLOT_BORDER("Plot Border", Material.BARRIER),
-	VANITY("Vanity", Material.GOLDEN_CHESTPLATE),
+	VANITY("Vanity Item", Material.GOLDEN_CHESTPLATE),
 	;
 
 	private final String mDisplayName;
