@@ -24,6 +24,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -151,8 +153,22 @@ public class VanityManager implements Listener {
 			    && !ItemUtils.isNullOrAir(offHand)
 			    && offHand.getMaxItemUseDuration() == 0) { // don't update items that have a use time (and the vanity is the same type anyway)
 			VanityData data = getData(player);
-			if (data.mSelfVanityEnabled && !ItemUtils.isNullOrAir(data.getEquipped(EquipmentSlot.OFF_HAND))) {
+			ItemStack offhandVanity = data.getEquipped(EquipmentSlot.OFF_HAND);
+			if (data.mSelfVanityEnabled && !ItemUtils.isNullOrAir(offhandVanity)) {
 				player.updateInventory();
+
+				// For 2-block tall blocks, send a block update for the block 2 above the clicked block to prevent the top half from visually staying
+				if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null) {
+					switch (offhandVanity.getType()) {
+						case PEONY, ROSE_BUSH, TALL_GRASS, TALL_SEAGRASS, LARGE_FERN, SUNFLOWER, LILAC,
+							     DARK_OAK_DOOR, ACACIA_DOOR, BIRCH_DOOR, CRIMSON_DOOR, IRON_DOOR, JUNGLE_DOOR, OAK_DOOR, SPRUCE_DOOR, WARPED_DOOR -> {
+							Block block = event.getClickedBlock().getRelative(BlockFace.UP, 2);
+							player.sendBlockChange(block.getLocation(), block.getBlockData());
+						}
+						default -> {
+						}
+					}
+				}
 			}
 		}
 	}
