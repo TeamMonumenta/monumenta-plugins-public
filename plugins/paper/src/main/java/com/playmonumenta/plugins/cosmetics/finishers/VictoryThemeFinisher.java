@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -10,11 +11,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class VictoryThemeFinisher {
+public class VictoryThemeFinisher implements EliteFinisher {
 
 	public static final String NAME = "Victory Theme";
 
-	public static void run(Player p, Entity killedMob, Location loc) {
+	@Override
+	public void run(Player p, Entity killedMob, Location loc) {
 		World world = p.getWorld();
 		loc.add(0, 1.5, 0);
 		Location loc2 = loc.clone().add(-1, 0, 0);
@@ -89,4 +91,10 @@ public class VictoryThemeFinisher {
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
+
+	@Override
+	public Material getDisplayItem() {
+		return Material.NOTE_BLOCK;
+	}
+
 }

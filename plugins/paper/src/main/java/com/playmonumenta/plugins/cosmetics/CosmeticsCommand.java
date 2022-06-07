@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.cosmetics;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.GenericCommand;
+import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
+import com.playmonumenta.plugins.plots.PlotBorderCustomInventory;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
@@ -15,6 +17,7 @@ import java.util.Locale;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -32,7 +35,18 @@ public class CosmeticsCommand extends GenericCommand {
 				new LiteralArgument("add"),
 				new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER),
 				new MultiLiteralArgument(types),
-				new GreedyStringArgument("name"))
+				new GreedyStringArgument("name").replaceSuggestions(info -> {
+					CosmeticType type = CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT));
+					if (type == CosmeticType.ELITE_FINISHER) {
+						return EliteFinishers.getNames();
+					} else if (type == CosmeticType.PLOT_BORDER) {
+						return PlotBorderCustomInventory.getCosmeticNames();
+					} else if (type == CosmeticType.VANITY) {
+						return Arrays.stream(Material.values()).filter(mat -> !mat.isLegacy()).map(mat -> mat.name().toLowerCase(Locale.ROOT) + ":").toArray(String[]::new);
+					} else {
+						return new String[0];
+					}
+				}))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));

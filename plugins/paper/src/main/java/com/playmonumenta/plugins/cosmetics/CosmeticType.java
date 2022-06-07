@@ -1,12 +1,18 @@
 package com.playmonumenta.plugins.cosmetics;
 
+import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
 import java.util.Locale;
 import org.bukkit.Material;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public enum CosmeticType {
 	TITLE("Player Title", Material.NAME_TAG),
-	ELITE_FINISHER("Elite Finisher", Material.FIREWORK_ROCKET),
+	ELITE_FINISHER("Elite Finisher", Material.FIREWORK_ROCKET) {
+		@Override
+		public Material getDisplayItem(@Nullable String name) {
+			return name == null ? Material.FIREWORK_ROCKET : EliteFinishers.getDisplayItem(name);
+		}
+	},
 	PLOT_BORDER("Plot Border", Material.BARRIER),
 	VANITY("Vanity Item", Material.GOLDEN_CHESTPLATE),
 	;
@@ -27,7 +33,7 @@ public enum CosmeticType {
 		return mDisplayName;
 	}
 
-	public Material getDisplayItem() {
+	public Material getDisplayItem(@Nullable String name) {
 		return mDisplayItem;
 	}
 

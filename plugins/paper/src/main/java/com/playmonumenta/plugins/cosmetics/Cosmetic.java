@@ -72,7 +72,7 @@ public class Cosmetic {
 				cosmeticItem.setItemMeta(meta);
 			}
 			default -> {
-				cosmeticItem = new ItemStack(mEquipped ? Material.GREEN_CONCRETE : mType.getDisplayItem(), 1);
+				cosmeticItem = new ItemStack(mEquipped ? Material.GREEN_CONCRETE : mType.getDisplayItem(mName), 1);
 
 				ItemMeta meta = cosmeticItem.getItemMeta();
 				meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);

@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
@@ -46,7 +47,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		String mName;
 		String mLore;
 		PermType mPermType;
-		String mCosmeticString;
+		@Nullable String mCosmeticString;
 		@Nullable String mScoreboard;
 		int mScoreRequired;
 		Material mType;
@@ -259,4 +260,9 @@ public class PlotBorderCustomInventory extends CustomInventory {
 			}
 		}
 	}
+
+	public static String[] getCosmeticNames() {
+		return BORDER_ITEMS.stream().map(item -> item.mCosmeticString).filter(Objects::nonNull).toArray(String[]::new);
+	}
+
 }

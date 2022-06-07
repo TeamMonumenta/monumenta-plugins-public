@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -11,11 +12,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class WarmFireworkFinisher {
+public class WarmFireworkFinisher implements EliteFinisher {
 
 	public static final String NAME = "Warm Firework";
 
-	public static void run(Player p, Entity killedMob, Location loc) {
+	@Override
+	public void run(Player p, Entity killedMob, Location loc) {
 		Firework fw = (Firework) p.getWorld().spawnEntity(loc, EntityType.FIREWORK);
 		FireworkMeta fwm = fw.getFireworkMeta();
 		FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
@@ -32,4 +34,10 @@ public class WarmFireworkFinisher {
 			}
 		}.runTaskLater(Plugin.getInstance(), 40);
 	}
+
+	@Override
+	public Material getDisplayItem() {
+		return Material.FIREWORK_ROCKET;
+	}
+
 }

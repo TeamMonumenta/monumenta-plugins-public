@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -16,7 +17,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class LightningFinisher {
+public class LightningFinisher implements EliteFinisher {
 
 	public static final String NAME = "Lightning";
 
@@ -28,7 +29,8 @@ public class LightningFinisher {
 	private static final int SHOCK_DELAY_TICKS = Constants.TICKS_PER_SECOND;
 
 	// Yeah this is straight ripped and tweaked from Kaul's LightningStrike
-	public static void run(Player p, Entity killedMob, Location loc) {
+	@Override
+	public void run(Player p, Entity killedMob, Location loc) {
 		World world = p.getWorld();
 		Location strikeLocation = killedMob.getLocation();
 		strikeLocation.setY(strikeLocation.getY());
@@ -193,4 +195,10 @@ public class LightningFinisher {
 		};
 		lightningRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
+
+	@Override
+	public Material getDisplayItem() {
+		return Material.NETHER_STAR;
+	}
+
 }

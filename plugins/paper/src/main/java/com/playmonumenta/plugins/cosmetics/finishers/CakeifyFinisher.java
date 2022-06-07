@@ -17,15 +17,17 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class CakeifyFinisher {
+public class CakeifyFinisher implements EliteFinisher {
 
 	public static final String NAME = "Cakeify";
 
-	public static void run(Player p, Entity killedMob, Location loc) {
+	@Override
+	public void run(Player p, Entity killedMob, Location loc) {
 
 		throwCakes(0, loc);
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks <= 30) {
@@ -64,4 +66,10 @@ public class CakeifyFinisher {
 			cakeItem.setVelocity(new Vector(0.2 * FastUtils.sinDeg(degrees), 0.6, 0.2 * FastUtils.cosDeg(degrees)));
 		}
 	}
+
+	@Override
+	public Material getDisplayItem() {
+		return Material.CAKE;
+	}
+
 }
