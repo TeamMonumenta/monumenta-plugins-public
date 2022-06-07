@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -14,7 +13,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
-
+import org.bukkit.potion.PotionType;
 
 
 public class CrossbowListener implements Listener {
@@ -28,16 +27,12 @@ public class CrossbowListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		//Has to be an arrow
-		if (
-			!EntityUtils.isSomeArrow(event.getEntity())
-			|| !(event.getEntity().getShooter() instanceof LivingEntity)
-		) {
+		if (!(event.getEntity() instanceof Arrow arrow)
+			    || !(arrow.getShooter() instanceof LivingEntity shooter)) {
 			return;
 		}
 
-		LivingEntity shooter = (LivingEntity)event.getEntity().getShooter();
 		ItemStack item = shooter.getEquipment().getItemInMainHand();
-		AbstractArrow arrow = (AbstractArrow)event.getEntity();
 
 		//For non player entities that shoot a crossbow
 		if (item.getType().equals(Material.CROSSBOW) && !(arrow.getShooter() instanceof Player)) {
@@ -50,20 +45,19 @@ public class CrossbowListener implements Listener {
 		}
 
 		//Has to be a player-shot normal arrow
-		if (arrow.getShooter() instanceof Player) {
-			Player player = (Player)arrow.getShooter();
+		if (arrow.getShooter() instanceof Player player) {
 			ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
 			ItemStack itemInOffHand = player.getEquipment().getItemInOffHand();
 
-			// Check if the player has an crossbow in main or offhand
-			if (itemInMainHand.getType().equals(Material.CROSSBOW) ||
-			    itemInOffHand.getType().equals(Material.CROSSBOW)) {
+			// Check if the player has a crossbow in main or offhand
+			if (itemInMainHand.getType().equals(Material.CROSSBOW)
+				    || itemInOffHand.getType().equals(Material.CROSSBOW)) {
 
-				//Infinity gives arrow to player if the arrow shot had no custom effects
+				//Infinity gives arrow to player if the arrow shot had no potion nor custom effects
 				if (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0
-						&& arrow instanceof Arrow
-						&& !((Arrow)event.getEntity()).hasCustomEffects()
-						&& ((Arrow)event.getEntity()).getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
+					    && !arrow.hasCustomEffects()
+					    && arrow.getBasePotionData().getType() == PotionType.UNCRAFTABLE // plain arrow
+					    && arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
 					arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
 					if (player.getGameMode() != GameMode.CREATIVE) {
 						player.getInventory().addItem(new ItemStack(Material.ARROW));
