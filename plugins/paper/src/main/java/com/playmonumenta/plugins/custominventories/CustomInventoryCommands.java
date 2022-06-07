@@ -182,8 +182,8 @@ public class CustomInventoryCommands {
 		arguments.add(new IntegerArgument("region #"));
 		arguments.add(new IntegerArgument("level"));
 
-		List<String> questScore = new ArrayList<>(Arrays.asList("DailyQuest", "Daily2Quest"));
-		List<String> rewardScore = new ArrayList<>(Arrays.asList("DailyReward", "Daily2Reward"));
+		List<String> questScore = new ArrayList<>(Arrays.asList("DailyQuest", "Daily2Quest", "Daily3Quest"));
+		List<String> rewardScore = new ArrayList<>(Arrays.asList("DailyReward", "Daily2Reward", "Daily3Reward"));
 
 		new CommandAPICommand("openbountygui")
 			.withPermission("monumenta.command.openbountygui")

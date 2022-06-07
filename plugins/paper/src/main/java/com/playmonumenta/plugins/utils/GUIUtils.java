@@ -13,6 +13,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class GUIUtils {
 
 	public static void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor, boolean clean) {
+		if (lore.isEmpty()) {
+			return;
+		}
 		String[] splitLine = lore.split(" ");
 		StringBuilder currentString = new StringBuilder(defaultColor + "");
 		List<String> finalLines = (clean || meta.getLore() == null) ? new ArrayList<>() : meta.getLore();

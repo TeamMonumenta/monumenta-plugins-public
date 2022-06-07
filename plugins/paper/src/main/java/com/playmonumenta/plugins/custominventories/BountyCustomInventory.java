@@ -101,7 +101,7 @@ public class BountyCustomInventory extends CustomInventory {
 			return;
 		}
 
-		if (mLevel == 1) {
+		if (mLevel == 0) {
 			for (int i = 0; i < BOUNTY_L1_LOCATIONS.size(); i++) {
 				if (event.getSlot() == BOUNTY_L1_LOCATIONS.get(i)) {
 					setBounty((Player) event.getWhoClicked(), mBountyChoices.get(i));
@@ -113,7 +113,7 @@ public class BountyCustomInventory extends CustomInventory {
 	}
 
 	private void pickNewBounties(Player player) {
-		if (mLevel == 1) {
+		if (mLevel == 0) {
 			Collections.shuffle(mBounties);
 			int usedLocations = 0;
 			for (BountyData bounty : mBounties) {
@@ -121,7 +121,7 @@ public class BountyCustomInventory extends CustomInventory {
 					(ScoreboardUtils.getScoreboardValue(player, bounty.mScoreboardReq).orElse(0) >= bounty.mReqMin)) {
 					_inventory.setItem(BOUNTY_L1_LOCATIONS.get(usedLocations++), createBasicItem(
 						bounty.mMaterial, bounty.mName, NamedTextColor.AQUA,
-						false, "Tier " + bounty.mLevel, ChatColor.WHITE));
+						false, (bounty.mLevel != 0) ? "Tier " + bounty.mLevel : "", ChatColor.WHITE));
 					tagThemAll(player, "R" + mRegion + "Bounties" + usedLocations, bounty.mID * 100);
 					mBountyChoices.add(bounty);
 				}
@@ -149,7 +149,7 @@ public class BountyCustomInventory extends CustomInventory {
 
 
 	private void loadFromExisting(Player player) {
-		if (mLevel == 1) {
+		if (mLevel == 0) {
 			List<Integer> savedBounties = new ArrayList<>();
 			for (int i = 1; i <= 3; i++) {
 				int currentValue = ScoreboardUtils.getScoreboardValue(player, "R" + mRegion + "Bounties" + i).orElse(0);
@@ -165,13 +165,13 @@ public class BountyCustomInventory extends CustomInventory {
 	}
 
 	private void setLayout() {
-		if (mLevel == 1) {
+		if (mLevel == 0) {
 			for (int i = 0; i < BOUNTY_L1_LOCATIONS.size(); i++) {
 				BountyData bounty = mBountyChoices.get(i);
 				if (bounty != null) {
 					_inventory.setItem(BOUNTY_L1_LOCATIONS.get(i), createBasicItem(
 						bounty.mMaterial, bounty.mName, NamedTextColor.AQUA,
-						false, "Tier " + bounty.mLevel, ChatColor.WHITE));
+						false, (bounty.mLevel != 0) ? "Tier " + bounty.mLevel : "", ChatColor.WHITE));
 				}
 			}
 		}
