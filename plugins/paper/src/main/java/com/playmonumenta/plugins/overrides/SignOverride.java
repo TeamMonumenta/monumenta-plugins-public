@@ -116,6 +116,10 @@ public class SignOverride extends BaseOverride {
 			player.sendMessage(Component.text(display));
 		}
 
+		if (player.isSneaking()) {
+			return output;
+		}
+
 		if (item != null) {
 			ItemMeta meta = item.getItemMeta();
 			// If clicking a sign with another sign, copy the contents to the item
