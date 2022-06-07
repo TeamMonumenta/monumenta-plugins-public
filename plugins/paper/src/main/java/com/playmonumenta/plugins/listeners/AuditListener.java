@@ -32,6 +32,7 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.loot.LootTable;
 import org.bukkit.loot.Lootable;
 
 
@@ -40,36 +41,55 @@ public class AuditListener implements Listener {
 	private static final List<Pattern> IGNORED_COMMAND_REGEX = Arrays.asList(
 		// ScriptedQuests
 		exactOptionalArguments("(scriptedquests:)?questtrigger"),
-		exactOptionalArguments("clickable"),
-
-		// VentureChat
-		exactOptionalArguments("(venturechat:)?(msg|v?message)"),
-		exactOptionalArguments("(venturechat:)?(w(hisper)?|vwhisper)"),
-		exactOptionalArguments("(venturechat:)?v?tell"),
-		exactOptionalArguments("(venturechat:)?pm"),
-		exactOptionalArguments("(venturechat:)?(r(eply)?|vreply)"),
-		exactOptionalArguments("(venturechat:)?v?me"),
+		exactOptionalArguments("(minecraft:)?clickable"),
 
 		// MonumentaNetworkChat
 		exactOptionalArguments("help"),
 		exactOptionalArguments("(minecraft:)?ch help"),
 		exactOptionalArguments("(minecraft:)?chat help"),
 		exactOptionalArguments("(minecraft:)?networkchat help"),
+		exactOptionalArguments("(minecraft:)?ch join"),
+		exactOptionalArguments("(minecraft:)?chat join"),
+		exactOptionalArguments("(minecraft:)?networkchat join"),
+		exactOptionalArguments("(minecraft:)?ch leave"),
+		exactOptionalArguments("(minecraft:)?chat leave"),
+		exactOptionalArguments("(minecraft:)?networkchat leave"),
+		exactOptionalArguments("(minecraft:)?ch pause"),
+		exactOptionalArguments("(minecraft:)?chat pause"),
+		exactOptionalArguments("(minecraft:)?networkchat pause"),
+		exactOptionalArguments("(minecraft:)?ch unpause"),
+		exactOptionalArguments("(minecraft:)?chat unpause"),
+		exactOptionalArguments("(minecraft:)?networkchat unpause"),
+		exactOptionalArguments("(minecraft:)?ch player"),
+		exactOptionalArguments("(minecraft:)?chat player"),
+		exactOptionalArguments("(minecraft:)?networkchat player"),
 		exactOptionalArguments("(minecraft:)?ch say"),
 		exactOptionalArguments("(minecraft:)?chat say"),
 		exactOptionalArguments("(minecraft:)?networkchat say"),
 		exactOptionalArguments("(minecraft:)?g"),
 		exactOptionalArguments("(minecraft:)?global"),
+		exactOptionalArguments("(minecraft:)?gc"),
+		exactOptionalArguments("(minecraft:)?guildchat"),
 		exactOptionalArguments("(minecraft:)?l"),
 		exactOptionalArguments("(minecraft:)?local"),
 		exactOptionalArguments("(minecraft:)?p"),
 		exactOptionalArguments("(minecraft:)?party"),
+		exactOptionalArguments("(minecraft:)?pausechat"),
+		exactOptionalArguments("(minecraft:)?pc"),
+		exactOptionalArguments("(minecraft:)?me"),
 		exactOptionalArguments("(minecraft:)?msg"),
 		exactOptionalArguments("(minecraft:)?tell"),
 		exactOptionalArguments("(minecraft:)?w"),
 		exactOptionalArguments("(minecraft:)?r"),
 		exactOptionalArguments("(minecraft:)?tm"),
 		exactOptionalArguments("(minecraft:)?teammsg"),
+		exactOptionalArguments("lfg"),
+		exactOptionalArguments("m"),
+		exactOptionalArguments("mh"),
+		exactOptionalArguments("join"),
+		exactOptionalArguments("leave"),
+		exactOptionalArguments("ignore"),
+		exactOptionalArguments("unignore"),
 
 		// CoreProtect
 		exactOptionalArguments("(coreprotect:)?co i(nspect)?"),
@@ -82,10 +102,25 @@ public class AuditListener implements Listener {
 			JunkItemListener.COMMAND,
 			JunkItemListener.ALIAS
 		)),
-		exactOptionalArguments("peb")
+		exactOptionalArguments("(minecraft:)?blockinteractions"),
+		exactOptionalArguments("(minecraft:)?bi"),
+		exactOptionalArguments("(minecraft:)?disabledrop"),
+		exactOptionalArguments("(minecraft:)?dd"),
+		exactOptionalArguments("(minecraft:)?glowing"),
+		exactOptionalArguments("(minecraft:)?leaderboard(?! update)"),
+		exactOptionalArguments("(minecraft:)?particles"),
+		exactOptionalArguments("playerstats"),
+		exactOptionalArguments("ps"),
+		exactOptionalArguments("peb"),
+		exactOptionalArguments("(minecraft:)?race leaderboard"),
+		exactOptionalArguments("(minecraft:)?toggleswap"),
+		exactOptionalArguments("(minecraft:)?toggleworldnames"),
+		exactOptionalArguments("(minecraft:)?virtualfirmament"),
+		exactOptionalArguments("(minecraft:)?vf"),
+		exactOptionalArguments("(spark:)?tps")
 	);
 
-	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<HumanEntity, ItemStack>();
+	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<>();
 	private final Logger mLogger;
 	private static AuditListener INSTANCE = null;
 
@@ -98,7 +133,7 @@ public class AuditListener implements Listener {
 	public void death(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 
-		log("Death: " + player.getName() + " " + event.getDeathMessage());
+		log("Death: " + player.getName() + " " + MessagingUtils.plainText(event.deathMessage()));
 
 		checkDestroy(player);
 	}
@@ -119,7 +154,8 @@ public class AuditListener implements Listener {
 	public void creative(InventoryCreativeEvent event) {
 		HumanEntity player = event.getWhoClicked();
 
-		if (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) {
+		event.getCursor();
+		if (!event.getCursor().getType().equals(Material.AIR)) {
 			ItemStack lastItem = mLastCreativeDestroy.get(player);
 			ItemStack newItem = event.getCursor();
 			if (lastItem != null) {
@@ -183,37 +219,41 @@ public class AuditListener implements Listener {
 			return "";
 		}
 
-		String retStr = "(" + item.getType().toString().replace("minecraft:", "") + " " + Integer.toString(item.getAmount());
+		StringBuilder retStr = new StringBuilder("(" + item.getType().toString().replace("minecraft:", "") + " " + item.getAmount());
 		if (item.hasItemMeta()) {
 			ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
 				Component displayName = meta.displayName();
 				if (displayName != null) {
 					/* Has display name */
-					retStr += " \"" + MessagingUtils.plainText(displayName) + "\"";
+					retStr.append(" \"").append(MessagingUtils.plainText(displayName)).append("\"");
 				}
 
 				if (meta instanceof BlockStateMeta) {
-					retStr += " [";
+					retStr.append(" [");
 
 					boolean elementAdded = false;
 
 					/* Is a container of more things */
 					BlockState state = ((BlockStateMeta)meta).getBlockState();
-					if ((state instanceof Lootable) && ((Lootable)state).hasLootTable()) {
-						retStr += ((Lootable)state).getLootTable().getKey().toString();
-						elementAdded = true;
+					if (state instanceof Lootable lootable) {
+						if (lootable.hasLootTable()) {
+							@Nullable LootTable lootTable = lootable.getLootTable();
+							assert lootTable != null;
+							retStr.append(lootTable.getKey());
+							elementAdded = true;
+						}
 					}
 					if (state instanceof CommandBlock) {
-						retStr += ((CommandBlock)state).getCommand();
+						retStr.append(((CommandBlock) state).getCommand());
 					}
 					if (state instanceof Container) {
 						for (ItemStack subItem : ((Container)state).getInventory().getContents()) {
 							if (subItem != null) {
 								if (elementAdded) {
-									retStr += ", ";
+									retStr.append(", ");
 								}
-								retStr += getItemLogString(subItem);
+								retStr.append(getItemLogString(subItem));
 								elementAdded = true;
 							}
 						}
@@ -221,17 +261,17 @@ public class AuditListener implements Listener {
 					if (state instanceof Sign) {
 						for (Component comp : ((Sign)state).lines()) {
 							String line = MessagingUtils.plainText(comp);
-							if (line != null && !line.isEmpty()) {
+							if (!line.isEmpty()) {
 								if (elementAdded) {
-									retStr += ", ";
+									retStr.append(", ");
 								}
-								retStr += "\"" + line + "\"";
+								retStr.append("\"").append(line).append("\"");
 								elementAdded = true;
 							}
 						}
 					}
 
-					retStr += "]";
+					retStr.append("]");
 				}
 			}
 		}
@@ -319,6 +359,6 @@ public class AuditListener implements Listener {
 	 * either with or without arguments after it.
 	 */
 	private static Pattern exactOptionalArguments(String command) {
-		return Pattern.compile("^\\/" + command + "($| )");
+		return Pattern.compile("^/" + command + "($| )", Pattern.CASE_INSENSITIVE);
 	}
 }
