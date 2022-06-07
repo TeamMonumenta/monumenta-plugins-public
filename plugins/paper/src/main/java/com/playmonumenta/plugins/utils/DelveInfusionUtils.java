@@ -40,6 +40,7 @@ public class DelveInfusionUtils {
 		CHOLER("choler", "Choler", NamespacedKeyUtils.fromString("epic:r1/delves/yellow/auxiliary/delve_material")),
 		UNYIELDING("unyielding", "Unyielding", NamespacedKeyUtils.fromString("epic:r1/delves/willows/auxiliary/echoes_of_the_veil")),
 		USURPER("usurper", "Usurper", NamespacedKeyUtils.fromString("epic:r1/delves/reverie/auxiliary/delve_material")),
+		VENGEFUL("vengeful", "Vengeful", NamespacedKeyUtils.fromString("epic:r1/delves/rogue/persistent_parchment")),
 
 		EMPOWERED("empowered", "Empowered", NamespacedKeyUtils.fromString("epic:r2/delves/lime/auxiliary/delve_material")),
 		NUTRIMENT("nutriment", "Nutriment", NamespacedKeyUtils.fromString("epic:r2/delves/pink/auxiliary/delve_material")),

@@ -530,6 +530,7 @@ public class ItemStatUtils {
 		UNDERSTANDING(new Understanding(), "", true, false, false),
 		UNYIELDING(new Unyielding(), "", true, false, false),
 		USURPER(new Usurper(), "", true, false, false),
+		VENGEFUL(new Vengeful(), "", true, false, false),
 		VIGOR(new Vigor(), "", true, false, false),
 		VITALITY(new Vitality(), "", true, false, false),
 		// Other Added Tags

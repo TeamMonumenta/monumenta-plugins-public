@@ -298,7 +298,7 @@ public class InfusionCustomInventory extends CustomInventory {
 							if (originalMeta instanceof LeatherArmorMeta oldLeather && meta instanceof LeatherArmorMeta newLeather) {
 								newLeather.setColor(oldLeather.getColor());
 							}
-							meta.displayName(Component.text("Placeholder", TextColor.fromCSSHexString("000000"))
+							meta.displayName(originalMeta.displayName()
 											.decoration(TextDecoration.BOLD, true)
 											.decoration(TextDecoration.ITALIC, false));
 							meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
