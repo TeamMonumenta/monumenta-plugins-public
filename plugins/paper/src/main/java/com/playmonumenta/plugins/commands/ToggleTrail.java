@@ -97,7 +97,7 @@ public class ToggleTrail extends GenericCommand implements Listener {
 		//Remove from active players
 		CharmManager.getInstance().onQuit(event.getPlayer());
 		mTrackedPlayers.remove(event.getPlayer().getUniqueId());
-		if (mTrackedPlayers.isEmpty()) {
+		if (mTrackedPlayers.isEmpty() && mRunnable != null) {
 			mRunnable.cancel();
 			mRunnable = null;
 		}
