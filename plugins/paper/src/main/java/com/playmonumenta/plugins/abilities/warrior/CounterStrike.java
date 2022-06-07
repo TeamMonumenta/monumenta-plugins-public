@@ -43,7 +43,7 @@ public class CounterStrike extends Ability {
 			    && source != null
 			    && !event.isBlocked()
 			    && mPlayer != null
-				&& mPlayer.getNoDamageTicks() == 0) {
+			    && mPlayer.getNoDamageTicks() <= mPlayer.getMaximumNoDamageTicks() / 2f) {
 
 			Location loc = mPlayer.getLocation().add(0, 1, 0);
 			new PartialParticle(Particle.SWEEP_ATTACK, loc, 6, 0.75, 0.5, 0.75, 0.001).spawnAsPlayerActive(mPlayer);
