@@ -179,6 +179,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		ItemStack titanicKnowledge = loadItemTable(playerLoad, "epic:r2/eldrask/materials/epic_material");
 		ItemStack ancestralEffigy = loadItemTable(playerLoad, "epic:r2/lich/materials/ancestral_effigy");
 		ItemStack voidstainedGeode = loadItemTable(playerLoad, "epic:r2/depths/loot/voidstained_geode");
+		ItemStack persistentParchment = loadItemTable(playerLoad, "epic:r1/delves/rogue/persistent_parchment");
 		ItemStack unicornPuke = loadItemTable(playerLoad, "epic:r1/dungeons/4/static_uncommons/unicorn_puke");
 		ItemStack blitzDoubloon = loadItemTable(playerLoad, "epic:r1/blitz/blitz_doubloon");
 
@@ -344,6 +345,12 @@ public final class ParrotCustomInventory extends CustomInventory {
 				"You have reached round " + (ScoreboardUtils.getScoreboardValue(playerLoad, "Blitz").orElse(1) - 1)),
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "Blitz").orElse(0) > 50,
 			ImmutableMap.of(blitzDoubloon, 128));
+
+		int corridorsScore = ScoreboardUtils.getScoreboardValue(playerLoad, "RogEndless").orElse(0);
+		createParrotItems(playerLoad, ParrotVariant.CORRIDORS, ParrotGUIPage.R1, 19, Material.NETHER_WART_BLOCK, "ParrotBought20",
+			List.of("Requires clearing floor 12 from Ephemeral Corridors", "You have cleared floor " + corridorsScore),
+			(player, inv) -> ScoreboardUtils.getScoreboardValue(playerLoad, "RogEndless").orElse(0) > 12,
+			ImmutableMap.of(persistentParchment, 24));
 
 		//==================================================================================================
 		//                                         R1 parrots end
