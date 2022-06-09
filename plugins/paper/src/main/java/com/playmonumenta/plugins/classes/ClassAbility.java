@@ -122,7 +122,7 @@ public enum ClassAbility {
 	// Berserker
 	METEOR_SLAM(MeteorSlam.NAME),
 	RAMPAGE("Rampage"),
-	RECKLESS_SWING("Reckless Swing"),
+	GLORIOUS_BATTLE("Glorious Battle"),
 
 	// Guardian
 	BODYGUARD("Bodyguard"),

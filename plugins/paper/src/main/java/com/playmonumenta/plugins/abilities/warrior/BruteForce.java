@@ -52,7 +52,7 @@ public class BruteForce extends Ability {
 			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.135).spawnAsPlayerActive(mPlayer);
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, BRUTE_FORCE_RADIUS, enemy)) {
-				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damageBonus, mInfo.mLinkedSpell, true);
+				DamageUtils.damage(mPlayer, mob, DamageType.WARRIOR_AOE_OTHER, damageBonus, mInfo.mLinkedSpell, true);
 				if (!EntityUtils.isBoss(mob)) {
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, BRUTE_FORCE_KNOCKBACK_SPEED, BRUTE_FORCE_KNOCKBACK_SPEED / 2, true);
 				}
