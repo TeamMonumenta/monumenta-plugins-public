@@ -23,6 +23,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -121,6 +122,7 @@ public enum DelvesModifier {
 		ItemStack stack = new ItemStack(material);
 
 		ItemMeta meta = stack.getItemMeta();
+		meta.addItemFlags(ItemFlag.values());
 		meta.displayName(name);
 		List<Component> lore = new ArrayList<>();
 		lore.add(Component.text(description, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));

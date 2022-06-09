@@ -27,7 +27,7 @@ public class Entropy {
 	};
 
 	public static int getDepthPointsAssigned(int rank) {
-		return rank == 0 ? 0 : DEPTH_POINTS_ASSIGNED[rank - 1];
+		return rank <= 0 ? 0 : DEPTH_POINTS_ASSIGNED[rank - 1];
 	}
 
 }
