@@ -23,7 +23,7 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 	private static final String DREADLING_TERRAIN_SOUL_NAME = "Dreadling";
 	private static final String DREADLING_WATER_SOUL_NAME = "Hydraling";
 
-	private static final int DAMAGE_IMMUNE_DISTANCE = 6;
+	private static final int DAMAGE_IMMUNE_DISTANCE = 8;
 
 	private double mDamageCounter = 0;
 
