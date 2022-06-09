@@ -228,7 +228,7 @@ public class ShulkerEquipmentListener implements Listener {
 			NBTCompound vanityItems = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY).addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY).addCompound(ItemStatUtils.VANITY_ITEMS_KEY);
 			String slotKey = slot.name().toLowerCase(Locale.ROOT);
 			ItemStack newVanity = vanityItems.hasKey(slotKey) ? vanityItems.getItemStack(slotKey) : null;
-			if (newVanity != null && (newVanity.getType() == Material.AIR || !mPlugin.mVanityManager.hasVanityUnlocked(player, newVanity, slot))) {
+			if (newVanity != null && (newVanity.getType() == Material.AIR || !VanityManager.isValidVanityItem(player, newVanity, slot))) {
 				newVanity = null;
 			} else if (newVanity != null && !ItemStatUtils.isClean(newVanity)) {
 				ItemUtils.setPlainTag(newVanity);

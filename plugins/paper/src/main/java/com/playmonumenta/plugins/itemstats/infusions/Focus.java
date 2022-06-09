@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public class Focus implements Infusion {
 
-	public static final double DAMAGE_PCT_PER_LEVEL = 0.01;
+	public static final double DAMAGE_MOD_PER_LEVEL = 0.01;
 
 	@Override
 	public String getName() {
@@ -31,7 +31,7 @@ public class Focus implements Infusion {
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		DamageEvent.DamageType type = event.getType();
 		if (type.equals(DamageType.PROJECTILE) || type.equals(DamageType.PROJECTILE_SKILL)) {
-			double damageBuffPct = value * DAMAGE_PCT_PER_LEVEL;
+			double damageBuffPct = value * DAMAGE_MOD_PER_LEVEL;
 			event.setDamage(event.getDamage() * (1.0 + damageBuffPct));
 		}
 

@@ -3,8 +3,10 @@ package com.playmonumenta.plugins.cosmetics;
 import com.destroystokyo.paper.event.player.PlayerDataLoadEvent;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.protocollib.VirtualItemsReplacer;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -14,9 +16,12 @@ import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTType;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,6 +29,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -36,6 +43,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.jetbrains.annotations.Nullable;
@@ -55,7 +63,7 @@ public class VanityManager implements Listener {
 			if (item == null || item.getType() == Material.AIR) {
 				mEquipped.remove(slot);
 			} else {
-				item = cleanForDisplay(item);
+				item = cleanCopyForDisplay(item);
 				item.setAmount(1);
 				mEquipped.put(slot, item);
 			}
@@ -99,8 +107,7 @@ public class VanityManager implements Listener {
 		for (Map.Entry<String, JsonElement> entry : items.entrySet()) {
 			ItemStack item = NBTItem.convertNBTtoItem(new NBTContainer(entry.getValue().getAsString()));
 			EquipmentSlot slot = EquipmentSlot.valueOf(entry.getKey());
-			if (hasVanityUnlocked(player, item, slot)
-				    && (slot != EquipmentSlot.OFF_HAND || isValidOffhandVanityItem(item))) {
+			if (isValidVanityItem(player, item, slot)) {
 				if (!ItemStatUtils.isClean(item)) {
 					ItemUtils.setPlainTag(item);
 					ItemStatUtils.generateItemStats(item);
@@ -110,6 +117,7 @@ public class VanityManager implements Listener {
 			}
 		}
 		vanityData.mSelfVanityEnabled = data.getAsJsonPrimitive("selfVanityEnabled").getAsBoolean();
+		vanityData.mOtherVanityEnabled = Optional.ofNullable(data.getAsJsonPrimitive("otherVanityEnabled")).map(JsonPrimitive::getAsBoolean).orElse(true);
 		vanityData.mLockboxSwapEnabled = data.getAsJsonPrimitive("lockboxSwapEnabled").getAsBoolean();
 		mData.put(player.getUniqueId(), vanityData);
 	}
@@ -127,6 +135,7 @@ public class VanityManager implements Listener {
 		}
 		data.add("equipped", equipped);
 		data.addProperty("selfVanityEnabled", vanityData.mSelfVanityEnabled);
+		data.addProperty("otherVanityEnabled", vanityData.mOtherVanityEnabled);
 		data.addProperty("lockboxSwapEnabled", vanityData.mLockboxSwapEnabled);
 		event.setPluginData(KEY_PLUGIN_DATA, data);
 	}
@@ -178,7 +187,7 @@ public class VanityManager implements Listener {
 	 *
 	 * @return A copy of the passed item stack with some data removed
 	 */
-	public static ItemStack cleanForDisplay(ItemStack item) {
+	public static ItemStack cleanCopyForDisplay(ItemStack item) {
 		if (item == null) {
 			return null;
 		}
@@ -245,13 +254,22 @@ public class VanityManager implements Listener {
 		return item.getType().name().toLowerCase(Locale.ROOT) + ":" + ItemUtils.getPlainNameIfExists(item);
 	}
 
-	public boolean hasVanityUnlocked(Player player, ItemStack item, EquipmentSlot slot) {
+	/**
+	 * Checks if the player may equip the given item into the given vanity slot (is unlocked or is patron, and checks if the slot is valid for the item's type)
+	 */
+	public static boolean isValidVanityItem(Player player, ItemStack item, EquipmentSlot slot) {
 		if (item == null || item.getType() == Material.AIR) {
 			return true;
 		}
-		return hasFreeAccess(player)
-			       || (CosmeticsManager.getInstance().playerHasCosmetic(player, CosmeticType.VANITY, getCosmeticsName(item))
-				           && (slot != EquipmentSlot.HEAD || ItemUtils.getEquipmentSlot(item) == EquipmentSlot.HEAD));
+		return ((slot == EquipmentSlot.OFF_HAND && isValidOffhandVanityItem(item)) || (hasFreeAccess(player) && slot == EquipmentSlot.HEAD) || ItemUtils.getEquipmentSlot(item) == slot)
+			       && hasVanityUnlocked(player, item);
+	}
+
+	public static boolean hasVanityUnlocked(Player player, ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return true;
+		}
+		return hasFreeAccess(player) || CosmeticsManager.getInstance().playerHasCosmetic(player, CosmeticType.VANITY, getCosmeticsName(item));
 	}
 
 	public void unlockVanity(Player player, ItemStack item) {
@@ -271,6 +289,98 @@ public class VanityManager implements Listener {
 			case AIR, WRITABLE_BOOK, BUCKET -> false;
 			default -> true;
 		};
+	}
+
+	public static void applyVanity(ItemStack itemStack, VanityData vanityData, EquipmentSlot equipmentSlot) {
+		ItemStack vanityItem = vanityData.getEquipped(equipmentSlot);
+		if (vanityItem != null && vanityItem.getType() != Material.AIR) {
+			if (equipmentSlot == EquipmentSlot.OFF_HAND
+				    && (itemStack.getMaxItemUseDuration() > 0 || vanityItem.getMaxItemUseDuration() > 0)
+				    && itemStack.getType() != vanityItem.getType()) {
+				// don't allow changing item type of useable items (e.g. food, shields) to prevent not being slowed down while using them or just messing with their use in general
+				return;
+			}
+			boolean invisible = VanityManager.isInvisibleVanityItem(vanityItem);
+			if (invisible && equipmentSlot != EquipmentSlot.OFF_HAND) { // invisible armor: only add tag for RP and add lore line
+				NBTItem nbt = new NBTItem(itemStack, true);
+				nbt.addCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(VanityManager.INVISIBLE_NBT_KEY, true);
+				ItemMeta meta = itemStack.getItemMeta();
+				if (meta != null) {
+					List<Component> lore = meta.lore() == null ? new ArrayList<>() : new ArrayList<>(meta.lore());
+					lore.add(0, Component.text("Invisibility vanity skin applied", NamedTextColor.GOLD));
+					meta.lore(lore);
+					itemStack.setItemMeta(meta);
+				}
+				return;
+			}
+			ItemMeta vanityMeta = vanityItem.getItemMeta();
+			if (vanityMeta == null) {
+				return;
+			}
+			ItemMeta originalMeta = itemStack.getItemMeta();
+
+			// copy over durability, adjusted for potentially changed max durability
+			if (vanityMeta instanceof Damageable vanityDamage
+				    && vanityItem.getType().getMaxDurability() > 0
+				    && originalMeta instanceof Damageable originalDamage
+				    && itemStack.getType().getMaxDurability() > 0
+				    && !originalMeta.isUnbreakable()) {
+				vanityMeta.setUnbreakable(false);
+				vanityDamage.setDamage((int) Math.round(1.0 * vanityItem.getType().getMaxDurability() * originalDamage.getDamage() / itemStack.getType().getMaxDurability()));
+			}
+
+			// copy display name and lore, but not plain ones
+			if (originalMeta != null) {
+				vanityMeta.displayName(originalMeta.displayName());
+			}
+			List<Component> lore = originalMeta == null || originalMeta.lore() == null ? new ArrayList<>() : new ArrayList<>(originalMeta.lore());
+			if (invisible) {
+				lore.add(0, Component.text("Invisibility vanity skin applied", NamedTextColor.GOLD));
+			} else {
+				lore.add(0, Component.text("Vanity skin: ", NamedTextColor.GOLD).append(ItemUtils.getPlainNameComponent(vanityItem)));
+			}
+			// add durability lore line if vanity item is unbreakable
+			if (originalMeta instanceof Damageable originalDamage
+				    && itemStack.getType().getMaxDurability() > 0
+				    && !originalMeta.isUnbreakable()
+				    && (!(vanityMeta instanceof Damageable) || vanityItem.getType().getMaxDurability() <= 0)) {
+				lore.add(Component.translatable("item.durability", NamedTextColor.WHITE,
+					Component.text(itemStack.getType().getMaxDurability() - originalDamage.getDamage()),
+					Component.text(itemStack.getType().getMaxDurability())
+				).decoration(TextDecoration.ITALIC, false));
+			}
+			vanityMeta.lore(lore);
+
+			// copy attributes
+			for (EquipmentSlot s : EquipmentSlot.values()) {
+				vanityMeta.removeAttributeModifier(s);
+			}
+			if (originalMeta != null) {
+				for (Map.Entry<Attribute, AttributeModifier> entry : originalMeta.getAttributeModifiers(equipmentSlot).entries()) {
+					vanityMeta.addAttributeModifier(entry.getKey(), entry.getValue());
+				}
+			}
+
+			// copy enchantments
+			vanityMeta.getEnchants().keySet().forEach(vanityMeta::removeEnchant);
+			if (originalMeta != null) {
+				originalMeta.getEnchants().forEach((ench, level) -> vanityMeta.addEnchant(ench, level, true));
+			}
+
+			// merge flags
+			if (originalMeta != null) {
+				vanityMeta.addItemFlags(originalMeta.getItemFlags().toArray(ItemFlag[]::new));
+			}
+
+			itemStack.setType(vanityItem.getType());
+			itemStack.setItemMeta(vanityMeta);
+			VirtualItemsReplacer.markVirtual(itemStack);
+
+			if (invisible) {
+				NBTItem nbt = new NBTItem(itemStack, true);
+				nbt.addCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(VanityManager.INVISIBLE_NBT_KEY, true);
+			}
+		}
 	}
 
 }

@@ -217,7 +217,7 @@ public class CosmeticsGUI extends CustomInventory {
 		} else {
 			// equip vanity equipment from inventory
 			if (mDisplayPage == null) {
-				item = VanityManager.cleanForDisplay(item);
+				item = VanityManager.cleanCopyForDisplay(item);
 				item.setAmount(1);
 				EquipmentSlot slot = ItemUtils.getEquipmentSlot(item);
 				if (slot == EquipmentSlot.HAND || event.getClick().isRightClick()) {
@@ -232,7 +232,7 @@ public class CosmeticsGUI extends CustomInventory {
 					player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
 					return;
 				}
-				if (mPlugin.mVanityManager.hasVanityUnlocked(player, item, slot)) {
+				if (VanityManager.hasVanityUnlocked(player, item)) {
 					vanityData.equip(slot, item);
 					mVanityChanged = true;
 					setUpCosmetics(player);
@@ -447,7 +447,7 @@ public class CosmeticsGUI extends CustomInventory {
 			ItemMeta meta = otherVanityToggle.getItemMeta();
 			meta.displayName(Component.text("Others' Vanity " + (vanityData.mOtherVanityEnabled ? "Enabled" : "Disabled"), vanityData.mOtherVanityEnabled ? NamedTextColor.GREEN : NamedTextColor.RED)
 				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			meta.lore(List.of(Component.text("Click to toggle whether your see", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+			meta.lore(List.of(Component.text("Click to toggle whether you see", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 				Component.text("other people's vanity equipment.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			otherVanityToggle.setItemMeta(meta);
 			ItemUtils.setPlainTag(otherVanityToggle);

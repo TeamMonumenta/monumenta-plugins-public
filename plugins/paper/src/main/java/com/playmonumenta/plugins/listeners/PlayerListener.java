@@ -1176,8 +1176,11 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void gamemodeChangeEvent(PlayerGameModeChangeEvent event) {
-		// When switching to creative, update the inventory to update any virtual items back into normal forms to prevent breaking them
-		if (event.getNewGameMode() == GameMode.CREATIVE) {
+		// When switching to creative, update the inventory to update any virtual items back into normal forms to prevent breaking them.
+		// Also update when switching away from creative or spectator to show virtual items again.
+		if (event.getNewGameMode() == GameMode.CREATIVE
+			    || event.getPlayer().getGameMode() == GameMode.CREATIVE && event.getNewGameMode() != GameMode.SPECTATOR
+			    || event.getPlayer().getGameMode() == GameMode.SPECTATOR) {
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> event.getPlayer().updateInventory(), 1);
 		}
 	}
