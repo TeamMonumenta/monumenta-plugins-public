@@ -46,8 +46,8 @@ public class JudgementChainMobEffect extends Effect {
 
 	@Override
 	public void onDamage(@NotNull LivingEntity entity, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
-		if (entity instanceof Player) {
-			if (entity != mPlayer) {
+		if (enemy instanceof Player) {
+			if (enemy != mPlayer) {
 				event.setDamage(0);
 			} else {
 				event.setDamage(event.getDamage() / 2);
