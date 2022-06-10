@@ -133,7 +133,8 @@ public class AuditListener implements Listener {
 	public void death(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 
-		log("Death: " + player.getName() + " " + MessagingUtils.plainText(event.deathMessage()));
+		// TODO Update MessageUtils.plain() to accept a language file to translate with
+		log("Death: " + player.getName() + " " + event.getDeathMessage());
 
 		checkDestroy(player);
 	}
