@@ -326,23 +326,35 @@ public class GenerateItems extends GenericCommand {
 				player.chat("/editattr" + " KnockbackResistance " + Double.toString(kbrAttr) + " add " + slot);
 			}
 			// Enchants
-			if (meleeProt != 0) {
+			if (meleeProt > 0) {
 				player.chat("/editench" + " MeleeProtection " + Integer.toString(meleeProt));
+			} else if (meleeProt < 0) {
+				player.chat("/editench" + " MeleeFragility " + Integer.toString(meleeProt));
 			}
-			if (projProt != 0) {
+			if (projProt > 0) {
 				player.chat("/editench" + " ProjectileProtection " + Integer.toString(projProt));
+			} else if (projProt < 0) {
+				player.chat("/editench" + " ProjectileFragility " + Integer.toString(projProt));
 			}
-			if (magicProt != 0) {
+			if (magicProt > 0) {
 				player.chat("/editench" + " MagicProtection " + Integer.toString(magicProt));
+			} else if (magicProt < 0) {
+				player.chat("/editench" + " MagicFragility " + Integer.toString(magicProt));
 			}
-			if (blastProt != 0) {
+			if (blastProt > 0) {
 				player.chat("/editench" + " BlastProtection " + Integer.toString(blastProt));
+			} else if (blastProt < 0) {
+				player.chat("/editench" + " BlastFragility " + Integer.toString(blastProt));
 			}
-			if (fireProt != 0) {
+			if (fireProt > 0) {
 				player.chat("/editench" + " FireProtection " + Integer.toString(fireProt));
+			} else if (fireProt < 0) {
+				player.chat("/editench" + " FireFragility " + Integer.toString(fireProt));
 			}
-			if (featherProt != 0) {
+			if (featherProt > 0) {
 				player.chat("/editench" + " FeatherFalling " + Integer.toString(featherProt));
+			} else if (featherProt < 0) {
+				player.chat("/editench" + " FallFragility " + Integer.toString(featherProt));
 			}
 			if (aquaAffinity != 0) {
 				player.chat("/editench" + " AquaAffinity " + Integer.toString(aquaAffinity));

@@ -161,6 +161,7 @@ public class ItemStatUtils {
 		OBFUSCATED("obfuscated", Component.text("Stick_:)", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true)),
 		SHULKER_BOX("shulker", Component.text("Invalid Type", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false)),
 		CHARM("charm", Component.text("Charm", TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false)),
+		RARE_CHARM("rarecharm", Component.text("Rare Charm", TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false)),
 		QUEST_COMPASS("quest_compass", Component.text("Invalid Type", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false));
 
 		static final String KEY = "Tier";
@@ -204,6 +205,12 @@ public class ItemStatUtils {
 		I("1", Component.text("★", TextColor.fromHexString("#FFB43E")).append(Component.text("☆☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
 		II("2", Component.text("★★", TextColor.fromHexString("#FFB43E")).append(Component.text("☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
 		III("3", Component.text("★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		IV("4", Component.text("★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		V("5", Component.text("★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		VI("6", Component.text("★★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		VIIA("7a", Component.text("★★★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		VIIB("7b", Component.text("★★★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		VIIC("7c", Component.text("★★★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
 		ERROR("error", Component.text("ERROR", TextColor.fromHexString("#704C8A")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true));
 
 		static final String KEY = "Masterwork";
@@ -1854,7 +1861,7 @@ public class ItemStatUtils {
 					}
 				}
 
-				if (getTier(item) == Tier.CHARM) {
+				if (getTier(item) == Tier.CHARM || getTier(item) == Tier.RARE_CHARM) {
 					int charmPower = getCharmPower(item);
 					if (charmPower > 0) {
 						String starString = "";
@@ -1998,7 +2005,7 @@ public class ItemStatUtils {
 		}
 
 		NBTList<String> charmLore = monumenta.getStringList(CHARM_KEY);
-		if (charmLore != null && getTier(item) == Tier.CHARM) {
+		if (charmLore != null && (getTier(item) == Tier.CHARM || getTier(item) == Tier.RARE_CHARM)) {
 			lore.add(Component.empty());
 			lore.add(Component.text("When in Charm Slot:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 			for (String serializedLine : charmLore) {

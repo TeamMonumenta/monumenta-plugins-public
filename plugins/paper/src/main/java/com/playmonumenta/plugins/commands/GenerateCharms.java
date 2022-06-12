@@ -88,7 +88,11 @@ public class GenerateCharms extends GenericCommand {
 
 			// Logic for commands to run
 			// Item Info
-			player.chat("/editinfo ring charm " + location + " none");
+			if (row.get(15).equals("")) {
+				player.chat("/editinfo ring charm " + location + " none");
+			} else {
+				player.chat("/editinfo ring rarecharm " + location + " none");
+			}
 			player.chat("/editcharm power " + Integer.toString(power));
 			// Charm Stats
 			for (int i = 0; i < loreText.length; i++) {

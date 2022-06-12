@@ -649,7 +649,7 @@ public class CharmManager {
 			return false;
 		}
 		// Make sure item has Charm Tier
-		if (!ItemStatUtils.getTier(charm).equals(ItemStatUtils.Tier.CHARM)) {
+		if (!ItemStatUtils.getTier(charm).equals(ItemStatUtils.Tier.CHARM) && !ItemStatUtils.getTier(charm).equals(ItemStatUtils.Tier.RARE_CHARM)) {
 			return false;
 		}
 		// Charm Power Handling
