@@ -6,6 +6,10 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStat;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -31,6 +35,10 @@ public class Quickdraw extends Ability {
 	private static final int QUICKDRAW_1_COOLDOWN = 20 * 6;
 	private static final int QUICKDRAW_2_COOLDOWN = 20 * 3;
 
+	public static final String CHARM_DAMAGE = "Quickdraw Damage";
+	public static final String CHARM_COOLDOWN = "Quickdraw Cooldown";
+	public static final String CHARM_PIERCING = "Quickdraw Piercing";
+
 	public Quickdraw(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Quickdraw");
 		mInfo.mLinkedSpell = ClassAbility.QUICKDRAW;
@@ -38,7 +46,7 @@ public class Quickdraw extends Ability {
 		mInfo.mShorthandName = "Qd";
 		mInfo.mDescriptions.add("Left-clicking with a bow instantly fires a fully charged arrow. This skill can only apply Recoil once before touching the ground. Cooldown: 6s.");
 		mInfo.mDescriptions.add("Cooldown: 3s.");
-		mInfo.mCooldown = isLevelOne() ? QUICKDRAW_1_COOLDOWN : QUICKDRAW_2_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? QUICKDRAW_1_COOLDOWN : QUICKDRAW_2_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
@@ -89,7 +97,7 @@ public class Quickdraw extends Ability {
 		}
 
 		arrow.setShooter(mPlayer);
-		arrow.setPierceLevel(inMainHand.getEnchantmentLevel(Enchantment.PIERCING));
+		arrow.setPierceLevel(inMainHand.getEnchantmentLevel(Enchantment.PIERCING) + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING));
 		arrow.setCritical(true);
 		arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 
@@ -99,6 +107,16 @@ public class Quickdraw extends Ability {
 		if (!eventLaunch.isCancelled()) {
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
 		}
+
+		//please
+		ItemStatManager.PlayerItemStats stats = DamageListener.getProjectileItemStats(arrow);
+		ItemStatManager.PlayerItemStats.ItemStatsMap map = stats.getItemStats();
+		if (map != null) {
+			ItemStat projDamageAdd = ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat();
+			double damage = map.get(projDamageAdd);
+			map.add(projDamageAdd, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage));
+		}
+		//thank you
 
 		return !eventLaunch.isCancelled();
 	}

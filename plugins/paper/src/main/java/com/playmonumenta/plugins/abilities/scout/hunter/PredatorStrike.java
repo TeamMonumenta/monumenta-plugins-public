@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -44,6 +45,10 @@ public class PredatorStrike extends Ability {
 	private static final double EXPLODE_RADIUS = 0.75;
 	private static final double HITBOX_LENGTH = 0.5;
 
+	public static final String CHARM_COOLDOWN = "Predator Strike Cooldown";
+	public static final String CHARM_DAMAGE = "Predator Strike Damage";
+	public static final String CHARM_RADIUS = "Predator Strike Radius";
+
 	private boolean mActive = false;
 	private final double mDistanceScale;
 
@@ -54,7 +59,7 @@ public class PredatorStrike extends Ability {
 		mInfo.mShorthandName = "PrS";
 		mInfo.mDescriptions.add("Left-clicking with a bow or trident while not sneaking will prime a Predator Strike that unprimes after 5s. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits an enemy or block and damages enemies in a 0.75 block radius. This ability deals 100% of your projectile base damage increased by 10% for every block of distance from you and the target (up to 12 blocks, or 220% total). Hit targets contribute to Sharpshooter stacks. Cooldown: 18s.");
 		mInfo.mDescriptions.add("Damage now increases 15% for each block of distance (up to 280%). Cooldown: 14s.");
-		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.SPECTRAL_ARROW, 1);
@@ -140,15 +145,16 @@ public class PredatorStrike extends Ability {
 		}
 		World world = mPlayer.getWorld();
 
-		double damage = ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE));
+		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EXPLODE_RADIUS);
+		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE)));
 
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 45, EXPLODE_RADIUS, EXPLODE_RADIUS, EXPLODE_RADIUS, 0.125).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.FLAME, loc, 12, EXPLODE_RADIUS, EXPLODE_RADIUS, EXPLODE_RADIUS, 0.1).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 45, radius, radius, radius, 0.125).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLAME, loc, 12, radius, radius, radius, 0.1).spawnAsPlayerActive(mPlayer);
 
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.7f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.7f);
 
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, EXPLODE_RADIUS, mPlayer);
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius, mPlayer);
 		for (LivingEntity mob : mobs) {
 			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
 			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE, damage, mInfo.mLinkedSpell, true);

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.*;
 import javax.annotation.Nullable;
@@ -34,6 +35,16 @@ public class Volley extends Ability {
 	public Set<AbstractArrow> mVolleyArrows;
 	private Map<LivingEntity, Integer> mVolleyHitMap;
 
+	public static final String CHARM_COOLDOWN = "Volley Cooldown";
+	public static final String CHARM_ARROWS = "Volley Arrows";
+	public static final String CHARM_DAMAGE = "Volley Damage";
+	public static final String CHARM_BLEED_AMPLIFIER = "Volley Bleed Amplifier";
+	public static final String CHARM_BLEED_DURATION = "Volley Bleed Duration";
+	public static final String CHARM_PIERCING = "Volley Piercing";
+
+	private int mArrows;
+	private double mMultiplier;
+
 	public Volley(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Volley");
 		mInfo.mLinkedSpell = ClassAbility.VOLLEY;
@@ -42,9 +53,13 @@ public class Volley extends Ability {
 		mInfo.mDescriptions.add("When you shoot an arrow or trident while sneaking, you shoot a volley consisting of 7 projectiles instead. Only one arrow is consumed, and each projectile deals 30% bonus damage. Cooldown: 15s.");
 		mInfo.mDescriptions.add("Increases the number of projectiles to 11 and enhances the bonus damage to 50%.");
 		mInfo.mDescriptions.add("Volley now fires in a 360 degree arc and the arrows inflicting 20% Bleed for 4s.");
-		mInfo.mCooldown = VOLLEY_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, VOLLEY_COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.ARROW, 1);
+
+		mArrows = (isLevelOne() ? VOLLEY_1_ARROW_COUNT : VOLLEY_2_ARROW_COUNT) + (int) CharmManager.getLevel(mPlayer, CHARM_ARROWS);
+		mMultiplier = isLevelOne() ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
+
 		mVolleyArrows = new HashSet<>();
 		mVolleyHitMap = new HashMap<>();
 	}
@@ -77,9 +92,6 @@ public class Volley extends Ability {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				// Ability Enchantments
-				int numArrows = isLevelOne() ? VOLLEY_1_ARROW_COUNT : VOLLEY_2_ARROW_COUNT;
-
 				// Store PotionData from the original arrow only if it is weakness or slowness
 				PotionData tArrowData = null;
 				int fireticks = 0;
@@ -97,20 +109,18 @@ public class Volley extends Ability {
 
 				List<AbstractArrow> projectiles;
 				if (!isEnhanced()) {
-					projectiles = EntityUtils.spawnArrowVolley(mPlayer, numArrows, arrowSpeed, 5, arrow.getClass());
+					projectiles = EntityUtils.spawnArrowVolley(mPlayer, mArrows, arrowSpeed, 5, arrow.getClass());
 				} else {
-					projectiles = EntityUtils.spawnArrowVolleyEnhanced(mPlayer, numArrows, arrowSpeed, 5, arrow.getClass());
+					projectiles = EntityUtils.spawnArrowVolleyEnhanced(mPlayer, mArrows, arrowSpeed, 5, arrow.getClass());
 				}
 
+				int piercing = arrow.getPierceLevel() + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING);
 				for (AbstractArrow proj : projectiles) {
 					mVolleyArrows.add(proj);
 					proj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-					if (fireticks > 0) {
-						proj.setFireTicks(fireticks);
-					}
 
 					proj.setCritical(arrow.isCritical());
-					proj.setPierceLevel(arrow.getPierceLevel());
+					proj.setPierceLevel(piercing);
 
 					// If the base arrow's potion data is still stored, apply it to the new arrows
 					if (tArrowData != null) {
@@ -138,9 +148,7 @@ public class Volley extends Ability {
 		Entity proj = event.getDamager();
 		if (event.getType() == DamageType.PROJECTILE && proj instanceof AbstractArrow && mVolleyArrows.contains(proj)) {
 			if (notBeenHit(enemy)) {
-				double damageMultiplier = getAbilityScore() == 1 ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
-				event.setDamage(event.getDamage() * damageMultiplier);
-
+				event.setDamage(event.getDamage() * mMultiplier * (1 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)));
 				if (isEnhanced()) {
 					EntityUtils.applyBleed(mPlugin, ENHANCEMENT_BLEED_DURATION, ENHANCEMENT_BLEED_POTENCY, enemy);
 				}

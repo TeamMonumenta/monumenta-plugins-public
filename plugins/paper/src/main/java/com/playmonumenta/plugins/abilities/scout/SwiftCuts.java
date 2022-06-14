@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
@@ -20,6 +21,8 @@ public class SwiftCuts extends Ability {
 	private static final double CONSECUTIVE_PERCENT_DAMAGE_2 = 0.35;
 	private static final double ENHANCEMENT_DAMAGE_PERCENT = 0.35;
 
+	public static final String CHARM_DAMAGE = "Swift Cuts Damage";
+
 	private final double mConsecutivePercentDamage;
 
 	private @Nullable LivingEntity mLastTarget = null;
@@ -33,7 +36,7 @@ public class SwiftCuts extends Ability {
 		mInfo.mDescriptions.add("Bonus damage increased to +35%.");
 		mInfo.mDescriptions.add("Every third fully charged melee attack in a row against the same mob deals " + ENHANCEMENT_DAMAGE_PERCENT * 100 + "% more damage.");
 		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
-		mConsecutivePercentDamage = isLevelOne() ? CONSECUTIVE_PERCENT_DAMAGE_1 : CONSECUTIVE_PERCENT_DAMAGE_2;
+		mConsecutivePercentDamage = (isLevelOne() ? CONSECUTIVE_PERCENT_DAMAGE_1 : CONSECUTIVE_PERCENT_DAMAGE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 	}
 
 	@Override

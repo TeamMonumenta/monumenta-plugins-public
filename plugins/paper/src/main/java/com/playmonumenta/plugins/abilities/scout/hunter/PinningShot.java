@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -32,6 +33,9 @@ public class PinningShot extends Ability {
 	private static final double PINNING_WEAKEN_1 = 0.3;
 	private static final double PINNING_WEAKEN_2 = 0.6;
 
+	public static final String CHARM_DAMAGE = "Pinning Shot Max Health Damage";
+	public static final String CHARM_WEAKEN = "Pinning Shot Weakness Amplifier";
+
 	private final double mDamageMultiplier;
 	private final double mWeaken;
 
@@ -46,8 +50,8 @@ public class PinningShot extends Ability {
 		mInfo.mDescriptions.add("Weaken increased to 60% and bonus damage increased to 20% max health.");
 		mDisplayItem = new ItemStack(Material.CROSSBOW, 1);
 
-		mDamageMultiplier = isLevelOne() ? PINNING_SHOT_1_DAMAGE_MULTIPLIER : PINNING_SHOT_2_DAMAGE_MULTIPLIER;
-		mWeaken = isLevelOne() ? PINNING_WEAKEN_1 : PINNING_WEAKEN_2;
+		mDamageMultiplier = (isLevelOne() ? PINNING_SHOT_1_DAMAGE_MULTIPLIER : PINNING_SHOT_2_DAMAGE_MULTIPLIER) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mWeaken = (isLevelOne() ? PINNING_WEAKEN_1 : PINNING_WEAKEN_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
 	}
 
 	@Override

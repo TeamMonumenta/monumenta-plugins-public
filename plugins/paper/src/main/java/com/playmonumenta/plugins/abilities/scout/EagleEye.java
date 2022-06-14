@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -32,10 +33,17 @@ public class EagleEye extends Ability {
 	private static final int EAGLE_EYE_EFFECT_LVL = 0;
 	private static final int EAGLE_EYE_DURATION = 10 * 20;
 	private static final int EAGLE_EYE_COOLDOWN = 24 * 20;
+	private static final int EAGLE_EYE_REFRESH = 2 * 20;
 	private static final double EAGLE_EYE_1_VULN_LEVEL = 0.2;
 	private static final double EAGLE_EYE_2_VULN_LEVEL = 0.35;
 	private static final int EAGLE_EYE_RADIUS = 20;
 	private static final double ENHANCEMENT_DAMAGE_PERCENT = 0.3;
+
+	public static final String CHARM_DURATION = "Eagle Eye Duration";
+	public static final String CHARM_COOLDOWN = "Eagle Eye Cooldown";
+	public static final String CHARM_VULN = "Eagle Eye Vulnerability Amplifier";
+	public static final String CHARM_RADIUS = "Eagle Eye Radius";
+	public static final String CHARM_REFRESH = "Eagle Eye Refresh";
 
 	private double mVulnLevel;
 	private Team mEagleEyeTeam = null;
@@ -49,12 +57,12 @@ public class EagleEye extends Ability {
 		mInfo.mDescriptions.add("When you left-click while sneaking you reveal all enemies in a 20 block radius, giving them the glowing effect for 10 seconds. Affected enemies have 20% Vulnerability. If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by 2 seconds. This skill can not be activated if you have a pickaxe in your mainhand. Cooldown: 24s.");
 		mInfo.mDescriptions.add("The effect is increased to 35% Vulnerability.");
 		mInfo.mDescriptions.add("Your first attack against every enemy affected by this ability will deal " + ENHANCEMENT_DAMAGE_PERCENT * 100 + "% extra damage.");
-		mInfo.mCooldown = EAGLE_EYE_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, EAGLE_EYE_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
 		mInfo.mIgnoreCooldown = true;
 
-		mVulnLevel = isLevelOne() ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
+		mVulnLevel = (isLevelOne() ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
 		createTeams();
 	}
 
@@ -70,7 +78,7 @@ public class EagleEye extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1.5f, 1.25f);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.25f);
 
-		mEntitiesAffected = EntityUtils.getNearbyMobs(player.getLocation(), EAGLE_EYE_RADIUS, mPlayer);
+		mEntitiesAffected = EntityUtils.getNearbyMobs(player.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, EAGLE_EYE_RADIUS), mPlayer);
 
 		for (LivingEntity mob : mEntitiesAffected) {
 			// Don't apply vulnerability to arena mobs
@@ -85,9 +93,10 @@ public class EagleEye extends Ability {
 				mEagleEyeTeam.addEntry(mob.getUniqueId().toString());
 			}
 
+			int duration = EAGLE_EYE_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 			PotionUtils.applyPotion(mPlayer, mob,
-				new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
-			EntityUtils.applyVulnerability(mPlugin, EAGLE_EYE_DURATION, mVulnLevel, mob);
+				new PotionEffect(PotionEffectType.GLOWING, duration, EAGLE_EYE_EFFECT_LVL, true, false));
+			EntityUtils.applyVulnerability(mPlugin, duration, mVulnLevel, mob);
 
 			new BukkitRunnable() {
 				int mTicks = 0;
@@ -96,7 +105,7 @@ public class EagleEye extends Ability {
 				public void run() {
 					mTicks++;
 					if (mob.isDead() || !mob.isValid()) {
-						mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.EAGLE_EYE, 20 * 2);
+						mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.EAGLE_EYE, EAGLE_EYE_REFRESH + CharmManager.getExtraDuration(mPlayer, CHARM_REFRESH));
 						this.cancel();
 					}
 					if (mTicks >= EAGLE_EYE_DURATION) {

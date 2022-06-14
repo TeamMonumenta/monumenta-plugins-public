@@ -61,6 +61,19 @@ import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
+import com.playmonumenta.plugins.abilities.scout.EagleEye;
+import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
+import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
+import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
+import com.playmonumenta.plugins.abilities.scout.Swiftness;
+import com.playmonumenta.plugins.abilities.scout.Volley;
+import com.playmonumenta.plugins.abilities.scout.WindBomb;
+import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
+import com.playmonumenta.plugins.abilities.scout.hunter.PredatorStrike;
+import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
+import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
+import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
+import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
 import com.playmonumenta.plugins.abilities.warlock.CursedWound;
@@ -539,6 +552,7 @@ public class CharmManager {
 			Taboo.CHARM_HEALING,
 			Taboo.CHARM_KNOCKBACK_RESISTANCE,
 			Taboo.CHARM_SELF_DAMAGE,
+
 			//Warlock
 			AmplifyingHex.CHARM_CONE,
 			AmplifyingHex.CHARM_COOLDOWN,
@@ -609,7 +623,68 @@ public class CharmManager {
 			VoodooBonds.CHARM_DAMAGE,
 			VoodooBonds.CHARM_RADIUS,
 			VoodooBonds.CHARM_TRANSFER_DAMAGE,
-			VoodooBonds.CHARM_TRANSFER_TIME
+			VoodooBonds.CHARM_TRANSFER_TIME,
+
+			//Scout
+			EagleEye.CHARM_COOLDOWN,
+			EagleEye.CHARM_DURATION,
+			EagleEye.CHARM_RADIUS,
+			EagleEye.CHARM_REFRESH,
+			EagleEye.CHARM_VULN,
+			HuntingCompanion.CHARM_DAMAGE,
+			HuntingCompanion.CHARM_DURATION,
+			HuntingCompanion.CHARM_COOLDOWN,
+			HuntingCompanion.CHARM_STUN_DURATION,
+			HuntingCompanion.CHARM_BLEED_DURATION,
+			HuntingCompanion.CHARM_BLEED_AMPLIFIER,
+			HuntingCompanion.CHARM_FOXES,
+			HuntingCompanion.CHARM_EAGLES,
+			HuntingCompanion.CHARM_SPEED,
+			Sharpshooter.CHARM_STACK_DAMAGE,
+			Sharpshooter.CHARM_STACKS,
+			Sharpshooter.CHARM_RETRIEVAL,
+			Sharpshooter.CHARM_DECAY,
+			SwiftCuts.CHARM_DAMAGE,
+			Swiftness.CHARM_SPEED,
+			Swiftness.CHARM_JUMP_BOOST,
+			Swiftness.CHARM_DODGE,
+			Volley.CHARM_COOLDOWN,
+			Volley.CHARM_ARROWS,
+			Volley.CHARM_DAMAGE,
+			Volley.CHARM_PIERCING,
+			Volley.CHARM_BLEED_AMPLIFIER,
+			Volley.CHARM_BLEED_DURATION,
+			WindBomb.CHARM_COOLDOWN,
+			WindBomb.CHARM_DAMAGE,
+			WindBomb.CHARM_RADIUS,
+			WindBomb.CHARM_DURATION,
+			WindBomb.CHARM_WEAKNESS,
+			WindBomb.CHARM_HEIGHT,
+			WindBomb.CHARM_PULL,
+			WindBomb.CHARM_VORTEX_DURATION,
+			WindBomb.CHARM_VORTEX_RADIUS,
+			PinningShot.CHARM_DAMAGE,
+			PinningShot.CHARM_WEAKEN,
+			PredatorStrike.CHARM_DAMAGE,
+			PredatorStrike.CHARM_RADIUS,
+			PredatorStrike.CHARM_COOLDOWN,
+			SplitArrow.CHARM_DAMAGE,
+			SplitArrow.CHARM_RANGE,
+			SplitArrow.CHARM_BOUNCES,
+			Quickdraw.CHARM_COOLDOWN,
+			Quickdraw.CHARM_PIERCING,
+			Quickdraw.CHARM_DAMAGE,
+			TacticalManeuver.CHARM_CHARGES,
+			TacticalManeuver.CHARM_COOLDOWN,
+			TacticalManeuver.CHARM_DAMAGE,
+			TacticalManeuver.CHARM_VELOCITY,
+			TacticalManeuver.CHARM_RADIUS,
+			TacticalManeuver.CHARM_DURATION,
+			WhirlingBlade.CHARM_CHARGES,
+			WhirlingBlade.CHARM_COOLDOWN,
+			WhirlingBlade.CHARM_DAMAGE,
+			WhirlingBlade.CHARM_RADIUS,
+			WhirlingBlade.CHARM_KNOCKBACK
 		);
 	}
 

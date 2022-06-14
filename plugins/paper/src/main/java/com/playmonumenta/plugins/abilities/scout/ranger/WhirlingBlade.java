@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -36,13 +37,17 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	private static final float BLADE_1_KNOCKBACK = 0.4f;
 	private static final float BLADE_2_KNOCKBACK = 1.2f;
 	private static final double THROW_RADIUS = 3;
-	private static final double BLADE_RADIUS = THROW_RADIUS/3;
-	private static final int BLADE_1_MAX_CHARGES = 2;
-	private static final int BLADE_2_MAX_CHARGES = 2;
-	private static final int BLADE_1_COOLDOWN = 20 * 8;
-	private static final int BLADE_2_COOLDOWN = 20 * 8;
+	private static final double BLADE_RADIUS = 1;
+	private static final int BLADE_MAX_CHARGES = 2;
+	private static final int BLADE_COOLDOWN = 20 * 8;
 
-	private final int mDamage;
+	public static final String CHARM_DAMAGE = "Whirling Blade Damage";
+	public static final String CHARM_KNOCKBACK = "Whirling Blade Knockback";
+	public static final String CHARM_RADIUS = "Whirling Blade Radius";
+	public static final String CHARM_CHARGES = "Whirling Blade Charges";
+	public static final String CHARM_COOLDOWN = "Whirling Blade Cooldown";
+
+	private final double mDamage;
 	private final float mKnockback;
 
 	private int mLastCastTicks = 0;
@@ -55,13 +60,12 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		mInfo.mDescriptions.add("Use the swap key while holding a weapon and not looking up to throw a whirling blade that circles around you, knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits. Cooldown: 8s. Charges: 2.");
 		mInfo.mDescriptions.add("The damage is increased to " + BLADE_2_DAMAGE + " and the knockback is greatly increased.");
 		mInfo.mLinkedSpell = ClassAbility.WHIRLING_BLADE;
-		mDamage = isLevelOne() ? BLADE_1_DAMAGE : BLADE_2_DAMAGE;
-		mKnockback = isLevelOne() ? BLADE_1_KNOCKBACK : BLADE_2_KNOCKBACK;
-		mInfo.mCooldown = isLevelOne() ? BLADE_1_COOLDOWN : BLADE_2_COOLDOWN;
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? BLADE_1_DAMAGE : BLADE_2_DAMAGE);
+		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, isLevelOne() ? BLADE_1_KNOCKBACK : BLADE_2_KNOCKBACK);
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, BLADE_COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
-		mMaxCharges = isLevelOne() ? BLADE_1_MAX_CHARGES : BLADE_2_MAX_CHARGES;
-		mMaxCharges = getAbilityScore() == 1 ? BLADE_1_MAX_CHARGES : BLADE_2_MAX_CHARGES;
+		mMaxCharges = BLADE_MAX_CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
 
 		if (player != null) {
@@ -87,7 +91,6 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		}
 
 		// Player is looking up, do not cast (conflict with Swiftness)
-		//TODO needs sneaking check for wind bomb - but needs Stick's PR in first to do this
 		if (mPlayer.getLocation().getPitch() < -45) {
 			return;
 		}
@@ -100,13 +103,15 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		}
 		mLastCastTicks = ticks;
 
+		double throwRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, THROW_RADIUS);
+		double bladeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BLADE_RADIUS);
 		new BukkitRunnable() {
 			World mWorld = mPlayer.getWorld();
 			Location mLoc = mPlayer.getEyeLocation().add(0, -0.5, 0);
 			Vector mEyeDir = mLoc.getDirection();
 
 			// Convoluted range parameter makes sure we grab all possible entities to be hit without recalculating manually
-			List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(mLoc, 4*THROW_RADIUS, mPlayer);
+			List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(mLoc, 4 * throwRadius, mPlayer);
 
 			double mStartAngle = Math.atan(mEyeDir.getZ()/mEyeDir.getX());
 			int mIncrementDegrees = 0;
@@ -116,16 +121,16 @@ public class WhirlingBlade extends MultipleChargeAbility {
 					if (mEyeDir.getX() < 0) {
 						mStartAngle += Math.PI;
 					}
-					mStartAngle += Math.PI*90/180;
+					mStartAngle += Math.PI * 90 / 180;
 				}
 				Location mLoc = mPlayer.getEyeLocation().add(0, -0.5, 0);
-				Vector direction = new Vector(Math.cos(mStartAngle - Math.PI*mIncrementDegrees/180), 0, Math.sin(mStartAngle - Math.PI*mIncrementDegrees/180));
-				Location bladeLoc1 = mLoc.clone().add(direction.clone().multiply(THROW_RADIUS));
-				Location bladeLoc2 = mLoc.clone().add(direction.clone().multiply(THROW_RADIUS/2));
-				Location bladeLoc3 = mLoc.clone().add(direction.clone().multiply(THROW_RADIUS/4));
-				BoundingBox mBox1 = BoundingBox.of(bladeLoc1, BLADE_RADIUS, BLADE_RADIUS, BLADE_RADIUS);
-				BoundingBox mBox2 = BoundingBox.of(bladeLoc2, BLADE_RADIUS/2, BLADE_RADIUS/2, BLADE_RADIUS/2);
-				BoundingBox mBox3 = BoundingBox.of(bladeLoc3, BLADE_RADIUS/4, BLADE_RADIUS/4, BLADE_RADIUS/4);
+				Vector direction = new Vector(Math.cos(mStartAngle - Math.PI * mIncrementDegrees / 180), 0, Math.sin(mStartAngle - Math.PI * mIncrementDegrees / 180));
+				Location bladeLoc1 = mLoc.clone().add(direction.clone().multiply(throwRadius));
+				Location bladeLoc2 = mLoc.clone().add(direction.clone().multiply(throwRadius / 2));
+				Location bladeLoc3 = mLoc.clone().add(direction.clone().multiply(throwRadius / 4));
+				BoundingBox mBox1 = BoundingBox.of(bladeLoc1, bladeRadius, bladeRadius, bladeRadius);
+				BoundingBox mBox2 = BoundingBox.of(bladeLoc2, bladeRadius / 2, bladeRadius / 2, bladeRadius / 2);
+				BoundingBox mBox3 = BoundingBox.of(bladeLoc3, bladeRadius / 4, bladeRadius / 4, bladeRadius / 4);
 				Iterator<LivingEntity> mobIter = mMobs.iterator();
 				while (mobIter.hasNext()) {
 					LivingEntity mob = mobIter.next();

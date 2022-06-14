@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -16,8 +17,8 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
@@ -48,7 +50,7 @@ import org.bukkit.util.Vector;
 
 public class HuntingCompanion extends Ability {
 	private static final int COOLDOWN = 24 * 20;
-	public static final int DURATION = 12 * 20;
+	private static final int DURATION = 12 * 20;
 	private static final int TICK_INTERVAL = 5;
 	public static final String FOX_NAME = "FoxCompanion";
 	public static final String EAGLE_NAME = "EagleCompanion";
@@ -62,6 +64,16 @@ public class HuntingCompanion extends Ability {
 	private static final double VELOCITY = 0.9;
 	private static final double JUMP_HEIGHT = 0.8;
 	private static final double MAX_TARGET_Y = 4;
+
+	public static final String CHARM_COOLDOWN = "Hunting Companion Cooldown";
+	public static final String CHARM_DURATION = "Hunting Companion Duration";
+	public static final String CHARM_STUN_DURATION = "Hunting Companion Stun Duration";
+	public static final String CHARM_BLEED_DURATION = "Hunting Companion Bleed Duration";
+	public static final String CHARM_BLEED_AMPLIFIER = "Hunting Companion Bleed Amplifier";
+	public static final String CHARM_DAMAGE = "Hunting Companion Damage";
+	public static final String CHARM_SPEED = "Hunting Companion Speed";
+	public static final String CHARM_FOXES = "Hunting Companion Foxes";
+	public static final String CHARM_EAGLES = "Hunting Companion Eagles";
 
 	private HashMap<Mob, LivingEntity> mSummons;
 	private final double mDamageFraction;
@@ -82,7 +94,7 @@ public class HuntingCompanion extends Ability {
 		mDisplayItem = new ItemStack(Material.SWEET_BERRIES, 1);
 
 		mDamageFraction = isLevelOne() ? DAMAGE_FRACTION_1 : DAMAGE_FRACTION_2;
-		mStunTime = isLevelOne() ? STUN_TIME_1 : STUN_TIME_2;
+		mStunTime = (isLevelOne() ? STUN_TIME_1 : STUN_TIME_2) + CharmManager.getExtraDuration(mPlayer, CHARM_STUN_DURATION);
 
 		mSummons = new HashMap<>();
 		mRunnable = null;
@@ -108,20 +120,27 @@ public class HuntingCompanion extends Ability {
 
 			clearSummons();
 
-			double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
+			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamageFraction * ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND));
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
-			spawnFox(damage, playerItemStats);
+			int foxCount = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_FOXES);
+			for (int i = 0; i < foxCount; i++) {
+				spawnFox(damage, playerItemStats);
+			}
 			if (isEnhanced()) {
-				spawnEagle(damage, playerItemStats);
+				int eagleCount = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_EAGLES);
+				for (int i = 0; i < eagleCount; i++) {
+					spawnEagle(damage, playerItemStats);
+				}
 			}
 
+			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 			World world = mPlayer.getWorld();
 			mRunnable = new BukkitRunnable() {
 				int mTicksElapsed = 0;
 				@Override
 				public void run() {
-					if (mTicksElapsed >= DURATION) {
+					if (mTicksElapsed >= duration) {
 						for (Mob summon : mSummons.keySet()) {
 							Location summonLoc = summon.getLocation();
 							if (summon instanceof Fox) {
@@ -239,6 +258,8 @@ public class HuntingCompanion extends Ability {
 			return;
 		}
 
+		EntityUtils.setAttributeBase(fox, Attribute.GENERIC_MOVEMENT_SPEED, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SPEED, EntityUtils.getAttributeBaseOrDefault(fox, Attribute.GENERIC_MOVEMENT_SPEED, 0)));
+
 		if (LocationUtils.isInSnowyBiome(loc)) {
 			fox.setFoxType(Fox.Type.SNOW);
 		}
@@ -307,7 +328,7 @@ public class HuntingCompanion extends Ability {
 			MMLog.warning("Failed to get HuntingCompanionBoss for EagleCompanion");
 			return;
 		}
-		huntingCompanionBoss.spawn(mPlayer, damage, 0, BLEED_DURATION, BLEED_AMOUNT, playerItemStats);
+		huntingCompanionBoss.spawn(mPlayer, damage, 0, BLEED_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_BLEED_DURATION), BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER), playerItemStats);
 
 		eagleSounds(eagle.getLocation());
 	}

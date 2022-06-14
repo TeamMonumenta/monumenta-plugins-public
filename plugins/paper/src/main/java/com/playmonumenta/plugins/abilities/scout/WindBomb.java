@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.WindBombAirTag;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -33,6 +34,7 @@ public class WindBomb extends Ability {
 
 	private static final int DURATION = 20 * 4;
 	private static final double WEAKEN_EFFECT = 0.2;
+	private static final double LAUNCH_VELOCITY = 1.2;
 	private static final int SLOW_FALL_EFFECT = 0;
 	private static final int COOLDOWN_1 = 20 * 15;
 	private static final int COOLDOWN_2 = 20 * 10;
@@ -47,6 +49,16 @@ public class WindBomb extends Ability {
 	private static final int PULL_DURATION = 3 * 20;
 	private static final double PULL_RATIO = 0.12;
 
+	public static final String CHARM_DURATION = "Wind Bomb Duration";
+	public static final String CHARM_WEAKNESS = "Wind Bomb Weaken Amplifier";
+	public static final String CHARM_COOLDOWN = "Wind Bomb Cooldown";
+	public static final String CHARM_DAMAGE = "Wind Bomb Damage Modifier";
+	public static final String CHARM_RADIUS = "Wind Bomb Radius";
+	public static final String CHARM_HEIGHT = "Wind Bomb Height";
+	public static final String CHARM_PULL = "Wind Bomb Vortex Pull";
+	public static final String CHARM_VORTEX_DURATION = "Wind Bomb Vortex Duration";
+	public static final String CHARM_VORTEX_RADIUS = "Wind Bomb Vortex Radius";
+
 	private @Nullable Snowball mProj = null;
 
 	public WindBomb(Plugin plugin, @Nullable Player player) {
@@ -57,7 +69,7 @@ public class WindBomb extends Ability {
 		mInfo.mDescriptions.add("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, launches mobs in a 3 block radius into the air, giving them Slow Falling and 20% Weaken for 4s. Cannot be used while holding a trident or snowball. Cooldown: 15s.");
 		mInfo.mDescriptions.add("The cooldown is reduced to 10s. Additionally, you deal 20% more damage to enemies made airborne by this skill, until they hit the ground.");
 		mInfo.mDescriptions.add("On impact, generate a vortex that pulls mobs within 8 blocks toward the center for 3 seconds.");
-		mInfo.mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.TNT, 1);
 	}
@@ -67,7 +79,7 @@ public class WindBomb extends Ability {
 		event.setCancelled(true);
 
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
-		if (mainhand != null && (mainhand.getType() == Material.TRIDENT || mainhand.getType() == Material.SNOWBALL)) {
+		if (mainhand.getType() == Material.TRIDENT || mainhand.getType() == Material.SNOWBALL) {
 			return;
 		}
 
@@ -93,29 +105,33 @@ public class WindBomb extends Ability {
 			World world = proj.getWorld();
 
 			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.2f, 1.25f);
+
+			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 			new BukkitRunnable() {
-				final double mRadius = RADIUS;
 
 				@Override
 				public void run() {
 					for (double j = 0; j < 360; j += 6) {
 						double radian1 = Math.toRadians(j);
-						loc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
+						loc.add(FastUtils.cos(radian1) * radius, 0.15, FastUtils.sin(radian1) * radius);
 						new PartialParticle(Particle.CLOUD, loc, 3, 0, 0, 0, 0.125).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-						loc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
+						loc.subtract(FastUtils.cos(radian1) * radius, 0.15, FastUtils.sin(radian1) * radius);
 					}
 					this.cancel();
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
+			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+			double weaken = WEAKEN_EFFECT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS);
+			float velocity = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEIGHT, LAUNCH_VELOCITY);
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius, mPlayer)) {
 				if (!EntityUtils.isBoss(mob)) {
-					mob.setVelocity(new Vector(0.f, 1.2f, 0.f));
-					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, DURATION, SLOW_FALL_EFFECT, true, false));
+					mob.setVelocity(new Vector(0.f, velocity, 0.f));
+					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, duration, SLOW_FALL_EFFECT, true, false));
 				}
-				EntityUtils.applyWeaken(mPlugin, DURATION, WEAKEN_EFFECT, mob);
+				EntityUtils.applyWeaken(mPlugin, duration, weaken, mob);
 				if (isLevelTwo()) {
-					mPlugin.mEffectManager.addEffect(mob, AIR_TAG, new WindBombAirTag(DURATION * 2, MIDAIR_DAMAGE_BONUS, mPlayer));
+					mPlugin.mEffectManager.addEffect(mob, AIR_TAG, new WindBombAirTag(duration * 2, MIDAIR_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE), mPlayer));
 				}
 			}
 
@@ -126,6 +142,10 @@ public class WindBomb extends Ability {
 				world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.8f, 1f);
 				world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, 0.8f, 1);
 
+				double pullVelocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_VELOCITY);
+				double pullRadius = CharmManager.getRadius(mPlayer, CHARM_VORTEX_RADIUS, PULL_RADIUS);
+				int pullDuration = PULL_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_VORTEX_DURATION);
+
 				new BukkitRunnable() {
 					int mTicks = 0;
 
@@ -133,11 +153,11 @@ public class WindBomb extends Ability {
 					public void run() {
 						mTicks++;
 						if (mTicks % PULL_INTERVAL == 0) {
-							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, PULL_RADIUS)) {
+							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, pullRadius)) {
 								if (!(EntityUtils.isBoss(mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag) || ZoneUtils.hasZoneProperty(mob.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES))) {
 									Vector vector = mob.getLocation().toVector().subtract(loc.toVector());
-									double ratio = PULL_RATIO + vector.length() / PULL_RADIUS;
-									Vector velocity = mob.getVelocity().add(vector.normalize().multiply(PULL_VELOCITY).multiply(-ratio).add(new Vector(0, 0.1 + 0.2 * ratio, 0)));
+									double ratio = PULL_RATIO + vector.length() / pullRadius;
+									Vector velocity = mob.getVelocity().add(vector.normalize().multiply(pullVelocity).multiply(-ratio).add(new Vector(0, 0.1 + 0.2 * ratio, 0)));
 									if (mPlugin.mEffectManager.hasEffect(mob, AIR_TAG)) {
 										// If mob was launched by the ability, don't change their Y
 										velocity.setY(mob.getVelocity().getY());
@@ -149,7 +169,7 @@ public class WindBomb extends Ability {
 						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 6, 2, 2, 2, 0.1);
 						world.spawnParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05);
 						world.spawnParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15);
-						if (mTicks >= PULL_DURATION) {
+						if (mTicks >= pullDuration) {
 							this.cancel();
 						}
 					}
