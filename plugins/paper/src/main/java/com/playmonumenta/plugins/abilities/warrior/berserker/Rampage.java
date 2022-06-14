@@ -38,6 +38,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	private static final double RAMPAGE_DAMAGE_RESISTANCE_PER_STACK = 0.01;
 	private static final double RAMPAGE_RADIUS = 4;
 	private static final double HEAL_PERCENT = 0.025;
+	private static final double RAMPAGE_STACK_PERCENTAGE = 1.5;
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "RampagePercentDamageResistEffect";
 
 	public static final String CHARM_THRESHOLD = "Rampage Damage Threshold";
@@ -62,7 +63,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		mInfo.mScoreboardId = "Rampage";
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mShorthandName = "Rmp";
-		mInfo.mDescriptions.add("Gain a stack of rage for each 50 melee damage dealt. Stacks decay by 1 every 5 seconds of not dealing melee damage and cap at 15. Passively gain 1% damage resistance for each stack. When at 10 or more stacks, right click while looking down to consume all stacks and damage mobs in a 4 block radius by stacks consumed. For the next (stacks consumed / 2) seconds, heal 2.5% of max health per second and keep your passive damage reduction.");
+		mInfo.mDescriptions.add("Gain a stack of rage for each 50 melee damage dealt. Stacks decay by 1 every 5 seconds of not dealing melee damage and cap at 15. Passively gain 1% damage resistance for each stack. When at 10 or more stacks, right click while looking down to consume all stacks and damage mobs in a 4 block radius by 1.5 times the number of stacks consumed. For the next (stacks consumed / 2) seconds, heal 2.5% of max health per second and keep your passive damage reduction.");
 		mInfo.mDescriptions.add("Gain a stack of rage for each 35 melee damage dealt, with stacks capping at 20.");
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 		mDamagePerStack = (isLevelOne() ? RAMPAGE_1_DAMAGE_PER_STACK : RAMPAGE_2_DAMAGE_PER_STACK) + CharmManager.getLevel(mPlayer, CHARM_THRESHOLD);
@@ -81,9 +82,9 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 
 		if (mStacks >= 10 && loc.getPitch() > 70) {
 			World world = mPlayer.getWorld();
-			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mStacks);
+			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mStacks * RAMPAGE_STACK_PERCENTAGE);
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RAMPAGE_RADIUS))) {
-				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, mob, DamageType.WARRIOR_AOE, damage, mInfo.mLinkedSpell);
 				new PartialParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
 			}
 

@@ -39,7 +39,7 @@ public class Dreadful {
 	public static void applyModifiers(LivingEntity mob, int level) {
 		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob)) {
 			mob.addScoreboardTag(DreadfulSummonBoss.identityTag);
-			mob.addScoreboardTag(DreadfulSummonBoss.identityTag + "[spawnchange=" + SPAWN_CHANCE[level - 1] + "]");
+			mob.addScoreboardTag(DreadfulSummonBoss.identityTag + "[spawnchance=" + SPAWN_CHANCE[level - 1] + "]");
 		}
 	}
 

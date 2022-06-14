@@ -62,7 +62,10 @@ public class CosmeticsManager implements Listener {
 	 * Returns true if the player has unlocked the cosmetic with given name and type
 	 * This is called by external methods such as plot border GUI
 	 */
-	public boolean playerHasCosmetic(Player player, CosmeticType type, String name) {
+	public boolean playerHasCosmetic(Player player, CosmeticType type, @Nullable String name) {
+		if (name == null) {
+			return false;
+		}
 		List<Cosmetic> playerCosmetics = mPlayerCosmetics.get(player.getUniqueId());
 		if (playerCosmetics != null) {
 			return listHasCosmetic(playerCosmetics, type, name);

@@ -2,13 +2,18 @@ package com.playmonumenta.plugins.delves;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.ObjectiveArgument;
+import dev.jorel.commandapi.arguments.ScoreHolderArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.bukkit.entity.Player;
 
 public class DelvesCommands {
@@ -109,12 +114,39 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("set"),
 				new MultiLiteralArgument("mod"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_PLAYERS),
 				dungeonArg,
 				delveModArg,
 				new IntegerArgument("rank", 0, 10)
 			).executes((commandSender, args) -> {
-				return DelvesUtils.setDelvePoint(commandSender, (Player) args[2], (String) args[3], DelvesModifier.fromName((String) args[4]), (Integer) args[5]);
+				int rank = (Integer) args[5];
+				for (Player target : ((Collection<Player>) args[2])) {
+					DelvesUtils.setDelvePoint(commandSender, target, (String) args[3], DelvesModifier.fromName((String) args[4]), rank);
+				}
+				return rank;
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
+				new MultiLiteralArgument("set"),
+				new MultiLiteralArgument("mod"),
+				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.MANY_PLAYERS),
+				dungeonArg,
+				delveModArg,
+				new MultiLiteralArgument("score"),
+				new ScoreHolderArgument("score holder"),
+				new ObjectiveArgument("objective")
+			).executes((commandSender, args) -> {
+				DelvesModifier mod = DelvesModifier.fromName((String) args[4]);
+				String scoreHolder = (String) args[6];
+				String objective = (String) args[7];
+				int rank = ScoreboardUtils.getScoreboardValue(scoreHolder, objective).orElse(0);
+				rank = DelvesUtils.getMaxPointAssignable(mod, rank);
+				for (Player target : ((Collection<Player>) args[2])) {
+					DelvesUtils.setDelvePoint(commandSender, target, (String) args[3], mod, rank);
+				}
+				return rank;
 			}).register();
 
 		new CommandAPICommand(COMMAND)
@@ -122,12 +154,17 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("random"),
 				new MultiLiteralArgument("mods"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.MANY_PLAYERS),
 				dungeonArg,
 				new IntegerArgument("pointsToAssign", 0)
 			).executes((commandSender, args) -> {
-				DelvesUtils.assignRandomDelvePoints((Player) args[2], (String) args[3], (Integer) args[4]);
-				return DelvesUtils.getPlayerTotalDelvePoint(commandSender, (Player) args[2], (String) args[3]);
+				List<Player> otherPlayers = new ArrayList<>((Collection<Player>) args[2]);
+				Player firstPlayer = otherPlayers.remove(0);
+				DelvesUtils.assignRandomDelvePoints(firstPlayer, (String) args[3], (Integer) args[4]);
+				for (Player target : otherPlayers) {
+					DelvesUtils.copyDelvePoint(commandSender, firstPlayer, target, (String) args[3]);
+				}
+				return DelvesUtils.getPlayerTotalDelvePoint(commandSender, firstPlayer, (String) args[3]);
 			}).register();
 
 		new CommandAPICommand(COMMAND)
@@ -135,9 +172,14 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("clear"),
 				new MultiLiteralArgument("mods"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER)
+				new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_PLAYERS)
 			).executes((commandSender, args) -> {
-				DelvesUtils.clearDelvePlayerByShard(commandSender, (Player) args[2], ServerProperties.getShardName());
+				int count = 0;
+				for (Player target : ((Collection<Player>) args[2])) {
+					count++;
+					DelvesUtils.clearDelvePlayerByShard(commandSender, target, ServerProperties.getShardName());
+				}
+				return count;
 			}).register();
 
 		new CommandAPICommand(COMMAND)
@@ -145,10 +187,15 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("clear"),
 				new MultiLiteralArgument("mods"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.MANY_PLAYERS),
 				dungeonArg
 			).executes((commandSender, args) -> {
-				DelvesUtils.clearDelvePlayerByShard(commandSender, (Player) args[2], (String) args[3]);
+				int count = 0;
+				for (Player target : ((Collection<Player>) args[2])) {
+					count++;
+					DelvesUtils.clearDelvePlayerByShard(commandSender, target, (String) args[3]);
+				}
+				return count;
 			}).register();
 
 		new CommandAPICommand(COMMAND)
@@ -156,9 +203,11 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("update"),
 				new MultiLiteralArgument("scoreboard"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER)
+				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.MANY_ENTITIES)
 			).executes((commandSender, args) -> {
-				DelvesUtils.updateDelveScoreBoard((Player) args[2]);
+				for (Player target : ((Collection<Player>) args[2])) {
+					DelvesUtils.updateDelveScoreBoard(target);
+				}
 			}).register();
 
 		new CommandAPICommand(COMMAND)

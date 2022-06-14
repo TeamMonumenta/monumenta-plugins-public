@@ -97,6 +97,7 @@ public class DelveCustomInventory extends CustomInventory {
 	private final String mDungeonName;
 	private int mPage = 0;
 	private int mTotalPoint = 0;
+	private int mIgnoreOldEntropyPoint;
 
 	private final Map<DelvesModifier, Integer> mPointSelected = new HashMap<>();
 
@@ -108,6 +109,7 @@ public class DelveCustomInventory extends CustomInventory {
 		for (DelvesModifier mod : DelvesModifier.values()) {
 			mPointSelected.put(mod, DelvesUtils.getDelveModLevel(owner, dungeon, mod));
 		}
+		mIgnoreOldEntropyPoint = mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0);
 
 		loadInv();
 	}
@@ -116,12 +118,13 @@ public class DelveCustomInventory extends CustomInventory {
 		mTotalPoint = 0;
 		mInventory.clear();
 		List<DelvesModifier> mods = DelvesModifier.valuesList();
-		mods.remove(DelvesModifier.ENTROPY);
 		mods.remove(DelvesModifier.TWISTED);
 
 		for (DelvesModifier mod : mods) {
 			mTotalPoint += mPointSelected.getOrDefault(mod, 0);
 		}
+		//ignore old entropy point so the count don't stack
+		mTotalPoint -= Entropy.getDepthPointsAssigned(mIgnoreOldEntropyPoint);
 
 		mTotalPoint += Entropy.getDepthPointsAssigned(mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0));
 		mTotalPoint += (mPointSelected.getOrDefault(DelvesModifier.TWISTED, 0) * 5);
@@ -336,6 +339,7 @@ public class DelveCustomInventory extends CustomInventory {
 					} else {
 						int finaPoint = DelvesUtils.getMaxPointAssignable(mod, 5 - row);
 						mPointSelected.put(mod, finaPoint);
+						playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.BLOCK_STONE_PLACE, 1f, 1.5f);
 					}
 				}
 			}
@@ -362,6 +366,7 @@ public class DelveCustomInventory extends CustomInventory {
 			} else if (mEditableDelvePoint) {
 				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1f, 0.5f);
 				mPointSelected.forEach((mod, value) -> mPointSelected.put(mod, 0));
+				mIgnoreOldEntropyPoint = 0;
 			}
 		}
 
@@ -370,7 +375,7 @@ public class DelveCustomInventory extends CustomInventory {
 				if (mPointSelected.containsKey(DelvesModifier.ENTROPY)) {
 					//give random point for each point of entropy
 
-					int entropyPoint = Entropy.getDepthPointsAssigned(mPointSelected.get(DelvesModifier.ENTROPY));
+					int entropyPoint = Entropy.getDepthPointsAssigned(mPointSelected.get(DelvesModifier.ENTROPY)) - Entropy.getDepthPointsAssigned(mIgnoreOldEntropyPoint);
 
 					List<DelvesModifier> mods = DelvesModifier.valuesList();
 					mods.remove(DelvesModifier.ENTROPY);

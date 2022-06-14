@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.ScorchedEarthDamage;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -98,8 +99,9 @@ public class ScorchedEarth extends MultipleChargeAbility {
 				}
 
 				double damage = mAlchemistPotions.getDamage() * SCORCHED_EARTH_DAMAGE_FRACTION;
+				ItemStatManager.PlayerItemStats stats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, SCORCHED_EARTH_RADIUS)) {
-					EffectManager.getInstance().addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage));
+					EffectManager.getInstance().addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage, mPlayer, stats));
 				}
 			}
 		}

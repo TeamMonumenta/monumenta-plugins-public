@@ -40,6 +40,7 @@ public class Pernicious {
 	public static void applyModifiers(LivingEntity mob, int level) {
 		if (!(mob instanceof Vex) && FastUtils.RANDOM.nextDouble() < BLOCK_BREAK_CHANCE[level - 1] && !DelvesUtils.isDelveMob(mob)) {
 			mob.addScoreboardTag(BlockBreakBoss.identityTag);
+			mob.addScoreboardTag(BlockBreakBoss.identityTag + "[adapttoboundingbox=true]");
 		}
 	}
 }

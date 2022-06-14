@@ -9,6 +9,7 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.Pair;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -45,11 +46,11 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 					if (VanityManager.isInvisibleVanityItem(vanity)) {
 						pair.setSecond(new ItemStack(Material.AIR));
 					} else {
-						pair.setSecond(vanity);
+						pair.setSecond(ItemUtils.clone(vanity));
 					}
 				}
 			}
-			VanityManager.cleanForDisplay(pair.getSecond());
+			pair.setSecond(VanityManager.cleanCopyForDisplay(pair.getSecond()));
 		}
 		packet.getSlotStackPairLists().write(0, items);
 

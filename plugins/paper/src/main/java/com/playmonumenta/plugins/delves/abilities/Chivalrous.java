@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.delves.abilities;
 
-import com.playmonumenta.plugins.bosses.bosses.AntiRangeChivalrousBoss;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -19,17 +18,21 @@ public class Chivalrous {
 			0.45
 	};
 
+	// 50% bee - 25% slime - 25% magmacube
 	private static final String[] MOUNTS = {
+			"ChivalrousBeeMount",
+			"ChivalrousBeeMount",
 			"SlimeMount",
 			"MagmaCubeMount"
 	};
 
 	public static final String[] MOUNT_NAMES = {
+			"Chivalrous Bee Mount",
 			"Slime Mount",
 			"Magma Cube Mount"
 	};
 
-	public static final String DESCRIPTION = "Enemies become Knights of Slime.";
+	public static final String DESCRIPTION = "Enemies become Knights of Slime and bees.";
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 			{
@@ -56,7 +59,6 @@ public class Chivalrous {
 			Entity mount = LibraryOfSoulsIntegration.summon(mob.getLocation(), MOUNTS[FastUtils.RANDOM.nextInt(MOUNTS.length)]);
 			if (mount != null) {
 				mount.addPassenger(mob);
-				mob.addScoreboardTag(AntiRangeChivalrousBoss.identityTag);
 
 				if (mob instanceof Creeper creeper) {
 					creeper.setExplosionRadius((creeper.getExplosionRadius() + 1) / 2);

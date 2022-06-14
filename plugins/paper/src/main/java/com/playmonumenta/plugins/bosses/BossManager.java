@@ -471,6 +471,9 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> GrenadeLauncherBoss.deserialize(p, e));
 		mBossDeserializers.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> SizeChangerBoss.deserialize(p, e));
 		mBossDeserializers.put(DeathSummonBoss.identityTag, (Plugin p, LivingEntity e) -> DeathSummonBoss.deserialize(p, e));
+		mBossDeserializers.put(SpectralSummonBoss.identityTag, (Plugin p, LivingEntity e) -> SpectralSummonBoss.deserialize(p, e));
+		mBossDeserializers.put(DreadfulSummonBoss.identityTag, (Plugin p, LivingEntity e) -> DreadfulSummonBoss.deserialize(p, e));
+		mBossDeserializers.put(StatMultiplierBoss.identityTag, (Plugin p, LivingEntity e) -> StatMultiplierBoss.deserialize(p, e));
 		mBossDeserializers.put(SummonOnExplosionBoss.identityTag, (Plugin p, LivingEntity e) -> SummonOnExplosionBoss.deserialize(p, e));
 
 		mBossDeserializers.put(Lich.identityTag, (Plugin p, LivingEntity e) -> Lich.deserialize(p, e));
@@ -749,7 +752,7 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void damageEvent(DamageEvent event) {
+	public void onHurt(DamageEvent event) {
 		LivingEntity damagee = event.getDamagee();
 		Entity damager = event.getDamager();
 		LivingEntity source = event.getSource();
@@ -766,9 +769,15 @@ public class BossManager implements Listener {
 			}
 			boss.setLastHitBy(source);
 		}
+	}
 
+	// Must be before player items and abilities, which use priority HIGH
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void onDamage(DamageEvent event) {
+		LivingEntity damagee = event.getDamagee();
+		LivingEntity source = event.getSource();
 		if (source != null) {
-			boss = mBosses.get(source.getUniqueId());
+			Boss boss = mBosses.get(source.getUniqueId());
 			if (boss != null) {
 				// May cancel the event
 				boss.onDamage(event, damagee);

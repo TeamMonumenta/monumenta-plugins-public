@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -82,15 +83,17 @@ public class VoodooBondsReaper extends Effect {
 		if (mPlayer != null && !mDone) {
 			double absorbHealth = AbsorptionUtils.getAbsorption(mPlayer);
 			double maxHealth = EntityUtils.getMaxHealth(mPlayer);
-			if (absorbHealth <= 0) {
-				mPlayer.setHealth(Math.max(Math.min(mPlayer.getHealth() - maxHealth * mDamagePercent, mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()), 1));
-			} else {
-				if (maxHealth * mDamagePercent >= absorbHealth) {
-					double leftoverHealth = mPlayer.getHealth() + absorbHealth - maxHealth * mDamagePercent;
-					AbsorptionUtils.subtractAbsorption(mPlayer, absorbHealth);
-					mPlayer.setHealth(Math.max(leftoverHealth, 1));
+			if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.RESIST_5)) {
+				if (absorbHealth <= 0) {
+					mPlayer.setHealth(Math.max(Math.min(mPlayer.getHealth() - maxHealth * mDamagePercent, mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()), 1));
 				} else {
-					AbsorptionUtils.subtractAbsorption(mPlayer, absorbHealth);
+					if (maxHealth * mDamagePercent >= absorbHealth) {
+						double leftoverHealth = mPlayer.getHealth() + absorbHealth - maxHealth * mDamagePercent;
+						AbsorptionUtils.subtractAbsorption(mPlayer, absorbHealth);
+						mPlayer.setHealth(Math.max(leftoverHealth, 1));
+					} else {
+						AbsorptionUtils.subtractAbsorption(mPlayer, absorbHealth);
+					}
 				}
 			}
 

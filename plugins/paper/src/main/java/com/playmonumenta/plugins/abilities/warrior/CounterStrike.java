@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.HashMap;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -57,16 +58,21 @@ public class CounterStrike extends Ability {
 			    && source != null
 			    && !event.isBlocked()
 			    && mPlayer != null
-				&& mPlayer.getNoDamageTicks() == 0) {
+			    && mPlayer.getNoDamageTicks() <= mPlayer.getMaximumNoDamageTicks() / 2f) {
 
 			Location loc = mPlayer.getLocation().add(0, 1, 0);
 			new PartialParticle(Particle.SWEEP_ATTACK, loc, 6, 0.75, 0.5, 0.75, 0.001).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.FIREWORKS_SPARK, loc, 8, 0.75, 0.5, 0.75, 0.1).spawnAsPlayerActive(mPlayer);
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.6f, 0.7f);
 			double eventDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, event.getOriginalDamage() * mReflect);
+			List<LivingEntity> entityList = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, COUNTER_STRIKE_RADIUS));
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, COUNTER_STRIKE_RADIUS), mPlayer)) {
-				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, eventDamage, mInfo.mLinkedSpell, true, true);
+			if (entityList.remove(source)) {
+				DamageUtils.damage(mPlayer, source, DamageType.MELEE_SKILL, eventDamage, mInfo.mLinkedSpell, true, true);
+			}
+
+			for (LivingEntity mob : entityList) {
+				DamageUtils.damage(mPlayer, mob, DamageType.WARRIOR_AOE, eventDamage, mInfo.mLinkedSpell, true, true);
 			}
 
 			if (isEnhanced()) {

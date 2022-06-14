@@ -4,19 +4,24 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import java.util.HashMap;
 import java.util.UUID;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class BirthdayThemeFinisher {
+public class BirthdayThemeFinisher implements EliteFinisher {
 
 	public static final String NAME = "Birthday Theme";
 
 	private static HashMap<UUID, Integer> mMobsKilled = new HashMap<>();
 
-	public static void run(Player p, Entity killedMob, Location loc) {
+	@Override
+	public void run(Player p, Entity killedMob, Location loc) {
 		World world = p.getWorld();
 		loc.add(0, 1.5, 0);
 
@@ -121,4 +126,10 @@ public class BirthdayThemeFinisher {
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
+
+	@Override
+	public Material getDisplayItem() {
+		return Material.NOTE_BLOCK;
+	}
+
 }

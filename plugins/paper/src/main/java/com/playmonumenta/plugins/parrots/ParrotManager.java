@@ -58,7 +58,8 @@ public class ParrotManager implements Listener {
 		BEE("Bee Conure", 16, Parrot.Variant.CYAN),
 		RADIANT("Radiant Conure", 17, Parrot.Variant.CYAN),
 		HEKAWT("Veil Electus", 18, Parrot.Variant.BLUE),
-		BLITZ("Plushy Parrot", 19, Parrot.Variant.RED);
+		BLITZ("Plushy Parrot", 19, Parrot.Variant.RED),
+		CORRIDORS("Crimson Lace", 20, Parrot.Variant.RED);
 
 
 		private String mName;

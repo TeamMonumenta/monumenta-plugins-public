@@ -46,7 +46,7 @@ public class Spectral {
 	public static void applyModifiers(LivingEntity mob, int level) {
 		if (!DelvesUtils.isDelveMob(mob)) {
 			mob.addScoreboardTag(SpectralSummonBoss.identityTag);
-			mob.addScoreboardTag(SpectralSummonBoss.identityTag + "[spawnchange=" + SPAWN_CHANCE[level - 1] + "]");
+			mob.addScoreboardTag(SpectralSummonBoss.identityTag + "[spawnchance=" + SPAWN_CHANCE[level - 1] + "]");
 		}
 	}
 

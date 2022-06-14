@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public class Perspicacity implements Infusion {
 
-	private static final double DAMAGE_PCT_PER_LEVEL = 0.01;
+	public static final double DAMAGE_MOD_PER_LEVEL = 0.01;
 
 	@Override
 	public String getName() {
@@ -33,7 +33,7 @@ public class Perspicacity implements Infusion {
 			return;
 		}
 
-		double abilityDmgBuffPct = value * DAMAGE_PCT_PER_LEVEL;
+		double abilityDmgBuffPct = value * DAMAGE_MOD_PER_LEVEL;
 		event.setDamage(event.getDamage() * (1.0 + abilityDmgBuffPct));
 	}
 }

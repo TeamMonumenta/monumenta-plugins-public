@@ -29,6 +29,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -203,13 +204,17 @@ public class ItemUpdateManager implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void playerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
+		List<String> path = new ArrayList<>();
+		path.add("PlayerArmorStandManipulateEvent");
+		updateNested(path, event.getArmorStandItem());
+	}
+
 	public static void updateNested(List<String> path, @Nullable ItemStack item) {
 		if (item == null || !item.hasItemMeta()) {
 			return;
 		}
-
-		path = new ArrayList<>(path);
-		path.add("in ItemStack " + ItemUtils.getGiveCommand(item));
 
 		try {
 			if (ItemStatUtils.isClean(item)) {
@@ -240,6 +245,8 @@ public class ItemUpdateManager implements Listener {
 				ItemStatUtils.generateItemStats(item);
 			}
 		} catch (Exception e) {
+			path = new ArrayList<>(path);
+			path.add("in ItemStack " + ItemUtils.getGiveCommand(item));
 			logNestedException(path, e);
 		}
 

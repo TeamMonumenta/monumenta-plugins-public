@@ -14,7 +14,9 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -35,10 +37,10 @@ public final class MeteorSlam extends Ability {
 	public static final ClassAbility ABILITY = ClassAbility.METEOR_SLAM;
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickSlammed";
 
-	public static final int DAMAGE_1 = 2;
-	public static final int DAMAGE_2 = 3;
-	public static final double REDUCED_DAMAGE_1 = 1.5;
-	public static final double REDUCED_DAMAGE_2 = 2;
+	public static final double DAMAGE_1 = 2.5;
+	public static final double DAMAGE_2 = 3.5;
+	public static final double REDUCED_DAMAGE_1 = 2;
+	public static final double REDUCED_DAMAGE_2 = 2.5;
 	public static final int SIZE_1 = 2;
 	public static final int SIZE_2 = 3;
 	public static final int JUMP_AMPLIFIER_1 = 3;
@@ -67,6 +69,7 @@ public final class MeteorSlam extends Ability {
 	private final double mLevelSize;
 	private final int mLevelJumpAmplifier;
 	private final BukkitRunnable mSlamAttackRunner;
+	private Ability[] mAbilities = {};
 
 	private double mFallFromY = -7050;
 
@@ -115,6 +118,13 @@ public final class MeteorSlam extends Ability {
 		mLevelReducedDamage = isLevelOne() ? REDUCED_DAMAGE_1 : REDUCED_DAMAGE_2;
 		mLevelSize = CharmManager.getRadius(mPlayer, CHARM_RADIUS, (isLevelOne() ? SIZE_1 : SIZE_2));
 		mLevelJumpAmplifier = (isLevelOne() ? JUMP_AMPLIFIER_1 : JUMP_AMPLIFIER_2) + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST);
+
+		if (player != null) {
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				mAbilities = Stream.of(GloriousBattle.class)
+					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
+			});
+		}
 
 		mSlamAttackRunner = new BukkitRunnable() {
 			@Override
@@ -176,7 +186,8 @@ public final class MeteorSlam extends Ability {
 
 		if (mPlayer != null
 				&& !isTimerActive()
-				&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+				&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
+				&& (mAbilities.length < 0 || mAbilities[0] == null || mAbilities[0].getClass() != GloriousBattle.class || !mPlayer.isSneaking())) {
 			putOnCooldown();
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mLevelJumpAmplifier, true, false));
@@ -230,7 +241,7 @@ public final class MeteorSlam extends Ability {
 		slamDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, slamDamage);
 
 		for (LivingEntity enemy : EntityUtils.getNearbyMobs(location, mLevelSize)) {
-			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.mLinkedSpell, true);
+			DamageUtils.damage(mPlayer, enemy, DamageType.WARRIOR_AOE, slamDamage, mInfo.mLinkedSpell, true);
 		}
 
 		World world = mPlayer.getWorld();

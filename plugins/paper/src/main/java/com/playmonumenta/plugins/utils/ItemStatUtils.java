@@ -606,6 +606,7 @@ public class ItemStatUtils {
 		UNDERSTANDING(new Understanding(), "", true, false, false),
 		UNYIELDING(new Unyielding(), "", true, false, false),
 		USURPER(new Usurper(), "", true, false, false),
+		VENGEFUL(new Vengeful(), "", true, false, false),
 		VIGOR(new Vigor(), "", true, false, false),
 		VITALITY(new Vitality(), "", true, false, false),
 		// Other Added Tags
@@ -1493,7 +1494,7 @@ public class ItemStatUtils {
 		}
 
 		String regionString = monumenta.getString(Region.KEY);
-		if (regionString != null) {
+		if (regionString != null && !regionString.isEmpty()) {
 			return Region.getRegion(regionString);
 		}
 
@@ -1523,7 +1524,7 @@ public class ItemStatUtils {
 		}
 
 		String tierString = monumenta.getString(Tier.KEY);
-		if (tierString != null) {
+		if (tierString != null && !tierString.isEmpty()) {
 			return Tier.getTier(tierString);
 		}
 

@@ -518,6 +518,7 @@ public class ItemUtils {
 			case IRON_HELMET:
 			case GOLDEN_HELMET:
 			case DIAMOND_HELMET:
+			case NETHERITE_HELMET:
 			case TURTLE_HELMET:
 			case CARVED_PUMPKIN:
 			case CREEPER_HEAD:
@@ -531,18 +532,21 @@ public class ItemUtils {
 			case IRON_CHESTPLATE:
 			case GOLDEN_CHESTPLATE:
 			case DIAMOND_CHESTPLATE:
+			case NETHERITE_CHESTPLATE:
 				return EquipmentSlot.CHEST;
 			case LEATHER_LEGGINGS:
 			case CHAINMAIL_LEGGINGS:
 			case IRON_LEGGINGS:
 			case GOLDEN_LEGGINGS:
 			case DIAMOND_LEGGINGS:
+			case NETHERITE_LEGGINGS:
 				return EquipmentSlot.LEGS;
 			case LEATHER_BOOTS:
 			case CHAINMAIL_BOOTS:
 			case IRON_BOOTS:
 			case GOLDEN_BOOTS:
 			case DIAMOND_BOOTS:
+			case NETHERITE_BOOTS:
 				return EquipmentSlot.FEET;
 			case SHIELD:
 				return EquipmentSlot.OFF_HAND;

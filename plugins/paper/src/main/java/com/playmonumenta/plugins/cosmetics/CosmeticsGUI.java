@@ -113,26 +113,50 @@ public class CosmeticsGUI extends CustomInventory {
 		if (event.getClickedInventory() == mInventory) {
 			//Attempt to switch page if clicked page
 			// Main page filtering
-			if (mDisplayPage == null && event.getSlot() == TITLE_LOC) {
+			int slot = event.getSlot();
+			if (mDisplayPage == null && slot == TITLE_LOC) {
 				mDisplayPage = CosmeticType.TITLE;
 				player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
 				setUpCosmetics(player);
 				return;
-			} else if (mDisplayPage == null && event.getSlot() == ELITE_FINISHER_LOC) {
+			} else if (mDisplayPage == null && slot == ELITE_FINISHER_LOC) {
 				mDisplayPage = CosmeticType.ELITE_FINISHER;
 				player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
 				setUpCosmetics(player);
 				return;
-			} else if (mDisplayPage == null && event.getSlot() == UNLOCKED_VANITY_LOC) {
+			} else if (mDisplayPage == null && slot == UNLOCKED_VANITY_LOC) {
 				mDisplayPage = CosmeticType.VANITY;
 				player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
 				setUpCosmetics(player);
 				return;
-			} else if (mDisplayPage != null && (item.getType() == mDisplayPage.getDisplayItem() || item.getType() == Material.GREEN_CONCRETE)) {
+			}
+
+			//Page control items
+			if (slot == NEXT_PAGE_LOC && item.getType() == Material.ARROW) {
+				player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+				mPageNumber++;
+				setUpCosmetics(player);
+				return;
+			}
+
+			if (slot == PREV_PAGE_LOC && item.getType() == Material.ARROW) {
+				player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+				mPageNumber--;
+				setUpCosmetics(player);
+				return;
+			}
+
+			if (slot == BACK_LOC && item.getType() == Material.REDSTONE_BLOCK) {
+				player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+				mDisplayPage = null;
+				setUpCosmetics(player);
+				return;
+			}
+
+			if (mDisplayPage != null && item.getType() != FILLER && mDisplayPage.isEquippable() && slot >= COSMETICS_START) {
 				//Get the list of cosmetics back
 				// Note this only works for cosmetic types where only one cosmetic can be equipped at a time!
 				List<Cosmetic> playerCosmetics = CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical(player, mDisplayPage);
-				int slot = event.getSlot();
 				int index = (slot - COSMETICS_START) + (COSMETICS_PER_PAGE * (mPageNumber - 1));
 				if (playerCosmetics != null) {
 					for (int i = 0; i < playerCosmetics.size(); i++) {
@@ -154,32 +178,10 @@ public class CosmeticsGUI extends CustomInventory {
 				}
 			}
 
-			//Page control items
-			if (event.getSlot() == NEXT_PAGE_LOC && item.getType() == Material.ARROW) {
-				player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
-				mPageNumber++;
-				setUpCosmetics(player);
-				return;
-			}
-
-			if (event.getSlot() == PREV_PAGE_LOC && item.getType() == Material.ARROW) {
-				player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
-				mPageNumber--;
-				setUpCosmetics(player);
-				return;
-			}
-
-			if (event.getSlot() == BACK_LOC && item.getType() == Material.REDSTONE_BLOCK) {
-				player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
-				mDisplayPage = null;
-				setUpCosmetics(player);
-				return;
-			}
-
 			// unequip vanity equipment
 			if (mDisplayPage == null) {
 				for (Map.Entry<EquipmentSlot, Integer> entry : VANITY_EQUIPMENT_ITEM_SLOTS.entrySet()) {
-					if (event.getSlot() == entry.getValue()) {
+					if (slot == entry.getValue()) {
 						VanityManager.VanityData vanityData = mPlugin.mVanityManager.getData(player);
 						ItemStack vanityItem = vanityData.getEquipped(entry.getKey());
 						if (vanityItem != null) {
@@ -196,17 +198,17 @@ public class CosmeticsGUI extends CustomInventory {
 					}
 				}
 
-				if (event.getSlot() == SELF_VANITY_TOGGLE_SLOT) {
+				if (slot == SELF_VANITY_TOGGLE_SLOT) {
 					mPlugin.mVanityManager.toggleSelfVanity(player);
 					setUpCosmetics(player);
 					return;
 				}
-				if (event.getSlot() == OTHER_VANITY_TOGGLE_SLOT) {
+				if (slot == OTHER_VANITY_TOGGLE_SLOT) {
 					mPlugin.mVanityManager.toggleOtherVanity(player);
 					setUpCosmetics(player);
 					return;
 				}
-				if (event.getSlot() == LOCKBOX_VANITY_TOGGLE_SLOT) {
+				if (slot == LOCKBOX_VANITY_TOGGLE_SLOT) {
 					mPlugin.mVanityManager.toggleLockboxSwap(player);
 					setUpCosmetics(player);
 					return;
@@ -215,8 +217,7 @@ public class CosmeticsGUI extends CustomInventory {
 		} else {
 			// equip vanity equipment from inventory
 			if (mDisplayPage == null) {
-				item = ItemUtils.clone(item);
-				VanityManager.cleanForDisplay(item);
+				item = VanityManager.cleanCopyForDisplay(item);
 				item.setAmount(1);
 				EquipmentSlot slot = ItemUtils.getEquipmentSlot(item);
 				if (slot == EquipmentSlot.HAND || event.getClick().isRightClick()) {
@@ -231,7 +232,7 @@ public class CosmeticsGUI extends CustomInventory {
 					player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
 					return;
 				}
-				if (mPlugin.mVanityManager.hasVanityUnlocked(player, item, slot)) {
+				if (VanityManager.hasVanityUnlocked(player, item)) {
 					vanityData.equip(slot, item);
 					mVanityChanged = true;
 					setUpCosmetics(player);
@@ -250,9 +251,8 @@ public class CosmeticsGUI extends CustomInventory {
 	public void setUpCosmetics(Player targetPlayer) {
 
 		// Set inventory to filler to start
-		for (int i = 0; i < 54; i++) {
-			mInventory.setItem(i, new ItemStack(FILLER, 1));
-		}
+		mInventory.clear();
+		GUIUtils.fillWithFiller(mInventory, FILLER);
 
 		// Special case: home page
 		if (mDisplayPage == null) {
@@ -338,7 +338,7 @@ public class CosmeticsGUI extends CustomInventory {
 	 */
 	private void setUpHomePage(Player player) {
 		{
-			ItemStack titleItem = new ItemStack(CosmeticType.TITLE.getDisplayItem(), 1);
+			ItemStack titleItem = new ItemStack(CosmeticType.TITLE.getDisplayItem(null), 1);
 			ItemMeta meta = titleItem.getItemMeta();
 			meta.displayName(Component.text("Titles", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			meta.lore(List.of(Component.text("Select a title to be displayed", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
@@ -347,7 +347,7 @@ public class CosmeticsGUI extends CustomInventory {
 			mInventory.setItem(TITLE_LOC, titleItem);
 		}
 		{
-			ItemStack eliteItem = new ItemStack(CosmeticType.ELITE_FINISHER.getDisplayItem(), 1);
+			ItemStack eliteItem = new ItemStack(CosmeticType.ELITE_FINISHER.getDisplayItem(null), 1);
 			ItemMeta meta = eliteItem.getItemMeta();
 			meta.displayName(Component.text("Elite Finishers", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			meta.lore(List.of(Component.text("Select an effect to play", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
@@ -357,7 +357,7 @@ public class CosmeticsGUI extends CustomInventory {
 			mInventory.setItem(ELITE_FINISHER_LOC, eliteItem);
 		}
 		{
-			ItemStack unlockedVanityItem = new ItemStack(CosmeticType.VANITY.getDisplayItem(), 1);
+			ItemStack unlockedVanityItem = new ItemStack(CosmeticType.VANITY.getDisplayItem(null), 1);
 			ItemMeta meta = unlockedVanityItem.getItemMeta();
 			meta.displayName(Component.text("Show Unlocked Vanity", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			meta.lore(List.of(Component.text("Shows all unlocked vanity items.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
@@ -409,6 +409,7 @@ public class CosmeticsGUI extends CustomInventory {
 				meta.lore(lore);
 				vanityItem.setItemMeta(meta);
 			} else {
+				vanityItem = ItemUtils.clone(vanityItem);
 				ItemMeta meta = vanityItem.getItemMeta();
 				List<Component> lore = new ArrayList<>();
 				if (VanityManager.isInvisibleVanityItem(vanityItem)) {
@@ -446,7 +447,7 @@ public class CosmeticsGUI extends CustomInventory {
 			ItemMeta meta = otherVanityToggle.getItemMeta();
 			meta.displayName(Component.text("Others' Vanity " + (vanityData.mOtherVanityEnabled ? "Enabled" : "Disabled"), vanityData.mOtherVanityEnabled ? NamedTextColor.GREEN : NamedTextColor.RED)
 				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			meta.lore(List.of(Component.text("Click to toggle whether your see", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+			meta.lore(List.of(Component.text("Click to toggle whether you see", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 				Component.text("other people's vanity equipment.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			otherVanityToggle.setItemMeta(meta);
 			ItemUtils.setPlainTag(otherVanityToggle);

@@ -112,10 +112,18 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		//Reverie
 		ItemStack reverieItem = new ItemStack(Material.NETHER_WART_BLOCK);
 		ItemMeta reverieMeta = reverieItem.getItemMeta();
-		reverieMeta.displayName(Component.text("Usurper", TextColor.fromCSSHexString("#8B0000")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		reverieMeta.displayName(Component.text("Usurper", TextColor.fromCSSHexString("#790E47")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(reverieMeta, "Heal 2.5% of your max health per level whenever you slay an elite or boss enemy.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		reverieItem.setItemMeta(reverieMeta);
 		mDelvePannelList.add(reverieItem);
+
+		//Ephemeral Corridors
+		ItemStack corridorsItem = new ItemStack(Material.MAGMA_BLOCK);
+		ItemMeta corridorsMeta = corridorsItem.getItemMeta();
+		corridorsMeta.displayName(Component.text("Vengeful", TextColor.fromCSSHexString("#8B0000")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		splitLoreLine(corridorsMeta, "Gain 2% damage per level against the last enemy that damaged you.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		corridorsItem.setItemMeta(corridorsMeta);
+		mDelvePannelList.add(corridorsItem);
 
 		//R2
 		//Lime
@@ -275,12 +283,24 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		for (int i = 0; i < 4; i++) {
 			ItemStack pannel = new ItemStack(Material.NETHER_WART_BLOCK, 1);
 			ItemMeta meta = pannel.getItemMeta();
-			meta.displayName(Component.text("Usurper level " + (i + 1), TextColor.fromCSSHexString("#8B0000")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+			meta.displayName(Component.text("Usurper level " + (i + 1), TextColor.fromCSSHexString("#790E47")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Heal " + 2.5 * (1 + i) + "% of your max health whenever you slay an elite or boss enemy.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			reverieItems.add(pannel);
 		}
 		mDelveInfusionPannelsMap.put(DelveInfusionSelection.USURPER, reverieItems);
+
+		//corridors
+		List<ItemStack> corridorsItems = new ArrayList<>();
+		for (int i = 0; i < 4; i++) {
+			ItemStack pannel = new ItemStack(Material.MAGMA_BLOCK, 1);
+			ItemMeta meta = pannel.getItemMeta();
+			meta.displayName(Component.text("Vengeful level " + (i + 1), TextColor.fromCSSHexString("#8B0000")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+			splitLoreLine(meta, "Gain " + 2 * (1 + i) + "% damage against the last enemy that damaged you.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			pannel.setItemMeta(meta);
+			corridorsItems.add(pannel);
+		}
+		mDelveInfusionPannelsMap.put(DelveInfusionSelection.VENGEFUL, corridorsItems);
 
 		//lime
 		List<ItemStack> limeItems = new ArrayList<>();
@@ -466,6 +486,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		mDelveMatsMap.put(DelveInfusionSelection.CHOLER, "Season's Wraths");
 		mDelveMatsMap.put(DelveInfusionSelection.UNYIELDING, "Echoes of the Veil");
 		mDelveMatsMap.put(DelveInfusionSelection.USURPER, "Nightmare Fuels");
+		mDelveMatsMap.put(DelveInfusionSelection.VENGEFUL, "Persistent Parchments");
 		//r2
 		mDelveMatsMap.put(DelveInfusionSelection.EMPOWERED, "Refound Knowledge");
 		mDelveMatsMap.put(DelveInfusionSelection.NUTRIMENT, "Roots of Balance");
@@ -548,17 +569,18 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		}.runTaskLater(Plugin.getInstance(), 2);
 
 		//R1 = 6
-		mInventory.setItem(19, mDelvePannelList.get(0));
-		mInventory.setItem(20, mDelvePannelList.get(1));
-		mInventory.setItem(21, mDelvePannelList.get(2));
-		mInventory.setItem(22, mDelvePannelList.get(3));
+		mInventory.setItem(18, mDelvePannelList.get(0));
+		mInventory.setItem(19, mDelvePannelList.get(1));
+		mInventory.setItem(20, mDelvePannelList.get(2));
+		mInventory.setItem(21, mDelvePannelList.get(3));
 		mInventory.setItem(23, mDelvePannelList.get(4));
 		mInventory.setItem(24, mDelvePannelList.get(5));
 		mInventory.setItem(25, mDelvePannelList.get(6));
+		mInventory.setItem(26, mDelvePannelList.get(7));
 
 		//R2
 		int index = 27;
-		for (int i = 7; i < mDelvePannelList.size(); i++) {
+		for (int i = 8; i < mDelvePannelList.size(); i++) {
 			mInventory.setItem(index++, mDelvePannelList.get(i));
 		}
 
@@ -577,19 +599,19 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		});
 
 
-		mMapFunction.put(19, (p, inventory, slot) -> {
+		mMapFunction.put(18, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.PENNATE);
 		});
 
-		mMapFunction.put(20, (p, inventory, slot) -> {
+		mMapFunction.put(19, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.CARAPACE);
 		});
 
-		mMapFunction.put(21, (p, inventory, slot) -> {
+		mMapFunction.put(20, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.AURA);
 		});
 
-		mMapFunction.put(22, (p, inventory, slot) -> {
+		mMapFunction.put(21, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.EXPEDITE);
 		});
 
@@ -603,6 +625,10 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 
 		mMapFunction.put(25, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.USURPER);
+		});
+
+		mMapFunction.put(26, (p, inventory, slot) -> {
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.VENGEFUL);
 		});
 
 		//R2
@@ -683,7 +709,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 						public void run() {
 							ItemStack itemStack = new ItemStack(item.getType());
 							ItemMeta meta = itemStack.getItemMeta();
-							meta.displayName(Component.text("Placeholder", TextColor.fromCSSHexString("000000"))
+							meta.displayName(item.getItemMeta().displayName()
 											.decoration(TextDecoration.BOLD, true)
 											.decoration(TextDecoration.ITALIC, false));
 							meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);

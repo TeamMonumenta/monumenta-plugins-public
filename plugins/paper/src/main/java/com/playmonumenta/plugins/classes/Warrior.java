@@ -9,9 +9,9 @@ import com.playmonumenta.plugins.abilities.warrior.Riposte;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WeaponMastery;
+import com.playmonumenta.plugins.abilities.warrior.berserker.GloriousBattle;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
-import com.playmonumenta.plugins.abilities.warrior.berserker.RecklessSwing;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
@@ -43,9 +43,9 @@ public class Warrior extends PlayerClass {
 		mClassDescription = "Warriors specialize in melee combat, being able to both deal and survive heavy damage.";
 		mClassPassiveDescription = "Gain a base of 20% Knockback Resistance. This stacks with other skills and items.";
 
+		mSpecOne.mAbilities.add(new GloriousBattle(plugin, player));
 		mSpecOne.mAbilities.add(new MeteorSlam(plugin, player));
 		mSpecOne.mAbilities.add(new Rampage(plugin, player));
-		mSpecOne.mAbilities.add(new RecklessSwing(plugin, player));
 		mSpecOne.mSpecQuestScoreboard = "Quest103a";
 		mSpecOne.mSpecialization = 3;
 		mSpecOne.mSpecName = "Berserker";

@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.itemstats;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.itemstats.attributes.Armor;
 import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
@@ -21,10 +23,17 @@ import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken
 import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
+import com.playmonumenta.plugins.itemstats.infusions.Focus;
+import com.playmonumenta.plugins.itemstats.infusions.Perspicacity;
+import com.playmonumenta.plugins.itemstats.infusions.Tenacity;
+import com.playmonumenta.plugins.itemstats.infusions.Vigor;
+import com.playmonumenta.plugins.itemstats.infusions.Vitality;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -36,10 +45,10 @@ import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.DoubleFunction;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -52,9 +61,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerItemStatsGUI extends CustomInventory {
 
@@ -63,12 +72,35 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		private ItemStatUtils.Region mRegion = ItemStatUtils.Region.VALLEY;
 	}
 
+	private enum InfusionSetting {
+		DISABLED("Ignore all infusions in calculations", null),
+		ENABLED("Respect existing infusions on items", null),
+		VITALITY("20 Vitality + 4 Tenacity", InfusionType.VITALITY),
+		TENACITY("24 Tenacity", InfusionType.TENACITY),
+		VIGOR("24 Vigor", InfusionType.VIGOR),
+		FOCUS("24 Focus", InfusionType.FOCUS),
+		PERSPICACITY("24 Perspicacity", InfusionType.PERSPICACITY),
+		;
+
+		private final String mDescription;
+		private final @Nullable InfusionType mInfusionType;
+
+		InfusionSetting(String description, @Nullable InfusionType infusionType) {
+			this.mDescription = description;
+			this.mInfusionType = infusionType;
+		}
+	}
+
 	private static class Stats {
 		private final PlayerItemStats mPlayerItemStats = new PlayerItemStats();
 		private final EnumMap<Equipment, ItemStack> mEquipment = new EnumMap<>(Equipment.class);
+		private final EnumMap<Equipment, ItemStack> mDisplayedEquipment = new EnumMap<>(Equipment.class);
+		private final EnumMap<Equipment, ItemStack> mOriginalEquipment = new EnumMap<>(Equipment.class);
+		private final EnumMap<Equipment, ItemStack> mOriginalDisplayedEquipment = new EnumMap<>(Equipment.class);
 		private final EnumMap<Stat, Double> mStatCache = new EnumMap<>(Stat.class);
 		private final @Nullable Stats mMainStats;
 		private final Settings mSettings;
+		private InfusionSetting mInfusionSetting = InfusionSetting.DISABLED;
 
 		private Stats(@Nullable Stats mainStats, Settings settings) {
 			mMainStats = mainStats;
@@ -93,6 +125,30 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				return mMainStats.mEquipment.get(slot);
 			}
 			return result;
+		}
+
+		private InfusionSetting getInfusionSetting() {
+			if (mInfusionSetting == InfusionSetting.DISABLED && mMainStats != null) {
+				return mMainStats.mInfusionSetting;
+			}
+			return mInfusionSetting;
+		}
+
+		private double getInfusion(InfusionType infusion) {
+			InfusionSetting setting = getInfusionSetting();
+			if (setting == InfusionSetting.ENABLED) {
+				return mPlayerItemStats.getItemStats().get(infusion.getItemStat());
+			} else if (setting.mInfusionType == infusion) {
+				if (setting == InfusionSetting.VITALITY) {
+					return 20;
+				}
+				return 24;
+			} else {
+				if (setting == InfusionSetting.VITALITY && infusion == InfusionType.TENACITY) {
+					return 4;
+				}
+				return 0;
+			}
 		}
 
 		private double getMainhandAttributeAmount(AttributeType type, Operation operation) {
@@ -134,28 +190,30 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		}
 	}
 
-	static double calculateDamageMultiplier(Stats stats, Protection protection) {
-		double armor = stats.get(AttributeType.ARMOR);
-		double agility = stats.get(AttributeType.AGILITY);
-
-		double armorBonus = 0;
-		double agilityBonus = 0;
-		for (SecondaryStat stat : stats.mSettings.mSecondaryStatEnabled) {
-			if (stat.isArmorModifier()) {
-				armorBonus += Shielding.ARMOR_BONUS_PER_LEVEL * stats.get(stat.getEnchantmentType());
-			} else {
-				agilityBonus += Shielding.ARMOR_BONUS_PER_LEVEL * stats.get(stat.getEnchantmentType());
-			}
-		}
-
-		boolean adaptability = stats.get(EnchantmentType.ADAPTABILITY) > 0;
-		double epf = protection.getEPF() * stats.get(protection.getEnchantmentType());
-
-		ItemStatUtils.Region maxRegion = stats.getMaximumRegion(false);
-
+	static double calculateDamageMultiplier(Stats stats, @Nullable Protection protection) {
 		boolean region2 = stats.mSettings.mRegion.compareTo(ItemStatUtils.Region.ISLES) >= 0;
-		double damageMultiplier = Armor.getDamageMultiplier(armor, armorBonus, agility, agilityBonus,
-			Armor.getSecondaryEnchantCap(region2), adaptability, epf, protection.getType().isEnvironmental());
+
+		double damageMultiplier = 1;
+		if (protection != null) {
+			double armor = stats.get(AttributeType.ARMOR);
+			double agility = stats.get(AttributeType.AGILITY);
+
+			double armorBonus = 0;
+			double agilityBonus = 0;
+			for (SecondaryStat stat : stats.mSettings.mSecondaryStatEnabled) {
+				if (stat.isArmorModifier()) {
+					armorBonus += Shielding.ARMOR_BONUS_PER_LEVEL * stats.get(stat.getEnchantmentType());
+				} else {
+					agilityBonus += Shielding.ARMOR_BONUS_PER_LEVEL * stats.get(stat.getEnchantmentType());
+				}
+			}
+
+			boolean adaptability = stats.get(EnchantmentType.ADAPTABILITY) > 0;
+			double epf = protection.getEPF() * stats.get(protection.getEnchantmentType());
+
+			damageMultiplier = Armor.getDamageMultiplier(armor, armorBonus, agility, agilityBonus,
+				Armor.getSecondaryEnchantCap(region2), adaptability, epf, protection.getType().isEnvironmental());
+		}
 
 		// when Steadfast is enabled, also include Second Wind in calculation
 		if (stats.mSettings.mSecondaryStatEnabled.contains(SecondaryStat.STEADFAST)) {
@@ -166,9 +224,12 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			damageMultiplier *= ProtectionOfTheDepths.getDamageMultiplier(region2);
 		}
 
+		ItemStatUtils.Region maxRegion = stats.getMaximumRegion(false);
 		if (maxRegion.compareTo(stats.mSettings.mRegion) > 0) {
 			damageMultiplier *= RegionScalingDamageTaken.DAMAGE_TAKEN_MULTIPLIER;
 		}
+
+		damageMultiplier *= 1 - stats.getInfusion(InfusionType.TENACITY) * Tenacity.DAMAGE_REDUCTION_PER_LEVEL;
 
 		return damageMultiplier;
 	}
@@ -187,7 +248,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private enum Stat {
 
 		// health and healing
-		HEALTH("Max Health", NUMBER, stats -> stats.getAttributeAmount(AttributeType.MAX_HEALTH, 20)),
+		HEALTH("Max Health", NUMBER, stats -> stats.getAttributeAmount(AttributeType.MAX_HEALTH, 20) * (1 + Vitality.HEALTH_MOD_PER_LEVEL * stats.getInfusion(InfusionType.VITALITY))),
 		HEALING_RATE("Healing Rate", PERCENT, stats -> Sustenance.getHealingMultiplier(stats.get(EnchantmentType.SUSTENANCE), stats.get(EnchantmentType.CURSE_OF_ANEMIA))),
 		EFFECTIVE_HEALING_RATE("Effective Healing Rate", PERCENT, stats -> HEALING_RATE.get(stats) * 20.0 / HEALTH.get(stats)),
 		REGENERATION("Regeneration per second", NUMBER, stats -> 4 * Regeneration.healPer5Ticks(stats.get(EnchantmentType.REGENERATION)) * HEALING_RATE.get(stats)),
@@ -202,6 +263,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		BLAST_DAMAGE_TAKEN("Blast", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new BlastProtection()), false, DR_CHANGE_FORMAT),
 		FIRE_DAMAGE_TAKEN("Fire", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new FireProtection()), false, DR_CHANGE_FORMAT),
 		FALL_DAMAGE_TAKEN("Fall", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new FeatherFalling()), false, DR_CHANGE_FORMAT),
+		AILMENT_DAMAGE_TAKEN("Ailment", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, null), false, DR_CHANGE_FORMAT),
 
 		// These stats are effective damage taken, but get displayed as effective damage reduction
 		EFFECTIVE_MELEE_DAMAGE_TAKEN("Melee", ONE_MINUS_PERCENT, stats -> MELEE_DAMAGE_TAKEN.get(stats) * 20.0 / HEALTH.get(stats), false, DR_CHANGE_FORMAT),
@@ -210,6 +272,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		EFFECTIVE_BLAST_DAMAGE_TAKEN("Blast", ONE_MINUS_PERCENT, stats -> BLAST_DAMAGE_TAKEN.get(stats) * 20.0 / HEALTH.get(stats), false, DR_CHANGE_FORMAT),
 		EFFECTIVE_FIRE_DAMAGE_TAKEN("Fire", ONE_MINUS_PERCENT, stats -> FIRE_DAMAGE_TAKEN.get(stats) * 20.0 / HEALTH.get(stats), false, DR_CHANGE_FORMAT),
 		EFFECTIVE_FALL_DAMAGE_TAKEN("Fall", ONE_MINUS_PERCENT, stats -> FALL_DAMAGE_TAKEN.get(stats) * 20.0 / HEALTH.get(stats), false, DR_CHANGE_FORMAT),
+		EFFECTIVE_AILMENT_DAMAGE_TAKEN("Ailment", ONE_MINUS_PERCENT, stats -> AILMENT_DAMAGE_TAKEN.get(stats) * 20.0 / HEALTH.get(stats), false, DR_CHANGE_FORMAT),
 
 		// effective health
 		MELEE_EHP("Melee", NUMBER, stats -> HEALTH.get(stats) / MELEE_DAMAGE_TAKEN.get(stats)),
@@ -218,6 +281,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		BLAST_EHP("Blast", NUMBER, stats -> HEALTH.get(stats) / BLAST_DAMAGE_TAKEN.get(stats)),
 		FIRE_EHP("Fire", NUMBER, stats -> HEALTH.get(stats) / FIRE_DAMAGE_TAKEN.get(stats)),
 		FALL_EHP("Fall", NUMBER, stats -> HEALTH.get(stats) / FALL_DAMAGE_TAKEN.get(stats)),
+		AILMENT_EHP("Ailment", NUMBER, stats -> HEALTH.get(stats) / AILMENT_DAMAGE_TAKEN.get(stats)),
 
 		// effective health multipliers
 		// TODO this was suggested, but would need to fit into the GUI somehow
@@ -228,17 +292,22 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		BLAST_EHM("Blast", NUMBER, stats -> 1.0 / BLAST_DAMAGE_TAKEN.get(stats)),
 		FIRE_EHM("Fire", NUMBER, stats -> 1.0 / FIRE_DAMAGE_TAKEN.get(stats)),
 		FALL_EHM("Fall", NUMBER, stats -> 1.0 / FALL_DAMAGE_TAKEN.get(stats)),
+		AILMENT_EHM("Ailment", NUMBER, stats -> 1.0 / AILMENT_DAMAGE_TAKEN.get(stats)),
 
 		// melee
 		ATTACK_DAMAGE("Attack Damage", NUMBER, stats -> (1 + stats.get(AttributeType.ATTACK_DAMAGE_ADD)) * stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY, 1)),
 		ATTACK_DAMAGE_ADD("+flat Attack Damage", NUMBER, stats -> stats.get(AttributeType.ATTACK_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD)),
-		ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", PERCENT, stats -> stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY, 1) * stats.getRegionScalingDamageDealtMultiplier() - 1),
+		ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", PERCENT, stats -> stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY, 1)
+			                                                             * stats.getRegionScalingDamageDealtMultiplier()
+			                                                             * (1 + Vigor.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.VIGOR)) - 1),
 		ATTACK_SPEED("Attack Speed", NUMBER, stats -> stats.getAttributeAmount(AttributeType.ATTACK_SPEED, 4)),
 
 		// projectile
 		PROJECTILE_DAMAGE("Projectile Damage", NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) * stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY, 1)),
 		PROJECTILE_DAMAGE_ADD("+flat Projectile Damage", NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD)),
-		PROJECTILE_DAMAGE_MULTIPLY("+% Projectile Damage", PERCENT, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY, 1) * stats.getRegionScalingDamageDealtMultiplier() - 1),
+		PROJECTILE_DAMAGE_MULTIPLY("+% Projectile Damage", PERCENT, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY, 1)
+			                                                                     * stats.getRegionScalingDamageDealtMultiplier()
+			                                                                     * (1 + Focus.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.FOCUS)) - 1),
 		PROJECTILE_SPEED("Projectile Speed", NUMBER, stats -> {
 			ItemStack mainhand = stats.getItem(Equipment.MAINHAND);
 			if (ItemUtils.isBowOrTrident(mainhand)) {
@@ -268,7 +337,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		// magic
 		SPELL_POWER("Spell Power", PERCENT, stats -> stats.get(AttributeType.SPELL_DAMAGE)),
 		MAGIC_DAMAGE_ADD("+flat Magic Damage", NUMBER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_ADD)),
-		MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", PERCENT, stats -> stats.get(AttributeType.MAGIC_DAMAGE_MULTIPLY, 1) * stats.getRegionScalingDamageDealtMultiplier() - 1),
+		MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", PERCENT, stats -> stats.get(AttributeType.MAGIC_DAMAGE_MULTIPLY, 1)
+			                                                           * stats.getRegionScalingDamageDealtMultiplier()
+			                                                           * (1 + Perspicacity.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.PERSPICACITY)) - 1),
 		COOLDOWN_MULTIPLIER("Cooldown Multiplier", PERCENT, stats -> (1 + Aptitude.getCooldownPercentage(stats.get(EnchantmentType.APTITUDE)))
 			                                                             * (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE))), false),
 		// misc
@@ -351,6 +422,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			meta.displayName(mName);
 			meta.lore(mDisplayedStats.stream().map(stat -> stat.getDisplay(stats, otherStats)).toList());
 			icon.setItemMeta(meta);
+			ItemUtils.setPlainName(icon);
 			return icon;
 		}
 	}
@@ -361,27 +433,28 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	private static final StatItem HEALTH_NORMALIZED_DAMAGE_RESISTANCE = new StatItem(21, Material.GLOWSTONE_DUST,
 		Component.text("Health Normalized Damage Reduction", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
-		Stat.EFFECTIVE_MELEE_DAMAGE_TAKEN, Stat.EFFECTIVE_PROJECTILE_DAMAGE_TAKEN, Stat.EFFECTIVE_MAGIC_DAMAGE_TAKEN, Stat.EFFECTIVE_BLAST_DAMAGE_TAKEN, Stat.EFFECTIVE_FIRE_DAMAGE_TAKEN, Stat.EFFECTIVE_FALL_DAMAGE_TAKEN);
+		Stat.EFFECTIVE_MELEE_DAMAGE_TAKEN, Stat.EFFECTIVE_PROJECTILE_DAMAGE_TAKEN, Stat.EFFECTIVE_MAGIC_DAMAGE_TAKEN,
+		Stat.EFFECTIVE_BLAST_DAMAGE_TAKEN, Stat.EFFECTIVE_FIRE_DAMAGE_TAKEN, Stat.EFFECTIVE_FALL_DAMAGE_TAKEN, Stat.EFFECTIVE_AILMENT_DAMAGE_TAKEN);
 
 	private static final StatItem DAMAGE_RESISTANCE = new StatItem(22, Material.SUGAR,
 		Component.text("Damage Reduction", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
-		Stat.MELEE_DAMAGE_TAKEN, Stat.PROJECTILE_DAMAGE_TAKEN, Stat.MAGIC_DAMAGE_TAKEN, Stat.BLAST_DAMAGE_TAKEN, Stat.FIRE_DAMAGE_TAKEN, Stat.FALL_DAMAGE_TAKEN);
+		Stat.MELEE_DAMAGE_TAKEN, Stat.PROJECTILE_DAMAGE_TAKEN, Stat.MAGIC_DAMAGE_TAKEN, Stat.BLAST_DAMAGE_TAKEN, Stat.FIRE_DAMAGE_TAKEN, Stat.FALL_DAMAGE_TAKEN, Stat.AILMENT_DAMAGE_TAKEN);
 
 	private static final StatItem EFFECTIVE_HEALTH = new StatItem(23, Material.REDSTONE,
 		Component.text("Effective Health", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
-		Stat.MELEE_EHP, Stat.PROJECTILE_EHP, Stat.MAGIC_EHP, Stat.BLAST_EHP, Stat.FIRE_EHP, Stat.FALL_EHP);
+		Stat.MELEE_EHP, Stat.PROJECTILE_EHP, Stat.MAGIC_EHP, Stat.BLAST_EHP, Stat.FIRE_EHP, Stat.FALL_EHP, Stat.AILMENT_EHP);
 
 	private static final StatItem MELEE_INFO = new StatItem(30, Material.IRON_SWORD,
 		Component.text("Melee", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
-		Stat.ATTACK_DAMAGE, Stat.ATTACK_DAMAGE_ADD, Stat.ATTACK_DAMAGE_MULTIPLY, Stat.ATTACK_SPEED);
+		Stat.ATTACK_DAMAGE, /*Stat.ATTACK_DAMAGE_ADD,*/ Stat.ATTACK_DAMAGE_MULTIPLY, Stat.ATTACK_SPEED);
 
 	private static final StatItem PROJECTILE_INFO = new StatItem(31, Material.BOW,
 		Component.text("Projectile", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
-		Stat.PROJECTILE_DAMAGE, Stat.PROJECTILE_DAMAGE_ADD, Stat.PROJECTILE_DAMAGE_MULTIPLY, Stat.PROJECTILE_SPEED, Stat.PROJECTILE_RATE);
+		Stat.PROJECTILE_DAMAGE, /*Stat.PROJECTILE_DAMAGE_ADD,*/ Stat.PROJECTILE_DAMAGE_MULTIPLY, Stat.PROJECTILE_SPEED, Stat.PROJECTILE_RATE);
 
 	private static final StatItem MAGIC_INFO = new StatItem(32, Material.BLAZE_ROD,
 		Component.text("Magic", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
-		Stat.SPELL_POWER, Stat.MAGIC_DAMAGE_ADD, Stat.MAGIC_DAMAGE_MULTIPLY, Stat.COOLDOWN_MULTIPLIER);
+		Stat.SPELL_POWER, /*Stat.MAGIC_DAMAGE_ADD,*/ Stat.MAGIC_DAMAGE_MULTIPLY, Stat.COOLDOWN_MULTIPLIER);
 
 	private static final StatItem MISC_INFO = new StatItem(40, Material.LEATHER_BOOTS,
 		Component.text("Misc", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
@@ -521,13 +594,12 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	);
 
 	private static final int SWAP_EQUIPMENT_SET_SLOT = 49;
+	private static final int INFUSION_SETTINGS_LEFT_SLOT = 9;
+	private static final int INFUSION_SETTINGS_RIGHT_SLOT = 17;
 
 	private final Settings mSettings = new Settings();
 	private final Stats mLeftStats = new Stats(null, mSettings);
 	private final Stats mRightStats = new Stats(mLeftStats, mSettings);
-
-	private final EnumMap<Equipment, ItemStack> mOriginalEquipmentLeft = new EnumMap<>(Equipment.class);
-	private final EnumMap<Equipment, ItemStack> mOriginalEquipmentRight = new EnumMap<>(Equipment.class);
 
 	private boolean mSelectedRightEquipmentSet;
 	private @Nullable Equipment mSelectedEquipmentsSlot = null;
@@ -547,20 +619,56 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	}
 
 	private void setEquipmentFromPlayer(boolean right, Player player) {
-		PlayerInventory inventory = player.getInventory();
 		Stats stats = right ? mRightStats : mLeftStats;
-		EnumMap<Equipment, ItemStack> originalEquipment = right ? mOriginalEquipmentRight : mOriginalEquipmentLeft;
 
-		stats.mEquipment.put(Equipment.MAINHAND, inventory.getItemInMainHand());
-		stats.mEquipment.put(Equipment.OFFHAND, inventory.getItemInOffHand());
-		stats.mEquipment.put(Equipment.HEAD, inventory.getHelmet());
-		stats.mEquipment.put(Equipment.CHEST, inventory.getChestplate());
-		stats.mEquipment.put(Equipment.LEGS, inventory.getLeggings());
-		stats.mEquipment.put(Equipment.FEET, inventory.getBoots());
-		stats.mEquipment.values().removeIf(item -> item == null || item.getType() == Material.AIR);
+		stats.mEquipment.clear();
+		stats.mDisplayedEquipment.clear();
+		for (Equipment slot : Equipment.values()) {
+			setEquipmentFromPlayer(stats, player, slot);
+		}
 
-		originalEquipment.clear();
-		originalEquipment.putAll(stats.mEquipment);
+		stats.mOriginalEquipment.clear();
+		stats.mOriginalEquipment.putAll(stats.mEquipment);
+		stats.mOriginalDisplayedEquipment.clear();
+		stats.mOriginalDisplayedEquipment.putAll(stats.mDisplayedEquipment);
+	}
+
+	private void setEquipmentFromPlayer(Stats stats, Player player, Equipment slot) {
+		ItemStack item = player.getInventory().getItem(slot.mEquipmentSlot);
+		setEquipment(stats, slot, item);
+		stats.mDisplayedEquipment.put(slot, getPlayerItemWithVanity(player, slot.mEquipmentSlot));
+	}
+
+	public static @Nullable ItemStack getPlayerItemWithVanity(Player player, EquipmentSlot slot) {
+		ItemStack item = player.getInventory().getItem(slot);
+		if (item != null && item.getType() != Material.AIR) {
+			VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(player);
+			if (vanityData.getEquipped(slot) != null) {
+				ItemStack vanityItem = ItemUtils.clone(item);
+				if (VanityManager.isInvisibleVanityItem(vanityData.getEquipped(slot))) {
+					ItemMeta meta = vanityItem.getItemMeta();
+					if (meta != null) {
+						List<Component> lore = meta.lore() == null ? new ArrayList<>() : new ArrayList<>(meta.lore());
+						lore.add(0, Component.text("Invisibility vanity skin applied", NamedTextColor.GOLD));
+						meta.lore(lore);
+						vanityItem.setItemMeta(meta);
+					}
+				} else {
+					VanityManager.applyVanity(vanityItem, vanityData, slot);
+				}
+				return vanityItem;
+			}
+		}
+		return item;
+	}
+
+	private void setEquipment(Stats stats, Equipment slot, ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+		item = ItemUtils.clone(item);
+		stats.mEquipment.put(slot, item);
+		stats.mDisplayedEquipment.put(slot, item);
 	}
 
 	@Override
@@ -580,6 +688,14 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				mLeftStats.mEquipment.putAll(mRightStats.mEquipment);
 				mRightStats.mEquipment.clear();
 				mRightStats.mEquipment.putAll(leftEquipment);
+				EnumMap<Equipment, ItemStack> leftDisplayEquipment = new EnumMap<>(mLeftStats.mDisplayedEquipment);
+				mLeftStats.mDisplayedEquipment.clear();
+				mLeftStats.mDisplayedEquipment.putAll(mRightStats.mDisplayedEquipment);
+				mRightStats.mDisplayedEquipment.clear();
+				mRightStats.mDisplayedEquipment.putAll(leftDisplayEquipment);
+				InfusionSetting leftInfusionSetting = mLeftStats.mInfusionSetting;
+				mLeftStats.mInfusionSetting = mRightStats.mInfusionSetting;
+				mRightStats.mInfusionSetting = leftInfusionSetting;
 				generateInventory();
 				return;
 			}
@@ -600,10 +716,18 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				}
 			}
 
+			if (slot == INFUSION_SETTINGS_LEFT_SLOT || slot == INFUSION_SETTINGS_RIGHT_SLOT) {
+				Stats stats = (slot == INFUSION_SETTINGS_LEFT_SLOT ? mLeftStats : mRightStats);
+				stats.mInfusionSetting = InfusionSetting.values()[(stats.mInfusionSetting.ordinal() + (event.getClick().isLeftClick() ? 1 : InfusionSetting.values().length - 1)) % InfusionSetting.values().length];
+				generateInventory();
+				return;
+			}
+
 			for (Equipment equipment : Equipment.values()) {
 				if (slot == equipment.mRightSlot) {
 					if (event.isRightClick()) {
-						mRightStats.mEquipment.put(equipment, mOriginalEquipmentRight.get(equipment));
+						mRightStats.mEquipment.put(equipment, mRightStats.mOriginalEquipment.get(equipment));
+						mRightStats.mDisplayedEquipment.put(equipment, mRightStats.mOriginalDisplayedEquipment.get(equipment));
 					} else {
 						if (mSelectedEquipmentsSlot == equipment && mSelectedRightEquipmentSet) {
 							mSelectedEquipmentsSlot = null;
@@ -612,6 +736,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 							mSelectedRightEquipmentSet = true;
 						} else {
 							mRightStats.mEquipment.remove(equipment);
+							mRightStats.mDisplayedEquipment.remove(equipment);
 						}
 					}
 
@@ -620,7 +745,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				}
 				if (slot == equipment.mLeftSlot) {
 					if (event.isRightClick()) {
-						mLeftStats.mEquipment.put(equipment, mOriginalEquipmentLeft.get(equipment));
+						mLeftStats.mEquipment.put(equipment, mLeftStats.mOriginalEquipment.get(equipment));
+						mLeftStats.mDisplayedEquipment.put(equipment, mLeftStats.mOriginalDisplayedEquipment.get(equipment));
 					} else {
 						if (mSelectedEquipmentsSlot == equipment && !mSelectedRightEquipmentSet) {
 							mSelectedEquipmentsSlot = null;
@@ -629,6 +755,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 							mSelectedRightEquipmentSet = false;
 						} else {
 							mLeftStats.mEquipment.remove(equipment);
+							mLeftStats.mDisplayedEquipment.remove(equipment);
 						}
 					}
 
@@ -660,7 +787,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 						}
 						ItemStack shulkerItem = shulker.getInventory().getItem(shulkerSlot);
 						if (shulkerItem != null && shulkerItem.getType() != Material.AIR) {
-							stats.mEquipment.put(equipment, shulkerItem);
+							setEquipment(stats, equipment, shulkerItem);
 						}
 					}
 					generateInventory();
@@ -690,7 +817,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 					}
 				}
 				if (targetSlot != null) {
-					(targetRightSet ? mRightStats : mLeftStats).mEquipment.put(targetSlot, item);
+					setEquipment(targetRightSet ? mRightStats : mLeftStats, targetSlot, item);
 					mSelectedEquipmentsSlot = null;
 					generateInventory();
 				}
@@ -748,6 +875,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		meta.displayName(Component.text("Warning!", NamedTextColor.DARK_RED).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 		meta.lore(warnings);
 		item.setItemMeta(meta);
+		ItemUtils.setPlainName(item);
 		return item;
 	}
 
@@ -759,20 +887,17 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				stats.getItem(Equipment.HEAD), stats.getItem(Equipment.CHEST), stats.getItem(Equipment.LEGS), stats.getItem(Equipment.FEET), true);
 		}
 
-		for (int i = 0; i < 54; i++) {
-			mInventory.setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1));
-		}
-
 		ItemStack swapItem = new ItemStack(Material.ARMOR_STAND, 1);
 		ItemMeta swapItemMeta = swapItem.getItemMeta();
 		swapItemMeta.displayName(Component.text("Swap Equipment Sets", NamedTextColor.WHITE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 		swapItem.setItemMeta(swapItemMeta);
+		ItemUtils.setPlainName(swapItem);
 		mInventory.setItem(SWAP_EQUIPMENT_SET_SLOT, swapItem);
 
 		mInventory.setItem(REGION_SETTING_SLOT, REGION_ICONS.get(mSettings.mRegion));
 
 		for (StatItem statItem : STAT_ITEMS) {
-			mInventory.setItem(statItem.mSlot, statItem.getDisplay(mLeftStats, mRightStats.mEquipment.isEmpty() ? null : mRightStats));
+			mInventory.setItem(statItem.mSlot, statItem.getDisplay(mLeftStats, mRightStats.mEquipment.isEmpty() && mRightStats.mInfusionSetting == InfusionSetting.DISABLED ? null : mRightStats));
 		}
 
 		for (SecondaryStat stat : SecondaryStat.values()) {
@@ -787,31 +912,50 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			meta.lore(stat.getDisplayLore());
 
 			item.setItemMeta(meta);
+			ItemUtils.setPlainName(item);
 
 			mInventory.setItem(stat.getSlot(), item);
 		}
 
-		for (Equipment equipment : Equipment.values()) {
-			ItemStack leftItem = mLeftStats.mEquipment.get(equipment);
-			mInventory.setItem(equipment.mLeftSlot, leftItem != null ? new ItemStack(leftItem) : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && !mSelectedRightEquipmentSet));
-
-			ItemStack rightItem = mRightStats.mEquipment.get(equipment);
-			mInventory.setItem(equipment.mRightSlot, rightItem != null ? new ItemStack(rightItem) : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && mSelectedRightEquipmentSet));
-		}
-
-		ItemStack leftWarningIcon = getWarningIcon(mLeftStats);
-		if (leftWarningIcon != null) {
-			mInventory.setItem(28, leftWarningIcon);
-		}
-		ItemStack rightWarningIcon = getWarningIcon(mRightStats);
-		if (rightWarningIcon != null) {
-			mInventory.setItem(34, rightWarningIcon);
-		}
-
-		for (ItemStack item : mInventory.getContents()) {
-			if (item != null) {
-				ItemUtils.setPlainName(item);
+		BiFunction<Boolean, InfusionSetting, ItemStack> makeInfusionSettingsItem = (left, selectedSetting) -> {
+			ItemStack item = new ItemStack(Material.ANVIL);
+			ItemMeta meta = item.getItemMeta();
+			meta.displayName(Component.text("Infusion Settings", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+			List<Component> lore = new ArrayList<>();
+			lore.add(Component.text("Click to select how infusion are", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("treated by this calculator.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("Selected option:", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+			for (InfusionSetting setting : InfusionSetting.values()) {
+				String line;
+				if (setting == InfusionSetting.DISABLED && !left) {
+					line = "Use option chosen on the left build";
+				} else {
+					line = setting.mDescription;
+				}
+				boolean selected = setting == selectedSetting;
+				lore.add(Component.text((selected ? "+ " : "- ") + line, selected ? NamedTextColor.GREEN : NamedTextColor.GRAY)
+					.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, selected));
 			}
+			meta.lore(lore);
+			item.setItemMeta(meta);
+			ItemUtils.setPlainName(item);
+			return item;
+		};
+		mInventory.setItem(INFUSION_SETTINGS_LEFT_SLOT, makeInfusionSettingsItem.apply(true, mLeftStats.mInfusionSetting));
+		mInventory.setItem(INFUSION_SETTINGS_RIGHT_SLOT, makeInfusionSettingsItem.apply(false, mRightStats.mInfusionSetting));
+
+		for (Equipment equipment : Equipment.values()) {
+			ItemStack leftItem = mLeftStats.mDisplayedEquipment.get(equipment);
+			mInventory.setItem(equipment.mLeftSlot, leftItem != null ? leftItem : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && !mSelectedRightEquipmentSet));
+
+			ItemStack rightItem = mRightStats.mDisplayedEquipment.get(equipment);
+			mInventory.setItem(equipment.mRightSlot, rightItem != null ? rightItem : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && mSelectedRightEquipmentSet));
 		}
+
+		mInventory.setItem(28, getWarningIcon(mLeftStats));
+		mInventory.setItem(34, getWarningIcon(mRightStats));
+
+		GUIUtils.fillWithFiller(mInventory, Material.BLACK_STAINED_GLASS_PANE);
+
 	}
 }

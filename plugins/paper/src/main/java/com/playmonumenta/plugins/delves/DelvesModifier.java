@@ -23,6 +23,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -41,6 +42,9 @@ public enum DelvesModifier {
 	CARAPACE(12, Carapace::applyModifiers, createIcon(Material.NETHERITE_HELMET, Component.text("Carapace", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Carapace.DESCRIPTION), Carapace.RANK_DESCRIPTIONS, 14),
 	ENTROPY(13, null, createIcon(Material.STRUCTURE_VOID, Component.text("Entropy", NamedTextColor.BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Entropy.DESCRIPTION), Entropy.RANK_DESCRIPTIONS, 15),
 	TWISTED(14, Twisted::applyModifiers, createIcon(Material.TIPPED_ARROW, Component.text("Twisted", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Twisted.DESCRIPTION), Twisted.RANK_DESCRIPTIONS, 16);
+
+	private static final List<DelvesModifier> DEATH_TRIGGER_MODIFIERS = List.of(SPECTRAL, DREADFUL);
+	private static final List<DelvesModifier> SPAWN_TRIGGER_MODIFIERS = List.of(RELENTLESS, ARCANIC, INFERNAL, TRANSCENDENT, CHIVALROUS, BLOODTHIRSTY, PERNICIOUS, LEGIONARY, CARAPACE, TWISTED);
 
 	private final int mIndex;
 	private final BiConsumer<LivingEntity, Integer> mApplyFunc;
@@ -99,6 +103,14 @@ public enum DelvesModifier {
 		return new ArrayList<>(List.of(values()));
 	}
 
+	public static List<DelvesModifier> spawnTriggerDelvesModifier() {
+		return new ArrayList<>(SPAWN_TRIGGER_MODIFIERS);
+	}
+
+	public static List<DelvesModifier> deathTriggerDelvesModifier() {
+		return new ArrayList<>(DEATH_TRIGGER_MODIFIERS);
+	}
+
 	public static @Nullable DelvesModifier fromIndex(int index) {
 		if (index < 1 || index > values().length) {
 			return null;
@@ -110,6 +122,7 @@ public enum DelvesModifier {
 		ItemStack stack = new ItemStack(material);
 
 		ItemMeta meta = stack.getItemMeta();
+		meta.addItemFlags(ItemFlag.values());
 		meta.displayName(name);
 		List<Component> lore = new ArrayList<>();
 		lore.add(Component.text(description, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));

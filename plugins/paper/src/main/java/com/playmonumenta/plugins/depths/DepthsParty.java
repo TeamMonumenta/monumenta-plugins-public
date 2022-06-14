@@ -464,8 +464,12 @@ public class DepthsParty {
 			if (roomReached > highestRoom) {
 				ScoreboardUtils.setScoreboardValue(p, "DepthsEndless", roomReached);
 				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getDisplayName() + " DepthsEndless");
-				if (roomReached > 30) {
-					MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+			}
+			if (roomReached > 30) {
+				if (roomReached > highestRoom) {
+					MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+				} else {
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths! (Endless Room Reached: " + roomReached + ")\",\"color\":\"yellow\",\"italic\":true,\"bold\":false}]");
 				}
 			}
 			SeasonalEventListener.playerCompletedDepths(p, roomReached);

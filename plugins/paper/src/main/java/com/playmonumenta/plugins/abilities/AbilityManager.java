@@ -115,9 +115,9 @@ import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WarriorPassive;
 import com.playmonumenta.plugins.abilities.warrior.WeaponMastery;
+import com.playmonumenta.plugins.abilities.warrior.berserker.GloriousBattle;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
-import com.playmonumenta.plugins.abilities.warrior.berserker.RecklessSwing;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
@@ -343,7 +343,7 @@ public class AbilityManager {
 			// BERSERKER
 			new MeteorSlam(mPlugin, null),
 			new Rampage(mPlugin, null),
-			new RecklessSwing(mPlugin, null),
+			new GloriousBattle(mPlugin, null),
 
 			// GUARDIAN
 			new ShieldWall(mPlugin, null),
@@ -416,12 +416,16 @@ public class AbilityManager {
 
 		AttributeInstance knockbackResistance = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 		AttributeInstance movementSpeed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+		AttributeInstance attackDamage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
 		AttributeInstance attackSpeed = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
 		AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 
 		// Reset passive buffs to player base attributes
 		if (knockbackResistance != null) {
 			knockbackResistance.setBaseValue(0);
+		}
+		if (attackDamage != null) {
+			attackDamage.setBaseValue(1.0);
 		}
 		if (attackSpeed != null) {
 			attackSpeed.setBaseValue(4.0);
@@ -457,6 +461,7 @@ public class AbilityManager {
 		 */
 		@Nullable AttributeInstance[] instances = {
 			knockbackResistance,
+			attackDamage,
 			attackSpeed,
 			movementSpeed,
 			maxHealth
