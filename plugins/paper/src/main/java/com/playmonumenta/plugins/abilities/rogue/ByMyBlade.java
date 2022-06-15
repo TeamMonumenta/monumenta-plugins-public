@@ -39,8 +39,11 @@ public class ByMyBlade extends Ability {
 
 	public static final String CHARM_DAMAGE = "By My Blade Damage";
 	public static final String CHARM_COOLDOWN = "By My Blade Cooldown";
+	public static final String CHARM_HASTE_AMPLIFIER = "By My Blade Haste Amplifier";
+	public static final String CHARM_HASTE_DURATION = "By My Blade Haste Duration";
 
 	private final double mDamageBonus;
+	private final int mHasteAmplifier;
 
 	public ByMyBlade(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "By My Blade");
@@ -53,15 +56,14 @@ public class ByMyBlade extends Ability {
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, BY_MY_BLADE_COOLDOWN);
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 		mDamageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE);
+		mHasteAmplifier = (isLevelOne() ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER) + (int) CharmManager.getLevel(mPlayer, CHARM_HASTE_AMPLIFIER);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
-			int hasteAmplifier = isLevelOne() ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER;
-
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-				new PotionEffect(PotionEffectType.FAST_DIGGING, BY_MY_BLADE_HASTE_DURATION, hasteAmplifier, false, true));
+				new PotionEffect(PotionEffectType.FAST_DIGGING, BY_MY_BLADE_HASTE_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_HASTE_DURATION), mHasteAmplifier, false, true));
 
 			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, mDamageBonus, mInfo.mLinkedSpell, true);
 

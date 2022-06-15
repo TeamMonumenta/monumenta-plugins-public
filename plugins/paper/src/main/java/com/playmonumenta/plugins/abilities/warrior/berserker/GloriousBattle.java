@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.point.Raycast;
@@ -18,7 +19,12 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -35,6 +41,13 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	private static final double BLEED_PERCENT = 0.2;
 	private static final int BLEED_TIME = 4 * 20;
 
+	public static final String CHARM_CHARGES = "Glorious Battle Charges";
+	public static final String CHARM_DAMAGE = "Glorious Battle Damage";
+	public static final String CHARM_RADIUS = "Glorious Battle Radius";
+	public static final String CHARM_BLEED_AMPLIFIER = "Glorious Battle Bleed Amplifier";
+	public static final String CHARM_BLEED_DURATION = "Glorious Battle Bleed Duration";
+	public static final String CHARM_VELOCITY = "Glorious Battle Velocity";
+
 	private int mStacks = 0;
 	private int mStackLimit;
 	private LivingEntity mTarget;
@@ -43,7 +56,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		super(plugin, player, "Glorious Battle");
 		mInfo.mLinkedSpell = ClassAbility.GLORIOUS_BATTLE;
 		mInfo.mCooldown = 0;
-		mStackLimit = getAbilityScore() == 1 ? LEVEL_ONE_CHARGES : LEVEL_TWO_CHARGES;
+		mStackLimit = (isLevelOne() ? LEVEL_ONE_CHARGES : LEVEL_TWO_CHARGES) + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mInfo.mScoreboardId = "GloriousBattle";
 		mInfo.mShorthandName = "GB";
 		mInfo.mDescriptions.add("Dealing indirect damage with an ability grants you a Glorious Battle stack. Shift and swap hands while looking at an enemy to consume a stack and charge forwards. Landing within a " + RADIUS + " block radius of the targeted mob will deal " + DAMAGE + " damage and " +
@@ -66,8 +79,8 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 
 		mStacks--;
 		Vector dir = mPlayer.getLocation().getDirection();
-		Vector yVelocity = new Vector(0, dir.getY() * 0.2 + 0.3, 0);
-		mPlayer.setVelocity(dir.multiply(1.4).add(yVelocity));
+		Vector yVelocity = new Vector(0, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, dir.getY() * 0.2 + 0.3), 0);
+		mPlayer.setVelocity(dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1.4)).add(yVelocity));
 		MessagingUtils.sendActionBarMessage(mPlayer, "Glorious Battle Stacks: " + mStacks);
 		Location location = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
@@ -99,15 +112,15 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	}
 
 	public void doBattle() {
-		if (!EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer).contains(mTarget)) {
+		if (!EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), mPlayer).contains(mTarget)) {
 			return;
 		}
 		Location location = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 		world.playSound(location, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1f, 1f);
 		new PartialParticle(Particle.SWEEP_ATTACK, location, 20, 1, 0, 1, 0).spawnAsPlayerActive(mPlayer);
-		EntityUtils.applyBleed(mPlugin, BLEED_TIME, BLEED_PERCENT, mTarget);
-		DamageUtils.damage(mPlayer, mTarget, DamageType.MELEE_SKILL, DAMAGE, ClassAbility.GLORIOUS_BATTLE, true);
+		EntityUtils.applyBleed(mPlugin, BLEED_TIME + CharmManager.getExtraDuration(mPlayer, CHARM_BLEED_DURATION), BLEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER), mTarget);
+		DamageUtils.damage(mPlayer, mTarget, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE), ClassAbility.GLORIOUS_BATTLE, true);
 	}
 
 	@Override

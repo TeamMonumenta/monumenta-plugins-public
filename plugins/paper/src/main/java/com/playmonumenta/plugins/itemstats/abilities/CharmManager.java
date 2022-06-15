@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
@@ -96,6 +97,7 @@ import com.playmonumenta.plugins.abilities.warrior.Riposte;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WeaponMastery;
+import com.playmonumenta.plugins.abilities.warrior.berserker.GloriousBattle;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
@@ -351,6 +353,8 @@ public class CharmManager {
 			AdvancingShadows.CHARM_RANGE,
 			ByMyBlade.CHARM_COOLDOWN,
 			ByMyBlade.CHARM_DAMAGE,
+			ByMyBlade.CHARM_HASTE_DURATION,
+			ByMyBlade.CHARM_HASTE_AMPLIFIER,
 			DaggerThrow.CHARM_COOLDOWN,
 			DaggerThrow.CHARM_DAMAGE,
 			DaggerThrow.CHARM_RANGE,
@@ -427,6 +431,12 @@ public class CharmManager {
 			WeaponMastery.CHARM_ATTACK_SPEED,
 			WeaponMastery.CHARM_WEAKEN,
 			WeaponMastery.CHARM_DURATION,
+			GloriousBattle.CHARM_DAMAGE,
+			GloriousBattle.CHARM_CHARGES,
+			GloriousBattle.CHARM_VELOCITY,
+			GloriousBattle.CHARM_RADIUS,
+			GloriousBattle.CHARM_BLEED_AMPLIFIER,
+			GloriousBattle.CHARM_BLEED_DURATION,
 			MeteorSlam.CHARM_COOLDOWN,
 			MeteorSlam.CHARM_DAMAGE,
 			MeteorSlam.CHARM_RADIUS,
@@ -439,7 +449,6 @@ public class CharmManager {
 			Rampage.CHARM_HEALING,
 			Rampage.CHARM_THRESHOLD,
 			Rampage.CHARM_REDUCTION_PER_STACK,
-			//TODO reckless swings replacement charms
 			Bodyguard.CHARM_COOLDOWN,
 			Bodyguard.CHARM_RADIUS,
 			Bodyguard.CHARM_RANGE,
@@ -496,6 +505,7 @@ public class CharmManager {
 			EnergizingElixir.CHARM_DURATION,
 			EnergizingElixir.CHARM_STACKS,
 			EnergizingElixir.CHARM_BONUS,
+			EnergizingElixir.CHARM_PRICE,
 			GruesomeAlchemy.CHARM_DAMAGE,
 			GruesomeAlchemy.CHARM_DURATION,
 			GruesomeAlchemy.CHARM_SLOWNESS,
@@ -546,7 +556,11 @@ public class CharmManager {
 			EsotericEnhancements.CHARM_FUSE,
 			EsotericEnhancements.CHARM_SPEED,
 			EsotericEnhancements.CHARM_CREEPER,
-			//TODO Scorched Earth charms after it gets changes
+			ScorchedEarth.CHARM_DAMAGE,
+			ScorchedEarth.CHARM_COOLDOWN,
+			ScorchedEarth.CHARM_CHARGES,
+			ScorchedEarth.CHARM_RADIUS,
+			ScorchedEarth.CHARM_DURATION,
 			Taboo.CHARM_COOLDOWN,
 			Taboo.CHARM_DAMAGE,
 			Taboo.CHARM_HEALING,

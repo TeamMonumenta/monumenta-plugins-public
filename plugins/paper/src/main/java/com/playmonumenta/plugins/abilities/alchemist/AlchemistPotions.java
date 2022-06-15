@@ -362,6 +362,19 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		return false;
 	}
 
+	public boolean decrementCharges(int charges) {
+		if (mCharges >= charges) {
+			for (int i = 0; i < charges; i++) {
+				if (!decrementCharge()) {
+					//Enough charges but cannot remove for other reason such as no bag
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
 	public boolean incrementCharge() {
 		if (mPlayer != null && mCharges < mMaxCharges) {
 			mCharges++;

@@ -47,6 +47,7 @@ public class EnergizingElixir extends Ability {
 	public static final String CHARM_DAMAGE = "Energizing Elixir Damage Modifier";
 	public static final String CHARM_BONUS = "Energizing Elixir Bonus Per Stack";
 	public static final String CHARM_STACKS = "Energizing Elixir Max Stacks";
+	public static final String CHARM_PRICE = "Energizing Elixir Potion Price";
 
 	private final double mSpeedAmp;
 	private @Nullable AlchemistPotions mAlchemistPotions;
@@ -78,7 +79,9 @@ public class EnergizingElixir extends Ability {
 		if (mPlayer != null
 			&& ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())
 			&& !(mHasUnstableAmalgam && mPlayer.isSneaking())) {
-			if (mAlchemistPotions == null || !mAlchemistPotions.decrementCharge()) {
+
+			int price = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_PRICE);
+			if (mAlchemistPotions == null || !mAlchemistPotions.decrementCharges(price)) {
 				// If no charges, do not activate ability
 				return;
 			}

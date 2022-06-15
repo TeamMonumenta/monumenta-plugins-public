@@ -37,7 +37,7 @@ public class SplitArrow extends Ability {
 	private static final PotionEffect SPECTRAL_ARROW_EFFECT = new PotionEffect(PotionEffectType.GLOWING, 200, 0);
 	private static final int IFRAMES = 10;
 
-	public static final String CHARM_DAMAGE = "Split Arrow Damage Modifier";
+	public static final String CHARM_DAMAGE = "Split Arrow Damage";
 	public static final String CHARM_BOUNCES = "Split Arrow Bounces";
 	public static final String CHARM_RANGE = "Split Arrow Range";
 
@@ -52,12 +52,13 @@ public class SplitArrow extends Ability {
 		mInfo.mDescriptions.add("Damage to the second target is increased to " + (int) (100 * SPLIT_ARROW_2_DAMAGE_PERCENT) + "% of the original arrow damage.");
 		mDisplayItem = new ItemStack(Material.BLAZE_ROD, 1);
 
-		mDamagePercent = (isLevelOne() ? SPLIT_ARROW_1_DAMAGE_PERCENT : SPLIT_ARROW_2_DAMAGE_PERCENT) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mDamagePercent = isLevelOne() ? SPLIT_ARROW_1_DAMAGE_PERCENT : SPLIT_ARROW_2_DAMAGE_PERCENT;
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow && EntityUtils.isHostileMob(enemy)) {
+			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, event.getDamage() * mDamagePercent);
 			int count = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_BOUNCES);
 			double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, SPLIT_ARROW_CHAIN_RANGE);
 			LivingEntity sourceEnemy = enemy;
@@ -88,7 +89,7 @@ public class SplitArrow extends Ability {
 					new PartialParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6).spawnAsPlayerActive(mPlayer);
 					world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 
-					DamageUtils.damage(mPlayer, nearestMob, DamageType.OTHER, event.getDamage() * mDamagePercent, mInfo.mLinkedSpell, true, true);
+					DamageUtils.damage(mPlayer, nearestMob, DamageType.OTHER, damage, mInfo.mLinkedSpell, true, true);
 					MovementUtils.knockAway(sourceEnemy, nearestMob, 0.125f, 0.35f, true);
 					EntityUtils.applyArrowIframes(mPlugin, IFRAMES, nearestMob);
 					if (event.getDamager() instanceof SpectralArrow) {
