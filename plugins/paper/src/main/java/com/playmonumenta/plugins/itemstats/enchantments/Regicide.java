@@ -44,7 +44,8 @@ public class Regicide implements Enchantment {
 		if (event.getType() != DamageType.AILMENT
 			    && event.getType() != DamageType.POISON
 			    && event.getType() != DamageType.FALL
-			    && event.getType() != DamageType.OTHER) {
+			    && event.getType() != DamageType.OTHER
+			    && event.getType() != DamageType.WARRIOR_AOE_OTHER) {
 			event.setDamage(calculateDamage(level, target, event));
 		}
 	}

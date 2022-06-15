@@ -68,7 +68,7 @@ public class BossBarManager {
 			}
 		}
 
-		double progress = mBoss.getHealth() / EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 0);
+		double progress = mBoss.getHealth() / EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 0);
 		if (mEvents != null && (progress * 100) > 99 && mEventCursor >= 99) {
 			BossHealthAction event = mEvents.get(mEventCursor);
 			if (event != null) {
@@ -87,7 +87,7 @@ public class BossBarManager {
 		if (!Double.isFinite(progress) || progress > 1.0f || progress < 0f) {
 			mPlugin.getLogger().severe("Boss '" + mBoss.getCustomName() + "' has invalid health " +
 				                           mBoss.getHealth() + " out of max " +
-				                           EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 0));
+				                           EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 0));
 		} else {
 			mBar.setProgress(progress);
 		}
