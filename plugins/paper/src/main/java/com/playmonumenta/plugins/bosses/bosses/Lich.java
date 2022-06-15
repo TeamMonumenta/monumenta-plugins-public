@@ -939,7 +939,7 @@ public final class Lich extends BossAbilityGroup {
 	private double mTotalDamage = 0;
 
 	@Override
-	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+	public void onHurt(DamageEvent event) {
 		event.setDamage(event.getDamage() / mDefenseScaling);
 		mGotHit = true;
 
@@ -1029,6 +1029,8 @@ public final class Lich extends BossAbilityGroup {
 			}
 		}
 
+		LivingEntity source = event.getSource();
+
 		// Custom Aggro
 		if (mAggro) {
 			mAggro = false;
@@ -1057,12 +1059,7 @@ public final class Lich extends BossAbilityGroup {
 		}
 
 		//damage immunity if over 15 blocks
-		Player player = null;
-		if (source instanceof Player) {
-			player = (Player) source;
-		}
-
-		if (player != null && player.getLocation().distance(mBoss.getLocation()) > 15) {
+		if (source instanceof Player player && player.getLocation().distance(mBoss.getLocation()) > 15) {
 			event.setCancelled(true);
 			player.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 5);
 			mBoss.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 10, 0, 0, 0, 0.1);
@@ -1071,56 +1068,58 @@ public final class Lich extends BossAbilityGroup {
 			return;
 		}
 
-		// teleport
-		mTotalDamage += event.getDamage();
-		Location loc = mBoss.getLocation();
-		if (mTotalDamage / EntityUtils.getMaxHealth(mBoss) >= 0.04
-			&& !mActivated
-			&& !mCutscene
-			&& !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
-			World world = mBoss.getWorld();
-			mTotalDamage = 0;
-			boolean locFound = false;
-			while (!locFound) {
-				double x = FastUtils.randomDoubleInRange(-16, 16);
-				double z = FastUtils.randomDoubleInRange(-16, 16);
-				Location newloc = loc.clone().add(x, 0, z);
-				newloc.setY(mSpawnLoc.clone().getY());
-				if (newloc.distance(mSpawnLoc) < 30 && newloc.getBlock().getType() == Material.AIR) {
-					locFound = true;
-					for (int i = 0; i < 50; i++) {
-						Vector vec = LocationUtils.getDirectionTo(newloc, loc);
-						Location pLoc = mBoss.getEyeLocation();
-						pLoc.add(vec.multiply(i * 0.5));
-						if (pLoc.distance(mBoss.getEyeLocation()) > newloc.distance(loc)) {
-							break;
+		if (source != null) {
+			// teleport
+			mTotalDamage += event.getDamage();
+			Location loc = mBoss.getLocation();
+			if (mTotalDamage / EntityUtils.getMaxHealth(mBoss) >= 0.04
+				    && !mActivated
+				    && !mCutscene
+				    && !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
+				World world = mBoss.getWorld();
+				mTotalDamage = 0;
+				boolean locFound = false;
+				while (!locFound) {
+					double x = FastUtils.randomDoubleInRange(-16, 16);
+					double z = FastUtils.randomDoubleInRange(-16, 16);
+					Location newloc = loc.clone().add(x, 0, z);
+					newloc.setY(mSpawnLoc.clone().getY());
+					if (newloc.distance(mSpawnLoc) < 30 && newloc.getBlock().getType() == Material.AIR) {
+						locFound = true;
+						for (int i = 0; i < 50; i++) {
+							Vector vec = LocationUtils.getDirectionTo(newloc, loc);
+							Location pLoc = mBoss.getEyeLocation();
+							pLoc.add(vec.multiply(i * 0.5));
+							if (pLoc.distance(mBoss.getEyeLocation()) > newloc.distance(loc)) {
+								break;
+							}
+							new PartialParticle(Particle.VILLAGER_ANGRY, pLoc, 1, 0, 0, 0, 0).spawnAsBoss();
 						}
-						new PartialParticle(Particle.VILLAGER_ANGRY, pLoc, 1, 0, 0, 0, 0).spawnAsBoss();
-					}
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							// 10 ticks + final check
-							Vector vector = LocationUtils.getDirectionTo(newloc, loc);
-							for (int i = 0; i < 32; i++) {
-								Location pLoc = mBoss.getEyeLocation();
-								pLoc.add(vector.multiply(i / 2));
-								if (pLoc.distance(mBoss.getEyeLocation()) > newloc.distance(loc)) {
-									break;
-								}
-								BoundingBox box = BoundingBox.of(pLoc, 0.3, 0.3, 0.3);
-								for (Player p : playersInRange(mBoss.getLocation(), detectionRange, true)) {
-									if (p.getBoundingBox().overlaps(box)) {
-										BossUtils.blockableDamage(mBoss, p, DamageType.MAGIC, 20);
+						new BukkitRunnable() {
+							@Override
+							public void run() {
+								// 10 ticks + final check
+								Vector vector = LocationUtils.getDirectionTo(newloc, loc);
+								for (int i = 0; i < 32; i++) {
+									Location pLoc = mBoss.getEyeLocation();
+									pLoc.add(vector.multiply(i / 2));
+									if (pLoc.distance(mBoss.getEyeLocation()) > newloc.distance(loc)) {
+										break;
+									}
+									BoundingBox box = BoundingBox.of(pLoc, 0.3, 0.3, 0.3);
+									for (Player p : playersInRange(mBoss.getLocation(), detectionRange, true)) {
+										if (p.getBoundingBox().overlaps(box)) {
+											BossUtils.blockableDamage(mBoss, p, DamageType.MAGIC, 20);
+										}
 									}
 								}
+								world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 2.0f, 1.0f);
+								world.playSound(newloc, Sound.ENTITY_ENDERMAN_TELEPORT, 2.0f, 1.0f);
+								mBoss.teleport(newloc);
+								this.cancel();
 							}
-							world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 2.0f, 1.0f);
-							world.playSound(newloc, Sound.ENTITY_ENDERMAN_TELEPORT, 2.0f, 1.0f);
-							mBoss.teleport(newloc);
-							this.cancel();
-						}
-					}.runTaskLater(mPlugin, 10);
+						}.runTaskLater(mPlugin, 10);
+					}
 				}
 			}
 		}
