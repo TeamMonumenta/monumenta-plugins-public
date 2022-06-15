@@ -29,7 +29,7 @@ public class JunglesNourishment implements Enchantment {
 	private static final int COOLDOWN = 20 * 25;
 	public static final String CHARM_COOLDOWN = "Jungle's Nourishment Cooldown";
 	public static final String CHARM_HEALTH = "Jungle's Nourishment Health";
-	public static final Material COOLDOWN_ITEM = Material.STICK;
+	public static final Material COOLDOWN_ITEM = Material.MELON_SEEDS;
 
 	@Override
 	public String getName() {
