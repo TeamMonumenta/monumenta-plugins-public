@@ -236,7 +236,7 @@ public class AmplifyingHex extends Ability {
 				if (EntityUtils.hasDamageOverTime(mPlugin, mob)) {
 					debuffCount++;
 					int dotLevel = (int) EntityUtils.getHighestDamageOverTime(mPlugin, mob);
-					amplifierCount += Math.min(mAmplifierCap, dotLevel - 1);
+					amplifierCount += (int) Math.min(mAmplifierCap, dotLevel - 1);
 					// mPlayer.sendMessage("Before: DoT at Level " + dotLevel);
 
 					if (isEnhanced() && dotLevel < 3) {
