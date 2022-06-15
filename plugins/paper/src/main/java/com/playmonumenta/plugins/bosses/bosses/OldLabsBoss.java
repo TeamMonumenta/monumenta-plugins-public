@@ -104,7 +104,7 @@ public class OldLabsBoss extends BossAbilityGroup {
 						mBoss.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 75, 0.2, 0.45, 0.2, 0.2);
 						mBoss.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0.2, 0.45, 0.2, 0.15);
 						for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-							MessagingUtils.sendBoldTitle(player, ChatColor.GOLD + "Elcard", ChatColor.RED + "The Ignoable");
+							MessagingUtils.sendBoldTitle(player, ChatColor.GOLD + "Elcard", ChatColor.RED + "The Ignoble");
 							player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 10, 1.65f);
 							player.playSound(player.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 10, 0.6f);
 						}
