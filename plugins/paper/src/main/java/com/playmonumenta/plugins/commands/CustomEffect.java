@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.DoubleArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.ObjectiveArgument;
 import dev.jorel.commandapi.arguments.ScoreHolderArgument;
@@ -35,7 +36,7 @@ public class CustomEffect {
 
 	@FunctionalInterface
 	private interface SingleArgument {
-		void run(Entity entity, int duration, double amount);
+		void run(Entity entity, int duration, double amount, String source);
 	}
 
 	public static void register() {
@@ -44,15 +45,15 @@ public class CustomEffect {
 		zeroArgumentEffects.put("silence", (Entity entity, int duration) -> Plugin.getInstance().mEffectManager.addEffect(entity, AbilitySilence.GENERIC_NAME, new AbilitySilence(duration)));
 
 		HashMap<String, SingleArgument> singleArgumentEffects = new HashMap<>();
-		singleArgumentEffects.put("speed", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, PercentSpeed.GENERIC_NAME, new PercentSpeed(duration, amount, PercentSpeed.GENERIC_NAME)));
-		singleArgumentEffects.put("damagedealt", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, PercentDamageDealt.GENERIC_NAME, new PercentDamageDealt(duration, amount)));
-		singleArgumentEffects.put("damagereceived", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, PercentDamageReceived.GENERIC_NAME, new PercentDamageReceived(duration, amount)));
-		singleArgumentEffects.put("experience", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, PercentExperience.GENERIC_NAME, new PercentExperience(duration, amount)));
-		singleArgumentEffects.put("attackspeed", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, PercentAttackSpeed.GENERIC_NAME, new PercentAttackSpeed(duration, amount, PercentAttackSpeed.GENERIC_NAME)));
-		singleArgumentEffects.put("knockbackresist", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, PercentKnockbackResist.GENERIC_NAME, new PercentKnockbackResist(duration, amount, PercentKnockbackResist.GENERIC_NAME)));
-		singleArgumentEffects.put("arrowsaving", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, ArrowSaving.GENERIC_NAME, new ArrowSaving(duration, amount)));
-		singleArgumentEffects.put("durabilitysaving", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, DurabilitySaving.GENERIC_NAME, new DurabilitySaving(duration, amount)));
-		singleArgumentEffects.put("soul", (Entity entity, int duration, double amount) -> Plugin.getInstance().mEffectManager.addEffect(entity, BonusSoulThreads.GENERIC_NAME, new BonusSoulThreads(duration, amount)));
+		singleArgumentEffects.put("speed", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, PercentSpeed.GENERIC_NAME), new PercentSpeed(duration, amount, getSource(source, PercentSpeed.GENERIC_NAME))));
+		singleArgumentEffects.put("damagedealt", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, PercentDamageDealt.GENERIC_NAME), new PercentDamageDealt(duration, amount)));
+		singleArgumentEffects.put("damagereceived", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, PercentDamageReceived.GENERIC_NAME), new PercentDamageReceived(duration, amount)));
+		singleArgumentEffects.put("experience", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, PercentExperience.GENERIC_NAME), new PercentExperience(duration, amount)));
+		singleArgumentEffects.put("attackspeed", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, PercentAttackSpeed.GENERIC_NAME), new PercentAttackSpeed(duration, amount, getSource(source, PercentAttackSpeed.GENERIC_NAME))));
+		singleArgumentEffects.put("knockbackresist", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, PercentKnockbackResist.GENERIC_NAME), new PercentKnockbackResist(duration, amount, getSource(source, PercentKnockbackResist.GENERIC_NAME))));
+		singleArgumentEffects.put("arrowsaving", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, ArrowSaving.GENERIC_NAME), new ArrowSaving(duration, amount)));
+		singleArgumentEffects.put("durabilitysaving", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, DurabilitySaving.GENERIC_NAME), new DurabilitySaving(duration, amount)));
+		singleArgumentEffects.put("soul", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, BonusSoulThreads.GENERIC_NAME), new BonusSoulThreads(duration, amount)));
 
 		HashMap<String, String> translations = new HashMap<>();
 		translations.put("stasis", Stasis.GENERIC_NAME);
@@ -86,7 +87,20 @@ public class CustomEffect {
 				new DoubleArgument("amount")
 			).executes((sender, args) -> {
 				for (Entity entity : (Collection<Entity>) args[0]) {
-					singleArgumentEffects.get((String) args[1]).run(entity, (int) (((double) args[2]) * 20), (double) args[3]);
+					singleArgumentEffects.get((String) args[1]).run(entity, (int) (((double) args[2]) * 20), (double) args[3], null);
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
+			.withArguments(
+				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new MultiLiteralArgument(singleArgumentEffects.keySet().toArray(String[]::new)),
+				new DoubleArgument("seconds"),
+				new DoubleArgument("amount"),
+				new GreedyStringArgument("source")
+			).executes((sender, args) -> {
+				for (Entity entity : (Collection<Entity>) args[0]) {
+					singleArgumentEffects.get((String) args[1]).run(entity, (int) (((double) args[2]) * 20), (double) args[3], (String) args[4]);
 				}
 			}).register();
 
@@ -113,7 +127,22 @@ public class CustomEffect {
 			).executes((sender, args) -> {
 				int duration = getDuration((String) args[3], (double) args[2]);
 				for (Entity entity : (Collection<Entity>) args[0]) {
-					singleArgumentEffects.get((String) args[1]).run(entity, duration, (double) args[4]);
+					singleArgumentEffects.get((String) args[1]).run(entity, duration, (double) args[4], null);
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
+			.withArguments(
+				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new MultiLiteralArgument(singleArgumentEffects.keySet().toArray(String[]::new)),
+				new DoubleArgument("time"),
+				new MultiLiteralArgument("minutes", "seconds", "ticks"),
+				new DoubleArgument("amount"),
+				new GreedyStringArgument("source")
+			).executes((sender, args) -> {
+				int duration = getDuration((String) args[3], (double) args[2]);
+				for (Entity entity : (Collection<Entity>) args[0]) {
+					singleArgumentEffects.get((String) args[1]).run(entity, duration, (double) args[4], (String) args[5]);
 				}
 			}).register();
 
@@ -143,7 +172,7 @@ public class CustomEffect {
 				for (Entity entity : (Collection<Entity>) args[0]) {
 					int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue(entity, (String) args[2]).orElse(0));
 					if (duration > 0) {
-						singleArgumentEffects.get((String) args[1]).run(entity, duration, (double) args[4]);
+						singleArgumentEffects.get((String) args[1]).run(entity, duration, (double) args[4], null);
 					}
 				}
 			}).register();
@@ -176,7 +205,7 @@ public class CustomEffect {
 				int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue((String) args[4], (String) args[2]).orElse(0));
 				for (Entity entity : (Collection<Entity>) args[0]) {
 					if (duration > 0) {
-						singleArgumentEffects.get((String) args[1]).run(entity, duration, (double) args[5]);
+						singleArgumentEffects.get((String) args[1]).run(entity, duration, (double) args[5], null);
 					}
 				}
 			}).register();
@@ -207,5 +236,13 @@ public class CustomEffect {
 			case "seconds" -> (int) (num * 20);
 			default -> (int) num;
 		};
+	}
+
+	private static String getSource(String provided, String generic) {
+		if (provided == null || provided.isEmpty()) {
+			return generic;
+		} else {
+			return provided;
+		}
 	}
 }
