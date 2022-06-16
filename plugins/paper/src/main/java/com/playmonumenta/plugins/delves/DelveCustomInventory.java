@@ -129,7 +129,7 @@ public class DelveCustomInventory extends CustomInventory {
 		mTotalPoint += Entropy.getDepthPointsAssigned(mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0));
 		mTotalPoint += (mPointSelected.getOrDefault(DelvesModifier.TWISTED, 0) * 5);
 
-		mTotalPoint = Math.min(DelvesUtils.MAX_DEPTH_POINTS, mTotalPoint);
+		mTotalPoint = Math.max(Math.min(DelvesUtils.MAX_DEPTH_POINTS, mTotalPoint), 0);
 
 
 		mInventory.setItem(TOTAL_POINT_SLOT, getSummary());
@@ -339,6 +339,13 @@ public class DelveCustomInventory extends CustomInventory {
 						mPointSelected.put(mod, finaPoint);
 						playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.BLOCK_STONE_PLACE, 1f, 1.5f);
 					}
+					int newPoint = mPointSelected.getOrDefault(mod, 0);
+					if (mod == DelvesModifier.ENTROPY) {
+						if (newPoint < mIgnoreOldEntropyPoint) {
+							mIgnoreOldEntropyPoint = newPoint;
+						}
+					}
+
 				}
 			}
 
