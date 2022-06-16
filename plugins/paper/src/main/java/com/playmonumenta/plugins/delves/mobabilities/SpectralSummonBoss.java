@@ -45,7 +45,7 @@ public class SpectralSummonBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		if (!EntityUtils.isElite(mBoss) && !DelvesUtils.isDelveMob(mBoss) && EntityUtils.isHostileMob(mBoss)) {
+		if (event != null && !EntityUtils.isElite(mBoss) && !DelvesUtils.isDelveMob(mBoss) && EntityUtils.isHostileMob(mBoss)) {
 			double chance = FastUtils.RANDOM.nextDouble();
 			if (chance < mParam.SPAWN_CHANCE) {
 				Location loc = mBoss.getLocation();

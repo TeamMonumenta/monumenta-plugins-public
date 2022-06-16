@@ -42,7 +42,7 @@ public class DreadfulSummonBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		if (EntityUtils.isElite(mBoss) && !DelvesUtils.isDelveMob(mBoss)) {
+		if (event != null && EntityUtils.isElite(mBoss) && !DelvesUtils.isDelveMob(mBoss)) {
 			if (FastUtils.RANDOM.nextDouble() < mParam.SPAWN_CHANCE) {
 				Location loc = mBoss.getLocation();
 				if (loc.getBlock().getType() == Material.WATER) {
