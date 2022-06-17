@@ -35,6 +35,10 @@ public class FastUtils {
 		return min == max ? min : (RANDOM.nextDouble() * (max - min)) + min;
 	}
 
+	public static float randomFloatInRange(float min, float max) {
+		return min == max ? min : (RANDOM.nextFloat() * (max - min)) + min;
+	}
+
 	/**
 	 * Fast, reduced-accuracy sin implementation
 	 *
