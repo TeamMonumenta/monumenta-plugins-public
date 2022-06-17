@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.protocollib.VirtualItemsReplacer;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -199,10 +201,9 @@ public class VanityManager implements Listener {
 			nbtItem.removeKey("BlockEntityTag"); // shulker contents, and also other invisible block entity data
 		}
 		if (nbtItem.getType("display") == NBTType.NBTTagCompound) {
-			// display name and lore (plain.display.xyz is kept for RP purposes)
+			// display lore (plain.display.Lore is kept for RP purposes)
 			NBTCompound display = nbtItem.getCompound("display");
 			display.removeKey("Lore");
-			display.removeKey("name");
 		}
 		nbtItem.removeKey("pages"); // book contents
 		NBTCompound monumenta = nbtItem.getCompound(ItemStatUtils.MONUMENTA_KEY);
@@ -291,10 +292,19 @@ public class VanityManager implements Listener {
 		};
 	}
 
-	public static void applyVanity(ItemStack itemStack, VanityData vanityData, EquipmentSlot equipmentSlot) {
+	/**
+	 * Applies vanity to the given item, Modifies the passed-in item stack!
+	 *
+	 * @param itemStack     Real item stack to apply vanity to (will be modified!)
+	 * @param vanityData    Vanity data for the player
+	 * @param equipmentSlot The item's slot
+	 * @param self          Whether this is for the player's own equipment or not. Affects offhands.
+	 */
+	public static void applyVanity(ItemStack itemStack, VanityData vanityData, EquipmentSlot equipmentSlot, boolean self) {
 		ItemStack vanityItem = vanityData.getEquipped(equipmentSlot);
 		if (vanityItem != null && vanityItem.getType() != Material.AIR) {
-			if (equipmentSlot == EquipmentSlot.OFF_HAND
+			if (self
+				    && equipmentSlot == EquipmentSlot.OFF_HAND
 				    && (itemStack.getMaxItemUseDuration() > 0 || vanityItem.getMaxItemUseDuration() > 0)
 				    && itemStack.getType() != vanityItem.getType()) {
 				// don't allow changing item type of useable items (e.g. food, shields) to prevent not being slowed down while using them or just messing with their use in general
@@ -319,25 +329,37 @@ public class VanityManager implements Listener {
 			}
 			ItemMeta originalMeta = itemStack.getItemMeta();
 
-			// copy over durability, adjusted for potentially changed max durability
 			if (vanityMeta instanceof Damageable vanityDamage
-				    && vanityItem.getType().getMaxDurability() > 0
-				    && originalMeta instanceof Damageable originalDamage
-				    && itemStack.getType().getMaxDurability() > 0
-				    && !originalMeta.isUnbreakable()) {
-				vanityMeta.setUnbreakable(false);
-				vanityDamage.setDamage((int) Math.round(1.0 * vanityItem.getType().getMaxDurability() * originalDamage.getDamage() / itemStack.getType().getMaxDurability()));
+				    && vanityItem.getType().getMaxDurability() > 0) {
+				// Copy over durability, adjusted for potentially changed max durability,
+				// or remove any damage present if the original item is unbreakable
+				if (originalMeta instanceof Damageable originalDamage
+					    && itemStack.getType().getMaxDurability() > 0
+					    && !originalMeta.isUnbreakable()) {
+					vanityMeta.setUnbreakable(false);
+					vanityDamage.setDamage((int) Math.round(1.0 * vanityItem.getType().getMaxDurability() * originalDamage.getDamage() / itemStack.getType().getMaxDurability()));
+				} else if (!vanityMeta.isUnbreakable()) {
+					vanityDamage.setDamage(0);
+				}
 			}
 
 			// copy display name and lore, but not plain ones
+			Component vanityDisplayName = vanityMeta.displayName();
 			if (originalMeta != null) {
-				vanityMeta.displayName(originalMeta.displayName());
+				vanityMeta.displayName(Objects.requireNonNullElseGet(originalMeta.displayName(),
+					() -> Component.translatable(itemStack.getType().getTranslationKey()).decoration(TextDecoration.ITALIC, false)));
 			}
 			List<Component> lore = originalMeta == null || originalMeta.lore() == null ? new ArrayList<>() : new ArrayList<>(originalMeta.lore());
 			if (invisible) {
 				lore.add(0, Component.text("Invisibility vanity skin applied", NamedTextColor.GOLD));
 			} else {
-				lore.add(0, Component.text("Vanity skin: ", NamedTextColor.GOLD).append(ItemUtils.getPlainNameComponent(vanityItem)));
+				// This does not use the plain name as that cuts off some characters
+				if (vanityDisplayName != null) {
+					vanityDisplayName = Component.text(MessagingUtils.plainText(vanityDisplayName));
+				} else {
+					vanityDisplayName = Component.translatable(vanityItem.getType().getTranslationKey());
+				}
+				lore.add(0, Component.text("Vanity skin: ", NamedTextColor.GOLD).append(vanityDisplayName));
 			}
 			// add durability lore line if vanity item is unbreakable
 			if (originalMeta instanceof Damageable originalDamage

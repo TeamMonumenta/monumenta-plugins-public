@@ -56,6 +56,7 @@ import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
@@ -654,7 +655,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 						vanityItem.setItemMeta(meta);
 					}
 				} else {
-					VanityManager.applyVanity(vanityItem, vanityData, slot);
+					VanityManager.applyVanity(vanityItem, vanityData, slot, false);
 				}
 				return vanityItem;
 			}
@@ -674,6 +675,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		if (event.getClick() == ClickType.DOUBLE_CLICK) {
+			return;
+		}
 
 		int slot = event.getSlot();
 		Inventory inv = event.getClickedInventory();
@@ -946,10 +950,12 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 		for (Equipment equipment : Equipment.values()) {
 			ItemStack leftItem = mLeftStats.mDisplayedEquipment.get(equipment);
-			mInventory.setItem(equipment.mLeftSlot, leftItem != null ? leftItem : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && !mSelectedRightEquipmentSet));
+			mInventory.setItem(equipment.mLeftSlot, leftItem != null && leftItem.getType() != Material.AIR ? leftItem
+				                                        : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && !mSelectedRightEquipmentSet));
 
 			ItemStack rightItem = mRightStats.mDisplayedEquipment.get(equipment);
-			mInventory.setItem(equipment.mRightSlot, rightItem != null ? rightItem : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && mSelectedRightEquipmentSet));
+			mInventory.setItem(equipment.mRightSlot, rightItem != null && rightItem.getType() != Material.AIR ? rightItem
+				                                         : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && mSelectedRightEquipmentSet));
 		}
 
 		mInventory.setItem(28, getWarningIcon(mLeftStats));

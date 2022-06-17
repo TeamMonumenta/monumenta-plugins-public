@@ -94,7 +94,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 					case 8 -> EquipmentSlot.FEET;
 					default -> EquipmentSlot.OFF_HAND;
 				};
-				VanityManager.applyVanity(itemStack, vanityData, equipmentSlot);
+				VanityManager.applyVanity(itemStack, vanityData, equipmentSlot, true);
 			}
 		}
 	}
