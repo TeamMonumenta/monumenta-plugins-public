@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.infusions.Refresh;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -102,7 +103,7 @@ public class RageOfTheKeter implements Enchantment {
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1, OLIVE_COLOR).spawnAsPlayerBuff(player);
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1, GREEN_COLOR).spawnAsPlayerBuff(player);
 			world.playSound(player.getLocation(), Sound.ENTITY_STRIDER_EAT, 1, 0.85f);
-			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
+			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, Refresh.reduceCooldown(plugin, player, COOLDOWN));
 			player.setCooldown(COOLDOWN_ITEM, cooldown);
 			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()), new ItemCooldown(cooldown, item, plugin));
 		}

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.effects.ItemCooldown;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.infusions.Refresh;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -59,7 +60,7 @@ public class JunglesNourishment implements Enchantment {
 			double heal = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEALTH, HEAL);
 			PlayerUtils.healPlayer(plugin, player, heal, player);
 			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RECEIVED));
-			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
+			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, Refresh.reduceCooldown(plugin, player, COOLDOWN));
 			player.setCooldown(COOLDOWN_ITEM, cooldown);
 			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()), new ItemCooldown(cooldown, item, plugin));
 			player.setFoodLevel(24);

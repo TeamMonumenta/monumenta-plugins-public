@@ -143,7 +143,7 @@ public class PhlegmaticResolve extends Ability {
 				mLastMaxDamage = event.getDamage();
 
 				// Set the event to be cancelled also, so that it doesn't mess with invincibiility ticks.
-				event.isCancelled();
+				event.setCancelled(true);
 			}
 
 			if (damageSplit > 0) {

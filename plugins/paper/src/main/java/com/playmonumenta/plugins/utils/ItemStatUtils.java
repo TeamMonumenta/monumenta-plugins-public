@@ -602,6 +602,7 @@ public class ItemStatUtils {
 		PENNATE(new Pennate(), "", true, false, false),
 		PERSPICACITY(new Perspicacity(), "", true, false, false),
 		REFLECTION(new Reflection(), "", true, false, false),
+		REFRESH(new Refresh(), "", true, false, false),
 		TENACITY(new Tenacity(), "", true, false, false),
 		UNDERSTANDING(new Understanding(), "", true, false, false),
 		UNYIELDING(new Unyielding(), "", true, false, false),
