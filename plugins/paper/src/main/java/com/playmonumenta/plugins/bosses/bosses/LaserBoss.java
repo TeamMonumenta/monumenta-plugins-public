@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
@@ -29,7 +30,7 @@ public class LaserBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public int DAMAGE = 0;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "not written", deprecated = true)
 		public int DETECTION = 30;
 
 		@BossParam(help = "not written")
@@ -47,7 +48,7 @@ public class LaserBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public boolean CAN_MOVE = false;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "not written", deprecated = true)
 		public boolean SINGLE_TARGET = false;
 
 		@BossParam(help = "not written")
@@ -93,7 +94,7 @@ public class LaserBoss extends BossAbilityGroup {
 			//same object
 			//probably an older mob version?
 			//build a new target from others config
-			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL), Arrays.asList(PLAYERFILTER.HAS_LINEOFSIGHT));
+			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL), List.of(PLAYERFILTER.HAS_LINEOFSIGHT));
 			//by default LaserBoss don't take player in stealt and need LINEOFSIGHT to cast.
 		}
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
@@ -144,7 +145,7 @@ public class LaserBoss extends BossAbilityGroup {
 					})
 		));
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(activeSpells, Collections.emptyList(), (int) (p.TARGETS.getRange() * 2), null, p.DELAY);
 	}
 }
 

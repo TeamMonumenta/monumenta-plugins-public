@@ -36,7 +36,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public double SPEED = 0.4;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "not written", deprecated = true)
 		public int DETECTION = 24;
 
 		@BossParam(help = "Delay of the first spell, then cooldown is used to determinate when this spell will cast again")
@@ -51,7 +51,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public double HITBOX_LENGTH = 0.5;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "not written", deprecated = true)
 		public boolean SINGLE_TARGET = true;
 
 		@BossParam(help = "not written")
@@ -172,7 +172,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 					})
 		));
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(activeSpells, Collections.emptyList(), (int) (p.TARGETS.getRange() * 2), null, p.DELAY);
 
 	}
 }

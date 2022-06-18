@@ -114,7 +114,7 @@ public abstract class BossParameters {
 					String soFar = reader.readSoFar();
 					List<Tooltip<String>> suggArgs = new ArrayList<>(fields.length);
 					for (Map.Entry<String, TypeAndDesc> valid : validParams.entrySet()) {
-						if (valid.getKey().startsWith(remaining) && !usedParams.contains(valid.getKey())) {
+						if (valid.getKey().startsWith(remaining) && !usedParams.contains(valid.getKey()) && !valid.getValue().getDeprecated()) {
 							Object def = valid.getValue().getField().get(parameters);
 							final String defStr;
 							if (def instanceof PotionEffectType) {

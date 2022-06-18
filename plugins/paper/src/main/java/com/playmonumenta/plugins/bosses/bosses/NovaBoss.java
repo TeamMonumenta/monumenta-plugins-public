@@ -21,7 +21,7 @@ public final class NovaBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_nova";
 
 	public static class Parameters extends BossParameters {
-		@BossParam(help = "not written")
+		@BossParam(help = "you should use TARGETS instead of this param.", deprecated = true)
 		public int RADIUS = 9;
 		@BossParam(help = "not written")
 		public int DAMAGE = 0;
@@ -29,13 +29,13 @@ public final class NovaBoss extends BossAbilityGroup {
 		public int DELAY = 100;
 		@BossParam(help = "not written")
 		public int DURATION = 70;
-		@BossParam(help = "not written")
+		@BossParam(help = "not written", deprecated = true)
 		public int DETECTION = 40;
 		@BossParam(help = "not written")
 		public int COOLDOWN = 8 * 20;
 		@BossParam(help = "not written")
 		public boolean CAN_MOVE = false;
-		@BossParam(help = "You should not use this. use TARGETS instead.")
+		@BossParam(help = "You should not use this. use TARGETS instead.", deprecated = true)
 		public boolean NEED_LINE_OF_SIGHT = true;
 
 		@BossParam(help = "not written")
@@ -86,10 +86,10 @@ public final class NovaBoss extends BossAbilityGroup {
 			p.NEED_LINE_OF_SIGHT = false;
 		}
 		SpellManager activeSpells = new SpellManager(List.of(
-			new SpellBaseAoE(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE) {
+			new SpellBaseAoE(plugin, boss, (int) p.TARGETS.getRange(), p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE) {
 				@Override
 				protected void chargeAuraAction(Location loc) {
-					p.PARTICLE_AIR.spawn(loc, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, 0.05);
+					p.PARTICLE_AIR.spawn(loc, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, 0.05);
 				}
 
 				@Override
@@ -122,6 +122,6 @@ public final class NovaBoss extends BossAbilityGroup {
 				}
 			}));
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(activeSpells, Collections.emptyList(), (int) (p.TARGETS.getRange() * 2), null, p.DELAY);
 	}
 }
