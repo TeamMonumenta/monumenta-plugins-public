@@ -30,6 +30,7 @@ public class DelveCustomInventory extends CustomInventory {
 	private static final ItemStack SELECT_ALL_MOD_ITEM = getSelectAllModifiers();
 	private static final ItemStack REMOVE_ALL_MOD_ITEM = getResetModifiers();
 	private static final ItemStack STARTING_ITEM = new ItemStack(Material.OBSERVER);
+	private static final ItemStack STARTING_ITEM_NOT_ENOUGH_POINTS = new ItemStack(Material.OBSERVER);
 
 	private static final Map<String, String> DUNGEON_FUNCTION_MAPPINGS = new HashMap<>();
 
@@ -40,10 +41,14 @@ public class DelveCustomInventory extends CustomInventory {
 
 		meta = STARTING_ITEM.getItemMeta();
 		meta.displayName(Component.text("Start delve!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+		STARTING_ITEM.setItemMeta(meta);
+
+		meta = STARTING_ITEM_NOT_ENOUGH_POINTS.getItemMeta();
+		meta.displayName(Component.text("Start delve!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 		List<Component> lore = new ArrayList<>();
 		lore.add(Component.text("- Requires " + DelvesUtils.MINIMUM_DEPTH_POINTS + " Depth Points to begin", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		meta.lore(lore);
-		STARTING_ITEM.setItemMeta(meta);
+		STARTING_ITEM_NOT_ENOUGH_POINTS.setItemMeta(meta);
 
 		meta = SELECT_ALL_MOD_ITEM.getItemMeta();
 		meta.displayName(Component.text("Select all modifiers!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
@@ -123,10 +128,12 @@ public class DelveCustomInventory extends CustomInventory {
 		for (DelvesModifier mod : mods) {
 			mTotalPoint += mPointSelected.getOrDefault(mod, 0);
 		}
-		//ignore old entropy point so the count don't stack
-		mTotalPoint -= Entropy.getDepthPointsAssigned(mIgnoreOldEntropyPoint);
-
-		mTotalPoint += Entropy.getDepthPointsAssigned(mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0));
+		// Ignore old entropy point so the count doesn't stack. Also, only count up to how many delve points can still be randomly assigned.
+		int entropy = Entropy.getDepthPointsAssigned(mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0)) - Entropy.getDepthPointsAssigned(mIgnoreOldEntropyPoint);
+		int entropyAssignablePoints = mods.stream().filter(mod -> mod != DelvesModifier.ENTROPY)
+			.mapToInt(mod -> DelvesUtils.getMaxPointAssignable(mod, 1000) - mPointSelected.getOrDefault(mod, 0))
+			.sum();
+		mTotalPoint += Math.min(entropy, entropyAssignablePoints);
 		mTotalPoint += (mPointSelected.getOrDefault(DelvesModifier.TWISTED, 0) * 5);
 
 		mTotalPoint = Math.max(Math.min(DelvesUtils.MAX_DEPTH_POINTS, mTotalPoint), 0);
@@ -134,7 +141,11 @@ public class DelveCustomInventory extends CustomInventory {
 
 		mInventory.setItem(TOTAL_POINT_SLOT, getSummary());
 		if (mEditableDelvePoint) {
-			mInventory.setItem(START_SLOT, STARTING_ITEM);
+			if (mTotalPoint < 5) {
+				mInventory.setItem(START_SLOT, STARTING_ITEM_NOT_ENOUGH_POINTS);
+			} else {
+				mInventory.setItem(START_SLOT, STARTING_ITEM);
+			}
 		}
 
 		mods = DelvesModifier.valuesList();
@@ -154,16 +165,15 @@ public class DelveCustomInventory extends CustomInventory {
 
 		if (mPage > 0) {
 			mInventory.setItem(PAGE_LEFT_SLOT, getPreviousPage());
-		} else {
+		} else if (mEditableDelvePoint) {
 			mInventory.setItem(PAGE_LEFT_SLOT, REMOVE_ALL_MOD_ITEM);
 		}
 
 		if (TOTAL_DELVE_MOD - ((mPage + 1) * 7) > 0) {
 			mInventory.setItem(PAGE_RIGHT_SLOT, getNextPage());
-		} else {
+		} else if (mEditableDelvePoint) {
 			mInventory.setItem(PAGE_RIGHT_SLOT, SELECT_ALL_MOD_ITEM);
 		}
-
 
 		for (int i = 0; i < 54; i++) {
 			if (mInventory.getItem(i) == null) {
@@ -257,7 +267,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 		lore.add(Component.text(""));
 
-		if (depthPoints == DelvesUtils.MAX_DEPTH_POINTS) {
+		if (depthPoints >= DelvesUtils.MAX_DEPTH_POINTS) {
 			lore.add(Component.text("- All DelvesModifiers Advancement Granted upon Completion", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 		} else {
 			lore.add(Component.text("- All DelvesModifiers Advancement Granted upon Completion", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
@@ -317,10 +327,10 @@ public class DelveCustomInventory extends CustomInventory {
 
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
+		event.setCancelled(true);
 		if (!mInventory.equals(event.getClickedInventory())) {
 			return;
 		}
-		event.setCancelled(true);
 
 		Player playerWhoClicked = (Player) event.getWhoClicked();
 		int slot = event.getSlot();
@@ -339,8 +349,8 @@ public class DelveCustomInventory extends CustomInventory {
 						mPointSelected.put(mod, finaPoint);
 						playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.BLOCK_STONE_PLACE, 1f, 1.5f);
 					}
-					int newPoint = mPointSelected.getOrDefault(mod, 0);
 					if (mod == DelvesModifier.ENTROPY) {
+						int newPoint = mPointSelected.getOrDefault(mod, 0);
 						if (newPoint < mIgnoreOldEntropyPoint) {
 							mIgnoreOldEntropyPoint = newPoint;
 						}
@@ -361,7 +371,6 @@ public class DelveCustomInventory extends CustomInventory {
 					mPointSelected.put(mod, DelvesUtils.getMaxPointAssignable(mod, 1000));
 				}
 			}
-
 		}
 
 		if (slot == PAGE_LEFT_SLOT) {

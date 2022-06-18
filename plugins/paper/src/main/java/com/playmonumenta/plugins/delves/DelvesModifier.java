@@ -55,6 +55,9 @@ public enum DelvesModifier {
 	DelvesModifier(int index, BiConsumer<LivingEntity, Integer> applying, ItemStack stack, String[][] rankDescriptions, int column) {
 		mIndex = index;
 		mApplyFunc = applying;
+		ItemMeta meta = stack.getItemMeta();
+		meta.addItemFlags(ItemFlag.values());
+		stack.setItemMeta(meta);
 		mIcon = stack;
 		mRankDescriptions = rankDescriptions;
 		mOldColumn = column;
