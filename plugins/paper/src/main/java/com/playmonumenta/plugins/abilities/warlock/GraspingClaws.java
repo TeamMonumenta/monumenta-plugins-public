@@ -252,25 +252,25 @@ public class GraspingClaws extends Ability {
 
 					List<Integer> degreesToKeep = new ArrayList<>();
 					for (int d = 0; d < 360; d += 3) {
-						mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(CAGE_RADIUS * FastUtils.cosDeg(d), 0, CAGE_RADIUS * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE);
-						mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(CAGE_RADIUS * FastUtils.cosDeg(d), 5, CAGE_RADIUS * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE);
+						mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(mRadius * FastUtils.cosDeg(d), 0, mRadius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE);
+						mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(mRadius * FastUtils.cosDeg(d), 5, mRadius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE);
 
 						if (mDegrees1.contains(d)) {
-							mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(CAGE_RADIUS * FastUtils.cosDeg(d), 5.5, CAGE_RADIUS * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE);
+							mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(mRadius * FastUtils.cosDeg(d), 5.5, mRadius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE);
 							if (FastUtils.randomDoubleInRange(0, 1) < 0.5) {
 								mDegrees1.remove((Integer) d);
 							}
 						}
 
 						if (mDegrees2.contains(d)) {
-							mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(CAGE_RADIUS * FastUtils.cosDeg(d), 6, CAGE_RADIUS * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE);
+							mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(mRadius * FastUtils.cosDeg(d), 6, mRadius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE);
 							if (FastUtils.randomDoubleInRange(0, 1) < 0.5) {
 								mDegrees2.remove((Integer) d);
 							}
 						}
 
 						if (mDegrees3.contains(d)) {
-							mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(CAGE_RADIUS * FastUtils.cosDeg(d), 6.75, CAGE_RADIUS * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE);
+							mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(mRadius * FastUtils.cosDeg(d), 6.75, mRadius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE);
 						}
 
 						if (FastUtils.randomDoubleInRange(0, 1) < 0.25) {
