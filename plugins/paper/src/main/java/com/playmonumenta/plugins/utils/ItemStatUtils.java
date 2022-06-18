@@ -503,6 +503,7 @@ public class ItemStatUtils {
 		HIDE_ATTRIBUTES(new HideAttributes(), false, false, false),
 		HIDE_ENCHANTS(new HideEnchants(), false, false, false),
 		HIDE_INFO(new HideInfo(), false, false, false),
+		NO_GLINT(new NoGlint(), false, false, false),
 		ANTI_CRIT_SCALING(new AntiCritScaling(), false, false, false),
 		CRIT_SCALING(new CritScaling(), false, false, false),
 		STRENGTH_APPLY(new StrengthApply(), false, false, false),
@@ -561,10 +562,11 @@ public class ItemStatUtils {
 
 		public boolean isHidden() {
 			return this == MAINHAND_OFFHAND_DISABLE
-				|| this == OFFHAND_MAINHAND_DISABLE
-				|| this == HIDE_ATTRIBUTES
-				|| this == HIDE_ENCHANTS
-				|| this == HIDE_INFO;
+				       || this == OFFHAND_MAINHAND_DISABLE
+				       || this == HIDE_ATTRIBUTES
+				       || this == HIDE_ENCHANTS
+				       || this == HIDE_INFO
+				       || this == NO_GLINT;
 		}
 
 		public Component getDisplay(int level) {
@@ -2046,10 +2048,11 @@ public class ItemStatUtils {
 			meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME, 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 
-		if (item.getType() == Material.BOW || item.getType() == Material.CROSSBOW) {
-			meta.addEnchant(Enchantment.WATER_WORKER, 1, true);
+		Enchantment placeholder = ItemUtils.isSomeBow(item) ? Enchantment.WATER_WORKER : Enchantment.ARROW_DAMAGE;
+		if (getEnchantmentLevel(item, EnchantmentType.NO_GLINT) > 0) {
+			meta.removeEnchant(placeholder);
 		} else {
-			meta.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
+			meta.addEnchant(placeholder, 1, true);
 		}
 
 		item.setItemMeta(meta);

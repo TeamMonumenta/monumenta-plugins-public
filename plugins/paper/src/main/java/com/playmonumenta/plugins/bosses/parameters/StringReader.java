@@ -244,6 +244,7 @@ public class StringReader {
 	}
 
 	public <E extends Enum<?>> @Nullable E readEnum(E[] values) {
+		skipWhitespace();
 		String remain = remaining();
 
 		for (E value : values) {

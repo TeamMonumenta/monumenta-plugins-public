@@ -28,6 +28,9 @@ public class ChargerBoss extends BossAbilityGroup {
 		public int DAMAGE = 15;
 
 		@BossParam(help = "not written")
+		public DamageType DAMAGE_TYPE = DamageType.MELEE;
+
+		@BossParam(help = "not written")
 		public int DURATION = 25;
 
 		@BossParam(help = "not written")
@@ -127,7 +130,7 @@ public class ChargerBoss extends BossAbilityGroup {
 			(LivingEntity target) -> {
 				p.PARTICLE_HIT.spawn(target.getEyeLocation(), 0.4d, 0.4d, 0.4d, 0.4d);
 				if (p.DAMAGE > 0) {
-					BossUtils.blockableDamage(boss, target, DamageType.MELEE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+					BossUtils.blockableDamage(boss, target, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
 				}
 
 				if (p.DAMAGE_PERCENTAGE > 0.0) {

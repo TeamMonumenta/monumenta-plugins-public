@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.commands.BossTagCommand.TypeAndDesc;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import dev.jorel.commandapi.Tooltip;
 import java.lang.reflect.Field;
@@ -274,12 +273,18 @@ public abstract class BossParameters {
 							return ParseResult.of(result.getTooltip());
 						}
 						validType.getField().set(parameters, result.getResult());
-					} else if (validTypeClass == DamageEvent.DamageType.class) {
-						ParseResult<DamageEvent.DamageType> result = DamageEvent.DamageType.fromReader(reader, validType.getDesc());
-						if (result.getTooltip() != null) {
-							return ParseResult.of(result.getTooltip());
+					} else if (Enum.class.isAssignableFrom(validTypeClass)) {
+						Object val = reader.readEnum(((Class<? extends Enum>) validTypeClass).getEnumConstants());
+						if (val == null) {
+							// Entry not valid, offer all entries as completions
+							List<Tooltip<String>> suggArgs = new ArrayList<>();
+							String soFar = reader.readSoFar();
+							for (Enum<?> valid : ((Class<? extends Enum>) validTypeClass).getEnumConstants()) {
+								suggArgs.add(Tooltip.of(soFar + valid.name(), validType.getDesc()));
+							}
+							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 						}
-						validType.getField().set(parameters, result.getResult());
+						validType.getField().set(parameters, val);
 					} else {
 						return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "Not supported yet: " + validTypeClass.toString(), "")));
 					}

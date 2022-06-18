@@ -30,8 +30,8 @@ public class ScorchedEarthDamage extends Effect {
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
 		DamageType type = event.getType();
-		if (type != DamageType.AILMENT && type != DamageType.FIRE && type != DamageType.OTHER && event.getAbility() != ClassAbility.SCORCHED_EARTH) {
-			DamageUtils.damage(mAlchemist, entity, DamageType.MAGIC, mDamage, ClassAbility.SCORCHED_EARTH, true, false);
+		if (type != DamageType.AILMENT && type != DamageType.FIRE && type != DamageType.OTHER && type != DamageType.WARRIOR_AOE_OTHER && event.getAbility() != ClassAbility.SCORCHED_EARTH) {
+			DamageUtils.damage(mAlchemist, entity, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.SCORCHED_EARTH, mStats), mAmount, true, false, false);
 			World world = entity.getWorld();
 			Location loc = entity.getLocation().clone().add(0, 1, 0);
 			world.spawnParticle(Particle.FLAME, loc, 5, 0.25, 0.5, 0.25, 0.05);

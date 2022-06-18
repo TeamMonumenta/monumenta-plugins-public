@@ -19,13 +19,13 @@ public class ParticlesList {
 	private static final EnumSet<Particle> PARTICLES_WITH_PARAMETERS = EnumSet.of(Particle.REDSTONE, Particle.ITEM_CRACK, Particle.BLOCK_CRACK, Particle.BLOCK_DUST, Particle.FALLING_DUST);
 
 	public static class CParticle {
-		Particle mParticle;
-		int mCount;
-		double mDx;
-		double mDy;
-		double mDz;
-		double mVelocity;
-		Object mExtra2; //used when we have a particle that is inside PARTICLE_MATERIALS or Particle.REDSTONE
+		public Particle mParticle;
+		public int mCount;
+		public double mDx;
+		public double mDy;
+		public double mDz;
+		public double mVelocity;
+		public Object mExtra2; //used when we have a particle that is inside PARTICLE_MATERIALS or Particle.REDSTONE
 
 		public CParticle(Particle particle) {
 			this(particle, 1, 0, 0, 0);
@@ -85,7 +85,6 @@ public class ParticlesList {
 			double fdz = mDz != 0 ? mDz : dz;
 			double fVelocity = mVelocity != 0.0d ? mVelocity : extra1;
 			spawnNow(loc, fdx, fdy, fdz, fVelocity, mExtra2);
-
 		}
 
 		private void spawnNow(Location loc, double dx, double dy, double dz, double extra1, Object extra2) {
@@ -116,27 +115,23 @@ public class ParticlesList {
 		return mParticleList.isEmpty();
 	}
 
+	public List<CParticle> getParticleList() {
+		return mParticleList;
+	}
+
 	public void spawn(Location loc) {
 		spawn(loc, 0, 0, 0);
 	}
 
 	public void spawn(Location loc, double dx, double dy, double dz) {
-		spawn(loc, dx, dy, dz, null);
+		for (CParticle particle : mParticleList) {
+			particle.spawn(loc, dx, dy, dz);
+		}
 	}
 
-	public <F> void spawn(Location loc, double dx, double dy, double dz, F extra1) {
+	public void spawn(Location loc, double dx, double dy, double dz, double extra1) {
 		for (CParticle particle : mParticleList) {
-			if (extra1 instanceof Double) {
-				particle.spawn(loc, dx, dy, dz, (Double) extra1);
-			} else if (extra1 instanceof Float) {
-				particle.spawn(loc, dx, dy, dz, ((Float) extra1).doubleValue());
-			} else if (extra1 instanceof Integer) {
-				particle.spawn(loc, dx, dy, dz, ((Integer) extra1).doubleValue());
-			} else if (extra1 == null) {
-				particle.spawn(loc, dx, dy, dz);
-			} else {
-				Plugin.getInstance().getLogger().warning("[Particle List] Error during spawn for param. extra1 is not a number. Value: " + extra1);
-			}
+			particle.spawn(loc, dx, dy, dz, extra1);
 		}
 	}
 

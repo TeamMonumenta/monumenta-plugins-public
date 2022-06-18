@@ -82,6 +82,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		Vector yVelocity = new Vector(0, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, dir.getY() * 0.2 + 0.3), 0);
 		mPlayer.setVelocity(dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1.4)).add(yVelocity));
 		MessagingUtils.sendActionBarMessage(mPlayer, "Glorious Battle Stacks: " + mStacks);
+		ClientModHandler.updateAbility(mPlayer, this);
 		Location location = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 		world.playSound(location, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 2f, 0.5f);

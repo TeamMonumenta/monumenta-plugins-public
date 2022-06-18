@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.delves.abilities;
 
 import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.bosses.bosses.CommanderBoss;
+import com.playmonumenta.plugins.bosses.bosses.DodgeBoss;
 import com.playmonumenta.plugins.bosses.bosses.ProjectileBoss;
 import com.playmonumenta.plugins.bosses.bosses.WrathBoss;
 import com.playmonumenta.plugins.delves.DelvesUtils;
@@ -69,11 +70,13 @@ public class Transcendent {
 		List<String> wrathBoss = new ArrayList<>();
 		wrathBoss.add(WrathBoss.identityTag);
 		wrathBoss.add(WrathBoss.identityTag + "[damage=9,spellname=\"" + WRATH_SPELL_NAME + "\"]");
+		wrathBoss.add(DodgeBoss.identityTag);
 		ABILITY_POOL_MELEE_R1.add(wrathBoss);
 		wrathBoss = new ArrayList<>();
 		wrathBoss.add(WrathBoss.identityTag);
 		wrathBoss.add(WrathBoss.identityTag + "[damage=18,spellname=\"" + WRATH_SPELL_NAME + "\"]");
-		ABILITY_POOL_MELEE_R2.add(commanderBoss);
+		wrathBoss.add(DodgeBoss.identityTag);
+		ABILITY_POOL_MELEE_R2.add(wrathBoss);
 
 	}
 

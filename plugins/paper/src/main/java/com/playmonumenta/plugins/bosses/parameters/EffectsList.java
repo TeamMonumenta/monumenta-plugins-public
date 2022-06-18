@@ -86,9 +86,9 @@ public class EffectsList {
 			CUSTOM_EFFECT_RUNNER.put("CustomResistance", (target, boss, duration, strength, effectName) -> {
 				if (EffectManager.getInstance() != null && strength > 0) {
 					if (effectName != null) {
-						EffectManager.getInstance().addEffect(target, effectName, new PercentDamageReceived((int) duration, strength));
+						EffectManager.getInstance().addEffect(target, effectName, new PercentDamageReceived((int) duration, -strength));
 					} else {
-						EffectManager.getInstance().addEffect(target, "EffectListCustomResistance", new PercentDamageReceived((int) duration, strength));
+						EffectManager.getInstance().addEffect(target, "EffectListCustomResistance", new PercentDamageReceived((int) duration, -strength));
 					}
 				}
 			});
@@ -96,9 +96,9 @@ public class EffectsList {
 			CUSTOM_EFFECT_RUNNER.put("CustomVulnerability", (target, boss, duration, strength, effectName) -> {
 				if (EffectManager.getInstance() != null && strength > 0) {
 					if (effectName != null) {
-						EffectManager.getInstance().addEffect(target, effectName, new PercentDamageReceived((int) duration, -strength));
+						EffectManager.getInstance().addEffect(target, effectName, new PercentDamageReceived((int) duration, strength));
 					} else {
-						EffectManager.getInstance().addEffect(target, "EffectListCustomVulnerability", new PercentDamageReceived((int) duration, -strength));
+						EffectManager.getInstance().addEffect(target, "EffectListCustomVulnerability", new PercentDamageReceived((int) duration, strength));
 					}
 				}
 			});
