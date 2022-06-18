@@ -4,7 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.ScorchedEarthDamage;
+import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -28,8 +30,6 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-
-
 
 public class ScorchedEarth extends MultipleChargeAbility {
 
@@ -108,8 +108,9 @@ public class ScorchedEarth extends MultipleChargeAbility {
 					world.playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 0.5f);
 				}
 
+				PlayerItemStats stats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mRadius)) {
-					mPlugin.mEffectManager.addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage, mPlayer));
+					EffectManager.getInstance().addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage, mPlayer, stats));
 				}
 			}
 		}

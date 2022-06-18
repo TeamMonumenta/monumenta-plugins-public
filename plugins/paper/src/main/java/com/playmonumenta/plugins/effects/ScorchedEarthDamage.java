@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -15,11 +16,13 @@ public class ScorchedEarthDamage extends Effect {
 
 	private final double mDamage;
 	private final Player mAlchemist;
+	private final PlayerItemStats mStats;
 
-	public ScorchedEarthDamage(int duration, double damage, Player player) {
+	public ScorchedEarthDamage(int duration, double damage, Player player, PlayerItemStats stats) {
 		super(duration);
 		mDamage = damage;
 		mAlchemist = player;
+		mStats = stats;
 	}
 
 	@Override
@@ -31,7 +34,7 @@ public class ScorchedEarthDamage extends Effect {
 	public void onHurt(LivingEntity entity, DamageEvent event) {
 		DamageType type = event.getType();
 		if (type != DamageType.AILMENT && type != DamageType.FIRE && type != DamageType.OTHER && type != DamageType.WARRIOR_AOE_OTHER && event.getAbility() != ClassAbility.SCORCHED_EARTH) {
-			DamageUtils.damage(mAlchemist, entity, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.SCORCHED_EARTH, mStats), mAmount, true, false, false);
+			DamageUtils.damage(mAlchemist, entity, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.SCORCHED_EARTH, mStats), mDamage, true, false, false);
 			World world = entity.getWorld();
 			Location loc = entity.getLocation().clone().add(0, 1, 0);
 			world.spawnParticle(Particle.FLAME, loc, 5, 0.25, 0.5, 0.25, 0.05);
