@@ -59,7 +59,6 @@ import org.bukkit.projectiles.ProjectileSource;
 public class MobListener implements Listener {
 
 	static final int SPAWNER_DROP_THRESHOLD = 20;
-	static final int ALCH_PASSIVE_RADIUS = 12;
 	private static final NamespacedKey ARMED_ARMOR_STAND_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/armed_armor_stand");
 
 	private final Plugin mPlugin;
