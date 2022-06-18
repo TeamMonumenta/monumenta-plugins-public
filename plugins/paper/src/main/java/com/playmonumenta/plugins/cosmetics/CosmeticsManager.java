@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.util.ArrayList;
@@ -152,6 +153,22 @@ public class CosmeticsManager implements Listener {
 		return null;
 	}
 
+	public List<Cosmetic> getActiveCosmetics(Player player, CosmeticType type) {
+		List<Cosmetic> cosmetics = mPlayerCosmetics.get(player.getUniqueId());
+		if (cosmetics != null) {
+			return cosmetics.stream().filter(c -> c.getType() == type && c.isEquipped()).toList();
+		}
+		return Collections.emptyList();
+	}
+
+	public @Nullable Cosmetic getRandomActiveCosmetic(Player player, CosmeticType type) {
+		List<Cosmetic> activeCosmetics = getActiveCosmetics(player, type);
+		if (!activeCosmetics.isEmpty()) {
+			return activeCosmetics.get(FastUtils.RANDOM.nextInt(activeCosmetics.size()));
+		}
+		return null;
+	}
+
 	//Handlers for player lifecycle events
 
 	//Discard cosmetic data a few ticks after player leaves shard
@@ -219,7 +236,7 @@ public class CosmeticsManager implements Listener {
 		Player player = mob.getKiller();
 
 		if (player != null && EntityUtils.isElite(mob)) {
-			Cosmetic activeCosmetic = CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.ELITE_FINISHER);
+			Cosmetic activeCosmetic = CosmeticsManager.getInstance().getRandomActiveCosmetic(player, CosmeticType.ELITE_FINISHER);
 			if (activeCosmetic != null) {
 				EliteFinishers.activateFinisher(player, mob, mob.getLocation(), activeCosmetic.getName());
 			}

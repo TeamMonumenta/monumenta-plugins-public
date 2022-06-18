@@ -885,7 +885,7 @@ public class ItemUtils {
 		return getPlainLoreIfExists(itemStack);
 	}
 
-	private static List<String> getPlainLoreIfExists(@Nullable ItemStack itemStack) {
+	public static List<String> getPlainLoreIfExists(@Nullable ItemStack itemStack) {
 		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return new ArrayList<>();
 		}

@@ -155,22 +155,33 @@ public class CosmeticsGUI extends CustomInventory {
 
 			if (mDisplayPage != null && item.getType() != FILLER && mDisplayPage.isEquippable() && slot >= COSMETICS_START) {
 				//Get the list of cosmetics back
-				// Note this only works for cosmetic types where only one cosmetic can be equipped at a time!
 				List<Cosmetic> playerCosmetics = CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical(player, mDisplayPage);
-				int index = (slot - COSMETICS_START) + (COSMETICS_PER_PAGE * (mPageNumber - 1));
 				if (playerCosmetics != null) {
-					for (int i = 0; i < playerCosmetics.size(); i++) {
-						if (i == index) {
-							if (!playerCosmetics.get(i).mEquipped) {
-								player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.8f, 1f);
-								playerCosmetics.get(i).mEquipped = true;
+					int index = (slot - COSMETICS_START) + (COSMETICS_PER_PAGE * (mPageNumber - 1));
+					if (mDisplayPage.canEquipMultiple()) {
+						if (!playerCosmetics.get(index).mEquipped) {
+							player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.8f, 1f);
+							playerCosmetics.get(index).mEquipped = true;
+						} else {
+							player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 0.8f, 1f);
+							playerCosmetics.get(index).mEquipped = false;
+						}
+					} else {
+						for (int i = 0; i < playerCosmetics.size(); i++) {
+							if (i == index) {
+								if (!playerCosmetics.get(i).mEquipped) {
+									player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.8f, 1f);
+									playerCosmetics.get(i).mEquipped = true;
+								} else {
+									player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 0.8f, 1f);
+									playerCosmetics.get(i).mEquipped = false;
+								}
 							} else {
-								player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 0.8f, 1f);
 								playerCosmetics.get(i).mEquipped = false;
 							}
-						} else {
-							playerCosmetics.get(i).mEquipped = false;
 						}
+					}
+					if (mDisplayPage == CosmeticType.TITLE) {
 						MonumentaNetworkChatIntegration.refreshPlayer(mPlugin, player);
 					}
 					setUpCosmetics(player);
@@ -278,9 +289,11 @@ public class CosmeticsGUI extends CustomInventory {
 
 			if (mDisplayPage.isEquippable()) {
 				List<Component> lore = new ArrayList<>();
-				Cosmetic activeCosmetic = CosmeticsManager.getInstance().getActiveCosmetic(targetPlayer, mDisplayPage);
-				if (activeCosmetic != null) {
-					lore.add(Component.text("Equipped Cosmetic: " + activeCosmetic.getName(), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+				List<Cosmetic> activeCosmetics = CosmeticsManager.getInstance().getActiveCosmetics(targetPlayer, mDisplayPage);
+				if (activeCosmetics.size() > 1) {
+					lore.add(Component.text("Equipped Cosmetics: multiple (" + activeCosmetics.size() + ")", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+				} else if (!activeCosmetics.isEmpty()) {
+					lore.add(Component.text("Equipped Cosmetic: " + activeCosmetics.get(0).getName(), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 				} else {
 					lore.add(Component.text("No Equipped Cosmetic!", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 				}

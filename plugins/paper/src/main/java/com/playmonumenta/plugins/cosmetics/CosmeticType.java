@@ -41,6 +41,10 @@ public enum CosmeticType {
 		return this != VANITY;
 	}
 
+	public boolean canEquipMultiple() {
+		return this == ELITE_FINISHER;
+	}
+
 	public static @Nullable CosmeticType getTypeSelection(String type) {
 		if (type == null) {
 			return null;

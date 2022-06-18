@@ -1541,11 +1541,12 @@ public class ItemStatUtils {
 	public static Masterwork getMasterwork(final @Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return Masterwork.NONE;
-		}
+    }
+  
 		NBTItem nbt = new NBTItem(item);
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
-			return Masterwork.NONE;
+      return Masterwork.NONE;
 		}
 
 		if (getRegion(item) != Region.RING) {
@@ -1558,6 +1559,24 @@ public class ItemStatUtils {
 		}
 
 		return Masterwork.NONE;
+  }
+  
+	public static Location getLocation(final @Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return Location.NONE;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return Location.NONE;
+		}
+
+		String locationString = monumenta.getString(Location.KEY);
+		if (locationString != null && !locationString.isEmpty()) {
+			return Location.getLocation(locationString);
+		}
+
+		return Location.NONE;
 	}
 
 	public static boolean isClean(final @Nullable ItemStack item) {
