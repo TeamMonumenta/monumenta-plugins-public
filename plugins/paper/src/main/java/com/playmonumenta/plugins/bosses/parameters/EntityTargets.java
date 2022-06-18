@@ -131,6 +131,12 @@ public class EntityTargets {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return EntityUtils.isElite(entity);
 			}
+		},
+		NOT_SELF {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return !launcher.equals(entity);
+			}
 		};
 
 	}
