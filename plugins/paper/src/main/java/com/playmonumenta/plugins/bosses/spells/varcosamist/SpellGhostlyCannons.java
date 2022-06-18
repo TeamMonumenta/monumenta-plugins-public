@@ -115,16 +115,17 @@ public class SpellGhostlyCannons extends Spell {
 				mTicks--;
 				players.removeIf(p -> p.getLocation().distance(mCenter) > 30);
 				if (mTicks % 2 == 0) {
+					double size = (60 - mTicks) / 20.0;
 					for (Player player : players) {
 						// Player gets more particles the closer they are to the landing area
 						double dist = player.getLocation().distance(mLoc);
 						double step = dist < 10 ? 0.5 : (dist < 15 ? 1 : 3);
 						for (double deg = 0; deg < 360; deg += (step * 45)) {
-							player.spawnParticle(Particle.REDSTONE, mLoc.clone().add(FastUtils.cos(deg), 0, FastUtils.sin(deg)), 1, 0.15, 0.15, 0.15, 0, CANNONS_COLOR);
+							player.spawnParticle(Particle.REDSTONE, mLoc.clone().add(FastUtils.cos(deg) * size, 0, FastUtils.sin(deg) * size), 1, 0.15, 0.15, 0.15, 0, CANNONS_COLOR);
 						}
 					}
 				}
-				Location particle = mLoc.clone().add(0, mTicks / 3, 0);
+				Location particle = mLoc.clone().add(0, mTicks / 3.0, 0);
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true);
 				if (FastUtils.RANDOM.nextBoolean()) {
 					mWorld.spawnParticle(Particle.CRIT, particle, 1, 0, 0, 0, 0, null, true);
