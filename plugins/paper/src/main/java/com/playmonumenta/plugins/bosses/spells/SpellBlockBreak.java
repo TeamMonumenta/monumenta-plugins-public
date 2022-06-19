@@ -18,6 +18,7 @@ import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.Lootable;
 
 public class SpellBlockBreak extends Spell {
@@ -64,14 +65,19 @@ public class SpellBlockBreak extends Spell {
 	}
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
-	            Material.AIR,
-	            Material.COMMAND_BLOCK,
-	            Material.CHAIN_COMMAND_BLOCK,
-	            Material.REPEATING_COMMAND_BLOCK,
-	            Material.BEDROCK,
-				Material.BARRIER,
-	            Material.SPAWNER
-	        );
+		Material.AIR,
+		Material.CAVE_AIR,
+		Material.VOID_AIR,
+		Material.STRUCTURE_VOID,
+		Material.STRUCTURE_BLOCK,
+		Material.JIGSAW,
+		Material.COMMAND_BLOCK,
+		Material.CHAIN_COMMAND_BLOCK,
+		Material.REPEATING_COMMAND_BLOCK,
+		Material.BEDROCK,
+		Material.BARRIER,
+		Material.SPAWNER
+	);
 
 	@Override
 	public void run() {
@@ -126,11 +132,21 @@ public class SpellBlockBreak extends Spell {
 				return;
 			}
 
-			/* Remove any remaining blocks, which might have been modified by the event */
-			for (Block block : badBlockList) {
-				block.setType(Material.AIR);
-			}
 			if (badBlockList.size() > 0) {
+				/* Remove any remaining blocks, which might have been modified by the event */
+				for (Block block : badBlockList) {
+					switch (block.getType()) {
+						case SHULKER_BOX, BLACK_SHULKER_BOX, BLUE_SHULKER_BOX, BROWN_SHULKER_BOX, CYAN_SHULKER_BOX,
+							     GREEN_SHULKER_BOX, LIME_SHULKER_BOX, LIGHT_BLUE_SHULKER_BOX, LIGHT_GRAY_SHULKER_BOX,
+							     MAGENTA_SHULKER_BOX, ORANGE_SHULKER_BOX, PINK_SHULKER_BOX, PURPLE_SHULKER_BOX,
+							     RED_SHULKER_BOX, WHITE_SHULKER_BOX, YELLOW_SHULKER_BOX, GRAY_SHULKER_BOX,
+							     CHEST, TRAPPED_CHEST,
+							     IRON_ORE, IRON_BLOCK, GOLD_ORE, GOLD_BLOCK, NETHER_GOLD_ORE, GILDED_BLACKSTONE, LAPIS_ORE, LAPIS_BLOCK,
+							     ANVIL, CHIPPED_ANVIL, DAMAGED_ANVIL -> block.breakNaturally(new ItemStack(Material.IRON_PICKAXE));
+						default -> block.setType(Material.AIR);
+					}
+				}
+
 				loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
 				loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
 			}
