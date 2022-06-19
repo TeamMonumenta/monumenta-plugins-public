@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.listeners.StasisListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -174,14 +175,18 @@ public class SpellPutridPlague extends Spell {
 						ps.removeIf(p -> p.getLocation().getY() >= 61);
 						for (Player player : ps) {
 							if (!safe.contains(player)) {
-								player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 2);
-								world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15);
-								world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,
-								                    Material.LIME_CONCRETE.createBlockData());
-								player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 30, 1));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 1));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
-								DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Putrid Plague");
+								PotionEffect resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+								if ((resistance == null || resistance.getAmplifier() < 4)
+									    && !StasisListener.isInStasis(player)) {
+									player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 2);
+									world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15);
+									world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,
+										Material.LIME_CONCRETE.createBlockData());
+									player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 30, 1));
+									player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 1));
+									player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
+									DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Putrid Plague");
+								}
 							} else {
 								world.spawnParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 25, 0.25, 0.45, 0.25, 1);
 								world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 35, 0.25, 0.45, 0.25, 1);
