@@ -164,7 +164,7 @@ public final class Lich extends BossAbilityGroup {
 
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
-		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
+		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange, mCeiling);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 
 		for (Entity e : mBoss.getNearbyEntities(detectionRange, detectionRange, detectionRange)) {
@@ -904,9 +904,13 @@ public final class Lich extends BossAbilityGroup {
 	// resurrection pt 1
 	@Override
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
-		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
-		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 		Player player = event.getEntity();
+		if (player.getLocation().distanceSquared(mSpawnLoc) > detectionRange * detectionRange
+			    || player.getLocation().getY() - mSpawnLoc.getY() > mCeiling) {
+			return;
+		}
+		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange, mCeiling);
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 		World world = player.getWorld();
 		world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 10, 0.4, 0.45, 0.4,
 			Material.MELON.createBlockData());

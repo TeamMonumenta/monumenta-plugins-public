@@ -244,9 +244,16 @@ public class BossUtils {
 		return PlayerUtils.playersInRange(loc, radius, true).size();
 	}
 
+	public static int getPlayersInRangeForHealthScaling(Location loc, double radius, double ceiling) {
+		return (int) PlayerUtils.playersInRange(loc, radius, true).stream()
+			.filter(p -> p.getLocation().getY() - loc.getY() <= ceiling)
+			.count();
+	}
+
 	/**
 	 * Adds modifiers to the existing map from the string
-	 * @param s a string like "[damage=10, cooldown=60, detectionrange=80, singletarget=true....]
+	 *
+	 * @param s   a string like "[damage=10, cooldown=60, detectionrange=80, singletarget=true....]
 	 * @param map the map where the values ​​will be added
 	 */
 	public static void addModifiersFromString(Map<String, String> map, String s) {

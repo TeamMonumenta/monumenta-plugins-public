@@ -108,111 +108,114 @@ public class SpellSoulShackle extends Spell {
 	// soul shackle player lock
 	@Override
 	public void bossProjectileHit(ProjectileHitEvent event) {
-		if (event.getEntity() instanceof ShulkerBullet && event.getHitEntity() instanceof Player) {
-			event.setCancelled(true);
-			event.getEntity().remove();
-
-			Player p = (Player) event.getHitEntity();
-			if (p == null || mGotHit.contains(p)) {
-				return;
-			}
-			mGotHit.add(p);
-
-			World world = mBoss.getWorld();
-			Location pLoc = p.getLocation().add(0, 1.5, 0);
-			p.sendMessage(ChatColor.AQUA
-	                   + "You got chained by Hekawt! Don't move outside of the ring!");
-
-			DamageUtils.damage(mBoss, p, DamageType.MAGIC, 27, null, false, true, "Soul Shackle");
-			AbilityUtils.silencePlayer(p, 5 * 20);
-			mRod.location(pLoc).spawnAsBoss();
-			world.playSound(pLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.7f, 0.5f);
-			BossBar bar = Bukkit.getServer().createBossBar(ChatColor.RED + "Soul Shackle Duration", BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-			bar.setVisible(true);
-			bar.addPlayer(p);
-
-			PPCircle indicator = new PPCircle(Particle.END_ROD, pLoc, 3).ringMode(true).count(36);
-
-			BukkitRunnable run = new BukkitRunnable() {
-
-				int mINC = 0;
-
-				@Override
-				public void run() {
-					//chain function
-					mINC++;
-					if (SpellDimensionDoor.getShadowed().contains(p)) {
-						this.cancel();
-						bar.setVisible(false);
-						bar.removePlayer(p);
-						return;
-					}
-
-					if (mINC % 10 == 0) {
-						p.removePotionEffect(PotionEffectType.LEVITATION);
-						for (double n = -1; n < 2; n += 1) {
-							Location mColumn = pLoc.clone().add(0, n, 0);
-							mSpark.location(mColumn).spawnAsBoss();
-						}
-
-						// check HORIZONTAL distance to allow jump boost effects
-						Location pGroundLoc = p.getLocation();
-						Location pCheckLoc = pLoc.clone();
-						pGroundLoc.setY(mCenter.getY());
-						pCheckLoc.setY(mCenter.getY());
-						if (pGroundLoc.distance(pCheckLoc) > 3) {
-							p.sendMessage(ChatColor.AQUA + "I shouldn't leave this ring.");
-							world.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 2.0f, 1.0f);
-							BossUtils.bossDamagePercent(mBoss, p, 0.15, null, "Soul Shackle");
-							MovementUtils.knockAway(pCheckLoc, p, -0.75f, false);
-						}
-
-						Location endLoc = pLoc.clone();
-						Vector baseVect = LocationUtils.getDirectionTo(p.getLocation(), pLoc);
-
-						for (int inc = 0; inc < 100; inc++) {
-							world.spawnParticle(Particle.END_ROD, endLoc, 1, 0.1, 0.1, 0.1, 0);
-							endLoc.add(baseVect.clone().multiply(0.5));
-							if (endLoc.distance(pLoc) > p.getLocation().distance(pLoc)) {
-								break;
-							}
-						}
-
-						indicator.location(pLoc).spawnAsBoss();
-					}
-
-					//boss bar
-					double progress = 1.0d - mINC / (20.0d * 5.0d);
-					if (progress > 0) {
-						bar.setProgress(progress);
-					}
-
-					// cancel
-					if (mINC >= 20 * 5 || p.isDead() || Lich.phase3over() || mBoss.isDead() || !mBoss.isValid()) {
-						bar.setVisible(false);
-						bar.removePlayer(p);
-						mGotHit.remove(p);
-						this.cancel();
-					}
-				}
-			};
-			run.runTaskTimer(mPlugin, 0, 1);
-			mActiveRunnables.add(run);
-
-			//do not put this in activerunnables or else the boss bar will linger when phase change
-			new BukkitRunnable() {
-
-				@Override
-				public void run() {
-					if (run.isCancelled()) {
-						bar.setVisible(false);
-						bar.removeAll();
-						this.cancel();
-					}
-				}
-
-			}.runTaskTimer(mPlugin, 0, 5);
+		if (!(event.getEntity() instanceof ShulkerBullet)) {
+			return;
 		}
+		event.setCancelled(true);
+		event.getEntity().remove();
+
+		if (!(event.getHitEntity() instanceof Player p)) {
+			return;
+		}
+		if (mGotHit.contains(p)) {
+			return;
+		}
+		mGotHit.add(p);
+
+		World world = mBoss.getWorld();
+		Location pLoc = p.getLocation().add(0, 1.5, 0);
+		p.sendMessage(ChatColor.AQUA
+			              + "You got chained by Hekawt! Don't move outside of the ring!");
+
+		DamageUtils.damage(mBoss, p, DamageType.MAGIC, 27, null, false, true, "Soul Shackle");
+		AbilityUtils.silencePlayer(p, 5 * 20);
+		mRod.location(pLoc).spawnAsBoss();
+		world.playSound(pLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.7f, 0.5f);
+		BossBar bar = Bukkit.getServer().createBossBar(ChatColor.RED + "Soul Shackle Duration", BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
+		bar.setVisible(true);
+		bar.addPlayer(p);
+
+		PPCircle indicator = new PPCircle(Particle.END_ROD, pLoc, 3).ringMode(true).count(36);
+
+		BukkitRunnable run = new BukkitRunnable() {
+
+			int mINC = 0;
+
+			@Override
+			public void run() {
+				//chain function
+				mINC++;
+				if (SpellDimensionDoor.getShadowed().contains(p)) {
+					this.cancel();
+					bar.setVisible(false);
+					bar.removePlayer(p);
+					return;
+				}
+
+				if (mINC % 10 == 0) {
+					p.removePotionEffect(PotionEffectType.LEVITATION);
+					for (double n = -1; n < 2; n += 1) {
+						Location mColumn = pLoc.clone().add(0, n, 0);
+						mSpark.location(mColumn).spawnAsBoss();
+					}
+
+					// check HORIZONTAL distance to allow jump boost effects
+					Location pGroundLoc = p.getLocation();
+					Location pCheckLoc = pLoc.clone();
+					pGroundLoc.setY(mCenter.getY());
+					pCheckLoc.setY(mCenter.getY());
+					if (pGroundLoc.distance(pCheckLoc) > 3) {
+						p.sendMessage(ChatColor.AQUA + "I shouldn't leave this ring.");
+						world.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 2.0f, 1.0f);
+						BossUtils.bossDamagePercent(mBoss, p, 0.15, null, "Soul Shackle");
+						MovementUtils.knockAway(pCheckLoc, p, -0.75f, false);
+					}
+
+					Location endLoc = pLoc.clone();
+					Vector baseVect = LocationUtils.getDirectionTo(p.getLocation(), pLoc);
+
+					for (int inc = 0; inc < 100; inc++) {
+						world.spawnParticle(Particle.END_ROD, endLoc, 1, 0.1, 0.1, 0.1, 0);
+						endLoc.add(baseVect.clone().multiply(0.5));
+						if (endLoc.distance(pLoc) > p.getLocation().distance(pLoc)) {
+							break;
+						}
+					}
+
+					indicator.location(pLoc).spawnAsBoss();
+				}
+
+				//boss bar
+				double progress = 1.0d - mINC / (20.0d * 5.0d);
+				if (progress > 0) {
+					bar.setProgress(progress);
+				}
+
+				// cancel
+				if (mINC >= 20 * 5 || p.isDead() || Lich.phase3over() || mBoss.isDead() || !mBoss.isValid()) {
+					bar.setVisible(false);
+					bar.removePlayer(p);
+					mGotHit.remove(p);
+					this.cancel();
+				}
+			}
+		};
+		run.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(run);
+
+		//do not put this in activerunnables or else the boss bar will linger when phase change
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				if (run.isCancelled()) {
+					bar.setVisible(false);
+					bar.removeAll();
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(mPlugin, 0, 5);
 	}
 
 	@Override
