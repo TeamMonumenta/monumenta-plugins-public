@@ -1312,9 +1312,9 @@ public class DepthsManager {
 					getPartyFromId(dp).populateLootRoom(player, false);
 					int depthsWins = ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0);
 					if (depthsWins == 0) {
-						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + player.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
 					} else {
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths!\",\"color\":\"yellow\",\"italic\":true,\"bold\":false}]");
+						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw @a [\"\",{\"text\":\"" + player.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths!\",\"color\":\"yellow\",\"italic\":true,\"bold\":false}]");
 					}
 					//Set score
 					ScoreboardUtils.setScoreboardValue(player, "Depths", depthsWins + 1);
