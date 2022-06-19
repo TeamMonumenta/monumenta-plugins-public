@@ -4,9 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import java.util.EnumSet;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Item;
@@ -26,11 +24,6 @@ public class Clucking implements Enchantment {
 	@Override
 	public EnchantmentType getEnchantmentType() {
 		return EnchantmentType.CLUCKING;
-	}
-
-	@Override
-	public EnumSet<ItemStatUtils.Slot> getSlots() {
-		return EnumSet.of(ItemStatUtils.Slot.MAINHAND);
 	}
 
 	@Override
