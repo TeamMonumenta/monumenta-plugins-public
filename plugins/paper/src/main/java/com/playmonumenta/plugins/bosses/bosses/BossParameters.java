@@ -121,6 +121,16 @@ public abstract class BossParameters {
 								defStr = ((PotionEffectType) def).getName();
 							} else if (def instanceof Sound) {
 								defStr = ((Sound) def).name();
+							} else if (def instanceof Color color) {
+								if (StringReader.COLOR_NAME_MAP.containsKey(color)) {
+									defStr = StringReader.COLOR_NAME_MAP.get(color);
+								} else {
+									String rgbDef = "" + ((Color) def).asRGB();
+									while (rgbDef.length() < 6) {
+										rgbDef = "0" + rgbDef;
+									}
+									defStr = "#" + rgbDef;
+								}
 							} else {
 								defStr = def.toString();
 							}

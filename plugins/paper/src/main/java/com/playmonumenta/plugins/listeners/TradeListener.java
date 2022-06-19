@@ -352,7 +352,7 @@ public class TradeListener implements Listener {
 			return false;
 		}
 		if (!(item.getItemMeta() instanceof BlockStateMeta meta)
-			    || (!(meta.getBlockState() instanceof ShulkerBox shulkerBox))
+			    || !(meta.getBlockState() instanceof ShulkerBox shulkerBox)
 			    || shulkerBox.getInventory().isEmpty()) {
 			return false;
 		}

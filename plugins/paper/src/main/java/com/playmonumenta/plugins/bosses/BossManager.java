@@ -281,6 +281,8 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(RestlessSoulsBoss.identityTag, (Plugin p, LivingEntity e) -> new RestlessSoulsBoss(p, e));
 		mStatelessBosses.put(AlchemicalAberrationBoss.identityTag, (Plugin p, LivingEntity e) -> new AlchemicalAberrationBoss(p, e));
 		mStatelessBosses.put(ThrowSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new ThrowSummonBoss(p, e));
+		mStatelessBosses.put(PotionThrowBoss.identityTag, (Plugin p, LivingEntity e) -> new PotionThrowBoss(p, e));
+
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -479,6 +481,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(SummonOnExplosionBoss.identityTag, (Plugin p, LivingEntity e) -> SummonOnExplosionBoss.deserialize(p, e));
 		mBossDeserializers.put(WarriorShieldWallBoss.identityTag, (Plugin p, LivingEntity e) -> WarriorShieldWallBoss.deserialize(p, e));
 		mBossDeserializers.put(DodgeBoss.identityTag, (Plugin p, LivingEntity e) -> DodgeBoss.deserialize(p, e));
+		mBossDeserializers.put(PotionThrowBoss.identityTag, (Plugin p, LivingEntity e) -> PotionThrowBoss.deserialize(p, e));
 
 
 		mBossDeserializers.put(Lich.identityTag, (Plugin p, LivingEntity e) -> Lich.deserialize(p, e));
@@ -550,6 +553,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(WarriorShieldWallBoss.identityTag, new WarriorShieldWallBoss.Parameters());
 		mBossParameters.put(DodgeBoss.identityTag, new DodgeBoss.Parameters());
 		mBossParameters.put(GenericBoss.identityTag, new GenericBoss.Parameters());
+		mBossParameters.put(PotionThrowBoss.identityTag, new PotionThrowBoss.Parameters());
 	}
 
 	/********************************************************************************
@@ -734,6 +738,13 @@ public class BossManager implements Listener {
 			Boss boss = mBosses.get(entity.getUniqueId());
 			if (boss != null) {
 				boss.splashPotionAppliedToBoss(event);
+			}
+		}
+
+		if (event.getEntity().getShooter() instanceof LivingEntity le) {
+			Boss boss = mBosses.get(le.getUniqueId());
+			if (boss != null) {
+				boss.bossSplashPotion(event);
 			}
 		}
 	}

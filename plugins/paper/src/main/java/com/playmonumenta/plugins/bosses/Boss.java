@@ -177,6 +177,20 @@ public class Boss {
 		}
 	}
 
+	public void bossSplashPotion(PotionSplashEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossSplashPotion(event);
+
+			for (Spell passive : ability.getPassives()) {
+				passive.bossSplashPotion(event);
+			}
+
+			for (Spell active : ability.getActiveSpells()) {
+				active.bossSplashPotion(event);
+			}
+		}
+	}
+
 	public void bossCastAbility(SpellCastEvent event) {
 		if (EntityUtils.isSilenced(event.getBoss())) {
 			return;

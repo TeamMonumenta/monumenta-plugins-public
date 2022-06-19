@@ -598,6 +598,11 @@ public class EntityTargets {
 		return mRange;
 	}
 
+	public EntityTargets setRange(double range) {
+		mRange = range;
+		return this;
+	}
+
 	public List<Location> getTargetsLocationList(LivingEntity boss) {
 		List<? extends LivingEntity> entityList = getTargetsList(boss);
 		List<Location> locations = new ArrayList<>(entityList.size());

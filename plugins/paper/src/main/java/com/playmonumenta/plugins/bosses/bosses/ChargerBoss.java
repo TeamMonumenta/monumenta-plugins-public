@@ -155,6 +155,6 @@ public class ChargerBoss extends BossAbilityGroup {
 			})
 		));
 
-		super.constructBoss(activeSpells, Collections.emptyList(), (int) p.TARGETS.getRange() * 2, null, p.DELAY);
+		super.constructBoss(activeSpells, Collections.emptyList(), (int) (p.TARGETS.getRange() * 2), null, p.DELAY);
 	}
 }
