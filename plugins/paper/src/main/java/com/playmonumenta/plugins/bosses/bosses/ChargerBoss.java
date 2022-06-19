@@ -36,7 +36,7 @@ public class ChargerBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public int DELAY = 5 * 20;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "not written", deprecated = true)
 		public int DETECTION = 20;
 
 		@BossParam(help = "not written")
@@ -155,6 +155,6 @@ public class ChargerBoss extends BossAbilityGroup {
 			})
 		));
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(activeSpells, Collections.emptyList(), (int) p.TARGETS.getRange() * 2, null, p.DELAY);
 	}
 }

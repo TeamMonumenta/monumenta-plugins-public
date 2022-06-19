@@ -17,7 +17,7 @@ public class ForceBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_force";
 
 	public static class Parameters extends BossParameters {
-		@BossParam(help = "not written")
+		@BossParam(help = "not written", deprecated = true)
 		public int DETECTION = 20;
 
 		@BossParam(help = "not written")
@@ -109,11 +109,11 @@ public class ForceBoss extends BossAbilityGroup {
 					for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
 
 						double distance = target.getLocation().distance(loc);
-						if (distance < p.RADIUS / 3.0) {
+						if (distance < p.TARGETS.getRange() / 3.0) {
 							p.EFFECTS_NEAR.apply(target, boss);
-						} else if (distance < (p.RADIUS * 2.0) / 3.0) {
+						} else if (distance < (p.TARGETS.getRange() * 2.0) / 3.0) {
 							p.EFFECTS_MIDDLE.apply(target, boss);
-						} else if (distance < p.RADIUS) {
+						} else if (distance < p.TARGETS.getRange()) {
 							p.EFFECTS_LIMIT.apply(target, boss);
 						}
 						p.PARTICLE_HIT.spawn(target.getEyeLocation(), 0.25, 0.5, 0.25, 0);
@@ -122,6 +122,6 @@ public class ForceBoss extends BossAbilityGroup {
 
 			}));
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(activeSpells, Collections.emptyList(), (int) (p.TARGETS.getRange() * 2), null, p.DELAY);
 	}
 }

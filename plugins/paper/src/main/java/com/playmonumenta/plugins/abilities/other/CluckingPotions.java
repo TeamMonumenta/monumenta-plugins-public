@@ -5,21 +5,19 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 
 /* TODO:
@@ -52,44 +50,16 @@ public class CluckingPotions extends Ability {
 		if (potion.hasMetadata("CluckingPotion")) {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
 				for (LivingEntity entity : affectedEntities) {
-					new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
 					if (entity instanceof Player player) {
-						List<ItemStack> cluckingCandidates = new ArrayList<>();
-						for (ItemStack armor : player.getInventory().getArmorContents()) {
-							if (armor != null) {
-								cluckingCandidates.add(armor);
-							}
-						}
-
-						loop:
-						while (!cluckingCandidates.isEmpty()) {
-							int idx = FastUtils.RANDOM.nextInt(cluckingCandidates.size());
-							ItemStack item = cluckingCandidates.get(idx);
-							cluckingCandidates.remove(idx);
-
-							ItemMeta meta = item.getItemMeta();
-							List<Component> lore = meta.lore();
-							List<String> plainLore = ItemUtils.getPlainLore(item);
-
-							List<Component> newLore = new ArrayList<>();
-							if (plainLore != null) {
-								for (int i = 0; i < lore.size(); i++) {
-									String plainEntry = plainLore.get(i);
-									if (plainEntry.contains("Clucking")) {
-										// Already has clucking, don't touch this item
-										continue loop;
-									}
-
-									newLore.add(lore.get(i));
-								}
-							}
-
-							// This is an item without clucking - success!
-							newLore.add(Component.text("Clucking", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-							meta.lore(newLore);
-							item.setItemMeta(meta);
-							ItemUtils.setPlainLore(item);
-							break;
+						List<ItemStack> cluckingCandidates = new ArrayList<>(Arrays.asList(player.getInventory().getArmorContents()));
+						cluckingCandidates.add(player.getInventory().getItemInOffHand());
+						cluckingCandidates.removeIf(item -> item.getType() == Material.AIR || ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.CLUCKING) > 0);
+						if (!cluckingCandidates.isEmpty()) {
+							ItemStack item = cluckingCandidates.get(FastUtils.RANDOM.nextInt(cluckingCandidates.size()));
+							ItemStatUtils.addEnchantment(item, ItemStatUtils.EnchantmentType.CLUCKING, 1);
+							ItemStatUtils.generateItemStats(item);
+							mPlugin.mItemStatManager.updateStats(player);
+							new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
 						}
 					}
 				}

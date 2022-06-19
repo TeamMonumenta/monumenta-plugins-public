@@ -289,11 +289,8 @@ public class OrinCustomInventory extends CustomInventory {
 			}
 		}
 
-		for (int i = 0; i < 54; i++) {
-			if (mInventory.getItem(i) == null) {
-				mInventory.setItem(i, new ItemStack(FILLER, 1));
-			}
-		}
+		GUIUtils.fillWithFiller(mInventory, FILLER);
+
 		if (mCurrentPage == 11) {
 			showInstances(player, "valley");
 		} else if (mCurrentPage == 12) {

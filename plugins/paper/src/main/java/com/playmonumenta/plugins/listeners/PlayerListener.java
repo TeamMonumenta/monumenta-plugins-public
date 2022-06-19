@@ -32,6 +32,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
+import de.tr7zw.nbtapi.NBTEntity;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -353,8 +354,7 @@ public class PlayerListener implements Listener {
 		if (clickedEntity instanceof Animals && itemInHand != null && itemInHand.hasItemMeta() && itemInHand.getItemMeta().hasLore()) {
 			event.setCancelled(true);
 			return;
-		} else if (clickedEntity instanceof ItemFrame) {
-			ItemFrame frame = (ItemFrame) clickedEntity;
+		} else if (clickedEntity instanceof ItemFrame frame) {
 
 			// Plot Security: If item frame is in a plot but the player is in adventure, cancel.
 			if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(frame)) {
@@ -392,6 +392,15 @@ public class PlayerListener implements Listener {
 						InventoryUtils.giveItem(player, giveMap);
 					}
 				}
+			}
+
+			if (!event.isCancelled()
+				    && EntityListener.INVISIBLE_ITEM_FRAME_NAME.equals(frame.getCustomName())) {
+				Bukkit.getScheduler().runTask(mPlugin, () -> {
+					if (frame.isValid()) {
+						new NBTEntity(frame).setBoolean("Invisible", !ItemUtils.isNullOrAir(frame.getItem()));
+					}
+				});
 			}
 		}
 

@@ -12,12 +12,14 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -25,6 +27,7 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.scriptedquests.zones.Zone;
+import de.tr7zw.nbtapi.NBTEntity;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -39,9 +42,11 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -98,6 +103,7 @@ import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.event.entity.VillagerCareerChangeEvent;
 import org.bukkit.event.entity.VillagerReplenishTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
@@ -163,6 +169,9 @@ public class EntityListener implements Listener {
 	);
 
 	public static final int MAX_ANIMALS_IN_PLAYER_PLOT = 64;
+
+	public static final String INVISIBLE_ITEM_FRAME_NAME = "Invisible Item Frame";
+	private static final NamespacedKey INVISIBLE_ITEM_FRAME_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/invisible_item_frame");
 
 	Plugin mPlugin;
 	AbilityManager mAbilities;
@@ -313,6 +322,15 @@ public class EntityListener implements Listener {
 			} else {
 				// This damage is not from a particular entity source - don't allow it
 				event.setCancelled(true);
+			}
+			if (!event.isCancelled()
+				    && damagee instanceof ItemFrame frame
+				    && INVISIBLE_ITEM_FRAME_NAME.equals(damagee.getCustomName())) {
+				Bukkit.getScheduler().runTask(mPlugin, () -> {
+					if (frame.isValid()) {
+						new NBTEntity(frame).setBoolean("Invisible", !ItemUtils.isNullOrAir(frame.getItem()));
+					}
+				});
 			}
 			// No more processing needed for invulnerable item frames/paintings
 			return;
@@ -972,6 +990,21 @@ public class EntityListener implements Listener {
 		} else if (event.getEntity() instanceof Vindicator vindicator) {
 			// Remove the bonus range Vindicators get when riding Ravagers
 			NmsUtils.getVersionAdapter().setAttackRange(vindicator, 1.43, 0);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void hangingBreakEvent(HangingBreakEvent event) {
+		if (event.getEntity() instanceof ItemFrame frame
+			    && INVISIBLE_ITEM_FRAME_NAME.equals(frame.getCustomName())
+			    && (!(event instanceof HangingBreakByEntityEvent breakByEntityEvent && breakByEntityEvent.getRemover() instanceof Player player && player.getGameMode() == GameMode.CREATIVE))) {
+			event.setCancelled(true);
+			frame.getWorld().dropItemNaturally(frame.getLocation(), InventoryUtils.getItemFromLootTable(frame, INVISIBLE_ITEM_FRAME_LOOT_TABLE));
+			if (!ItemUtils.isNullOrAir(frame.getItem())
+				    && frame.getItemDropChance() > FastUtils.RANDOM.nextFloat()) {
+				frame.getWorld().dropItemNaturally(frame.getLocation(), frame.getItem());
+			}
+			frame.remove();
 		}
 	}
 
