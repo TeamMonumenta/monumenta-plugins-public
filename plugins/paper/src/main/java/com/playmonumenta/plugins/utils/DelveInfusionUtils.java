@@ -52,6 +52,11 @@ public class DelveInfusionUtils {
 		NATANT("natant", "Natant", NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material")),
 		UNDERSTANDING("understanding", "Understanding", NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material")),
 
+		REFRESH("refresh", "Refresh", NamespacedKeyUtils.fromString("epic:r3/items/currency/silver_remnant")),
+		SOOTHING("soothing", "Soothing", NamespacedKeyUtils.fromString("epic:r3/items/currency/sorceress_stave")),
+		QUENCH("quench", "Quench", NamespacedKeyUtils.fromString("epic:r3/items/currency/fenian_flower")),
+		GRACE("grace", "Grace", NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst")),
+
 		REFUND("refund", "refund", null);
 
 		private final String mLabel;

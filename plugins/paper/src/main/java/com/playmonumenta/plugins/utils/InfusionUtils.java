@@ -167,6 +167,9 @@ public class InfusionUtils {
 			stack = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
 		} else if (region.equals(Region.ISLES)) {
 			stack = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
+		// TODO: The stuff below
+		// else if (region.equals(Region.RING)) {
+		// stack = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r3/items/currency/pulsating_diamond"));
 		} else {
 			CommandAPI.fail("Item must have a Region tag!");
 			return;
