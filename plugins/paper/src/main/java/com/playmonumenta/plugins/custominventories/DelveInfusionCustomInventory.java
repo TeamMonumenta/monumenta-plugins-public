@@ -198,6 +198,38 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		fallenItem.setItemMeta(fallenMeta);
 		mDelvePannelList.add(fallenItem);
 
+		// Silver Knight's Tomb
+		ItemStack sktItem = new ItemStack(Material.IRON_BLOCK); // TODO: Replace with Material.POLISHED_DEEPSLATE;
+		ItemMeta sktMeta = sktItem.getItemMeta();
+		sktMeta.displayName(Component.text("Refresh", TextColor.fromCSSHexString("#C0C0C0")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		splitLoreLine(sktMeta, "Reduces the cooldown of infinite consumables by 2% per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		sktItem.setItemMeta(sktMeta);
+		mDelvePannelList.add(sktItem);
+
+		// Blue
+		ItemStack blueItem = new ItemStack(Material.BLUE_WOOL);
+		ItemMeta blueMeta = blueItem.getItemMeta();
+		blueMeta.displayName(Component.text("Soothing", TextColor.fromCSSHexString("#0C2CA2")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		splitLoreLine(blueMeta, "Regenerate 0.0825 health per level each second.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		blueItem.setItemMeta(blueMeta);
+		mDelvePannelList.add(blueItem);
+
+		// Wolfswood
+		ItemStack woodItem = new ItemStack(Material.DARK_OAK_WOOD);
+		ItemMeta woodMeta = woodItem.getItemMeta();
+		woodMeta.displayName(Component.text("Quench", TextColor.fromCSSHexString("#4C8F4D")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		splitLoreLine(woodMeta, "Gain 1% damage per level when you have a non-infinite vanilla potion effect active.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		woodItem.setItemMeta(woodMeta);
+		mDelvePannelList.add(woodItem);
+
+		// Keep
+		ItemStack keepItem = new ItemStack(Material.CRACKED_STONE_BRICKS);
+		ItemMeta keepMeta = keepItem.getItemMeta();
+		keepMeta.displayName(Component.text("Grace", TextColor.fromCSSHexString("#C4BBA5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		splitLoreLine(keepMeta, "Gain 2% attack speed per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		keepItem.setItemMeta(keepMeta);
+		mDelvePannelList.add(keepItem);
+
 
 		//LOADING mDelveInfusionPannelsMap
 		//-----------------------------------------------------
@@ -419,6 +451,58 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		}
 		mDelveInfusionPannelsMap.put(DelveInfusionSelection.UNDERSTANDING, forumItems);
 
+		// SKT
+		List<ItemStack> sktItems = new ArrayList<>();
+
+		for (int i = 0; i < 4; i++) {
+			ItemStack pannel = new ItemStack(Material.IRON_BLOCK, 1); // TODO: Replace with Material.POLISHED_DEEPSLATE
+			ItemMeta meta = pannel.getItemMeta();
+			meta.displayName(Component.text("Refresh level " + (i + 1), TextColor.fromCSSHexString("#C0C0C0")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+			splitLoreLine(meta, "Reduces the cooldown of infinite consumables by " + (i + 1) * 2 + "%.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			pannel.setItemMeta(meta);
+			sktItems.add(pannel);
+		}
+		mDelveInfusionPannelsMap.put(DelveInfusionSelection.REFRESH, sktItems);
+
+		// Blue
+		List<ItemStack> blueItems = new ArrayList<>();
+
+		for (int i = 0; i < 4; i++) {
+			ItemStack pannel = new ItemStack(Material.BLUE_WOOL, 1);
+			ItemMeta meta = pannel.getItemMeta();
+			meta.displayName(Component.text("Soothing level " + (i + 1), TextColor.fromCSSHexString("#0C2CA2")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+			splitLoreLine(meta, "Regenerate " + 0.0825 * (i + 1) + " health each second.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			pannel.setItemMeta(meta);
+			blueItems.add(pannel);
+		}
+		mDelveInfusionPannelsMap.put(DelveInfusionSelection.SOOTHING, blueItems);
+
+		// Wolfswood
+		List<ItemStack> forestItems = new ArrayList<>();
+
+		for (int i = 0; i < 4; i++) {
+			ItemStack pannel = new ItemStack(Material.DARK_OAK_WOOD, 1);
+			ItemMeta meta = pannel.getItemMeta();
+			meta.displayName(Component.text("Quench level " + (i + 1), TextColor.fromCSSHexString("#4C8F4D")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+			splitLoreLine(meta, "Gain " + (i + 1) + "% damage when you have a non-infinite vanilla potion effect active.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			pannel.setItemMeta(meta);
+			forestItems.add(pannel);
+		}
+		mDelveInfusionPannelsMap.put(DelveInfusionSelection.QUENCH, forestItems);
+
+		// Keep
+		List<ItemStack> keepItems = new ArrayList<>();
+
+		for (int i = 0; i < 4; i++) {
+			ItemStack pannel = new ItemStack(Material.CRACKED_STONE_BRICKS, 1);
+			ItemMeta meta = pannel.getItemMeta();
+			meta.displayName(Component.text("Grace level " + (i + 1), TextColor.fromCSSHexString("#C4BBA5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+			splitLoreLine(meta, "Gain " + 2 * (i + 1) + "% attack speed.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			pannel.setItemMeta(meta);
+			keepItems.add(pannel);
+		}
+		mDelveInfusionPannelsMap.put(DelveInfusionSelection.GRACE, keepItems);
+
 		//INVALIDS ITEM.
 		//placeholder when an item can't be infused.
 
@@ -487,6 +571,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		mDelveMatsMap.put(DelveInfusionSelection.UNYIELDING, "Echoes of the Veil");
 		mDelveMatsMap.put(DelveInfusionSelection.USURPER, "Nightmare Fuels");
 		mDelveMatsMap.put(DelveInfusionSelection.VENGEFUL, "Persistent Parchments");
+
 		//r2
 		mDelveMatsMap.put(DelveInfusionSelection.EMPOWERED, "Refound Knowledge");
 		mDelveMatsMap.put(DelveInfusionSelection.NUTRIMENT, "Roots of Balance");
@@ -497,6 +582,12 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		mDelveMatsMap.put(DelveInfusionSelection.EPOCH, "Weathered Runes");
 		mDelveMatsMap.put(DelveInfusionSelection.NATANT, "Primordial Clay");
 		mDelveMatsMap.put(DelveInfusionSelection.UNDERSTANDING, "Binah Leaves");
+
+		//r3
+		mDelveMatsMap.put(DelveInfusionSelection.REFRESH, "Silver Remnants");
+		mDelveMatsMap.put(DelveInfusionSelection.SOOTHING, "Sorceress' Staves");
+		mDelveMatsMap.put(DelveInfusionSelection.QUENCH, "Fenian Flowers");
+		mDelveMatsMap.put(DelveInfusionSelection.GRACE, "Iridium Catalysts");
 
 	}
 
@@ -568,21 +659,35 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			}
 		}.runTaskLater(Plugin.getInstance(), 2);
 
-		//R1 = 6
-		mInventory.setItem(18, mDelvePannelList.get(0));
-		mInventory.setItem(19, mDelvePannelList.get(1));
-		mInventory.setItem(20, mDelvePannelList.get(2));
-		mInventory.setItem(21, mDelvePannelList.get(3));
-		mInventory.setItem(23, mDelvePannelList.get(4));
-		mInventory.setItem(24, mDelvePannelList.get(5));
-		mInventory.setItem(25, mDelvePannelList.get(6));
-		mInventory.setItem(26, mDelvePannelList.get(7));
+		//R1
+		mInventory.setItem(9, mDelvePannelList.get(0));
+		mInventory.setItem(10, mDelvePannelList.get(1));
+		mInventory.setItem(11, mDelvePannelList.get(2));
+		mInventory.setItem(12, mDelvePannelList.get(3));
+		mInventory.setItem(14, mDelvePannelList.get(4));
+		mInventory.setItem(15, mDelvePannelList.get(5));
+		mInventory.setItem(16, mDelvePannelList.get(6));
+		mInventory.setItem(17, mDelvePannelList.get(7));
 
 		//R2
-		int index = 27;
-		for (int i = 8; i < mDelvePannelList.size(); i++) {
-			mInventory.setItem(index++, mDelvePannelList.get(i));
-		}
+		mInventory.setItem(18, mDelvePannelList.get(8));
+		mInventory.setItem(19, mDelvePannelList.get(9));
+		mInventory.setItem(20, mDelvePannelList.get(10));
+		mInventory.setItem(21, mDelvePannelList.get(11));
+		mInventory.setItem(22, mDelvePannelList.get(12));
+		mInventory.setItem(23, mDelvePannelList.get(13));
+		mInventory.setItem(24, mDelvePannelList.get(14));
+		mInventory.setItem(25, mDelvePannelList.get(15));
+		mInventory.setItem(26, mDelvePannelList.get(16));
+
+		//R3 Dungeon
+		mInventory.setItem(30, mDelvePannelList.get(17));
+		mInventory.setItem(32, mDelvePannelList.get(18));
+
+		//R3 Other
+		mInventory.setItem(39, mDelvePannelList.get(19));
+		mInventory.setItem(41, mDelvePannelList.get(20));
+
 
 		ItemStack swapPage = new ItemStack(Material.PAPER);
 		ItemMeta meta = swapPage.getItemMeta();
@@ -599,73 +704,91 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		});
 
 
-		mMapFunction.put(18, (p, inventory, slot) -> {
+		mMapFunction.put(9, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.PENNATE);
 		});
 
-		mMapFunction.put(19, (p, inventory, slot) -> {
+		mMapFunction.put(10, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.CARAPACE);
 		});
 
-		mMapFunction.put(20, (p, inventory, slot) -> {
+		mMapFunction.put(11, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.AURA);
 		});
 
-		mMapFunction.put(21, (p, inventory, slot) -> {
+		mMapFunction.put(12, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.EXPEDITE);
 		});
 
-		mMapFunction.put(23, (p, inventory, slot) -> {
+		mMapFunction.put(14, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.CHOLER);
 		});
 
-		mMapFunction.put(24, (p, inventory, slot) -> {
+		mMapFunction.put(15, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.UNYIELDING);
 		});
 
-		mMapFunction.put(25, (p, inventory, slot) -> {
+		mMapFunction.put(16, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.USURPER);
 		});
 
-		mMapFunction.put(26, (p, inventory, slot) -> {
+		mMapFunction.put(17, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.VENGEFUL);
 		});
 
 		//R2
-		mMapFunction.put(27, (p, inventory, slot) -> {
+		mMapFunction.put(18, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.EMPOWERED);
 		});
 
-		mMapFunction.put(28, (p, inventory, slot) -> {
+		mMapFunction.put(19, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.NUTRIMENT);
 		});
 
-		mMapFunction.put(29, (p, inventory, slot) -> {
+		mMapFunction.put(20, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.EXECUTION);
 		});
 
-		mMapFunction.put(30, (p, inventory, slot) -> {
+		mMapFunction.put(21, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.REFLECTION);
 		});
 
-		mMapFunction.put(31, (p, inventory, slot) -> {
+		mMapFunction.put(22, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.MITOSIS);
 		});
 
-		mMapFunction.put(32, (p, inventory, slot) -> {
+		mMapFunction.put(23, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.ARDOR);
 		});
 
-		mMapFunction.put(33, (p, inventory, slot) -> {
+		mMapFunction.put(24, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.EPOCH);
 		});
 
-		mMapFunction.put(34, (p, inventory, slot) -> {
+		mMapFunction.put(25, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.NATANT);
 		});
 
-		mMapFunction.put(35, (p, inventory, slot) -> {
+		mMapFunction.put(26, (p, inventory, slot) -> {
 			attemptInfusion(p, infusedItem, DelveInfusionSelection.UNDERSTANDING);
+		});
+
+		//R3 Dungeon
+		mMapFunction.put(30, (p, inventory, slot) -> {
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.REFRESH);
+		});
+
+		mMapFunction.put(32, (p, inventory, slot) -> {
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.SOOTHING);
+		});
+
+		//R3 Other
+		mMapFunction.put(39, (p, inventory, slot) -> {
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.QUENCH);
+		});
+
+		mMapFunction.put(41, (p, inventory, slot) -> {
+			attemptInfusion(p, infusedItem, DelveInfusionSelection.GRACE);
 		});
 	}
 
@@ -710,8 +833,8 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 							ItemStack itemStack = new ItemStack(item.getType());
 							ItemMeta meta = itemStack.getItemMeta();
 							meta.displayName(item.getItemMeta().displayName()
-											.decoration(TextDecoration.BOLD, true)
-											.decoration(TextDecoration.ITALIC, false));
+								.decoration(TextDecoration.BOLD, true)
+								.decoration(TextDecoration.ITALIC, false));
 							meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 							itemStack.setItemMeta(meta);
 							ItemUtils.setPlainName(itemStack, ItemUtils.getPlainName(item));
