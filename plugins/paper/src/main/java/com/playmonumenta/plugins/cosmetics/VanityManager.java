@@ -287,7 +287,7 @@ public class VanityManager implements Listener {
 		}
 		Material type = item.getType();
 		return switch (type) {
-			case AIR, WRITABLE_BOOK, BUCKET -> false;
+			case AIR, WRITABLE_BOOK, BUCKET, WATER_BUCKET, COD_BUCKET, PUFFERFISH_BUCKET, SALMON_BUCKET, TROPICAL_FISH_BUCKET, LAVA_BUCKET -> false;
 			default -> true;
 		};
 	}
