@@ -17,7 +17,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-public class EntityTargets {
+public class EntityTargets implements Cloneable {
 
 	/**
 	 *          targetsParam=[   TARGETS
@@ -451,6 +451,7 @@ public class EntityTargets {
 
 		public static final Limit DEFAULT = new Limit(LIMITSENUM.ALL, SORTING.RANDOM);
 		public static final Limit DEFAULT_ONE = new Limit(1, SORTING.RANDOM);
+		public static final Limit DEFAULT_CLOSER = new Limit(LIMITSENUM.ALL, SORTING.CLOSER);
 
 		//format (num,sortingEnum) || (limitEnum,sortingEnum)
 		public static ParseResult<Limit> fromReader(StringReader reader, String hoverDescription) {
@@ -601,6 +602,16 @@ public class EntityTargets {
 	public EntityTargets setRange(double range) {
 		mRange = range;
 		return this;
+	}
+
+	public EntityTargets setLimit(Limit limit) {
+		mLimit = limit;
+		return this;
+	}
+
+	@Override
+	public EntityTargets clone() {
+		return new EntityTargets(mTargets, mRange, mOptional, mLimit, mFilters, mTagsFilter);
 	}
 
 	public List<Location> getTargetsLocationList(LivingEntity boss) {

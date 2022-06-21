@@ -49,9 +49,9 @@ public class PotionThrowBoss extends BossAbilityGroup {
 		public EffectsList EFFECTS_ENEMY = EffectsList.EMPTY;
 		public EffectsList EFFECTS_ALLY = EffectsList.EMPTY;
 
-		public EntityTargets THROWING_TARGET = EntityTargets.GENERIC_ONE_PLAYER_TARGET.setRange(15);
-		public EntityTargets ENEMIES_TARGET = EntityTargets.GENERIC_PLAYER_TARGET.setRange(3);
-		public EntityTargets ALLY_TARGET = EntityTargets.GENERIC_MOB_TARGET.setRange(3);
+		public EntityTargets THROWING_TARGET = EntityTargets.GENERIC_ONE_PLAYER_TARGET.clone().setRange(15);
+		public EntityTargets ENEMIES_TARGET = EntityTargets.GENERIC_PLAYER_TARGET.clone().setRange(3);
+		public EntityTargets ALLY_TARGET = EntityTargets.GENERIC_MOB_TARGET.clone().setRange(3);
 
 		public float MIN_POTION_SPEED = 0;
 		public float MAX_POTION_SPEED = 0.75f;
