@@ -259,6 +259,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(FriendlyBoss.identityTag, (Plugin p, LivingEntity e) -> new FriendlyBoss(p, e));
 		mStatelessBosses.put(WarriorShieldWallBoss.identityTag, (Plugin p, LivingEntity e) -> new WarriorShieldWallBoss(p, e));
 		mStatelessBosses.put(DodgeBoss.identityTag, (Plugin p, LivingEntity e) -> new DodgeBoss(p, e));
+		mStatelessBosses.put(BlockPlacerBoss.identityTag, (Plugin p, LivingEntity e) -> new BlockPlacerBoss(p, e));
 		mStatelessBosses.put(ScoutVolleyBoss.identityTag, (Plugin p, LivingEntity e) -> new ScoutVolleyBoss(p, e));
 		mStatelessBosses.put(WarlockAmpHexBoss.identityTag, (Plugin p, LivingEntity e) -> new WarlockAmpHexBoss(p, e));
 
@@ -483,6 +484,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(WarriorShieldWallBoss.identityTag, (Plugin p, LivingEntity e) -> WarriorShieldWallBoss.deserialize(p, e));
 		mBossDeserializers.put(WarlockAmpHexBoss.identityTag, (Plugin p, LivingEntity e) -> WarlockAmpHexBoss.deserialize(p, e));
 		mBossDeserializers.put(DodgeBoss.identityTag, (Plugin p, LivingEntity e) -> DodgeBoss.deserialize(p, e));
+		mBossDeserializers.put(BlockPlacerBoss.identityTag, (Plugin p, LivingEntity e) -> BlockPlacerBoss.deserialize(p, e));
 		mBossDeserializers.put(PotionThrowBoss.identityTag, (Plugin p, LivingEntity e) -> PotionThrowBoss.deserialize(p, e));
 
 
