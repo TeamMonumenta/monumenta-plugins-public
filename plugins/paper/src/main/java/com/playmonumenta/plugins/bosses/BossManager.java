@@ -253,6 +253,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(DeathSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new DeathSummonBoss(p, e));
 		mStatelessBosses.put(SummonOnExplosionBoss.identityTag, (Plugin p, LivingEntity e) -> new SummonOnExplosionBoss(p, e));
 		mStatelessBosses.put(HostileBoss.identityTag, (Plugin p, LivingEntity e) -> new HostileBoss(p, e));
+		mStatelessBosses.put(StarfallBoss.identityTag, (Plugin p, LivingEntity e) -> new StarfallBoss(p, e));
 		mStatelessBosses.put(StatMultiplierBoss.identityTag, (Plugin p, LivingEntity e) -> new StatMultiplierBoss(p, e));
 		mStatelessBosses.put(SpectralSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new SpectralSummonBoss(p, e));
 		mStatelessBosses.put(DreadfulSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new DreadfulSummonBoss(p, e));
@@ -477,6 +478,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> GrenadeLauncherBoss.deserialize(p, e));
 		mBossDeserializers.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> SizeChangerBoss.deserialize(p, e));
 		mBossDeserializers.put(DeathSummonBoss.identityTag, (Plugin p, LivingEntity e) -> DeathSummonBoss.deserialize(p, e));
+		mBossDeserializers.put(StarfallBoss.identityTag, (Plugin p, LivingEntity e) -> StarfallBoss.deserialize(p, e));
 		mBossDeserializers.put(SpectralSummonBoss.identityTag, (Plugin p, LivingEntity e) -> SpectralSummonBoss.deserialize(p, e));
 		mBossDeserializers.put(DreadfulSummonBoss.identityTag, (Plugin p, LivingEntity e) -> DreadfulSummonBoss.deserialize(p, e));
 		mBossDeserializers.put(StatMultiplierBoss.identityTag, (Plugin p, LivingEntity e) -> StatMultiplierBoss.deserialize(p, e));
@@ -554,6 +556,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(FriendlyBoss.identityTag, new FriendlyBoss.Parameters());
 		mBossParameters.put(RebornBoss.identityTag, new RebornBoss.Parameters());
 		mBossParameters.put(BlockBreakBoss.identityTag, new BlockBreakBoss.Parameters());
+		mBossParameters.put(StarfallBoss.identityTag, new StarfallBoss.Parameters());
 		mBossParameters.put(WarriorShieldWallBoss.identityTag, new WarriorShieldWallBoss.Parameters());
 		mBossParameters.put(WarlockAmpHexBoss.identityTag, new WarlockAmpHexBoss.Parameters());
 		mBossParameters.put(DodgeBoss.identityTag, new DodgeBoss.Parameters());
