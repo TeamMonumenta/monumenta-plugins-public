@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -103,15 +104,15 @@ public class FileUtils {
 	 * Returns a list of all files in the directory that are both regular files
 	 * AND end with the specified string
 	 */
-	public static List<File> getFilesInDirectory(String folderPath,
-	                                                  String endsWith) throws IOException {
-		ArrayList<File> matchedFiles = new ArrayList<File>();
+	public static List<Path> getFilesInDirectory(Path folderPath,
+	                                             String endsWith) throws IOException {
+		ArrayList<Path> matchedFiles = new ArrayList<>();
 
-		try (Stream<Path> stream = Files.walk(Paths.get(folderPath), 100, FileVisitOption.FOLLOW_LINKS)) {
+		try (Stream<Path> stream = Files.walk(folderPath, 100, FileVisitOption.FOLLOW_LINKS)) {
 			stream.forEach(path -> {
 				if (path.toString().toLowerCase().endsWith(endsWith) && !path.toFile().isDirectory()) {
 					// Note - this will pass directories that end with .json back to the caller too
-					matchedFiles.add(path.toFile());
+					matchedFiles.add(path);
 				}
 			});
 		}
@@ -164,51 +165,42 @@ public class FileUtils {
 	 * @param subfolder Should be the name of the subfolder the files of interest live in (i.e. loot_tables, advancements, functions)
 	 * @param extension The expected file extension, including the "." (i.e. ".json", ".mcfunction")
 	 */
-	public static Map<NamespacedKey, File> getEnabledDatapackFiles(String subfolder, String extension) {
+	public static Map<NamespacedKey, Path> getEnabledDatapackFiles(String subfolder, String extension) {
 		// Join the server root directory + primary world name + "datapacks" to get the root datapacks directory
 		Path datapacksRoot = Paths.get(Bukkit.getServer().getWorldContainer().getAbsolutePath(), Bukkit.getServer().getWorlds().get(0).getName(), "datapacks");
 
-		Map<NamespacedKey, File> results = new LinkedHashMap<>();
+		Map<NamespacedKey, Path> results = new LinkedHashMap<>();
 
 		MMLog.fine("Searching for enabled datapack files matching subfolder '" + subfolder + "' and extension '" + extension + "'");
 		for (Datapack pack : Bukkit.getDatapackManager().getEnabledPacks()) {
 			if (pack.getName().startsWith("file/")) {
 				String packName = pack.getName().substring("file/".length());
-				String datapackPath = Paths.get(datapacksRoot.toString(), packName).toString();
+				Path datapackPath = Paths.get(datapacksRoot.toString(), packName);
 				MMLog.finer("Searching datapack '" + packName + "': " + datapackPath);
 				try {
-					for (File file : FileUtils.getFilesInDirectory(datapackPath, extension)) {
-						String filePath = file.getPath().toString();
-						if (filePath.startsWith(datapackPath)) {
-							// Get just the path under the datapack (i.e. data/monumenta/loot_tables/whatever)
-							String subpath = filePath.substring(datapackPath.length());
-							// Remove any leading /'s
-							while (subpath.startsWith(File.separator)) {
-								subpath = subpath.substring(File.separator.length());
-							}
-							// Remove the file extension
-							subpath = subpath.substring(0, subpath.length() - 5);
+					for (Path path : FileUtils.getFilesInDirectory(datapackPath, extension)) {
+						// Get just the path under the datapack (e.g. data/monumenta/loot_tables/whatever)
+						String subpath = datapackPath.relativize(path).toString();
+						// Remove the file extension
+						subpath = subpath.substring(0, subpath.length() - extension.length());
 
-							// Split by file separator (i.e. /), max 4 parts ("data", "namespace", "loot_tables", "path")
-							String[] split = subpath.split(File.separator, 4);
-							if (split.length == 4) {
-								if (split[2].equals(subfolder)) {
-									// Matching file!
-									try {
-										NamespacedKey key = NamespacedKeyUtils.fromString(split[1] + ":" + split[3]);
-										results.put(key, file);
-										MMLog.finer("Matched datapack file " + key + " -> " + file.toPath().toString());
-									} catch (IllegalArgumentException ex) {
-										MMLog.warning("Datapack file name can't be parsed to NamespacedKey: " + filePath);
-									}
-								} else {
-									MMLog.finest("Datapack file matches extension '" + extension + "' but not subfolder '" + subfolder + "': " + filePath);
+						// Split by file separator, max 4 parts ("data", "namespace", "loot_tables", "path")
+						String[] split = subpath.split(Pattern.quote(File.separator), 4);
+						if (split.length == 4) {
+							if (split[2].equals(subfolder)) {
+								// Matching file!
+								try {
+									NamespacedKey key = NamespacedKeyUtils.fromString(split[1] + ":" + split[3].replace(File.separator, "/"));
+									results.put(key, path);
+									MMLog.finer("Matched datapack file " + key + " -> " + path);
+								} catch (IllegalArgumentException ex) {
+									MMLog.warning("Datapack file name can't be parsed to NamespacedKey: " + path);
 								}
 							} else {
-								MMLog.warning("Datapack file is nested in an invalid folder. Likely should be moved or deleted: " + filePath);
+								MMLog.finest("Datapack file matches extension '" + extension + "' but not subfolder '" + subfolder + "': " + path);
 							}
 						} else {
-							MMLog.warning("Datapack file '" + filePath + "' doesn't start with the expected path '" + datapackPath + "'. Likely the loot table manager is broken!");
+							MMLog.warning("Datapack file is nested in an invalid folder. Likely should be moved or deleted: " + path);
 						}
 					}
 				} catch (Exception ex) {

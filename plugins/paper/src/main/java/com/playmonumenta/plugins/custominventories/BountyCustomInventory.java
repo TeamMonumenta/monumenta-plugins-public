@@ -18,6 +18,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -34,6 +35,7 @@ public class BountyCustomInventory extends CustomInventory {
 	private static final List<String> BOUNTY_SCOREBOARDS = new ArrayList<>(Arrays.asList("DailyQuest", "Daily2Quest", "Daily3Quest"));
 	private static final List<String> BOUNTY_REWARD_BOARDS = new ArrayList<>(Arrays.asList("DailyReward", "Daily2Reward", "Daily3Reward"));
 	private static final List<String> LORE_SCOREBOARDS = new ArrayList<>(Arrays.asList("DailyLoreReq", "Daily2LoreReq", "Daily3LoreReq"));
+	private static final List<String> BOUNTY_NPCS = new ArrayList<>(Arrays.asList("King's Herald", "Seer", "?"));
 
 	//Beyond creating this file, you also need a command, set up within
 	//CustomInventoriesCommands.java in this folder.
@@ -202,7 +204,10 @@ public class BountyCustomInventory extends CustomInventory {
 				ScoreboardUtils.setScoreboardValue(target, "R" + mRegion + "Bounties" + 1, 0);
 				ScoreboardUtils.setScoreboardValue(target, "R" + mRegion + "Bounties" + 2, 0);
 				ScoreboardUtils.setScoreboardValue(target, "R" + mRegion + "Bounties" + 3, 0);
-				target.sendMessage("Your bounty for today is " + ChatColor.AQUA + bounty.mName + ChatColor.WHITE + "!");
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "interactnpc " + player.getName() + " \"" + BOUNTY_NPCS.get(mRegion - 1) + "\"");
+				target.sendMessage(Component.text("Your bounty for today is ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)
+					.append(Component.text(bounty.mName, NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true))
+					.append(Component.text("!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)));
 			}
 		}
 	}

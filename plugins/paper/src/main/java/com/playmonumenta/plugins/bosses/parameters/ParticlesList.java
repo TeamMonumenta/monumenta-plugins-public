@@ -232,8 +232,8 @@ public class ParticlesList {
 			}
 
 			Long count = reader.readLong();
-			if (count == null || count <= 0) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "1", "Particle count > 0")));
+			if (count == null || count < 0) {
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "1", "Particle count >= 0")));
 			}
 
 			if (!reader.advance(",")) {
