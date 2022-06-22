@@ -451,6 +451,7 @@ public class EntityTargets implements Cloneable {
 
 		public static final Limit DEFAULT = new Limit(LIMITSENUM.ALL, SORTING.RANDOM);
 		public static final Limit DEFAULT_ONE = new Limit(1, SORTING.RANDOM);
+		public static final Limit CLOSER_ONE = new Limit(1, SORTING.CLOSER);
 		public static final Limit DEFAULT_CLOSER = new Limit(LIMITSENUM.ALL, SORTING.CLOSER);
 
 		//format (num,sortingEnum) || (limitEnum,sortingEnum)
@@ -512,6 +513,7 @@ public class EntityTargets implements Cloneable {
 	public static final EntityTargets GENERIC_MOB_TARGET = new EntityTargets(TARGETS.MOB, 30, true, Limit.DEFAULT, new ArrayList<>(), TagsListFiter.DEFAULT);
 	public static final EntityTargets GENERIC_SELF_TARGET = new EntityTargets(TARGETS.SELF, 0, false, Limit.DEFAULT, new ArrayList<>(), TagsListFiter.DEFAULT);
 	public static final EntityTargets GENERIC_ONE_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.DEFAULT_ONE, new ArrayList<>(), TagsListFiter.DEFAULT);
+	public static final EntityTargets GENERIC_ONE_PLAYER_CLOSER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.CLOSER_ONE, new ArrayList<>(), TagsListFiter.DEFAULT);
 
 	private static final String LIMIT_STRING = "limit=";
 	private static final String FILTERS_STRING = "filters=";

@@ -258,11 +258,13 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(SpectralSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new SpectralSummonBoss(p, e));
 		mStatelessBosses.put(DreadfulSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new DreadfulSummonBoss(p, e));
 		mStatelessBosses.put(FriendlyBoss.identityTag, (Plugin p, LivingEntity e) -> new FriendlyBoss(p, e));
+		mStatelessBosses.put(MageCosmicMoonbladeBoss.identityTag, (Plugin p, LivingEntity e) -> new MageCosmicMoonbladeBoss(p, e));
 		mStatelessBosses.put(WarriorShieldWallBoss.identityTag, (Plugin p, LivingEntity e) -> new WarriorShieldWallBoss(p, e));
 		mStatelessBosses.put(DodgeBoss.identityTag, (Plugin p, LivingEntity e) -> new DodgeBoss(p, e));
 		mStatelessBosses.put(BlockPlacerBoss.identityTag, (Plugin p, LivingEntity e) -> new BlockPlacerBoss(p, e));
 		mStatelessBosses.put(ScoutVolleyBoss.identityTag, (Plugin p, LivingEntity e) -> new ScoutVolleyBoss(p, e));
 		mStatelessBosses.put(WarlockAmpHexBoss.identityTag, (Plugin p, LivingEntity e) -> new WarlockAmpHexBoss(p, e));
+
 
 		mStatelessBosses.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> new LichMageBoss(p, e));
 		mStatelessBosses.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> new LichRogueBoss(p, e));
@@ -513,7 +515,9 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(ThrowSummonBoss.identityTag, (Plugin p, LivingEntity e) -> ThrowSummonBoss.deserialize(p, e));
 		mBossDeserializers.put(HostileBoss.identityTag, (Plugin p, LivingEntity e) -> HostileBoss.deserialize(p, e));
 		mBossDeserializers.put(FriendlyBoss.identityTag, (Plugin p, LivingEntity e) -> FriendlyBoss.deserialize(p, e));
+		mBossDeserializers.put(MageCosmicMoonbladeBoss.identityTag, (Plugin p, LivingEntity e) -> MageCosmicMoonbladeBoss.deserialize(p, e));
 		mBossDeserializers.put(ScoutVolleyBoss.identityTag, (Plugin p, LivingEntity e) -> ScoutVolleyBoss.deserialize(p, e));
+
 
 		/***************************************************
 		 * Boss Parameters
@@ -556,6 +560,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(FriendlyBoss.identityTag, new FriendlyBoss.Parameters());
 		mBossParameters.put(RebornBoss.identityTag, new RebornBoss.Parameters());
 		mBossParameters.put(BlockBreakBoss.identityTag, new BlockBreakBoss.Parameters());
+		mBossParameters.put(MageCosmicMoonbladeBoss.identityTag, new MageCosmicMoonbladeBoss.Parameters());
 		mBossParameters.put(StarfallBoss.identityTag, new StarfallBoss.Parameters());
 		mBossParameters.put(WarriorShieldWallBoss.identityTag, new WarriorShieldWallBoss.Parameters());
 		mBossParameters.put(WarlockAmpHexBoss.identityTag, new WarlockAmpHexBoss.Parameters());
