@@ -50,7 +50,7 @@ public class BarrierBoss extends BossAbilityGroup {
 				(Location loc) -> {
 					p.SOUND_REFRESH.play(loc);
 				}, (Location loc) -> {
-					p.PARTICLE.spawn(loc, 0, 1, 0);
+					p.PARTICLE.spawn(boss, loc, 0, 1, 0);
 				}, (Location loc) -> {
 					p.SOUND_BREAK.play(loc);
 				})));

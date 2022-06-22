@@ -118,7 +118,7 @@ public class PotionThrowBoss extends BossAbilityGroup {
 										cancel();
 										return;
 									}
-									mParams.PARTICLE_TRAIL.spawn(tp.getLocation());
+									mParams.PARTICLE_TRAIL.spawn(boss, tp.getLocation());
 								}
 							}.runTaskTimer(mPlugin, 0, 1);
 						}
@@ -159,7 +159,7 @@ public class PotionThrowBoss extends BossAbilityGroup {
 						for (int i = 0; i < 360; i += 15) {
 							double radian1 = Math.toRadians(FastUtils.randomDoubleInRange(-i, i) + i);
 							Location newLoc = loc.clone().add(FastUtils.cos(radian1) * mCurrentRadius, 0.2 + mCurrentRadius / 2, FastUtils.sin(radian1) * mCurrentRadius);
-							mParams.PARTICLE_ENEMY.spawn(newLoc);
+							mParams.PARTICLE_ENEMY.spawn(mBoss, newLoc);
 						}
 
 						mCurrentRadius += mRadiusIncrease;
@@ -196,7 +196,7 @@ public class PotionThrowBoss extends BossAbilityGroup {
 						for (int i = 0; i < 360; i += 15) {
 							double radian1 = Math.toRadians(FastUtils.randomDoubleInRange(-i, i) + i);
 							Location newLoc = loc.clone().add(FastUtils.cos(radian1) * mCurrentRadius, 0.2 + mCurrentRadius / 2, FastUtils.sin(radian1) * mCurrentRadius);
-							mParams.PARTICLE_ENEMY.spawn(newLoc);
+							mParams.PARTICLE_ENEMY.spawn(mBoss, newLoc);
 						}
 
 						mCurrentRadius += mRadiusIncrease;

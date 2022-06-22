@@ -95,7 +95,7 @@ public class StarfallBoss extends BossAbilityGroup {
 											Location meteorCenter = mLocation.clone().add(0, mCurrentHeight, 0);
 
 											if (mCurrentHeight <= 0) {
-												p.PARTICLE_EXPLOSION.spawn(meteorCenter, p.TARGETS_EXPLOSION.getRange() / 2, p.TARGETS_EXPLOSION.getRange() / 2, p.TARGETS_EXPLOSION.getRange() / 2, 0.1);
+												p.PARTICLE_EXPLOSION.spawn(boss, meteorCenter, p.TARGETS_EXPLOSION.getRange() / 2, p.TARGETS_EXPLOSION.getRange() / 2, p.TARGETS_EXPLOSION.getRange() / 2, 0.1);
 												p.SOUND_EXPLOSION.play(meteorCenter);
 												for (LivingEntity target : p.TARGETS_EXPLOSION.getTargetsListByLocation(mBoss, meteorCenter)) {
 
@@ -113,7 +113,7 @@ public class StarfallBoss extends BossAbilityGroup {
 											}
 
 											p.SOUND_METEOR.play(meteorCenter, 3.0f, (float) (mCurrentHeight / p.HEIGHT) * 1.5f);
-											p.PARTICLE_METEOR.spawn(meteorCenter);
+											p.PARTICLE_METEOR.spawn(boss, meteorCenter);
 
 										}
 									}.runTaskTimer(mPlugin, 0, 1);
@@ -131,7 +131,7 @@ public class StarfallBoss extends BossAbilityGroup {
 									for (int degree = 0; degree <= 360; degree += 5) {
 										double radiant = Math.toRadians(degree);
 										Location l = mLocation.clone().add(FastUtils.cos(radiant) * size, 0.3, FastUtils.sin(radiant) * size);
-										p.PARTICLE_CIRCLE.spawn(l);
+										p.PARTICLE_CIRCLE.spawn(boss, l);
 									}
 								}
 

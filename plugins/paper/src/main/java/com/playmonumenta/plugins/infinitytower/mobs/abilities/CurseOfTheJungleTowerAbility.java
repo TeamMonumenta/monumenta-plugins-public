@@ -33,11 +33,11 @@ public class CurseOfTheJungleTowerAbility extends TowerAbility {
 			@Override
 			public void run() {
 				if (mIsPlayerMob) {
-					MOB_PARTICLE_ALLY.spawn(mBoss.getLocation());
-					AIR_PARTICLE_ALLY.spawn(mBoss.getLocation());
+					MOB_PARTICLE_ALLY.spawn(boss, mBoss.getLocation());
+					AIR_PARTICLE_ALLY.spawn(boss, mBoss.getLocation());
 				} else {
-					MOB_PARTICLE_ENEMY.spawn(mBoss.getLocation());
-					AIR_PARTICLE_ENEMY.spawn(mBoss.getLocation());
+					MOB_PARTICLE_ENEMY.spawn(boss, mBoss.getLocation());
+					AIR_PARTICLE_ENEMY.spawn(boss, mBoss.getLocation());
 				}
 				if (mTimer % 5 == 0) {
 					List<LivingEntity> targets = (mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs());

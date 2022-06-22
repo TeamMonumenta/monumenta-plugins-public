@@ -143,12 +143,12 @@ public class ProjectileBoss extends BossAbilityGroup {
 					},
 					// Launch Aesthetic
 					(World world, Location loc, int ticks) -> {
-						p.PARTICLE_LAUNCH.spawn(loc);
+						p.PARTICLE_LAUNCH.spawn(boss, loc);
 						p.SOUND_LAUNCH.play(loc);
 					},
 					// Projectile Aesthetic
 					(World world, Location loc, int ticks) -> {
-						p.PARTICLE_PROJECTILE.spawn(loc, 0.1, 0.1, 0.1, 0.1);
+						p.PARTICLE_PROJECTILE.spawn(boss, loc, 0.1, 0.1, 0.1, 0.1);
 						if (ticks % 40 == 0) {
 							p.SOUND_PROJECTILE.play(loc);
 						}
@@ -156,7 +156,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 					// Hit Action
 					(World world, LivingEntity target, Location loc) -> {
 						p.SOUND_HIT.play(loc, 0.5f, 0.5f);
-						p.PARTICLE_HIT.spawn(loc, 0d, 0d, 0d, 0.25d);
+						p.PARTICLE_HIT.spawn(boss, loc, 0d, 0d, 0d, 0.25d);
 
 						if (target != null) {
 							if (p.DAMAGE > 0) {

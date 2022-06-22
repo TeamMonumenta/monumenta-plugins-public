@@ -60,7 +60,7 @@ public class HostileBoss extends BossAbilityGroup {
 					}
 
 					if (p.PARTICLES != ParticlesList.EMPTY) {
-						p.PARTICLES.spawn(target.getEyeLocation());
+						p.PARTICLES.spawn(boss, target.getEyeLocation());
 					}
 
 				});

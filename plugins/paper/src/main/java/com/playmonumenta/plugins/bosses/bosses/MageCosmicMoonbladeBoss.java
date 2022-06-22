@@ -91,7 +91,7 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 										vec = VectorUtils.rotateYAxis(vec, originTargetDirection.getYaw());
 
 										Location l = originTargetDirection.clone().add(0, 1.25, 0).add(vec);
-										mParams.PARTICLE_TELL.spawn(l);
+										mParams.PARTICLE_TELL.spawn(boss, l);
 									}
 								}
 								if (mDegree >= 135) {
@@ -164,7 +164,7 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 													vec = VectorUtils.rotateYAxis(vec, originTargetDirection.getYaw());
 
 													Location l = originTargetDirection.clone().add(0, 1.25, 0).add(vec);
-													mParams.PARTICLE_SWING.spawn(l);
+													mParams.PARTICLE_SWING.spawn(boss, l);
 
 													BoundingBox box = BoundingBox.of(l, 0.3, 1, 0.3);
 
@@ -190,7 +190,7 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 
 													Location l = originTargetDirection.clone().add(0, 1.25, 0).add(vec);
 													l.setPitch(-l.getPitch());
-													mParams.PARTICLE_SWING.spawn(l);
+													mParams.PARTICLE_SWING.spawn(boss, l);
 
 													BoundingBox box = BoundingBox.of(l, 0.3, 1, 0.3);
 

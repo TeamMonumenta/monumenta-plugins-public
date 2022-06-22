@@ -100,7 +100,7 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 											v = VectorUtils.rotateYAxis(v, tloc.getYaw() + 90);
 
 											Location loc = mBoss.getLocation().clone().add(v);
-											p.PARTICLE_CONE_WARNING.spawn(loc);
+											p.PARTICLE_CONE_WARNING.spawn(boss, loc);
 										}
 									}
 								}
@@ -117,7 +117,7 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 											vec = VectorUtils.rotateYAxis(vec, tloc.getYaw() + 90);
 
 											Location l = mBoss.getLocation().clone().add(vec);
-											p.PARTICLE_CONE_HIT.spawn(l);
+											p.PARTICLE_CONE_HIT.spawn(boss, l);
 											BoundingBox box = BoundingBox.of(l, 0.4, 10, 0.4);
 
 											for (LivingEntity target : targets) {
@@ -140,7 +140,7 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 													}
 													p.EFFECTS.apply(target, mBoss);
 
-													p.PARTICLE_HIT.spawn(target.getLocation());
+													p.PARTICLE_HIT.spawn(boss, target.getLocation());
 												}
 											}
 										}

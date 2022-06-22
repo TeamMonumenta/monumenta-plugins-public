@@ -97,7 +97,7 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 										new BukkitRunnable() {
 
 											@Override public void run() {
-												p.PARTICLE_PROJECTILE.spawn(arrow.getLocation());
+												p.PARTICLE_PROJECTILE.spawn(boss, arrow.getLocation());
 
 												if (arrow.isInBlock() || !arrow.isValid()) {
 													this.cancel();

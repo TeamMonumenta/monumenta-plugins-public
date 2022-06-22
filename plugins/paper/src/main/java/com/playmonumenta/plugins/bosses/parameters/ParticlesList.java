@@ -12,7 +12,9 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class ParticlesList {
 	private static final EnumSet<Particle> PARTICLE_MATERIALS = EnumSet.of(Particle.ITEM_CRACK, Particle.BLOCK_CRACK, Particle.BLOCK_DUST, Particle.FALLING_DUST);
@@ -25,7 +27,7 @@ public class ParticlesList {
 		public double mDy;
 		public double mDz;
 		public double mVelocity;
-		public Object mExtra2; //used when we have a particle that is inside PARTICLE_MATERIALS or Particle.REDSTONE
+		public @Nullable Object mExtra2; //used when we have a particle that is inside PARTICLE_MATERIALS or Particle.REDSTONE
 
 		public CParticle(Particle particle) {
 			this(particle, 1, 0, 0, 0);
@@ -71,31 +73,25 @@ public class ParticlesList {
 			return "(" + mParticle.name() + "," + mCount + "," + mDx + "," + mDy + "," + mDz + "," + mVelocity + ")";
 		}
 
-		public void spawn(Location loc) {
-			spawn(loc, 0, 0, 0, 0.0d);
+		public void spawn(LivingEntity boss, Location loc) {
+			spawn(boss, loc, 0, 0, 0, 0.0d);
 		}
 
-		public void spawn(Location loc, double dx, double dy, double dz) {
-			spawn(loc, dx, dy, dz, 0.0d);
+		public void spawn(LivingEntity boss, Location loc, double dx, double dy, double dz) {
+			spawn(boss, loc, dx, dy, dz, 0.0d);
 		}
 
-		public void spawn(Location loc, double dx, double dy, double dz, double extra1) {
+		public void spawn(LivingEntity boss, Location loc, double dx, double dy, double dz, double extra1) {
 			double fdx = mDx != 0 ? mDx : dx;
 			double fdy = mDy != 0 ? mDy : dy;
 			double fdz = mDz != 0 ? mDz : dz;
 			double fVelocity = mVelocity != 0.0d ? mVelocity : extra1;
-			spawnNow(loc, fdx, fdy, fdz, fVelocity, mExtra2);
+			spawnNow(boss, loc, fdx, fdy, fdz, fVelocity, mExtra2);
 		}
 
-		private void spawnNow(Location loc, double dx, double dy, double dz, double extra1, Object extra2) {
+		private void spawnNow(LivingEntity boss, Location loc, double dx, double dy, double dz, double extra1, Object extra2) {
 			try {
-				if (mParticle.equals(Particle.REDSTONE)) {
-					new PartialParticle(mParticle, loc, mCount, dx, dy, dz, extra1, extra2).spawnAsBoss();
-				} else if (PARTICLE_MATERIALS.contains(mParticle)) {
-					new PartialParticle(mParticle, loc, mCount, dx, dy, dz, extra1, extra2).spawnAsBoss();
-				} else {
-					new PartialParticle(mParticle, loc, mCount, dx, dy, dz, extra1).spawnAsBoss();
-				}
+				new PartialParticle(mParticle, loc, mCount, dx, dy, dz, extra1, extra2).spawnAsEntityActive(boss);
 			} catch (Exception e) {
 				Plugin.getInstance().getLogger().warning("Failed to spawn a particle at loc. Reason: " + e.getMessage());
 				e.printStackTrace();
@@ -119,19 +115,19 @@ public class ParticlesList {
 		return mParticleList;
 	}
 
-	public void spawn(Location loc) {
-		spawn(loc, 0, 0, 0);
+	public void spawn(LivingEntity boss, Location loc) {
+		spawn(boss, loc, 0, 0, 0);
 	}
 
-	public void spawn(Location loc, double dx, double dy, double dz) {
+	public void spawn(LivingEntity boss, Location loc, double dx, double dy, double dz) {
 		for (CParticle particle : mParticleList) {
-			particle.spawn(loc, dx, dy, dz);
+			particle.spawn(boss, loc, dx, dy, dz);
 		}
 	}
 
-	public void spawn(Location loc, double dx, double dy, double dz, double extra1) {
+	public void spawn(LivingEntity boss, Location loc, double dx, double dy, double dz, double extra1) {
 		for (CParticle particle : mParticleList) {
-			particle.spawn(loc, dx, dy, dz, extra1);
+			particle.spawn(boss, loc, dx, dy, dz, extra1);
 		}
 	}
 

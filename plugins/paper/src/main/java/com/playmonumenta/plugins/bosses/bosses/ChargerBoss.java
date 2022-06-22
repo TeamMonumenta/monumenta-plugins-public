@@ -113,22 +113,22 @@ public class ChargerBoss extends BossAbilityGroup {
 			},
 			// Warning sound/particles at boss location and slow boss
 			(LivingEntity player) -> {
-				p.PARTICLE_WARNING.spawn(boss.getLocation(), 2d, 2d, 2d);
+				p.PARTICLE_WARNING.spawn(boss, boss.getLocation(), 2d, 2d, 2d);
 				p.SOUND_WARNING.play(boss.getLocation(), 1f, 1.5f);
 				boss.setAI(false);
 			},
 			// Warning particles
 			(Location loc) -> {
-				p.PARTICLE_TELL.spawn(loc, 0.65d, 0.65d, 0.65d);
+				p.PARTICLE_TELL.spawn(boss, loc, 0.65d, 0.65d, 0.65d);
 			},
 			// Charge attack sound/particles at boss location
 			(LivingEntity player) -> {
-				p.PARTICLE_ROAR.spawn(boss.getLocation(), 0.3d, 0.3d, 0.3d, 0.15d);
+				p.PARTICLE_ROAR.spawn(boss, boss.getLocation(), 0.3d, 0.3d, 0.3d, 0.15d);
 				p.SOUND_ROAR.play(boss.getLocation(), 1f, 1.5f);
 			},
 			// Attack hit a player
 			(LivingEntity target) -> {
-				p.PARTICLE_HIT.spawn(target.getEyeLocation(), 0.4d, 0.4d, 0.4d, 0.4d);
+				p.PARTICLE_HIT.spawn(boss, target.getEyeLocation(), 0.4d, 0.4d, 0.4d, 0.4d);
 				if (p.DAMAGE > 0) {
 					BossUtils.blockableDamage(boss, target, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
 				}
@@ -145,11 +145,11 @@ public class ChargerBoss extends BossAbilityGroup {
 			},
 			// Attack particles
 			(Location loc) -> {
-				p.PARTICLE_ATTACK.spawn(loc);
+				p.PARTICLE_ATTACK.spawn(boss, loc);
 			},
 			// Ending particles on boss
 			() -> {
-				p.PARTICLE_ROAR.spawn(boss.getLocation(), 0.3, 0.3, 0.3, 0.15);
+				p.PARTICLE_ROAR.spawn(boss, boss.getLocation(), 0.3, 0.3, 0.3, 0.15);
 				p.SOUND_ROAR.play(boss.getLocation(), 1f, 1.5f);
 				boss.setAI(true);
 			})

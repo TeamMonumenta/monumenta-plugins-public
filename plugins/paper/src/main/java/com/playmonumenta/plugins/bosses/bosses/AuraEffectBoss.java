@@ -54,8 +54,8 @@ public class AuraEffectBoss extends BossAbilityGroup {
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBaseAura(boss, p.RADIUS, p.HEIGHT, p.RADIUS,
 				(Entity entity) -> {
-					p.PARTICLE.spawn(entity.getLocation(), p.RADIUS / 2, p.HEIGHT / 2, p.RADIUS / 2);
-					p.PARTICLE_ENTITY.spawn(entity.getLocation().clone().add(0, 1, 0));
+					p.PARTICLE.spawn(boss, entity.getLocation(), p.RADIUS / 2, p.HEIGHT / 2, p.RADIUS / 2);
+					p.PARTICLE_ENTITY.spawn(boss, entity.getLocation().clone().add(0, 1, 0));
 				},
 				(p.EFFECTS == EffectsList.EMPTY ? null :
 					(Player player) -> {

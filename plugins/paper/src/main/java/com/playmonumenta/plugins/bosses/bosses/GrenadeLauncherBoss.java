@@ -132,13 +132,13 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 				},
 				(LivingEntity bosss, Location loc) -> {
 					//aesthetics follow the grenade
-					p.PARTICLE_BOMB.spawn(loc);
+					p.PARTICLE_BOMB.spawn(boss, loc);
 					p.SOUND_GRENADE.play(loc);
 
 				},
 				(LivingEntity bosss, Location loc) -> {
 					//aesthetics
-					p.PARTICLE_EXPLOSION.spawn(loc);
+					p.PARTICLE_EXPLOSION.spawn(boss, loc);
 					p.SOUND_EXPLOSION.play(loc);
 				},
 				(LivingEntity bosss, LivingEntity target, Location loc) -> {
@@ -157,14 +157,14 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 				//Aesthetics and hit for the lingering ring
 				(Location loc) -> {
 					//particle for ring
-					p.PARTICLE_LINGERING_RING.spawn(loc, 0.1, 0.2, 0.1, 0.1);
+					p.PARTICLE_LINGERING_RING.spawn(boss, loc, 0.1, 0.2, 0.1, 0.1);
 				},
 				(Location loc, int ticks) -> {
 					//particle for ring center
 					if (ticks % 20 == 0) {
 						p.SOUND_LINGERING.play(loc);
 					}
-					p.PARTICLE_LINGERING_CENTER.spawn(loc, p.EXPLOSION_TARGET.getRange() / 3, 0.2, p.EXPLOSION_TARGET.getRange() / 3, 0.5);
+					p.PARTICLE_LINGERING_CENTER.spawn(boss, loc, p.EXPLOSION_TARGET.getRange() / 3, 0.2, p.EXPLOSION_TARGET.getRange() / 3, 0.5);
 				},
 				(LivingEntity bosss, LivingEntity target, Location loc) -> {
 					//hit ring actions
