@@ -20,12 +20,12 @@ import org.bukkit.inventory.ItemStack;
 public class Transcendent {
 
 	private static final double[] ABILITY_CHANCE = {
-		0.15,
+		0.1,
+		0.2,
 		0.3,
-		0.45,
-		0.6,
-		0.75,
-		0.9
+		0.4,
+		0.5,
+		0.6
 	};
 
 	private static final List<List<String>> ABILITY_POOL_MELEE_R1;

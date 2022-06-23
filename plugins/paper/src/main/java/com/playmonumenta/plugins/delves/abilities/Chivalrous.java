@@ -15,7 +15,9 @@ public class Chivalrous {
 	private static final double[] SPAWN_CHANCE = {
 			0.15,
 			0.3,
-			0.45
+			0.45,
+			0.60,
+			0.75
 	};
 
 	// 50% bee - 25% slime - 25% magmacube
@@ -41,6 +43,10 @@ public class Chivalrous {
 				"Enemies have a " + Math.round(SPAWN_CHANCE[1] * 100) + "% chance to be Chivalrous."
 			}, {
 				"Enemies have a " + Math.round(SPAWN_CHANCE[2] * 100) + "% chance to be Chivalrous."
+			}, {
+				"Enemies have a " + Math.round(SPAWN_CHANCE[3] * 100) + "% chance to be Chivalrous."
+			}, {
+				"Enemies have a " + Math.round(SPAWN_CHANCE[4] * 100) + "% chance to be Chivalrous."
 			}
 	};
 

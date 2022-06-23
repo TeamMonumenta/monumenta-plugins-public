@@ -24,7 +24,7 @@ public class StatMultiplier {
 
 	private static final Map<String, Double> STAT_COMPENSATION_MAPPINGS = new HashMap<>();
 
-	public static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.5;
+	public static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.4;
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
 
 	static {

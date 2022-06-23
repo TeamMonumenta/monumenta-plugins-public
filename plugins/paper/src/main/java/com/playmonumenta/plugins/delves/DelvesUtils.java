@@ -30,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 public class DelvesUtils {
 
 	public static final int MAX_DEPTH_POINTS;
-	public static final int TWISTED_DEPTH_POINTS = 5;
 	public static final int MINIMUM_DEPTH_POINTS = 5;
 	private static final EnumMap<DelvesModifier, Integer> MODIFIER_RANK_CAPS = new EnumMap<>(DelvesModifier.class);
 
@@ -38,17 +37,17 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.RELENTLESS, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.ARCANIC, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.INFERNAL, 5);
-		MODIFIER_RANK_CAPS.put(DelvesModifier.TRANSCENDENT, 3);
-		MODIFIER_RANK_CAPS.put(DelvesModifier.SPECTRAL, 3);
-		MODIFIER_RANK_CAPS.put(DelvesModifier.DREADFUL, 3);
-		MODIFIER_RANK_CAPS.put(DelvesModifier.COLOSSAL, 3);
-		MODIFIER_RANK_CAPS.put(DelvesModifier.CHIVALROUS, 3);
-		MODIFIER_RANK_CAPS.put(DelvesModifier.BLOODTHIRSTY, 3);
-		MODIFIER_RANK_CAPS.put(DelvesModifier.PERNICIOUS, 3);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.TRANSCENDENT, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.SPECTRAL, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.DREADFUL, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.COLOSSAL, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.CHIVALROUS, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.BLOODTHIRSTY, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.PERNICIOUS, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.LEGIONARY, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.CARAPACE, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.ENTROPY, 5);
-		MODIFIER_RANK_CAPS.put(DelvesModifier.TWISTED, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.TWISTED, 5);
 
 		// Depths endless changes- use dev2 for testing
 		if (ServerProperties.getShardName().startsWith("depths")
@@ -71,11 +70,7 @@ public class DelvesUtils {
 
 		int maxDepthPoints = 0;
 		for (Map.Entry<DelvesModifier, Integer> entry : MODIFIER_RANK_CAPS.entrySet()) {
-			if (entry.getKey() == DelvesModifier.TWISTED) {
-				maxDepthPoints += TWISTED_DEPTH_POINTS;
-			} else {
-				maxDepthPoints += entry.getValue();
-			}
+			maxDepthPoints += entry.getValue();
 		}
 
 		MAX_DEPTH_POINTS = maxDepthPoints;
@@ -159,15 +154,12 @@ public class DelvesUtils {
 		DelvesManager.DungeonDelveInfo info = map.get(dungeonName);
 		int oldLevel = info.get(modifier);
 
-		if (modifier == DelvesModifier.TWISTED) {
-			info.mTotalPoint += (TWISTED_DEPTH_POINTS * level - TWISTED_DEPTH_POINTS * oldLevel);
-		} else if (modifier == DelvesModifier.ENTROPY) {
+		 if (modifier == DelvesModifier.ENTROPY) {
 			int pointsToAssign = Entropy.getDepthPointsAssigned(level) - Entropy.getDepthPointsAssigned(oldLevel);
 			info.mTotalPoint += pointsToAssign;
 			if (pointsToAssign > 0) {
 				List<DelvesModifier> mods = DelvesModifier.valuesList();
 				mods.remove(DelvesModifier.ENTROPY);
-				mods.remove(DelvesModifier.TWISTED);
 
 				while (pointsToAssign > 0) {
 					if (mods.isEmpty()) {
@@ -238,7 +230,6 @@ public class DelvesUtils {
 		Map<DelvesModifier, Integer> delvesApplied = new HashMap<>();
 
 		List<DelvesModifier> mods = DelvesModifier.valuesList();
-		mods.remove(DelvesModifier.TWISTED);
 
 		for (Player delvePlayer : DelvesManager.getParty(loc)) {
 			for (DelvesModifier mod : mods) {
@@ -250,8 +241,6 @@ public class DelvesUtils {
 		for (Map.Entry<DelvesModifier, Integer> entry : delvesApplied.entrySet()) {
 			totalLevel += entry.getValue();
 		}
-
-		totalLevel += (delvesApplied.getOrDefault(DelvesModifier.TWISTED, 0) * TWISTED_DEPTH_POINTS);
 
 		totalLevel = Math.min(totalLevel, MAX_DEPTH_POINTS);
 		if (sender != null && !(sender instanceof ProxiedCommandSender)) {

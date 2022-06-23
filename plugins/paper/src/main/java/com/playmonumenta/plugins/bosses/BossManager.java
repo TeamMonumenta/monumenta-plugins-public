@@ -213,7 +213,6 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(FireBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new FireBombTossBoss(p, e));
 		mStatelessBosses.put(CommanderBoss.identityTag, (Plugin p, LivingEntity e) -> new CommanderBoss(p, e));
 		mStatelessBosses.put(ShadePossessedBoss.identityTag, (Plugin p, LivingEntity e) -> new ShadePossessedBoss(p, e));
-		mStatelessBosses.put(TwistedEventBoss.identityTag, (Plugin p, LivingEntity e) -> new TwistedEventBoss(p, e));
 		mStatelessBosses.put(TwistedDespairBoss.identityTag, (Plugin p, LivingEntity e) -> new TwistedDespairBoss(p, e));
 		mStatelessBosses.put(CoordinatedAttackBoss.identityTag, (Plugin p, LivingEntity e) -> new CoordinatedAttackBoss(p, e));
 		mStatelessBosses.put(AbilitySilenceBoss.identityTag, (Plugin p, LivingEntity e) -> new AbilitySilenceBoss(p, e));
@@ -432,7 +431,6 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(FireBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> FireBombTossBoss.deserialize(p, e));
 		mBossDeserializers.put(CommanderBoss.identityTag, (Plugin p, LivingEntity e) -> CommanderBoss.deserialize(p, e));
 		mBossDeserializers.put(ShadePossessedBoss.identityTag, (Plugin p, LivingEntity e) -> ShadePossessedBoss.deserialize(p, e));
-		mBossDeserializers.put(TwistedEventBoss.identityTag, (Plugin p, LivingEntity e) -> TwistedEventBoss.deserialize(p, e));
 		mBossDeserializers.put(TwistedDespairBoss.identityTag, (Plugin p, LivingEntity e) -> TwistedDespairBoss.deserialize(p, e));
 		mBossDeserializers.put(CoordinatedAttackBoss.identityTag, (Plugin p, LivingEntity e) -> CoordinatedAttackBoss.deserialize(p, e));
 		mBossDeserializers.put(AbilitySilenceBoss.identityTag, (Plugin p, LivingEntity e) -> AbilitySilenceBoss.deserialize(p, e));
@@ -567,6 +565,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(DodgeBoss.identityTag, new DodgeBoss.Parameters());
 		mBossParameters.put(GenericBoss.identityTag, new GenericBoss.Parameters());
 		mBossParameters.put(PotionThrowBoss.identityTag, new PotionThrowBoss.Parameters());
+		mBossParameters.put(GenericTargetBoss.identityTag, new GenericTargetBoss.Parameters());
 	}
 
 	/********************************************************************************

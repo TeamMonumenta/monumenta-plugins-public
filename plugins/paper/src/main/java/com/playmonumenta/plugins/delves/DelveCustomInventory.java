@@ -123,7 +123,6 @@ public class DelveCustomInventory extends CustomInventory {
 		mTotalPoint = 0;
 		mInventory.clear();
 		List<DelvesModifier> mods = DelvesModifier.valuesList();
-		mods.remove(DelvesModifier.TWISTED);
 
 		for (DelvesModifier mod : mods) {
 			mTotalPoint += mPointSelected.getOrDefault(mod, 0);
@@ -134,7 +133,6 @@ public class DelveCustomInventory extends CustomInventory {
 			.mapToInt(mod -> DelvesUtils.getMaxPointAssignable(mod, 1000) - mPointSelected.getOrDefault(mod, 0))
 			.sum();
 		mTotalPoint += Math.min(entropy, entropyAssignablePoints);
-		mTotalPoint += (mPointSelected.getOrDefault(DelvesModifier.TWISTED, 0) * 5);
 
 		mTotalPoint = Math.max(Math.min(DelvesUtils.MAX_DEPTH_POINTS, mTotalPoint), 0);
 
@@ -393,7 +391,6 @@ public class DelveCustomInventory extends CustomInventory {
 
 					List<DelvesModifier> mods = DelvesModifier.valuesList();
 					mods.remove(DelvesModifier.ENTROPY);
-					mods.remove(DelvesModifier.TWISTED);
 
 					while (entropyPoint > 0) {
 						if (mods.isEmpty()) {
