@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -150,7 +151,8 @@ public class ItemStatUtils {
 		UNCOMMON("uncommon", Component.text("Uncommon", TextColor.fromHexString("#C0C0C0")).decoration(TextDecoration.ITALIC, false)),
 		RARE("rare", Component.text("Rare", TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false)),
 		ARTIFACT("artifact", Component.text("Artifact", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
-		EPIC("epic", Component.text("Epic", TextColor.fromHexString("#FFD700")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
+		EPIC("epic", Component.text("Epic", TextColor.fromHexString("#B314E3")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
+		LEGENDARY("legendary", Component.text("Legendary", TextColor.fromHexString("#FFD700")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
 		UNIQUE("unique", Component.text("Unique", TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false)),
 		PATRON("patron", Component.text("Patron Made", TextColor.fromHexString("#82DB17")).decoration(TextDecoration.ITALIC, false)),
 		EVENT("event", Component.text("Event", TextColor.fromHexString("#7FFFD4")).decoration(TextDecoration.ITALIC, false)),
@@ -208,9 +210,9 @@ public class ItemStatUtils {
 		IV("4", Component.text("★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
 		V("5", Component.text("★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
 		VI("6", Component.text("★★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		VIIA("7a", Component.text("★★★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		VIIB("7b", Component.text("★★★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		VIIC("7c", Component.text("★★★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		VIIA("7a", Component.text("★★★★★★★", TextColor.fromHexString("#D02E28")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		VIIB("7b", Component.text("★★★★★★★", TextColor.fromHexString("#4AC2E5")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		VIIC("7c", Component.text("★★★★★★★", TextColor.fromHexString("#FFFA75")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
 		ERROR("error", Component.text("ERROR", TextColor.fromHexString("#704C8A")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true));
 
 		static final String KEY = "Masterwork";
@@ -252,10 +254,11 @@ public class ItemStatUtils {
 		NONE("none", DUMMY_LORE_TO_REMOVE),
 		OVERWORLD1("overworld1", Component.text("King's Valley Overworld", TextColor.fromHexString("#DCAE32")).decoration(TextDecoration.ITALIC, false)),
 		OVERWORLD2("overworld2", Component.text("Celsian Isles Overworld", TextColor.fromHexString("#32D7DC")).decoration(TextDecoration.ITALIC, false)),
-		FOREST("forest", Component.text("R3 Forest biome", TextColor.fromHexString("#4C8F4D")).decoration(TextDecoration.ITALIC, false)),
+		FOREST("forest", Component.text("The Wolfswood", TextColor.fromHexString("#4C8F4D")).decoration(TextDecoration.ITALIC, false)),
 		KEEP("keep", Component.text("Pelias' Keep", TextColor.fromHexString("#C4BBA5")).decoration(TextDecoration.ITALIC, false)),
 		CASINO1("casino1", Component.text("Rock's Little Casino", TextColor.fromHexString("#EDC863")).decoration(TextDecoration.ITALIC, false)),
 		CASINO2("casino2", Component.text("Monarch's Cozy Casino", TextColor.fromHexString("#1773B1")).decoration(TextDecoration.ITALIC, false)),
+		CASINO3("casino3", Component.text("Stick's Placeholder Name Casino", TextColor.fromHexString("#C4BBA5")).decoration(TextDecoration.ITALIC, false)),
 		LABS("labs", Component.text("Alchemy Labs", TextColor.fromHexString("#B4ACC3")).decoration(TextDecoration.ITALIC, false)),
 		WHITE("white", Component.text("Halls of Wind and Blood", TextColor.fromHexString("#FFFFFF")).decoration(TextDecoration.ITALIC, false)),
 		ORANGE("orange", Component.text("Fallen Menagerie", TextColor.fromHexString("#FFAA00")).decoration(TextDecoration.ITALIC, false)),
@@ -1547,7 +1550,7 @@ public class ItemStatUtils {
 		if (item == null || item.getType() == Material.AIR) {
 			return Masterwork.NONE;
     }
-  
+
 		NBTItem nbt = new NBTItem(item);
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
@@ -1565,7 +1568,7 @@ public class ItemStatUtils {
 
 		return Masterwork.NONE;
   }
-  
+
 	public static Location getLocation(final @Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return Location.NONE;
@@ -1882,8 +1885,37 @@ public class ItemStatUtils {
 			String regionString = monumenta.getString(Region.KEY);
 			if (regionString != null) {
 				Region region = Region.getRegion(regionString);
+				Masterwork masterwork = Masterwork.getMasterwork(monumenta.getString(Masterwork.KEY));
+				Tier tier = Tier.getTier(monumenta.getString(Tier.KEY));
 				if (region != null) {
-					Tier tier = Tier.getTier(monumenta.getString(Tier.KEY));
+					// For R3 items, set tier to match masterwork level
+					if (region == Region.RING) {
+						if (masterwork != null && masterwork != Masterwork.ERROR && masterwork != Masterwork.NONE) {
+							switch (Objects.requireNonNull(masterwork)) {
+								case ZERO:
+								case I:
+								case II:
+								case III:
+									tier = Tier.RARE;
+									break;
+								case IV:
+								case V:
+									tier = Tier.ARTIFACT;
+									break;
+								case VI:
+									tier = Tier.EPIC;
+									break;
+								case VIIA:
+								case VIIB:
+								case VIIC:
+									tier = Tier.LEGENDARY;
+									break;
+								default:
+									break;
+							}
+							monumenta.setString(Tier.KEY, tier.getName());
+						}
+					}
 					if (tier != null && tier != Tier.NONE) {
 						lore.add(region.getDisplay().append(tier.getDisplay()));
 					}
@@ -1900,7 +1932,6 @@ public class ItemStatUtils {
 					}
 				}
 
-				Masterwork masterwork = Masterwork.getMasterwork(monumenta.getString(Masterwork.KEY));
 				if (masterwork != null && masterwork != Masterwork.NONE) {
 					lore.add(Component.text("Masterwork : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(masterwork.getDisplay()));
 				}
@@ -2129,6 +2160,34 @@ public class ItemStatUtils {
 			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
+			}
+
+			// For R3 items, set tier to match masterwork level
+			if (region == Region.RING) {
+				if (m != Masterwork.ERROR && m != Masterwork.NONE) {
+					switch (Objects.requireNonNull(m)) {
+						case ZERO:
+						case I:
+						case II:
+						case III:
+							tier = Tier.RARE;
+							break;
+						case IV:
+						case V:
+							tier = Tier.ARTIFACT;
+							break;
+						case VI:
+							tier = Tier.EPIC;
+							break;
+						case VIIA:
+						case VIIB:
+						case VIIC:
+							tier = Tier.LEGENDARY;
+							break;
+						default:
+							break;
+					}
+				}
 			}
 
 			editItemInfo(item, region, tier, m, location);
