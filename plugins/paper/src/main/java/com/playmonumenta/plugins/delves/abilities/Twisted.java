@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.delves.abilities;
 
 import com.playmonumenta.libraryofsouls.Soul;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -53,7 +54,7 @@ public class Twisted {
 	};
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE[level - 1]) {
+		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE[level - 1] && DelvesUtils.isValidTwistedMob(mob)) {
 			//spawn a twisted mob
 			spawnTwisted(mob);
 		}
