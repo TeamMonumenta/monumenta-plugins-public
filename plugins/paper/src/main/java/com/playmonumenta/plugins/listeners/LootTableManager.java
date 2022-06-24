@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import io.papermc.paper.event.server.ServerResourcesReloadedEvent;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -209,14 +209,14 @@ public class LootTableManager implements Listener {
 	private void reload() {
 		mTables = new HashMap<>();
 
-		Map<NamespacedKey, File> datapackFiles = FileUtils.getEnabledDatapackFiles("loot_tables", ".json");
+		Map<NamespacedKey, Path> datapackFiles = FileUtils.getEnabledDatapackFiles("loot_tables", ".json");
 		if (datapackFiles.size() == 0) {
 			MMLog.severe("Failed to find any matching loot tables from datapacks - this may be a critical problem");
 		}
 
 		// Load all the loot table namespaces into the map
-		for (Map.Entry<NamespacedKey, File> file : datapackFiles.entrySet()) {
-			String path = file.getValue().toPath().toString();
+		for (Map.Entry<NamespacedKey, Path> file : datapackFiles.entrySet()) {
+			String path = file.getValue().toString();
 			// Insert new or update the existing record
 			mTables.compute(file.getKey(), (k, v) -> {
 				if (v == null) {

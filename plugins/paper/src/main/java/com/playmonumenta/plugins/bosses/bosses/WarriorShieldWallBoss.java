@@ -76,7 +76,7 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 
 				@Override
 				public void run() {
-					p.PARTICLE_CAST.spawn(mBoss.getLocation());
+					p.PARTICLE_CAST.spawn(mBoss, mBoss.getLocation());
 					p.SOUND_CAST.play(mBoss.getLocation());
 					new BukkitRunnable() {
 						int mT = 0;
@@ -99,7 +99,7 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 
 									Location l = mLoc.clone().add(vec);
 									if (mT % 4 == 0) {
-										p.PARTICLE_WALL.spawn(l);
+										p.PARTICLE_WALL.spawn(boss, l);
 									}
 									if (!mHitboxes) {
 										mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
@@ -116,7 +116,7 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 									if (e instanceof Projectile proj && p.CAN_BLOCK_PROJECTILE && proj.getShooter() instanceof LivingEntity livingEntity) {
 										if (targets.contains(livingEntity)) {
 											proj.remove();
-											p.PARTICLE_DEFLECT_PROJECTILE.spawn(eLoc);
+											p.PARTICLE_DEFLECT_PROJECTILE.spawn(boss, eLoc);
 											p.SOUND_DEFLECT_PROJECTILE.play(eLoc);
 										}
 									} else if (e instanceof LivingEntity le && targets.contains(le)) {
@@ -139,7 +139,7 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 											if (p.KNOCK_BACK != 0) {
 												MovementUtils.knockAway(mLoc, le, p.KNOCK_BACK, true);
 											}
-											p.PARTICLE_DEFLECT_ENTITY.spawn(eLoc);
+											p.PARTICLE_DEFLECT_ENTITY.spawn(boss, eLoc);
 											p.SOUND_DEFLECT_ENTITY.play(eLoc);
 										}
 

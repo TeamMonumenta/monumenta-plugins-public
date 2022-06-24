@@ -85,23 +85,23 @@ public class ForceBoss extends BossAbilityGroup {
 
 				@Override
 				protected void chargeAuraAction(Location loc) {
-					p.PARTICLE_AIR.spawn(loc, currentRadius / 2, currentRadius / 2, currentRadius / 2, 0.05);
+					p.PARTICLE_AIR.spawn(boss, loc, currentRadius / 2, currentRadius / 2, currentRadius / 2, 0.05);
 				}
 
 				@Override
 				protected void chargeCircleAction(Location loc) {
-					p.PARTICLE_CIRCLE.spawn(loc, 0.25, 0.25, 0.25, 0.1);
+					p.PARTICLE_CIRCLE.spawn(boss, loc, 0.25, 0.25, 0.25, 0.1);
 				}
 
 				@Override
 				protected void outburstAction(Location loc) {
-					p.PARTICLE_EXPLODE.spawn(loc, 0.5, 0, 0.5, 0.8f);
+					p.PARTICLE_EXPLODE.spawn(boss, loc, 0.5, 0, 0.5, 0.8f);
 					p.SOUND_EXPLODE.play(loc, 1.0f, 0.7f);
 				}
 
 				@Override
 				protected void circleOutburstAction(Location loc) {
-					p.PARTICLE_CIRCLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
+					p.PARTICLE_CIRCLE_EXPLODE.spawn(boss, loc, 0.2, 0.2, 0.2, 0.2);
 				}
 
 				@Override
@@ -116,7 +116,7 @@ public class ForceBoss extends BossAbilityGroup {
 						} else if (distance < p.TARGETS.getRange()) {
 							p.EFFECTS_LIMIT.apply(target, boss);
 						}
-						p.PARTICLE_HIT.spawn(target.getEyeLocation(), 0.25, 0.5, 0.25, 0);
+						p.PARTICLE_HIT.spawn(boss, target.getEyeLocation(), 0.25, 0.5, 0.25, 0);
 					}
 				}
 

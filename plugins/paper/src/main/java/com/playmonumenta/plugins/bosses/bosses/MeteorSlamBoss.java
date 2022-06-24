@@ -60,6 +60,7 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
 				(World world, Location loc) -> {
+					mBoss.addScoreboardTag(BlockPlacerBoss.STOP_PLACING_BLOCK);
 					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
 					world.spawnParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0);
 				}, (World world, Location loc) -> {
@@ -68,6 +69,7 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 				}, (World world, Location loc) -> {
 					world.spawnParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f));
 				}, (World world, Player player, Location loc, Vector dir) -> {
+					mBoss.removeScoreboardTag(BlockPlacerBoss.STOP_PLACING_BLOCK);
 					ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
 							Arrays.asList(
 									new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {

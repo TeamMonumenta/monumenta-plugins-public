@@ -134,8 +134,8 @@ public class SizeChangerBoss extends BossAbilityGroup {
 							double rad = Math.toRadians(i);
 							double cos = FastUtils.cos(rad) * height;
 							double sin = FastUtils.sin(rad) * height;
-							mParams.PARTICLES.spawn(mLoc.clone().add(cos, sin, sin));
-							mParams.PARTICLES.spawn(mLoc.clone().add(sin, sin, cos));
+							mParams.PARTICLES.spawn(mBoss, mLoc.clone().add(cos, sin, sin));
+							mParams.PARTICLES.spawn(mBoss, mLoc.clone().add(sin, sin, cos));
 						}
 					}
 				}.runTaskLater(mPlugin, 1);

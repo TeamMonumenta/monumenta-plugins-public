@@ -98,24 +98,24 @@ public class SpellEarthshake extends Spell {
 	protected void chargeActions(Location loc, int ticks) {
 
 		if (ticks % 2 == 0) {
-			mParameters.PARTICLES_CHARGE_TWO_TICKS.spawn(loc);
+			mParameters.PARTICLES_CHARGE_TWO_TICKS.spawn(mLauncher, loc);
 		}
 
 		if (ticks % 20 == 0 && ticks > 0) {
 			mParameters.SOUND_CHARGE_TARGET.play(loc);
 			for (int i = 0; i < 360; i += 18) {
-				mParameters.PARTICLES_CHARGE_TWENTY_TICKS_BORDER.spawn(loc.clone().add(FastUtils.cos(Math.toRadians(i)) * mParameters.RADIUS, 0.2, FastUtils.sin(Math.toRadians(i)) * mParameters.RADIUS));
+				mParameters.PARTICLES_CHARGE_TWENTY_TICKS_BORDER.spawn(mLauncher, loc.clone().add(FastUtils.cos(Math.toRadians(i)) * mParameters.RADIUS, 0.2, FastUtils.sin(Math.toRadians(i)) * mParameters.RADIUS));
 			}
-			mParameters.PARTICLES_CHARGE_TWENTY_TICKS.spawn(loc);
+			mParameters.PARTICLES_CHARGE_TWENTY_TICKS.spawn(mLauncher, loc);
 		}
 
 		if (ticks <= (mParameters.FUSE_TIME - 5)) {
 			mParameters.SOUND_CHARGE_BOSS.play(mLauncher.getLocation());
 		}
 
-		mParameters.PARTICLES_CHARGE.spawn(loc);
+		mParameters.PARTICLES_CHARGE.spawn(mLauncher, loc);
 
-		mParameters.PARTICLES_CHARGE_BOSS.spawn(mLauncher.getLocation().clone().add(0, mLauncher.getHeight() / 2, 0));
+		mParameters.PARTICLES_CHARGE_BOSS.spawn(mLauncher, mLauncher.getLocation().clone().add(0, mLauncher.getHeight() / 2, 0));
 
 	}
 
@@ -124,10 +124,10 @@ public class SpellEarthshake extends Spell {
 		World world = loc.getWorld();
 
 		mParameters.SOUND_EXPLOSION.play(loc);
-		mParameters.PARTICLES_EXPLOSION.spawn(loc);
+		mParameters.PARTICLES_EXPLOSION.spawn(mLauncher, loc);
 
 		for (int i = 0; i < 100; i++) {
-			mParameters.PARTICLES_EXPLOSION_DIRECTIONAL.spawn(loc.clone().add(FastUtils.randomDoubleInRange(-1, 1) * mParameters.RADIUS * 0.75, 0.1, FastUtils.randomDoubleInRange(-1, 1) * mParameters.RADIUS * 0.75),
+			mParameters.PARTICLES_EXPLOSION_DIRECTIONAL.spawn(mLauncher, loc.clone().add(FastUtils.randomDoubleInRange(-1, 1) * mParameters.RADIUS * 0.75, 0.1, FastUtils.randomDoubleInRange(-1, 1) * mParameters.RADIUS * 0.75),
 				0, 1, 0, 0.2 + FastUtils.RANDOM.nextDouble() * 0.4);
 		}
 

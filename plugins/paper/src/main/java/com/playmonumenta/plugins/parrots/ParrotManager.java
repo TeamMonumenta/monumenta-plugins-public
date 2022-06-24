@@ -59,7 +59,8 @@ public class ParrotManager implements Listener {
 		RADIANT("Radiant Conure", 17, Parrot.Variant.CYAN),
 		HEKAWT("Veil Electus", 18, Parrot.Variant.BLUE),
 		BLITZ("Plushy Parrot", 19, Parrot.Variant.RED),
-		CORRIDORS("Crimson Lace", 20, Parrot.Variant.RED);
+		CORRIDORS("Crimson Lace", 20, Parrot.Variant.RED),
+		TWISTED("Twisted Torrap", 21, Parrot.Variant.BLUE);
 
 
 		private String mName;

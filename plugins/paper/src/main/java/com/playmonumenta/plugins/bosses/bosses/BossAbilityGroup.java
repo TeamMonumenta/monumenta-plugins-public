@@ -287,6 +287,13 @@ public abstract class BossAbilityGroup {
 
 	}
 
+	/*
+	 *  Boss throws a splash potion
+	 */
+	public void bossSplashPotion(PotionSplashEvent event) {
+
+	}
+
 	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
 
 	}

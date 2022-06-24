@@ -1,211 +1,148 @@
 package com.playmonumenta.plugins.delves.abilities;
 
+import com.playmonumenta.libraryofsouls.Soul;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.bosses.ShadeParticleBoss;
-import com.playmonumenta.plugins.bosses.bosses.ShadePossessedBoss;
-import com.playmonumenta.plugins.bosses.bosses.TwistedEventBoss;
-import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import java.util.Iterator;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Enderman;
-import org.bukkit.entity.Flying;
-import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Spider;
-import org.bukkit.entity.Witch;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class Twisted {
 
-	private static final double EVENT_ATTEMPT_CHANCE = 0.2;
-	private static final int EFFECT_RANGE = 16;
+	private static final double[] SPAWN_CHANCE = {
+		0.005,
+		0.010,
+		0.013,
+		0.020,
+		0.025
+	};
 
-	private static final String AFFECTED_MOB_TAG = "ShadeAffectedMob";
+	private static final String POOL_NAME = "~Twisted";
+	private static final String POOL_NAME_WATER = "~TwistedWater";
 
-	private static final String SHADE_OF_WRATH = "ShadeofWrath";
-	private static final String SHADE_OF_GREED = "ShadeofGreed";
-	private static final String SHADE_OF_DESPAIR = "ShadeofDespair";
-
-	private static final String PERCENT_SPEED_MODIFIER_NAME = "TwistedCorruptedPercentSpeedModifier";
-	private static final double PERCENT_SPEED_MODIFIER = 0.25;
+	private static final int ANIMATION_DURATION = 20 * 2;
+	private static final int MAX_SPIRAL_ANIMATOR_COUNT = 3;
 
 	public static final String DESCRIPTION = "Something, everything is wrong...";
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 			{
-				"Worth 5 Depth Points.",
-				"Cannot be randomly assigned by Entropy.",
-				"",
-				ChatColor.DARK_RED + "Select at your own demise."
+				ChatColor.MAGIC + "M" + ChatColor.RESET + "or" + ChatColor.MAGIC + "tu" + ChatColor.RESET + "i non mo" + ChatColor.MAGIC + "rd" + ChatColor.RESET + "ent",
+			}, {
+				ChatColor.MAGIC + "Mors" + ChatColor.RESET + " non a" + ChatColor.MAGIC + "ccip" + ChatColor.RESET + "it excusatio" + ChatColor.MAGIC + "nes"
+			}, {
+				"Quid" + ChatColor.MAGIC + "quid in" + ChatColor.RESET + " altum " + ChatColor.MAGIC + "for" + ChatColor.RESET + "tuna " + ChatColor.MAGIC + "tulit" + ChatColor.RESET + ", ruitura " + ChatColor.MAGIC + "levat."
+			}, {
+				ChatColor.MAGIC + "Nec" + ChatColor.RESET + " vita " + ChatColor.MAGIC + "nec" + ChatColor.RESET + " fortuna " + ChatColor.MAGIC + "hominibus " + ChatColor.RESET + " perpes " + ChatColor.MAGIC + "est"
+			}, {
+				"For" + ChatColor.MAGIC + "tu" + ChatColor.RESET + "na " + ChatColor.MAGIC + "fav" + ChatColor.RESET + "et fo" + ChatColor.MAGIC + "rtib" + ChatColor.RESET + "u" + ChatColor.MAGIC + "s"
 			}
 	};
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (FastUtils.RANDOM.nextDouble() < EVENT_ATTEMPT_CHANCE) {
-			mob.addScoreboardTag(TwistedEventBoss.identityTag);
+		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE[level - 1]) {
+			//spawn a twisted mob
+			spawnTwisted(mob);
 		}
 	}
 
-	public static void runEvent(LivingEntity mob) {
-		if (mob instanceof Mob) {
-			Plugin plugin = Plugin.getInstance();
-			int random = FastUtils.RANDOM.nextInt(4);
-			List<LivingEntity> mobs = getAffectedMobs(mob);
+	public static void spawnTwisted(LivingEntity mob) {
+		List<LivingEntity> mobsInArea = EntityUtils.getNearbyMobs(mob.getLocation(), 16);
+		mobsInArea.remove(mob);
+		Location spawningLoc = mob.getLocation().clone();
 
-			if (random == 0) {
-				shadeOfWrath(plugin, mobs);
-			} else if (random == 1) {
-				shadeOfDeath(mobs);
-			} else if (random == 2) {
-				shadeOfDespair(plugin, mobs);
-			} else {
-				shadeOfCorruption(plugin, mobs);
-			}
-		}
-	}
-
-	private static void shadeOfWrath(Plugin plugin, List<LivingEntity> mobs) {
-		for (LivingEntity mob : mobs) {
+		mob.getWorld().playSound(spawningLoc, Sound.ENTITY_WITHER_SPAWN, 10, 0.5f);
+		int count = MAX_SPIRAL_ANIMATOR_COUNT;
+		for (LivingEntity le : mobsInArea) {
+			final int countFinal = count;
 			new BukkitRunnable() {
-				int mTicks = 0;
+				int mTimer = 0;
+				final boolean mShouldSpawnSpiral = countFinal > 0;
+				final Location mLocation = le.getEyeLocation();
+				final double mDistance = mLocation.distance(spawningLoc);
+				final Vector mDirection = spawningLoc.clone().subtract(mLocation).toVector().normalize().multiply(mDistance / (ANIMATION_DURATION / 2.0));
+				final PartialParticle mPPRay = new PartialParticle(Particle.REDSTONE, mLocation, 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(127, 0, 0), 1.0f));
+				final PartialParticle mPPRay2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, mLocation, 1, 0, 0, 0);
+				final PartialParticle mPPSpiral = new PartialParticle(Particle.REDSTONE, mLocation, 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(127, 0, 0), 1.0f));
+				final PartialParticle mPPSpiral2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, mLocation, 1, 0, 0, 0);
+				final PartialParticle mPPSpiral3 = new PartialParticle(Particle.SMOKE_LARGE, mLocation, 1, 0, 0, 0);
 
+				final double mZDiff = mLocation.getZ() - spawningLoc.getZ();
+				final double mXDiff = mLocation.getX() - spawningLoc.getX();
+				final double mHeightStep = 0.03;
+				double mRadiant = 2 * Math.atan(mZDiff / (mXDiff + Math.sqrt(mXDiff * mXDiff + mZDiff * mZDiff)));
+				double mCurrentHeight = mHeightStep;
 				@Override
 				public void run() {
-					if (!mob.isValid() || mob.isDead()) {
-						this.cancel();
-					}
-
-					mob.setNoDamageTicks(0);
-					mob.damage(0.0001);
-
-					mTicks += 2;
-					if (mTicks > 60) {
-						mob.setHealth(0);
-
-						if (FastUtils.RANDOM.nextBoolean()) {
-							LibraryOfSoulsIntegration.summon(mob.getLocation(), SHADE_OF_WRATH);
-						} else {
-							LibraryOfSoulsIntegration.summon(mob.getLocation(), SHADE_OF_GREED);
+					if (mTimer <= ANIMATION_DURATION / 2.0) {
+						mPPRay.location(mLocation).spawnAsBoss();
+						mPPRay2.location(mLocation).spawnAsBoss();
+						mLocation.add(mDirection);
+					} else if (mShouldSpawnSpiral) {
+						for (double degree = mRadiant; degree <= mRadiant + 15; degree += 5) {
+							Location l = spawningLoc.clone().add(FastUtils.cos(degree) * 1.2, mCurrentHeight, FastUtils.sin(degree) * 1.2);
+							mCurrentHeight += mHeightStep;
+							mPPSpiral.location(l).spawnAsBoss();
+							mPPSpiral2.location(l).spawnAsBoss();
+							mPPSpiral3.location(l).spawnAsBoss();
 						}
-
-						this.cancel();
-					}
-				}
-			}.runTaskTimer(plugin, 0, 2);
-		}
-	}
-
-	private static void shadeOfDeath(List<LivingEntity> mobs) {
-		for (LivingEntity mob : mobs) {
-			mob.getWorld().playSound(mob.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.3f, 0.5f);
-
-			try {
-				BossManager.createBoss(null, mob, ShadePossessedBoss.identityTag);
-			} catch (Exception ex) {
-				Plugin.getInstance().getLogger().severe("Failed to create ShadePossessedBoss: " + ex.getMessage());
-				ex.printStackTrace();
-			}
-		}
-	}
-
-	private static void shadeOfDespair(Plugin plugin, List<LivingEntity> mobs) {
-		for (LivingEntity mob : mobs) {
-			World world = mob.getWorld();
-			Location loc = mob.getLocation();
-			world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, 0.5f, 0.5f);
-			world.playSound(loc, Sound.ENTITY_HORSE_DEATH, 0.2f, 0.25f);
-
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					world.playSound(loc, Sound.ENTITY_GHAST_DEATH, 1f, 0.5f);
-					new PartialParticle(Particle.SMOKE_LARGE, loc, 20, 0.2, 0.3, 0.2, 0.1).spawnAsEnemy();
-
-					LibraryOfSoulsIntegration.summon(mob.getLocation(), SHADE_OF_DESPAIR);
-				}
-			}.runTaskLater(plugin, 60);
-		}
-	}
-
-	private static void shadeOfCorruption(Plugin plugin, List<LivingEntity> mobs) {
-		for (LivingEntity mob : mobs) {
-			World world = mob.getWorld();
-			Location loc = mob.getLocation();
-			world.playSound(loc, Sound.ENTITY_HUSK_CONVERTED_TO_ZOMBIE, 0.5f, 0.5f);
-			world.playSound(loc, Sound.ENTITY_HUSK_DEATH, 0.5f, 0.5f);
-
-			try {
-				BossManager.createBoss(null, mob, ShadeParticleBoss.identityTag);
-			} catch (Exception ex) {
-				Plugin.getInstance().getLogger().severe("Failed to create ShadeParticleBoss: " + ex.getMessage());
-				ex.printStackTrace();
-			}
-
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					new PartialParticle(Particle.SMOKE_LARGE, loc, 20, 0.2, 0.3, 0.2, 0.1).spawnAsEnemy();
-					world.playSound(loc, Sound.ENTITY_HUSK_AMBIENT, 1f, 0.5f);
-
-					// These mobs don't have visible equipment and are obnoxious when invisible
-					if (!(mob instanceof Creeper || mob instanceof Spider || mob instanceof Witch
-						|| mob instanceof Enderman || mob instanceof IronGolem)) {
-						PotionUtils.applyPotion(null, mob,
-						                        new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 3600 * 100, 0, false, false));
+						mRadiant += 15;
 					}
 
-					EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
-					                         new AttributeModifier(PERCENT_SPEED_MODIFIER_NAME, PERCENT_SPEED_MODIFIER, Operation.MULTIPLY_SCALAR_1));
+					if (mTimer >= ANIMATION_DURATION) {
+						cancel();
+						return;
+					}
+
+					if (!mShouldSpawnSpiral && mTimer >= ANIMATION_DURATION / 2) {
+						cancel();
+						return;
+					}
+					mTimer++;
 				}
-			}.runTaskLater(plugin, 60);
-		}
-	}
-
-	private static List<LivingEntity> getAffectedMobs(LivingEntity sourceMob) {
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(sourceMob.getEyeLocation(), EFFECT_RANGE);
-
-		Iterator<LivingEntity> iter = mobs.iterator();
-		while (iter.hasNext()) {
-			LivingEntity mob = iter.next();
-
-			if (!sourceMob.hasLineOfSight(mob) || mob instanceof Flying) {
-				iter.remove();
-				continue;
-			}
-
-			Set<String> tags = mob.getScoreboardTags();
-			if ((tags.contains(ShadeParticleBoss.identityTag)
-							|| tags.contains(AFFECTED_MOB_TAG)
-							|| tags.contains(DelvesManager.AVOID_MODIFIERS)
-							|| EntityUtils.isElite(mob)
-							|| EntityUtils.isBoss(mob))) {
-				iter.remove();
-				continue;
-			}
-
-			mob.addScoreboardTag(AFFECTED_MOB_TAG);
+			}.runTaskTimer(Plugin.getInstance(), 0, 1);
+			count--;
 		}
 
-		return mobs;
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			LivingEntity twistedMob = null;
+			String pool = spawningLoc.getBlock().getType() == Material.WATER ? POOL_NAME_WATER : POOL_NAME;
+			Map<Soul, Integer> mobsPool = LibraryOfSoulsIntegration.getPool(pool);
+			if (mobsPool != null) {
+				for (Map.Entry<Soul, Integer> entry : mobsPool.entrySet()) {
+					twistedMob = (LivingEntity) entry.getKey().summon(spawningLoc);
+				}
+			}
+			if (twistedMob == null) {
+				MMLog.warning("[Delve - Twisted] summoned twisted with null object! THIS IS A BUG!");
+				return;
+			}
+			twistedMob.setInvulnerable(true);
+			twistedMob.setGravity(false);
+			final LivingEntity twistedMobFinal = twistedMob;
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				twistedMobFinal.setGravity(true);
+				twistedMobFinal.setInvulnerable(false);
+				twistedMobFinal.getWorld().playSound(twistedMobFinal.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 10, 0.8f);
+			}, ANIMATION_DURATION / 2);
+		}, ANIMATION_DURATION / 2);
+
+
+
 	}
+
 
 }

@@ -84,23 +84,23 @@ public class RejuvenationBoss extends BossAbilityGroup {
 					return p.TARGETS.getTargetsList(mBoss);
 				},
 				(Location loc, int ticks) -> {
-					p.PARTICLE_CHARGE_AIR.spawn(loc, 3.5, 3.5, 3.5, 0.25);
+					p.PARTICLE_CHARGE_AIR.spawn(boss, loc, 3.5, 3.5, 3.5, 0.25);
 					if (ticks <= (p.DURATION - 5) && ticks % 2 == 0) {
 						p.SOUND_CHARGE.play(mBoss.getLocation(), 0.8f, 0.25f + ((float)ticks / (float)100));
 					}
 				},
 				(Location loc, int ticks) -> {
-					p.PARTICLE_CHARGE_CIRCLE.spawn(loc, 0.25, 0.25, 0.25);
+					p.PARTICLE_CHARGE_CIRCLE.spawn(boss, loc, 0.25, 0.25, 0.25);
 				},
 				(Location loc, int ticks) -> {
-					p.PARTICLE_OUTBURST_AIR.spawn(loc, 3.5, 3.5, 3.5, 0.25);
+					p.PARTICLE_OUTBURST_AIR.spawn(boss, loc, 3.5, 3.5, 3.5, 0.25);
 					p.SOUND_OUTBURST_CIRCLE.play(loc);
 				},
 				(Location loc, int ticks) -> {
-					p.PARTICLE_OUTBURST_CIRCLE.spawn(loc);
+					p.PARTICLE_OUTBURST_CIRCLE.spawn(boss, loc);
 				},
 				(LivingEntity target) -> {
-					p.PARTICLE_HEAL.spawn(target.getEyeLocation());
+					p.PARTICLE_HEAL.spawn(boss, target.getEyeLocation());
 					double hp = target.getHealth() + p.HEAL;
 					double max = target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 					if (hp >= max) {

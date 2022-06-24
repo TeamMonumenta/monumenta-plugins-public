@@ -141,6 +141,13 @@ public abstract class Spell implements Cloneable {
 
 	}
 
+	/*
+	 * Boss throws a splash potion
+	 */
+	public void bossSplashPotion(PotionSplashEvent event) {
+
+	}
+
 	public void bossCastAbility(SpellCastEvent event) {
 
 	}

@@ -89,12 +89,12 @@ public final class NovaBoss extends BossAbilityGroup {
 			new SpellBaseAoE(plugin, boss, (int) p.TARGETS.getRange(), p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE) {
 				@Override
 				protected void chargeAuraAction(Location loc) {
-					p.PARTICLE_AIR.spawn(loc, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, 0.05);
+					p.PARTICLE_AIR.spawn(boss, loc, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, 0.05);
 				}
 
 				@Override
 				protected void chargeCircleAction(Location loc) {
-					p.PARTICLE_LOAD.spawn(loc, 0.25d, 0.25d, 0.25d, 0.0d);
+					p.PARTICLE_LOAD.spawn(boss, loc, 0.25d, 0.25d, 0.25d, 0.0d);
 				}
 
 				@Override
@@ -104,7 +104,7 @@ public final class NovaBoss extends BossAbilityGroup {
 
 				@Override
 				protected void circleOutburstAction(Location loc) {
-					p.PARTICLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
+					p.PARTICLE_EXPLODE.spawn(boss, loc, 0.2, 0.2, 0.2, 0.2);
 				}
 
 				@Override

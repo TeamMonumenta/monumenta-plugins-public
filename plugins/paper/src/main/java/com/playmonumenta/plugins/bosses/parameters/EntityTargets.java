@@ -17,7 +17,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-public class EntityTargets {
+public class EntityTargets implements Cloneable {
 
 	/**
 	 *          targetsParam=[   TARGETS
@@ -451,6 +451,8 @@ public class EntityTargets {
 
 		public static final Limit DEFAULT = new Limit(LIMITSENUM.ALL, SORTING.RANDOM);
 		public static final Limit DEFAULT_ONE = new Limit(1, SORTING.RANDOM);
+		public static final Limit CLOSER_ONE = new Limit(1, SORTING.CLOSER);
+		public static final Limit DEFAULT_CLOSER = new Limit(LIMITSENUM.ALL, SORTING.CLOSER);
 
 		//format (num,sortingEnum) || (limitEnum,sortingEnum)
 		public static ParseResult<Limit> fromReader(StringReader reader, String hoverDescription) {
@@ -511,6 +513,7 @@ public class EntityTargets {
 	public static final EntityTargets GENERIC_MOB_TARGET = new EntityTargets(TARGETS.MOB, 30, true, Limit.DEFAULT, new ArrayList<>(), TagsListFiter.DEFAULT);
 	public static final EntityTargets GENERIC_SELF_TARGET = new EntityTargets(TARGETS.SELF, 0, false, Limit.DEFAULT, new ArrayList<>(), TagsListFiter.DEFAULT);
 	public static final EntityTargets GENERIC_ONE_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.DEFAULT_ONE, new ArrayList<>(), TagsListFiter.DEFAULT);
+	public static final EntityTargets GENERIC_ONE_PLAYER_CLOSER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.CLOSER_ONE, new ArrayList<>(), TagsListFiter.DEFAULT);
 
 	private static final String LIMIT_STRING = "limit=";
 	private static final String FILTERS_STRING = "filters=";
@@ -596,6 +599,21 @@ public class EntityTargets {
 
 	public double getRange() {
 		return mRange;
+	}
+
+	public EntityTargets setRange(double range) {
+		mRange = range;
+		return this;
+	}
+
+	public EntityTargets setLimit(Limit limit) {
+		mLimit = limit;
+		return this;
+	}
+
+	@Override
+	public EntityTargets clone() {
+		return new EntityTargets(mTargets, mRange, mOptional, mLimit, mFilters, mTagsFilter);
 	}
 
 	public List<Location> getTargetsLocationList(LivingEntity boss) {

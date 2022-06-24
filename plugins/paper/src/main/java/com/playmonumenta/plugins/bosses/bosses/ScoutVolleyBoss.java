@@ -5,13 +5,18 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,6 +50,8 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new ScoutVolleyBoss(plugin, boss);
 	}
+
+	private final Set<AbstractArrow> mVolleyArrowSet = new HashSet<>();
 
 	public ScoutVolleyBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -83,6 +90,8 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 							}
 
 							if (mTimer >= p.SPELL_DELAY) {
+								mVolleyArrowSet.clear();
+
 								p.SOUND_SHOOT.play(mBoss.getLocation());
 								Location eyeLoc = mBoss.getEyeLocation();
 								Location targetEyeLoc = p.TARGETS.getTargetsList(mBoss).get(0).getEyeLocation();
@@ -93,11 +102,12 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 									arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
 									arrow.setPierceLevel(p.PIERCING);
 									arrow.setDamage(p.DAMAGE);
+									mVolleyArrowSet.add(arrow);
 									if (!p.PARTICLE_PROJECTILE.isEmpty()) {
 										new BukkitRunnable() {
 
 											@Override public void run() {
-												p.PARTICLE_PROJECTILE.spawn(arrow.getLocation());
+												p.PARTICLE_PROJECTILE.spawn(boss, arrow.getLocation());
 
 												if (arrow.isInBlock() || !arrow.isValid()) {
 													this.cancel();
@@ -119,15 +129,25 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 				public int cooldownTicks() {
 					return p.COOLDOWN;
 				}
+
+				@Override public boolean canRun() {
+					return !p.TARGETS.getTargetsList(mBoss).isEmpty();
+				}
 			}
 		));
 
 		super.constructBoss(spells, Collections.emptyList(), -1, null, p.DELAY);
 	}
 
-
-
-
+	@Override
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		Entity damager = event.getDamager();
+		if (event.getType() == DamageEvent.DamageType.PROJECTILE && damager instanceof AbstractArrow arrow && mVolleyArrowSet.contains(arrow)) {
+			if (MetadataUtils.happenedThisTick(damagee, "ScoutVolleyBoss")) {
+				event.setCancelled(true);
+			}
+		}
+	}
 
 	private static AbstractArrow spawnArrow(LivingEntity entity, Vector dir, double yawOffset, float speed) {
 		Location loc = entity.getEyeLocation();

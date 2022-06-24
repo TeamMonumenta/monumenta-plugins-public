@@ -98,7 +98,7 @@ public class AvengerBoss extends BossAbilityGroup {
 			if (entity.getKiller() != null
 					&& entity.getLocation().distance(bossLoc) < mParam.RADIUS) {
 				mParam.SOUND_DEATH.play(bossLoc, 0.1f, 0.8f);
-				mParam.PARTICLE_DEATH.spawn(bossLoc.clone().add(0, mBoss.getHeight() / 2, 0), 0.25, 0.45, 0.25, 1);
+				mParam.PARTICLE_DEATH.spawn(mBoss, bossLoc.clone().add(0, mBoss.getHeight() / 2, 0), 0.25, 0.45, 0.25, 1);
 
 				new BukkitRunnable() {
 					int mCount = 0;
@@ -107,16 +107,16 @@ public class AvengerBoss extends BossAbilityGroup {
 					@Override
 					public void run() {
 						if (mCount >= mMaxCount) {
-							mParam.PARTICLE_BOSS.spawn(bossLoc, 20, 1.5, 1.5, 1.5);
+							mParam.PARTICLE_BOSS.spawn(mBoss, bossLoc, 20, 1.5, 1.5, 1.5);
 							if (mParam.HEAL_PERCENT > 0) {
-								mParam.PARTICLE_HEAL.spawn(bossLoc.clone().add(0, 0.5, 1), 1, 1, 1);
+								mParam.PARTICLE_HEAL.spawn(mBoss, bossLoc.clone().add(0, 0.5, 1), 1, 1, 1);
 							}
 							this.cancel();
 						}
 
 						Location bossEyeLoc = mBoss.getEyeLocation();
 						Vector particleVector = bossEyeLoc.subtract(deadLoc).toVector().multiply((double) mCount / mMaxCount);
-						mParam.PARTICLE_VECTOR.spawn(deadLoc.add(particleVector));
+						mParam.PARTICLE_VECTOR.spawn(mBoss, deadLoc.add(particleVector));
 
 						mCount++;
 					}

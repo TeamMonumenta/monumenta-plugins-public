@@ -10,11 +10,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collections;
-import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -73,22 +69,22 @@ public class JumpBoss extends BossAbilityGroup {
 		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
 				(World world, Location loc) -> {
 					p.SOUND_JUMP.play(loc);
-					p.PARTICLE_START.spawn(loc, 1, 0, 1);
+					p.PARTICLE_START.spawn(boss, loc, 1, 0, 1);
 				}, (World world, Location loc) -> {
-					p.SOUND_JUMP_START.play(loc);
-					p.PARTICLE_START_GROUND.spawn(loc, 1, 0, 1);
+			p.SOUND_JUMP_START.play(loc);
+			p.PARTICLE_START_GROUND.spawn(boss, loc, 1, 0, 1);
 				}, (World world, Location loc) -> {
-					p.PARTICLE_AIR.spawn(loc, 4, 0.5, 0.5);
+			p.PARTICLE_AIR.spawn(boss, loc, 4, 0.5, 0.5);
 				}, (World world, Player player, Location loc, Vector dir) -> {
 					ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
 							Arrays.asList(
 									new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
-										p.PARTICLE_LAND_GROUND.spawn(loc, 1, 0.1, 0.1);
+										p.PARTICLE_LAND_GROUND.spawn(boss, loc, 1, 0.1, 0.1);
 									})
 							));
 
-					p.SOUND_LANDING.play(loc);
-					p.PARTICLE_LAND.spawn(loc);
+			p.SOUND_LANDING.play(loc);
+			p.PARTICLE_LAND.spawn(boss, loc);
 					})));
 		super.constructBoss(manager, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}

@@ -88,21 +88,21 @@ public final class PounceBoss extends BossAbilityGroup {
 		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
 				(World world, Location loc) -> {
 					p.SOUND_START.play(loc, 1f, 1f);
-					p.PARTICLE_START.spawn(loc, 1d, 0d, 1d);
+					p.PARTICLE_START.spawn(boss, loc, 1d, 0d, 1d);
 				}, (World world, Location loc) -> {
-					p.SOUND_LEAP.play(loc, 1f, 1f);
-					p.PARTICLE_LEAP.spawn(loc, 1d, 0f, 1d, 0d);
+			p.SOUND_LEAP.play(loc, 1f, 1f);
+			p.PARTICLE_LEAP.spawn(boss, loc, 1d, 0f, 1d, 0d);
 				}, (World world, Location loc) -> {
-					p.PARTICLE_LEAPING.spawn(loc, 0.5, 0.5, 0.5, 1d);
+			p.PARTICLE_LEAPING.spawn(boss, loc, 0.5, 0.5, 0.5, 1d);
 				}, (World world, Player player, Location loc, Vector dir) -> {
 					ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
 							Arrays.asList(
 									new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
-										p.PARTICLE_RING.spawn(loc, 0.1, 0.1, 0.1, 0.1);
+										p.PARTICLE_RING.spawn(boss, loc, 0.1, 0.1, 0.1, 0.1);
 									})
 							));
-					p.SOUND_HIT.play(loc, 1, 1);
-					p.PARTICLE_HIT.spawn(loc);
+			p.SOUND_HIT.play(loc, 1, 1);
+			p.PARTICLE_HIT.spawn(boss, loc);
 
 					if (player != null) {
 						if (p.DAMAGE > 0) {

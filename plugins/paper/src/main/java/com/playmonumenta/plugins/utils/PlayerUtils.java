@@ -66,7 +66,7 @@ public class PlayerUtils {
 		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
 		if (isDungeon) {
 			return location.getWorld().getPlayers().stream()
-				.filter(p -> p.getGameMode() != GameMode.SPECTATOR && p.getGameMode() != GameMode.CREATIVE)
+				.filter(p -> p.getGameMode() != GameMode.SPECTATOR && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER))
 				.toList();
 		}
 
@@ -74,8 +74,7 @@ public class PlayerUtils {
 		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(location.toVector(), true);
 		if (!structures.isEmpty()) {
 			return location.getWorld().getPlayers().stream()
-				.filter(p -> p.getGameMode() != GameMode.SPECTATOR && p.getGameMode() != GameMode.CREATIVE
-					             && structures.stream().anyMatch(structure -> structure.isNearby(p)))
+				.filter(p -> p.getGameMode() != GameMode.SPECTATOR && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER) && structures.stream().anyMatch(structure -> structure.isNearby(p)))
 				.toList();
 		}
 

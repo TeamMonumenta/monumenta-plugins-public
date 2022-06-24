@@ -61,7 +61,7 @@ public class SummonOnExplosionBoss extends BossAbilityGroup {
 	public void death(EntityDeathEvent event) {
 		if (event == null) {
 			//it exploded
-			mParam.PARTICLES.spawn(mBoss.getLocation().clone().add(0, 0.5, 0));
+			mParam.PARTICLES.spawn(mBoss, mBoss.getLocation().clone().add(0, 0.5, 0));
 			mParam.SOUNDS.play(mBoss.getLocation());
 			for (int i = 0; i < mParam.MOB_COUNT; i++) {
 				Entity entity = mParam.POOL.spawn(mBoss.getLocation());

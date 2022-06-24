@@ -57,7 +57,7 @@ public class OnHitBoss extends BossAbilityGroup {
 
 		//Particle & Sound
 		mParams.SOUND.play(loc);
-		mParams.PARTICLE.spawn(loc, 0d, 0d, 0d);
+		mParams.PARTICLE.spawn(mBoss, loc, 0d, 0d, 0d);
 
 	}
 

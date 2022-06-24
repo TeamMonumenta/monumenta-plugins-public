@@ -1,6 +1,9 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.google.common.collect.ImmutableMap;
+import com.playmonumenta.libraryofsouls.SoulEntry;
+import com.playmonumenta.libraryofsouls.SoulsDatabase;
+import com.playmonumenta.libraryofsouls.bestiary.BestiaryManager;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.parrots.ParrotManager;
@@ -23,6 +26,7 @@ import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -480,6 +484,28 @@ public final class ParrotCustomInventory extends CustomInventory {
 				hcs, 32,
 				hxp, 32,
 				unicornPuke, 1));
+
+		List<String> twistedMobsKilled = List.of("AlricLordofFrostedWinds", "YeigarLastEmperor", "SalazarArchitectofViridia", "XenoShatteredScalllawag", "IsadoratheBloodiedQueen", "CTelsketCrimsonConqueror", "AesirLightbringer");
+		boolean twistedUnlocked = true;
+
+		for (String twistedMobName : twistedMobsKilled) {
+			SoulEntry entry = SoulsDatabase.getInstance().getSoul(twistedMobName);
+			if (entry != null) {
+				int kills = BestiaryManager.getKillsForMob(playerLoad, entry);
+				if (kills <= 0) {
+					twistedUnlocked = false;
+					break;
+				}
+			}
+		}
+
+		if (twistedUnlocked) {
+			createParrotItems(playerLoad, ParrotVariant.TWISTED, ParrotGUIPage.SPECIAL, 12, Material.BEDROCK, "ParrotBought21", ImmutableMap.of());
+		} else {
+			ItemStack stack = buildItem(Material.BEDROCK, ChatColor.MAGIC + "Twisted?????", List.of());
+			ItemUtils.setPlainName(stack, ParrotVariant.TWISTED.getName());
+			GUI_ITEMS.add(new GuiItem(ParrotGUIPage.SPECIAL.mNum, 12, stack, null, null, null));
+		}
 
 		//==================================================================================================
 		//                                         Special parrots end

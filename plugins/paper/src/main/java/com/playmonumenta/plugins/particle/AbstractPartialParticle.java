@@ -245,6 +245,8 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	public void spawnAsEntityActive(Entity entity) {
 		if (entity instanceof Player) {
 			spawnAsPlayerActive((Player) entity);
+		} else if (entity.getScoreboardTags().contains("Boss")) {
+			spawnAsBoss();
 		} else {
 			spawnAsEnemy();
 		}
@@ -257,6 +259,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		if (entity instanceof Player) {
 			spawnAsPlayerBuff((Player) entity);
 		} else {
+			// no boss check here - buffs are often applied by players and can interfere with particles from boss abilities
 			spawnAsEnemyBuff();
 		}
 	}

@@ -74,12 +74,12 @@ public class SwingBoss extends BossAbilityGroup {
 				@Override
 				protected void chargeAuraAction(Location loc) {
 					boss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 1, 2));
-					p.PARTICLE_CHARGE.spawn(loc, ((double) p.RADIUS) / 3, ((double) p.RADIUS) / 3, ((double) p.RADIUS) / 3, 0.05);
+					p.PARTICLE_CHARGE.spawn(boss, loc, ((double) p.RADIUS) / 3, ((double) p.RADIUS) / 3, ((double) p.RADIUS) / 3, 0.05);
 				}
 
 				@Override
 				protected void chargeCircleAction(Location loc) {
-					p.PARTICLE_CIRCLE.spawn(loc, 0.25, 0.25, 0.25, 0.05);
+					p.PARTICLE_CIRCLE.spawn(boss, loc, 0.25, 0.25, 0.25, 0.05);
 				}
 
 				@Override
@@ -89,7 +89,7 @@ public class SwingBoss extends BossAbilityGroup {
 
 				@Override
 				protected void circleOutburstAction(Location loc) {
-					p.PARTICLE_CIRCLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
+					p.PARTICLE_CIRCLE_EXPLODE.spawn(boss, loc, 0.2, 0.2, 0.2, 0.2);
 				}
 
 				@Override

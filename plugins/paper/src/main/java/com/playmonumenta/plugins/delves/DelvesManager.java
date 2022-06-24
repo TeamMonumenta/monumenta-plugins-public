@@ -345,16 +345,11 @@ public class DelvesManager implements Listener {
 				if (event instanceof SpawnerSpawnEvent) {
 					//normal spawn - handle all the mods
 					List<DelvesModifier> mods = DelvesModifier.valuesList();
-					mods.remove(DelvesModifier.TWISTED);
 
 					for (DelvesModifier mod : mods) {
 						mod.applyDelve(livingEntity, delvesApplied.getOrDefault(mod, 0));
 						totalLevel += delvesApplied.getOrDefault(mod, 0);
 					}
-
-					DelvesModifier.TWISTED.applyDelve(livingEntity, delvesApplied.getOrDefault(DelvesModifier.TWISTED, 0));
-					totalLevel += (delvesApplied.getOrDefault(DelvesModifier.TWISTED, 0) * DelvesUtils.TWISTED_DEPTH_POINTS);
-					//twisted point value 5 time a normal one
 
 				} else {
 					//this mob is spawned by something that is not a spawner (plugin - command - egg)
@@ -362,11 +357,9 @@ public class DelvesManager implements Listener {
 
 					//calculate total points to use for StatMultiplier
 					List<DelvesModifier> mods = DelvesModifier.valuesList();
-					mods.remove(DelvesModifier.TWISTED);
 					for (DelvesModifier mod : mods) {
 						totalLevel += delvesApplied.getOrDefault(mod, 0);
 					}
-					totalLevel += (delvesApplied.getOrDefault(DelvesModifier.TWISTED, 0) * DelvesUtils.TWISTED_DEPTH_POINTS);
 
 					for (DelvesModifier mod : DelvesModifier.deathTriggerDelvesModifier()) {
 						mod.applyDelve(livingEntity, delvesApplied.getOrDefault(mod, 0));
@@ -470,11 +463,7 @@ public class DelvesManager implements Listener {
 		public void recalculateTotalPoint() {
 			mTotalPoint = 0;
 			for (Map.Entry<DelvesModifier, Integer> entry : mModifierPoint.entrySet()) {
-				if (entry.getKey() == DelvesModifier.TWISTED) {
-					mTotalPoint += DelvesUtils.TWISTED_DEPTH_POINTS;
-				} else {
-					mTotalPoint += entry.getValue();
-				}
+				mTotalPoint += entry.getValue();
 			}
 			mTotalPoint = Math.min(mTotalPoint, DelvesUtils.MAX_DEPTH_POINTS);
 		}

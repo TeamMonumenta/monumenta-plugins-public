@@ -345,7 +345,7 @@ public class EntityUtils {
 				return AbilityManager.getManager().isPvPEnabled((Player) entity);
 			} else if (entity instanceof Mob) {
 				LivingEntity target = ((Mob) entity).getTarget();
-				return (target != null && target instanceof Player) || entity.getScoreboardTags().contains("boss_targetplayer") || entity.getScoreboardTags().contains("Hostile");
+				return (target != null && target instanceof Player) || entity.getScoreboardTags().contains("boss_targetplayer") || entity.getScoreboardTags().contains("boss_hostile") || entity.getScoreboardTags().contains("Hostile");
 			}
 		}
 

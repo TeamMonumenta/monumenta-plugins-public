@@ -258,6 +258,7 @@ public class StringReader {
 	}
 
 	public static final Map<String, Color> COLOR_MAP = new LinkedHashMap<>();
+	public static final Map<Color, String> COLOR_NAME_MAP = new LinkedHashMap<>();
 	public static final List<Particle> PARTICLES_SORTED = Arrays.asList(Particle.values());
 	public static final List<Material> MATERIALS_SORTED = Arrays.asList(Material.values());
 	public static final List<Sound> SOUNDS_SORTED = Arrays.asList(Sound.values());
@@ -282,6 +283,10 @@ public class StringReader {
 		COLOR_MAP.put("TEAL", Color.TEAL);
 		COLOR_MAP.put("WHITE", Color.WHITE);
 		COLOR_MAP.put("YELLOW", Color.YELLOW);
+
+		for (Map.Entry<String, Color> entry : COLOR_MAP.entrySet()) {
+			COLOR_NAME_MAP.put(entry.getValue(), entry.getKey());
+		}
 
 		//Sorting Particle
 		PARTICLES_SORTED.sort((a, b) -> b.name().length() - a.name().length());
