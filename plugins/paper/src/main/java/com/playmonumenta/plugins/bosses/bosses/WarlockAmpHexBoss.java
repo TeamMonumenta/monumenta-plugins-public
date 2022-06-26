@@ -43,7 +43,7 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 	public static class Parameters extends BossParameters {
 		public int COOLDOWN = 20 * 8;
 		public int DELAY = 20 * 2;
-		public int SPELL_DELAY = 20 * 1;
+		public int SPELL_DELAY = (int) (20 * 1.5);
 
 		public int CONE = 40;
 
@@ -118,7 +118,7 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 
 											Location l = mBoss.getLocation().clone().add(vec);
 											p.PARTICLE_CONE_HIT.spawn(boss, l);
-											BoundingBox box = BoundingBox.of(l, 0.4, 10, 0.4);
+											BoundingBox box = BoundingBox.of(l, 0.4, 2, 0.4);
 
 											for (LivingEntity target : targets) {
 												if (target.getBoundingBox().overlaps(box)) {
