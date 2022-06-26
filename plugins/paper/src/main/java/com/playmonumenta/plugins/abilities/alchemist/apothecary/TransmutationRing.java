@@ -7,14 +7,19 @@ import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
@@ -76,13 +81,13 @@ public class TransmutationRing extends PotionAbility {
 
 			world.playSound(mCenter, Sound.ENTITY_PHANTOM_FLAP, 3f, 0.35f);
 
+			PPCircle particles = new PPCircle(Particle.REDSTONE, mCenter, TRANSMUTATION_RING_RADIUS)
+				.data(GOLD_COLOR)
+				.ringMode(true);
+
 			new BukkitRunnable() {
 				int mTicks = 0;
 				int mMaxTicks = TRANSMUTATION_RING_DURATION;
-
-				List<Integer> mDegrees1 = new ArrayList<>();
-				List<Integer> mDegrees2 = new ArrayList<>();
-				List<Integer> mDegrees3 = new ArrayList<>();
 
 				@Override
 				public void run() {
@@ -104,36 +109,10 @@ public class TransmutationRing extends PotionAbility {
 						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(1 * 20, damageBoost));
 					}
 
-					List<Integer> degreesToKeep = new ArrayList<>();
-					for (int deg = 0; deg < 360; deg += 3) {
-						world.spawnParticle(Particle.REDSTONE, mCenter.clone().add(TRANSMUTATION_RING_RADIUS * FastUtils.cosDeg(deg), 0, TRANSMUTATION_RING_RADIUS * FastUtils.sinDeg(deg)), 1, GOLD_COLOR);
-
-						if (mDegrees1.contains(deg)) {
-							world.spawnParticle(Particle.REDSTONE, mCenter.clone().add(TRANSMUTATION_RING_RADIUS * FastUtils.cosDeg(deg), 0.5, TRANSMUTATION_RING_RADIUS * FastUtils.sinDeg(deg)), 1, GOLD_COLOR);
-							if (FastUtils.randomDoubleInRange(0, 1) < 0.5) {
-								mDegrees1.remove((Integer) deg);
-							}
-						}
-
-						if (mDegrees2.contains(deg)) {
-							world.spawnParticle(Particle.REDSTONE, mCenter.clone().add(TRANSMUTATION_RING_RADIUS * FastUtils.cosDeg(deg), 1, TRANSMUTATION_RING_RADIUS * FastUtils.sinDeg(deg)), 1, GOLD_COLOR);
-							if (FastUtils.randomDoubleInRange(0, 1) < 0.5) {
-								mDegrees2.remove((Integer) deg);
-							}
-						}
-
-						if (mDegrees3.contains(deg)) {
-							world.spawnParticle(Particle.REDSTONE, mCenter.clone().add(TRANSMUTATION_RING_RADIUS * FastUtils.cosDeg(deg), 1.75, TRANSMUTATION_RING_RADIUS * FastUtils.sinDeg(deg)), 1, GOLD_COLOR);
-						}
-
-						if (FastUtils.randomDoubleInRange(0, 1) < 0.25) {
-							degreesToKeep.add(deg);
-						}
-					}
-
-					mDegrees3 = new ArrayList<>(mDegrees2);
-					mDegrees2 = new ArrayList<>(mDegrees1);
-					mDegrees1 = new ArrayList<>(degreesToKeep);
+					particles.count(120).location(mCenter).spawnAsPlayerActive(mPlayer);
+					particles.count(30).location(mCenter.clone().add(0, 0.5, 0)).spawnAsPlayerActive(mPlayer);
+					particles.count(15).location(mCenter.clone().add(0, 1, 0)).spawnAsPlayerActive(mPlayer);
+					particles.count(7).location(mCenter.clone().add(0, 1.75, 0)).spawnAsPlayerActive(mPlayer);
 
 					mTicks += 5;
 				}

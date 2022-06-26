@@ -40,7 +40,7 @@ public class ProtocolLibIntegration {
 
 		mPlayerTitleManager = new PlayerTitleManager(syncManager);
 
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::tick, 1, 1);
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::tick, 2, 2);
 
 		if (Bukkit.getPluginManager().isPluginEnabled("PrometheusExporter")) {
 			mPacketMonitor = new PacketMonitor(plugin);
@@ -48,7 +48,7 @@ public class ProtocolLibIntegration {
 		}
 	}
 
-	// called every tick
+	// called every 2 ticks
 	private void tick() {
 		try {
 			mPlayerTitleManager.tick();
