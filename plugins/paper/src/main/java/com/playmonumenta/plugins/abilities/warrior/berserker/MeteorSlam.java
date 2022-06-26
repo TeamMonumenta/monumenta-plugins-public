@@ -13,9 +13,14 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -55,7 +60,7 @@ public final class MeteorSlam extends Ability {
 	private final int mLevelSize;
 	private final int mLevelJumpAmplifier;
 	private final BukkitRunnable mSlamAttackRunner;
-	private Ability[] mAbilities = {};
+	private boolean mHasGloriousBattle = false;
 
 	private double mFallFromY = -7050;
 
@@ -108,8 +113,7 @@ public final class MeteorSlam extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				mAbilities = Stream.of(GloriousBattle.class)
-					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
+				mHasGloriousBattle = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, GloriousBattle.class) != null;
 			});
 		}
 
@@ -172,9 +176,9 @@ public final class MeteorSlam extends Ability {
 		event.setCancelled(true);
 
 		if (mPlayer != null
-				&& !isTimerActive()
-				&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-				&& (mAbilities.length < 0 || mAbilities[0] == null || mAbilities[0].getClass() != GloriousBattle.class || !mPlayer.isSneaking())) {
+			    && !isTimerActive()
+			    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
+			    && (!mHasGloriousBattle || !mPlayer.isSneaking())) {
 			putOnCooldown();
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION_TICKS, mLevelJumpAmplifier, true, false));
@@ -207,7 +211,12 @@ public final class MeteorSlam extends Ability {
 		}
 		// player.getFallDistance() is unreliable (e.g. does not get reset while in a bed, despite player.isOnGround() being true),
 		// thus we calculate the fall distance ourselves.
-		mFallFromY = Math.max(mFallFromY, mPlayer.getLocation().getY());
+		// We still check if fall distance is 0 to reset our fall distance calculation, as that checks for water, vines, etc.
+		if (mPlayer.getFallDistance() <= 0) {
+			mFallFromY = -10000;
+		} else {
+			mFallFromY = Math.max(mFallFromY, mPlayer.getLocation().getY());
+		}
 	}
 
 	private double calculateFallDistance() {
