@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,6 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -120,7 +120,8 @@ public class Twisted {
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			LivingEntity twistedMob = null;
-			String pool = spawningLoc.getBlock().getType() == Material.WATER ? POOL_NAME_WATER : POOL_NAME;
+			boolean isWaterLoc = LocationUtils.containsWater(spawningLoc.getBlock());
+			String pool = isWaterLoc ? POOL_NAME_WATER : POOL_NAME;
 			Map<Soul, Integer> mobsPool = LibraryOfSoulsIntegration.getPool(pool);
 			if (mobsPool != null) {
 				for (Map.Entry<Soul, Integer> entry : mobsPool.entrySet()) {

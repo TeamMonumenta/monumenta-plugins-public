@@ -66,7 +66,7 @@ public class LocationUtils {
 
 	public static boolean isWaterlogged(Block block) {
 		BlockData data = block.getBlockData();
-		if (data != null && data instanceof Waterlogged) {
+		if (data instanceof Waterlogged) {
 			return ((Waterlogged)data).isWaterlogged();
 		}
 		return false;
@@ -78,6 +78,7 @@ public class LocationUtils {
 		}
 		Material mat = block.getType();
 		if (mat.equals(Material.BUBBLE_COLUMN) ||
+		    mat.equals(Material.WATER) ||
 		    mat.equals(Material.KELP) ||
 		    mat.equals(Material.KELP_PLANT) ||
 		    mat.equals(Material.SEAGRASS) ||
