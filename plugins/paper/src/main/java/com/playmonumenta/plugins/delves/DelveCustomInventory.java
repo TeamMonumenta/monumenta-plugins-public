@@ -391,6 +391,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 					List<DelvesModifier> mods = DelvesModifier.valuesList();
 					mods.remove(DelvesModifier.ENTROPY);
+					mods.remove(DelvesModifier.TWISTED);
 
 					while (entropyPoint > 0) {
 						if (mods.isEmpty()) {
