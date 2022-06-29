@@ -601,8 +601,13 @@ public class BossManager implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
-		if (event.getEntity() instanceof LivingEntity living) {
-			processEntity(living);
+		if (event.getEntity() instanceof LivingEntity living
+			    && !living.getScoreboardTags().isEmpty()) {
+			// EntityAddToWorldEvent is called at an inconvenient time in Minecraft's code, which can cause deadlocks,
+			// so we delay initialisation of boss data slightly to be outside of the entity loading code.
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				processEntity(living);
+			});
 		}
 	}
 
@@ -618,7 +623,7 @@ public class BossManager implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void chunkLoadEvent(ChunkLoadEvent event) {
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> { // delay by a tick as the chunk is loaded before entities in 1.18+
 			for (Entity entity : event.getChunk().getEntities()) {
 				if (entity instanceof LivingEntity living
 					    && mBosses.get(entity.getUniqueId()) == null) {
