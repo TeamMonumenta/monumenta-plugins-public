@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.AntiRangeChivalrousBoss;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
@@ -53,14 +52,8 @@ public class FocusedCombos extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		arrow.addScoreboardTag(AntiRangeChivalrousBoss.ignoreTag);
-		return true;
-	}
-
-	@Override
 	public String getDescription(int rarity) {
-		return "Every third critical arrow shot deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " times damage and applies " + DepthsUtils.roundPercent(BLEED_AMOUNT) + "% Bleed for " + BLEED_DURATION / 20 + " seconds. Additionally, arrows you shoot bypass arrow immunity.";
+		return "Every third critical arrow shot deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " times damage and applies " + DepthsUtils.roundPercent(BLEED_AMOUNT) + "% Bleed for " + BLEED_DURATION / 20 + " seconds.";
 	}
 
 	@Override
