@@ -204,7 +204,7 @@ public class BountyCustomInventory extends CustomInventory {
 				ScoreboardUtils.setScoreboardValue(target, "R" + mRegion + "Bounties" + 1, 0);
 				ScoreboardUtils.setScoreboardValue(target, "R" + mRegion + "Bounties" + 2, 0);
 				ScoreboardUtils.setScoreboardValue(target, "R" + mRegion + "Bounties" + 3, 0);
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "interactnpc " + player.getName() + " \"" + BOUNTY_NPCS.get(mRegion - 1) + "\"");
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "interactnpc " + target.getName() + " \"" + BOUNTY_NPCS.get(mRegion - 1) + "\"");
 				target.sendMessage(Component.text("Your bounty for today is ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)
 					.append(Component.text(bounty.mName, NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true))
 					.append(Component.text("!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)));
