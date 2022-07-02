@@ -42,7 +42,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.parrots.RainbowParrot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,6 +73,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
@@ -614,6 +614,13 @@ public class BossManager implements Listener {
 		}
 	}
 
+	// Creature spawn event is also listened to to set up boss data for initial spawn at the moment the mob is summoned,
+	// which allows to immediately use the boss after summoning it.
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void creatureSpawnEvent(CreatureSpawnEvent event) {
+		processEntity(event.getEntity());
+	}
+
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
 		if (event.getEntity() instanceof LivingEntity living) {
@@ -628,8 +635,7 @@ public class BossManager implements Listener {
 	public void chunkLoadEvent(ChunkLoadEvent event) {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> { // delay by a tick as the chunk is loaded before entities in 1.18+
 			for (Entity entity : event.getChunk().getEntities()) {
-				if (entity instanceof LivingEntity living
-					    && mBosses.get(entity.getUniqueId()) == null) {
+				if (entity instanceof LivingEntity living) {
 					processEntity(living);
 				}
 			}
@@ -1171,9 +1177,8 @@ public class BossManager implements Listener {
 	}
 
 	private void processEntity(LivingEntity entity) {
-		/* This should never happen */
-		if (mBosses.get(entity.getUniqueId()) != null) {
-			MMLog.warning("[BossManager] ProcessEntity: " + entity.getName() + " Attempted to add boss that was already tracked!");
+		if (mBosses.containsKey(entity.getUniqueId())) {
+			// already loaded
 			return;
 		}
 
