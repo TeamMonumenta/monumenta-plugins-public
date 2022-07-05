@@ -37,8 +37,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class RestlessSouls extends Ability {
-	private static final int DAMAGE_1 = 8;
-	private static final int DAMAGE_2 = 12;
+	private static final int DAMAGE_1 = 10;
+	private static final int DAMAGE_2 = 15;
 	private static final int SILENCE_DURATION_1 = 2 * 20;
 	private static final int SILENCE_DURATION_2 = 3 * 20;
 	private static final int VEX_DURATION = 15 * 20;

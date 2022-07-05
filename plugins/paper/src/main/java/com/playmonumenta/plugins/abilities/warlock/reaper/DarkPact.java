@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
@@ -34,8 +33,6 @@ public class DarkPact extends Ability {
 
 	public static final String PERCENT_HEAL_EFFECT_NAME = "DarkPactPercentHealEffect";
 	private static final int PERCENT_HEAL = -1;
-	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "DarkPactPercentDamageResistEffect";
-	private static final double PERCENT_DAMAGE_RESIST = -0.1;
 	private static final String AESTHETICS_EFFECT_NAME = "DarkPactAestheticsEffect";
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "DarkPactPercentDamageDealtEffect";
 	private static final String PERCENT_ATKS_EFFECT_NAME = "DarkPactPercentAtksEffect";
@@ -59,7 +56,7 @@ public class DarkPact extends Ability {
 		super(plugin, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain 10% damage reduction, +10% attack speed, and deal +30% melee damage on your scythe attacks. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
+		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain +10% attack speed, and deal +30% melee damage on your scythe attacks. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
 		mInfo.mDescriptions.add("You gain +20% attack speed and attacks with a scythe deal +60% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
@@ -97,7 +94,6 @@ public class DarkPact extends Ability {
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES, 0, (entity, enemy) -> entity instanceof Player player && ItemUtils.isHoe(player.getInventory().getItemInMainHand())));
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_ATKS_EFFECT_NAME, new PercentAttackSpeed(DURATION, mPercentAtks, PERCENT_ATKS_EFFECT_NAME));
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(DURATION, PERCENT_HEAL));
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RESIST));
 			mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(DURATION,
 					(entity, fourHertz, twoHertz, oneHertz) -> {
 					new PartialParticle(Particle.SPELL_WITCH, entity.getLocation(), 3, 0.2, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
@@ -132,12 +128,6 @@ public class DarkPact extends Ability {
 		NavigableSet<Effect> percentAtksEffects = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_ATKS_EFFECT_NAME);
 		if (percentAtksEffects != null) {
 			for (Effect effect : percentAtksEffects) {
-				effect.setDuration(effect.getDuration() + DURATION_INCREASE_ON_KILL);
-			}
-		}
-		NavigableSet<Effect> percentDefense = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME);
-		if (percentDefense != null) {
-			for (Effect effect : percentDefense) {
 				effect.setDuration(effect.getDuration() + DURATION_INCREASE_ON_KILL);
 			}
 		}
