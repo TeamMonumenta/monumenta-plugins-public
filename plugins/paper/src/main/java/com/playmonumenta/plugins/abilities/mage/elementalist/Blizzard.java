@@ -34,7 +34,7 @@ public class Blizzard extends Ability {
 	public static final ClassAbility ABILITY = ClassAbility.BLIZZARD;
 
 	public static final int DAMAGE_1 = 3;
-	public static final int DAMAGE_2 = 6;
+	public static final int DAMAGE_2 = 5;
 	public static final int SIZE_1 = 6;
 	public static final int SIZE_2 = 8;
 	public static final double SLOW_MULTIPLIER_1 = 0.25;
@@ -43,8 +43,7 @@ public class Blizzard extends Ability {
 	public static final int SLOW_INTERVAL = (int)(0.5 * Constants.TICKS_PER_SECOND);
 	public static final int DURATION_TICKS = 10 * Constants.TICKS_PER_SECOND;
 	public static final int SLOW_TICKS = 5 * Constants.TICKS_PER_SECOND;
-	public static final int COOLDOWN_TICKS_1 = 30 * Constants.TICKS_PER_SECOND;
-	public static final int COOLDOWN_TICKS_2 = 25 * Constants.TICKS_PER_SECOND;
+	public static final int COOLDOWN_TICKS = 30 * Constants.TICKS_PER_SECOND;
 	public static final int ANGLE = -45; // Looking straight up is -90. This is 45 degrees of pitch allowance
 
 	private final int mLevelDamage;
@@ -59,12 +58,12 @@ public class Blizzard extends Ability {
 		mInfo.mShorthandName = "Bl";
 		mInfo.mDescriptions.add("Right click while sneaking, looking upwards, and holding a wand to create a storm of ice and snow that follows the player, dealing 3 magic damage every second to all enemies in a 6 block radius around you. The blizzard last for 10s, and chills enemies within it, slowing them by 25%." +
 			" Players in the blizzard are extinguished if they are on fire, and the ability's damage bypasses iframes. This ability does not interact with Spellshock. Cooldown: 30s.");
-		mInfo.mDescriptions.add("Damage is increased from 3 to 6, aura size is increased from 6 to 8 blocks, slowness increased to 30%.");
+		mInfo.mDescriptions.add("Damage is increased from 3 to 5, aura size is increased from 6 to 8 blocks, slowness increased to 30%.");
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.SNOWBALL, 1);
 
 		boolean isUpgraded = getAbilityScore() == 2;
-		mInfo.mCooldown = isUpgraded ? COOLDOWN_TICKS_2 : COOLDOWN_TICKS_1;
+		mInfo.mCooldown = COOLDOWN_TICKS;
 
 		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
 		mLevelSize = isUpgraded ? SIZE_2 : SIZE_1;
@@ -104,7 +103,7 @@ public class Blizzard extends Ability {
 
 					if (mTicks % DAMAGE_INTERVAL == 0) {
 						for (LivingEntity mob : mobs) {
-							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), spellDamage, false, true, false);
+							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), spellDamage, false, false, false);
 						}
 					}
 
