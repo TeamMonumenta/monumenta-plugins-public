@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.Collections;
-import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -16,7 +15,6 @@ import org.bukkit.plugin.Plugin;
 public class AntiRangeChivalrousBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_antirangechivalrous";
 	public static final int detectionRange = 40;
-	public static final String ignoreTag = "antirange_ignore";
 
 	private static final int ANTI_RANGE_DISTANCE = 8;
 
@@ -43,12 +41,6 @@ public class AntiRangeChivalrousBoss extends BossAbilityGroup {
 		}
 
 		Location loc = mBoss.getLocation();
-
-		//Arrows are given ignoreTag from a Depths ability to ignore the boss ability
-		Set<String> tags = damager.getScoreboardTags();
-		if (tags.contains(ignoreTag)) {
-			return;
-		}
 
 		if (loc.distance(source.getLocation()) > ANTI_RANGE_DISTANCE) {
 			event.setCancelled(true);

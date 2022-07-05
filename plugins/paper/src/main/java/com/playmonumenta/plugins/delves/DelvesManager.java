@@ -3,10 +3,13 @@ package com.playmonumenta.plugins.delves;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Colossal;
 import com.playmonumenta.plugins.delves.abilities.Infernal;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
+import com.playmonumenta.plugins.delves.abilities.Twisted;
+import com.playmonumenta.plugins.delves.mobabilities.TwistedMiniBoss;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -37,9 +40,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -302,7 +307,7 @@ public class DelvesManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entitySpawnEvent(EntitySpawnEvent event) {
 		if (!DUNGEONS.contains(ServerProperties.getShardName())) {
 			return;
@@ -426,6 +431,30 @@ public class DelvesManager implements Listener {
 		}
 
 		Colossal.applyModifiers(loc, maxColossal);
+
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onChunkUnloadEvent(ChunkUnloadEvent event) {
+		for (Entity entity : event.getChunk().getEntities()) {
+			if (entity.getScoreboardTags().contains(Twisted.TWISTED_MINIBOSS_TAG)) {
+				Twisted.despawnTwistedMiniBoss((LivingEntity) entity);
+				entity.remove();
+			}
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onPlayerDeath(PlayerDeathEvent event) {
+		Player player = event.getEntity();
+
+		for (LivingEntity mob : player.getLocation().getNearbyLivingEntities(25)) {
+			TwistedMiniBoss boss = BossManager.getInstance().getBoss(mob, TwistedMiniBoss.class);
+			if (boss != null) {
+				boss.playerDeath(player);
+			}
+
+		}
 
 	}
 

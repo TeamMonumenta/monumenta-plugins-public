@@ -82,8 +82,10 @@ public class PlayerTitleManager {
 		mProtocolManager = protocolManager;
 	}
 
-	public void tick() {
+	private int mTick = 0;
 
+	public void tick() {
+		mTick++;
 		Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
 		for (Player player : onlinePlayers) {
 			PlayerMetadata metadata = METADATA.get(player.getUniqueId());
@@ -124,59 +126,60 @@ public class PlayerTitleManager {
 				}
 			}
 
-			// Check if display has changed and update if so
-			List<Component> display = getDisplay(player);
-			if (!metadata.mDisplay.equals(display)) {
+			if (mTick % 3 == 0) {
+				// Check if display has changed and update if so
+				List<Component> display = getDisplay(player);
+				if (!metadata.mDisplay.equals(display)) {
 
-				// create new lines
-				int existingSize = metadata.mLines.size();
-				if (display.size() > existingSize) {
-					while (display.size() > metadata.mLines.size()) {
-						metadata.mLines.add(createLine(player, display.get(metadata.mLines.size()), metadata.mLines.size()));
+					// create new lines
+					int existingSize = metadata.mLines.size();
+					if (display.size() > existingSize) {
+						while (display.size() > metadata.mLines.size()) {
+							metadata.mLines.add(createLine(player, display.get(metadata.mLines.size()), metadata.mLines.size()));
+						}
+						List<PacketContainer> packets = getSpawnLinesPackets(player, metadata, existingSize);
+						for (PacketContainer packet : packets) {
+							broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
+						}
 					}
-					List<PacketContainer> packets = getSpawnLinesPackets(player, metadata, existingSize);
-					for (PacketContainer packet : packets) {
-						broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
-					}
-				}
 
-				// delete removed lines
-				if (display.size() < metadata.mLines.size()) {
-					List<LineMetadata> subList = metadata.mLines.subList(display.size(), metadata.mLines.size());
+					// delete removed lines
+					if (display.size() < metadata.mLines.size()) {
+						List<LineMetadata> subList = metadata.mLines.subList(display.size(), metadata.mLines.size());
 
 					PacketContainer packet = createDestroyPacket(metadata);
 					broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
 
-					subList.clear();
-				}
+						subList.clear();
+					}
 
-				// update changed lines
-				int updatedSize = Math.min(existingSize, display.size());
-				for (int i = 0; i < updatedSize; i++) {
-					if (!display.get(i).equals(metadata.mDisplay.get(i))) {
-						EntityMetadata armorStand = metadata.mLines.get(i).mArmorStand;
-						WrappedWatchableObject nameWatchableObject = null;
-						for (WrappedWatchableObject watchableObject : armorStand.mDataWatcher.getWatchableObjects()) {
-							if (watchableObject.getValue() instanceof Optional<?> optional
-								    && optional.isPresent()
-								    && optional.get() instanceof AdventureComponent) {
-								watchableObject.setValue(Optional.of(new AdventureComponent(display.get(i))));
-								nameWatchableObject = watchableObject;
-								break;
+					// update changed lines
+					int updatedSize = Math.min(existingSize, display.size());
+					for (int i = 0; i < updatedSize; i++) {
+						if (!display.get(i).equals(metadata.mDisplay.get(i))) {
+							EntityMetadata armorStand = metadata.mLines.get(i).mArmorStand;
+							WrappedWatchableObject nameWatchableObject = null;
+							for (WrappedWatchableObject watchableObject : armorStand.mDataWatcher.getWatchableObjects()) {
+								if (watchableObject.getValue() instanceof Optional<?> optional
+									    && optional.isPresent()
+									    && optional.get() instanceof AdventureComponent) {
+									watchableObject.setValue(Optional.of(new AdventureComponent(display.get(i))));
+									nameWatchableObject = watchableObject;
+									break;
+								}
+							}
+							if (nameWatchableObject != null) {
+								PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
+								packet.getIntegers().write(0, armorStand.mId);
+								packet.getWatchableCollectionModifier().write(0, new ArrayList<>(List.of(nameWatchableObject))); // protocollib needs an ArrayList
+								broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
 							}
 						}
-						if (nameWatchableObject != null) {
-							PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
-							packet.getIntegers().write(0, armorStand.mId);
-							packet.getWatchableCollectionModifier().write(0, new ArrayList<>(List.of(nameWatchableObject))); // protocollib needs an ArrayList
-							broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
-						}
 					}
+
+					metadata.mDisplay.clear();
+					metadata.mDisplay.addAll(display);
 				}
-
-				metadata.mDisplay.clear();
-				metadata.mDisplay.addAll(display);
-
 			}
 
 			// Move titles if the player has moved

@@ -23,9 +23,9 @@ public class PhlegmaticResolve extends Ability {
 
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "PhlegmaticPercentDamageResistEffect";
 	private static final String KNOCKBACK_RESIST_EFFECT_NAME = "PhlegmaticPercentKnockbackResistEffect";
-	private static final double PERCENT_DAMAGE_RESIST_1 = -0.02;
-	private static final double PERCENT_DAMAGE_RESIST_2 = -0.03;
-	private static final double PERCENT_KNOCKBACK_RESIST = 0.1;
+	private static final double PERCENT_DAMAGE_RESIST_1 = -0.015;
+	private static final double PERCENT_DAMAGE_RESIST_2 = -0.025;
+	private static final double PERCENT_KNOCKBACK_RESIST = 0.05;
 	private static final int RADIUS = 7;
 	private static final double ALLY_MODIFIER = 0.33;
 
@@ -43,8 +43,8 @@ public class PhlegmaticResolve extends Ability {
 		super(plugin, player, "Phlegmatic Resolve");
 		mInfo.mScoreboardId = "Phlegmatic";
 		mInfo.mShorthandName = "PR";
-		mInfo.mDescriptions.add("For each spell on cooldown, gain +2% Damage Reduction and +1 Knockback Resistance.");
-		mInfo.mDescriptions.add("Increase to +3% Damage Reduction per spell on cooldown, and players within 7 blocks are given 33% of your bonuses. (Does not stack with multiple Warlocks.)");
+		mInfo.mDescriptions.add("For each spell on cooldown, gain +1.5% Damage Reduction and +0.5 Knockback Resistance.");
+		mInfo.mDescriptions.add("Increase to +2.5% Damage Reduction per spell on cooldown, and players within 7 blocks are given 33% of your bonuses. (Does not stack with multiple Warlocks.)");
 		mInfo.mDescriptions.add("All non-ailment damage taken is instead converted into a short Damage-over-Time effect. A third of the damage stored is dealt every second for 3s.");
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 		mPercentDamageResist = (isLevelOne() ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2) - CharmManager.getLevelPercentDecimal(player, CHARM_RESIST);

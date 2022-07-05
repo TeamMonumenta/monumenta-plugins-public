@@ -12,8 +12,8 @@ import org.bukkit.entity.Player;
 
 public class RoguePassive extends Ability {
 
-	public static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
-	public static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
+	public static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 1.3;
+	public static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.15;
 
 	public RoguePassive(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
@@ -26,10 +26,6 @@ public class RoguePassive extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getAbility() == null) {
-			return false;
-		}
-
 		if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			//  This test if the damagee is an instance of a Elite.
 			if (enemy != null) {

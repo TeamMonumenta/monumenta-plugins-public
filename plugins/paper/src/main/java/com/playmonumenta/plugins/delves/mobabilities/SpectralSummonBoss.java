@@ -9,9 +9,9 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.Collections;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -49,7 +49,8 @@ public class SpectralSummonBoss extends BossAbilityGroup {
 			double chance = FastUtils.RANDOM.nextDouble();
 			if (chance < mParam.SPAWN_CHANCE) {
 				Location loc = mBoss.getLocation();
-				if (loc.getBlock().getType() == Material.WATER) {
+				boolean isWaterLoc = LocationUtils.containsWater(loc.getBlock());
+				if (isWaterLoc) {
 					LibraryOfSoulsIntegration.summon(loc, SPECTERS_WATER[FastUtils.RANDOM.nextInt(SPECTERS_WATER.length)]);
 				} else {
 					LibraryOfSoulsIntegration.summon(loc, SPECTERS[FastUtils.RANDOM.nextInt(SPECTERS.length)]);

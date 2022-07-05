@@ -6,8 +6,10 @@ import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.WindBombAirTag;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -38,6 +40,8 @@ public class WindBomb extends Ability {
 	private static final int SLOW_FALL_EFFECT = 0;
 	private static final int COOLDOWN_1 = 20 * 15;
 	private static final int COOLDOWN_2 = 20 * 10;
+	private static final int DAMAGE_1 = 6;
+	private static final int DAMAGE_2 = 8;
 	private static final double MIDAIR_DAMAGE_BONUS = 0.2;
 	private static final int RADIUS = 3;
 	private static final double VELOCITY = 1.5;
@@ -59,6 +63,8 @@ public class WindBomb extends Ability {
 	public static final String CHARM_VORTEX_DURATION = "Wind Bomb Vortex Duration";
 	public static final String CHARM_VORTEX_RADIUS = "Wind Bomb Vortex Radius";
 
+	private final double mDamage;
+
 	private @Nullable Snowball mProj = null;
 
 	public WindBomb(Plugin plugin, @Nullable Player player) {
@@ -66,12 +72,13 @@ public class WindBomb extends Ability {
 		mInfo.mScoreboardId = "WindBomb";
 		mInfo.mShorthandName = "WB";
 		mInfo.mLinkedSpell = ClassAbility.WIND_BOMB;
-		mInfo.mDescriptions.add("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, launches mobs in a 3 block radius into the air, giving them Slow Falling and 20% Weaken for 4s. Cannot be used while holding a trident or snowball. Cooldown: 15s.");
-		mInfo.mDescriptions.add("The cooldown is reduced to 10s. Additionally, you deal 20% more damage to enemies made airborne by this skill, until they hit the ground.");
+		mInfo.mDescriptions.add("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, deals 6 projectile damage to mobs in a a 3 block radius and launches them into the air, giving them Slow Falling and 20% Weaken for 4s. Cannot be used while holding a trident or snowball. Cooldown: 15s.");
+		mInfo.mDescriptions.add("The damage is increased to 8 and the cooldown is reduced to 10s. Additionally, you deal 20% more damage to enemies made airborne by this skill, until they hit the ground.");
 		mInfo.mDescriptions.add("On impact, generate a vortex that pulls mobs within 8 blocks toward the center for 3 seconds.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.TNT, 1);
+		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	@Override
@@ -125,6 +132,7 @@ public class WindBomb extends Ability {
 			double weaken = WEAKEN_EFFECT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS);
 			float velocity = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEIGHT, LAUNCH_VELOCITY);
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius, mPlayer)) {
+				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.PROJECTILE_SKILL, mDamage, mInfo.mLinkedSpell, true, false);
 				if (!EntityUtils.isBoss(mob)) {
 					mob.setVelocity(new Vector(0.f, velocity, 0.f));
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, duration, SLOW_FALL_EFFECT, true, false));

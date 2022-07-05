@@ -23,8 +23,6 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 	private static final String DREADLING_TERRAIN_SOUL_NAME = "Dreadling";
 	private static final String DREADLING_WATER_SOUL_NAME = "Hydraling";
 
-	private static final int DAMAGE_IMMUNE_DISTANCE = 8;
-
 	private double mDamageCounter = 0;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -43,15 +41,6 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		Location loc = mBoss.getLocation();
-
-		if (loc.distance(source.getLocation()) > DAMAGE_IMMUNE_DISTANCE) {
-			event.setCancelled(true);
-			World world = mBoss.getWorld();
-			world.playSound(damager.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f);
-			world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.5f);
-			world.spawnParticle(Particle.SPELL_WITCH, loc.add(0, 1, 0), 100, 0, 0, 0, 0.5);
-			return;
-		}
 
 		mDamageCounter += event.getFinalDamage(false);
 

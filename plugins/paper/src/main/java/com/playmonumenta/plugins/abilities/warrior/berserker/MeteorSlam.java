@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,6 +22,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -69,7 +69,7 @@ public final class MeteorSlam extends Ability {
 	private final double mLevelSize;
 	private final int mLevelJumpAmplifier;
 	private final BukkitRunnable mSlamAttackRunner;
-	private Ability[] mAbilities = {};
+	private boolean mHasGloriousBattle = false;
 
 	private double mFallFromY = -7050;
 
@@ -81,7 +81,7 @@ public final class MeteorSlam extends Ability {
 		mInfo.mShorthandName = "MS";
 		mInfo.mDescriptions.add(
 				String.format(
-						"Pressing the swap key grants you Jump Boost %s for %ss instead of doing its vanilla function. Cooldown: %ss. Falling more than %s blocks passively generates a slam when you land, dealing %s melee damage to all enemies in a %s-block cube around you per block fallen for the first %s blocks, and %s damage per block thereafter. Falling more than %s blocks and attacking an enemy also passively generates a slam at that enemy, and resets your blocks fallen and fall damage.",
+						"Pressing the swap key grants you Jump Boost %s for %ss instead of doing its vanilla function. Cooldown: %ss. Falling more than %s blocks passively generates a slam when you land, dealing %s melee damage to all enemies in a %s-block cube around you per block fallen for the first %s blocks, and %s damage per block thereafter. Falling more than %s blocks and attacking an enemy also passively generates a slam at that enemy, and resets your blocks fallen. If any enemies are damaged by a slam, you take no fall damage from that fall.",
 						JUMP_LEVEL_1,
 						DURATION_SECONDS,
 						COOLDOWN_SECONDS_1,
@@ -119,12 +119,9 @@ public final class MeteorSlam extends Ability {
 		mLevelSize = CharmManager.getRadius(mPlayer, CHARM_RADIUS, (isLevelOne() ? SIZE_1 : SIZE_2));
 		mLevelJumpAmplifier = (isLevelOne() ? JUMP_AMPLIFIER_1 : JUMP_AMPLIFIER_2) + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST);
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				mAbilities = Stream.of(GloriousBattle.class)
-					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
-			});
-		}
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			mHasGloriousBattle = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, GloriousBattle.class) != null;
+		});
 
 		mSlamAttackRunner = new BukkitRunnable() {
 			@Override
@@ -173,8 +170,6 @@ public final class MeteorSlam extends Ability {
 		if (mPlayer != null && event.getType() == DamageType.MELEE && calculateFallDistance() > MANUAL_THRESHOLD && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
 			doSlamAttack(enemy.getLocation().add(0, 0.15, 0));
 			mFallFromY = -7050;
-			// Also reset fall damage, mFallFromY can continue updating from there
-			mPlayer.setFallDistance(0);
 			return true;
 		}
 		return false;
@@ -185,9 +180,9 @@ public final class MeteorSlam extends Ability {
 		event.setCancelled(true);
 
 		if (mPlayer != null
-				&& !isTimerActive()
-				&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-				&& (mAbilities.length < 0 || mAbilities[0] == null || mAbilities[0].getClass() != GloriousBattle.class || !mPlayer.isSneaking())) {
+			    && !isTimerActive()
+			    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
+			    && (!mHasGloriousBattle || !mPlayer.isSneaking())) {
 			putOnCooldown();
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mLevelJumpAmplifier, true, false));
@@ -220,7 +215,12 @@ public final class MeteorSlam extends Ability {
 		}
 		// player.getFallDistance() is unreliable (e.g. does not get reset while in a bed, despite player.isOnGround() being true),
 		// thus we calculate the fall distance ourselves.
-		mFallFromY = Math.max(mFallFromY, mPlayer.getLocation().getY());
+		// We still check if fall distance is 0 to reset our fall distance calculation, as that checks for water, vines, etc.
+		if (mPlayer.getFallDistance() <= 0) {
+			mFallFromY = -10000;
+		} else {
+			mFallFromY = Math.max(mFallFromY, mPlayer.getLocation().getY());
+		}
 	}
 
 	private double calculateFallDistance() {
@@ -241,7 +241,7 @@ public final class MeteorSlam extends Ability {
 		slamDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, slamDamage);
 
 		for (LivingEntity enemy : EntityUtils.getNearbyMobs(location, mLevelSize)) {
-			DamageUtils.damage(mPlayer, enemy, DamageType.WARRIOR_AOE, slamDamage, mInfo.mLinkedSpell, true);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.mLinkedSpell, true);
 		}
 
 		World world = mPlayer.getWorld();
@@ -251,5 +251,13 @@ public final class MeteorSlam extends Ability {
 		new PartialParticle(Particle.FLAME, location, 60, 0F, 0F, 0F, 0.2F).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, location, 20, 0F, 0F, 0F, 0.3F).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.LAVA, location, (int) (3 * mLevelSize * mLevelSize), mLevelSize, 0.25f, mLevelSize, 0).spawnAsPlayerActive(mPlayer);
+	}
+
+	@Override
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		// If there is a mob in range, cancel the fall damage
+		if (event.getType() == DamageType.FALL && !EntityUtils.getNearbyMobs(mPlayer.getLocation(), mLevelSize).isEmpty()) {
+			event.setCancelled(true);
+		}
 	}
 }

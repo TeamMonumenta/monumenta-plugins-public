@@ -89,10 +89,10 @@ public class ShieldBash extends Ability {
 									world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, 1.5f, 1);
 									world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
 
-									bash(mob, DamageType.MELEE_SKILL);
+									bash(mob, mInfo.mLinkedSpell);
 									if (isLevelTwo()) {
 										for (LivingEntity le : EntityUtils.getNearbyMobs(mob.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, SHIELD_BASH_2_RADIUS), mob)) {
-											bash(le, DamageType.WARRIOR_AOE);
+											bash(le, ClassAbility.SHIELD_BASH_AOE);
 										}
 									}
 
@@ -130,8 +130,8 @@ public class ShieldBash extends Ability {
 		}
 	}
 
-	private void bash(LivingEntity le, DamageType type) {
-		DamageUtils.damage(mPlayer, le, type, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_BASH_DAMAGE), mInfo.mLinkedSpell, true, true);
+	private void bash(LivingEntity le, ClassAbility ca) {
+		DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_BASH_DAMAGE), ca, true, true);
 		int duration = SHIELD_BASH_STUN + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 		if (EntityUtils.isBoss(le) || EntityUtils.isElite(le)) {
 			EntityUtils.applySlow(mPlugin, duration, .99, le);

@@ -16,6 +16,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 public class Shielding implements Enchantment {
 
 	public static final double ARMOR_BONUS_PER_LEVEL = 0.2;
+	public static final double ARMOR_BONUS_PER_LEVEL_DISABLED = 0.1;
 	private static final double DISTANCE = 2.5;
 	private static final int DISABLE_DURATION = 5 * 20;
 	private static final String DISABLE_METAKEY = "ShieldingDisabled";
@@ -32,10 +33,12 @@ public class Shielding implements Enchantment {
 
 	public static double applyShielding(DamageEvent event, Plugin plugin, Player player) {
 		LivingEntity source = event.getSource();
-		if (source != null && !MetadataUtils.happenedInRecentTicks(player, DISABLE_METAKEY, DISABLE_DURATION)) {
-			if (doesShieldingApply(player, source)) {
-				return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SHIELDING) * ARMOR_BONUS_PER_LEVEL;
+		if (doesShieldingApply(player, source)) {
+			double bonusPer = ARMOR_BONUS_PER_LEVEL;
+			if (!MetadataUtils.happenedInRecentTicks(player, DISABLE_METAKEY, DISABLE_DURATION)) {
+				bonusPer = ARMOR_BONUS_PER_LEVEL_DISABLED;
 			}
+			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SHIELDING) * bonusPer;
 		}
 		return 0;
 	}

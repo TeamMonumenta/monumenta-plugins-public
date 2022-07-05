@@ -66,13 +66,13 @@ public class CounterStrike extends Ability {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.6f, 0.7f);
 			double eventDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, event.getOriginalDamage() * mReflect);
 			List<LivingEntity> entityList = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, COUNTER_STRIKE_RADIUS));
-
-			if (entityList.remove(source)) {
-				DamageUtils.damage(mPlayer, source, DamageType.MELEE_SKILL, eventDamage, mInfo.mLinkedSpell, true, true);
-			}
-
 			for (LivingEntity mob : entityList) {
-				DamageUtils.damage(mPlayer, mob, DamageType.WARRIOR_AOE, eventDamage, mInfo.mLinkedSpell, true, true);
+				// Use different ClassAbility for non-target for Glorious Battle
+				ClassAbility ca = ClassAbility.COUNTER_STRIKE_AOE;
+				if (mob == source) {
+					ca = mInfo.mLinkedSpell;
+				}
+				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, eventDamage, ca, true, true);
 			}
 
 			if (isEnhanced()) {

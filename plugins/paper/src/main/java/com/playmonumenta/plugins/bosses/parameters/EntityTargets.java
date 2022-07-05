@@ -83,9 +83,9 @@ public class EntityTargets implements Cloneable {
 		MOB {
 			@Override
 			public List<LivingEntity> getTargets(LivingEntity launcher, Location loc, double range, boolean notIncludeLauncher) {
-				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, range, (LivingEntity) launcher);
+				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, range, launcher);
 				if (!notIncludeLauncher) {
-					mobs.add((LivingEntity) launcher);
+					mobs.add(launcher);
 				}
 				return mobs;
 			}
@@ -673,9 +673,23 @@ public class EntityTargets implements Cloneable {
 
 		Boolean optional = reader.readBoolean();
 		if (optional == null) {
-			return ParseResult.of(Tooltip.arrayOf(
-				Tooltip.of(reader.readSoFar() + "true", "default value true"),
-				Tooltip.of(reader.readSoFar() + "false", "default value true")));
+			switch (target) {
+				case PLAYER -> {
+					return ParseResult.of(Tooltip.arrayOf(
+						Tooltip.of(reader.readSoFar() + "true", "true -> target player in stealth"),
+						Tooltip.of(reader.readSoFar() + "false", "false -> DON'T target player in stealth")));
+				}
+				case MOB, ENTITY -> {
+					return ParseResult.of(Tooltip.arrayOf(
+						Tooltip.of(reader.readSoFar() + "true", "true -> DON'T include the launcher"),
+						Tooltip.of(reader.readSoFar() + "false", "false -> include the launcher")));
+				}
+				default -> {
+					return ParseResult.of(Tooltip.arrayOf(
+						Tooltip.of(reader.readSoFar() + "true", "not used >.<"),
+						Tooltip.of(reader.readSoFar() + "false", "not used >.>")));
+				}
+			}
 		}
 
 

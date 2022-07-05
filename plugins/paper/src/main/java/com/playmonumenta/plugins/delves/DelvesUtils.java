@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.delves;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Entropy;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.MetadataValue;
 import org.jetbrains.annotations.NotNull;
 
 public class DelvesUtils {
@@ -371,5 +374,18 @@ public class DelvesUtils {
 	public static boolean isDelveMob(Entity entity) {
 		Set<String> tags = entity.getScoreboardTags();
 		return tags.contains(DELVE_MOB_TAG);
+	}
+
+	public static boolean isValidTwistedMob(LivingEntity livingEntity) {
+		if (livingEntity.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
+			int spawnCount = 0;
+			// There should only be one value - just use the latest one
+			for (MetadataValue value : livingEntity.getMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
+				spawnCount = value.asInt();
+			}
+
+			return spawnCount <= MobListener.SPAWNER_DROP_THRESHOLD;
+		}
+		return true;
 	}
 }

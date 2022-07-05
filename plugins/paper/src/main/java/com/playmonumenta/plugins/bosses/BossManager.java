@@ -33,6 +33,7 @@ import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.delves.mobabilities.DreadfulSummonBoss;
 import com.playmonumenta.plugins.delves.mobabilities.SpectralSummonBoss;
 import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
+import com.playmonumenta.plugins.delves.mobabilities.TwistedMiniBoss;
 import com.playmonumenta.plugins.depths.bosses.Davey;
 import com.playmonumenta.plugins.depths.bosses.Hedera;
 import com.playmonumenta.plugins.depths.bosses.Nucleus;
@@ -41,7 +42,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.parrots.RainbowParrot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,6 +73,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
@@ -286,6 +287,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(AlchemicalAberrationBoss.identityTag, (Plugin p, LivingEntity e) -> new AlchemicalAberrationBoss(p, e));
 		mStatelessBosses.put(ThrowSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new ThrowSummonBoss(p, e));
 		mStatelessBosses.put(PotionThrowBoss.identityTag, (Plugin p, LivingEntity e) -> new PotionThrowBoss(p, e));
+		mStatelessBosses.put(TwistedMiniBoss.identityTag, (Plugin p, LivingEntity e) -> new TwistedMiniBoss(p, e));
 
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -517,6 +519,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(PortalBoss.identityTag, (Plugin p, LivingEntity e) -> PortalBoss.deserialize(p, e));
 		mBossDeserializers.put(MageCosmicMoonbladeBoss.identityTag, (Plugin p, LivingEntity e) -> MageCosmicMoonbladeBoss.deserialize(p, e));
 		mBossDeserializers.put(ScoutVolleyBoss.identityTag, (Plugin p, LivingEntity e) -> ScoutVolleyBoss.deserialize(p, e));
+		mBossDeserializers.put(TwistedMiniBoss.identityTag, (Plugin p, LivingEntity e) -> TwistedMiniBoss.deserialize(p, e));
 
 
 		/***************************************************
@@ -603,9 +606,21 @@ public class BossManager implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
-		if (event.getEntity() instanceof LivingEntity living) {
-			processEntity(living);
+		if (event.getEntity() instanceof LivingEntity living
+			    && !living.getScoreboardTags().isEmpty()) {
+			// EntityAddToWorldEvent is called at an inconvenient time in Minecraft's code, which can cause deadlocks,
+			// so we delay initialisation of boss data slightly to be outside of the entity loading code.
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				processEntity(living);
+			});
 		}
+	}
+
+	// Creature spawn event is also listened to to set up boss data for initial spawn at the moment the mob is summoned,
+	// which allows to immediately use the boss after summoning it.
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void creatureSpawnEvent(CreatureSpawnEvent event) {
+		processEntity(event.getEntity());
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -620,10 +635,9 @@ public class BossManager implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void chunkLoadEvent(ChunkLoadEvent event) {
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> { // delay by a tick as the chunk is loaded before entities in 1.18+
 			for (Entity entity : event.getChunk().getEntities()) {
-				if (entity instanceof LivingEntity living
-					    && mBosses.get(entity.getUniqueId()) == null) {
+				if (entity instanceof LivingEntity living) {
 					processEntity(living);
 				}
 			}
@@ -1165,9 +1179,8 @@ public class BossManager implements Listener {
 	}
 
 	private void processEntity(LivingEntity entity) {
-		/* This should never happen */
-		if (mBosses.get(entity.getUniqueId()) != null) {
-			MMLog.warning("[BossManager] ProcessEntity: " + entity.getName() + " Attempted to add boss that was already tracked!");
+		if (mBosses.containsKey(entity.getUniqueId())) {
+			// already loaded
 			return;
 		}
 

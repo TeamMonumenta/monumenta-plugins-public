@@ -97,7 +97,11 @@ public final class ShadowSlam extends DepthsAbility {
 		if (mPlayer == null) {
 			return;
 		}
-		mFallFromY = Math.max(mFallFromY, mPlayer.getLocation().getY());
+		if (mPlayer.getFallDistance() <= 0) {
+			mFallFromY = -10000;
+		} else {
+			mFallFromY = Math.max(mFallFromY, mPlayer.getLocation().getY());
+		}
 	}
 
 	private double calculateFallDistance() {

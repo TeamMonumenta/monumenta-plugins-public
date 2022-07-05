@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import it.unimi.dsi.util.XoRoShiRo128PlusRandom;
+import java.math.BigInteger;
 
 public class FastUtils {
 	public static final XoRoShiRo128PlusRandom RANDOM = new XoRoShiRo128PlusRandom();
@@ -14,6 +15,7 @@ public class FastUtils {
 	private static final double degToIndex = SIN_COUNT / degFull;
 	private static final double[] sin;
 	private static final double[] cos;
+	private static final BigInteger[] fact = new BigInteger[300];
 
 	static {
 		sin = new double[SIN_COUNT];
@@ -28,6 +30,12 @@ public class FastUtils {
 		for (int i = 0; i < 360; i += 90) {
 			sin[(int) (i * degToIndex) & SIN_MASK] = Math.sin(i * Math.PI / 180.0);
 			cos[(int) (i * degToIndex) & SIN_MASK] = Math.cos(i * Math.PI / 180.0);
+		}
+
+		fact[0] = BigInteger.ONE;
+		fact[1] = BigInteger.ONE;
+		for (int i = 2; i < 300; i++) {
+			fact[i] = fact[i - 1].multiply(BigInteger.valueOf(i));
 		}
 	}
 
@@ -79,5 +87,9 @@ public class FastUtils {
 	 */
 	public static double cosDeg(double deg) {
 		return cos[(int) (deg * degToIndex) & SIN_MASK];
+	}
+
+	public static BigInteger bigFact(int num) throws RuntimeException {
+		return fact[num];
 	}
 }

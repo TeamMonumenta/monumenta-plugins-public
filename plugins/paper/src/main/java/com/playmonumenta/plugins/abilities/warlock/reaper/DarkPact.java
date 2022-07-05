@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -34,8 +33,6 @@ public class DarkPact extends Ability {
 
 	public static final String PERCENT_HEAL_EFFECT_NAME = "DarkPactPercentHealEffect";
 	private static final int PERCENT_HEAL = -1;
-	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "DarkPactPercentDamageResistEffect";
-	private static final double PERCENT_DAMAGE_RESIST = -0.1;
 	private static final String AESTHETICS_EFFECT_NAME = "DarkPactAestheticsEffect";
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "DarkPactPercentDamageDealtEffect";
 	private static final String PERCENT_ATKS_EFFECT_NAME = "DarkPactPercentAtksEffect";
@@ -68,7 +65,7 @@ public class DarkPact extends Ability {
 		super(plugin, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain 10% damage reduction, +10% attack speed, and deal +30% melee damage on your scythe attacks. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
+		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain +10% attack speed, and deal +30% melee damage on your scythe attacks. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
 		mInfo.mDescriptions.add("You gain +20% attack speed and attacks with a scythe deal +60% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
@@ -107,7 +104,6 @@ public class DarkPact extends Ability {
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(duration, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES, 0, (entity, enemy) -> entity instanceof Player player && ItemUtils.isHoe(player.getInventory().getItemInMainHand())));
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_ATKS_EFFECT_NAME, new PercentAttackSpeed(duration, mPercentAtks, PERCENT_ATKS_EFFECT_NAME));
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(duration, PERCENT_HEAL));
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(duration, PERCENT_DAMAGE_RESIST - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION)));
 			mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(duration,
 					(entity, fourHertz, twoHertz, oneHertz) -> {
 					new PartialParticle(Particle.SPELL_WITCH, entity.getLocation(), 3, 0.2, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
