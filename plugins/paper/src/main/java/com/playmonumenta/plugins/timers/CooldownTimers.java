@@ -168,6 +168,35 @@ public class CooldownTimers {
 		}
 	}
 
+	public void updateCooldownsExcept(Player player, ClassAbility spell, int ticks) {
+		HashMap<ClassAbility, Integer> cds = mTimers.get(player.getUniqueId());
+
+		if (cds != null) {
+			Iterator<Entry<ClassAbility, Integer>> it = cds.entrySet().iterator();
+			while (it.hasNext()) {
+				Entry<ClassAbility, Integer> entry = it.next();
+				ClassAbility currSpell = entry.getKey();
+				if (!currSpell.equals(spell)) {
+					int cd = entry.getValue();
+					cd -= ticks;
+					if (cd <= 0) {
+						if (mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilityIgnoringSilence(currSpell) != null) {
+							MessagingUtils.sendActionBarMessage(player, currSpell.getName() + " is now off cooldown!");
+						}
+						it.remove();
+					} else {
+						cds.put(currSpell, cd);
+					}
+					ClientModHandler.updateAbility(player, currSpell);
+				}
+			}
+
+			if (cds.isEmpty()) {
+				mTimers.remove(player.getUniqueId());
+			}
+		}
+	}
+
 	public void removeAllCooldowns(Player player) {
 		HashMap<ClassAbility, Integer> cds = mTimers.remove(player.getUniqueId());
 		if (cds != null) {

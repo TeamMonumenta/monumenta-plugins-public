@@ -29,19 +29,19 @@ public class EscapeDeath extends Ability {
 	private static final int RANGE = 5;
 	private static final int STUN_DURATION = 20 * 3;
 	private static final int BUFF_DURATION = 20 * 8;
-	private static final int ABSORPTION_HEALTH = 8;
+	private static final int ABSORPTION_HEALTH = 4;
 	private static final double SPEED_PERCENT = 0.3;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "EscapeDeathPercentSpeedEffect";
 	private static final int JUMP_BOOST_AMPLIFIER = 2;
-	private static final int COOLDOWN = 90 * 20;
+	private static final int COOLDOWN = 60 * 20;
 
 	public EscapeDeath(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Escape Death");
 		mInfo.mLinkedSpell = ClassAbility.ESCAPE_DEATH;
 		mInfo.mScoreboardId = "EscapeDeath";
 		mInfo.mShorthandName = "ED";
-		mInfo.mDescriptions.add("When taking damage from a mob leaves you below 5 hearts, throw a paralyzing grenade that stuns all enemies within 5 blocks for 3 seconds. Cooldown: 90s.");
-		mInfo.mDescriptions.add("When this skill is triggered, also gain 4 Absorption hearts for 8 seconds, 30% Speed, and Jump Boost III. If damage taken would kill you but could have been prevented by this skill it will instead do so.");
+		mInfo.mDescriptions.add("When taking damage from a mob leaves you below 5 hearts, throw a paralyzing grenade that stuns all enemies within 5 blocks for 3 seconds. Cooldown: 60s.");
+		mInfo.mDescriptions.add("When this skill is triggered, also gain 2 Absorption hearts for 8 seconds, 30% Speed, and Jump Boost III. If damage taken would kill you but could have been prevented by this skill it will instead do so.");
 		mInfo.mCooldown = COOLDOWN;
 		mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
 	}

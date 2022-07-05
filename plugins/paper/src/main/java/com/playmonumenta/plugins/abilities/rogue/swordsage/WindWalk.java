@@ -31,14 +31,12 @@ public class WindWalk extends MultipleChargeAbility {
 
 	private static final int WIND_WALK_COOLDOWN = 20 * 25;
 	private static final int WIND_WALK_MAX_CHARGES = 2;
-	private static final int WIND_WALK_1_DURATION = 20 * 2;
-	private static final int WIND_WALK_2_DURATION = 20 * 4;
-	private static final int WIND_WALK_VULNERABILITY_DURATION_INCREASE = 20 * 3;
-	private static final double WIND_WALK_VULNERABILITY_AMPLIFIER = 0.3;
+	private static final int WIND_WALK_DURATION = 20 * 2;
 	private static final int WIND_WALK_RADIUS = 3;
 	private static final double WIND_WALK_Y_VELOCITY = 0.2;
 	private static final double WIND_WALK_Y_VELOCITY_MULTIPLIER = 0.2;
 	private static final double WIND_WALK_VELOCITY_BONUS = 1.5;
+	private static final int WIND_WALK_CDR = 20 * 2;
 
 	private final int mDuration;
 
@@ -50,12 +48,12 @@ public class WindWalk extends MultipleChargeAbility {
 		mInfo.mScoreboardId = "WindWalk";
 		mInfo.mShorthandName = "WW";
 		mInfo.mDescriptions.add("Press the swap key while holding two swords to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. Cooldown: 25s. Charges: 2.");
-		mInfo.mDescriptions.add("Now afflicts 30% Vulnerability; enemies are stunned and levitated for 4 seconds.");
+		mInfo.mDescriptions.add("Casting this ability reduces the cooldown of all other abilities by 2 seconds.");
 		mInfo.mCooldown = WIND_WALK_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.QUARTZ, 1);
-		mDuration = getAbilityScore() == 1 ? WIND_WALK_1_DURATION : WIND_WALK_2_DURATION;
+		mDuration = WIND_WALK_DURATION;
 		mMaxCharges = WIND_WALK_MAX_CHARGES;
 		mCharges = getTrackedCharges();
 	}
@@ -77,8 +75,11 @@ public class WindWalk extends MultipleChargeAbility {
 		mLastCastTicks = ticks;
 
 		putOnCooldown();
-
 		walk();
+
+		if (getAbilityScore() > 1) {
+			mPlugin.mTimers.updateCooldownsExcept(mPlayer, mInfo.mLinkedSpell, WIND_WALK_CDR);
+		}
 	}
 
 	public void walk() {
@@ -114,9 +115,6 @@ public class WindWalk extends MultipleChargeAbility {
 							world.playSound(mob.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 1.25f);
 
 							EntityUtils.applyStun(mPlugin, mDuration, mob);
-							if (getAbilityScore() > 1) {
-								EntityUtils.applyVulnerability(mPlugin, mDuration + WIND_WALK_VULNERABILITY_DURATION_INCREASE, WIND_WALK_VULNERABILITY_AMPLIFIER, mob);
-							}
 
 							if (EntityUtils.isElite(mob)) {
 								new PartialParticle(Particle.EXPLOSION_NORMAL, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);

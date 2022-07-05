@@ -32,8 +32,8 @@ public class ViciousCombos extends Ability {
 		super(plugin, player, "Vicious Combos");
 		mInfo.mScoreboardId = "ViciousCombos";
 		mInfo.mShorthandName = "VC";
-		mInfo.mDescriptions.add("Passively, killing an enemy with melee or ability damage refreshes the cooldown of your abilities by 1 second. Killing an Elite enemy instead resets the cooldown of your abilities.");
-		mInfo.mDescriptions.add("Killing an enemy now refreshes your ability cooldowns by 2 seconds. Killing an Elite enemy inflicts nearby enemies within 5 blocks with 15% weaken and 15% Vulnerability for 5 seconds.");
+		mInfo.mDescriptions.add("Passively, killing an enemy with melee or ability damage refreshes the cooldown of your abilities by 1 second. Killing an Elite or Boss enemy instead resets the cooldown of your abilities.");
+		mInfo.mDescriptions.add("Killing an enemy now refreshes your ability cooldowns by 2 seconds. Killing an Elite or Boss enemy inflicts nearby enemies within 5 blocks with 15% weaken and 15% Vulnerability for 5 seconds.");
 		mDisplayItem = new ItemStack(Material.ZOMBIE_HEAD, 1);
 	}
 
@@ -56,7 +56,7 @@ public class ViciousCombos extends Ability {
 					loc = loc.add(0, 0.5, 0);
 
 					World world = mPlayer.getWorld();
-					if (EntityUtils.isElite(killedEntity)) {
+					if (EntityUtils.isElite(killedEntity) || EntityUtils.isBoss(killedEntity)) {
 						mPlugin.mTimers.removeAllCooldowns(mPlayer);
 						MessagingUtils.sendActionBarMessage(mPlayer, "All your cooldowns have been reset");
 
