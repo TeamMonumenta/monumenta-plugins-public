@@ -312,7 +312,7 @@ public class JudgementChain extends Ability {
 			if (isHostile) {
 				PotionUtils.applyPotion(mPlayer, e, new PotionEffect(PotionEffectType.HUNGER, BUFF_DURATION, 0, false, true));
 			} else {
-				mPlugin.mEffectManager.addEffect(e, HEAL_RATE_NAME, new PercentHeal(DURATION, mAmplifier));
+				mPlugin.mEffectManager.addEffect(e, HEAL_RATE_NAME, new PercentHeal(BUFF_DURATION, mAmplifier));
 			}
 		}
 	}

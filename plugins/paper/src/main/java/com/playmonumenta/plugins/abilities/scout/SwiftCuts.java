@@ -53,7 +53,7 @@ public class SwiftCuts extends Ability {
 				event.setDamage(event.getDamage() * (1 + mConsecutivePercentDamage));
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, SWEEP_RADIUS, enemy)) {
-					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, event.getDamage() * (1 + mPercentAoEDamage), mInfo.mLinkedSpell, true, true);
+					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, event.getDamage() * mPercentAoEDamage, mInfo.mLinkedSpell, true, true);
 				}
 			} else {
 				mLastTarget = enemy;

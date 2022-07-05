@@ -164,7 +164,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		}
 
 		DamageEvent.DamageType type = event.getType();
-		if (type == DamageType.MELEE || type == DamageType.MELEE_SKILL || type == DamageType.MELEE_ENCH) {
+		if (getAbilityScore() > 1 && (type == DamageType.MELEE || type == DamageType.MELEE_SKILL || type == DamageType.MELEE_ENCH)) {
 			int count = 0;
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), TARGET_RANGE)) {
 				if (le instanceof Mob mob && mob.getTarget() == mPlayer) {
