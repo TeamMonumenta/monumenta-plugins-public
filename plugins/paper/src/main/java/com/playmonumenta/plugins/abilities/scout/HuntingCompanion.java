@@ -52,6 +52,7 @@ public class HuntingCompanion extends Ability {
 	private static final double VELOCITY = 0.9;
 	private static final double JUMP_HEIGHT = 0.8;
 	private static final double MAX_TARGET_Y = 4;
+	private static final double HEALING_PERCENT = 0.05;
 
 	private @Nullable Fox mFox;
 	private @Nullable LivingEntity mTarget;
@@ -65,7 +66,7 @@ public class HuntingCompanion extends Ability {
 		super(plugin, player, "Hunting Companion");
 		mInfo.mScoreboardId = "HuntingCompanion";
 		mInfo.mShorthandName = "HC";
-		mInfo.mDescriptions.add("Swap hands while holding a bow or crossbow to summon an invulnerable fox companion. The fox attacks the nearest mob within " + DETECTION_RANGE + " blocks. The fox prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The fox deals damage equal to " + (int) (100 * DAMAGE_FRACTION_1) + "% of your projectile damage when the ability is cast, ignoring i-frames. Once per mob, the fox stuns upon attack for " + STUN_TIME_1 / 20 + " seconds, except for elites and bosses. The fox disappears after " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.");
+		mInfo.mDescriptions.add("Swap hands while holding a bow, crossbow, or trident to summon an invulnerable fox companion. The fox attacks the nearest mob within " + DETECTION_RANGE + " blocks. The fox prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The fox deals melee damage equal to " + (int) (100 * DAMAGE_FRACTION_1) + "% of your projectile damage. Once per mob, the fox stuns upon attack for " + STUN_TIME_1 / 20 + " seconds, except for elites and bosses. When a mob that was damaged by the fox dies, you heal 5% of your max health. The fox disappears after " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.");
 		mInfo.mDescriptions.add("Damage is increased to " + (int) (100 * DAMAGE_FRACTION_2) + "% of your projectile damage and the stun time is increased to " + STUN_TIME_2 / 20 + " seconds.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
@@ -129,7 +130,8 @@ public class HuntingCompanion extends Ability {
 				mFox.setFoxType(Fox.Type.SNOW);
 			}
 
-			double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
+			double multiply = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
+			double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (multiply != 0 ? multiply : 1);
 
 			BossManager bossManager = BossManager.getInstance();
 			if (bossManager != null) {
@@ -138,7 +140,7 @@ public class HuntingCompanion extends Ability {
 					for (BossAbilityGroup ability : abilities) {
 						if (ability instanceof HuntingCompanionBoss huntingCompanionBoss) {
 							ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-							huntingCompanionBoss.spawn(mPlayer, damage, mStunTime, playerItemStats);
+							huntingCompanionBoss.spawn(mPlayer, damage, mStunTime, HEALING_PERCENT, playerItemStats);
 							break;
 						}
 					}

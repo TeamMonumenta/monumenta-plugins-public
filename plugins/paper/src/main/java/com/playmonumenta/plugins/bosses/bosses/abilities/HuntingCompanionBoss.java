@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses.abilities;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.HealPlayerOnDeath;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -25,11 +26,14 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_huntingcompanion";
 	public static final int detectionRange = 64;
 
+	private static final String HEAL_EFFECT = "HuntingCompanionHealPlayerOnDeathEffect";
+
 	private List<UUID> mStunnedMobs;
 
 	private @Nullable Player mPlayer;
 	private double mDamage = 0;
 	private int mStunTime = 0;
+	private double mHealingPercent;
 	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -45,10 +49,11 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
-	public void spawn(Player player, double damage, int stunTime, ItemStatManager.PlayerItemStats playerItemStats) {
+	public void spawn(Player player, double damage, int stunTime, double healingPercent, ItemStatManager.PlayerItemStats playerItemStats) {
 		mPlayer = player;
 		mDamage = damage;
 		mStunTime = stunTime;
+		mHealingPercent = healingPercent;
 		mPlayerItemStats = playerItemStats;
 	}
 
@@ -57,7 +62,7 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 		if (mPlayer != null && mPlayerItemStats != null) {
 			event.setCancelled(true);
 
-			DamageUtils.damage(mPlayer, damagee, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, ClassAbility.HUNTING_COMPANION, mPlayerItemStats), mDamage, true, true, false);
+			DamageUtils.damage(mPlayer, damagee, new DamageEvent.Metadata(DamageType.MELEE_SKILL, ClassAbility.HUNTING_COMPANION, mPlayerItemStats), mDamage, true, true, false);
 
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_FOX_BITE, 1.5f, 1.0f);
 			UUID uuid = damagee.getUniqueId();
@@ -65,6 +70,7 @@ public class HuntingCompanionBoss extends BossAbilityGroup {
 				EntityUtils.applyStun(com.playmonumenta.plugins.Plugin.getInstance(), mStunTime, damagee);
 				mStunnedMobs.add(uuid);
 			}
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(damagee, HEAL_EFFECT, new HealPlayerOnDeath(60 * 20, EntityUtils.getMaxHealth(mPlayer) * mHealingPercent, mPlayer));
 		}
 	}
 

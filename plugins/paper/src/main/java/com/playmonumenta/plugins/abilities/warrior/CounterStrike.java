@@ -53,12 +53,13 @@ public class CounterStrike extends Ability {
 			double eventDamage = event.getOriginalDamage() * mReflect;
 			List<LivingEntity> entityList = EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer);
 
-			if (entityList.remove(damager)) {
-				DamageUtils.damage(mPlayer, (LivingEntity)damager, DamageType.MELEE_SKILL, eventDamage, mInfo.mLinkedSpell, true, true);
-			}
-
 			for (LivingEntity mob : entityList) {
-				DamageUtils.damage(mPlayer, mob, DamageType.WARRIOR_AOE, eventDamage, mInfo.mLinkedSpell, true, true);
+				// Use different ClassAbility for non-target for Glorious Battle
+				ClassAbility ca = ClassAbility.COUNTER_STRIKE_AOE;
+				if (mob == source) {
+					ca = mInfo.mLinkedSpell;
+				}
+				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, eventDamage, ca, true, true);
 			}
 		}
 	}

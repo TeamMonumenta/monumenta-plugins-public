@@ -38,9 +38,7 @@ public class DamageEvent extends Event implements Cancellable {
 		FALL(true, true),
 		AILMENT(false, false),
 		POISON(false, false),
-		OTHER(false, false),
-		WARRIOR_AOE(false, true),
-		WARRIOR_AOE_OTHER(false, true);
+		OTHER(false, false);
 
 		public static DamageType getType(DamageCause cause) {
 			// List every cause for completeness
@@ -126,7 +124,6 @@ public class DamageEvent extends Event implements Cancellable {
 		private final @Nullable ClassAbility mAbility;
 		private final @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 		private final @Nullable String mBossSpellName;
-		private final boolean mWarriorAoe;
 
 		public Metadata(DamageType type, @Nullable ClassAbility ability) {
 			this(type, ability, null);
@@ -140,14 +137,10 @@ public class DamageEvent extends Event implements Cancellable {
 			if (type == null) {
 				mType = DamageType.OTHER;
 				Plugin.getInstance().getLogger().log(Level.WARNING, "Attempted to construct DamageEvent with null DamageType");
-			} else if (type == DamageType.WARRIOR_AOE) {
-				mType = DamageType.MELEE_SKILL;
-			} else if (type == DamageType.WARRIOR_AOE_OTHER) {
-				mType = DamageType.OTHER;
 			} else {
 				mType = type;
 			}
-			mWarriorAoe = type != null && (type == DamageType.WARRIOR_AOE || type == DamageType.WARRIOR_AOE_OTHER);
+
 			mAbility = ability;
 			mPlayerItemStats = playerItemStats;
 			mBossSpellName = bossSpellName;
@@ -264,10 +257,6 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public @Nullable LivingEntity getSource() {
 		return mSource;
-	}
-
-	public boolean isWarriorAoe() {
-		return mMetadata.mWarriorAoe;
 	}
 
 	@Override

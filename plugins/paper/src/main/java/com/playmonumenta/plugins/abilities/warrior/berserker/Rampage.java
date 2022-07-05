@@ -77,7 +77,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		if (mStacks >= 10 && loc.getPitch() > 70) {
 			World world = mPlayer.getWorld();
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RAMPAGE_RADIUS)) {
-				DamageUtils.damage(mPlayer, mob, DamageType.WARRIOR_AOE, mStacks * RAMPAGE_STACK_PERCENTAGE, mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mStacks * RAMPAGE_STACK_PERCENTAGE, mInfo.mLinkedSpell);
 				new PartialParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
 			}
 
