@@ -23,7 +23,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	private static final double PERCENT_BASE_DAMAGE = 0.2;
 	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 4;
 	private static final int MAX_STACKS = 8;
-	private static final double PERCENT_DAMAGE_PER_STACK = 0.035;
+	private static final double PERCENT_DAMAGE_PER_STACK = 0.04;
 	private static final double ARROW_SAVE_CHANCE = 0.2;
 
 	public Sharpshooter(Plugin plugin, @Nullable Player player) {
@@ -31,7 +31,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		mInfo.mScoreboardId = "Sharpshooter";
 		mInfo.mShorthandName = "Ss";
 		mInfo.mDescriptions.add("Your arrows deal 20% more damage.");
-		mInfo.mDescriptions.add("Each enemy hit with a critical arrow or trident gives you a stack of Sharpshooter, up to 8. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows and tridents deal +3.5% damage. Additionally, passively gain a 20% chance to not consume arrows when shot.");
+		mInfo.mDescriptions.add("Each enemy hit with a critical arrow or trident gives you a stack of Sharpshooter, up to 8. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows and tridents deal +4% damage. Additionally, passively gain a 20% chance to not consume arrows when shot.");
 		mDisplayItem = new ItemStack(Material.TARGET, 1);
 	}
 

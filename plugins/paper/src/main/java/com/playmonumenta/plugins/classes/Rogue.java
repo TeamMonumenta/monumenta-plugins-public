@@ -39,7 +39,7 @@ public class Rogue extends PlayerClass {
 		mClassName = "Rogue";
 		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
 		mClassDescription = "Rogues excel in one-on-one battles, using precise strikes to bring down dangerous elite enemies.";
-		mClassPassiveDescription = "While holding two swords, abilities deal 2x damage to elite enemies, and 25% more to bosses.";
+		mClassPassiveDescription = "While holding two swords, deal 30% damage to elite enemies, and 15% more to bosses.";
 
 		mSpecOne.mAbilities.add(new BladeDance(plugin, player));
 		mSpecOne.mAbilities.add(new DeadlyRonde(plugin, player));
