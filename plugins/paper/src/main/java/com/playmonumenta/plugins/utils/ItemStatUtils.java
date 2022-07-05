@@ -416,6 +416,7 @@ public class ItemStatUtils {
 		REFLEXES(new Reflexes(), true, false, false),
 		ETHEREAL(new Ethereal(), true, false, false),
 		EVASION(new Evasion(), true, false, false),
+		CLOAKED(new Cloaked(), true, false, false),
 		ADAPTABILITY(new Adaptability(), false, false, false),
 		// Custom Enchants
 		ABYSSAL(new Abyssal(), true, false, false),
@@ -565,11 +566,11 @@ public class ItemStatUtils {
 
 		public boolean isHidden() {
 			return this == MAINHAND_OFFHAND_DISABLE
-				       || this == OFFHAND_MAINHAND_DISABLE
-				       || this == HIDE_ATTRIBUTES
-				       || this == HIDE_ENCHANTS
-				       || this == HIDE_INFO
-				       || this == NO_GLINT;
+				|| this == OFFHAND_MAINHAND_DISABLE
+				|| this == HIDE_ATTRIBUTES
+				|| this == HIDE_ENCHANTS
+				|| this == HIDE_INFO
+				|| this == NO_GLINT;
 		}
 
 		public Component getDisplay(int level) {
@@ -1549,12 +1550,11 @@ public class ItemStatUtils {
 	public static Masterwork getMasterwork(final @Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return Masterwork.NONE;
-    }
-
+		}
 		NBTItem nbt = new NBTItem(item);
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
-      return Masterwork.NONE;
+			return Masterwork.NONE;
 		}
 
 		if (getRegion(item) != Region.RING) {
@@ -1567,7 +1567,7 @@ public class ItemStatUtils {
 		}
 
 		return Masterwork.NONE;
-  }
+	}
 
 	public static Location getLocation(final @Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {

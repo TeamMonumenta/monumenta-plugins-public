@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemstats.attributes;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Attribute;
+import com.playmonumenta.plugins.itemstats.enchantments.Cloaked;
 import com.playmonumenta.plugins.itemstats.enchantments.Ethereal;
 import com.playmonumenta.plugins.itemstats.enchantments.Evasion;
 import com.playmonumenta.plugins.itemstats.enchantments.Reflexes;
@@ -43,9 +44,10 @@ public class Agility implements Attribute {
 	 */
 	public static double getSecondaryEnchantsMod(DamageEvent event, Plugin plugin, Player player) {
 		return Tempo.applyTempo(event, plugin, player)
-			       + Reflexes.applyReflexes(event, plugin, player)
-			       + Evasion.applyEvasion(event, plugin, player)
-			       + Ethereal.applyEthereal(event, plugin, player);
+			+ Reflexes.applyReflexes(event, plugin, player)
+			+ Evasion.applyEvasion(event, plugin, player)
+			+ Ethereal.applyEthereal(event, plugin, player)
+			+ Cloaked.applyCloaked(event, plugin, player);
 	}
 
 }
