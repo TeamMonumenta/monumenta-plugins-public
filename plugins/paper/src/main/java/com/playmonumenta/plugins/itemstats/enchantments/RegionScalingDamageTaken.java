@@ -38,6 +38,9 @@ public class RegionScalingDamageTaken implements Enchantment {
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (!ServerProperties.getClassSpecializationsEnabled()) {
+			if (event.getType() == DamageEvent.DamageType.FALL) {
+				return;
+			}
 			event.setDamage(event.getDamage() * DAMAGE_TAKEN_MULTIPLIER);
 			if (event.getType() == DamageEvent.DamageType.POISON) {
 				event.setDamage(Math.min(event.getDamage(), Math.max(player.getHealth() - 1, 0)));

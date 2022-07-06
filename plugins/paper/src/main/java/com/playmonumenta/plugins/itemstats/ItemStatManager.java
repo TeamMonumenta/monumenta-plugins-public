@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -170,22 +171,27 @@ public class ItemStatManager implements Listener {
 					NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 					NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
+					boolean scaleRegion = ItemStatUtils.getRegion(item) == ItemStatUtils.Region.ISLES && !ServerProperties.getClassSpecializationsEnabled();
+
 					for (ItemStat stat : ITEM_STATS) {
 						if (stat instanceof Attribute attribute) {
-							newArmorAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, slot));
-							newArmorMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, slot));
+							double multiplier = attribute.getAttributeType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+							newArmorAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, slot) * multiplier);
+							newArmorMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, slot) * multiplier);
 						} else if (stat instanceof Enchantment enchantment) {
+							double multiplier = enchantment.getEnchantmentType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
 							if (enchantment.getEnchantmentType() == EnchantmentType.MAINHAND_OFFHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
 								break;
 							}
 							if (enchantment.getSlots().contains(slot)) {
-								newArmorAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()));
+								newArmorAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 							}
 							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN && (ItemStatUtils.getRegion(item) == ItemStatUtils.Region.ISLES || ItemStatUtils.getRegion(item) == ItemStatUtils.Region.RING)) {
 								newArmorAddStats.add(stat, 1);
 							}
 						} else if (stat instanceof Infusion infusion) {
-							newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()));
+							double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+							newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
 						}
 					}
 				}
@@ -200,19 +206,24 @@ public class ItemStatManager implements Listener {
 				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 				NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
+				boolean scaleRegion = ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.ISLES && !ServerProperties.getClassSpecializationsEnabled();
+
 				for (ItemStat stat : ITEM_STATS) {
 					if (stat instanceof Attribute attribute) {
-						newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND));
-						newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND));
+						double multiplier = attribute.getAttributeType().isMainhandRegionScaled() && scaleRegion ? 0.5 : 1.0;
+						newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND) * multiplier);
+						newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND) * multiplier);
 					} else if (stat instanceof Enchantment enchantment) {
+						double multiplier = enchantment.getEnchantmentType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
 						if (enchantment.getEnchantmentType() == EnchantmentType.OFFHAND_MAINHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
 							break;
 						}
 						if (enchantment.getSlots().contains(Slot.MAINHAND)) {
-							newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()));
+							newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 						}
 					} else if (stat instanceof Infusion infusion) {
-						newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()));
+						double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+						newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
 					}
 				}
 			}
