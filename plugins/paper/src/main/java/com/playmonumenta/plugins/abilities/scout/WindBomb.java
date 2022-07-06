@@ -56,7 +56,8 @@ public class WindBomb extends Ability {
 	public static final String CHARM_DURATION = "Wind Bomb Duration";
 	public static final String CHARM_WEAKNESS = "Wind Bomb Weaken Amplifier";
 	public static final String CHARM_COOLDOWN = "Wind Bomb Cooldown";
-	public static final String CHARM_DAMAGE = "Wind Bomb Damage Modifier";
+	public static final String CHARM_DAMAGE = "Wind Bomb Damage";
+	public static final String CHARM_DAMAGE_MODIFIER = "Wind Bomb Damage Modifier";
 	public static final String CHARM_RADIUS = "Wind Bomb Radius";
 	public static final String CHARM_HEIGHT = "Wind Bomb Height";
 	public static final String CHARM_PULL = "Wind Bomb Vortex Pull";
@@ -78,7 +79,7 @@ public class WindBomb extends Ability {
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.TNT, 1);
-		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2);
 	}
 
 	@Override
@@ -139,7 +140,7 @@ public class WindBomb extends Ability {
 				}
 				EntityUtils.applyWeaken(mPlugin, duration, weaken, mob);
 				if (isLevelTwo()) {
-					mPlugin.mEffectManager.addEffect(mob, AIR_TAG, new WindBombAirTag(duration * 2, MIDAIR_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE), mPlayer));
+					mPlugin.mEffectManager.addEffect(mob, AIR_TAG, new WindBombAirTag(duration * 2, MIDAIR_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MODIFIER), mPlayer));
 				}
 			}
 

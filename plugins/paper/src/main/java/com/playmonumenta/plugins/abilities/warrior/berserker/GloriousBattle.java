@@ -62,9 +62,11 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	public static final String CHARM_BLEED_AMPLIFIER = "Glorious Battle Bleed Amplifier";
 	public static final String CHARM_BLEED_DURATION = "Glorious Battle Bleed Duration";
 	public static final String CHARM_VELOCITY = "Glorious Battle Velocity";
+	public static final String CHARM_KNOCKBACK = "Glorious Battle Knockback";
+	public static final String CHARM_DAMAGE_MODIFIER = "Glorious Battle Damage Modifier";
 
 	private int mStacks;
-	private int mStackLimit;
+	private final int mStackLimit;
 	private final double mDamage;
 	private @Nullable LivingEntity mTarget;
 
@@ -139,8 +141,9 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		mPlugin.mEffectManager.clearEffects(mPlayer, KBR_EFFECT);
 
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius)) {
-			MovementUtils.knockAway(mPlayer, mob, KNOCK_AWAY_SPEED, true);
+			MovementUtils.knockAway(mPlayer, mob, knockback, true);
 		}
 
 		if (mTarget == null || mPlayer.getLocation().distance(mTarget.getLocation()) > radius) {
@@ -183,7 +186,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 				if (count > MAX_TARGETING) {
 					count = MAX_TARGETING;
 				}
-				event.setDamage(event.getDamage() * (1 + count * DAMAGE_PER));
+				event.setDamage(event.getDamage() * (1 + count * (DAMAGE_PER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MODIFIER))));
 			}
 		}
 

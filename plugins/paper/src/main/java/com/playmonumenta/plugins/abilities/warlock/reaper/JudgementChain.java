@@ -127,7 +127,8 @@ public class JudgementChain extends Ability {
 		Location loc = mPlayer.getEyeLocation();
 		World world = mPlayer.getWorld();
 
-		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, RANGE, false, true, true);
+		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
+		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, (int) range, false, true, true);
 		if (e != null && !EntityUtils.isBoss(e) && EntityUtils.isHostileMob(e)) {
 			mTarget = e;
 			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.25f);
@@ -189,7 +190,7 @@ public class JudgementChain extends Ability {
 							mChainActive = false;
 							ClientModHandler.updateAbility(mPlayer, JudgementChain.this);
 						}
-					} else if (l.distance(mTarget.getLocation()) > RANGE) {
+					} else if (l.distance(mTarget.getLocation()) > range) {
 						this.cancel();
 						breakChain(true, false);
 						mTarget = null;
@@ -214,17 +215,20 @@ public class JudgementChain extends Ability {
 			Location mLoc = mTarget.getLocation();
 			World world = mPlayer.getWorld();
 
-			new PartialParticle(Particle.REDSTONE, loc.add(0, mPlayer.getHeight() / 2, 0), 15, CHAIN_BREAK_EFFECT_RANGE, CHAIN_BREAK_EFFECT_RANGE, CHAIN_BREAK_EFFECT_RANGE, 0.125, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.REDSTONE, loc.add(0, mPlayer.getHeight() / 2, 0), 15, CHAIN_BREAK_EFFECT_RANGE, CHAIN_BREAK_EFFECT_RANGE, CHAIN_BREAK_EFFECT_RANGE, 0.125, DARK_COLOR).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CRIT, loc.add(0, mPlayer.getHeight() / 2, 0), 30, CHAIN_BREAK_DAMAGE_RANGE, CHAIN_BREAK_DAMAGE_RANGE, CHAIN_BREAK_DAMAGE_RANGE, 0.125).spawnAsPlayerActive(mPlayer);
+			double effectRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, CHAIN_BREAK_EFFECT_RANGE);
+			double damageRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, CHAIN_BREAK_DAMAGE_RANGE);
+
+			new PartialParticle(Particle.REDSTONE, loc.add(0, mPlayer.getHeight() / 2, 0), 15, effectRadius, effectRadius, effectRadius, 0.125, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, loc.add(0, mPlayer.getHeight() / 2, 0), 15, effectRadius, effectRadius, effectRadius, 0.125, DARK_COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CRIT, loc.add(0, mPlayer.getHeight() / 2, 0), 30, damageRadius, damageRadius, damageRadius, 0.125).spawnAsPlayerActive(mPlayer);
 			world.playSound(mLoc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.7f, 0.6f);
 			world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.6f, 0.6f);
 
 			if (isLevelTwo()) {
-				for (LivingEntity m : EntityUtils.getNearbyMobs(loc, CHAIN_BREAK_EFFECT_RANGE, mTarget)) {
+				for (LivingEntity m : EntityUtils.getNearbyMobs(loc, effectRadius, mTarget)) {
 					applyEffects(m, true);
 				}
-				for (Player p : PlayerUtils.playersInRange(loc, CHAIN_BREAK_EFFECT_RANGE, false)) {
+				for (Player p : PlayerUtils.playersInRange(loc, effectRadius, false)) {
 					applyEffects(p, false);
 				}
 			}
@@ -238,7 +242,6 @@ public class JudgementChain extends Ability {
 			DamageUtils.damage(mPlayer, mTarget, DamageType.MAGIC, damage, mInfo.mLinkedSpell, false, false);
 
 			if (doDamage && isLevelTwo()) {
-				double damageRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, CHAIN_BREAK_DAMAGE_RANGE);
 				for (LivingEntity m : EntityUtils.getNearbyMobs(loc, damageRadius, mTarget)) {
 					DamageUtils.damage(mPlayer, m, DamageType.MAGIC, damage, mInfo.mLinkedSpell);
 				}

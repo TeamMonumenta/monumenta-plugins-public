@@ -27,6 +27,8 @@ public class SwiftCuts extends Ability {
 	private static final double ENHANCEMENT_DAMAGE_PERCENT = 0.35;
 
 	public static final String CHARM_DAMAGE = "Swift Cuts Damage";
+	public static final String CHARM_SWEEP_DAMAGE = "Swift Cuts Sweep Damage";
+	public static final String CHARM_RADIUS = "Swift Cuts Radius";
 
 	private final double mConsecutivePercentDamage;
 	private final double mPercentAoEDamage;
@@ -58,8 +60,9 @@ public class SwiftCuts extends Ability {
 
 					event.setDamage(event.getDamage() * (1 + mConsecutivePercentDamage));
 
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, SWEEP_RADIUS, enemy)) {
-						DamageUtils.damage(mPlayer, mob, DamageType.OTHER, event.getDamage() * (1 + mPercentAoEDamage), mInfo.mLinkedSpell, true, true);
+					double sweepDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SWEEP_DAMAGE, event.getDamage() * mPercentAoEDamage);
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, SWEEP_RADIUS), enemy)) {
+						DamageUtils.damage(mPlayer, mob, DamageType.OTHER, sweepDamage, mInfo.mLinkedSpell, true, true);
 					}
 
 					if (isEnhanced()) {

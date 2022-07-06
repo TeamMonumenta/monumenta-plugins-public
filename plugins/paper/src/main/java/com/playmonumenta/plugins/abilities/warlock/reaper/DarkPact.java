@@ -53,7 +53,6 @@ public class DarkPact extends Ability {
 	public static final String CHARM_ATTACK_SPEED = "Dark Pact Attack Speed Amplifier";
 	public static final String CHARM_CAP = "Dark Pact Absorption Cap";
 	public static final String CHARM_DURATION = "Dark Pact Buff Duration";
-	public static final String CHARM_REDUCTION = "Dark Pact Damage Reduction";
 	public static final String CHARM_ABSORPTION = "Dark Pact Absorption Per Kill";
 
 	private final double mPercentDamageDealt;
@@ -141,12 +140,6 @@ public class DarkPact extends Ability {
 		NavigableSet<Effect> percentAtksEffects = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_ATKS_EFFECT_NAME);
 		if (percentAtksEffects != null) {
 			for (Effect effect : percentAtksEffects) {
-				effect.setDuration(effect.getDuration() + duration);
-			}
-		}
-		NavigableSet<Effect> percentDefense = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME);
-		if (percentDefense != null) {
-			for (Effect effect : percentDefense) {
 				effect.setDuration(effect.getDuration() + duration);
 			}
 		}

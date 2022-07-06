@@ -41,6 +41,7 @@ public class WindWalk extends MultipleChargeAbility {
 
 	public static final String CHARM_COOLDOWN = "Wind Walk Cooldown";
 	public static final String CHARM_CHARGE = "Wind Walk Charge";
+	public static final String CHARM_COOLDOWN_REDUCTION = "Wind Walk Cooldown Reduction";
 
 	private final int mDuration;
 
@@ -82,7 +83,7 @@ public class WindWalk extends MultipleChargeAbility {
 		walk();
 
 		if (isLevelTwo()) {
-			mPlugin.mTimers.updateCooldownsExcept(mPlayer, mInfo.mLinkedSpell, WIND_WALK_CDR);
+			mPlugin.mTimers.updateCooldownsExcept(mPlayer, mInfo.mLinkedSpell, WIND_WALK_CDR + CharmManager.getExtraDuration(mPlayer, CHARM_COOLDOWN_REDUCTION));
 		}
 	}
 

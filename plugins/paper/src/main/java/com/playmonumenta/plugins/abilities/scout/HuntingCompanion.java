@@ -72,13 +72,14 @@ public class HuntingCompanion extends Ability {
 	public static final String CHARM_BLEED_DURATION = "Hunting Companion Bleed Duration";
 	public static final String CHARM_BLEED_AMPLIFIER = "Hunting Companion Bleed Amplifier";
 	public static final String CHARM_DAMAGE = "Hunting Companion Damage";
+	public static final String CHARM_HEALING = "Hunting Companion Healing";
 	public static final String CHARM_SPEED = "Hunting Companion Speed";
 	public static final String CHARM_FOXES = "Hunting Companion Foxes";
 	public static final String CHARM_EAGLES = "Hunting Companion Eagles";
 
 	private HashMap<Mob, LivingEntity> mSummons;
 	private final double mDamageFraction;
-	private int mStunTime;
+	private final int mStunTime;
 	private boolean mHasWindBomb;
 	private @Nullable BukkitRunnable mRunnable;
 
@@ -125,16 +126,18 @@ public class HuntingCompanion extends Ability {
 			double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (multiply != 0 ? multiply : 1);
 			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 
+			double healingPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEALING_PERCENT);
+
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 			int foxCount = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_FOXES);
 			for (int i = 0; i < foxCount; i++) {
-				spawnFox(damage, playerItemStats);
+				spawnFox(damage, healingPercent, playerItemStats);
 			}
 			if (isEnhanced()) {
 				int eagleCount = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_EAGLES);
 				for (int i = 0; i < eagleCount; i++) {
-					spawnEagle(damage, playerItemStats);
+					spawnEagle(damage, healingPercent, playerItemStats);
 				}
 			}
 
@@ -237,7 +240,7 @@ public class HuntingCompanion extends Ability {
 		}
 	}
 
-	private void spawnFox(double damage, ItemStatManager.PlayerItemStats playerItemStats) {
+	private void spawnFox(double damage, double healingPercent, ItemStatManager.PlayerItemStats playerItemStats) {
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
 		Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
@@ -278,7 +281,7 @@ public class HuntingCompanion extends Ability {
 			MMLog.warning("Failed to get HuntingCompanionBoss for FoxCompanion");
 			return;
 		}
-		huntingCompanionBoss.spawn(mPlayer, damage, mStunTime, 0, 0, playerItemStats);
+		huntingCompanionBoss.spawn(mPlayer, damage, mStunTime, 0, 0, healingPercent, playerItemStats);
 
 		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
 		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
@@ -288,7 +291,7 @@ public class HuntingCompanion extends Ability {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.2f, 1.0f);
 	}
 
-	private void spawnEagle(double damage, ItemStatManager.PlayerItemStats playerItemStats) {
+	private void spawnEagle(double damage, double healingPercent, ItemStatManager.PlayerItemStats playerItemStats) {
 		Location loc = mPlayer.getLocation();
 		Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
 		Vector perp = new Vector(-facingDirection.getZ(), 0, facingDirection.getX()).normalize(); //projection of the perpendicular vector to facingDirection onto the xz plane
@@ -332,7 +335,7 @@ public class HuntingCompanion extends Ability {
 			MMLog.warning("Failed to get HuntingCompanionBoss for EagleCompanion");
 			return;
 		}
-		huntingCompanionBoss.spawn(mPlayer, damage, 0, BLEED_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_BLEED_DURATION), BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER), playerItemStats);
+		huntingCompanionBoss.spawn(mPlayer, damage, 0, BLEED_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_BLEED_DURATION), BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER), healingPercent, playerItemStats);
 
 		eagleSounds(eagle.getLocation());
 	}
