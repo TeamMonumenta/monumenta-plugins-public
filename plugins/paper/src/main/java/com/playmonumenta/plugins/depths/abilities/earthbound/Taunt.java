@@ -20,7 +20,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 
@@ -59,10 +58,9 @@ public class Taunt extends DepthsAbility {
 			// add rarity% absorption for each affected mob, up to 6
 			AbsorptionUtils.addAbsorption(mPlayer, Math.min(mobs.size(), MAX_ABSORB) * ABSORPTION[mRarity - 1], MAX_ABSORB * ABSORPTION[mRarity - 1], ABSORPTION_DURATION);
 			for (LivingEntity le : mobs) {
-				Mob mob = (Mob) le;
-				mob.setTarget(mPlayer);
-				world.spawnParticle(Particle.BLOCK_DUST, mob.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.DIRT.createBlockData());
-				world.spawnParticle(Particle.FIREWORKS_SPARK, mob.getLocation(), 30, 0.1, 0.1, 0.1, 0.2);
+				EntityUtils.applyTaunt(mPlugin, le, mPlayer);
+				world.spawnParticle(Particle.BLOCK_DUST, le.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.DIRT.createBlockData());
+				world.spawnParticle(Particle.FIREWORKS_SPARK, le.getLocation(), 30, 0.1, 0.1, 0.1, 0.2);
 			}
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 1, 1.2f);
 			world.spawnParticle(Particle.BLOCK_DUST, mPlayer.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.DIRT.createBlockData());
