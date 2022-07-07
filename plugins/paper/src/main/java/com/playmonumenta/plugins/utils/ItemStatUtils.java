@@ -648,8 +648,8 @@ public class ItemStatUtils {
 	}
 
 	public enum AttributeType {
-		ARMOR(new Armor(), true, true),
-		AGILITY(new Agility(), true, true),
+		ARMOR(new Armor(), false, true),
+		AGILITY(new Agility(), false, true),
 		MAX_HEALTH(Attribute.GENERIC_MAX_HEALTH, "Max Health", false, false),
 		ATTACK_DAMAGE_ADD(new AttackDamageAdd(), true, false),
 		ATTACK_DAMAGE_MULTIPLY(new AttackDamageMultiply(), true, false),
