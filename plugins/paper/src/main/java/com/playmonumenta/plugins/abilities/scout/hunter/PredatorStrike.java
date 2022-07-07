@@ -141,6 +141,7 @@ public class PredatorStrike extends Ability {
 		World world = mPlayer.getWorld();
 
 		double damage = ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE));
+		damage *= Sharpshooter.getDamageMultiplier(mPlayer);
 
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 45, EXPLODE_RADIUS, EXPLODE_RADIUS, EXPLODE_RADIUS, 0.125).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLAME, loc, 12, EXPLODE_RADIUS, EXPLODE_RADIUS, EXPLODE_RADIUS, 0.1).spawnAsPlayerActive(mPlayer);
