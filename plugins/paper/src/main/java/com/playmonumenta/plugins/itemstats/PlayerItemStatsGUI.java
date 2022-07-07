@@ -473,7 +473,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			Gain (Level*20%) effective Armor
 			when taking damage from an enemy within 2.5 blocks.
 			Taking damage that would stun a shield
-			disables Shielding for 5 seconds."""),
+			halves Shielding reduction for 5 seconds."""),
 		POISE(1, Material.LILY_OF_THE_VALLEY, EnchantmentType.POISE, true, """
 			Gain (Level*20%) effective Armor
 			when above 90% Max Health."""),
@@ -488,7 +488,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			Also calculates bonus from Second Wind when enabled."""),
 		ETHEREAL(5, Material.PHANTOM_MEMBRANE, EnchantmentType.ETHEREAL, false, """
 			Gain (Level*20%) effective Agility
-			on hits taken within 1.5 seconds of any previous hit."""),
+			on hits taken within 2 seconds of any previous hit."""),
 		REFLEXES(6, Material.ENDER_EYE, EnchantmentType.REFLEXES, false, """
 			Gain (Level*20%) effective Agility
 			when there are 4 or more enemies within 8 blocks."""),
