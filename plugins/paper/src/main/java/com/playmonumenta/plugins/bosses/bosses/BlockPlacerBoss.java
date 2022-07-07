@@ -91,13 +91,13 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 					}
 
 					LivingEntity target = mMob.getTarget();
-					if (target instanceof Player player) {
+					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), NEW_TARGET_RANGE, false);
+					if (target instanceof Player player && !players.isEmpty()) {
 						mNoTargetTicks = 0;
 						execute(player);
 					} else {
 						mNoTargetTicks += 5;
 						if (mNoTargetTicks > IDLE_TIME) {
-							List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), NEW_TARGET_RANGE, false);
 							if (!players.isEmpty()) {
 								mMob.setTarget(players.get(FastUtils.RANDOM.nextInt(players.size())));
 							}
@@ -254,6 +254,11 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 						}
 
 						if (material.isAir() || block.isLiquid() || !block.isSolid()) {
+							for (Player player : PlayerUtils.playersInRange(block.getLocation(), 2, true)) {
+								if (block.getBoundingBox().overlaps(player.getBoundingBox())) {
+									return;
+								}
+							}
 							block.setType(Material.POLISHED_BLACKSTONE_BRICKS);
 							loc.getWorld().playSound(loc, Sound.BLOCK_NETHER_BRICKS_PLACE, 1f, 0.7f);
 							pathfinder.moveTo(loc.clone().add(0, 1, 0));
