@@ -23,7 +23,7 @@ public class WeeklyMission {
 	//Which mobs are eligible to kill for mission (Library of Souls)
 	public List<String> mEligibleMobs;
 	//Delve mission fields
-	public DelvesModifier mDelveModifier;
+	public List<DelvesModifier> mDelveModifiers;
 	public int mModifierRank;
 	public int mDelvePoints;
 	//Region of content to clear (includes dungeon, strike, boss)

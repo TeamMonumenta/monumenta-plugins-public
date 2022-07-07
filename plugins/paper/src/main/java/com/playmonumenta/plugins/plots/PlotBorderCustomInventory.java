@@ -106,6 +106,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		BORDER_ITEMS.add(new TeleportEntry(2, 23, "Eldrask's Arena", "Located in the Eldrask arena.", Material.PACKED_ICE, "FGWins", 1, "eldrask_arena"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 24, "Hekawt's Arena", "Located in the Hekawt arena.", Material.RED_SANDSTONE, "LichWins", 1, "hekawt_arena"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 30, "Verdant Remnants", "A plot located right in the middle of Verdant Remnants.", Material.JUNGLE_SAPLING, "Verdant Remnants", "dungeons/verdant_remnants"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 31, "Corsair's Claw", "Located under a looming claw on the beach.", Material.SAND, "Corsair's Claw", "pois/corsairs_claw"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 32, "Sierhaven", "Located right in the town square of Sierhaven.", Material.BLUE_CONCRETE, "Sierhaven", "pass/sierhaven"));
 
 		BORDER_ITEMS.add(new TeleportEntry(3, 18, "Halls of Wind and Blood", "A plot right in the middle of the main room.", Material.WHITE_WOOL, "White", 1, "dungeons/white"));

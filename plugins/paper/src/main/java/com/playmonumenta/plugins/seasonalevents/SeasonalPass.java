@@ -173,10 +173,26 @@ public class SeasonalPass {
 				}
 				if (toParse.get("delvemodifier") != null) {
 					// This compares using integers - in json need to list the number of the modifier, not the name!
-					int delveModifier = toParse.get("delvemodifier").getAsInt();
-					for (DelvesModifier selection : DelvesModifier.values()) {
-						if (selection.getColumn() == delveModifier) {
-							mission.mDelveModifier = selection;
+					if (toParse.get("delvemodifier") instanceof JsonArray) {
+						JsonArray mods = toParse.get("delvemodifier").getAsJsonArray();
+						List<DelvesModifier> modList = new ArrayList<>();
+						for (JsonElement mod : mods) {
+							int delveModifier = mod.getAsInt();
+							for (DelvesModifier selection : DelvesModifier.values()) {
+								if (selection.getColumn() == delveModifier) {
+									modList.add(selection);
+								}
+							}
+						}
+						mission.mDelveModifiers = modList;
+					} else {
+						int delveModifier = toParse.get("delvemodifier").getAsInt();
+						List<DelvesModifier> modList = new ArrayList<>();
+						for (DelvesModifier selection : DelvesModifier.values()) {
+							if (selection.getColumn() == delveModifier) {
+								modList.add(selection);
+								mission.mDelveModifiers = modList;
+							}
 						}
 					}
 				}
