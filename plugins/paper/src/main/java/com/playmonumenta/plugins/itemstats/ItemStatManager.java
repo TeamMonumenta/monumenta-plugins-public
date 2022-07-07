@@ -111,19 +111,32 @@ public class ItemStatManager implements Listener {
 		private ItemStatsMap mArmorMultiplyStats = new ItemStatsMap();
 		private ItemStatsMap mStats = new ItemStatsMap();
 
-		public PlayerItemStats() {
+		private ItemStatUtils.Region mRegion;
+
+		public PlayerItemStats(ItemStatUtils.Region region) {
+			mRegion = region;
 		}
 
 		public PlayerItemStats(Player player) {
+			mRegion = ServerProperties.getClassSpecializationsEnabled() ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY;
 			updateStats(player, true);
 		}
 
 		public PlayerItemStats(PlayerItemStats playerItemStats) {
 			mStats = playerItemStats.getItemStats();
+			mRegion = playerItemStats.mRegion;
 		}
 
 		public ItemStatsMap getItemStats() {
 			return mStats;
+		}
+
+		public ItemStatUtils.Region getRegion() {
+			return mRegion;
+		}
+
+		public void setRegion(ItemStatUtils.Region region) {
+			mRegion = region;
 		}
 
 		public void updateStats(Player player, boolean updateAll) {
@@ -169,7 +182,7 @@ public class ItemStatManager implements Listener {
 					NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 					NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
-					boolean scaleRegion = ItemStatUtils.getRegion(item) == ItemStatUtils.Region.ISLES && !ServerProperties.getClassSpecializationsEnabled();
+					boolean scaleRegion = mRegion.compareTo(ItemStatUtils.getRegion(item)) < 0;
 
 					for (ItemStat stat : ITEM_STATS) {
 						if (stat instanceof Attribute attribute) {
@@ -204,7 +217,7 @@ public class ItemStatManager implements Listener {
 				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 				NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
-				boolean scaleRegion = ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.ISLES && !ServerProperties.getClassSpecializationsEnabled();
+				boolean scaleRegion = mRegion.compareTo(ItemStatUtils.getRegion(mainhand)) < 0;
 
 				for (ItemStat stat : ITEM_STATS) {
 					if (stat instanceof Attribute attribute) {
@@ -279,14 +292,13 @@ public class ItemStatManager implements Listener {
 	}
 
 	private final Plugin mPlugin;
-	private final BukkitRunnable mTimer;
 	private final Map<UUID, PlayerItemStats> mPlayerItemStatsMappings = new HashMap<>();
 	private static final int PERIOD = 5;
 
 	public ItemStatManager(Plugin plugin) {
 		mPlugin = plugin;
 
-		mTimer = new BukkitRunnable() {
+		new BukkitRunnable() {
 			int mTicks = 0;
 
 			@Override
@@ -316,9 +328,7 @@ public class ItemStatManager implements Listener {
 					ex.printStackTrace();
 				}
 			}
-		};
-
-		mTimer.runTaskTimer(plugin, 0, PERIOD);
+		}.runTaskTimer(plugin, 0, PERIOD);
 	}
 
 	public Map<UUID, PlayerItemStats> getPlayerItemStatsMappings() {
