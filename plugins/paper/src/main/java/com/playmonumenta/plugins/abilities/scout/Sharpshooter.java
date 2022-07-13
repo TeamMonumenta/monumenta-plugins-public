@@ -31,7 +31,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		mInfo.mScoreboardId = "Sharpshooter";
 		mInfo.mShorthandName = "Ss";
 		mInfo.mDescriptions.add("Your arrows deal 20% more damage.");
-		mInfo.mDescriptions.add("Each enemy hit with a critical arrow or trident gives you a stack of Sharpshooter, up to 8. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows and tridents deal +4% damage. Additionally, passively gain a 20% chance to not consume arrows when shot.");
+		mInfo.mDescriptions.add("Each enemy hit with a critical arrow or trident gives you a stack of Sharpshooter, up to 8. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows and tridents deal an additional +4% damage. Additionally, passively gain a 20% chance to not consume arrows when shot.");
 		mDisplayItem = new ItemStack(Material.TARGET, 1);
 	}
 
