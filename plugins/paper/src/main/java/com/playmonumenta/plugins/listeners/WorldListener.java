@@ -18,6 +18,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,6 +28,7 @@ import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -176,13 +178,9 @@ public class WorldListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockFormEvent(BlockFormEvent event) {
 		Material blockType = event.getNewState().getType();
-		if (blockType == null) {
-			blockType = Material.AIR;
-		}
 
 		if (blockType.equals(Material.SNOW) || blockType.equals(Material.ICE)) {
 			event.setCancelled(true);
-			return;
 		}
 	}
 
@@ -190,6 +188,14 @@ public class WorldListener implements Listener {
 	public void tntPrimeEvent(TNTPrimeEvent event) {
 		Location loc = event.getBlock().getLocation();
 		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.NO_EXPLOSIONS)) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void inventoryPickupItemEvent(InventoryPickupItemEvent event) {
+		Item itemEntity = event.getItem();
+		if (!itemEntity.canPlayerPickup() || itemEntity.getOwner() != null) {
 			event.setCancelled(true);
 		}
 	}
@@ -230,11 +236,7 @@ public class WorldListener implements Listener {
 		                               oldLoc.getX() + direction.getModX(),
 		                               oldLoc.getY() + direction.getModY(),
 		                               oldLoc.getZ() + direction.getModZ());
-		if (pistonTestValue != pistonZonePropertyTest(newLoc)) {
-			return true;
-		}
-
-		return false;
+		return pistonTestValue != pistonZonePropertyTest(newLoc);
 	}
 
 	private int pistonZonePropertyTest(Location loc) {
