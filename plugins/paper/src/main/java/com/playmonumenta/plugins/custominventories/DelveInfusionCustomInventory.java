@@ -57,6 +57,32 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		//                    DELVE INFUSIONS!
 		//---------------------------------------------------------------------
 
+		//Delve Mats
+		//r1
+		mDelveMatsMap.put(DelveInfusionSelection.PENNATE, "Soul Essences");
+		mDelveMatsMap.put(DelveInfusionSelection.CARAPACE, "Beastly Broods");
+		mDelveMatsMap.put(DelveInfusionSelection.AURA, "Plagueroot Saps");
+		mDelveMatsMap.put(DelveInfusionSelection.EXPEDITE, "Arcane Crystals");
+		mDelveMatsMap.put(DelveInfusionSelection.CHOLER, "Season's Wraths");
+		mDelveMatsMap.put(DelveInfusionSelection.UNYIELDING, "Echoes of the Veil");
+		mDelveMatsMap.put(DelveInfusionSelection.USURPER, "Nightmare Fuels");
+		mDelveMatsMap.put(DelveInfusionSelection.VENGEFUL, "Persistent Parchments");
+		//r2
+		mDelveMatsMap.put(DelveInfusionSelection.EMPOWERED, "Refound Knowledge");
+		mDelveMatsMap.put(DelveInfusionSelection.NUTRIMENT, "Roots of Balance");
+		mDelveMatsMap.put(DelveInfusionSelection.EXECUTION, "Forgotten Ashes");
+		mDelveMatsMap.put(DelveInfusionSelection.REFLECTION, "Aurora Shards");
+		mDelveMatsMap.put(DelveInfusionSelection.MITOSIS, "Feverish Flesh");
+		mDelveMatsMap.put(DelveInfusionSelection.ARDOR, "Despondent Doubloons");
+		mDelveMatsMap.put(DelveInfusionSelection.EPOCH, "Weathered Runes");
+		mDelveMatsMap.put(DelveInfusionSelection.NATANT, "Primordial Clay");
+		mDelveMatsMap.put(DelveInfusionSelection.UNDERSTANDING, "Binah Leaves");
+		//r3
+		mDelveMatsMap.put(DelveInfusionSelection.REFRESH, "Silver Remnants");
+		mDelveMatsMap.put(DelveInfusionSelection.SOOTHING, "Sorceress' Staves");
+		mDelveMatsMap.put(DelveInfusionSelection.QUENCH, "Fenian Flowers");
+		mDelveMatsMap.put(DelveInfusionSelection.GRACE, "Iridium Catalysts");
+
 		//Load all the pannels for delves
 		//mDelvePannelList
 
@@ -610,36 +636,6 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 						.decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(maxMeta, "You've reached the max Delve Infusion level on this item.", MAX_LORE_LENGHT, ChatColor.DARK_AQUA);
 		mMaxLevelReachedItem.setItemMeta(maxMeta);
-
-
-		//Delve Mats
-		//r1
-		mDelveMatsMap.put(DelveInfusionSelection.PENNATE, "Soul Essences");
-		mDelveMatsMap.put(DelveInfusionSelection.CARAPACE, "Beastly Broods");
-		mDelveMatsMap.put(DelveInfusionSelection.AURA, "Plagueroot Saps");
-		mDelveMatsMap.put(DelveInfusionSelection.EXPEDITE, "Arcane Crystals");
-		mDelveMatsMap.put(DelveInfusionSelection.CHOLER, "Season's Wraths");
-		mDelveMatsMap.put(DelveInfusionSelection.UNYIELDING, "Echoes of the Veil");
-		mDelveMatsMap.put(DelveInfusionSelection.USURPER, "Nightmare Fuels");
-		mDelveMatsMap.put(DelveInfusionSelection.VENGEFUL, "Persistent Parchments");
-
-		//r2
-		mDelveMatsMap.put(DelveInfusionSelection.EMPOWERED, "Refound Knowledge");
-		mDelveMatsMap.put(DelveInfusionSelection.NUTRIMENT, "Roots of Balance");
-		mDelveMatsMap.put(DelveInfusionSelection.EXECUTION, "Forgotten Ashes");
-		mDelveMatsMap.put(DelveInfusionSelection.REFLECTION, "Aurora Shards");
-		mDelveMatsMap.put(DelveInfusionSelection.MITOSIS, "Feverish Flesh");
-		mDelveMatsMap.put(DelveInfusionSelection.ARDOR, "Despondent Doubloons");
-		mDelveMatsMap.put(DelveInfusionSelection.EPOCH, "Weathered Runes");
-		mDelveMatsMap.put(DelveInfusionSelection.NATANT, "Primordial Clay");
-		mDelveMatsMap.put(DelveInfusionSelection.UNDERSTANDING, "Binah Leaves");
-
-		//r3
-		mDelveMatsMap.put(DelveInfusionSelection.REFRESH, "Silver Remnants");
-		mDelveMatsMap.put(DelveInfusionSelection.SOOTHING, "Sorceress' Staves");
-		mDelveMatsMap.put(DelveInfusionSelection.QUENCH, "Fenian Flowers");
-		mDelveMatsMap.put(DelveInfusionSelection.GRACE, "Iridium Catalysts");
-
 	}
 
 	private static void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {

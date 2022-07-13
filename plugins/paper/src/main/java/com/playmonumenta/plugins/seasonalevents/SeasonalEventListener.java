@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.seasonalevents;
 
+import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.MonumentaEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -98,8 +99,15 @@ public class SeasonalEventListener implements Listener {
 						if (mission.mContent == null || mission.mContent.contains(content)) {
 							SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
 						}
-					} else if (mission.mType == WeeklyMissionType.DELVE_MODIFIER && DelvesUtils.getDelveModLevel(p, content.getLabel(), mission.mDelveModifier) >= mission.mModifierRank) {
-						if (mission.mContent == null || mission.mContent.contains(content)) {
+					} else if (mission.mType == WeeklyMissionType.DELVE_MODIFIER) {
+						boolean modsActive = true;
+						for (DelvesModifier modifier : mission.mDelveModifiers) {
+							if (DelvesUtils.getDelveModLevel(p, content.getLabel(), modifier) < mission.mModifierRank) {
+								modsActive = false;
+							}
+						}
+
+						if ((mission.mContent == null || mission.mContent.contains(content)) && modsActive) {
 							SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
 						}
 					}

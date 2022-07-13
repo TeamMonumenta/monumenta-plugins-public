@@ -94,7 +94,7 @@ public class BossUtils {
 			ItemUtils.damageShield(player, durability);
 		} else {
 			DamageUtils.damage(damager, damagee, new DamageEvent.Metadata(type, null, null, cause), damage, bypassIFrames, causeKnockback, false);
-			if (damagee instanceof Player player && Shielding.doesShieldingApply(player, damager)) {
+			if (damagee instanceof Player player && Shielding.doesShieldingApply(player, damager) && damage > 0) {
 				Shielding.disable(player);
 			}
 		}
@@ -228,7 +228,7 @@ public class BossUtils {
 				}
 			}
 
-			if (target instanceof Player player && Shielding.doesShieldingApply(player, boss)) {
+			if (target instanceof Player player && Shielding.doesShieldingApply(player, boss) && percentHealth > 0) {
 				Shielding.disable(player);
 			}
 		}

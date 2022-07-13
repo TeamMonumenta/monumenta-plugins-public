@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.WindBombAirTag;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -73,7 +72,7 @@ public class WindBomb extends Ability {
 		mInfo.mScoreboardId = "WindBomb";
 		mInfo.mShorthandName = "WB";
 		mInfo.mLinkedSpell = ClassAbility.WIND_BOMB;
-		mInfo.mDescriptions.add("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, deals 6 projectile damage to mobs in a a 3 block radius and launches them into the air, giving them Slow Falling and 20% Weaken for 4s. Cannot be used while holding a trident or snowball. Cooldown: 15s.");
+		mInfo.mDescriptions.add("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, deals 6 projectile damage to mobs in a a 3 block radius and launches them into the air, giving them Slow Falling and 20% Weaken for 4s. Cooldown: 15s.");
 		mInfo.mDescriptions.add("The damage is increased to 8 and the cooldown is reduced to 10s. Additionally, you deal 20% more damage to enemies made airborne by this skill, until they hit the ground.");
 		mInfo.mDescriptions.add("On impact, generate a vortex that pulls mobs within 8 blocks toward the center for 3 seconds.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
@@ -86,29 +85,25 @@ public class WindBomb extends Ability {
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
 
-		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
-		if (mainhand.getType() == Material.TRIDENT || mainhand.getType() == Material.SNOWBALL) {
-			return;
-		}
-
-		if (mPlayer.isSneaking()) {
+		if (mPlayer != null && mPlayer.isSneaking()) {
 			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 				return;
 			}
 			World world = mPlayer.getWorld();
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.25f);
-			mProj = mPlayer.launchProjectile(Snowball.class);
-			mProj.setVelocity(mProj.getVelocity().normalize().multiply(VELOCITY));
+			Location loc = mPlayer.getLocation();
+			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.25f);
+			mProj = world.spawn(mPlayer.getEyeLocation(), Snowball.class);
+			mProj.setVelocity(loc.getDirection().normalize().multiply(VELOCITY));
+			mProj.setShooter(mPlayer);
 			mPlugin.mProjectileEffectTimers.addEntity(mProj, Particle.CLOUD);
-			DamageListener.removeProjectileItemStats(mProj);
 			putOnCooldown();
 		}
 	}
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (mPlayer != null && this.mProj != null && this.mProj == proj) {
-			this.mProj = null;
+		if (mPlayer != null && mProj != null && mProj == proj) {
+			mProj = null;
 			Location loc = proj.getLocation();
 			World world = proj.getWorld();
 

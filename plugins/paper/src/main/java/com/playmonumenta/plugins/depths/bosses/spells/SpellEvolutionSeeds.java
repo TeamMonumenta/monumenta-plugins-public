@@ -47,7 +47,7 @@ public class SpellEvolutionSeeds extends Spell {
 		for (Location loc : mPlants.keySet()) {
 			String currentPlantType = mPlantTypes.get(loc);
 			LivingEntity currentPlant = mPlants.get(loc);
-			if (currentPlant != null && currentPlantType != null && mPlantOptions.contains(currentPlantType)) {
+			if (currentPlant != null && !currentPlant.isDead() && currentPlant.getHealth() > 0 && currentPlantType != null && mPlantOptions.contains(currentPlantType)) {
 				String evolvedType = "Elder" + currentPlantType;
 
 				//Get hp difference on old plant to conserve player damage dealt

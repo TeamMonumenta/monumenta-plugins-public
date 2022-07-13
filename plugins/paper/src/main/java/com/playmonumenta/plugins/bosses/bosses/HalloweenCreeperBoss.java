@@ -2,22 +2,29 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import java.util.Collections;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class HalloweenCreeperBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_halloween_creeper";
-
-	private final BukkitRunnable mRunnable;
-	private final Creeper mCreeper;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new HalloweenCreeperBoss(plugin, boss);
@@ -25,65 +32,51 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 
 	public HalloweenCreeperBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
-		if (!(boss instanceof Creeper)) {
+		if (!(boss instanceof Creeper creeper)) {
 			throw new Exception(identityTag + " only works on mobs!");
 		}
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), 100, null);
 
-		mCreeper = (Creeper)boss;
-		if (mCreeper.isIgnited()) {
-			// Nothing to do - creeper already exploding
-			mRunnable = null;
-		} else {
-			mCreeper.setCustomName(ChatColor.GOLD + "Tricky Creeper");
-			mCreeper.setGlowing(true);
-			mCreeper.setExplosionRadius(20);
-			mCreeper.setMaxFuseTicks(100);
-			mCreeper.setIgnited(true);
+		if (!creeper.isIgnited()) {
+			creeper.setCustomName(ChatColor.GOLD + "Tricky Creeper");
+			creeper.setGlowing(true);
+			creeper.setExplosionRadius(20);
+			creeper.setMaxFuseTicks(100);
+			creeper.setIgnited(true);
+			creeper.addScoreboardTag(CrowdControlImmunityBoss.identityTag);
+			creeper.addScoreboardTag(AbilityUtils.IGNORE_TAG);
 
-			mRunnable = new BukkitRunnable() {
+			new BukkitRunnable() {
 				private int mTicks = 0;
 
 				@Override
 				public void run() {
 					Location loc = boss.getLocation().add(0, 1, 0);
-					String baseCmd = "summon minecraft:firework_rocket " + Double.toString(loc.getX()) + " " + Double.toString(loc.getY()) + " " + Double.toString(loc.getZ());
-					loc.getWorld().playSound(loc, Sound.ENTITY_CREEPER_HURT, SoundCategory.HOSTILE, 1.0f, 0.9f);
+					World world = loc.getWorld();
+					world.playSound(loc, Sound.ENTITY_CREEPER_HURT, SoundCategory.HOSTILE, 1.0f, 0.9f);
 					switch (mTicks) {
-						case 0:
-						case 1:
-						case 3:
-						case 4:
-						case 5:
-						case 7:
-						case 8:
-						case 10:
-						case 11:
-							// Sorta jank - do nothing during intermediate steps
-							break;
-						case 12:
-							CommandUtils.runCommandViaConsole("setblock " + Integer.toString(loc.getBlockX()) + " " + Integer.toString(loc.getBlockY()) + " " + Integer.toString(loc.getBlockZ()) + " minecraft:chest{LootTable:\"epic:event/halloween2019/tricked_creeper\",CustomName:\"{\\\"text\\\":\\\"§6§lCreeperween Chest\\\"}\"}");
-							break;
-						case 2:
-							CommandUtils.runCommandViaConsole(baseCmd + " {Silent:1b,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:0,Flicker:0b,Colors:[I;16738847],FadeColors:[I;0]}]}}}}");
-							break;
-						case 6:
-							CommandUtils.runCommandViaConsole(baseCmd + " {Silent:1b,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Flicker:0b,Colors:[I;16738847],FadeColors:[I;0]}]}}}}");
-							break;
-						case 9:
-							CommandUtils.runCommandViaConsole(baseCmd + " {Silent:1b,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:3,Flicker:1b,Colors:[I;16738847],FadeColors:[I;0]}]}}}}");
-							break;
-						default:
-							CommandUtils.runCommandViaConsole(baseCmd + " {Silent:1b,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:3,Flicker:1b,Colors:[I;16738847],FadeColors:[I;0]}]}}}}");
+						case 12 -> {
+							Block block = world.getBlockAt(loc);
+							block.setType(Material.CHEST);
+							if (block.getState() instanceof Chest chest) {
+								chest.setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + "Creeperween Chest");
+								chest.setLootTable(Bukkit.getLootTable(NamespacedKeyUtils.fromString("epic:event/halloween2019/tricked_creeper")));
+								chest.update();
+							}
+						}
+						case 2, 6 -> summonFirework(loc, true);
+						case 9 -> summonFirework(loc, false);
+						case 13 -> {
+							summonFirework(loc, false);
 							this.cancel();
-							break;
+						}
+						default -> {
+						}
 					}
 					mTicks++;
 				}
-			};
-
-			mRunnable.runTaskTimer(plugin, 0, 10);
+			}.runTaskTimer(plugin, 0, 10);
 		}
 	}
 
@@ -91,5 +84,25 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 	public void onHurt(DamageEvent event) {
 		// Reduce the damage but don't cancel the hit
 		event.setDamage(0);
+	}
+
+	private void summonFirework(Location loc, boolean first) {
+		loc.getWorld().spawn(loc, Firework.class, firework -> {
+			FireworkMeta fwm = firework.getFireworkMeta();
+			FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
+			fwBuilder.withColor(Color.fromRGB(255, 106, 31));
+			if (first) {
+				fwBuilder.with(FireworkEffect.Type.BALL_LARGE);
+			} else {
+				fwBuilder.withFlicker();
+				fwBuilder.with(FireworkEffect.Type.CREEPER);
+			}
+			FireworkEffect fwEffect = fwBuilder.build();
+			fwm.addEffect(fwEffect);
+			firework.setFireworkMeta(fwm);
+			firework.setSilent(true);
+			firework.detonate();
+		});
+
 	}
 }

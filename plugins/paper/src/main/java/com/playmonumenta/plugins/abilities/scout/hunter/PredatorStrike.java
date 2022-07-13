@@ -147,6 +147,7 @@ public class PredatorStrike extends Ability {
 
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EXPLODE_RADIUS);
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE)));
+		damage *= Sharpshooter.getDamageMultiplier(mPlayer);
 
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 45, radius, radius, radius, 0.125).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLAME, loc, 12, radius, radius, radius, 0.1).spawnAsPlayerActive(mPlayer);

@@ -70,7 +70,6 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	private static class Settings {
 		private final EnumSet<SecondaryStat> mSecondaryStatEnabled = EnumSet.noneOf(SecondaryStat.class);
-		private ItemStatUtils.Region mRegion = ItemStatUtils.Region.VALLEY;
 	}
 
 	private enum InfusionSetting {
@@ -93,7 +92,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	}
 
 	private static class Stats {
-		private final PlayerItemStats mPlayerItemStats = new PlayerItemStats();
+		private final PlayerItemStats mPlayerItemStats = new PlayerItemStats(ItemStatUtils.Region.VALLEY);
 		private final EnumMap<Equipment, ItemStack> mEquipment = new EnumMap<>(Equipment.class);
 		private final EnumMap<Equipment, ItemStack> mDisplayedEquipment = new EnumMap<>(Equipment.class);
 		private final EnumMap<Equipment, ItemStack> mOriginalEquipment = new EnumMap<>(Equipment.class);
@@ -183,7 +182,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		}
 
 		private boolean hasLaterRegionEquipment(boolean mainhand) {
-			return getMaximumRegion(mainhand).compareTo(mSettings.mRegion) > 0;
+			return getMaximumRegion(mainhand).compareTo(mPlayerItemStats.getRegion()) > 0;
 		}
 
 		private double getRegionScalingDamageDealtMultiplier() {
@@ -192,7 +191,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	}
 
 	static double calculateDamageMultiplier(Stats stats, @Nullable Protection protection) {
-		boolean region2 = stats.mSettings.mRegion.compareTo(ItemStatUtils.Region.ISLES) >= 0;
+		boolean region2 = stats.mPlayerItemStats.getRegion().compareTo(ItemStatUtils.Region.ISLES) >= 0;
 
 		double damageMultiplier = 1;
 		if (protection != null) {
@@ -226,7 +225,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		}
 
 		ItemStatUtils.Region maxRegion = stats.getMaximumRegion(false);
-		if (maxRegion.compareTo(stats.mSettings.mRegion) > 0) {
+		if (maxRegion.compareTo(stats.mPlayerItemStats.getRegion()) > 0 && (protection == null || protection.getEnchantmentType() != EnchantmentType.FEATHER_FALLING)) {
 			damageMultiplier *= RegionScalingDamageTaken.DAMAGE_TAKEN_MULTIPLIER;
 		}
 
@@ -473,7 +472,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			Gain (Level*20%) effective Armor
 			when taking damage from an enemy within 2.5 blocks.
 			Taking damage that would stun a shield
-			disables Shielding for 5 seconds."""),
+			halves Shielding reduction for 5 seconds."""),
 		POISE(1, Material.LILY_OF_THE_VALLEY, EnchantmentType.POISE, true, """
 			Gain (Level*20%) effective Armor
 			when above 90% Max Health."""),
@@ -488,7 +487,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			Also calculates bonus from Second Wind when enabled."""),
 		ETHEREAL(5, Material.PHANTOM_MEMBRANE, EnchantmentType.ETHEREAL, false, """
 			Gain (Level*20%) effective Agility
-			on hits taken within 1.5 seconds of any previous hit."""),
+			on hits taken within 2 seconds of any previous hit."""),
 		REFLEXES(6, Material.ENDER_EYE, EnchantmentType.REFLEXES, false, """
 			Gain (Level*20%) effective Agility
 			when there are 4 or more enemies within 8 blocks."""),
@@ -615,7 +614,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		if (otherPlayer != null) {
 			setEquipmentFromPlayer(true, otherPlayer);
 		}
-		mSettings.mRegion = Stream.of(mLeftStats.getMaximumRegion(false), mRightStats.getMaximumRegion(false)).max(Comparator.naturalOrder()).orElse(ItemStatUtils.Region.VALLEY);
+		ItemStatUtils.Region region = Stream.of(mLeftStats.getMaximumRegion(false), mRightStats.getMaximumRegion(false)).max(Comparator.naturalOrder()).orElse(ItemStatUtils.Region.VALLEY);
+		mLeftStats.mPlayerItemStats.setRegion(region);
+		mRightStats.mPlayerItemStats.setRegion(region);
 		generateInventory();
 	}
 
@@ -705,7 +706,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			}
 
 			if (slot == REGION_SETTING_SLOT) {
-				mSettings.mRegion = mSettings.mRegion == ItemStatUtils.Region.VALLEY ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY;
+				ItemStatUtils.Region region = mLeftStats.mPlayerItemStats.getRegion() == ItemStatUtils.Region.VALLEY ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY;
+				mLeftStats.mPlayerItemStats.setRegion(region);
+				mRightStats.mPlayerItemStats.setRegion(region);
 				generateInventory();
 				return;
 			}
@@ -898,7 +901,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		ItemUtils.setPlainName(swapItem);
 		mInventory.setItem(SWAP_EQUIPMENT_SET_SLOT, swapItem);
 
-		mInventory.setItem(REGION_SETTING_SLOT, REGION_ICONS.get(mSettings.mRegion));
+		mInventory.setItem(REGION_SETTING_SLOT, REGION_ICONS.get(mLeftStats.mPlayerItemStats.getRegion()));
 
 		for (StatItem statItem : STAT_ITEMS) {
 			mInventory.setItem(statItem.mSlot, statItem.getDisplay(mLeftStats, mRightStats.mEquipment.isEmpty() && mRightStats.mInfusionSetting == InfusionSetting.DISABLED ? null : mRightStats));

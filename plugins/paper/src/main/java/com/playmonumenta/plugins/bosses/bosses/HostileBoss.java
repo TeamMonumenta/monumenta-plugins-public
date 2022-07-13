@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import java.util.Collections;
 import org.bukkit.entity.Creature;
@@ -34,6 +33,7 @@ public class HostileBoss extends BossAbilityGroup {
 		@BossParam(help = "Sounds player when deal damage")
 		public SoundsList SOUNDS = SoundsList.EMPTY;
 
+		public String SPELL_NAME = "";
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -48,7 +48,7 @@ public class HostileBoss extends BossAbilityGroup {
 			if (boss instanceof Creature creature) {
 				NmsUtils.getVersionAdapter().setAggressive(creature, (LivingEntity target) -> {
 					if (p.DAMAGE != 0) {
-						DamageUtils.damage(mBoss, target, p.TYPE, p.DAMAGE);
+						BossUtils.blockableDamage(mBoss, target, p.TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), 0);
 					}
 
 					if (p.DAMAGE_PERCENTAGE != 0) {

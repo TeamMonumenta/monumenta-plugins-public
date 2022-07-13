@@ -11,9 +11,10 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
-import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
 /*
@@ -68,11 +69,10 @@ public class SpellBossBlockBreak extends Spell {
 	@Override
 	public void run() {
 		LivingEntity target = null;
-		if (mBoss instanceof Creature) {
-			Creature c = (Creature) mBoss;
-			target = c.getTarget();
+		if (mBoss instanceof Mob m) {
+			target = m.getTarget();
 		}
-		if (target == null) {
+		if (!(target instanceof Player)) {
 			return;
 		}
 

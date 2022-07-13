@@ -50,42 +50,40 @@ public class SwiftCuts extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer != null) {
-			if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) {
-				if (enemy.equals(mLastTarget)) {
-					Location loc = enemy.getLocation();
-					World world = mPlayer.getWorld();
-					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.5f, 1.5f);
-					new PartialParticle(Particle.SWEEP_ATTACK, loc, 2, 0.25, 0.35, 0.25, 0.001).spawnAsPlayerActive(mPlayer);
+		if (mPlayer != null && event.getType() == DamageType.MELEE) {
+			if (enemy.equals(mLastTarget)) {
+				Location loc = enemy.getLocation();
+				World world = mPlayer.getWorld();
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.5f, 1.5f);
+				new PartialParticle(Particle.SWEEP_ATTACK, loc, 2, 0.25, 0.35, 0.25, 0.001).spawnAsPlayerActive(mPlayer);
 
-					event.setDamage(event.getDamage() * (1 + mConsecutivePercentDamage));
+				event.setDamage(event.getDamage() * (1 + mConsecutivePercentDamage));
 
-					double sweepDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SWEEP_DAMAGE, event.getDamage() * mPercentAoEDamage);
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, SWEEP_RADIUS), enemy)) {
-						DamageUtils.damage(mPlayer, mob, DamageType.OTHER, sweepDamage, mInfo.mLinkedSpell, true, true);
+				double sweepDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SWEEP_DAMAGE, event.getDamage() * mPercentAoEDamage);
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, SWEEP_RADIUS), enemy)) {
+					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, sweepDamage, mInfo.mLinkedSpell, true, true);
+				}
+
+				if (isEnhanced()) {
+					// If swung with full charge
+					if (mPlayer.getAttackCooldown() == 1.0) {
+						mEnhancementHits += 1;
 					}
 
-					if (isEnhanced()) {
-						// If swung with full charge
-						if (mPlayer.getAttackCooldown() == 1.0) {
-							mEnhancementHits += 1;
-						}
-
-						if (mEnhancementHits == 3) {
-							event.setDamage(event.getDamage() * (1 + ENHANCEMENT_DAMAGE_PERCENT));
-							mEnhancementHits = 0;
-						}
-					}
-				} else {
-					mLastTarget = enemy;
-
-					if (isEnhanced()) {
+					if (mEnhancementHits == 3) {
+						event.setDamage(event.getDamage() * (1 + ENHANCEMENT_DAMAGE_PERCENT));
 						mEnhancementHits = 0;
+					}
+				}
+			} else {
+				mLastTarget = enemy;
 
-						// If swung with full charge
-						if (mPlayer.getAttackCooldown() == 1.0) {
-							mEnhancementHits += 1;
-						}
+				if (isEnhanced()) {
+					mEnhancementHits = 0;
+
+					// If swung with full charge
+					if (mPlayer.getAttackCooldown() == 1.0) {
+						mEnhancementHits += 1;
 					}
 				}
 			}

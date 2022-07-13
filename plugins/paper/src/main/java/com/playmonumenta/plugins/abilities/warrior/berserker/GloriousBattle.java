@@ -11,11 +11,9 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -68,7 +66,6 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	private int mStacks;
 	private final int mStackLimit;
 	private final double mDamage;
-	private @Nullable LivingEntity mTarget;
 
 	public GloriousBattle(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Glorious Battle");
@@ -76,8 +73,8 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		mInfo.mCooldown = 0;
 		mInfo.mScoreboardId = "GloriousBattle";
 		mInfo.mShorthandName = "GB";
-		mInfo.mDescriptions.add("Dealing indirect damage with an ability grants you a Glorious Battle stack. Shift and swap hands while looking at an enemy to consume a stack and charge forwards, gaining full knockback resistance until landing. Landing within a 3 block radius of the targeted mob will deal " + DAMAGE_1 + " damage and " +
-				"apply " + (int) DepthsUtils.roundPercent(BLEED_PERCENT) + "% bleed to the mob for " + (BLEED_TIME / 20) + " seconds. Additionally when landing, knock back all mobs within 3 blocks.");
+		mInfo.mDescriptions.add("Dealing indirect damage with an ability grants you a Glorious Battle stack. Shift and swap hands to consume a stack and charge forwards, gaining full knockback resistance until landing. When you land, deal " + DAMAGE_1 + " damage to the nearest mob within 3 blocks and " +
+				"apply " + (int) DepthsUtils.roundPercent(BLEED_PERCENT) + "% bleed for " + (BLEED_TIME / 20) + " seconds. Additionally, knock back all mobs within 3 blocks.");
 		mInfo.mDescriptions.add("Damage increased to 30. Additionally, you now passively gain 5% melee damage for each mob targeting you within 8 blocks, up to 6 mobs.");
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
@@ -89,20 +86,16 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
 
-		if (!isValidTimeToCast()) {
-			return;
-		}
-
-		if (mPlayer == null || mTarget == null) {
+		if (mPlayer == null || mStacks < 1 || !mPlayer.isSneaking()) {
 			return;
 		}
 
 		mStacks--;
 		Vector dir = mPlayer.getLocation().getDirection();
-		Vector yVelocity = new Vector(0, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, dir.getY() * 0.2 + 0.3), 0);
-		mPlayer.setVelocity(dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1.4)).add(yVelocity));
-		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT, new PercentKnockbackResist(100, 1, KBR_EFFECT));
-		MessagingUtils.sendActionBarMessage(mPlayer, "Glorious Battle Stacks: " + mStacks);
+		dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1.4));
+		dir.setY(dir.getY() * 0.5 + 0.4);
+		mPlayer.setVelocity(dir);
+		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT, new PercentKnockbackResist(200, 1, KBR_EFFECT));
 		ClientModHandler.updateAbility(mPlayer, this);
 		Location location = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
@@ -116,50 +109,45 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			public void run() {
 				mT++;
 				if (mPlayer.isOnGround()) {
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							doBattle();
-						}
-					}.runTaskLater(mPlugin, 0);
+					mPlugin.mEffectManager.clearEffects(mPlayer, KBR_EFFECT);
+
+					double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+					Location location = mPlayer.getLocation();
+					World world = mPlayer.getWorld();
+					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(location, radius);
+					mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+
+					LivingEntity nearest = EntityUtils.getNearestMob(location, mobs);
+					if (nearest == null) {
+						this.cancel();
+						return;
+					}
+
+					EntityUtils.applyBleed(mPlugin, BLEED_TIME + CharmManager.getExtraDuration(mPlayer, CHARM_BLEED_DURATION), BLEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER), nearest);
+					DamageUtils.damage(mPlayer, nearest, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage), ClassAbility.GLORIOUS_BATTLE, true);
+
+					float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED);
+					for (LivingEntity mob : mobs) {
+						MovementUtils.knockAway(mPlayer, mob, KNOCK_AWAY_SPEED, true);
+					}
+
+					world.playSound(location, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1f, 1f);
+					new PartialParticle(Particle.SWEEP_ATTACK, location, 20, 1, 0, 1, 0).spawnAsPlayerActive(mPlayer);
+
 					this.cancel();
 				}
 
 				//Logged off or something probably
-				if (mT > 100) {
+				if (mT > 200) {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 10, 2);
-	}
-
-	public void doBattle() {
-		if (mPlayer == null) {
-			return;
-		}
-
-		mPlugin.mEffectManager.clearEffects(mPlayer, KBR_EFFECT);
-
-		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
-		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius)) {
-			MovementUtils.knockAway(mPlayer, mob, knockback, true);
-		}
-
-		if (mTarget == null || mPlayer.getLocation().distance(mTarget.getLocation()) > radius) {
-			return;
-		}
-		Location location = mPlayer.getLocation();
-		World world = mPlayer.getWorld();
-		world.playSound(location, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1f, 1f);
-		new PartialParticle(Particle.SWEEP_ATTACK, location, 20, 1, 0, 1, 0).spawnAsPlayerActive(mPlayer);
-		EntityUtils.applyBleed(mPlugin, BLEED_TIME + CharmManager.getExtraDuration(mPlayer, CHARM_BLEED_DURATION), BLEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER), mTarget);
-		DamageUtils.damage(mPlayer, mTarget, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage), ClassAbility.GLORIOUS_BATTLE, true);
+		}.runTaskTimer(mPlugin, 10, 1);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (AFFECTED_ABILITIES.contains(event.getAbility()) && !MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "GloriousBattleStackIncrease")) {
+		if (AFFECTED_ABILITIES.contains(event.getAbility()) && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "GloriousBattleStackIncrease")) {
 			int previousStacks = mStacks;
 			if (mStacks < mStackLimit) {
 				mStacks++;
@@ -201,35 +189,5 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	@Override
 	public int getMaxCharges() {
 		return mStackLimit;
-	}
-
-	public boolean isValidTimeToCast() {
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (ItemUtils.isBowOrTrident(inMainHand) || ItemUtils.isSomePotion(inMainHand) || inMainHand.getType().isBlock()
-			|| inMainHand.getType().isEdible() || !mPlayer.isSneaking()) {
-			return false;
-		}
-
-		if (mStacks < 1) {
-			return false;
-		}
-
-		Location eyeLoc = mPlayer.getEyeLocation();
-		Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), 10);
-		ray.mThroughBlocks = false;
-		ray.mThroughNonOccluding = false;
-
-		RaycastData data = ray.shootRaycast();
-
-		List<LivingEntity> rayEntities = data.getEntities();
-		if (rayEntities != null && !rayEntities.isEmpty()) {
-			for (LivingEntity t : rayEntities) {
-				if (!t.getUniqueId().equals(mPlayer.getUniqueId()) && t.isValid() && !t.isDead() && EntityUtils.isHostileMob(t)) {
-					mTarget = t;
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 }
