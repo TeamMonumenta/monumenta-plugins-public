@@ -37,6 +37,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
@@ -58,12 +59,12 @@ public class PotionConsumeListener implements Listener {
 
 	private final Plugin mPlugin;
 	/* Note that this map only contains non-cancelled tasks. Everywhere these runnables are cancelled they should be removed from this map */
-	private final Map<UUID, BukkitRunnable> mRunnables = new HashMap<UUID, BukkitRunnable>();
+	private final Map<UUID, BukkitRunnable> mRunnables = new HashMap<>();
 	/* This will only contain an item if currently consuming a potion, cleared after complete */
-	private Map<UUID, ItemStack> mPotionsConsumed = new HashMap<UUID, ItemStack>();
+	private final Map<UUID, ItemStack> mPotionsConsumed = new HashMap<>();
 
 	/* Note that this map only contains non-cancelled tasks. Everywhere these runnables are cancelled they should be removed from this map */
-	private Map<UUID, BukkitTask> mCooldowns = new HashMap<>();
+	private final Map<UUID, BukkitTask> mCooldowns = new HashMap<>();
 
 	public PotionConsumeListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -74,14 +75,10 @@ public class PotionConsumeListener implements Listener {
 		HumanEntity whoClicked = event.getWhoClicked();
 		if (
 		    // Must be a left or right click
-		    event.getClick() == null ||
 		    !(event.getClick().equals(ClickType.LEFT) || event.getClick().equals(ClickType.RIGHT)) ||
-		    // Must be placing a single block
-		    event.getAction() == null ||
 		    // Must be a player interacting with an inventory
-		    whoClicked == null ||
-		    !(whoClicked instanceof Player) ||
-		    ((Player)whoClicked).getGameMode() == GameMode.SPECTATOR ||
+		    !(whoClicked instanceof Player player) ||
+		    player.getGameMode() == GameMode.SPECTATOR ||
 		    event.getClickedInventory() == null ||
 		    // Must be a click on a drinkable potion or glass bottle in empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
@@ -95,7 +92,6 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		Player player = (Player) whoClicked;
 		ItemStack item = event.getCurrentItem();
 
 		Set<String> tags = player.getScoreboardTags();
@@ -150,7 +146,7 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		if (item.containsEnchantment(Enchantment.ARROW_INFINITE) && !(effects.size() == 1 && effects.get(0).getType().equals(PotionEffectType.GLOWING))) {
+		if (ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.INFINITY) > 0 && !(effects.size() == 1 && effects.get(0).getType().equals(PotionEffectType.GLOWING))) {
 			player.sendMessage(ChatColor.RED + "Infinite potions can not be quick drinked!");
 
 			float pitch = ((float)FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
@@ -200,7 +196,7 @@ public class PotionConsumeListener implements Listener {
 						PotionUtils.applyPotion(mPlugin, player, meta);
 
 						//Apply Starvation if applicable
-						int starvation = (int) mPlugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.STARVATION);
+						int starvation = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.STARVATION);
 						if (starvation > 0) {
 							Starvation.apply(player, starvation);
 						}
@@ -208,7 +204,7 @@ public class PotionConsumeListener implements Listener {
 						//If Sacred Provisions check passes, do not consume, but do not enable cancel quick drink function
 						//Do not run addition on infinity potions
 						ItemStack potion = mPotionsConsumed.remove(player.getUniqueId());
-						if (potion != null && !potion.containsEnchantment(Enchantment.ARROW_INFINITE) &&
+						if (potion != null && ItemStatUtils.getEnchantmentLevel(potion, EnchantmentType.INFINITY) == 0 &&
 							NonClericProvisionsPassive.testRandomChance(player)) {
 							NonClericProvisionsPassive.sacredProvisionsSound(player);
 
@@ -246,7 +242,7 @@ public class PotionConsumeListener implements Listener {
 		CoreProtectIntegration.logContainerTransaction(player, event.getClickedInventory().getLocation());
 
 		//Do not reduce potions or place glass bottles if the potion is infinite
-		if (!item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+		if (ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.INFINITY) == 0) {
 			item.setAmount(item.getAmount() - 1);
 			//If not instant drink, place an empty bottle in the inventory
 			if (instantDrinkLevel == 0) {
@@ -264,15 +260,11 @@ public class PotionConsumeListener implements Listener {
 		HumanEntity whoClicked = event.getWhoClicked();
 		if (
 		    // Must be a right click
-		    event.getClick() == null ||
 		    !event.getClick().equals(ClickType.RIGHT) ||
-		    // Must be placing a single block
-		    event.getAction() == null ||
 		    !event.getAction().equals(InventoryAction.PICKUP_HALF) ||
 		    // Must be a player interacting with their main inventory
-		    whoClicked == null ||
-		    !(whoClicked instanceof Player) ||
-		    ((Player)whoClicked).getGameMode() == GameMode.SPECTATOR ||
+		    !(whoClicked instanceof Player player) ||
+		    player.getGameMode() == GameMode.SPECTATOR ||
 		    event.getClickedInventory() == null ||
 		    // Must be a click on a shulker box with an empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
@@ -285,7 +277,6 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		Player player = (Player) whoClicked;
 		ItemStack item = event.getCurrentItem();
 
 		Set<String> tags = player.getScoreboardTags();
@@ -338,6 +329,14 @@ public class PotionConsumeListener implements Listener {
 		item.setAmount(item.getAmount() - 1);
 
 		event.setCancelled(true);
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void playerDeathEvent(PlayerDeathEvent event) {
+		BukkitRunnable runnable = mRunnables.remove(event.getEntity().getUniqueId());
+		if (runnable != null) {
+			runnable.cancel();
+		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
