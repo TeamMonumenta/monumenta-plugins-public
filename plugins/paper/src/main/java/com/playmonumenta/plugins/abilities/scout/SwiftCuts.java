@@ -43,7 +43,7 @@ public class SwiftCuts extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) {
+		if (event.getType() == DamageType.MELEE) {
 			if (enemy.equals(mLastTarget)) {
 				Location loc = enemy.getLocation();
 				World world = mPlayer.getWorld();
