@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
