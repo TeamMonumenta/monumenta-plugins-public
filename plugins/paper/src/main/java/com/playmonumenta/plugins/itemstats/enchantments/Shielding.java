@@ -57,7 +57,7 @@ public class Shielding implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (source != null && event.getType() == DamageEvent.DamageType.MELEE && source.getEquipment() != null && ItemUtils.isAxe(source.getEquipment().getItemInMainHand()) && doesShieldingApply(player, source) && !event.isBlockedByShield()) {
+		if (doesShieldingApply(player, source) && event.getType() == DamageEvent.DamageType.MELEE && event.getDamage() > 0 && source.getEquipment() != null && ItemUtils.isAxe(source.getEquipment().getItemInMainHand()) && !event.isBlockedByShield()) {
 			disable(player);
 		}
 	}
