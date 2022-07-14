@@ -88,7 +88,7 @@ public class Raycast {
 
 			if (!mThroughBlocks) {
 				// breakRay: determines if the ray should collide and end on this block.
-				boolean breakRay = LocationUtils.collidesWithSolid(mStart, block);
+				boolean breakRay = LocationUtils.collidesWithSolid(mStart);
 				if (breakRay) {
 					if (!mThroughNonOccluding) {
 						break;
