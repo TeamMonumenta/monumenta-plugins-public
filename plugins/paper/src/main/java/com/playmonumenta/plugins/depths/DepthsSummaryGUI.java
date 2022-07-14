@@ -1,14 +1,17 @@
 package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -20,12 +23,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 public class DepthsSummaryGUI extends CustomInventory {
-	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<>(Arrays.asList(45, 48, 50, 53));
+	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<>(Arrays.asList(47, 48, 50, 51, 46, 52, 45, 53));
 	public static final ArrayList<Integer> TREE_LOCATIONS = new ArrayList<>(Arrays.asList(2, 3, 5, 6));
 	private static final int START_OF_PASSIVES = 27;
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final int REWARD_LOCATION = 49;
 	private Boolean mDebugVersion = false;
+	private DepthsParty mDepthsParty;
+	private final DepthsPlayer mRequestingPlayer;
 
 	static class TriggerData {
 		int mInvLocation;
@@ -69,53 +74,11 @@ public class DepthsSummaryGUI extends CustomInventory {
 		if (playerInstance != null) {
 			DepthsParty playerParty = DepthsManager.getInstance().getPartyFromId(playerInstance);
 			if (playerParty != null && playerParty.mPlayersInParty != null) {
-				for (int i = 0; i < playerParty.mPlayersInParty.size(); i++) {
-					DepthsPlayer player = playerParty.mPlayersInParty.get(i);
-					if (player == null) {
-						return;
-					}
-					Player actualPlayer = Bukkit.getPlayer(player.mPlayerId);
-					if (actualPlayer != null && actualPlayer.isOnline()) {
-						ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
-						SkullMeta meta = (SkullMeta) playerHead.getItemMeta();
-						meta.setOwningPlayer(actualPlayer);
-						meta.displayName(Component.text(actualPlayer.getName() + "'s Abilities", NamedTextColor.YELLOW)
-							.decoration(TextDecoration.ITALIC, false));
-						playerHead.setItemMeta(meta);
-						mInventory.setItem(HEAD_LOCATIONS.get(i), playerHead);
-					}
-				}
+				mDepthsParty = playerParty;
 			}
 		}
-		DepthsPlayer playerWhoAsked = DepthsManager.getInstance().mPlayers.get(targetPlayer.getUniqueId());
+		mRequestingPlayer = DepthsManager.getInstance().mPlayers.get(targetPlayer.getUniqueId());
 
-
-		//First- check if the player has any rewards to open
-		ItemStack rewardItem;
-		if (playerWhoAsked.mEarnedRewards.size() > 0) {
-			rewardItem = new ItemStack(Material.GOLD_INGOT, playerWhoAsked.mEarnedRewards.size());
-			ItemMeta rewardMeta = rewardItem.getItemMeta();
-			rewardMeta.displayName(Component.text("Claim your Room Reward!", NamedTextColor.YELLOW)
-										.decoration(TextDecoration.ITALIC, false));
-			rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			ItemUtils.setPlainName(rewardItem, "Claim your Room Reward!");
-			if (playerWhoAsked.mEarnedRewards.size() > 1) {
-				rewardMeta.displayName(Component.text("Claim your Room Rewards!", NamedTextColor.YELLOW)
-						.decoration(TextDecoration.ITALIC, false));
-				rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-				ItemUtils.setPlainName(rewardItem, "Claim your Room Rewards!");
-			}
-			rewardItem.setItemMeta(rewardMeta);
-		} else {
-			rewardItem = new ItemStack(Material.GOLD_NUGGET, 1);
-			ItemMeta rewardMeta = rewardItem.getItemMeta();
-			rewardMeta.displayName(Component.text("All Room Rewards Claimed!", NamedTextColor.YELLOW)
-										.decoration(TextDecoration.ITALIC, false));
-			rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			ItemUtils.setPlainName(rewardItem, "All Room Rewards Claimed!");
-			rewardItem.setItemMeta(rewardMeta);
-		}
-		mInventory.setItem(REWARD_LOCATION, rewardItem);
 		setAbilities(targetPlayer);
 	}
 
@@ -152,10 +115,36 @@ public class DepthsSummaryGUI extends CustomInventory {
 			return false;
 		}
 
-		for (int i = 0; i < 45; i++) {
-			mInventory.setItem(i, new ItemStack(FILLER, 1));
-		}
+		GUIUtils.fillWithFiller(mInventory, Material.GRAY_STAINED_GLASS_PANE, true);
 
+		//First- check if the player has any rewards to open
+		ItemStack rewardItem;
+		if (mRequestingPlayer.mEarnedRewards.size() > 0) {
+			rewardItem = new ItemStack(Material.GOLD_INGOT, mRequestingPlayer.mEarnedRewards.size());
+			ItemMeta rewardMeta = rewardItem.getItemMeta();
+			rewardMeta.displayName(Component.text("Claim your Room Reward!", NamedTextColor.YELLOW)
+				.decoration(TextDecoration.ITALIC, false));
+			rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+			ItemUtils.setPlainName(rewardItem, "Claim your Room Reward!");
+			if (mRequestingPlayer.mEarnedRewards.size() > 1) {
+				rewardMeta.displayName(Component.text("Claim your Room Rewards!", NamedTextColor.YELLOW)
+					.decoration(TextDecoration.ITALIC, false));
+				rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+				ItemUtils.setPlainName(rewardItem, "Claim your Room Rewards!");
+			}
+			rewardItem.setItemMeta(rewardMeta);
+		} else {
+			rewardItem = new ItemStack(Material.GOLD_NUGGET, 1);
+			ItemMeta rewardMeta = rewardItem.getItemMeta();
+			rewardMeta.displayName(Component.text("All Room Rewards Claimed!", NamedTextColor.YELLOW)
+				.decoration(TextDecoration.ITALIC, false));
+			rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+			ItemUtils.setPlainName(rewardItem, "All Room Rewards Claimed!");
+			rewardItem.setItemMeta(rewardMeta);
+		}
+		mInventory.setItem(REWARD_LOCATION, rewardItem);
+
+		//Set actives, save passives for future
 		List<DepthsAbilityItem> passiveItems = new ArrayList<>();
 		for (DepthsAbilityItem item : items) {
 			if (item.mTrigger == DepthsTrigger.PASSIVE) {
@@ -170,6 +159,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 			}
 		}
 
+		//Lay out all passives
 		for (int i = 0; i < passiveItems.size() && i < 18; i++) {
 			mInventory.setItem(i + START_OF_PASSIVES, passiveItems.get(i).mItem);
 		}
@@ -201,6 +191,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 			}
 		}
 
+		//Place the "no active" glass panes
 		for (int i = 9; i <= 17; i++) {
 			ItemStack triggerItem = mInventory.getItem(i);
 			if (triggerItem != null && triggerItem.getType() == FILLER) {
@@ -216,25 +207,44 @@ public class DepthsSummaryGUI extends CustomInventory {
 				}
 			}
 		}
+		updatePlayerHeads(targetPlayer);
+		return true;
+	}
 
-		for (int location : HEAD_LOCATIONS) {
-			ItemStack headItem = mInventory.getItem(location);
-			if (headItem != null && headItem.getType() == Material.PLAYER_HEAD) {
-				SkullMeta chosenMeta = (SkullMeta) headItem.getItemMeta();
-				OfflinePlayer chosenPlayer = chosenMeta.getOwningPlayer();
-				ItemStack indicatorItem;
-				if (chosenPlayer != null && chosenPlayer.equals(targetPlayer)) {
-					indicatorItem = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
+	private void updatePlayerHeads(Player targetPlayer) {
+		for (int i = 0; i < mDepthsParty.mPlayersInParty.size(); i++) {
+			DepthsPlayer player = mDepthsParty.mPlayersInParty.get(i);
+			if (player == null) {
+				return;
+			}
+			Player actualPlayer = Bukkit.getPlayer(player.mPlayerId);
+			if (actualPlayer != null && actualPlayer.isOnline()) {
+				if (actualPlayer.getUniqueId().equals(targetPlayer.getUniqueId())) {
+					ItemStack activePlayerIndicator = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
+					ItemMeta activeMeta = activePlayerIndicator.getItemMeta();
+					activeMeta.displayName(Component.text(actualPlayer.getName() + "'s Abilities", NamedTextColor.YELLOW)
+						.decoration(TextDecoration.ITALIC, false));
+					GUIUtils.splitLoreLine(activeMeta, "Currently Shown", 30, ChatColor.GRAY, true);
+					activePlayerIndicator.setItemMeta(activeMeta);
+					mInventory.setItem(HEAD_LOCATIONS.get(i), activePlayerIndicator);
+
+					ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
+					SkullMeta meta = (SkullMeta) playerHead.getItemMeta();
+					meta.setOwningPlayer(actualPlayer);
+					meta.displayName(Component.text(actualPlayer.getName() + "'s Abilities", NamedTextColor.YELLOW)
+						.decoration(TextDecoration.ITALIC, false));
+					playerHead.setItemMeta(meta);
+					mInventory.setItem(4, playerHead);
 				} else {
-					indicatorItem = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
-				}
-				switch (location) {
-				case 45, 50 -> mInventory.setItem(location + 1, indicatorItem);
-				case 48, 53 -> mInventory.setItem(location - 1, indicatorItem);
-				default -> mInventory.setItem(location, indicatorItem);
+					ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
+					SkullMeta meta = (SkullMeta) playerHead.getItemMeta();
+					meta.setOwningPlayer(actualPlayer);
+					meta.displayName(Component.text(actualPlayer.getName() + "'s Abilities", NamedTextColor.YELLOW)
+						.decoration(TextDecoration.ITALIC, false));
+					playerHead.setItemMeta(meta);
+					mInventory.setItem(HEAD_LOCATIONS.get(i), playerHead);
 				}
 			}
 		}
-		return true;
 	}
 }

@@ -43,6 +43,9 @@ import org.bukkit.util.Vector;
  */
 public class DepthsParty {
 	public static final int MAX_LOOT_ROOMS = 4;
+	public static final int MAX_LOOT_ROOMS_EXPANDED = 6;
+	public static final String ENDLESS_LEADERBOARD = "DepthsEndless";
+	public static final String EXPANDED_LEADERBOARD = "DepthsEndless6";
 
 	// The difference between where the player spawns in a loot room, and where the loot needs to be dropped
 	// Transient- don't try to save a circular reference to players (will crash data save)
@@ -95,6 +98,8 @@ public class DepthsParty {
 	public transient ArrayList<String> mInitialPlayers = new ArrayList<>();
 	//The X value of the start side of the current room
 	public int mRoomStartX;
+	//Whether the party has exceeded four players
+	public boolean mIsSixPlayerMode;
 
 	/**
 	 * Creates a new depths party with the given players
@@ -102,6 +107,9 @@ public class DepthsParty {
 	public DepthsParty(List<DepthsPlayer> players, Location loc) {
 		mPlayersInParty = players;
 		mWorldUUID = loc.getWorld().getUID();
+		if (players != null && players.size() > 4) {
+			mIsSixPlayerMode = true;
+		}
 
 		for (DepthsPlayer dp : players) {
 
@@ -153,7 +161,7 @@ public class DepthsParty {
 		mRoomStartX = loc.getBlockX();
 
 		//Attempt to set locations for the next floor lobby to load
-		Collection<ArmorStand> nearbyStands = loc.getNearbyEntitiesByType(ArmorStand.class, 60.0);
+		Collection<ArmorStand> nearbyStands = loc.getNearbyEntitiesByType(ArmorStand.class, 100.0);
 		for (ArmorStand stand : nearbyStands) {
 			if (stand.getName().contains(DepthsManager.PLAYER_SPAWN_STAND_NAME)) {
 				mFloorLobbyLoadPlayerTpPoint = stand.getLocation().toVector();
@@ -174,6 +182,9 @@ public class DepthsParty {
 	public void addPlayerToParty(DepthsPlayer player) {
 		mPlayersInParty.add(player);
 		player.mPartyNum = this.mPartyNum;
+		if (mPlayersInParty.size() > 4) {
+			mIsSixPlayerMode = true;
+		}
 
 		//Endless mode detection
 		Player p = Bukkit.getPlayer(player.mPlayerId);
@@ -420,7 +431,8 @@ public class DepthsParty {
 
 	//Sends player to, and fills, the next open loot room
 	public void populateLootRoom(Player p, boolean victory) {
-		if (mLootRoomLocations.size() > mLootRoomsUsed && MAX_LOOT_ROOMS > mLootRoomsUsed) {
+		int maxLootRooms = mIsSixPlayerMode ? MAX_LOOT_ROOMS_EXPANDED : MAX_LOOT_ROOMS;
+		if (mLootRoomLocations.size() > mLootRoomsUsed && maxLootRooms > mLootRoomsUsed) {
 			Location lootRoomLoc = new Location(p.getWorld(), mLootRoomLocations.get(mLootRoomsUsed).getX(), mLootRoomLocations.get(mLootRoomsUsed).getY(), mLootRoomLocations.get(mLootRoomsUsed).getZ());
 			p.teleport(lootRoomLoc);
 			p.setBedSpawnLocation(lootRoomLoc, true);
@@ -457,22 +469,40 @@ public class DepthsParty {
 
 			DepthsManager.getInstance().deletePlayer(p);
 			mPlayersInParty.remove(dp);
-			DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), treasureScore, p, roomReached > 120);
+			int lootRoomTreasure = mIsSixPlayerMode ? (int) Math.ceil(treasureScore * 0.75) : treasureScore;
+			DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), lootRoomTreasure, p, (roomReached > 120) && !mIsSixPlayerMode);
 
 			//Set their highest room score and do announcements
-			int highestRoom = ScoreboardUtils.getScoreboardValue(p, "DepthsEndless").orElse(0);
-			if (roomReached > highestRoom) {
-				ScoreboardUtils.setScoreboardValue(p, "DepthsEndless", roomReached);
-				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getDisplayName() + " DepthsEndless");
-			}
-			if (roomReached > 30) {
+			if (!mIsSixPlayerMode) {
+				int highestRoom = ScoreboardUtils.getScoreboardValue(p, ENDLESS_LEADERBOARD).orElse(0);
 				if (roomReached > highestRoom) {
-					MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
-				} else {
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths! (Endless Room Reached: " + roomReached + ")\",\"color\":\"yellow\",\"italic\":true,\"bold\":false}]");
+					ScoreboardUtils.setScoreboardValue(p, ENDLESS_LEADERBOARD, roomReached);
+					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getDisplayName() + " " + ENDLESS_LEADERBOARD);
 				}
+				if (roomReached > 30) {
+					if (roomReached > highestRoom) {
+						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+					} else {
+						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths! (Endless Room Reached: " + roomReached + ")\",\"color\":\"yellow\",\"italic\":true,\"bold\":false}]");
+					}
+				}
+				SeasonalEventListener.playerCompletedDepths(p, roomReached);
+			} else {
+				int highestRoom = ScoreboardUtils.getScoreboardValue(p, EXPANDED_LEADERBOARD).orElse(0);
+				if (roomReached > highestRoom) {
+					ScoreboardUtils.setScoreboardValue(p, EXPANDED_LEADERBOARD, roomReached);
+					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getDisplayName() + " " + EXPANDED_LEADERBOARD);
+				}
+				if (roomReached > 30) {
+					if (roomReached > highestRoom) {
+						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best in six player mode! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+					} else {
+						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths! (Endless Room Reached: " + roomReached + ")\",\"color\":\"yellow\",\"italic\":true,\"bold\":false}]");
+					}
+				}
+				SeasonalEventListener.playerCompletedDepths(p, roomReached);
 			}
-			SeasonalEventListener.playerCompletedDepths(p, roomReached);
+
 			if (victory) {
 				Bukkit.getPluginManager().callEvent(new MonumentaEvent(p, "depths"));
 			}

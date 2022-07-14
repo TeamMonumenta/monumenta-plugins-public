@@ -46,6 +46,18 @@ public class GUIUtils {
 		}
 	}
 
+	public static void fillWithFiller(Inventory inventory, Material fillerMaterial, Boolean clearInv) {
+		ItemStack filler = new ItemStack(fillerMaterial, 1);
+		ItemMeta meta = filler.getItemMeta();
+		meta.setDisplayName(ChatColor.RESET + "");
+		filler.setItemMeta(meta);
+		for (int i = 0; i < inventory.getSize(); i++) {
+			if (inventory.getItem(i) == null || clearInv) {
+				inventory.setItem(i, filler.clone());
+			}
+		}
+	}
+
 	public static ChatColor namedTextColorToChatColor(NamedTextColor color) {
 		return ChatColor.of(color.toString());
 	}
