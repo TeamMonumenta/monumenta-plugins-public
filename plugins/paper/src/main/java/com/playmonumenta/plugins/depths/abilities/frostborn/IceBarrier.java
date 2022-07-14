@@ -122,7 +122,7 @@ public class IceBarrier extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right clicking while sneaking and holding a weapon to place an ice marker up to " + CAST_RANGE + " blocks away. Placing a second marker within " + CAST_TIME / 20 + " seconds and within " + DepthsUtils.getRarityColor(rarity) + MAX_LENGTH[rarity - 1] + ChatColor.WHITE + " blocks of the first marker forms a wall of ice connecting the two points, lasting for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Mobs that break the barrier are slowed by 90% for 2s. Cooldown is refunded if no second marker is placed. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
+		return "Right clicking while sneaking and holding a weapon to place an ice marker up to " + CAST_RANGE + " blocks away. Placing a second marker within " + CAST_TIME / 20 + " seconds and within " + DepthsUtils.getRarityColor(rarity) + MAX_LENGTH[rarity - 1] + ChatColor.WHITE + " blocks of the first marker forms a wall of ice connecting the two points, lasting for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Mobs that break the barrier are stunned for 2s. Cooldown is refunded if no second marker is placed. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
 	}
 
 	@Override

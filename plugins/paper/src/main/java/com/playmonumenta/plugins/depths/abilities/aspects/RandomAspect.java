@@ -16,7 +16,7 @@ public class RandomAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Obtain a random ability.";
+		return "Obtain a random ability. Transforms into a random other aspect after defeating floor 3.";
 	}
 }
 

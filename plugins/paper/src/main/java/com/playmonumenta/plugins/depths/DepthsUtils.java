@@ -39,6 +39,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -417,14 +418,14 @@ public class DepthsUtils {
 
 	public static void explodeEvent(EntityExplodeEvent event) {
 		// Check location of blocks to see if they were ice barrier placed
-		if (event.getEntity() == null || event.getEntity().isDead() || !(event.getEntity() instanceof LivingEntity)) {
+		if (event.getEntity() == null || event.getEntity().isDead() || !(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof AbstractHorse) {
 			return;
 		}
 		List<Block> blocks = event.blockList();
 		for (Block b : blocks) {
 			if (Boolean.TRUE.equals(iceBarrier.get(b.getLocation()))) {
-				// Apply ice barrier slow passive effect to the mob
-				EntityUtils.applySlow(Plugin.getInstance(), 2 * 20, .9, (LivingEntity) event.getEntity());
+				// Apply ice barrier stun passive effect to the mob
+				EntityUtils.applyStun(Plugin.getInstance(), 2 * 20, (LivingEntity) event.getEntity());
 				return;
 			}
 		}

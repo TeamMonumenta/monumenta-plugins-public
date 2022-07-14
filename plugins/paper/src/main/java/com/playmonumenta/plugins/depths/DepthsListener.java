@@ -7,19 +7,13 @@ import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Enlightenment;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
-import com.playmonumenta.plugins.depths.abilities.flamecaller.Pyromania;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
-import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import org.bukkit.Location;
@@ -46,7 +40,6 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
 
 public class DepthsListener implements Listener {
@@ -140,28 +133,6 @@ public class DepthsListener implements Listener {
 	public void damageEvent(DamageEvent event) {
 		LivingEntity damagee = event.getDamagee();
 		LivingEntity source = event.getSource();
-
-		//Pyromania implementation handler
-		if (event.getType() == DamageType.FIRE && !(damagee instanceof Player) && !MetadataUtils.happenedInRecentTicks(damagee, Pyromania.LAST_PYROMANIA_DAMAGE, 10)) {
-			List<Player> playersToCheck = PlayerUtils.playersInRange(damagee.getLocation(), Pyromania.RADIUS, true);
-			double addedDamage = 0;
-			for (Player p : playersToCheck) {
-				DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(p.getUniqueId());
-
-				if (dp != null) {
-					Integer pyroLevel = dp.mAbilities.get(Pyromania.ABILITY_NAME);
-					if (pyroLevel != null && pyroLevel.intValue() > 0) {
-						addedDamage += Pyromania.FIRE_BONUS_DAMAGE[pyroLevel.intValue() - 1];
-					}
-				}
-			}
-
-			if (addedDamage > 0) {
-				damagee.setMetadata(Pyromania.LAST_PYROMANIA_DAMAGE, new FixedMetadataValue(mPlugin, damagee.getTicksLived()));
-				event.setCancelled(true);
-				DamageUtils.damage(null, damagee, DamageType.OTHER, event.getDamage() + addedDamage, null, true, false);
-			}
-		}
 
 		if (damagee instanceof Player player) {
 			DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());

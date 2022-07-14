@@ -22,7 +22,7 @@ import org.bukkit.entity.Player;
 public class Brutalize extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Brutalize";
-	public static final double[] DAMAGE = {0.09, 0.12, 0.15, 0.18, 0.21, 0.27};
+	public static final double[] DAMAGE = {0.12, 0.15, 0.18, 0.21, 0.24, 0.30};
 	public static final int RADIUS = 2;
 
 	public Brutalize(Plugin plugin, Player player) {

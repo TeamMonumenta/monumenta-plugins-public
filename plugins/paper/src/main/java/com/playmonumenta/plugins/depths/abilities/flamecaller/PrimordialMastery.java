@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 public class PrimordialMastery extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Primordial Mastery";
-	public static final double[] SPELL_MOD = {1.08, 1.10, 1.12, 1.14, 1.16, 1.2};
+	public static final double[] SPELL_MOD = {1.08, 1.095, 1.11, 1.125, 1.14, 1.18};
 
 	public PrimordialMastery(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

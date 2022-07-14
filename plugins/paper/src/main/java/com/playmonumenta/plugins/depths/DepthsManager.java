@@ -79,6 +79,7 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.Sidearm;
 import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Aeromancy;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
+import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsWindWalk;
 import com.playmonumenta.plugins.depths.abilities.windwalker.GuardingBolt;
 import com.playmonumenta.plugins.depths.abilities.windwalker.HowlingWinds;
 import com.playmonumenta.plugins.depths.abilities.windwalker.LastBreath;
@@ -86,7 +87,6 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.OneWithTheWind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.RestoringDraft;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Slipstream;
-import com.playmonumenta.plugins.depths.abilities.windwalker.Updraft;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
@@ -428,6 +428,16 @@ public class DepthsManager {
 				Plugin.getInstance().getLogger().info("Error while attempting to set player depths ability");
 				e.printStackTrace();
 			}
+		} else {
+			for (DepthsPlayer otherPlayer : getPartyFromId(dp).mPlayersInParty) {
+				Player newPlayer = Bukkit.getPlayer(otherPlayer.mPlayerId);
+				if (newPlayer != null && !newPlayer.equals(p) && level == 1) {
+					newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has selected " + name + " as their aspect!");
+				} else if (newPlayer != null && !newPlayer.equals(p) && level == 2) {
+					// Aspect is being transformed from mystery box
+					newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has had their mystery box transform into " + name + "!");
+				}
+			}
 		}
 		AbilityManager.getManager().updatePlayerAbilities(p, false);
 	}
@@ -473,7 +483,7 @@ public class DepthsManager {
 			new RestoringDraft(plugin, null),
 			new Skyhook(plugin, null),
 			new Slipstream(plugin, null),
-			new Updraft(plugin, null),
+			new DepthsWindWalk(plugin, null),
 			new Whirlwind(plugin, null),
 
 			//Shadow abilities
@@ -1328,7 +1338,10 @@ public class DepthsManager {
 				if (player == null || !player.isOnline()) {
 					continue;
 				}
-
+				//Transform mystery box if applicable
+				if (getPlayerLevelInAbility(RandomAspect.ABILITY_NAME, player) > 0) {
+					transformMysteryBox(player);
+				}
 				//Set score
 				ScoreboardUtils.setScoreboardValue(player, "Depths", ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0) + 1);
 				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Depths");
@@ -1361,6 +1374,34 @@ public class DepthsManager {
 		}
 		mRoomRepository.goToNextFloor(getPartyFromId(dp), treasureScoreIncrease);
 		getPartyFromId(dp).mBeatBoss = true;
+	}
+
+	/**
+	 * Transforms the mystery box aspect into a random other aspect after defeating floor 3
+	 * The level 2 denotes that it is being transformed rather than selected (the aspects are not leveled)
+	 * @param player the player to transform the ability of
+	 */
+	private void transformMysteryBox(Player player) {
+		setPlayerLevelInAbility(RandomAspect.ABILITY_NAME, player, 0);
+		switch (mRandom.nextInt(5)) {
+			case 0:
+				setPlayerLevelInAbility(SwordAspect.ABILITY_NAME, player, 2);
+				break;
+			case 1:
+				setPlayerLevelInAbility(AxeAspect.ABILITY_NAME, player, 2);
+				break;
+			case 2:
+				setPlayerLevelInAbility(ScytheAspect.ABILITY_NAME, player, 2);
+				break;
+			case 3:
+				setPlayerLevelInAbility(WandAspect.ABILITY_NAME, player, 2);
+				break;
+			case 4:
+				setPlayerLevelInAbility(BowAspect.ABILITY_NAME, player, 2);
+				break;
+			default:
+				return;
+		}
 	}
 
 	/**

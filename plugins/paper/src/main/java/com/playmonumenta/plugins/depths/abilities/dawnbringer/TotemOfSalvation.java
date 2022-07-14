@@ -108,7 +108,9 @@ public class TotemOfSalvation extends DepthsAbility {
 							double maxHealth = EntityUtils.getMaxHealth(p);
 							double healthFromFull = maxHealth - p.getHealth();
 							double healthToHeal = maxHealth * PERCENT_HEALING;
-
+							if (p != mPlayer) {
+								healthToHeal *= 1.5;
+							}
 							PlayerUtils.healPlayer(mPlugin, p, healthToHeal);
 
 							double remainingHealing = healthToHeal - healthFromFull;
@@ -142,7 +144,7 @@ public class TotemOfSalvation extends DepthsAbility {
 		if (TICK_FREQUENCY[rarity - 1] == 20) {
 			s = "";
 		}
-		return "Swap hands while holding a weapon to summon a totem that lasts " + DURATION / 20 + " second. The totem heals all players within " + EFFECT_RADIUS + " blocks by " + (int) DepthsUtils.roundPercent(PERCENT_HEALING) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + TICK_FREQUENCY[rarity - 1] / 20.0 + ChatColor.WHITE + " second" + s + ". If a player has full health, the healing will be converted into absorption that lasts " + ABSORPTION_DURATION / 20 + " seconds and caps at " + MAX_ABSORPTION / 2 + " hearts. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap hands while holding a weapon to summon a totem that lasts " + DURATION / 20 + " second. The totem heals all players within " + EFFECT_RADIUS + " blocks by " + (int) DepthsUtils.roundPercent(PERCENT_HEALING) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + TICK_FREQUENCY[rarity - 1] / 20.0 + ChatColor.WHITE + " second" + s + ". If a player has full health, the healing will be converted into absorption that lasts " + ABSORPTION_DURATION / 20 + " seconds and caps at " + MAX_ABSORPTION / 2 + " hearts. Healing is 50% more effective on allies. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

@@ -44,6 +44,7 @@ public class ChaosDagger extends DepthsAbility {
 	public static final int DAMAGE_DURATION = 5 * 20;
 	private static final int TARGET_RADIUS = 20;
 	private static final int ELITE_RADIUS = 5;
+	private static final int STEALTH_DURATION = 30;
 
 	private @Nullable Entity mHitMob;
 
@@ -182,13 +183,23 @@ public class ChaosDagger extends DepthsAbility {
 			if (!enemy.isInvisible()) {
 				enemy.setGlowing(false);
 			}
+			new BukkitRunnable() {
+
+				@Override
+				public void run() {
+					if (enemy.isDead() || enemy.getHealth() < 0) {
+						AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION);
+					}
+				}
+
+			}.runTaskLater(mPlugin, 1);
 		}
 		return false; // only changes event damage, and also prevents multiple calls itself by clearing mHitMob
 	}
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap hands to throw a cursed dagger that stuns an enemy for " + STUN_DURATION / 20 + " seconds (rooting bosses instead). The next instance of melee or projectile damage you deal to this mob within " + DAMAGE_DURATION / 20 + " seconds is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + ". The dagger prioritizes nearby Elites and Bosses but can hit any mob in its path. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap hands to throw a cursed dagger that stuns an enemy for " + STUN_DURATION / 20 + " seconds (rooting bosses instead). The next instance of melee or projectile damage you deal to this mob within " + DAMAGE_DURATION / 20 + " seconds is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + ". If this damage kills the target, gain stealth for 1.5s. The dagger prioritizes nearby Elites and Bosses but can hit any mob in its path. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

@@ -1,6 +1,9 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -52,6 +55,7 @@ public class Skyhook extends DepthsAbility {
 
 	private void hook(Entity arrow) {
 		Location loc = arrow.getLocation();
+		Location playerStartLoc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 
 		if (loc.clone().add(0, 0.5, 0).getBlock().isSolid()) {
@@ -75,6 +79,18 @@ public class Skyhook extends DepthsAbility {
 			world.spawnParticle(Particle.SWEEP_ATTACK, loc, 5, .5, .2, .5, 0.65);
 			loc.setDirection(mPlayer.getEyeLocation().getDirection());
 			mPlayer.teleport(loc);
+
+			//Refund cooldowns
+			for (Ability abil : AbilityManager.getManager().getPlayerAbilities(mPlayer).getAbilities()) {
+				AbilityInfo info = abil.getInfo();
+				ClassAbility spell = info.mLinkedSpell;
+				if (spell == null || spell == mInfo.mLinkedSpell) {
+					continue;
+				}
+				int totalCD = info.mCooldown;
+				int reducedCD = (int) (totalCD * (loc.distance(playerStartLoc) / 100.0));
+				mPlugin.mTimers.updateCooldown(mPlayer, spell, reducedCD);
+			}
 		}
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, 1, 1.5f);
 
@@ -127,7 +143,7 @@ public class Skyhook extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting a bow while sneaking shoots out a skyhook. When the skyhook lands, you dash to the location. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
+		return "Shooting a bow while sneaking shoots out a skyhook. When the skyhook lands, you dash to the location and reduce all ability cooldowns by 1% per block traveled. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
 	}
 
 	@Override

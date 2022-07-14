@@ -20,7 +20,7 @@ import org.bukkit.entity.Trident;
 public class FocusedCombos extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Focused Combos";
-	public static final double[] DAMAGE = {1.20, 1.25, 1.30, 1.35, 1.40, 1.75};
+	public static final double[] DAMAGE = {1.40, 1.45, 1.50, 1.55, 1.60, 2.00};
 	public static final double BLEED_AMOUNT = 0.2;
 	public static final int BLEED_DURATION = 20 * 3;
 

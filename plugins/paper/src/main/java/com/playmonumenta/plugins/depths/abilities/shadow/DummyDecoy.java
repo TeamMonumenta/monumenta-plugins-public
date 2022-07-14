@@ -37,7 +37,7 @@ public class DummyDecoy extends DepthsAbility {
 
 	public static final int COOLDOWN = 25 * 20;
 	public static final String DUMMY_NAME = "AlluringShadow";
-	public static final int[] HEALTH = {30, 35, 40, 45, 50, 100};
+	public static final int[] HEALTH = {40, 50, 60, 70, 80, 150};
 	public static final int[] STUN_TICKS = {20, 25, 30, 35, 40, 60};
 	public static final int MAX_TICKS = 10 * 20;
 	public static final int AGGRO_RADIUS = 8;
@@ -142,7 +142,7 @@ public class DummyDecoy extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting a bow while sneaking fires a cursed arrow. When the arrow lands, it spawns a dummy decoy at the location with " + DepthsUtils.getRarityColor(rarity) + HEALTH[rarity - 1] + ChatColor.WHITE + " health that lasts for up to " + MAX_TICKS / 20 + " seconds. The decoy aggros mobs within " + AGGRO_RADIUS + " blocks on a regular interval. On death, the decoy explodes, stunning mobs in a " + STUN_RADIUS + " block radius for " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundDouble(STUN_TICKS[rarity - 1] / 20.0) + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Shooting a bow, crossbow, or trident while sneaking fires a cursed arrow. When the arrow lands, it spawns a dummy decoy at the location with " + DepthsUtils.getRarityColor(rarity) + HEALTH[rarity - 1] + ChatColor.WHITE + " health that lasts for up to " + MAX_TICKS / 20 + " seconds. The decoy aggros mobs within " + AGGRO_RADIUS + " blocks on a regular interval. On death, the decoy explodes, stunning mobs in a " + STUN_RADIUS + " block radius for " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundDouble(STUN_TICKS[rarity - 1] / 20.0) + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

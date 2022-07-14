@@ -33,7 +33,7 @@ public class GuardingBolt extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Guarding Bolt";
 	public static final int COOLDOWN = 24 * 20;
-	private static final int RADIUS = 3;
+	private static final int RADIUS = 4;
 	private static final int RANGE = 25;
 	private static final int[] DAMAGE = {12, 14, 16, 18, 20, 24};
 	private static final int[] STUN_DURATION = {20, 25, 30, 35, 40, 50};
