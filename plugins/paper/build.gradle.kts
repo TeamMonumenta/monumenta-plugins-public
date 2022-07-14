@@ -229,6 +229,19 @@ tasks.create("stage-deploy") {
     }
 }
 
+tasks.create("stage-118-deploy") {
+    val shadowJar by tasks.named<ShadowJar>("shadowJar")
+    dependsOn(shadowJar)
+    doLast {
+        ssh.runSessions {
+            session(basicssh) {
+                put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/stage/m12/server_config/plugins")
+                execute("cd /home/epic/stage/m12/server_config/plugins && rm -f Monumenta-1.18.jar && ln -s " + shadowJar.archiveFileName.get() + " Monumenta-1.18.jar")
+            }
+        }
+    }
+}
+
 tasks.create("build-deploy") {
     val shadowJar by tasks.named<ShadowJar>("shadowJar")
     dependsOn(shadowJar)
@@ -237,7 +250,20 @@ tasks.create("build-deploy") {
             session(adminssh) {
                 put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/project_epic/server_config/plugins")
                 execute("cd /home/epic/project_epic/server_config/plugins && rm -f Monumenta.jar && ln -s " + shadowJar.archiveFileName.get() + " Monumenta.jar")
-                execute("cd /home/epic/project_epic/mobs/plugins && rm -f Monumenta.jar && ln -s ../../server_config/plugins/Monumenta.jar")
+                execute("cd /home/epic/project_epic/mobs/plugins && rm -rf Monumenta*.jar && ln -s ../../server_config/plugins/Monumenta.jar")
+            }
+        }
+    }
+}
+
+tasks.create("build-118-deploy") {
+    val shadowJar by tasks.named<ShadowJar>("shadowJar")
+    dependsOn(shadowJar)
+    doLast {
+        ssh.runSessions {
+            session(adminssh) {
+                put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/project_epic/server_config/plugins")
+                execute("cd /home/epic/project_epic/server_config/plugins && rm -f Monumenta-1.18.jar && ln -s " + shadowJar.archiveFileName.get() + " Monumenta-1.18.jar")
             }
         }
     }
