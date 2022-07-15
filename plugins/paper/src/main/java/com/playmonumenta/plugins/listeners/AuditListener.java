@@ -72,6 +72,8 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("(minecraft:)?guildchat"),
 		exactOptionalArguments("(minecraft:)?l"),
 		exactOptionalArguments("(minecraft:)?local"),
+		exactOptionalArguments("(minecraft:)?wc"),
+		exactOptionalArguments("(minecraft:)?worldchat"),
 		exactOptionalArguments("(minecraft:)?p"),
 		exactOptionalArguments("(minecraft:)?party"),
 		exactOptionalArguments("(minecraft:)?pausechat"),
