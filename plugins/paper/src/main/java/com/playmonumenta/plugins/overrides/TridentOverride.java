@@ -1,9 +1,11 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -49,6 +51,10 @@ public class TridentOverride extends BaseOverride {
 						}
 					}
 				}
+			}
+
+			if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.BROOMSTICK_ENABLED) && !EntityUtils.isRiptideDisable(plugin, player)) {
+				return true;
 			}
 
 			return false;

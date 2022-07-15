@@ -38,7 +38,8 @@ public class ZoneUtils {
 		WINTER_SNOWBALLS_ONLY("Winter Snowballs Only"),
 		NO_POTIONS("No Potions"),
 		NO_FALL_DAMAGE("No Fall Damage"),
-		RESTRICTED("Restricted");
+		RESTRICTED("Restricted"),
+		BROOMSTICK_ENABLED("Broomstick Enabled");
 
 		private final String mPropertyName;
 

@@ -425,6 +425,7 @@ public class ItemStatUtils {
 		ARCANE_THRUST(new ArcaneThrust(), true, false, false, true),
 		ASHES_OF_ETERNITY(new AshesOfEternity(), false, false, false, true),
 		BLEEDING(new Bleeding(), true, false, false, true),
+		BROOMSTICK(new Broomstick(), false, false, false, false),
 		CHAOTIC(new Chaotic(), true, false, false, true),
 		DARKSIGHT(new Darksight(), false, false, false, false),
 		DECAY(new Decay(), true, false, false, true),
@@ -469,6 +470,7 @@ public class ItemStatUtils {
 		THROWING_KNIFE(new ThrowingKnife(), false, false, false, false),
 		TRIAGE(new Triage(), true, false, false, true),
 		TRIVIUM(new Trivium(), true, false, false, true),
+
 		// Curses
 		CURSE_OF_ANEMIA(new CurseOfAnemia(), true, true, false, false),
 		CURSE_OF_BINDING(Enchantment.BINDING_CURSE, "Curse of Binding", false, true, false, false),

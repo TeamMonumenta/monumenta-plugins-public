@@ -841,7 +841,7 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		Location loc = player.getLocation();
 
-		//Manually forces the player in place during the riptide if they use it out of water (in rain)
+		//Manually forces the player in place during the riptide if they use it out of water (in rain) or have the riptide disable effect
 		if (StasisListener.isInStasis(player) || !mPlugin.mItemOverrides.playerRiptide(mPlugin, player, event)) {
 			player.teleport(loc);
 			player.setCooldown(Material.TRIDENT, 15*20);
@@ -855,7 +855,10 @@ public class PlayerListener implements Listener {
 					player.setVelocity(player.getVelocity().multiply(0));
 				}
 			}.runTaskTimer(mPlugin, 0, 2);
+			return;
 		}
+
+		mPlugin.mItemStatManager.onRiptide(mPlugin, player, event);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)

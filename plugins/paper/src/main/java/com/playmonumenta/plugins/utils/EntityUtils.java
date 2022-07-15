@@ -1015,6 +1015,15 @@ public class EntityUtils {
 		return false;
 	}
 
+	public static boolean isRiptideDisable(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> disable = plugin.mEffectManager.getEffects(mob, NO_RECOIL_EFFECT_NAME);
+		if (disable != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	private static final String ARROW_IFRAMES_EFFECT_NAME = "SplitArrrowIframesEffect";
 
 	public static void applyArrowIframes(Plugin plugin, int ticks, LivingEntity mob) {

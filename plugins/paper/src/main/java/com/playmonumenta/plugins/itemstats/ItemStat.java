@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerRiptideEvent;
 
 public interface ItemStat {
 
@@ -274,6 +275,17 @@ public interface ItemStat {
 	 * @param event  the associated PlayerExpChangeEvent
 	 */
 	default void onCombust(Plugin plugin, Player player, double value, EntityCombustEvent event) {
+
+	}
+
+	/**
+	 * Called when a player riptides (hopefully???)
+	 * @param plugin monumenta plugin
+	 * @param player the Player riptiding
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated PlayerRiptdieEvent
+	 */
+	default void onRiptide(Plugin plugin, Player player, double value, PlayerRiptideEvent event) {
 
 	}
 }

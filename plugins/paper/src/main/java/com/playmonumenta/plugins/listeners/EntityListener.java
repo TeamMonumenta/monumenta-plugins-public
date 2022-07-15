@@ -993,6 +993,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
+
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void hangingBreakEvent(HangingBreakEvent event) {
 		if (event.getEntity() instanceof ItemFrame frame
