@@ -128,7 +128,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 
 					float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED);
 					for (LivingEntity mob : mobs) {
-						MovementUtils.knockAway(mPlayer, mob, KNOCK_AWAY_SPEED, true);
+						MovementUtils.knockAway(mPlayer, mob, knockback, true);
 					}
 
 					world.playSound(location, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1f, 1f);
