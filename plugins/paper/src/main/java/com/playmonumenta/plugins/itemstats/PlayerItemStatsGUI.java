@@ -485,6 +485,11 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			gain up to (Level*20%) effective Armor
 			(0.25% armor per 1% health lost, up to 20% armor).
 			Also calculates bonus from Second Wind when enabled."""),
+		GUARD(9, Material.SHULKER_SHELL, EnchantmentType.GUARD, true, """
+			Gain (Level*20%) effective Armor
+			after blocking an attack with a shield.
+			The duration lasts for 2.5s if blocked
+			from offhand, and 5s from mainhand."""),
 		ETHEREAL(5, Material.PHANTOM_MEMBRANE, EnchantmentType.ETHEREAL, false, """
 			Gain (Level*20%) effective Agility
 			on hits taken within 2 seconds of any previous hit."""),
@@ -500,7 +505,10 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			on the first hit taken after
 			4 seconds of taking no damage.
 			Half of the bonus is granted after
-			2 seconds of taking no damage.""");
+			2 seconds of taking no damage."""),
+		CLOAKED(17, Material.BLACK_DYE, EnchantmentType.CLOAKED, false, """
+			Gain (Level*20%) effective Agility
+			when there are 2 or less enemies within 5 blocks.""");
 
 		private final int mSlot;
 		private final Material mIcon;
@@ -594,8 +602,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	);
 
 	private static final int SWAP_EQUIPMENT_SET_SLOT = 49;
-	private static final int INFUSION_SETTINGS_LEFT_SLOT = 9;
-	private static final int INFUSION_SETTINGS_RIGHT_SLOT = 17;
+	private static final int INFUSION_SETTINGS_LEFT_SLOT = 12;
+	private static final int INFUSION_SETTINGS_RIGHT_SLOT = 14;
 
 	private final Settings mSettings = new Settings();
 	private final Stats mLeftStats = new Stats(null, mSettings);
