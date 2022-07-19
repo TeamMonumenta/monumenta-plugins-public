@@ -50,7 +50,7 @@ public class GenerateItems extends GenericCommand {
 			String itemName = row.get(0);
 			String baseItem = row.get(1);
 			baseItem = baseItem.split(":", 2)[1].toUpperCase();
-			Boolean isMainhand = row.get(71).equals("1");
+			Boolean isMainhand = row.get(73).equals("1");
 			String slot;
 			if (isMainhand) {
 				slot = "mainhand";
@@ -176,79 +176,81 @@ public class GenerateItems extends GenericCommand {
 			int firstStrike = Integer.parseInt(row.get(54));
 			int stamina = Integer.parseInt(row.get(55));
 			int trivium = Integer.parseInt(row.get(56));
-			int vanishing = Integer.parseInt(row.get(65));
-			int corruption = Integer.parseInt(row.get(66));
-			int retrieval = Integer.parseInt(row.get(108));
-			int weightless = Integer.parseInt(row.get(109));
-			int voidTether = Integer.parseInt(row.get(122));
-			int resurrection = Integer.parseInt(row.get(123));
-			int divineAura = Integer.parseInt(row.get(127));
-			int material = Integer.parseInt(row.get(129));
-			int irrepairibiliy = Integer.parseInt(row.get(128));
+			int vanishing = Integer.parseInt(row.get(67));
+			int corruption = Integer.parseInt(row.get(68));
+			int retrieval = Integer.parseInt(row.get(110));
+			int weightless = Integer.parseInt(row.get(111));
+			int voidTether = Integer.parseInt(row.get(124));
+			int resurrection = Integer.parseInt(row.get(125));
+			int divineAura = Integer.parseInt(row.get(129));
+			int material = Integer.parseInt(row.get(131));
+			int irrepairibiliy = Integer.parseInt(row.get(130));
 			// Defense Mod Enchants
 			int adaptability = Integer.parseInt(row.get(52));
 			int shielding = Integer.parseInt(row.get(57));
 			int inure = Integer.parseInt(row.get(58));
 			int steadfast = Integer.parseInt(row.get(59));
 			int poise = Integer.parseInt(row.get(60));
-			int tempo = Integer.parseInt(row.get(61));
-			int reflexes = Integer.parseInt(row.get(62));
-			int evasion = Integer.parseInt(row.get(63));
-			int ethereal = Integer.parseInt(row.get(64));
+			int guard = Integer.parseInt(row.get(61));
+			int tempo = Integer.parseInt(row.get(62));
+			int reflexes = Integer.parseInt(row.get(63));
+			int evasion = Integer.parseInt(row.get(64));
+			int ethereal = Integer.parseInt(row.get(65));
+			int cloaked = Integer.parseInt(row.get(66));
 			// Durability
-			int unbreaking = Integer.parseInt(row.get(67));
-			int mending = Integer.parseInt(row.get(68));
-			int unbreakable = Integer.parseInt(row.get(69));
+			int unbreaking = Integer.parseInt(row.get(69));
+			int mending = Integer.parseInt(row.get(70));
+			int unbreakable = Integer.parseInt(row.get(71));
 			// Mainhand Stats
-			double mainhandAttackDamage = Double.parseDouble(row.get(73));
-			double mainhandAttackSpeed = Double.parseDouble(row.get(74));
-			double spellPower = Double.parseDouble(row.get(78)) / 100.0;
-			int wand = Integer.parseInt(row.get(79));
-			double mainhandProjDamage = Double.parseDouble(row.get(75));
-			double mainhandProjSpeed = Double.parseDouble(row.get(76));
-			double throwRate = Double.parseDouble(row.get(77));
+			double mainhandAttackDamage = Double.parseDouble(row.get(75));
+			double mainhandAttackSpeed = Double.parseDouble(row.get(76));
+			double spellPower = Double.parseDouble(row.get(80)) / 100.0;
+			int wand = Integer.parseInt(row.get(81));
+			double mainhandProjDamage = Double.parseDouble(row.get(77));
+			double mainhandProjSpeed = Double.parseDouble(row.get(78));
+			double throwRate = Double.parseDouble(row.get(79));
 			// Enchants
-			int sweepingEdge = Integer.parseInt(row.get(80));
-			int arcaneThrust = Integer.parseInt(row.get(81));
-			int knockback = Integer.parseInt(row.get(82));
-			int looting = Integer.parseInt(row.get(83));
-			int fireAspect = Integer.parseInt(row.get(84));
-			int iceAspect = Integer.parseInt(row.get(85));
-			int thunderAspect = Integer.parseInt(row.get(86));
-			int windAspect = Integer.parseInt(row.get(87));
-			int earthAspect = Integer.parseInt(row.get(88));
-			int decay = Integer.parseInt(row.get(89));
-			int bleeding = Integer.parseInt(row.get(90));
-			int smite = Integer.parseInt(row.get(91));
-			int slayer = Integer.parseInt(row.get(92));
-			int duelist = Integer.parseInt(row.get(93));
-			int abyssal = Integer.parseInt(row.get(94));
-			int chaotic = Integer.parseInt(row.get(95));
-			int hexEater = Integer.parseInt(row.get(96));
-			int twoHanded = Integer.parseInt(row.get(97));
-			int quake = Integer.parseInt(row.get(98));
-			int ephemerality = Integer.parseInt(row.get(99));
-			int pointBlank = Integer.parseInt(row.get(100));
-			int sniper = Integer.parseInt(row.get(101));
-			int punch = Integer.parseInt(row.get(102));
-			int quickCharge = Integer.parseInt(row.get(103));
-			int piercing = Integer.parseInt(row.get(104));
-			int multishot = Integer.parseInt(row.get(105));
-			int infinity = Integer.parseInt(row.get(106));
-			int recoil = Integer.parseInt(row.get(107));
-			int riptide = Integer.parseInt(row.get(110));
-			int efficiency = Integer.parseInt(row.get(111));
-			int silkTouch = Integer.parseInt(row.get(112));
-			int fortune = Integer.parseInt(row.get(113));
-			int eruption = Integer.parseInt(row.get(114));
-			int shrapnel = Integer.parseInt(row.get(115));
-			int multitool = Integer.parseInt(row.get(116));
-			int luckOfTheSea = Integer.parseInt(row.get(117));
-			int lure = Integer.parseInt(row.get(118));
-			int ashes = Integer.parseInt(row.get(119));
-			int jungles = Integer.parseInt(row.get(120));
-			int rageKeter = Integer.parseInt(row.get(121));
-			int depths = Integer.parseInt(row.get(124));
+			int sweepingEdge = Integer.parseInt(row.get(82));
+			int arcaneThrust = Integer.parseInt(row.get(83));
+			int knockback = Integer.parseInt(row.get(84));
+			int looting = Integer.parseInt(row.get(85));
+			int fireAspect = Integer.parseInt(row.get(86));
+			int iceAspect = Integer.parseInt(row.get(87));
+			int thunderAspect = Integer.parseInt(row.get(88));
+			int windAspect = Integer.parseInt(row.get(89));
+			int earthAspect = Integer.parseInt(row.get(90));
+			int decay = Integer.parseInt(row.get(91));
+			int bleeding = Integer.parseInt(row.get(92));
+			int smite = Integer.parseInt(row.get(93));
+			int slayer = Integer.parseInt(row.get(94));
+			int duelist = Integer.parseInt(row.get(95));
+			int abyssal = Integer.parseInt(row.get(96));
+			int chaotic = Integer.parseInt(row.get(97));
+			int hexEater = Integer.parseInt(row.get(98));
+			int twoHanded = Integer.parseInt(row.get(99));
+			int quake = Integer.parseInt(row.get(100));
+			int ephemerality = Integer.parseInt(row.get(101));
+			int pointBlank = Integer.parseInt(row.get(102));
+			int sniper = Integer.parseInt(row.get(103));
+			int punch = Integer.parseInt(row.get(104));
+			int quickCharge = Integer.parseInt(row.get(105));
+			int piercing = Integer.parseInt(row.get(106));
+			int multishot = Integer.parseInt(row.get(107));
+			int infinity = Integer.parseInt(row.get(108));
+			int recoil = Integer.parseInt(row.get(109));
+			int riptide = Integer.parseInt(row.get(112));
+			int efficiency = Integer.parseInt(row.get(113));
+			int silkTouch = Integer.parseInt(row.get(114));
+			int fortune = Integer.parseInt(row.get(115));
+			int eruption = Integer.parseInt(row.get(116));
+			int shrapnel = Integer.parseInt(row.get(117));
+			int multitool = Integer.parseInt(row.get(118));
+			int luckOfTheSea = Integer.parseInt(row.get(119));
+			int lure = Integer.parseInt(row.get(120));
+			int ashes = Integer.parseInt(row.get(121));
+			int jungles = Integer.parseInt(row.get(122));
+			int rageKeter = Integer.parseInt(row.get(123));
+			int depths = Integer.parseInt(row.get(126));
 
 			// Logic for item creation
 			ItemStack item = new ItemStack(Material.valueOf(baseItem));
@@ -463,6 +465,9 @@ public class GenerateItems extends GenericCommand {
 			if (poise > 0) {
 				player.chat("/editench" + " Poise " + Integer.toString(poise));
 			}
+			if (guard > 0) {
+				player.chat("/editench" + " Guard " + Integer.toString(guard));
+			}
 			if (tempo > 0) {
 				player.chat("/editench" + " Tempo " + Integer.toString(tempo));
 			}
@@ -474,6 +479,9 @@ public class GenerateItems extends GenericCommand {
 			}
 			if (ethereal > 0) {
 				player.chat("/editench" + " Ethereal " + Integer.toString(ethereal));
+			}
+			if (cloaked > 0) {
+				player.chat("/editench" + " Cloaked " + Integer.toString(cloaked));
 			}
 			if (material > 0) {
 				player.chat("/editench" + " Material " + Integer.toString(material));

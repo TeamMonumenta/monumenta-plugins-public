@@ -412,6 +412,7 @@ public class ItemStatUtils {
 		INURE(new Inure(), true, false, false, true),
 		POISE(new Poise(), true, false, false, true),
 		STEADFAST(new Steadfast(), true, false, false, true),
+		GUARD(new Guard(), true, false, false, true),
 		TEMPO(new Tempo(), true, false, false, true),
 		REFLEXES(new Reflexes(), true, false, false, true),
 		ETHEREAL(new Ethereal(), true, false, false, true),

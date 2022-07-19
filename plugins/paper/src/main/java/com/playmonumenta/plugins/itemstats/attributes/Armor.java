@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemstats.attributes;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Attribute;
+import com.playmonumenta.plugins.itemstats.enchantments.Guard;
 import com.playmonumenta.plugins.itemstats.enchantments.Inure;
 import com.playmonumenta.plugins.itemstats.enchantments.Poise;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
@@ -91,7 +92,8 @@ public class Armor implements Attribute {
 		return Shielding.applyShielding(event, plugin, player)
 			       + Inure.applyInure(event, plugin, player)
 			       + Steadfast.applySteadfast(event, plugin, player)
-			       + Poise.applyPoise(event, plugin, player);
+			       + Poise.applyPoise(event, plugin, player)
+			       + Guard.applyGuard(event, plugin, player);
 	}
 
 }
