@@ -36,7 +36,6 @@ public class ShieldBash extends Ability {
 	private static final int SHIELD_BASH_COOLDOWN = 20 * 8;
 	private static final int SHIELD_BASH_2_RADIUS = 2;
 	private static final int SHIELD_BASH_RANGE = 4;
-	private static final int ENHANCEMENT_COOLDOWN_REDUCTION = SHIELD_BASH_COOLDOWN / 2;
 	private static final int ENHANCEMENT_BLOCKING_DURATION = 10;
 
 	public static final String CHARM_DAMAGE = "Shield Bash Damage";
@@ -121,7 +120,7 @@ public class ShieldBash extends Ability {
 		if (mPlayer != null) {
 			if (isEnhanced() && mPlayer.getHandRaisedTime() < ENHANCEMENT_BLOCKING_DURATION && event.isBlockedByShield() && isTimerActive() && !mIsEnhancementUsed) {
 				// Reduce cooldown by half of shield bash's CD.
-				mPlugin.mTimers.updateCooldown(mPlayer, mInfo.mLinkedSpell, ENHANCEMENT_COOLDOWN_REDUCTION);
+				mPlugin.mTimers.updateCooldown(mPlayer, mInfo.mLinkedSpell, getModifiedCooldown() / 2);
 				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 1, 2);
 
 				mIsEnhancementUsed = true;

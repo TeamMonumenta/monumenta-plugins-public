@@ -468,24 +468,6 @@ public class EntityUtils {
 		return projectiles;
 	}
 
-	public static List<AbstractArrow> spawnArrowVolleyEnhanced(LivingEntity player, int numProjectiles, float speed, double spacing, Class<? extends AbstractArrow> arrowClass) {
-		List<AbstractArrow> projectiles = new ArrayList<>();
-
-		for (int i = 0; i < numProjectiles; i++) {
-			double yaw = spacing * (i - (numProjectiles - 1) / 2f);
-			AbstractArrow arrow = spawnArrow(player, yaw, 0.0, new Vector(0, 0, 0), speed, arrowClass);
-			projectiles.add(arrow);
-			AbstractArrow arrow2 = spawnArrow(player, yaw + 90, 0.0, new Vector(0, 0, 0), speed, arrowClass);
-			projectiles.add(arrow2);
-			AbstractArrow arrow3 = spawnArrow(player, yaw + 180, 0.0, new Vector(0, 0, 0), speed, arrowClass);
-			projectiles.add(arrow3);
-			AbstractArrow arrow4 = spawnArrow(player, yaw + 270, 0.0, new Vector(0, 0, 0), speed, arrowClass);
-			projectiles.add(arrow4);
-		}
-
-		return projectiles;
-	}
-
 	public static AreaEffectCloud spawnAreaEffectCloud(World world, Location loc, Collection<PotionEffect> effects, float radius, int duration) {
 		AreaEffectCloud cloud = (AreaEffectCloud) world.spawnEntity(loc, EntityType.AREA_EFFECT_CLOUD);
 

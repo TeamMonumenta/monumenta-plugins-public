@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -15,7 +16,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,6 +40,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	private static final double HEAL_PERCENT = 0.025;
 	private static final double RAMPAGE_STACK_PERCENTAGE = 1.5;
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "RampagePercentDamageResistEffect";
+	private static final String CUSTOM_REGENERATION_EFFECT_NAME = "RampageCustomRegenerationEffect";
 
 	public static final String CHARM_THRESHOLD = "Rampage Damage Threshold";
 	public static final String CHARM_DAMAGE = "Rampage Damage";
@@ -54,7 +55,6 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	private int mStacks = 0;
 	private double mRemainderDamage = 0;
 	private int mTimeToStackDecay = 0;
-	private int mTimer = 0;
 
 	public Rampage(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Rampage");
@@ -88,7 +88,8 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 				new PartialParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
 			}
 
-			mTimer = mStacks / 2;
+			mPlugin.mEffectManager.addEffect(mPlayer, CUSTOM_REGENERATION_EFFECT_NAME, new CustomRegeneration(mStacks * 10, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT * EntityUtils.getMaxHealth(mPlayer)), mPlugin));
+
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(mStacks * 10, mStacks / -100.0));
 			new PartialParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SWEEP_ATTACK, loc.clone().add(0, 1, 0), 50, 3, 1, 3, 0).spawnAsPlayerActive(mPlayer);
@@ -115,21 +116,12 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
-
-		if (oneSecond) {
-			if (mTimer > 0) {
-				mTimer--;
-				double maxHealth = EntityUtils.getMaxHealth(mPlayer);
-				PlayerUtils.healPlayer(mPlugin, mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT * maxHealth));
-				new PartialParticle(Particle.HEART, mPlayer.getLocation().add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001).spawnAsPlayerActive(mPlayer);
-			}
-		}
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if ((event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)
-			    && event.getAbility() != ClassAbility.RAMPAGE) {
+				&& event.getAbility() != ClassAbility.RAMPAGE) {
 			damageDealt(event.getFinalDamage(false));
 		}
 		return false; // does not deal damage, just tallies the damage dealt
@@ -139,7 +131,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		mTimeToStackDecay = 0;
 
 		mRemainderDamage += damage;
-		int newStacks = (int)(mRemainderDamage / mDamagePerStack);
+		int newStacks = (int) (mRemainderDamage / mDamagePerStack);
 		mRemainderDamage -= (newStacks * mDamagePerStack);
 
 		if (newStacks > 0) {
