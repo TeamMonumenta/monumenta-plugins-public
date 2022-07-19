@@ -123,7 +123,9 @@ public class DepthsWindWalk extends DepthsAbility {
 								new PartialParticle(Particle.CLOUD, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
 
 								mob.setVelocity(mob.getVelocity().setY(0.5));
-								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.LEVITATION, LEVITATION_DURATION, 0, true, false));
+								if (!DepthsUtils.isPlant(mob)) {
+									PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.LEVITATION, LEVITATION_DURATION, 0, true, false));
+								}
 							}
 						}
 
