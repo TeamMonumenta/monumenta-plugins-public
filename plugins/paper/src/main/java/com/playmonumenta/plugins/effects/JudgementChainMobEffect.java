@@ -38,7 +38,7 @@ public class JudgementChainMobEffect extends Effect {
 
 	@Override
 	public void onHurt(@NotNull LivingEntity entity, @NotNull DamageEvent event) {
-		List<LivingEntity> e = EntityUtils.getNearbyMobs(entity.getLocation(), 8, entity);
+		List<LivingEntity> e = EntityUtils.getNearbyMobs(entity.getLocation(), 8, entity, true);
 		if (!e.isEmpty()) {
 			event.setDamage(0);
 		}

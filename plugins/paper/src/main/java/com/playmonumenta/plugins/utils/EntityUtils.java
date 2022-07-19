@@ -521,12 +521,50 @@ public class EntityUtils {
 		return list;
 	}
 
+	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, LivingEntity getter, boolean ignoreStack) {
+		List<LivingEntity> list = getNearbyMobs(loc, radius, radius, radius);
+		if (ignoreStack) {
+			List<LivingEntity> mobs = new ArrayList<LivingEntity>();
+			if (getter.getVehicle() != null) {
+				getStackedMobsBelow(getter, mobs);
+			}
+
+			if (getter.getPassenger() != null) {
+				getStackedMobsAbove(getter, mobs);
+			}
+			for (LivingEntity mob : mobs) {
+				list.remove(mob);
+			}
+		}
+		return list;
+	}
+
 	public static List<LivingEntity> getNearbyMobs(Location loc, double radius) {
 		return getNearbyMobs(loc, radius, radius, radius);
 	}
 
 	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, EnumSet<EntityType> types) {
 		return getNearbyMobs(loc, radius, radius, radius, types);
+	}
+
+	public static void getStackedMobsAbove(Entity base, List<LivingEntity> prior) {
+		if (isHostileMob(base)) {
+			prior.add((LivingEntity) base);
+		}
+
+		if (base.getPassenger() != null) {
+			getStackedMobsAbove(base.getPassenger(), prior);
+		}
+	}
+
+	public static void getStackedMobsBelow(Entity base, List<LivingEntity> prior) {
+		if (isHostileMob(base)) {
+			prior.add((LivingEntity) base);
+		}
+
+		if (base.getVehicle() != null) {
+			getStackedMobsBelow(base.getVehicle(), prior);
+		}
 	}
 
 	public static List<LivingEntity> getMobsInLine(Location loc, Vector direction, double range, double halfHitboxLength) {
