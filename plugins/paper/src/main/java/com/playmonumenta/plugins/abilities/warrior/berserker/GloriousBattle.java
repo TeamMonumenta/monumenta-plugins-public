@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -76,7 +77,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
 
-		if (mPlayer == null || mStacks < 1 || !mPlayer.isSneaking()) {
+		if (mPlayer == null || mStacks < 1 || !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return;
 		}
 
@@ -120,7 +121,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 						MovementUtils.knockAway(mPlayer, mob, KNOCK_AWAY_SPEED, true);
 					}
 
-					world.playSound(location, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1f, 1f);
+					world.playSound(location, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.PLAYERS, 0.8f, 0.65f);
 					new PartialParticle(Particle.SWEEP_ATTACK, location, 20, 1, 0, 1, 0).spawnAsPlayerActive(mPlayer);
 
 					this.cancel();
