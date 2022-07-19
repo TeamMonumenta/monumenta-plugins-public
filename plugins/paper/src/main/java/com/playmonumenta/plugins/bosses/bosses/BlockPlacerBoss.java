@@ -86,7 +86,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 				private Location mLastLocation = mMob.getLocation();
 
 				@Override public void run() {
-					if (mBoss.getScoreboardTags().contains(STOP_PLACING_BLOCK)) {
+					if (mBoss.getScoreboardTags().contains(STOP_PLACING_BLOCK) || ZoneUtils.hasZoneProperty(mBoss, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
 						return;
 					}
 

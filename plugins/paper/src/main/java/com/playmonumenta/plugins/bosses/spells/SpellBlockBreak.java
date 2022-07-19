@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -82,6 +83,9 @@ public class SpellBlockBreak extends Spell {
 	@Override
 	public void run() {
 		Location loc = mLauncher.getLocation();
+		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
+			return;
+		}
 		/* Get a list of all blocks that impede the boss's movement */
 		List<Block> badBlockList = new ArrayList<Block>();
 		Location testloc = new Location(loc.getWorld(), 0, 0, 0);

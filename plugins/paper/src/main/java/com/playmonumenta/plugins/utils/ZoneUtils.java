@@ -39,7 +39,8 @@ public class ZoneUtils {
 		NO_POTIONS("No Potions"),
 		NO_FALL_DAMAGE("No Fall Damage"),
 		RESTRICTED("Restricted"),
-		BROOMSTICK_ENABLED("Broomstick Enabled");
+		BROOMSTICK_ENABLED("Broomstick Enabled"),
+		BLOCKBREAK_DISABLED("Blockbreak Disabled");
 
 		private final String mPropertyName;
 
