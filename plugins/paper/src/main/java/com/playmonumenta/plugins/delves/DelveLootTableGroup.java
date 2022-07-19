@@ -75,6 +75,51 @@ public class DelveLootTableGroup {
 		new DelveLootTableGroup("r2/delves/shiftingcity/base_chest", "r2/delves/shiftingcity/dmat_chest", "r2/delves/shiftingcity/cmat_chest", "r2/dungeons/fred/normal_city", "r2/dungeons/fred/objective_city", "r2/dungeons/fred/normal_lush", "r2/dungeons/fred/objective_lush", "r2/dungeons/fred/normal_water", "r2/dungeons/fred/objective_water").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r2/delves/shiftingcity/base_challenge", "r2/delves/shiftingcity/dmat_challenge", "r2/delves/shiftingcity/cmat_challenge", "r2/dungeons/fred/challenge").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r2/delves/shiftingcity/base_final", "r2/delves/shiftingcity/dmat_final", "r2/delves/shiftingcity/cmat_final", "r2/dungeons/fred/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		// Blue Delves
+
+		// SKT Delves
+
+		// R3 Overworld Delves
+		// amanita
+		new DelveLootTableGroup("r3/world/poi/amanita_colony/delves/base_chest", "r3/world/poi/amanita_colony/delves/dmat_chest", "r3/world/poi/amanita_colony/delves/cmat_chest", "r3/world/poi/amanita_colony/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/amanita_colony/delves/base_final", "r3/world/poi/amanita_colony/delves/dmat_final", "r3/world/poi/amanita_colony/delves/cmat_final", "r3/world/poi/amanita_colony/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// arx
+		new DelveLootTableGroup("r3/world/poi/arx_spirensis/delves/base_chest", "r3/world/poi/arx_spirensis/delves/dmat_chest", "r3/world/poi/arx_spirensis/delves/cmat_chest", "r3/world/poi/arx_spirensis/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/arx_spirensis/delves/base_final", "r3/world/poi/arx_spirensis/delves/dmat_final", "r3/world/poi/arx_spirensis/delves/cmat_final", "r3/world/poi/arx_spirensis/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// cathedral
+		new DelveLootTableGroup("r3/world/poi/cathedral/delves/base_chest", "r3/world/poi/cathedral/delves/dmat_chest", "r3/world/poi/cathedral/delves/cmat_chest", "r3/world/poi/cathedral/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/cathedral/delves/base_final", "r3/world/poi/cathedral/delves/dmat_final", "r3/world/poi/cathedral/delves/cmat_final", "r3/world/poi/cathedral/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// chanterelle
+		new DelveLootTableGroup("r3/world/poi/chanterelle_village/delves/base_chest", "r3/world/poi/chanterelle_village/delves/dmat_chest", "r3/world/poi/chanterelle_village/delves/cmat_chest", "r3/world/poi/chanterelle_village/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/chanterelle_village/delves/base_final", "r3/world/poi/chanterelle_village/delves/dmat_final", "r3/world/poi/chanterelle_village/delves/cmat_final", "r3/world/poi/chanterelle_village/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// coven
+		new DelveLootTableGroup("r3/world/poi/coven_fortress/delves/base_chest", "r3/world/poi/coven_fortress/delves/dmat_chest", "r3/world/poi/coven_fortress/delves/cmat_chest", "r3/world/poi/coven_fortress/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/coven_fortress/delves/base_final", "r3/world/poi/coven_fortress/delves/dmat_final", "r3/world/poi/coven_fortress/delves/cmat_final", "r3/world/poi/coven_fortress/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// doomed
+		new DelveLootTableGroup("r3/world/poi/doomed_encampment/delves/base_chest", "r3/world/poi/doomed_encampment/delves/dmat_chest", "r3/world/poi/doomed_encampment/delves/cmat_chest", "r3/world/poi/doomed_encampment/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/doomed_encampment/delves/base_final", "r3/world/poi/doomed_encampment/delves/dmat_final", "r3/world/poi/doomed_encampment/delves/cmat_final", "r3/world/poi/doomed_encampment/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// farm
+		new DelveLootTableGroup("r3/world/poi/farm/delves/base_chest", "r3/world/poi/farm/delves/dmat_chest", "r3/world/poi/farm/delves/cmat_chest", "r3/world/poi/farm/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/farm/delves/base_final", "r3/world/poi/farm/delves/dmat_final", "r3/world/poi/farm/delves/cmat_final", "r3/world/poi/farm/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// forsaken
+		new DelveLootTableGroup("r3/world/poi/forsaken_manor/delves/base_chest", "r3/world/poi/forsaken_manor/delves/dmat_chest", "r3/world/poi/forsaken_manor/delves/cmat_chest", "r3/world/poi/forsaken_manor/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/forsaken_manor/delves/base_final", "r3/world/poi/forsaken_manor/delves/dmat_final", "r3/world/poi/forsaken_manor/delves/cmat_final", "r3/world/poi/forsaken_manor/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// locum
+		new DelveLootTableGroup("r3/world/poi/locum_vernatia/delves/base_chest", "r3/world/poi/locum_vernatia/delves/dmat_chest", "r3/world/poi/locum_vernatia/delves/cmat_chest", "r3/world/poi/locum_vernatia/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/locum_vernatia/delves/base_final", "r3/world/poi/locum_vernatia/delves/dmat_final", "r3/world/poi/locum_vernatia/delves/cmat_final", "r3/world/poi/locum_vernatia/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// silverstrike
+		new DelveLootTableGroup("r3/world/poi/silverstrike_bastille/delves/base_chest", "r3/world/poi/silverstrike_bastille/delves/dmat_chest", "r3/world/poi/silverstrike_bastille/delves/cmat_chest", "r3/world/poi/silverstrike_bastille/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/silverstrike_bastille/delves/base_final", "r3/world/poi/silverstrike_bastille/delves/dmat_final", "r3/world/poi/silverstrike_bastille/delves/cmat_final", "r3/world/poi/silverstrike_bastille/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// terracotta
+		new DelveLootTableGroup("r3/world/poi/terracotta_mine/delves/base_chest", "r3/world/poi/terracotta_mine/delves/dmat_chest", "r3/world/poi/terracotta_mine/delves/cmat_chest", "r3/world/poi/terracotta_mine/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/terracotta_mine/delves/base_final", "r3/world/poi/terracotta_mine/delves/dmat_final", "r3/world/poi/terracotta_mine/delves/cmat_final", "r3/world/poi/terracotta_mine/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// vibrant
+		new DelveLootTableGroup("r3/world/poi/vibrant_hollow/delves/base_chest", "r3/world/poi/vibrant_hollow/delves/dmat_chest", "r3/world/poi/vibrant_hollow/delves/cmat_chest", "r3/world/poi/vibrant_hollow/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/vibrant_hollow/delves/base_final", "r3/world/poi/vibrant_hollow/delves/dmat_final", "r3/world/poi/vibrant_hollow/delves/cmat_final", "r3/world/poi/vibrant_hollow/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// waterfall
+		new DelveLootTableGroup("r3/world/poi/waterfall_village/delves/base_chest", "r3/world/poi/waterfall_village/delves/dmat_chest", "r3/world/poi/waterfall_village/delves/cmat_chest", "r3/world/poi/waterfall_village/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/world/poi/waterfall_village/delves/base_final", "r3/world/poi/waterfall_village/delves/dmat_final", "r3/world/poi/waterfall_village/delves/cmat_final", "r3/world/poi/waterfall_village/endchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 	}
 
 
