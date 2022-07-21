@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -23,8 +24,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -34,6 +38,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.loot.LootContext;
 
 public class YellowTesseractOverride extends BaseOverride {
 	private static final TextComponent TESSERACT_NAME = Component.text("Tesseract of the Elements", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
@@ -97,6 +102,14 @@ public class YellowTesseractOverride extends BaseOverride {
 			return false;
 		}
 
+		// This tesseract is not updated or otherwise broken, replace it with a fresh one
+		if (ItemStatUtils.getTier(item) != ItemStatUtils.Tier.UNIQUE) {
+			for (ItemStack tess : Bukkit.getLootTable(NamespacedKey.fromString("epic:r2/quests/114_elements")).populateLoot(FastUtils.RANDOM, new LootContext.Builder(player.getLocation()).build())) {
+				item.setItemMeta(tess.getItemMeta());
+				player.sendMessage(ChatColor.RED + "Your Tesseract had incorrect data, so it has been replaced. Only report this if it happens multiple times on the same Tesseract or if the replacement does not function.");
+				return false;
+			}
+		}
 
 		if (!InventoryUtils.testForItemWithLore(item, CLASS_STR)
 				|| !InventoryUtils.testForItemWithName(item, CONFIGURED.content())) {
@@ -158,7 +171,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		if (lore == null) {
 			return;
 		}
-		Map<String, Integer> targetSkills = new HashMap<String, Integer>();
+		Map<String, Integer> targetSkills = new HashMap<>();
 		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
 		Integer totalSpec = ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
 
@@ -176,18 +189,10 @@ public class YellowTesseractOverride extends BaseOverride {
 				targetSkills.put(str.substring(PREFIX.length(), str.indexOf(" : ")), level);
 			} else if (str.startsWith(CLASSL_STR)) {
 				Integer classLevel = Integer.parseInt(str.substring(CLASSL_STR.length()));
-				if (totalLevel != null && classLevel != null) {
-					ScoreboardUtils.setScoreboardValue(player, LEVEL, totalLevel - classLevel);
-				} else {
-					ScoreboardUtils.setScoreboardValue(player, LEVEL, 0);
-				}
+				ScoreboardUtils.setScoreboardValue(player, LEVEL, totalLevel - classLevel);
 			} else if (str.startsWith(SPECL_STR)) {
 				Integer specLevel = Integer.parseInt(str.substring(SPECL_STR.length()));
-				if (totalSpec != null && specLevel != null) {
-					ScoreboardUtils.setScoreboardValue(player, SPEC_LEVEL, totalSpec - specLevel);
-				} else {
-					ScoreboardUtils.setScoreboardValue(player, SPEC_LEVEL, 0);
-				}
+				ScoreboardUtils.setScoreboardValue(player, SPEC_LEVEL, totalSpec - specLevel);
 			}
 		}
 
