@@ -53,7 +53,7 @@ public class DepthsWindWalk extends DepthsAbility {
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mTree = DepthsTree.WINDWALKER;
-		mDisplayMaterial = Material.QUARTZ;
+		mDisplayMaterial = Material.WHITE_DYE;
 
 	}
 
