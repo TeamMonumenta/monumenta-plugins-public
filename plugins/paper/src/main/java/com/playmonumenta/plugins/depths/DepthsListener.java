@@ -272,6 +272,10 @@ public class DepthsListener implements Listener {
 
 				}
 			}
+			if (dp.mOfflineTeleportLoc != null) {
+				player.teleport(dp.mOfflineTeleportLoc);
+				dp.mOfflineTeleportLoc = null;
+			}
 		}
 	}
 }

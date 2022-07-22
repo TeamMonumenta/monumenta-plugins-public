@@ -422,12 +422,13 @@ public class DepthsRoomRepository {
 					}
 				}
 			} else {
-				Location l = new Location(world, party.mFloorLobbyLoadPlayerTpPoint.getX(), party.mFloorLobbyLoadPlayerTpPoint.getY(), party.mFloorLobbyLoadPlayerTpPoint.getZ());
+				Location l = new Location(world, party.mFloorLobbyLoadPlayerTpPoint.getX(), party.mFloorLobbyLoadPlayerTpPoint.getY(), party.mFloorLobbyLoadPlayerTpPoint.getZ(), 270.0f, 0.0f);
 				//Tp all the players to it
 				for (DepthsPlayer dp : party.mPlayersInParty) {
 					Player p = Bukkit.getPlayer(dp.mPlayerId);
-					if (p != null) {
-						l.setYaw(270f);
+					if (p == null) {
+						dp.offlineTeleport(l);
+					} else {
 						p.teleport(l);
 						PotionUtils.applyPotion(Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 						p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Your party earned " + treasure + " treasure score for clearing floor " + party.getFloor() + "! Sending your party to next floor.");

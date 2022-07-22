@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -254,7 +256,7 @@ public class DepthsParty {
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
 			if (p != null) {
 				p.playSound(p.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.0f);
-				p.sendActionBar(ChatColor.GOLD + "" + score + " treasure score added to loot room!");
+				p.sendActionBar(Component.text("" + score + " treasure score added to loot room!", NamedTextColor.GOLD));
 			}
 		}
 
@@ -365,14 +367,14 @@ public class DepthsParty {
 		for (DepthsPlayer dp : mPlayersInParty) {
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
 			if (p != null) {
-				Bukkit.getPlayer(dp.mPlayerId).sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Spawned new " + DepthsUtils.roomString(room.mRoomType) + " room!");
+				p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Spawned new " + DepthsUtils.roomString(room.mRoomType) + " room!");
 			}
 		}
 
 		mBeatBoss = false;
 	}
 
-	//Spawns the reward chest in the given location- needs a 1s delay to not be overwritten
+	//Spawns the reward chest in the given location - needs a 1s delay to not be overwritten
 	//By spawner break event
 	public static class PlaceChest extends BukkitRunnable {
 

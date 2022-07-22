@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import javax.annotation.Nullable;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class DepthsPlayer {
@@ -18,7 +20,7 @@ public class DepthsPlayer {
 	//Unique identifier for the player
 	public UUID mPlayerId;
 	//A map containing all abilities the player has and their current rarity
-	public Map<String, Integer> mAbilities = new HashMap<>();
+	public Map<String, Integer> mAbilities;
 	//Unique identifier, mapping to an active depths party object
 	public long mPartyNum;
 	//The depths ability trees the player is eligible to select from this run
@@ -39,6 +41,8 @@ public class DepthsPlayer {
 	public Queue<DepthsRewardType> mEarnedRewards;
 	//The room on which the player died. -1 if the player has not died
 	public int mDeathRoom;
+	//The location to teleport offline players to; null if no teleport is required on login
+	public @Nullable Location mOfflineTeleportLoc = null;
 
 	public DepthsPlayer(Player p) {
 		mPlayerId = p.getUniqueId();
@@ -154,4 +158,10 @@ public class DepthsPlayer {
 		return mDeathRoom >= 0;
 	}
 
+	public void offlineTeleport(Location location) {
+		if (hasDied()) {
+			return;
+		}
+		mOfflineTeleportLoc = location;
+	}
 }

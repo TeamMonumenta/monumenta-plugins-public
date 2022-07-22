@@ -1413,16 +1413,22 @@ public class DepthsManager {
 	public void startBossFight(Player p, Location l) {
 		//Check the player is in the system
 		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
-		if (dp == null || getPartyFromId(dp) == null) {
+		DepthsParty depthsParty = null;
+		if (dp != null) {
+			depthsParty = getPartyFromId(dp);
+		}
+		if (depthsParty == null) {
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
 			return;
 		}
 		//Teleport all players in party to the player activating the fight
-		for (DepthsPlayer dpInParty : getPartyFromId(dp).mPlayersInParty) {
+		for (DepthsPlayer dpInParty : depthsParty.mPlayersInParty) {
 			try {
 				if (dpInParty != dp) {
 					Player playerToTp = Bukkit.getPlayer(dpInParty.mPlayerId);
-					if (playerToTp.getLocation().distance(l) > 20) {
+					if (playerToTp == null) {
+						dpInParty.offlineTeleport(playerToTp.getLocation());
+					} else if (playerToTp.getLocation().distance(l) > 20) {
 						playerToTp.teleport(p);
 					}
 				}
@@ -1435,10 +1441,10 @@ public class DepthsManager {
 		//Spawn boss depending on which floor we're on
 		final String losName;
 		final String bossTag;
-		if (getPartyFromId(dp).getFloor() % 3 == 1) {
+		if (depthsParty.getFloor() % 3 == 1) {
 			losName = HEDERA_LOS;
 			bossTag = "boss_hedera";
-		} else if (getPartyFromId(dp).getFloor() % 3 == 2) {
+		} else if (depthsParty.getFloor() % 3 == 2) {
 			losName = DAVEY_LOS;
 			bossTag = "boss_davey";
 		} else {
@@ -1448,7 +1454,7 @@ public class DepthsManager {
 
 		try {
 			Entity entity = LibraryOfSoulsIntegration.summon(l, losName);
-			if (entity != null && entity instanceof LivingEntity) {
+			if (entity instanceof LivingEntity) {
 				BossManager.createBoss(null, (LivingEntity)entity, bossTag, l.clone().add(0, -2, 0));
 			} else {
 				Plugin.getInstance().getLogger().severe("Failed to summon depths boss " + bossTag);
@@ -1542,7 +1548,7 @@ public class DepthsManager {
 		}
 
 		Collections.shuffle(abilities);
-		if (abilities.get(0).getDisplayName().equals(currentAbility) && abilities.size() > 1) {
+		if (currentAbility.equals(abilities.get(0).getDisplayName()) && abilities.size() > 1) {
 			setPlayerLevelInAbility(abilities.get(1).getDisplayName(), p, 1);
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + abilities.get(1).getDisplayName() + " at " + DepthsUtils.getRarityText(1) + " level!");
 		} else if (abilities.size() > 0) {
@@ -1559,10 +1565,14 @@ public class DepthsManager {
 	 */
 	public void setRoomDebug(Player player, int number) {
 		DepthsPlayer dp = mPlayers.get(player.getUniqueId());
-		if (dp == null || getPartyFromId(dp) == null) {
+		DepthsParty depthsParty = null;
+		if (dp != null) {
+			depthsParty = getPartyFromId(dp);
+		}
+		if (depthsParty == null) {
 			player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
 			return;
 		}
-		getPartyFromId(dp).mRoomNumber = number;
+		depthsParty.mRoomNumber = number;
 	}
 }

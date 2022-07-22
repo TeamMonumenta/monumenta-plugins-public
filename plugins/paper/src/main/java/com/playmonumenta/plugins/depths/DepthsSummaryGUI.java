@@ -139,8 +139,8 @@ public class DepthsSummaryGUI extends CustomInventory {
 			rewardMeta.displayName(Component.text("All Room Rewards Claimed!", NamedTextColor.YELLOW)
 				.decoration(TextDecoration.ITALIC, false));
 			rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			ItemUtils.setPlainName(rewardItem, "All Room Rewards Claimed!");
 			rewardItem.setItemMeta(rewardMeta);
+			ItemUtils.setPlainName(rewardItem, "All Room Rewards Claimed!");
 		}
 		mInventory.setItem(REWARD_LOCATION, rewardItem);
 
@@ -179,6 +179,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 					.decoration(TextDecoration.ITALIC, false));
 			boxMeta.lore(lore);
 			mysteryBox.setItemMeta(boxMeta);
+			ItemUtils.setPlainName(mysteryBox, "Obtain a random ability.");
 			mInventory.setItem(9, mysteryBox);
 		}
 
@@ -202,6 +203,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 						noAbilityMeta.displayName(Component.text(data.mString, NamedTextColor.RED)
 								.decoration(TextDecoration.ITALIC, false));
 						noAbility.setItemMeta(noAbilityMeta);
+						ItemUtils.setPlainName(noAbility, data.mString);
 						mInventory.setItem(i, noAbility);
 					}
 				}
@@ -226,6 +228,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 						.decoration(TextDecoration.ITALIC, false));
 					GUIUtils.splitLoreLine(activeMeta, "Currently Shown", 30, ChatColor.GRAY, true);
 					activePlayerIndicator.setItemMeta(activeMeta);
+					ItemUtils.setPlainName(activePlayerIndicator);
 					mInventory.setItem(HEAD_LOCATIONS.get(i), activePlayerIndicator);
 
 					ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
@@ -234,6 +237,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 					meta.displayName(Component.text(actualPlayer.getName() + "'s Abilities", NamedTextColor.YELLOW)
 						.decoration(TextDecoration.ITALIC, false));
 					playerHead.setItemMeta(meta);
+					ItemUtils.setPlainName(playerHead);
 					mInventory.setItem(4, playerHead);
 				} else {
 					ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
@@ -242,6 +246,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 					meta.displayName(Component.text(actualPlayer.getName() + "'s Abilities", NamedTextColor.YELLOW)
 						.decoration(TextDecoration.ITALIC, false));
 					playerHead.setItemMeta(meta);
+					ItemUtils.setPlainName(playerHead);
 					mInventory.setItem(HEAD_LOCATIONS.get(i), playerHead);
 				}
 			}

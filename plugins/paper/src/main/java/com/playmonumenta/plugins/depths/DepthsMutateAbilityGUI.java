@@ -136,7 +136,7 @@ public class DepthsMutateAbilityGUI extends CustomInventory {
 		for (DepthsAbilityItem item : items) {
 			if (item.mTrigger != DepthsTrigger.PASSIVE) {
 				for (TriggerData data : TRIGGER_STRINGS) {
-					if (data.mTrigger == item.mTrigger) {
+					if (data.mTrigger.equals(item.mTrigger)) {
 						mInventory.setItem(data.mInvLocation, item.mItem);
 						break;
 					}
@@ -154,6 +154,7 @@ public class DepthsMutateAbilityGUI extends CustomInventory {
 						noAbilityMeta.displayName(Component.text(data.mString, NamedTextColor.RED)
 								.decoration(TextDecoration.ITALIC, false));
 						noAbility.setItemMeta(noAbilityMeta);
+						ItemUtils.setPlainName(noAbility, data.mString);
 						mInventory.setItem(i, noAbility);
 					}
 				}
