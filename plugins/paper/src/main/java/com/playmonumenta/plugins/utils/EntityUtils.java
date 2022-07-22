@@ -384,7 +384,7 @@ public class EntityUtils {
 			bz = b.getZ();
 
 			//  If we want to check Line of sight we want to make sure that the blocks are transparent.
-			if (checkLos && LocationUtils.isLosBlockingBlock(b.getType())) {
+			if (checkLos && BlockUtils.isLosBlockingBlock(b.getType())) {
 				break;
 			}
 

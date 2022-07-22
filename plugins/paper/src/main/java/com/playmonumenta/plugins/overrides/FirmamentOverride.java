@@ -87,7 +87,7 @@ public class FirmamentOverride extends BaseOverride {
 
 	private boolean placeBlock(Player player, ItemStack item, BlockPlaceEvent event) {
 		if (!isFirmamentItem(item)) {
-			//Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe - hopefully other shulkers with lore wont get placed
+			// Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe - hopefully other shulkers with lore won't get placed
 			// Check permission to enable placing shulkers, just so this can be turned off via perms if needed
 			return player.hasPermission(CAN_PLACE_SHULKER_PERM);
 		}

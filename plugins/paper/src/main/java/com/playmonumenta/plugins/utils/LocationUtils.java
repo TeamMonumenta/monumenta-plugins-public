@@ -13,9 +13,6 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Rail;
-import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BlockIterator;
@@ -39,48 +36,39 @@ public class LocationUtils {
 		return e.getLocation().add(0, e.getHeight() / 2, 0);
 	}
 
+	@Deprecated
 	public static boolean isLosBlockingBlock(Material mat) {
-		return mat.isOccluding();
+		return BlockUtils.isLosBlockingBlock(mat);
 	}
 
+	@Deprecated
 	public static boolean isPathBlockingBlock(Material mat) {
-		return mat.isSolid() || mat.equals(Material.LAVA);
+		return BlockUtils.isPathBlockingBlock(mat);
 	}
 
+	@Deprecated
 	public static boolean isWaterlogged(Block block) {
-		BlockData data = block.getBlockData();
-		if (data instanceof Waterlogged) {
-			return ((Waterlogged)data).isWaterlogged();
-		}
-		return false;
+		return BlockUtils.isWaterlogged(block);
 	}
 
+	@Deprecated
 	public static boolean containsWater(Block block) {
-		if (isWaterlogged(block)) {
-			return true;
-		}
-		Material mat = block.getType();
-		return mat.equals(Material.BUBBLE_COLUMN) ||
-			mat.equals(Material.WATER) ||
-			mat.equals(Material.KELP) ||
-			mat.equals(Material.KELP_PLANT) ||
-			mat.equals(Material.SEAGRASS) ||
-			mat.equals(Material.TALL_SEAGRASS);
+		return BlockUtils.containsWater(block);
 	}
 
+	@Deprecated
 	public static boolean isRail(Block block) {
-		BlockData data = block.getBlockData();
-		return data instanceof Rail;
+		return BlockUtils.isRail(block);
 	}
 
 	public static boolean isValidMinecartLocation(Location loc) {
 		Block block = loc.getBlock();
-		if (isRail(block)) {
+		if (BlockUtils.isRail(block)) {
 			return true;
 		}
 
 		block = loc.subtract(0, 1, 0).getBlock();
-		if (isRail(block)) {
+		if (BlockUtils.isRail(block)) {
 			return true;
 		}
 
@@ -92,7 +80,7 @@ public class LocationUtils {
 		for (int i = loc.getBlockY(); i > Math.max(0, loc.getBlockY() - 50); i--) {
 			loc.setY(i);
 			block = loc.getBlock();
-			if (isRail(block)) {
+			if (BlockUtils.isRail(block)) {
 				return true;
 			} else if (!block.isEmpty()) {
 				return false;
@@ -104,7 +92,7 @@ public class LocationUtils {
 
 	public static boolean isLocationInWater(Location loc) {
 		Block block = loc.getBlock();
-		return block.getType() == Material.WATER || containsWater(block);
+		return block.getType() == Material.WATER || BlockUtils.containsWater(block);
 	}
 
 	public static boolean isValidBoatLocation(Location loc) {
@@ -117,7 +105,7 @@ public class LocationUtils {
 		for (int i = 0; i < 50; i++) {
 			Block block = loc.getBlock();
 			if (block.isLiquid()
-				    || containsWater(block)
+				    || BlockUtils.containsWater(block)
 				    || block.getType() == Material.ICE
 				    || block.getType() == Material.BLUE_ICE
 				    || block.getType() == Material.PACKED_ICE
@@ -152,7 +140,7 @@ public class LocationUtils {
 
 				// If block is occluding (shouldn't include transparent blocks, liquids etc.),
 				// line of sight is broken, return false
-				if (LocationUtils.isLosBlockingBlock(b.getType())) {
+				if (BlockUtils.isLosBlockingBlock(b.getType())) {
 					return false;
 				}
 			}
