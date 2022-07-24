@@ -272,6 +272,7 @@ public class DepthsListener implements Listener {
 
 				}
 			}
+			dp.doOfflineTeleport();
 		}
 	}
 }
