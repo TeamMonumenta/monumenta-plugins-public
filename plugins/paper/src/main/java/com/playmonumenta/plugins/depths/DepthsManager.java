@@ -1427,7 +1427,7 @@ public class DepthsManager {
 				if (dpInParty != dp) {
 					Player playerToTp = Bukkit.getPlayer(dpInParty.mPlayerId);
 					if (playerToTp == null) {
-						dpInParty.offlineTeleport(playerToTp.getLocation());
+						dpInParty.offlineTeleport(p.getLocation());
 					} else if (playerToTp.getLocation().distance(l) > 20) {
 						playerToTp.teleport(p);
 					}

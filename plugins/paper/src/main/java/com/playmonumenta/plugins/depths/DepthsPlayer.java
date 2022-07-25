@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 public class DepthsPlayer {
 
@@ -52,7 +53,9 @@ public class DepthsPlayer {
 	public int mDeathRoom;
 	//The location to teleport offline players to; null if no teleport is required on login - DO NOT REFERENCE WORLD
 	private String mOfflineTeleportWorld = "";
-	private @Nullable Location mOfflineTeleportLoc = null;
+	private @Nullable Vector mOfflineTeleportLoc = null;
+	private @Nullable Float mOfflineTeleportYaw = null;
+	private @Nullable Float mOfflineTeleportPitch = null;
 
 	/*
 	 * !!!! WARNING !!!!
@@ -183,7 +186,9 @@ public class DepthsPlayer {
 		// DO NOT STORE A REFERENCE TO A WORLD
 		mOfflineTeleportWorld = location.getWorld().getName();
 		location.setWorld(null);
-		mOfflineTeleportLoc = location;
+		mOfflineTeleportLoc = location.toVector();
+		mOfflineTeleportYaw = location.getYaw();
+		mOfflineTeleportPitch = location.getPitch();
 	}
 
 	public void doOfflineTeleport() {
@@ -201,10 +206,24 @@ public class DepthsPlayer {
 			world = player.getWorld();
 		}
 
-		Location location = mOfflineTeleportLoc.clone();
+		if (mOfflineTeleportYaw == null) {
+			mOfflineTeleportYaw = 0.0f;
+		}
+		if (mOfflineTeleportPitch == null) {
+			mOfflineTeleportPitch = 0.0f;
+		}
+
+		Location location = new Location(world,
+			mOfflineTeleportLoc.getX(),
+			mOfflineTeleportLoc.getY(),
+			mOfflineTeleportLoc.getZ(),
+			mOfflineTeleportYaw,
+			mOfflineTeleportPitch);
 		location.setWorld(world);
 		player.teleport(location);
 		mOfflineTeleportWorld = "";
 		mOfflineTeleportLoc = null;
+		mOfflineTeleportYaw = null;
+		mOfflineTeleportPitch = null;
 	}
 }
