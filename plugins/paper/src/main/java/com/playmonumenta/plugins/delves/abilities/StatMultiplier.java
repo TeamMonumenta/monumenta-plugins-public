@@ -31,6 +31,7 @@ public class StatMultiplier {
 
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.4;
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
+	public static final double DELVE_MOB_STAT_MULTIPLIER_R3 = 1.5;
 
 	static {
 		STAT_COMPENSATION_MAPPINGS.put("white", 1.7);
@@ -116,7 +117,7 @@ public class StatMultiplier {
 
 		//stat
 		double healthMulti = DelvesUtils.isDelveMob(mob) ?
-			                    getHealthMultiplier(level) * (ServerProperties.getClassSpecializationsEnabled() ? DELVE_MOB_STAT_MULTIPLIER_R2 : DELVE_MOB_STAT_MULTIPLIER_R1) :
+			                    getHealthMultiplier(level) * (ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? DELVE_MOB_STAT_MULTIPLIER_R3 : DELVE_MOB_STAT_MULTIPLIER_R2) : DELVE_MOB_STAT_MULTIPLIER_R1) :
 			                    getHealthMultiplier(level) * statCompensation;
 
 		EntityUtils.scaleMaxHealth(mob, healthMulti - 1, HEALTH_MODIFIER_NAME);
