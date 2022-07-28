@@ -21,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class CharmsGUI extends CustomInventory {
-	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<Integer>(Arrays.asList(45, 48, 50, 53));
 	private static final int START_OF_CHARMS = 45;
 	private static final int EXIT_BUTTON_LOC = 53;
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;

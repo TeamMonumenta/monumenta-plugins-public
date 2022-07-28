@@ -153,7 +153,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
 public class CharmManager {
 
@@ -848,8 +847,8 @@ public class CharmManager {
 		//Loop through charms for onhit effects
 		Multimap<ClassAbility, Effect> abilityEffects = ArrayListMultimap.create();
 		for (ItemStack item : equippedCharms) {
-			@NotNull List<@NotNull String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(item));
-			for (@NotNull String plainLore : plainLoreLines) {
+			List<String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(item));
+			for (String plainLore : plainLoreLines) {
 				if (plainLore.contains("Hit :")) {
 					ClassAbility classAbility = null;
 					//Step one- get the class ability
@@ -903,8 +902,8 @@ public class CharmManager {
 
 	//Helper method to parse item for charm effects
 	private CharmParsedInfo getPlayerItemLevel(ItemStack itemStack, String effect) {
-		@NotNull List<@NotNull String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(itemStack));
-		for (@NotNull String plainLore : plainLoreLines) {
+		List<String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(itemStack));
+		for (String plainLore : plainLoreLines) {
 			if (plainLore.contains(effect)) {
 				double value = parseValue(plainLore);
 				if (plainLore.contains("%")) {
@@ -992,8 +991,8 @@ public class CharmManager {
 			List<String> effectsAlreadyAdded = new ArrayList<>();
 			if (playerCharms != null) {
 				for (ItemStack charm : playerCharms) {
-					@NotNull List<@NotNull String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(charm));
-					for (@NotNull String plainLore : plainLoreLines) {
+					List<String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(charm));
+					for (String plainLore : plainLoreLines) {
 						if (plainLore.contains("Hit :") && !effectsAlreadyAdded.contains(plainLore)) {
 							summary += plainLore + "\n";
 							effectsAlreadyAdded.add(plainLore);
@@ -1008,43 +1007,61 @@ public class CharmManager {
 
 	public List<Component> getSummaryOfAllAttributesAsComponents(Player p) {
 		Map<String, Double> allEffects = mPlayerCharmEffectMap.get(p.getUniqueId());
-		if (allEffects != null) {
-			List<Component> components = new ArrayList<>();
-			for (String s : allEffects.keySet()) {
-				if (allEffects.get(s) != 0) {
-					if (s.contains("%")) {
-						if ((allEffects.get(s) > 0 && !s.contains("Cooldown")) || (allEffects.get(s) < 0 && s.contains("Cooldown"))) {
-							components.add(Component.text(s + " : " + allEffects.get(s).toString() + "%", TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false));
-						} else {
-							components.add(Component.text(s + " : " + allEffects.get(s).toString() + "%", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false));
-						}
-					} else {
-						if ((allEffects.get(s) > 0 && !s.contains("Cooldown")) || (allEffects.get(s) > 0 && s.contains("Cooldown"))) {
-							components.add(Component.text(s + " : " + allEffects.get(s).toString(), TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false));
-						} else {
-							components.add(Component.text(s + " : " + allEffects.get(s).toString(), TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false));
-						}
-					}
-				}
-			}
-			//Now add the custom charm effects
-			List<ItemStack> playerCharms = CharmManager.getInstance().mPlayerCharms.get(p.getUniqueId());
-			List<String> effectsAlreadyAdded = new ArrayList<>();
 
-			if (playerCharms != null) {
-				for (ItemStack charm : playerCharms) {
-					@NotNull List<@NotNull String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(charm));
-					for (@NotNull String plainLore : plainLoreLines) {
-						if (plainLore.contains("Hit :") && !effectsAlreadyAdded.contains(plainLore)) {
-							components.add(Component.text(plainLore, TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false));
-							effectsAlreadyAdded.add(plainLore);
-						}
+		//Sort the effects in the order in the manager list
+		List<String> orderedEffects = new ArrayList<>();
+		for (String effect : mCharmEffectList) {
+			if (allEffects.containsKey(effect)) {
+				orderedEffects.add(effect);
+			}
+
+			String percentEffect = effect + "%";
+			if (allEffects.containsKey(percentEffect)) {
+				orderedEffects.add(percentEffect);
+			}
+		}
+
+		List<Component> components = new ArrayList<>();
+		for (String s : orderedEffects) {
+			if (allEffects.get(s) != 0) {
+
+				// Strip ugly .0s
+				String desc = s + " : " + allEffects.get(s).toString();
+				if (desc.endsWith(".0")) {
+					desc = desc.substring(0, desc.length() - 2);
+				}
+
+				if (s.contains("%")) {
+					if ((allEffects.get(s) > 0 && !s.contains("Cooldown")) || (allEffects.get(s) < 0 && s.contains("Cooldown"))) {
+						components.add(Component.text(desc + "%", TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false));
+					} else {
+						components.add(Component.text(desc + "%", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false));
+					}
+				} else {
+					if ((allEffects.get(s) > 0 && !s.contains("Cooldown")) || (allEffects.get(s) > 0 && s.contains("Cooldown"))) {
+						components.add(Component.text(desc, TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false));
+					} else {
+						components.add(Component.text(desc, TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false));
 					}
 				}
 			}
-			return components;
 		}
-		return null;
+		//Now add the custom charm effects
+		List<ItemStack> playerCharms = CharmManager.getInstance().mPlayerCharms.get(p.getUniqueId());
+		List<String> effectsAlreadyAdded = new ArrayList<>();
+
+		if (playerCharms != null) {
+			for (ItemStack charm : playerCharms) {
+				List<String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(charm));
+				for (String plainLore : plainLoreLines) {
+					if (plainLore.contains("Hit :") && !effectsAlreadyAdded.contains(plainLore)) {
+						components.add(Component.text(plainLore, TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false));
+						effectsAlreadyAdded.add(plainLore);
+					}
+				}
+			}
+		}
+		return components;
 	}
 
 	public String getSummaryOfCharmNames(Player p) {
@@ -1110,9 +1127,7 @@ public class CharmManager {
 
 				JsonObject charmData = new JsonObject();
 				charmData.addProperty(KEY_ITEM, NBTItem.convertItemtoNBT(charm).toString());
-				if (charmData != null) {
-					charmArray.add(charmData);
-				}
+				charmArray.add(charmData);
 			}
 			event.setPluginData(KEY_PLUGIN_DATA, data);
 		}

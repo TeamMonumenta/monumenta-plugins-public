@@ -128,6 +128,14 @@ public class CharmsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("gui"));
+
+		new CommandAPICommand("charm")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				new CharmsGUI(player).openInventory(player, plugin);
+			}).register();
+
 		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
 
 		new CommandAPICommand("charm")
