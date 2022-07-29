@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -118,32 +119,32 @@ import org.spigotmc.event.entity.EntityDismountEvent;
 
 public class EntityListener implements Listener {
 	private static final Set<Material> ENTITY_UNINTERACTABLE_MATS = EnumSet.of(
-	            Material.TRIPWIRE,
-	            Material.TRIPWIRE_HOOK,
-	            Material.OAK_PRESSURE_PLATE,
-	            Material.ACACIA_PRESSURE_PLATE,
-	            Material.BIRCH_PRESSURE_PLATE,
-	            Material.DARK_OAK_PRESSURE_PLATE,
-	            Material.JUNGLE_PRESSURE_PLATE,
-	            Material.SPRUCE_PRESSURE_PLATE,
-	            Material.STONE_PRESSURE_PLATE,
-	            Material.LIGHT_WEIGHTED_PRESSURE_PLATE,
-	            Material.HEAVY_WEIGHTED_PRESSURE_PLATE
-	        );
+		Material.TRIPWIRE,
+		Material.TRIPWIRE_HOOK,
+		Material.OAK_PRESSURE_PLATE,
+		Material.ACACIA_PRESSURE_PLATE,
+		Material.BIRCH_PRESSURE_PLATE,
+		Material.DARK_OAK_PRESSURE_PLATE,
+		Material.JUNGLE_PRESSURE_PLATE,
+		Material.SPRUCE_PRESSURE_PLATE,
+		Material.STONE_PRESSURE_PLATE,
+		Material.LIGHT_WEIGHTED_PRESSURE_PLATE,
+		Material.HEAVY_WEIGHTED_PRESSURE_PLATE
+	);
 
 	public static final Set<DamageCause> DAMAGE_CAUSES_IGNORED_IN_TOWNS = EnumSet.of(
-	            DamageCause.FALL,
-	            DamageCause.FALLING_BLOCK,
-	            DamageCause.FIRE,
-	            DamageCause.FIRE_TICK,
-	            DamageCause.FLY_INTO_WALL,
-	            DamageCause.MAGIC,
-	            DamageCause.POISON,
-	            DamageCause.PROJECTILE,
-	            DamageCause.STARVATION,
-	            DamageCause.THORNS,
-	            DamageCause.WITHER
-	        );
+		DamageCause.FALL,
+		DamageCause.FALLING_BLOCK,
+		DamageCause.FIRE,
+		DamageCause.FIRE_TICK,
+		DamageCause.FLY_INTO_WALL,
+		DamageCause.MAGIC,
+		DamageCause.POISON,
+		DamageCause.PROJECTILE,
+		DamageCause.STARVATION,
+		DamageCause.THORNS,
+		DamageCause.WITHER
+	);
 
 	public static final EnumSet<EntityType> PLOT_ANIMALS = EnumSet.of(
 		EntityType.CAT,
@@ -193,7 +194,7 @@ public class EntityListener implements Listener {
 		// Only mark mobs that were not already burning
 		if ((combuster instanceof Player) && (combustee.getFireTicks() <= 0)) {
 			MetadataUtils.checkOnceThisTick(mPlugin, combustee,
-			                                Constants.ENTITY_COMBUST_NONCE_METAKEY);
+				Constants.ENTITY_COMBUST_NONCE_METAKEY);
 		}
 
 		if ((combuster instanceof Player) && (combustee.getFireTicks() > 0)) {
@@ -207,7 +208,7 @@ public class EntityListener implements Listener {
 		}
 
 		if ((combustee instanceof Player)) {
-			Player player = (Player)combustee;
+			Player player = (Player) combustee;
 
 			if (!mAbilities.playerCombustByEntityEvent(player, event)) {
 				event.setCancelled(true);
@@ -324,8 +325,8 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 			}
 			if (!event.isCancelled()
-				    && damagee instanceof ItemFrame frame
-				    && INVISIBLE_ITEM_FRAME_NAME.equals(damagee.getCustomName())) {
+				&& damagee instanceof ItemFrame frame
+				&& INVISIBLE_ITEM_FRAME_NAME.equals(damagee.getCustomName())) {
 				Bukkit.getScheduler().runTask(mPlugin, () -> {
 					if (frame.isValid()) {
 						new NBTEntity(frame).setBoolean("Invisible", !ItemUtils.isNullOrAir(frame.getItem()));
@@ -353,9 +354,9 @@ public class EntityListener implements Listener {
 				for (double y = -0.5; y <= 0.5; y += 1) {
 					for (double x = -0.5; x <= 0.5; x += 1) {
 						for (double z = -0.5; z <= 0.5; z += 1) {
-							final int ny = (int)Math.floor(playerLoc.getY() + y * 0.1f + (float)player.getEyeHeight());
-							final int nx = (int)Math.floor(playerLoc.getX() + x * 0.48f);
-							final int nz = (int)Math.floor(playerLoc.getZ() + z * 0.48f);
+							final int ny = (int) Math.floor(playerLoc.getY() + y * 0.1f + (float) player.getEyeHeight());
+							final int nx = (int) Math.floor(playerLoc.getX() + x * 0.48f);
+							final int nz = (int) Math.floor(playerLoc.getZ() + z * 0.48f);
 
 							Material type = player.getWorld().getBlockAt(new Location(world, nx, ny, nz)).getType();
 							if (type == Material.BEDROCK) {
@@ -490,13 +491,13 @@ public class EntityListener implements Listener {
 			// TODO: change the infinity stuff to lowest priority listener, and cancel and re-call the event so that other listeners can catch the proper event
 
 			if (event.getEntityType() == EntityType.SNOWBALL) {
-				Snowball origBall = (Snowball)proj;
+				Snowball origBall = (Snowball) proj;
 				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
 
 				// Check if the player has an infinity snowball
 				if (itemInMainHand.getType().equals(Material.SNOWBALL)
-						&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
-					Snowball newBall = (Snowball)origBall.getWorld().spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
+					&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
+					Snowball newBall = (Snowball) origBall.getWorld().spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 
 					// Copy the item's name/etc so it can be textured
 					newBall.getItem().setItemMeta(itemInMainHand.getItemMeta());
@@ -509,13 +510,13 @@ public class EntityListener implements Listener {
 					return;
 				}
 			} else if (event.getEntityType() == EntityType.ENDER_PEARL) {
-				EnderPearl origPearl = (EnderPearl)proj;
+				EnderPearl origPearl = (EnderPearl) proj;
 				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
 
 				// Check if the player has an infinity ender pearl
 				if (itemInMainHand.getType().equals(Material.ENDER_PEARL)
-						&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
-					EnderPearl newPearl = (EnderPearl)origPearl.getWorld().spawnEntity(origPearl.getLocation(), EntityType.ENDER_PEARL);
+					&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
+					EnderPearl newPearl = (EnderPearl) origPearl.getWorld().spawnEntity(origPearl.getLocation(), EntityType.ENDER_PEARL);
 
 					// Copy the item's name/etc so it can be textured
 					newPearl.getItem().setItemMeta(itemInMainHand.getItemMeta());
@@ -541,22 +542,22 @@ public class EntityListener implements Listener {
 
 					if (potionItem.getType().equals(Material.SPLASH_POTION)
 						&& potionItem.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
-							ThrownPotion potionClone = (ThrownPotion)potion.getWorld().spawnEntity(potion.getLocation(), EntityType.SPLASH_POTION);
-							ItemStack newPotion = potionItem.clone();
-							if (newPotion.hasItemMeta() && newPotion.getItemMeta().hasLore()) {
-								List<Component> lore = newPotion.lore();
-								lore.removeIf((component) -> !MessagingUtils.plainText(component).contains("* Alchemical Utensil *"));
-								newPotion.lore(lore);
-							}
-							ItemUtils.setPlainTag(newPotion);
-
-							potionClone.setItem(newPotion);
-							potionClone.setShooter(player);
-							potionClone.setVelocity(potion.getVelocity());
-							//this potion should not have other metadata
-							event.setCancelled(true);
-							potion = potionClone;
+						ThrownPotion potionClone = (ThrownPotion) potion.getWorld().spawnEntity(potion.getLocation(), EntityType.SPLASH_POTION);
+						ItemStack newPotion = potionItem.clone();
+						if (newPotion.hasItemMeta() && newPotion.getItemMeta().hasLore()) {
+							List<Component> lore = newPotion.lore();
+							lore.removeIf((component) -> !MessagingUtils.plainText(component).contains("* Alchemical Utensil *"));
+							newPotion.lore(lore);
 						}
+						ItemUtils.setPlainTag(newPotion);
+
+						potionClone.setItem(newPotion);
+						potionClone.setShooter(player);
+						potionClone.setVelocity(potion.getVelocity());
+						//this potion should not have other metadata
+						event.setCancelled(true);
+						potion = potionClone;
+					}
 					if (potionItem.getType() == Material.SPLASH_POTION) {
 						if (!mAbilities.playerThrewSplashPotionEvent(player, potion)) {
 							event.setCancelled(true);
@@ -617,7 +618,7 @@ public class EntityListener implements Listener {
 		for (LivingEntity entity : affectedEntities) {
 			if (entity instanceof Player player) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, PotionUtils.getEffects(potion.getItem()),
-				                                 event.getIntensity(entity));
+					event.getIntensity(entity));
 			}
 		}
 
@@ -632,7 +633,7 @@ public class EntityListener implements Listener {
 			Collection<PotionEffect> appliedEffects = p.getActivePotionEffects();
 			for (PotionEffect pe : appliedEffects) {
 				if (pe.getType().equals(PotionEffectType.SLOW_FALLING) &&
-						p.getGameMode().equals(GameMode.ADVENTURE)) {
+					p.getGameMode().equals(GameMode.ADVENTURE)) {
 					//Remove Slow Falling effects in Adventure mode areas (#947)
 					p.sendMessage(ChatColor.RED + "You cannot apply slow falling potion effects in adventure mode areas, other effects were still applied.");
 					p.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
@@ -709,7 +710,7 @@ public class EntityListener implements Listener {
 
 			// If this block is "unbreakable" than we want to remove it from the list.
 			if (ServerProperties.getUnbreakableBlocks().contains(block.getType()) ||
-			    !mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
+				!mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
 				iter.remove();
 			}
 		}
@@ -736,7 +737,7 @@ public class EntityListener implements Listener {
 
 			// If this block is "unbreakable" then we want to remove it from the list.
 			if (ServerProperties.getUnbreakableBlocks().contains(block.getType()) ||
-			    !mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
+				!mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
 				iter.remove();
 			}
 		}
@@ -869,7 +870,7 @@ public class EntityListener implements Listener {
 
 		/* Mark as applying slowness so arcane strike won't activate this tick */
 		if (applier instanceof Player && !applied.hasPotionEffect(PotionEffectType.SLOW)
-		    && event.getEffect().getType().equals(PotionEffectType.SLOW)) {
+			&& event.getEffect().getType().equals(PotionEffectType.SLOW)) {
 			MetadataUtils.checkOnceThisTick(mPlugin, applied, Constants.ENTITY_SLOWED_NONCE_METAKEY);
 		}
 
@@ -983,18 +984,28 @@ public class EntityListener implements Listener {
 		} else if (event.getEntity() instanceof Vindicator vindicator) {
 			// Remove the bonus range Vindicators get when riding Ravagers
 			NmsUtils.getVersionAdapter().setAttackRange(vindicator, 1.43, 0);
+		} else if (event.getEntity().getScoreboardTags().contains("REMOVE_ON_UNLOAD") && event.getEntity().getTicksLived() > 20) {
+			// This is a jank fix to make sure entities that is supposed to be removed on unload, if it gets loaded (and isn't spawned this tick), remove it.
+			event.getEntity().remove();
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
+		if (event.getEntity().getScoreboardTags().contains("REMOVE_ON_UNLOAD")) {
+			event.getEntity().remove();
 		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void hangingBreakEvent(HangingBreakEvent event) {
 		if (event.getEntity() instanceof ItemFrame frame
-			    && INVISIBLE_ITEM_FRAME_NAME.equals(frame.getCustomName())
-			    && !(event instanceof HangingBreakByEntityEvent breakByEntityEvent && breakByEntityEvent.getRemover() instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
+			&& INVISIBLE_ITEM_FRAME_NAME.equals(frame.getCustomName())
+			&& !(event instanceof HangingBreakByEntityEvent breakByEntityEvent && breakByEntityEvent.getRemover() instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			frame.getWorld().dropItemNaturally(frame.getLocation(), InventoryUtils.getItemFromLootTable(frame, INVISIBLE_ITEM_FRAME_LOOT_TABLE));
 			if (!ItemUtils.isNullOrAir(frame.getItem())
-				    && frame.getItemDropChance() > FastUtils.RANDOM.nextFloat()) {
+				&& frame.getItemDropChance() > FastUtils.RANDOM.nextFloat()) {
 				frame.getWorld().dropItemNaturally(frame.getLocation(), frame.getItem());
 			}
 			frame.remove();
