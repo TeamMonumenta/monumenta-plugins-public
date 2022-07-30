@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 public class SwordAspect extends WeaponAspectDepthsAbility {
 
 	public static final String ABILITY_NAME = "Aspect of the Sword";
-	public static final double DAMAGE = 1.5;
+	public static final double DAMAGE = 2.5;
 
 	public SwordAspect(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -29,7 +29,7 @@ public class SwordAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "You deal 1.5 extra melee damage when holding a sword.";
+		return "You deal 2.5 extra melee damage when holding a sword.";
 	}
 }
 

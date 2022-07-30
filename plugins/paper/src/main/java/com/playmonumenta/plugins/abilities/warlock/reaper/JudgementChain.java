@@ -182,7 +182,7 @@ public class JudgementChain extends Ability {
 							applyEffects(m, true);
 						}
 					}
-					if (mTarget == null || mT >= mRunnableDuration || mPlayer.isDead() || (mTarget != null && (mTarget.isDead() || !mTarget.isValid()))) {
+					if (mTarget == null || mPlayer.isDead() || (mTarget != null && (mTarget.isDead() || !mTarget.isValid()))) {
 						this.cancel();
 						if (mTarget != null) {
 							breakChain(false, false);
@@ -190,7 +190,7 @@ public class JudgementChain extends Ability {
 							mChainActive = false;
 							ClientModHandler.updateAbility(mPlayer, JudgementChain.this);
 						}
-					} else if (l.distance(mTarget.getLocation()) > range) {
+					} else if (l.distance(mTarget.getLocation()) > range || mT >= mRunnableDuration) {
 						this.cancel();
 						breakChain(true, false);
 						mTarget = null;

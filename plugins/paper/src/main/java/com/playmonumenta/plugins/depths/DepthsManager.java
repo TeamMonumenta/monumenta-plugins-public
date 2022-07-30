@@ -79,6 +79,7 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.Sidearm;
 import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Aeromancy;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
+import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsWindWalk;
 import com.playmonumenta.plugins.depths.abilities.windwalker.GuardingBolt;
 import com.playmonumenta.plugins.depths.abilities.windwalker.HowlingWinds;
 import com.playmonumenta.plugins.depths.abilities.windwalker.LastBreath;
@@ -86,7 +87,6 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.OneWithTheWind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.RestoringDraft;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Slipstream;
-import com.playmonumenta.plugins.depths.abilities.windwalker.Updraft;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
@@ -428,6 +428,16 @@ public class DepthsManager {
 				Plugin.getInstance().getLogger().info("Error while attempting to set player depths ability");
 				e.printStackTrace();
 			}
+		} else {
+			for (DepthsPlayer otherPlayer : getPartyFromId(dp).mPlayersInParty) {
+				Player newPlayer = Bukkit.getPlayer(otherPlayer.mPlayerId);
+				if (newPlayer != null && !newPlayer.equals(p) && level == 1) {
+					newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has selected " + name + " as their aspect!");
+				} else if (newPlayer != null && !newPlayer.equals(p) && level == 2) {
+					// Aspect is being transformed from mystery box
+					newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has had their mystery box transform into " + name + "!");
+				}
+			}
 		}
 		AbilityManager.getManager().updatePlayerAbilities(p, false);
 	}
@@ -473,7 +483,7 @@ public class DepthsManager {
 			new RestoringDraft(plugin, null),
 			new Skyhook(plugin, null),
 			new Slipstream(plugin, null),
-			new Updraft(plugin, null),
+			new DepthsWindWalk(plugin, null),
 			new Whirlwind(plugin, null),
 
 			//Shadow abilities
@@ -1328,7 +1338,10 @@ public class DepthsManager {
 				if (player == null || !player.isOnline()) {
 					continue;
 				}
-
+				//Transform mystery box if applicable
+				if (getPlayerLevelInAbility(RandomAspect.ABILITY_NAME, player) > 0) {
+					transformMysteryBox(player);
+				}
 				//Set score
 				ScoreboardUtils.setScoreboardValue(player, "Depths", ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0) + 1);
 				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Depths");
@@ -1364,6 +1377,34 @@ public class DepthsManager {
 	}
 
 	/**
+	 * Transforms the mystery box aspect into a random other aspect after defeating floor 3
+	 * The level 2 denotes that it is being transformed rather than selected (the aspects are not leveled)
+	 * @param player the player to transform the ability of
+	 */
+	private void transformMysteryBox(Player player) {
+		setPlayerLevelInAbility(RandomAspect.ABILITY_NAME, player, 0);
+		switch (mRandom.nextInt(5)) {
+			case 0:
+				setPlayerLevelInAbility(SwordAspect.ABILITY_NAME, player, 2);
+				break;
+			case 1:
+				setPlayerLevelInAbility(AxeAspect.ABILITY_NAME, player, 2);
+				break;
+			case 2:
+				setPlayerLevelInAbility(ScytheAspect.ABILITY_NAME, player, 2);
+				break;
+			case 3:
+				setPlayerLevelInAbility(WandAspect.ABILITY_NAME, player, 2);
+				break;
+			case 4:
+				setPlayerLevelInAbility(BowAspect.ABILITY_NAME, player, 2);
+				break;
+			default:
+				return;
+		}
+	}
+
+	/**
 	 * This method starts a bossfight for the given player's party depending on their current floor
 	 * The bosses themselves will handle reading armor stands for cleaning up the arena
 	 * @param p player to get party of
@@ -1372,16 +1413,22 @@ public class DepthsManager {
 	public void startBossFight(Player p, Location l) {
 		//Check the player is in the system
 		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
-		if (dp == null || getPartyFromId(dp) == null) {
+		DepthsParty depthsParty = null;
+		if (dp != null) {
+			depthsParty = getPartyFromId(dp);
+		}
+		if (depthsParty == null) {
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
 			return;
 		}
 		//Teleport all players in party to the player activating the fight
-		for (DepthsPlayer dpInParty : getPartyFromId(dp).mPlayersInParty) {
+		for (DepthsPlayer dpInParty : depthsParty.mPlayersInParty) {
 			try {
 				if (dpInParty != dp) {
 					Player playerToTp = Bukkit.getPlayer(dpInParty.mPlayerId);
-					if (playerToTp.getLocation().distance(l) > 20) {
+					if (playerToTp == null) {
+						dpInParty.offlineTeleport(p.getLocation());
+					} else if (playerToTp.getLocation().distance(l) > 20) {
 						playerToTp.teleport(p);
 					}
 				}
@@ -1394,10 +1441,10 @@ public class DepthsManager {
 		//Spawn boss depending on which floor we're on
 		final String losName;
 		final String bossTag;
-		if (getPartyFromId(dp).getFloor() % 3 == 1) {
+		if (depthsParty.getFloor() % 3 == 1) {
 			losName = HEDERA_LOS;
 			bossTag = "boss_hedera";
-		} else if (getPartyFromId(dp).getFloor() % 3 == 2) {
+		} else if (depthsParty.getFloor() % 3 == 2) {
 			losName = DAVEY_LOS;
 			bossTag = "boss_davey";
 		} else {
@@ -1407,7 +1454,7 @@ public class DepthsManager {
 
 		try {
 			Entity entity = LibraryOfSoulsIntegration.summon(l, losName);
-			if (entity != null && entity instanceof LivingEntity) {
+			if (entity instanceof LivingEntity) {
 				BossManager.createBoss(null, (LivingEntity)entity, bossTag, l.clone().add(0, -2, 0));
 			} else {
 				Plugin.getInstance().getLogger().severe("Failed to summon depths boss " + bossTag);
@@ -1501,7 +1548,7 @@ public class DepthsManager {
 		}
 
 		Collections.shuffle(abilities);
-		if (abilities.get(0).getDisplayName().equals(currentAbility) && abilities.size() > 1) {
+		if (currentAbility.equals(abilities.get(0).getDisplayName()) && abilities.size() > 1) {
 			setPlayerLevelInAbility(abilities.get(1).getDisplayName(), p, 1);
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + abilities.get(1).getDisplayName() + " at " + DepthsUtils.getRarityText(1) + " level!");
 		} else if (abilities.size() > 0) {
@@ -1518,10 +1565,14 @@ public class DepthsManager {
 	 */
 	public void setRoomDebug(Player player, int number) {
 		DepthsPlayer dp = mPlayers.get(player.getUniqueId());
-		if (dp == null || getPartyFromId(dp) == null) {
+		DepthsParty depthsParty = null;
+		if (dp != null) {
+			depthsParty = getPartyFromId(dp);
+		}
+		if (depthsParty == null) {
 			player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
 			return;
 		}
-		getPartyFromId(dp).mRoomNumber = number;
+		depthsParty.mRoomNumber = number;
 	}
 }

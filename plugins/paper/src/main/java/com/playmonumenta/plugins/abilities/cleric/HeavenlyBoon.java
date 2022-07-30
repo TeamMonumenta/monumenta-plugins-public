@@ -87,6 +87,10 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			return false;
 		}
 
+		if (!(potion.getShooter() instanceof Player)) {
+			return true;
+		}
+
 		boolean hasPositiveEffects = PotionUtils.hasPositiveEffects(PotionUtils.getEffects(potion.getItem()));
 		if (PotionUtils.hasNegativeEffects(potion.getItem()) && !hasPositiveEffects) {
 			return true;

@@ -33,6 +33,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -73,18 +74,20 @@ public class PotionConsumeListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void drinkablePotionEvent(InventoryClickEvent event) {
 		HumanEntity whoClicked = event.getWhoClicked();
+		Inventory clickedInventory = event.getClickedInventory();
 		if (
 		    // Must be a left or right click
 		    !(event.getClick().equals(ClickType.LEFT) || event.getClick().equals(ClickType.RIGHT)) ||
 		    // Must be a player interacting with an inventory
 		    !(whoClicked instanceof Player player) ||
 		    player.getGameMode() == GameMode.SPECTATOR ||
-		    event.getClickedInventory() == null ||
+		    clickedInventory == null ||
+		    ((clickedInventory.getHolder() == null || clickedInventory.getHolder() instanceof Villager) && clickedInventory.getType() != InventoryType.ENDER_CHEST) ||
 		    // Must be a click on a drinkable potion or glass bottle in empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
 		    event.getCurrentItem() == null ||
 		    ItemStatUtils.isShattered(event.getCurrentItem()) ||
-			ZoneUtils.hasZoneProperty(whoClicked, ZoneProperty.NO_POTIONS) ||
+		    ZoneUtils.hasZoneProperty(whoClicked, ZoneProperty.NO_POTIONS) ||
 		    !(event.getCurrentItem().getType().equals(Material.POTION) ||
 		      event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE))
 		    ) {
@@ -258,6 +261,7 @@ public class PotionConsumeListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void throwablePotionEvent(InventoryClickEvent event) {
 		HumanEntity whoClicked = event.getWhoClicked();
+		Inventory clickedInventory = event.getClickedInventory();
 		if (
 		    // Must be a right click
 		    !event.getClick().equals(ClickType.RIGHT) ||
@@ -265,11 +269,12 @@ public class PotionConsumeListener implements Listener {
 		    // Must be a player interacting with their main inventory
 		    !(whoClicked instanceof Player player) ||
 		    player.getGameMode() == GameMode.SPECTATOR ||
-		    event.getClickedInventory() == null ||
+		    clickedInventory == null ||
+		    ((clickedInventory.getHolder() == null || clickedInventory.getHolder() instanceof Villager) && clickedInventory.getType() != InventoryType.ENDER_CHEST) ||
 		    // Must be a click on a shulker box with an empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
 		    event.getCurrentItem() == null ||
-			ItemStatUtils.isShattered(event.getCurrentItem()) ||
+		    ItemStatUtils.isShattered(event.getCurrentItem()) ||
 		    !(event.getCurrentItem().getType().equals(Material.SPLASH_POTION) ||
 		      event.getCurrentItem().getType().equals(Material.LINGERING_POTION))
 				) {

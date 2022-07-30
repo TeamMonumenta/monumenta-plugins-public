@@ -53,7 +53,7 @@ public class LastBreath extends DepthsAbility {
 		mWindAbilities.add(ClassAbility.GUARDING_BOLT);
 		mWindAbilities.add(ClassAbility.SKYHOOK);
 		mWindAbilities.add(ClassAbility.SLIPSTREAM);
-		mWindAbilities.add(ClassAbility.UPDRAFT);
+		mWindAbilities.add(ClassAbility.WIND_WALK);
 		mWindAbilities.add(ClassAbility.WHIRLWIND);
 		mWindAbilities.add(ClassAbility.HOWLINGWINDS);
 	}

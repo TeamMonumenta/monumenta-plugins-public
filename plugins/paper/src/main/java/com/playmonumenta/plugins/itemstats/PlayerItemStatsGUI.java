@@ -29,6 +29,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Tenacity;
 import com.playmonumenta.plugins.itemstats.infusions.Vigor;
 import com.playmonumenta.plugins.itemstats.infusions.Vitality;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
@@ -909,6 +910,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		ItemUtils.setPlainName(swapItem);
 		mInventory.setItem(SWAP_EQUIPMENT_SET_SLOT, swapItem);
 
+		if (ServerProperties.getClassSpecializationsEnabled()) {
+			mLeftStats.mPlayerItemStats.setRegion(ItemStatUtils.Region.ISLES);
+		}
 		mInventory.setItem(REGION_SETTING_SLOT, REGION_ICONS.get(mLeftStats.mPlayerItemStats.getRegion()));
 
 		for (StatItem statItem : STAT_ITEMS) {

@@ -20,9 +20,11 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -36,6 +38,7 @@ public class IceLance extends DepthsAbility {
 	private static final double AMPLIFIER = 0.2;
 	private static final int RANGE = 8;
 	private static final double HITBOX_SIZE = 0.75;
+	public static final int ICE_TICKS = 6 * 20;
 
 	public IceLance(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -81,6 +84,21 @@ public class IceLance extends DepthsAbility {
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f, true);
 					iter.remove();
 					mobs.remove(mob);
+					new BukkitRunnable() {
+
+						@Override
+						public void run() {
+							if (mob.isDead() || mob.getHealth() < 0) {
+								Location deathSpot = mob.getLocation().add(0, -1, 0);
+								DepthsUtils.iceExposedBlock(deathSpot.getBlock(), ICE_TICKS, mPlayer);
+								DepthsUtils.iceExposedBlock(deathSpot.getBlock().getRelative(BlockFace.NORTH), ICE_TICKS, mPlayer);
+								DepthsUtils.iceExposedBlock(deathSpot.getBlock().getRelative(BlockFace.SOUTH), ICE_TICKS, mPlayer);
+								DepthsUtils.iceExposedBlock(deathSpot.getBlock().getRelative(BlockFace.WEST), ICE_TICKS, mPlayer);
+								DepthsUtils.iceExposedBlock(deathSpot.getBlock().getRelative(BlockFace.EAST), ICE_TICKS, mPlayer);
+							}
+						}
+
+					}.runTaskLater(mPlugin, 1);
 				}
 			}
 		}
@@ -90,7 +108,7 @@ public class IceLance extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click to shoot an ice lance that travels " + RANGE + " blocks and pierces through mobs, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and applying " + (int) DepthsUtils.roundPercent(AMPLIFIER) + "% slowness and weaken for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click to shoot an ice lance that travels " + RANGE + " blocks and pierces through mobs, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and applying " + (int) DepthsUtils.roundPercent(AMPLIFIER) + "% slowness and weaken for " + DURATION / 20 + " seconds. If the lance kills a mob, the nearby area is frozen for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
@@ -204,6 +205,8 @@ public class ShulkerEquipmentListener implements Listener {
 			}
 		}
 
+		// Reset player's attack cooldown so it cannot be exploited by swapping from high to low cooldown items of the same type
+		PlayerUtils.resetAttackCooldown(player);
 	}
 
 	private void swapItem(Inventory from, Inventory to, int fromSlot, int toSlot) {

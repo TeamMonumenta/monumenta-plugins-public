@@ -175,7 +175,6 @@ public enum ClassAbility {
 	LAST_BREATH("Last Breath"),
 	SKYHOOK("Skyhook"),
 	SLIPSTREAM("Slipstream"),
-	UPDRAFT("Updraft"),
 	WHIRLWIND("Whirlwind"),
 	HOWLINGWINDS("Howling Winds"),
 

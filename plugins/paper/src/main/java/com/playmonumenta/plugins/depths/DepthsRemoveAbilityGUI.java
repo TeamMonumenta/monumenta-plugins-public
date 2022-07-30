@@ -185,6 +185,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 			GUIUtils.splitLoreLine(meta, lore, 30, defaultColor, true);
 		}
 		newItem.setItemMeta(meta);
+		ItemUtils.setPlainName(newItem, name);
 		return newItem;
 	}
 }

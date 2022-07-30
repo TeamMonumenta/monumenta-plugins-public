@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -324,8 +325,8 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 			}
 			if (!event.isCancelled()
-				    && damagee instanceof ItemFrame frame
-				    && INVISIBLE_ITEM_FRAME_NAME.equals(damagee.getCustomName())) {
+				&& damagee instanceof ItemFrame frame
+				&& INVISIBLE_ITEM_FRAME_NAME.equals(damagee.getCustomName())) {
 				Bukkit.getScheduler().runTask(mPlugin, () -> {
 					if (frame.isValid()) {
 						new NBTEntity(frame).setBoolean("Invisible", !ItemUtils.isNullOrAir(frame.getItem()));
@@ -990,6 +991,16 @@ public class EntityListener implements Listener {
 		} else if (event.getEntity() instanceof Vindicator vindicator) {
 			// Remove the bonus range Vindicators get when riding Ravagers
 			NmsUtils.getVersionAdapter().setAttackRange(vindicator, 1.43, 0);
+		} else if (event.getEntity().getScoreboardTags().contains("REMOVE_ON_UNLOAD") && event.getEntity().getTicksLived() > 20) {
+			// This is a jank fix to make sure entities that is supposed to be removed on unload, if it gets loaded (and isn't spawned this tick), remove it.
+			event.getEntity().remove();
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
+		if (event.getEntity().getScoreboardTags().contains("REMOVE_ON_UNLOAD")) {
+			event.getEntity().remove();
 		}
 	}
 
@@ -997,12 +1008,12 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void hangingBreakEvent(HangingBreakEvent event) {
 		if (event.getEntity() instanceof ItemFrame frame
-			    && INVISIBLE_ITEM_FRAME_NAME.equals(frame.getCustomName())
-			    && !(event instanceof HangingBreakByEntityEvent breakByEntityEvent && breakByEntityEvent.getRemover() instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
+			&& INVISIBLE_ITEM_FRAME_NAME.equals(frame.getCustomName())
+			&& !(event instanceof HangingBreakByEntityEvent breakByEntityEvent && breakByEntityEvent.getRemover() instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			frame.getWorld().dropItemNaturally(frame.getLocation(), InventoryUtils.getItemFromLootTable(frame, INVISIBLE_ITEM_FRAME_LOOT_TABLE));
 			if (!ItemUtils.isNullOrAir(frame.getItem())
-				    && frame.getItemDropChance() > FastUtils.RANDOM.nextFloat()) {
+				&& frame.getItemDropChance() > FastUtils.RANDOM.nextFloat()) {
 				frame.getWorld().dropItemNaturally(frame.getLocation(), frame.getItem());
 			}
 			frame.remove();

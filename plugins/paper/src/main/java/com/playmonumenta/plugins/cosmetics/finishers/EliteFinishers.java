@@ -16,6 +16,9 @@ public class EliteFinishers {
 			.put(VictoryThemeFinisher.NAME, new VictoryThemeFinisher())
 			.put(BirthdayThemeFinisher.NAME, new BirthdayThemeFinisher())
 			.put(CakeifyFinisher.NAME, new CakeifyFinisher())
+			.put(DefaultDanceFinisher.NAME, new DefaultDanceFinisher())
+			.put(USAFireworkFinisher.NAME, new USAFireworkFinisher())
+			.put(SplishSplashFinisher.NAME, new SplishSplashFinisher())
 			.build();
 
 	// Delegate based on elite finisher name

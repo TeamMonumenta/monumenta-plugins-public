@@ -165,7 +165,7 @@ public class Panacea extends Ability {
 					new PartialParticle(Particle.SPELL_INSTANT, mLoc, 5, 0.35, 0.35, 0.35, 1).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.SPELL_WITCH, mLoc, 5, 0.35, 0.35, 0.35, 1).spawnAsPlayerActive(mPlayer);
 
-					if (!mReverse && (!mLoc.isChunkLoaded() || LocationUtils.collidesWithSolid(mLoc, mLoc.getBlock()) || mTicks >= maxDuration)) {
+					if (!mReverse && (!mLoc.isChunkLoaded() || LocationUtils.collidesWithSolid(mLoc) || mTicks >= maxDuration)) {
 						mMobs = EntityUtils.getNearbyMobs(mLoc, (0.3 + moveSpeed) * maxDuration + 2, mPlayer);
 						mPlayers = PlayerUtils.otherPlayersInRange(mPlayer, (0.3 + moveSpeed) * maxDuration + 2, true);
 						mReverse = true;

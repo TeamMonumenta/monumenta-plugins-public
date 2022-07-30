@@ -5,9 +5,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -155,7 +155,7 @@ public class Twisted {
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			LivingEntity twistedMob = null;
-			boolean isWaterLoc = LocationUtils.containsWater(spawningLoc.getBlock());
+			boolean isWaterLoc = BlockUtils.containsWater(spawningLoc.getBlock());
 			String pool = isWaterLoc ? POOL_NAME_WATER : normalSummon ? POOL_NAME : POOL_NAME_NORMAL;
 			Map<Soul, Integer> mobsPool = LibraryOfSoulsIntegration.getPool(pool);
 			if (mobsPool != null) {

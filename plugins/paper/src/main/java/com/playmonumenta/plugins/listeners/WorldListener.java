@@ -4,19 +4,26 @@ import com.destroystokyo.paper.event.block.TNTPrimeEvent;
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
+import java.util.Set;
+import javax.annotation.Nullable;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.Bisected;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -25,6 +32,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDispenseArmorEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockFertilizeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -32,6 +40,7 @@ import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class WorldListener implements Listener {
@@ -173,6 +182,56 @@ public class WorldListener implements Listener {
 		if (event.getTargetEntity() instanceof Player) {
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, (Player) event.getTargetEntity(), event);
 		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockFertilizeEvent(BlockFertilizeEvent event) {
+		List<BlockState> modifiedBlocks = event.getBlocks();
+		Set<BlockState> blocksToRestore = new HashSet<>(modifiedBlocks.size());
+		for (BlockState modifiedBlock : modifiedBlocks) {
+			if (ZoneUtils.isInPlot(modifiedBlock.getLocation())) {
+				continue;
+			}
+			if (!BlockUtils.isWaterSource(modifiedBlock)) {
+				continue;
+			}
+			BlockState originalBlock = modifiedBlock.getBlock().getState();
+			if (BlockUtils.isWaterSource(originalBlock)) {
+				continue;
+			}
+			blocksToRestore.add(originalBlock);
+			boolean preserveBlockUnderneath = false;
+			if (modifiedBlock.getType().equals(Material.KELP)) {
+				preserveBlockUnderneath = true;
+			} else if (modifiedBlock.getBlockData() instanceof Bisected bisected) {
+				if (bisected.getHalf().equals(Bisected.Half.TOP)) {
+					preserveBlockUnderneath = true;
+				}
+			}
+			if (preserveBlockUnderneath) {
+				blocksToRestore.add(originalBlock.getLocation().subtract(0.0, 1.0, 0.0).getBlock().getState());
+			}
+		}
+		if (blocksToRestore.isEmpty()) {
+			return;
+		}
+		// Null if dispenser was used
+		@Nullable Player player = event.getPlayer();
+		if (modifiedBlocks.size() == blocksToRestore.size()) {
+			if (player != null) {
+				player.sendActionBar(Component.text("Cannot spread waterlogged blocks to non-source blocks outside of plots.", NamedTextColor.RED));
+			}
+			event.setCancelled(true);
+			return;
+		}
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				for (BlockState originalState : blocksToRestore) {
+					originalState.update(true, false);
+				}
+			}
+		}.runTaskLater(Plugin.getInstance(), 0);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

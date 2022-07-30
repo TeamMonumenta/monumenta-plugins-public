@@ -408,7 +408,7 @@ public class EntityUtils {
 			bz = b.getZ();
 
 			//  If we want to check Line of sight we want to make sure that the blocks are transparent.
-			if (checkLos && LocationUtils.isLosBlockingBlock(b.getType())) {
+			if (checkLos && BlockUtils.isLosBlockingBlock(b.getType())) {
 				break;
 			}
 
@@ -545,12 +545,50 @@ public class EntityUtils {
 		return list;
 	}
 
+	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, LivingEntity getter, boolean ignoreStack) {
+		List<LivingEntity> list = getNearbyMobs(loc, radius, radius, radius);
+		if (ignoreStack) {
+			List<LivingEntity> mobs = new ArrayList<LivingEntity>();
+			if (getter.getVehicle() != null) {
+				getStackedMobsBelow(getter, mobs);
+			}
+
+			if (getter.getPassenger() != null) {
+				getStackedMobsAbove(getter, mobs);
+			}
+			for (LivingEntity mob : mobs) {
+				list.remove(mob);
+			}
+		}
+		return list;
+	}
+
 	public static List<LivingEntity> getNearbyMobs(Location loc, double radius) {
 		return getNearbyMobs(loc, radius, radius, radius);
 	}
 
 	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, EnumSet<EntityType> types) {
 		return getNearbyMobs(loc, radius, radius, radius, types);
+	}
+
+	public static void getStackedMobsAbove(Entity base, List<LivingEntity> prior) {
+		if (isHostileMob(base)) {
+			prior.add((LivingEntity) base);
+		}
+
+		if (base.getPassenger() != null) {
+			getStackedMobsAbove(base.getPassenger(), prior);
+		}
+	}
+
+	public static void getStackedMobsBelow(Entity base, List<LivingEntity> prior) {
+		if (isHostileMob(base)) {
+			prior.add((LivingEntity) base);
+		}
+
+		if (base.getVehicle() != null) {
+			getStackedMobsBelow(base.getVehicle(), prior);
+		}
 	}
 
 	public static List<LivingEntity> getMobsInLine(Location loc, Vector direction, double range, double halfHitboxLength) {
@@ -1207,5 +1245,11 @@ public class EntityUtils {
 	public static boolean isTrainingDummy(LivingEntity e) {
 		Set<String> tags = e.getScoreboardTags();
 		return tags.contains("boss_training_dummy");
+	}
+
+	// Adds a Tag which Removes the entity on unload.
+	// See EntityListener, EntityRemoveFromWorldEvent
+	public static void setRemoveEntityOnUnload(Entity e) {
+		e.getScoreboardTags().add("REMOVE_ON_UNLOAD");
 	}
 }

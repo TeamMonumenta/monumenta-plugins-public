@@ -28,7 +28,7 @@ public class Sidearm extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Sidearm";
 	private static final int COOLDOWN = 4 * 20;
-	private static final int KILL_COOLDOWN_REDUCTION = 2 * 20;
+	private static final int KILL_COOLDOWN_REDUCTION = 3 * 20;
 	private static final int[] DAMAGE = {12, 15, 18, 21, 24, 30};
 	private static final int RANGE = 14;
 

@@ -207,6 +207,10 @@ public final class ItemOverrides {
 		mItems.put(Material.HOPPER_MINECART, minecartOverride);
 		mItems.put(Material.TNT_MINECART, minecartOverride);
 
+		BaseOverride kelpOverride = new KelpOverride();
+		mItems.put(Material.KELP, kelpOverride);
+		mItems.put(Material.SEAGRASS, kelpOverride);
+
 		mItems.put(Material.COMPOSTER, new ComposterOverride());
 		mItems.put(Material.CONDUIT, new ConduitOverride());
 		mItems.put(Material.GRINDSTONE, new GrindstoneOverride());
@@ -230,10 +234,12 @@ public final class ItemOverrides {
 		mItems.put(Material.YELLOW_STAINED_GLASS, new YellowTesseractOverride());
 		mItems.put(Material.WHITE_STAINED_GLASS, new FestiveTesseractOverride());
 
+		BaseOverride anvilOverride = new AnvilOverride();
+		mItems.put(Material.ANVIL, anvilOverride);
+		mItems.put(Material.CHIPPED_ANVIL, anvilOverride);
+		mItems.put(Material.DAMAGED_ANVIL, anvilOverride);
+
 		mItems.put(Material.FISHING_ROD, new FishingRodOverride());
-		mItems.put(Material.ANVIL, new AnvilOverride());
-		mItems.put(Material.CHIPPED_ANVIL, new AnvilOverride());
-		mItems.put(Material.DAMAGED_ANVIL, new AnvilOverride());
 		mItems.put(Material.ENCHANTING_TABLE, new EnchantmentTableOverride());
 		mItems.put(Material.GOLDEN_APPLE, new GoldenAppleOverride());
 		mItems.put(Material.ENDER_CHEST, new EnderChestOverride());

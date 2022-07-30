@@ -11,14 +11,26 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 public class DepthsPlayer {
+
+	/*
+	 * !!!! WARNING !!!!
+	 * This class is automatically serialized
+	 * IF YOU ADD ANYTHING HERE THAT REFERENCES A COMPLEX OBJECT THE SERVER WILL CRASH WHILE SAVING
+	 * (especially Player or World)
+	 */
 
 	//Unique identifier for the player
 	public UUID mPlayerId;
 	//A map containing all abilities the player has and their current rarity
-	public Map<String, Integer> mAbilities = new HashMap<>();
+	public Map<String, Integer> mAbilities;
 	//Unique identifier, mapping to an active depths party object
 	public long mPartyNum;
 	//The depths ability trees the player is eligible to select from this run
@@ -39,6 +51,18 @@ public class DepthsPlayer {
 	public Queue<DepthsRewardType> mEarnedRewards;
 	//The room on which the player died. -1 if the player has not died
 	public int mDeathRoom;
+	//The location to teleport offline players to; null if no teleport is required on login - DO NOT REFERENCE WORLD
+	private String mOfflineTeleportWorld = "";
+	private @Nullable Vector mOfflineTeleportLoc = null;
+	private @Nullable Float mOfflineTeleportYaw = null;
+	private @Nullable Float mOfflineTeleportPitch = null;
+
+	/*
+	 * !!!! WARNING !!!!
+	 * This class is automatically serialized
+	 * IF YOU ADD ANYTHING HERE THAT REFERENCES A COMPLEX OBJECT THE SERVER WILL CRASH WHILE SAVING
+	 * (especially Player or World)
+	 */
 
 	public DepthsPlayer(Player p) {
 		mPlayerId = p.getUniqueId();
@@ -53,7 +77,7 @@ public class DepthsPlayer {
 
 		mUsedChaosThisFloor = false;
 
-		//Dummy value- either replaced on death or on win
+		//Dummy value - either replaced on death or on win
 		mFinalTreasureScore = -1;
 
 		mEarnedRewards = new ConcurrentLinkedQueue<>();
@@ -82,7 +106,7 @@ public class DepthsPlayer {
 				return initTreesWithGuarantee(talismanScore);
 			} else {
 				//They failed both the usual random chance of the tree and the Talisman chance
-				List<DepthsTree> randomTrees = new ArrayList<DepthsTree>();
+				List<DepthsTree> randomTrees = new ArrayList<>();
 
 				DepthsTree talismanTree = DepthsUtils.TREES[talismanScore - 1];
 
@@ -123,7 +147,7 @@ public class DepthsPlayer {
 	}
 
 	public List<DepthsTree> initTreesWithGuarantee(int talismanScore) {
-		List<DepthsTree> randomTrees = new ArrayList<DepthsTree>();
+		List<DepthsTree> randomTrees = new ArrayList<>();
 
 		DepthsTree talismanTree = DepthsUtils.TREES[talismanScore - 1];
 		randomTrees.add(talismanTree);
@@ -154,4 +178,52 @@ public class DepthsPlayer {
 		return mDeathRoom >= 0;
 	}
 
+	public void offlineTeleport(Location location) {
+		if (hasDied()) {
+			return;
+		}
+		location = location.clone();
+		// DO NOT STORE A REFERENCE TO A WORLD
+		mOfflineTeleportWorld = location.getWorld().getName();
+		location.setWorld(null);
+		mOfflineTeleportLoc = location.toVector();
+		mOfflineTeleportYaw = location.getYaw();
+		mOfflineTeleportPitch = location.getPitch();
+	}
+
+	public void doOfflineTeleport() {
+		if (mOfflineTeleportLoc == null) {
+			return;
+		}
+
+		Player player = Bukkit.getPlayer(mPlayerId);
+		if (player == null) {
+			return;
+		}
+
+		World world = Bukkit.getWorld(mOfflineTeleportWorld);
+		if (world == null) {
+			world = player.getWorld();
+		}
+
+		if (mOfflineTeleportYaw == null) {
+			mOfflineTeleportYaw = 0.0f;
+		}
+		if (mOfflineTeleportPitch == null) {
+			mOfflineTeleportPitch = 0.0f;
+		}
+
+		Location location = new Location(world,
+			mOfflineTeleportLoc.getX(),
+			mOfflineTeleportLoc.getY(),
+			mOfflineTeleportLoc.getZ(),
+			mOfflineTeleportYaw,
+			mOfflineTeleportPitch);
+		location.setWorld(world);
+		player.teleport(location);
+		mOfflineTeleportWorld = "";
+		mOfflineTeleportLoc = null;
+		mOfflineTeleportYaw = null;
+		mOfflineTeleportPitch = null;
+	}
 }
