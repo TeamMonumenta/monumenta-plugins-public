@@ -40,8 +40,8 @@ public class CosmicMoonblade extends Ability {
 	private static final double DOT_ANGLE = 0.6;
 	public static final double REDUCTION_MULTIPLIER_1 = 0.05;
 	public static final double REDUCTION_MULTIPLIER_2 = 0.1;
-	public static final int CAP_TICKS_1 = (int)(0.5 * Constants.TICKS_PER_SECOND);
-	public static final int CAP_TICKS_2 = (int)(1 * Constants.TICKS_PER_SECOND);
+	public static final int CAP_TICKS_1 = (int) (0.5 * Constants.TICKS_PER_SECOND);
+	public static final int CAP_TICKS_2 = (int) (1 * Constants.TICKS_PER_SECOND);
 	private static final Particle.DustOptions FSWORD_COLOR1 = new Particle.DustOptions(Color.fromRGB(106, 203, 255), 1.0f);
 	private static final Particle.DustOptions FSWORD_COLOR2 = new Particle.DustOptions(Color.fromRGB(168, 226, 255), 1.0f);
 	public static final String CHARM_DAMAGE = "Cosmic Moonblade Damage";

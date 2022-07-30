@@ -6,8 +6,11 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.ItemCooldown;
+import com.playmonumenta.plugins.itemstats.enchantments.IntoxicatingWarmth;
 import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
+import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
+import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import java.util.List;
 import org.bukkit.GameMode;
@@ -21,7 +24,10 @@ public class VirtualFoodReplacer extends PacketAdapter {
 	// List of Infinity Food Enchantments
 	private static final ItemStatUtils.EnchantmentType[] mEnchantmentTypes = {
 		ItemStatUtils.EnchantmentType.JUNGLES_NOURISHMENT,
-		ItemStatUtils.EnchantmentType.RAGE_OF_THE_KETER
+		ItemStatUtils.EnchantmentType.RAGE_OF_THE_KETER,
+		ItemStatUtils.EnchantmentType.TEMPORAL_BENDER,
+		ItemStatUtils.EnchantmentType.INTOXICATING_WARMTH,
+		ItemStatUtils.EnchantmentType.LIQUID_COURAGE
 	};
 
 	public VirtualFoodReplacer(Plugin plugin) {
@@ -88,6 +94,18 @@ public class VirtualFoodReplacer extends PacketAdapter {
 					}
 					if (enchantmentType.equals(ItemStatUtils.EnchantmentType.RAGE_OF_THE_KETER) && ItemStatUtils.getEnchantmentLevel(itemStack, ItemStatUtils.EnchantmentType.RAGE_OF_THE_KETER) > 0) {
 						itemStack.setType(RageOfTheKeter.COOLDOWN_ITEM);
+					}
+
+					if (enchantmentType.equals(ItemStatUtils.EnchantmentType.INTOXICATING_WARMTH) && ItemStatUtils.getEnchantmentLevel(itemStack, ItemStatUtils.EnchantmentType.INTOXICATING_WARMTH) > 0) {
+						itemStack.setType(IntoxicatingWarmth.COOLDOWN_ITEM);
+					}
+
+					if (enchantmentType.equals(ItemStatUtils.EnchantmentType.TEMPORAL_BENDER) && ItemStatUtils.getEnchantmentLevel(itemStack, ItemStatUtils.EnchantmentType.TEMPORAL_BENDER) > 0) {
+						itemStack.setType(TemporalBender.COOLDOWN_ITEM);
+					}
+
+					if (enchantmentType.equals(ItemStatUtils.EnchantmentType.LIQUID_COURAGE) && ItemStatUtils.getEnchantmentLevel(itemStack, ItemStatUtils.EnchantmentType.LIQUID_COURAGE) > 0) {
+						itemStack.setType(LiquidCourage.COOLDOWN_ITEM);
 					}
 				}
 			}
