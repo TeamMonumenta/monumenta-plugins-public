@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -15,6 +16,8 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class EarthAspect implements Enchantment {
@@ -38,43 +41,55 @@ public class EarthAspect implements Enchantment {
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		DamageEvent.DamageType type = event.getType();
 		if ((type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageEvent.DamageType.PROJECTILE) {
-			plugin.mEffectManager.addEffect(player, EARTH_STRING, new PercentDamageReceived(DURATION, DAMAGE_REDUCTION_PER_LEVEL * level));
-
-			double widthDelta = PartialParticle.getWidthDelta(player);
-			double widerWidthDelta = widthDelta * 1.5;
-			double doubleWidthDelta = widthDelta * 2;
-			double heightDelta = PartialParticle.getHeightDelta(player);
-
-			new PartialParticle(
-				Particle.FALLING_DUST,
-				LocationUtils.getHalfHeightLocation(player),
-				10,
-				widerWidthDelta,
-				heightDelta,
-				widerWidthDelta,
-				1,
-				Material.COARSE_DIRT.createBlockData()
-			).spawnAsEnemy();
-
-			new PartialParticle(
-				Particle.REDSTONE,
-				LocationUtils.getHeightLocation(player, 0.25),
-				10,
-				doubleWidthDelta,
-				heightDelta / 2,
-				doubleWidthDelta,
-				1,
-				COLOR
-			).spawnAsEnemy();
-
-			player.getWorld().playSound(
-				player.getLocation(),
-				Sound.BLOCK_GRAVEL_BREAK,
-				SoundCategory.PLAYERS,
-				1.0f,
-				1.0f
-			);
+			apply(plugin, player, level);
 		}
+	}
+
+	@Override
+	public void onBlockBreak(Plugin plugin, Player player, double level, BlockBreakEvent event) {
+		ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
+		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER && !ItemUtils.isPickaxe(player.getInventory().getItemInOffHand())) {
+			apply(plugin, player, level);
+		}
+	}
+
+	public static void apply(Plugin plugin, Player player, double level) {
+		plugin.mEffectManager.addEffect(player, EARTH_STRING, new PercentDamageReceived(DURATION, DAMAGE_REDUCTION_PER_LEVEL * level));
+
+		double widthDelta = PartialParticle.getWidthDelta(player);
+		double widerWidthDelta = widthDelta * 1.5;
+		double doubleWidthDelta = widthDelta * 2;
+		double heightDelta = PartialParticle.getHeightDelta(player);
+
+		new PartialParticle(
+			Particle.FALLING_DUST,
+			LocationUtils.getHalfHeightLocation(player),
+			10,
+			widerWidthDelta,
+			heightDelta,
+			widerWidthDelta,
+			1,
+			Material.COARSE_DIRT.createBlockData()
+		).spawnAsEnemy();
+
+		new PartialParticle(
+			Particle.REDSTONE,
+			LocationUtils.getHeightLocation(player, 0.25),
+			10,
+			doubleWidthDelta,
+			heightDelta / 2,
+			doubleWidthDelta,
+			1,
+			COLOR
+		).spawnAsEnemy();
+
+		player.getWorld().playSound(
+			player.getLocation(),
+			Sound.BLOCK_GRAVEL_BREAK,
+			SoundCategory.PLAYERS,
+			1.0f,
+			1.0f
+		);
 	}
 
 }

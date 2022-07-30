@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Color;
@@ -25,6 +26,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
 
 import static com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect.CHARM_STUN_CHANCE;
@@ -70,6 +73,8 @@ public class Explosive implements Enchantment {
 		int thunder = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.THUNDER_ASPECT);
 		int decay = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.DECAY);
 		int bleed = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.BLEEDING);
+		int earth = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.EARTH_ASPECT);
+		int wind = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT);
 
 		Location location = EntityUtils.getProjectileHitLocation(event);
 
@@ -99,30 +104,37 @@ public class Explosive implements Enchantment {
 				if (bleed > 0) {
 					EntityUtils.applyBleed(plugin, Bleeding.DURATION, bleed * Bleeding.AMOUNT_PER_LEVEL, mob);
 				}
-
-				//Visual feedback
-				if (ice > 0) {
-					player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.6f, 1.3f);
-					new PartialParticle(Particle.SNOW_SHOVEL, location, 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
+				if (earth > 0) {
+					EarthAspect.apply(plugin, player, earth);
 				}
-				if (thunder > 0) {
-					player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.6f, 0.8f);
-					new PartialParticle(Particle.REDSTONE, location, 12, 1.5, 1.5, 1.5, YELLOW_1_COLOR).spawnAsPlayerActive(player);
-					new PartialParticle(Particle.REDSTONE, location, 12, 1.5, 1.5, 1.5, YELLOW_2_COLOR).spawnAsPlayerActive(player);
-				}
-				if (decay > 0) {
-					player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.4f, 0.7f);
-					new PartialParticle(Particle.SQUID_INK, location, 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
-				}
-				if (bleed > 0) {
-					player.playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH, 0.7f, 0.7f);
-					new PartialParticle(Particle.REDSTONE, location, 25, 1.5, 1.5, 1.5, BLEED_COLOR).spawnAsPlayerActive(player);
-				}
-				if (fire > 0 || fire + ice + thunder + decay + bleed == 0) {
-					player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);
-					player.getWorld().spawnParticle(Particle.LAVA, location, 25, 1.5, 1.5, 1.5);
+				if (wind > 0) {
+					PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
+					WindAspect.launch(mob, wind);
 				}
 			}
+		}
+
+		//Visual feedback
+		if (ice > 0) {
+			player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.6f, 1.3f);
+			new PartialParticle(Particle.SNOW_SHOVEL, location, 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
+		}
+		if (thunder > 0) {
+			player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.6f, 0.8f);
+			new PartialParticle(Particle.REDSTONE, location, 12, 1.5, 1.5, 1.5, YELLOW_1_COLOR).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.REDSTONE, location, 12, 1.5, 1.5, 1.5, YELLOW_2_COLOR).spawnAsPlayerActive(player);
+		}
+		if (decay > 0) {
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.4f, 0.7f);
+			new PartialParticle(Particle.SQUID_INK, location, 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
+		}
+		if (bleed > 0) {
+			player.playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH, 0.7f, 0.7f);
+			new PartialParticle(Particle.REDSTONE, location, 25, 1.5, 1.5, 1.5, BLEED_COLOR).spawnAsPlayerActive(player);
+		}
+		if (fire > 0 || fire + ice + thunder + decay + bleed == 0) {
+			player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);
+			player.getWorld().spawnParticle(Particle.LAVA, location, 25, 1.5, 1.5, 1.5);
 		}
 
 		// Remove projectile (mainly to avoid tridents doing a double explosion)

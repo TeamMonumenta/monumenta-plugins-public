@@ -127,10 +127,10 @@ public class TransmutationRing extends PotionAbility {
 						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost));
 					}
 
-					particles.count(120).location(mCenter).spawnAsPlayerActive(mPlayer);
-					particles.count(30).location(mCenter.clone().add(0, 0.5, 0)).spawnAsPlayerActive(mPlayer);
-					particles.count(15).location(mCenter.clone().add(0, 1, 0)).spawnAsPlayerActive(mPlayer);
-					particles.count(7).location(mCenter.clone().add(0, 1.75, 0)).spawnAsPlayerActive(mPlayer);
+					particles.count((int) Math.floor(120 * mRadius / TRANSMUTATION_RING_RADIUS)).location(mCenter).spawnAsPlayerActive(mPlayer);
+					particles.count((int) Math.floor(30 * mRadius / TRANSMUTATION_RING_RADIUS)).location(mCenter.clone().add(0, 0.5, 0)).spawnAsPlayerActive(mPlayer);
+					particles.count((int) Math.floor(15 * mRadius / TRANSMUTATION_RING_RADIUS)).location(mCenter.clone().add(0, 1, 0)).spawnAsPlayerActive(mPlayer);
+					particles.count((int) Math.floor(7 * mRadius / TRANSMUTATION_RING_RADIUS)).location(mCenter.clone().add(0, 1.75, 0)).spawnAsPlayerActive(mPlayer);
 
 					mTicks += 5;
 				}

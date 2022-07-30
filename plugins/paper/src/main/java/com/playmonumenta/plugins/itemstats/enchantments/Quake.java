@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Color;
@@ -22,6 +23,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 
 public class Quake implements Enchantment {
@@ -79,10 +82,11 @@ public class Quake implements Enchantment {
 			int thunder = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.THUNDER_ASPECT);
 			int decay = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.DECAY);
 			int bleed = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.BLEEDING);
+			int wind = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT);
 			/*
-			*Damage any mobs in the area
-			*Need to cast it because the methods only take integers
-			*/
+			 *Damage any mobs in the area
+			 *Need to cast it because the methods only take integers
+			 */
 			for (LivingEntity mob : mobs) {
 				double finalDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, damage * DAMAGE_MODIFIER_PER_LEVEL * level);
 				DamageUtils.damage(player, mob, DamageType.OTHER, finalDamage, null, false, true);
@@ -100,6 +104,10 @@ public class Quake implements Enchantment {
 				}
 				if (bleed > 0) {
 					EntityUtils.applyBleed(plugin, Bleeding.DURATION, bleed * Bleeding.AMOUNT_PER_LEVEL, mob);
+				}
+				if (wind > 0) {
+					PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
+					WindAspect.launch(mob, wind);
 				}
 			}
 

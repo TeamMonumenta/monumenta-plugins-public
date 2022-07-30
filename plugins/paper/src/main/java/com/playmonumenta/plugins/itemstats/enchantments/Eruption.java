@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -21,6 +22,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class Eruption implements Enchantment {
 
@@ -58,6 +61,7 @@ public class Eruption implements Enchantment {
 			int bleed = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.BLEEDING);
 			int sapper = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SAPPER) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SAPPER) : 0;
 			int adrenaline = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.ADRENALINE) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADRENALINE) : 0;
+			int wind = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.WIND_ASPECT) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT) : 0;
 
 			//Damage any mobs in the area
 			for (LivingEntity mob : mobs) {
@@ -77,6 +81,10 @@ public class Eruption implements Enchantment {
 				}
 				if (bleed > 0) {
 					EntityUtils.applyBleed(plugin, Bleeding.DURATION, bleed * Bleeding.AMOUNT_PER_LEVEL, mob);
+				}
+				if (wind > 0) {
+					PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
+					WindAspect.launch(mob, wind);
 				}
 			}
 

@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Decay;
 import com.playmonumenta.plugins.itemstats.enchantments.FireAspect;
 import com.playmonumenta.plugins.itemstats.enchantments.IceAspect;
 import com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect;
+import com.playmonumenta.plugins.itemstats.enchantments.WindAspect;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -20,6 +21,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
@@ -31,6 +33,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -80,9 +83,9 @@ public class ArcaneStrike extends Ability {
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)
 				if (EntityUtils.isSlowed(mPlugin, mob) || (mob.hasPotionEffect(PotionEffectType.SLOW)
-					                                           && !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
-					    || (mob.getFireTicks() > 0
-						        && !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
+					&& !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
+					|| (mob.getFireTicks() > 0
+					&& !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
 					dmg += SpellPower.getSpellDamage(mPlugin, mPlayer, mDamageBonusAffected);
 				}
 
@@ -110,6 +113,11 @@ public class ArcaneStrike extends Ability {
 					if (bleed > 0) {
 						Bleeding.apply(mPlugin, mPlayer, bleed, Bleeding.DURATION, mob);
 					}
+					int wind = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.WIND_ASPECT);
+					if (wind > 0) {
+						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
+						WindAspect.launch(mob, wind);
+					}
 				}
 
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, dmg, mInfo.mLinkedSpell, true, true);
@@ -128,6 +136,7 @@ public class ArcaneStrike extends Ability {
 			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
 			new BukkitRunnable() {
 				double mD = 30;
+
 				@Override
 				public void run() {
 					Vector vec;

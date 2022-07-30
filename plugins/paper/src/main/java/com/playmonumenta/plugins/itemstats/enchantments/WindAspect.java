@@ -40,7 +40,7 @@ public class WindAspect implements Enchantment {
 		}
 	}
 
-	private void launch(Entity e, double level) {
+	public static void launch(Entity e, double level) {
 		World world = e.getWorld();
 		world.playSound(e.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
 
