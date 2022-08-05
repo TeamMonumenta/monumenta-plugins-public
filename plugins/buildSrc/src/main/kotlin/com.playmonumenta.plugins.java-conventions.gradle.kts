@@ -9,7 +9,7 @@ repositories {
     mavenLocal()
     jcenter()
     maven {
-        url = uri("https://papermc.io/repo/repository/maven-public/")
+        url = uri("https://repo.papermc.io/repository/maven-public/")
     }
 
     maven {
@@ -70,10 +70,6 @@ repositories {
 
     maven {
         url = uri("https://raw.githubusercontent.com/TeamMonumenta/scripted-quests/master/mvn-repo/")
-    }
-
-    maven {
-        url = uri("https://maven.sk89q.com/repo/")
     }
 
     maven {
