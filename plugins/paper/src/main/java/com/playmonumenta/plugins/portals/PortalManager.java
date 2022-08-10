@@ -65,6 +65,10 @@ public class PortalManager {
 		dir = dir.multiply(.5);
 		box.shift(dir);
 		World mWorld = player.getWorld();
+		String worldName = mWorld.getName();
+		if (worldName.startsWith("Project_Epic")) {
+			worldName = "overworld";
+		}
 
 		Block blockHit = null;
 		if (portalNum == 1) {
@@ -240,11 +244,11 @@ public class PortalManager {
 		mPortal2 = mPlayerPortal2.get(player);
 
 		if (mPortal1 != null && portalNum == 1) {
-			CommandUtils.runCommandViaConsole("execute positioned " + mPortal1.mLocation1.toCenterLocation().getX() + " " + mPortal1.mLocation1.toCenterLocation().getY() + " " + mPortal1.mLocation1.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
-			CommandUtils.runCommandViaConsole("execute positioned " + mPortal1.mLocation2.toCenterLocation().getX() + " " + mPortal1.mLocation2.toCenterLocation().getY() + " " + mPortal1.mLocation2.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
+			CommandUtils.runCommandViaConsole("execute in " + worldName + " positioned " + mPortal1.mLocation1.toCenterLocation().getX() + " " + mPortal1.mLocation1.toCenterLocation().getY() + " " + mPortal1.mLocation1.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
+			CommandUtils.runCommandViaConsole("execute in " + worldName + " positioned " + mPortal1.mLocation2.toCenterLocation().getX() + " " + mPortal1.mLocation2.toCenterLocation().getY() + " " + mPortal1.mLocation2.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
 		} else if (mPortal2 != null && portalNum == 2) {
-			CommandUtils.runCommandViaConsole("execute positioned " + mPortal2.mLocation1.toCenterLocation().getX() + " " + mPortal2.mLocation1.toCenterLocation().getY() + " " + mPortal2.mLocation1.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
-			CommandUtils.runCommandViaConsole("execute positioned " + mPortal2.mLocation2.toCenterLocation().getX() + " " + mPortal2.mLocation2.toCenterLocation().getY() + " " + mPortal2.mLocation2.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
+			CommandUtils.runCommandViaConsole("execute in " + worldName + " positioned " + mPortal2.mLocation1.toCenterLocation().getX() + " " + mPortal2.mLocation1.toCenterLocation().getY() + " " + mPortal2.mLocation1.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
+			CommandUtils.runCommandViaConsole("execute in " + worldName + " positioned " + mPortal2.mLocation2.toCenterLocation().getX() + " " + mPortal2.mLocation2.toCenterLocation().getY() + " " + mPortal2.mLocation2.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
 		}
 
 		//Store portals
@@ -274,11 +278,11 @@ public class PortalManager {
 		int mapNum = portalNum + getMapNum(mCurrentShard);
 
 		if (portalNum == 1) {
-			CommandUtils.runCommandViaConsole("summon item_frame " + mPortal1.mLocation1.getX() + " " + mPortal1.mLocation1.getY() + " " + mPortal1.mLocation1.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation1 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
-			CommandUtils.runCommandViaConsole("summon item_frame " + mPortal1.mLocation2.getX() + " " + mPortal1.mLocation2.getY() + " " + mPortal1.mLocation2.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation2 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
+			CommandUtils.runCommandViaConsole("execute in " + worldName + " run summon item_frame " + mPortal1.mLocation1.getX() + " " + mPortal1.mLocation1.getY() + " " + mPortal1.mLocation1.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation1 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
+			CommandUtils.runCommandViaConsole("execute in " + worldName + " run summon item_frame " + mPortal1.mLocation2.getX() + " " + mPortal1.mLocation2.getY() + " " + mPortal1.mLocation2.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation2 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
 		} else if (portalNum == 2) {
-			CommandUtils.runCommandViaConsole("summon item_frame " + mPortal2.mLocation1.getX() + " " + mPortal2.mLocation1.getY() + " " + mPortal2.mLocation1.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation1 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
-			CommandUtils.runCommandViaConsole("summon item_frame " + mPortal2.mLocation2.getX() + " " + mPortal2.mLocation2.getY() + " " + mPortal2.mLocation2.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation2 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
+			CommandUtils.runCommandViaConsole("execute in " + worldName + " run summon item_frame " + mPortal2.mLocation1.getX() + " " + mPortal2.mLocation1.getY() + " " + mPortal2.mLocation1.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation1 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
+			CommandUtils.runCommandViaConsole("execute in " + worldName + " run summon item_frame " + mPortal2.mLocation2.getX() + " " + mPortal2.mLocation2.getY() + " " + mPortal2.mLocation2.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation2 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
 		}
 
 		//Activate teleport logic
@@ -325,9 +329,13 @@ public class PortalManager {
 			mPortalTeleportChecks.remove(player);
 		}
 		//Kill item frames
+		String worldName = player.getWorld().getName();
+		if (worldName.startsWith("Project_Epic")) {
+			worldName = "overworld";
+		}
 		if (p != null) {
-			CommandUtils.runCommandViaConsole("execute positioned " + p.mLocation1.toCenterLocation().getX() + " " + p.mLocation1.toCenterLocation().getY() + " " + p.mLocation1.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
-			CommandUtils.runCommandViaConsole("execute positioned " + p.mLocation2.toCenterLocation().getX() + " " + p.mLocation2.toCenterLocation().getY() + " " + p.mLocation2.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
+			CommandUtils.runCommandViaConsole("execute in " + worldName + " positioned " + p.mLocation1.toCenterLocation().getX() + " " + p.mLocation1.toCenterLocation().getY() + " " + p.mLocation1.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
+			CommandUtils.runCommandViaConsole("execute in " + worldName + " positioned " + p.mLocation2.toCenterLocation().getX() + " " + p.mLocation2.toCenterLocation().getY() + " " + p.mLocation2.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
 		}
 	}
 
