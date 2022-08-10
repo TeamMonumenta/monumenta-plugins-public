@@ -1007,6 +1007,9 @@ public class CharmManager {
 
 	public List<Component> getSummaryOfAllAttributesAsComponents(Player p) {
 		Map<String, Double> allEffects = mPlayerCharmEffectMap.get(p.getUniqueId());
+		if (allEffects == null) {
+			return new ArrayList<>();
+		}
 
 		//Sort the effects in the order in the manager list
 		List<String> orderedEffects = new ArrayList<>();
