@@ -398,4 +398,9 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 		return !((CraftWorld) world).getHandle().b(new AxisAlignedBB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()));
 	}
 
+	@Override
+	public void mobAIChanges(Mob entity) {
+		// nothing to do - everything is done via Paper patches in 1.16
+	}
+
 }

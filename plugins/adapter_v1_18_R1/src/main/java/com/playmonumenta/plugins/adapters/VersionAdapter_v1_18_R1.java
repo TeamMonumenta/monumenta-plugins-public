@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.minecraft.core.Registry;
@@ -18,11 +19,15 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.EntityDamageSource;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NonTameRandomTargetGoal;
+import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.CommandBlockEntity;
 import net.minecraft.world.phys.AABB;
@@ -41,13 +46,20 @@ import org.bukkit.craftbukkit.v1_18_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftParrot;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
+import org.bukkit.entity.AbstractSkeleton;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Drowned;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Evoker;
+import org.bukkit.entity.Fox;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.WitherSkeleton;
+import org.bukkit.entity.Wolf;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -382,6 +394,53 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 
 	public boolean hasCollision(World world, BoundingBox aabb) {
 		return !((CraftWorld) world).getHandle().noCollision(new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()));
+	}
+
+	private static final Field targetTypeField = getField(NearestAttackableTargetGoal.class, "a"); // unobfuscated field name: targetType
+
+	private static Class<?> getNearestAttackableTargetGoalTargetType(NearestAttackableTargetGoal<?> goal) {
+		return (Class<?>) getFieldValue(targetTypeField, goal);
+	}
+
+	@Override
+	public void mobAIChanges(Mob mob) {
+		Set<WrappedGoal> availableGoals = ((CraftMob) mob).getHandle().goalSelector.availableGoals;
+		Set<WrappedGoal> availableTargetGoals = ((CraftMob) mob).getHandle().targetSelector.availableGoals;
+		if (mob instanceof Fox || mob instanceof AbstractSkeleton) {
+			// prevent foxes running from players, wolves, and polar bears, and skeletons running away from wolves
+			availableGoals.removeIf(goal -> goal.getGoal() instanceof AvoidEntityGoal);
+			if (mob instanceof WitherSkeleton) {
+				// prevent wither skeletons from attacking piglins
+				availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
+					                                      && AbstractPiglin.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
+			}
+		} else if (mob instanceof IronGolem) {
+			// prevent iron golems defending villages and attacking mobs
+			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof DefendVillageTargetGoal);
+			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
+				                                      && getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.Mob.class);
+		} else if (mob instanceof Drowned) {
+			// prevent drowneds from attacking mobs
+			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
+				                                      && net.minecraft.world.entity.Mob.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
+		} else if (mob instanceof Evoker) {
+			// disable vexes and fangs on evokers with the proper tags
+			if (mob.getScoreboardTags().contains("boss_evoker_no_vex")) {
+				availableGoals.removeIf(goal -> "net.minecraft.world.entity.monster.EntityEvoker$c".equals(goal.getGoal().getClass().getName())); // EvokerSummonSpellGoal
+			}
+			if (mob.getScoreboardTags().contains("boss_evoker_no_fangs")) {
+				availableGoals.removeIf(goal -> "net.minecraft.world.entity.monster.EntityEvoker$a".equals(goal.getGoal().getClass().getName())); // EvokerAttackSpellGoal
+			}
+		} else if (mob instanceof Wolf) {
+			// prevent wolves from attacking animals and skeletons
+			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
+				                                      && net.minecraft.world.entity.monster.AbstractSkeleton.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
+			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NonTameRandomTargetGoal);
+		}
+		// prevent all mobs from attacking iron golems and turtles
+		availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
+			                                      && (getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.IronGolem.class
+				                                          || getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.Turtle.class));
 	}
 
 }

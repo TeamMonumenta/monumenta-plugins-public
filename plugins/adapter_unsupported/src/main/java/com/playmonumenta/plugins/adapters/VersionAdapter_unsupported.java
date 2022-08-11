@@ -117,4 +117,8 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 		return false;
 	}
 
+	@Override
+	public void mobAIChanges(Mob entity) {
+	}
+
 }
