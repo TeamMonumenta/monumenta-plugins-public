@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -467,6 +468,24 @@ public class LocationUtils {
 		}
 	}
 
+	public static List<Chunk> getSurroundingChunks(Block block, int radius) {
+		ArrayList<Chunk> chunkList = new ArrayList<Chunk>();
+		Location location = block.getLocation();
+		// 16 block offset guarantees we get an adjacent chunk
+		for (int x = -radius; x <= radius; x += 16) {
+			for (int z = -radius; z <= radius; z += 16) {
+				Location offsetLocation = location.clone().add(x, 0, z);
+				if (offsetLocation.isChunkLoaded()) {
+					chunkList.add(block.getRelative(x, 0, z).getChunk());
+				}
+			}
+		}
+		return chunkList;
+	}
+
+	public static boolean blocksAreWithinRadius(Block block1, Block block2, int radius) {
+		return block1.getLocation().distanceSquared(block2.getLocation()) <= radius * radius;
+	}
 
 
 	// TODO use Consumer?

@@ -77,7 +77,6 @@ public class PlayerUtils {
 				.filter(p -> p.getGameMode() != GameMode.SPECTATOR && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER) && structures.stream().anyMatch(structure -> structure.isNearby(p)))
 				.toList();
 		}
-
 		// Otherwise, perform no loot scaling
 		return Collections.emptyList();
 	}

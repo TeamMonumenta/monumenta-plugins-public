@@ -94,7 +94,16 @@ public class ChestUtils {
 					// Get all other players in range, excluding the source player
 					otherPlayers = PlayerUtils.otherPlayersInLootScalingRange(player);
 
-					double bonusItems = BONUS_ITEMS[Math.min(BONUS_ITEMS.length - 1, otherPlayers.size() + 1)];
+					int otherPlayersMultiplier = otherPlayers.size() + 1;
+
+					MMLog.fine("Lootable seed: " + lootable.getSeed());
+					// Loot table seed set and use the seed for number of players
+					if (lootable.getSeed() > 0 && lootable.getSeed() < 50) {
+						otherPlayersMultiplier = (int)lootable.getSeed();
+						MMLog.fine("Chest loot was already generated due to a spawner being broken with seed " + otherPlayersMultiplier);
+					}
+
+					double bonusItems = BONUS_ITEMS[Math.min(BONUS_ITEMS.length - 1, otherPlayersMultiplier)];
 					luckAmount = (int) bonusItems;
 
 					// Account for fractions of extra items with random roll
@@ -589,6 +598,20 @@ public class ChestUtils {
 				slotsWithMultipleItems.add(splitslot);
 		    }
 		}
+	}
+
+	public static boolean isUnlootedChest(Block block) {
+		return block.getState() instanceof Chest chest && chest.getLootTable() != null &&
+			chest.getSeed() == 0 && isChestEmpty(chest);
+	}
+
+	public static boolean isChestEmpty(Chest chest) {
+		for (ItemStack slot : chest.getBlockInventory().getContents()) {
+			if (slot != null && !slot.getType().isAir()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public static boolean isEmpty(Block block) {
