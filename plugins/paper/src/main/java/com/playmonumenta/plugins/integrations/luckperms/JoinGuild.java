@@ -77,7 +77,7 @@ public class JoinGuild {
 				// Success indicators
 				player.sendMessage(ChatColor.GOLD + "Congratulations! You have joined " + guildName + "!");
 				p.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.GOLD + " has joined your guild");
-				MonumentaNetworkChatIntegration.refreshPlayer(plugin, player);
+				MonumentaNetworkChatIntegration.refreshPlayer(player);
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
 				                       "execute at " + player.getName()
 				                       + " run summon minecraft:firework_rocket ~ ~1 ~ "

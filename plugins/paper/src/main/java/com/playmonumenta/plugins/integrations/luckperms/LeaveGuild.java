@@ -70,7 +70,7 @@ public class LeaveGuild {
 					ex.printStackTrace();
 				} else {
 					Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-						MonumentaNetworkChatIntegration.refreshPlayer(plugin, player);
+						MonumentaNetworkChatIntegration.refreshPlayer(player);
 					});
 				}
 			});

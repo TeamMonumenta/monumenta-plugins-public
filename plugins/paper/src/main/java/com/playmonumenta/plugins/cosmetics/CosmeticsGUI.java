@@ -182,7 +182,7 @@ public class CosmeticsGUI extends CustomInventory {
 						}
 					}
 					if (mDisplayPage == CosmeticType.TITLE) {
-						MonumentaNetworkChatIntegration.refreshPlayer(mPlugin, player);
+						MonumentaNetworkChatIntegration.refreshPlayer(player);
 					}
 					setUpCosmetics(player);
 					return;

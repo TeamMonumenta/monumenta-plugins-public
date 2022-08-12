@@ -89,7 +89,7 @@ public class CreateGuild {
 		}
 
 		// Create guild chat channel
-		MonumentaNetworkChatIntegration.createGuildChannel(plugin, guildTag, cleanGuildName);
+		MonumentaNetworkChatIntegration.createGuildChannel(guildTag, cleanGuildName);
 
 		// Add tags, display messages and effects
 		for (Player founder : founders) {
@@ -98,7 +98,7 @@ public class CreateGuild {
 			founder.playSound(founder.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1.5f);
 
 			// Refresh chat name
-			MonumentaNetworkChatIntegration.refreshPlayer(plugin, founder);
+			MonumentaNetworkChatIntegration.refreshPlayer(founder);
 
 			// fireworks!
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at " + founder.getName()
