@@ -1,6 +1,11 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.MonumentaClasses;
+import com.playmonumenta.plugins.classes.PlayerClass;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -40,6 +45,17 @@ public class AbilityUtils {
 
 	private static final String ARROW_REFUNDED_METAKEY = "ArrowRefunded";
 	private static final String POTION_REFUNDED_METAKEY = "PotionRefunded";
+	public static final String TOTAL_LEVEL = "TotalLevel";
+	public static final String TOTAL_SPEC = "TotalSpec";
+	public static final String REMAINING_SKILL = "Skill";
+	public static final String REMAINING_SPEC = "SkillSpec";
+	public static final String SCOREBOARD_CLASS_NAME = "Class";
+	public static final String SCOREBOARD_SPEC_NAME = "Specialization";
+
+	public static final int MAX_SKILL_POINTS = 10;
+	public static final int MAX_SPEC_POINTS = 4;
+
+
 
 	private static final Map<Player, Integer> INVISIBLE_PLAYERS = new HashMap<Player, Integer>();
 	private static @Nullable BukkitRunnable invisTracker = null;
@@ -470,5 +486,54 @@ public class AbilityUtils {
 		}
 
 		return debuffCount;
+	}
+
+	public static void ensureSkillAlignmentWithClassAndSpec(Player player) {
+		int playerClass = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0);
+		int playerSpec = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_SPEC_NAME).orElse(0);
+		MonumentaClasses mClasses = new MonumentaClasses(Plugin.getInstance(), null);
+		for (PlayerClass mClass: mClasses.mClasses) {
+			if (playerClass != mClass.mClass) {
+				for (Ability ability : mClass.mAbilities) {
+					ScoreboardUtils.setScoreboardValue(player, ability.getScoreboard(), 0);
+				}
+			}
+			if (playerSpec != mClass.mSpecOne.mSpecialization) {
+				for (Ability ability : mClass.mSpecOne.mAbilities) {
+					ScoreboardUtils.setScoreboardValue(player, ability.getScoreboard(), 0);
+				}
+			}
+			if (playerSpec != mClass.mSpecTwo.mSpecialization) {
+				for (Ability ability : mClass.mSpecTwo.mAbilities) {
+					ScoreboardUtils.setScoreboardValue(player, ability.getScoreboard(), 0);
+				}
+			}
+		}
+	}
+
+	public static int skillDiff(Player player) {
+		return getAssignedAbilityPoints(player) + getUnassignedAbilityPoints(player) - getTotalAbilityPoints(player);
+	}
+
+	public static int getUnassignedAbilityPoints(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, REMAINING_SKILL).orElse(0) + ScoreboardUtils.getScoreboardValue(player, REMAINING_SPEC).orElse(0);
+	}
+
+	public static int getAssignedAbilityPoints(Player player) {
+		int points = 0;
+		for (Ability ability : AbilityManager.getManager().getPlayerAbilities(player).getAbilitiesIgnoringSilence()) {
+			if (!(ability instanceof DepthsAbility)) {
+				if (ability.isLevelOne()) {
+					points++;
+				} else if (ability.isLevelTwo()) {
+					points += 2;
+				}
+			}
+		}
+		return points;
+	}
+
+	public static int getTotalAbilityPoints(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0) + ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
 	}
 }

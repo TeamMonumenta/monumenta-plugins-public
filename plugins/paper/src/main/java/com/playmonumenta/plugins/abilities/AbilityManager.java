@@ -130,11 +130,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Vitality;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.*;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.util.ArrayList;
@@ -146,6 +142,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -785,6 +784,18 @@ public class AbilityManager {
 	}
 
 	public void playerJoinEvent(Player player, PlayerJoinEvent event) {
+		// Anticheat for skills
+		AbilityUtils.ensureSkillAlignmentWithClassAndSpec(player);
+		int skillDifference = AbilityUtils.skillDiff(player);
+		if (skillDifference > 0) {
+			player.sendMessage(Component.text("You had more skills than expected. Available skills have been reset.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+			AbilityManager.getManager().resetPlayerAbilities(player);
+			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
+		} else if (skillDifference < 0) {
+			player.sendMessage(Component.text("You had less skills than expected. Available skills may have been updated.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+			AbilityManager.getManager().resetPlayerAbilities(player);
+			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
+		}
 		UUID uuid = player.getUniqueId();
 		JsonObject chargesData = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_PLUGIN_DATA);
 		if (chargesData != null) {
