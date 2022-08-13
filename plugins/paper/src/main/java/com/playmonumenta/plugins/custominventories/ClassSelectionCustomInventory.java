@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
@@ -94,12 +95,10 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 					}
 				}
 			} else if (chosenSlot == P1_RESET_CLASS_LOC) {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"execute as " + player.getUniqueId() + " run function monumenta:class_selection/reset");
+				AbilityUtils.resetClass(player);
 				makeClassSelectPage(player);
 			} else if (chosenSlot == P1_RESET_SPEC_LOC) {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"execute as " + player.getUniqueId() + " run function monumenta:class_selection/reset_spec");
+				AbilityUtils.resetSpec(player);
 				makeClassSelectPage(player);
 			}
 			break;

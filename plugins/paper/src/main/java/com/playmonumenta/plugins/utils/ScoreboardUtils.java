@@ -11,7 +11,6 @@ public class ScoreboardUtils {
 	public static Optional<Integer> getScoreboardValue(String scoreHolder, String objectiveName) {
 		Optional<Integer> scoreValue = Optional.empty();
 		Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(objectiveName);
-
 		if (objective != null) {
 			Score score = objective.getScore(scoreHolder);
 			if (score.isScoreSet()) {

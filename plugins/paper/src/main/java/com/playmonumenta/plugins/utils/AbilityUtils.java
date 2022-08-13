@@ -22,7 +22,9 @@ import java.util.Map.Entry;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -486,6 +488,47 @@ public class AbilityUtils {
 		}
 
 		return debuffCount;
+	}
+
+	public static void resetClass(Player player) {
+		if (ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0) == 0) {
+			player.sendMessage(Component.text("You do not have a class.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
+			return;
+		}
+		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_CLASS_NAME, 0);
+		ensureSkillAlignmentWithClassAndSpec(player);
+		ScoreboardUtils.setScoreboardValue(player, REMAINING_SKILL, ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0));
+		player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.7f);
+		player.sendMessage(Component.text("Your class and skill points have been reset. You can pick a new class now.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
+		if (ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_SPEC_NAME).orElse(0) != 0) {
+			resetSpec(player, true);
+		}
+		refreshClass(player);
+	}
+
+	public static void resetSpec(Player player) {
+		resetSpec(player, false);
+	}
+
+	public static void resetSpec(Player player, boolean fromResetClass) {
+		if (ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_SPEC_NAME).orElse(0) == 0) {
+			player.sendMessage(Component.text("You do not have a specialization.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
+			return;
+		}
+		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_SPEC_NAME, 0);
+		ensureSkillAlignmentWithClassAndSpec(player);
+		ScoreboardUtils.setScoreboardValue(player, REMAINING_SPEC, ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0));
+		if (!fromResetClass) {
+			player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.7f);
+			player.sendMessage(Component.text("Your specialization and skill points have been reset. You can pick a new specialization now.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
+			refreshClass(player);
+		}
+	}
+
+	public static void refreshClass(Player player) {
+		AbilityManager.getManager().updatePlayerAbilities(player, true);
+		InventoryUtils.scheduleDelayedEquipmentCheck(Plugin.getInstance(), player, null);
+		Bukkit.getConsoleSender().sendMessage(ChatColor.GOLD + "Refreshed class for player '" + player.getName() + "'");
 	}
 
 	public static void ensureSkillAlignmentWithClassAndSpec(Player player) {
