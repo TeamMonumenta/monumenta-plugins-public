@@ -152,7 +152,6 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -434,9 +433,9 @@ public class AbilityManager {
 		}
 		// This zooms the player's screen obnoxiously, so try not to do it if it's not needed
 		if (movementSpeed != null
-			    && movementSpeed.getValue() != 0.1
-			    && !player.getGameMode().equals(GameMode.CREATIVE)
-			    && !player.getGameMode().equals(GameMode.SPECTATOR)) {
+			&& movementSpeed.getValue() != 0.1
+			&& !player.getGameMode().equals(GameMode.CREATIVE)
+			&& !player.getGameMode().equals(GameMode.SPECTATOR)) {
 			movementSpeed.setBaseValue(0.1);
 		}
 
@@ -666,8 +665,8 @@ public class AbilityManager {
 		return conditionalCastCancellable(player, (ability) -> ability.playerCombustByEntityEvent(event));
 	}
 
-	public boolean playerShotArrowEvent(Player player, AbstractArrow arrow) {
-		return conditionalCastCancellable(player, (ability) -> ability.playerShotArrowEvent(arrow));
+	public boolean playerShotProjectileEvent(Player player, Projectile projectile) {
+		return conditionalCastCancellable(player, (ability) -> ability.playerShotProjectileEvent(projectile));
 	}
 
 	public boolean playerThrewSplashPotionEvent(Player player, ThrownPotion potion) {
@@ -836,7 +835,7 @@ public class AbilityManager {
 					} else if (abilityInfo.mTrigger == AbilityTrigger.RIGHT_CLICK) {
 						if (
 							action == Action.RIGHT_CLICK_AIR
-							|| (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked))
+								|| (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked))
 						) {
 							if (ability.canCast()) {
 								ability.cast(action);

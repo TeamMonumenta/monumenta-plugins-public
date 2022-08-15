@@ -23,9 +23,9 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -48,10 +48,10 @@ public class PiercingCold extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
+	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (mPlayer.isSneaking()) {
-			arrow.remove();
-			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
+			projectile.remove();
+			mPlugin.mProjectileEffectTimers.removeEntity(projectile);
 			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
 

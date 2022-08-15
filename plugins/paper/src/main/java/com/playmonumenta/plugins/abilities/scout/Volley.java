@@ -7,7 +7,11 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,8 +19,13 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.*;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
@@ -32,7 +41,7 @@ public class Volley extends Ability {
 	private static final double VOLLEY_2_DAMAGE_MULTIPLIER = 1.5;
 	private static final double ENHANCEMENT_BLEED_POTENCY = 0.1;
 	private static final int ENHANCEMENT_BLEED_DURATION = 4 * 20;
-	public Set<AbstractArrow> mVolleyArrows;
+	public Set<Projectile> mVolley;
 	private Map<LivingEntity, Integer> mVolleyHitMap;
 
 	public static final String CHARM_COOLDOWN = "Volley Cooldown";
@@ -60,7 +69,7 @@ public class Volley extends Ability {
 		mArrows = (isLevelOne() ? VOLLEY_1_ARROW_COUNT : VOLLEY_2_ARROW_COUNT) + (int) CharmManager.getLevel(mPlayer, CHARM_ARROWS);
 		mMultiplier = isLevelOne() ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
 
-		mVolleyArrows = new HashSet<>();
+		mVolley = new HashSet<>();
 		mVolleyHitMap = new HashMap<>();
 	}
 
@@ -70,7 +79,7 @@ public class Volley extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
+	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (mPlayer == null
 			|| !mPlayer.isSneaking()
 			|| mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
@@ -85,9 +94,9 @@ public class Volley extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.33f);
 		// Garbage Collector at home
-		mVolleyArrows.clear();
+		mVolley.clear();
 		mVolleyHitMap.clear();
-		float arrowSpeed = (float) arrow.getVelocity().length();
+		float arrowSpeed = (float) projectile.getVelocity().length();
 		// Give time for other skills to set data
 		new BukkitRunnable() {
 			@Override
@@ -96,7 +105,7 @@ public class Volley extends Ability {
 				PotionData tArrowData = null;
 				int fireticks = 0;
 
-				if (arrow instanceof Arrow regularArrow) {
+				if (projectile instanceof Arrow regularArrow) {
 					fireticks = regularArrow.getFireTicks();
 					if (regularArrow.hasCustomEffects()) {
 						tArrowData = regularArrow.getBasePotionData();
@@ -107,24 +116,29 @@ public class Volley extends Ability {
 					}
 				}
 
-				List<AbstractArrow> projectiles;
+				List<Projectile> projectiles;
 				if (!isEnhanced()) {
-					projectiles = EntityUtils.spawnArrowVolley(mPlayer, mArrows, arrowSpeed, 5, arrow.getClass());
+					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows, arrowSpeed, 5, projectile.getClass());
 				} else {
-					projectiles = EntityUtils.spawnArrowVolley(mPlayer, mArrows * 6, arrowSpeed, 360.0 / (mArrows * 6), arrow.getClass());
+					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows * 6, arrowSpeed, 360.0 / (mArrows * 6), projectile.getClass());
 				}
 
-				int piercing = arrow.getPierceLevel() + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING);
-				for (AbstractArrow proj : projectiles) {
-					mVolleyArrows.add(proj);
-					proj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+				int piercing = (projectile instanceof Arrow arrow) ? arrow.getPierceLevel() + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING) : 0;
 
-					proj.setCritical(arrow.isCritical());
-					proj.setPierceLevel(piercing);
+				for (Projectile proj : projectiles) {
 
-					// If the base arrow's potion data is still stored, apply it to the new arrows
-					if (tArrowData != null) {
-						((Arrow) proj).setBasePotionData(tArrowData);
+					mVolley.add(proj);
+
+					if (proj instanceof AbstractArrow arrow) {
+						arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+
+						arrow.setCritical(projectile instanceof AbstractArrow projectileArrow && projectileArrow.isCritical());
+						arrow.setPierceLevel(piercing);
+
+						// If the base arrow's potion data is still stored, apply it to the new arrows
+						if (tArrowData != null) {
+							((Arrow) proj).setBasePotionData(tArrowData);
+						}
 					}
 
 					mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
@@ -136,7 +150,7 @@ public class Volley extends Ability {
 				// We can't just use arrow.remove() because that cancels the event and refunds the arrow
 				Location jankWorkAround = mPlayer.getLocation();
 				jankWorkAround.setY(-15);
-				arrow.teleport(jankWorkAround);
+				projectile.teleport(jankWorkAround);
 			}
 		}.runTaskLater(mPlugin, 0);
 
@@ -146,7 +160,7 @@ public class Volley extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity proj = event.getDamager();
-		if (event.getType() == DamageType.PROJECTILE && proj instanceof AbstractArrow && mVolleyArrows.contains(proj)) {
+		if (event.getType() == DamageType.PROJECTILE && mVolley.contains(proj)) {
 			if (notBeenHit(enemy)) {
 				event.setDamage(event.getDamage() * mMultiplier * (1 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)));
 				if (isEnhanced()) {

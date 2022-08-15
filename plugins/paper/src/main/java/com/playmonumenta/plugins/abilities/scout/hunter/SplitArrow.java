@@ -23,6 +23,7 @@ import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -57,7 +58,7 @@ public class SplitArrow extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow && EntityUtils.isHostileMob(enemy)) {
+		if (event.getType() == DamageType.PROJECTILE && (event.getDamager() instanceof AbstractArrow || event.getDamager() instanceof Snowball) && EntityUtils.isHostileMob(enemy)) {
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, event.getDamage() * mDamagePercent);
 			int count = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_BOUNCES);
 			double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, SPLIT_ARROW_CHAIN_RANGE);

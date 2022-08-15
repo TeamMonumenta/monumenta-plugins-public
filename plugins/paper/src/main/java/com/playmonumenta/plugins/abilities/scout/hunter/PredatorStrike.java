@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -25,6 +24,8 @@ import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
@@ -57,7 +58,7 @@ public class PredatorStrike extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.PREDATOR_STRIKE;
 		mInfo.mScoreboardId = "PredatorStrike";
 		mInfo.mShorthandName = "PrS";
-		mInfo.mDescriptions.add("Left-clicking with a bow or trident while not sneaking will prime a Predator Strike that unprimes after 5s. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits an enemy or block and damages enemies in a 0.75 block radius. This ability deals 100% of your projectile base damage increased by 10% for every block of distance from you and the target (up to 12 blocks, or 220% total). Hit targets contribute to Sharpshooter stacks. Cooldown: 18s.");
+		mInfo.mDescriptions.add("Left-clicking with a bow, snowball or trident while not sneaking will prime a Predator Strike that unprimes after 5s. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits an enemy or block and damages enemies in a 0.75 block radius. This ability deals 100% of your projectile base damage increased by 10% for every block of distance from you and the target (up to 12 blocks, or 220% total). Hit targets contribute to Sharpshooter stacks. Cooldown: 18s.");
 		mInfo.mDescriptions.add("Damage now increases 15% for each block of distance (up to 280%). Cooldown: 14s.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -70,7 +71,7 @@ public class PredatorStrike extends Ability {
 	public void cast(Action action) {
 		if (mPlayer != null && !mPlayer.isSneaking() && !mActive && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (ItemUtils.isBowOrTrident(mainHand)) {
+			if (ItemUtils.isBowOrTrident(mainHand) || mainHand.getType() == Material.SNOWBALL) {
 				Player player = mPlayer;
 				mActive = true;
 				ClientModHandler.updateAbility(mPlayer, this);
@@ -95,12 +96,12 @@ public class PredatorStrike extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (mPlayer != null && mActive && (arrow.isCritical() || arrow instanceof Trident)) {
+	public boolean playerShotProjectileEvent(Projectile projectile) {
+		if (mPlayer != null && mActive && ((projectile instanceof AbstractArrow arrow && arrow.isCritical()) || projectile instanceof Trident || projectile instanceof Snowball)) {
 			mActive = false;
 			putOnCooldown();
-			arrow.remove();
-			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
+			projectile.remove();
+			mPlugin.mProjectileEffectTimers.removeEntity(projectile);
 
 			Location loc = mPlayer.getEyeLocation();
 			Vector direction = loc.getDirection();
@@ -147,7 +148,6 @@ public class PredatorStrike extends Ability {
 
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EXPLODE_RADIUS);
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE)));
-		damage *= Sharpshooter.getDamageMultiplier(mPlayer);
 
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 45, radius, radius, radius, 0.125).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLAME, loc, 12, radius, radius, radius, 0.1).spawnAsPlayerActive(mPlayer);
@@ -158,9 +158,8 @@ public class PredatorStrike extends Ability {
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius, mPlayer);
 		for (LivingEntity mob : mobs) {
 			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
-			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE, damage, mInfo.mLinkedSpell, true);
+			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, damage, mInfo.mLinkedSpell, true);
 		}
-		Sharpshooter.addStacks(mPlayer, mobs.size());
 	}
 
 	@Override

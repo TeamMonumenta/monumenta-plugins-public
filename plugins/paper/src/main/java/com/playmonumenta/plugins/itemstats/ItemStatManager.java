@@ -95,6 +95,14 @@ public class ItemStatManager implements Listener {
 				}
 			}
 
+			public void set(ItemStat stat, double value) {
+				if (value != 0) {
+					mMap.put(stat, value);
+				} else {
+					mMap.remove(stat);
+				}
+			}
+
 			public double get(ItemStat stat) {
 				return get(stat, 0);
 			}
@@ -126,7 +134,9 @@ public class ItemStatManager implements Listener {
 		}
 
 		public PlayerItemStats(PlayerItemStats playerItemStats) {
-			mStats = playerItemStats.getItemStats();
+			for (Entry<ItemStat, Double> entry : playerItemStats.getItemStats()) {
+				mStats.add(entry.getKey(), entry.getValue());
+			}
 			mRegion = playerItemStats.mRegion;
 		}
 

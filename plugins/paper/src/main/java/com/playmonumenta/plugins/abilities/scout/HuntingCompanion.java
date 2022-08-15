@@ -39,6 +39,7 @@ import org.bukkit.entity.Fox;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Vex;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -117,7 +118,7 @@ public class HuntingCompanion extends Ability {
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isBowOrTrident(inMainHand) && !ItemStatUtils.isShattered(inMainHand)) {
+		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && (ItemUtils.isBowOrTrident(inMainHand) || inMainHand.getType() == Material.SNOWBALL) && !ItemStatUtils.isShattered(inMainHand)) {
 			putOnCooldown();
 
 			clearSummons();
@@ -145,6 +146,7 @@ public class HuntingCompanion extends Ability {
 			World world = mPlayer.getWorld();
 			mRunnable = new BukkitRunnable() {
 				int mTicksElapsed = 0;
+
 				@Override
 				public void run() {
 					if (mTicksElapsed >= duration) {
@@ -199,7 +201,7 @@ public class HuntingCompanion extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow) {
+		if (event.getType() == DamageType.PROJECTILE && (event.getDamager() instanceof AbstractArrow || event.getDamager() instanceof Snowball)) {
 			Mob nearestSummon = findNearestNonTargetingSummon(enemy);
 			if (nearestSummon != null) {
 				mSummons.replace(nearestSummon, enemy);

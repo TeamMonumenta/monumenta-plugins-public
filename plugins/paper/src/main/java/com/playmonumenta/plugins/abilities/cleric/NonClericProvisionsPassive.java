@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import org.bukkit.Sound;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -68,8 +69,8 @@ public class NonClericProvisionsPassive extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (mPlayer != null && testRandomChance(mPlayer)) {
+	public boolean playerShotProjectileEvent(Projectile projectile) {
+		if (mPlayer != null && projectile instanceof AbstractArrow arrow && testRandomChance(mPlayer)) {
 			AbilityUtils.refundArrow(mPlayer, arrow);
 		}
 		return true;

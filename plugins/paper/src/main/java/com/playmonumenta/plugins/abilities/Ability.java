@@ -18,7 +18,6 @@ import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -74,6 +73,7 @@ public abstract class Ability {
 
 	/**
 	 * Gets the AbilityInfo object, which contains the small data side of the ability itself, and is required to have for any ability.
+	 *
 	 * @return the AbilityInfo object. Never null.
 	 */
 	public AbilityInfo getInfo() {
@@ -183,6 +183,7 @@ public abstract class Ability {
 
 	/**
 	 * A combination of both runCheck and isOnCooldown.
+	 *
 	 * @return true or false
 	 */
 	public final boolean canCast() {
@@ -228,7 +229,8 @@ public abstract class Ability {
 		return true;
 	}
 
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
+	// Specifically called for: AbstractArrows and Snowballs
+	public boolean playerShotProjectileEvent(Projectile projectile) {
 		return true;
 	}
 
@@ -241,13 +243,13 @@ public abstract class Ability {
 	}
 
 	public boolean playerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities,
-	                                           ThrownPotion potion, PotionSplashEvent event) {
+											   ThrownPotion potion, PotionSplashEvent event) {
 		return true;
 	}
 
 	// Called when entities are hit by a potion a player threw
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities,
-	                                       ThrownPotion potion, PotionSplashEvent event) {
+										   ThrownPotion potion, PotionSplashEvent event) {
 		return true;
 	}
 

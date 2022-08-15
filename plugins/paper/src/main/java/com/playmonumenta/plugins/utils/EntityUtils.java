@@ -432,7 +432,7 @@ public class EntityUtils {
 		return null;
 	}
 
-	public static AbstractArrow spawnArrow(LivingEntity player, double yawOffset, double pitchOffset, Vector offset, float speed, Class<? extends AbstractArrow> arrowClass) {
+	public static Projectile spawnProjectile(LivingEntity player, double yawOffset, double pitchOffset, Vector offset, float speed, Class<? extends Projectile> projectileClass) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
 
@@ -451,17 +451,19 @@ public class EntityUtils {
 		World world = player.getWorld();
 
 		// Spawn the arrow at the specified location, direction, and speed
-		AbstractArrow arrow = world.spawnArrow(loc, dir, speed, 0.0f, arrowClass);
-		arrow.setShooter(player);
-		return arrow;
+		Projectile projectile = world.spawn(loc, projectileClass);
+		projectile.setVelocity(dir.normalize().multiply(speed));
+		projectile.setShooter(player);
+		return projectile;
 	}
 
-	public static List<AbstractArrow> spawnArrowVolley(LivingEntity player, int numProjectiles, float speed, double spacing, Class<? extends AbstractArrow> arrowClass) {
-		List<AbstractArrow> projectiles = new ArrayList<>();
+
+	public static List<Projectile> spawnVolley(LivingEntity player, int numProjectiles, float speed, double spacing, Class<? extends Projectile> projectileClass) {
+		List<Projectile> projectiles = new ArrayList<>();
 
 		for (int i = 0; i < numProjectiles; i++) {
 			double yaw = spacing * (i - (numProjectiles - 1) / 2f);
-			AbstractArrow arrow = spawnArrow(player, yaw, 0.0, new Vector(0, 0, 0), speed, arrowClass);
+			Projectile arrow = spawnProjectile(player, yaw, 0.0, new Vector(0, 0, 0), speed, projectileClass);
 			projectiles.add(arrow);
 		}
 

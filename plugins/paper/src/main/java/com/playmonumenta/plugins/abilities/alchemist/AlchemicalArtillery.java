@@ -30,6 +30,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -77,8 +78,10 @@ public class AlchemicalArtillery extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (mPlayer != null && mAlchemistPotions != null && mActive && (arrow.isCritical() || arrow instanceof Trident) && mAlchemistPotions.decrementCharge()) {
+	public boolean playerShotProjectileEvent(Projectile projectile) {
+		if (mPlayer != null && mAlchemistPotions != null
+			&& mActive && projectile instanceof AbstractArrow arrow
+			&& (arrow.isCritical() || arrow instanceof Trident) && mAlchemistPotions.decrementCharge()) {
 			ThrownPotion pot = mPlayer.getWorld().spawn(arrow.getLocation(), ThrownPotion.class);
 			pot.setVelocity(arrow.getVelocity());
 			pot.setShooter(mPlayer);

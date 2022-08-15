@@ -18,6 +18,7 @@ import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Stray;
 import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
@@ -44,7 +45,6 @@ public class ElementalArrows extends Ability {
 	public static final String CHARM_RANGE = "Elemental Arrows Range";
 
 	private double mLastDamage = 0;
-	private double mDamageMultiplier;
 
 	public ElementalArrows(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
@@ -123,23 +123,23 @@ public class ElementalArrows extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
+	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (mPlayer == null) {
 			return true;
 		}
-		if (arrow.isCritical() || arrow instanceof Trident) {
+		if ((projectile instanceof AbstractArrow arrow && arrow.isCritical()) || projectile instanceof Trident) {
 			if (isEnhanced() && !isTimerActive()) {
-				arrow.setMetadata("ElementalArrowsThunderArrow", new FixedMetadataValue(mPlugin, 0));
-				arrow.setFireTicks(0);
-				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.END_ROD);
+				projectile.setMetadata("ElementalArrowsThunderArrow", new FixedMetadataValue(mPlugin, 0));
+				projectile.setFireTicks(0);
+				mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.END_ROD);
 			} else if (mPlayer.isSneaking()) {
-				arrow.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
-				arrow.setFireTicks(0);
-				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SNOW_SHOVEL);
+				projectile.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
+				projectile.setFireTicks(0);
+				mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.SNOW_SHOVEL);
 			} else {
-				arrow.setMetadata("ElementalArrowsFireArrow", new FixedMetadataValue(mPlugin, 0));
-				arrow.setFireTicks(ELEMENTAL_ARROWS_DURATION);
-				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FLAME);
+				projectile.setMetadata("ElementalArrowsFireArrow", new FixedMetadataValue(mPlugin, 0));
+				projectile.setFireTicks(ELEMENTAL_ARROWS_DURATION);
+				mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.FLAME);
 			}
 		}
 		return true;

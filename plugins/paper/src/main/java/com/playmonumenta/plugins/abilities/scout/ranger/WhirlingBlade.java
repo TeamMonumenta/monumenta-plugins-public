@@ -86,7 +86,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
 		if (ItemUtils.isSomeBow(inMainHand) || ItemUtils.isSomeBow(inOffHand) || ItemUtils.isSomePotion(inMainHand) || inMainHand.getType().isBlock()
-				|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.TRIDENT || inMainHand.getType() == Material.COMPASS || inMainHand.getType() == Material.SHIELD) {
+			|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.TRIDENT || inMainHand.getType() == Material.COMPASS || inMainHand.getType() == Material.SHIELD || inMainHand.getType() == Material.SNOWBALL) {
 			return;
 		}
 
@@ -113,8 +113,9 @@ public class WhirlingBlade extends MultipleChargeAbility {
 			// Convoluted range parameter makes sure we grab all possible entities to be hit without recalculating manually
 			List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(mLoc, 4 * throwRadius, mPlayer);
 
-			double mStartAngle = Math.atan(mEyeDir.getZ()/mEyeDir.getX());
+			double mStartAngle = Math.atan(mEyeDir.getZ() / mEyeDir.getX());
 			int mIncrementDegrees = 0;
+
 			@Override
 			public void run() {
 				if (mIncrementDegrees == 0) {

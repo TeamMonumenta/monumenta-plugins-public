@@ -23,8 +23,12 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -39,7 +43,7 @@ public class Earthquake extends DepthsAbility {
 	public static final int MAX_TICKS = 4 * 20;
 	public static final String EARTHQUAKE_ARROW_METADATA = "EarthquakeArrow";
 
-	private WeakHashMap<AbstractArrow, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	private WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public Earthquake(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -53,19 +57,29 @@ public class Earthquake extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && mPlayerItemStatsMap.containsKey(arrow)) {
-			quake(arrow, enemy.getLocation());
+		Entity damager = event.getDamager();
+		if (event.getType() == DamageType.PROJECTILE && damager instanceof AbstractArrow && mPlayerItemStatsMap.containsKey(damager)) {
+			quake((Projectile) damager, enemy.getLocation());
 		}
 		return false; // prevents multiple calls by removing the arrow (from the world and the player stats map)
 	}
 
-	private void quake(AbstractArrow arrow, Location loc) {
+	// Since Snowballs disappear after landing, we need an extra detection for when it hits the ground.
+	@Override
+	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
+		if (mPlayer != null && proj instanceof Snowball && mPlayerItemStatsMap.containsKey(proj)) {
+			quake(proj, proj.getLocation());
+		}
+	}
+
+	private void quake(Projectile projectile, Location loc) {
 		World world = mPlayer.getWorld();
 
-		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(arrow);
+		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(projectile);
 		if (playerItemStats != null) {
 			new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					if (mTicks >= EARTHQUAKE_TIME) {
@@ -104,7 +118,7 @@ public class Earthquake extends DepthsAbility {
 			}.runTaskTimer(mPlugin, 0, 5);
 		}
 
-		arrow.remove();
+		projectile.remove();
 	}
 
 	private void knockup(LivingEntity le) {
@@ -112,7 +126,7 @@ public class Earthquake extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
+	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			return true;
 		}
@@ -123,26 +137,29 @@ public class Earthquake extends DepthsAbility {
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.BLOCK_CAMPFIRE_CRACKLE, 2, 1.0f);
 
-			arrow.setPierceLevel(0);
-			arrow.setCritical(true);
-			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+			if (projectile instanceof AbstractArrow arrow) {
+				arrow.setPierceLevel(0);
+				arrow.setCritical(true);
+				arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+			}
 
-			mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+			mPlayerItemStatsMap.put(projectile, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 
-			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.LAVA);
+			mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.LAVA);
 
 			new BukkitRunnable() {
 				int mT = 0;
+
 				@Override
 				public void run() {
-					if (mT > COOLDOWN || !mPlayerItemStatsMap.containsKey(arrow)) {
-						arrow.remove();
+					if (mT > COOLDOWN || !mPlayerItemStatsMap.containsKey(projectile)) {
+						projectile.remove();
 
 						this.cancel();
 					}
 
-					if (arrow.getVelocity().length() < .05 || arrow.isOnGround()) {
-						quake(arrow, arrow.getLocation());
+					if (projectile.getVelocity().length() < .05 || projectile.isOnGround()) {
+						quake(projectile, projectile.getLocation());
 
 						this.cancel();
 					}
@@ -157,7 +174,7 @@ public class Earthquake extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting a bow or trident while sneaking causes an earthquake " + EARTHQUAKE_TIME / 20 + " second after impact. The earthquake deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to mobs in a " + RADIUS + " block radius, silencing for " + DepthsUtils.getRarityColor(rarity) + (float)SILENCE_DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds and knocking upward. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Shooting a bow or trident while sneaking causes an earthquake " + EARTHQUAKE_TIME / 20 + " second after impact. The earthquake deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to mobs in a " + RADIUS + " block radius, silencing for " + DepthsUtils.getRarityColor(rarity) + (float) SILENCE_DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds and knocking upward. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

@@ -20,6 +20,7 @@ import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -56,7 +57,7 @@ public class PinningShot extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() != DamageType.PROJECTILE || !(event.getDamager() instanceof AbstractArrow)) {
+		if (event.getType() != DamageType.PROJECTILE || (!(event.getDamager() instanceof AbstractArrow) && !(event.getDamager() instanceof Snowball))) {
 			return false;
 		}
 

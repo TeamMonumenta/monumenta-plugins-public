@@ -25,6 +25,9 @@ import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Pyroblast extends DepthsAbility {
@@ -36,7 +39,7 @@ public class Pyroblast extends DepthsAbility {
 	private static final int RADIUS = 4;
 	private static final int DURATION = 4 * 20;
 
-	private WeakHashMap<AbstractArrow, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	private WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public Pyroblast(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -51,31 +54,39 @@ public class Pyroblast extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity damager = event.getDamager();
-		if (event.getType() == DamageType.PROJECTILE && damager != null && damager instanceof AbstractArrow arrow && mPlayerItemStatsMap.containsKey(arrow)) {
-			explode(arrow, enemy.getLocation());
+		if (event.getType() == DamageType.PROJECTILE && damager != null && damager instanceof AbstractArrow && mPlayerItemStatsMap.containsKey(damager)) {
+			explode((Projectile) damager, enemy.getLocation());
 		}
 		return false; // prevents multiple calls itself by removing the arrow
 	}
 
-	private void explode(AbstractArrow arrow, Location loc) {
-		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(arrow);
+	// Since Snowballs disappear after landing, we need an extra detection for when it hits the ground.
+	@Override
+	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
+		if (mPlayer != null && proj instanceof Snowball && mPlayerItemStatsMap.containsKey(proj)) {
+			explode(proj, proj.getLocation());
+		}
+	}
+
+	private void explode(Projectile proj, Location loc) {
+		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(proj);
 		if (mPlayer != null && playerItemStats != null) {
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, RADIUS);
 			for (LivingEntity mob : mobs) {
 				EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
 				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false);
 			}
-			World world = arrow.getWorld();
+			World world = proj.getWorld();
 			world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);
 			world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 40, 2, 2, 2, 0);
 			world.spawnParticle(Particle.FLAME, loc, 40, 2, 2, 2, 0);
 			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-			arrow.remove();
+			proj.remove();
 		}
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
+	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (mPlayer == null || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			return true;
 		}
@@ -86,27 +97,30 @@ public class Pyroblast extends DepthsAbility {
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.4f);
 
-			arrow.setPierceLevel(0);
-			arrow.setCritical(true);
-			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+			if (projectile instanceof AbstractArrow arrow) {
+				arrow.setPierceLevel(0);
+				arrow.setCritical(true);
+				arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+			}
 
-			mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+			mPlayerItemStatsMap.put(projectile, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 
-			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SOUL_FIRE_FLAME);
-			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.CAMPFIRE_SIGNAL_SMOKE);
+			mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.SOUL_FIRE_FLAME);
+			mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.CAMPFIRE_SIGNAL_SMOKE);
 
 			new BukkitRunnable() {
 				int mT = 0;
+
 				@Override
 				public void run() {
 
-					if (mT > COOLDOWN || !mPlayerItemStatsMap.containsKey(arrow)) {
-						arrow.remove();
+					if (mT > COOLDOWN || !mPlayerItemStatsMap.containsKey(projectile)) {
+						projectile.remove();
 
 						this.cancel();
 					}
-					if (arrow.getVelocity().length() < .05 || arrow.isOnGround()) {
-						explode(arrow, arrow.getLocation());
+					if (projectile.getVelocity().length() < .05 || projectile.isOnGround()) {
+						explode(projectile, projectile.getLocation());
 
 						this.cancel();
 					}

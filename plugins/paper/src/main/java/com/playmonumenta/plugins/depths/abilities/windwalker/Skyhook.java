@@ -25,6 +25,9 @@ import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -46,11 +49,21 @@ public class Skyhook extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(SKYHOOK_ARROW_METADATA)) {
-			hook(arrow);
-			arrow.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
+		Entity damager = event.getDamager();
+		if (event.getType() == DamageType.PROJECTILE && damager instanceof AbstractArrow && damager.hasMetadata(SKYHOOK_ARROW_METADATA)) {
+			hook(damager);
+			damager.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
 		}
 		return false; // prevents multiple calls itself
+	}
+
+	// Since Snowballs disappear after landing, we need an extra detection for when it hits the ground.
+	@Override
+	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
+		if (mPlayer != null && proj instanceof Snowball && proj.hasMetadata(SKYHOOK_ARROW_METADATA)) {
+			hook(proj);
+			proj.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
+		}
 	}
 
 	private void hook(Entity arrow) {
@@ -98,8 +111,8 @@ public class Skyhook extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || arrow.hasMetadata(RapidFire.META_DATA_TAG)) {
+	public boolean playerShotProjectileEvent(Projectile projectile) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || projectile.hasMetadata(RapidFire.META_DATA_TAG)) {
 			return true;
 		}
 
@@ -110,26 +123,29 @@ public class Skyhook extends DepthsAbility {
 			Location loc = mPlayer.getLocation();
 			world.playSound(loc, Sound.ITEM_CROSSBOW_QUICK_CHARGE_3, 1, 1.0f);
 
-			arrow.setPierceLevel(0);
-			arrow.setCritical(true);
-			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-			arrow.setMetadata(SKYHOOK_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
+			if (projectile instanceof AbstractArrow arrow) {
+				arrow.setPierceLevel(0);
+				arrow.setCritical(true);
+				arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+			}
+			projectile.setMetadata(SKYHOOK_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
 
-			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
+			mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.FIREWORKS_SPARK);
 
 			new BukkitRunnable() {
 				int mT = 0;
+
 				@Override
 				public void run() {
-					if (arrow == null || mT > MAX_TICKS) {
-						mPlugin.mProjectileEffectTimers.removeEntity(arrow);
-						arrow.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
-						arrow.remove();
+					if (projectile == null || mT > MAX_TICKS) {
+						mPlugin.mProjectileEffectTimers.removeEntity(projectile);
+						projectile.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
+						projectile.remove();
 						this.cancel();
 					}
 
-					if (arrow.getVelocity().length() < .05 || arrow.isOnGround()) {
-						hook(arrow);
+					if (projectile.getVelocity().length() < .05 || projectile.isOnGround()) {
+						hook(projectile);
 						this.cancel();
 					}
 					mT++;

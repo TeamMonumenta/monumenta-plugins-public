@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -17,6 +18,8 @@ import org.bukkit.Sound;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
 
@@ -55,15 +58,29 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow) {
+		if (event.getType() == DamageType.PROJECTILE_SKILL && (event.getAbility() == ClassAbility.WIND_BOMB || event.getAbility() == ClassAbility.PREDATOR_STRIKE)) {
+			event.setDamage(event.getDamage() * (1 + PERCENT_BASE_DAMAGE + mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE))));
 
+			// Critical arrow and mob is actually going to take damage
+			if (isLevelTwo() && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage())) {
+				mTicksToStackDecay = mDecayTime;
+
+				if (mStacks < mMaxStacks) {
+					mStacks++;
+					MessagingUtils.sendActionBarMessage(mPlayer, "Sharpshooter Stacks: " + mStacks);
+					ClientModHandler.updateAbility(mPlayer, this);
+				}
+			}
+		} else if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && (projectile instanceof AbstractArrow || projectile instanceof Snowball)) {
 			event.setDamage(event.getDamage() * (1 + PERCENT_BASE_DAMAGE + mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE))));
 			if (isEnhanced()) {
 				event.setDamage(event.getDamage() * (1 + Math.min(enemy.getLocation().distance(mPlayer.getLocation()), MAX_DISTANCE) * DAMAGE_PER_BLOCK));
 			}
 
 			// Critical arrow and mob is actually going to take damage
-			if (isLevelTwo() && (arrow.isCritical() || arrow instanceof Trident) && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage())) {
+			if (isLevelTwo()
+				&& ((projectile instanceof AbstractArrow arrow && (arrow.isCritical() || arrow instanceof Trident)) || projectile instanceof Snowball)
+				&& (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage())) {
 				mTicksToStackDecay = mDecayTime;
 
 				if (mStacks < mMaxStacks) {
@@ -94,8 +111,10 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (isLevelTwo() && mPlayer != null && FastUtils.RANDOM.nextDouble() < ARROW_SAVE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RETRIEVAL)) {
+	public boolean playerShotProjectileEvent(Projectile projectile) {
+		if (isLevelTwo()
+			&& mPlayer != null && projectile instanceof AbstractArrow arrow
+			&& FastUtils.RANDOM.nextDouble() < ARROW_SAVE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RETRIEVAL)) {
 			boolean refunded = AbilityUtils.refundArrow(mPlayer, arrow);
 			if (refunded) {
 				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
@@ -115,7 +134,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	public static double getDamageMultiplier(Player player) {
 		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
-		return ss == null ? 1 : (1 + PERCENT_BASE_DAMAGE + ss.mStacks * PERCENT_DAMAGE_PER_STACK);
+		return ss == null ? 1 : (1 + PERCENT_BASE_DAMAGE + ss.mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(player, CHARM_STACK_DAMAGE)));
 	}
 
 	@Override

@@ -485,11 +485,10 @@ public class EntityListener implements Listener {
 			}
 
 			// We already have a crossbowListener, we don't want to run the onLaunchProjectile twice.
-			if (player.getInventory().getItemInMainHand().getType() == Material.CROSSBOW) {
-				return;
+			// We do want it to run for everything else though
+			if (player.getInventory().getItemInMainHand().getType() != Material.CROSSBOW) {
+				mPlugin.mItemStatManager.onLaunchProjectile(mPlugin, player, event, proj);
 			}
-
-			mPlugin.mItemStatManager.onLaunchProjectile(mPlugin, player, event, proj);
 
 			if (event.isCancelled()) {
 				return;
@@ -500,10 +499,14 @@ public class EntityListener implements Listener {
 			if (event.getEntityType() == EntityType.SNOWBALL) {
 				Snowball origBall = (Snowball) proj;
 				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
+				if (!mAbilities.playerShotProjectileEvent(player, proj)) {
+					event.setCancelled(true);
+				}
 
-				// Check if the player has an infinity snowball
+				// Check if the player has an infinity snowball and not throw rate
 				if (itemInMainHand.getType().equals(Material.SNOWBALL)
-					&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
+					&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0
+					&& ItemStatUtils.getAttributeAmount(itemInMainHand, ItemStatUtils.AttributeType.THROW_RATE, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) == 0) {
 					Snowball newBall = (Snowball) origBall.getWorld().spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 
 					// Copy the item's name/etc so it can be textured
@@ -537,7 +540,7 @@ public class EntityListener implements Listener {
 			} else if (event.getEntity() instanceof AbstractArrow arrow) {
 				// Includes arrows and spectral arrows
 				// Tridents are handled in ThrowRate
-				if (!mAbilities.playerShotArrowEvent(player, arrow)) {
+				if (!mAbilities.playerShotProjectileEvent(player, arrow)) {
 					event.setCancelled(true);
 				}
 
