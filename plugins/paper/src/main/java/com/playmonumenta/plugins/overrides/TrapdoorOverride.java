@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -243,6 +244,6 @@ public class TrapdoorOverride extends UnbreakableOnBedrockOverride {
 
 	public void markPos(Location loc) {
 		Location tempLoc = new Location(loc.getWorld(), loc.getX() + 0.5, loc.getY() + 0.5, loc.getZ() + 0.5);
-		loc.getWorld().spawnParticle(Particle.BARRIER, tempLoc, 1);
+		loc.getWorld().spawnParticle(Particle.REDSTONE, tempLoc, 1, new Particle.DustOptions(Color.fromRGB(255, 0, 0), 4));
 	}
 }

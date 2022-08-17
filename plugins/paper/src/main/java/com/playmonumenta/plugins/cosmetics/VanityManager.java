@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.cosmetics;
 
-import com.destroystokyo.paper.event.player.PlayerDataLoadEvent;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -41,6 +40,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
@@ -98,7 +98,7 @@ public class VanityManager implements Listener {
 	}
 
 	// not an event listener - called by the cosmetics manager so that cosmetics are loaded before this is called
-	public void playerDataLoadEvent(PlayerDataLoadEvent event) {
+	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		JsonObject data = MonumentaRedisSyncAPI.getPlayerPluginData(player.getUniqueId(), KEY_PLUGIN_DATA);
 		if (data == null) {

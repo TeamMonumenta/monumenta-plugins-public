@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
-import io.papermc.paper.adventure.AdventureComponent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -164,8 +163,8 @@ public class PlayerTitleManager {
 							for (WrappedWatchableObject watchableObject : armorStand.mDataWatcher.getWatchableObjects()) {
 								if (watchableObject.getValue() instanceof Optional<?> optional
 									    && optional.isPresent()
-									    && optional.get() instanceof AdventureComponent) {
-									watchableObject.setValue(Optional.of(new AdventureComponent(display.get(i))));
+									    && optional.get() instanceof Component) {
+									watchableObject.setValue(Optional.of(display.get(i)));
 									nameWatchableObject = watchableObject;
 									break;
 								}
