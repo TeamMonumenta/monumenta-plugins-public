@@ -1,11 +1,11 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import java.util.Collection;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
 public class TellMiniMessage {
@@ -21,7 +21,7 @@ public class TellMiniMessage {
 				Collection<Player> recipients = (Collection<Player>) args[0];
 				String message = (String) args[1];
 
-				Component parsedMessage = MiniMessage.miniMessage().parse(message);
+				Component parsedMessage = MessagingUtils.fromMiniMessage(message);
 				for (Player recipient : recipients) {
 					recipient.sendMessage(parsedMessage);
 				}

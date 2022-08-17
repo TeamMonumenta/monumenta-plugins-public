@@ -10,8 +10,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.transformation.TransformationRegistry;
-import net.kyori.adventure.text.minimessage.transformation.TransformationType;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
@@ -23,22 +22,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MessagingUtils {
 	public static final Gson GSON = new Gson();
-	public static final MiniMessage MINIMESSAGE_ALL = MiniMessage.builder()
-		.transformations(
-			TransformationRegistry.builder().clear()
-				.add(TransformationType.COLOR)
-				.add(TransformationType.DECORATION)
-				.add(TransformationType.HOVER_EVENT)
-				.add(TransformationType.CLICK_EVENT)
-				.add(TransformationType.KEYBIND)
-				.add(TransformationType.TRANSLATABLE)
-				.add(TransformationType.INSERTION)
-				.add(TransformationType.FONT)
-				.add(TransformationType.GRADIENT)
-				.add(TransformationType.RAINBOW)
-				.build()
-		)
-		.build();
+	public static final MiniMessage MINIMESSAGE_ALL = MiniMessage.builder().tags(TagResolver.standard()).build();
 	public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
 	public static final GsonComponentSerializer GSON_SERIALIZER = GsonComponentSerializer.gson();
 	public static final PlainComponentSerializer PLAIN_SERIALIZER = PlainComponentSerializer.plain();
@@ -132,7 +116,7 @@ public class MessagingUtils {
 	}
 
 	public static Component fromMiniMessage(String miniMessageText) {
-		return MINIMESSAGE_ALL.parse(miniMessageText);
+		return MINIMESSAGE_ALL.deserialize(miniMessageText);
 	}
 
 	public static String toMiniMessage(Component component) {

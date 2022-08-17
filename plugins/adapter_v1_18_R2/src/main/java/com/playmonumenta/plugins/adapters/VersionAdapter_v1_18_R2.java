@@ -8,40 +8,39 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import net.minecraft.server.v1_16_R3.AxisAlignedBB;
-import net.minecraft.server.v1_16_R3.ChatMessage;
-import net.minecraft.server.v1_16_R3.DamageSource;
-import net.minecraft.server.v1_16_R3.EntityCreature;
-import net.minecraft.server.v1_16_R3.EntityDamageSource;
-import net.minecraft.server.v1_16_R3.EntityHuman;
-import net.minecraft.server.v1_16_R3.EntityLiving;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
-import net.minecraft.server.v1_16_R3.EntityTypes;
-import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import net.minecraft.server.v1_16_R3.IRegistry;
-import net.minecraft.server.v1_16_R3.MinecraftKey;
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
-import net.minecraft.server.v1_16_R3.PathfinderGoalMeleeAttack;
-import net.minecraft.server.v1_16_R3.PathfinderGoalNearestAttackableTarget;
-import net.minecraft.server.v1_16_R3.PathfinderGoalPanic;
-import net.minecraft.server.v1_16_R3.PathfinderGoalPerch;
-import net.minecraft.server.v1_16_R3.PathfinderGoalWrapped;
-import net.minecraft.server.v1_16_R3.ResourceKey;
-import net.minecraft.server.v1_16_R3.TileEntityCommand;
-import net.minecraft.server.v1_16_R3.Vec3D;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.PanicGoal;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.CommandBlockEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftCreature;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMob;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftParrot;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlockState;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftCreature;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftMob;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftParrot;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -53,7 +52,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-public class VersionAdapter_v1_16_R3 implements VersionAdapter {
+public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 
 	public void removeAllMetadata(Plugin plugin) {
 		CraftServer server = (CraftServer) plugin.getServer();
@@ -67,15 +66,15 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 
 	public void resetPlayerIdleTimer(Player player) {
 		CraftPlayer p = (CraftPlayer) player;
-		EntityPlayer playerHandle = p.getHandle();
-		playerHandle.resetIdleTimer();
+		ServerPlayer playerHandle = p.getHandle();
+		playerHandle.resetLastActionTime();
 	}
 
 	private static class CustomDamageSource extends EntityDamageSource {
 		private final boolean mBlockable;
 		private final String mKilledUsingMsg;
 
-		public CustomDamageSource(net.minecraft.server.v1_16_R3.Entity damager, boolean blockable, @Nullable String killedUsingMsg) {
+		public CustomDamageSource(net.minecraft.world.entity.Entity damager, boolean blockable, @Nullable String killedUsingMsg) {
 			super("custom", damager);
 			mBlockable = blockable;
 			if (killedUsingMsg == null || killedUsingMsg.isEmpty()) {
@@ -87,20 +86,19 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 		}
 
 		@Override
-		public @Nullable Vec3D w() {
-			return mBlockable ? super.w() : null;
+		public @Nullable Vec3 getSourcePosition() {
+			return mBlockable ? super.getSourcePosition() : null;
 		}
 
 		@Override
-		public IChatBaseComponent getLocalizedDeathMessage(EntityLiving entityliving) {
-			assert this.w != null : "@AssumeAssertion(nullness): always set in constructors of this subclass";
+		public Component getLocalizedDeathMessage(net.minecraft.world.entity.LivingEntity entityliving) {
 			if (mKilledUsingMsg == null) {
 				String s = "death.attack.mob";
-				return new ChatMessage(s, entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName());
+				return new TranslatableComponent(s, entityliving.getScoreboardName(), this.entity.getScoreboardName());
 			} else {
 				// death.attack.indirectMagic.item=%1$s was killed by %2$s using %3$s
 				String s = "death.attack.indirectMagic.item";
-				return new ChatMessage(s, entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName(), mKilledUsingMsg);
+				return new TranslatableComponent(s, entityliving.getScoreboardName(), this.entity.getScoreboardName(), mKilledUsingMsg);
 			}
 		}
 	}
@@ -108,14 +106,14 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg) {
 		DamageSource reason = damager == null ? DamageSource.GENERIC : new CustomDamageSource(((CraftLivingEntity) damager).getHandle(), blockable, killedUsingMsg);
 
-		((CraftLivingEntity) damagee).getHandle().damageEntity(reason, (float) amount);
+		((CraftLivingEntity) damagee).getHandle().hurt(reason, (float) amount);
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T extends Entity> T duplicateEntity(T entity) {
 		T newEntity = (T) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
 
-		NBTTagCompound nbttagcompound = ((CraftEntity) entity).getHandle().save(new NBTTagCompound());
+		CompoundTag nbttagcompound = ((CraftEntity) entity).getHandle().saveWithoutId(new CompoundTag());
 		nbttagcompound.remove("UUID");
 		nbttagcompound.remove("UUIDMost");
 		nbttagcompound.remove("UUIDLeast");
@@ -126,7 +124,7 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	}
 
 	public @Nullable Entity getEntityById(World world, int entityId) {
-		net.minecraft.server.v1_16_R3.Entity entity = ((CraftWorld) world).getHandle().getEntity(entityId);
+		net.minecraft.world.entity.Entity entity = ((CraftWorld) world).getHandle().getEntity(entityId);
 		return entity == null ? null : entity.getBukkitEntity();
 	}
 
@@ -163,8 +161,8 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	public Vector getActualDirection(Entity entity) {
 		Vector vector = new Vector();
 
-		double rotX = ((CraftEntity) entity).getHandle().yaw;
-		double rotY = ((CraftEntity) entity).getHandle().pitch;
+		double rotX = ((CraftEntity) entity).getHandle().getXRot();
+		double rotY = ((CraftEntity) entity).getHandle().getYRot();
 
 		vector.setY(-Math.sin(Math.toRadians(rotY)));
 
@@ -209,7 +207,7 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 
 	// To find the new field name, see which field is reset by EntityHuman.resetAttackCooldown
 	// If the field's type changed from int to another type, update the type used by the getAttackCooldown/setAttackCooldown methods in this class accordingly.
-	private static final Field attackCooldownField = getField(EntityLiving.class, "at");
+	private static final Field attackCooldownField = getField(net.minecraft.world.entity.LivingEntity.class, "aR");
 
 	@SuppressWarnings("unboxing.of.nullable")
 	public int getAttackCooldown(LivingEntity entity) {
@@ -221,17 +219,18 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 	}
 
 	// Update the code in releaseActiveItem() below before updating this, as this may not even be used anymore.
-	private static final Method tickActiveItemStack = getMethod(EntityLiving.class, "t");
+	private static final Method tickActiveItemStack = getMethod(net.minecraft.world.entity.LivingEntity.class, "A");
 
 	public void releaseActiveItem(LivingEntity entity, boolean clearActiveItem) {
-		EntityLiving nmsEntity = ((CraftLivingEntity) entity).getHandle();
+		net.minecraft.world.entity.LivingEntity nmsEntity = ((CraftLivingEntity) entity).getHandle();
 		if (clearActiveItem) {
-			nmsEntity.releaseActiveItem();
+			nmsEntity.releaseUsingItem();
 		} else {
-			// This code is copied from releaseActiveItem(), without the call to clearActiveItem()
-			if (!nmsEntity.activeItem.isEmpty()) {
-				nmsEntity.activeItem.a(nmsEntity.world, nmsEntity, nmsEntity.dZ());
-				if (nmsEntity.activeItem.m()) {
+			// This code is adapted from releaseActiveItem(), without the call to clearActiveItem() (can't use exactly because of private fields)
+			ItemStack activeItem = nmsEntity.getUseItem();
+			if (!activeItem.isEmpty()) {
+				activeItem.releaseUsing(nmsEntity.level, nmsEntity, nmsEntity.getUseItemRemainingTicks());
+				if (activeItem.useOnRelease()) {
 					invokeMethod(tickActiveItemStack, nmsEntity);
 				}
 			}
@@ -247,17 +246,17 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 
 	@Override
 	public void cancelStrafe(Mob mob) {
-		((CraftMob) mob).getHandle().t(0);
-		((CraftMob) mob).getHandle().v(0);
+		((CraftMob) mob).getHandle().setXxa(0);
+		((CraftMob) mob).getHandle().setZza(0);
 	}
 
 	@Override
 	public Entity spawnWorldlessEntity(EntityType type, World world) {
-		Optional<EntityTypes<?>> entityTypes = EntityTypes.getByName(type.name().toLowerCase(Locale.ROOT));
+		Optional<net.minecraft.world.entity.EntityType<?>> entityTypes = net.minecraft.world.entity.EntityType.byString(type.name().toLowerCase(Locale.ROOT));
 		if (entityTypes.isEmpty()) {
 			throw new IllegalArgumentException("Invalid entity type " + type.name());
 		}
-		net.minecraft.server.v1_16_R3.Entity entity = entityTypes.get().a(((CraftWorld) world).getHandle());
+		net.minecraft.world.entity.Entity entity = entityTypes.get().create(((CraftWorld) world).getHandle());
 		if (entity == null) {
 			throw new IllegalArgumentException("Unspawnable entity type " + type.name());
 		}
@@ -266,72 +265,72 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 
 	@Override
 	public int getEntityTypeRegistryId(Entity entity) {
-		return IRegistry.ENTITY_TYPE.a(((CraftEntity) entity).getHandle().getEntityType());
+		return Registry.ENTITY_TYPE.getId(((CraftEntity) entity).getHandle().getType());
 	}
 
 	@Override
 	public void disablePerching(Parrot parrot) {
-		((CraftParrot) parrot).getHandle().goalSelector.getTasks().removeIf(w -> w.getGoal() instanceof PathfinderGoalPerch);
+		((CraftParrot) parrot).getHandle().goalSelector.getAvailableGoals().removeIf(w -> w.getGoal() instanceof LandOnOwnersShoulderGoal);
 	}
 
 	@Override
 	public void setAggressive(Creature entity, DamageAction action) {
-		EntityCreature entityCreature = ((CraftCreature) entity).getHandle();
-		entityCreature.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack16(entityCreature, action, 1.0));
-		entityCreature.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(entityCreature, EntityHuman.class, true));
+		PathfinderMob mob = ((CraftCreature) entity).getHandle();
+		mob.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(mob, action));
+		mob.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(mob, net.minecraft.world.entity.player.Player.class, true));
 	}
 
 	@Override
 	public void setFriendly(Creature entity, DamageAction action, Predicate<LivingEntity> predicate, double attackRange) {
-		EntityCreature entityCreature = ((CraftCreature) entity).getHandle();
+		PathfinderMob entityCreature = ((CraftCreature) entity).getHandle();
 
 		//removing panic mode
-		Optional<PathfinderGoalWrapped> oldGoal = entityCreature.goalSelector.getTasks().stream().filter(task -> task.getGoal() instanceof PathfinderGoalPanic).findFirst();
+		Optional<WrappedGoal> oldGoal = entityCreature.goalSelector.getAvailableGoals().stream().filter(task -> task.getGoal() instanceof PanicGoal).findFirst();
 		if (oldGoal.isPresent()) {
-			PathfinderGoalWrapped goal = oldGoal.get();
-			entityCreature.goalSelector.getTasks().remove(goal);
+			WrappedGoal goal = oldGoal.get();
+			entityCreature.goalSelector.removeGoal(goal);
 		}
 
-		//removing others PathfinderGoalNearestAttackableTarget
-		List<PathfinderGoalWrapped> list = entityCreature.targetSelector.getTasks().stream().filter(task -> task.getGoal() instanceof PathfinderGoalNearestAttackableTarget).toList();
-		for (PathfinderGoalWrapped wrapped : list) {
-			entityCreature.targetSelector.getTasks().remove(wrapped);
+		//removing others NearestAttackableTargetGoal
+		List<WrappedGoal> list = entityCreature.targetSelector.getAvailableGoals().stream().filter(task -> task.getGoal() instanceof NearestAttackableTargetGoal).toList();
+		for (WrappedGoal wrapped : list) {
+			entityCreature.targetSelector.removeGoal(wrapped);
 		}
 
 
-		entityCreature.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack16(entityCreature, action, 1.0) {
+		entityCreature.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(entityCreature, action) {
 			@Override
-			protected double a(EntityLiving target) {
-				// to make it possible for entities to not attack from their feet,
-				// calculate whether the attack can hit here and return positive or negative infinity to allow/disallow the attack.
-				double x = a.locX();
-				double y = a.locY() + 1;
-				double z = a.locZ();
-				if (target.h(x, y, z) <= attackRange * attackRange) {
+			protected double getAttackReachSqr(net.minecraft.world.entity.LivingEntity target) {
+				double x = mob.getX();
+				double y = mob.getY() + 1;
+				double z = mob.getZ();
+				if (target.distanceToSqr(x, y, z) <= attackRange * attackRange) {
 					return Double.POSITIVE_INFINITY;
 				} else {
 					return Double.NEGATIVE_INFINITY;
 				}
 			}
 		});
-		entityCreature.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(entityCreature, EntityLiving.class, 10, false, false, entityLiving -> predicate.test(getLivingEntity(entityLiving))));
+		entityCreature.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entityCreature, net.minecraft.world.entity.LivingEntity.class, 10, false, false, entityLiving -> predicate.test(getLivingEntity(entityLiving))));
+
+
 	}
 
-	private LivingEntity getLivingEntity(EntityLiving nmsEntity) {
+	private LivingEntity getLivingEntity(net.minecraft.world.entity.LivingEntity nmsEntity) {
 		try {
-			return ((EntityLiving) nmsEntity).getBukkitLivingEntity();
+			return nmsEntity.getBukkitLivingEntity();
 		} catch (Exception e) {
 			return null;
 		}
 	}
 
 	public void setAttackRange(Creature entity, double attackRange, double attackHeight) {
-		EntityCreature entityCreature = ((CraftCreature) entity).getHandle();
-		Optional<PathfinderGoalWrapped> oldGoal = entityCreature.goalSelector.getTasks().stream().filter(task -> task.getGoal() instanceof PathfinderGoalMeleeAttack).findFirst();
+		PathfinderMob mob = ((CraftCreature) entity).getHandle();
+		Optional<WrappedGoal> oldGoal = mob.goalSelector.getAvailableGoals().stream().filter(goal -> goal.getGoal() instanceof MeleeAttackGoal).findFirst();
 		if (oldGoal.isPresent()) {
-			PathfinderGoalWrapped goal = oldGoal.get();
-			entityCreature.goalSelector.getTasks().remove(goal);
-			entityCreature.goalSelector.addGoal(goal.getPriority(), new CustomPathfinderGoalMeleeAttack16(entityCreature, 1.0, true, attackRange, attackHeight));
+			WrappedGoal goal = oldGoal.get();
+			mob.goalSelector.getAvailableGoals().remove(goal);
+			mob.goalSelector.addGoal(goal.getPriority(), new CustomPathfinderGoalMeleeAttack18(mob, 1.0, true, attackRange, attackHeight));
 		}
 	}
 
@@ -342,19 +341,17 @@ public class VersionAdapter_v1_16_R3 implements VersionAdapter {
 
 	@Override
 	public Object createDimensionTypeResourceKey(String namespace, String key) {
-		return ResourceKey.newResourceKey(IRegistry.K, new MinecraftKey(namespace, key));
+		return ResourceKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(namespace, key));
 	}
 
 	@Override
 	public void executeCommandAsBlock(Block block, String command) {
-		TileEntityCommand tileEntity = new TileEntityCommand();
-		tileEntity.setLocation(((CraftBlock) block).getCraftWorld().getHandle(), ((CraftBlock) block).getPosition());
-		Bukkit.dispatchCommand(tileEntity.getCommandBlock().getBukkitSender(tileEntity.getCommandBlock().getWrapper()), command);
+		CommandBlockEntity tileEntity = new CommandBlockEntity(((CraftBlock) block).getPosition(), ((CraftBlockState) block.getState()).getHandle());
+		Bukkit.dispatchCommand(tileEntity.getCommandBlock().getBukkitSender(tileEntity.getCommandBlock().createCommandSourceStack()), command);
 	}
 
-	@Override
 	public boolean hasCollision(World world, BoundingBox aabb) {
-		return !((CraftWorld) world).getHandle().b(new AxisAlignedBB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()));
+		return !((CraftWorld) world).getHandle().noCollision(new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()));
 	}
 
 }

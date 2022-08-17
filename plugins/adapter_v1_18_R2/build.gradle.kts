@@ -5,10 +5,10 @@ plugins {
 
 dependencies {
     implementation(project(":adapter_api"))
-    paperDevBundle("1.18.1-R0.1-SNAPSHOT")
+    paperDevBundle("1.18.2-R0.1-SNAPSHOT")
 }
 
-description = "adapter_v1_18_R1"
+description = "adapter_v1_18_R2"
 version = rootProject.version
 
 tasks {
