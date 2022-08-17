@@ -13,7 +13,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -24,7 +24,7 @@ public class MessagingUtils {
 	public static final MiniMessage MINIMESSAGE_ALL = MiniMessage.builder().tags(TagResolver.standard()).build();
 	public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
 	public static final GsonComponentSerializer GSON_SERIALIZER = GsonComponentSerializer.gson();
-	public static final PlainComponentSerializer PLAIN_SERIALIZER = PlainComponentSerializer.plain();
+	public static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
 	public static String translatePlayerName(Player player, String message) {
 		return message.replaceAll("@S", player.getName());

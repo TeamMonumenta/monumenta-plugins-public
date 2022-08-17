@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.cosmetics;
 
-import com.destroystokyo.paper.event.player.PlayerDataLoadEvent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -24,6 +23,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -205,7 +205,7 @@ public class CosmeticsManager implements Listener {
 
 	//Load plugin data into local cosmetic data
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void playerDataLoadEvent(PlayerDataLoadEvent event) {
+	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player p = event.getPlayer();
 		JsonObject cosmeticData = MonumentaRedisSyncAPI.getPlayerPluginData(p.getUniqueId(), KEY_PLUGIN_DATA);
 		if (cosmeticData != null) {
@@ -226,7 +226,7 @@ public class CosmeticsManager implements Listener {
 			}
 		}
 		// call the "event listener" of the vanity manager after the cosmetics manager loaded cosmetics
-		Plugin.getInstance().mVanityManager.playerDataLoadEvent(event);
+		Plugin.getInstance().mVanityManager.playerJoinEvent(event);
 	}
 
 	// Elite Finisher handler

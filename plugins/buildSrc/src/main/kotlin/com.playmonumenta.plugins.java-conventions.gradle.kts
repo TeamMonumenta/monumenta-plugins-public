@@ -100,8 +100,8 @@ repositories {
 }
 
 group = "com.playmonumenta.plugins"
-java.sourceCompatibility = JavaVersion.VERSION_16
-java.targetCompatibility = JavaVersion.VERSION_16
+java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
 
 tasks.withType<JavaCompile>() {
     options.encoding = "UTF-8"

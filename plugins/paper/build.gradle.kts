@@ -34,8 +34,7 @@ dependencies {
     compileOnly("net.kyori:adventure-api:4.11.0")
     compileOnly("net.kyori:adventure-text-minimessage:4.11.0")
 
-    compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
-    compileOnly("com.destroystokyo.paper:paper:1.16.5-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
     compileOnly("dev.jorel.CommandAPI:commandapi-core:6.0.0")
     compileOnly("me.clip:placeholderapi:2.10.4")
     compileOnly("de.jeff_media:ChestSortAPI:12.0.0")
@@ -70,7 +69,7 @@ version = rootProject.version
 bukkit {
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
     main = "com.playmonumenta.plugins.Plugin"
-    apiVersion = "1.16"
+    apiVersion = "1.18"
     name = "Monumenta"
     authors = listOf("The Monumenta Team")
     depend = listOf("CommandAPI", "ScriptedQuests", "NBTAPI")
