@@ -5,8 +5,12 @@ import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.BlockUtils;
+import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -18,6 +22,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -30,6 +35,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDispenseArmorEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFertilizeEvent;
@@ -39,12 +45,14 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.loot.Lootable;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class WorldListener implements Listener {
 	Plugin mPlugin;
+	public static final int SPAWNER_BREAK_CHEST_CHECK_RADIUS = 16;
 
 	public WorldListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -280,6 +288,26 @@ public class WorldListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void spawnerBreakEvent(BlockBreakEvent event) {
+		Block spawner = event.getBlock();
+		if (spawner.getType() == Material.SPAWNER) {
+			List<Chunk> chunkList = LocationUtils.getSurroundingChunks(spawner, SPAWNER_BREAK_CHEST_CHECK_RADIUS);
+			int chests = 0;
+			for (Chunk chunk : chunkList) {
+				for (BlockState interestingBlock: chunk.getTileEntities()) {
+					if (ChestUtils.isUnlootedChest(interestingBlock.getBlock()) && LocationUtils.blocksAreWithinRadius(spawner, interestingBlock.getBlock(), SPAWNER_BREAK_CHEST_CHECK_RADIUS)) {
+						chests++;
+						((Lootable)interestingBlock).setSeed(PlayerUtils.playersInLootScalingRange(spawner.getLocation()).size());
+						interestingBlock.update();
+						MMLog.fine("SpawnerBreakLootScaling : Players in radius: " + PlayerUtils.playersInLootScalingRange(spawner.getLocation()).size());
+					}
+				}
+			}
+			MMLog.fine("SpawnerBreakLootScaling : Set loot table seed for " + chests + " chests.");
 		}
 	}
 

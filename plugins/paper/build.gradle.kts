@@ -19,16 +19,21 @@ plugins {
 }
 
 dependencies {
+    // NOTE - Make sure if you add another version here you make sure to exclude it from minimization below!
     implementation(project(":adapter_api"))
     implementation(project(":adapter_unsupported"))
-    implementation(project(":adapter_v1_16_R3"))
-    implementation(project(":adapter_v1_18_R1", "reobf"))
+    implementation(project(":adapter_v1_18_R2", "reobf"))
+
     implementation("org.openjdk.jmh:jmh-core:1.19")
     implementation("org.openjdk.jmh:jmh-generator-annprocess:1.19")
     implementation("com.github.LeonMangler:PremiumVanishAPI:2.6.3")
-    implementation("net.kyori:adventure-text-minimessage:4.2-ab62718")
-    implementation("com.opencsv:opencsv:5.5")
+    implementation("com.opencsv:opencsv:5.5") // generateitems
     implementation("dev.jaqobb:namemcapi:2.0.7")
+
+    // Note this version should match what's in the Paper jar
+    compileOnly("net.kyori:adventure-api:4.11.0")
+    compileOnly("net.kyori:adventure-text-minimessage:4.11.0")
+
     compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.destroystokyo.paper:paper:1.16.5-R0.1-SNAPSHOT")
     compileOnly("dev.jorel.CommandAPI:commandapi-core:6.0.0")
@@ -110,6 +115,7 @@ tasks.withType<JavaCompile>().configureEach {
 
         /*** Disabled checks ***/
         // These we almost certainly don't want
+        check("InlineMeSuggester", CheckSeverity.OFF) // We won't keep deprecated stuff around long enough for this to matter
         check("CatchAndPrintStackTrace", CheckSeverity.OFF) // This is the primary way a lot of exceptions are handled
         check("FutureReturnValueIgnored", CheckSeverity.OFF) // This one is dumb and doesn't let you check return values with .whenComplete()
         check("ImmutableEnumChecker", CheckSeverity.OFF) // Would like to turn this on but we'd have to annotate a bunch of base classes
@@ -117,6 +123,23 @@ tasks.withType<JavaCompile>().configureEach {
         check("StaticAssignmentInConstructor", CheckSeverity.OFF) // We have tons of these on purpose
         check("StringSplitter", CheckSeverity.OFF) // We have a lot of string splits too which are fine for this use
         check("MutablePublicArray", CheckSeverity.OFF) // These are bad practice but annoying to refactor and low risk of actual bugs
+    }
+}
+
+// Relocation / shading
+tasks {
+    shadowJar {
+        relocate("com.opencsv", "com.playmonumenta.plugins.internal.com.opencsv") // /generateitems
+        relocate("dev.jaqobb", "com.playmonumenta.plugins.internal.dev.jaqobb") // NameMC API
+        relocate("org.json", "com.playmonumenta.plugins.internal.org.json") // NameMC API dependency
+        relocate("org.openjdk.jmh", "com.playmonumenta.plugins.internal.org.openjdk.jmh") // Benchmarking Sin/Cos
+        relocate("joptsimple", "com.playmonumenta.plugins.internal.joptsimple") // Dependency of jmh
+        relocate("org.apache.commons", "com.playmonumenta.plugins.internal.org.apache.commons") // Dependency of several things
+        minimize {
+            exclude(project(":adapter_api"))
+            exclude(project(":adapter_unsupported"))
+            exclude(project(":adapter_v1_18_R2"))
+        }
     }
 }
 
