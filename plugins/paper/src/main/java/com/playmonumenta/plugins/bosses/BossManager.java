@@ -264,7 +264,10 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(BlockPlacerBoss.identityTag, (Plugin p, LivingEntity e) -> new BlockPlacerBoss(p, e));
 		mStatelessBosses.put(ScoutVolleyBoss.identityTag, (Plugin p, LivingEntity e) -> new ScoutVolleyBoss(p, e));
 		mStatelessBosses.put(WarlockAmpHexBoss.identityTag, (Plugin p, LivingEntity e) -> new WarlockAmpHexBoss(p, e));
-
+		mStatelessBosses.put(BlueFireBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueFireBoss(p, e));
+		mStatelessBosses.put(BlueEarthBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueEarthBoss(p, e));
+		mStatelessBosses.put(BlueAirBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueAirBoss(p, e));
+		mStatelessBosses.put(BlueWaterBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueWaterBoss(p, e));
 
 		mStatelessBosses.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> new LichMageBoss(p, e));
 		mStatelessBosses.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> new LichRogueBoss(p, e));
@@ -491,6 +494,10 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(DodgeBoss.identityTag, (Plugin p, LivingEntity e) -> DodgeBoss.deserialize(p, e));
 		mBossDeserializers.put(BlockPlacerBoss.identityTag, (Plugin p, LivingEntity e) -> BlockPlacerBoss.deserialize(p, e));
 		mBossDeserializers.put(PotionThrowBoss.identityTag, (Plugin p, LivingEntity e) -> PotionThrowBoss.deserialize(p, e));
+		mBossDeserializers.put(BlueFireBoss.identityTag, (Plugin p, LivingEntity e) -> BlueFireBoss.deserialize(p, e));
+		mBossDeserializers.put(BlueEarthBoss.identityTag, (Plugin p, LivingEntity e) -> BlueEarthBoss.deserialize(p, e));
+		mBossDeserializers.put(BlueAirBoss.identityTag, (Plugin p, LivingEntity e) -> BlueAirBoss.deserialize(p, e));
+		mBossDeserializers.put(BlueWaterBoss.identityTag, (Plugin p, LivingEntity e) -> BlueWaterBoss.deserialize(p, e));
 
 
 		mBossDeserializers.put(Lich.identityTag, (Plugin p, LivingEntity e) -> Lich.deserialize(p, e));
@@ -593,7 +600,7 @@ public class BossManager implements Listener {
 					continue;
 				}
 
-				processEntity((LivingEntity)entity);
+				processEntity((LivingEntity) entity);
 			}
 		}
 
@@ -607,7 +614,7 @@ public class BossManager implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
 		if (event.getEntity() instanceof LivingEntity living
-			    && !living.getScoreboardTags().isEmpty()) {
+			&& !living.getScoreboardTags().isEmpty()) {
 			// EntityAddToWorldEvent is called at an inconvenient time in Minecraft's code, which can cause deadlocks,
 			// so we delay initialisation of boss data slightly to be outside of the entity loading code.
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
@@ -733,7 +740,7 @@ public class BossManager implements Listener {
 		if (proj != null) {
 			ProjectileSource shooter = proj.getShooter();
 			if (shooter != null && shooter instanceof LivingEntity) {
-				Boss boss = mBosses.get(((LivingEntity)shooter).getUniqueId());
+				Boss boss = mBosses.get(((LivingEntity) shooter).getUniqueId());
 				if (boss != null) {
 					boss.bossProjectileHit(event);
 				}
@@ -901,9 +908,9 @@ public class BossManager implements Listener {
 			Entity snowman = Bukkit.getEntity(UUID.fromString(player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString()));
 			Component snowmanName = snowman != null ? snowman.customName() : null;
 			Component deathMessage = Component.text("")
-					.append(Component.selector(player.getName()))
-					.append(Component.text(" was snowballed by "))
-					.append(snowmanName != null ? snowmanName : Component.text("a snowman"));
+				.append(Component.selector(player.getName()))
+				.append(Component.text(" was snowballed by "))
+				.append(snowmanName != null ? snowmanName : Component.text("a snowman"));
 			event.deathMessage(deathMessage);
 			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
 		}
@@ -1038,8 +1045,8 @@ public class BossManager implements Listener {
 			if (mStatefulBosses.get(requestedTag) != null) {
 				if (sender != null) {
 					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
-									   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
-									   "' but it requires positional arguments");
+						ChatColor.GREEN + requestedTag + ChatColor.GOLD +
+						"' but it requires positional arguments");
 					sender.sendMessage(ChatColor.GOLD + "Try again with some ending location coordinates");
 				}
 			} else {
@@ -1065,8 +1072,8 @@ public class BossManager implements Listener {
 			if (INSTANCE.mStatelessBosses.get(requestedTag) != null) {
 				if (sender != null) {
 					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
-									   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
-									   "' but it does not take positional arguments");
+						ChatColor.GREEN + requestedTag + ChatColor.GOLD +
+						"' but it does not take positional arguments");
 					sender.sendMessage(ChatColor.GOLD + "Try again without the coordinates");
 				}
 			} else {
