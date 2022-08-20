@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fish;
@@ -32,7 +33,7 @@ public class BucketOverride extends BaseOverride {
 			return true;
 		} else if (clickedEntity instanceof Cow) {
 			return false;
-		} else if (clickedEntity instanceof Fish && !ZoneUtils.isInPlot(clickedEntity)) {
+		} else if ((clickedEntity instanceof Fish || clickedEntity instanceof Axolotl) && !ZoneUtils.isInPlot(clickedEntity)) {
 			return false;
 		}
 

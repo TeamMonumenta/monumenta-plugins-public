@@ -105,6 +105,7 @@ public final class ItemOverrides {
 
 	public void registerOverrides() {
 		BaseOverride monsterEggOverride = new MonsterEggOverride();
+		mItems.put(Material.AXOLOTL_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.BAT_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.BEE_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.BLAZE_SPAWN_EGG, monsterEggOverride);
@@ -123,6 +124,8 @@ public final class ItemOverrides {
 		mItems.put(Material.EVOKER_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.FOX_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.GHAST_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.GLOW_SQUID_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.GOAT_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.GUARDIAN_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.HOGLIN_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.HORSE_SPAWN_EGG, monsterEggOverride);
@@ -226,6 +229,7 @@ public final class ItemOverrides {
 		mItems.put(Material.PUFFERFISH_BUCKET, bucketOverride);
 		mItems.put(Material.SALMON_BUCKET, bucketOverride);
 		mItems.put(Material.TROPICAL_FISH_BUCKET, bucketOverride);
+		mItems.put(Material.AXOLOTL_BUCKET, bucketOverride);
 
 		BaseOverride chestOverride = new ChestOverride();
 		mItems.put(Material.CHEST, chestOverride);

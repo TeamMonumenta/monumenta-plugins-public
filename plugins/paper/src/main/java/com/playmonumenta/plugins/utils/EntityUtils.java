@@ -80,6 +80,8 @@ public class EntityUtils {
 	);
 
 	private static final EnumSet<EntityType> AQUATIC_MOBS = EnumSet.of(
+		EntityType.AXOLOTL,
+		EntityType.GLOW_SQUID,
 		EntityType.GUARDIAN,
 		EntityType.ELDER_GUARDIAN,
 		EntityType.SQUID,
@@ -107,6 +109,7 @@ public class EntityUtils {
 		EntityType.CAVE_SPIDER,
 		EntityType.SILVERFISH,
 		EntityType.ENDERMITE,
+		EntityType.AXOLOTL,
 		EntityType.BEE,
 		EntityType.POLAR_BEAR,
 		EntityType.BAT,
@@ -115,6 +118,8 @@ public class EntityUtils {
 		EntityType.COW,
 		EntityType.DONKEY,
 		EntityType.FOX,
+		EntityType.GOAT,
+		EntityType.GLOW_SQUID,
 		EntityType.HORSE,
 		EntityType.LLAMA,
 		EntityType.MULE,
