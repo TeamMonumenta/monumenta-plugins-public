@@ -128,4 +128,11 @@ public interface VersionAdapter {
 	 */
 	boolean hasCollision(World world, BoundingBox aabb);
 
+	/**
+	 * Performs all desired AI changes for the given newly spawned or loaded mob.
+	 * Note that this is called inside an {@link com.destroystokyo.paper.event.entity.EntityAddToWorldEvent}, so must not use the world or other entities.
+	 * If any extra data is needed, delay the code by 1 tick.
+	 */
+	void mobAIChanges(Mob entity);
+
 }

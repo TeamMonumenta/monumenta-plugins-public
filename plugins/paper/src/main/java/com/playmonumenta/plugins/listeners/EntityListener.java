@@ -68,6 +68,7 @@ import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
@@ -977,6 +978,9 @@ public class EntityListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
+		if (event.getEntity() instanceof Mob mob) {
+			NmsUtils.getVersionAdapter().mobAIChanges(mob);
+		}
 		if (event.getEntity() instanceof IronGolem golem) {
 			NmsUtils.getVersionAdapter().setAttackRange(golem, 2.5, 1);
 		} else if (event.getEntity() instanceof Ravager ravager) {
