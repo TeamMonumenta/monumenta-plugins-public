@@ -119,8 +119,7 @@ public class PlayerTitleManager {
 					iterator.remove();
 					Player otherPlayer = Bukkit.getPlayer(visibleToPlayer);
 					if (otherPlayer != null) {
-						PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
-						packet.getIntegerArrays().write(0, metadata.mLines.stream().mapToInt(line -> line.mArmorStand.mId).toArray());
+						PacketContainer packet = createDestroyPacket(metadata);
 						sendPacketNoFilters(otherPlayer, packet);
 					}
 				}
@@ -147,8 +146,7 @@ public class PlayerTitleManager {
 					if (display.size() < metadata.mLines.size()) {
 						List<LineMetadata> subList = metadata.mLines.subList(display.size(), metadata.mLines.size());
 
-						PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
-						packet.getIntegerArrays().write(0, subList.stream().mapToInt(line -> line.mArmorStand.mId).toArray());
+						PacketContainer packet = createDestroyPacket(metadata);
 						broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
 
 						subList.clear();
@@ -323,8 +321,7 @@ public class PlayerTitleManager {
 
 	private void destroyEntities(PlayerMetadata metadata) {
 		if (!metadata.mVisibleToPlayers.isEmpty()) {
-			PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
-			packet.getIntegerArrays().write(0, metadata.mLines.stream().mapToInt(line -> line.mArmorStand.mId).toArray());
+			PacketContainer packet = createDestroyPacket(metadata);
 			broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
 			metadata.mVisibleToPlayers.clear();
 		}
@@ -357,6 +354,16 @@ public class PlayerTitleManager {
 			// ProtocolLib sometimes throws this if it cannot find trackers. Appears to happen near logout.
 			return Collections.emptyList();
 		}
+	}
+
+	private PacketContainer createDestroyPacket(PlayerMetadata metadata) {
+		PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
+		if (packet.getIntegerArrays().size() > 0) {
+			packet.getIntegerArrays().write(0, metadata.mLines.stream().mapToInt(line -> line.mArmorStand.mId).toArray());
+		} else {
+			packet.getIntLists().write(0, metadata.mLines.stream().map(line -> line.mArmorStand.mId).toList());
+		}
+		return packet;
 	}
 
 }
