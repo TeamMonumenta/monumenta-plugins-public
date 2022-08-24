@@ -105,7 +105,8 @@ public class RKitxet extends BossAbilityGroup {
 				}
 
 				List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-				if (players != null && players.size() > 0 && mBoss instanceof Mob mob) {
+				Collections.shuffle(players);
+				if (!players.isEmpty() && mBoss instanceof Mob mob) {
 					mob.setTarget(players.get(0));
 				}
 			}

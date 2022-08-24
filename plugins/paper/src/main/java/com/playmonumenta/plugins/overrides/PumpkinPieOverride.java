@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -25,7 +26,8 @@ public class PumpkinPieOverride extends BaseOverride {
 				|| !InventoryUtils.testForItemWithName(item, "Creeper's Delight")
 				|| "plots".equals(ServerProperties.getShardName())
 				|| "playerplots".equals(ServerProperties.getShardName())
-				|| clickedEntity.getScoreboardTags().contains("boss_halloween_creeper")) {
+				|| clickedEntity.getScoreboardTags().contains("boss_halloween_creeper")
+				|| clickedEntity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			return true;
 		}
 

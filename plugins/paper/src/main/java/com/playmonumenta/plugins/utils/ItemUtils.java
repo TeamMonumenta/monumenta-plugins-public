@@ -1184,6 +1184,7 @@ public class ItemUtils {
 
 	public static EntityType getSpawnEggType(Material material) {
 		return switch (material) {
+			case AXOLOTL_SPAWN_EGG -> EntityType.AXOLOTL;
 			case BAT_SPAWN_EGG -> EntityType.BAT;
 			case BEE_SPAWN_EGG -> EntityType.BEE;
 			case BLAZE_SPAWN_EGG -> EntityType.BLAZE;
@@ -1202,6 +1203,8 @@ public class ItemUtils {
 			case EVOKER_SPAWN_EGG -> EntityType.EVOKER;
 			case FOX_SPAWN_EGG -> EntityType.FOX;
 			case GHAST_SPAWN_EGG -> EntityType.GHAST;
+			case GLOW_SQUID_SPAWN_EGG -> EntityType.GLOW_SQUID;
+			case GOAT_SPAWN_EGG -> EntityType.GOAT;
 			case GUARDIAN_SPAWN_EGG -> EntityType.GUARDIAN;
 			case HOGLIN_SPAWN_EGG -> EntityType.HOGLIN;
 			case HORSE_SPAWN_EGG -> EntityType.HORSE;

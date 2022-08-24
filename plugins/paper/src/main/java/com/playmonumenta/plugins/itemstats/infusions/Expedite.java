@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.NavigableSet;
-import java.util.TreeSet;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -43,15 +42,13 @@ public class Expedite implements Infusion {
 			double percentSpeed = PERCENT_SPEED_PER_LEVEL * modifiedLevel;
 			NavigableSet<Effect> oldEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
 			if (oldEffects != null && !oldEffects.isEmpty()) {
-				NavigableSet<Effect> speedEffects = new TreeSet<>(oldEffects);
-				for (Effect effect : speedEffects) {
-					double mag = effect.getMagnitude() / percentSpeed;
-					if (effect.getMagnitude() == percentSpeed * Math.min(MAX_STACKS, mag + 1)) {
-						effect.setDuration(DURATION);
-					} else {
-						effect.setDuration(1);
-						plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed * Math.min(5, mag + 1), PERCENT_SPEED_EFFECT_NAME));
-					}
+				Effect oldEffect = oldEffects.last();
+				int oldStacks = (int) Math.round(oldEffect.getMagnitude() / percentSpeed);
+				if (oldStacks >= MAX_STACKS) {
+					oldEffect.setDuration(DURATION);
+				} else {
+					oldEffect.clearEffect();
+					plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed * (oldStacks + 1), PERCENT_SPEED_EFFECT_NAME));
 				}
 			} else {
 				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed, PERCENT_SPEED_EFFECT_NAME));

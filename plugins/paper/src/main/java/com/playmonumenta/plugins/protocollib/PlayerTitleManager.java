@@ -146,8 +146,8 @@ public class PlayerTitleManager {
 					if (display.size() < metadata.mLines.size()) {
 						List<LineMetadata> subList = metadata.mLines.subList(display.size(), metadata.mLines.size());
 
-					PacketContainer packet = createDestroyPacket(metadata);
-					broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
+						PacketContainer packet = createDestroyPacket(metadata);
+						broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
 
 						subList.clear();
 					}
