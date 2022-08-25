@@ -30,9 +30,16 @@ public class BlueFireBoss extends BossAbilityGroup {
 
 	public BlueFireBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		Player nearestPlayer = EntityUtils.getNearestPlayer(boss.getLocation(), 30);
-		mBlueTimeOfDay = ScoreboardUtils.getScoreboardValue(nearestPlayer, "BlueTimeOfDay").orElse(0);
-		mBlueTimeOfDay = Math.min(3, Math.max(0, mBlueTimeOfDay));
+
+		if (ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
+			long time = boss.getWorld().getTime();
+			mBlueTimeOfDay = (int) Math.floor(time / 6000.0);
+
+			// Pretty sure Time ranges from 0 to 23999, but just in case...
+			if (mBlueTimeOfDay > 3) {
+				mBlueTimeOfDay = 3;
+			}
+		}
 
 		// Fire: Player takes 0 / 20 / 30 / 40% more fire damage
 		List<Spell> passiveSpells = Arrays.asList(

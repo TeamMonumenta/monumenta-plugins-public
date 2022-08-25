@@ -5,12 +5,10 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class BlueEarthBoss extends BossAbilityGroup {
@@ -28,9 +26,16 @@ public class BlueEarthBoss extends BossAbilityGroup {
 
 	public BlueEarthBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		Player nearestPlayer = EntityUtils.getNearestPlayer(boss.getLocation(), 30);
-		mBlueTimeOfDay = ScoreboardUtils.getScoreboardValue(nearestPlayer, "BlueTimeOfDay").orElse(0);
-		mBlueTimeOfDay = Math.min(3, Math.max(0, mBlueTimeOfDay));
+
+		if (ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
+			long time = boss.getWorld().getTime();
+			mBlueTimeOfDay = (int) Math.floor(time / 6000.0);
+
+			// Pretty sure Time ranges from 0 to 23999, but just in case...
+			if (mBlueTimeOfDay > 3) {
+				mBlueTimeOfDay = 3;
+			}
+		}
 
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellRunAction(() -> {
