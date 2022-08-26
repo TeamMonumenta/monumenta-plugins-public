@@ -5,6 +5,9 @@ import com.playmonumenta.plugins.effects.CourageEffect;
 import com.playmonumenta.plugins.effects.ItemCooldown;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.infusions.Refresh;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
@@ -12,13 +15,20 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class LiquidCourage implements Enchantment {
 
+	public static final String CHARM_COOLDOWN = "Liquid Courage Cooldown";
+	public static final String CHARM_DURATION = "Liquid Courage Duration";
+	public static final String CHARM_RESISTANCE = "Liquid Courage Resistance";
+	public static final String CHARM_CHARGES = "Liquid Courage Charges";
 	private static final int DURATION = 20 * 15;
 	private static final int COOLDOWN = 20 * 30;
 
@@ -35,6 +45,9 @@ public class LiquidCourage implements Enchantment {
 	);
 
 	public static final Material COOLDOWN_ITEM = Material.HONEYCOMB;
+
+	private static final Particle.DustOptions ORANGE1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 128, 0), 1.0f);
+	private static final Particle.DustOptions ORANGE2_COLOR = new Particle.DustOptions(Color.fromRGB(214, 94, 47), 1.0f);
 
 	@Override
 	public String getName() {
@@ -64,15 +77,19 @@ public class LiquidCourage implements Enchantment {
 
 			event.setCancelled(true);
 
-			plugin.mEffectManager.addEffect(player, COURAGE_EFFECT_SOURCE, new CourageEffect(DURATION, AMOUNT, CHARGES, AFFECTED_DAMAGE_TYPES));
+			int duration = DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION);
+			plugin.mEffectManager.addEffect(player, COURAGE_EFFECT_SOURCE, new CourageEffect(duration, CharmManager.calculateFlatAndPercentValue(player, CHARM_RESISTANCE, AMOUNT), (int) (CHARGES + CharmManager.getLevel(player, CHARM_CHARGES)), AFFECTED_DAMAGE_TYPES));
 
 			player.setFoodLevel(Math.min(20, player.getFoodLevel() + 8));
 			player.setSaturation(Math.min(player.getFoodLevel(), Math.min(player.getSaturation() + 8, 20)));
 
-			// TODO: Particles and Sound Effects
+			// Particles + Sound
+			player.playSound(player.getLocation(), Sound.ENTITY_VINDICATOR_CELEBRATE, 1, 1);
+			new PartialParticle(Particle.REDSTONE, player.getLocation(), 10, 0.25, 0.25, 0.25, 0.1, ORANGE1_COLOR).spawnAsPlayerBuff(player);
+			new PartialParticle(Particle.REDSTONE, player.getLocation(), 10, 0.5, 0.5, 0.5, 0.1, ORANGE2_COLOR).spawnAsPlayerBuff(player);
 
-			// TODO: Charm Effects and Refresh Infusion
-			int cooldown = COOLDOWN;
+			// Set Cooldown
+			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, Refresh.reduceCooldown(plugin, player, COOLDOWN));
 			player.setCooldown(COOLDOWN_ITEM, cooldown);
 			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()), new ItemCooldown(cooldown, item, plugin));
 		}

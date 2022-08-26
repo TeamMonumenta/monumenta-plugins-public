@@ -115,8 +115,10 @@ import com.playmonumenta.plugins.itemstats.enchantments.Eruption;
 import com.playmonumenta.plugins.itemstats.enchantments.HexEater;
 import com.playmonumenta.plugins.itemstats.enchantments.IceAspect;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.itemstats.enchantments.IntoxicatingWarmth;
 import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
 import com.playmonumenta.plugins.itemstats.enchantments.LifeDrain;
+import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Quake;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
@@ -128,6 +130,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
 import com.playmonumenta.plugins.itemstats.enchantments.Slayer;
 import com.playmonumenta.plugins.itemstats.enchantments.Smite;
 import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
+import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
 import com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -214,6 +217,15 @@ public class CharmManager {
 			RageOfTheKeter.CHARM_COOLDOWN,
 			RageOfTheKeter.CHARM_DAMAGE,
 			RageOfTheKeter.CHARM_SPEED,
+			IntoxicatingWarmth.CHARM_COOLDOWN,
+			IntoxicatingWarmth.CHARM_DURATION,
+			IntoxicatingWarmth.CHARM_SATURATION,
+			TemporalBender.CHARM_COOLDOWN,
+			TemporalBender.CHARM_COOLDOWN_REDUCTION,
+			LiquidCourage.CHARM_CHARGES,
+			LiquidCourage.CHARM_DURATION,
+			LiquidCourage.CHARM_COOLDOWN,
+			LiquidCourage.CHARM_RESISTANCE,
 			Regeneration.CHARM_HEAL,
 			Smite.CHARM_DAMAGE,
 			Slayer.CHARM_DAMAGE,
@@ -956,7 +968,8 @@ public class CharmManager {
 	/**
 	 * This method will be called by abilities & enchantments to get the modifier value of all
 	 * charms the player currently has equipped for a particular attribute.
-	 * @param p player to get
+	 *
+	 * @param p              player to get
 	 * @param charmAttribute string property of the charm to parse
 	 * @return total value over all charms the player has equipped
 	 */
