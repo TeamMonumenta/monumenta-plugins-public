@@ -37,7 +37,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	private static final int CLOAK_2_MAX_STACKS = 12;
 	private static final int CLOAK_MIN_STACKS = 5;
 	private static final int CLOAK_STACKS_ON_ELITE_KILL = 5;
-	private static final int STEALTH_DURATION = 50;
+	private static final int STEALTH_DURATION = (int)(2.5 * 20);
+	private static final int BOSS_DAMAGE_THRESHOLD = 300;
 
 	public static final String CHARM_DAMAGE = "Cloak And Dagger Damage";
 	public static final String CHARM_STACKS = "Cloak And Dagger Max Stacks";
@@ -55,15 +56,25 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		super(plugin, player, "Cloak and Dagger");
 		mInfo.mScoreboardId = "CloakAndDagger";
 		mInfo.mShorthandName = "CnD";
-		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you five stacks (every 300 damage to them). Stacks are capped at 8. When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain 2.5 seconds of Stealth and (2 * X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this.");
-		mInfo.mDescriptions.add("Cloak stacks are now capped at 12 and bonus damage is increased to (3 * X) where X is the number of stacks you have upon activating this skill.");
+		mInfo.mDescriptions.add(
+			String.format("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you %s stacks (every %s damage to them). Stacks are capped at %s. When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain %s seconds of Stealth and (%s * X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least %s stacks to activate this.",
+				CLOAK_STACKS_ON_ELITE_KILL,
+				BOSS_DAMAGE_THRESHOLD,
+				CLOAK_1_MAX_STACKS,
+				STEALTH_DURATION / 20.0,
+				(int)CLOAK_1_DAMAGE_MULTIPLIER,
+				CLOAK_MIN_STACKS));
+		mInfo.mDescriptions.add(
+			String.format("Cloak stacks are now capped at %s and bonus damage is increased to (%s * X) where X is the number of stacks you have upon activating this skill.",
+				CLOAK_2_MAX_STACKS,
+				(int)CLOAK_2_DAMAGE_MULTIPLIER));
 		mInfo.mLinkedSpell = ClassAbility.CLOAK_AND_DAGGER;
 		mInfo.mCooldown = 0;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 		mDamageMultiplier = (isLevelOne() ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER) + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE);
 		mMaxStacks = (isLevelOne() ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS) + (int) CharmManager.getLevel(player, CHARM_STACKS);
-		mTracker = new KillTriggeredAbilityTracker(this, 300);
+		mTracker = new KillTriggeredAbilityTracker(this, BOSS_DAMAGE_THRESHOLD);
 	}
 
 	@Override

@@ -46,9 +46,21 @@ public class Smokescreen extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.SMOKESCREEN;
 		mInfo.mScoreboardId = "SmokeScreen";
 		mInfo.mShorthandName = "Smk";
-		mInfo.mDescriptions.add("When holding two swords, right-click while sneaking and looking down to release a cloud of smoke, afflicting all enemies in a 6 block radius with 8s of 20% Weaken and 20% Slowness. Cooldown: 20s.");
-		mInfo.mDescriptions.add("The Weaken debuff is increased to 40%.");
-		mInfo.mDescriptions.add("Leave a " + ENHANCEMENT_SMOKECLOUD_RADIUS + " block radius persistent cloud on the ground for " + ENHANCEMENT_SMOKECLOUD_DURATION / 20 + " seconds, enemies in the cloud gain the same debuffs for " + ENHANCEMENT_SMOKECLOUD_EFFECT_DURATION / 20 + " seconds, pulsing every second.");
+		mInfo.mDescriptions.add(
+			String.format("When holding two swords, right-click while sneaking and looking down to release a cloud of smoke, afflicting all enemies in a %s block radius with %ss of %s%% Weaken and %s%% Slowness. Cooldown: %ss.",
+				SMOKESCREEN_RANGE,
+				SMOKESCREEN_DURATION / 20,
+				(int)(WEAKEN_EFFECT_1 * 100),
+				(int)(SMOKESCREEN_SLOWNESS_AMPLIFIER * 100),
+				SMOKESCREEN_COOLDOWN / 20));
+		mInfo.mDescriptions.add(
+			String.format("The Weaken debuff is increased to %s%%.",
+				(int)(WEAKEN_EFFECT_2 * 100)));
+		mInfo.mDescriptions.add(
+			String.format("Leave a %s block radius persistent cloud on the ground for %s seconds, enemies in the cloud gain the same debuffs for %s seconds, pulsing every second.",
+				ENHANCEMENT_SMOKECLOUD_RADIUS,
+				ENHANCEMENT_SMOKECLOUD_DURATION / 20,
+				ENHANCEMENT_SMOKECLOUD_EFFECT_DURATION));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, SMOKESCREEN_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.DEAD_TUBE_CORAL, 1);

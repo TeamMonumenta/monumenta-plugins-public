@@ -69,8 +69,20 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mInfo.mLinkedSpell = ClassAbility.BODKIN_BLITZ;
 		mInfo.mScoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";
-		mInfo.mDescriptions.add("Sneak right click while holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. Upon teleporting, your next melee attack deals 7 bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: 20s. Charges: 2.");
-		mInfo.mDescriptions.add("Range increased to 14 blocks, Stealth increased to 1.5 seconds. Upon teleporting, your next melee attack deals 14 bonus damage if your target is not focused on you. Cooldown: 18s.");
+		mInfo.mDescriptions.add(
+			String.format("Sneak right click while holding two swords to teleport %s blocks forwards. Gain %s second of Stealth upon teleporting. Upon teleporting, your next melee attack deals %s bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: %ss. Charges: %s.",
+				DISTANCE_1,
+				STEALTH_DURATION_1 / 20,
+				BONUS_DMG_1,
+				COOLDOWN_1 / 20,
+				MAX_CHARGES
+				));
+		mInfo.mDescriptions.add(
+			String.format("Range increased to %s blocks, Stealth increased to %s seconds. Upon teleporting, your next melee attack deals %s bonus damage if your target is not focused on you. Cooldown: %ss.",
+				DISTANCE_2,
+				STEALTH_DURATION_2 / 20.0,
+				BONUS_DMG_2,
+				COOLDOWN_2 / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;

@@ -71,9 +71,22 @@ public class AdvancingShadows extends Ability {
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, ADVANCING_SHADOWS_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
-		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within " + (ADVANCING_SHADOWS_RANGE_1 - 1) + " blocks and gain +30% Melee Damage for 5 seconds. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Damage increased to +40% Melee Damage for 5s, teleport range is increased to " + (ADVANCING_SHADOWS_RANGE_2 - 1) + " blocks and all hostile non-target mobs within " + ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE + " blocks are knocked away from the target.");
-		mInfo.mDescriptions.add("You deal " + ENHANCEMENT_BONUS_DAMAGE * 100 + "% extra damage for " + ENHANCEMENT_BONUS_DAMAGE_DURATION / 20 + "s to the target.");
+		mInfo.mDescriptions.add(
+			String.format("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within %s blocks and gain +%s%% Melee Damage for %s seconds. Cooldown: %ss.",
+				ADVANCING_SHADOWS_RANGE_1 - 1,
+				(int)(DAMAGE_BONUS_1 * 100),
+				DURATION / 20,
+				ADVANCING_SHADOWS_COOLDOWN / 20));
+		mInfo.mDescriptions.add(
+			String.format("Damage increased to +%s%% Melee Damage for %ss, teleport range is increased to %s blocks and all hostile non-target mobs within %s blocks are knocked away from the target.",
+				(int)(DAMAGE_BONUS_2 * 100),
+				DURATION / 20,
+				ADVANCING_SHADOWS_RANGE_2 - 1,
+				(int)ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE));
+		mInfo.mDescriptions.add(
+			String.format("You deal %s%% extra damage for %ss to the target.",
+				(int)(ENHANCEMENT_BONUS_DAMAGE * 100),
+				ENHANCEMENT_BONUS_DAMAGE_DURATION / 20));
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
 		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2);
 		mActivationRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, (isLevelOne() ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2));

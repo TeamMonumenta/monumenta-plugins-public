@@ -44,9 +44,21 @@ public class ViciousCombos extends Ability {
 		super(plugin, player, "Vicious Combos");
 		mInfo.mScoreboardId = "ViciousCombos";
 		mInfo.mShorthandName = "VC";
-		mInfo.mDescriptions.add("Passively, killing an enemy with melee or ability damage refreshes the cooldown of your abilities by 1 second. Killing an Elite or Boss enemy instead resets the cooldown of your abilities.");
-		mInfo.mDescriptions.add("Killing an enemy now refreshes your ability cooldowns by 2 seconds. Killing an Elite or Boss enemy inflicts nearby enemies within 5 blocks with 15% weaken and 15% Vulnerability for 5 seconds.");
-		mInfo.mDescriptions.add("When an ability goes on cooldown, your next melee attack in " + ENHANCEMENT_CHARGE_LIFETIME / 20 + "s deals " + ENHANCEMENT_DAMAGE_INCREASE * 100 + "% more melee damage and that ability's cooldown is refreshed by " + ENHANCEMENT_COOLDOWN_REDUCTION / 20 + "s, prioritizing the last ability.");
+		mInfo.mDescriptions.add(
+			String.format("Passively, killing an enemy with melee or ability damage refreshes the cooldown of your abilities by %s second. Killing an Elite or Boss enemy instead resets the cooldown of your abilities.",
+				VICIOUS_COMBOS_COOL_1 / 20));
+		mInfo.mDescriptions.add(
+			String.format("Killing an enemy now refreshes your ability cooldowns by %s seconds. Killing an Elite or Boss enemy inflicts nearby enemies within %s blocks with %s%% weaken and %s%% Vulnerability for %s seconds.",
+				VICIOUS_COMBOS_COOL_2 / 20,
+				VICIOUS_COMBOS_RANGE,
+				(int)(VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL * 100),
+				(int)(VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL * 100),
+				VICIOUS_COMBOS_CRIPPLE_DURATION / 20));
+		mInfo.mDescriptions.add(
+			String.format("When an ability goes on cooldown, your next melee attack in %ss deals %s%% more melee damage and that ability's cooldown is refreshed by %ss, prioritizing the last ability.",
+				ENHANCEMENT_CHARGE_LIFETIME / 20,
+				(int)(ENHANCEMENT_DAMAGE_INCREASE * 100),
+				ENHANCEMENT_COOLDOWN_REDUCTION / 20));
 		mDisplayItem = new ItemStack(Material.ZOMBIE_HEAD, 1);
 	}
 

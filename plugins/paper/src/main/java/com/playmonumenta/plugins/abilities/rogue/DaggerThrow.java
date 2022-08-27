@@ -59,9 +59,20 @@ public class DaggerThrow extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.DAGGER_THROW;
 		mInfo.mScoreboardId = "DaggerThrow";
 		mInfo.mShorthandName = "DT";
-		mInfo.mDescriptions.add("Sneak left click while holding two swords to throw three daggers which deal 4 melee damage and gives each target 20% Vulnerability for 10 seconds. Cooldown: 12s.");
-		mInfo.mDescriptions.add("The damage is increased to 8 and the Vulnerability increased to 40%.");
-		mInfo.mDescriptions.add("Targets are additionally silenced for 2s. Vulnerability is increased by 10%.");
+		mInfo.mDescriptions.add(
+			String.format("Sneak left click while holding two swords to throw three daggers which deal %s melee damage and gives each target %s%% Vulnerability for %s seconds. Cooldown: %ss.",
+				DAGGER_THROW_1_DAMAGE,
+				(int)(DAGGER_THROW_1_VULN * 100),
+				DAGGER_THROW_DURATION / 20,
+				DAGGER_THROW_COOLDOWN / 20));
+		mInfo.mDescriptions.add(
+			String.format("The damage is increased to %s and the Vulnerability increased to %s%%.",
+				DAGGER_THROW_2_DAMAGE,
+				(int)(DAGGER_THROW_2_VULN * 100)));
+		mInfo.mDescriptions.add(
+			String.format("Targets are additionally silenced for %ss. Vulnerability is increased by %s%%.",
+				DAGGER_THROW_SILENCE_DURATION / 20,
+				(int)(DAGGER_THROW_VULN_ENHANCEMENT * 100)));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, DAGGER_THROW_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.WOODEN_SWORD, 1);

@@ -70,8 +70,14 @@ public class Dodging extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.DODGING;
 		mInfo.mScoreboardId = "Dodging";
 		mInfo.mShorthandName = "Dg";
-		mInfo.mDescriptions.add("Blocks an arrow, thrown potion, blaze fireball, or snowball that would have hit you. Cooldown: 12s.");
-		mInfo.mDescriptions.add("The cooldown is reduced to 10 s. When this ability is triggered, you gain +20% Speed for 15s.");
+		mInfo.mDescriptions.add(
+			String.format("Blocks an arrow, thrown potion, blaze fireball, or snowball that would have hit you. Cooldown: %ss.",
+				DODGING_COOLDOWN_1 / 20));
+		mInfo.mDescriptions.add(
+			String.format("The cooldown is reduced to %s s. When this ability is triggered, you gain +%s%% Speed for %ss.",
+				DODGING_COOLDOWN_2 / 20,
+				(int)(PERCENT_SPEED * 100),
+				DODGING_SPEED_EFFECT_DURATION / 20));
 		mInfo.mDescriptions.add("The projectile you dodged is now reflected back to the enemy.");
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2);

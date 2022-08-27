@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -52,9 +53,22 @@ public class EscapeDeath extends Ability {
 		mInfo.mScoreboardId = "EscapeDeath";
 		mInfo.mShorthandName = "ED";
 		mInfo.mIgnoreCooldown = true;
-		mInfo.mDescriptions.add("When taking damage from a mob leaves you below 5 hearts, throw a paralyzing grenade that stuns all enemies within 5 blocks for 3 seconds. Cooldown: 60s.");
-		mInfo.mDescriptions.add("When this skill is triggered, also gain 2 Absorption hearts for 8 seconds, 30% Speed, and Jump Boost III. If damage taken would kill you but could have been prevented by this skill it will instead do so.");
-		mInfo.mDescriptions.add("When this skill is triggered, gain a regenerating effect that heals you for " + ENHANCEMENT_HEAL_PERCENT * 100 + "% hp every second for " + ENHANCEMENT_DURATION / 20 + "s, if an enemy hits you during the regeneration, the effect stops.");
+		mInfo.mDescriptions.add(
+			String.format("When taking damage from a mob leaves you below %s hearts, throw a paralyzing grenade that stuns all enemies within %s blocks for %s seconds. Cooldown: %ss.",
+				(int)TRIGGER_THRESHOLD_HEALTH / 2,
+				RANGE,
+				STUN_DURATION / 20,
+				COOLDOWN / 20));
+		mInfo.mDescriptions.add(
+			String.format("When this skill is triggered, also gain %s Absorption hearts for %s seconds, %s%% Speed, and Jump Boost %s. If damage taken would kill you but could have been prevented by this skill it will instead do so.",
+				ABSORPTION_HEALTH / 2,
+				BUFF_DURATION / 20,
+				(int)(SPEED_PERCENT * 100),
+				StringUtils.toRoman(JUMP_BOOST_AMPLIFIER + 1)));
+		mInfo.mDescriptions.add(
+			String.format("When this skill is triggered, gain a regenerating effect that heals you for %s%% hp every second for %ss, if an enemy hits you during the regeneration, the effect stops.",
+				(int)(ENHANCEMENT_HEAL_PERCENT * 100),
+				ENHANCEMENT_DURATION / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
 	}

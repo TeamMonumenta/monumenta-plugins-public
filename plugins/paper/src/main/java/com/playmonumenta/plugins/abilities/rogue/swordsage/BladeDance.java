@@ -54,8 +54,18 @@ public class BladeDance extends Ability {
 		super(plugin, player, "Blade Dance");
 		mInfo.mScoreboardId = "BladeDance";
 		mInfo.mShorthandName = "BD";
-		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 4 melee damage to enemies in a 4 block radius. Damaged enemies are rooted for 2 seconds. Cooldown: 18s.");
-		mInfo.mDescriptions.add("The area attack now deals 7 damage and roots for 2.5. Cooldown: 16s.");
+		mInfo.mDescriptions.add(
+			String.format("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals %s melee damage to enemies in a %s block radius. Damaged enemies are rooted for %s seconds. Cooldown: %ss.",
+				DANCE_1_DAMAGE,
+				DANCE_RADIUS,
+				SLOW_DURATION_1 / 20,
+				COOLDOWN_1 / 20
+				));
+		mInfo.mDescriptions.add(
+			String.format("The area attack now deals %s damage and roots for %ss. Cooldown: %ss.",
+				DANCE_2_DAMAGE,
+				SLOW_DURATION_2 / 20.0,
+				COOLDOWN_2 / 20));
 		mInfo.mLinkedSpell = ClassAbility.BLADE_DANCE;
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

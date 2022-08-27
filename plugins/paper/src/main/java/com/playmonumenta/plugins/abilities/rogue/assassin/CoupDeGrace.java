@@ -45,8 +45,14 @@ public class CoupDeGrace extends Ability {
 		super(plugin, player, "Coup de Grace");
 		mInfo.mScoreboardId = "CoupDeGrace";
 		mInfo.mShorthandName = "CdG";
-		mInfo.mDescriptions.add("If melee damage you deal brings a normal mob under 10% health, they die instantly. The threshold for elites is 20% health.");
-		mInfo.mDescriptions.add("The health threshold is increased to 15% for normal enemies and 30% for elites.");
+		mInfo.mDescriptions.add(
+			String.format("If melee damage you deal brings a normal mob under %s%% health, they die instantly. The threshold for elites is %s%% health.",
+				(int)(COUP_1_NORMAL_THRESHOLD * 100),
+				(int)(COUP_1_ELITE_THRESHOLD * 100)));
+		mInfo.mDescriptions.add(
+			String.format("The health threshold is increased to %s%% for normal enemies and %s%% for elites.",
+				(int)(COUP_2_NORMAL_THRESHOLD * 100),
+				(int)(COUP_2_ELITE_THRESHOLD * 100)));
 		mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
 		double sharedThreshold = CharmManager.getLevelPercentDecimal(player, CHARM_THRESHOLD);
 		mNormalThreshold = (isLevelOne() ? COUP_1_NORMAL_THRESHOLD : COUP_2_NORMAL_THRESHOLD) + CharmManager.getLevelPercentDecimal(player, CHARM_NORMAL) + sharedThreshold;

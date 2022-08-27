@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -50,9 +51,22 @@ public class ByMyBlade extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.BY_MY_BLADE;
 		mInfo.mScoreboardId = "ByMyBlade";
 		mInfo.mShorthandName = "BmB";
-		mInfo.mDescriptions.add("While holding two swords, attacking an enemy with a critical attack deals an extra 10 melee damage to that enemy, and grants you Haste 2 for 4s. Cooldown: 10s.");
-		mInfo.mDescriptions.add("Damage is increased from 10 to 20. Haste level is increased from 2 to 4.");
-		mInfo.mDescriptions.add("Killing an enemy with this ability heals you for " + ENHANCEMENT_HEAL_PERCENT * 100 + "% of your max health, increased to " + ENHANCEMENT_HEAL_PERCENT_ELITE * 100 + "% if the target was an elite or boss.");
+		mInfo.mDescriptions.add(
+			String.format("While holding two swords, attacking an enemy with a critical attack deals an extra %s melee damage to that enemy, and grants you Haste %s for %ss. Cooldown: %ss.",
+				BY_MY_BLADE_1_DAMAGE,
+				StringUtils.toRoman(BY_MY_BLADE_1_HASTE_AMPLIFIER + 1),
+				BY_MY_BLADE_HASTE_DURATION / 20,
+				BY_MY_BLADE_COOLDOWN / 20));
+		mInfo.mDescriptions.add(
+			String.format("Damage is increased from %s to %s. Haste level is increased from %s to %s.",
+				BY_MY_BLADE_1_DAMAGE,
+				BY_MY_BLADE_2_DAMAGE,
+				StringUtils.toRoman(BY_MY_BLADE_1_HASTE_AMPLIFIER + 1),
+				StringUtils.toRoman(BY_MY_BLADE_2_HASTE_AMPLIFIER + 1)));
+		mInfo.mDescriptions.add(
+			String.format("Killing an enemy with this ability heals you for %s%% of your max health, increased to %s%% if the target was an elite or boss.",
+				(int)(ENHANCEMENT_HEAL_PERCENT * 100),
+				(int)(ENHANCEMENT_HEAL_PERCENT_ELITE * 100)));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, BY_MY_BLADE_COOLDOWN);
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 		mDamageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE);

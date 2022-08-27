@@ -42,9 +42,19 @@ public class Skirmisher extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.SKIRMISHER;
 		mInfo.mScoreboardId = "Skirmisher";
 		mInfo.mShorthandName = "Sk";
-		mInfo.mDescriptions.add("When dealing melee damage to a mob that has at least one other mob within 2.5 blocks, deal + 1 + 10% final damage.");
-		mInfo.mDescriptions.add("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased to 2 + 15% final damage done.");
-		mInfo.mDescriptions.add("When you hit an enemy with a sword, the nearest enemy within " + ENHANCEMENT_SPLASH_RADIUS + " blocks takes " + ENHANCEMENT_SPLASH_PERCENT_DAMAGE * 100 + "% of the original attack's damage (ignores invulnerability frames).");
+		mInfo.mDescriptions.add(
+			String.format("When dealing melee damage to a mob that has at least one other mob within %s blocks, deal + %s + %s%% final damage.",
+				SKIRMISHER_FRIENDLY_RADIUS,
+				(int)GROUPED_FLAT_DAMAGE,
+				(int)(GROUPED_PERCENT_DAMAGE_1 * 100)));
+		mInfo.mDescriptions.add(
+			String.format("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased to %s + %s%% final damage done.",
+				(int)GROUPED_FLAT_DAMAGE_2,
+				(int)(GROUPED_PERCENT_DAMAGE_2 * 100)));
+		mInfo.mDescriptions.add(
+			String.format("When you hit an enemy with a sword, the nearest enemy within %s blocks takes %s%% of the original attack's damage (ignores invulnerability frames).",
+				(int)ENHANCEMENT_SPLASH_RADIUS,
+				(int)(ENHANCEMENT_SPLASH_PERCENT_DAMAGE * 100)));
 		mDisplayItem = new ItemStack(Material.BONE, 1);
 		mIsolatedPercentDamage = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2);
 		mIsolatedFlatDamage = isLevelOne() ? GROUPED_FLAT_DAMAGE : GROUPED_FLAT_DAMAGE_2;

@@ -44,6 +44,8 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	private static final int RONDE_2_DAMAGE = 5;
 	private static final int RONDE_1_MAX_STACKS = 2;
 	private static final int RONDE_2_MAX_STACKS = 3;
+	private static final double RONDE_SPEED_BONUS = 0.2;
+	private static final int RONDE_DECAY_TIMER = 5 * 20;
 	private static final double RONDE_RADIUS = 4.5;
 	private static final double RONDE_DOT_COSINE = 0.33;
 	private static final float RONDE_KNOCKBACK_SPEED = 0.14f;
@@ -61,8 +63,18 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		mInfo.mLinkedSpell = ClassAbility.DEADLY_RONDE;
 		mInfo.mScoreboardId = "DeadlyRonde";
 		mInfo.mShorthandName = "DR";
-		mInfo.mDescriptions.add("After casting a skill, gain a stack of Deadly Ronde for 5 seconds, stacking up to 2 times. While Deadly Ronde is active, you gain 20% Speed, and your next melee attack consumes a stack to fire a flurry of blades, that fire in a cone with a radius of 4 blocks and deal 3 melee damage to all enemies they hit.");
-		mInfo.mDescriptions.add("Damage increased to 5, and you can now store up to 3 charges.");
+		mInfo.mDescriptions.add(
+			String.format("After casting a skill, gain a stack of Deadly Ronde for %s seconds, stacking up to %s times. While Deadly Ronde is active, you gain %s%% Speed, and your next melee attack consumes a stack to fire a flurry of blades, that fire in a cone with a radius of %s blocks and deal %s melee damage to all enemies they hit.",
+				RONDE_DECAY_TIMER / 20,
+				RONDE_1_MAX_STACKS,
+				(int)(RONDE_SPEED_BONUS * 100),
+				RONDE_RADIUS,
+				RONDE_1_DAMAGE
+				));
+		mInfo.mDescriptions.add(
+			String.format("Damage increased to %s, and you can now store up to %s charges.",
+				RONDE_2_DAMAGE,
+				RONDE_2_MAX_STACKS));
 		mDisplayItem = new ItemStack(Material.BLAZE_ROD, 1);
 	}
 
@@ -80,7 +92,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, SWORDSAGE_COLOR).spawnAsPlayerBuff(mPlayer);
-					mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde", new PercentSpeed(5, 0.2, "DeadlyRondeMod"));
+					mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde", new PercentSpeed(5, RONDE_SPEED_BONUS, "DeadlyRondeMod"));
 					if (mActiveRunnable == null) {
 						this.cancel();
 					}
@@ -97,7 +109,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			}
 
 		};
-		mActiveRunnable.runTaskLater(mPlugin, 20 * 5);
+		mActiveRunnable.runTaskLater(mPlugin, RONDE_DECAY_TIMER);
 
 		int maxStacks = getMaxCharges();
 		if (mRondeStacks < maxStacks) {
@@ -157,7 +169,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 					}
 
 				};
-				mActiveRunnable.runTaskLater(mPlugin, 20 * 5);
+				mActiveRunnable.runTaskLater(mPlugin, RONDE_DECAY_TIMER);
 			}
 			return true; // only trigger once per attack
 		}
