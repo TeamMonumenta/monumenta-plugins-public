@@ -59,9 +59,9 @@ public class Volley extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.VOLLEY;
 		mInfo.mScoreboardId = "Volley";
 		mInfo.mShorthandName = "Vly";
-		mInfo.mDescriptions.add("When you shoot an arrow or trident while sneaking, you shoot a volley consisting of 7 projectiles instead. Only one arrow is consumed, and each projectile deals 30% bonus damage. Cooldown: 15s.");
-		mInfo.mDescriptions.add("Increases the number of projectiles to 11 and enhances the bonus damage to 50%.");
-		mInfo.mDescriptions.add("Volley now fires in a 360 degree arc and the arrows inflicting 20% Bleed for 4s.");
+		mInfo.mDescriptions.add(String.format("When you shoot an arrow or trident while sneaking, you shoot a volley consisting of %d projectiles instead. Only one arrow is consumed, and each projectile deals %d%% bonus damage. Cooldown: 15s.", VOLLEY_1_ARROW_COUNT, (int)((VOLLEY_1_DAMAGE_MULTIPLIER - 1) * 100)));
+		mInfo.mDescriptions.add(String.format("Increases the number of projectiles to %d and enhances the bonus damage to %d%%.", VOLLEY_2_ARROW_COUNT, (int)((VOLLEY_2_DAMAGE_MULTIPLIER - 1) * 100)));
+		mInfo.mDescriptions.add(String.format("Volley now fires in a 360 degree arc and the arrows inflicting %d%% Bleed for %ds.", (int)(ENHANCEMENT_BLEED_POTENCY * 100), ENHANCEMENT_BLEED_DURATION / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, VOLLEY_COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.ARROW, 1);

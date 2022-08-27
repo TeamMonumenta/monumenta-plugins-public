@@ -5,8 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.WindBombAirTag;
-import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -72,9 +72,10 @@ public class WindBomb extends Ability {
 		mInfo.mScoreboardId = "WindBomb";
 		mInfo.mShorthandName = "WB";
 		mInfo.mLinkedSpell = ClassAbility.WIND_BOMB;
-		mInfo.mDescriptions.add("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, deals 6 projectile damage to mobs in a a 3 block radius and launches them into the air, giving them Slow Falling and 20% Weaken for 4s. Cooldown: 15s.");
-		mInfo.mDescriptions.add("The damage is increased to 8 and the cooldown is reduced to 10s. Additionally, you deal 20% more damage to enemies made airborne by this skill, until they hit the ground.");
-		mInfo.mDescriptions.add("On impact, generate a vortex that pulls mobs within 8 blocks toward the center for 3 seconds.");
+		mInfo.mDescriptions.add(String.format("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, deals %d projectile damage to mobs in a a %d block radius and launches them into the air, giving them Slow Falling and %d%% Weaken for %ds. Cooldown: %ds.",
+			DAMAGE_1, RADIUS, (int)(WEAKEN_EFFECT * 100), DURATION / 20, COOLDOWN_1 / 20));
+		mInfo.mDescriptions.add(String.format("The damage is increased to %d and the cooldown is reduced to %ds. Additionally, you deal %d%% more damage to enemies made airborne by this skill, until they hit the ground.", DAMAGE_2, COOLDOWN_2 / 20, (int)(MIDAIR_DAMAGE_BONUS * 100)));
+		mInfo.mDescriptions.add(String.format("On impact, generate a vortex that pulls mobs within %s blocks toward the center for %d seconds.", (int)PULL_RADIUS, PULL_DURATION / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.TNT, 1);

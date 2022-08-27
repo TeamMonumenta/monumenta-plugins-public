@@ -40,9 +40,9 @@ public class SwiftCuts extends Ability {
 		super(plugin, player, "Swift Cuts");
 		mInfo.mScoreboardId = "SwiftCuts";
 		mInfo.mShorthandName = "SC";
-		mInfo.mDescriptions.add("If you perform a melee attack on the same mob 2 or more times in a row, each hit after the first does +20% damage and deals 10% of the damage to all other mobs in a 2.5 block radius.");
-		mInfo.mDescriptions.add("Bonus damage increased to +35%, sweep damage increased to 20%.");
-		mInfo.mDescriptions.add("Every third fully charged melee attack in a row against the same mob deals " + ENHANCEMENT_DAMAGE_PERCENT * 100 + "% more damage.");
+		mInfo.mDescriptions.add(String.format("If you perform a melee attack on the same mob 2 or more times in a row, each hit after the first does +%d%% damage and deals %d%% of the damage to all other mobs in a %s block radius.", (int)(CONSECUTIVE_PERCENT_DAMAGE_1 * 100), (int)(PERCENT_AOE_DAMAGE_1 * 100), SWEEP_RADIUS));
+		mInfo.mDescriptions.add(String.format("Bonus damage increased to +%d%%, sweep damage increased to %d%%.", (int)(CONSECUTIVE_PERCENT_DAMAGE_2 * 100), (int)(PERCENT_AOE_DAMAGE_2 * 100)));
+		mInfo.mDescriptions.add("Every third fully charged melee attack in a row against the same mob deals " + (int)(ENHANCEMENT_DAMAGE_PERCENT * 100) + "% more damage.");
 		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
 		mConsecutivePercentDamage = (isLevelOne() ? CONSECUTIVE_PERCENT_DAMAGE_1 : CONSECUTIVE_PERCENT_DAMAGE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mPercentAoEDamage = isLevelOne() ? PERCENT_AOE_DAMAGE_1 : PERCENT_AOE_DAMAGE_2;

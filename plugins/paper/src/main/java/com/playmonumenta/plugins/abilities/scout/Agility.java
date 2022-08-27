@@ -38,8 +38,8 @@ public class Agility extends Ability {
 		super(plugin, player, "Agility");
 		mInfo.mScoreboardId = "Agility";
 		mInfo.mShorthandName = "Agl";
-		mInfo.mDescriptions.add("You gain permanent Haste I. Your melee attacks deal +1 extra damage.");
-		mInfo.mDescriptions.add("You gain permanent Haste II. Increase melee damage by +1 plus 10% of final damage done.");
+		mInfo.mDescriptions.add(String.format("You gain permanent Haste %s. Your melee attacks deal +%d extra damage.", StringUtils.toRoman(AGILITY_1_EFFECT_LVL + 1), AGILITY_BONUS_DAMAGE));
+		mInfo.mDescriptions.add(String.format("You gain permanent Haste %s. Increase melee damage by +%d plus %d%% of final damage done.", StringUtils.toRoman(AGILITY_2_EFFECT_LVL + 1), AGILITY_BONUS_DAMAGE, (int)(SCALING_DAMAGE * 100)));
 		mInfo.mDescriptions.add(
 			String.format("Breaking a spawner refreshes the cooldown of all your skills by %s%%.",
 				StringUtils.multiplierToPercentage(ENHANCEMENT_COOLDOWN_REFRESH)));

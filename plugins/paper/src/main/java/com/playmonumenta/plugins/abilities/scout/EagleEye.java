@@ -54,9 +54,10 @@ public class EagleEye extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.EAGLE_EYE;
 		mInfo.mScoreboardId = "Tinkering"; // lmao
 		mInfo.mShorthandName = "EE";
-		mInfo.mDescriptions.add("When you left-click while sneaking you reveal all enemies in a 20 block radius, giving them the glowing effect for 10 seconds. Affected enemies have 20% Vulnerability. If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by 2 seconds. This skill can not be activated if you have a pickaxe in your mainhand. Cooldown: 24s.");
-		mInfo.mDescriptions.add("The effect is increased to 35% Vulnerability.");
-		mInfo.mDescriptions.add("Your first attack against every enemy affected by this ability will deal " + ENHANCEMENT_DAMAGE_PERCENT * 100 + "% extra damage.");
+		mInfo.mDescriptions.add(String.format("When you left-click while sneaking you reveal all enemies in a %d block radius, giving them the glowing effect for %d seconds. Affected enemies have %d%% Vulnerability. If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by %d seconds. This skill can not be activated if you have a pickaxe in your mainhand. Cooldown: %ds.",
+			EAGLE_EYE_RADIUS, EAGLE_EYE_DURATION / 20, (int)(EAGLE_EYE_1_VULN_LEVEL * 100), EAGLE_EYE_REFRESH / 20, EAGLE_EYE_COOLDOWN / 20));
+		mInfo.mDescriptions.add(String.format("The effect is increased to %d%% Vulnerability.", (int)(EAGLE_EYE_2_VULN_LEVEL * 100)));
+		mInfo.mDescriptions.add("Your first attack against every enemy affected by this ability will deal " + (int)(ENHANCEMENT_DAMAGE_PERCENT * 100) + "% extra damage.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, EAGLE_EYE_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);

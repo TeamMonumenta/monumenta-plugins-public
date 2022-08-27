@@ -49,7 +49,7 @@ public class SplitArrow extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.SPLIT_ARROW;
 		mInfo.mScoreboardId = "SplitArrow";
 		mInfo.mShorthandName = "SA";
-		mInfo.mDescriptions.add("When you hit an enemy with an arrow, the next nearest enemy within 5 blocks takes " + (int) (100 * SPLIT_ARROW_1_DAMAGE_PERCENT) + "% of the original arrow damage (ignores invulnerability frames).");
+		mInfo.mDescriptions.add("When you hit an enemy with an arrow, the next nearest enemy within " + (int)SPLIT_ARROW_CHAIN_RANGE + " blocks takes " + (int) (100 * SPLIT_ARROW_1_DAMAGE_PERCENT) + "% of the original arrow damage (ignores invulnerability frames).");
 		mInfo.mDescriptions.add("Damage to the second target is increased to " + (int) (100 * SPLIT_ARROW_2_DAMAGE_PERCENT) + "% of the original arrow damage.");
 		mDisplayItem = new ItemStack(Material.BLAZE_ROD, 1);
 

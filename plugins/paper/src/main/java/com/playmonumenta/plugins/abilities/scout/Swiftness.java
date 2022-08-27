@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import javax.annotation.Nullable;
@@ -47,9 +48,9 @@ public class Swiftness extends Ability {
 		super(plugin, player, "Swiftness");
 		mInfo.mScoreboardId = "Swiftness";
 		mInfo.mShorthandName = "Swf";
-		mInfo.mDescriptions.add("Gain +20% Speed when you are not inside a town.");
-		mInfo.mDescriptions.add("In addition, gain Jump Boost III when you are not inside a town. Swap hands looking up, not sneaking, and not holding a bow, crossbow, or trident to toggle the Jump Boost.");
-		mInfo.mDescriptions.add("You now have a 10% chance to dodge any projectile or melee attack.");
+		mInfo.mDescriptions.add(String.format("Gain +%d%% Speed when you are not inside a town.", (int)(SWIFTNESS_SPEED_BONUS * 100)));
+		mInfo.mDescriptions.add(String.format("In addition, gain Jump Boost %s when you are not inside a town. Swap hands looking up, not sneaking, and not holding a bow, crossbow, or trident to toggle the Jump Boost.", StringUtils.toRoman(SWIFTNESS_EFFECT_JUMP_LVL + 1)));
+		mInfo.mDescriptions.add(String.format("You now have a %d%% chance to dodge any projectile or melee attack.", (int)(DODGE_CHANCE * 100)));
 		mDisplayItem = new ItemStack(Material.RABBIT_FOOT, 1);
 		if (player != null) {
 			addModifier(player);

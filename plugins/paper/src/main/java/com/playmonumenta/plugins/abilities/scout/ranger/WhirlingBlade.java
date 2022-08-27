@@ -57,7 +57,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		super(plugin, player, "Whirling Blade");
 		mInfo.mScoreboardId = "WhirlingBlade";
 		mInfo.mShorthandName = "WB";
-		mInfo.mDescriptions.add("Use the swap key while holding a weapon and not looking up to throw a whirling blade that circles around you, knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits. Cooldown: 8s. Charges: 2.");
+		mInfo.mDescriptions.add("Use the swap key while holding a weapon and not looking up to throw a whirling blade that circles around you, knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits. Cooldown: " + BLADE_COOLDOWN / 20 + "s. Charges: " + BLADE_MAX_CHARGES + ".");
 		mInfo.mDescriptions.add("The damage is increased to " + BLADE_2_DAMAGE + " and the knockback is greatly increased.");
 		mInfo.mLinkedSpell = ClassAbility.WHIRLING_BLADE;
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? BLADE_1_DAMAGE : BLADE_2_DAMAGE);

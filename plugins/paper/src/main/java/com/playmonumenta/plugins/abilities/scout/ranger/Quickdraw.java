@@ -51,8 +51,8 @@ public class Quickdraw extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.QUICKDRAW;
 		mInfo.mScoreboardId = "Quickdraw";
 		mInfo.mShorthandName = "Qd";
-		mInfo.mDescriptions.add("Left-clicking with a bow or snowball to instantly fire a fully charged arrow / snowball. Left-clicking twice with a trident will fire a trident. This skill can only apply Recoil once before touching the ground. Cooldown: 6s.");
-		mInfo.mDescriptions.add("Cooldown: 3s.");
+		mInfo.mDescriptions.add(String.format("Left-clicking with a bow or snowball instantly fires a fully charged arrow / snowball. Left-clicking twice with a trident will fire a trident. This skill can only apply Recoil once before touching the ground. Cooldown: %ds.", QUICKDRAW_1_COOLDOWN / 20));
+		mInfo.mDescriptions.add(String.format("Cooldown: %ds.", QUICKDRAW_2_COOLDOWN / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? QUICKDRAW_1_COOLDOWN : QUICKDRAW_2_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
