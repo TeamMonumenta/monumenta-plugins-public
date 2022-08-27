@@ -58,8 +58,18 @@ public class CosmicMoonblade extends Ability {
 		super(plugin, player, "Cosmic Moonblade");
 		mInfo.mScoreboardId = "CosmicMoonblade";
 		mInfo.mShorthandName = "CM";
-		mInfo.mDescriptions.add("Swap with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 2 times (5 damage per hit) in rapid succession that if each land, reduce all your other skill cooldowns by 5% (Max 0.5s). Cooldown: 8s.");
-		mInfo.mDescriptions.add("Cooldown reduction is increased to 10% (Max 1s) for blade.");
+		mInfo.mDescriptions.add(
+			String.format("Swap with a wand causes a wave of Arcane blades to hit every enemy within a %s block cone %s times (%s damage per hit) in rapid succession that if each land, reduce all your other skill cooldowns by %s%% (Max %ss). Cooldown: %ss.",
+				RADIUS,
+				SWINGS,
+				(int)DAMAGE,
+				(int)(REDUCTION_MULTIPLIER_1 * 100),
+				CAP_TICKS_1 / 20.0,
+				COOLDOWN / 20));
+		mInfo.mDescriptions.add(
+			String.format("Cooldown reduction is increased to %s%% (Max %ss) for blade.",
+				(int)(REDUCTION_MULTIPLIER_2 * 100),
+				CAP_TICKS_2 / 20));
 		mInfo.mLinkedSpell = ABILITY;
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;

@@ -70,8 +70,19 @@ public class Spellshock extends Ability {
 
 		mInfo.mScoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";
-		mInfo.mDescriptions.add("Hitting an enemy with a spell inflicts static for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 20% of the triggering spell's damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick. If a static mob is struck by a melee attack, it takes 10% more damage on the hit and is slowed by 30% for 0.5 seconds, clearing the static.");
-		mInfo.mDescriptions.add("Damage is increased to 30% for spells and 15% for melee. Additionally, gain +20% speed for 2 seconds whenever a spellshock is triggered.");
+		mInfo.mDescriptions.add(
+			String.format("Hitting an enemy with a spell inflicts static for %s seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals %s%% of the triggering spell's damage to all mobs in a %s block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick. If a static mob is struck by a melee attack, it takes %s%% more damage on the hit and is slowed by %s%% for %s seconds, clearing the static.",
+				DURATION_TICKS / 20,
+				(int)(DAMAGE_1 * 100),
+				SIZE,
+				(int)(MELEE_BONUS_1 * 100),
+				(int)(-SLOW_MULTIPLIER * 100),
+				SLOW_DURATION / 20.0));
+		mInfo.mDescriptions.add(
+			String.format("Damage is increased to %s%% for spells and %s%% for melee. Additionally, gain +%s%% speed for 2 seconds whenever a spellshock is triggered.",
+				(int)(DAMAGE_2 * 100),
+				(int)(MELEE_BONUS_2 * 100),
+				(int)(SPEED_MULTIPLIER * 100)));
 		mInfo.mDescriptions.add(
 			String.format("If an enemy that had static applied on them at one point dies, they explode, dealing %s damage in a %s block radius, bypassing iframes.",
 				ENHANCEMENT_DAMAGE,

@@ -52,9 +52,25 @@ public class ElementalArrows extends Ability {
 
 		mInfo.mScoreboardId = "Elemental";
 		mInfo.mShorthandName = "EA";
-		mInfo.mDescriptions.add("Your fully drawn arrows and tridents are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with 20% Slowness for 6 seconds. Projectiles shot this way deal magical damage instead of projectile damage. Ice arrows deal 8 extra damage to Blazes. Fire arrows deal 8 extra damage to strays. This skill can not apply Spellshock.");
-		mInfo.mDescriptions.add("Your fire arrows also set nearby enemies within a radius of 3 blocks on fire when they hit a target. Your ice arrows also slow nearby enemies within a radius of 3 blocks when they hit a target. Both area of effect effects do 20% bow damage to all targets affected.");
-		mInfo.mDescriptions.add("Your next elemental arrow every 10s stuns non elite enemies hit for 1s and deals an extra 50% bow damage to affected enemies.");
+		mInfo.mDescriptions.add(
+			String.format("Your fully drawn arrows and tridents are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with %s%% Slowness for %s seconds. Projectiles shot this way deal magical damage instead of projectile damage. Ice arrows deal %s extra damage to Blazes. Fire arrows deal %s extra damage to strays. This skill can not apply Spellshock.",
+				(int)(SLOW_AMPLIFIER * 100),
+				ELEMENTAL_ARROWS_DURATION / 20,
+				ELEMENTAL_ARROWS_BONUS_DAMAGE,
+				ELEMENTAL_ARROWS_BONUS_DAMAGE
+				));
+		mInfo.mDescriptions.add(
+			String.format("Your fire arrows also set nearby enemies within a radius of %s blocks on fire when they hit a target. Your ice arrows also slow nearby enemies within a radius of %s blocks when they hit a target. Both area of effect effects do %s%% bow damage to all targets affected.",
+				(int)ELEMENTAL_ARROWS_RADIUS,
+				(int)ELEMENTAL_ARROWS_RADIUS,
+				(int)(AOE_DAMAGE_MULTIPLIER * 100)
+				));
+		mInfo.mDescriptions.add(
+			String.format("Your next elemental arrow every %ss stuns non elite enemies hit for %ss and deals an extra %s%% bow damage to affected enemies.",
+				ENHANCED_ARROW_COOLDOWN / 20,
+				ENHANCED_ARROW_STUN_DURATION / 20,
+				(int)(ENHANCED_DAMAGE_MULTIPLIER * 100)
+			));
 		mDisplayItem = new ItemStack(Material.SPECTRAL_ARROW, 1);
 		mInfo.mCooldown = ENHANCED_ARROW_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;

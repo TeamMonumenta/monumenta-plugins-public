@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class MagePassive extends Ability {
 
-	private static final double PERCENT_MELEE_INCREASE = 0.2;
+	public static final double PERCENT_MELEE_INCREASE = 0.2;
 
 	private boolean mCast = false;
 

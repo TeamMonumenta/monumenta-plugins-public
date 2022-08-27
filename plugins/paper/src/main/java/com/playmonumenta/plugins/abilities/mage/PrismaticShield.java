@@ -56,8 +56,20 @@ public class PrismaticShield extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.PRISMATIC_SHIELD;
 		mInfo.mScoreboardId = "Prismatic";
 		mInfo.mShorthandName = "PS";
-		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive 2 Absorption hearts which lasts up to 12 s. In addition enemies within four blocks are knocked back. Cooldown: 90s.");
-		mInfo.mDescriptions.add("The shield is improved to 4 Absorption hearts. Enemies within four blocks are knocked back and stunned for 1 s. Cooldown: 70s.");
+		mInfo.mDescriptions.add(
+			String.format("When your health drops below %s hearts (including if the attack would've killed you), you receive %s Absorption hearts which lasts up to %s s. In addition enemies within %s blocks are knocked back. Cooldown: %ss.",
+				TRIGGER_HEALTH / 2,
+				ABSORPTION_HEALTH_1 / 2,
+				DURATION / 20,
+				(int)RADIUS,
+				COOLDOWN_1 / 20
+				));
+		mInfo.mDescriptions.add(
+			String.format("The shield is improved to %s Absorption hearts. Enemies within %s blocks are knocked back and stunned for %s s. Cooldown: %ss.",
+				ABSORPTION_HEALTH_2 / 2,
+				(int)RADIUS,
+				STUN_DURATION / 20,
+				COOLDOWN_2 / 20));
 		mInfo.mDescriptions.add(
 			String.format("After Prismatic Shield is activated, in the next %ss, every spell that lands successfully will heal you for %s%% of your max health.",
 				HEAL_DURATION / 20,

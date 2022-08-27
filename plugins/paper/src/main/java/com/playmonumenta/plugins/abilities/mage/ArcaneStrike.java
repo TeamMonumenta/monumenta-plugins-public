@@ -64,8 +64,17 @@ public class ArcaneStrike extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.ARCANE_STRIKE;
 		mInfo.mScoreboardId = "ArcaneStrike";
 		mInfo.mShorthandName = "AS";
-		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 4 magic damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 5s.");
-		mInfo.mDescriptions.add("The damage is increased to 7. Mobs that are on fire or slowed take 3 additional damage.");
+		mInfo.mDescriptions.add(
+			String.format("When you attack an enemy with a wand, you unleash an arcane explosion dealing %s magic damage to all mobs in a %s block radius around the target. Enemies that are on fire or slowed take %s extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: %ss.",
+				DAMAGE_1,
+				(int)RADIUS,
+				BONUS_DAMAGE_1,
+				COOLDOWN / 20
+			));
+		mInfo.mDescriptions.add(
+			String.format("The damage is increased to %s. Mobs that are on fire or slowed take %s additional damage.",
+				DAMAGE_2,
+				BONUS_DAMAGE_2));
 		mInfo.mDescriptions.add("Your enchantment on-hit effects are now also applied to all other enemies hit in the radius.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);

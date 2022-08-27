@@ -51,8 +51,16 @@ public class ManaLance extends MultipleChargeAbility {
 		mInfo.mLinkedSpell = ClassAbility.MANA_LANCE;
 		mInfo.mScoreboardId = "ManaLance";
 		mInfo.mShorthandName = "ML";
-		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 6 magic damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: 5s.");
-		mInfo.mDescriptions.add("The beam instead deals 7 damage. Cooldown: 3s.");
+		mInfo.mDescriptions.add(
+			String.format("Right clicking with a wand fires forth a piercing beam of Mana going %s blocks, dealing %s magic damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: %ss.",
+				RANGE,
+				(int)DAMAGE_1,
+				COOLDOWN_1 / 20
+			));
+		mInfo.mDescriptions.add(
+			String.format("The beam instead deals %s damage. Cooldown: %ss.",
+				(int)DAMAGE_2,
+				COOLDOWN_2 / 20));
 		mInfo.mDescriptions.add("Mana lance now has two charges.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

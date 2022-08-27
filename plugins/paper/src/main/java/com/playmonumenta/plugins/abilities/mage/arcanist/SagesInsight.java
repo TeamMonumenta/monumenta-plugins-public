@@ -53,8 +53,20 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 		super(plugin, player, "Sage's Insight");
 		mInfo.mScoreboardId = "SagesInsight";
 		mInfo.mShorthandName = "SgI";
-		mInfo.mDescriptions.add("If an active spell hits an enemy, you gain an Arcane Insight. Insights stack up to 8, but decay every 4s of not gaining one. Once 8 Insights are revealed, the Arcanist gains 20% Speed for 8s and the cooldowns of the previous two spells cast are refreshed. This sets your Insights back to 0.");
-		mInfo.mDescriptions.add("Sage's Insight now grants 30% Speed and refreshes the cooldowns of your previous three spells upon activating.");
+		mInfo.mDescriptions.add(
+			String.format("If an active spell hits an enemy, you gain an Arcane Insight. Insights stack up to %s, but decay every %ss of not gaining one. Once %s Insights are revealed, the Arcanist gains %s%% Speed for %ss and the cooldowns of the previous %s spells cast are refreshed. This sets your Insights back to 0.",
+				MAX_STACKS,
+				DECAY_TIMER / 20,
+				MAX_STACKS,
+				(int)(SPEED_1 * 100),
+				SPEED_DURATION / 20,
+				ABILITIES_COUNT_1
+				));
+		mInfo.mDescriptions.add(
+			String.format("Sage's Insight now grants %s%% Speed and refreshes the cooldowns of your previous %s spells upon activating.",
+				(int)(SPEED_2 * 100),
+				ABILITIES_COUNT_2
+				));
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
 		mResetSize = (isLevelOne() ? ABILITIES_COUNT_1 : ABILITIES_COUNT_2) + (int) CharmManager.getLevel(player, CHARM_ABILITY);
 		mMaxStacks = (int) CharmManager.getLevel(player, CHARM_STACKS) + MAX_STACKS;
