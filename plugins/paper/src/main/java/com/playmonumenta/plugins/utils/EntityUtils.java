@@ -71,16 +71,10 @@ public class EntityUtils {
 		EntityType.DROWNED
 	);
 
-	private static final EnumSet<EntityType> ARTHROPOD_MOBS = EnumSet.of(
-		EntityType.SPIDER,
-		EntityType.CAVE_SPIDER,
-		EntityType.SILVERFISH,
-		EntityType.ENDERMITE,
-		EntityType.BEE
-	);
-
-	private static final EnumSet<EntityType> AQUATIC_MOBS = EnumSet.of(
+	private static final EnumSet<EntityType> WATER_MOBS = EnumSet.of(
 		EntityType.AXOLOTL,
+		EntityType.DOLPHIN,
+		EntityType.DROWNED,
 		EntityType.GLOW_SQUID,
 		EntityType.GUARDIAN,
 		EntityType.ELDER_GUARDIAN,
@@ -269,14 +263,18 @@ public class EntityUtils {
 		return UNDEAD_MOBS.contains(mob.getType());
 	}
 
-	// Affected by Bane of Arthropods
-	public static boolean isArthropod(LivingEntity mob) {
-		return ARTHROPOD_MOBS.contains(mob.getType());
+	/**
+	 * Checks if the mob can usually spawn in water
+	 */
+	public static boolean isWaterMob(LivingEntity mob) {
+		return isWaterMob(mob.getType());
 	}
 
-	// Affected by Impaling
-	public static boolean isAquatic(LivingEntity mob) {
-		return AQUATIC_MOBS.contains(mob.getType());
+	/**
+	 * Checks if the mob can usually spawn in water
+	 */
+	public static boolean isWaterMob(EntityType type) {
+		return WATER_MOBS.contains(type);
 	}
 
 	// Affected by Slayer
@@ -290,7 +288,11 @@ public class EntityUtils {
 	}
 
 	public static boolean isFlyingMob(LivingEntity mob) {
-		return FLYING_MOBS.contains(mob.getType());
+		return isFlyingMob(mob.getType());
+	}
+
+	public static boolean isFlyingMob(EntityType type) {
+		return FLYING_MOBS.contains(type);
 	}
 
 	// Affected by Abyssal
