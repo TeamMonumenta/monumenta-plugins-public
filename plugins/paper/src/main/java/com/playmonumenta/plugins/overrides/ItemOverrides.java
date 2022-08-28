@@ -358,6 +358,9 @@ public final class ItemOverrides {
 
 		BaseOverride lodestoneOverride = new LodestoneOverride();
 		mItems.put(Material.LODESTONE, lodestoneOverride);
+
+		BaseOverride boneMealOverride = new BoneMealOverride();
+		mItems.put(Material.BONE_MEAL, boneMealOverride);
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, @Nullable Block block, PlayerInteractEvent event) {

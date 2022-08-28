@@ -40,7 +40,8 @@ public class ZoneUtils {
 		NO_FALL_DAMAGE("No Fall Damage"),
 		RESTRICTED("Restricted"),
 		BROOMSTICK_ENABLED("Broomstick Enabled"),
-		BLOCKBREAK_DISABLED("Blockbreak Disabled");
+		BLOCKBREAK_DISABLED("Blockbreak Disabled"),
+		BONE_MEAL_DISABLED("Bone Meal Disabled");
 
 		private final String mPropertyName;
 
