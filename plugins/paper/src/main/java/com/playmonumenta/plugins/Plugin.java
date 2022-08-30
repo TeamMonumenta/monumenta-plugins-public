@@ -40,6 +40,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.parrots.ParrotManager;
+import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.plots.ShopManager;
 import com.playmonumenta.plugins.potion.PotionManager;
@@ -105,6 +106,7 @@ public class Plugin extends JavaPlugin {
 	private @Nullable HttpManager mHttpManager = null;
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
+	public ActivityManager mActivityManager;
 	public SpawnZoneManager mZoneManager;
 	public AbilityManager mAbilityManager;
 	public ShulkerInventoryManager mShulkerInventoryManager;
@@ -187,6 +189,7 @@ public class Plugin extends JavaPlugin {
 		CustomInventoryCommands.register(this);
 		DelvesCommands.register(this);
 		AdminNotify.register();
+		ViewActivity.register();
 		ItemStatUtils.registerInfoCommand();
 		ItemStatUtils.registerLoreCommand();
 		ItemStatUtils.registerNameCommand();
@@ -287,6 +290,7 @@ public class Plugin extends JavaPlugin {
 		mTowerManager = new TowerManager(this);
 		mCosmeticsManager = CosmeticsManager.getInstance();
 		mSeasonalEventManager = new SeasonalEventManager();
+		mActivityManager = new ActivityManager(this);
 		mVanityManager = new VanityManager();
 
 		new ClientModHandler(this);

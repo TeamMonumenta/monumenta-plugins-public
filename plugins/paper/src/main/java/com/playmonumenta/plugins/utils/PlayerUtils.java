@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.structures.StructuresPlugin;
@@ -66,7 +67,7 @@ public class PlayerUtils {
 		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
 		if (isDungeon) {
 			return location.getWorld().getPlayers().stream()
-				.filter(p -> p.getGameMode() != GameMode.SPECTATOR && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER))
+				.filter(p -> ActivityManager.getManager().isActive(p) && p.getGameMode() != GameMode.SPECTATOR && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER))
 				.toList();
 		}
 
@@ -87,7 +88,7 @@ public class PlayerUtils {
 		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
 		if (isDungeon) {
 			return player.getWorld().getPlayers().stream()
-				.filter(p -> p.getGameMode() != GameMode.SPECTATOR
+				.filter(p -> ActivityManager.getManager().isActive(p) && p.getGameMode() != GameMode.SPECTATOR
 					             && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER)
 					             && !p.equals(player))
 				.toList();
@@ -163,6 +164,10 @@ public class PlayerUtils {
 				double newHealth = Math.min(player.getHealth() + event.getAmount(), EntityUtils.getMaxHealth(player));
 				player.setHealth(newHealth);
 			}
+		}
+		// Add to activity
+		if (sourcePlayer != null && ActivityManager.getManager().isActive(player)) {
+			ActivityManager.getManager().addHealingDealt(player, healAmount);
 		}
 	}
 
