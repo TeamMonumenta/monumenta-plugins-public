@@ -466,9 +466,14 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				int currentLevel = ScoreboardUtils.getScoreboardValue(player, selectedAbility.mInfo.mScoreboardId);
 				if (add) {
 					//clear ability data
-					ScoreboardUtils.setScoreboardValue(player, selectedAbility.mInfo.mScoreboardId, currentLevel + 2);
 					int currentCount = ScoreboardUtils.getScoreboardValue(player, R3_ENHANCE_CURRENT);
-					ScoreboardUtils.setScoreboardValue(player, R3_ENHANCE_CURRENT, currentCount - 1);
+					// don't want to assign ability if we don't have points
+					if (currentCount > 0) {
+						ScoreboardUtils.setScoreboardValue(player, R3_ENHANCE_CURRENT, currentCount - 1);
+						ScoreboardUtils.setScoreboardValue(player, selectedAbility.mInfo.mScoreboardId, currentLevel + 2);
+					} else {
+						player.sendMessage("You don't have enough enhancement points to select this enhancement!");
+					}
 				} else {
 					//level clicked is lower than level existing
 					ScoreboardUtils.setScoreboardValue(player, selectedAbility.mInfo.mScoreboardId, currentLevel - 2);

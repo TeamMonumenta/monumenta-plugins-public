@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -11,6 +12,14 @@ public class ScoreboardUtils {
 	public static Optional<Integer> getScoreboardValue(String scoreHolder, String objectiveName) {
 		Optional<Integer> scoreValue = Optional.empty();
 		Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(objectiveName);
+		// Fast track applies
+		if (ServerProperties.getAbilityEnhancementsEnabled()) {
+			if (objectiveName.equals(AbilityUtils.TOTAL_LEVEL)) {
+				return Optional.of(AbilityUtils.MAX_SKILL_POINTS);
+			} else if (objectiveName.equals(AbilityUtils.TOTAL_SPEC)) {
+				return Optional.of(AbilityUtils.MAX_SPEC_POINTS);
+			}
+		}
 		if (objective != null) {
 			Score score = objective.getScore(scoreHolder);
 			if (score.isScoreSet()) {

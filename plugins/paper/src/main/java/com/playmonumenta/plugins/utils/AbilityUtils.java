@@ -49,8 +49,10 @@ public class AbilityUtils {
 	private static final String POTION_REFUNDED_METAKEY = "PotionRefunded";
 	public static final String TOTAL_LEVEL = "TotalLevel";
 	public static final String TOTAL_SPEC = "TotalSpec";
+	public static final String TOTAL_ENHANCE = "TotalEnhance";
 	public static final String REMAINING_SKILL = "Skill";
 	public static final String REMAINING_SPEC = "SkillSpec";
+	public static final String REMAINING_ENHANCE = "Enhancements";
 	public static final String SCOREBOARD_CLASS_NAME = "Class";
 	public static final String SCOREBOARD_SPEC_NAME = "Specialization";
 
@@ -498,6 +500,7 @@ public class AbilityUtils {
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_CLASS_NAME, 0);
 		ensureSkillAlignmentWithClassAndSpec(player);
 		ScoreboardUtils.setScoreboardValue(player, REMAINING_SKILL, ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0));
+		ScoreboardUtils.setScoreboardValue(player, REMAINING_ENHANCE, ScoreboardUtils.getScoreboardValue(player, TOTAL_ENHANCE).orElse(0));
 		player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.7f);
 		player.sendMessage(Component.text("Your class and skill points have been reset. You can pick a new class now.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
 		if (ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_SPEC_NAME).orElse(0) != 0) {
@@ -555,28 +558,65 @@ public class AbilityUtils {
 	}
 
 	public static int skillDiff(Player player) {
-		return getAssignedAbilityPoints(player) + getUnassignedAbilityPoints(player) - getTotalAbilityPoints(player);
+		Map<String, Integer> unassignedPoints = getUnassignedAbilityPoints(player);
+		Map<String, Integer> assignedPoints = getAssignedAbilityPoints(player);
+		Map<String, Integer> totalPoints = getTotalAbilityPoints(player);
+		Map<String, Integer> diffs = Map.of(
+			"Skill", unassignedPoints.get("Skill") + assignedPoints.get("Skill") - totalPoints.get("Skill"),
+			"Spec", unassignedPoints.get("Spec") + assignedPoints.get("Spec") - totalPoints.get("Spec"),
+			"Enhance", unassignedPoints.get("Enhance") + assignedPoints.get("Enhance") - totalPoints.get("Enhance")
+		);
+		if (diffs.get("Skill") > 0 || diffs.get("Spec") > 0 || diffs.get("Enhance") > 0) {
+			return 1;
+		} else if (diffs.get("Skill") < 0 || diffs.get("Spec") < 0 || diffs.get("Enhance") < 0) {
+			return -1;
+		}
+		return 0;
 	}
 
-	public static int getUnassignedAbilityPoints(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, REMAINING_SKILL).orElse(0) + ScoreboardUtils.getScoreboardValue(player, REMAINING_SPEC).orElse(0);
+	public static Map<String, Integer> getUnassignedAbilityPoints(Player player) {
+		return Map.of(
+			"Skill", ScoreboardUtils.getScoreboardValue(player, REMAINING_SKILL).orElse(0),
+			"Spec", ScoreboardUtils.getScoreboardValue(player, REMAINING_SPEC).orElse(0),
+			"Enhance", ScoreboardUtils.getScoreboardValue(player, REMAINING_ENHANCE).orElse(0));
 	}
 
-	public static int getAssignedAbilityPoints(Player player) {
-		int points = 0;
-		for (Ability ability : AbilityManager.getManager().getPlayerAbilities(player).getAbilitiesIgnoringSilence()) {
-			if (!(ability instanceof DepthsAbility)) {
-				if (ability.isLevelOne()) {
-					points++;
-				} else if (ability.isLevelTwo()) {
-					points += 2;
+	public static Map<String, Integer> getAssignedAbilityPoints(Player player) {
+		int skill = 0;
+		int spec = 0;
+		int enhance = 0;
+		MonumentaClasses mClasses = new MonumentaClasses(Plugin.getInstance(), null);
+		for (PlayerClass mClass: mClasses.mClasses) {
+			if (mClass.mClass == ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0)) {
+				List<Ability> abilities = mClass.mAbilities;
+				List<Ability> specAbilities = mClass.mSpecOne.mAbilities;
+				specAbilities.addAll(mClass.mSpecTwo.mAbilities);
+				// Loop over base abilities
+				for (Ability ability : abilities) {
+					// Enhanced ability
+					if (ScoreboardUtils.getScoreboardValue(player, ability.getScoreboard()).orElse(0) > 2) {
+						enhance++;
+						skill += ScoreboardUtils.getScoreboardValue(player, ability.getScoreboard()).orElse(0) - 2;
+					} else {
+						skill += ScoreboardUtils.getScoreboardValue(player, ability.getScoreboard()).orElse(0);
+					}
+				}
+				// Loop over specs
+				for (Ability specAbility : specAbilities) {
+					spec += ScoreboardUtils.getScoreboardValue(player, specAbility.getScoreboard()).orElse(0);
 				}
 			}
 		}
-		return points;
+		return Map.of(
+			"Skill", skill,
+			"Spec", spec,
+			"Enhance", enhance);
 	}
 
-	public static int getTotalAbilityPoints(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0) + ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
+	public static Map<String, Integer> getTotalAbilityPoints(Player player) {
+		return Map.of(
+			"Skill", ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0),
+			"Spec", ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0),
+			"Enhance", ScoreboardUtils.getScoreboardValue(player, TOTAL_ENHANCE).orElse(0));
 	}
 }

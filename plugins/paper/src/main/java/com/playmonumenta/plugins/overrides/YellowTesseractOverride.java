@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityCollection;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -19,6 +20,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -48,6 +50,7 @@ public class YellowTesseractOverride extends BaseOverride {
 	private static final String PREFIX = " - ";
 	private static final String CLASSL_STR = "Class Level: ";
 	private static final String SPECL_STR = "Specialization Level: ";
+	private static final String ENHANCE_STR = "Enhancement Level: ";
 	private static final String TOTAL_LEVEL = "TotalLevel";
 	private static final String TOTAL_SPEC = "TotalSpec";
 	private static final String LEVEL = "Skill";
@@ -174,6 +177,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		Map<String, Integer> targetSkills = new HashMap<>();
 		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
 		Integer totalSpec = ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
+		Integer totalEnhancement = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
 
 		/* Get all the target skills */
 		for (Component comp : lore) {
@@ -185,7 +189,7 @@ public class YellowTesseractOverride extends BaseOverride {
 				int specVal = AbilityUtils.getSpec(str.substring(SPEC_STR.length()));
 				ScoreboardUtils.setScoreboardValue(player, "Specialization", specVal);
 			} else if (str.startsWith(PREFIX)) {
-				int level = str.endsWith("2") ? 2 : 1;
+				int level = Integer.parseInt(str.substring(str.length() - 1));
 				targetSkills.put(str.substring(PREFIX.length(), str.indexOf(" : ")), level);
 			} else if (str.startsWith(CLASSL_STR)) {
 				Integer classLevel = Integer.parseInt(str.substring(CLASSL_STR.length()));
@@ -193,6 +197,9 @@ public class YellowTesseractOverride extends BaseOverride {
 			} else if (str.startsWith(SPECL_STR)) {
 				Integer specLevel = Integer.parseInt(str.substring(SPECL_STR.length()));
 				ScoreboardUtils.setScoreboardValue(player, SPEC_LEVEL, totalSpec - specLevel);
+			} else if (str.startsWith(ENHANCE_STR)) {
+				Integer enhanceLevel = Integer.parseInt(str.substring(ENHANCE_STR.length()));
+				ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE, totalEnhancement - enhanceLevel);
 			}
 		}
 
@@ -219,38 +226,49 @@ public class YellowTesseractOverride extends BaseOverride {
 		}
 
 		int totalSkillsAdded = 0;
-		// Check Reference abilities for enabled skills
-		for (Ability reference : AbilityManager.getManager().getReferenceAbilities()) {
+		int totalSpecAdded = 0;
+		int totalEnhancementsAdded = 0;
+		// We want to separate different points here because of fast track, since people with fast track can cheese the skill cap otherwise
+		// Check all abilities for matches
+		MonumentaClasses mClasses = new MonumentaClasses(Plugin.getInstance(), null);
+		List<Ability> allBaseAbilities = mClasses.mClasses.stream().flatMap(x -> x.mAbilities.stream()).toList();
+		List<Ability> allSpecAbilities = mClasses.mClasses.stream().flatMap(x -> Stream.concat(x.mSpecOne.mAbilities.stream(), x.mSpecTwo.mAbilities.stream())).toList();
+		for (Ability reference : allBaseAbilities) {
 			@Nullable Integer level = targetSkills.get(reference.getDisplayName());
 			if (level != null) {
 				String scoreboard = reference.getScoreboard();
 				if (scoreboard != null) {
 					ScoreboardUtils.setScoreboardValue(player, scoreboard, level);
-					totalSkillsAdded += level;
+					if (level > 2) {
+						totalSkillsAdded += level - 2;
+						totalEnhancementsAdded++;
+					} else {
+						totalSkillsAdded += level;
+					}
 				}
 			}
 		}
 
-		// Check DisabledAbilities for disabled skills to be added (makes sure we get the spec skills even in R1)
-		for (Ability reference : AbilityManager.getManager().getDisabledAbilities()) {
+		// Check all specialization abilities
+		for (Ability reference : allSpecAbilities) {
 			@Nullable Integer level = targetSkills.get(reference.getDisplayName());
 			if (level != null) {
 				String scoreboard = reference.getScoreboard();
 				if (scoreboard != null) {
 					ScoreboardUtils.setScoreboardValue(player, scoreboard, level);
-					totalSkillsAdded += level;
+					totalSpecAdded += level;
 				}
 			}
 		}
 
 		// If the Tesseract had too many skills, reset the player and the item.
-		if (totalSkillsAdded > (totalLevel + totalSpec)) {
+		if (totalSkillsAdded > totalLevel || totalSpecAdded > totalSpec || totalEnhancementsAdded > totalEnhancement) {
 			player.sendMessage(Component.text("The Tesseract of the Elements has too many skills!", NamedTextColor.RED));
 			resetTesseract(player, item);
 			AbilityManager.getManager().resetPlayerAbilities(player);
 			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
 			return;
-		} else if (totalSkillsAdded < (totalLevel + totalSpec)) {
+		} else if (totalSkillsAdded < totalLevel || totalSpecAdded < totalSpec || totalEnhancementsAdded < totalEnhancement) {
 			player.sendMessage(Component.text("You have additional skill points to spend!", NamedTextColor.YELLOW));
 		}
 
@@ -272,6 +290,8 @@ public class YellowTesseractOverride extends BaseOverride {
 		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
 		Integer specLevel = ScoreboardUtils.getScoreboardValue(player, SPEC_LEVEL).orElse(0);
 		Integer totalSpec = ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
+		Integer enhanceLevel = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE).orElse(0);
+		Integer totalEnhance = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
 
 		if (InventoryUtils.testForItemWithLore(item, CLASS_STR)) {
 			clearTesseractLore(item);
@@ -285,6 +305,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(CLASSL_STR + (totalLevel - classLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(SPEC_STR + AbilityUtils.getSpec(player), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(SPECL_STR + (totalSpec - specLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(ENHANCE_STR + (totalEnhance - enhanceLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 
 		AbilityCollection coll = AbilityManager.getManager().getPlayerAbilities(player);
 		if (coll != null) {
@@ -323,6 +344,7 @@ public class YellowTesseractOverride extends BaseOverride {
 				|| line.startsWith(SPEC_STR)
 				|| line.startsWith(CLASSL_STR)
 				|| line.startsWith(SPECL_STR)
+				|| line.startsWith(ENHANCE_STR)
 				|| line.startsWith(PREFIX)) {
 				ItemStatUtils.removeLore(item, i);
 			}

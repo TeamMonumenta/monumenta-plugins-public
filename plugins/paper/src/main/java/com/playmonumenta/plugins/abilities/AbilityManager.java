@@ -891,11 +891,13 @@ public class AbilityManager {
 				ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
 			}
 		}
-		// Reset Skill and SkillSpec
-		int skill = ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0);
-		int spec = ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0);
-		ScoreboardUtils.setScoreboardValue(player, "Skill", skill);
-		ScoreboardUtils.setScoreboardValue(player, "SkillSpec", spec);
+		// Reset Skill and SkillSpec and Enhancements
+		int skill = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_LEVEL).orElse(0);
+		int spec = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_SPEC).orElse(0);
+		int enhance = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SKILL, skill);
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SPEC, spec);
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE, enhance);
 
 		// Run updatePlayerAbilities to clear existing ability effects.
 		updatePlayerAbilities(player, true);
