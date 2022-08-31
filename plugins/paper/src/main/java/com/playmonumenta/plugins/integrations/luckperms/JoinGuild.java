@@ -28,43 +28,51 @@ public class JoinGuild {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.joinguild");
 
 		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.MANY_PLAYERS));
 
 		new CommandAPICommand("joinguild")
 			.withPermission(perms)
 			.withArguments(arguments)
-			.executes((sender, args) -> {
+			.executesPlayer((founder, args) -> {
 				if (!ServerProperties.getShardName().contains("build")) {
-					run(plugin, (Player) args[0]);
+					run(plugin, founder, (List<Player>) args[0]);
 				}
 			})
 			.register();
 	}
 
-	private static void run(Plugin plugin, Player player) throws WrapperCommandSyntaxException {
-		Group currentGuild = LuckPermsIntegration.getGuild(player);
+	private static void run(Plugin plugin, Player founder, List<Player> players) throws WrapperCommandSyntaxException {
+		Group currentGuild = LuckPermsIntegration.getGuild(founder);
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
-		if (currentGuildName != null) {
-			String err = ChatColor.RED + "You are already in the guild '" + currentGuildName + "' !";
-			player.sendMessage(err);
+		if (currentGuildName != null &&
+			ScoreboardUtils.getScoreboardValue(founder, "Founder").orElse(0) != 1) {
+			String err = ChatColor.RED + "You are not a founder of '" + currentGuildName + "' !";
 			CommandAPI.fail(err);
+			return;
+		}
+		if (currentGuildName == null) {
+			founder.sendMessage(ChatColor.RED + "You are not currently in a guild.");
+			return;
+		}
+		players.removeIf(player -> founder.getName().equalsIgnoreCase(player.getName()));
+		if (players.size() == 0) {
+			founder.sendMessage(ChatColor.RED + "No other players found on the pedestal to add to your guild.");
 		}
 
-		// Check for nearby founder
-		for (Player p : PlayerUtils.otherPlayersInRange(player, 1, true)) {
-			if (ScoreboardUtils.getScoreboardValue(p, "Founder").orElse(0) == 1) {
-				/* Nearby player is a founder - join to that guild */
+		// Check nearby players, add if not in guild and not founder of something
+		for (Player p : players) {
+			if (ScoreboardUtils.getScoreboardValue(p, "Founder").orElse(0) == 0) {
 				Group group = LuckPermsIntegration.getGuild(p);
-				if (group == null) {
+				if (group != null) {
+					p.sendMessage(ChatColor.RED + "You are already a part of another guild, please leave your current guild before trying again.");
 					continue;
 				}
-				String guildName = LuckPermsIntegration.getGuildName(group);
 				// Add user to guild
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						User user = LuckPermsIntegration.UM.getUser(player.getUniqueId());
-						user.data().add(InheritanceNode.builder(group).build());
+						User user = LuckPermsIntegration.UM.getUser(p.getUniqueId());
+						user.data().add(InheritanceNode.builder(currentGuild).build());
 						LuckPermsIntegration.UM.saveUser(user).whenComplete((unused, ex) -> {
 							if (ex != null) {
 								ex.printStackTrace();
@@ -75,21 +83,21 @@ public class JoinGuild {
 				}.runTaskAsynchronously(plugin);
 
 				// Success indicators
-				player.sendMessage(ChatColor.GOLD + "Congratulations! You have joined " + guildName + "!");
-				p.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.GOLD + " has joined your guild");
-				MonumentaNetworkChatIntegration.refreshPlayer(player);
+				p.sendMessage(ChatColor.GOLD + "Congratulations! You have joined " + currentGuildName + "!");
+				founder.sendMessage(ChatColor.WHITE + p.getName() + ChatColor.GOLD + " has joined your guild");
+				MonumentaNetworkChatIntegration.refreshPlayer(p);
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-				                       "execute at " + player.getName()
-				                       + " run summon minecraft:firework_rocket ~ ~1 ~ "
-				                       + "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
-
-				// All done
-				return;
+					"execute at " + p.getName()
+						+ " run summon minecraft:firework_rocket ~ ~1 ~ "
+						+ "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
+			} else {
+				Group group = LuckPermsIntegration.getGuild(p);
+				if (group != null) {
+					p.sendMessage(ChatColor.RED + "You are marked as a founder but have no current guild, please contact a moderator.");
+					continue;
+				}
+				p.sendMessage(ChatColor.RED + "You are the founder of another guild, please leave your current guild before trying again.");
 			}
 		}
-
-		String err = ChatColor.RED + "A founder of the guild you wish to join needs to stand within 1 block of you";
-		player.sendMessage(err);
-		CommandAPI.fail(err);
 	}
 }
