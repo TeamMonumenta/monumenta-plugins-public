@@ -869,6 +869,11 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 
 		mPlugin.mItemStatManager.onExpChange(mPlugin, player, event);
+
+		if (event.getAmount() > 0) {
+			ScoreboardUtils.getScoreboardValue(player, "XpGainBonus")
+				.ifPresent(value -> event.setAmount((int) Math.ceil(event.getAmount() * (1 + value / 100.0))));
+		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
