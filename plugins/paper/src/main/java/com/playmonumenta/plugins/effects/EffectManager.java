@@ -463,19 +463,18 @@ public final class EffectManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-	public boolean entityRegainHealthEvent(EntityRegainHealthEvent event) {
+	public void entityRegainHealthEvent(EntityRegainHealthEvent event) {
 		Effects effects = mEntities.get(event.getEntity());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
 					if (!effectGroup.last().entityRegainHealthEvent(event)) {
-						return false;
+						event.setCancelled(true);
+						return;
 					}
 				}
 			}
 		}
-
-		return true;
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
