@@ -58,11 +58,13 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 					switch (mTicks) {
 						case 12 -> {
 							Block block = world.getBlockAt(loc);
-							block.setType(Material.CHEST);
-							if (block.getState() instanceof Chest chest) {
-								chest.setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + "Creeperween Chest");
-								chest.setLootTable(Bukkit.getLootTable(NamespacedKeyUtils.fromString("epic:event/halloween2019/tricked_creeper")));
-								chest.update();
+							if (block.getType() == Material.AIR || block.isLiquid()) {
+								block.setType(Material.CHEST);
+								if (block.getState() instanceof Chest chest) {
+									chest.setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + "Creeperween Chest");
+									chest.setLootTable(Bukkit.getLootTable(NamespacedKeyUtils.fromString("epic:event/halloween2019/tricked_creeper")));
+									chest.update();
+								}
 							}
 						}
 						case 2, 6 -> summonFirework(loc, true);
