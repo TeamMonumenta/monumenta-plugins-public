@@ -10,6 +10,7 @@ import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fish;
+import org.bukkit.entity.Goat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
@@ -31,7 +32,7 @@ public class BucketOverride extends BaseOverride {
 	                                           ItemStack itemInHand) {
 		if (clickedEntity == null) {
 			return true;
-		} else if (clickedEntity instanceof Cow) {
+		} else if (clickedEntity instanceof Cow || clickedEntity instanceof Goat) {
 			return false;
 		} else if ((clickedEntity instanceof Fish || clickedEntity instanceof Axolotl) && !ZoneUtils.isInPlot(clickedEntity)) {
 			return false;

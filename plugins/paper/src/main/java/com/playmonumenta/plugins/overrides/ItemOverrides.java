@@ -224,6 +224,7 @@ public final class ItemOverrides {
 		mItems.put(Material.BUCKET, bucketOverride);
 		mItems.put(Material.WATER_BUCKET, bucketOverride);
 		mItems.put(Material.LAVA_BUCKET, bucketOverride);
+		mItems.put(Material.POWDER_SNOW_BUCKET, bucketOverride);
 		mItems.put(Material.COD_BUCKET, bucketOverride);
 		mItems.put(Material.MILK_BUCKET, bucketOverride);
 		mItems.put(Material.PUFFERFISH_BUCKET, bucketOverride);
