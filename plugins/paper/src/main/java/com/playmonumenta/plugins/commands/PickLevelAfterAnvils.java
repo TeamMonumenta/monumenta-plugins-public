@@ -1,9 +1,10 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.overrides.LimeTesseractOverride;
 import com.playmonumenta.plugins.utils.ExperienceUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -11,23 +12,25 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.loot.LootContext;
-import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class PickLevelAfterAnvils extends GenericCommand {
-	static final String COMMAND = "picklevelafteranvils";
-	static final String FAILURE = "Please enter a number between 1 and your current level.";
-	public static final NamespacedKey ANVILTABLE = NamespacedKeyUtils.fromString("epic:r1/items/misc/repair_anvil");
+
+	public static final NamespacedKey ANVIL_TABLE = NamespacedKeyUtils.fromString("epic:r1/items/misc/repair_anvil");
+	public static int LEVELS_PER_ANVIL = 25;
+	public static int XP_PER_ANVIL = ExperienceUtils.getTotalExperience(LEVELS_PER_ANVIL);
+
+	private static final String COMMAND = "picklevelafteranvils";
+	private static final String FAILURE = "Please enter a number between 1 and your current level.";
 
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.picklevelafteranvils");
@@ -44,70 +47,60 @@ public class PickLevelAfterAnvils extends GenericCommand {
 			.register();
 	}
 
-	private static void run(Player target) throws WrapperCommandSyntaxException {
+	public static void run(Player target) {
 		SignUtils.Menu menu = SignUtils.newMenu(
 				new ArrayList<String>(Arrays.asList("", "~~~~~~~~~~~", "Input total", "levels to keep.")))
-	            .reopenIfFail(false)
-	            .response((player, strings) -> {
-					int inputVal = -1;
-					try {
-						inputVal = Integer.parseInt(strings[0]);
-					} catch (Exception e) {
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								player.sendMessage(FAILURE);
-							}
-						}.runTaskLater(Plugin.getInstance(), 2);
-						return true;
-					}
-					if (inputVal == -1) {
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								player.sendMessage(FAILURE);
-							}
-						}.runTaskLater(Plugin.getInstance(), 2);
-						return true;
-					}
-					if (inputVal >= 1 && player.getLevel() >= inputVal) {
-						final int finalInputVal = inputVal;
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								LootContext context = new LootContext.Builder(player.getLocation()).build();
-								LootTable anvilTable = Bukkit.getLootTable(ANVILTABLE);
-								Collection<ItemStack> anvilLoot = anvilTable.populateLoot(FastUtils.RANDOM, context);
-								int currentXp = ExperienceUtils.getTotalExperience(player);
-								int currentAnvilCount = (currentXp - ExperienceUtils.getTotalExperience(finalInputVal)) / ExperienceUtils.LEVEL_30;
-								if (currentAnvilCount <= 0) {
-									player.sendMessage("The levels between your current level and the requested level will not be enough to create an anvil.");
-									return;
-								}
-								ExperienceUtils.setTotalExperience(player, currentXp - (currentAnvilCount * ExperienceUtils.getTotalExperience(30)));
-								player.sendMessage("You've been given " + String.valueOf(currentAnvilCount) + " anvils.");
-								for (ItemStack anvilTableItem : anvilLoot) {
-									ItemStack anvil = anvilTableItem;
-									anvil.setAmount(64);
-									while (currentAnvilCount >= 64) {
-										currentAnvilCount -= 64;
-										InventoryUtils.giveItem(player, anvil);
-									}
-									anvil.setAmount(currentAnvilCount);
-									InventoryUtils.giveItem(player, anvil);
-								}
-							}
-						}.runTaskLater(Plugin.getInstance(), 2);
-					} else {
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								player.sendMessage(FAILURE);
-							}
-						}.runTaskLater(Plugin.getInstance(), 2);
-					}
+			.reopenIfFail(false)
+			.response((player, strings) -> {
+				int inputVal;
+				try {
+					inputVal = Integer.parseInt(strings[0]);
+				} catch (Exception e) {
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							player.sendMessage(Component.text(FAILURE, NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+						}
+					}.runTaskLater(Plugin.getInstance(), 2);
 					return true;
-	            });
+				}
+				if (inputVal >= 1 && player.getLevel() >= inputVal) {
+					final int finalInputVal = inputVal;
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							int currentXp = ExperienceUtils.getTotalExperience(player);
+							int anvilsCreated = (currentXp - ExperienceUtils.getTotalExperience(finalInputVal)) / XP_PER_ANVIL;
+							if (anvilsCreated <= 0) {
+								player.sendMessage(Component.text("The levels between your current level and the requested level will not be enough to create an anvil.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+								return;
+							}
+							ExperienceUtils.setTotalExperience(player, currentXp - (anvilsCreated * XP_PER_ANVIL));
+							ItemStack mainHand = player.getInventory().getItemInMainHand();
+							if (ItemStatUtils.isUpgradedLimeTesseract(mainHand)) {
+								player.sendMessage(Component.text("The tesseract pulls from your intellect and gains " + anvilsCreated + " anvil charges.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+								ItemStatUtils.setCharges(mainHand, ItemStatUtils.getCharges(mainHand) + anvilsCreated);
+								ItemStatUtils.generateItemStats(mainHand);
+							} else {
+								if (LimeTesseractOverride.isAnyLimeTesseract(mainHand)) {
+									player.sendMessage(Component.text("The tesseract pulls from your intellect, and gives you " + anvilsCreated + " anvils.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+								} else {
+									player.sendMessage(Component.text("You have been given " + anvilsCreated + " anvils.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+								}
+								InventoryUtils.giveItemFromLootTable(player, ANVIL_TABLE, anvilsCreated);
+							}
+						}
+					}.runTaskLater(Plugin.getInstance(), 2);
+				} else {
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							player.sendMessage(Component.text(FAILURE, NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+						}
+					}.runTaskLater(Plugin.getInstance(), 2);
+				}
+				return true;
+			});
 		menu.open(target);
 	}
 }

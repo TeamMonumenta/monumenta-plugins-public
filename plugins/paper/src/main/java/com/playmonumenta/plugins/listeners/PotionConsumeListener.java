@@ -86,8 +86,7 @@ public class PotionConsumeListener implements Listener {
 		    // Must be a click on a drinkable potion or glass bottle in empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
 		    event.getCurrentItem() == null ||
-		    ItemStatUtils.isShattered(event.getCurrentItem()) ||
-		    ZoneUtils.hasZoneProperty(whoClicked, ZoneProperty.NO_POTIONS) ||
+			ZoneUtils.hasZoneProperty(whoClicked, ZoneProperty.NO_POTIONS) ||
 		    !(event.getCurrentItem().getType().equals(Material.POTION) ||
 		      event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE))
 		    ) {
@@ -274,7 +273,6 @@ public class PotionConsumeListener implements Listener {
 		    // Must be a click on a shulker box with an empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
 		    event.getCurrentItem() == null ||
-		    ItemStatUtils.isShattered(event.getCurrentItem()) ||
 		    !(event.getCurrentItem().getType().equals(Material.SPLASH_POTION) ||
 		      event.getCurrentItem().getType().equals(Material.LINGERING_POTION))
 				) {

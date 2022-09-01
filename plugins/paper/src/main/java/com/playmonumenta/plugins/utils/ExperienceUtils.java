@@ -28,24 +28,28 @@ public class ExperienceUtils {
 		return Math.round(player.getExp() * player.getExpToLevel()) + getTotalExperience(player.getLevel());
 	}
 
-	public static void setTotalExperience(Player player, int amount) {
+	public static int getLevel(int totalXp) {
 		float a = 0;
 		float b = 0;
-		float c = -amount;
+		float c = -totalXp;
 
-		if (amount > getTotalExperience(0) && amount <= getTotalExperience(15)) {
+		if (totalXp > getTotalExperience(0) && totalXp <= getTotalExperience(15)) {
 			a = 1;
 			b = 6;
-		} else if (amount > getTotalExperience(15) && amount <= getTotalExperience(30)) {
+		} else if (totalXp > getTotalExperience(15) && totalXp <= getTotalExperience(30)) {
 			a = 2.5f;
 			b = -40.5f;
 			c += 360;
-		} else if (amount > getTotalExperience(30)) {
+		} else if (totalXp > getTotalExperience(30)) {
 			a = 4.5f;
 			b = -162.5f;
 			c += 2220;
 		}
-		int level = (int) Math.floor((-b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a));
+		return (int) Math.floor((-b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a));
+	}
+
+	public static void setTotalExperience(Player player, int amount) {
+		int level = getLevel(amount);
 		int xp = amount - getTotalExperience(level);
 		player.setLevel(level);
 		player.setExp(0);

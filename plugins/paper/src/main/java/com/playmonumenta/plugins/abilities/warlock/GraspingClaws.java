@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.WeakHashMap;
@@ -69,7 +68,7 @@ public class GraspingClaws extends Ability {
 			return;
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && ItemUtils.isBowOrTrident(inMainHand) && !ItemStatUtils.isShattered(inMainHand)) {
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && ItemUtils.isBowOrTrident(inMainHand)) {
 			AbstractArrow arrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 1.5f, 0,
 				(Class<? extends AbstractArrow>) (inMainHand.getType() == Material.TRIDENT ? Trident.class : Arrow.class));
 			arrow.setShooter(mPlayer);

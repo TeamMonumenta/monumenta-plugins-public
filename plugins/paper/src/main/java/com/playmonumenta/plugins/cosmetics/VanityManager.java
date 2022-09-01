@@ -393,6 +393,7 @@ public class VanityManager implements Listener {
 			if (originalMeta != null) {
 				vanityMeta.addItemFlags(originalMeta.getItemFlags().toArray(ItemFlag[]::new));
 			}
+			vanityMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS); // hide vanilla values like banner patterns
 
 			itemStack.setType(vanityItem.getType());
 			itemStack.setItemMeta(vanityMeta);

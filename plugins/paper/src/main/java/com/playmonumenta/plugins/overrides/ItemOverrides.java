@@ -237,6 +237,7 @@ public final class ItemOverrides {
 		mItems.put(Material.TRAPPED_CHEST, chestOverride);
 
 		mItems.put(Material.YELLOW_STAINED_GLASS, new YellowTesseractOverride());
+		mItems.put(Material.LIME_STAINED_GLASS, new LimeTesseractOverride());
 		mItems.put(Material.WHITE_STAINED_GLASS, new FestiveTesseractOverride());
 
 		BaseOverride anvilOverride = new AnvilOverride();

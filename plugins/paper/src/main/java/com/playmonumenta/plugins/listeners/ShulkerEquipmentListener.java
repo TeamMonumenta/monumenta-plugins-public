@@ -76,32 +76,29 @@ public class ShulkerEquipmentListener implements Listener {
 		if (
 			// Must be a right click
 				event.getClick() == null ||
-		    !event.getClick().equals(ClickType.RIGHT) ||
-		    // Must be placing a single block
-		    event.getAction() == null ||
-		    !event.getAction().equals(InventoryAction.PICKUP_HALF) ||
-		    // Must be a player interacting with their main inventory
-		    event.getWhoClicked() == null ||
-		    !(event.getWhoClicked() instanceof Player) ||
-		    event.getClickedInventory() == null ||
-		    // If it's a player inventory, must be in main inventory
-		    // https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
-			(event.getClickedInventory() instanceof PlayerInventory && (event.getSlot() < 9 || event.getSlot() > 35)) ||
-			// Must be a player inventory, ender chest, or regular chest
-		    !(event.getClickedInventory() instanceof PlayerInventory ||
-		      event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST) ||
-		      event.getClickedInventory().getType().equals(InventoryType.CHEST)) ||
-		    // Must be a click on a shulker box with an empty hand
-		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
-		    event.getCurrentItem() == null ||
-		    !ItemUtils.isShulkerBox(event.getCurrentItem().getType())
+					!event.getClick().equals(ClickType.RIGHT) ||
+					// Must be placing a single block
+					event.getAction() == null ||
+					!event.getAction().equals(InventoryAction.PICKUP_HALF) ||
+					// Must be a player interacting with their main inventory
+					event.getWhoClicked() == null ||
+					!(event.getWhoClicked() instanceof Player player) ||
+					event.getClickedInventory() == null ||
+					// If it's a player inventory, must be in main inventory
+					// https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
+					(event.getClickedInventory() instanceof PlayerInventory && (event.getSlot() < 9 || event.getSlot() > 35)) ||
+					// Must be a player inventory, ender chest, or regular chest
+					!(event.getClickedInventory() instanceof PlayerInventory ||
+						  event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST) ||
+						  event.getClickedInventory().getType().equals(InventoryType.CHEST)) ||
+					// Must be a click on a shulker box with an empty hand
+					(event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
+					event.getCurrentItem() == null ||
+					!ItemUtils.isShulkerBox(event.getCurrentItem().getType())
 		) {
-
 			// Nope!
 			return;
 		}
-
-		Player player = (Player) event.getWhoClicked();
 
 		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
 			player.sendMessage(ChatColor.RED + "You can't use this here");
@@ -109,19 +106,31 @@ public class ShulkerEquipmentListener implements Listener {
 			return;
 		}
 
+		if (player.getLocation().getY() < player.getWorld().getMinHeight()) {
+			player.sendMessage(ChatColor.RED + "You can't use Lockboxes in the void");
+			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
+			return;
+		}
+
+		if (EntityUtils.touchesLava(player)) {
+			player.sendMessage(ChatColor.RED + "You can't use Lockboxes in lava");
+			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
+			return;
+		}
+
 		PlayerInventory pInv = player.getInventory();
 		ItemStack sboxItem = event.getCurrentItem();
 
-		if (sboxItem != null && ItemUtils.isShulkerBox(sboxItem.getType()) && !ItemStatUtils.isShattered(sboxItem) && sboxItem.hasItemMeta()) {
+		if (sboxItem != null && ItemUtils.isShulkerBox(sboxItem.getType()) && sboxItem.hasItemMeta()) {
 			if (sboxItem.getItemMeta() instanceof BlockStateMeta sMeta && sMeta.getBlockState() instanceof ShulkerBox sbox) {
 				if (sbox.isLocked() && sbox.getLock().equals(LOCK_STRING)) {
 
 					//if on cooldown don't swap
 					if (checkSwapCooldown(player)) {
-			            player.sendMessage(ChatColor.RED + "Lockbox still on cooldown!");
-			            player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			            event.setCancelled(true);
-			            return;
+						player.sendMessage(ChatColor.RED + "Lockbox still on cooldown!");
+						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						event.setCancelled(true);
+						return;
 					}
 
 					swap(player, pInv, sbox);

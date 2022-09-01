@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -15,10 +13,6 @@ public class TridentOverride extends BaseOverride {
 	public boolean playerRiptide(Plugin plugin, Player player, PlayerRiptideEvent event) {
 		if (player == null) {
 			return true;
-		}
-		if (ItemStatUtils.isShattered(event.getItem())) {
-			MessagingUtils.sendActionBarMessage(player, "Shattered items must be reforged before use");
-			return false;
 		}
 		if (player.getInventory().getItemInMainHand().getType() != Material.TRIDENT &&
 				player.getInventory().getItemInOffHand().getType() != Material.TRIDENT) {

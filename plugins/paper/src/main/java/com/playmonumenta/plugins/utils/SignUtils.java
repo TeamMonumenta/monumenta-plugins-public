@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
+import com.bergerkiller.bukkit.common.resources.BlockStateType;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketAdapter;
@@ -7,6 +9,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.nbt.NbtCompound;
+import com.comphenix.protocol.wrappers.nbt.NbtFactory;
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import java.lang.reflect.InvocationTargetException;
@@ -30,7 +33,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public final class SignUtils {
 
-	private static final int ACTION_INDEX = 9;
 	private static final int SIGN_LINES = 4;
 
 	private static final String NBT_BLOCK_ID = "minecraft:oak_sign";
@@ -206,10 +208,14 @@ public final class SignUtils {
 
 			PacketContainer openSign = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.OPEN_SIGN_EDITOR);
 			PacketContainer signData = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.TILE_ENTITY_DATA);
+			PacketPlayOutTileEntityDataHandle signPacket = PacketPlayOutTileEntityDataHandle.createHandle(signData.getHandle());
 
 			openSign.getBlockPositionModifier().write(0, mPosition);
 
 			NbtCompound signNBT = (NbtCompound) signData.getNbtModifier().read(0);
+			if (signNBT == null) {
+				signNBT = NbtFactory.ofCompound("sign");
+			}
 
 			for (int lineNum = 0; lineNum < SIGN_LINES; lineNum++) {
 				String lineLegacy = "";
@@ -230,7 +236,7 @@ public final class SignUtils {
 			signNBT.put("id", NBT_BLOCK_ID);
 
 			signData.getBlockPositionModifier().write(0, mPosition);
-			signData.getIntegers().write(0, ACTION_INDEX);
+			signPacket.setType(BlockStateType.SIGN);
 			signData.getNbtModifier().write(0, signNBT);
 
 			try {

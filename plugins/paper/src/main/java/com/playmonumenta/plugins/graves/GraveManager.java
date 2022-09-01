@@ -5,6 +5,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.infusions.Shattered;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.util.ArrayList;
@@ -14,12 +18,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.Chunk;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -36,18 +41,16 @@ public class GraveManager {
 	private static final String KEY_GRAVES = "graves";
 	private static final String KEY_THROWN_ITEMS = "thrown_items";
 	private static final HashMap<UUID, GraveManager> INSTANCES = new HashMap<>();
+	// graves by armor stand UUID, not grave UUID
 	private static final HashMap<UUID, Grave> GRAVES = new HashMap<>();
-	private static final HashMap<UUID, GraveItem> GRAVE_ITEMS = new HashMap<>();
 	private static final HashMap<UUID, ThrownItem> THROWN_ITEMS = new HashMap<>();
 	private static final HashMap<Long, HashSet<Grave>> UNLOADED_GRAVES = new HashMap<>();
-	private static final HashMap<Long, HashSet<GraveItem>> UNLOADED_GRAVE_ITEMS = new HashMap<>();
 	private static final HashMap<Long, HashSet<ThrownItem>> UNLOADED_THROWN_ITEMS = new HashMap<>();
 	private final ArrayList<ThrownItem> mThrownItems = new ArrayList<>();
 	private final ArrayList<Grave> mGraves = new ArrayList<>();
-	private final HashSet<UUID> mAllowed = new HashSet<>();
 	private final Player mPlayer;
 	private boolean mLoggedOut = false;
-	private int mDeleteAttemptIndex = -1;
+	private UUID mDeleteAttemptUUID = null;
 	private int mDeleteAttemptTicksLived = -1;
 
 	private GraveManager(Player player) {
@@ -68,7 +71,10 @@ public class GraveManager {
 				JsonArray thrownItemsData = graveManagerData.getAsJsonArray(KEY_THROWN_ITEMS);
 				for (JsonElement thrownItemData : thrownItemsData) {
 					JsonObject data = thrownItemData.getAsJsonObject();
-					mThrownItems.add(ThrownItem.deserialize(this, player, data));
+					ThrownItem thrownItem = ThrownItem.deserialize(this, player, data);
+					if (thrownItem != null) {
+						mThrownItems.add(thrownItem);
+					}
 				}
 			}
 		}
@@ -122,19 +128,9 @@ public class GraveManager {
 			JsonArray thrownItems = new JsonArray();
 			data.add(KEY_GRAVES, graves);
 			data.add(KEY_THROWN_ITEMS, thrownItems);
-			Iterator<Grave> iterGraves = manager.mGraves.iterator();
-			while (iterGraves.hasNext()) {
-				Grave grave = iterGraves.next();
-				if (grave.isEmpty()) {
-					grave.delete();
-					iterGraves.remove();
-				} else {
-					grave.onSave();
-					JsonObject graveData = grave.serialize();
-					if (graveData != null) {
-						graves.add(graveData);
-					}
-				}
+			for (Grave grave : manager.mGraves) {
+				grave.onSave();
+				graves.add(grave.serialize());
 			}
 			Iterator<ThrownItem> iterThrownItems = manager.mThrownItems.iterator();
 			while (iterThrownItems.hasNext()) {
@@ -174,10 +170,6 @@ public class GraveManager {
 		for (Grave grave : graves) {
 			grave.onChunkLoad();
 		}
-		HashSet<GraveItem> graveItems = new HashSet<>(getUnloadedGraveItems(event.getChunk().getChunkKey()));
-		for (GraveItem item : graveItems) {
-			item.onChunkLoad();
-		}
 		HashSet<ThrownItem> thrownItems = new HashSet<>(getUnloadedThrownItems(event.getChunk().getChunkKey()));
 		for (ThrownItem item : thrownItems) {
 			item.onChunkLoad();
@@ -188,26 +180,29 @@ public class GraveManager {
 		for (Entity entity : event.getChunk().getEntities()) {
 			if (GRAVES.containsKey(entity.getUniqueId())) {
 				GRAVES.get(entity.getUniqueId()).onChunkUnload();
-			} else if (GRAVE_ITEMS.containsKey(entity.getUniqueId())) {
-				GRAVE_ITEMS.get(entity.getUniqueId()).onChunkUnload();
 			} else if (THROWN_ITEMS.containsKey(entity.getUniqueId())) {
 				THROWN_ITEMS.get(entity.getUniqueId()).onChunkUnload();
 			}
 		}
 	}
 
-	// Called on any death, used for shattering items currently in limbo
-	public static void onDeath(Player player) {
-		GraveManager manager = INSTANCES.get(player.getUniqueId());
-		for (Grave grave : manager.mGraves) {
-			grave.onDeath();
-		}
-	}
-
 	// Called only on a death that would result in a grave
-	public static void onDeath(Player player, Map<Integer, ItemStack> droppedItems, HashMap<EquipmentSlot, ItemStack> equipment) {
+	public static void onDeath(Player player, HashMap<EquipmentSlot, ItemStack> equipment) {
 		GraveManager manager = INSTANCES.get(player.getUniqueId());
-		manager.mGraves.add(new Grave(manager, player, droppedItems, equipment));
+		String shard = ServerProperties.getShardName();
+		if (equipment.entrySet().stream().filter(e -> e.getKey() != EquipmentSlot.HAND)
+			.map(Map.Entry::getValue)
+			.allMatch(item -> ItemUtils.isNullOrAir(item) || ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED) >= Shattered.MAX_LEVEL)) {
+			player.sendMessage(Component.text("You died but had nothing equipped that could shatter, so no grave was created nor were items shattered further. ", NamedTextColor.GRAY)
+				.append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
+		} else if (manager.mGraves.stream().noneMatch(grave -> grave.mGhostGrave && shard.equals(grave.mShardName))) {
+			manager.mGraves.add(new Grave(manager, player, equipment));
+			player.sendMessage(Component.text("You died and left a grave! Return to it to repair your items! ", NamedTextColor.RED)
+				.append(Component.text("(/help death for more info)", NamedTextColor.RED).clickEvent(ClickEvent.runCommand("/help death"))));
+		} else {
+			player.sendMessage(Component.text("You died but already had a grave, so no new grave was created. Your items have shattered further! ", NamedTextColor.RED)
+				.append(Component.text("(/help death for more info)", NamedTextColor.RED).clickEvent(ClickEvent.runCommand("/help death"))));
+		}
 	}
 
 	// Called only when an item is dropped that, when destroyed, would result in a grave
@@ -228,9 +223,7 @@ public class GraveManager {
 	// Called when any player is within pickup range of any item
 	public static void onAttemptPickupItem(PlayerAttemptPickupItemEvent event) {
 		Item entity = event.getItem();
-		if (GRAVE_ITEMS.containsKey(entity.getUniqueId())) {
-			GRAVE_ITEMS.get(entity.getUniqueId()).onAttemptPickupItem(event);
-		} else if (THROWN_ITEMS.containsKey(entity.getUniqueId())) {
+		if (THROWN_ITEMS.containsKey(entity.getUniqueId())) {
 			ThrownItem item = THROWN_ITEMS.get(entity.getUniqueId());
 			item.onAttemptPickupItem(event);
 			if (!item.isValid()) {
@@ -240,14 +233,21 @@ public class GraveManager {
 	}
 
 	// Called when an item entity is killed by any method
-	public static void onDestroyItem(Item entity, boolean destroyedByVoid) {
-		if (GRAVE_ITEMS.containsKey(entity.getUniqueId())) {
-			GRAVE_ITEMS.get(entity.getUniqueId()).onDestroyItem(destroyedByVoid);
-		} else if (THROWN_ITEMS.containsKey(entity.getUniqueId())) {
+	public static void onDestroyItem(Item entity) {
+		if (THROWN_ITEMS.containsKey(entity.getUniqueId())) {
 			ThrownItem item = THROWN_ITEMS.remove(entity.getUniqueId());
 			if (item.isValid()) {
 				item.onDestroyItem();
-				item.mManager.mGraves.add(new Grave(item, destroyedByVoid));
+				if (ItemStatUtils.getInfusionLevel(item.mItem, ItemStatUtils.InfusionType.HOPE) <= 0) {
+					Shattered.shatter(item.mItem, Shattered.DROPPED_ITEM_DESTROYED);
+				}
+				item.mManager.mGraves.add(new Grave(item));
+				item.mManager.mPlayer.sendMessage(Component.text("An item you dropped at ", NamedTextColor.RED)
+					.append(Component.text(item.mLocation.getBlockX() + "," + item.mLocation.getBlockY() + "," + item.mLocation.getBlockZ()))
+					.append(Component.text(" was destroyed. A grave will keep it safe for you. "))
+					.append(Component.text("(/help death for more info)")
+						.clickEvent(ClickEvent.runCommand("/help death")))
+				);
 			}
 			item.mManager.mThrownItems.remove(item);
 		}
@@ -255,14 +255,6 @@ public class GraveManager {
 
 	public static boolean isGrave(Entity entity) {
 		return entity instanceof ArmorStand && (entity.getScoreboardTags().contains("Grave") || GRAVES.containsKey(entity.getUniqueId()));
-	}
-
-	public static boolean isGraveItem(Entity entity) {
-		return entity.getScoreboardTags().contains("GraveItem") || GRAVE_ITEMS.containsKey(entity.getUniqueId());
-	}
-
-	public static @Nullable GraveItem getGraveItem(Entity entity) {
-		return GRAVE_ITEMS.get(entity.getUniqueId());
 	}
 
 	public static boolean isThrownItem(Entity entity) {
@@ -276,13 +268,6 @@ public class GraveManager {
 		return UNLOADED_GRAVES.get(key);
 	}
 
-	private static HashSet<GraveItem> getUnloadedGraveItems(Long key) {
-		if (!UNLOADED_GRAVE_ITEMS.containsKey(key)) {
-			UNLOADED_GRAVE_ITEMS.put(key, new HashSet<>());
-		}
-		return UNLOADED_GRAVE_ITEMS.get(key);
-	}
-
 	private static HashSet<ThrownItem> getUnloadedThrownItems(Long key) {
 		if (!UNLOADED_THROWN_ITEMS.containsKey(key)) {
 			UNLOADED_THROWN_ITEMS.put(key, new HashSet<>());
@@ -290,25 +275,25 @@ public class GraveManager {
 		return UNLOADED_THROWN_ITEMS.get(key);
 	}
 
-	void addGrave(UUID uuid, Grave grave) {
-		GRAVES.put(uuid, grave);
+	void addGrave(ArmorStand armorStand, Grave grave) {
+		GRAVES.put(armorStand.getUniqueId(), grave);
 	}
 
-	void removeGrave(UUID uuid) {
-		GRAVES.remove(uuid);
+	void removeGrave(ArmorStand armorStand) {
+		GRAVES.remove(armorStand.getUniqueId());
 	}
 
-	void addItem(UUID uuid, GraveItem item) {
-		GRAVE_ITEMS.put(uuid, item);
+	void removeGrave(Grave grave) {
+		removeUnloadedGrave(Chunk.getChunkKey(grave.mLocation), grave);
+		mGraves.remove(grave);
 	}
 
-	void addItem(UUID uuid, ThrownItem item) {
-		THROWN_ITEMS.put(uuid, item);
+	void addItem(Item entity, ThrownItem item) {
+		THROWN_ITEMS.put(entity.getUniqueId(), item);
 	}
 
-	void removeItem(UUID uuid) {
-		GRAVE_ITEMS.remove(uuid);
-		THROWN_ITEMS.remove(uuid);
+	void removeItem(Item entity) {
+		THROWN_ITEMS.remove(entity.getUniqueId());
 	}
 
 	void addUnloadedGrave(Long key, Grave grave) {
@@ -319,16 +304,8 @@ public class GraveManager {
 		getUnloadedGraves(key).remove(grave);
 	}
 
-	void addUnloadedItem(Long key, GraveItem item) {
-		getUnloadedGraveItems(key).add(item);
-	}
-
 	void addUnloadedItem(Long key, ThrownItem item) {
 		getUnloadedThrownItems(key).add(item);
-	}
-
-	void removeUnloadedItem(Long key, GraveItem item) {
-		getUnloadedGraveItems(key).remove(item);
 	}
 
 	void removeUnloadedItem(Long key, ThrownItem item) {
@@ -337,26 +314,6 @@ public class GraveManager {
 
 	boolean isOwner(Player player) {
 		return player.getUniqueId().equals(mPlayer.getUniqueId());
-	}
-
-	boolean hasPermission(Player player) {
-		return isOwner(player) || mAllowed.contains(player.getUniqueId());
-	}
-
-	public boolean grantPermission(Player player) {
-		if (!hasPermission(player)) {
-			mAllowed.add(player.getUniqueId());
-			return true;
-		}
-		return false;
-	}
-
-	public boolean revokePermission(Player player) {
-		if (mAllowed.contains(player.getUniqueId())) {
-			mAllowed.remove(player.getUniqueId());
-			return true;
-		}
-		return false;
 	}
 
 	public int getGravesCount() {
@@ -373,6 +330,10 @@ public class GraveManager {
 	}
 
 	public ArrayList<Component> getGravesList(int page) {
+		return getGravesList(page, grave -> null);
+	}
+
+	public ArrayList<Component> getGravesList(int page, Function<Grave, Component> extraText) {
 		removeEmptyGraves();
 		ArrayList<Component> list = new ArrayList<>();
 		int first = 5 * (page - 1);
@@ -380,68 +341,55 @@ public class GraveManager {
 		if (mGraves.size() > first) {
 			for (int i = first; i <= last; i++) {
 				if (mGraves.size() > i) {
-					list.add(getGraveInfo(i));
+					Grave grave = mGraves.get(i);
+					Component graveInfo = getGraveInfo(grave);
+					Component extra = extraText.apply(grave);
+					if (extra != null) {
+						graveInfo = graveInfo.append(extra);
+					}
+					list.add(graveInfo);
 				}
 			}
 		}
 		return list;
 	}
 
-	public @Nullable Component getGraveInfo(int index) {
-		if (mGraves.size() > index) {
-			Grave grave = mGraves.get(index);
-			Component itemList = grave.getItemList(false);
-			return Component.text("World: (", NamedTextColor.GRAY)
-				.append(Component.text(grave.mShardName, NamedTextColor.WHITE))
-				.append(Component.text(") Loc: (", NamedTextColor.GRAY))
-				.append(Component.text(grave.mLocation.getBlockX() + "," + grave.mLocation.getBlockY() + "," + grave.mLocation.getBlockZ(), NamedTextColor.WHITE))
-				.append(Component.text(") ", NamedTextColor.GRAY))
-				.append(Component.text("Items: (", NamedTextColor.GRAY)
-					.hoverEvent(HoverEvent.showText(itemList)))
-				.append(Component.text(grave.mItems.size(), NamedTextColor.WHITE)
-					.hoverEvent(HoverEvent.showText(itemList)))
-				.append(Component.text(")", NamedTextColor.GRAY)
-					.hoverEvent(HoverEvent.showText(itemList)))
-				.append(Component.text(" "))
-				.append(Component.text("[X]", NamedTextColor.DARK_RED)
-					.hoverEvent(HoverEvent.showText(Component.text("Click to delete", NamedTextColor.RED)))
-					.clickEvent(ClickEvent.runCommand("/grave delete " + index)));
-		}
-		return null;
+	public Component getGraveInfo(Grave grave) {
+		Component itemList = grave.getItemList(false);
+		return Component.text("World: (", NamedTextColor.GRAY)
+			.append(Component.text(grave.mShardName, NamedTextColor.WHITE))
+			.append(Component.text(") Loc: (", NamedTextColor.GRAY))
+			.append(Component.text(grave.mLocation.getBlockX() + "," + grave.mLocation.getBlockY() + "," + grave.mLocation.getBlockZ(), NamedTextColor.WHITE))
+			.append(Component.text(") ", NamedTextColor.GRAY))
+			.append(Component.text("Items: (", NamedTextColor.GRAY)
+				.hoverEvent(HoverEvent.showText(itemList)))
+			.append(Component.text(grave.mItems.size(), NamedTextColor.WHITE)
+				.hoverEvent(HoverEvent.showText(itemList)))
+			.append(Component.text(")", NamedTextColor.GRAY)
+				.hoverEvent(HoverEvent.showText(itemList)))
+			.append(Component.text(" "))
+			.append(Component.text("[X]", NamedTextColor.DARK_RED)
+				.hoverEvent(HoverEvent.showText(Component.text("Click to delete", NamedTextColor.RED)))
+				.clickEvent(ClickEvent.runCommand("/grave delete " + grave.mUuid)));
 	}
 
 	public List<Grave> getGraves() {
 		return mGraves;
 	}
 
-	public boolean summonGrave(int index, Location location) {
-		if (mGraves.size() > index) {
-			Grave grave = mGraves.get(index);
-			grave.summon(location);
-			return true;
-		}
-		return false;
+	public Grave getGrave(UUID uuid) {
+		return mGraves.stream().filter(grave -> grave.mUuid.equals(uuid)).findFirst().orElse(null);
 	}
 
 	private void removeEmptyGraves() {
 		mGraves.removeIf(Grave::isEmpty);
 	}
 
-	public @Nullable Integer getIndex(Grave grave) {
-		List<Grave> graves = getGraves();
-		for (int i = 0; i < graves.size(); i++) {
-			if (graves.get(i).equals(grave)) {
-				return i;
-			}
-		}
-		return null;
-	}
-
-	public boolean isDeleteConfirmation(int index, int ticksLived) {
-		if (index == mDeleteAttemptIndex && ticksLived <= mDeleteAttemptTicksLived + 20 * 20) {
+	public boolean isDeleteConfirmation(UUID uuid, int ticksLived) {
+		if (uuid.equals(mDeleteAttemptUUID) && ticksLived <= mDeleteAttemptTicksLived + 20 * 20) {
 			return true;
 		} else {
-			mDeleteAttemptIndex = index;
+			mDeleteAttemptUUID = uuid;
 			mDeleteAttemptTicksLived = ticksLived;
 			return false;
 		}
@@ -449,10 +397,10 @@ public class GraveManager {
 
 	public boolean cancelDeletion() {
 		mDeleteAttemptTicksLived = -1;
-		if (mDeleteAttemptIndex == -1) {
+		if (mDeleteAttemptUUID == null) {
 			return false;
 		}
-		mDeleteAttemptIndex = -1;
+		mDeleteAttemptUUID = null;
 		return true;
 	}
 }

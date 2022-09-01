@@ -35,6 +35,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attributable;
@@ -298,6 +299,20 @@ public class EntityUtils {
 	// Affected by Abyssal
 	public static boolean isInWater(LivingEntity mob) {
 		return LocationUtils.isLocationInWater(mob.getLocation()) || LocationUtils.isLocationInWater(mob.getLocation().subtract(0, 1, 0));
+	}
+
+	public static boolean touchesLava(Entity entity) {
+		BoundingBox boundingBox = entity.getBoundingBox();
+		for (int x = (int) Math.floor(boundingBox.getMinX()); x < boundingBox.getMaxX(); x++) {
+			for (int y = (int) Math.floor(boundingBox.getMinY()); y < boundingBox.getMaxY(); y++) {
+				for (int z = (int) Math.floor(boundingBox.getMinZ()); z < boundingBox.getMaxZ(); z++) {
+					if (entity.getWorld().getBlockAt(x, y, z).getType() == Material.LAVA) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	public static boolean isElite(Entity entity) {

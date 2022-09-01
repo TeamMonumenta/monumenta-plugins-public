@@ -175,8 +175,8 @@ public final class JunkItemListener implements Listener {
 				}
 			}
 
-			// Allow collection of death piles and valuable player-dropped items
-			if (GraveManager.isGraveItem(entity) || GraveManager.isThrownItem(entity)) {
+			// Allow collection of valuable player-dropped items
+			if (GraveManager.isThrownItem(entity)) {
 				return;
 			}
 

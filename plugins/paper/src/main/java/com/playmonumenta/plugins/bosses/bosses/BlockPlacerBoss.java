@@ -145,8 +145,8 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 						Location finalPoint = path.getFinalPoint();
 						if ((distanceToTarget > 2 && (finalPoint == null || finalPoint.distance(bossLocation) < 1))
 							    || nextPoint == null
-							    || distanceToTarget < path.getNextPoint().distance(targetLocation)
-								       && (distanceToTarget < BEELINE_DISTANCE || path.getFinalPoint().distance(targetLocation) > BEELINE_DISTANCE)) {
+							    || (distanceToTarget < path.getNextPoint().distance(targetLocation)
+								        && (distanceToTarget < BEELINE_DISTANCE || path.getFinalPoint().distance(targetLocation) > BEELINE_DISTANCE))) {
 							if (!dig()) {
 								bridge(pathfinder, bossLocation, targetLocation);
 							}

@@ -46,7 +46,7 @@ dependencies {
     compileOnly("com.playmonumenta:structures:7.2")
     compileOnly("com.playmonumenta:worlds:1.6")
     compileOnly("com.playmonumenta:libraryofsouls:4.2")
-    compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.15.2-v2")
+    compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.18.2-v2")
     compileOnly("com.goncalomb.bukkit:nbteditor:3.2")
     compileOnly("de.tr7zw:item-nbt-api-plugin:2.3.1")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")

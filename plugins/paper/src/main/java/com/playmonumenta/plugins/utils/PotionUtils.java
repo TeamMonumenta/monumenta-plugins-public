@@ -238,9 +238,7 @@ public class PotionUtils {
 
 		if (meta.hasCustomEffects()) {
 			List<PotionEffect> effects = meta.getCustomEffects();
-			for (PotionEffect effect : effects) {
-				effectsList.add(effect);
-			}
+			effectsList.addAll(effects);
 		}
 
 		return effectsList;
@@ -293,10 +291,7 @@ public class PotionUtils {
 	}
 
 	public static void clearNegatives(Plugin plugin, Player player) {
-		boolean dolphin = false;
-		if (player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE)) {
-			dolphin = true;
-		}
+		boolean dolphin = player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE);
 		for (PotionEffectType type : NEGATIVE_EFFECTS) {
 			if (player.hasPotionEffect(type)) {
 				if ("SLOW".equals(type.getName()) && dolphin) {

@@ -95,7 +95,7 @@ public class HuntingCompanion extends Ability {
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isBowOrTrident(inMainHand) && !ItemStatUtils.isShattered(inMainHand)) {
+		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isBowOrTrident(inMainHand)) {
 			putOnCooldown();
 			mStunnedMobs = new ArrayList<>();
 

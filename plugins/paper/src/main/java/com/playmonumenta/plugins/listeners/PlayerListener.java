@@ -512,6 +512,19 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
+		if (player.getGameMode() != GameMode.CREATIVE
+			    && event.getClickedInventory() == player.getInventory()
+			    && 36 <= event.getSlot() && event.getSlot() <= 40
+			    && (ItemUtils.isNullOrAir(event.getCursor())
+				        || event.getClick().isShiftClick()
+				        || event.getClick() == ClickType.UNKNOWN
+				        || (event.getClick() == ClickType.NUMBER_KEY && ItemUtils.isNullOrAir(player.getInventory().getItem(event.getHotbarButton()))))
+			    && (player.getLocation().getY() < player.getWorld().getMinHeight() || EntityUtils.touchesLava(player))) {
+			player.sendMessage(Component.text("Unequipping gear in lava or void is not allowed!", NamedTextColor.RED));
+			event.setCancelled(true);
+			return;
+		}
+
 		if (!mPlugin.mItemOverrides.inventoryClickInteraction(mPlugin, player, event)) {
 			event.setCancelled(true);
 		}
@@ -659,10 +672,9 @@ public class PlayerListener implements Listener {
 			if (maxHealth != null && maxHealth.getValue() <= 0) {
 				event.setKeepInventory(false);
 			}
-		} else {
-			//Only activate on death effects for non-safe deaths
-			mPlugin.mItemStatManager.onDeath(mPlugin, player, event);
 		}
+
+		mPlugin.mItemStatManager.onDeath(mPlugin, player, event);
 
 		// Give the player a NewDeath score of 1 so the city guides will give items again
 		ScoreboardUtils.setScoreboardValue(player, "NewDeath", 1);
@@ -717,12 +729,6 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
 		Player player = event.getPlayer();
-
-		/* Don't let players consume shattered items */
-		if (ItemStatUtils.isShattered(event.getItem())) {
-			event.setCancelled(true);
-			return;
-		}
 
 		if (event.getItem().getItemMeta() instanceof PotionMeta) {
 			if (PotionUtils.isLuckPotion((PotionMeta) event.getItem().getItemMeta())) {

@@ -441,14 +441,6 @@ public class EntityListener implements Listener {
 	public void entityResurrectEvent(EntityResurrectEvent event) {
 		Entity entity = event.getEntity();
 		if (entity instanceof Player player) {
-			ItemStack mainhand = player.getInventory().getItemInMainHand();
-			ItemStack offhand = player.getInventory().getItemInOffHand();
-			//If one hand has a shattered totem, do not resurrect
-			if ((mainhand.getType() == Material.TOTEM_OF_UNDYING && ItemStatUtils.isShattered(mainhand)) ||
-				(offhand.getType() == Material.TOTEM_OF_UNDYING && ItemStatUtils.isShattered(offhand))) {
-				event.setCancelled(true);
-			}
-
 			//Updates custom enchants in inventory
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 

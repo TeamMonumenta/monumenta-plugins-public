@@ -211,7 +211,7 @@ public class ItemStatManager implements Listener {
 				newArmorMultiplyStats = mArmorMultiplyStats;
 			}
 
-			if (mainhand != null && mainhand.getType() != Material.AIR && !ItemUtils.isArmorOrWearable(mainhand) && !ItemStatUtils.isShattered(mainhand)) {
+			if (mainhand != null && mainhand.getType() != Material.AIR && !ItemUtils.isArmorOrWearable(mainhand)) {
 				NBTItem nbt = new NBTItem(mainhand);
 				NBTCompound enchantments = ItemStatUtils.getEnchantments(nbt);
 				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);

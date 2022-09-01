@@ -63,21 +63,13 @@ public abstract class ExperiencinatorUtils {
 	}
 
 	/**
-	 * Checks if the player can use the given Experiencinator (not shattered and prerequisites met).
+	 * Checks if the player can use the given Experiencinator (prerequisites met).
 	 * Will send a failure message to the player if this returns false.
 	 */
 	public static boolean checkExperiencinator(Experiencinator experiencinator, ItemStack experiencinatorItem, Player player) {
 
-		if (ItemStatUtils.isShattered(experiencinatorItem)) {
-			player.sendRawMessage(ChatColor.DARK_RED + "Your " + experiencinator.getName() + " is shattered and cannot be used!");
-			return false;
-		}
-
-		if (!experiencinator.checkPrerequisites(player, experiencinatorItem)) { // sends a failure message directly
-			return false;
-		}
-
-		return true;
+		// sends a failure message directly
+		return experiencinator.checkPrerequisites(player, experiencinatorItem);
 
 	}
 
