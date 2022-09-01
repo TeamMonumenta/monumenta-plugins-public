@@ -76,7 +76,8 @@ public class SpellBlockBreak extends Spell {
 		Material.REPEATING_COMMAND_BLOCK,
 		Material.BEDROCK,
 		Material.BARRIER,
-		Material.SPAWNER
+		Material.SPAWNER,
+		Material.LIGHT
 	);
 
 	@Override

@@ -36,7 +36,8 @@ public class SpellEarthshake extends Spell {
 		Material.SPAWNER,
 		Material.CHEST,
 		Material.END_PORTAL,
-		Material.END_PORTAL_FRAME
+		Material.END_PORTAL_FRAME,
+		Material.LIGHT
 	);
 
 	private final Plugin mPlugin;
