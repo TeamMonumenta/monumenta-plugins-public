@@ -133,7 +133,14 @@ tasks {
         relocate("org.json", "com.playmonumenta.plugins.internal.org.json") // NameMC API dependency
         relocate("org.openjdk.jmh", "com.playmonumenta.plugins.internal.org.openjdk.jmh") // Benchmarking Sin/Cos
         relocate("joptsimple", "com.playmonumenta.plugins.internal.joptsimple") // Dependency of jmh
-        relocate("org.apache.commons", "com.playmonumenta.plugins.internal.org.apache.commons") // Dependency of several things
+        relocate(
+            "org.apache.commons.lang3",
+            "com.playmonumenta.plugins.internal.org.apache.commons.lang3"
+        ) // Dependency of several things
+        relocate(
+            "org.apache.commons.math3",
+            "com.playmonumenta.plugins.internal.org.apache.commons.math3"
+        ) // Dependency of several things
         minimize {
             exclude(project(":adapter_api"))
             exclude(project(":adapter_unsupported"))
