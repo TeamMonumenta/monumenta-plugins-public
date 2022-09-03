@@ -160,6 +160,9 @@ public abstract class ExperiencinatorUtils {
 	 */
 	private static boolean canConvert(ItemStack item) {
 		for (InfusionType infusion : InfusionType.values()) {
+			if (infusion == InfusionType.SHATTERED) {
+				continue;
+			}
 			if (ItemStatUtils.getInfusionLevel(item, infusion) > 0) {
 				return false;
 			}
