@@ -38,6 +38,7 @@ import com.playmonumenta.plugins.listeners.ArrowListener;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.BlockInteractionsListener;
 import com.playmonumenta.plugins.listeners.BrewingListener;
+import com.playmonumenta.plugins.listeners.BrokenEquipmentListener;
 import com.playmonumenta.plugins.listeners.CrossbowListener;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.listeners.EntityListener;
@@ -389,6 +390,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new LootTableManager(), this);
 		manager.registerEvents(new QuiverListener(), this);
 		manager.registerEvents(mVanityManager, this);
+		manager.registerEvents(new BrokenEquipmentListener(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")
