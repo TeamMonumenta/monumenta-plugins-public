@@ -166,8 +166,8 @@ public class PlayerUtils {
 			}
 		}
 		// Add to activity
-		if (sourcePlayer != null && ActivityManager.getManager().isActive(player)) {
-			ActivityManager.getManager().addHealingDealt(player, healAmount);
+		if (sourcePlayer != null && player != sourcePlayer && ActivityManager.getManager().isActive(player)) {
+			ActivityManager.getManager().addHealingDealt(sourcePlayer, healAmount);
 		}
 	}
 
