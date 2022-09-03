@@ -209,7 +209,6 @@ public final class Grave {
 			mEntity = (ArmorStand) mPlayer.getWorld().spawnEntity(mLocation, EntityType.ARMOR_STAND);
 			mEntity.setSmall(mSmall);
 			mEntity.setArms(true);
-			mEntity.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 			mEntity.setHeadPose(mPose.get(KEY_POSE_HEAD));
 			mEntity.setBodyPose(mPose.get(KEY_POSE_BODY));
 			mEntity.setLeftArmPose(mPose.get(KEY_POSE_LEFT_ARM));
@@ -222,6 +221,7 @@ public final class Grave {
 			mEntity.setItem(EquipmentSlot.FEET, mEquipment.get(KEY_EQUIPMENT_FEET));
 			mEntity.setItem(EquipmentSlot.HAND, mEquipment.get(KEY_EQUIPMENT_HAND));
 			mEntity.setItem(EquipmentSlot.OFF_HAND, mEquipment.get(KEY_EQUIPMENT_OFF_HAND));
+			mEntity.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 			mEntity.setGravity(false);
 			mEntity.setCanMove(false);
 			mEntity.setSilent(true);

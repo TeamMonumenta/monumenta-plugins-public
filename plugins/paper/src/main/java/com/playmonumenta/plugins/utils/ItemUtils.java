@@ -1213,7 +1213,7 @@ public class ItemUtils {
 		public final Material mType;
 		public final @Nullable String mName;
 
-		public ItemIdentifier(Material type, @Nullable String name) {
+		public ItemIdentifier(@Nullable Material type, @Nullable String name) {
 			mType = type == null ? Material.AIR : type;
 			mName = name != null && name.isEmpty() ? null : name;
 		}
@@ -1248,8 +1248,12 @@ public class ItemUtils {
 		}
 	}
 
-	public static ItemIdentifier getIdentifier(ItemStack item) {
-		return new ItemIdentifier(item.getType(), getPlainNameIfExists(item));
+	public static ItemIdentifier getIdentifier(@Nullable ItemStack item) {
+		if (item != null) {
+			return new ItemIdentifier(item.getType(), getPlainNameIfExists(item));
+		} else {
+			return new ItemIdentifier(null, null);
+		}
 	}
 
 }
