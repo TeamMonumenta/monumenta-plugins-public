@@ -60,16 +60,17 @@ public class SignOverride extends BaseOverride {
 						final Material blockType = placedBlock.getType();
 						final BlockData originalBlockData = placedBlock.getBlockData();
 						final @Nullable DyeColor signColor = signItem.getColor();
+						final boolean glowing = signItem.isGlowingText();
 						final List<Component> signLines = signItem.lines();
 						new BukkitRunnable() {
 							@Override
 							public void run() {
 								Block signBlock = loc.getBlock();
 								signBlock.setType(blockType);
-								BlockData blockData = originalBlockData;
-								signBlock.setBlockData(blockData, true);
+								signBlock.setBlockData(originalBlockData, true);
 								Sign sign = (Sign) signBlock.getState();
 								sign.setColor(signColor);
+								sign.setGlowingText(glowing);
 								for (int lineNum = 0; lineNum < signLines.size(); ++lineNum) {
 									sign.line(lineNum, signLines.get(lineNum));
 								}
