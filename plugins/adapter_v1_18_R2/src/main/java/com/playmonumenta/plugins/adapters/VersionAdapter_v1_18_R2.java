@@ -358,6 +358,7 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	@Override
 	public void executeCommandAsBlock(Block block, String command) {
 		CommandBlockEntity tileEntity = new CommandBlockEntity(((CraftBlock) block).getPosition(), ((CraftBlockState) block.getState()).getHandle());
+		tileEntity.setLevel(((CraftBlock) block).getHandle().getMinecraftWorld());
 		Bukkit.dispatchCommand(tileEntity.getCommandBlock().getBukkitSender(tileEntity.getCommandBlock().createCommandSourceStack()), command);
 	}
 
