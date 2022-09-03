@@ -20,7 +20,7 @@ public class ViewActivity extends GenericCommand {
 		Component text = Component.text("Player Activities:", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true).append(Component.newline());
 		for (Player worldPlayer : ((Player)sender).getWorld().getPlayers()) {
 			int activity = ActivityManager.getManager().mActivity.getOrDefault(worldPlayer.getUniqueId(), 0);
-			text = text.append(Component.newline()).append(Component.text(String.format("%s's Activity: %s", player.getName(), activity), activity > 0 ? NamedTextColor.GREEN : NamedTextColor.RED));
+			text = text.append(Component.newline()).append(Component.text(String.format("%s's Activity: %s", worldPlayer.getName(), activity), activity > 0 ? NamedTextColor.GREEN : NamedTextColor.RED));
 		}
 		sender.sendMessage(text);
 	}
