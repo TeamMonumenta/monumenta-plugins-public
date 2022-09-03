@@ -81,6 +81,7 @@ import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
 import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
+import com.playmonumenta.plugins.timers.ShowMarkerTimer;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -439,6 +440,13 @@ public class Plugin extends JavaPlugin {
 				// Update cooldowns
 				try {
 					mProjectileEffectTimers.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				// Show marker entities
+				try {
+					ShowMarkerTimer.update();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
