@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
-import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -982,13 +981,6 @@ public class EntityListener implements Listener {
 			NmsUtils.getVersionAdapter().setAttackRange(vindicator, 1.43, 0);
 		} else if (event.getEntity().getScoreboardTags().contains("REMOVE_ON_UNLOAD") && event.getEntity().getTicksLived() > 20) {
 			// This is a jank fix to make sure entities that is supposed to be removed on unload, if it gets loaded (and isn't spawned this tick), remove it.
-			event.getEntity().remove();
-		}
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
-		if (event.getEntity().getScoreboardTags().contains("REMOVE_ON_UNLOAD")) {
 			event.getEntity().remove();
 		}
 	}
