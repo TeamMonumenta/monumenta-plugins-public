@@ -113,7 +113,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			PlayerInventory inventory = mPlayer.getInventory();
 			ItemStack inMainHand = inventory.getItemInMainHand();
 
-			if (ItemUtils.isBowOrTrident(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand()) && !ItemStatUtils.isShattered(inMainHand)) {
+			if (ItemUtils.isBowOrTrident(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand())) {
 				int ticks = mPlayer.getTicksLived();
 				// Prevent double casting on accident
 				if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {

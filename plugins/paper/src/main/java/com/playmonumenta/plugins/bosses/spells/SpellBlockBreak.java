@@ -23,6 +23,72 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.Lootable;
 
 public class SpellBlockBreak extends Spell {
+	private static final EnumSet<Material> IGNORED_MATS = EnumSet.of(
+		Material.AIR,
+		Material.CAVE_AIR,
+		Material.VOID_AIR,
+		Material.STRUCTURE_VOID,
+		Material.STRUCTURE_BLOCK,
+		Material.JIGSAW,
+		Material.COMMAND_BLOCK,
+		Material.CHAIN_COMMAND_BLOCK,
+		Material.REPEATING_COMMAND_BLOCK,
+		Material.BEDROCK,
+		Material.BARRIER,
+		Material.SPAWNER,
+		Material.LIGHT
+	);
+
+	private static final EnumSet<Material> VALUABLES = EnumSet.of(
+		Material.SHULKER_BOX,
+		Material.BLACK_SHULKER_BOX,
+		Material.BLUE_SHULKER_BOX,
+		Material.BROWN_SHULKER_BOX,
+		Material.CYAN_SHULKER_BOX,
+		Material.GREEN_SHULKER_BOX,
+		Material.LIME_SHULKER_BOX,
+		Material.LIGHT_BLUE_SHULKER_BOX,
+		Material.LIGHT_GRAY_SHULKER_BOX,
+		Material.MAGENTA_SHULKER_BOX,
+		Material.ORANGE_SHULKER_BOX,
+		Material.PINK_SHULKER_BOX,
+		Material.PURPLE_SHULKER_BOX,
+		Material.RED_SHULKER_BOX,
+		Material.WHITE_SHULKER_BOX,
+		Material.YELLOW_SHULKER_BOX,
+		Material.GRAY_SHULKER_BOX,
+		Material.CHEST,
+		Material.TRAPPED_CHEST,
+		Material.IRON_ORE,
+		Material.IRON_BLOCK,
+		Material.DEEPSLATE_IRON_ORE,
+		Material.RAW_IRON,
+		Material.RAW_IRON_BLOCK,
+		Material.COPPER_ORE,
+		Material.DEEPSLATE_COPPER_ORE,
+		Material.RAW_COPPER,
+		Material.RAW_COPPER_BLOCK,
+		Material.COPPER_BLOCK,
+		Material.GOLD_ORE,
+		Material.DEEPSLATE_GOLD_ORE,
+		Material.RAW_GOLD,
+		Material.RAW_GOLD_BLOCK,
+		Material.GOLD_BLOCK,
+		Material.NETHER_GOLD_ORE,
+		Material.GILDED_BLACKSTONE,
+		Material.LAPIS_ORE,
+		Material.DEEPSLATE_LAPIS_ORE,
+		Material.EMERALD_ORE,
+		Material.DEEPSLATE_EMERALD_ORE,
+		Material.LAPIS_BLOCK,
+		Material.DIAMOND_ORE,
+		Material.DEEPSLATE_DIAMOND_ORE,
+		Material.EMERALD_ORE,
+		Material.DEEPSLATE_EMERALD_ORE,
+		Material.ANVIL,
+		Material.CHIPPED_ANVIL,
+		Material.DAMAGED_ANVIL
+	);
 
 	private Entity mLauncher;
 	private List<Material> mNoBreak;
@@ -65,21 +131,6 @@ public class SpellBlockBreak extends Spell {
 		mNoBreak = Arrays.asList(noBreak);
 	}
 
-	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
-		Material.AIR,
-		Material.CAVE_AIR,
-		Material.VOID_AIR,
-		Material.STRUCTURE_VOID,
-		Material.STRUCTURE_BLOCK,
-		Material.JIGSAW,
-		Material.COMMAND_BLOCK,
-		Material.CHAIN_COMMAND_BLOCK,
-		Material.REPEATING_COMMAND_BLOCK,
-		Material.BEDROCK,
-		Material.BARRIER,
-		Material.SPAWNER
-	);
-
 	@Override
 	public void run() {
 		Location loc = mLauncher.getLocation();
@@ -116,7 +167,7 @@ public class SpellBlockBreak extends Spell {
 							}
 						}
 					} else if ((y > 0 || (mFootLevelBreak && y >= 0)) &&
-					           !mIgnoredMats.contains(material) && !mNoBreak.contains(material) &&
+					           !IGNORED_MATS.contains(material) && !mNoBreak.contains(material) &&
 					           (material.isSolid() || ItemUtils.carpet.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD)) &&
 					           (!(block.getState() instanceof Lootable)
 								|| (!((Lootable)block.getState()).hasLootTable()
@@ -139,15 +190,10 @@ public class SpellBlockBreak extends Spell {
 			if (badBlockList.size() > 0) {
 				/* Remove any remaining blocks, which might have been modified by the event */
 				for (Block block : badBlockList) {
-					switch (block.getType()) {
-						case SHULKER_BOX, BLACK_SHULKER_BOX, BLUE_SHULKER_BOX, BROWN_SHULKER_BOX, CYAN_SHULKER_BOX,
-							     GREEN_SHULKER_BOX, LIME_SHULKER_BOX, LIGHT_BLUE_SHULKER_BOX, LIGHT_GRAY_SHULKER_BOX,
-							     MAGENTA_SHULKER_BOX, ORANGE_SHULKER_BOX, PINK_SHULKER_BOX, PURPLE_SHULKER_BOX,
-							     RED_SHULKER_BOX, WHITE_SHULKER_BOX, YELLOW_SHULKER_BOX, GRAY_SHULKER_BOX,
-							     CHEST, TRAPPED_CHEST,
-							     IRON_ORE, IRON_BLOCK, GOLD_ORE, GOLD_BLOCK, NETHER_GOLD_ORE, GILDED_BLACKSTONE, LAPIS_ORE, LAPIS_BLOCK,
-							     ANVIL, CHIPPED_ANVIL, DAMAGED_ANVIL -> block.breakNaturally(new ItemStack(Material.IRON_PICKAXE));
-						default -> block.setType(Material.AIR);
+					if (VALUABLES.contains(block.getType())) {
+						block.breakNaturally(new ItemStack(Material.IRON_PICKAXE));
+					} else {
+						block.setType(Material.AIR);
 					}
 				}
 

@@ -46,7 +46,7 @@ dependencies {
     compileOnly("com.playmonumenta:structures:7.2")
     compileOnly("com.playmonumenta:worlds:1.6")
     compileOnly("com.playmonumenta:libraryofsouls:4.2")
-    compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.15.2-v2")
+    compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.18.2-v2")
     compileOnly("com.goncalomb.bukkit:nbteditor:3.2")
     compileOnly("de.tr7zw:item-nbt-api-plugin:2.3.1")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
@@ -133,7 +133,14 @@ tasks {
         relocate("org.json", "com.playmonumenta.plugins.internal.org.json") // NameMC API dependency
         relocate("org.openjdk.jmh", "com.playmonumenta.plugins.internal.org.openjdk.jmh") // Benchmarking Sin/Cos
         relocate("joptsimple", "com.playmonumenta.plugins.internal.joptsimple") // Dependency of jmh
-        relocate("org.apache.commons", "com.playmonumenta.plugins.internal.org.apache.commons") // Dependency of several things
+        relocate(
+            "org.apache.commons.lang3",
+            "com.playmonumenta.plugins.internal.org.apache.commons.lang3"
+        ) // Dependency of several things
+        relocate(
+            "org.apache.commons.math3",
+            "com.playmonumenta.plugins.internal.org.apache.commons.math3"
+        ) // Dependency of several things
         minimize {
             exclude(project(":adapter_api"))
             exclude(project(":adapter_unsupported"))

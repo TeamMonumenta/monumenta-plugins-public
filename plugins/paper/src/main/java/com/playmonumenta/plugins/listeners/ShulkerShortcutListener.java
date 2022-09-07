@@ -192,9 +192,8 @@ public class ShulkerShortcutListener implements Listener {
 			}
 			event.setCancelled(true);
 		} else if (itemClicked != null && ItemUtils.isShulkerBox(itemClicked.getType())
-			           && !ShulkerEquipmentListener.isEquipmentBox(itemClicked)
-			           && !PortableEnderListener.isPortableEnder(itemClicked)
-			           && !ItemStatUtils.isShattered(itemClicked)) {
+			                                                                                                                                                                                                                                                                               && !ShulkerEquipmentListener.isEquipmentBox(itemClicked)
+			                                                                                                                                                                                                                                                                               && !PortableEnderListener.isPortableEnder(itemClicked)) {
 			// Player clicked a non-shattered non-equipment shulker box in an inventory.
 			if (ShulkerInventoryManager.isShulkerInUse(itemClicked)) {
 				// A currently open shulker box was clicked, cancel.

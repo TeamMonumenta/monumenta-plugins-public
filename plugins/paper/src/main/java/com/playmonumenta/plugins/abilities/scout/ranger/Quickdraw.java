@@ -66,7 +66,7 @@ public class Quickdraw extends Ability {
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && (ItemUtils.isBowOrTrident(inMainHand) || inMainHand.getType() == Material.SNOWBALL) && !ItemUtils.isShootableItem(inOffHand) && !ItemStatUtils.isShattered(inMainHand)) {
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && (ItemUtils.isBowOrTrident(inMainHand) || inMainHand.getType() == Material.SNOWBALL) && !ItemUtils.isShootableItem(inOffHand)) {
 			World world = mPlayer.getWorld();
 
 			if (ItemUtils.isSomeBow(inMainHand)) {

@@ -5,20 +5,19 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.GraveCommand;
 import com.playmonumenta.plugins.graves.GraveManager;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.itemstats.infusions.Shattered;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import de.tr7zw.nbtapi.NBTEntity;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.Bukkit;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,13 +41,11 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class GraveListener implements Listener {
 	Plugin mPlugin;
-
-	private static final double KEPT_ITEM_DURABILITY_DAMAGE_PERCENT = 0.1;
-	private static final List<Integer> KEEP_EQUIPPED_SLOTS = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 36, 37, 38, 39, 40);
 
 	public GraveListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -111,7 +108,7 @@ public class GraveListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void itemMerge(ItemMergeEvent event) {
 		Item entity = event.getEntity();
-		if (GraveManager.isGraveItem(entity) || GraveManager.isThrownItem(entity)) {
+		if (GraveManager.isThrownItem(entity)) {
 			event.setCancelled(true);
 		}
 	}
@@ -134,7 +131,7 @@ public class GraveListener implements Listener {
 	// Fires whenever an item entity despawns due to time. Does not catch items that got killed in other ways.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void itemDespawnEvent(ItemDespawnEvent event) {
-		GraveManager.onDestroyItem(event.getEntity(), true);
+		GraveManager.onDestroyItem(event.getEntity());
 	}
 
 	// Fires any time any entity is deleted.
@@ -142,8 +139,8 @@ public class GraveListener implements Listener {
 	public void entityRemoveFromWorld(EntityRemoveFromWorldEvent event) {
 		if (event.getEntity() instanceof Item entity) {
 			// Check if an item entity was destroyed by the void.
-			if (entity.getLocation().getY() <= -64) {
-				GraveManager.onDestroyItem(entity, true);
+			if (entity.getLocation().getY() <= entity.getWorld().getMinHeight() - 64) {
+				GraveManager.onDestroyItem(entity);
 			}
 		}
 	}
@@ -157,7 +154,7 @@ public class GraveListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
-			GraveManager.onDestroyItem(entity, event.getCause() == EntityDamageEvent.DamageCause.VOID);
+			GraveManager.onDestroyItem(entity);
 			if (entity.isValid()
 				    && event.getCause() != EntityDamageEvent.DamageCause.VOID
 				    && ItemStatUtils.getInfusionLevel(entity.getItemStack(), ItemStatUtils.InfusionType.HOPE) > 0) {
@@ -177,30 +174,32 @@ public class GraveListener implements Listener {
 
 	public static void itemDropped(Player player, Item entity) {
 		ItemStack item = entity.getItemStack();
-		ItemUtils.ItemDeathResult result = ItemUtils.getItemDeathResult(item);
 		if (gravesEnabled(player)
-			    && result != ItemUtils.ItemDeathResult.LOSE
-			    && result != ItemUtils.ItemDeathResult.KEEP_EQUIPPED // similar to LOSE except in the overworld
-			    && result != ItemUtils.ItemDeathResult.KEEP_DAMAGED // same
-			    && result != ItemUtils.ItemDeathResult.KEEP_NOGRAVE
-			    && result != ItemUtils.ItemDeathResult.DESTROY) {
+			    && doesGrave(item)) {
 			@Nullable UUID thrower = entity.getThrower();
 			if (thrower != null && thrower.equals(player.getUniqueId())) {
 				GraveManager.onDropItem(player, entity);
 			} else {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						if (entity.isValid()) {
-							NBTEntity nbte = new NBTEntity(entity);
-							if (nbte.getShort("Age") < 11999) {
-								GraveManager.onDropItem(player, entity);
-							}
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+					if (entity.isValid()) {
+						NBTEntity nbte = new NBTEntity(entity);
+						if (nbte.getShort("Age") < 11999) {
+							GraveManager.onDropItem(player, entity);
 						}
 					}
-				}.runTask(Plugin.getInstance());
+				});
 			}
 		}
+	}
+
+	/**
+	 * Returns whether an items will grave if dropped and destroyed.
+	 */
+	public static boolean doesGrave(ItemStack item) {
+		return switch (ItemStatUtils.getTier(item)) {
+			case NONE, ZERO, I, II, III, KEYTIER, QUEST_COMPASS -> false;
+			default -> true;
+		};
 	}
 
 	// An item on the player breaks.
@@ -208,11 +207,18 @@ public class GraveListener implements Listener {
 	public void playerItemBreakEvent(PlayerItemBreakEvent event) {
 		// If an item breaks, attempt to shatter it
 		ItemStack item = event.getBrokenItem();
-		if (ItemStatUtils.isShattered(item) || ItemStatUtils.shatter(item)) {
-			// If the item shatters, drop it on the player with instant pickup, grave item if it couldn't be picked up.
+		if (ItemStatUtils.getTier(item) != ItemStatUtils.Tier.NONE) {
 			Player player = event.getPlayer();
-			player.sendMessage(ChatColor.RED + "An item shattered because it ran out of durability!");
-			InventoryUtils.giveItem(player, item);
+			if (Shattered.shatter(item, Shattered.DURABILITY_SHATTER)) {
+				// If the item shatters, drop it on the player with instant pickup, grave item if it couldn't be picked up.
+				player.sendMessage(ChatColor.RED + "An item shattered because it ran out of durability!");
+			}
+			item.setAmount(item.getAmount() + 1);
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				Damageable meta = (Damageable) item.getItemMeta();
+				meta.setDamage(item.getType().getMaxDurability());
+				item.setItemMeta((ItemMeta) meta);
+			});
 		}
 	}
 
@@ -236,74 +242,65 @@ public class GraveListener implements Listener {
 			}
 		}
 
-		GraveManager.onDeath(player);
-
 		if (!event.getKeepInventory()) {
 			/* Monumenta-custom keep inventory
 			 *
-			 * Keep armor and hotbar items if they meet some conditions (_isKeptItemOnDeath)
-			 *
-			 * The player always gets keepinv set on them to prevent relog bugs - so items must
-			 * be manually dropped here if they don't meet the conditions.
-			 *
-			 * Items dropped are invulnerable for a short while to prevent double-creepering
+			 * Keep inventory (bot not levels), and equipped items get one level of Shatter.
 			 */
 
-			// Effectively cancel vanilla item dropping to replace with our custom system
 			event.setKeepInventory(true);
 			event.setKeepLevel(false);
 			event.getDrops().clear();
 
-			Map<Integer, ItemStack> droppedItems = new HashMap<>();
-			HashMap<EquipmentSlot, ItemStack> equipment = new HashMap<>();
-			equipment.put(EquipmentSlot.HEAD, player.getInventory().getHelmet());
-			equipment.put(EquipmentSlot.CHEST, player.getInventory().getChestplate());
-			equipment.put(EquipmentSlot.LEGS, player.getInventory().getLeggings());
-			equipment.put(EquipmentSlot.FEET, player.getInventory().getBoots());
-			equipment.put(EquipmentSlot.HAND, player.getInventory().getItemInMainHand());
-			equipment.put(EquipmentSlot.OFF_HAND, player.getInventory().getItemInOffHand());
-
-			for (int slot = 0; slot <= 40; slot++) {
-				ItemStack item = inv.getItem(slot);
-				if (item == null || item.getType() == Material.AIR) {
+			// Handle curse of vanishing
+			ItemStack[] items = inv.getContents();
+			for (int i = 0; i < items.length; i++) {
+				ItemStack item = items[i];
+				if (item == null) {
 					continue;
 				}
-				ItemUtils.ItemDeathResult result = ItemUtils.getItemDeathResult(item);
-				if (result == ItemUtils.ItemDeathResult.DESTROY) {
-					// Destroy item before it's even dropped
-					inv.setItem(slot, null);
-				} else if (result == ItemUtils.ItemDeathResult.KEEP_DAMAGED
-					|| (result == ItemUtils.ItemDeathResult.KEEP_EQUIPPED && KEEP_EQUIPPED_SLOTS.contains(slot))) {
-					// Item is kept, but damaged
-					ItemUtils.damageItemPercent(item, KEPT_ITEM_DURABILITY_DAMAGE_PERCENT, false);
-				} else if (result != ItemUtils.ItemDeathResult.KEEP
-				           && result != ItemUtils.ItemDeathResult.KEEP_NOGRAVE) {
-					droppedItems.put(slot, item);
-					inv.setItem(slot, null);
+				int vanishing = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.CURSE_OF_VANISHING);
+				if (vanishing >= 2) {
+					inv.setItem(i, null);
+				} else if (vanishing == 1 || item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
+					Shattered.shatter(item, Shattered.CURSE_OF_VANISHING_SHATTER);
 				}
 			}
 
-			if (droppedItems.size() > 0) {
-				if (!gravesEnabled(player)) {
-					// Graves disabled, just drop items
-					for (ItemStack item : droppedItems.values()) {
-						player.getWorld().dropItemNaturally(player.getLocation(), item);
-					}
-				} else {
-					// Generate a new grave
-					GraveManager.onDeath(player, droppedItems, equipment);
+			// Equipment for the grave. This must be after curse of vanishing, but before death shattering to have proper shattered levels on the items.
+			HashMap<EquipmentSlot, ItemStack> equipment = new HashMap<>();
+			equipment.put(EquipmentSlot.HEAD, ItemUtils.clone(player.getInventory().getHelmet()));
+			equipment.put(EquipmentSlot.CHEST, ItemUtils.clone(player.getInventory().getChestplate()));
+			equipment.put(EquipmentSlot.LEGS, ItemUtils.clone(player.getInventory().getLeggings()));
+			equipment.put(EquipmentSlot.FEET, ItemUtils.clone(player.getInventory().getBoots()));
+			equipment.put(EquipmentSlot.HAND, ItemUtils.clone(player.getInventory().getItemInMainHand()));
+			equipment.put(EquipmentSlot.OFF_HAND, ItemUtils.clone(player.getInventory().getItemInOffHand()));
+
+			// Shatter equipment
+			EntityDamageEvent.DamageCause lastDamageCause = player.getLastDamageCause() != null ? player.getLastDamageCause().getCause() : null;
+			int shatterLevels = player.getLocation().getY() < player.getWorld().getMinHeight() || lastDamageCause == EntityDamageEvent.DamageCause.VOID
+				                    ? Shattered.DEATH_VOID_SHATTER
+				                    : EntityUtils.touchesLava(player) || lastDamageCause == EntityDamageEvent.DamageCause.LAVA
+					                      ? Shattered.DEATH_LAVA_SHATTER
+					                      : Shattered.DEATH_SHATTER;
+			for (int i = 36; i <= 40; i++) {
+				ItemStack item = items[i];
+				if (item == null || ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE) {
+					continue;
 				}
+				Shattered.shatter(item, ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.HOPE) > 0 ? Math.max(1, shatterLevels - 1) : shatterLevels);
 			}
+
+			if (gravesEnabled(player)) {
+				// Generate a new grave if necessary
+				GraveManager.onDeath(player, equipment);
+			}
+
 		}
 	}
 
 	public static boolean gravesEnabled(Player player) {
-		if (player.getScoreboardTags().contains("DisableGraves")) {
-			return false;
-		}
-		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.DISABLE_GRAVES)) {
-			return false;
-		}
-		return true;
+		return !player.getScoreboardTags().contains("DisableGraves")
+			       && !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.DISABLE_GRAVES);
 	}
 }

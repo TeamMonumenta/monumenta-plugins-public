@@ -62,4 +62,40 @@ public class VectorUtils {
 	) {
 		return v1.angle(v2) < Math.toRadians(degrees);
 	}
+
+	// convert direction vector to [yaw, pitch] in degrees
+	public static double[] vectorToRotation(Vector dir) {
+		double[] ret = new double[2];
+		dir = dir.normalize();
+		//For Minecraft coords are different with math coords, we need to flip X and Y.
+		ret[1] = Math.toDegrees(Math.asin(Math.max(-1, Math.min(1, -dir.getY()))));
+		ret[0] = Math.toDegrees(Math.atan2(-dir.getX(), dir.getZ()));
+		return ret;
+	}
+
+	// convert [yaw, pitch] in degrees to direction vector
+	public static Vector rotationToVector(double yaw, double pitch) {
+		double x = FastUtils.sinDeg(yaw) * FastUtils.cos(pitch);
+		double z = -FastUtils.cosDeg(yaw) * FastUtils.cos(pitch);
+		double y = -FastUtils.sinDeg(pitch);
+		return new Vector(x, y, z);
+	}
+
+	// similar to volley generator?
+	public static Vector rotateTargetDirection(Vector targetDir, double yaw, double pitch) {
+		if (yaw == 0 && pitch == 0) {
+			return targetDir;
+		} else {
+			double[] targetAngle = VectorUtils.vectorToRotation(targetDir);
+			// Start with the assumption the target is at due South (yaw 0.0, pitch 0.0, no offset)
+			Vector dir = new Vector(0.0, 0.0, 1.0);
+			// Apply pitch/yaw offset to get start pattern
+			dir = VectorUtils.rotateXAxis(dir, pitch);
+			dir = VectorUtils.rotateYAxis(dir, yaw);
+			// Apply target pitch/yaw to rotate that pattern to match the direction
+			dir = VectorUtils.rotateXAxis(dir, targetAngle[1]);
+			dir = VectorUtils.rotateYAxis(dir, targetAngle[0]);
+			return dir;
+		}
+	}
 }

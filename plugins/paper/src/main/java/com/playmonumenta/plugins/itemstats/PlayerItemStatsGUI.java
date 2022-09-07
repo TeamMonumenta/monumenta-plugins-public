@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
 import com.playmonumenta.plugins.itemstats.infusions.Focus;
 import com.playmonumenta.plugins.itemstats.infusions.Perspicacity;
+import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemstats.infusions.Tenacity;
 import com.playmonumenta.plugins.itemstats.infusions.Vigor;
 import com.playmonumenta.plugins.itemstats.infusions.Vitality;
@@ -136,6 +137,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		}
 
 		private double getInfusion(InfusionType infusion) {
+			if (infusion == InfusionType.SHATTERED) {
+				return mPlayerItemStats.getItemStats().get(infusion.getItemStat());
+			}
 			InfusionSetting setting = getInfusionSetting();
 			if (setting == InfusionSetting.ENABLED) {
 				return mPlayerItemStats.getItemStats().get(infusion.getItemStat());
@@ -186,8 +190,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			return getMaximumRegion(mainhand).compareTo(mPlayerItemStats.getRegion()) > 0;
 		}
 
-		private double getRegionScalingDamageDealtMultiplier() {
-			return hasLaterRegionEquipment(true) ? RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER : 1;
+		private double getTotalDamageDealtMultiplier() {
+			return (hasLaterRegionEquipment(true) ? RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER : 1)
+				       * (1 + getInfusion(InfusionType.SHATTERED) * Shattered.DAMAGE_DEALT_MULTIPLIER);
 		}
 	}
 
@@ -230,6 +235,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			damageMultiplier *= RegionScalingDamageTaken.DAMAGE_TAKEN_MULTIPLIER;
 		}
 
+		damageMultiplier *= 1 + Shattered.DAMAGE_TAKEN_MULTIPLIER * stats.getInfusion(InfusionType.SHATTERED);
+
 		damageMultiplier *= 1 - stats.getInfusion(InfusionType.TENACITY) * Tenacity.DAMAGE_REDUCTION_PER_LEVEL;
 
 		return damageMultiplier;
@@ -242,6 +249,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private static final DoubleFunction<String> PERCENT = PERCENT_FORMATTER::format;
 	@SuppressWarnings("UnnecessaryLambda")
 	private static final DoubleFunction<String> ONE_MINUS_PERCENT = d -> PERCENT_FORMATTER.format(1 - d);
+	@SuppressWarnings("UnnecessaryLambda")
+	private static final DoubleFunction<String> PERCENT_MODIFIER = d -> PERCENT_FORMATTER.format(d - 1);
 	private static final DoubleFunction<String> NUMBER = NUMBER_FORMATTER::format;
 	@SuppressWarnings("UnnecessaryLambda")
 	private static final DoubleFunction<String> DR_CHANGE_FORMAT = d -> PERCENT_CHANGE_FORMATTER.format(d) + " damage taken";
@@ -296,19 +305,19 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		AILMENT_EHM("Ailment", NUMBER, stats -> 1.0 / AILMENT_DAMAGE_TAKEN.get(stats)),
 
 		// melee
-		ATTACK_DAMAGE("Attack Damage", NUMBER, stats -> (1 + stats.get(AttributeType.ATTACK_DAMAGE_ADD)) * stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY, 1)),
 		ATTACK_DAMAGE_ADD("+flat Attack Damage", NUMBER, stats -> stats.get(AttributeType.ATTACK_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD)),
-		ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", PERCENT, stats -> stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY, 1)
-			                                                             * stats.getRegionScalingDamageDealtMultiplier()
-			                                                             * (1 + Vigor.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.VIGOR)) - 1),
+		ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", PERCENT_MODIFIER, stats -> stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY, 1)
+			                                                                      * stats.getTotalDamageDealtMultiplier()
+			                                                                      * (1 + Vigor.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.VIGOR))),
+		TOTAL_ATTACK_DAMAGE("Total Attack Damage", NUMBER, stats -> (1 + stats.get(AttributeType.ATTACK_DAMAGE_ADD)) * ATTACK_DAMAGE_MULTIPLY.get(stats)),
 		ATTACK_SPEED("Attack Speed", NUMBER, stats -> stats.getAttributeAmount(AttributeType.ATTACK_SPEED, 4)),
 
 		// projectile
-		PROJECTILE_DAMAGE("Projectile Damage", NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) * stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY, 1)),
 		PROJECTILE_DAMAGE_ADD("+flat Projectile Damage", NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD)),
-		PROJECTILE_DAMAGE_MULTIPLY("+% Projectile Damage", PERCENT, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY, 1)
-			                                                                     * stats.getRegionScalingDamageDealtMultiplier()
-			                                                                     * (1 + Focus.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.FOCUS)) - 1),
+		PROJECTILE_DAMAGE_MULTIPLY("+% Projectile Damage", PERCENT_MODIFIER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY, 1)
+			                                                                              * stats.getTotalDamageDealtMultiplier()
+			                                                                              * (1 + Focus.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.FOCUS))),
+		TOTAL_PROJECTILE_DAMAGE("Total Projectile Damage", NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) * PROJECTILE_DAMAGE_MULTIPLY.get(stats)),
 		PROJECTILE_SPEED("Projectile Speed", NUMBER, stats -> {
 			ItemStack mainhand = stats.getItem(Equipment.MAINHAND);
 			if (ItemUtils.isBowOrTrident(mainhand)) {
@@ -338,9 +347,10 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		// magic
 		SPELL_POWER("Spell Power", PERCENT, stats -> stats.get(AttributeType.SPELL_DAMAGE)),
 		MAGIC_DAMAGE_ADD("+flat Magic Damage", NUMBER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_ADD)),
-		MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", PERCENT, stats -> stats.get(AttributeType.MAGIC_DAMAGE_MULTIPLY, 1)
-			                                                           * stats.getRegionScalingDamageDealtMultiplier()
-			                                                           * (1 + Perspicacity.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.PERSPICACITY)) - 1),
+		MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", PERCENT_MODIFIER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_MULTIPLY, 1)
+			                                                                    * stats.getTotalDamageDealtMultiplier()
+			                                                                    * (1 + Perspicacity.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.PERSPICACITY))),
+		TOTAL_SPELL_DAMAGE("Total Spell Damage %", PERCENT, stats -> SPELL_POWER.get(stats) * MAGIC_DAMAGE_MULTIPLY.get(stats)),
 		COOLDOWN_MULTIPLIER("Cooldown Multiplier", PERCENT, stats -> (1 + Aptitude.getCooldownPercentage(stats.get(EnchantmentType.APTITUDE)))
 			                                                             * (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE))), false),
 		// misc
@@ -349,7 +359,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		MOVEMENT_SPEED("Movement Speed", PERCENT,
 			stats -> stats.getAttributeAmount(AttributeType.SPEED, 0.1, stats.hasLaterRegionEquipment(false) ? RegionScalingDamageTaken.SPEED_EFFECT : 0) / 0.1),
 		KNOCKBACK_RESISTANCE("Knockback Resistance", PERCENT, stats -> stats.getAttributeAmount(AttributeType.KNOCKBACK_RESISTANCE, 0)),
-		THORNS_DAMAGE("Thorns Damage", NUMBER, stats -> stats.get(AttributeType.THORNS) * stats.getRegionScalingDamageDealtMultiplier()),
+		THORNS_DAMAGE("Thorns Damage", NUMBER, stats -> stats.get(AttributeType.THORNS) * stats.getTotalDamageDealtMultiplier()),
 		MINING_SPEED("Mining Speed", NUMBER, stats -> ItemUtils.getMiningSpeed(stats.getItem(Equipment.MAINHAND)) * (stats.hasLaterRegionEquipment(true) ? 0.3 : 1)),
 
 		;
@@ -447,15 +457,15 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	private static final StatItem MELEE_INFO = new StatItem(30, Material.IRON_SWORD,
 		Component.text("Melee", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
-		Stat.ATTACK_DAMAGE, /*Stat.ATTACK_DAMAGE_ADD,*/ Stat.ATTACK_DAMAGE_MULTIPLY, Stat.ATTACK_SPEED);
+		/*Stat.ATTACK_DAMAGE_ADD,*/ Stat.ATTACK_DAMAGE_MULTIPLY, Stat.TOTAL_ATTACK_DAMAGE, Stat.ATTACK_SPEED);
 
 	private static final StatItem PROJECTILE_INFO = new StatItem(31, Material.BOW,
 		Component.text("Projectile", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
-		Stat.PROJECTILE_DAMAGE, /*Stat.PROJECTILE_DAMAGE_ADD,*/ Stat.PROJECTILE_DAMAGE_MULTIPLY, Stat.PROJECTILE_SPEED, Stat.PROJECTILE_RATE);
+		/*Stat.PROJECTILE_DAMAGE_ADD,*/ Stat.PROJECTILE_DAMAGE_MULTIPLY, Stat.TOTAL_PROJECTILE_DAMAGE, Stat.PROJECTILE_SPEED, Stat.PROJECTILE_RATE);
 
 	private static final StatItem MAGIC_INFO = new StatItem(32, Material.BLAZE_ROD,
 		Component.text("Magic", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
-		Stat.SPELL_POWER, /*Stat.MAGIC_DAMAGE_ADD,*/ Stat.MAGIC_DAMAGE_MULTIPLY, Stat.COOLDOWN_MULTIPLIER);
+		Stat.SPELL_POWER, /*Stat.MAGIC_DAMAGE_ADD,*/ Stat.MAGIC_DAMAGE_MULTIPLY, Stat.TOTAL_SPELL_DAMAGE, Stat.COOLDOWN_MULTIPLIER);
 
 	private static final StatItem MISC_INFO = new StatItem(40, Material.LEATHER_BOOTS,
 		Component.text("Misc", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),

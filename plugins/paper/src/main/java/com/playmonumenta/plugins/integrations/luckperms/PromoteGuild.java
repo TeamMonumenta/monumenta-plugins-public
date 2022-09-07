@@ -19,63 +19,63 @@ import org.bukkit.entity.Player;
 
 public class PromoteGuild {
 	public static void register() {
-		// promoteguild <playername>
+		// promoteguild <player collection>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.promoteguild");
 
 		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS));
 
 		new CommandAPICommand("promoteguild")
 			.withPermission(perms)
 			.withArguments(arguments)
-			.executes((sender, args) -> {
+			.executesPlayer((founder, args) -> {
 				if (!ServerProperties.getShardName().contains("build")) {
-					run((Player) args[0]);
+					run(founder, (List<Player>) args[0]);
 				}
 			})
 			.register();
 	}
 
-	private static void run(Player player) throws WrapperCommandSyntaxException {
-		Group currentGuild = LuckPermsIntegration.getGuild(player);
+	private static void run(Player founder, List<Player> players) throws WrapperCommandSyntaxException {
+		//get data off the founder, confirm founder
+		Group currentGuild = LuckPermsIntegration.getGuild(founder);
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 		if (currentGuild == null || currentGuildName == null) {
-			String err = ChatColor.RED + "You are not in a guild";
-			player.sendMessage(err);
+			String err = ChatColor.RED + "Founder is not in a guild";
 			CommandAPI.fail(err);
 		}
 
-		if (ScoreboardUtils.getScoreboardValue(player, "Founder").orElse(0) == 1) {
-			String err = ChatColor.RED + "You are already a founder of guild '" + currentGuildName + "'";
-			player.sendMessage(err);
+		if (ScoreboardUtils.getScoreboardValue(founder, "Founder").orElse(0) != 1) {
+			String err = ChatColor.RED + "You are not a founder of guild '" + currentGuildName + "'";
 			CommandAPI.fail(err);
+			return;
+		}
+		players.removeIf(player -> founder.getName().equalsIgnoreCase(player.getName()));
+		if (players.size() == 0) {
+			founder.sendMessage(ChatColor.RED + "No other players found on the pedestal to promote to founder.");
 		}
 
-		// Check for nearby founder
-		for (Player p : PlayerUtils.otherPlayersInRange(player, 1, true)) {
+		// Check the nearby players for proper setup
+		for (Player p : players) {
 			Group nearbyPlayerGroup = LuckPermsIntegration.getGuild(p);
 			String nearbyPlayerGroupName = LuckPermsIntegration.getGuildName(nearbyPlayerGroup);
 			if (nearbyPlayerGroup != null && nearbyPlayerGroupName != null &&
 			    nearbyPlayerGroupName.equalsIgnoreCase(currentGuildName) &&
-				ScoreboardUtils.getScoreboardValue(p, "Founder").orElse(0) == 1) {
+				ScoreboardUtils.getScoreboardValue(p, "Founder").orElse(0) == 0) {
 
 				// Set scores and permissions
-				ScoreboardUtils.setScoreboardValue(player, "Founder", 1);
+				ScoreboardUtils.setScoreboardValue(p, "Founder", 1);
 
 				// Flair (mostly stolen from CreateGuild)
-				player.sendMessage(ChatColor.GOLD + "Congratulations! You are now a founder of " + currentGuildName + "!");
-				p.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.GOLD + " has been promoted to guild founder");
+				p.sendMessage(ChatColor.GOLD + "Congratulations! You are now a founder of " + currentGuildName + "!");
+				founder.sendMessage(ChatColor.WHITE + p.getName() + ChatColor.GOLD + " has been promoted to guild founder");
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-				                       "execute at " + player.getName()
-				                       + " run summon minecraft:firework_rocket ~ ~1 ~ "
-				                       + "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
-				// All done
-				return;
+					"execute at " + p.getName()
+						+ " run summon minecraft:firework_rocket ~ ~1 ~ "
+						+ "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
+			} else if (ScoreboardUtils.getScoreboardValue(p, "Founder").orElse(0) == 1) {
+				founder.sendMessage(p.getName() + ChatColor.GOLD + " is already a founder!");
 			}
 		}
-
-		String err = ChatColor.RED + "A founder for " + currentGuildName + " needs to stand within 1 block of you";
-		player.sendMessage(err);
-		CommandAPI.fail(err);
 	}
 }

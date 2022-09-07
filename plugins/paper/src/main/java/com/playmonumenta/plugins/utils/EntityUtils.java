@@ -35,6 +35,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attributable;
@@ -69,27 +70,6 @@ public class EntityUtils {
 		EntityType.SKELETON_HORSE,
 		EntityType.PHANTOM,
 		EntityType.DROWNED
-	);
-
-	private static final EnumSet<EntityType> ARTHROPOD_MOBS = EnumSet.of(
-		EntityType.SPIDER,
-		EntityType.CAVE_SPIDER,
-		EntityType.SILVERFISH,
-		EntityType.ENDERMITE,
-		EntityType.BEE
-	);
-
-	private static final EnumSet<EntityType> AQUATIC_MOBS = EnumSet.of(
-		EntityType.AXOLOTL,
-		EntityType.GLOW_SQUID,
-		EntityType.GUARDIAN,
-		EntityType.ELDER_GUARDIAN,
-		EntityType.SQUID,
-		EntityType.TURTLE,
-		EntityType.COD,
-		EntityType.SALMON,
-		EntityType.TROPICAL_FISH,
-		EntityType.PUFFERFISH
 	);
 
 	private static final EnumSet<EntityType> BEAST_MOBS = EnumSet.of(
@@ -171,15 +151,18 @@ public class EntityUtils {
 	);
 
 	private static final EnumSet<EntityType> WATER_MOBS = EnumSet.of(
-		EntityType.ELDER_GUARDIAN,
-		EntityType.GUARDIAN,
+		EntityType.AXOLOTL,
 		EntityType.DOLPHIN,
-		EntityType.TROPICAL_FISH,
-		EntityType.PUFFERFISH,
-		EntityType.SALMON,
-		EntityType.COD,
 		EntityType.DROWNED,
-		EntityType.SQUID
+		EntityType.GLOW_SQUID,
+		EntityType.GUARDIAN,
+		EntityType.ELDER_GUARDIAN,
+		EntityType.SQUID,
+		EntityType.TURTLE,
+		EntityType.COD,
+		EntityType.SALMON,
+		EntityType.TROPICAL_FISH,
+		EntityType.PUFFERFISH
 	);
 
 	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";
@@ -281,16 +264,6 @@ public class EntityUtils {
 		return UNDEAD_MOBS.contains(mob.getType());
 	}
 
-	// Affected by Bane of Arthropods
-	public static boolean isArthropod(LivingEntity mob) {
-		return ARTHROPOD_MOBS.contains(mob.getType());
-	}
-
-	// Affected by Impaling
-	public static boolean isAquatic(LivingEntity mob) {
-		return AQUATIC_MOBS.contains(mob.getType());
-	}
-
 	// Affected by Slayer
 	public static boolean isBeast(LivingEntity mob) {
 		return BEAST_MOBS.contains(mob.getType());
@@ -320,6 +293,20 @@ public class EntityUtils {
 	// Affected by Abyssal
 	public static boolean isInWater(LivingEntity mob) {
 		return LocationUtils.isLocationInWater(mob.getLocation()) || LocationUtils.isLocationInWater(mob.getLocation().subtract(0, 1, 0));
+	}
+
+	public static boolean touchesLava(Entity entity) {
+		BoundingBox boundingBox = entity.getBoundingBox();
+		for (int x = (int) Math.floor(boundingBox.getMinX()); x < boundingBox.getMaxX(); x++) {
+			for (int y = (int) Math.floor(boundingBox.getMinY()); y < boundingBox.getMaxY(); y++) {
+				for (int z = (int) Math.floor(boundingBox.getMinZ()); z < boundingBox.getMaxZ(); z++) {
+					if (entity.getWorld().getBlockAt(x, y, z).getType() == Material.LAVA) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	public static boolean isElite(Entity entity) {

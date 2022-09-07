@@ -30,10 +30,10 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public int DAMAGE = 0;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "How long the projectile can travel at most.")
 		public int DISTANCE = 64;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Projectile speed")
 		public double SPEED = 0.4;
 
 		@BossParam(help = "not written", deprecated = true)
@@ -42,7 +42,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "Delay of the first spell, then cooldown is used to determinate when this spell will cast again")
 		public int DELAY = 20 * 5;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Time period between the start of the last charge and next start.")
 		public int COOLDOWN = 20 * 10;
 
 		@BossParam(help = "not written")
@@ -57,10 +57,10 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public double DAMAGE_PERCENTAGE = 0.0;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Track target when launching if true.")
 		public boolean LAUNCH_TRACKING = true;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Angular velocity (in radian) of projectile when tracking target. Set to 0 for linear projectile.")
 		public double TURN_RADIUS = Math.PI / 30;
 
 		@BossParam(help = "not written")
@@ -78,8 +78,39 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Effects applied to the player when he got hit")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
+
 		@BossParam(help = "The spell name shown when a player is killed by this skill")
 		public String SPELL_NAME = "";
+
+		@BossParam(help = "How many times to be cast after one cooldown")
+		public int CHARGE = 1;
+
+		@BossParam(help = "Interval between casting with charges")
+		public int CHARGE_INTERVAL = 40;
+
+		@BossParam(help = "Left offset from mob's eye to projectile start point")
+		public double OFFSET_LEFT = 0;
+
+		@BossParam(help = "Up offset from mob's eye to projectile start point")
+		public double OFFSET_UP = 0;
+
+		@BossParam(help = "Front offset from mob's eye to projectile start point")
+		public double OFFSET_FRONT = 0;
+
+		@BossParam(help = "How many projectiles mob will launch in a sector plane")
+		public int SPLIT = 1;
+
+		@BossParam(help = "Interval angles between splitting projectiles in degree")
+		public double SPLIT_ANGLE = 30;
+
+		@BossParam(help = "Dupe launch in mirror position. 0=None, 1=L-R, 2=F-B, 3=Both")
+		public int MIRROR = 0;
+
+		@BossParam(help = "Force launch at a yaw degree offset from boss' sight. [-180, 180] is valid.")
+		public double FIX_YAW = 200.0;
+
+		@BossParam(help = "Force launch at a fixed pitch degree. [-90, 90] is valid.")
+		public double FIX_PITCH = 100.0;
 
 		//particle & sound used!
 		@BossParam(help = "Sound played at the start")
@@ -129,10 +160,15 @@ public class ProjectileBoss extends BossAbilityGroup {
 			p.SPELL_DELAY = p.DELAY;
 		}
 
+		if (p.MIRROR > 3 || p.MIRROR < 0) {
+			p.MIRROR = 0;
+		}
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.COOLDOWN, p.SPELL_DELAY,
-					p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS, 0, p.COLLIDES_WITH_OTHERS,
-					//spell targets
+			new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL, p.COOLDOWN, p.SPELL_DELAY,
+				p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH, p.SPLIT, p.SPLIT_ANGLE,
+				p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
+				//spell targets
 					() -> {
 						return p.TARGETS.getTargetsList(mBoss);
 					},

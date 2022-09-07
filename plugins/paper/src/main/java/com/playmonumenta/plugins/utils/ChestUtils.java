@@ -65,7 +65,6 @@ public class ChestUtils {
 
 	private static void generateContainerLootWithScaling(Player player, Inventory inventory) {
 		if (inventory.getHolder() instanceof Lootable lootable) {
-
 			LootTable lootTable = lootable.getLootTable();
 			if (lootTable != null) {
 				/* Figure out what the luck level should be and which players contribute to scaling */

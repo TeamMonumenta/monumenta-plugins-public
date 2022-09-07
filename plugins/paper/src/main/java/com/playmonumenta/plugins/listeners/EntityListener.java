@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
-import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -441,14 +440,6 @@ public class EntityListener implements Listener {
 	public void entityResurrectEvent(EntityResurrectEvent event) {
 		Entity entity = event.getEntity();
 		if (entity instanceof Player player) {
-			ItemStack mainhand = player.getInventory().getItemInMainHand();
-			ItemStack offhand = player.getInventory().getItemInOffHand();
-			//If one hand has a shattered totem, do not resurrect
-			if ((mainhand.getType() == Material.TOTEM_OF_UNDYING && ItemStatUtils.isShattered(mainhand)) ||
-				(offhand.getType() == Material.TOTEM_OF_UNDYING && ItemStatUtils.isShattered(offhand))) {
-				event.setCancelled(true);
-			}
-
 			//Updates custom enchants in inventory
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 
@@ -1003,14 +994,6 @@ public class EntityListener implements Listener {
 			event.getEntity().remove();
 		}
 	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
-		if (event.getEntity().getScoreboardTags().contains("REMOVE_ON_UNLOAD")) {
-			event.getEntity().remove();
-		}
-	}
-
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void hangingBreakEvent(HangingBreakEvent event) {

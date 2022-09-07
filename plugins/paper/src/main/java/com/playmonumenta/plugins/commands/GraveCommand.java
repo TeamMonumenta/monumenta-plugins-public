@@ -7,12 +7,15 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
+import dev.jorel.commandapi.arguments.UUIDArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.executors.CommandExecutor;
 import dev.jorel.commandapi.executors.PlayerCommandExecutor;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -30,17 +33,6 @@ public class GraveCommand {
 	public static void register() {
 		new CommandAPICommand("grave")
 			.withPermission("monumenta.command.grave")
-			.withSubcommand(new CommandAPICommand("permission")
-				.withPermission("monumenta.command.grave.permission")
-				.withSubcommand(new CommandAPICommand("grant")
-					.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
-					.executesPlayer((PlayerCommandExecutor) (player, args) -> permissionGrantPlayer(player, (Player) args[0]))
-				)
-				.withSubcommand(new CommandAPICommand("revoke")
-					.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
-					.executesPlayer((PlayerCommandExecutor) (player, args) -> permissionRevokePlayer(player, (Player) args[0]))
-				)
-			)
 			.withSubcommand(new CommandAPICommand("list")
 				.withPermission("monumenta.command.grave.list")
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> listGravesSelf(player, 1))
@@ -77,91 +69,37 @@ public class GraveCommand {
 					.withSubcommand(new CommandAPICommand("select")
 						.withRequirement(sender -> ((Player) sender).getScoreboardTags().contains(SUMMON_LIST_TAG))
 						.withArguments(new LocationArgument("location"))
-						.withArguments(new IntegerArgument("grave"))
-						.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveListSelect(player, (Location) args[0], (int) args[1]))
+						.withArguments(new UUIDArgument("grave"))
+						.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveListSelect(player, (Location) args[0], (UUID) args[1]))
 					)
 					.withSubcommand(new CommandAPICommand("confirm")
 						.withRequirement(sender -> ((Player) sender).getScoreboardTags().contains(SUMMON_LIST_TAG))
 						.withArguments(new LocationArgument("location"))
-						.withArguments(new IntegerArgument("grave"))
-						.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveListConfirm(player, (Location) args[0], (int) args[1]))
+						.withArguments(new UUIDArgument("grave"))
+						.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveListConfirm(player, (Location) args[0], (UUID) args[1]))
 					)
 				)
 			)
 			.withSubcommand(new CommandAPICommand("summon")
 				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER).withPermission("monumenta.command.grave.summon.other"))
 				.withArguments(new LocationArgument("location"))
-				.withArguments(new IntegerArgument("grave"))
-				.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveOther(player, (Player) args[0], (Location) args[1], (int) args[2]))
+				.withArguments(new UUIDArgument("grave"))
+				.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveOther(player, (Player) args[0], (Location) args[1], (UUID) args[2]))
 			)
 			.withSubcommand(new CommandAPICommand("summon")
 				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER).withPermission("monumenta.command.grave.summon.other"))
-				.withArguments(new IntegerArgument("grave"))
-				.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveOther(player, (Player) args[0], player.getLocation(), (int) args[1]))
+				.withArguments(new UUIDArgument("grave"))
+				.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveOther(player, (Player) args[0], player.getLocation(), (UUID) args[1]))
 			)
 			.withSubcommand(new CommandAPICommand("delete")
 				.withPermission("monumenta.command.grave.delete")
-				.withArguments(new IntegerArgument("grave"))
-				.executesPlayer((PlayerCommandExecutor) (player, args) -> delete(player, (int) args[0])))
+				.withArguments(new UUIDArgument("grave"))
+				.executesPlayer((PlayerCommandExecutor) (player, args) -> delete(player, (UUID) args[0])))
+			.withSubcommand(new CommandAPICommand("delete")
+				.withPermission("monumenta.command.grave.delete")
+				.withArguments(new LiteralArgument("cancel"))
+				.executesPlayer((PlayerCommandExecutor) (player, args) -> delete(player, null)))
 			.register();
-	}
-
-	private static void permissionGrantPlayer(Player player, Player target) {
-		GraveManager manager = GraveManager.getInstance(player);
-		if (manager != null && manager.grantPermission(target)) {
-			player.sendMessage(Component.text()
-				.color(NamedTextColor.AQUA)
-				.append(target.displayName()
-					.hoverEvent(target))
-				.append(Component.text(" has been granted permission to collect your graves."))
-				.append(Component.newline())
-				.append(Component.text("This permission will last until you log out or revoke it with /grave permission revoke <player>."))
-			);
-			target.sendMessage(Component.text()
-				.color(NamedTextColor.AQUA)
-				.append(player.displayName()
-					.hoverEvent(player))
-				.append(Component.text(" has granted you permission to collect their graves."))
-				.append(Component.newline())
-				.append(Component.text("This permission will last until they log out or revoke it."))
-			);
-		} else {
-			player.sendMessage(Component.text()
-				.color(NamedTextColor.AQUA)
-				.append(target.displayName()
-					.hoverEvent(target))
-				.append(Component.text(" already has permission to collect your graves."))
-				.append(Component.newline())
-				.append(Component.text("This permission will last until you log out or revoke it with /grave permission revoke <player>."))
-			);
-		}
-	}
-
-	private static void permissionRevokePlayer(Player player, Player target) {
-		GraveManager manager = GraveManager.getInstance(player);
-		if (manager != null && manager.revokePermission(target)) {
-			player.sendMessage(Component.text()
-				.color(NamedTextColor.AQUA)
-				.append(target.displayName()
-					.hoverEvent(target))
-				.append(Component.text(" has had their permission to access your graves revoked."))
-			);
-			target.sendMessage(Component.text()
-				.color(NamedTextColor.AQUA)
-				.append(player.displayName()
-					.hoverEvent(player))
-				.append(Component.text(" has revoked your permission to access their graves."))
-			);
-		} else {
-			player.sendMessage(Component.text()
-				.color(NamedTextColor.AQUA)
-				.append(target.displayName()
-					.hoverEvent(target))
-				.append(Component.text(" does not have permission to collect your graves."))
-				.append(Component.newline())
-				.append(Component.text("You can grant them permission with /grave permission grant <player>."))
-			);
-		}
 	}
 
 	private static void listGravesSelf(Player player, int page) throws WrapperCommandSyntaxException {
@@ -171,19 +109,12 @@ public class GraveCommand {
 			if (page > pages || page < 1) {
 				page = pages;
 			}
-			int index = (page - 1) * 5;
 			ArrayList<Component> entries = manager.getGravesList(page);
 			Component message = Component.text("List of ", NamedTextColor.AQUA)
 				.append(player.displayName().hoverEvent(player))
 				.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"));
 			for (Component entry : entries) {
-				message = message.append(Component.newline()
-					.append(Component.text("[", NamedTextColor.GRAY))
-					.append(Component.text(index, NamedTextColor.WHITE))
-					.append(Component.text("] ", NamedTextColor.GRAY))
-					.append(entry)
-				);
-				index++;
+				message = message.append(Component.newline().append(entry));
 			}
 			message = message.append(Component.newline()
 				.append(Component.text("<<<")
@@ -218,19 +149,12 @@ public class GraveCommand {
 			if (page > pages || page < 1) {
 				page = pages;
 			}
-			int index = (page - 1) * 5;
 			ArrayList<Component> entries = manager.getGravesList(page);
 			Component message = Component.text("List of ", NamedTextColor.AQUA)
 				.append(player.displayName().hoverEvent(player))
 				.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"));
 			for (Component entry : entries) {
-				message = message.append(Component.newline()
-					.append(Component.text("[", NamedTextColor.GRAY))
-					.append(Component.text(index, NamedTextColor.WHITE))
-					.append(Component.text("] ", NamedTextColor.GRAY))
-					.append(entry)
-				);
-				index++;
+				message = message.append(Component.newline().append(entry));
 			}
 			message = message.append(Component.newline()
 				.append(Component.text("<<<")
@@ -270,24 +194,16 @@ public class GraveCommand {
 				if (page > pages || page < 1) {
 					page = pages;
 				}
-				int index = (page - 1) * 5;
 				String coordinates = String.format("%s %s %s", location.getX(), location.getY(), location.getZ());
-				ArrayList<Component> entries = manager.getGravesList(page);
+				ArrayList<Component> entries = manager.getGravesList(page, grave -> Component.text(" ")
+					.append(Component.text("[S]", NamedTextColor.GOLD))
+					.hoverEvent(HoverEvent.showText(Component.text("Click to summon")))
+					.clickEvent(ClickEvent.runCommand("/grave summon list select " + coordinates + " " + grave.mUuid)));
 				Component message = Component.text("List of ", NamedTextColor.AQUA)
 					.append(player.displayName().hoverEvent(player))
-					.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"))
-					.append(Component.newline())
-					.append(Component.text("Click the number on the left to select", NamedTextColor.GOLD));
+					.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"));
 				for (Component entry : entries) {
-					message = message.append(Component.newline()
-						.append(Component.text("[", NamedTextColor.GRAY)
-							.append(Component.text(index, NamedTextColor.GOLD))
-							.append(Component.text("] ", NamedTextColor.GRAY))
-							.hoverEvent(HoverEvent.showText(Component.text("Click to summon")))
-							.clickEvent(ClickEvent.runCommand("/grave summon list select " + coordinates + " " + index)))
-						.append(entry)
-					);
-					index++;
+					message = message.append(Component.newline().append(entry));
 				}
 				message = message.append(Component.newline()
 					.append(Component.text("<<<")
@@ -318,26 +234,27 @@ public class GraveCommand {
 		}
 	}
 
-	private static void summonGraveListSelect(Player player, Location location, int index) throws WrapperCommandSyntaxException {
+	private static void summonGraveListSelect(Player player, Location location, UUID uuid) throws WrapperCommandSyntaxException {
 		if (removeSummonListTag(player)) {
 			GraveManager manager = GraveManager.getInstance(player);
 			if (manager != null) {
-				Component grave = manager.getGraveInfo(index);
+				Grave grave = manager.getGrave(uuid);
 				if (grave != null) {
+					Component graveInfo = manager.getGraveInfo(manager.getGrave(uuid));
 					String coordinates = String.format("%s %s %s", location.getBlockX(), location.getBlockY(), location.getBlockZ());
 					player.sendMessage(Component.text("Are you sure you wanted to summon this grave?", NamedTextColor.AQUA)
 						.append(Component.newline())
-						.append(grave)
+						.append(graveInfo)
 						.append(Component.newline())
 						.append(Component.text("[", NamedTextColor.GRAY)
 							.append(Component.text("CONFIRM", NamedTextColor.GREEN))
 							.append(Component.text("]", NamedTextColor.GRAY))
-							.clickEvent(ClickEvent.runCommand("/grave summon list confirm " + coordinates + " " + index))
+							.clickEvent(ClickEvent.runCommand("/grave summon list confirm " + coordinates + " " + uuid))
 						)
 					);
 					addSummonListTag(player);
 				} else {
-					CommandAPI.fail("Grave " + index + " does not exist. Maximum is " + (manager.getGravesCount() - 1));
+					CommandAPI.fail("This grave does not exist.");
 				}
 			} else {
 				CommandAPI.fail("You do not have any graves.");
@@ -347,20 +264,18 @@ public class GraveCommand {
 		}
 	}
 
-	private static void summonGraveListConfirm(Player player, Location location, int index) {
+	private static void summonGraveListConfirm(Player player, Location location, UUID uuid) {
 		GraveManager manager = GraveManager.getInstance(player);
 		if (removeSummonListTag(player)) {
 			if (manager != null) {
-				if (manager.getGravesCount() > index) {
-					if (manager.summonGrave(index, location)) {
-						player.sendMessage(Component.text("Grave successfully summoned to ", NamedTextColor.AQUA)
-							.append(Component.text(location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ()))
-						);
-					} else {
-						player.sendMessage(Component.text("Something went wrong getting your grave; please try again", NamedTextColor.RED));
-					}
+				Grave grave = manager.getGrave(uuid);
+				if (grave != null) {
+					grave.summon(location);
+					player.sendMessage(Component.text("Grave successfully summoned to ", NamedTextColor.AQUA)
+						.append(Component.text(location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ()))
+					);
 				} else {
-					player.sendMessage(Component.text("Grave " + index + " does not exist. Maximum is " + (manager.getGravesCount() - 1), NamedTextColor.RED));
+					player.sendMessage(Component.text("This grave does not exist.", NamedTextColor.RED));
 				}
 			} else {
 				player.sendMessage(Component.text("You do not have any graves", NamedTextColor.RED));
@@ -370,19 +285,17 @@ public class GraveCommand {
 		}
 	}
 
-	private static void summonGraveOther(Player sender, Player player, Location location, int index) {
+	private static void summonGraveOther(Player sender, Player player, Location location, UUID uuid) {
 		GraveManager manager = GraveManager.getInstance(player);
 		if (manager != null) {
-			if (manager.getGravesCount() > index) {
-				if (manager.summonGrave(index, location)) {
-					sender.sendMessage(Component.text("Grave successfully summoned to ", NamedTextColor.AQUA)
-						.append(Component.text(location.getX() + "," + location.getY() + "," + location.getZ()))
-					);
-				} else {
-					sender.sendMessage(Component.text("Something went wrong getting the grave; please try again", NamedTextColor.RED));
-				}
+			Grave grave = manager.getGrave(uuid);
+			if (grave != null) {
+				grave.summon(location);
+				sender.sendMessage(Component.text("Grave successfully summoned to ", NamedTextColor.AQUA)
+					.append(Component.text(location.getX() + "," + location.getY() + "," + location.getZ()))
+				);
 			} else {
-				sender.sendMessage(Component.text("Grave " + index + " does not exist. Maximum is " + (manager.getGravesCount() - 1), NamedTextColor.RED));
+				player.sendMessage(Component.text("This grave does not exist.", NamedTextColor.RED));
 			}
 		} else {
 			sender.sendMessage(Component.text("You do not have any graves", NamedTextColor.RED));
@@ -422,37 +335,40 @@ public class GraveCommand {
 		return false;
 	}
 
-	private static void delete(Player player, int index) {
+	private static void delete(Player player, UUID uuid) {
 		GraveManager manager = GraveManager.getInstance(player);
-		if (manager != null) {
-			if (index < 0) {
-				if (manager.cancelDeletion()) {
-					player.sendMessage(Component.text("Grave deletion cancelled.", NamedTextColor.RED));
-				}
-			} else if (manager.getGravesCount() > index) {
-				Grave grave = manager.getGraves().get(index);
-				if (manager.isDeleteConfirmation(index, player.getTicksLived())) {
-					grave.delete();
-					manager.cancelDeletion();
-					player.sendMessage(Component.text("Grave " + index + " has been deleted.", NamedTextColor.GREEN));
-				} else {
-					player.sendMessage(Component.text("Are you sure you want to fully delete grave " + index + "? This cannot be undone!", NamedTextColor.RED, TextDecoration.BOLD));
-					player.sendMessage(Component.text("Item" + (grave.getItems().size() > 1 ? "s" : "") + " in the grave: ", NamedTextColor.AQUA)
-						.append(grave.getItemList(true)));
-					player.sendMessage(Component.text()
-						.append(Component.text("[DELETE]", NamedTextColor.RED)
-							.hoverEvent(HoverEvent.showText(Component.text("Delete the grave. Cannot be undone!", NamedTextColor.RED)))
-							.clickEvent(ClickEvent.runCommand("/grave delete " + index)))
-						.append(Component.text("   "))
-						.append(Component.text("[CANCEL]", NamedTextColor.WHITE)
-							.hoverEvent(HoverEvent.showText(Component.text("Cancel deletion of the grave", NamedTextColor.WHITE)))
-							.clickEvent(ClickEvent.runCommand("/grave delete -1"))));
-				}
-			} else {
-				player.sendMessage(Component.text("Grave " + index + " does not exist. Maximum is " + (manager.getGravesCount() - 1), NamedTextColor.RED));
+		if (manager == null) {
+			player.sendMessage(Component.text("You do not have any graves.", NamedTextColor.RED));
+			return;
+		}
+		if (uuid == null) {
+			if (manager.cancelDeletion()) {
+				player.sendMessage(Component.text("Grave deletion cancelled.", NamedTextColor.RED));
 			}
+			return;
+		}
+		Optional<Grave> optionalGrave = manager.getGraves().stream().filter(grave -> grave.mUuid.equals(uuid)).findFirst();
+		if (optionalGrave.isEmpty()) {
+			player.sendMessage(Component.text("This grave does not exist. It may have already been collected or deleted.", NamedTextColor.RED));
+			return;
+		}
+		Grave grave = optionalGrave.get();
+		if (manager.isDeleteConfirmation(uuid, player.getTicksLived())) {
+			grave.delete();
+			manager.cancelDeletion();
+			player.sendMessage(Component.text("Grave has been deleted.", NamedTextColor.GREEN));
 		} else {
-			player.sendMessage(Component.text("You do not have any graves", NamedTextColor.RED));
+			player.sendMessage(Component.text("Are you sure you want to fully delete this grave? This cannot be undone!", NamedTextColor.RED, TextDecoration.BOLD));
+			player.sendMessage(Component.text("Item" + (grave.getItems().size() > 1 ? "s" : "") + " in the grave: ", NamedTextColor.AQUA)
+				.append(grave.getItemList(true)));
+			player.sendMessage(Component.text()
+				.append(Component.text("[DELETE]", NamedTextColor.RED)
+					.hoverEvent(HoverEvent.showText(Component.text("Delete the grave. Cannot be undone!", NamedTextColor.RED)))
+					.clickEvent(ClickEvent.runCommand("/grave delete " + uuid)))
+				.append(Component.text("   "))
+				.append(Component.text("[CANCEL]", NamedTextColor.WHITE)
+					.hoverEvent(HoverEvent.showText(Component.text("Cancel deletion of the grave", NamedTextColor.WHITE)))
+					.clickEvent(ClickEvent.runCommand("/grave delete cancel"))));
 		}
 	}
 }

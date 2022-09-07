@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.*;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,6 +45,16 @@ public class SpellBaseSeekingProjectile extends Spell {
 	private final int mRange;
 	private final boolean mSingleTarget;
 	private final boolean mLaunchTracking;
+	private final int mCharge;
+	private final int mChargeInterval;
+	private final double mOffsetLeft;
+	private final double mOffsetUp;
+	private final double mOffsetFront;
+	private final int mSplit;
+	private final double mSplitAngle;
+	private final int mMirror;
+	private final double mFixYaw;
+	private final double mFixPitch;
 	private final int mCooldown;
 	private final int mDelay;
 	private final double mSpeed;
@@ -63,6 +71,9 @@ public class SpellBaseSeekingProjectile extends Spell {
 	private final boolean mCollidesWithOthers;
 	private final GetSpellTargets<LivingEntity> mGetSpellTargets;
 
+	private final boolean mFixed;
+	private int mChargeRemain;
+
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, int range, boolean singleTarget, boolean launchTracking, int cooldown, int delay,
 			double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers,
 			AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
@@ -72,23 +83,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 	}
 
 	/**
-	 * @param plugin              Plugin
-	 * @param boss                Boss
 	 * @param range               Range within which players may be targeted
 	 * @param singleTarget        Target random player (true) or all players (false)
-	 * @param launchTracking      Launch projectile at where the player is at time of launch (true) or was at time of spell nitiation (false)
-	 * @param cooldown            How often this spell can be cast
-	 * @param delay               How long between spell initiation and projectile launch
-	 * @param speed               How many blocks per tick the projectile travels
-	 * @param turnRadius          How many radians per tick the projectile can turn (higher values = tighter tracking, 0 = no tracking)
-	 * @param lifetimeTicks       How many ticks before the projectile should dissipate
-	 * @param hitboxLength        Dimensions of the projectile hitbox
-	 * @param collidesWithBlocks  Whether the projectile should dissipate upon contact with a block
-	 * @param lingers             Whether the projectile should dissipate upon boss death
-	 * @param initiateAesthetic   Called when the attack initiates
-	 * @param launchAesthetic     Called when the projectile is launched
-	 * @param projectileAesthetic Called each tick at projectile locations
-	 * @param hitAction           Called when the projectile intersects a player (or possibly a block)
 	 */
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, int range, boolean singleTarget, boolean launchTracking, int cooldown, int delay,
 			double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
@@ -99,9 +95,20 @@ public class SpellBaseSeekingProjectile extends Spell {
 		mRange = range;
 		mSingleTarget = singleTarget;
 		mLaunchTracking = launchTracking;
+		mCharge = 1;
+		mChargeInterval = 100;
 		mCooldown = cooldown;
-		mSpeed = speed;
 		mDelay = delay;
+		mOffsetLeft = 0;
+		mOffsetUp = 0;
+		mOffsetFront = 0;
+		mSplit = 1;
+		mSplitAngle = 30;
+		mMirror = 0;
+		mFixed = false;
+		mFixYaw = 0.0;
+		mFixPitch = 0.0;
+		mSpeed = speed;
 		mTurnRadius = Math.max(0, Math.min(Math.PI, turnRadius));
 		mLifetimeTicks = lifetimeTicks;
 		mHitboxLength = hitboxLength;
@@ -116,18 +123,70 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 		//not used
 		mGetSpellTargets = null;
+
+		//initialize
+		mChargeRemain = 0;
 	}
+	//Constructors above are redirected to this one.
 
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, boolean launchTracking, int cooldown, int delay,
-			double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
-			GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+									  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
+									  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+		this(plugin, boss, launchTracking, 1, 40, cooldown, delay,
+			0, 0, 0, 0, 200.0, 100.0, 1, 30, speed, turnRadius,
+			lifetimeTicks, hitboxLength, lingers, collidesWithBlocks, collidesWithOthers, collisionCheckDelay,
+			targets, initiateAesthetic, launchAesthetic, projectileAesthetic, hitAction);
+	}
+
+	/**
+	 * @param plugin              Plugin
+	 * @param boss                Boss
+	 * @param launchTracking      Launch projectile at where the player is at time of launch (true) or was at time of spell nitiation (false)
+	 * @param charge              Repeatly launch projectile for specific times
+	 * @param chargeInterval      Interval between casting charges
+	 * @param cooldown            How often this spell can be cast
+	 * @param delay               How long between spell initiation and projectile launch
+	 * @param offsetX             X-offset from mob's eye to projectile's start (Left)
+	 * @param offsetY             Y-offset from mob's eye to projectile's start (Up)
+	 * @param offsetZ             Z-offset from mob's eye to projectile's start (Front)
+	 * @param mirror              Generate duplicated projectiles. 1 = L-R, 2 = F-B, 4 = U-D
+	 * @param fixYaw              Force projectile shoot in a yaw relative to shooter
+	 * @param fixPitch            Force projectile shoot in a pitch relative to shooter
+	 * @param split               How many projectiles to be launched in a sector plane
+	 * @param splitAngle          Angles between splited projectiles in degree
+	 * @param speed               How many blocks per tick the projectile travels
+	 * @param turnRadius          How many radians per tick the projectile can turn (higher values = tighter tracking, 0 = no tracking)
+	 * @param lifetimeTicks       How many ticks before the projectile should dissipate
+	 * @param hitboxLength        Dimensions of the projectile hitbox
+	 * @param lingers             Whether the projectile should dissipate upon boss death
+	 * @param collidesWithBlocks  Whether the projectile should dissipate upon contact with a block
+	 * @param initiateAesthetic   Called when the attack initiates
+	 * @param launchAesthetic     Called when the projectile is launched
+	 * @param projectileAesthetic Called each tick at projectile locations
+	 * @param hitAction           Called when the projectile intersects a player (or possibly a block)
+	 */
+	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, boolean launchTracking, int charge, int chargeInterval, int cooldown, int delay,
+									  double offsetX, double offsetY, double offsetZ, int mirror, double fixYaw, double fixPitch, int split, double splitAngle, double speed, double turnRadius,
+									  int lifetimeTicks, double hitboxLength, boolean lingers, boolean collidesWithBlocks, boolean collidesWithOthers, int collisionCheckDelay,
+									  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();
 		mLaunchTracking = launchTracking;
-		mCooldown = cooldown;
-		mSpeed = speed;
 		mDelay = delay;
+		mCooldown = cooldown;
+		mCharge = charge;
+		mChargeInterval = chargeInterval;
+		mOffsetLeft = offsetX;
+		mOffsetUp = offsetY;
+		mOffsetFront = offsetZ;
+		mSplit = Math.max(split, 1);
+		mSplitAngle = Math.max(splitAngle, 0);
+		mMirror = mirror < 0 || mirror >= 8 ? 0 : mirror;
+		mFixed = !((fixYaw > 180.0) || (fixYaw < -180.0) || (fixPitch > 90.0) || (fixPitch < -90.0));
+		mFixYaw = fixYaw;
+		mFixPitch = fixPitch;
+		mSpeed = speed;
 		mTurnRadius = Math.max(0, Math.min(Math.PI, turnRadius));
 		mLifetimeTicks = lifetimeTicks;
 		mHitboxLength = hitboxLength;
@@ -141,13 +200,15 @@ public class SpellBaseSeekingProjectile extends Spell {
 		mCollidesWithOthers = collidesWithOthers;
 		mGetSpellTargets = targets;
 
-		mSingleTarget = false;
 		//it should be not used since mGetSpellTargets will handle also the singletarget
-
-		mRange = 50;
+		mSingleTarget = false;
 		//used to calc if the projectile should stop before since the player is to far.
-	}
+		mRange = 50;
 
+		//initialize
+		mChargeRemain = 0;
+	}
+	//Constructors above are redirected to this one.
 
 	@Override
 	public void run() {
@@ -170,11 +231,11 @@ public class SpellBaseSeekingProjectile extends Spell {
 					if (!mLaunchTracking) {
 						for (Map.Entry<LivingEntity, Location> entry : mLocations.entrySet()) {
 							LivingEntity target = entry.getKey();
-							launch(target, entry.getValue());
+							launchDX(target, entry.getValue(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
 						}
 					} else {
 						for (LivingEntity target : mTargets) {
-							launch(target, target.getEyeLocation());
+							launchDX(target, target.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
 						}
 					}
 
@@ -184,6 +245,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 			initiateSpell.runTaskLater(mPlugin, mDelay);
 			mActiveRunnables.add(initiateSpell);
+			consumeCharge();
 			return;
 
 		}
@@ -210,9 +272,9 @@ public class SpellBaseSeekingProjectile extends Spell {
 						for (Player player : mPlayers) {
 							if (LocationUtils.hasLineOfSight(mBoss, player)) {
 								if (!mLaunchTracking) {
-									launch(player, mLocations.get(player));
+									launchDX(player, mLocations.get(player), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
 								} else {
-									launch(player, player.getEyeLocation());
+									launchDX(player, player.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
 								}
 								return;
 							}
@@ -223,13 +285,13 @@ public class SpellBaseSeekingProjectile extends Spell {
 							for (Map.Entry<Player, Location> entry : mLocations.entrySet()) {
 								Player player = entry.getKey();
 								if (LocationUtils.hasLineOfSight(mBoss, player)) {
-									launch(player, entry.getValue());
+									launchDX(player, entry.getValue(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
 								}
 							}
 						} else {
 							for (Player player : mPlayers) {
 								if (LocationUtils.hasLineOfSight(mBoss, player)) {
-									launch(player, player.getEyeLocation());
+									launchDX(player, player.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
 								}
 							}
 						}
@@ -240,6 +302,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 		initiateSpell.runTaskLater(mPlugin, mDelay);
 		mActiveRunnables.add(initiateSpell);
+		consumeCharge();
 	}
 
 	@Override
@@ -264,17 +327,55 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return mCooldown;
+		return mChargeRemain > 0 ? mChargeInterval : mCooldown;
 	}
 
+	public <V extends LivingEntity> void launchDX(V target, Location targetLoc, double offsetX, double offsetY, double offsetZ,
+												  int split, double splitAngle, int mirror, double fixYaw, double fixPitch) {
+		// yaw degrees of splits
+		double[] yaws = new double[split];
+		for (int i = 0; i < split; i++) {
+			yaws[i] = splitAngle * (i - (split - 1) / 2.0);
+			launch(target, targetLoc, mFixed, fixYaw, fixPitch, offsetX, offsetY, offsetZ, yaws[i], 0);
+			if (mirror % 2 == 1) {
+				launch(target, targetLoc, mFixed, -fixYaw, fixPitch, -offsetX, offsetY, offsetZ, yaws[i], 0);
+			}
+			if (mirror >= 2) {
+				launch(target, targetLoc, mFixed, fixYaw >= 0 ? (180.0 - fixYaw) : (-180.0 - fixYaw),
+					fixPitch, offsetX, offsetY, -offsetZ, yaws[i], 0);
+			}
+			if (mirror == 3) {
+				launch(target, targetLoc, mFixed, fixYaw >= 0 ? (fixYaw - 180.0) : (fixYaw + 180.0),
+					fixPitch, -offsetX, offsetY, -offsetZ, yaws[i], 0);
+			}
+		}
+
+	}
+
+	// normal launch
 	public <V extends LivingEntity> void launch(V target, Location targetLoc) {
+		launch(target, targetLoc, false, 0, 0.0, 0, 0, 0, 0.0, 0.0);
+	}
+
+	public <V extends LivingEntity> void launch(V target, Location targetLoc, boolean fixed, double fYaw, double fPitch,
+												double offsetX, double offsetY, double offsetZ, double offsetYaw, double offsetPitch) {
 		mLaunchAesthetic.run(mWorld, mBoss.getEyeLocation(), 0);
 
 		BukkitRunnable runnable = new BukkitRunnable() {
-			Location mLocation = mBoss.getEyeLocation();
+			//Start point of projectiles
+			Location mLocation = mBoss.getEyeLocation().add(VectorUtils.rotateYAxis(
+				VectorUtils.rotateXAxis(new Vector(offsetX, offsetY, offsetZ), mBoss.getLocation().getPitch()),
+				mBoss.getLocation().getYaw()));
 			BoundingBox mHitbox = BoundingBox.of(mLocation, mHitboxLength / 2, mHitboxLength / 2, mHitboxLength / 2);
 			V mTarget = target;
-			Vector mDirection = targetLoc.subtract(mLocation).toVector().normalize();
+			//Base direction of projectiles
+			Vector mBaseDir = !fixed ? targetLoc.clone().subtract(mLocation).toVector().normalize() :
+				VectorUtils.rotationToVector(fYaw + mBoss.getLocation().getYaw(), fPitch);
+			//Hint: Clone is important for multiple launching
+			//Vector mDirection = targetLoc.clone().subtract(mLocation).toVector().normalize();
+			Vector mDirection = VectorUtils.rotateTargetDirection(
+				mBaseDir, offsetYaw, offsetPitch);
+
 			int mTicks = 0;
 			int mCollisionDelayTicks = mCollisionCheckDelay;
 
@@ -396,4 +497,14 @@ public class SpellBaseSeekingProjectile extends Spell {
 	protected void onEndAction(Location projLoc, BoundingBox projHitbox) {
 		//Do nothing, must be overriden in subclasses to be used
 	}
+
+	//Reusable for other charge implementation
+	private void consumeCharge() {
+		if (mChargeRemain > 0) {
+			mChargeRemain--;
+		} else {
+			mChargeRemain = mCharge - 1;
+		}
+	}
+
 }

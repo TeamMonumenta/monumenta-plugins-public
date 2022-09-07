@@ -19,6 +19,7 @@ public class EliteFinishers {
 			.put(DefaultDanceFinisher.NAME, new DefaultDanceFinisher())
 			.put(USAFireworkFinisher.NAME, new USAFireworkFinisher())
 			.put(SplishSplashFinisher.NAME, new SplishSplashFinisher())
+			.put(FrozenSolidFinisher.NAME, new FrozenSolidFinisher())
 			.build();
 
 	// Delegate based on elite finisher name

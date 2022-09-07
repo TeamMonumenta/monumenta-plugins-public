@@ -44,7 +44,8 @@ public class SpellBossBlockBreak extends Spell {
 			Material.SPAWNER,
 			Material.WATER,
 			Material.LAVA,
-			Material.END_PORTAL
+			Material.END_PORTAL,
+			Material.LIGHT
 		);
 
 	/*

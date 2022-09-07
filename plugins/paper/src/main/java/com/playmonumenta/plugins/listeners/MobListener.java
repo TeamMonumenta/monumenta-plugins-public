@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.ListIterator;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -63,6 +64,29 @@ public class MobListener implements Listener {
 
 	public static final int SPAWNER_DROP_THRESHOLD = 20;
 	private static final NamespacedKey ARMED_ARMOR_STAND_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/armed_armor_stand");
+	private static final String SPAWNER_TORCH_LAST_CHECK_TIME_METADATA_KEY = "MonumentaTorchSkipLastCheck";
+	private static final String SPAWNER_TORCH_SKIP_COUNT_METADATA_KEY = "MonumentaTorchSkipCount";
+	/**
+	 * Number of spawn cycles skipped if a torch is present adjacent to a spawner
+	 */
+	private static final int SPAWNER_TORCH_SPAWN_CYCLE_SKIPS = 1;
+
+	/**
+	 * Set of entity types that may spawn both on land and floating in water.
+	 */
+	private static final EnumSet<EntityType> AMPHIBIOUS_MOBS = EnumSet.of(
+		EntityType.DROWNED,
+		EntityType.GUARDIAN
+	);
+
+	/**
+	 * Set of entity types that may spawn in the air despite not being {@link EntityUtils#isFlyingMob(EntityType) flying mobs}.
+	 */
+	private static final EnumSet<EntityType> FALLING_MOBS = EnumSet.of(
+		EntityType.CREEPER,
+		EntityType.SPLASH_POTION,
+		EntityType.PRIMED_TNT
+	);
 
 	private final Plugin mPlugin;
 
@@ -71,39 +95,66 @@ public class MobListener implements Listener {
 	}
 
 	/**
-	 * This method handles spawner spawn rules. We use a Paper patch that disables all vanilla span rules for spawners,
+	 * This method handles spawner spawn rules. We use a Paper patch that disables all vanilla spawn rules for spawners,
 	 * so all types of mobs can spawn anywhere if there's enough space for the mob.
+	 * Since light level is no longer a factor for spawning, this also includes a torch check to slow down spawners.
 	 */
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	void preSpawnerSpawnEvent(PreSpawnerSpawnEvent event) {
 
+		// If a torch is adjacent to a spawner, slow down the spawner by making it skip spawn cycles
+		Block spawnerBlock = event.getSpawnerLocation().getBlock();
+		// If the max number of spawn cycle skips has been reached already, the spawner is currently trying to spawn, so don't check torches
+		List<MetadataValue> skipCount = spawnerBlock.getMetadata(SPAWNER_TORCH_SKIP_COUNT_METADATA_KEY);
+		if (skipCount.isEmpty() || skipCount.get(0).asInt() < SPAWNER_TORCH_SPAWN_CYCLE_SKIPS) {
+			// Make sure we only check at most once per tick and not once per spawn attempt
+			List<MetadataValue> lastCheck = spawnerBlock.getMetadata(SPAWNER_TORCH_LAST_CHECK_TIME_METADATA_KEY);
+			if (lastCheck.isEmpty() || lastCheck.get(0).asInt() != Bukkit.getServer().getCurrentTick()) {
+				spawnerBlock.setMetadata(SPAWNER_TORCH_LAST_CHECK_TIME_METADATA_KEY, new FixedMetadataValue(mPlugin, Bukkit.getServer().getCurrentTick()));
+				// Then check for torches
+				for (BlockFace bf : new BlockFace[] {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST}) {
+					Material adjacentType = spawnerBlock.getRelative(bf).getType();
+					if (adjacentType == Material.TORCH || adjacentType == Material.WALL_TORCH) {
+						// If a torch is found, increase the skipped spawn count by one. If this is still less than the configured number of skips, abort the spawn cycle, otherwise proceed with spawning.
+						int newSkipCount = skipCount.isEmpty() ? 0 : skipCount.get(0).asInt() + 1;
+						spawnerBlock.setMetadata(SPAWNER_TORCH_SKIP_COUNT_METADATA_KEY, new FixedMetadataValue(mPlugin, newSkipCount));
+						if (newSkipCount < SPAWNER_TORCH_SPAWN_CYCLE_SKIPS) {
+							event.setShouldAbortSpawn(true);
+							event.setCancelled(true);
+							return;
+						}
+						break;
+					}
+				}
+			}
+		}
+
 		EntityType type = event.getType();
 		boolean inWater = LocationUtils.isLocationInWater(event.getSpawnLocation());
 
-		// water mobs: must spawn in water
-		if (EntityUtils.isWaterMob(type)) {
+		// water entities: must spawn in water
+		if (EntityUtils.isWaterMob(type) && !AMPHIBIOUS_MOBS.contains(type)) {
 			if (!inWater) {
 				event.setCancelled(true);
 			}
 			return;
 		}
 
-		// land & air mobs: must not spawn in water
-		if (inWater) {
-			event.setCancelled(true);
+		// Amphibious entities can spawn in water even without a solid block below
+		if (inWater && AMPHIBIOUS_MOBS.contains(type)) {
 			return;
 		}
 
-		// land mobs: must not spawn in the air (i.e. must have a block with collision below)
-		// creepers don't follow this rule so that they can be used in drop creeper traps
-		if (!EntityUtils.isFlyingMob(type) && type != EntityType.CREEPER) {
+		// Land entities: must not spawn in the air (i.e. must have a block with collision below)
+		// Some entities like creepers don't follow this rule so that they can be used in drop creeper traps
+		if (!EntityUtils.isFlyingMob(type) && !FALLING_MOBS.contains(type)) {
 			if (!event.getSpawnLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
 				event.setCancelled(true);
 			}
 			return;
 		}
 
-		// flying mobs: can spawn anywhere (except water), so no more checks
+		// flying/dropping entities: can spawn anywhere, so no more checks
 
 	}
 
@@ -185,6 +236,10 @@ public class MobListener implements Listener {
 		// Create new metadata entries
 		spawner.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
 		mob.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
+
+		// Successful spawn: allow torches to disable the next spawn cycle again
+		spawner.getBlock().removeMetadata(SPAWNER_TORCH_SKIP_COUNT_METADATA_KEY, mPlugin);
+		spawner.getBlock().setMetadata(SPAWNER_TORCH_LAST_CHECK_TIME_METADATA_KEY, new FixedMetadataValue(mPlugin, Bukkit.getServer().getCurrentTick()));
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

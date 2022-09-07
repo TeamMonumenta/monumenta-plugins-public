@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
+import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -152,6 +154,10 @@ public class DamageListener implements Listener {
 						mPlugin.mItemStatManager.onDamage(mPlugin, player, event, damagee);
 						mPlugin.mAbilityManager.onDamage(player, event, damagee);
 					}
+				}
+				// Check for activity purposes
+				if (damagee.customName() != null && !damagee.getScoreboardTags().contains(TrainingDummyBoss.identityTag) && EntityUtils.isHostileMob(damagee)) {
+					ActivityManager.getManager().addDamageDealt(player, Math.min(event.getDamage(), damagee.getHealth()));
 				}
 			}
 		}

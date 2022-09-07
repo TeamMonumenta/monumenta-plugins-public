@@ -3,10 +3,10 @@ package com.playmonumenta.plugins.graves;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTEntity;
 import de.tr7zw.nbtapi.NBTItem;
-import javax.annotation.Nullable;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class ThrownItem {
 	private static final String KEY_LOCATION = "location";
@@ -77,7 +78,7 @@ public class ThrownItem {
 			}
 		}.runTaskLater(Plugin.getInstance(), 5 * 20);
 		mEntity.addScoreboardTag("ThrownItem");
-		mManager.addItem(mEntity.getUniqueId(), this);
+		mManager.addItem(mEntity, this);
 		startTracking();
 	}
 
@@ -102,7 +103,7 @@ public class ThrownItem {
 			mEntity.setThrower(mPlayer.getUniqueId());
 			NBTEntity nbt = new NBTEntity(mEntity);
 			nbt.setShort("Age", mAge);
-			mManager.addItem(mEntity.getUniqueId(), this);
+			mManager.addItem(mEntity, this);
 			mManager.removeUnloadedItem(Chunk.getChunkKey(mLocation), this);
 			startTracking();
 		}
@@ -110,7 +111,7 @@ public class ThrownItem {
 
 	private void remove() {
 		if (mEntity != null) {
-			mManager.removeItem(mEntity.getUniqueId());
+			mManager.removeItem(mEntity);
 			mEntity.remove();
 			mEntity = null;
 			stopTracking();
@@ -182,7 +183,6 @@ public class ThrownItem {
 	void onDestroyItem() {
 		mValid = false;
 		update();
-		//TODO alert player that an item is now in limbo
 	}
 
 	public void onAttemptPickupItem(PlayerAttemptPickupItemEvent event) {
@@ -207,7 +207,7 @@ public class ThrownItem {
 		}
 	}
 
-	static ThrownItem deserialize(GraveManager manager, Player player, JsonObject data) {
+	static @Nullable ThrownItem deserialize(GraveManager manager, Player player, JsonObject data) {
 		ItemStack item = null;
 		String shard = null;
 		Short age = null;
@@ -215,6 +215,9 @@ public class ThrownItem {
 		Vector velocity = null;
 		if (data.has(KEY_NBT) && data.get(KEY_NBT).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_NBT).isString()) {
 			item = NBTItem.convertNBTtoItem(new NBTContainer(data.getAsJsonPrimitive(KEY_NBT).getAsString()));
+		}
+		if (ItemUtils.isNullOrAir(item)) { // item replacements deleted this item, or bad data
+			return null;
 		}
 		if (data.has(KEY_SHARD) && data.get(KEY_SHARD).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_SHARD).isString()) {
 			shard = data.getAsJsonPrimitive(KEY_SHARD).getAsString();

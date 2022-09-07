@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
+import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
@@ -390,74 +390,6 @@ public class ItemUtils {
 		return itemStack == null || itemStack.getType() == Material.AIR;
 	}
 
-	public enum ItemDeathResult {
-		KEEP, // Item is kept in inventory on death, takes no damage
-		KEEP_DAMAGED, // Item is kept on death, with a durability loss
-		KEEP_EQUIPPED, // Item is kept on death if it's in an armor/offhand/hotbar slot, with durability loss
-		KEEP_NOGRAVE, // Item is kept on death. If it somehow drops, it won't be placed in grave when destroyed.
-		LOSE, // Item is dropped on death, lost when destroyed
-		SAFE, // Item is dropped on death, placed in grave when destroyed, does not shatter
-		SHATTER, // Item is dropped on death, placed in grave when destroyed, does shatter
-		SHATTER_NOW, // Item is shattered on death, like Curse of Vanishing 1
-		DESTROY, // Item is destroyed on death, like Curse of Vanishing 2
-	}
-
-	// Returns an ItemDeathResult reporting what should happen to an item when the player carrying it dies.
-	public static ItemDeathResult getItemDeathResult(ItemStack item) {
-		int vanishingLevel = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_VANISHING);
-		if (vanishingLevel >= 2) {
-			return ItemDeathResult.DESTROY;
-		} else if (vanishingLevel == 1 || item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
-			return ItemDeathResult.SHATTER_NOW;
-		} else if (ShulkerShortcutListener.isEnderExpansion(item)) {
-			return ItemDeathResult.KEEP;
-		} else if (item.getType().equals(Material.COMPASS)) {
-			switch (getPlainName(item)) {
-				case "": // Vanilla compass
-				case "Quest Compass": // Free quest compass
-					return ItemDeathResult.KEEP_NOGRAVE;
-				default:
-					return ItemDeathResult.KEEP;
-			}
-		} else if (ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.PERSISTENCE) > 0) {
-			return ItemDeathResult.KEEP;
-		} else if (isShulkerBox(item.getType())) {
-			return ItemDeathResult.SHATTER;
-		}
-		switch (Objects.requireNonNull(ItemStatUtils.getRegion(item))) {
-		case VALLEY:
-		case ISLES:
-		case RING:
-		case SHULKER_BOX:
-			switch (Objects.requireNonNull(ItemStatUtils.getTier(item))) {
-			case ZERO:
-			case I:
-			case II:
-			case III:
-				if (ServerProperties.getKeepLowTierInventory() && !item.containsEnchantment(Enchantment.BINDING_CURSE)) {
-					return ItemDeathResult.KEEP_EQUIPPED;
-				} else {
-					return ItemDeathResult.LOSE;
-				}
-			case IV:
-			case V:
-			case UNCOMMON:
-			case PATRON:
-			case RARE:
-			case ARTIFACT:
-			case EPIC:
-			case UNIQUE:
-			case EVENT:
-			case SHULKER_BOX:
-				return ItemDeathResult.SHATTER;
-			default:
-				return ItemDeathResult.LOSE;
-			}
-		default:
-			return ItemDeathResult.LOSE;
-		}
-	}
-
 	// Returns the costs (in tier 2 currency (CXP/CCS/etc.)) for each region to reforge a list of items.
 	// There is no global "MONUMENTA" currency. The calling function will determine what to do with this cost.
 	public static Map<Region, Integer> getReforgeCosts(Collection<ItemStack> items) {
@@ -711,9 +643,7 @@ public class ItemUtils {
 			int currentDamage = dMeta.getDamage();
 			int newDamage = currentDamage + damage;
 			if (canBreak && newDamage > maxDurability - 1) {
-				if (!ItemStatUtils.shatter(item)) {
-					item.setAmount(0);
-				}
+				Shattered.shatter(item, Shattered.DURABILITY_SHATTER);
 			} else {
 				dMeta.setDamage(Math.min(maxDurability - 1, newDamage));
 				item.setItemMeta(meta);
@@ -729,9 +659,7 @@ public class ItemUtils {
 			int currentDamage = dMeta.getDamage();
 			int newDamage = (int) (currentDamage + (maxDurability * damagePercent) / 100);
 			if (canBreak && newDamage > maxDurability - 1) {
-				if (!ItemStatUtils.shatter(item)) {
-					item.setAmount(0);
-				}
+				Shattered.shatter(item, Shattered.DURABILITY_SHATTER);
 			} else {
 				dMeta.setDamage(Math.min(maxDurability - 1, newDamage));
 				item.setItemMeta(meta);
@@ -997,14 +925,6 @@ public class ItemUtils {
 		return isWearable(itemStack) || isArmor(itemStack);
 	}
 
-	public static boolean isShatteredWearable(@Nullable ItemStack itemStack) {
-		if (itemStack != null) {
-			return isWearable(itemStack) && ItemStatUtils.isShattered(itemStack);
-		} else {
-			return false;
-		}
-	}
-
 	public static boolean isSword(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.SWORDS.contains(itemStack.getType());
@@ -1035,10 +955,6 @@ public class ItemUtils {
 	 */
 	public static boolean isHoe(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			if (ItemStatUtils.isShattered(itemStack)) {
-				return false;
-			}
-
 			return Materials.HOES.contains(itemStack.getType());
 		} else {
 			return false;
@@ -1050,30 +966,18 @@ public class ItemUtils {
 	 */
 	public static boolean isWand(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			if (ItemStatUtils.isShattered(itemStack)) {
-				return false;
-			}
-
 			List<String> loreLines = getPlainLore(itemStack);
 			for (String loreLine : loreLines) {
 				if (loreLine.contains("* Magic Wand *")) {
 					return true;
 				}
 			}
-
-			return false;
-		} else {
-			return false;
 		}
-
+		return false;
 	}
 
 	public static boolean isAlchemistItem(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			if (ItemStatUtils.isShattered(itemStack)) {
-				return false;
-			}
-
 			List<String> loreLines = getPlainLore(itemStack);
 			for (String loreLine : loreLines) {
 				if (loreLine.contains("* Alchemical Utensil *")) {
@@ -1093,27 +997,15 @@ public class ItemUtils {
 	}
 
 	public static boolean isAxe(@Nullable ItemStack itemStack) {
-		if (itemStack != null) {
-			return Materials.AXES.contains(itemStack.getType());
-		} else {
-			return false;
-		}
+		return itemStack != null && Materials.AXES.contains(itemStack.getType());
 	}
 
 	public static boolean isShovel(@Nullable ItemStack itemStack) {
-		if (itemStack != null) {
-			return Materials.SHOVELS.contains(itemStack.getType());
-		} else {
-			return false;
-		}
+		return itemStack != null && Materials.SHOVELS.contains(itemStack.getType());
 	}
 
 	public static boolean isSomePotion(@Nullable ItemStack itemStack) {
-		if (itemStack != null) {
-			return Materials.POTIONS.contains(itemStack.getType());
-		} else {
-			return false;
-		}
+		return itemStack != null && Materials.POTIONS.contains(itemStack.getType());
 	}
 
 	public static boolean isArrow(@Nullable ItemStack itemStack) {
@@ -1315,6 +1207,53 @@ public class ItemUtils {
 			return name;
 		}
 		return Component.translatable(item.getType().getTranslationKey());
+	}
+
+	public static final class ItemIdentifier {
+		public final Material mType;
+		public final @Nullable String mName;
+
+		public ItemIdentifier(@Nullable Material type, @Nullable String name) {
+			mType = type == null ? Material.AIR : type;
+			mName = name != null && name.isEmpty() ? null : name;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+			ItemIdentifier that = (ItemIdentifier) o;
+			return mType == that.mType && Objects.equals(mName, that.mName);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(mType, mName);
+		}
+
+		public boolean isIdentifierFor(ItemStack item) {
+			Material otherType = item == null ? Material.AIR : item.getType();
+			if (mType != otherType) {
+				return false;
+			}
+			String otherName = getPlainNameIfExists(item);
+			if (otherName != null && otherName.isEmpty()) {
+				otherName = null;
+			}
+			return Objects.equals(mName, otherName);
+		}
+	}
+
+	public static ItemIdentifier getIdentifier(@Nullable ItemStack item) {
+		if (item != null) {
+			return new ItemIdentifier(item.getType(), getPlainNameIfExists(item));
+		} else {
+			return new ItemIdentifier(null, null);
+		}
 	}
 
 }

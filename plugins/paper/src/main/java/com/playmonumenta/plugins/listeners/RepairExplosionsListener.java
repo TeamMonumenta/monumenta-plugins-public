@@ -41,20 +41,38 @@ public class RepairExplosionsListener implements Listener {
 
 		// Ores
 		Material.COAL_ORE,
+		Material.DEEPSLATE_COAL_ORE,
 		Material.IRON_ORE,
+		Material.DEEPSLATE_IRON_ORE,
+		Material.COPPER_ORE,
+		Material.DEEPSLATE_COPPER_ORE,
 		Material.GOLD_ORE,
+		Material.DEEPSLATE_GOLD_ORE,
 		Material.GILDED_BLACKSTONE,
 		Material.NETHER_GOLD_ORE,
 		Material.REDSTONE_ORE,
+		Material.DEEPSLATE_REDSTONE_ORE,
 		Material.LAPIS_ORE,
+		Material.DEEPSLATE_LAPIS_ORE,
 		Material.NETHER_QUARTZ_ORE,
 		Material.DIAMOND_ORE,
+		Material.DEEPSLATE_DIAMOND_ORE,
 		Material.EMERALD_ORE,
+		Material.DEEPSLATE_EMERALD_ORE,
 		Material.ANCIENT_DEBRIS,
+
+		// Raw metals
+		Material.RAW_IRON,
+		Material.RAW_IRON_BLOCK,
+		Material.RAW_COPPER,
+		Material.RAW_COPPER_BLOCK,
+		Material.RAW_GOLD,
+		Material.RAW_GOLD_BLOCK,
 
 		// Blocks
 		Material.COAL_BLOCK,
 		Material.IRON_BLOCK,
+		Material.COPPER_BLOCK,
 		Material.GOLD_BLOCK,
 		Material.REDSTONE_BLOCK,
 		Material.LAPIS_BLOCK,

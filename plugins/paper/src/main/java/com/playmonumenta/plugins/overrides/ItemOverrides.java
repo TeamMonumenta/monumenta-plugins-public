@@ -224,6 +224,7 @@ public final class ItemOverrides {
 		mItems.put(Material.BUCKET, bucketOverride);
 		mItems.put(Material.WATER_BUCKET, bucketOverride);
 		mItems.put(Material.LAVA_BUCKET, bucketOverride);
+		mItems.put(Material.POWDER_SNOW_BUCKET, bucketOverride);
 		mItems.put(Material.COD_BUCKET, bucketOverride);
 		mItems.put(Material.MILK_BUCKET, bucketOverride);
 		mItems.put(Material.PUFFERFISH_BUCKET, bucketOverride);
@@ -236,6 +237,7 @@ public final class ItemOverrides {
 		mItems.put(Material.TRAPPED_CHEST, chestOverride);
 
 		mItems.put(Material.YELLOW_STAINED_GLASS, new YellowTesseractOverride());
+		mItems.put(Material.LIME_STAINED_GLASS, new LimeTesseractOverride());
 		mItems.put(Material.WHITE_STAINED_GLASS, new FestiveTesseractOverride());
 
 		BaseOverride anvilOverride = new AnvilOverride();

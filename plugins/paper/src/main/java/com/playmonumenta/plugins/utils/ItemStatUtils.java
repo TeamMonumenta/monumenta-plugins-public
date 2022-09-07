@@ -53,7 +53,6 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -70,6 +69,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemStatUtils {
 
@@ -84,7 +84,6 @@ public class ItemStatUtils {
 	static final String CHARM_KEY = "CharmText";
 	static final String CHARM_POWER_KEY = "CharmPower";
 	static final String AMOUNT_KEY = "Amount";
-	static final String SHATTERED_KEY = "Shattered";
 	static final String EFFECT_TYPE_KEY = "EffectType";
 	static final String EFFECT_DURATION_KEY = "EffectDuration";
 	static final String EFFECT_STRENGTH_KEY = "EffectStrength";
@@ -93,6 +92,7 @@ public class ItemStatUtils {
 	static final String SHULKER_SLOTS_KEY = "ShulkerSlots";
 	static final String IS_QUIVER_KEY = "IsQuiver";
 	static final String QUIVER_ARROW_TRANSFORM_MODE_KEY = "ArrowTransformMode";
+	static final String CHARGES_KEY = "Charges";
 	public static final String ITEMS_KEY = "Items";
 	public static final String VANITY_ITEMS_KEY = "VanityItems";
 
@@ -508,7 +508,6 @@ public class ItemStatUtils {
 		ALCHEMICAL_ALEMBIC(null, "Alchemical Utensil", false, false, false, false),
 		//Random Stuff
 		PESTILENCE_TESSERACT(new PestilenceTesseract(), false, false, true, false),
-		PERSISTENCE(new Persistence(), false, false, false, false),
 		// Crit Calcs (defaults to value of 1, always active. DO NOT GIVE TO PLAYERS VIA ENCHANT)
 		HIDE_ATTRIBUTES(new HideAttributes(), false, false, false, false),
 		HIDE_ENCHANTS(new HideEnchants(), false, false, false, false),
@@ -644,6 +643,7 @@ public class ItemStatUtils {
 		SOULBOUND(new Soulbound(), "Soulbound", false, false, false, false),
 		FESTIVE(new Festive(), "Decorated", false, true, false, false),
 		GILDED(new Gilded(), "Gilded", false, true, false, false),
+		SHATTERED(new Shattered(), "", true, false, false, false),
 		// Stat tracking stuff
 		STAT_TRACK(new StatTrack(), "Tracked", false, false, false, false),
 		STAT_TRACK_KILLS(new StatTrackKills(), "", true, false, true, false),
@@ -733,8 +733,11 @@ public class ItemStatUtils {
 			}
 		}
 
-		public static @Nullable
-		InfusionType getInfusionType(String name) {
+		public boolean isHidden() {
+			return this == SHATTERED;
+		}
+
+		public static @Nullable InfusionType getInfusionType(String name) {
 			return REVERSE_MAPPINGS.get(name.replace(" ", ""));
 		}
 	}
@@ -1657,60 +1660,6 @@ public class ItemStatUtils {
 		item.setItemMeta(nbt.getItem().getItemMeta());
 	}
 
-	public static boolean isShattered(final @Nullable ItemStack item) {
-		if (item == null || item.getType() == Material.AIR) {
-			return false;
-		}
-		NBTItem nbt = new NBTItem(item);
-
-		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
-			return false;
-		}
-
-		NBTCompound modified = monumenta.getCompound(PLAYER_MODIFIED_KEY);
-		if (modified == null) {
-			return false;
-		}
-
-		return modified.hasKey(SHATTERED_KEY);
-	}
-
-	public static boolean shatter(final @Nullable ItemStack item) {
-		if (item == null || item.getType() == Material.AIR || getTier(item) == Tier.NONE) {
-			return false;
-		}
-		NBTItem nbt = new NBTItem(item);
-		NBTCompound modified = nbt.addCompound(MONUMENTA_KEY).addCompound(PLAYER_MODIFIED_KEY);
-		modified.setInteger(SHATTERED_KEY, 1);
-
-		item.setItemMeta(nbt.getItem().getItemMeta());
-		generateItemStats(item);
-		return true;
-	}
-
-	public static void reforge(final ItemStack item) {
-		if (item == null || item.getType() == Material.AIR) {
-			return;
-		}
-		NBTItem nbt = new NBTItem(item);
-
-		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
-			return;
-		}
-
-		NBTCompound modified = monumenta.getCompound(PLAYER_MODIFIED_KEY);
-		if (modified == null) {
-			return;
-		}
-
-		modified.removeKey(SHATTERED_KEY);
-
-		item.setItemMeta(nbt.getItem().getItemMeta());
-		generateItemStats(item);
-	}
-
 	public static int getShulkerSlots(@Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return 27;
@@ -1752,7 +1701,7 @@ public class ItemStatUtils {
 	}
 
 	public static boolean isArrowTransformingQuiver(@Nullable ItemStack item) {
-		return isQuiver(item) && getEnchantmentLevel(item, EnchantmentType.PERSISTENCE) > 0;
+		return isQuiver(item) && "Shaman's Quiver".equals(ItemUtils.getPlainNameIfExists(item));
 	}
 
 	public static ItemStack setArrowTransformMode(@Nullable ItemStack item, QuiverListener.ArrowTransformMode arrowTransformMode) {
@@ -1782,6 +1731,31 @@ public class ItemStatUtils {
 		} catch (IllegalArgumentException e) {
 			return QuiverListener.ArrowTransformMode.NONE;
 		}
+	}
+
+	public static boolean isUpgradedLimeTesseract(@Nullable ItemStack item) {
+		return item != null
+			       && item.getType() == Material.LIME_STAINED_GLASS
+			       && "Tesseract of Knowledge (u)".equals(ItemUtils.getPlainNameIfExists(item));
+	}
+
+	public static int getCharges(@Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return 0;
+		}
+		NBTCompound playerModified = getPlayerModified(new NBTItem(item));
+		if (playerModified == null) {
+			return 0;
+		}
+		Integer charges = playerModified.getInteger(CHARGES_KEY);
+		return charges == null ? 0 : charges;
+	}
+
+	public static void setCharges(@Nullable ItemStack item, int charges) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+		addPlayerModified(new NBTItem(item, true)).setInteger(CHARGES_KEY, charges);
 	}
 
 	public static void generateItemStats(final ItemStack item) {
@@ -1865,14 +1839,15 @@ public class ItemStatUtils {
 			NBTCompound enchantments = getEnchantments(nbt);
 			if (enchantments != null) {
 				for (EnchantmentType type : EnchantmentType.values()) {
+					if (type.isHidden()) {
+						continue;
+					}
 					NBTCompound enchantment = enchantments.getCompound(type.getName());
 					if (enchantment != null) {
 						if (type.isItemTypeEnchantment()) {
 							tagsLater.add(type.getDisplay(enchantment.getInteger(LEVEL_KEY)));
 						} else if (type.getName().equals("Mending") || type.getName().equals("Unbreaking") || type.getName().equals("Unbreakable")) {
 							unbreakingTags.add(type.getDisplay(enchantment.getInteger(LEVEL_KEY)));
-						} else if (type.isHidden()) {
-							continue;
 						} else {
 							lore.add(type.getDisplay(enchantment.getInteger(LEVEL_KEY)));
 						}
@@ -1888,6 +1863,9 @@ public class ItemStatUtils {
 		NBTCompound infusions = getInfusions(nbt);
 		if (infusions != null) {
 			for (InfusionType type : InfusionType.values()) {
+				if (type.isHidden()) {
+					continue;
+				}
 				NBTCompound infusion = infusions.getCompound(type.getName());
 				if (infusion != null) {
 					if (type == InfusionType.STAT_TRACK) {
@@ -1997,12 +1975,18 @@ public class ItemStatUtils {
 			}
 		}
 
-		if (ItemStatUtils.isShattered(item)) {
-			lore.add(Component.text("* SHATTERED *", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text("Maybe a Master Repairman", NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text("could reforge it...", NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false));
+		if (isUpgradedLimeTesseract(item)) {
+			lore.add(Component.text("Stored anvils: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
+				.append(Component.text(getCharges(item), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
 		}
 
+		int shatterLevel = ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);
+		if (shatterLevel > 0) {
+			TextColor color = TextColor.color(155 + (int) (100.0 * (shatterLevel - 1) / (Shattered.MAX_LEVEL - 1)), 0, 0);
+			lore.add(Component.text("* SHATTERED - " + toRomanNumerals(shatterLevel) + " *", color, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("Return to your grave to remove one level", color).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("of Shattered, or use an anvil on this item.", color).decoration(TextDecoration.ITALIC, false));
+		}
 
 		NBTCompoundList effects = getEffects(nbt);
 		if (effects != null && !effects.isEmpty()) {

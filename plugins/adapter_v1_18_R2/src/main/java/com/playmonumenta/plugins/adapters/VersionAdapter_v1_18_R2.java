@@ -173,15 +173,15 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	public Vector getActualDirection(Entity entity) {
 		Vector vector = new Vector();
 
-		double rotX = ((CraftEntity) entity).getHandle().getXRot();
-		double rotY = ((CraftEntity) entity).getHandle().getYRot();
+		double pitch = ((CraftEntity) entity).getHandle().getXRot();
+		double yaw = ((CraftEntity) entity).getHandle().getYRot();
 
-		vector.setY(-Math.sin(Math.toRadians(rotY)));
+		vector.setY(-Math.sin(Math.toRadians(pitch)));
 
-		double xz = Math.cos(Math.toRadians(rotY));
+		double xz = Math.cos(Math.toRadians(pitch));
 
-		vector.setX(-xz * Math.sin(Math.toRadians(rotX)));
-		vector.setZ(xz * Math.cos(Math.toRadians(rotX)));
+		vector.setX(-xz * Math.sin(Math.toRadians(yaw)));
+		vector.setZ(xz * Math.cos(Math.toRadians(yaw)));
 
 		return vector;
 	}
@@ -388,6 +388,7 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	@Override
 	public void executeCommandAsBlock(Block block, String command) {
 		CommandBlockEntity tileEntity = new CommandBlockEntity(((CraftBlock) block).getPosition(), ((CraftBlockState) block.getState()).getHandle());
+		tileEntity.setLevel(((CraftBlock) block).getHandle().getMinecraftWorld());
 		Bukkit.dispatchCommand(tileEntity.getCommandBlock().getBukkitSender(tileEntity.getCommandBlock().createCommandSourceStack()), command);
 	}
 

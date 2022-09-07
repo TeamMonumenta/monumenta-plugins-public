@@ -41,6 +41,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.parrots.ParrotManager;
+import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.plots.ShopManager;
 import com.playmonumenta.plugins.potion.PotionManager;
@@ -53,6 +54,7 @@ import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
 import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
+import com.playmonumenta.plugins.timers.ShowMarkerTimer;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -106,6 +108,7 @@ public class Plugin extends JavaPlugin {
 	private @Nullable HttpManager mHttpManager = null;
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
+	public ActivityManager mActivityManager;
 	public SpawnZoneManager mZoneManager;
 	public AbilityManager mAbilityManager;
 	public ShulkerInventoryManager mShulkerInventoryManager;
@@ -154,10 +157,6 @@ public class Plugin extends JavaPlugin {
 		GiveSoulbound.register();
 		ClaimRaffle.register(this);
 		DateVersionCommand.register();
-		ShatterHeldItem.register();
-		CalculateReforge.register();
-		ReforgeHeldItem.register();
-		ReforgeInventory.register();
 		DebugInfo.register(this);
 		BossDebug.register();
 		RefreshClass.register(this);
@@ -180,7 +179,6 @@ public class Plugin extends JavaPlugin {
 		Portal2.register();
 		ClearPortals.register();
 		Launch.register();
-		Magnetize.register();
 		UnsignBook.register();
 		GetScoreCommand.register();
 		GraveCommand.register();
@@ -189,6 +187,7 @@ public class Plugin extends JavaPlugin {
 		CustomInventoryCommands.register(this);
 		DelvesCommands.register(this);
 		AdminNotify.register();
+		ViewActivity.register();
 		ItemStatUtils.registerInfoCommand();
 		ItemStatUtils.registerLoreCommand();
 		ItemStatUtils.registerNameCommand();
@@ -221,7 +220,7 @@ public class Plugin extends JavaPlugin {
 		CharmsCommand.register(this);
 		WorldNameCommand.register();
 		ToggleTrail.register();
-
+		MonumentaTrigger.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -294,6 +293,7 @@ public class Plugin extends JavaPlugin {
 		mTowerManager = new TowerManager(this);
 		mCosmeticsManager = CosmeticsManager.getInstance();
 		mSeasonalEventManager = new SeasonalEventManager();
+		mActivityManager = new ActivityManager(this);
 		mVanityManager = new VanityManager();
 
 		new ClientModHandler(this);
@@ -341,7 +341,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ShulkerShortcutListener(this), this);
 		manager.registerEvents(new ShulkerEquipmentListener(this), this);
 		manager.registerEvents(new PortableEnderListener(), this);
-		manager.registerEvents(new ShatteredEquipmentListener(), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);
 		manager.registerEvents(new ZoneListener(), this);
 		manager.registerEvents(new TridentListener(), this);
@@ -374,6 +373,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new QuiverListener(), this);
 		manager.registerEvents(new ToggleTrail(), this);
 		manager.registerEvents(mVanityManager, this);
+		manager.registerEvents(new BrokenEquipmentListener(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")
@@ -422,6 +422,13 @@ public class Plugin extends JavaPlugin {
 				// Update cooldowns
 				try {
 					mProjectileEffectTimers.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				// Show marker entities
+				try {
+					ShowMarkerTimer.update();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
