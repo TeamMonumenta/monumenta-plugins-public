@@ -8,6 +8,7 @@ import java.util.EnumSet;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -52,7 +53,7 @@ public class CrystalineBlessing extends ZeroArgumentEffect {
 					}, (e) -> {
 					// Lose effect
 					Location loc = entity.getLocation();
-					//TODO: entity.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1f, 0.85f);
+					entity.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1f, 0.85f);
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, DARK_COLOR).spawnAsPlayerBuff((Player) entity);
@@ -60,7 +61,7 @@ public class CrystalineBlessing extends ZeroArgumentEffect {
 			);
 
 			// Aesthetics
-			//TODO: entity.getWorld().playSound(entity.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_PLACE, 1, 0.85f); - add when plugin is on 1.18
+			entity.getWorld().playSound(entity.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_PLACE, 1, 0.85f);
 
 		}
 	}

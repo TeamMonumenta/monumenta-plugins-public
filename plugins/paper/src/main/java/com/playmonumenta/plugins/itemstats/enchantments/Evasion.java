@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public class Evasion implements Enchantment {
 
 	private static final double AGIL_BONUS_PER_LEVEL = 0.2;
-	private static final int DISTANCE = 5;
+	private static final int DISTANCE = 4;
 
 	@Override
 	public @NotNull String getName() {

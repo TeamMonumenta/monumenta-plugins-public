@@ -38,7 +38,7 @@ import org.bukkit.util.Vector;
 
 public class GloriousBattle extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DAMAGE_1 = 20;
-	private static final int DAMAGE_2 = 30;
+	private static final int DAMAGE_2 = 25;
 	private static final double RADIUS = 3;
 	private static final double BLEED_PERCENT = 0.2;
 	private static final int BLEED_TIME = 4 * 20;
@@ -77,7 +77,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		mInfo.mShorthandName = "GB";
 		mInfo.mDescriptions.add("Dealing indirect damage with an ability grants you a Glorious Battle stack. Shift and swap hands to consume a stack and charge forwards, gaining full knockback resistance until landing. When you land, deal " + DAMAGE_1 + " damage to the nearest mob within 3 blocks and " +
 				"apply " + (int) DepthsUtils.roundPercent(BLEED_PERCENT) + "% bleed for " + (BLEED_TIME / 20) + " seconds. Additionally, knock back all mobs within 3 blocks.");
-		mInfo.mDescriptions.add("Damage increased to 30. Additionally, you now passively gain 5% melee damage for each mob targeting you within 8 blocks, up to 6 mobs.");
+		mInfo.mDescriptions.add("Damage increased to 25. Additionally, you now passively gain 5% melee damage for each mob targeting you within 8 blocks, up to 6 mobs.");
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mStacks = 0;

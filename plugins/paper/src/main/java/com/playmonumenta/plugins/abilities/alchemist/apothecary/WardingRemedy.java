@@ -27,7 +27,7 @@ public class WardingRemedy extends Ability {
 
 	private static final int WARDING_REMEDY_1_COOLDOWN = 20 * 30;
 	private static final int WARDING_REMEDY_2_COOLDOWN = 20 * 25;
-	private static final int WARDING_REMEDY_PULSES = 12;
+	private static final int WARDING_REMEDY_PULSES = 8;
 	private static final int WARDING_REMEDY_PULSE_DELAY = 10;
 	private static final int WARDING_REMEDY_ABSORPTION = 1;
 	private static final int WARDING_REMEDY_MAX_ABSORPTION = 6;
@@ -54,7 +54,7 @@ public class WardingRemedy extends Ability {
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? WARDING_REMEDY_1_COOLDOWN : WARDING_REMEDY_2_COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mShorthandName = "WR";
-		mInfo.mDescriptions.add("Swap hands while sneaking and holding an Alchemist's Bag to give players (including yourself) within a 6 block radius 1 absorption health per 0.5 seconds for 6 seconds, lasting 30 seconds, up to 6 absorption health. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Swap hands while sneaking and holding an Alchemist's Bag to give players (including yourself) within a 6 block radius 1 absorption health per 0.5 seconds for 4 seconds, lasting 30 seconds, up to 6 absorption health. Cooldown: 30s.");
 		mInfo.mDescriptions.add("You and allies in a 12 block radius passively gain 10% increased healing while having absorption health, and cooldown decreased to 25s.");
 		mDisplayItem = new ItemStack(Material.GOLDEN_CARROT, 1);
 	}

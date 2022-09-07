@@ -29,8 +29,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class EsotericEnhancements extends PotionAbility {
 	private static final String ABERRATION_LOS = "Alchemicalaberration";
-	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 0.8;
-	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1.2;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 0.6;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1;
 	private static final double ABERRATION_DAMAGE_RADIUS = 3;
 	private static final int ABERRATION_SUMMON_DURATION = 30;
 	private static final double ABERRATION_BLEED_AMOUNT = 0.2;
@@ -61,8 +61,8 @@ public class EsotericEnhancements extends PotionAbility {
 		mInfo.mLinkedSpell = ClassAbility.ESOTERIC_ENHANCEMENTS;
 		mInfo.mScoreboardId = "Esoteric";
 		mInfo.mShorthandName = "Es";
-		mInfo.mDescriptions.add("When afflicting a mob with a Brutal potion within 1.5s of afflicting that mob with a Gruesome potion, summon an Alchemical Aberration. The Aberration targets the mob with the highest health within 8 blocks and explodes on that mob, dealing 80% of your potion damage and applying 20% Bleed for 4s to all mobs in a 3 block radius. Cooldown: 5s.");
-		mInfo.mDescriptions.add("Damage is increased to 120% of your potion damage.");
+		mInfo.mDescriptions.add("When afflicting a mob with a Brutal potion within 1.5s of afflicting that mob with a Gruesome potion, summon an Alchemical Aberration. The Aberration targets the mob with the highest health within 8 blocks and explodes on that mob, dealing 60% of your potion damage and applying 20% Bleed for 4s to all mobs in a 3 block radius. Cooldown: 5s.");
+		mInfo.mDescriptions.add("Damage is increased to 100% of your potion damage.");
 		mDisplayItem = new ItemStack(Material.CREEPER_HEAD, 1);
 
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, ABERRATION_COOLDOWN);

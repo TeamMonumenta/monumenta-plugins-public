@@ -276,10 +276,10 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		mDelvePannelList.add(fallenItem);
 
 		// Silver Knight's Tomb
-		ItemStack sktItem = new ItemStack(Material.IRON_BLOCK); // TODO: Replace with Material.POLISHED_DEEPSLATE;
+		ItemStack sktItem = new ItemStack(Material.POLISHED_DEEPSLATE);
 		ItemMeta sktMeta = sktItem.getItemMeta();
 		sktMeta.displayName(Component.text("Refresh", TextColor.fromCSSHexString("#C0C0C0")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(sktMeta, "Reduces the cooldown of infinite consumables by 2% per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(sktMeta, "Reduces the cooldown of infinite consumable foods by 2% per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		sktItem.setItemMeta(sktMeta);
 		mDelvePannelList.add(sktItem);
 
@@ -532,10 +532,10 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		List<ItemStack> sktItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.IRON_BLOCK, 1); // TODO: Replace with Material.POLISHED_DEEPSLATE
+			ItemStack pannel = new ItemStack(Material.POLISHED_DEEPSLATE, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Refresh level " + (i + 1), TextColor.fromCSSHexString("#C0C0C0")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Reduces the cooldown of infinite consumables by " + (i + 1) * 2 + "%.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Reduces the cooldown of infinite consumable foods by " + (i + 1) * 2 + "%.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			sktItems.add(pannel);
 		}

@@ -16,8 +16,8 @@ import org.bukkit.entity.Player;
 
 public class ScoutPassive extends Ability {
 
-	public static final float DAMAGE_MULTIPLY_MELEE = 0.25f;
-	public static final float DAMAGE_MULTIPLY_PROJ = 0.25f;
+	public static final float DAMAGE_MULTIPLY_MELEE = 0.50f;
+	public static final float DAMAGE_MULTIPLY_PROJ = 0.40f;
 
 	public ScoutPassive(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);

@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.Aesthetics;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -11,6 +13,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.EnumSet;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -21,12 +24,13 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class MelancholicLament extends Ability {
 
@@ -36,7 +40,12 @@ public class MelancholicLament extends Ability {
 	private static final int COOLDOWN = 20 * 16;
 	private static final int RADIUS = 7;
 	private static final int CLEANSE_REDUCTION = 20 * 10;
-
+	private static final int ENHANCE_RADIUS = 16;
+	private static final double ENHANCE_DAMAGE = .025;
+	private static final String ENHANCE_EFFECT_NAME = "LamentDamage";
+	private static final String ENHANCE_EFFECT_PARTICLE_NAME = "LamentParticle";
+	private static final int ENHANCE_EFFECT_DURATION = 20;
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageEvent.DamageType.MELEE);
 	public static final String CHARM_RADIUS = "Melancholic Lament Radius";
 	public static final String CHARM_COOLDOWN = "Melancholic Lament Cooldown";
 	public static final String CHARM_WEAKNESS = "Melancholic Lament Weakness Amplifier";
@@ -56,7 +65,7 @@ public class MelancholicLament extends Ability {
 		mInfo.mShorthandName = "MLa";
 		mInfo.mDescriptions.add("Press the swap key while sneaking and holding a scythe to recite a haunting song, causing all mobs within 7 blocks to target the user and afflicting them with 20% Weaken for 8 seconds. Cooldown: 16s.");
 		mInfo.mDescriptions.add("Increase the Weaken to 30% and decrease the duration of all negative potion effects on players in the radius by 10s.");
-		mInfo.mDescriptions.add("When cast, also cleanse all potion debuffs. Then, your next non-ailment damage deals +1 damage per debuff cleansed.");
+		mInfo.mDescriptions.add("For 8s after casting this ability, you and your allies in a 16 block radius gain +2.5% melee damage for each mob targeting you (max 6 stacks).");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
@@ -98,16 +107,42 @@ public class MelancholicLament extends Ability {
 			}
 
 			if (isEnhanced()) {
-				mEnhancementBonusDamage = 0;
-				for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, mPlayer)) {
-					PotionEffect effect = mPlayer.getPotionEffect(effectType);
-					if (effect != null) {
-						mPlayer.removePotionEffect(effectType);
-						mEnhancementBonusDamage += 1;
+				new BukkitRunnable() {
+					int mTicks = 0;
 
-						// mPlayer.sendMessage("Removed " + effectType);
+					@Override
+					public void run() {
+
+						if (mPlayer == null || !mPlayer.isOnline() || mPlayer.isDead()) {
+							this.cancel();
+							return;
+						}
+
+						int numTargetting = 0;
+						for (LivingEntity entity : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ENHANCE_RADIUS, mPlayer)) {
+							Mob mob = (Mob) entity;
+							if (mob.getTarget() != null && mob.getTarget().equals(mPlayer)) {
+								numTargetting++;
+							}
+						}
+						numTargetting = Math.min(numTargetting, 6);
+						for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), ENHANCE_RADIUS, true)) {
+							mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME, new PercentDamageDealt(ENHANCE_EFFECT_DURATION, ENHANCE_DAMAGE * numTargetting, AFFECTED_DAMAGE_TYPES));
+							mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_PARTICLE_NAME, new Aesthetics(ENHANCE_EFFECT_DURATION,
+								(entity, fourHertz, twoHertz, oneHertz) -> {
+									Location loc = player.getLocation().add(0, 1, 0);
+									new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 20, 0.5, 0, 0.5, 0.125).spawnAsPlayerActive(mPlayer);
+								}, (entity) -> { })
+							);
+						}
+
+						mTicks += 1;
+						if (mTicks > DURATION) {
+							this.cancel();
+						}
 					}
-				}
+				}.runTaskTimer(mPlugin, 0, 1);
+
 			}
 
 			if (isLevelTwo()) {
