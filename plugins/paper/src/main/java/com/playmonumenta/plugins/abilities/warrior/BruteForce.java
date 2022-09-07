@@ -33,8 +33,7 @@ public class BruteForce extends Ability {
 	public static final String CHARM_KNOCKBACK = "Brute Force Knockback";
 	public static final String CHARM_BONUS_DAMAGE = "Brute Force Bonus Damage";
 
-	private double mMultiplier;
-
+	private final double mMultiplier;
 
 	public BruteForce(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Brute Force");
@@ -43,7 +42,7 @@ public class BruteForce extends Ability {
 		mInfo.mShorthandName = "BF";
 		mInfo.mDescriptions.add("Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2-block cube around it, and knocks all non-boss enemies away from you.");
 		mInfo.mDescriptions.add("Damage is increased to 10 percent of the attack's damage plus 2.");
-		mInfo.mDescriptions.add("Attack damage is increased by " + ENHANCEMENT_DAMAGE_INCREASE * 100 + "% on critical hits while running or sprinting.");
+		mInfo.mDescriptions.add("Attack damage is increased by " + (int) (ENHANCEMENT_DAMAGE_INCREASE * 100) + "% on critical hits while running or sprinting.");
 		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
 
 		mMultiplier = isLevelOne() ? 0 : BRUTE_FORCE_2_MODIFIER;

@@ -7,9 +7,11 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +33,7 @@ public class Skirmisher extends Ability {
 	private static final int MOB_COUNT_CUTOFF = 1;
 	private static final double ENHANCEMENT_SPLASH_RADIUS = 3;
 	private static final double ENHANCEMENT_SPLASH_PERCENT_DAMAGE = 0.3;
+
 	public static final String CHARM_DAMAGE = "Skirmisher Damage Multiplier";
 	public static final String CHARM_RADIUS = "Skirmisher Damage Radius";
 
@@ -52,7 +55,7 @@ public class Skirmisher extends Ability {
 				(int)GROUPED_FLAT_DAMAGE_2,
 				(int)(GROUPED_PERCENT_DAMAGE_2 * 100)));
 		mInfo.mDescriptions.add(
-			String.format("When you hit an enemy with a sword, the nearest enemy within %s blocks takes %s%% of the original attack's damage (ignores invulnerability frames).",
+			String.format("When you hit an enemy with a sword, the nearest enemy within %s blocks takes %s%% of the original attack's damage.",
 				(int)ENHANCEMENT_SPLASH_RADIUS,
 				(int)(ENHANCEMENT_SPLASH_PERCENT_DAMAGE * 100)));
 		mDisplayItem = new ItemStack(Material.BONE, 1);
@@ -67,10 +70,12 @@ public class Skirmisher extends Ability {
 
 			// If Enhanced and triggers on a melee strike,
 			if (isEnhanced() && event.getType() == DamageType.MELEE) {
-				LivingEntity selectedEnemy = EntityUtils.getNearestMob(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_SPLASH_RADIUS), enemy);
+				List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_SPLASH_RADIUS), enemy);
+				nearbyEntities.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+				LivingEntity selectedEnemy = EntityUtils.getNearestMob(loc, nearbyEntities);
 
 				if (selectedEnemy != null) {
-					DamageUtils.damage(mPlayer, selectedEnemy, DamageType.OTHER, event.getOriginalDamage() * ENHANCEMENT_SPLASH_PERCENT_DAMAGE, mInfo.mLinkedSpell, true);
+					DamageUtils.damage(mPlayer, selectedEnemy, DamageType.OTHER, event.getDamage() * ENHANCEMENT_SPLASH_PERCENT_DAMAGE, mInfo.mLinkedSpell, true);
 				}
 			}
 

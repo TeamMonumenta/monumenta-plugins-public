@@ -29,6 +29,11 @@ public class CustomDamageOverTime extends Effect {
 		mParticle = particle;
 	}
 
+	// Dummy constructor for copying
+	public CustomDamageOverTime() {
+		this(0, 0, 1, null, null, null);
+	}
+
 	//Magnitude is equal to the level of wither that it is equivalent to, at low levels of wither
 	//i.e. a magnitude of 2 means it is the same as wither 2 - deals 1 health per second
 	@Override

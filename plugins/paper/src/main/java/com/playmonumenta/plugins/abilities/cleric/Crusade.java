@@ -42,7 +42,7 @@ public class Crusade extends Ability {
 			"Your abilities that work against undead enemies now also work against human-like enemies - illagers, vexes, witches, piglins, piglin brutes, golems and giants."
 		); // List of human-likes hardcoded
 		mInfo.mDescriptions.add(
-			String.format("Gain %s%% more ability damage for every mob affected by this ability within %s blocks, capping at %s mobs.",
+			String.format("Gain %s%% ability damage for every mob affected by this ability within %s blocks, capping at %s mobs.",
 				(int) (ENHANCEMENT_BONUS_DAMAGE * 100), ENHANCEMENT_RADIUS, ENHANCEMENT_MAX_MOBS)
 		);
 		mDisplayItem = new ItemStack(Material.ZOMBIE_HEAD, 1);

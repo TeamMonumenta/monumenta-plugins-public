@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -12,12 +13,19 @@ public class SpreadEffectOnDeath extends Effect {
 	private final String mSource;
 	private final double mRadius;
 	private final int mNewDuration;
+	private final boolean mRecurse;
 
-	public SpreadEffectOnDeath(int duration, String source, double radius, int newDuration) {
+	public SpreadEffectOnDeath(int duration, String source, double radius, int newDuration, boolean recurse) {
 		super(duration);
 		mSource = source;
 		mRadius = radius;
 		mNewDuration = newDuration;
+		mRecurse = recurse;
+	}
+
+	// Dummy constructor for copying
+	public SpreadEffectOnDeath() {
+		this(0, null, 0, 0, false);
 	}
 
 	@Override
@@ -26,13 +34,31 @@ public class SpreadEffectOnDeath extends Effect {
 		EffectManager manager = Plugin.getInstance().mEffectManager;
 		Effect effect = manager.getActiveEffect(entity, mSource);
 		if (effect != null) {
-			effect.setDuration(mNewDuration);
 			Location loc = entity.getLocation();
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mRadius, entity)) {
-				manager.addEffect(mob, mSource, effect);
+			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius, entity);
+			for (LivingEntity mob : mobs) {
+				Effect copy = effect.getCopy();
+				if (copy != null) {
+					copy.setDuration(mNewDuration);
+					manager.addEffect(mob, mSource, copy);
+				}
 			}
 
-			entity.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.75f, 1);
+			// If mRecurse is true, also spread to other mobs the spread effect, so this effect can be chained theoretically infinitely
+			if (mRecurse) {
+				String source = manager.getSource(entity, this);
+				if (source != null) {
+					for (LivingEntity mob : mobs) {
+						Effect copy = this.getCopy();
+						if (copy != null) {
+							copy.setDuration(mNewDuration);
+							manager.addEffect(mob, source, copy);
+						}
+					}
+				}
+			}
+
+			entity.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.6f, 1.1f);
 		}
 	}
 

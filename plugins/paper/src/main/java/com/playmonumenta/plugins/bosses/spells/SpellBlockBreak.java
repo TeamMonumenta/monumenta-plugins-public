@@ -87,7 +87,7 @@ public class SpellBlockBreak extends Spell {
 			return;
 		}
 		/* Get a list of all blocks that impede the boss's movement */
-		List<Block> badBlockList = new ArrayList<Block>();
+		List<Block> badBlockList = new ArrayList<>();
 		Location testloc = new Location(loc.getWorld(), 0, 0, 0);
 		int xRad = (int) (mAdaptToBoundingBox ? mLauncher.getBoundingBox().getWidthX() : mXRad);
 		int yRad = (int) (mAdaptToBoundingBox ? mLauncher.getBoundingBox().getHeight() + 1 : mYRad);

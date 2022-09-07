@@ -38,6 +38,7 @@ public class PrismaticShield extends Ability {
 	private static final int HEAL_DURATION = 3 * 20;
 	private static final int HEAL_PERCENT = 5;
 	private static final String HEALED_THIS_TICK_METAKEY = "PrismaticShieldHealedThisTick";
+
 	public static final String CHARM_ABSORPTION = "Prismatic Shield Absorption Health";
 	public static final String CHARM_COOLDOWN = "Prismatic Shield Cooldown";
 	public static final String CHARM_KNOCKBACK = "Prismatic Shield Knockback";
@@ -71,7 +72,7 @@ public class PrismaticShield extends Ability {
 				STUN_DURATION / 20,
 				COOLDOWN_2 / 20));
 		mInfo.mDescriptions.add(
-			String.format("After Prismatic Shield is activated, in the next %ss, every spell that lands successfully will heal you for %s%% of your max health.",
+			String.format("After Prismatic Shield is activated, in the next %ss, every spell that deals damage to at least one enemy will heal you for %s%% of your max health.",
 				HEAL_DURATION / 20,
 				HEAL_PERCENT)
 		);

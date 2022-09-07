@@ -46,8 +46,8 @@ public class Challenge extends Ability {
 
 	public static final String CHARM_DURATION = "Challenge Duration";
 	public static final String CHARM_DAMAGE = "Challenge Damage";
-	public static final String CHARM_ABSORPTION_PER = "Challenge Absorption Per Mob";
-	public static final String CHARM_ABSORPTION_MAX = "Challenge Max Absorption";
+	public static final String CHARM_ABSORPTION_PER = "Challenge Absorption Health Per Mob";
+	public static final String CHARM_ABSORPTION_MAX = "Challenge Max Absorption Health";
 	public static final String CHARM_RANGE = "Challenge Range";
 	public static final String CHARM_COOLDOWN = "Challenge Cooldown";
 

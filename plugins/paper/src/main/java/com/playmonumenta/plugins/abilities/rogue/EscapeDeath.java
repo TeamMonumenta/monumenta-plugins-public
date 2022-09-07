@@ -45,7 +45,7 @@ public class EscapeDeath extends Ability {
 	public static final String CHARM_JUMP = "Escape Death Jump Boost Amplifier";
 	public static final String CHARM_SPEED = "Escape Death Speed Amplifier";
 	public static final String CHARM_COOLDOWN = "Escape Death Cooldown";
-
+	public static final String CHARM_STUN_DURATION = "Escape Death Stun Duration";
 
 	public EscapeDeath(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Escape Death");
@@ -66,7 +66,7 @@ public class EscapeDeath extends Ability {
 				(int)(SPEED_PERCENT * 100),
 				StringUtils.toRoman(JUMP_BOOST_AMPLIFIER + 1)));
 		mInfo.mDescriptions.add(
-			String.format("When this skill is triggered, gain a regenerating effect that heals you for %s%% hp every second for %ss, if an enemy hits you during the regeneration, the effect stops.",
+			String.format("When this skill is triggered, gain a regenerating effect that heals you for %s%% hp every second for %ss. The effect is canceled if you take damage from an enemy.",
 				(int)(ENHANCEMENT_HEAL_PERCENT * 100),
 				ENHANCEMENT_DURATION / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
@@ -86,6 +86,7 @@ public class EscapeDeath extends Ability {
 			&& EntityUtils.isHostileMob(event.getSource())) {
 			mPlugin.mEffectManager.clearEffects(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN);
 		}
+
 		double absorptionHealth = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, ABSORPTION_HEALTH);
 		if (!event.isBlocked() && !isTimerActive()) {
 			double newHealth = mPlayer.getHealth() - event.getFinalDamage(true);
@@ -96,8 +97,9 @@ public class EscapeDeath extends Ability {
 				}
 				putOnCooldown();
 
+				int stunDuration = STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN_DURATION);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RANGE, mPlayer)) {
-					EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
+					EntityUtils.applyStun(mPlugin, stunDuration, mob);
 				}
 
 				if (isLevelTwo()) {

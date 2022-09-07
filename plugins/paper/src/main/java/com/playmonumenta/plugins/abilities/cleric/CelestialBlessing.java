@@ -44,11 +44,13 @@ public class CelestialBlessing extends Ability {
 			DamageType.MELEE,
 			DamageType.MELEE_SKILL,
 			DamageType.MELEE_ENCH,
-			DamageType.PROJECTILE
+			DamageType.PROJECTILE,
+			DamageType.PROJECTILE_SKILL
 	);
 	private static final EnumSet<DamageType> ENHANCED_AFFECTED_DAMAGE_TYPES = EnumSet.of(
 			DamageType.MAGIC
 	);
+
 	public static final String DAMAGE_EFFECT_NAME = "CelestialBlessingExtraDamage";
 	public static final String CHARM_DAMAGE = "Celestial Blessing Damage Modifier";
 	public static final String CHARM_COOLDOWN = "Celestial Blessing Damage Cooldown";

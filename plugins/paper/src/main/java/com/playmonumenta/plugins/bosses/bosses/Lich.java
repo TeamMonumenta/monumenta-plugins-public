@@ -85,6 +85,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -1352,7 +1353,7 @@ public final class Lich extends BossAbilityGroup {
 			for (Player p : SpellDimensionDoor.getShadowed()) {
 				Location loc = p.getLocation();
 				loc.setY(mStart.getLocation().getY());
-				p.teleport(loc);
+				p.teleport(loc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 			}
 		}
 

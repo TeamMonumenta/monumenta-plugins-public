@@ -128,6 +128,7 @@ public class PhlegmaticResolve extends Ability {
 			event.getType() != DamageEvent.DamageType.AILMENT &&
 			event.getType() != DamageEvent.DamageType.POISON &&
 			event.getType() != DamageEvent.DamageType.OTHER &&
+			!event.isBlocked() &&
 			mPlayer != null) {
 
 			double damageSplit;

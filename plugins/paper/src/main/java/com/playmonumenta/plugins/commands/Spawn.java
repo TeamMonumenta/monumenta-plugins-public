@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.bukkit.entity.Entity;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class Spawn {
 	public static String COMMAND = "spawn";
@@ -24,7 +25,7 @@ public class Spawn {
 			.executes((sender, args) -> {
 				Collection<Entity> targets = (Collection<Entity>)args[0];
 				for (Entity target : targets) {
-					target.teleport(target.getWorld().getSpawnLocation());
+					target.teleport(target.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
 				}
 			})
 			.register();

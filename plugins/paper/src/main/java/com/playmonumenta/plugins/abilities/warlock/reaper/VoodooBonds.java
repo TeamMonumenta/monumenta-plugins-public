@@ -111,7 +111,7 @@ public class VoodooBonds extends Ability {
 			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 0.75f);
 			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01).spawnAsPlayerActive(mPlayer);
 			mPlugin.mEffectManager.addEffect(p, "VoodooBondsEffect",
-					new VoodooBondsOtherPlayer(mInfo.mCooldown, mTransferDuration, mPlayer, mPlugin));
+					new VoodooBondsOtherPlayer(getModifiedCooldown(), mTransferDuration, mPlayer, mPlugin));
 		}
 	}
 

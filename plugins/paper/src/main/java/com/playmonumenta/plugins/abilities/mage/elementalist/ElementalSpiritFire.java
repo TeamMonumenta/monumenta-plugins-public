@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -100,11 +99,9 @@ public class ElementalSpiritFire extends Ability {
 		mLevelBowMultiplier = isLevelOne() ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
 
 		// Task runs on the next server tick. Need to wait for entire AbilityCollection to be initialised to properly getPlayerAbility()
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mElementalArrows = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mElementalArrows = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
+		});
 	}
 
 	@Override
@@ -149,7 +146,7 @@ public class ElementalSpiritFire extends Ability {
 							double increment = 0.2;
 
 							List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + size);
-							float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+							float spellDamage = ClassAbility.ELEMENTAL_ARROWS_FIRE == ability ? mLevelDamage : SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 							Vector vectorIncrement = vector.normalize().multiply(increment);
 
 							// Fire spirit sound

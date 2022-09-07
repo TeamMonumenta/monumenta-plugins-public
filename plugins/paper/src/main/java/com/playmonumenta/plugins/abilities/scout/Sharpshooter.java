@@ -25,7 +25,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
 	private static final double PERCENT_BASE_DAMAGE = 0.2;
-	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 4;
+	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 5;
 	private static final int MAX_STACKS = 8;
 	private static final double PERCENT_DAMAGE_PER_STACK = 0.04;
 	private static final double DAMAGE_PER_BLOCK = 0.02;

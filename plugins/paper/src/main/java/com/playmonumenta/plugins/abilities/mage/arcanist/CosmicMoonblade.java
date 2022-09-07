@@ -3,8 +3,6 @@ package com.playmonumenta.plugins.abilities.mage.arcanist;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -32,8 +30,8 @@ import org.bukkit.util.Vector;
 public class CosmicMoonblade extends Ability {
 
 	public static final String NAME = "Cosmic Moonblade";
-	public static final ClassAbility ABILITY = ClassAbility.COSMIC_MOONBLADE;
-	private static final float DAMAGE = 5.0f;
+	private static final double DAMAGE_1 = 5;
+	private static final double DAMAGE_2 = 8;
 	private static final int SWINGS = 2;
 	private static final int RADIUS = 5;
 	private static final int COOLDOWN = 20 * 8;
@@ -41,9 +39,10 @@ public class CosmicMoonblade extends Ability {
 	public static final double REDUCTION_MULTIPLIER_1 = 0.05;
 	public static final double REDUCTION_MULTIPLIER_2 = 0.1;
 	public static final int CAP_TICKS_1 = (int) (0.5 * Constants.TICKS_PER_SECOND);
-	public static final int CAP_TICKS_2 = (int) (1 * Constants.TICKS_PER_SECOND);
+	public static final int CAP_TICKS_2 = 1 * Constants.TICKS_PER_SECOND;
 	private static final Particle.DustOptions FSWORD_COLOR1 = new Particle.DustOptions(Color.fromRGB(106, 203, 255), 1.0f);
 	private static final Particle.DustOptions FSWORD_COLOR2 = new Particle.DustOptions(Color.fromRGB(168, 226, 255), 1.0f);
+
 	public static final String CHARM_DAMAGE = "Cosmic Moonblade Damage";
 	public static final String CHARM_SPELL_COOLDOWN = "Cosmic Moonblade Cooldown Reduction";
 	public static final String CHARM_COOLDOWN = "Cosmic Moonblade Cooldown";
@@ -51,6 +50,7 @@ public class CosmicMoonblade extends Ability {
 	public static final String CHARM_RANGE = "Cosmic Moonblade Range";
 	public static final String CHARM_SLASH = "Cosmic Moonblade Slashes";
 
+	private final double mDamage;
 	private final double mLevelReduction;
 	private final int mLevelCap;
 
@@ -59,23 +59,25 @@ public class CosmicMoonblade extends Ability {
 		mInfo.mScoreboardId = "CosmicMoonblade";
 		mInfo.mShorthandName = "CM";
 		mInfo.mDescriptions.add(
-			String.format("Swap with a wand causes a wave of Arcane blades to hit every enemy within a %s block cone %s times (%s damage per hit) in rapid succession that if each land, reduce all your other skill cooldowns by %s%% (Max %ss). Cooldown: %ss.",
+			String.format("Swap while holding a wand to cause a wave of arcane blades to hit every enemy within a %s block cone %s times (%s damage per hit) in rapid succession that if each land, reduce all your other skill cooldowns by %s%% (Max %ss). Cooldown: %ss.",
 				RADIUS,
 				SWINGS,
-				(int)DAMAGE,
+				(int) DAMAGE_1,
 				(int)(REDUCTION_MULTIPLIER_1 * 100),
 				CAP_TICKS_1 / 20.0,
 				COOLDOWN / 20));
 		mInfo.mDescriptions.add(
-			String.format("Cooldown reduction is increased to %s%% (Max %ss) for blade.",
+			String.format("Cooldown reduction is increased to %s%% (Max %ss) per blade and damage is increased to %s.",
 				(int)(REDUCTION_MULTIPLIER_2 * 100),
-				CAP_TICKS_2 / 20));
-		mInfo.mLinkedSpell = ABILITY;
+				CAP_TICKS_2 / 20,
+				(int) DAMAGE_2));
+		mInfo.mLinkedSpell = ClassAbility.COSMIC_MOONBLADE;
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.DIAMOND_SWORD, 1);
-		mLevelReduction = (getAbilityScore() == 1 ? REDUCTION_MULTIPLIER_1 : REDUCTION_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SPELL_COOLDOWN);
-		mLevelCap = (getAbilityScore() == 1 ? CAP_TICKS_1 : CAP_TICKS_2) + CharmManager.getExtraDuration(player, CHARM_CAP);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mLevelReduction = (isLevelOne() ? REDUCTION_MULTIPLIER_1 : REDUCTION_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SPELL_COOLDOWN);
+		mLevelCap = (isLevelOne() ? CAP_TICKS_1 : CAP_TICKS_2) + CharmManager.getExtraDuration(player, CHARM_CAP);
 	}
 
 
@@ -85,8 +87,7 @@ public class CosmicMoonblade extends Ability {
 			event.setCancelled(true);
 			if (!isTimerActive() && !mPlayer.isSneaking()) {
 				putOnCooldown();
-				float charmDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
-				float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, charmDamage);
+				float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, (float) mDamage);
 				double range = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS);
 				int swings = (int) CharmManager.getLevel(mPlayer, CHARM_SLASH) + SWINGS;
 				ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
@@ -194,14 +195,13 @@ public class CosmicMoonblade extends Ability {
 	}
 
 	public void updateCooldowns(double percent) {
-		for (Ability abil : AbilityManager.getManager().getPlayerAbilities(mPlayer).getAbilities()) {
-			AbilityInfo info = abil.getInfo();
-			if (info.mLinkedSpell == mInfo.mLinkedSpell) {
+		for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
+			if (abil == this) {
 				continue;
 			}
-			int totalCD = info.mCooldown;
+			int totalCD = abil.getModifiedCooldown();
 			int reducedCD = Math.min((int) (totalCD * percent), mLevelCap);
-			mPlugin.mTimers.updateCooldown(mPlayer, info.mLinkedSpell, reducedCD);
+			mPlugin.mTimers.updateCooldown(mPlayer, abil.getInfo().mLinkedSpell, reducedCD);
 		}
 	}
 }

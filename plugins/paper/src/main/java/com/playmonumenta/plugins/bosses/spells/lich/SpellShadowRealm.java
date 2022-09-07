@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class SpellShadowRealm extends Spell {
 
@@ -37,13 +38,13 @@ public class SpellShadowRealm extends Spell {
 			p.removeIf(pl -> pl.getLocation().getY() >= mCenter.getY() - 8);
 			for (Player player : p) {
 				if (player.getLocation().getBlock().getType() != Material.AIR) {
-					player.teleport(shadowloc);
+					player.teleport(shadowloc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 				}
 				if (player.getLocation().getY() < mCenter.getY() - 8 && player.getLocation().distance(shadowloc) < mRange) {
 					AbilityUtils.increaseHealingPlayer(player, 20 * 2, -0.4, "Lich");
 				}
 				if (!SpellDimensionDoor.getShadowed().contains(player) && player.getLocation().getY() < mCenter.getY() - 8) {
-					player.teleport(player.getLocation().add(0, 43, 0));
+					player.teleport(player.getLocation().add(0, 43, 0), PlayerTeleportEvent.TeleportCause.UNKNOWN);
 				}
 			}
 			List<Player> shadowedplayers = Lich.playersInRange(shadowloc, mRange, true);

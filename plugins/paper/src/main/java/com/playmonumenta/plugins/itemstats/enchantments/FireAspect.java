@@ -20,7 +20,7 @@ import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 public class FireAspect implements Enchantment {
-	private static final int FIRE_ASPECT_DURATION = 20 * 4;
+	public static final int FIRE_ASPECT_DURATION = 20 * 4;
 
 	@Override
 	public String getName() {

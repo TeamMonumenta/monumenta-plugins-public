@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
@@ -50,7 +49,7 @@ public class GruesomeAlchemy extends PotionAbility {
 		mInfo.mShorthandName = "GA";
 		mInfo.mDescriptions.add("Swap hands while holding an Alchemist's Bag to switch to Gruesome potions. These potions deal 80% of the damage of your Brutal potions and do not afflict damage over time. Instead, they apply 10% Slow, 10% Vulnerability, and 10% Weaken for 8 seconds. If Alchemical Artillery is active, left clicking while holding a bow, crossbow, or trident will also swap modes.");
 		mInfo.mDescriptions.add("The Slow and Vulnerability are increased to 20%.");
-		mInfo.mDescriptions.add("Your Gruesome potions now additionally paralyze mobs for 8s.");
+		mInfo.mDescriptions.add("Your Gruesome potions now additionally paralyze (25% chance for 100% slowness for a second once a second) mobs for 8s.");
 
 		//This is just for the Alchemical Artillery integration
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -59,13 +58,13 @@ public class GruesomeAlchemy extends PotionAbility {
 		mVulnerabilityAmount = (isLevelOne() ? GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER : GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULNERABILITY);
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-			mAlchemicalArtillery = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+			mAlchemicalArtillery = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
 
-			mHasTaboo = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Taboo.class) != null;
-			mHasWardingRemedy = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WardingRemedy.class) != null;
-			mHasPanacea = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Panacea.class) != null;
+			mHasTaboo = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Taboo.class) != null;
+			mHasWardingRemedy = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, WardingRemedy.class) != null;
+			mHasPanacea = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Panacea.class) != null;
 		});
 	}
 

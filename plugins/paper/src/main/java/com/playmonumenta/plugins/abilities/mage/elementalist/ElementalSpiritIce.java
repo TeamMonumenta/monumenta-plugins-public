@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -64,11 +63,9 @@ public class ElementalSpiritIce extends Ability {
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, ElementalSpiritFire.CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mLevelBowMultiplier = isLevelOne() ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mElementalArrows = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mElementalArrows = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
+		});
 	}
 
 	@Override
@@ -101,7 +98,7 @@ public class ElementalSpiritIce extends Ability {
 							putOnCooldown();
 
 							Location centre = LocationUtils.getHalfHeightLocation(closestEnemy);
-							float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+							float spellDamage = ClassAbility.ELEMENTAL_ARROWS_ICE == ability ? mLevelDamage : SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 							World world = mPlayer.getWorld();
 
 							mSpiritPulser = new BukkitRunnable() {

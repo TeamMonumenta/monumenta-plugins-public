@@ -28,7 +28,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -165,7 +164,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 				mTick++;
 				if (mTick >= TELEPORT_TICKS) {
 					tpLoc.setDirection(mPlayer.getLocation().getDirection());
-					mPlayer.teleport(tpLoc, TeleportCause.UNKNOWN);
+					mPlayer.teleport(tpLoc);
 
 					mTeleporting = false;
 

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -39,9 +38,9 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private static final double ENHANCEMENT_POTION_EFFECT_BONUS = 0.2;
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_BOOST = 24 * 20;
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_DURATION = 3 * 60 * 20;
+
 	public static final String CHARM_CHANCE = "Heavenly Boon Potion Chance";
 	public static final String CHARM_DURATION = "Heavenly Boon Potion Duration";
-
 
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
@@ -68,11 +67,9 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		mDuration = CharmManager.getExtraDuration(player, CHARM_DURATION) + (isLevelOne() ? HEAVENLY_BOON_1_DURATION : HEAVENLY_BOON_2_DURATION);
 		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
+		});
 	}
 
 	/*
@@ -150,28 +147,28 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				int rand = FastUtils.RANDOM.nextInt(4);
 				if (rand == 0 || rand == 1) {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, mDuration, 0,
-					                                         "Splash Potion of Regeneration");
+						"Splash Potion of Regeneration");
 				} else if (rand == 2) {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, mDuration, 0,
-					                                         "Splash Potion of Absorption");
+						"Splash Potion of Absorption");
 				} else {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, mDuration, 0,
-					                                         "Splash Potion of Speed");
+						"Splash Potion of Speed");
 				}
 			} else {
 				int rand = FastUtils.RANDOM.nextInt(5);
 				if (rand == 0) {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, mDuration, 0,
-					                                         "Splash Potion of Regeneration");
+						"Splash Potion of Regeneration");
 				} else if (rand == 1) {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, mDuration, 0,
-					                                         "Splash Potion of Absorption");
+						"Splash Potion of Absorption");
 				} else if (rand == 2) {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, mDuration, 0,
-					                                         "Splash Potion of Speed");
+						"Splash Potion of Speed");
 				} else if (rand == 3) {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.INCREASE_DAMAGE, 1, mDuration, 0,
-					                                         "Splash Potion of Strength");
+						"Splash Potion of Strength");
 				} else {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.DAMAGE_RESISTANCE, 1, mDuration, 0,
 						"Splash Potion of Resistance");

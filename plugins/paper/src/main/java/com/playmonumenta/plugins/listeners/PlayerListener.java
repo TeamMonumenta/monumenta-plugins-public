@@ -1013,7 +1013,7 @@ public class PlayerListener implements Listener {
 								player.setGameMode(mode);
 
 							} else if (mTicks >= BED_TELE_TIME + 1) {
-								player.teleport(teleLoc);
+								player.teleport(teleLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 
 								world.playSound(teleLoc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1.0f, 1.3f);
 

@@ -29,8 +29,8 @@ import org.bukkit.util.Vector;
 
 public class BladeDance extends Ability {
 
-	private static final int DANCE_1_DAMAGE = 4;
-	private static final int DANCE_2_DAMAGE = 7;
+	private static final int DANCE_1_DAMAGE = 6;
+	private static final int DANCE_2_DAMAGE = 9;
 	private static final double SLOWNESS_AMPLIFIER = 1;
 	private static final int SLOW_DURATION_1 = 2 * 20;
 	private static final int SLOW_DURATION_2 = (int) (2.5 * 20);

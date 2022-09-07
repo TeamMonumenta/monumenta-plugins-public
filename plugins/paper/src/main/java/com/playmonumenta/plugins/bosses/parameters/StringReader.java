@@ -243,7 +243,7 @@ public class StringReader {
 		return null;
 	}
 
-	public <E extends Enum<?>> @Nullable E readEnum(E[] values) {
+	public @Nullable <E extends Enum<?>> E readEnum(E[] values) {
 		skipWhitespace();
 		String remain = remaining();
 

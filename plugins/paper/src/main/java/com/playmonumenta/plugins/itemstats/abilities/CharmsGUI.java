@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import net.kyori.adventure.text.Component;

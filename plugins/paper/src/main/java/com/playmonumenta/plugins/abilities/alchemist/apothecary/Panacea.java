@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -56,7 +55,7 @@ public class Panacea extends Ability {
 
 	public static final String CHARM_DAMAGE = "Panacea Damage";
 	public static final String CHARM_ABSORPTION = "Panacea Absorption Health";
-	public static final String CHARM_ABSORPTION_MAX = "Panacea Max Absorption";
+	public static final String CHARM_ABSORPTION_MAX = "Panacea Max Absorption Health";
 	public static final String CHARM_ABSORPTION_DURATION = "Panacea Absorption Duration";
 	public static final String CHARM_MOVEMENT_DURATION = "Panacea Movement Duration";
 	public static final String CHARM_MOVEMENT_SPEED = "Panacea Movement Speed";
@@ -77,12 +76,12 @@ public class Panacea extends Ability {
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mLinkedSpell = ClassAbility.PANACEA;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mDisplayItem = new ItemStack(Material.PURPLE_CONCRETE_POWDER, 1);
 		mSlowTicks = (isLevelOne() ? PANACEA_1_SLOW_TICKS : PANACEA_2_SLOW_TICKS) + CharmManager.getExtraDuration(mPlayer, CHARM_SLOW_DURATION);
 		mShield = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, isLevelOne() ? PANACEA_1_SHIELD : PANACEA_2_SHIELD);
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 		});
-		mDisplayItem = new ItemStack(Material.PURPLE_CONCRETE_POWDER, 1);
 	}
 
 	@Override
@@ -152,6 +151,7 @@ public class Panacea extends Ability {
 
 					mDegree += 12;
 					Vector vec;
+					double ratio = radius / PANACEA_RADIUS;
 					for (int i = 0; i < 2; i++) {
 						double radian1 = Math.toRadians(mDegree + (i * 180));
 						vec = new Vector(FastUtils.cos(radian1) * 0.325, 0, FastUtils.sin(radian1) * 0.325);
@@ -159,11 +159,11 @@ public class Panacea extends Ability {
 						vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 						Location l = mLoc.clone().add(vec);
-						new PartialParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_DARK_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, l, (int) (5 * ratio * ratio), 0.1 * ratio, 0.1, 0.1 * ratio, APOTHECARY_LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, l, (int) (5 * ratio * ratio), 0.1 * ratio, 0.1, 0.1 * ratio, APOTHECARY_DARK_COLOR).spawnAsPlayerActive(mPlayer);
 					}
-					new PartialParticle(Particle.SPELL_INSTANT, mLoc, 5, 0.35, 0.35, 0.35, 1).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SPELL_WITCH, mLoc, 5, 0.35, 0.35, 0.35, 1).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SPELL_INSTANT, mLoc, (int) (5 * ratio * ratio), 0.35 * ratio, 0.35, 0.35 * ratio, 1).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SPELL_WITCH, mLoc, (int) (5 * ratio * ratio), 0.35 * ratio, 0.35, 0.35 * ratio, 1).spawnAsPlayerActive(mPlayer);
 
 					if (!mReverse && (!mLoc.isChunkLoaded() || LocationUtils.collidesWithSolid(mLoc) || mTicks >= maxDuration)) {
 						mMobs = EntityUtils.getNearbyMobs(mLoc, (0.3 + moveSpeed) * maxDuration + 2, mPlayer);
@@ -175,9 +175,9 @@ public class Panacea extends Ability {
 					if (mReverse) {
 						if (mTicks <= 0) {
 							world.playSound(mLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.2f, 2.4f);
-							new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.5).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.SPELL, mPlayer.getLocation().add(0, 1, 0), 8, 0.35, 0.5, 0.35).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 25, 0.35, 0.5, 0.35, APOTHECARY_LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), (int) (8 * ratio * ratio), 0.25 * ratio, 0.5, 0.25 * ratio, 0.5).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.SPELL, mPlayer.getLocation().add(0, 1, 0), (int) (8 * ratio * ratio), 0.35 * ratio, 0.5, 0.35 * ratio).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), (int) (25 * ratio * ratio), 0.35 * ratio, 0.5, 0.35 * ratio, APOTHECARY_LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
 							this.cancel();
 						}
 

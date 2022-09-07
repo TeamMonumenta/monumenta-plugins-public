@@ -146,7 +146,8 @@ public class ViciousCombos extends Ability {
 		if (isEnhanced()) {
 			// Run this 1 tick late to prevent ByMyBlade triggering it immediately.
 			new BukkitRunnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					// Get the index of the ability in mAbilities, add to the order.
 					mLastAbility = event.getAbility();
 					mAbilityCastTime = mPlayer.getTicksLived();

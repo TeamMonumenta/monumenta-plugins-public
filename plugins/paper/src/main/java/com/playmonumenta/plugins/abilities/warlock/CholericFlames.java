@@ -110,8 +110,8 @@ public class CholericFlames extends Ability {
 				int debuffs = Math.min(AbilityUtils.getDebuffCount(mPlugin, mob), MAX_DEBUFFS);
 				if (debuffs > 0) {
 					playerItemStats.getItemStats().add(ItemStatUtils.EnchantmentType.INFERNO.getItemStat(), debuffs);
-					mPlugin.mEffectManager.addEffect(mob, SPREAD_EFFECT_ON_DEATH_EFFECT, new SpreadEffectOnDeath(SPREAD_EFFECT_DURATION, Inferno.INFERNO_EFFECT_NAME, SPREAD_EFFECT_RADIUS, SPREAD_EFFECT_DURATION_APPLIED));
 				}
+				mPlugin.mEffectManager.addEffect(mob, SPREAD_EFFECT_ON_DEATH_EFFECT, new SpreadEffectOnDeath(SPREAD_EFFECT_DURATION, Inferno.INFERNO_EFFECT_NAME, SPREAD_EFFECT_RADIUS, SPREAD_EFFECT_DURATION_APPLIED, false));
 			}
 			EntityUtils.applyFire(mPlugin, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_FIRE), mob, mPlayer, playerItemStats);
 

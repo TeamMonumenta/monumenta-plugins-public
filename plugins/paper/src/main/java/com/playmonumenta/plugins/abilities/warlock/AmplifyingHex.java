@@ -68,7 +68,6 @@ public class AmplifyingHex extends Ability {
 	public static final String CHARM_CONE = "Amplifying Hex Cone";
 	public static final String CHARM_EFFECT = "Amplifying Hex Damage per Effect Potency";
 
-
 	public AmplifyingHex(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Amplifying Hex");
 		mInfo.mScoreboardId = "AmplifyingHex";

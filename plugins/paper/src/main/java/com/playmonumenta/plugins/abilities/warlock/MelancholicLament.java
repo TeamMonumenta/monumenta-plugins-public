@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -43,14 +42,12 @@ public class MelancholicLament extends Ability {
 	public static final String CHARM_WEAKNESS = "Melancholic Lament Weakness Amplifier";
 	public static final String CHARM_RECOVERY = "Melancholic Lament Negative Effect Recovery";
 
-
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(235, 235, 224), 1.0f);
 
 	private final double mWeakenEffect;
 	private @Nullable JudgementChain mJudgementChain;
 
 	private int mEnhancementBonusDamage;
-
 
 	public MelancholicLament(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Melancholic Lament");
@@ -64,11 +61,9 @@ public class MelancholicLament extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
 		mWeakenEffect = CharmManager.getLevelPercentDecimal(player, CHARM_WEAKNESS) + (isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2);
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mJudgementChain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, JudgementChain.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mJudgementChain = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, JudgementChain.class);
+		});
 	}
 
 	@Override

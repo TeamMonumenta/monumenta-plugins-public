@@ -40,17 +40,17 @@ public class FrostNova extends Ability {
 	public static final double SLOW_MULTIPLIER_2 = 0.4;
 	public static final double REDUCTION_MULTIPLIER = 0.1;
 	public static final double ENHANCED_DAMAGE_MODIFIER = 1.15;
-	public static final double ENHANCED_COOLDOWN_REDUCTION = 0.9;
-	public static final int ENHANCED_FROZEN_DURATION = 1 * Constants.TICKS_PER_SECOND;
 	public static final int DURATION_TICKS = 4 * Constants.TICKS_PER_SECOND;
+	public static final int ENHANCED_FROZEN_DURATION = 1 * Constants.TICKS_PER_SECOND;
 	public static final int COOLDOWN_TICKS = 18 * Constants.TICKS_PER_SECOND;
+	public static final int ENHANCED_COOLDOWN_TICKS = 16 * Constants.TICKS_PER_SECOND;
+
 	public static final String CHARM_DAMAGE = "Frost Nova Damage";
 	public static final String CHARM_COOLDOWN = "Frost Nova Cooldown";
 	public static final String CHARM_RANGE = "Frost Nova Range";
 	public static final String CHARM_SLOW = "Frost Nova Slowness Amplifier";
 	public static final String CHARM_DURATION = "Frost Nova Slowness Duration";
 	public static final String CHARM_FROZEN = "Frost Nova Frozen Duration";
-
 
 	private final float mLevelDamage;
 	private final double mLevelSlowMultiplier;
@@ -83,13 +83,13 @@ public class FrostNova extends Ability {
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"Damage is increased by %s%% and cooldown is decreased by %s%%. Non elites and bosses are frozen for %ss, having their AI and gravity removed.",
+				"Damage is increased by %s%% and cooldown is reduced to %ss. Non elites and bosses are frozen for %ss, having their AI and gravity removed.",
 				StringUtils.multiplierToPercentage(ENHANCED_DAMAGE_MODIFIER - 1),
-				StringUtils.multiplierToPercentage(1 - ENHANCED_COOLDOWN_REDUCTION),
+				ENHANCED_COOLDOWN_TICKS / 20,
 				StringUtils.ticksToSeconds(ENHANCED_FROZEN_DURATION)
 			)
 		);
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isEnhanced() ? (int) (COOLDOWN_TICKS * ENHANCED_COOLDOWN_REDUCTION) : COOLDOWN_TICKS);
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isEnhanced() ? ENHANCED_COOLDOWN_TICKS : COOLDOWN_TICKS);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.ICE, 1);
 

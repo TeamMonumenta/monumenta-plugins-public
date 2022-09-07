@@ -41,7 +41,7 @@ public class CleansingRain extends Ability {
 	public static final String CHARM_RANGE = "Cleansing Rain Range";
 	public static final String CHARM_COOLDOWN = "Cleansing Rain Cooldown";
 
-	private double mRadius;
+	private final double mRadius;
 
 	public CleansingRain(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Cleansing Rain");
@@ -79,9 +79,10 @@ public class CleansingRain extends Ability {
 					return;
 				}
 
-				new PartialParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 4, 0), 5, 2.5, 0.35, 2.5, 0).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.WATER_DROP, mPlayer.getLocation().add(0, 2, 0), 15, 2.5, 2, 2.5, 0.001).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 2, 0), 1, 2, 1.5, 2, 0.001).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+				double ratio = mRadius / CLEANSING_RADIUS;
+				new PartialParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 4, 0), (int) (5 * ratio * ratio), 2.5 * ratio, 0.35, 2.5 * ratio, 0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.WATER_DROP, mPlayer.getLocation().add(0, 2, 0), (int) (15 * ratio * ratio), 2.5 * ratio, 2, 2.5 * ratio, 0.001).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 2, 0), (int) (1 * ratio * ratio), 2 * ratio, 1.5, 2 * ratio, 0.001).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 
 				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
 					if (isEnhanced()) {

@@ -23,6 +23,11 @@ public class InfernoDamage extends Effect {
 		mPlayer = player;
 	}
 
+	// Dummy constructor for copying
+	public InfernoDamage() {
+		this(0, 0, null);
+	}
+
 	@Override
 	public double getMagnitude() {
 		return mLevel;

@@ -64,7 +64,8 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		if (EntityUtils.isHostileMob(damagee)) {
+		// Set damage to 0 for non-boss hostile mobs to apply normal knockback. Bosses should not take any knockback
+		if (EntityUtils.isHostileMob(damagee) && !EntityUtils.isBoss(damagee)) {
 			event.setDamage(0);
 		} else {
 			event.setCancelled(true);

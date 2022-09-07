@@ -33,6 +33,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -436,7 +437,7 @@ public class DepthsParty {
 		int maxLootRooms = mIsSixPlayerMode ? MAX_LOOT_ROOMS_EXPANDED : MAX_LOOT_ROOMS;
 		if (mLootRoomLocations.size() > mLootRoomsUsed && maxLootRooms > mLootRoomsUsed) {
 			Location lootRoomLoc = new Location(p.getWorld(), mLootRoomLocations.get(mLootRoomsUsed).getX(), mLootRoomLocations.get(mLootRoomsUsed).getY(), mLootRoomLocations.get(mLootRoomsUsed).getZ());
-			p.teleport(lootRoomLoc);
+			p.teleport(lootRoomLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 			p.setBedSpawnLocation(lootRoomLoc, true);
 			p.addScoreboardTag(Constants.Tags.NO_TRANSPOSING);
 			mLootRoomsUsed++;

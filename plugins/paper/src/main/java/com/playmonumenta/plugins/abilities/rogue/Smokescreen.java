@@ -38,7 +38,6 @@ public class Smokescreen extends Ability {
 	public static final String CHARM_COOLDOWN = "Smokescreen Cooldown";
 	public static final String CHARM_RANGE = "Smokescreen Range";
 
-
 	private final double mWeakenEffect;
 
 	public Smokescreen(Plugin plugin, @Nullable Player player) {
@@ -57,7 +56,7 @@ public class Smokescreen extends Ability {
 			String.format("The Weaken debuff is increased to %s%%.",
 				(int)(WEAKEN_EFFECT_2 * 100)));
 		mInfo.mDescriptions.add(
-			String.format("Leave a %s block radius persistent cloud on the ground for %s seconds, enemies in the cloud gain the same debuffs for %s seconds, pulsing every second.",
+			String.format("Leave a %s block radius persistent cloud on the ground for %s seconds after activating. Enemies in the cloud gain the same debuffs for %s seconds, pulsing every second.",
 				ENHANCEMENT_SMOKECLOUD_RADIUS,
 				ENHANCEMENT_SMOKECLOUD_DURATION / 20,
 				ENHANCEMENT_SMOKECLOUD_EFFECT_DURATION));

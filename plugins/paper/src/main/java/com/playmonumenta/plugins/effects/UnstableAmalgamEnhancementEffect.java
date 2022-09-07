@@ -3,7 +3,11 @@ package com.playmonumenta.plugins.effects;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableAmalgam;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
@@ -31,9 +35,14 @@ public class UnstableAmalgamEnhancementEffect extends Effect {
 		potion.teleport(eyeLoc);
 		potion.setVelocity(dir);
 		//we may need to multiply the velocity a bit more?
-		mUnstableAmalgam.setEnhancementThrowPotion(potion, mStats);
+		mUnstableAmalgam.setEnhancementThrownPotion(potion, mStats);
 
 		clearEffect();
+	}
+
+	@Override
+	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
+		new PartialParticle(Particle.REDSTONE, mPlayer.getEyeLocation(), 12, 0.5, 0.5, 0.5, 0.3, new Particle.DustOptions(Color.WHITE, 0.8f)).spawnAsPlayerPassive(mPlayer);
 	}
 
 	@Override public String toString() {

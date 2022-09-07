@@ -2,8 +2,6 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -13,8 +11,6 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -41,21 +37,12 @@ public class LastBreath extends DepthsAbility {
 	public static final int RADIUS = 5;
 	public static final double KNOCKBACK_SPEED = 2;
 
-	private List<ClassAbility> mWindAbilities = new ArrayList<ClassAbility>();
-
 	public LastBreath(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayMaterial = Material.DRAGON_BREATH;
 		mTree = DepthsTree.WINDWALKER;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.LAST_BREATH;
-
-		mWindAbilities.add(ClassAbility.GUARDING_BOLT);
-		mWindAbilities.add(ClassAbility.SKYHOOK);
-		mWindAbilities.add(ClassAbility.SLIPSTREAM);
-		mWindAbilities.add(ClassAbility.WIND_WALK);
-		mWindAbilities.add(ClassAbility.WHIRLWIND);
-		mWindAbilities.add(ClassAbility.HOWLINGWINDS);
 	}
 
 	@Override
@@ -78,20 +65,18 @@ public class LastBreath extends DepthsAbility {
 
 		putOnCooldown();
 
-		for (Ability abil : AbilityManager.getManager().getPlayerAbilities(mPlayer).getAbilities()) {
-			AbilityInfo info = abil.getInfo();
-			ClassAbility spell = info.mLinkedSpell;
-			if (spell == null || spell == mInfo.mLinkedSpell) {
+		for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
+			if (abil == this) {
 				continue;
 			}
-			int totalCD = info.mCooldown;
-			int reducedCD = 0;
-			if (mWindAbilities.contains(spell)) {
+			int totalCD = abil.getModifiedCooldown();
+			int reducedCD;
+			if (abil instanceof DepthsAbility da && da.mTree == DepthsTree.WINDWALKER) {
 				reducedCD = totalCD;
 			} else {
 				reducedCD = (int) (totalCD * COOLDOWN_REDUCTION[mRarity - 1]);
 			}
-			mPlugin.mTimers.updateCooldown(mPlayer, spell, reducedCD);
+			mPlugin.mTimers.updateCooldown(mPlayer, abil.getInfo().mLinkedSpell, reducedCD);
 		}
 
 		Location loc = mPlayer.getLocation();

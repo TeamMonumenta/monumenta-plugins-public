@@ -269,8 +269,8 @@ public class Portal {
 			direction.setY(Math.abs(direction.getY()));
 		}
 		Vector fireballDirection = direction; // Dummy value to satisfy the compiler; not actually used.
-		if (entity instanceof Fireball) {
-			fireballDirection = ((Fireball)entity).getDirection();
+		if (entity instanceof Fireball fireball) {
+			fireballDirection = fireball.getDirection();
 		}
 
 		location = mPair.fromInterPortalCoords(toInterPortalCoords(location));
@@ -288,8 +288,8 @@ public class Portal {
 		location.setDirection(direction);
 		entity.teleport(location);
 		entity.setVelocity(velocity);
-		if (entity instanceof Fireball) {
-			((Fireball)entity).setDirection(fireballDirection);
+		if (entity instanceof Fireball fireball) {
+			fireball.setDirection(fireballDirection);
 		}
 	}
 }

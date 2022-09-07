@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -56,7 +57,7 @@ public class Stuck {
 									.decoration(TextDecoration.ITALIC, false));
 							break;
 						case 0:
-							mTarget.teleport(player.getWorld().getSpawnLocation());
+							mTarget.teleport(player.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
 							this.cancel();
 							return;
 						default:

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -59,7 +58,7 @@ public class Bezoar extends Ability {
 	public static final String CHARM_DAMAGE_DURATION = "Bezoar Damage Duration";
 	public static final String CHARM_DAMAGE = "Bezoar Damage Modifier";
 	public static final String CHARM_PHILOSOPHER_STONE_RATE = "Bezoar Philosopher Stone Spawn Rate";
-	public static final String CHARM_ABSORPTION = "Bezoar Absorption";
+	public static final String CHARM_ABSORPTION = "Bezoar Absorption Health";
 	public static final String CHARM_ABSORPTION_DURATION = "Bezoar Absorption Duration";
 	public static final String CHARM_POTIONS = "Bezoar Potions";
 	public static final String CHARM_PHILOSOPHER_STONE_POTIONS = "Bezoar Philosopher Stone Potions";
@@ -67,7 +66,7 @@ public class Bezoar extends Ability {
 
 	private int mKills = 0;
 	private @Nullable AlchemistPotions mAlchemistPotions;
-	private int mLingerTime;
+	private final int mLingerTime;
 
 	public Bezoar(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Bezoar");
@@ -76,17 +75,17 @@ public class Bezoar extends Ability {
 		mInfo.mShorthandName = "BZ";
 		mInfo.mDescriptions.add("Every 5th mob killed within 16 blocks of the Alchemist spawns a Bezoar that lingers for 10s. Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates 5% of max health every second for 2 seconds and reduces the duration of all current potion debuffs by 10s.");
 		mInfo.mDescriptions.add("The Bezoar now additionally grants +15% damage from all sources for 8s.");
-		mInfo.mDescriptions.add("When a Bezoar would spawn, 10% of the time it will summon a Philosopher's Stone instead. When the Philospher's Stone is picked up, the player and the Alchemist gain 12 absorption health for 3s and the Alchemist gains 3 potions.");
+		mInfo.mDescriptions.add("When a Bezoar would spawn, 10% of the time it will summon a Philosopher's Stone instead. When the Philosopher's Stone is picked up, the player and the Alchemist gain 12 absorption health for 3s and the Alchemist gains 3 potions.");
 		mDisplayItem = new ItemStack(Material.LIME_CONCRETE, 1);
 
 		mLingerTime = LINGER_TIME + CharmManager.getExtraDuration(mPlayer, CHARM_LINGER_TIME);
 
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 		});
 	}
 
-	public void dropBezoar(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void dropBezoar(EntityDeathEvent event) {
 		mKills = 0;
 		Location loc = event.getEntity().getLocation().add(0, 0.25, 0);
 		if (isEnhanced() && FastUtils.RANDOM.nextDouble() <= (PHILOSOPHER_STONE_SPAWN_RATE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_PHILOSOPHER_STONE_RATE))) {
@@ -248,7 +247,7 @@ public class Bezoar extends Ability {
 
 		mKills++;
 		if (shouldDrop()) {
-			dropBezoar(event, shouldGenDrops);
+			dropBezoar(event);
 		}
 	}
 

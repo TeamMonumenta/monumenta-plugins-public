@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.lang.reflect.Field;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
@@ -135,6 +137,25 @@ public abstract class Effect implements Comparable<Effect> {
 		String specificDisplay = getSpecificDisplay();
 		if (specificDisplay != null) {
 			return ChatColor.GREEN + specificDisplay + " " + ChatColor.GRAY + StringUtils.intToMinuteAndSeconds(mDuration / 20);
+		}
+		return null;
+	}
+
+	public final @Nullable Effect getCopy() {
+		try {
+			// You must create a dummy constructor with no parameters for the effect to be copyable
+			Effect clone = this.getClass().getConstructor().newInstance();
+			for (Field field : this.getClass().getDeclaredFields()) {
+				field.setAccessible(true);
+				field.set(clone, field.get(this));
+			}
+			return clone;
+		} catch (NoSuchMethodException e) {
+			MMLog.warning("Effect needs dummy constructor with no parameters in order to be copied. Caught exception: " + e.getMessage());
+			e.printStackTrace();
+		} catch (Exception e) {
+			MMLog.warning("Caught exception when making copy of an effect: " + e.getMessage());
+			e.printStackTrace();
 		}
 		return null;
 	}

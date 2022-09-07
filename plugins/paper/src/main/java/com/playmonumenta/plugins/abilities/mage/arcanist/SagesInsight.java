@@ -26,7 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DECAY_TIMER = 20 * 4;
-	private static final int MAX_STACKS = 8;
+	private static final int MAX_STACKS = 9;
 	private static final double SPEED_1 = 0.2;
 	private static final double SPEED_2 = 0.3;
 	private static final int SPEED_DURATION = 8 * 20;
@@ -39,7 +39,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 
 	private final int mResetSize;
 	private final int mMaxStacks;
-	private ClassAbility[] mResets;
+	private final ClassAbility[] mResets;
 	private final double mSpeed;
 	public static String CHARM_STACKS = "Sage's Insight Stack Trigger Threshold";
 	public static String CHARM_DECAY = "Sage's Insight Decay Duration";
@@ -47,7 +47,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	public static String CHARM_ABILITY = "Sage's Insight Ability Count";
 
 
-	private HashMap<ClassAbility, Boolean> mStacksMap;
+	private final HashMap<ClassAbility, Boolean> mStacksMap;
 
 	public SagesInsight(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Sage's Insight");

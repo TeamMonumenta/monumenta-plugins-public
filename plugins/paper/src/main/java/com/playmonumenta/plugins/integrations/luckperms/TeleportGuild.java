@@ -15,6 +15,7 @@ import net.luckperms.api.model.group.Group;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class TeleportGuild {
 	private static final String COMMAND = "teleportguild";
@@ -82,7 +83,7 @@ public class TeleportGuild {
 			player.sendMessage(ChatColor.RED + "The teleport for your guild is not set up");
 			player.sendMessage(ChatColor.RED + "Please ask a moderator to fix this");
 		} else {
-			player.teleport(loc);
+			player.teleport(loc, PlayerTeleportEvent.TeleportCause.COMMAND);
 		}
 	}
 }

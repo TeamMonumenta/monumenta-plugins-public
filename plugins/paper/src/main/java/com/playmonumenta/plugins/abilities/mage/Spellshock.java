@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -54,8 +53,9 @@ public class Spellshock extends Ability {
 	public static final int DURATION_TICKS = 6 * 20;
 	public static final int SLOW_DURATION = 10;
 	public static final double SLOW_MULTIPLIER = -0.3;
-	public static final int ENHANCEMENT_DAMAGE = 4;
-	public static final int ENHANCEMENT_RADIUS = 2;
+	public static final int ENHANCEMENT_DAMAGE = 6;
+	public static final double ENHANCEMENT_RADIUS = 2.5;
+
 	public static final String CHARM_SPELL = "Spellshock Spell Amplifier";
 	public static final String CHARM_MELEE = "Spellshock Melee Amplifier";
 	public static final String CHARM_SPEED = "Spellshock Speed Amplifier";
@@ -84,7 +84,7 @@ public class Spellshock extends Ability {
 				(int)(MELEE_BONUS_2 * 100),
 				(int)(SPEED_MULTIPLIER * 100)));
 		mInfo.mDescriptions.add(
-			String.format("If an enemy that had static applied on them at one point dies, they explode, dealing %s damage in a %s block radius, bypassing iframes.",
+			String.format("When an enemy that had ever had static applied dies, they explode, dealing %s damage to enemies in a %s block radius.",
 				ENHANCEMENT_DAMAGE,
 				ENHANCEMENT_RADIUS));
 		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
@@ -108,7 +108,7 @@ public class Spellshock extends Ability {
 					e.clearEffect();
 				}
 			}
-		} else if (event.getAbility() != null && event.getAbility() != Blizzard.ABILITY && event.getAbility() != ArcaneStrike.ABILITY && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
+		} else if (event.getAbility() != null && event.getAbility() != ClassAbility.BLIZZARD && event.getAbility() != ClassAbility.ARCANE_STRIKE && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
 			// Check if the mob has static, and trigger it if possible; otherwise, apply/refresh it
 			NavigableSet<Effect> effectGroupOriginal = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
 			if (effectGroupOriginal != null) {
@@ -188,7 +188,7 @@ public class Spellshock extends Ability {
 					}
 				} else {
 					mPlugin.mEffectManager.addEffect(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION_TICKS));
-					if (!mPlugin.mEffectManager.hasEffect(enemy, ENHANCEMENT_EFFECT_NAME)) {
+					if (isEnhanced() && !mPlugin.mEffectManager.hasEffect(enemy, ENHANCEMENT_EFFECT_NAME)) {
 						mPlugin.mEffectManager.addEffect(enemy, ENHANCEMENT_EFFECT_NAME,
 							new SpellShockExplosion(mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer), SpellPower.getSpellDamage(mPlugin, mPlayer, ENHANCEMENT_DAMAGE), mPlayer.getUniqueId()));
 					}

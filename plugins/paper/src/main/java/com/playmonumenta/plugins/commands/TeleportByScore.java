@@ -19,6 +19,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
 public class TeleportByScore extends GenericCommand {
@@ -129,7 +130,7 @@ public class TeleportByScore extends GenericCommand {
 		if (asyncFunctions != null) {
 			TeleportAsync.teleport(sender, asyncFunctions, entity, loc, TeleportAsync.getLocationRotation(loc));
 		} else {
-			entity.teleport(loc);
+			entity.teleport(loc, PlayerTeleportEvent.TeleportCause.COMMAND);
 		}
 	}
 }

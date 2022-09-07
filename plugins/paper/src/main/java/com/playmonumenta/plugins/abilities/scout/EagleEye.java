@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,9 +46,9 @@ public class EagleEye extends Ability {
 	public static final String CHARM_RADIUS = "Eagle Eye Radius";
 	public static final String CHARM_REFRESH = "Eagle Eye Refresh";
 
-	private double mVulnLevel;
+	private final double mVulnLevel;
 	private Team mEagleEyeTeam = null;
-	private List<LivingEntity> mEntitiesAffected = null; // Used for tracking Entities on a first hit.
+	private List<LivingEntity> mEntitiesAffected = new ArrayList<>(); // Used for tracking Entities on a first hit.
 
 	public EagleEye(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Eagle Eye");

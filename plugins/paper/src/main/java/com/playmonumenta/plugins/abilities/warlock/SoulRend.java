@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
@@ -62,11 +61,9 @@ public class SoulRend extends Ability {
 		mDisplayItem = new ItemStack(Material.POTION, 1);
 		mHeal = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, isLevelOne() ? HEAL_1 : HEAL_2);
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mDarkPact = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, DarkPact.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mDarkPact = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, DarkPact.class);
+		});
 	}
 
 	@Override

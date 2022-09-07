@@ -33,7 +33,7 @@ public class Expedite implements Infusion {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getAbility() == null) {
+		if (event.getAbility() == null || event.getType() == DamageEvent.DamageType.AILMENT) {
 			return;
 		}
 

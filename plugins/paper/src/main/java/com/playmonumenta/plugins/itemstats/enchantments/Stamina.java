@@ -18,7 +18,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class Stamina implements Enchantment {
 
@@ -31,11 +30,12 @@ public class Stamina implements Enchantment {
 		DamageEvent.DamageType.MELEE,
 		DamageEvent.DamageType.MELEE_ENCH,
 		DamageEvent.DamageType.MELEE_SKILL,
-		DamageEvent.DamageType.PROJECTILE
+		DamageEvent.DamageType.PROJECTILE,
+		DamageEvent.DamageType.PROJECTILE_SKILL
 	);
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Stamina";
 	}
 
@@ -46,7 +46,9 @@ public class Stamina implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		applyStamina(plugin, player, level);
+		if (AFFECTED_DAMAGE_TYPES.contains(event.getType())) {
+			applyStamina(plugin, player, level);
+		}
 	}
 
 	@Override
@@ -60,7 +62,7 @@ public class Stamina implements Enchantment {
 		if (s != null) {
 			currStamina = s.last().getMagnitude();
 		}
-		plugin.mEffectManager.addEffect(player, STAMINA_EFFECT, new PercentDamageDealt(DURATION, Math.min(currStamina + DAMAGE_BONUS, DAMAGE_CAP) * level, AFFECTED_DAMAGE_TYPES));
+		plugin.mEffectManager.addEffect(player, STAMINA_EFFECT, new PercentDamageDealt(DURATION, Math.min(currStamina + (DAMAGE_BONUS * level), DAMAGE_CAP * level), AFFECTED_DAMAGE_TYPES));
 
 		player.getWorld().playSound(
 			player.getLocation(),

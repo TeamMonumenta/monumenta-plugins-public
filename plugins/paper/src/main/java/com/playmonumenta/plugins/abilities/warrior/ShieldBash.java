@@ -53,7 +53,7 @@ public class ShieldBash extends Ability {
 		mInfo.mShorthandName = "SB";
 		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to deal 5 melee damage, stun for 1 second, and taunt. Elites and bosses are rooted instead of stunned. Cooldown: 8s.");
 		mInfo.mDescriptions.add("Additionally, apply damage, stun, and taunt to all enemies in a 2 block radius from the enemy you are looking at.");
-		mInfo.mDescriptions.add("While Shield Bash is on cooldown, if you block damage with a shield within " + ENHANCEMENT_BLOCKING_DURATION / 20 + "s of blocking, 50% of the cooldown of this skill is refreshed.");
+		mInfo.mDescriptions.add("Blocking damage with a shield within 0.5s of beginning to block refreshes 50% of this skill's cooldown.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, SHIELD_BASH_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.IRON_DOOR, 1);

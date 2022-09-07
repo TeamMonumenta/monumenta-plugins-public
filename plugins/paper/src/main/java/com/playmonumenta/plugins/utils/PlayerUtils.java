@@ -26,6 +26,7 @@ import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -57,7 +58,7 @@ public class PlayerUtils {
 		plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION,
 			new PotionEffect(PotionEffectType.SLOW, 5 * 20 * 60, 3, false, true));
 
-		player.teleport(player.getWorld().getSpawnLocation());
+		player.teleport(player.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.UNKNOWN);
 	}
 
 	public static List<Player> playersInLootScalingRange(Location location) {

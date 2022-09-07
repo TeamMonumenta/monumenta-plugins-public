@@ -168,6 +168,18 @@ public final class EffectManager implements Listener {
 			}
 		}
 
+		public @Nullable String getSource(Effect effect) {
+			for (EffectPriority priority : mPriorityMap.keySet()) {
+				HashMap<String, NavigableSet<Effect>> sourceMap = mPriorityMap.get(priority);
+				for (String source : sourceMap.keySet()) {
+					if (sourceMap.get(source).contains(effect)) {
+						return source;
+					}
+				}
+			}
+			return null;
+		}
+
 		/**
 		 * Gets all effects as a json object
 		 */
@@ -451,6 +463,14 @@ public final class EffectManager implements Listener {
 			effects.clearEffects();
 			mEntities.remove(entity);
 		}
+	}
+
+	public @Nullable String getSource(Entity entity, Effect effect) {
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			return effects.getSource(effect);
+		}
+		return null;
 	}
 
 	/**

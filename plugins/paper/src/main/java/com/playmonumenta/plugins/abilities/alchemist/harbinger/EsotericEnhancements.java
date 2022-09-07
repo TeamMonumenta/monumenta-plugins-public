@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
@@ -72,10 +71,10 @@ public class EsotericEnhancements extends PotionAbility {
 
 		mAppliedMobs = new HashMap<>();
 
-		mDamageMultiplier = getAbilityScore() == 1 ? ABERRATION_POTION_DAMAGE_MULTIPLIER_1 : ABERRATION_POTION_DAMAGE_MULTIPLIER_2;
+		mDamageMultiplier = isLevelOne() ? ABERRATION_POTION_DAMAGE_MULTIPLIER_1 : ABERRATION_POTION_DAMAGE_MULTIPLIER_2;
 
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 		});
 	}
 
@@ -107,14 +106,14 @@ public class EsotericEnhancements extends PotionAbility {
 				return;
 			}
 
-			AlchemicalAberrationBoss alchemicalAbberationBoss = BossUtils.getBossOfClass(aberration, AlchemicalAberrationBoss.class);
-			if (alchemicalAbberationBoss == null) {
+			AlchemicalAberrationBoss alchemicalAberrationBoss = BossUtils.getBossOfClass(aberration, AlchemicalAberrationBoss.class);
+			if (alchemicalAberrationBoss == null) {
 				MMLog.warning("Failed to get AlchemicalAberrationBoss for Alchemicalaberration");
 				return;
 			}
 
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ABERRATION_DAMAGE_RADIUS);
-			alchemicalAbberationBoss.spawn(mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * mDamageMultiplier), radius, ABERRATION_BLEED_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
+			alchemicalAberrationBoss.spawn(mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * mDamageMultiplier), radius, ABERRATION_BLEED_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
 
 			aberration.setMaxFuseTicks(aberration.getFuseTicks() + CharmManager.getExtraDuration(mPlayer, CHARM_FUSE));
 			aberration.setExplosionRadius((int) radius);

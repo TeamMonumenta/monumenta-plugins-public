@@ -14,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -55,7 +56,7 @@ public class SpellPortalPassiveLava extends Spell {
 				p.sendActionBar(ChatColor.RED + "You have 50% reduced healing for 6s");
 				PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
 				p.sendMessage(ChatColor.RED + "You feel the pure, flowing energy infest you, then spit you out.");
-				p.teleport(mStartLoc.clone().add(new Vector(0, 5, 0)));
+				p.teleport(mStartLoc.clone().add(new Vector(0, 5, 0)), PlayerTeleportEvent.TeleportCause.UNKNOWN);
 				p.playSound(p.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1.0f, 0.6f);
 			}
 		}

@@ -51,9 +51,9 @@ public class DarkPact extends Ability {
 	public static final String CHARM_DAMAGE = "Dark Pact Melee Damage";
 	public static final String CHARM_REFRESH = "Dark Pact Refresh";
 	public static final String CHARM_ATTACK_SPEED = "Dark Pact Attack Speed Amplifier";
-	public static final String CHARM_CAP = "Dark Pact Absorption Cap";
+	public static final String CHARM_CAP = "Dark Pact Absorption Health Cap";
 	public static final String CHARM_DURATION = "Dark Pact Buff Duration";
-	public static final String CHARM_ABSORPTION = "Dark Pact Absorption Per Kill";
+	public static final String CHARM_ABSORPTION = "Dark Pact Absorption Health Per Kill";
 
 	private final double mPercentDamageDealt;
 	private final double mPercentAtks;

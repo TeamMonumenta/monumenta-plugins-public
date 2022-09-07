@@ -76,9 +76,8 @@ public class GraspingClaws extends Ability {
 	public static final String CHARM_SLOW = "Grasping Claws Slowness Amplifier";
 	public static final String CHARM_RADIUS = "Grasping Claws Radius";
 	public static final String CHARM_DURATION = "Grasping Claws Slowness Duration";
-	public static final String CHARM_ARROW = "Grasping Claws Arrow Range";
-
-
+	public static final String CHARM_PROJ_SPEED = "Grasping Claws Projectile Speed";
+	public static final String CHARM_CAGE_RADIUS = "Grasping Claws Cage Radius";
 
 	private final double mAmplifier;
 	private final double mDamage;
@@ -90,9 +89,9 @@ public class GraspingClaws extends Ability {
 		mInfo.mShorthandName = "GC";
 		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow or crossbow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given 20% Slowness for 8 seconds and take 3 magic damage. Cooldown: 16s.");
 		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, and their Slowness is increased to 30%.");
-		mInfo.mDescriptions.add("At the location of the arrow's landing, summon an impenetrable cage. Non-boss mobs within a 6 block radius of the location cannot enter or exit the cage, and players within the cage are granted +10% damage and 5% max health healing every 2 seconds. The cage disappears after 6 seconds. Mobs that are immune to crowd control cannot be trapped.");
+		mInfo.mDescriptions.add("At the location that the arrow lands, summon an impenetrable cage. Non-boss mobs within a 6 block radius of the location cannot enter or exit the cage, and players within the cage are granted +10% damage and 5% max health healing every 2 seconds. The cage disappears after 6 seconds. Mobs that are immune to crowd control cannot be trapped.");
 		mInfo.mLinkedSpell = ClassAbility.GRASPING_CLAWS;
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BOW, 1);
@@ -113,6 +112,7 @@ public class GraspingClaws extends Ability {
 			arrow.setShooter(mPlayer);
 			arrow.setDamage(0);
 			arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
+			arrow.setVelocity(arrow.getVelocity().multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PROJ_SPEED, 1)));
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SPELL_WITCH);
 			mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 			putOnCooldown();
@@ -162,7 +162,7 @@ public class GraspingClaws extends Ability {
 			final List<LivingEntity> mMobsHitThisTick = new ArrayList<>();
 			boolean mHitboxes = false;
 			World mWorld = loc.getWorld();
-			double mRadius = CharmManager.getRadius(mPlayer, CHARM_ARROW, CAGE_RADIUS);
+			double mRadius = CharmManager.getRadius(mPlayer, CHARM_CAGE_RADIUS, CAGE_RADIUS);
 
 			List<Integer> mDegrees1 = new ArrayList<>();
 			List<Integer> mDegrees2 = new ArrayList<>();

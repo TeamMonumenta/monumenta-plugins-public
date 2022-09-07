@@ -29,9 +29,8 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class AdvancingShadows extends Ability {
@@ -46,7 +45,7 @@ public class AdvancingShadows extends Ability {
 	private static final double DAMAGE_BONUS_2 = 0.4;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
 	private static final double ENHANCEMENT_BONUS_DAMAGE = 0.2;
-	private static final long ENHANCEMENT_BONUS_DAMAGE_DURATION = 20 * 5;
+	private static final int ENHANCEMENT_BONUS_DAMAGE_DURATION = 20 * 5;
 
 	public static final String CHARM_DAMAGE = "Advancing Shadows Damage Multiplier";
 	public static final String CHARM_COOLDOWN = "Advancing Shadows Cooldown";
@@ -55,10 +54,10 @@ public class AdvancingShadows extends Ability {
 
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "AdvancingShadowsPercentDamageDealtEffect";
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE, DamageType.MELEE_ENCH, DamageType.MELEE_SKILL);
+	private static final String ENHANCEMENT_EFFECT_NAME = "AdvancingShadowsEnhancementPercentDamageDealtEffect";
 
 	private @Nullable LivingEntity mTarget = null;
-	LivingEntity mMarked = null;
-	private @Nullable BladeDance mBladeDance;
+	private boolean mHasBladeDance;
 
 	private final double mPercentDamageDealt;
 	private final double mActivationRange;
@@ -91,11 +90,9 @@ public class AdvancingShadows extends Ability {
 		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2);
 		mActivationRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, (isLevelOne() ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2));
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mBladeDance = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, BladeDance.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mHasBladeDance = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, BladeDance.class) != null;
+		});
 	}
 
 	@Override
@@ -171,7 +168,7 @@ public class AdvancingShadows extends Ability {
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
 
 			if (loc.distance(entity.getLocation()) <= origDistance) {
-				mPlayer.teleport(loc, TeleportCause.UNKNOWN);
+				mPlayer.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
 			}
 
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES));
@@ -185,13 +182,7 @@ public class AdvancingShadows extends Ability {
 			}
 
 			if (isEnhanced()) {
-				mMarked = mTarget;
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						mMarked = null;
-					}
-				}.runTaskLater(mPlugin, ENHANCEMENT_BONUS_DAMAGE_DURATION);
+				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCEMENT_EFFECT_NAME, new PercentDamageDealt(ENHANCEMENT_BONUS_DAMAGE_DURATION, ENHANCEMENT_BONUS_DAMAGE, null, 0, (player, enemy) -> enemy == entity));
 			}
 
 			new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0).spawnAsPlayerActive(mPlayer);
@@ -207,7 +198,7 @@ public class AdvancingShadows extends Ability {
 		if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			if (!mPlayer.isSneaking()) {
 				// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
-				if (mBladeDance != null && mPlayer.getLocation().getPitch() >= 50) {
+				if (mHasBladeDance && mPlayer.getLocation().getPitch() >= 50) {
 					return false;
 				}
 
@@ -234,17 +225,6 @@ public class AdvancingShadows extends Ability {
 				}
 			}
 		}
-		return false;
-	}
-
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		// If enemy to be damaged is the same as marked enemy
-		if (mMarked != null && mMarked.equals(enemy)) {
-			event.setDamage(event.getDamage() * (1 + ENHANCEMENT_BONUS_DAMAGE));
-		}
-
-		// Increases event damage and simply stops.
 		return false;
 	}
 }

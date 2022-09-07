@@ -63,6 +63,7 @@ public class ThunderStep extends Ability {
 	public static final int BACK_TELEPORT_MAX_DELAY = 3 * 20;
 	public static final int ENHANCEMENT_BONUS_DAMAGE_TIMER = 30 * 20;
 	public static final int ENHANCEMENT_PARALYZE_DURATION = 5 * 20;
+
 	public static final String CHARM_DAMAGE = "Thunder Step Damage";
 	public static final String CHARM_STUN = "Thunder Step Stun Duration";
 	public static final String CHARM_COOLDOWN = "Thunder Step Cooldown";
@@ -106,9 +107,8 @@ public class ThunderStep extends Ability {
 			)
 		);
 		mInfo.mDescriptions.add(
-			String.format("You are now able to recast this skill after the original cast within %ss." +
-				              " If you do, you get teleported back to the original starting location, stunning but not damaging nearby mobs." +
-				              " If you instead choose to not recast the skill, your next Thunder Step within %ss will paralyze enemies for %ss.",
+			String.format("Within %ss of casting, use the same trigger to return to the original starting location, stunning but not damaging nearby mobs." +
+				              " If you do not do so, your next Thunder Step within %ss will paralyze enemies for %ss.",
 				BACK_TELEPORT_MAX_DELAY / 20,
 				ENHANCEMENT_BONUS_DAMAGE_TIMER / 20,
 				ENHANCEMENT_PARALYZE_DURATION / 20
@@ -150,7 +150,7 @@ public class ThunderStep extends Ability {
 
 					doDamage(mPlayer.getLocation(), 0, false);
 					mLastCastLocation.setDirection(mPlayer.getLocation().getDirection());
-					mPlayer.teleport(mLastCastLocation, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+					mPlayer.teleport(mLastCastLocation);
 					doDamage(mLastCastLocation, 0, false);
 
 					// prevent further back teleports as well as paralyze of any further casts
@@ -200,7 +200,7 @@ public class ThunderStep extends Ability {
 					return;
 				}
 
-				mPlayer.teleport(playerEndLocation, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+				mPlayer.teleport(playerEndLocation);
 				doDamage(playerEndLocation, spellDamage, doParalyze);
 			}
 		}
@@ -241,8 +241,9 @@ public class ThunderStep extends Ability {
 
 	@Override
 	public void playerTeleportEvent(PlayerTeleportEvent event) {
-		// Might trigger too often
-		mLastCastLocation = null;
+		if (event.getCause() != PlayerTeleportEvent.TeleportCause.PLUGIN) {
+			mLastCastLocation = null;
+		}
 	}
 
 }

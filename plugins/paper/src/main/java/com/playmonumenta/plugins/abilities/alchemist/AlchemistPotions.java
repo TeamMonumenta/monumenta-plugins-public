@@ -257,7 +257,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		if (playerItemStats != null) {
 			Location loc = potion.getLocation();
 
-			createAura(loc, getPotionRadius());
+			createAura(loc, potion, playerItemStats);
 
 			boolean isGruesome = isGruesome(potion);
 
@@ -276,15 +276,9 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		return true;
 	}
 
-	public void createAura(Location loc) {
+	public void createAura(Location loc, ThrownPotion potion, ItemStatManager.PlayerItemStats playerItemStats) {
 		for (PotionAbility potionAbility : mPotionAbilities) {
-			potionAbility.createAura(loc);
-		}
-	}
-
-	public void createAura(Location loc, double radius) {
-		for (PotionAbility potionAbility : mPotionAbilities) {
-			potionAbility.createAura(loc, radius);
+			potionAbility.createAura(loc, potion, playerItemStats);
 		}
 	}
 

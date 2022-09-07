@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -101,11 +100,11 @@ public class HandOfLight extends Ability {
 
 		mDamageMode = player != null && player.getScoreboardTags().contains(DAMAGE_MODE_TAG);
 
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
 
-			mHasCleansingRain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, CleansingRain.class) != null;
-			mHasLuminousInfusion = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, LuminousInfusion.class) != null;
+			mHasCleansingRain = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, CleansingRain.class) != null;
+			mHasLuminousInfusion = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, LuminousInfusion.class) != null;
 		});
 	}
 
@@ -147,8 +146,10 @@ public class HandOfLight extends Ability {
 
 		if (!mDamageMode) {
 			List<Player> nearbyPlayers = PlayerUtils.otherPlayersInRange(mPlayer, CharmManager.getRadius(mPlayer, CHARM_RANGE, HEALING_RADIUS), true);
-			nearbyPlayers.removeIf(p -> (!isEnhanced() && playerDir.dot(p.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && p.getLocation().distance(userLoc) > 2)
-				                            || p.getScoreboardTags().contains("disable_class"));
+			if (!isEnhanced()) {
+				nearbyPlayers.removeIf(p -> playerDir.dot(p.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && p.getLocation().distance(userLoc) > 2);
+			}
+			nearbyPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class"));
 			if (nearbyPlayers.size() > 0) {
 				double healthHealed = 0;
 				for (Player p : nearbyPlayers) {
@@ -173,12 +174,14 @@ public class HandOfLight extends Ability {
 				if (isEnhanced()) {
 					cooldown *= 1 - Math.min((healthHealed / 4) * ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED, ENHANCEMENT_COOLDOWN_REDUCTION_MAX);
 				}
-				putOnCooldown((int)cooldown);
+				putOnCooldown((int) cooldown);
 			}
 		} else {
 			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(userLoc, CharmManager.getRadius(mPlayer, CHARM_RANGE, DAMAGE_RADIUS));
-			nearbyMobs.removeIf(mob -> (!isEnhanced() && playerDir.dot(mob.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && mob.getLocation().distance(userLoc) > 2)
-				                           || mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+			if (!isEnhanced()) {
+				nearbyMobs.removeIf(mob -> playerDir.dot(mob.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && mob.getLocation().distance(userLoc) > 2);
+			}
+			nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
 			List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
 			undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob, mCrusade));
@@ -237,8 +240,8 @@ public class HandOfLight extends Ability {
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 
 		//Must be holding weapon, tool, or shield
-		if (ItemUtils.isSomeBow(mainhand) || ItemUtils.isSomePotion(mainhand) || mainhand.getType().isBlock()
-			    || mainhand.getType().isEdible() || mainhand.getType() == Material.TRIDENT || mainhand.getType() == Material.COMPASS) {
+		if (ItemUtils.isBowOrTrident(mainhand) || ItemUtils.isSomePotion(mainhand) || mainhand.getType().isBlock()
+			    || mainhand.getType().isEdible() || mainhand.getType() == Material.COMPASS) {
 			return false;
 		}
 

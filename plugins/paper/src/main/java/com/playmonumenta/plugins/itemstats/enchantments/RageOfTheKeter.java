@@ -34,9 +34,6 @@ public class RageOfTheKeter implements Enchantment {
 	private static final int DURATION = 20 * 15;
 	private static final int COOLDOWN = 20 * 25;
 	private static final String ATTR_NAME = "KeterExtraSpeedAttr";
-	public static final String CHARM_COOLDOWN = "Rage of the Keter Cooldown";
-	public static final String CHARM_DAMAGE = "Rage of the Keter Damage";
-	public static final String CHARM_SPEED = "Rage of the Keter Speed";
 	public static final Material COOLDOWN_ITEM = Material.POPPED_CHORUS_FRUIT;
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
 		DamageType.MELEE,
@@ -46,6 +43,10 @@ public class RageOfTheKeter implements Enchantment {
 		DamageType.PROJECTILE_SKILL,
 		DamageType.MAGIC
 	);
+
+	public static final String CHARM_COOLDOWN = "Rage of the Keter Cooldown";
+	public static final String CHARM_DAMAGE = "Rage of the Keter Damage";
+	public static final String CHARM_SPEED = "Rage of the Keter Speed";
 
 	private static final Particle.DustOptions OLIVE_COLOR = new Particle.DustOptions(Color.fromRGB(128, 128, 0), 1.0f);
 	private static final Particle.DustOptions GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(64, 128, 0), 1.0f);
@@ -78,8 +79,8 @@ public class RageOfTheKeter implements Enchantment {
 
 			event.setCancelled(true);
 			World world = player.getWorld();
-			plugin.mEffectManager.addEffect(player, "KeterExtraDamage", new PercentDamageDealt(DURATION, DAMAGE_PERCENT + CharmManager.getLevelPercent(player, CHARM_DAMAGE), AFFECTED_DAMAGE_TYPES));
-			plugin.mEffectManager.addEffect(player, "KeterExtraSpeed", new PercentSpeed(DURATION, SPEED_PERCENT + CharmManager.getLevelPercent(player, CHARM_SPEED), ATTR_NAME));
+			plugin.mEffectManager.addEffect(player, "KeterExtraDamage", new PercentDamageDealt(DURATION, DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE), AFFECTED_DAMAGE_TYPES));
+			plugin.mEffectManager.addEffect(player, "KeterExtraSpeed", new PercentSpeed(DURATION, SPEED_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_SPEED), ATTR_NAME));
 			plugin.mEffectManager.addEffect(player, "KeterParticles", new Aesthetics(DURATION,
 					(entity, fourHertz, twoHertz, oneHertz) -> {
 						// Tick effect

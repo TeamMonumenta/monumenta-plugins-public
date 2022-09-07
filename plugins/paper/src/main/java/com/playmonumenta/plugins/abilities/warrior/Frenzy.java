@@ -40,7 +40,7 @@ public class Frenzy extends Ability {
 		mInfo.mShorthandName = "Fnz";
 		mInfo.mDescriptions.add("Gain +30% Attack Speed for 5 seconds after killing a mob.");
 		mInfo.mDescriptions.add("Gain +40% Attack Speed and +20% Speed for 5 seconds after killing a mob.");
-		mInfo.mDescriptions.add("Additionally, your next melee damage after getting a kill, within 5 seconds, deals 20% extra damage.");
+		mInfo.mDescriptions.add("Additionally, your next melee damage within 5 seconds after getting a kill deals 20% extra damage.");
 		mDisplayItem = new ItemStack(Material.FEATHER, 1);
 
 		mPercentAttackSpeedEffect = (isLevelOne() ? PERCENT_ATTACK_SPEED_EFFECT_1 : PERCENT_ATTACK_SPEED_EFFECT_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK_SPEED);

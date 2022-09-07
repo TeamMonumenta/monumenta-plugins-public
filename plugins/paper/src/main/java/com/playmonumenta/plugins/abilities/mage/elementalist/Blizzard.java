@@ -32,7 +32,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class Blizzard extends Ability {
 	public static final String NAME = "Blizzard";
-	public static final ClassAbility ABILITY = ClassAbility.BLIZZARD;
 
 	public static final int DAMAGE_1 = 3;
 	public static final int DAMAGE_2 = 5;
@@ -59,7 +58,7 @@ public class Blizzard extends Ability {
 
 	public Blizzard(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = ABILITY;
+		mInfo.mLinkedSpell = ClassAbility.BLIZZARD;
 
 		mInfo.mScoreboardId = NAME;
 		mInfo.mShorthandName = "Bl";

@@ -41,8 +41,8 @@ public class WardingRemedy extends Ability {
 	public static final String CHARM_COOLDOWN = "Warding Remedy Cooldown";
 	public static final String CHARM_PULSES = "Warding Remedy Pulses";
 	public static final String CHARM_FREQUENCY = "Warding Remedy Pulse Frequency";
-	public static final String CHARM_ABSORPTION = "Warding Remedy Absorption";
-	public static final String CHARM_MAX_ABSORPTION = "Warding Remedy Max Absorption";
+	public static final String CHARM_ABSORPTION = "Warding Remedy Absorption Health";
+	public static final String CHARM_MAX_ABSORPTION = "Warding Remedy Max Absorption Health";
 	public static final String CHARM_ABSORPTION_DURATION = "Warding Remedy Absorption Duration";
 	public static final String CHARM_RADIUS = "Warding Remedy Radius";
 	public static final String CHARM_HEALING = "Warding Remedy Healing Bonus";

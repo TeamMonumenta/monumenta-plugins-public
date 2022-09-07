@@ -67,6 +67,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	private int mStacks;
 	private final int mStackLimit;
 	private final double mDamage;
+	private @Nullable BukkitRunnable mRunnable;
 
 	public GloriousBattle(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Glorious Battle");
@@ -104,7 +105,11 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		new PartialParticle(Particle.CRIMSON_SPORE, location, 25, 1, 0, 1, 0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CRIT, location, 15, 1, 0, 1, 0).spawnAsPlayerActive(mPlayer);
 
-		new BukkitRunnable() {
+		if (mRunnable != null) {
+			mRunnable.cancel();
+		}
+
+		mRunnable = new BukkitRunnable() {
 			int mT = 0;
 			@Override
 			public void run() {
@@ -143,7 +148,8 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 10, 1);
+		};
+		mRunnable.runTaskTimer(mPlugin, 10, 1);
 	}
 
 	@Override

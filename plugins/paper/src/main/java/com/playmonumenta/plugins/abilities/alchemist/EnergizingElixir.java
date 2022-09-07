@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -68,9 +67,9 @@ public class EnergizingElixir extends Ability {
 
 		mSpeedAmp = (isLevelOne() ? SPEED_AMPLIFIER_1 : SPEED_AMPLIFIER_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 		mStacks = 0;
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-			mHasUnstableAmalgam = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, UnstableAmalgam.class) != null;
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+			mHasUnstableAmalgam = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, UnstableAmalgam.class) != null;
 		});
 	}
 

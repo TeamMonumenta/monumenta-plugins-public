@@ -28,7 +28,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.Vector;
 
 public class DepthsAdvancingShadows extends DepthsAbility {
@@ -125,7 +124,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
 
 			if (!(mPlayer.getInventory().getItemInOffHand().getType() == Material.SHIELD) && (loc.distance(entity.getLocation()) <= origDistance)) {
-				mPlayer.teleport(loc, TeleportCause.UNKNOWN);
+				mPlayer.teleport(loc);
 			}
 			playerLoc = mPlayer.getLocation();
 

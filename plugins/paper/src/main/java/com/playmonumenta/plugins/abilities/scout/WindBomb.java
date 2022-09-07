@@ -39,8 +39,8 @@ public class WindBomb extends Ability {
 	private static final int SLOW_FALL_EFFECT = 0;
 	private static final int COOLDOWN_1 = 20 * 15;
 	private static final int COOLDOWN_2 = 20 * 10;
-	private static final int DAMAGE_1 = 6;
-	private static final int DAMAGE_2 = 8;
+	private static final int DAMAGE_1 = 8;
+	private static final int DAMAGE_2 = 10;
 	private static final double MIDAIR_DAMAGE_BONUS = 0.2;
 	private static final int RADIUS = 3;
 	private static final double VELOCITY = 1.5;

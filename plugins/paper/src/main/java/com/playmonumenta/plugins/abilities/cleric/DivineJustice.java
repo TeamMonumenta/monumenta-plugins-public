@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.cleric;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -53,7 +52,7 @@ public class DivineJustice extends Ability {
 	public static final double ENHANCEMENT_ASH_CHANCE = 0.33;
 	public static final int ENHANCEMENT_ASH_DURATION = 10 * 20;
 	public static final double ENHANCEMENT_ASH_BONUS_DAMAGE = 0.025;
-	public static final double ENHANCEMENT_BONUS_DAMAGE_MAX = 0.1;
+	public static final double ENHANCEMENT_BONUS_DAMAGE_MAX = 0.15;
 	public static final int ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION = 30 * 20;
 	public static final int ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION = 5 * 60 * 20;
 	public static final String ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME = "DivineJusticeBonusDamageEffect";
@@ -98,7 +97,7 @@ public class DivineJustice extends Ability {
 		mInfo.mDescriptions.add(
 			String.format(
 				"Undead killed have a %s%% chance to drop Purified Ash which disappears after %ss." +
-					" Clerics who pick it up get %s%% increased undead damage for %ss." +
+					" Clerics with this ability who pick it up get %s%% increased undead damage for %ss." +
 					" This effect stacks up to %s%% and the duration is refreshed on each pickup." +
 					" Bone Shards can be consumed from the inventory by right-clicking to get the max effect for %s minutes.",
 				StringUtils.multiplierToPercentage(ENHANCEMENT_ASH_CHANCE),
@@ -113,11 +112,9 @@ public class DivineJustice extends Ability {
 
 		mDoHealingAndMultiplier = isLevelTwo();
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
+		});
 	}
 
 	@Override
@@ -284,6 +281,16 @@ public class DivineJustice extends Ability {
 			new PercentDamageDealt(fromBoneShard ? ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION : ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION,
 				fromBoneShard ? ENHANCEMENT_BONUS_DAMAGE_MAX : Math.min(existingEffectAmount + ENHANCEMENT_ASH_BONUS_DAMAGE, ENHANCEMENT_BONUS_DAMAGE_MAX),
 				null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy, mCrusade)));
+	}
+
+	@Override
+	public void remove(Player p) {
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			DivineJustice dj = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(p, DivineJustice.class);
+			if (dj == null || !dj.isEnhanced()) {
+				mPlugin.mEffectManager.clearEffects(p, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
+			}
+		}, 5);
 	}
 
 }
