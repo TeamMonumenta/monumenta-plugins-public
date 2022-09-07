@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warlock;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
 import java.util.HashMap;
 import javax.annotation.Nullable;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -43,6 +45,9 @@ public class CursedWound extends Ability {
 	private static final int CURSED_WOUND_EXTENDED_DURATION = 2 * 20;
 	private static final String DOT_EFFECT_NAME = "CursedWoundDamageOverTimeEffect";
 	private static final double DAMAGE_PER_EFFECT = 2;
+
+	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(217, 217, 217), 1.0f);
+	private static final Particle.DustOptions DARK_COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
 	public static final String CHARM_DAMAGE = "Cursed Wound Damage Modifier";
 	public static final String CHARM_RADIUS = "Cursed Wound Radius";
@@ -84,6 +89,8 @@ public class CursedWound extends Ability {
 				}
 				mStoredPotionEffects = null;
 				mStoredCustomEffects = null;
+
+				mPlugin.mEffectManager.clearEffects(mPlayer, "WoundEnhanceParticle");
 			}
 
 			BlockData fallingDustData = Material.ANVIL.createBlockData();
@@ -165,6 +172,17 @@ public class CursedWound extends Ability {
 			if (!mStoredPotionEffects.isEmpty() || !mStoredCustomEffects.isEmpty()) {
 				//It would be really cool if there were some particles here that were like empowering the scythe but I'm too lazy to make them
 				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_ARMOR_EQUIP_CHAIN, 1, 0.8f);
+				mPlugin.mEffectManager.addEffect(mPlayer, "WoundEnhanceParticle", new Aesthetics(99999,
+					(player, fourHertz, twoHertz, oneHertz) -> {
+						Player p = (Player) player;
+						Location rightHand = PlayerUtils.getRightSide(p.getEyeLocation(), 0.45).subtract(0, .8, 0);
+						Location leftHand = PlayerUtils.getRightSide(p.getEyeLocation(), -0.45).subtract(0, .8, 0);
+						new PartialParticle(Particle.REDSTONE, leftHand, 1, 0.05f, 0.05f, 0.05f, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, rightHand, 1, 0.05f, 0.05f, 0.05f, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, leftHand, 1, 0.05f, 0.05f, 0.05f, 0, DARK_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, rightHand, 1, 0.05f, 0.05f, 0.05f, 0, DARK_COLOR).spawnAsPlayerActive(mPlayer);
+					}, (player) -> { })
+				);
 			}
 		}
 	}

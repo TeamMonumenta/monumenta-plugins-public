@@ -1,16 +1,19 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.EnumSet;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class NegateDamage extends Effect {
 	private int mCount;
 	private @Nullable EnumSet<DamageEvent.DamageType> mAffectedTypes;
+	private @Nullable PartialParticle mParticleData;
 
 	public NegateDamage(int duration, int count) {
 		super(duration);
@@ -24,6 +27,13 @@ public class NegateDamage extends Effect {
 		mAffectedTypes = affectedTypes;
 	}
 
+	public NegateDamage(int duration, int count, @Nullable EnumSet<DamageEvent.DamageType> affectedTypes, @Nullable PartialParticle particleData) {
+		super(duration);
+		mCount = count;
+		mAffectedTypes = affectedTypes;
+		mParticleData = particleData;
+	}
+
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
 		//TODO this might have order issues, i.e. triggering after riposte
@@ -32,6 +42,9 @@ public class NegateDamage extends Effect {
 			World world = entity.getWorld();
 			Location loc = entity.getLocation();
 			world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 1, 1.2f);
+			if (mParticleData != null) {
+				mParticleData.spawnAsPlayerActive((Player) entity);
+			}
 			mCount--;
 		}
 	}
