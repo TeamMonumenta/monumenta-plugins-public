@@ -72,11 +72,20 @@ public class MobListener implements Listener {
 	private static final int SPAWNER_TORCH_SPAWN_CYCLE_SKIPS = 1;
 
 	/**
-	 * Set of mobs that may spawn both on land and floating in water.
+	 * Set of entity types that may spawn both on land and floating in water.
 	 */
 	private static final EnumSet<EntityType> AMPHIBIOUS_MOBS = EnumSet.of(
 		EntityType.DROWNED,
 		EntityType.GUARDIAN
+	);
+
+	/**
+	 * Set of entity types that may spawn in the air despite not being {@link EntityUtils#isFlyingMob(EntityType) flying mobs}.
+	 */
+	private static final EnumSet<EntityType> FALLING_MOBS = EnumSet.of(
+		EntityType.CREEPER,
+		EntityType.SPLASH_POTION,
+		EntityType.PRIMED_TNT
 	);
 
 	private final Plugin mPlugin;
@@ -123,7 +132,7 @@ public class MobListener implements Listener {
 		EntityType type = event.getType();
 		boolean inWater = LocationUtils.isLocationInWater(event.getSpawnLocation());
 
-		// water mobs: must spawn in water
+		// water entities: must spawn in water
 		if (EntityUtils.isWaterMob(type) && !AMPHIBIOUS_MOBS.contains(type)) {
 			if (!inWater) {
 				event.setCancelled(true);
@@ -131,21 +140,21 @@ public class MobListener implements Listener {
 			return;
 		}
 
-		// Amphibious mobs can spawn in water even without a solid block below
+		// Amphibious entities can spawn in water even without a solid block below
 		if (inWater && AMPHIBIOUS_MOBS.contains(type)) {
 			return;
 		}
 
-		// land mobs: must not spawn in the air (i.e. must have a block with collision below)
-		// creepers don't follow this rule so that they can be used in drop creeper traps
-		if (!EntityUtils.isFlyingMob(type) && type != EntityType.CREEPER) {
+		// Land entities: must not spawn in the air (i.e. must have a block with collision below)
+		// Some entities like creepers don't follow this rule so that they can be used in drop creeper traps
+		if (!EntityUtils.isFlyingMob(type) && !FALLING_MOBS.contains(type)) {
 			if (!event.getSpawnLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
 				event.setCancelled(true);
 			}
 			return;
 		}
 
-		// flying mobs: can spawn anywhere, so no more checks
+		// flying/dropping entities: can spawn anywhere, so no more checks
 
 	}
 
