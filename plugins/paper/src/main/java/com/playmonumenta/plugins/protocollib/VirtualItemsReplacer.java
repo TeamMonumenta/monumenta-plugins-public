@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.protocollib;
 
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetSlotHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWindowItemsHandle;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
@@ -33,34 +35,27 @@ public class VirtualItemsReplacer extends PacketAdapter {
 	public void onPacketSending(PacketEvent event) {
 		Player player = event.getPlayer();
 		if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
-			// Creative mode directly sends items to the server, so would break Firmaments.
+			// Creative mode directly sends items to the server, so would break virtual items.
 			// Spectators don't see items anyway so skip them.
 			return;
 		}
 		PacketContainer packet = event.getPacket();
 		if (packet.getType().equals(PacketType.Play.Server.WINDOW_ITEMS)) {
-			// doc: https://wiki.vg/Protocol#Window_Items
-			if (packet.getIntegers().read(0) != 0) {
-				// first int (should be a byte?) is the window ID, with ID 0 being the player inventory
+			PacketPlayOutWindowItemsHandle handle = PacketPlayOutWindowItemsHandle.createHandle(packet.getHandle());
+			if (handle.getWindowId() != 0) { //  0 = player inventory
 				return;
 			}
-			for (List<ItemStack> items : packet.getItemListModifier().getValues()) {
-				for (int i = 0; i < items.size(); i++) {
-					ItemStack item = items.get(i);
-					processItem(item, i, player);
-				}
+			List<ItemStack> items = handle.getItems();
+			for (int i = 0; i < items.size(); i++) {
+				ItemStack item = items.get(i);
+				processItem(item, i, player);
 			}
 		} else { // PacketType.Play.Server.SET_SLOT
-			// doc: https://wiki.vg/Protocol#Set_Slot
-			if (packet.getIntegers().read(0) != 0) {
-				// first int (should be a byte?) is the window ID, with ID 0 being the player inventory
+			PacketPlayOutSetSlotHandle handle = PacketPlayOutSetSlotHandle.createHandle(packet.getHandle());
+			if (handle.getWindowId() != 0) { //  0 = player inventory
 				return;
 			}
-			// second integer (should be first short?) is the slot ID
-			int slot = packet.getIntegers().read(1);
-			for (ItemStack itemStack : packet.getItemModifier().getValues()) {
-				processItem(itemStack, slot, player);
-			}
+			processItem(handle.getItem(), handle.getSlot(), player);
 		}
 	}
 

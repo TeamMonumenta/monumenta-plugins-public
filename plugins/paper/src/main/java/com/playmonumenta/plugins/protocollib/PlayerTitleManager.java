@@ -1,16 +1,24 @@
 package com.playmonumenta.plugins.protocollib;
 
-import com.comphenix.protocol.PacketType;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityMetadataHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -21,7 +29,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -37,16 +44,16 @@ import org.bukkit.entity.Player;
 public class PlayerTitleManager {
 
 	private static class EntityMetadata {
-		private final WrappedDataWatcher mDataWatcher;
+		private final DataWatcher mDataWatcher;
 		private final int mId;
 		private final UUID mUuid;
-		private final int mEntityType;
+		private final EntityType mEntityType;
 
 		private EntityMetadata(Entity entity) {
-			mDataWatcher = WrappedDataWatcher.getEntityWatcher(entity);
+			mDataWatcher = new DataWatcher(WrappedDataWatcher.getEntityWatcher(entity).getHandle());
 			mId = entity.getEntityId();
 			mUuid = entity.getUniqueId();
-			mEntityType = NmsUtils.getVersionAdapter().getEntityTypeRegistryId(entity);
+			mEntityType = entity.getType();
 		}
 	}
 
@@ -119,8 +126,7 @@ public class PlayerTitleManager {
 					iterator.remove();
 					Player otherPlayer = Bukkit.getPlayer(visibleToPlayer);
 					if (otherPlayer != null) {
-						PacketContainer packet = createDestroyPacket(metadata);
-						sendPacketNoFilters(otherPlayer, packet);
+						sendPacketNoFilters(otherPlayer, createDestroyPacket(metadata.mLines));
 					}
 				}
 			}
@@ -136,8 +142,8 @@ public class PlayerTitleManager {
 						while (display.size() > metadata.mLines.size()) {
 							metadata.mLines.add(createLine(player, display.get(metadata.mLines.size()), metadata.mLines.size()));
 						}
-						List<PacketContainer> packets = getSpawnLinesPackets(player, metadata, existingSize);
-						for (PacketContainer packet : packets) {
+						List<PacketHandle> packets = getSpawnLinesPackets(player, metadata.mLines.subList(existingSize, metadata.mLines.size()));
+						for (PacketHandle packet : packets) {
 							broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
 						}
 					}
@@ -145,10 +151,7 @@ public class PlayerTitleManager {
 					// delete removed lines
 					if (display.size() < metadata.mLines.size()) {
 						List<LineMetadata> subList = metadata.mLines.subList(display.size(), metadata.mLines.size());
-
-						PacketContainer packet = createDestroyPacket(metadata);
-						broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
-
+						broadcastPacketNoFilters(createDestroyPacket(subList), metadata.mVisibleToPlayers);
 						subList.clear();
 					}
 
@@ -157,21 +160,13 @@ public class PlayerTitleManager {
 					for (int i = 0; i < updatedSize; i++) {
 						if (!display.get(i).equals(metadata.mDisplay.get(i))) {
 							EntityMetadata armorStand = metadata.mLines.get(i).mArmorStand;
-							WrappedWatchableObject nameWatchableObject = null;
-							for (WrappedWatchableObject watchableObject : armorStand.mDataWatcher.getWatchableObjects()) {
-								if (watchableObject.getValue() instanceof Optional<?> optional
-									    && optional.isPresent()
-									    && optional.get() instanceof Component) {
-									watchableObject.setValue(Optional.of(display.get(i)));
-									nameWatchableObject = watchableObject;
-									break;
-								}
-							}
-							if (nameWatchableObject != null) {
-								PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
-								packet.getIntegers().write(0, armorStand.mId);
-								packet.getWatchableCollectionModifier().write(0, new ArrayList<>(List.of(nameWatchableObject))); // protocollib needs an ArrayList
-								broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
+							DataWatcher.Item<ChatText> name = armorStand.mDataWatcher.getItem(EntityHandle.DATA_CUSTOM_NAME);
+							if (name != null) {
+								name.setValue(ChatText.fromJson(MessagingUtils.toGson(display.get(i)).toString()), true);
+								DataWatcher dw = new DataWatcher();
+								dw.watch(name);
+								PacketPlayOutEntityMetadataHandle handle = PacketPlayOutEntityMetadataHandle.createNew(armorStand.mId, dw, true);
+								broadcastPacketNoFilters(handle, metadata.mVisibleToPlayers);
 							}
 						}
 					}
@@ -189,25 +184,24 @@ public class PlayerTitleManager {
 				if (Math.abs(location.getX() - metadata.mLastLocation.getX()) < 8
 					    && Math.abs(location.getY() - metadata.mLastLocation.getY()) < 8
 					    && Math.abs(location.getZ() - metadata.mLastLocation.getZ()) < 8
-					    && player.getTicksLived() % 200 != 0) {
+					    && ((player.getTicksLived() % 200) + 200) % 200 > 1) {
 					for (LineMetadata line : metadata.mLines) {
-						// doc: https://wiki.vg/Protocol#Entity_Position
-						PacketContainer packet = new PacketContainer(PacketType.Play.Server.REL_ENTITY_MOVE);
-						packet.getIntegers().write(0, line.mArmorStand.mId);
-						packet.getShorts().write(0, (short) ((location.getX() - metadata.mLastLocation.getX()) * 32 * 128))
-							.write(1, (short) ((location.getY() - metadata.mLastLocation.getY()) * 32 * 128))
-							.write(2, (short) ((location.getZ() - metadata.mLastLocation.getZ()) * 32 * 128));
-						broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
+						PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle handle = PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle.createNew(
+							line.mArmorStand.mId,
+							location.getX() - metadata.mLastLocation.getX(),
+							location.getY() - metadata.mLastLocation.getY(),
+							location.getZ() - metadata.mLastLocation.getZ(),
+							false);
+						broadcastPacketNoFilters(handle, metadata.mVisibleToPlayers);
 					}
 				} else {
 					for (LineMetadata line : metadata.mLines) {
-						// doc: https://wiki.vg/Protocol#Entity_Teleport
-						PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_TELEPORT);
-						packet.getIntegers().write(0, line.mArmorStand.mId);
-						packet.getDoubles().write(0, location.getX())
-							.write(1, location.getY() + line.mHeight)
-							.write(2, location.getZ());
-						broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
+						PacketPlayOutEntityTeleportHandle handle = PacketPlayOutEntityTeleportHandle.createNew(
+							line.mArmorStand.mId,
+							location.getX(), location.getY() + line.mHeight, location.getZ(),
+							0, 0, false
+						);
+						broadcastPacketNoFilters(handle, metadata.mVisibleToPlayers);
 					}
 				}
 				metadata.mLastLocation = location;
@@ -216,8 +210,8 @@ public class PlayerTitleManager {
 			// spawn in entities for players newly in range
 			for (Player tracker : trackers) {
 				if (metadata.mVisibleToPlayers.add(tracker.getUniqueId())) {
-					List<PacketContainer> packets = getSpawnLinesPackets(player, metadata, 0);
-					for (PacketContainer packet : packets) {
+					List<PacketHandle> packets = getSpawnLinesPackets(player, metadata.mLines);
+					for (PacketHandle packet : packets) {
 						sendPacketNoFilters(tracker, packet);
 					}
 				}
@@ -236,31 +230,30 @@ public class PlayerTitleManager {
 
 	}
 
-	private List<PacketContainer> getSpawnLinesPackets(Player targetPlayer, PlayerMetadata metadata, int startLine) {
-		List<PacketContainer> result = new ArrayList<>();
-		List<LineMetadata> linesToSend = metadata.mLines.subList(startLine, metadata.mLines.size());
+	private List<PacketHandle> getSpawnLinesPackets(Player targetPlayer, List<LineMetadata> linesToSend) {
+		List<PacketHandle> result = new ArrayList<>();
 		for (LineMetadata line : linesToSend) {
 			// spawn armor stand
-			// doc: https://wiki.vg/Protocol#Spawn_Living_Entity
 			{
-				PacketContainer packet = new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
-				packet.getIntegers().write(0, line.mArmorStand.mId); // id
-				packet.getUUIDs().write(0, line.mArmorStand.mUuid); // uuid
-				packet.getIntegers().write(1, line.mArmorStand.mEntityType); // type
-				packet.getDoubles().write(0, targetPlayer.getEyeLocation().getX())
-					.write(1, targetPlayer.getEyeLocation().getY() + line.mHeight)
-					.write(2, targetPlayer.getEyeLocation().getZ());
+				PacketPlayOutSpawnEntityLivingHandle handle = PacketPlayOutSpawnEntityLivingHandle.createNew();
+				handle.setEntityId(line.mArmorStand.mId);
+				handle.setEntityUUID(line.mArmorStand.mUuid);
+				handle.setEntityType(line.mArmorStand.mEntityType);
+				handle.setPosX(targetPlayer.getEyeLocation().getX());
+				handle.setPosY(targetPlayer.getEyeLocation().getY() + line.mHeight);
+				handle.setPosZ(targetPlayer.getEyeLocation().getZ());
 				// other fields: keep defaults (0 velocity, 0 pitch/yaw/headYaw)
-				result.add(packet);
+				result.add(handle);
 			}
 
 			// set armor stand metadata
-			// doc: https://wiki.vg/Protocol#Entity_Metadata
 			{
-				PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
-				packet.getIntegers().write(0, line.mArmorStand.mId); // entity id
-				packet.getWatchableCollectionModifier().write(0, line.mArmorStand.mDataWatcher.getWatchableObjects()); // data watcher objects
-				result.add(packet);
+				PacketPlayOutEntityMetadataHandle handle = PacketPlayOutEntityMetadataHandle.createNew(
+					line.mArmorStand.mId,
+					line.mArmorStand.mDataWatcher,
+					true
+				);
+				result.add(handle);
 			}
 		}
 
@@ -321,8 +314,7 @@ public class PlayerTitleManager {
 
 	private void destroyEntities(PlayerMetadata metadata) {
 		if (!metadata.mVisibleToPlayers.isEmpty()) {
-			PacketContainer packet = createDestroyPacket(metadata);
-			broadcastPacketNoFilters(packet, metadata.mVisibleToPlayers);
+			broadcastPacketNoFilters(createDestroyPacket(metadata.mLines), metadata.mVisibleToPlayers);
 			metadata.mVisibleToPlayers.clear();
 		}
 	}
@@ -331,7 +323,7 @@ public class PlayerTitleManager {
 	/**
 	 * Broadcasts a packet to all player in the given set, ignoring packet filters/listeners.
 	 */
-	private void broadcastPacketNoFilters(PacketContainer packet, Set<UUID> visibleToPlayers) {
+	private void broadcastPacketNoFilters(PacketHandle packet, Set<UUID> visibleToPlayers) {
 		for (Player otherPlayer : Bukkit.getOnlinePlayers()) {
 			if (visibleToPlayers.contains(otherPlayer.getUniqueId())) {
 				sendPacketNoFilters(otherPlayer, packet);
@@ -339,9 +331,9 @@ public class PlayerTitleManager {
 		}
 	}
 
-	private void sendPacketNoFilters(Player receiver, PacketContainer packet) {
+	private void sendPacketNoFilters(Player receiver, PacketHandle packet) {
 		try {
-			mProtocolManager.sendServerPacket(receiver, packet, false);
+			mProtocolManager.sendServerPacket(receiver, PacketContainer.fromPacket(packet.getRaw()), false);
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		}
@@ -356,14 +348,8 @@ public class PlayerTitleManager {
 		}
 	}
 
-	private PacketContainer createDestroyPacket(PlayerMetadata metadata) {
-		PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
-		if (packet.getIntegerArrays().size() > 0) {
-			packet.getIntegerArrays().write(0, metadata.mLines.stream().mapToInt(line -> line.mArmorStand.mId).toArray());
-		} else {
-			packet.getIntLists().write(0, metadata.mLines.stream().map(line -> line.mArmorStand.mId).toList());
-		}
-		return packet;
+	private PacketHandle createDestroyPacket(List<LineMetadata> lines) {
+		return PacketPlayOutEntityDestroyHandle.createNewMultiple(lines.stream().mapToInt(line -> line.mArmorStand.mId).toArray());
 	}
 
 }
