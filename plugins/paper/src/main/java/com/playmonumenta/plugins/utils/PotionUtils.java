@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -8,7 +9,6 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +38,7 @@ public class PotionUtils {
 	private static final int MINUTES_5 = MINUTES_1 * 5;
 	private static final int MINUTES_8 = MINUTES_1 * 8;
 
-	private static final PotionEffectType[] POSITIVE_EFFECTS = new PotionEffectType[] {
+	private static final ImmutableSet<PotionEffectType> POSITIVE_EFFECTS = ImmutableSet.of(
 		PotionEffectType.ABSORPTION,
 		PotionEffectType.DAMAGE_RESISTANCE,
 		PotionEffectType.FAST_DIGGING,
@@ -54,9 +54,9 @@ public class PotionUtils {
 		PotionEffectType.SPEED,
 		PotionEffectType.LUCK,
 		PotionEffectType.WATER_BREATHING
-	};
+	);
 
-	private static final PotionEffectType[] NEGATIVE_EFFECTS = new PotionEffectType[] {
+	private static final ImmutableSet<PotionEffectType> NEGATIVE_EFFECTS = ImmutableSet.of(
 		PotionEffectType.BLINDNESS,
 		PotionEffectType.POISON,
 		PotionEffectType.CONFUSION,
@@ -68,7 +68,7 @@ public class PotionUtils {
 		PotionEffectType.HUNGER,
 		PotionEffectType.LEVITATION,
 		PotionEffectType.UNLUCK
-	};
+	);
 
 	// This map only notes any "useful" effect pairs, i.e. effects that would be non-annoying and balanced to invert
 	private static final Map<PotionEffectType, PotionEffectType> OPPOSITE_EFFECTS = new HashMap<PotionEffectType, PotionEffectType>();
@@ -255,14 +255,7 @@ public class PotionUtils {
 	}
 
 	public static boolean hasPositiveEffects(PotionEffectType type) {
-		String name = type.getName();
-		for (PotionEffectType testType : POSITIVE_EFFECTS) {
-			if (name.equals(testType.getName())) {
-				return true;
-			}
-		}
-
-		return false;
+		return POSITIVE_EFFECTS.contains(type);
 	}
 
 	public static boolean hasNegativeEffects(ItemStack potionItem) {
@@ -280,21 +273,14 @@ public class PotionUtils {
 	}
 
 	public static boolean hasNegativeEffects(PotionEffectType type) {
-		String name = type.getName();
-		for (PotionEffectType testType : NEGATIVE_EFFECTS) {
-			if (name.equals(testType.getName())) {
-				return true;
-			}
-		}
-
-		return false;
+		return NEGATIVE_EFFECTS.contains(type);
 	}
 
 	public static void clearNegatives(Plugin plugin, Player player) {
 		boolean dolphin = player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE);
 		for (PotionEffectType type : NEGATIVE_EFFECTS) {
 			if (player.hasPotionEffect(type)) {
-				if ("SLOW".equals(type.getName()) && dolphin) {
+				if (PotionEffectType.SLOW.equals(type) && dolphin) {
 					continue;
 				}
 				PotionEffect effect = player.getPotionEffect(type);
@@ -383,10 +369,9 @@ public class PotionUtils {
 	}
 
 	public static List<PotionEffectType> getNegativeEffects(Plugin plugin, LivingEntity le) {
-		List<PotionEffectType> types = new ArrayList<PotionEffectType>();
-		List<PotionEffectType> negatives = Arrays.asList(NEGATIVE_EFFECTS);
+		List<PotionEffectType> types = new ArrayList<>();
 		for (PotionEffect effect : le.getActivePotionEffects()) {
-			if (negatives.contains(effect.getType())) {
+			if (NEGATIVE_EFFECTS.contains(effect.getType())) {
 				types.add(effect.getType());
 			}
 		}

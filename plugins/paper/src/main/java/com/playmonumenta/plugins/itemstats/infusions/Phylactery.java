@@ -39,22 +39,21 @@ public class Phylactery implements Infusion {
 	public void onDeath(Plugin plugin, Player player, double value, PlayerDeathEvent event) {
 		if (!event.getKeepLevel()) {
 			int playerXp = ExperienceUtils.getTotalExperience(player);
-			if (playerXp > 0) {
+			int newTotalXp = ExperienceUtils.getTotalExperience(event.getNewLevel()) + event.getNewExp();
+			int xpLoss = playerXp - newTotalXp;
+			int savedXp = (int) (xpLoss * value * XP_KEPT);
+			if (savedXp > 0) {
 				event.setDroppedExp((int) (event.getDroppedExp() * (1 - value * XP_KEPT)));
 				if (!event.getKeepInventory() && GraveListener.gravesEnabled(player)) {
 					int previousStorage = Math.max(0, ScoreboardUtils.getScoreboardValue(player, GRAVE_XP_SCOREBOARD).orElse(0));
-					ScoreboardUtils.setScoreboardValue(player, GRAVE_XP_SCOREBOARD, previousStorage + (int) (playerXp * value * XP_KEPT));
+					ScoreboardUtils.setScoreboardValue(player, GRAVE_XP_SCOREBOARD, previousStorage + savedXp);
 					player.sendMessage(ChatColor.GOLD + "" + (int) (100 * value * XP_KEPT) + "% of your experience has been stored. Collect your grave to retrieve it.");
 				} else {
-					int newTotalXp = ExperienceUtils.getTotalExperience(event.getNewLevel()) + event.getNewExp();
-					int xpLoss = playerXp - newTotalXp;
-					if (xpLoss > 0) {
-						newTotalXp += (int) (xpLoss * value * XP_KEPT);
-						int newLevel = ExperienceUtils.getLevel(newTotalXp);
-						int newXp = newTotalXp - ExperienceUtils.getTotalExperience(newLevel);
-						event.setNewLevel(newLevel);
-						event.setNewExp(newXp);
-					}
+					newTotalXp += savedXp;
+					int newLevel = ExperienceUtils.getLevel(newTotalXp);
+					int newXp = newTotalXp - ExperienceUtils.getTotalExperience(newLevel);
+					event.setNewLevel(newLevel);
+					event.setNewExp(newXp);
 				}
 			}
 		}

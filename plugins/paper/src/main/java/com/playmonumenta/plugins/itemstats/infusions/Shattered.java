@@ -3,12 +3,18 @@ package com.playmonumenta.plugins.itemstats.infusions;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
+import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import java.util.HashSet;
 import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Shattered implements Infusion {
@@ -21,10 +27,14 @@ public class Shattered implements Infusion {
 	public static final int CURSE_OF_VANISHING_SHATTER = 1;
 	public static final int DROPPED_ITEM_DESTROYED = 2;
 
-	public static final double DAMAGE_DEALT_MULTIPLIER = -0.025;
-	public static final double DAMAGE_TAKEN_MULTIPLIER = 0.025;
+	public static final int MINING_FATIGUE_AMPLIFIER = 1;
+
+	private static final double DAMAGE_DEALT_MULTIPLIER = -0.04;
+	private static final double DAMAGE_TAKEN_MULTIPLIER = 0.04;
 
 	private static final UUID NULL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
+	private static final HashSet<UUID> mFatiguePlayers = new HashSet<>();
 
 	@Override
 	public String getName() {
@@ -41,14 +51,51 @@ public class Shattered implements Infusion {
 		return 4998; // just before region scaling
 	}
 
+	public static double getDamageDealtMultiplier(double level) {
+		return 1 + DAMAGE_DEALT_MULTIPLIER * level;
+	}
+
+	public static double getDamageTakenMultiplier(double level) {
+		return 1 + DAMAGE_TAKEN_MULTIPLIER * level;
+	}
+
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		event.setDamage(event.getDamage() * (1 + value * DAMAGE_DEALT_MULTIPLIER));
+		event.setDamage(event.getDamage() * getDamageDealtMultiplier(value));
 	}
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		event.setDamage(event.getDamage() * (1 + value * DAMAGE_TAKEN_MULTIPLIER));
+		event.setDamage(event.getDamage() * getDamageTakenMultiplier(value));
+	}
+
+	@Override
+	public void onEquipmentUpdate(Plugin plugin, Player player) {
+		if (plugin.mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.SHATTERED) >= MAX_LEVEL) {
+			// Need to delay this code as it checks equipped items which may not yet have changed, as this method is called from within events
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+				if (hasMaxShatteredItemEquipped(player)) {
+					mFatiguePlayers.add(player.getUniqueId());
+					plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 10000000, MINING_FATIGUE_AMPLIFIER, false, false));
+				} else if (mFatiguePlayers.remove(player.getUniqueId())) {
+					plugin.mPotionManager.removePotion(player, PotionManager.PotionID.ITEM, PotionEffectType.SLOW_DIGGING, MINING_FATIGUE_AMPLIFIER);
+				}
+			});
+		} else if (mFatiguePlayers.remove(player.getUniqueId())) {
+			plugin.mPotionManager.removePotion(player, PotionManager.PotionID.ITEM, PotionEffectType.SLOW_DIGGING, MINING_FATIGUE_AMPLIFIER);
+		}
+	}
+
+	public static boolean hasMaxShatteredItemEquipped(Player player) {
+		if (Plugin.getInstance().mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.SHATTERED) < MAX_LEVEL) {
+			return false;
+		}
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			if (ItemStatUtils.getInfusionLevel(player.getEquipment().getItem(slot), ItemStatUtils.InfusionType.SHATTERED) >= MAX_LEVEL) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

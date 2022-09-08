@@ -6,56 +6,52 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 public class PlayerPotionInfo {
 	//  Effect Type / Potion List
-	private final HashMap<PotionEffectType, PotionMap> mPotionInfo = new HashMap<PotionEffectType, PotionMap>();
+	private final HashMap<PotionEffectType, PotionMap> mPotionInfo = new HashMap<>();
 
 	protected void addPotionInfo(Player player, PotionID id, PotionInfo info) {
 		if (info.mType == null) {
 			return;
 		}
-		PotionMap type = mPotionInfo.get(info.mType);
-		if (type != null) {
-			type.addPotionMap(player, id, info);
-		} else {
-			PotionMap newMap = new PotionMap(info.mType);
-			newMap.addPotionMap(player, id, info);
-			mPotionInfo.put(info.mType, newMap);
-		}
+		mPotionInfo.computeIfAbsent(info.mType, PotionMap::new)
+			.addPotion(player, id, info);
 	}
 
 	protected Collection<PotionMap> getAllPotionMaps() {
 		return mPotionInfo.values();
 	}
 
-	protected void removePotionInfo(Player player, PotionID id, PotionEffectType type) {
+	protected void removePotionInfo(Player player, PotionID id, PotionEffectType type, int amplifier) {
 		PotionMap potionMap = mPotionInfo.get(type);
 		if (potionMap != null) {
-			potionMap.removePotionMap(player, id);
+			potionMap.removePotion(player, id, amplifier);
+		}
+	}
+
+	protected void clearPotionInfo(Player player, PotionID id, PotionEffectType type) {
+		PotionMap potionMap = mPotionInfo.get(type);
+		if (potionMap != null) {
+			potionMap.clearPotion(player, id);
 		}
 	}
 
 	protected void clearPotionIDType(Player player, PotionID id) {
-		Iterator<Entry<PotionEffectType, PotionMap>> potionMapIter = mPotionInfo.entrySet().iterator();
-		while (potionMapIter.hasNext()) {
-			Entry<PotionEffectType, PotionMap> potionEntry = potionMapIter.next();
-			potionEntry.getValue().removePotionMap(player, id);
+		for (Entry<PotionEffectType, PotionMap> potionEntry : mPotionInfo.entrySet()) {
+			potionEntry.getValue().clearPotion(player, id);
 		}
 	}
 
-	protected void clearPotionEffectType(Player player, PotionEffectType type) {
+	protected void clearPotionEffectType(PotionEffectType type) {
 		mPotionInfo.remove(type);
 	}
 
 	protected void updatePotionStatus(Player player, int ticks) {
-		Iterator<Entry<PotionEffectType, PotionMap>> potionMapIter = mPotionInfo.entrySet().iterator();
-		while (potionMapIter.hasNext()) {
-			Entry<PotionEffectType, PotionMap> potionEntry = potionMapIter.next();
+		for (Entry<PotionEffectType, PotionMap> potionEntry : mPotionInfo.entrySet()) {
 			potionEntry.getValue().updatePotionStatus(player, ticks);
 		}
 	}
