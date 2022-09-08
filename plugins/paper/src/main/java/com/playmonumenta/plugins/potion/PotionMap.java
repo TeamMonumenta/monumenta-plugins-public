@@ -92,6 +92,22 @@ public class PotionMap {
 		applyBestPotionEffect(player);
 	}
 
+	public void modifyPotionDuration(Player player, ToIntFunction<PotionInfo> function) {
+		boolean changed = false;
+		for (TreeMap<Integer, PotionInfo> treeMap : mPotionMap.values()) {
+			for (PotionInfo potionInfo : treeMap.values()) {
+				int newDuration = function.applyAsInt(potionInfo);
+				if (newDuration != potionInfo.mDuration) {
+					changed = true;
+					potionInfo.mDuration = newDuration;
+				}
+			}
+		}
+		if (changed) {
+			applyBestPotionEffect(player);
+		}
+	}
+
 	protected void removePotion(Player player, PotionID id, int amplifier) {
 		TreeMap<Integer, PotionInfo> map = mPotionMap.get(id);
 		if (map != null) {
