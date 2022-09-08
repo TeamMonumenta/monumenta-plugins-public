@@ -33,21 +33,18 @@ public class PotionMap {
 	private final boolean mIsNegative;
 
 	protected PotionMap(PotionEffectType type) {
-		mPotionMap = new EnumMap<PotionID, TreeMap<Integer, PotionInfo>>(PotionID.class);
+		mPotionMap = new EnumMap<>(PotionID.class);
 		mType = type;
 		mIsNegative = PotionUtils.hasNegativeEffects(type);
 	}
 
-	private void addPotionMap(PotionID id, PotionInfo newPotionInfo) {
+	private void addPotion(PotionID id, PotionInfo newPotionInfo) {
 		Integer amplifier = newPotionInfo.mAmplifier;
 
-		TreeMap<Integer, PotionInfo> trackedPotionInfo = mPotionMap.get(id);
-		if (trackedPotionInfo == null) {
-			trackedPotionInfo = new TreeMap<Integer, PotionInfo>();
-		}
+		TreeMap<Integer, PotionInfo> trackedPotionInfo = mPotionMap.computeIfAbsent(id, key -> new TreeMap<>());
 
 		if (mIsNegative) {
-			// Negative potions don't track multiple levels - only the highest / longest one
+			// Negative potions don't track multiple levels - only the highest / longest one, from any source
 			PotionInfo bestEffect = getBestEffect();
 
 			// If the current "best" negative effect is less than this new one, track it
@@ -60,54 +57,51 @@ public class PotionMap {
 			            || newPotionInfo.mDuration - bestEffect.mDuration >= 25 / (bestEffect.mAmplifier + 1) + 1)
 			        && (!newPotionInfo.mType.equals(PotionEffectType.WITHER)
 			            || newPotionInfo.mDuration - bestEffect.mDuration >= 40 / (bestEffect.mAmplifier + 1) + 1))) {
-				trackedPotionInfo.put(amplifier, newPotionInfo);
-			}
 
-			// Remove all lower-level effects than this new one
-			for (int i = newPotionInfo.mAmplifier - 1; i >= 0; i--) {
-				trackedPotionInfo.remove(i);
+				// remove any other (lower level/duration) effects
+				for (TreeMap<Integer, PotionInfo> infoMap : mPotionMap.values()) {
+					infoMap.values().removeIf(info -> newPotionInfo.mType.equals(info.mType));
+				}
+
+				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}
 		} else {
 			// Only add the new effect if it is longer for the same effect amplifier
 			PotionInfo currentInfo = trackedPotionInfo.get(amplifier);
 			if (currentInfo == null
-			    || (currentInfo.mDuration < newPotionInfo.mDuration
-			        && (!currentInfo.mType.equals(PotionEffectType.REGENERATION)
-			            || newPotionInfo.mDuration - currentInfo.mDuration >= 50 / (currentInfo.mAmplifier + 1) + 1))) {
+				    || (currentInfo.mDuration < newPotionInfo.mDuration
+					        && (!currentInfo.mType.equals(PotionEffectType.REGENERATION)
+						            || newPotionInfo.mDuration - currentInfo.mDuration >= 50 / (currentInfo.mAmplifier + 1) + 1))) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}
 		}
-
-		mPotionMap.put(id, trackedPotionInfo);
 	}
 
-	protected void addPotionMap(Player player, PotionID id, PotionInfo newPotionInfo) {
-		addPotionMap(id, newPotionInfo);
+	protected void addPotion(Player player, PotionID id, PotionInfo newPotionInfo) {
+		addPotion(id, newPotionInfo);
 
 		applyBestPotionEffect(player);
 	}
 
-	protected void removePotionMap(Player player, PotionID id) {
-		// Clear out all effects from this source
+	/**
+	 * Clears out all effects from this source
+	 */
+	protected void clearPotion(Player player, PotionID id) {
 		mPotionMap.remove(id);
 
 		applyBestPotionEffect(player);
 	}
 
-	public void modifyPotionDuration(Player player, ToIntFunction<PotionInfo> function) {
-		boolean changed = false;
-		for (TreeMap<Integer, PotionInfo> treeMap : mPotionMap.values()) {
-			for (PotionInfo potionInfo : treeMap.values()) {
-				int newDuration = function.applyAsInt(potionInfo);
-				if (newDuration != potionInfo.mDuration) {
-					changed = true;
-					potionInfo.mDuration = newDuration;
-				}
+	protected void removePotion(Player player, PotionID id, int amplifier) {
+		TreeMap<Integer, PotionInfo> map = mPotionMap.get(id);
+		if (map != null) {
+			map.remove(amplifier);
+			if (map.isEmpty()) {
+				mPotionMap.remove(id);
 			}
 		}
-		if (changed) {
-			applyBestPotionEffect(player);
-		}
+
+		applyBestPotionEffect(player);
 	}
 
 	protected Collection<PotionInfo> getPotionInfos(PotionID id) {
@@ -115,7 +109,7 @@ public class PotionMap {
 		if (tree != null) {
 			return tree.values();
 		}
-		return new ArrayList<PotionInfo>();
+		return new ArrayList<>();
 	}
 
 	protected void updatePotionStatus(Player player, int ticks) {
@@ -154,13 +148,15 @@ public class PotionMap {
 		PotionInfo bestEffect = null;
 
 		for (TreeMap<Integer, PotionInfo> potionInfos : mPotionMap.values()) {
-			for (PotionInfo info : potionInfos.values()) {
+			Entry<Integer, PotionInfo> lastEntry = potionInfos.lastEntry();
+			if (lastEntry != null) {
+				PotionInfo info = lastEntry.getValue();
 				if (bestEffect == null) {
 					bestEffect = info;
 				} else if (info.mAmplifier > bestEffect.mAmplifier) {
 					bestEffect = info;
 				} else if (info.mAmplifier == bestEffect.mAmplifier &&
-					info.mDuration > bestEffect.mDuration) {
+					           info.mDuration > bestEffect.mDuration) {
 					bestEffect = info;
 				}
 			}
@@ -233,7 +229,7 @@ public class PotionMap {
 					PotionInfo info = new PotionInfo();
 					info.loadFromJsonObject(element.getAsJsonObject());
 
-					addPotionMap(id, info);
+					addPotion(id, info);
 				}
 			}
 		}

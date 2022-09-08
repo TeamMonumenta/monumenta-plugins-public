@@ -192,7 +192,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 		private double getTotalDamageDealtMultiplier() {
 			return (hasLaterRegionEquipment(true) ? RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER : 1)
-				       * (1 + getInfusion(InfusionType.SHATTERED) * Shattered.DAMAGE_DEALT_MULTIPLIER);
+				       * Shattered.getDamageDealtMultiplier(getInfusion(InfusionType.SHATTERED));
 		}
 	}
 
@@ -235,7 +235,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			damageMultiplier *= RegionScalingDamageTaken.DAMAGE_TAKEN_MULTIPLIER;
 		}
 
-		damageMultiplier *= 1 + Shattered.DAMAGE_TAKEN_MULTIPLIER * stats.getInfusion(InfusionType.SHATTERED);
+		damageMultiplier *= Shattered.getDamageTakenMultiplier(stats.getInfusion(InfusionType.SHATTERED));
 
 		damageMultiplier *= 1 - stats.getInfusion(InfusionType.TENACITY) * Tenacity.DAMAGE_REDUCTION_PER_LEVEL;
 

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -76,33 +77,36 @@ public class PlayerUtils {
 		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(location.toVector(), true);
 		if (!structures.isEmpty()) {
 			return location.getWorld().getPlayers().stream()
-				.filter(p -> p.getGameMode() != GameMode.SPECTATOR && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER) && structures.stream().anyMatch(structure -> structure.isNearby(p)))
-				.toList();
+				       .filter(p -> p.getGameMode() != GameMode.SPECTATOR && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER) && structures.stream().anyMatch(structure -> structure.isNearby(p)))
+				       .toList();
 		}
 		// Otherwise, perform no loot scaling
 		return Collections.emptyList();
 	}
 
+	public static boolean playerCountsForLootScaling(Player player) {
+		return player.getGameMode() != GameMode.SPECTATOR
+			       && (player.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER)
+			       && ActivityManager.getManager().isActive(player)
+			       && !Shattered.hasMaxShatteredItemEquipped(player);
+	}
+
 	public static List<Player> otherPlayersInLootScalingRange(Player player) {
 		// In dungeons, all players in the same world (i.e. the entire dungeon) are in range
-
 		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
 		if (isDungeon) {
 			return player.getWorld().getPlayers().stream()
-				.filter(p -> ActivityManager.getManager().isActive(p) && p.getGameMode() != GameMode.SPECTATOR
-					             && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER)
-					             && !p.equals(player))
-				.toList();
+				       .filter(p -> !p.equals(player) && playerCountsForLootScaling(p))
+				       .toList();
 		}
 
 		// In a POI, all players within the same POI are in range
 		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(player.getLocation().toVector(), true);
 		if (!structures.isEmpty()) {
 			return player.getWorld().getPlayers().stream()
-				.filter(p -> p.getGameMode() != GameMode.SPECTATOR
-					             && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER)
-					             && !p.equals(player)
-					             && structures.stream().anyMatch(structure -> structure.isNearby(p)))
+				       .filter(p -> !p.equals(player)
+					                    && playerCountsForLootScaling(p)
+					                    && structures.stream().anyMatch(structure -> structure.isNearby(p)))
 				.toList();
 		}
 

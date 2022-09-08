@@ -11,14 +11,12 @@ public class ViewActivity extends GenericCommand {
 
 	public static void register() {
 		registerPlayerCommand("viewactivity", "monumenta.command.viewactivity",
-			(sender, player) -> {
-				run(sender, player);
-			});
+			ViewActivity::run);
 	}
 
 	private static void run(CommandSender sender, Player player) {
 		Component text = Component.text("Player Activities:", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true).append(Component.newline());
-		for (Player worldPlayer : ((Player)sender).getWorld().getPlayers()) {
+		for (Player worldPlayer : player.getWorld().getPlayers()) {
 			int activity = ActivityManager.getManager().mActivity.getOrDefault(worldPlayer.getUniqueId(), 0);
 			text = text.append(Component.newline()).append(Component.text(String.format("%s's Activity: %s", worldPlayer.getName(), activity), activity > 0 ? NamedTextColor.GREEN : NamedTextColor.RED));
 		}

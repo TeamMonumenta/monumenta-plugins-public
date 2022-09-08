@@ -84,15 +84,8 @@ public class PotionManager {
 			&& !info.mType.equals(PotionEffectType.HARM)
 			&& !info.mType.equals(PotionEffectType.HEAL)) {
 
-			UUID uuid = player.getUniqueId();
-			PlayerPotionInfo potionInfo = mPlayerPotions.get(uuid);
-			if (potionInfo != null) {
-				potionInfo.addPotionInfo(player, id, info);
-			} else {
-				PlayerPotionInfo newPotionInfo = new PlayerPotionInfo();
-				newPotionInfo.addPotionInfo(player, id, info);
-				mPlayerPotions.put(uuid, newPotionInfo);
-			}
+			mPlayerPotions.computeIfAbsent(player.getUniqueId(), key -> new PlayerPotionInfo())
+				.addPotionInfo(player, id, info);
 		}
 	}
 
@@ -109,7 +102,14 @@ public class PotionManager {
 	public void removePotion(Player player, PotionID id, PotionEffectType type) {
 		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
 		if (potionInfo != null) {
-			potionInfo.removePotionInfo(player, id, type);
+			potionInfo.clearPotionInfo(player, id, type);
+		}
+	}
+
+	public void removePotion(Player player, PotionID id, PotionEffectType type, int amplifier) {
+		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
+		if (potionInfo != null) {
+			potionInfo.removePotionInfo(player, id, type, amplifier);
 		}
 	}
 
@@ -117,7 +117,7 @@ public class PotionManager {
 		mPlayerPotions.remove(player.getUniqueId());
 
 		// Make a copy of the list to prevent ConcurrentModificationException's
-		for (PotionEffect type : new ArrayList<PotionEffect>(player.getActivePotionEffects())) {
+		for (PotionEffect type : new ArrayList<>(player.getActivePotionEffects())) {
 			player.removePotionEffect(type.getType());
 		}
 	}

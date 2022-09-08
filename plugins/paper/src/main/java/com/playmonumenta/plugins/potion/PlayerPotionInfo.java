@@ -19,30 +19,31 @@ public class PlayerPotionInfo {
 		if (info.mType == null) {
 			return;
 		}
-		PotionMap type = mPotionInfo.get(info.mType);
-		if (type != null) {
-			type.addPotionMap(player, id, info);
-		} else {
-			PotionMap newMap = new PotionMap(info.mType);
-			newMap.addPotionMap(player, id, info);
-			mPotionInfo.put(info.mType, newMap);
-		}
+		mPotionInfo.computeIfAbsent(info.mType, PotionMap::new)
+			.addPotion(player, id, info);
 	}
 
 	protected Collection<PotionMap> getAllPotionMaps() {
 		return mPotionInfo.values();
 	}
 
-	protected void removePotionInfo(Player player, PotionID id, PotionEffectType type) {
+	protected void removePotionInfo(Player player, PotionID id, PotionEffectType type, int amplifier) {
 		PotionMap potionMap = mPotionInfo.get(type);
 		if (potionMap != null) {
-			potionMap.removePotionMap(player, id);
+			potionMap.removePotion(player, id, amplifier);
+		}
+	}
+
+	protected void clearPotionInfo(Player player, PotionID id, PotionEffectType type) {
+		PotionMap potionMap = mPotionInfo.get(type);
+		if (potionMap != null) {
+			potionMap.clearPotion(player, id);
 		}
 	}
 
 	protected void clearPotionIDType(Player player, PotionID id) {
 		for (Entry<PotionEffectType, PotionMap> potionEntry : mPotionInfo.entrySet()) {
-			potionEntry.getValue().removePotionMap(player, id);
+			potionEntry.getValue().clearPotion(player, id);
 		}
 	}
 

@@ -247,7 +247,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		ItemStack item = mPlayer.getInventory().getItemInMainHand();
 		if (ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RECOIL) > 0) {
 			if (!EntityUtils.isRecoilDisable(mPlugin, mPlayer, mMaxCharges)) {
-				if (!mPlayer.isSneaking() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && mPlayer.getLocation().getY() >= 0) {
+				if (!mPlayer.isSneaking() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
 					Vector velocity = NmsUtils.getVersionAdapter().getActualDirection(mPlayer).multiply(-0.5 * Math.sqrt(ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RECOIL)));
 					velocity.setY(Math.max(0.1, velocity.getY()));
 					mPlayer.setVelocity(velocity);

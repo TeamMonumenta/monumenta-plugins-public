@@ -16,6 +16,9 @@ import org.bukkit.potion.PotionEffectType;
 public class RegionScalingDamageDealt implements Enchantment {
 
 	public static final double DAMAGE_DEALT_MULTIPLIER = 0.5;
+
+	public static final int MINING_FATIGUE_AMPLIFIER = 0;
+
 	private static HashSet<UUID> mFatiguePlayers = new HashSet<>();
 
 	@Override
@@ -45,9 +48,9 @@ public class RegionScalingDamageDealt implements Enchantment {
 		if (!ServerProperties.getClassSpecializationsEnabled()) {
 			if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.REGION_SCALING_DAMAGE_DEALT) > 0) {
 				mFatiguePlayers.add(player.getUniqueId());
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 10000000, 0, false, false));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 10000000, MINING_FATIGUE_AMPLIFIER, false, false));
 			} else if (mFatiguePlayers.remove(player.getUniqueId())) {
-				plugin.mPotionManager.removePotion(player, PotionManager.PotionID.ITEM, PotionEffectType.SLOW_DIGGING);
+				plugin.mPotionManager.removePotion(player, PotionManager.PotionID.ITEM, PotionEffectType.SLOW_DIGGING, MINING_FATIGUE_AMPLIFIER);
 			}
 		}
 	}
