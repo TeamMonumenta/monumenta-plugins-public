@@ -45,6 +45,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class DelvesManager implements Listener {
 	public static final String KEY_DELVES_PLUGIN_DATA = "MonumentaDelves";
@@ -313,8 +314,17 @@ public class DelvesManager implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
-		UUID playerUUID = event.getPlayer().getUniqueId();
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> PLAYER_DELVE_DUNGEON_MOD_MAP.remove(playerUUID), 5L);
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				Player p = event.getPlayer();
+				if (!p.isOnline()) {
+					PLAYER_DELVE_DUNGEON_MOD_MAP.remove(p.getUniqueId());
+				}
+			}
+
+		}.runTaskLater(Plugin.getInstance(), 100);
 	}
 
 	@EventHandler(ignoreCancelled = true)
