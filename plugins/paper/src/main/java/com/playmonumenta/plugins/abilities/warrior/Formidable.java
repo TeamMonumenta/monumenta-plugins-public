@@ -8,11 +8,11 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 
-public class WarriorPassive extends Ability {
+public class Formidable extends Ability {
 
 	private static final double PASSIVE_KNOCKBACK_RESISTANCE = 0.2;
 
-	public WarriorPassive(Plugin plugin, @Nullable Player player) {
+	public Formidable(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 	}
 

@@ -20,12 +20,12 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
-import com.playmonumenta.plugins.abilities.cleric.ClericPassive;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
+import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
@@ -35,9 +35,9 @@ import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
+import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
-import com.playmonumenta.plugins.abilities.mage.MagePassive;
 import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
@@ -64,9 +64,9 @@ import com.playmonumenta.plugins.abilities.other.PvP;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
 import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
+import com.playmonumenta.plugins.abilities.rogue.Dethroner;
 import com.playmonumenta.plugins.abilities.rogue.Dodging;
 import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
-import com.playmonumenta.plugins.abilities.rogue.RoguePassive;
 import com.playmonumenta.plugins.abilities.rogue.Skirmisher;
 import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
@@ -79,10 +79,10 @@ import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
 import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
-import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
+import com.playmonumenta.plugins.abilities.scout.Versatile;
 import com.playmonumenta.plugins.abilities.scout.Volley;
 import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
@@ -93,13 +93,13 @@ import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
+import com.playmonumenta.plugins.abilities.warlock.Culling;
 import com.playmonumenta.plugins.abilities.warlock.CursedWound;
 import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
 import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
 import com.playmonumenta.plugins.abilities.warlock.PhlegmaticResolve;
 import com.playmonumenta.plugins.abilities.warlock.SanguineHarvest;
 import com.playmonumenta.plugins.abilities.warlock.SoulRend;
-import com.playmonumenta.plugins.abilities.warlock.WarlockPassive;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
@@ -109,11 +109,11 @@ import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.abilities.warrior.BruteForce;
 import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
 import com.playmonumenta.plugins.abilities.warrior.DefensiveLine;
+import com.playmonumenta.plugins.abilities.warrior.Formidable;
 import com.playmonumenta.plugins.abilities.warrior.Frenzy;
 import com.playmonumenta.plugins.abilities.warrior.Riposte;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
-import com.playmonumenta.plugins.abilities.warrior.WarriorPassive;
 import com.playmonumenta.plugins.abilities.warrior.WeaponMastery;
 import com.playmonumenta.plugins.abilities.warrior.berserker.GloriousBattle;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
@@ -131,7 +131,12 @@ import com.playmonumenta.plugins.itemstats.infusions.Vitality;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.util.ArrayList;
@@ -230,7 +235,7 @@ public class AbilityManager {
 			new ThunderStep(mPlugin, null),
 			new ElementalArrows(mPlugin, null),
 			new FrostNova(mPlugin, null),
-			new MagePassive(mPlugin, null),
+			new Channeling(mPlugin, null),
 			new MagmaShield(mPlugin, null),
 			new ManaLance(mPlugin, null),
 			new Spellshock(mPlugin, null),
@@ -241,7 +246,7 @@ public class AbilityManager {
 			new ByMyBlade(mPlugin, null),
 			new DaggerThrow(mPlugin, null),
 			new Dodging(mPlugin, null),
-			new RoguePassive(mPlugin, null),
+			new Dethroner(mPlugin, null),
 			new Smokescreen(mPlugin, null),
 			new ViciousCombos(mPlugin, null),
 			new Skirmisher(mPlugin, null),
@@ -253,7 +258,7 @@ public class AbilityManager {
 			new Volley(mPlugin, null),
 			new Swiftness(mPlugin, null),
 			new EagleEye(mPlugin, null),
-			new ScoutPassive(mPlugin, null),
+			new Versatile(mPlugin, null),
 			new SwiftCuts(mPlugin, null),
 			new Sharpshooter(mPlugin, null),
 			new WindBomb(mPlugin, null),
@@ -265,7 +270,7 @@ public class AbilityManager {
 			new Riposte(mPlugin, null),
 			new ShieldBash(mPlugin, null),
 			new Toughness(mPlugin, null),
-			new WarriorPassive(mPlugin, null),
+			new Formidable(mPlugin, null),
 			new WeaponMastery(mPlugin, null),
 			new BruteForce(mPlugin, null),
 
@@ -273,7 +278,7 @@ public class AbilityManager {
 			new CelestialBlessing(mPlugin, null),
 			new CleansingRain(mPlugin, null),
 			new HandOfLight(mPlugin, null),
-			new ClericPassive(mPlugin, null),
+			new Rejuvenation(mPlugin, null),
 			new DivineJustice(mPlugin, null),
 			new HeavenlyBoon(mPlugin, null),
 			new Crusade(mPlugin, null),
@@ -286,7 +291,7 @@ public class AbilityManager {
 			new CholericFlames(mPlugin, null),
 			new CursedWound(mPlugin, null),
 			new GraspingClaws(mPlugin, null),
-			new WarlockPassive(mPlugin, null),
+			new Culling(mPlugin, null),
 			new SanguineHarvest(mPlugin, null),
 			new SoulRend(mPlugin, null),
 			new MelancholicLament(mPlugin, null),

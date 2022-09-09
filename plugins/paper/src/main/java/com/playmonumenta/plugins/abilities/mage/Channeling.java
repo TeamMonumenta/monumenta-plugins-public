@@ -13,13 +13,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 
-public class MagePassive extends Ability {
+public class Channeling extends Ability {
 
 	public static final double PERCENT_MELEE_INCREASE = 0.2;
 
 	private boolean mCast = false;
 
-	public MagePassive(Plugin plugin, @Nullable Player player) {
+	public Channeling(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 	}
 

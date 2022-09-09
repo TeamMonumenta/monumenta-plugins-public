@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 
 
 
-public class ClericPassive extends Ability {
+public class Rejuvenation extends Ability {
 
 	private static final int RADIUS = 12;
 	private static final int HEAL_INTERVAL = 20 * 5;
@@ -32,7 +32,7 @@ public class ClericPassive extends Ability {
 
 	private int mTimer = 0;
 
-	public ClericPassive(Plugin plugin, @Nullable Player player) {
+	public Rejuvenation(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 	}
 

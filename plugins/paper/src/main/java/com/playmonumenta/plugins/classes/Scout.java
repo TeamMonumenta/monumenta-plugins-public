@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
-import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
+import com.playmonumenta.plugins.abilities.scout.Versatile;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
@@ -41,7 +41,8 @@ public class Scout extends PlayerClass {
 		mChatColor = ChatColor.AQUA;
 		mDisplayItem = new ItemStack(Material.BOW, 1);
 		mClassDescription = "Scouts are agile masters of archery and exploration.";
-		mClassPassiveDescription = String.format("You gain %d%% of your Bow Damage %% as Attack Damage and you gain %d%% of your Attack Damage %% as Bow Damage.", (int)(ScoutPassive.DAMAGE_MULTIPLY_MELEE * 100), (int)(ScoutPassive.DAMAGE_MULTIPLY_PROJ * 100));
+		mClassPassiveDescription = String.format("You gain %d%% of your Bow Damage %% as Attack Damage and you gain %d%% of your Attack Damage %% as Bow Damage.", (int)(Versatile.DAMAGE_MULTIPLY_MELEE * 100), (int)(Versatile.DAMAGE_MULTIPLY_PROJ * 100));
+		mClassPassiveName = "Versatile";
 
 		mSpecOne.mAbilities.add(new Quickdraw(plugin, player));
 		mSpecOne.mAbilities.add(new WhirlingBlade(plugin, player));

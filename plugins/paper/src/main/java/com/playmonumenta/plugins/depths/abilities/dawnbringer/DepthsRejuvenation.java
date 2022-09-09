@@ -16,7 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
-public class Rejuvenation extends DepthsAbility {
+public class DepthsRejuvenation extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Rejuvenation";
 	public static final int[] HEAL_INTERVAL = {100, 90, 80, 70, 60, 50};
@@ -27,7 +27,7 @@ public class Rejuvenation extends DepthsAbility {
 
 	private int mTimer = 0;
 
-	public Rejuvenation(Plugin plugin, Player player) {
+	public DepthsRejuvenation(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayMaterial = Material.NETHER_STAR;
 		mTree = DepthsTree.SUNLIGHT;

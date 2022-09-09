@@ -42,6 +42,7 @@ public class Warrior extends PlayerClass {
 		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
 		mClassDescription = "Warriors specialize in melee combat, being able to both deal and survive heavy damage.";
 		mClassPassiveDescription = "Gain a base of 20% Knockback Resistance. This stacks with other skills and items.";
+		mClassPassiveName = "Formidable";
 
 		mSpecOne.mAbilities.add(new GloriousBattle(plugin, player));
 		mSpecOne.mAbilities.add(new MeteorSlam(plugin, player));

@@ -10,16 +10,12 @@ import javax.annotation.Nullable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-/*
- * Scout Passive:
- */
-
-public class ScoutPassive extends Ability {
+public class Versatile extends Ability {
 
 	public static final float DAMAGE_MULTIPLY_MELEE = 0.50f;
 	public static final float DAMAGE_MULTIPLY_PROJ = 0.40f;
 
-	public ScoutPassive(Plugin plugin, @Nullable Player player) {
+	public Versatile(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 	}
 

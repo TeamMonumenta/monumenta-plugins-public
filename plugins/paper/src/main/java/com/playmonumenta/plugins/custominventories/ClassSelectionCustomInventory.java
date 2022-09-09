@@ -584,9 +584,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			GUIUtils.splitLoreLine(newMeta, "Description: " + classToItemize.mClassDescription, 30, ChatColor.YELLOW, false);
 			newItem.setItemMeta(newMeta);
 		}
-		if (classToItemize.mClassPassiveDescription != null) {
+		if (classToItemize.mClassPassiveDescription != null && classToItemize.mClassPassiveName != null) {
 			ItemMeta newMeta = newItem.getItemMeta();
-			GUIUtils.splitLoreLine(newMeta, "Passive: " + classToItemize.mClassPassiveDescription, 30, ChatColor.GREEN, false);
+			GUIUtils.splitLoreLine(newMeta, classToItemize.mClassPassiveName + " (Passive): " + classToItemize.mClassPassiveDescription, 30, ChatColor.GREEN, false);
 			newItem.setItemMeta(newMeta);
 		}
 

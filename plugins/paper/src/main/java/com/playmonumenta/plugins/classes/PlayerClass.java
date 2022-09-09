@@ -24,6 +24,7 @@ public class PlayerClass {
 	public int mQuestReqMin;
 	public @Nullable String mClassDescription;
 	public @Nullable String mClassPassiveDescription;
+	public @Nullable String mClassPassiveName;
 
 	public PlayerSpec mSpecOne = new PlayerSpec();
 	public PlayerSpec mSpecTwo = new PlayerSpec();
