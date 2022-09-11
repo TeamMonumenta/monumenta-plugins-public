@@ -196,14 +196,19 @@ public class ItemStatManager implements Listener {
 					NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
 					boolean scaleRegion = mRegion.compareTo(ItemStatUtils.getRegion(item)) < 0;
+					boolean scaleRegionLarge = mRegion.equals(ItemStatUtils.Region.VALLEY) &&
+						ItemStatUtils.getRegion(item).equals(ItemStatUtils.Region.RING);
+					if (scaleRegionLarge) {
+						scaleRegion = false;
+					}
 
 					for (ItemStat stat : ITEM_STATS) {
 						if (stat instanceof Attribute attribute) {
-							double multiplier = attribute.getAttributeType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+							double multiplier = attribute.getAttributeType().isRegionScaled() && scaleRegion ? 0.5 : attribute.getAttributeType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 							newArmorAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, slot) * multiplier);
 							newArmorMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, slot) * multiplier);
 						} else if (stat instanceof Enchantment enchantment) {
-							double multiplier = enchantment.getEnchantmentType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+							double multiplier = enchantment.getEnchantmentType().isRegionScaled() && scaleRegion ? 0.5 : enchantment.getEnchantmentType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 							if (enchantment.getEnchantmentType() == EnchantmentType.MAINHAND_OFFHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
 								break;
 							}
@@ -214,7 +219,7 @@ public class ItemStatManager implements Listener {
 								newArmorAddStats.add(stat, 1);
 							}
 						} else if (stat instanceof Infusion infusion) {
-							double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+							double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : infusion.getInfusionType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 							newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
 						}
 					}
@@ -231,14 +236,19 @@ public class ItemStatManager implements Listener {
 				NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
 				boolean scaleRegion = mRegion.compareTo(ItemStatUtils.getRegion(mainhand)) < 0;
+				boolean scaleRegionLarge = mRegion.equals(ItemStatUtils.Region.VALLEY) &&
+					ItemStatUtils.getRegion(mainhand).equals(ItemStatUtils.Region.RING);
+				if (scaleRegionLarge) {
+					scaleRegion = false;
+				}
 
 				for (ItemStat stat : ITEM_STATS) {
 					if (stat instanceof Attribute attribute) {
-						double multiplier = attribute.getAttributeType().isMainhandRegionScaled() && scaleRegion ? 0.5 : 1.0;
+						double multiplier = attribute.getAttributeType().isMainhandRegionScaled() && scaleRegion ? 0.5 : attribute.getAttributeType().isMainhandRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 						newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND) * multiplier);
 						newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND) * multiplier);
 					} else if (stat instanceof Enchantment enchantment) {
-						double multiplier = enchantment.getEnchantmentType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+						double multiplier = enchantment.getEnchantmentType().isRegionScaled() && scaleRegion ? 0.5 : enchantment.getEnchantmentType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 						if (enchantment.getEnchantmentType() == EnchantmentType.OFFHAND_MAINHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
 							break;
 						}
@@ -246,7 +256,7 @@ public class ItemStatManager implements Listener {
 							newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 						}
 					} else if (stat instanceof Infusion infusion) {
-						double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+						double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : infusion.getInfusionType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 						newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
 					}
 				}

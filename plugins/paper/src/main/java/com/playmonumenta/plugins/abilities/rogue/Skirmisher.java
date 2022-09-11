@@ -67,6 +67,7 @@ public class Skirmisher extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer != null) {
 			Location loc = enemy.getLocation();
+			World world = mPlayer.getWorld();
 
 			// If Enhanced and triggers on a melee strike,
 			if (isEnhanced() && event.getType() == DamageType.MELEE) {
@@ -76,22 +77,16 @@ public class Skirmisher extends Ability {
 
 				if (selectedEnemy != null) {
 					DamageUtils.damage(mPlayer, selectedEnemy, DamageType.OTHER, event.getDamage() * ENHANCEMENT_SPLASH_PERCENT_DAMAGE, mInfo.mLinkedSpell, true);
+					Location eLoc = selectedEnemy.getLocation();
+					aesthetics(eLoc, world);
 				}
 			}
 
 			if (event.getAbility() != mInfo.mLinkedSpell && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)) {
 				if (EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, SKIRMISHER_FRIENDLY_RADIUS), enemy).size() >= MOB_COUNT_CUTOFF
 					|| (isLevelTwo() && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
-					World world = mPlayer.getWorld();
-					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
-					world.playSound(loc, Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 0.5f);
-					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
-					loc.add(0, 1, 0);
-					new PartialParticle(Particle.SMOKE_NORMAL, loc, 10, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SPELL_MOB, loc, 10, 0.35, 0.5, 0.35, 0.00001).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.CRIT, loc, 10, 0.25, 0.5, 0.25, 0.55).spawnAsPlayerActive(mPlayer);
-
 					event.setDamage((event.getDamage() + mIsolatedFlatDamage) * (1 + mIsolatedPercentDamage));
+					aesthetics(loc, world);
 				}
 			}
 		}
@@ -101,6 +96,16 @@ public class Skirmisher extends Ability {
 	@Override
 	public boolean runCheck() {
 		return InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer);
+	}
+
+	private void aesthetics(Location loc, World world) {
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
+		world.playSound(loc, Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 0.5f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
+		loc.add(0, 1, 0);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 10, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPELL_MOB, loc, 10, 0.35, 0.5, 0.35, 0.00001).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CRIT, loc, 10, 0.25, 0.5, 0.25, 0.55).spawnAsPlayerActive(mPlayer);
 	}
 }
 
