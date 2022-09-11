@@ -60,6 +60,8 @@ public class Spellshock extends Ability {
 	public static final String CHARM_MELEE = "Spellshock Melee Amplifier";
 	public static final String CHARM_SPEED = "Spellshock Speed Amplifier";
 	public static final String CHARM_SLOW = "Spellshock Slowness Amplifier";
+	public static final String CHARM_DETONATION_DAMAGE = "Spellshock Detonation Damage";
+	public static final String CHARM_DETONATION_RADIUS = "Spellshock Detonation Radius";
 
 	private final float mLevelDamage;
 	private final float mMeleeBonus;
@@ -190,7 +192,7 @@ public class Spellshock extends Ability {
 					mPlugin.mEffectManager.addEffect(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION_TICKS));
 					if (isEnhanced() && !mPlugin.mEffectManager.hasEffect(enemy, ENHANCEMENT_EFFECT_NAME)) {
 						mPlugin.mEffectManager.addEffect(enemy, ENHANCEMENT_EFFECT_NAME,
-							new SpellShockExplosion(mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer), SpellPower.getSpellDamage(mPlugin, mPlayer, ENHANCEMENT_DAMAGE), mPlayer.getUniqueId()));
+							new SpellShockExplosion(mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer), SpellPower.getSpellDamage(mPlugin, mPlayer, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DETONATION_DAMAGE, ENHANCEMENT_DAMAGE)), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DETONATION_RADIUS, ENHANCEMENT_RADIUS), mPlayer.getUniqueId()));
 					}
 				}
 			}

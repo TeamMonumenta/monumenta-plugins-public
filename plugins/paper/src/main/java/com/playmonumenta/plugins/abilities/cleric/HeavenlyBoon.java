@@ -41,10 +41,12 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	public static final String CHARM_CHANCE = "Heavenly Boon Potion Chance";
 	public static final String CHARM_DURATION = "Heavenly Boon Potion Duration";
+	public static final String CHARM_RADIUS = "Heavenly Boon Radius";
 
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
 	private final int mDuration;
+	private final double mRadius;
 
 	private @Nullable Crusade mCrusade;
 
@@ -62,10 +64,12 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				ENHANCEMENT_POTION_EFFECT_MAX_BOOST / 20,
 				ENHANCEMENT_POTION_EFFECT_MAX_DURATION / (60 * 20)
 			));
+		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
 		mTracker = new KillTriggeredAbilityTracker(this);
+
 		mChance = CharmManager.getLevelPercentDecimal(player, CHARM_CHANCE) + (isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE);
 		mDuration = CharmManager.getExtraDuration(player, CHARM_DURATION) + (isLevelOne() ? HEAVENLY_BOON_1_DURATION : HEAVENLY_BOON_2_DURATION);
-		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, HEAVENLY_BOON_RADIUS);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
@@ -101,7 +105,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		if (event.getIntensity(mPlayer) >= HEAVENLY_BOON_TRIGGER_INTENSITY) {
 			/* If within range, apply full strength of all potion effects to all nearby players */
 
-			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), HEAVENLY_BOON_RADIUS, true)) {
+			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
 				// Don't buff players that have their class disabled
 				if (p.getScoreboardTags().contains("disable_class")) {
 					continue;
@@ -181,7 +185,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			EntityUtils.spawnCustomSplashPotion(mPlayer, potions, pos);
 
 			if (isEnhanced()) {
-				for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), HEAVENLY_BOON_RADIUS, true)) {
+				for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
 					mPlugin.mPotionManager.modifyPotionDuration(p,
 						potionInfo -> {
 							if (potionInfo.mDuration > ENHANCEMENT_POTION_EFFECT_MAX_DURATION

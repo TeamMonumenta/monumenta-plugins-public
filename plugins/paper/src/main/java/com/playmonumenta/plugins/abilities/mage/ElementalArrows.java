@@ -44,6 +44,7 @@ public class ElementalArrows extends Ability {
 	public static final String CHARM_AREA_DAMAGE = "Elemental Arrows Area Damage";
 	public static final String CHARM_DURATION = "Elemental Arrows Duration";
 	public static final String CHARM_RANGE = "Elemental Arrows Range";
+	public static final String CHARM_THUNDER_COOLDOWN = "Elemental Arrows Thunder Arrow Cooldown";
 
 	private double mLastDamage = 0;
 
@@ -73,7 +74,7 @@ public class ElementalArrows extends Ability {
 				(int)(ENHANCED_DAMAGE_MULTIPLIER * 100)
 			));
 		mDisplayItem = new ItemStack(Material.SPECTRAL_ARROW, 1);
-		mInfo.mCooldown = ENHANCED_ARROW_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_THUNDER_COOLDOWN, ENHANCED_ARROW_COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 	}
 

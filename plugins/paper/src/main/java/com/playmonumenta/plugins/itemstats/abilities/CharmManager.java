@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
+import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
@@ -269,12 +270,16 @@ public class CharmManager {
 			ArcaneStrike.CHARM_BONUS,
 			ArcaneStrike.CHARM_COOLDOWN,
 			ElementalArrows.CHARM_DAMAGE,
+			ElementalArrows.CHARM_AREA_DAMAGE,
 			ElementalArrows.CHARM_DURATION,
 			ElementalArrows.CHARM_RANGE,
+			ElementalArrows.CHARM_THUNDER_COOLDOWN,
 			Spellshock.CHARM_SPEED,
 			Spellshock.CHARM_SLOW,
 			Spellshock.CHARM_SPELL,
 			Spellshock.CHARM_MELEE,
+			Spellshock.CHARM_DETONATION_DAMAGE,
+			Spellshock.CHARM_DETONATION_RADIUS,
 			AstralOmen.CHARM_DAMAGE,
 			AstralOmen.CHARM_RANGE,
 			AstralOmen.CHARM_MODIFIER,
@@ -313,6 +318,7 @@ public class CharmManager {
 			DivineJustice.CHARM_SELF,
 			HeavenlyBoon.CHARM_CHANCE,
 			HeavenlyBoon.CHARM_DURATION,
+			HeavenlyBoon.CHARM_RADIUS,
 			SacredProvisions.CHARM_CHANCE,
 			SacredProvisions.CHARM_RANGE,
 			CleansingRain.CHARM_COOLDOWN,
@@ -356,6 +362,7 @@ public class CharmManager {
 			HallowedBeam.CHARM_DISTANCE,
 			HallowedBeam.CHARM_STUN,
 			HallowedBeam.CHARM_HEAL,
+			Rejuvenation.CHARM_THRESHOLD,
 
 			//Rogue
 			AdvancingShadows.CHARM_COOLDOWN,

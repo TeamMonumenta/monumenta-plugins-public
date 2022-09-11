@@ -2,9 +2,9 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -30,6 +30,8 @@ public class Rejuvenation extends Ability {
 
 	private static final Map<UUID, Integer> LAST_HEAL_TICK = new HashMap<>();
 
+	public static final String CHARM_THRESHOLD = "Rejuvenation Health Threshold";
+
 	private int mTimer = 0;
 
 	public Rejuvenation(Plugin plugin, @Nullable Player player) {
@@ -46,9 +48,10 @@ public class Rejuvenation extends Ability {
 		if (oneSecond && mPlayer != null && !mPlayer.isDead()) {
 			mTimer += 20;
 			if (mTimer % HEAL_INTERVAL == 0) {
+				double healthLimit = HEALTH_LIMIT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_THRESHOLD);
 				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true)) {
-					// Don't buff players that have their class disabled or who have PvP enabled
-					if (player.getScoreboardTags().contains("disable_class") || AbilityManager.getManager().isPvPEnabled(player)) {
+					// Don't buff players that have their class disabled
+					if (player.getScoreboardTags().contains("disable_class")) {
 						continue;
 					}
 
@@ -63,7 +66,7 @@ public class Rejuvenation extends Ability {
 						LAST_HEAL_TICK.put(player.getUniqueId(), player.getTicksLived());
 						double maxHealth = EntityUtils.getMaxHealth(player);
 						double hp = player.getHealth() / maxHealth;
-						if (hp <= HEALTH_LIMIT) {
+						if (hp <= healthLimit) {
 							PlayerUtils.healPlayer(mPlugin, player, healPercent * maxHealth, mPlayer);
 							int numHearts = (int) (healPercent * 20);
 							new PartialParticle(Particle.HEART, player.getLocation().add(0, 2, 0), numHearts, 0.07, 0.07, 0.07, 0.001).spawnAsPlayerBuff(player);

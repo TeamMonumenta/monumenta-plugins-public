@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.effects;
 
-import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -26,12 +25,14 @@ public class SpellShockExplosion extends Effect {
 
 	private final ItemStatManager.PlayerItemStats mPlayerItemStats;
 	private final double mDamage;
+	private final double mRadius;
 	private final UUID mPlayerUuid; // store a UUID instead of a player to prevent memory leaks
 
-	public SpellShockExplosion(ItemStatManager.PlayerItemStats playerItemStats, double damage, UUID playerUuid) {
+	public SpellShockExplosion(ItemStatManager.PlayerItemStats playerItemStats, double damage, double radius, UUID playerUuid) {
 		super(DURATION);
 		mPlayerItemStats = playerItemStats;
 		mDamage = damage;
+		mRadius = radius;
 		mPlayerUuid = playerUuid;
 	}
 
@@ -49,10 +50,8 @@ public class SpellShockExplosion extends Effect {
 		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.5f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.0f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 1.5f);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(), 2 * Spellshock.ENHANCEMENT_RADIUS)) {
-			if (mob != entity && mob.getLocation().distanceSquared(entity.getLocation()) <= Spellshock.ENHANCEMENT_RADIUS * Spellshock.ENHANCEMENT_RADIUS) {
-				DamageUtils.damage(player, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, ClassAbility.SPELLSHOCK, mPlayerItemStats), mDamage, true, false, false);
-			}
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(), mRadius, entity)) {
+			DamageUtils.damage(player, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, ClassAbility.SPELLSHOCK, mPlayerItemStats), mDamage, true, false, false);
 		}
 	}
 
