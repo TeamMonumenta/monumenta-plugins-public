@@ -106,11 +106,11 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		public Component getLocalizedDeathMessage(net.minecraft.world.entity.LivingEntity entityliving) {
 			if (mKilledUsingMsg == null) {
 				String s = "death.attack.mob";
-				return new TranslatableComponent(s, entityliving.getScoreboardName(), this.entity.getScoreboardName());
+				return new TranslatableComponent(s, entityliving.getDisplayName(), this.entity.getDisplayName());
 			} else {
 				// death.attack.indirectMagic.item=%1$s was killed by %2$s using %3$s
 				String s = "death.attack.indirectMagic.item";
-				return new TranslatableComponent(s, entityliving.getScoreboardName(), this.entity.getScoreboardName(), mKilledUsingMsg);
+				return new TranslatableComponent(s, entityliving.getDisplayName(), this.entity.getDisplayName(), mKilledUsingMsg);
 			}
 		}
 	}
