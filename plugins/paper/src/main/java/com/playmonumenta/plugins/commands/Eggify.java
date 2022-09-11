@@ -45,7 +45,7 @@ public class Eggify {
 			.filter(Objects::nonNull)
 			.toList();
 		for (ItemStack spawnEgg : spawnEggs) {
-			if (entityType != ItemUtils.getSpawnEggType(spawnEgg.getType())) {
+			if (entityType != ItemUtils.getSpawnEggType(spawnEgg)) {
 				continue;
 			}
 			NBTItem nbtItem = new NBTItem(spawnEgg);
