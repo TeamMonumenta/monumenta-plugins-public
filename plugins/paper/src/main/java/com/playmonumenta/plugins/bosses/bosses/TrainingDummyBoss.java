@@ -23,8 +23,8 @@ import org.bukkit.plugin.Plugin;
 public class TrainingDummyBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_training_dummy";
 	public static final int detectionRange = 25;
-	private static final DecimalFormat cutoffDigits = new DecimalFormat("#.#####"); // number of #s determines maximum digits shown
-	private static final DecimalFormat holoDigits = new DecimalFormat("#.#"); // number of #s determines maximum digits shown
+	private static final DecimalFormat cutoffDigits = new DecimalFormat("0.0####"); // number of 0s/#s determines maximum digits shown
+	private static final DecimalFormat holoDigits = new DecimalFormat("0.0"); // number of 0s/#s determines maximum digits shown
 
 	private final Component HOLOGRAM_DEFAULT_NAME = Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
 		.append(Component.text("???", NamedTextColor.DARK_AQUA))
@@ -165,15 +165,16 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 		} else {
 			damageString = cutoffDigits.format(damage);
 		}
-		if (!damageString.contains(".")) {
-			damageString += ".0"; // DecimalFormat would take 1.0 to "1", but the ".0" is desired
-		}
 		return damageString;
 	}
 
 	@Override
 	public void unload() {
 		super.unload();
+		if (mHologram != null) {
+			mHologram.remove();
+			mHologram = null;
+		}
 		mDPSCounter = -1;
 		mDPSCounter10s = -1;
 		mDPSDisp = -1;
