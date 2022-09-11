@@ -34,11 +34,8 @@ public class Shielding implements Enchantment {
 	public static double applyShielding(DamageEvent event, Plugin plugin, Player player) {
 		LivingEntity source = event.getSource();
 		if (doesShieldingApply(player, source)) {
-			double bonusPer = ARMOR_BONUS_PER_LEVEL;
-			if (!MetadataUtils.happenedInRecentTicks(player, DISABLE_METAKEY, DISABLE_DURATION)) {
-				bonusPer = ARMOR_BONUS_PER_LEVEL_DISABLED;
-			}
-			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SHIELDING) * bonusPer;
+			double bonusPerLevel = MetadataUtils.happenedInRecentTicks(player, DISABLE_METAKEY, DISABLE_DURATION) ? ARMOR_BONUS_PER_LEVEL_DISABLED : ARMOR_BONUS_PER_LEVEL;
+			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SHIELDING) * bonusPerLevel;
 		}
 		return 0;
 	}
@@ -57,7 +54,12 @@ public class Shielding implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (doesShieldingApply(player, source) && event.getType() == DamageEvent.DamageType.MELEE && event.getDamage() > 0 && source.getEquipment() != null && ItemUtils.isAxe(source.getEquipment().getItemInMainHand()) && !event.isBlockedByShield()) {
+		if (doesShieldingApply(player, source)
+			    && event.getType() == DamageEvent.DamageType.MELEE
+			    && event.getDamage() > 0
+			    && source.getEquipment() != null
+			    && ItemUtils.isAxe(source.getEquipment().getItemInMainHand())
+			    && !event.isBlockedByShield()) {
 			disable(player);
 		}
 	}
