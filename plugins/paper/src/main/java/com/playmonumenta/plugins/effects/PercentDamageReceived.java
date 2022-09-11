@@ -35,7 +35,7 @@ public class PercentDamageReceived extends Effect {
 
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
-		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
+		if (event.getType() != DamageType.TRUE && (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType()))) {
 			double amount = mAmount;
 			if (EntityUtils.isBoss(entity) && amount > 0) {
 				amount = amount / 2;

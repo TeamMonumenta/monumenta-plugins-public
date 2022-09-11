@@ -15,7 +15,11 @@ public class AntiRangeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_antirange";
 	public static final int detectionRange = 40;
 
-	private static final int ANTI_RANGE_DISTANCE = 8;
+	private final int mDistance;
+
+	public static class Parameters extends BossParameters {
+		public int DISTANCE = 12;
+	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new AntiRangeBoss(plugin, boss);
@@ -23,7 +27,8 @@ public class AntiRangeBoss extends BossAbilityGroup {
 
 	public AntiRangeBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-
+		Parameters p = BossParameters.getParameters(boss, identityTag, new AntiRangeBoss.Parameters());
+		mDistance = p.DISTANCE;
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
@@ -31,7 +36,7 @@ public class AntiRangeBoss extends BossAbilityGroup {
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		Location loc = mBoss.getLocation();
 
-		if (loc.distance(source.getLocation()) > ANTI_RANGE_DISTANCE) {
+		if (loc.distance(source.getLocation()) > mDistance) {
 			event.setCancelled(true);
 
 			World world = mBoss.getWorld();

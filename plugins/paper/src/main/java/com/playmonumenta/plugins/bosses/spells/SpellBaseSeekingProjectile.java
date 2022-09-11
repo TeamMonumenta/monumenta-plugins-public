@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.utils.*;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;

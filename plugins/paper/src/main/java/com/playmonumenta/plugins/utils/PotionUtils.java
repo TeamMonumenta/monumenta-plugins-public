@@ -292,6 +292,22 @@ public class PotionUtils {
 
 	}
 
+	public static void clearNegatives(LivingEntity entity) {
+		boolean dolphin = entity.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE);
+		for (PotionEffectType type : NEGATIVE_EFFECTS) {
+			if (entity.hasPotionEffect(type)) {
+				if ("SLOW".equals(type.getName()) && dolphin) {
+					continue;
+				}
+				PotionEffect effect = entity.getPotionEffect(type);
+				if (effect != null && effect.getDuration() < Constants.THIRTY_MINUTES) {
+					entity.removePotionEffect(type);
+				}
+			}
+		}
+
+	}
+
 	public static void applyPotion(Plugin plugin, Player player, PotionEffect effect) {
 		if (effect.getType().equals(PotionEffectType.HEAL)) {
 			double health = player.getHealth();

@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.bosses.bosses.ChargerBoss;
 import com.playmonumenta.plugins.bosses.bosses.ProjectileBoss;
 import com.playmonumenta.plugins.bosses.bosses.RejuvenationBoss;
-import com.playmonumenta.plugins.bosses.bosses.TpBehindBoss;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -55,13 +54,6 @@ public class Arcanic {
 		trackingProjectile.add(ProjectileBoss.identityTag + "[soundstart=[(BLOCK_BEACON_POWER_SELECT,1,0.5)],soundlaunch=[(ENTITY_EVOKER_CAST_SPELL,1,0.5)],soundprojectile=[(BLOCK_BEACON_POWER_SELECT,0.4,0.5)],soundhit=[(BLOCK_BEACON_DEACTIVATE,1,0.5)]]");
 		trackingProjectile.add(ProjectileBoss.identityTag + "[particlelaunch=[(SPELL_WITCH,40,0,0,0,0.3)],particleprojectile=[(SPELL_WITCH,6,0,0,0,0.3),(SMOKE_LARGE,2,0.2,0.2,0.2,0)],particlehit=[(SPELL_WITCH,50,0,0,0,0.3)]]");
 		ABILITY_POOL_R1.add(trackingProjectile);
-
-		//TpBehindTargetedBoss
-		List<String> tpBehind = new ArrayList<>();
-		tpBehind.add(TpBehindBoss.identityTag);
-		tpBehind.add(TpBehindBoss.identityTag + "[range=50,random=false]");
-		ABILITY_POOL_R1.add(tpBehind);
-		ABILITY_POOL_R2.add(tpBehind);
 
 		//ChargerStrongBoss
 		List<String> charger = new ArrayList<>();

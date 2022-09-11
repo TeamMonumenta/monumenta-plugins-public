@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.delves.abilities;
 
 import com.playmonumenta.plugins.delves.DelvesUtils;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -13,11 +14,11 @@ import org.bukkit.entity.LivingEntity;
 public class Chivalrous {
 
 	private static final double[] SPAWN_CHANCE = {
-			0.15,
-			0.3,
-			0.45,
-			0.60,
-			0.75
+			0.10,
+			0.20,
+			0.30,
+			0.40,
+			0.50
 	};
 
 	// 50% bee - 25% slime - 25% magmacube
@@ -70,6 +71,7 @@ public class Chivalrous {
 					creeper.setExplosionRadius((creeper.getExplosionRadius() + 1) / 2);
 				}
 			}
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mob, "ChivalrousDamageEffect", new PercentDamageDealt(999999999, .1));
 		}
 	}
 

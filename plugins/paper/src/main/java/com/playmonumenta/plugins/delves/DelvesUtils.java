@@ -6,7 +6,9 @@ import com.playmonumenta.plugins.delves.abilities.Entropy;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import it.unimi.dsi.util.XoRoShiRo128PlusRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -37,7 +39,6 @@ public class DelvesUtils {
 	private static final EnumMap<DelvesModifier, Integer> MODIFIER_RANK_CAPS = new EnumMap<>(DelvesModifier.class);
 
 	static {
-		MODIFIER_RANK_CAPS.put(DelvesModifier.RELENTLESS, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.ARCANIC, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.INFERNAL, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.TRANSCENDENT, 5);
@@ -49,15 +50,21 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.PERNICIOUS, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.LEGIONARY, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.CARAPACE, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.ECHOES, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.VENGEANCE, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.ENTROPY, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.TWISTED, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.FRAGILE, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.ASSASSINS, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.UNYIELDING, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.ASTRAL, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.CHRONOLOGY, 1);
 
 		// Depths endless changes- use dev2 for testing
 		if (ServerProperties.getShardName().startsWith("depths")
 			|| ServerProperties.getShardName().equals("dev2")
 			|| ServerProperties.getShardName().equals("corridors")) {
 			// Total of 72 points in depths
-			MODIFIER_RANK_CAPS.put(DelvesModifier.RELENTLESS, 5);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.ARCANIC, 7);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.INFERNAL, 7);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.TRANSCENDENT, 6);
@@ -73,10 +80,14 @@ public class DelvesUtils {
 
 		int maxDepthPoints = 0;
 		for (Map.Entry<DelvesModifier, Integer> entry : MODIFIER_RANK_CAPS.entrySet()) {
-			maxDepthPoints += entry.getValue();
+			maxDepthPoints += entry.getValue() * entry.getKey().getPointsPerLevel();
 		}
 
 		MAX_DEPTH_POINTS = maxDepthPoints;
+	}
+
+	public static DelvesModifier getWeeklyRotatingModifier() {
+		return DelvesModifier.rotatingDelveModifiers().get(new XoRoShiRo128PlusRandom(DateUtils.getWeeklyVersion()).nextInt(DelvesModifier.rotatingDelveModifiers().size()));
 	}
 
 	public static ItemStack getRankItem(DelvesModifier mod, int rank, int level) {
@@ -263,6 +274,8 @@ public class DelvesUtils {
 			List<DelvesModifier> mods = DelvesModifier.valuesList();
 			mods.remove(DelvesModifier.ENTROPY);
 			mods.remove(DelvesModifier.TWISTED);
+			mods.remove(DelvesModifier.FRAGILE);
+			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
 
 			while (pointsToAssign > 0) {
 				if (mods.isEmpty()) {

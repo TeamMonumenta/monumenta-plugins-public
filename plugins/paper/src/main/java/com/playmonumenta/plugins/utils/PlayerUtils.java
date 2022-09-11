@@ -24,12 +24,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
 
@@ -264,6 +266,32 @@ public class PlayerUtils {
 		}
 
 		return false;
+	}
+
+	public static boolean hasLineOfSight(Player player, Block block) {
+		Location fromLocation = player.getEyeLocation();
+		Location toLocation = block.getLocation();
+		int range = (int)fromLocation.distance(toLocation) + 1;
+		Vector direction = toLocation.toVector().subtract(fromLocation.toVector()).normalize();
+
+		try {
+			BlockIterator bi = new BlockIterator(fromLocation.getWorld(), fromLocation.toVector(), direction, 0, range);
+
+			while (bi.hasNext()) {
+				Block b = bi.next();
+
+				// If block is occluding (shouldn't include transparent blocks, liquids etc.),
+				// line of sight is broken, return false
+				if (BlockUtils.isLosBlockingBlock(b.getType()) && b != block) {
+					return false;
+				}
+			}
+		} catch (IllegalStateException e) {
+			// Thrown sometimes when chunks aren't loaded at exactly the right time
+			return false;
+		}
+
+		return true;
 	}
 
 	/*

@@ -36,6 +36,7 @@ public class DepthsVolley extends DepthsAbility {
 	private static final double[] DAMAGE_MULTIPLIER = {1.4, 1.5, 1.6, 1.7, 1.8, 2.0};
 	public Set<AbstractArrow> mDepthsVolleyArrows;
 	public Map<LivingEntity, Integer> mDepthsVolleyHitMap;
+
 	public DepthsVolley(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mInfo.mCooldown = COOLDOWN;

@@ -4,15 +4,20 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.delves.abilities.Astral;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
+import com.playmonumenta.plugins.delves.abilities.Chronology;
 import com.playmonumenta.plugins.delves.abilities.Colossal;
+import com.playmonumenta.plugins.delves.abilities.Fragile;
 import com.playmonumenta.plugins.delves.abilities.Infernal;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
 import com.playmonumenta.plugins.delves.abilities.Twisted;
 import com.playmonumenta.plugins.delves.mobabilities.TwistedMiniBoss;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
@@ -28,8 +33,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -37,10 +47,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.potion.PotionEffect;
@@ -276,7 +289,7 @@ public class DelvesManager implements Listener {
 				if (event instanceof SpawnerSpawnEvent) {
 					//normal spawn - handle all the mods
 					List<DelvesModifier> mods = DelvesModifier.valuesList();
-
+					Chronology.applyModifiers(((SpawnerSpawnEvent) event).getSpawner(), delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
 					for (DelvesModifier mod : mods) {
 						mod.applyDelve(livingEntity, delvesApplied.getOrDefault(mod, 0));
 						totalLevel += delvesApplied.getOrDefault(mod, 0);
@@ -305,11 +318,46 @@ public class DelvesManager implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void entityExplodeEvent(EntityExplodeEvent event) {
+		if (!DUNGEONS.contains(ServerProperties.getShardName())) {
+			return;
+		}
+		for (Block b : event.blockList()) {
+			if (b.getType() == Material.CHEST && b.getState() instanceof Chest chest && chest.isLocked()) {
+				event.blockList().remove(b);
+			}
+		}
+	}
+
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		//load the delves
 		loadPlayerData(player);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void playerWalk(PlayerMoveEvent event) {
+		Player player = event.getPlayer();
+		if (getRank(player, DelvesModifier.ASTRAL) == 0) {
+			return;
+		}
+		if (player.getGameMode() == GameMode.SPECTATOR) {
+			return;
+		}
+		PotionEffect resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+		double resistanceLevel = (resistance == null ? 0 : resistance.getAmplifier() + 1);
+		if (resistanceLevel < 5) {
+			List<Chunk> chunkList = LocationUtils.getSurroundingChunks(event.getTo().getBlock(), 32);
+			for (Chunk chunk : chunkList) {
+				for (BlockState interestingBlock : chunk.getTileEntities()) {
+					if (ChestUtils.isUnlootedChest(interestingBlock.getBlock()) && LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), 32) && PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
+						Astral.applyModifiers(interestingBlock.getBlock(), getRank(player, DelvesModifier.ASTRAL));
+					}
+				}
+			}
+		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -325,6 +373,18 @@ public class DelvesManager implements Listener {
 			}
 
 		}.runTaskLater(Plugin.getInstance(), 100);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onExpChange(PlayerExpChangeEvent event) {
+		Player player = event.getPlayer();
+		for (DelvesModifier mod : DelvesModifier.rotatingDelveModifiers()) {
+			if (getRank(player, mod) > 0) {
+				double expBuffPct = .25;
+				event.setAmount((int)(event.getAmount() * (1.0 + expBuffPct)));
+				return;
+			}
+		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -352,6 +412,10 @@ public class DelvesManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockBreakEvent(BlockBreakEvent event) {
 		if (!DUNGEONS.contains(ServerProperties.getShardName())) {
+			return;
+		}
+		if (event.getBlock().getState() instanceof Chest chest && chest.isLocked()) {
+			event.setCancelled(true);
 			return;
 		}
 		if (event.getBlock().getType() != Material.SPAWNER) {
@@ -382,7 +446,7 @@ public class DelvesManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
-
+		Fragile.applyModifiers(player, getRank(player, DelvesModifier.FRAGILE));
 		for (LivingEntity mob : player.getLocation().getNearbyLivingEntities(25)) {
 			TwistedMiniBoss boss = BossManager.getInstance().getBoss(mob, TwistedMiniBoss.class);
 			if (boss != null) {
@@ -427,7 +491,7 @@ public class DelvesManager implements Listener {
 		public void recalculateTotalPoint() {
 			mTotalPoint = 0;
 			for (Map.Entry<DelvesModifier, Integer> entry : mModifierPoint.entrySet()) {
-				mTotalPoint += entry.getValue();
+				mTotalPoint += entry.getValue() * entry.getKey().getPointsPerLevel();
 			}
 			mTotalPoint = Math.min(mTotalPoint, DelvesUtils.MAX_DEPTH_POINTS);
 		}
