@@ -7,26 +7,18 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.scout.HuntingCompanionCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.LivingEntity;
@@ -39,11 +31,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+
+
 public class HuntingCompanion extends Ability {
 	private static final int COOLDOWN = 24 * 20;
 	public static final int DURATION = 12 * 20;
 	private static final int TICK_INTERVAL = 5;
-	public static final String FOX_NAME = "FoxCompanion";
 	private static final int DETECTION_RANGE = 32;
 	private static final double DAMAGE_FRACTION_1 = 0.2;
 	private static final double DAMAGE_FRACTION_2 = 0.4;
@@ -61,6 +54,7 @@ public class HuntingCompanion extends Ability {
 	private @Nullable WindBomb mWindBomb;
 
 	public List<Entity> mStunnedMobs;
+	private HuntingCompanionCS mCosmetic = new HuntingCompanionCS();
 
 	public HuntingCompanion(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Hunting Companion");
@@ -83,6 +77,9 @@ public class HuntingCompanion extends Ability {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				mWindBomb = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WindBomb.class);
 			});
+
+			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
+			mCosmetic = HuntingCompanionCS.SKIN_LIST.getOrDefault(name, new HuntingCompanionCS());
 		}
 	}
 
@@ -121,7 +118,8 @@ public class HuntingCompanion extends Ability {
 				return;
 			}
 
-			mFox = (Fox) LibraryOfSoulsIntegration.summon(loc.clone().add(sideOffset).add(facingDirection.clone().setY(0).normalize().multiply(-0.25)), FOX_NAME); // adds facing direction so golem doesn't spawn inside user
+			mFox = (Fox) LibraryOfSoulsIntegration.summon(loc.clone().add(sideOffset).add(facingDirection.clone().setY(0).normalize().multiply(-0.25)), mCosmetic.getFoxName());
+
 			if (mFox == null) {
 				return;
 			}
@@ -149,13 +147,7 @@ public class HuntingCompanion extends Ability {
 
 			mFox.setVelocity(facingDirection.clone().setY(JUMP_HEIGHT).normalize().multiply(VELOCITY));
 			mFox.teleport(mFox.getLocation().setDirection(facingDirection));
-
-			world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
-			world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
-			world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.2f);
-			world.playSound(loc, Sound.ENTITY_FOX_SNIFF, 2.0f, 1.0f);
-			world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 0.75f, 1.2f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.2f, 1.0f);
+			mCosmetic.foxOnSummon(world, loc);
 
 			new BukkitRunnable() {
 				int mTicksElapsed = 0;
@@ -215,10 +207,8 @@ public class HuntingCompanion extends Ability {
 
 		World world = mPlayer.getWorld();
 		mTarget = enemy;
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
-		world.playSound(mFox.getLocation(), Sound.ENTITY_FOX_AGGRO, 1.5f, 1.0f);
+		mCosmetic.foxOnAggro(world, mPlayer, mFox);
 		PotionUtils.applyPotion(mPlayer, mTarget, new PotionEffect(PotionEffectType.GLOWING, DURATION, 0, true, false));
-		new PartialParticle(Particle.VILLAGER_ANGRY, mFox.getEyeLocation(), 25).spawnAsPlayerActive(mPlayer);
 		return true; // only one targeting instance per tick
 	}
 

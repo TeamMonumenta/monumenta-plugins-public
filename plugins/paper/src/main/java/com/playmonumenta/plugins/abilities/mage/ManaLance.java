@@ -4,10 +4,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.mage.ManaLanceCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -15,11 +15,8 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -29,13 +26,15 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 
+
 public class ManaLance extends Ability {
 
 	private static final float DAMAGE_1 = 6.0f;
 	private static final float DAMAGE_2 = 7.0f;
 	private static final int COOLDOWN_1 = 5 * 20;
 	private static final int COOLDOWN_2 = 3 * 20;
-	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
+
+	private ManaLanceCS mCosmetic = new ManaLanceCS();
 
 	public ManaLance(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Mana Lance");
@@ -47,6 +46,11 @@ public class ManaLance extends Ability {
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.TRIDENT, 1);
+
+		if (player != null) {
+			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
+			mCosmetic = ManaLanceCS.SKIN_LIST.getOrDefault(name, new ManaLanceCS());
+		}
 	}
 
 	@Override
@@ -56,7 +60,6 @@ public class ManaLance extends Ability {
 		}
 		float damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		damage = SpellPower.getSpellDamage(mPlugin, mPlayer, damage);
-
 		putOnCooldown();
 
 		Location loc = mPlayer.getEyeLocation();
@@ -75,8 +78,7 @@ public class ManaLance extends Ability {
 
 			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 				bLoc.subtract(dir.multiply(0.5));
-				new PartialParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
+				mCosmetic.lanceHit(mPlayer, bLoc, world);
 				break;
 			}
 			Iterator<LivingEntity> iter = mobs.iterator();
@@ -90,10 +92,8 @@ public class ManaLance extends Ability {
 			}
 		}
 
-		new PPLine(Particle.EXPLOSION_NORMAL, loc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0.05).extra(0.025).spawnAsPlayerActive(mPlayer);
-		new PPLine(Particle.REDSTONE, loc, endLoc).shiftStart(0.75).countPerMeter(18).delta(0.35).data(MANA_LANCE_COLOR).spawnAsPlayerActive(mPlayer);
-
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
+		mCosmetic.lanceParticle(mPlayer, loc, endLoc);
+		mCosmetic.lanceSound(world, mPlayer);
 	}
 
 	@Override

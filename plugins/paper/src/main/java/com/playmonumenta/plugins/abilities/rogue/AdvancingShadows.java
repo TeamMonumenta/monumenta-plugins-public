@@ -6,10 +6,11 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.AdvancingShadowsCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -22,8 +23,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -31,6 +30,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
+
 
 public class AdvancingShadows extends Ability {
 
@@ -51,6 +52,7 @@ public class AdvancingShadows extends Ability {
 	private @Nullable BladeDance mBladeDance;
 
 	private final double mPercentDamageDealt;
+	private AdvancingShadowsCS mCosmetic = new AdvancingShadowsCS();
 
 	public AdvancingShadows(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Advancing Shadows");
@@ -68,6 +70,9 @@ public class AdvancingShadows extends Ability {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				mBladeDance = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, BladeDance.class);
 			});
+
+			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
+			mCosmetic = AdvancingShadowsCS.SKIN_LIST.getOrDefault(name, new AdvancingShadowsCS());
 		}
 	}
 
@@ -76,6 +81,7 @@ public class AdvancingShadows extends Ability {
 		if (mPlayer == null || mTarget == null) {
 			return;
 		}
+
 		LivingEntity entity = mTarget;
 		double maxRange = getActivationRange();
 		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
@@ -86,8 +92,7 @@ public class AdvancingShadows extends Ability {
 			Location loc = mPlayer.getLocation();
 			while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET) {
 				loc.add(dir.clone().multiply(0.3333));
-				new PartialParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 4, 0.3, 0.5, 0.3, 1.0).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 10, 0.3, 0.5, 0.3, 0.025).spawnAsPlayerActive(mPlayer);
+				mCosmetic.tpParticleTrack(mPlayer, loc);
 				if (loc.distance(entity.getLocation()) < ADVANCING_SHADOWS_OFFSET) {
 					double multiplier = ADVANCING_SHADOWS_OFFSET - loc.distance(entity.getLocation());
 					loc.subtract(dir.clone().multiply(multiplier));
@@ -105,7 +110,7 @@ public class AdvancingShadows extends Ability {
 
 			// If still solid, something is wrong.
 			if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
-				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
+				mCosmetic.tpSoundFail(world, mPlayer);
 				return;
 			}
 
@@ -126,7 +131,7 @@ public class AdvancingShadows extends Ability {
 
 				// Maybe void - not worth it
 				if (!safe) {
-					world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
+					mCosmetic.tpSoundFail(world, mPlayer);
 					return;
 				}
 
@@ -136,13 +141,12 @@ public class AdvancingShadows extends Ability {
 
 			// Extra safeguard to prevent bizarro teleports
 			if (mPlayer.getLocation().distance(loc) > maxRange) {
-				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
+				mCosmetic.tpSoundFail(world, mPlayer);
 				return;
 			}
 
-			new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
+			mCosmetic.tpParticle(mPlayer);
+			mCosmetic.tpSound(world, mPlayer);
 
 			if (loc.distance(entity.getLocation()) <= origDistance) {
 				mPlayer.teleport(loc, TeleportCause.UNKNOWN);
@@ -158,9 +162,9 @@ public class AdvancingShadows extends Ability {
 				}
 			}
 
-			new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
+			mCosmetic.tpParticle(mPlayer);
+			mCosmetic.tpSound(world, mPlayer);
+
 			mTarget = null;
 			putOnCooldown();
 		}

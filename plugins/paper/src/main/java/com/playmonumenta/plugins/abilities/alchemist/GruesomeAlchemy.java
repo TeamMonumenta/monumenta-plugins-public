@@ -6,6 +6,9 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.GruesomeAlchemyCS;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import javax.annotation.Nullable;
@@ -16,6 +19,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+
+
 
 public class GruesomeAlchemy extends PotionAbility {
 	private static final int GRUESOME_ALCHEMY_DURATION = 8 * 20;
@@ -37,6 +42,8 @@ public class GruesomeAlchemy extends PotionAbility {
 	private boolean mHasWardingRemedy;
 	private boolean mHasPanacea;
 
+	private GruesomeAlchemyCS mCosmetic = new GruesomeAlchemyCS();
+
 	public GruesomeAlchemy(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Gruesome Alchemy", 0, 0);
 		mInfo.mScoreboardId = "GruesomeAlchemy";
@@ -46,6 +53,8 @@ public class GruesomeAlchemy extends PotionAbility {
 
 		//This is just for the Alchemical Artillery integration
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+
+		mInfo.mLinkedSpell = ClassAbility.GRUESOME_ALCHEMY;
 
 		mSlownessAmount = getAbilityScore() == 1 ? GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER : GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER;
 		mVulnerabilityAmount = getAbilityScore() == 1 ? GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER : GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER;
@@ -59,6 +68,11 @@ public class GruesomeAlchemy extends PotionAbility {
 			mHasWardingRemedy = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WardingRemedy.class) != null;
 			mHasPanacea = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Panacea.class) != null;
 		});
+
+		if (player != null) {
+			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
+			mCosmetic = GruesomeAlchemyCS.SKIN_LIST.getOrDefault(name, new GruesomeAlchemyCS());
+		}
 	}
 
 	@Override
@@ -79,7 +93,8 @@ public class GruesomeAlchemy extends PotionAbility {
 		}
 
 		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && mAlchemistPotions != null) {
-			mAlchemistPotions.swapMode();
+			mCosmetic.particleOnSwap(mPlayer, mAlchemistPotions.isGruesomeMode());
+			mAlchemistPotions.swapMode(mCosmetic.getSwapBrewPitch());
 		}
 	}
 
@@ -87,7 +102,7 @@ public class GruesomeAlchemy extends PotionAbility {
 	@Override
 	public void cast(Action action) {
 		if (mPlayer != null && mAlchemicalArtillery != null && mAlchemistPotions != null && mAlchemicalArtillery.isActive() && ItemUtils.isBowOrTrident(mPlayer.getInventory().getItemInMainHand()) && !(mHasPanacea && mPlayer.isSneaking())) {
-			mAlchemistPotions.swapMode();
+			mAlchemistPotions.swapMode(1f);
 		}
 	}
 }

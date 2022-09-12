@@ -5,17 +5,13 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.AmplifyingHexCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -23,8 +19,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -34,6 +28,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
 
 
 public class AmplifyingHex extends Ability {
@@ -68,6 +63,7 @@ public class AmplifyingHex extends Ability {
 	private final int mRadius;
 	private float mRegionCap;
 	private float mDamage = 0f;
+	private AmplifyingHexCS mCosmetic = new AmplifyingHexCS();
 
 	public AmplifyingHex(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Amplifying Hex");
@@ -92,6 +88,9 @@ public class AmplifyingHex extends Ability {
 					.sum();
 				mDamage = DAMAGE_PER_SKILL_POINT * skillPoints;
 			});
+
+			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
+			mCosmetic = AmplifyingHexCS.SKIN_LIST.getOrDefault(name, new AmplifyingHexCS());
 		}
 	}
 
@@ -102,6 +101,7 @@ public class AmplifyingHex extends Ability {
 		}
 		World world = mPlayer.getWorld();
 		mRegionCap = ServerProperties.getClassSpecializationsEnabled() ? R2_CAP : R1_CAP;
+
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getLocation();
 			double mRadiusIncrement = 0.5;
@@ -120,8 +120,7 @@ public class AmplifyingHex extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().clone().add(0, 0.15, 0).add(vec);
-					new PartialParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					mCosmetic.amplifyingParticle(mPlayer, l);
 				}
 
 				if (mRadiusIncrement >= mRadius + 1) {
@@ -131,8 +130,10 @@ public class AmplifyingHex extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1.0f, 0.7f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.65f);
+
+		final Location soundLoc = mPlayer.getLocation();
+		mCosmetic.amplifyingSound(world, soundLoc);
+
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius, mPlayer)) {
@@ -140,7 +141,7 @@ public class AmplifyingHex extends Ability {
 			if (playerDir.dot(toMobVector) > DOT_ANGLE) {
 				int debuffCount = 0;
 				int amplifierCount = 0;
-				for (PotionEffectType effectType: DEBUFFS) {
+				for (PotionEffectType effectType : DEBUFFS) {
 					PotionEffect effect = mob.getPotionEffect(effectType);
 					if (effect != null) {
 						debuffCount++;

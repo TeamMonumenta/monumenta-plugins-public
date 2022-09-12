@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics;
 
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,16 +19,26 @@ public class Cosmetic {
 	public CosmeticType mType;
 	public boolean mEquipped;
 
+	//Lazy solution for cosmetic skill system
+	public ClassAbility mAbility;
+
 	public Cosmetic(CosmeticType type, String name) {
 		mName = name;
 		mType = type;
 		mEquipped = false;
+		mAbility = null;
 	}
 
 	public Cosmetic(CosmeticType type, String name, boolean isEquipped) {
 		mName = name;
 		mType = type;
 		mEquipped = isEquipped;
+		mAbility = null;
+	}
+
+	public Cosmetic(CosmeticType type, String name, boolean isEquipped, ClassAbility ability) {
+		this(type, name, isEquipped);
+		mAbility = ability;
 	}
 
 	public String getName() {
@@ -40,6 +51,10 @@ public class Cosmetic {
 
 	public boolean isEquipped() {
 		return mEquipped;
+	}
+
+	public ClassAbility getAbility() {
+		return mAbility;
 	}
 
 	public ItemStack getDisplayItem() {

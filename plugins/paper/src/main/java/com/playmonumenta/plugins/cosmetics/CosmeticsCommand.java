@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.GenericCommand;
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.plots.PlotBorderCustomInventory;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -43,6 +44,8 @@ public class CosmeticsCommand extends GenericCommand {
 						return PlotBorderCustomInventory.getCosmeticNames();
 					} else if (type == CosmeticType.VANITY) {
 						return Arrays.stream(Material.values()).filter(mat -> !mat.isLegacy()).map(mat -> mat.name().toLowerCase(Locale.ROOT) + ":").toArray(String[]::new);
+					} else if (type == CosmeticType.COSMETIC_SKILL) {
+						return CosmeticSkills.getNames();
 					} else {
 						return new String[0];
 					}
@@ -141,6 +144,7 @@ public class CosmeticsCommand extends GenericCommand {
 			.executesPlayer((player, args) -> {
 				new CosmeticsGUI(plugin, player).openInventory(player, plugin);
 			}).register();
+
 	}
 
 	private static void listCosmetics(Player player, CosmeticType type, CommandSender sender) {

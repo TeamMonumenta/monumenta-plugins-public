@@ -3,9 +3,10 @@ package com.playmonumenta.plugins.abilities.warrior;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.BruteForceCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -13,10 +14,10 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
 
 
 public class BruteForce extends Ability {
@@ -27,7 +28,7 @@ public class BruteForce extends Ability {
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
 
 	private double mMultiplier;
-
+	private BruteForceCS mCosmetic = new BruteForceCS();
 
 	public BruteForce(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Brute Force");
@@ -39,6 +40,11 @@ public class BruteForce extends Ability {
 		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
 
 		mMultiplier = getAbilityScore() == 1 ? 0 : BRUTE_FORCE_2_MODIFIER;
+
+		if (player != null) {
+			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
+			mCosmetic = BruteForceCS.SKIN_LIST.getOrDefault(name, new BruteForceCS());
+		}
 	}
 
 	@Override
@@ -48,11 +54,12 @@ public class BruteForce extends Ability {
 			event.setDamage(event.getDamage() + damageBonus);
 
 			Location loc = enemy.getLocation().add(0, 0.75, 0);
-			new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.135).spawnAsPlayerActive(mPlayer);
+			mCosmetic.bruteOnDamage(mPlayer, loc);
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, BRUTE_FORCE_RADIUS, enemy)) {
 				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damageBonus, mInfo.mLinkedSpell, true);
+				mCosmetic.bruteOnSpread(mPlayer, mob);
+
 				if (!EntityUtils.isBoss(mob)) {
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, BRUTE_FORCE_KNOCKBACK_SPEED, BRUTE_FORCE_KNOCKBACK_SPEED / 2, true);
 				}

@@ -4,7 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
@@ -84,8 +87,24 @@ public class CosmeticsManager implements Listener {
 		}
 		List<Cosmetic> playerCosmetics = mPlayerCosmetics.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>());
 		if (!listHasCosmetic(playerCosmetics, type, name)) {
-			playerCosmetics.add(new Cosmetic(type, name));
-			return true;
+			if (type != CosmeticType.COSMETIC_SKILL) {
+				playerCosmetics.add(new Cosmetic(type, name));
+				return true;
+			} else {
+				//Test only
+				if (name.equals("ALL")) {
+					for (String s : CosmeticSkills.getNames()) {
+						playerCosmetics.add(CosmeticSkills.getCosmeticByName(s));
+					}
+					return true;
+				}
+
+				Cosmetic c = CosmeticSkills.getCosmeticByName(name);
+				if (c != null) {
+					playerCosmetics.add(c);
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -129,11 +148,28 @@ public class CosmeticsManager implements Listener {
 	/**
 	 * Gets a list of unlocked cosmetic of certain type, sorted alphabetically by name
 	 */
+	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type, @Nullable Ability ability) {
+		if (type != CosmeticType.COSMETIC_SKILL) {
+			return getCosmetics(player).stream()
+				.filter(c -> c.getType() == type)
+				.sorted(Comparator.comparing(Cosmetic::getName))
+				.toList();
+		} else if (ability != null) {
+			return getCosmetics(player).stream()
+				.filter(c -> c.getType() == type)
+				.filter(c -> c.getAbility() == ability.mInfo.mLinkedSpell)
+				.sorted(Comparator.comparing(Cosmetic::getName))
+				.toList();
+		} else {
+			return getCosmetics(player).stream()
+				.filter(c -> c.getType() == type)
+				.sorted(Comparator.comparing(Cosmetic::getName))
+				.toList();
+		}
+	}
+
 	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type) {
-		return getCosmetics(player).stream()
-			.filter(c -> c.getType() == type)
-			.sorted(Comparator.comparing(Cosmetic::getName))
-			.toList();
+		return getCosmeticsOfTypeAlphabetical(player, type, null);
 	}
 
 	/**
@@ -169,6 +205,19 @@ public class CosmeticsManager implements Listener {
 		return null;
 	}
 
+	// Get current cosmetic skill of an ability
+	public String getSkillCosmeticName(Player player, ClassAbility ability) {
+		List<Cosmetic> activeCosmetics = getActiveCosmetics(player, CosmeticType.COSMETIC_SKILL);
+		if (activeCosmetics != null) {
+			for (Cosmetic c : activeCosmetics) {
+				if (c.isEquipped() && c.getAbility() == ability) {
+					return c.getName();
+				}
+			}
+		}
+		return "";
+	}
+
 	//Handlers for player lifecycle events
 
 	//Discard cosmetic data a few ticks after player leaves shard
@@ -197,6 +246,9 @@ public class CosmeticsManager implements Listener {
 				cosmeticObj.addProperty("name", cosmetic.getName());
 				cosmeticObj.addProperty("type", cosmetic.getType().getType());
 				cosmeticObj.addProperty("enabled", cosmetic.isEquipped());
+				if (cosmetic.getAbility() != null) {
+					cosmeticObj.addProperty("ability", cosmetic.getAbility().getName());
+				}
 				cosmeticArray.add(cosmeticObj);
 			}
 			event.setPluginData(KEY_PLUGIN_DATA, data);
@@ -215,8 +267,12 @@ public class CosmeticsManager implements Listener {
 				for (JsonElement cosmeticElement : cosmeticArray) {
 					JsonObject data = cosmeticElement.getAsJsonObject();
 					if (data.has("name") && data.has("type") && data.has("enabled")) {
-						playerCosmetics.add(new Cosmetic(CosmeticType.getTypeSelection(data.getAsJsonPrimitive("type").getAsString()), data.getAsJsonPrimitive("name").getAsString(),
-							data.getAsJsonPrimitive("enabled").getAsBoolean()));
+						Cosmetic toAdd = new Cosmetic(CosmeticType.getTypeSelection(data.getAsJsonPrimitive("type").getAsString()), data.getAsJsonPrimitive("name").getAsString(),
+							data.getAsJsonPrimitive("enabled").getAsBoolean(), null);
+						if (data.has("ability")) {
+							toAdd.mAbility = ClassAbility.getAbility(data.getAsJsonPrimitive("ability").getAsString());
+						}
+						playerCosmetics.add(toAdd);
 					}
 				}
 				//Check if we actually loaded any cosmetics

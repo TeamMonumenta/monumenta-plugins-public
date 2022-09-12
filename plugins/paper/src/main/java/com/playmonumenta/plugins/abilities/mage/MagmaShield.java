@@ -6,23 +6,15 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.mage.MagmaShieldCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.*;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -52,6 +44,7 @@ public class MagmaShield extends Ability {
 	private final int mLevelDamage;
 
 	private boolean mHasBlizzard;
+	private MagmaShieldCS mCosmetic;
 
 	public MagmaShield(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
@@ -86,6 +79,11 @@ public class MagmaShield extends Ability {
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 				mHasBlizzard = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Blizzard.class) != null;
 			});
+		}
+
+		if (player != null) {
+			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
+			mCosmetic = MagmaShieldCS.SKIN_LIST.getOrDefault(name, new MagmaShieldCS());
 		}
 	}
 
@@ -133,8 +131,7 @@ public class MagmaShield extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().add(0, 0.1, 0).add(vec);
-					new PartialParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					mCosmetic.magmaParticle(mPlayer, l);
 				}
 
 				if (mRadius >= SIZE + 1) {
@@ -144,9 +141,7 @@ public class MagmaShield extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.75f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 1f, 1.25f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
+		mCosmetic.magmaSound(world, mPlayer);
 	}
 
 	@Override

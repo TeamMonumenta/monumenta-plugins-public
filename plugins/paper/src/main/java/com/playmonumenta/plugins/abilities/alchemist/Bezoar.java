@@ -4,33 +4,27 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.BezoarCS;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import javax.annotation.Nullable;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+
+
 
 public class Bezoar extends Ability {
 	private static final int FREQUENCY = 5;
@@ -43,6 +37,7 @@ public class Bezoar extends Ability {
 
 	private int mKills = 0;
 	private @Nullable AlchemistPotions mAlchemistPotions;
+	private BezoarCS mCosmetic = new BezoarCS();
 
 	public Bezoar(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Bezoar");
@@ -56,18 +51,19 @@ public class Bezoar extends Ability {
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 		});
+
+		if (player != null) {
+			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
+			mCosmetic = BezoarCS.SKIN_LIST.getOrDefault(name, new BezoarCS());
+		}
 	}
 
 	public void dropBezoar(EntityDeathEvent event, boolean shouldGenDrops) {
 		mKills = 0;
 		World world = event.getEntity().getWorld();
 		Location loc = event.getEntity().getLocation().add(0, 0.25, 0);
-		ItemStack itemBezoar = new ItemStack(Material.LIME_CONCRETE);
-		ItemMeta bezoarMeta = itemBezoar.getItemMeta();
-		bezoarMeta.displayName(Component.text("Bezoar", NamedTextColor.WHITE)
-				.decoration(TextDecoration.ITALIC, false));
-		itemBezoar.setItemMeta(bezoarMeta);
-		ItemUtils.setPlainName(itemBezoar, "Bezoar");
+		ItemStack itemBezoar = mCosmetic.bezoarItem();
+
 		Item item = world.dropItemNaturally(loc, itemBezoar);
 		item.setGlowing(true);
 		item.setPickupDelay(Integer.MAX_VALUE);

@@ -4,8 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.CholericFlamesCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -15,7 +16,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -36,6 +36,7 @@ public class CholericFlames extends Ability {
 	private static final int COOLDOWN = 10 * 20;
 
 	private final int mDamage;
+	private CholericFlamesCS mCosmetic = new CholericFlamesCS();
 
 	public CholericFlames(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Choleric Flames");
@@ -48,6 +49,11 @@ public class CholericFlames extends Ability {
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.FIRE_CHARGE, 1);
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+
+		if (player != null) {
+			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
+			mCosmetic = CholericFlamesCS.SKIN_LIST.getOrDefault(name, new CholericFlamesCS());
+		}
 	}
 
 	@Override
@@ -65,9 +71,7 @@ public class CholericFlames extends Ability {
 			@Override
 			public void run() {
 				mRadius += 1.25;
-				new PPCircle(Particle.FLAME, mLoc, mRadius).ringMode(true).count(40).extra(0.125).spawnAsPlayerActive(mPlayer);
-				new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).ringMode(true).count(40).extra(0.125).spawnAsPlayerActive(mPlayer);
-				new PPCircle(Particle.SMOKE_NORMAL, mLoc, mRadius).ringMode(true).count(20).extra(0.15).spawnAsPlayerActive(mPlayer);
+				mCosmetic.flameParticle(mPlayer, mLoc, mRadius);
 				if (mRadius >= RADIUS + 1) {
 					this.cancel();
 				}
@@ -76,8 +80,7 @@ public class CholericFlames extends Ability {
 		}.runTaskTimer(mPlugin, 0, 1);
 
 		new PartialParticle(Particle.SMOKE_LARGE, loc, 30, 0, 0, 0, 0.15).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1.0f, 0.35f);
-		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
+		mCosmetic.flameSound(world, loc);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.mLinkedSpell, true);
