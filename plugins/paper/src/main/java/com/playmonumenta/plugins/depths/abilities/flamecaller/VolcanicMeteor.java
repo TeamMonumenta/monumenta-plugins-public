@@ -125,7 +125,7 @@ public class VolcanicMeteor extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap hands to summon a falling meteor location where you are looking, up to " + DISTANCE + " blocks away. When the meteor lands, it deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + SIZE + " block radius, but the damage is reduced depending on the distance from the center. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
+		return "Swap hands to summon a falling meteor location where you are looking, up to " + DISTANCE + " blocks away. When the meteor lands, it deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + SIZE + " block radius and apply fire for " + (FIRE_TICKS / 20) + "s, but the damage is reduced depending on the distance from the center. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
 	}
 
 	@Override

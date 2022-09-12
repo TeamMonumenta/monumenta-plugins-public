@@ -171,7 +171,7 @@ public class BottledSunlight extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while sneaking to throw a luminescent bottle. If you or an ally walk over it, you both gain " + DepthsUtils.getRarityColor(rarity) + ABSORPTION[rarity - 1] / 2 + ChatColor.WHITE + " absorption hearts for " + BOTTLE_ABSORPTION_DURATION / 20 + " seconds and the durations of negative potion effects get reduced by " + EFFECT_DURATION_REDUCTION / 20 + " seconds. If the bottle isn't grabbed, it quickly comes off cooldown. Cooldown: " + BOTTLE_USE_COOLDOWN / 20 + "s.";
+		return "Right click while sneaking to throw a luminescent bottle. If you or an ally walk over it, you both gain " + DepthsUtils.getRarityColor(rarity) + ABSORPTION[rarity - 1] / 2 + ChatColor.WHITE + " absorption hearts for " + BOTTLE_ABSORPTION_DURATION / 20 + " seconds and the durations of negative potion effects get reduced by " + EFFECT_DURATION_REDUCTION / 20 + " seconds. If the bottle is destroyed or not grabbed, it quickly comes off cooldown. Cooldown: " + BOTTLE_USE_COOLDOWN / 20 + "s.";
 	}
 
 	@Override

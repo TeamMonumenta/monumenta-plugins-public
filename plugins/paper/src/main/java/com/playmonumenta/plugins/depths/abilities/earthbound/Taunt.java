@@ -84,7 +84,7 @@ public class Taunt extends DepthsAbility {
 	@Override
 	public String getDescription(int rarity) {
 		return "Left click while sneaking and holding a weapon to have all enemies within " + CAST_RANGE + " blocks target you, and you gain " + DepthsUtils.getRarityColor(rarity) + ABSORPTION[rarity - 1] + ChatColor.WHITE +
-				" absorption for every enemy afflicted, up to " + MAX_ABSORB + ", for " + ABSORPTION_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+				" absorption for every enemy (up to " + MAX_ABSORB + " enemies) afflicted, for " + ABSORPTION_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

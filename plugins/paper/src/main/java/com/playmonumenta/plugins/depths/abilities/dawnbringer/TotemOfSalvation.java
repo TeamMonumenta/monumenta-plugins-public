@@ -144,7 +144,7 @@ public class TotemOfSalvation extends DepthsAbility {
 		if (TICK_FREQUENCY[rarity - 1] == 20) {
 			s = "";
 		}
-		return "Swap hands while holding a weapon to summon a totem that lasts " + DURATION / 20 + " second. The totem heals all players within " + EFFECT_RADIUS + " blocks by " + (int) DepthsUtils.roundPercent(PERCENT_HEALING) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + TICK_FREQUENCY[rarity - 1] / 20.0 + ChatColor.WHITE + " second" + s + ". If a player has full health, the healing will be converted into absorption that lasts " + ABSORPTION_DURATION / 20 + " seconds and caps at " + MAX_ABSORPTION / 2 + " hearts. Healing is 50% more effective on allies. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap hands while holding a weapon to summon a totem that lasts " + DURATION / 20 + " second. The totem heals all players within " + EFFECT_RADIUS + " blocks by " + (int) DepthsUtils.roundPercent(PERCENT_HEALING) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + TICK_FREQUENCY[rarity - 1] / 20.0 + ChatColor.WHITE + " second" + s + ". If a player has full health, the healing will be converted into absorption that lasts " + ABSORPTION_DURATION / 20 + " seconds and caps at " + MAX_ABSORPTION / 2 + " hearts. Healing from the totem is 50% more effective on allies. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override
