@@ -9,12 +9,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class WindBombAirTag extends Effect {
+	public static final String effectID = "WindBombAirTag";
 
 	private final double mAmount;
 	private final Player mPlayer;
 
 	public WindBombAirTag(int duration, double amount, Player player) {
-		super(duration);
+		super(duration, effectID);
 		mAmount = amount;
 		mPlayer = player;
 	}

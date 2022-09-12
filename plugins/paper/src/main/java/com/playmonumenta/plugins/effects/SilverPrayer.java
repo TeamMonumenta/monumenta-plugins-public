@@ -1,17 +1,19 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-public class SilverPrayer extends Effect {
+public class SilverPrayer extends ZeroArgumentEffect {
+	public static final String effectID = "SilverPrayer";
 
 	public static final String EFFECT_NAME = "SilverPrayerKnockbackRes";
 	public static final int EFFECT_DURATION = 2 * 20;
 
 	public SilverPrayer(int duration) {
-		super(duration);
+		super(duration, effectID);
 	}
 
 	@Override
@@ -23,6 +25,12 @@ public class SilverPrayer extends Effect {
 				}
 			}
 		}
+	}
+
+	public static SilverPrayer deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+
+		return new SilverPrayer(duration);
 	}
 
 	@Override

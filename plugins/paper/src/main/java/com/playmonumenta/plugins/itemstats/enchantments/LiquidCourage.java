@@ -90,8 +90,7 @@ public class LiquidCourage implements Enchantment {
 
 			// Set Cooldown
 			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, Refresh.reduceCooldown(plugin, player, COOLDOWN));
-			player.setCooldown(COOLDOWN_ITEM, cooldown);
-			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()), new ItemCooldown(cooldown, item, plugin));
+			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()), new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
 		}
 	}
 }

@@ -1,12 +1,19 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 // Reduce incoming damage based on charges
 public class CourageEffect extends Effect {
+	public static final String effectID = "CourageEffect";
 
 	private final @Nullable EnumSet<DamageEvent.DamageType> mAffectedDamageTypes;
 
@@ -15,7 +22,7 @@ public class CourageEffect extends Effect {
 	private int mTickWhenHit = 0;
 
 	public CourageEffect(int duration, double amount, int charges, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes) {
-		super(duration);
+		super(duration, effectID);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;
 		mCharges = charges;
@@ -52,6 +59,46 @@ public class CourageEffect extends Effect {
 				// without spending charges
 				event.setDamage(event.getDamage() * (1 - amount));
 			}
+		}
+	}
+
+	@Override
+	public JsonObject serialize() {
+		JsonObject object = new JsonObject();
+		object.addProperty("effectID", mEffectID);
+		object.addProperty("duration", mDuration);
+		object.addProperty("amount", mAmount);
+		object.addProperty("charges", mCharges);
+
+		if (mAffectedDamageTypes != null) {
+			JsonArray damageTypes = new JsonArray();
+			for (DamageEvent.DamageType type : mAffectedDamageTypes) {
+				damageTypes.add(type.name());
+			}
+			object.add("type", damageTypes);
+		}
+
+		return object;
+	}
+
+	public static CourageEffect deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+		double amount = object.get("amount").getAsDouble();
+		int charges = object.get("charges").getAsInt();
+
+		JsonArray damageTypes = object.getAsJsonArray("type");
+
+		if (damageTypes != null) {
+			List<DamageEvent.DamageType> damageTypeList = new ArrayList<>();
+			for (JsonElement element : damageTypes) {
+				String string = element.getAsString();
+				damageTypeList.add(DamageEvent.DamageType.valueOf(string));
+			}
+
+			EnumSet<DamageEvent.DamageType> damageTypeSet = EnumSet.copyOf(damageTypeList);
+			return new CourageEffect(duration, amount, charges, damageTypeSet);
+		} else {
+			return new CourageEffect(duration, amount, charges);
 		}
 	}
 

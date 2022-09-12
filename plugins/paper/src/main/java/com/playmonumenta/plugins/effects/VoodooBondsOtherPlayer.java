@@ -20,6 +20,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class VoodooBondsOtherPlayer extends Effect {
+	public static final String effectID = "VoodooBondsOtherPlayer";
 
 	private static final String SEND_EFFECT_NAME = "VoodooBondsDamageTaken";
 
@@ -33,7 +34,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
 	public VoodooBondsOtherPlayer(int duration, int transferDuration, Player player, Plugin plugin) {
-		super(duration);
+		super(duration, effectID);
 		mPlayer = player;
 		mPlugin = plugin;
 		mTransferDuration = transferDuration;

@@ -8,6 +8,7 @@ public class Aesthetics extends Effect {
 	public interface TickEffectAction {
 		/**
 		 * Ticking effects on the entity
+		 *
 		 * @param entity    the entity with the effect
 		 * @param fourHertz true every 5 ticks
 		 * @param twoHertz  true every 10 ticks
@@ -26,9 +27,10 @@ public class Aesthetics extends Effect {
 
 	private final TickEffectAction mTickEffectAction;
 	private final LoseEffectAction mLoseEffectAction;
+	public static final String effectID = "Aesthetics";
 
 	public Aesthetics(int duration, TickEffectAction tickEffectAction, LoseEffectAction loseEffectAction) {
-		super(duration);
+		super(duration, effectID);
 		mTickEffectAction = tickEffectAction;
 		mLoseEffectAction = loseEffectAction;
 	}

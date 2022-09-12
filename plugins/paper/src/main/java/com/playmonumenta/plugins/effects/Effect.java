@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -23,9 +25,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public abstract class Effect implements Comparable<Effect> {
 
 	protected int mDuration;
+	public String mEffectID;
 
-	public Effect(int duration) {
+	public Effect(int duration, String effectID) {
 		mDuration = duration;
+		mEffectID = effectID;
 	}
 
 	public EffectPriority getPriority() {
@@ -42,6 +46,10 @@ public abstract class Effect implements Comparable<Effect> {
 
 	public double getMagnitude() {
 		return 0;
+	}
+
+	public String getEffectID() {
+		return mEffectID;
 	}
 
 	public void clearEffect() {
@@ -109,6 +117,24 @@ public abstract class Effect implements Comparable<Effect> {
 
 	public void entityLoseEffect(Entity entity) {
 
+	}
+
+	// Serialize effects into JSON for debug and saving purposes.
+	// Override this if we need to save the effect, for effects that we can care less about
+	// though, just leave this be for String output purposes.
+	public JsonObject serialize() {
+		JsonObject object = new JsonObject();
+		object.addProperty("effectID", mEffectID);
+		object.addProperty("duration", mDuration);
+		object.addProperty("output", toString());
+
+		return object;
+	}
+
+	// Deserialize effects from JSON to create a new Effect Object, to be added on login.
+	// If we don't want the effect to be loaded on login, leave this be.
+	public static Effect deserialize(JsonObject object, Plugin plugin) {
+		return null;
 	}
 
 	// This is used by the Cursed Wound enhancement to determine if the effect should be stored and transferred

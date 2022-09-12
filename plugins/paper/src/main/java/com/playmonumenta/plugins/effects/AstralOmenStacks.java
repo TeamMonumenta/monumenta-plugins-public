@@ -7,14 +7,14 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 
 
-
 public class AstralOmenStacks extends Effect {
+	public static final String effectID = "AstralOmenStacks";
 	public static final Particle.DustOptions COLOR_PURPLE = new Particle.DustOptions(Color.fromRGB(100, 50, 170), 1f);
 
 	private final int mLevel;
 
 	public AstralOmenStacks(int duration, int level) {
-		super(duration);
+		super(duration, effectID);
 
 		mLevel = level;
 	}

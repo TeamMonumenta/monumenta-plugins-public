@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -20,7 +21,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class DeepGodsEndowment extends Effect {
+public class DeepGodsEndowment extends ZeroArgumentEffect {
+	public static final String effectID = "DeepGodsEndowment";
 
 	public static int HITS_NEEDED = 5;
 	Random RANDOM = new Random();
@@ -31,7 +33,7 @@ public class DeepGodsEndowment extends Effect {
 	private int mCurrHits = 0;
 
 	public DeepGodsEndowment(int duration) {
-		super(duration);
+		super(duration, effectID);
 	}
 
 	@Override
@@ -128,6 +130,12 @@ public class DeepGodsEndowment extends Effect {
 		loc.getWorld().spawnParticle(Particle.SPELL_WITCH, enemy.getLocation(), 15, 0.5, 0.2, 0.5, 0.65);
 		PotionUtils.applyPotion(entity, enemy,
 			new PotionEffect(PotionEffectType.GLOWING, 20 * 3, 0, true, false));
+	}
+
+	public static DeepGodsEndowment deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+
+		return new DeepGodsEndowment(duration);
 	}
 
 	@Override

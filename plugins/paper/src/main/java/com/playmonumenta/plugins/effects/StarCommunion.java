@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -10,7 +11,8 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-public class StarCommunion extends Effect {
+public class StarCommunion extends ZeroArgumentEffect {
+	public static final String effectID = "StarCommunion";
 
 	public static final double HEALTH_THRESHOLD = 0.9;
 	public static final int ON_HIT_DURATION = 4 * 20;
@@ -20,7 +22,7 @@ public class StarCommunion extends Effect {
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(154, 77, 255), 1.0f);
 
 	public StarCommunion(int duration) {
-		super(duration);
+		super(duration, effectID);
 	}
 
 	@Override
@@ -36,6 +38,12 @@ public class StarCommunion extends Effect {
 				new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, DARK_COLOR).spawnAsPlayerBuff((Player) entity);
 			}
 		}
+	}
+
+	public static StarCommunion deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+
+		return new StarCommunion(duration);
 	}
 
 	@Override

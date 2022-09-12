@@ -11,15 +11,15 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 
-
 public class AstralOmenBonusDamage extends Effect {
 	public static final Particle.DustOptions COLOR_PURPLE = AstralOmenStacks.COLOR_PURPLE;
+	public static final String effectID = "AstralOmenBonusDamage";
 
 	private final double mAmount;
 	private final Player mPlayer;
 
 	public AstralOmenBonusDamage(int duration, double amount, Player player) {
-		super(duration);
+		super(duration, effectID);
 		mAmount = amount;
 		mPlayer = player;
 	}

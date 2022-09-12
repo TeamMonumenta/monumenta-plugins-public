@@ -13,13 +13,14 @@ import org.bukkit.event.entity.EntityDeathEvent;
  * Effect for the healing of enhanced sanctified armor
  */
 public class SanctifiedArmorHeal extends Effect {
+	public static final String effectID = "SanctifiedArmorHeal";
 
 	private static final int DURATION = 20 * 60 * 5; // 5 minutes
 
 	private final Set<UUID> mPlayerUuids = new HashSet<>(); // store UUIDs instead of players to prevent memory leaks
 
 	public SanctifiedArmorHeal(UUID playerUuid) {
-		super(DURATION);
+		super(DURATION, effectID);
 		mPlayerUuids.add(playerUuid);
 	}
 

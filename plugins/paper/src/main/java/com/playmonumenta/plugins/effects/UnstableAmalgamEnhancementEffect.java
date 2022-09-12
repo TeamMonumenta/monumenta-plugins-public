@@ -14,13 +14,14 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.util.Vector;
 
 public class UnstableAmalgamEnhancementEffect extends Effect {
+	public static final String effectID = "UnstableAmalgamEnhancementEffect";
 
 	private final Player mPlayer;
 	private final UnstableAmalgam mUnstableAmalgam;
 	private final ItemStatManager.PlayerItemStats mStats;
 
 	public UnstableAmalgamEnhancementEffect(int duration, Player alchemist, UnstableAmalgam unstableAmalgam, ItemStatManager.PlayerItemStats stats) {
-		super(duration);
+		super(duration, effectID);
 		mPlayer = alchemist;
 		mUnstableAmalgam = unstableAmalgam;
 		mStats = stats;

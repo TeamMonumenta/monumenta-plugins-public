@@ -20,6 +20,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
  * Enhancement effect of Spellshock: Triggers an explosion when the enemy is killed.
  */
 public class SpellShockExplosion extends Effect {
+	public static final String effectID = "SpellShockExplosion";
 
 	private static final int DURATION = 20 * 60 * 5; // 5 minutes
 
@@ -29,7 +30,7 @@ public class SpellShockExplosion extends Effect {
 	private final UUID mPlayerUuid; // store a UUID instead of a player to prevent memory leaks
 
 	public SpellShockExplosion(ItemStatManager.PlayerItemStats playerItemStats, double damage, double radius, UUID playerUuid) {
-		super(DURATION);
+		super(DURATION, effectID);
 		mPlayerItemStats = playerItemStats;
 		mDamage = damage;
 		mRadius = radius;

@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.HashSet;
 import org.bukkit.entity.Entity;
@@ -7,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 public class BoonOfThePit extends ZeroArgumentEffect {
+	public static final String effectID = "BoonOfThePit";
 
 	public static double DAMAGE_BONUS = 1.2;
 	public static double HEAL_REDUCTION = 0.9;
@@ -14,7 +17,7 @@ public class BoonOfThePit extends ZeroArgumentEffect {
 	public HashSet<Entity> mEffectedMobs = new HashSet<>();
 
 	public BoonOfThePit(int duration) {
-		super(duration);
+		super(duration, effectID);
 	}
 
 	@Override
@@ -30,6 +33,12 @@ public class BoonOfThePit extends ZeroArgumentEffect {
 	public boolean entityRegainHealthEvent(EntityRegainHealthEvent event) {
 		event.setAmount(event.getAmount() * HEAL_REDUCTION);
 		return HEAL_REDUCTION > -1;
+	}
+
+	public static BoonOfThePit deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+
+		return new BoonOfThePit(duration);
 	}
 
 	@Override

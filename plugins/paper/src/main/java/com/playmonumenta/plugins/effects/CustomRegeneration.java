@@ -1,13 +1,16 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class CustomRegeneration extends Effect {
+	public static final String effectID = "CustomRegeneration";
 
 	private final double mAmount;
 	private final @Nullable Player mSourcePlayer;
@@ -18,7 +21,7 @@ public class CustomRegeneration extends Effect {
 	}
 
 	public CustomRegeneration(int duration, double amount, @Nullable Player sourcePlayer, Plugin plugin) {
-		super(duration);
+		super(duration, effectID);
 		mAmount = amount;
 		mSourcePlayer = sourcePlayer;
 		mPlugin = plugin;
@@ -30,6 +33,35 @@ public class CustomRegeneration extends Effect {
 			if (entity instanceof Player player) {
 				PlayerUtils.healPlayer(mPlugin, player, mAmount, mSourcePlayer);
 			}
+		}
+	}
+
+	@Override public JsonObject serialize() {
+		JsonObject object = new JsonObject();
+
+		object.addProperty("duration", mDuration);
+		object.addProperty("amount", mAmount);
+
+		if (mSourcePlayer != null) {
+			object.addProperty("sourcePlayer", mSourcePlayer.getUniqueId().toString());
+		}
+
+		return object;
+	}
+
+	public static CustomRegeneration deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+		double amount = object.get("amount").getAsDouble();
+
+		@Nullable Player sourcePlayer = null;
+		if (object.has("sourcePlayer")) {
+			sourcePlayer = plugin.getPlayer(UUID.fromString(object.get("sourcePlayer").getAsString()));
+		}
+
+		if (sourcePlayer != null && sourcePlayer.isOnline()) {
+			return new CustomRegeneration(duration, amount, sourcePlayer, plugin);
+		} else {
+			return null;
 		}
 	}
 

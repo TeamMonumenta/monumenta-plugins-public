@@ -13,13 +13,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * on the amount of debuffs the entity has.
  */
 public class SanguineHarvestBlight extends Effect {
+	public static final String effectID = "SanguineHarvestBlight";
 	public static final String GENERIC_NAME = "SanguineHarvestBlightEffect";
 
 	private final double mAmount;
 	private final Plugin mPlugin;
 
 	public SanguineHarvestBlight(int duration, double amount, Plugin plugin) {
-		super(duration);
+		super(duration, effectID);
 		mAmount = amount;
 		mPlugin = plugin;
 	}

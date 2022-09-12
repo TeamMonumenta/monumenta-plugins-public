@@ -1,24 +1,49 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class ItemCooldown extends Effect {
+	public static final String effectID = "ItemCooldown";
 
 	private final String mItemName;
+	private final Material mMaterial; // mMaterial is the "cooldown" item we select.
 	private final Plugin mPlugin;
 
 	public ItemCooldown(int duration, ItemStack item, Plugin plugin) {
-		super(duration);
-		mItemName = ItemUtils.getPlainName(item);
+		this(duration, ItemUtils.getPlainName(item), plugin);
+	}
+
+	public ItemCooldown(int duration, String itemName, Plugin plugin) {
+		this(duration, itemName, null, plugin);
+	}
+
+	public ItemCooldown(int duration, ItemStack item, Material material, Plugin plugin) {
+		this(duration, ItemUtils.getPlainName(item), material, plugin);
+	}
+
+	public ItemCooldown(int duration, String itemName, @Nullable Material material, Plugin plugin) {
+		super(duration, effectID);
+		mItemName = itemName;
+		mMaterial = material;
 		mPlugin = plugin;
+	}
+
+	@Override
+	public void entityGainEffect(Entity entity) {
+		if (mMaterial != null && entity instanceof Player player) {
+			player.setCooldown(mMaterial, mDuration);
+		}
 	}
 
 	@Override
@@ -33,6 +58,33 @@ public class ItemCooldown extends Effect {
 				}
 			}.runTaskLater(mPlugin, 1);
 		}
+	}
+
+	@Override
+	public JsonObject serialize() {
+		JsonObject object = new JsonObject();
+		object.addProperty("effectID", mEffectID);
+		object.addProperty("duration", mDuration);
+		object.addProperty("itemName", mItemName);
+
+		if (mMaterial != null) {
+			object.addProperty("material", mMaterial.name());
+		}
+
+		return object;
+	}
+
+	public static ItemCooldown deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+		String itemName = object.get("itemName").getAsString();
+
+		if (object.has("material")) {
+			String itemMaterial = object.get("material").getAsString();
+			Material material = Material.valueOf(itemMaterial);
+			return new ItemCooldown(duration, itemName, material, plugin);
+		}
+
+		return new ItemCooldown(duration, itemName, plugin);
 	}
 
 	/**

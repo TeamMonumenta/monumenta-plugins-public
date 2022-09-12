@@ -13,13 +13,14 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class ScorchedEarthDamage extends Effect {
+	public static final String effectID = "ScorchedEarthDamage";
 
 	private final double mDamage;
 	private final Player mAlchemist;
 	private final PlayerItemStats mStats;
 
 	public ScorchedEarthDamage(int duration, double damage, Player player, PlayerItemStats stats) {
-		super(duration);
+		super(duration, effectID);
 		mDamage = damage;
 		mAlchemist = player;
 		mStats = stats;

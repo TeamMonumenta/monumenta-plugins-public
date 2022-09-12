@@ -8,11 +8,12 @@ import java.util.stream.Collectors;
 import org.bukkit.entity.LivingEntity;
 
 public class PercentAbilityDamageReceived extends Effect {
+	public static final String effectID = "PercentAbilityDamageReceived";
 	private final double mAmount;
 	private final EnumSet<ClassAbility> mAffectedAbilities;
 
 	public PercentAbilityDamageReceived(int duration, double amount, EnumSet<ClassAbility> affectedAbilities) {
-		super(duration);
+		super(duration, effectID);
 		mAmount = amount;
 		mAffectedAbilities = affectedAbilities;
 	}

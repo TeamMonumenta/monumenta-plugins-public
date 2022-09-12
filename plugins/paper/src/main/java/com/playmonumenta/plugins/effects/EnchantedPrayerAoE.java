@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EnchantedPrayerAoE extends Effect {
+	public static final String effectID = "EnchantedPrayerAoE";
 
 	private final Plugin mPlugin;
 	private final double mDamageAmount;
@@ -28,7 +29,7 @@ public class EnchantedPrayerAoE extends Effect {
 	private final double mEffectSize;
 
 	public EnchantedPrayerAoE(Plugin plugin, int duration, double damageAmount, double healAmount, Player player, EnumSet<DamageType> affectedDamageTypes, double size) {
-		super(duration);
+		super(duration, effectID);
 		mPlugin = plugin;
 		mDamageAmount = damageAmount;
 		mHealAmount = healAmount;

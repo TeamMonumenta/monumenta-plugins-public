@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -187,17 +188,87 @@ public final class EffectManager implements Listener {
 			JsonObject ret = new JsonObject();
 			for (Map.Entry<EffectPriority, HashMap<String, NavigableSet<Effect>>> priorityEntries : mPriorityMap.entrySet()) {
 				JsonObject mid = new JsonObject();
+				JsonArray source = new JsonArray();
 				for (Map.Entry<String, NavigableSet<Effect>> effects : priorityEntries.getValue().entrySet()) {
 					JsonArray inner = new JsonArray();
 					for (Effect effect : effects.getValue()) {
-						inner.add(effect.toString());
+						inner.add(effect.serialize());
 					}
 					mid.add(effects.getKey(), inner);
+					source.add(effects.getKey());
 				}
+				mid.add("source", source);
 				ret.add(priorityEntries.getKey().name(), mid);
 			}
 			return ret;
 		}
+	}
+
+	@FunctionalInterface
+	public interface EffectDeserializer {
+		Effect deserialize(JsonObject object, Plugin plugin) throws Exception;
+	}
+
+	private static final Map<String, EffectDeserializer> mEffectDeserializer;
+
+	static {
+		mEffectDeserializer = new HashMap<>();
+		mEffectDeserializer.put(AbilityCooldownDecrease.effectID, AbilityCooldownDecrease::deserialize);
+		mEffectDeserializer.put(AbilityCooldownIncrease.effectID, AbilityCooldownIncrease::deserialize);
+		mEffectDeserializer.put(AbilitySilence.effectID, AbilitySilence::deserialize);
+		mEffectDeserializer.put(Aesthetics.effectID, Aesthetics::deserialize);
+		mEffectDeserializer.put(ArrowSaving.effectID, ArrowSaving::deserialize);
+		mEffectDeserializer.put(AstralOmenBonusDamage.effectID, AstralOmenBonusDamage::deserialize);
+		mEffectDeserializer.put(AstralOmenStacks.effectID, AstralOmenStacks::deserialize);
+		mEffectDeserializer.put(Bleed.effectID, Bleed::deserialize);
+		mEffectDeserializer.put(BonusSoulThreads.effectID, BonusSoulThreads::deserialize);
+		mEffectDeserializer.put(BoonOfThePit.effectID, BoonOfThePit::deserialize);
+		mEffectDeserializer.put(CourageEffect.effectID, CourageEffect::deserialize);
+		mEffectDeserializer.put(CrystalineBlessing.effectID, CrystalineBlessing::deserialize);
+		mEffectDeserializer.put(CustomDamageOverTime.effectID, CustomDamageOverTime::deserialize);
+		mEffectDeserializer.put(CustomRegeneration.effectID, CustomRegeneration::deserialize);
+		mEffectDeserializer.put(DeepGodsEndowment.effectID, DeepGodsEndowment::deserialize);
+		mEffectDeserializer.put(DurabilitySaving.effectID, DurabilitySaving::deserialize);
+		mEffectDeserializer.put(EnchantedPrayerAoE.effectID, EnchantedPrayerAoE::deserialize);
+		mEffectDeserializer.put(FirstStrikeCooldown.effectID, FirstStrikeCooldown::deserialize);
+		mEffectDeserializer.put(FlatDamageDealt.effectID, FlatDamageDealt::deserialize);
+		mEffectDeserializer.put(HealPlayerOnDeath.effectID, HealPlayerOnDeath::deserialize);
+		mEffectDeserializer.put(InfernoDamage.effectID, InfernoDamage::deserialize);
+		mEffectDeserializer.put(ItemCooldown.effectID, ItemCooldown::deserialize);
+		mEffectDeserializer.put(JudgementChainMobEffect.effectID, JudgementChainMobEffect::deserialize);
+		mEffectDeserializer.put(NegateDamage.effectID, NegateDamage::deserialize);
+		mEffectDeserializer.put(OnHitTimerEffect.effectID, OnHitTimerEffect::deserialize);
+		mEffectDeserializer.put(Paralyze.effectID, Paralyze::deserialize);
+		mEffectDeserializer.put(PercentAbilityDamageReceived.effectID, PercentAbilityDamageReceived::deserialize);
+		mEffectDeserializer.put(PercentAttackSpeed.effectID, PercentAttackSpeed::deserialize);
+		mEffectDeserializer.put(PercentDamageDealt.effectID, PercentDamageDealt::deserialize);
+		mEffectDeserializer.put(PercentDamageDealtSingle.effectID, PercentDamageDealtSingle::deserialize);
+		mEffectDeserializer.put(PercentDamageReceived.effectID, PercentDamageReceived::deserialize);
+		mEffectDeserializer.put(PercentExperience.effectID, PercentExperience::deserialize);
+		mEffectDeserializer.put(PercentHeal.effectID, PercentHeal::deserialize);
+		mEffectDeserializer.put(PercentKnockbackResist.effectID, PercentKnockbackResist::deserialize);
+		mEffectDeserializer.put(PercentSpeed.effectID, PercentSpeed::deserialize);
+		mEffectDeserializer.put(RecoilDisable.effectID, RecoilDisable::deserialize);
+		mEffectDeserializer.put(RiptideDisable.effectID, RiptideDisable::deserialize);
+		mEffectDeserializer.put(SanctifiedArmorHeal.effectID, SanctifiedArmorHeal::deserialize);
+		mEffectDeserializer.put(SanguineHarvestBlight.effectID, SanguineHarvestBlight::deserialize);
+		mEffectDeserializer.put(SanguineMark.effectID, SanguineMark::deserialize);
+		mEffectDeserializer.put(ScorchedEarthDamage.effectID, ScorchedEarthDamage::deserialize);
+		mEffectDeserializer.put(SilverPrayer.effectID, SilverPrayer::deserialize);
+		mEffectDeserializer.put(SpellShockExplosion.effectID, SpellShockExplosion::deserialize);
+		mEffectDeserializer.put(SpellShockStatic.effectID, SpellShockStatic::deserialize);
+		mEffectDeserializer.put(SplitArrowIframesEffect.effectID, SplitArrowIframesEffect::deserialize);
+		mEffectDeserializer.put(SpreadEffectOnDeath.effectID, SpreadEffectOnDeath::deserialize);
+		mEffectDeserializer.put(StarCommunion.effectID, StarCommunion::deserialize);
+		mEffectDeserializer.put(Stasis.effectID, Stasis::deserialize);
+		mEffectDeserializer.put(ThuribleBonusHealing.effectID, ThuribleBonusHealing::deserialize);
+		mEffectDeserializer.put(TuathanBlessing.effectID, TuathanBlessing::deserialize);
+		mEffectDeserializer.put(UnstableAmalgamEnhancementEffect.effectID, UnstableAmalgamEnhancementEffect::deserialize);
+		mEffectDeserializer.put(VengefulTag.effectID, VengefulTag::deserialize);
+		mEffectDeserializer.put(VoodooBondsOtherPlayer.effectID, VoodooBondsOtherPlayer::deserialize);
+		mEffectDeserializer.put(VoodooBondsReaper.effectID, VoodooBondsReaper::deserialize);
+		mEffectDeserializer.put(WarmthEffect.effectID, WarmthEffect::deserialize);
+		mEffectDeserializer.put(WindBombAirTag.effectID, WindBombAirTag::deserialize);
 	}
 
 	private static final int PERIOD = 5;
@@ -484,6 +555,31 @@ public final class EffectManager implements Listener {
 			return effects.getAsJsonObject();
 		}
 		return new JsonObject();
+	}
+
+	public void loadFromJsonObject(Player player, JsonObject object, Plugin plugin) throws Exception {
+		clearEffects(player);
+
+		String[] keys = {EffectPriority.EARLY.name(), EffectPriority.NORMAL.name(), EffectPriority.LATE.name()};
+
+		for (String priority : keys) {
+			JsonObject priorityEffect = object.get(priority).getAsJsonObject();
+
+			JsonArray sourceList = priorityEffect.get("source").getAsJsonArray();
+			for (JsonElement sourceElement : sourceList) {
+				String source = sourceElement.getAsString();
+				JsonArray innerArray = priorityEffect.get(source).getAsJsonArray();
+				for (JsonElement effectJson : innerArray) {
+					JsonObject effectObject = effectJson.getAsJsonObject();
+					String effectID = effectObject.get("effectID").getAsString();
+					Effect effect = mEffectDeserializer.get(effectID).deserialize(effectObject, plugin);
+
+					if (effect != null) {
+						addEffect(player, source, effect);
+					}
+				}
+			}
+		}
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

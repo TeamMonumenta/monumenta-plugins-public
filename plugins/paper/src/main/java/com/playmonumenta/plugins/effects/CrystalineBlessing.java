@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -14,6 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class CrystalineBlessing extends ZeroArgumentEffect {
+	public static final String effectID = "CrystalineBlessing";
 
 	private static final int DUR = 3 * 20;
 	private static final double DAMAGE_PERCENT = 0.2;
@@ -31,7 +33,13 @@ public class CrystalineBlessing extends ZeroArgumentEffect {
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(201, 127, 245), 1.0f);
 
 	public CrystalineBlessing(int duration) {
-		super(duration);
+		super(duration, effectID);
+	}
+
+	public static CrystalineBlessing deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+
+		return new CrystalineBlessing(duration);
 	}
 
 	@Override

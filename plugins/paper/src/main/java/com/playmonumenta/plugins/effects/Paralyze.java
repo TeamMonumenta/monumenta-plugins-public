@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -14,7 +15,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
-public class Paralyze extends Effect {
+public class Paralyze extends ZeroArgumentEffect {
+	public static final String effectID = "Paralyze";
 	private static final double CHANCE = 0.25;
 
 	private static final Particle.DustOptions COLOR_YELLOW
@@ -25,7 +27,7 @@ public class Paralyze extends Effect {
 	private Plugin mPlugin;
 
 	public Paralyze(int duration, Plugin plugin) {
-		super(duration);
+		super(duration, effectID);
 		mPlugin = plugin;
 	}
 
@@ -78,6 +80,12 @@ public class Paralyze extends Effect {
 				3f
 			);
 		}
+	}
+
+	public static Paralyze deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+
+		return new Paralyze(duration, plugin);
 	}
 
 	@Override

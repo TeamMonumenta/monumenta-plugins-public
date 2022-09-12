@@ -12,12 +12,13 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class JudgementChainMobEffect extends Effect {
+	public static final String effectID = "JudgementChainMobEffect";
 
 	private final Player mPlayer;
 	private final String mModifierName;
 
 	public JudgementChainMobEffect(int duration, Player player, String source) {
-		super(duration);
+		super(duration, effectID);
 		mPlayer = player;
 		mModifierName = source;
 	}

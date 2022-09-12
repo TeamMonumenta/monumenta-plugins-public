@@ -39,7 +39,6 @@ public class MonumentaRedisSyncIntegration implements Listener {
 	public void playerServerTransferEvent(PlayerServerTransferEvent event) {
 		Player player = event.getPlayer();
 		mLogger.info("PlayerTransferEvent: Player: " + player + "   Target: " + event.getTarget());
-		Plugin.getInstance().mEffectManager.clearEffects(player);
 		event.getPlayer().clearTitle();
 
 		player.closeInventory();
@@ -64,10 +63,21 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		if (data != null) {
 			try {
 				mPlugin.mPotionManager.loadFromJsonObject(player, data.get("potions").getAsJsonObject());
+
 				/* TODO LEVEL */
 				mLogger.info("Loaded potion data for player " + player.getName());
 			} catch (Exception ex) {
 				mLogger.severe("Failed to load potion data for player " + player.getName() + ":" + ex.getMessage());
+				ex.printStackTrace();
+			}
+
+			try {
+				mPlugin.mEffectManager.loadFromJsonObject(player, data.get("effects").getAsJsonObject(), mPlugin);
+
+				/* TODO LEVEL */
+				mLogger.info("Loaded effects data for player " + player.getName());
+			} catch (Exception ex) {
+				mLogger.severe("Failed to load effects data for player " + player.getName() + ":" + ex.getMessage());
 				ex.printStackTrace();
 			}
 		}
@@ -77,6 +87,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 	public void playerSaveEvent(PlayerSaveEvent event) {
 		JsonObject pluginData = new JsonObject();
 		pluginData.add("potions", mPlugin.mPotionManager.getAsJsonObject(event.getPlayer(), false));
+		pluginData.add("effects", mPlugin.mEffectManager.getAsJsonObject(event.getPlayer()));
 		event.setPluginData(IDENTIFIER, pluginData);
 	}
 

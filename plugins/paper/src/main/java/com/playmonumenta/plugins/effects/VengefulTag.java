@@ -4,12 +4,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class VengefulTag extends Effect {
+	public static final String effectID = "VengefulTag";
 
 	private final Player mPlayer;
 	private final LivingEntity mEnemy;
 
 	public VengefulTag(int duration, Player player, LivingEntity enemy) {
-		super(duration);
+		super(duration, effectID);
 		mPlayer = player;
 		mEnemy = enemy;
 	}

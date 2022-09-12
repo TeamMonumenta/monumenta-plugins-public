@@ -1,27 +1,38 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.function.BiPredicate;
 import org.bukkit.entity.LivingEntity;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PercentDamageDealt extends Effect {
 	public static final String GENERIC_NAME = "PercentDamageDealt";
+	public static final String effectID = "PercentDamageDealt";
 
 	protected final double mAmount;
 	protected final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
 	protected final int mPriority;
 	private @Nullable BiPredicate<LivingEntity, LivingEntity> mPredicate = null;
 
-	public PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate) {
-		super(duration);
+	private PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate, String id) {
+		super(duration, id);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;
 		mPriority = priority;
 		mPredicate = predicate;
+	}
+
+	public PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate) {
+		this(duration, amount, affectedDamageTypes, priority, predicate, effectID);
 	}
 
 	public PercentDamageDealt(int duration, double amount) {
@@ -30,6 +41,11 @@ public class PercentDamageDealt extends Effect {
 
 	public PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes) {
 		this(duration, amount, affectedDamageTypes, 0, null);
+	}
+
+	// Only call this in PercentDamageDealtSingle
+	public PercentDamageDealt(int duration, double amount, String effectIdentifier) {
+		this(duration, amount, null, 0, null, effectIdentifier);
 	}
 
 	// This needs to trigger before any flat damage
@@ -71,6 +87,52 @@ public class PercentDamageDealt extends Effect {
 	@Override
 	public @Nullable String getSpecificDisplay() {
 		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Damage Dealt";
+	}
+
+	@Override
+	public JsonObject serialize() {
+		JsonObject object = new JsonObject();
+		object.addProperty("effectID", mEffectID);
+		object.addProperty("duration", mDuration);
+		object.addProperty("amount", mAmount);
+
+		if (mAffectedDamageTypes != null) {
+			JsonArray jsonArray = new JsonArray();
+			for (DamageType damageType : mAffectedDamageTypes) {
+				jsonArray.add(damageType.name());
+			}
+			object.add("type", jsonArray);
+		}
+
+		object.addProperty("priority", mPriority);
+		object.addProperty("hasPredicate", mPredicate != null);
+
+		return object;
+	}
+
+	public static PercentDamageDealt deserialize(JsonObject object, Plugin plugin) {
+		if (object.has("hasPredicate") && object.get("hasPredicate").getAsBoolean()) {
+			// Noper nope nope not dealing with this
+			return null;
+		}
+
+		int duration = object.get("duration").getAsInt();
+		double amount = object.get("amount").getAsDouble();
+		int priority = object.get("priority").getAsInt();
+
+		if (object.has("type")) {
+			JsonArray damageTypes = object.getAsJsonArray("type");
+			List<DamageType> damageTypeList = new ArrayList<>();
+			for (JsonElement element : damageTypes) {
+				String string = element.getAsString();
+				damageTypeList.add(DamageEvent.DamageType.valueOf(string));
+			}
+
+			EnumSet<DamageEvent.DamageType> damageTypeSet = EnumSet.copyOf(damageTypeList);
+			return new PercentDamageDealt(duration, amount, damageTypeSet, priority, null);
+		} else {
+			return new PercentDamageDealt(duration, amount, null, priority, null);
+		}
 	}
 
 	@Override

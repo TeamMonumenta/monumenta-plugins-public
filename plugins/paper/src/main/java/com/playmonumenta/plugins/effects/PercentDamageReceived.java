@@ -1,21 +1,28 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PercentDamageReceived extends Effect {
+	public static final String effectID = "PercentDamageReceived";
 	public static final String GENERIC_NAME = "PercentDamageReceived";
 
 	private final double mAmount;
 	private final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
 
 	public PercentDamageReceived(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes) {
-		super(duration);
+		super(duration, effectID);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;
 	}
@@ -46,6 +53,43 @@ public class PercentDamageReceived extends Effect {
 				amount = amount / 2;
 			}
 			event.setDamage(event.getDamage() * (1 + amount));
+		}
+	}
+
+	@Override
+	public JsonObject serialize() {
+		JsonObject object = new JsonObject();
+		object.addProperty("effectID", mEffectID);
+		object.addProperty("duration", mDuration);
+		object.addProperty("amount", mAmount);
+
+		if (mAffectedDamageTypes != null) {
+			JsonArray jsonArray = new JsonArray();
+			for (DamageType damageType : mAffectedDamageTypes) {
+				jsonArray.add(damageType.name());
+			}
+			object.add("type", jsonArray);
+		}
+
+		return object;
+	}
+
+	public static PercentDamageReceived deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+		double amount = object.get("amount").getAsDouble();
+
+		if (object.has("type")) {
+			JsonArray damageTypes = object.getAsJsonArray("type");
+			List<DamageType> damageTypeList = new ArrayList<>();
+			for (JsonElement element : damageTypes) {
+				String string = element.getAsString();
+				damageTypeList.add(DamageEvent.DamageType.valueOf(string));
+			}
+
+			EnumSet<DamageEvent.DamageType> damageTypeSet = EnumSet.copyOf(damageTypeList);
+			return new PercentDamageReceived(duration, amount, damageTypeSet);
+		} else {
+			return new PercentDamageReceived(duration, amount);
 		}
 	}
 

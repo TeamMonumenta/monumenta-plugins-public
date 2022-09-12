@@ -13,12 +13,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class InfernoDamage extends Effect {
+	public static final String effectID = "InfernoDamage";
 
 	private final int mLevel;
 	private final Player mPlayer;
 
 	public InfernoDamage(int duration, int level, Player player) {
-		super(duration);
+		super(duration, effectID);
 		mLevel = level;
 		mPlayer = player;
 	}

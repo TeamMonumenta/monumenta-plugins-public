@@ -1,9 +1,19 @@
 package com.playmonumenta.plugins.effects;
 
-public class FirstStrikeCooldown extends Effect {
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+
+public class FirstStrikeCooldown extends ZeroArgumentEffect {
+	public static final String effectID = "FirstStrikeCooldown";
 
 	public FirstStrikeCooldown(int duration) {
-		super(duration);
+		super(duration, effectID);
+	}
+
+	public static FirstStrikeCooldown deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+
+		return new FirstStrikeCooldown(duration);
 	}
 
 	@Override

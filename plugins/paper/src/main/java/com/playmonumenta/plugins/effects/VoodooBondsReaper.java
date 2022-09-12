@@ -24,6 +24,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class VoodooBondsReaper extends Effect {
+	public static final String effectID = "VoodooBondsReaper";
 
 	private static final double PERCENT_1 = 0.33;
 	private static final double PERCENT_2 = 0.67;
@@ -40,7 +41,7 @@ public class VoodooBondsReaper extends Effect {
 	private boolean mDone = false;
 
 	public VoodooBondsReaper(int duration, Player player, double damageTaken, double damagePercent, Plugin plugin) {
-		super(duration);
+		super(duration, effectID);
 		mPlayer = player;
 		mDamageTaken = damageTaken;
 		mDamagePercent = damagePercent;

@@ -9,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 public class SpreadEffectOnDeath extends Effect {
+	public static final String effectID = "SpreadEffectOnDeath";
 	// mSource is the source of the OTHER effect, not this one! Be careful when using this effect
 	private final String mSource;
 	private final double mRadius;
@@ -16,7 +17,7 @@ public class SpreadEffectOnDeath extends Effect {
 	private final boolean mRecurse;
 
 	public SpreadEffectOnDeath(int duration, String source, double radius, int newDuration, boolean recurse) {
-		super(duration);
+		super(duration, effectID);
 		mSource = source;
 		mRadius = radius;
 		mNewDuration = newDuration;
