@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -12,7 +13,7 @@ import org.bukkit.entity.Player;
 
 
 public class AstralOmenBonusDamage extends Effect {
-	public static final Particle.DustOptions COLOR_PURPLE = AstralOmenStacks.COLOR_PURPLE;
+	public static final Particle.DustOptions COLOR_PURPLE = new Particle.DustOptions(Color.fromRGB(136, 147, 228), 1f);
 	public static final String effectID = "AstralOmenBonusDamage";
 
 	private final double mAmount;

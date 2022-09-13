@@ -66,7 +66,7 @@ public class ElementalSpiritFire extends Ability {
 		mInfo.mShorthandName = "ES";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, the fire spirit instantly dashes from you towards the farthest enemy that spell hit, dealing %s magic damage to all enemies in a %s-block cube around it along its path. The next moment after you deal ice damage, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, dealing %s magic damage to all enemies in a %s-block cube around it every second for %ss. If the spell was %s, the fire spirit does an additional %s%% of the bow's original damage, and for the ice spirit, an additional %s%%. The spirits' damage ignores iframes. Independent cooldown: %ss.",
+				"Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, the fire spirit instantly dashes from you towards the farthest enemy that spell hit, dealing %s fire magic damage to all enemies in a %s-block cube around it along its path. The next moment after you deal ice damage, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, dealing %s ice magic damage to all enemies in a %s-block cube around it every second for %ss. If the spell was %s, the fire spirit does an additional %s%% of the bow's original damage, and for the ice spirit, an additional %s%%. The spirits' damage ignores iframes. Independent cooldown: %ss.",
 				DAMAGE_1,
 				HITBOX,
 				ElementalSpiritIce.DAMAGE_1,
@@ -162,7 +162,7 @@ public class ElementalSpiritFire extends Ability {
 										double finalDamage = spellDamage;
 										if (
 											ClassAbility.ELEMENTAL_ARROWS_FIRE.equals(ability)
-											&& mElementalArrows != null
+												&& mElementalArrows != null
 										) {
 											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
 										}
@@ -214,9 +214,9 @@ public class ElementalSpiritFire extends Ability {
 				@Override
 				public void run() {
 					if (isTimerActive()
-						    || mPlayer == null
-							|| !mPlayer.isValid() // Ensure player is not dead, is still online?
-						    || PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
+						|| mPlayer == null
+						|| !mPlayer.isValid() // Ensure player is not dead, is still online?
+						|| PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
 						this.cancel();
 						mPlayerParticlesGenerator = null;
 					}
@@ -227,12 +227,12 @@ public class ElementalSpiritFire extends Ability {
 					mRotationAngle %= 360;
 
 					mParticle.location(
-						LocationUtils
-							.getHalfHeightLocation(mPlayer)
-							.add(
-								FastUtils.cos(Math.toRadians(mRotationAngle)),
-								FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.5,
-								FastUtils.sin(Math.toRadians(mRotationAngle))
+							LocationUtils
+								.getHalfHeightLocation(mPlayer)
+								.add(
+									FastUtils.cos(Math.toRadians(mRotationAngle)),
+									FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.5,
+									FastUtils.sin(Math.toRadians(mRotationAngle))
 								))
 						.spawnAsPlayerPassive(mPlayer);
 				}

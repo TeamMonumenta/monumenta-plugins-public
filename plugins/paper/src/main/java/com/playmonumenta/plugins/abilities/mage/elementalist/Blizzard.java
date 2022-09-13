@@ -40,7 +40,7 @@ public class Blizzard extends Ability {
 	public static final double SLOW_MULTIPLIER_1 = 0.25;
 	public static final double SLOW_MULTIPLIER_2 = 0.3;
 	public static final int DAMAGE_INTERVAL = 1 * Constants.TICKS_PER_SECOND;
-	public static final int SLOW_INTERVAL = (int)(0.5 * Constants.TICKS_PER_SECOND);
+	public static final int SLOW_INTERVAL = (int) (0.5 * Constants.TICKS_PER_SECOND);
 	public static final int DURATION_TICKS = 10 * Constants.TICKS_PER_SECOND;
 	public static final int SLOW_TICKS = 5 * Constants.TICKS_PER_SECOND;
 	public static final int COOLDOWN_TICKS = 30 * Constants.TICKS_PER_SECOND;
@@ -63,12 +63,12 @@ public class Blizzard extends Ability {
 		mInfo.mScoreboardId = NAME;
 		mInfo.mShorthandName = "Bl";
 		mInfo.mDescriptions.add(
-			String.format("Right click while sneaking, looking upwards, and holding a wand to create a storm of ice and snow that follows the player, dealing %s magic damage every second to all enemies in a %s block radius around you. The blizzard lasts for %ss, and chills enemies within it, slowing them by %s%%." +
-			" Players in the blizzard are extinguished if they are on fire, and the ability's damage bypasses iframes. This ability does not interact with Spellshock. Cooldown: %ss.",
+			String.format("Right click while sneaking, looking upwards, and holding a wand to create a storm of ice and snow that follows the player, dealing %s ice magic damage every second to all enemies in a %s block radius around you. The blizzard lasts for %ss, and chills enemies within it, slowing them by %s%%." +
+					" Players in the blizzard are extinguished if they are on fire, and the ability's damage bypasses iframes. This ability does not interact with Spellshock. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE_1,
 				DURATION_TICKS / 20,
-				(int)(SLOW_MULTIPLIER_1 * 100),
+				(int) (SLOW_MULTIPLIER_1 * 100),
 				COOLDOWN_TICKS / 20));
 		mInfo.mDescriptions.add(
 			String.format("Damage is increased from %s to %s, aura size is increased from %s to %s blocks, slowness increased to %s%%.",
@@ -76,7 +76,7 @@ public class Blizzard extends Ability {
 				DAMAGE_2,
 				SIZE_1,
 				SIZE_2,
-				(int)(SLOW_MULTIPLIER_2 * 100)));
+				(int) (SLOW_MULTIPLIER_2 * 100)));
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.SNOWBALL, 1);
 

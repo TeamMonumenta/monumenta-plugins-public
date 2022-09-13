@@ -54,7 +54,7 @@ public class Starfall extends Ability {
 		mInfo.mShorthandName = "SF";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While holding a wand, pressing the swap key marks where you're looking, up to %s blocks away. You summon a falling meteor above the mark that lands strongly, dealing %s magic damage to all enemies in a %s-block cube around it, setting them on fire for %ss, and knocking them away. Cooldown: %ss.",
+				"While holding a wand, pressing the swap key marks where you're looking, up to %s blocks away. You summon a falling meteor above the mark that lands strongly, dealing %s fire magic damage to all enemies in a %s-block cube around it, setting them on fire for %ss, and knocking them away. Cooldown: %ss.",
 				DISTANCE,
 				DAMAGE_1,
 				SIZE,
@@ -87,7 +87,7 @@ public class Starfall extends Ability {
 
 			if (
 				!isTimerActive()
-				&& !mPlayer.isSneaking()
+					&& !mPlayer.isSneaking()
 			) {
 				putOnCooldown();
 
@@ -121,6 +121,7 @@ public class Starfall extends Ability {
 
 		new BukkitRunnable() {
 			double mT = 0;
+
 			@Override
 			public void run() {
 				mT += 1;

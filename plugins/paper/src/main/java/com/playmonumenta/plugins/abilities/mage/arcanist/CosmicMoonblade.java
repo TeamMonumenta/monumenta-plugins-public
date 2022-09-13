@@ -59,16 +59,16 @@ public class CosmicMoonblade extends Ability {
 		mInfo.mScoreboardId = "CosmicMoonblade";
 		mInfo.mShorthandName = "CM";
 		mInfo.mDescriptions.add(
-			String.format("Swap while holding a wand to cause a wave of arcane blades to hit every enemy within a %s block cone %s times (%s damage per hit) in rapid succession that if each land, reduce all your other skill cooldowns by %s%% (Max %ss). Cooldown: %ss.",
+			String.format("Swap while holding a wand to cause a wave of arcane blades to hit every enemy within a %s block cone %s times (%s arcane magic damage per hit) in rapid succession that if each land, reduce all your other skill cooldowns by %s%% (Max %ss). Cooldown: %ss.",
 				RADIUS,
 				SWINGS,
 				(int) DAMAGE_1,
-				(int)(REDUCTION_MULTIPLIER_1 * 100),
+				(int) (REDUCTION_MULTIPLIER_1 * 100),
 				CAP_TICKS_1 / 20.0,
 				COOLDOWN / 20));
 		mInfo.mDescriptions.add(
 			String.format("Cooldown reduction is increased to %s%% (Max %ss) per blade and damage is increased to %s.",
-				(int)(REDUCTION_MULTIPLIER_2 * 100),
+				(int) (REDUCTION_MULTIPLIER_2 * 100),
 				CAP_TICKS_2 / 20,
 				(int) DAMAGE_2));
 		mInfo.mLinkedSpell = ClassAbility.COSMIC_MOONBLADE;

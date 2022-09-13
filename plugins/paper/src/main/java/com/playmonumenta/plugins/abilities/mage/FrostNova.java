@@ -63,7 +63,7 @@ public class FrostNova extends Ability {
 		mInfo.mShorthandName = "FN";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While sneaking, left-clicking with a wand unleashes a frost nova, dealing %s magic damage to all enemies in a %s-block cube around you, afflicting them with %s%% slowness for %ss, and extinguishing them if they're on fire. Slowness is reduced by %s%% on elites and bosses, and all players in the nova are also extinguished. The damage ignores iframes. Cooldown: %ss.",
+				"While sneaking, left-clicking with a wand unleashes a frost nova, dealing %s ice magic damage to all enemies in a %s-block cube around you, afflicting them with %s%% slowness for %ss, and extinguishing them if they're on fire. Slowness is reduced by %s%% on elites and bosses, and all players in the nova are also extinguished. The damage ignores iframes. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
 				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_1),

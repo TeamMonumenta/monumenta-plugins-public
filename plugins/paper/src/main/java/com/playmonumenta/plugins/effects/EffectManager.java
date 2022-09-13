@@ -219,7 +219,10 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(Aesthetics.effectID, Aesthetics::deserialize);
 		mEffectDeserializer.put(ArrowSaving.effectID, ArrowSaving::deserialize);
 		mEffectDeserializer.put(AstralOmenBonusDamage.effectID, AstralOmenBonusDamage::deserialize);
-		mEffectDeserializer.put(AstralOmenStacks.effectID, AstralOmenStacks::deserialize);
+		mEffectDeserializer.put(AstralOmenArcaneStacks.effectID, AstralOmenArcaneStacks::deserialize);
+		mEffectDeserializer.put(AstralOmenFireStacks.effectID, AstralOmenFireStacks::deserialize);
+		mEffectDeserializer.put(AstralOmenIceStacks.effectID, AstralOmenIceStacks::deserialize);
+		mEffectDeserializer.put(AstralOmenThunderStacks.effectID, AstralOmenThunderStacks::deserialize);
 		mEffectDeserializer.put(Bleed.effectID, Bleed::deserialize);
 		mEffectDeserializer.put(BonusSoulThreads.effectID, BonusSoulThreads::deserialize);
 		mEffectDeserializer.put(BoonOfThePit.effectID, BoonOfThePit::deserialize);

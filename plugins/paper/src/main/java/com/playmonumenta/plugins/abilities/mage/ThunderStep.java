@@ -87,7 +87,7 @@ public class ThunderStep extends Ability {
 		mInfo.mDescriptions.add(
 			String.format(
 				"While holding a wand while sneaking, pressing the swap key materializes a flash of thunder," +
-					" dealing %s magic damage to all enemies in a %s-block cube around you and knocking them away." +
+					" dealing %s thunder magic damage to all enemies in a %s-block cube around you and knocking them away." +
 					" The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block," +
 					" and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
 				DAMAGE_1,
@@ -108,7 +108,7 @@ public class ThunderStep extends Ability {
 		);
 		mInfo.mDescriptions.add(
 			String.format("Within %ss of casting, use the same trigger to return to the original starting location, stunning but not damaging nearby mobs." +
-				              " If you do not do so, your next Thunder Step within %ss will paralyze enemies for %ss.",
+					" If you do not do so, your next Thunder Step within %ss will paralyze enemies for %ss.",
 				BACK_TELEPORT_MAX_DELAY / 20,
 				ENHANCEMENT_BONUS_DAMAGE_TIMER / 20,
 				ENHANCEMENT_PARALYZE_DURATION / 20
@@ -139,14 +139,14 @@ public class ThunderStep extends Ability {
 			event.setCancelled(true);
 
 			if (mPlayer.isSneaking()
-				    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+				&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 
 				// if enhanced, can teleport back within a short time frame (regardless of if on cooldown or not)
 				if (isEnhanced()
-					    && mPlayer.getTicksLived() <= mLastCastTick + BACK_TELEPORT_MAX_DELAY
-					    && mLastCastLocation != null
-					    && mLastCastLocation.getWorld() == mPlayer.getWorld()
-					    && mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
+					&& mPlayer.getTicksLived() <= mLastCastTick + BACK_TELEPORT_MAX_DELAY
+					&& mLastCastLocation != null
+					&& mLastCastLocation.getWorld() == mPlayer.getWorld()
+					&& mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
 
 					doDamage(mPlayer.getLocation(), 0, false);
 					mLastCastLocation.setDirection(mPlayer.getLocation().getDirection());
@@ -196,7 +196,7 @@ public class ThunderStep extends Ability {
 					.setDirection(vector);
 
 				if (!playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)
-					    || ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+					|| ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 					return;
 				}
 

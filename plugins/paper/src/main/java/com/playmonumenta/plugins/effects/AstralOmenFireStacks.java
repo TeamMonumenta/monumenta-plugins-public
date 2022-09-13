@@ -7,13 +7,13 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 
 
-public class AstralOmenStacks extends Effect {
-	public static final String effectID = "AstralOmenStacks";
-	public static final Particle.DustOptions COLOR_PURPLE = new Particle.DustOptions(Color.fromRGB(100, 50, 170), 1f);
+public class AstralOmenFireStacks extends Effect {
+	public static final String effectID = "AstralOmenFireStacks";
+	public static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(255, 128, 0), 1f);
 
 	private final int mLevel;
 
-	public AstralOmenStacks(int duration, int level) {
+	public AstralOmenFireStacks(int duration, int level) {
 		super(duration, effectID);
 
 		mLevel = level;
@@ -29,7 +29,7 @@ public class AstralOmenStacks extends Effect {
 		if (fourHertz) {
 			Location location = entity.getLocation().add(0, 1, 0);
 			new PartialParticle(Particle.ENCHANTMENT_TABLE, location, 8, 0, 0, 0, 4).spawnAsEnemyBuff();
-			new PartialParticle(Particle.REDSTONE, location, 8, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE).spawnAsEnemyBuff();
+			new PartialParticle(Particle.REDSTONE, location, 8, 0.2, 0.2, 0.2, 0.1, COLOR).spawnAsEnemyBuff();
 		}
 	}
 

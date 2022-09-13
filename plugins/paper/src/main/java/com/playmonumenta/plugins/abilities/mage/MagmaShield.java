@@ -35,7 +35,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 
-
 public class MagmaShield extends Ability {
 
 	public static final String NAME = "Magma Shield";
@@ -77,7 +76,7 @@ public class MagmaShield extends Ability {
 		mInfo.mShorthandName = "MS";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While sneaking, right-clicking with a wand summons a torrent of flames, dealing %s magic damage to all enemies in front of you within a %s-block cube around you, setting them on fire for %ss, and knocking them away. The damage ignores iframes. Cooldown: %ss.",
+				"While sneaking, right-clicking with a wand summons a torrent of flames, dealing %s fire magic damage to all enemies in front of you within a %s-block cube around you, setting them on fire for %ss, and knocking them away. The damage ignores iframes. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
 				FIRE_SECONDS,

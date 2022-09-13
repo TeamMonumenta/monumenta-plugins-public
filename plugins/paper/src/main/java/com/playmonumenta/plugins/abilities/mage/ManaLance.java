@@ -52,14 +52,14 @@ public class ManaLance extends MultipleChargeAbility {
 		mInfo.mScoreboardId = "ManaLance";
 		mInfo.mShorthandName = "ML";
 		mInfo.mDescriptions.add(
-			String.format("Right clicking with a wand fires forth a piercing beam of Mana going %s blocks, dealing %s magic damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: %ss.",
+			String.format("Right clicking with a wand fires forth a piercing beam of Mana going %s blocks, dealing %s arcane magic damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: %ss.",
 				RANGE,
-				(int)DAMAGE_1,
+				(int) DAMAGE_1,
 				COOLDOWN_1 / 20
 			));
 		mInfo.mDescriptions.add(
 			String.format("The beam instead deals %s damage. Cooldown: %ss.",
-				(int)DAMAGE_2,
+				(int) DAMAGE_2,
 				COOLDOWN_2 / 20));
 		mInfo.mDescriptions.add("Mana lance now has two charges.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
