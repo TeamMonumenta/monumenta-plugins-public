@@ -7,18 +7,28 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.HuntingCompanionCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.LivingEntity;
@@ -54,7 +64,8 @@ public class HuntingCompanion extends Ability {
 	private @Nullable WindBomb mWindBomb;
 
 	public List<Entity> mStunnedMobs;
-	private HuntingCompanionCS mCosmetic = new HuntingCompanionCS();
+
+	private final HuntingCompanionCS mCosmetic;
 
 	public HuntingCompanion(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Hunting Companion");
@@ -73,13 +84,12 @@ public class HuntingCompanion extends Ability {
 
 		mStunnedMobs = new ArrayList<Entity>();
 
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HuntingCompanionCS(), HuntingCompanionCS.SKIN_LIST);
+
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				mWindBomb = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WindBomb.class);
 			});
-
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = HuntingCompanionCS.SKIN_LIST.getOrDefault(name, new HuntingCompanionCS());
 		}
 	}
 

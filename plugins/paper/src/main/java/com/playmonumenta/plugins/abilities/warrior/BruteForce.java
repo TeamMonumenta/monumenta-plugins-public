@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities.warrior;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.BruteForceCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -28,7 +28,8 @@ public class BruteForce extends Ability {
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
 
 	private double mMultiplier;
-	private BruteForceCS mCosmetic = new BruteForceCS();
+
+	private final BruteForceCS mCosmetic;
 
 	public BruteForce(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Brute Force");
@@ -41,10 +42,7 @@ public class BruteForce extends Ability {
 
 		mMultiplier = getAbilityScore() == 1 ? 0 : BRUTE_FORCE_2_MODIFIER;
 
-		if (player != null) {
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = BruteForceCS.SKIN_LIST.getOrDefault(name, new BruteForceCS());
-		}
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BruteForceCS(), BruteForceCS.SKIN_LIST);
 	}
 
 	@Override

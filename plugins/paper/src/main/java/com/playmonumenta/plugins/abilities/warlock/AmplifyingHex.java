@@ -5,13 +5,18 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.AmplifyingHexCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -63,7 +68,8 @@ public class AmplifyingHex extends Ability {
 	private final int mRadius;
 	private float mRegionCap;
 	private float mDamage = 0f;
-	private AmplifyingHexCS mCosmetic = new AmplifyingHexCS();
+
+	private final AmplifyingHexCS mCosmetic;
 
 	public AmplifyingHex(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Amplifying Hex");
@@ -79,6 +85,8 @@ public class AmplifyingHex extends Ability {
 		mAmplifierCap = getAbilityScore() == 1 ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2;
 		mRadius = getAbilityScore() == 1 ? RADIUS_1 : RADIUS_2;
 
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AmplifyingHexCS(), AmplifyingHexCS.SKIN_LIST);
+
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				int skillPoints = Stream.of(AmplifyingHex.class, CholericFlames.class, GraspingClaws.class, SoulRend.class,
@@ -88,9 +96,6 @@ public class AmplifyingHex extends Ability {
 					.sum();
 				mDamage = DAMAGE_PER_SKILL_POINT * skillPoints;
 			});
-
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = AmplifyingHexCS.SKIN_LIST.getOrDefault(name, new AmplifyingHexCS());
 		}
 	}
 

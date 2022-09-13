@@ -2,16 +2,27 @@ package com.playmonumenta.plugins.cosmetics.skills;
 
 import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.skills.alchemist.*;
-import com.playmonumenta.plugins.cosmetics.skills.cleric.*;
-import com.playmonumenta.plugins.cosmetics.skills.mage.*;
-import com.playmonumenta.plugins.cosmetics.skills.rogue.*;
-import com.playmonumenta.plugins.cosmetics.skills.scout.*;
-import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.*;
-import com.playmonumenta.plugins.cosmetics.skills.warlock.*;
-import com.playmonumenta.plugins.cosmetics.skills.warrior.*;
+import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.GruesomeEchoesCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.SunriseBrewCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.DarkPunishmentCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.TouchOfEntropyCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.DarkLanceCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.HallowedLanceCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.TwistedLanceCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.VolcanicBurstCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.TranscCombosCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.WindStepCS;
+import com.playmonumenta.plugins.cosmetics.skills.scout.TwistedCompanionCS;
+import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.AvalanchexCS;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.InfernalFlamesCS;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.BrambleShellCS;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.ColossalBruteCS;
 import com.playmonumenta.scriptedquests.internal.com.google.common.collect.ImmutableList;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class CosmeticSkills {
 
@@ -62,6 +73,11 @@ public class CosmeticSkills {
 
 	public static CosmeticSkill getCosmeticSkill(String name) {
 		return COSMETIC_SKILLS.get(name);
+	}
+
+	public static <T extends CosmeticSkill> T getPlayerCosmeticSkill(@Nullable Player player, T baseCosmetic, ImmutableMap<String, T> skinList) {
+		String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, baseCosmetic.getAbilityName());
+		return skinList.getOrDefault(name, baseCosmetic);
 	}
 
 	public static Material getDisplayItem(String cosmeticSkillName) {

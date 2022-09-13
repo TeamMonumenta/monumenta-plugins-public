@@ -207,6 +207,10 @@ public class CosmeticsManager implements Listener {
 
 	// Get current cosmetic skill of an ability
 	public String getSkillCosmeticName(Player player, ClassAbility ability) {
+		if (player == null) {
+			return "";
+		}
+
 		List<Cosmetic> activeCosmetics = getActiveCosmetics(player, CosmeticType.COSMETIC_SKILL);
 		if (activeCosmetics != null) {
 			for (Cosmetic c : activeCosmetics) {

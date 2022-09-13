@@ -6,15 +6,24 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.MagmaShieldCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import javax.annotation.Nullable;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -44,7 +53,8 @@ public class MagmaShield extends Ability {
 	private final int mLevelDamage;
 
 	private boolean mHasBlizzard;
-	private MagmaShieldCS mCosmetic;
+
+	private final MagmaShieldCS mCosmetic;
 
 	public MagmaShield(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
@@ -74,16 +84,13 @@ public class MagmaShield extends Ability {
 
 		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
 
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MagmaShieldCS(), MagmaShieldCS.SKIN_LIST);
+
 		mHasBlizzard = false;
 		if (ServerProperties.getClassSpecializationsEnabled()) {
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 				mHasBlizzard = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Blizzard.class) != null;
 			});
-		}
-
-		if (player != null) {
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = MagmaShieldCS.SKIN_LIST.getOrDefault(name, new MagmaShieldCS());
 		}
 	}
 

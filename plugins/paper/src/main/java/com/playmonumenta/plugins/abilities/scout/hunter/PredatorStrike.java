@@ -5,11 +5,15 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PredatorStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +46,8 @@ public class PredatorStrike extends Ability {
 
 	private boolean mActive = false;
 	private final double mDistanceScale;
-	private PredatorStrikeCS mCosmetic = new PredatorStrikeCS();
+
+	private final PredatorStrikeCS mCosmetic;
 
 	public PredatorStrike(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Predator Strike");
@@ -57,10 +62,7 @@ public class PredatorStrike extends Ability {
 		mDisplayItem = new ItemStack(Material.SPECTRAL_ARROW, 1);
 		mDistanceScale = getAbilityScore() == 1 ? DISTANCE_SCALE_1 : DISTANCE_SCALE_2;
 
-		if (player != null) {
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = PredatorStrikeCS.SKIN_LIST.getOrDefault(name, new PredatorStrikeCS());
-		}
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PredatorStrikeCS(), PredatorStrikeCS.SKIN_LIST);
 	}
 
 	@Override

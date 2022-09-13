@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.AdvancingShadowsCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -52,7 +52,7 @@ public class AdvancingShadows extends Ability {
 	private @Nullable BladeDance mBladeDance;
 
 	private final double mPercentDamageDealt;
-	private AdvancingShadowsCS mCosmetic = new AdvancingShadowsCS();
+	private final AdvancingShadowsCS mCosmetic;
 
 	public AdvancingShadows(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Advancing Shadows");
@@ -66,13 +66,12 @@ public class AdvancingShadows extends Ability {
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
 		mPercentDamageDealt = getAbilityScore() == 1 ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2;
 
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AdvancingShadowsCS(), AdvancingShadowsCS.SKIN_LIST);
+
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				mBladeDance = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, BladeDance.class);
 			});
-
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = AdvancingShadowsCS.SKIN_LIST.getOrDefault(name, new AdvancingShadowsCS());
 		}
 	}
 

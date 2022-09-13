@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities.warrior;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.CounterStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -27,7 +27,7 @@ public class CounterStrike extends Ability {
 	private static final float COUNTER_STRIKE_RADIUS = 3.0f;
 
 	private final double mReflect;
-	private CounterStrikeCS mCosmetic = new CounterStrikeCS();
+	private final CounterStrikeCS mCosmetic;
 
 	public CounterStrike(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Counter Strike");
@@ -39,10 +39,7 @@ public class CounterStrike extends Ability {
 		mDisplayItem = new ItemStack(Material.CACTUS, 1);
 		mReflect = getAbilityScore() == 1 ? COUNTER_STRIKE_1_REFLECT : COUNTER_STRIKE_2_REFLECT;
 
-		if (player != null) {
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = CounterStrikeCS.SKIN_LIST.getOrDefault(name, new CounterStrikeCS());
-		}
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CounterStrikeCS(), CounterStrikeCS.SKIN_LIST);
 	}
 
 	@Override

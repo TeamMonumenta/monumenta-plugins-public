@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.DivineJusticeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -43,7 +43,7 @@ public class DivineJustice extends Ability {
 
 	private @Nullable Crusade mCrusade;
 
-	private DivineJusticeCS mCosmetic = new DivineJusticeCS();
+	private final DivineJusticeCS mCosmetic;
 
 	public DivineJustice(
 		Plugin plugin,
@@ -75,13 +75,12 @@ public class DivineJustice extends Ability {
 
 		mDoHealingAndMultiplier = getAbilityScore() == 2;
 
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DivineJusticeCS(), DivineJusticeCS.SKIN_LIST);
+
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
 			});
-
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = DivineJusticeCS.SKIN_LIST.getOrDefault(name, new DivineJusticeCS());
 		}
 	}
 

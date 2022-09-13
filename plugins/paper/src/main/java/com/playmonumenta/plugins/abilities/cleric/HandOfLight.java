@@ -6,13 +6,18 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.HandOfLightCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
 import net.md_5.bungee.api.ChatColor;
@@ -59,7 +64,7 @@ public class HandOfLight extends Ability {
 	private boolean mHasCleansingRain;
 	private boolean mHasLuminousInfusion;
 
-	private HandOfLightCS mCosmetic = new HandOfLightCS();
+	private final HandOfLightCS mCosmetic;
 
 	public HandOfLight(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Hand of Light");
@@ -80,17 +85,14 @@ public class HandOfLight extends Ability {
 
 		mDamageMode = player != null && player.getScoreboardTags().contains(DAMAGE_MODE_TAG);
 
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HandOfLightCS(), HandOfLightCS.SKIN_LIST);
+
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
 
 			mHasCleansingRain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, CleansingRain.class) != null;
 			mHasLuminousInfusion = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, LuminousInfusion.class) != null;
 		});
-
-		if (player != null) {
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = HandOfLightCS.SKIN_LIST.getOrDefault(name, new HandOfLightCS());
-		}
 	}
 
 	@Override

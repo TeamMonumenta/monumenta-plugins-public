@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.BezoarCS;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -14,7 +14,12 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import javax.annotation.Nullable;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -37,7 +42,8 @@ public class Bezoar extends Ability {
 
 	private int mKills = 0;
 	private @Nullable AlchemistPotions mAlchemistPotions;
-	private BezoarCS mCosmetic = new BezoarCS();
+
+	private final BezoarCS mCosmetic;
 
 	public Bezoar(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Bezoar");
@@ -48,14 +54,11 @@ public class Bezoar extends Ability {
 		mInfo.mDescriptions.add("The Bezoar now additionally grants +15% damage from all sources for 8s.");
 		mDisplayItem = new ItemStack(Material.LIME_CONCRETE, 1);
 
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BezoarCS(), BezoarCS.SKIN_LIST);
+
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 		});
-
-		if (player != null) {
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = BezoarCS.SKIN_LIST.getOrDefault(name, new BezoarCS());
-		}
 	}
 
 	public void dropBezoar(EntityDeathEvent event, boolean shouldGenDrops) {

@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.CholericFlamesCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -36,7 +36,8 @@ public class CholericFlames extends Ability {
 	private static final int COOLDOWN = 10 * 20;
 
 	private final int mDamage;
-	private CholericFlamesCS mCosmetic = new CholericFlamesCS();
+
+	private final CholericFlamesCS mCosmetic;
 
 	public CholericFlames(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Choleric Flames");
@@ -50,10 +51,7 @@ public class CholericFlames extends Ability {
 		mDisplayItem = new ItemStack(Material.FIRE_CHARGE, 1);
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 
-		if (player != null) {
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = CholericFlamesCS.SKIN_LIST.getOrDefault(name, new CholericFlamesCS());
-		}
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CholericFlamesCS(), CholericFlamesCS.SKIN_LIST);
 	}
 
 	@Override

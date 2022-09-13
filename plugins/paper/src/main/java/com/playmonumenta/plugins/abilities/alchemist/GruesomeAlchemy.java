@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.GruesomeAlchemyCS;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -42,7 +42,7 @@ public class GruesomeAlchemy extends PotionAbility {
 	private boolean mHasWardingRemedy;
 	private boolean mHasPanacea;
 
-	private GruesomeAlchemyCS mCosmetic = new GruesomeAlchemyCS();
+	private final GruesomeAlchemyCS mCosmetic;
 
 	public GruesomeAlchemy(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Gruesome Alchemy", 0, 0);
@@ -60,6 +60,8 @@ public class GruesomeAlchemy extends PotionAbility {
 		mVulnerabilityAmount = getAbilityScore() == 1 ? GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER : GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER;
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GruesomeAlchemyCS(), GruesomeAlchemyCS.SKIN_LIST);
+
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 			mAlchemicalArtillery = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
@@ -68,11 +70,6 @@ public class GruesomeAlchemy extends PotionAbility {
 			mHasWardingRemedy = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WardingRemedy.class) != null;
 			mHasPanacea = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Panacea.class) != null;
 		});
-
-		if (player != null) {
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = GruesomeAlchemyCS.SKIN_LIST.getOrDefault(name, new GruesomeAlchemyCS());
-		}
 	}
 
 	@Override

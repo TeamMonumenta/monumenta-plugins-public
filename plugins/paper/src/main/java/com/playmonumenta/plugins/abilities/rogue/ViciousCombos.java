@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.ViciousCombosCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -32,7 +32,7 @@ public class ViciousCombos extends Ability {
 	private static final double VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL = 0.15;
 	private static final double VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL = 0.15;
 
-	private ViciousCombosCS mCosmetic = new ViciousCombosCS();
+	private final ViciousCombosCS mCosmetic;
 
 	public ViciousCombos(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Vicious Combos");
@@ -43,10 +43,7 @@ public class ViciousCombos extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.VICIOUS_COMBOS;
 		mDisplayItem = new ItemStack(Material.ZOMBIE_HEAD, 1);
 
-		if (player != null) {
-			String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, mInfo.mLinkedSpell);
-			mCosmetic = ViciousCombosCS.SKIN_LIST.getOrDefault(name, new ViciousCombosCS());
-		}
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ViciousCombosCS(), ViciousCombosCS.SKIN_LIST);
 	}
 
 	@Override
