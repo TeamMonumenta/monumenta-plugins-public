@@ -13,7 +13,7 @@ import static java.util.Map.entry;
 public enum DelvePreset {
 
 	MOTIVATED(1, "Motivated Mobs", 1, Material.BEACON, Map.ofEntries(
-		entry(DelvesModifier.RELENTLESS, 3),
+		entry(DelvesModifier.VENGEANCE, 3),
 		entry(DelvesModifier.BLOODTHIRSTY, 3),
 		entry(DelvesModifier.DREADFUL, 2)
 	)),
@@ -47,7 +47,7 @@ public enum DelvePreset {
 	)),
 	FERVOR(7, "Flaming Fervor", 2, Material.MAGMA_BLOCK, Map.ofEntries(
 		entry(DelvesModifier.INFERNAL, 5),
-		entry(DelvesModifier.RELENTLESS, 3),
+		entry(DelvesModifier.VENGEANCE, 3),
 		entry(DelvesModifier.CHIVALROUS, 3),
 		entry(DelvesModifier.PERNICIOUS, 3)
 	)),
@@ -68,7 +68,7 @@ public enum DelvePreset {
 		entry(DelvesModifier.CARAPACE, 5),
 		entry(DelvesModifier.SPECTRAL, 3),
 		entry(DelvesModifier.DREADFUL, 3),
-		entry(DelvesModifier.RELENTLESS, 2),
+		entry(DelvesModifier.VENGEANCE, 2),
 		entry(DelvesModifier.BLOODTHIRSTY, 2)
 	)),
 	SWARM(11, "Superior-less Swarm", 3, Material.DEAD_FIRE_CORAL, Map.ofEntries(
@@ -76,7 +76,7 @@ public enum DelvePreset {
 		entry(DelvesModifier.CARAPACE, 4),
 		entry(DelvesModifier.ARCANIC, 3),
 		entry(DelvesModifier.INFERNAL, 3),
-		entry(DelvesModifier.RELENTLESS, 2),
+		entry(DelvesModifier.VENGEANCE, 2),
 		entry(DelvesModifier.SPECTRAL, 2),
 		entry(DelvesModifier.PERNICIOUS, 2),
 		entry(DelvesModifier.BLOODTHIRSTY, 2)
@@ -85,12 +85,12 @@ public enum DelvePreset {
 		entry(DelvesModifier.ARCANIC, 5),
 		entry(DelvesModifier.INFERNAL, 5),
 		entry(DelvesModifier.LEGIONARY, 3),
-		entry(DelvesModifier.RELENTLESS, 3),
+		entry(DelvesModifier.VENGEANCE, 3),
 		entry(DelvesModifier.TRANSCENDENT, 3),
 		entry(DelvesModifier.CHIVALROUS, 3)
 	)),
 	TWO(13, "Take Two", 3, Material.ROSE_BUSH, Map.ofEntries(
-		entry(DelvesModifier.RELENTLESS, 2),
+		entry(DelvesModifier.VENGEANCE, 2),
 		entry(DelvesModifier.ARCANIC, 2),
 		entry(DelvesModifier.INFERNAL, 2),
 		entry(DelvesModifier.TRANSCENDENT, 2),
@@ -103,7 +103,7 @@ public enum DelvePreset {
 		entry(DelvesModifier.CARAPACE, 2)
 	)),
 	EMPIRE(14, "Elite Empire", 3, Material.GOLD_INGOT, Map.ofEntries(
-		entry(DelvesModifier.RELENTLESS, 5),
+		entry(DelvesModifier.VENGEANCE, 5),
 		entry(DelvesModifier.CARAPACE, 4),
 		entry(DelvesModifier.TRANSCENDENT, 3),
 		entry(DelvesModifier.DREADFUL, 3),
@@ -112,7 +112,7 @@ public enum DelvePreset {
 		entry(DelvesModifier.INFERNAL, 2)
 	)),
 	DEMISE(15, "Dreadful Demise", 3, Material.CRIMSON_NYLIUM, Map.ofEntries(
-		entry(DelvesModifier.RELENTLESS, 5),
+		entry(DelvesModifier.VENGEANCE, 5),
 		entry(DelvesModifier.SPECTRAL, 3),
 		entry(DelvesModifier.DREADFUL, 3),
 		entry(DelvesModifier.COLOSSAL, 3),
