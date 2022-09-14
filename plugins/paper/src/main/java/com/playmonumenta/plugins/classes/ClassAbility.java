@@ -52,6 +52,7 @@ public enum ClassAbility {
 	SKIRMISHER("Skirmisher"),
 	ESCAPE_DEATH("Escape Death"),
 	SMOKESCREEN("Smokescreen"),
+	VICIOUS_COMBOS("Vicious Combos"), //placeholder for cosmetic
 
 	// Assassin
 	BODKIN_BLITZ("Bodkin Blitz"),
@@ -139,6 +140,7 @@ public enum ClassAbility {
 	BEZOAR("Bezoar"),
 	BRUTAL_ALCHEMY("Brutal Alchemy"),
 	ENERGIZING_ELIXIR("Energizing Elixir"),
+	GRUESOME_ALCHEMY("Gruesome Alchemy"), //placeholder for cosmetic
 	IRON_TINCTURE("Iron Tincture"),
 	UNSTABLE_AMALGAM("Unstable Amalgam"),
 

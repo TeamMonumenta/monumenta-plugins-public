@@ -78,6 +78,7 @@ public class SanctifiedArmor extends Ability {
 			    && !EntityUtils.isBoss(source)) {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
+
 			new PartialParticle(Particle.FIREWORKS_SPARK, loc.add(0, source.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125).spawnAsPlayerPassive(mPlayer);
 			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
 

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.integrations;
 
-import com.playmonumenta.plugins.Plugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

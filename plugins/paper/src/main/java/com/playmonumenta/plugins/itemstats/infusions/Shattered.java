@@ -86,6 +86,14 @@ public class Shattered implements Infusion {
 		}
 	}
 
+	@Override
+	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
+		if (oneHz) {
+			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM,
+				new PotionEffect(PotionEffectType.BAD_OMEN, 40, 0, false, false, true));
+		}
+	}
+
 	public static boolean hasMaxShatteredItemEquipped(Player player) {
 		if (Plugin.getInstance().mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.SHATTERED) < MAX_LEVEL) {
 			return false;

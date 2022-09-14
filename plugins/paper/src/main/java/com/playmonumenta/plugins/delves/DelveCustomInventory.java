@@ -15,6 +15,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -31,7 +32,7 @@ public class DelveCustomInventory extends CustomInventory {
 	private static final ItemStack REMOVE_ALL_MOD_ITEM = getResetModifiers();
 	private static final ItemStack STARTING_ITEM = new ItemStack(Material.OBSERVER);
 	private static final ItemStack STARTING_ITEM_NOT_ENOUGH_POINTS = new ItemStack(Material.OBSERVER);
-
+	private static final ItemStack ROTATING_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(Material.MAGENTA_GLAZED_TERRACOTTA, Component.text("Rotating Modifier", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), "One of these modifiers is randomly available each week.");
 	private static final Map<String, String> DUNGEON_FUNCTION_MAPPINGS = new HashMap<>();
 
 	static {
@@ -125,7 +126,7 @@ public class DelveCustomInventory extends CustomInventory {
 		List<DelvesModifier> mods = DelvesModifier.valuesList();
 
 		for (DelvesModifier mod : mods) {
-			mTotalPoint += mPointSelected.getOrDefault(mod, 0);
+			mTotalPoint += mPointSelected.getOrDefault(mod, 0) * mod.getPointsPerLevel();
 		}
 		// Ignore old entropy point so the count doesn't stack. Also, only count up to how many delve points can still be randomly assigned.
 		int entropy = Entropy.getDepthPointsAssigned(mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0)) - Entropy.getDepthPointsAssigned(mIgnoreOldEntropyPoint);
@@ -147,7 +148,14 @@ public class DelveCustomInventory extends CustomInventory {
 		}
 
 		mods = DelvesModifier.valuesList();
+		if (mOwner.getGameMode() != GameMode.CREATIVE) {
+			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
+			mods.add(DelvesUtils.getWeeklyRotatingModifier());
+		}
 		for (int i = 0; i < 7; i++) {
+			if (mPage * 7 + i >= mods.size()) {
+				break;
+			}
 			DelvesModifier mod = mods.get((mPage * 7) + i);
 			if (mod != null) {
 				mInventory.setItem(DELVE_MOD_ITEM_SLOTS[i], mod.getIcon());
@@ -156,6 +164,9 @@ public class DelveCustomInventory extends CustomInventory {
 				for (int j = 0; j < 5; j++) {
 					ItemStack stack = DelvesUtils.getRankItem(mod, j + 1, level);
 					int slot = (DELVE_MOD_ITEM_SLOTS[i] - (9 * (j + 1)));
+					if (j == 4 && DelvesModifier.rotatingDelveModifiers().contains(mod)) {
+						stack = ROTATING_DELVE_MODIFIER_INFO;
+					}
 					mInventory.setItem(slot, stack);
 				}
 			}
@@ -340,7 +351,12 @@ public class DelveCustomInventory extends CustomInventory {
 		if (mEditableDelvePoint) {
 			for (int i : COLUMN_INDEX_SLOT) {
 				if (i == column) {
-					DelvesModifier mod = DelvesModifier.values()[column - 1 + (mPage * 7)];
+					List<DelvesModifier> mods = DelvesModifier.valuesList();
+					if (mOwner.getGameMode() != GameMode.CREATIVE) {
+						mods.removeAll(DelvesModifier.rotatingDelveModifiers());
+						mods.add(DelvesUtils.getWeeklyRotatingModifier());
+					}
+					DelvesModifier mod = mods.get(column - 1 + (mPage * 7));
 					if (row == 5) {
 						//last row -> clearing this delve mod point
 						mPointSelected.put(mod, 0);
@@ -368,7 +384,11 @@ public class DelveCustomInventory extends CustomInventory {
 			} else if (mEditableDelvePoint) {
 				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
 				for (DelvesModifier mod : DelvesModifier.values()) {
-					mPointSelected.put(mod, DelvesUtils.getMaxPointAssignable(mod, 1000));
+					if (DelvesModifier.rotatingDelveModifiers().contains(mod) && DelvesUtils.getWeeklyRotatingModifier() != mod) {
+						continue;
+					} else {
+						mPointSelected.put(mod, DelvesUtils.getMaxPointAssignable(mod, 1000));
+					}
 				}
 			}
 		}
@@ -393,6 +413,8 @@ public class DelveCustomInventory extends CustomInventory {
 
 					List<DelvesModifier> mods = DelvesModifier.valuesList();
 					mods.remove(DelvesModifier.ENTROPY);
+					mods.remove(DelvesModifier.FRAGILE);
+					mods.removeAll(DelvesModifier.rotatingDelveModifiers());
 					mods.remove(DelvesModifier.TWISTED);
 
 					while (entropyPoint > 0) {

@@ -24,7 +24,7 @@ public class ProjectileMastery extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE) {
+		if (event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.PROJECTILE_SKILL) {
 			event.setDamage(event.getDamage() * SPELL_MOD[mRarity - 1]);
 		}
 		return false; // only changes event damage

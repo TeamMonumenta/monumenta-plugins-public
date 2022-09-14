@@ -2,9 +2,10 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.HuntingCompanionCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -53,7 +54,6 @@ public class HuntingCompanion extends Ability {
 	private static final int COOLDOWN = 24 * 20;
 	private static final int DURATION = 12 * 20;
 	private static final int TICK_INTERVAL = 5;
-	public static final String FOX_NAME = "FoxCompanion";
 	public static final String EAGLE_NAME = "EagleCompanion";
 	private static final int DETECTION_RANGE = 32;
 	private static final double DAMAGE_FRACTION_1 = 0.2;
@@ -84,6 +84,8 @@ public class HuntingCompanion extends Ability {
 	private boolean mHasWindBomb;
 	private @Nullable BukkitRunnable mRunnable;
 
+	private final HuntingCompanionCS mCosmetic;
+
 	public HuntingCompanion(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Hunting Companion");
 		mInfo.mScoreboardId = "HuntingCompanion";
@@ -102,11 +104,11 @@ public class HuntingCompanion extends Ability {
 		mSummons = new HashMap<>();
 		mRunnable = null;
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mHasWindBomb = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WindBomb.class) != null;
-			});
-		}
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HuntingCompanionCS(), HuntingCompanionCS.SKIN_LIST);
+
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mHasWindBomb = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, WindBomb.class) != null;
+		});
 	}
 
 	@Override
@@ -213,7 +215,7 @@ public class HuntingCompanion extends Ability {
 				} else {
 					eagleSounds(nearestSummon.getLocation());
 				}
-				new PartialParticle(Particle.VILLAGER_ANGRY, nearestSummon.getEyeLocation(), 25).spawnAsPlayerActive(mPlayer);
+				mCosmetic.foxOnAggro(world, mPlayer, nearestSummon);
 				PotionUtils.applyPotion(mPlayer, enemy, new PotionEffect(PotionEffectType.GLOWING, DURATION, 0, true, false));
 			}
 		}
@@ -261,7 +263,7 @@ public class HuntingCompanion extends Ability {
 
 		loc.add(sideOffset).add(facingDirection.clone().setY(0).normalize().multiply(-0.25));
 
-		Fox fox = (Fox) LibraryOfSoulsIntegration.summon(loc, FOX_NAME);
+		Fox fox = (Fox) LibraryOfSoulsIntegration.summon(loc, mCosmetic.getFoxName());
 		if (fox == null) {
 			MMLog.warning("Failed to spawn FoxCompanion from Library of Souls");
 			return;
@@ -285,12 +287,7 @@ public class HuntingCompanion extends Ability {
 		}
 		huntingCompanionBoss.spawn(mPlayer, damage, mStunTime, 0, 0, healingPercent, playerItemStats);
 
-		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.2f);
-		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, 2.0f, 1.0f);
-		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 0.75f, 1.2f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.2f, 1.0f);
+		mCosmetic.foxOnSummon(world, loc);
 	}
 
 	private void spawnEagle(double damage, double healingPercent, ItemStatManager.PlayerItemStats playerItemStats) {

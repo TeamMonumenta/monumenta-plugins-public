@@ -25,7 +25,7 @@ public class DeadlyStrike extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
+		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) {
 			event.setDamage(event.getDamage() * DAMAGE[mRarity - 1]);
 		}
 		return false; // only changes event damage

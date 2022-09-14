@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.mage.MagmaShieldCS;
 import com.playmonumenta.plugins.effects.PercentAbilityDamageReceived;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -25,7 +27,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -68,6 +69,8 @@ public class MagmaShield extends Ability {
 
 	private boolean mHasBlizzard;
 
+	private final MagmaShieldCS mCosmetic;
+
 	public MagmaShield(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
@@ -103,6 +106,8 @@ public class MagmaShield extends Ability {
 		mDisplayItem = new ItemStack(Material.MAGMA_CREAM, 1);
 
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MagmaShieldCS(), MagmaShieldCS.SKIN_LIST);
 
 		mHasBlizzard = false;
 		if (ServerProperties.getClassSpecializationsEnabled()) {
@@ -164,8 +169,7 @@ public class MagmaShield extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().add(0, 0.1, 0).add(vec);
-					new PartialParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					mCosmetic.magmaParticle(mPlayer, l);
 				}
 
 				if (mRadius >= CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE + 1)) {
@@ -175,9 +179,7 @@ public class MagmaShield extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.75f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 1f, 1.25f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
+		mCosmetic.magmaSound(world, mPlayer);
 	}
 
 	@Override

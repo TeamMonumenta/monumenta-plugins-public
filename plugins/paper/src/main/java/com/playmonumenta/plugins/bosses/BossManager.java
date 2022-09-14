@@ -129,6 +129,11 @@ public class BossManager implements Listener {
 	static {
 		/* Stateless bosses are those that have no end location set where a redstone block would be spawned when they die */
 		mStatelessBosses = new HashMap<String, StatelessBossConstructor>();
+		mStatelessBosses.put(ChestLockBoss.identityTag, (Plugin p, LivingEntity e) -> new ChestLockBoss(p, e));
+		mStatelessBosses.put(UnyieldingBoss.identityTag, (Plugin p, LivingEntity e) -> new UnyieldingBoss(p, e));
+		mStatelessBosses.put(ToughBoss.identityTag, (Plugin p, LivingEntity e) -> new ToughBoss(p, e));
+		mStatelessBosses.put(UnseenBoss.identityTag, (Plugin p, LivingEntity e) -> new UnseenBoss(p, e));
+		mStatelessBosses.put(WhispersBoss.identityTag, (Plugin p, LivingEntity e) -> new WhispersBoss(p, e));
 		mStatelessBosses.put(GenericBoss.identityTag, (Plugin p, LivingEntity e) -> new GenericBoss(p, e));
 		mStatelessBosses.put(HiddenBoss.identityTag, (Plugin p, LivingEntity e) -> new HiddenBoss(p, e));
 		mStatelessBosses.put(InvisibleBoss.identityTag, (Plugin p, LivingEntity e) -> new InvisibleBoss(p, e));
@@ -218,6 +223,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(CoordinatedAttackBoss.identityTag, (Plugin p, LivingEntity e) -> new CoordinatedAttackBoss(p, e));
 		mStatelessBosses.put(AbilitySilenceBoss.identityTag, (Plugin p, LivingEntity e) -> new AbilitySilenceBoss(p, e));
 		mStatelessBosses.put(ShiftingBoss.identityTag, (Plugin p, LivingEntity e) -> new ShiftingBoss(p, e));
+		mStatelessBosses.put(BulletHellBoss.identityTag, (Plugin p, LivingEntity e) -> new BulletHellBoss(p, e));
 		mStatelessBosses.put(CarapaceBoss.identityTag, (Plugin p, LivingEntity e) -> new CarapaceBoss(p, e));
 		mStatelessBosses.put(KamikazeBoss.identityTag, (Plugin p, LivingEntity e) -> new KamikazeBoss(p, e));
 		mStatelessBosses.put(TinyBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new TinyBombTossBoss(p, e));
@@ -264,6 +270,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(BlockPlacerBoss.identityTag, (Plugin p, LivingEntity e) -> new BlockPlacerBoss(p, e));
 		mStatelessBosses.put(ScoutVolleyBoss.identityTag, (Plugin p, LivingEntity e) -> new ScoutVolleyBoss(p, e));
 		mStatelessBosses.put(WarlockAmpHexBoss.identityTag, (Plugin p, LivingEntity e) -> new WarlockAmpHexBoss(p, e));
+		mStatelessBosses.put(LimitedLifespanBoss.identityTag, (Plugin p, LivingEntity e) -> new LimitedLifespanBoss(p, e));
 		mStatelessBosses.put(BlueFireBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueFireBoss(p, e));
 		mStatelessBosses.put(BlueEarthBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueEarthBoss(p, e));
 		mStatelessBosses.put(BlueAirBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueAirBoss(p, e));
@@ -332,6 +339,11 @@ public class BossManager implements Listener {
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
+		mBossDeserializers.put(ChestLockBoss.identityTag, (Plugin p, LivingEntity e) -> ChestLockBoss.deserialize(p, e));
+		mBossDeserializers.put(UnyieldingBoss.identityTag, (Plugin p, LivingEntity e) -> UnyieldingBoss.deserialize(p, e));
+		mBossDeserializers.put(ToughBoss.identityTag, (Plugin p, LivingEntity e) -> ToughBoss.deserialize(p, e));
+		mBossDeserializers.put(UnseenBoss.identityTag, (Plugin p, LivingEntity e) -> UnseenBoss.deserialize(p, e));
+		mBossDeserializers.put(WhispersBoss.identityTag, (Plugin p, LivingEntity e) -> WhispersBoss.deserialize(p, e));
 		mBossDeserializers.put(GenericBoss.identityTag, (Plugin p, LivingEntity e) -> GenericBoss.deserialize(p, e));
 		mBossDeserializers.put(InvisibleBoss.identityTag, (Plugin p, LivingEntity e) -> InvisibleBoss.deserialize(p, e));
 		mBossDeserializers.put(HiddenBoss.identityTag, (Plugin p, LivingEntity e) -> HiddenBoss.deserialize(p, e));
@@ -442,6 +454,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(AbilitySilenceBoss.identityTag, (Plugin p, LivingEntity e) -> AbilitySilenceBoss.deserialize(p, e));
 		mBossDeserializers.put(ShiftingBoss.identityTag, (Plugin p, LivingEntity e) -> ShiftingBoss.deserialize(p, e));
 		mBossDeserializers.put(CarapaceBoss.identityTag, (Plugin p, LivingEntity e) -> CarapaceBoss.deserialize(p, e));
+		mBossDeserializers.put(BulletHellBoss.identityTag, (Plugin p, LivingEntity e) -> BulletHellBoss.deserialize(p, e));
 		mBossDeserializers.put(KamikazeBoss.identityTag, (Plugin p, LivingEntity e) -> KamikazeBoss.deserialize(p, e));
 		mBossDeserializers.put(TinyBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> TinyBombTossBoss.deserialize(p, e));
 		mBossDeserializers.put(AntiRangeBoss.identityTag, (Plugin p, LivingEntity e) -> AntiRangeBoss.deserialize(p, e));
@@ -494,6 +507,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(DodgeBoss.identityTag, (Plugin p, LivingEntity e) -> DodgeBoss.deserialize(p, e));
 		mBossDeserializers.put(BlockPlacerBoss.identityTag, (Plugin p, LivingEntity e) -> BlockPlacerBoss.deserialize(p, e));
 		mBossDeserializers.put(PotionThrowBoss.identityTag, (Plugin p, LivingEntity e) -> PotionThrowBoss.deserialize(p, e));
+		mBossDeserializers.put(LimitedLifespanBoss.identityTag, (Plugin p, LivingEntity e) -> LimitedLifespanBoss.deserialize(p, e));
 		mBossDeserializers.put(BlueFireBoss.identityTag, (Plugin p, LivingEntity e) -> BlueFireBoss.deserialize(p, e));
 		mBossDeserializers.put(BlueEarthBoss.identityTag, (Plugin p, LivingEntity e) -> BlueEarthBoss.deserialize(p, e));
 		mBossDeserializers.put(BlueAirBoss.identityTag, (Plugin p, LivingEntity e) -> BlueAirBoss.deserialize(p, e));
@@ -533,12 +547,19 @@ public class BossManager implements Listener {
 		 * Boss Parameters
 		 ****************************************************/
 		mBossParameters = new HashMap<>();
+		mBossParameters.put(ChestLockBoss.identityTag, new ChestLockBoss.Parameters());
+		mBossParameters.put(AntiRangeBoss.identityTag, new AntiRangeBoss.Parameters());
+		mBossParameters.put(UnyieldingBoss.identityTag, new UnyieldingBoss.Parameters());
+		mBossParameters.put(ToughBoss.identityTag, new ToughBoss.Parameters());
+		mBossParameters.put(UnseenBoss.identityTag, new UnseenBoss.Parameters());
+		mBossParameters.put(WhispersBoss.identityTag, new WhispersBoss.Parameters());
 		mBossParameters.put(NovaBoss.identityTag, new NovaBoss.Parameters());
 		mBossParameters.put(LaserBoss.identityTag, new LaserBoss.Parameters());
 		mBossParameters.put(ProjectileBoss.identityTag, new ProjectileBoss.Parameters());
 		mBossParameters.put(AuraEffectBoss.identityTag, new AuraEffectBoss.Parameters());
 		mBossParameters.put(AvengerBoss.identityTag, new AvengerBoss.Parameters());
 		mBossParameters.put(BarrierBoss.identityTag, new BarrierBoss.Parameters());
+		mBossParameters.put(BulletHellBoss.identityTag, new BulletHellBoss.Parameters());
 		mBossParameters.put(ChargerBoss.identityTag, new ChargerBoss.Parameters());
 		mBossParameters.put(CommanderBoss.identityTag, new CommanderBoss.Parameters());
 		mBossParameters.put(CrowdControlResistanceBoss.identityTag, new CrowdControlResistanceBoss.Parameters());
@@ -578,6 +599,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(GenericBoss.identityTag, new GenericBoss.Parameters());
 		mBossParameters.put(PotionThrowBoss.identityTag, new PotionThrowBoss.Parameters());
 		mBossParameters.put(GenericTargetBoss.identityTag, new GenericTargetBoss.Parameters());
+		mBossParameters.put(LimitedLifespanBoss.identityTag, new LimitedLifespanBoss.Parameters());
 	}
 
 	/********************************************************************************
@@ -614,7 +636,7 @@ public class BossManager implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
 		if (event.getEntity() instanceof LivingEntity living
-			&& !living.getScoreboardTags().isEmpty()) {
+			    && !living.getScoreboardTags().isEmpty()) {
 			// EntityAddToWorldEvent is called at an inconvenient time in Minecraft's code, which can cause deadlocks,
 			// so we delay initialisation of boss data slightly to be outside of the entity loading code.
 			Bukkit.getScheduler().runTask(mPlugin, () -> {

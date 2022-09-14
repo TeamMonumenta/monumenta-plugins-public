@@ -3,10 +3,11 @@ package com.playmonumenta.plugins.abilities.warrior;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.BruteForceCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -14,7 +15,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -35,6 +35,8 @@ public class BruteForce extends Ability {
 
 	private final double mMultiplier;
 
+	private final BruteForceCS mCosmetic;
+
 	public BruteForce(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Brute Force");
 		mInfo.mLinkedSpell = ClassAbility.BRUTE_FORCE;
@@ -46,6 +48,8 @@ public class BruteForce extends Ability {
 		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
 
 		mMultiplier = isLevelOne() ? 0 : BRUTE_FORCE_2_MODIFIER;
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BruteForceCS(), BruteForceCS.SKIN_LIST);
 	}
 
 	@Override
@@ -63,11 +67,12 @@ public class BruteForce extends Ability {
 			event.setDamage(event.getDamage() + damageBonus);
 
 			Location loc = enemy.getLocation().add(0, 0.75, 0);
-			new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.135).spawnAsPlayerActive(mPlayer);
+			mCosmetic.bruteOnDamage(mPlayer, loc);
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, BRUTE_FORCE_RADIUS), enemy)) {
 				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damageBonus, mInfo.mLinkedSpell, true);
+				mCosmetic.bruteOnSpread(mPlayer, mob);
+
 				if (!EntityUtils.isBoss(mob)) {
 					float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, BRUTE_FORCE_KNOCKBACK_SPEED);
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, knockback, knockback / 2, true);

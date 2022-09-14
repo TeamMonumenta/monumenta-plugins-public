@@ -25,6 +25,7 @@ import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
@@ -1074,6 +1075,10 @@ public class ItemUtils {
 		return NBTItem.convertNBTtoItem(new NBTContainer(nbtMojangson));
 	}
 
+	/**
+	 * Gets the entity type of a spawn egg by material, which is the default entity the egg will spawn unless overridden in the NBT tags.
+	 * Thus, use the more accurate {@link #getSpawnEggType(ItemStack) item stack check} instead if possible.
+	 */
 	public static EntityType getSpawnEggType(Material material) {
 		return switch (material) {
 			case AXOLOTL_SPAWN_EGG -> EntityType.AXOLOTL;
@@ -1145,6 +1150,35 @@ public class ItemUtils {
 			case ZOMBIFIED_PIGLIN_SPAWN_EGG -> EntityType.ZOMBIFIED_PIGLIN;
 			default -> EntityType.UNKNOWN;
 		};
+	}
+
+	/**
+	 * Gets the entity type of a spawn egg. THis is more accurate than the {@link #getSpawnEggType(Material) material-only check},
+	 * as a spawn egg can spawn mobs of a different type if the NBT tag {@code EntityTag.id} is set.
+	 */
+	public static EntityType getSpawnEggType(ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return EntityType.UNKNOWN;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound entityTag = nbt.getCompound("EntityTag");
+		if (entityTag == null) {
+			return getSpawnEggType(item.getType());
+		}
+		String id = entityTag.getString("id");
+		if (id == null || id.isEmpty()) {
+			return getSpawnEggType(item.getType());
+		}
+		NamespacedKey key = NamespacedKey.fromString(id);
+		if (key == null) {
+			return getSpawnEggType(item.getType());
+		}
+		for (EntityType entityType : EntityType.values()) {
+			if (key.equals(entityType.getKey())) {
+				return entityType;
+			}
+		}
+		return getSpawnEggType(item.getType());
 	}
 
 	public static String getGiveCommand(ItemStack item) {

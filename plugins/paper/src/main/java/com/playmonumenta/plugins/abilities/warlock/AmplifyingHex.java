@@ -5,13 +5,14 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.AmplifyingHexCS;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -27,7 +28,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -56,17 +56,19 @@ public class AmplifyingHex extends Ability {
 	private static final float KNOCKBACK_SPEED = 0.12f;
 	private static final String ENHANCED_DOT_EFFECT_NAME = "AmplifyingHexDamageOverTimeEffect";
 
+	public static final String CHARM_DAMAGE = "Amplifying Hex Damage";
+	public static final String CHARM_RANGE = "Amplifying Hex Range";
+	public static final String CHARM_COOLDOWN = "Amplifying Hex Cooldown";
+	public static final String CHARM_CONE = "Amplifying Hex Cone";
+	public static final String CHARM_EFFECT = "Amplifying Hex Damage per Effect Potency";
+
 	private final float mAmplifierDamage;
 	private final float mAmplifierCap;
 	private final float mRadius;
 	private float mRegionCap;
 	private float mDamage = 0f;
 
-	public static final String CHARM_DAMAGE = "Amplifying Hex Damage";
-	public static final String CHARM_RANGE = "Amplifying Hex Range";
-	public static final String CHARM_COOLDOWN = "Amplifying Hex Cooldown";
-	public static final String CHARM_CONE = "Amplifying Hex Cone";
-	public static final String CHARM_EFFECT = "Amplifying Hex Damage per Effect Potency";
+	private final AmplifyingHexCS mCosmetic;
 
 	public AmplifyingHex(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Amplifying Hex");
@@ -82,6 +84,8 @@ public class AmplifyingHex extends Ability {
 		mAmplifierDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2);
 		mAmplifierCap = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2);
 		mRadius = (float) CharmManager.getRadius(player, CHARM_RANGE, isLevelOne() ? RADIUS_1 : RADIUS_2);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AmplifyingHexCS(), AmplifyingHexCS.SKIN_LIST);
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -102,6 +106,7 @@ public class AmplifyingHex extends Ability {
 		}
 		World world = mPlayer.getWorld();
 		mRegionCap = ServerProperties.getClassSpecializationsEnabled() ? R2_CAP : R1_CAP;
+
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getLocation();
 			double mRadiusIncrement = 0.5;
@@ -120,8 +125,7 @@ public class AmplifyingHex extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().clone().add(0, 0.15, 0).add(vec);
-					new PartialParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					mCosmetic.amplifyingParticle(mPlayer, l);
 				}
 
 				if (mRadiusIncrement >= mRadius + 1) {
@@ -131,8 +135,10 @@ public class AmplifyingHex extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1.0f, 0.7f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.65f);
+
+		final Location soundLoc = mPlayer.getLocation();
+		mCosmetic.amplifyingSound(world, soundLoc);
+
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius, mPlayer)) {

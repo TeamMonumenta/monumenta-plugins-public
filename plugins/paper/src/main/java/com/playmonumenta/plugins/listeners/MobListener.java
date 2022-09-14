@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.destroystokyo.paper.event.entity.EndermanEscapeEvent;
 import com.destroystokyo.paper.event.entity.EntityZapEvent;
 import com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent;
 import com.playmonumenta.plugins.Constants;
@@ -30,6 +31,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Bat;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Evoker;
@@ -49,6 +51,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
@@ -459,4 +462,21 @@ public class MobListener implements Listener {
 			event.setCancelled(true);
 		}
 	}
+
+	// disable Enderman teleportation
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void endermanEscapeEvent(EndermanEscapeEvent event) {
+		event.setCancelled(true);
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entityDamageEvent(EntityDamageEvent event) {
+		// Make Endermen take no damage from water (unless drowning)
+		if (event.getCause() == EntityDamageEvent.DamageCause.DROWNING
+			    && event.getEntity() instanceof Enderman enderman
+			    && enderman.getRemainingAir() > 0) {
+			event.setCancelled(true);
+		}
+	}
+
 }

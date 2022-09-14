@@ -1246,4 +1246,17 @@ public class EntityUtils {
 	public static void setRemoveEntityOnUnload(Entity e) {
 		e.getScoreboardTags().add("REMOVE_ON_UNLOAD");
 	}
+
+	public static float getCounterclockwiseAngle(Entity e1, Entity e2) {
+		Vector loc1 = e1.getLocation().toVector();
+		Vector loc2 = e2.getLocation().toVector();
+		Vector lineOfSight = loc2.clone().subtract(loc1);
+		lineOfSight.setY(0).normalize();
+		// Treat it as a giant unit circle with axes (z, -x)
+		double angleCounterclockwise = Math.acos(lineOfSight.getZ());
+		if (lineOfSight.getX() > 0) {
+			angleCounterclockwise = -angleCounterclockwise;
+		}
+		return (float)angleCounterclockwise;
+	}
 }

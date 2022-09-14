@@ -54,7 +54,7 @@ public class Brutalize extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When you critically strike you deal " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " of the damage to enemies in a " + RADIUS + " block radius and knock them away from the target.";
+		return "When you critically strike you deal " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " of the damage to all enemies in a " + RADIUS + " block radius and knock other enemies away from the target.";
 	}
 
 	@Override

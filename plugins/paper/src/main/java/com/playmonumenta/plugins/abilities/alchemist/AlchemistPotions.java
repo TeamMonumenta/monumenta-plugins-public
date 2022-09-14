@@ -432,7 +432,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 	}
 
-	public void swapMode() {
+	public void swapMode(float brewPitch) {
 		if (mPlayer == null) {
 			return;
 		}
@@ -448,7 +448,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 
 		mPlayer.sendActionBar(ChatColor.YELLOW + "Alchemist's Potions swapped to " + mode + " mode");
-		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 0.9f, 1);
+		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 0.9f, brewPitch);
 		updateAlchemistItem(mPlayer.getInventory().getItem(mSlot), mCharges);
 		ClientModHandler.updateAbility(mPlayer, this);
 	}

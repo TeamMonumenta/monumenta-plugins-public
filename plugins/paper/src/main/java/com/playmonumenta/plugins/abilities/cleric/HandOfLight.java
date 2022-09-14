@@ -5,17 +5,17 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.HandOfLightCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -24,8 +24,6 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -73,6 +71,8 @@ public class HandOfLight extends Ability {
 	private boolean mHasCleansingRain;
 	private boolean mHasLuminousInfusion;
 
+	private final HandOfLightCS mCosmetic;
+
 	public HandOfLight(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Hand of Light");
 		mInfo.mLinkedSpell = ClassAbility.HAND_OF_LIGHT;
@@ -99,6 +99,8 @@ public class HandOfLight extends Ability {
 		mDamageMax = isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
 
 		mDamageMode = player != null && player.getScoreboardTags().contains(DAMAGE_MODE_TAG);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HandOfLightCS(), HandOfLightCS.SKIN_LIST);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
@@ -160,15 +162,10 @@ public class HandOfLight extends Ability {
 
 					Location loc = p.getLocation();
 					mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, 20 * 4, 1, true, true));
-					new PartialParticle(Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
-					mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
-					mPlayer.getWorld().playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.05f, 1.0f);
+					mCosmetic.lightHealEffect(mPlayer, loc);
 				}
 
-				world.playSound(userLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
-				world.playSound(userLoc, Sound.ENTITY_PLAYER_LEVELUP, 0.05f, 1.0f);
-				ParticleUtils.explodingConeEffect(mPlugin, mPlayer, (float) CharmManager.getRadius(mPlayer, CHARM_RANGE, HEALING_RADIUS), Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
+				mCosmetic.lightHealCastEffect(world, userLoc, mPlugin, mPlayer, (float) CharmManager.getRadius(mPlayer, CHARM_RANGE, HEALING_RADIUS), HEALING_DOT_ANGLE);
 
 				double cooldown = getModifiedCooldown();
 				if (isEnhanced()) {
@@ -193,13 +190,9 @@ public class HandOfLight extends Ability {
 					DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, true);
 
 					Location loc = mob.getLocation();
-					new PartialParticle(Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
-					mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 0.8f);
+					mCosmetic.lightDamageEffect(mPlayer, loc);
 				}
-
-				world.playSound(userLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 0.8f);
-				ParticleUtils.explodingConeEffect(mPlugin, mPlayer, (float) CharmManager.getRadius(mPlayer, CHARM_RANGE, DAMAGE_RADIUS), Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
+				mCosmetic.lightDamageCastEffect(world, userLoc, mPlugin, mPlayer, (float) CharmManager.getRadius(mPlayer, CHARM_RANGE, DAMAGE_RADIUS), HEALING_DOT_ANGLE);
 				putOnCooldown();
 			}
 		}

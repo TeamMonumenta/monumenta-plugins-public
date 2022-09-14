@@ -38,6 +38,7 @@ public class DamageEvent extends Event implements Cancellable {
 		FALL(true, true),
 		AILMENT(false, false),
 		POISON(false, false),
+		TRUE(false, false),
 		OTHER(false, false);
 
 		public static DamageType getType(DamageCause cause) {

@@ -167,6 +167,6 @@ public class DepthsWindWalk extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-			return "Right click while sneaking to dash in the target direction, applying " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for 5 seconds to all enemies dashed through, and levitating non-elites dashed through for 2 seconds. Gain immunity to melee damage for half a second when triggered. Cooldown: " + DepthsUtils.getRarityColor(rarity) + (COOLDOWN[rarity - 1] / 20) + "s" + ChatColor.WHITE + ".";
+			return "Right click while sneaking to dash in the target direction, applying " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for 5 seconds to all enemies dashed through, and apply Levitation I to non-elites dashed through for 2 seconds. Gain immunity to melee damage for half a second when triggered. Cooldown: " + DepthsUtils.getRarityColor(rarity) + (COOLDOWN[rarity - 1] / 20) + "s" + ChatColor.WHITE + ".";
 	}
 }

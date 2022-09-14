@@ -6,6 +6,9 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.ViciousCombosCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -13,7 +16,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -40,6 +42,8 @@ public class ViciousCombos extends Ability {
 	private ClassAbility mLastAbility = null;
 	private int mAbilityCastTime = 0;
 
+	private final ViciousCombosCS mCosmetic;
+
 	public ViciousCombos(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Vicious Combos");
 		mInfo.mScoreboardId = "ViciousCombos";
@@ -59,7 +63,10 @@ public class ViciousCombos extends Ability {
 				ENHANCEMENT_CHARGE_LIFETIME / 20,
 				(int)(ENHANCEMENT_DAMAGE_INCREASE * 100),
 				ENHANCEMENT_COOLDOWN_REDUCTION / 20));
+		mInfo.mLinkedSpell = ClassAbility.VICIOUS_COMBOS;
 		mDisplayItem = new ItemStack(Material.ZOMBIE_HEAD, 1);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ViciousCombosCS(), ViciousCombosCS.SKIN_LIST);
 	}
 
 	@Override
@@ -78,8 +85,8 @@ public class ViciousCombos extends Ability {
 				public void run() {
 					Location loc = killedEntity.getLocation();
 					loc = loc.add(0, 0.5, 0);
-
 					World world = mPlayer.getWorld();
+
 					if (EntityUtils.isElite(killedEntity) || EntityUtils.isBoss(killedEntity)) {
 						mPlugin.mTimers.removeAllCooldowns(mPlayer);
 						MessagingUtils.sendActionBarMessage(mPlayer, "All your cooldowns have been reset");
@@ -91,26 +98,16 @@ public class ViciousCombos extends Ability {
 								EntityUtils.applyWeaken(mPlugin, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL, mob);
 							}
 						}
+						mCosmetic.comboOnElite(world, loc, mPlayer, VICIOUS_COMBOS_RANGE);
 
-						world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, 0.5f);
-						new PartialParticle(Particle.CRIT, loc, 500, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.CRIT_MAGIC, loc, 500, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001).spawnAsPlayerActive(mPlayer);
 					} else if (EntityUtils.isHostileMob(killedEntity)) {
 						int timeReduction = isLevelOne() ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
 						if (killedEntity instanceof Player) {
 							timeReduction *= 2;
 						}
 
-						timeReduction += CharmManager.getExtraDuration(mPlayer, CHARM_CDR);
 						mPlugin.mTimers.updateCooldowns(mPlayer, timeReduction);
-
-						world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.5f);
-						new PartialParticle(Particle.CRIT, loc, 50, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.CRIT_MAGIC, loc, 50, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.SWEEP_ATTACK, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.SPELL_MOB, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001).spawnAsPlayerActive(mPlayer);
+						mCosmetic.comboOnKill(world, loc, mPlayer, VICIOUS_COMBOS_RANGE);
 					}
 
 				}

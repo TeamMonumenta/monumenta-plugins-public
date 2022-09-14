@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.cosmetics;
 
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import java.util.Locale;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +16,12 @@ public enum CosmeticType {
 	},
 	PLOT_BORDER("Plot Border", Material.BARRIER),
 	VANITY("Vanity Item", Material.GOLDEN_CHESTPLATE),
+	COSMETIC_SKILL("Cosmetic Skill", Material.BLAZE_POWDER) {
+		@Override
+		public Material getDisplayItem(@Nullable String name) {
+			return name == null ? Material.BLAZE_POWDER : CosmeticSkills.getDisplayItem(name);
+		}
+	}
 	;
 
 	private final String mDisplayName;

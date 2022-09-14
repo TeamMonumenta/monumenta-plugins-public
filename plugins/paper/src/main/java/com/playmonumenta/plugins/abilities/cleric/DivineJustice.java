@@ -1,9 +1,10 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.DivineJusticeCS;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -14,7 +15,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
@@ -70,6 +70,8 @@ public class DivineJustice extends Ability {
 
 	private @Nullable Crusade mCrusade;
 
+	private final DivineJusticeCS mCosmetic;
+
 	public DivineJustice(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
@@ -112,6 +114,8 @@ public class DivineJustice extends Ability {
 
 		mDoHealingAndMultiplier = isLevelTwo();
 
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DivineJusticeCS(), DivineJusticeCS.SKIN_LIST);
+
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
 		});
@@ -131,25 +135,8 @@ public class DivineJustice extends Ability {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
 
 			double widerWidthDelta = PartialParticle.getWidthDelta(enemy) * 1.5;
-			PartialParticle partialParticle = new PartialParticle(
-				Particle.END_ROD,
-				LocationUtils.getHalfHeightLocation(enemy),
-				10,
-				widerWidthDelta,
-				PartialParticle.getHeightDelta(enemy),
-				widerWidthDelta,
-				0.05
-			).spawnAsPlayerActive(mPlayer);
-			partialParticle.mParticle = Particle.FLAME;
-			partialParticle.spawnAsPlayerActive(mPlayer);
+			mCosmetic.justiceOnDamage(mPlayer, enemy, widerWidthDelta);
 
-			// /playsound block.anvil.land master @p ~ ~ ~ 0.15 1.5
-			mPlayer.getWorld().playSound(
-				enemy.getLocation(),
-				Sound.BLOCK_ANVIL_LAND,
-				0.15f,
-				1.5f
-			);
 			return true;
 		}
 		return false;
@@ -178,13 +165,11 @@ public class DivineJustice extends Ability {
 			}
 
 			players.add(mPlayer);
-			// /playsound block.note_block.chime master @p ~ ~ ~ 0.5 1.41
-			doHealingSounds(players, Constants.NotePitches.C18);
+			mCosmetic.justiceHealSound(players, mCosmetic.getHealPitchSelf());
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					// /playsound block.note_block.chime master @p ~ ~ ~ 0.5 1.78
-					doHealingSounds(players, Constants.NotePitches.E22);
+					mCosmetic.justiceHealSound(players, mCosmetic.getHealPitchOther());
 				}
 			}.runTaskLater(Plugin.getInstance(), 2);
 		}
@@ -193,17 +178,6 @@ public class DivineJustice extends Ability {
 			    && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
 			    && FastUtils.RANDOM.nextDouble() <= ENHANCEMENT_ASH_CHANCE) {
 			spawnAsh(entityDeathEvent.getEntity().getLocation());
-		}
-	}
-
-	public static void doHealingSounds(List<Player> players, float pitch) {
-		for (Player healedPlayer : players) {
-			healedPlayer.playSound(
-				healedPlayer.getLocation(),
-				Sound.BLOCK_NOTE_BLOCK_CHIME,
-				0.5f,
-				pitch
-			);
 		}
 	}
 

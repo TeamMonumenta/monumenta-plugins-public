@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.alchemist;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.BezoarCS;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -68,6 +70,8 @@ public class Bezoar extends Ability {
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private final int mLingerTime;
 
+	private final BezoarCS mCosmetic;
+
 	public Bezoar(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Bezoar");
 		mInfo.mLinkedSpell = ClassAbility.BEZOAR;
@@ -79,6 +83,8 @@ public class Bezoar extends Ability {
 		mDisplayItem = new ItemStack(Material.LIME_CONCRETE, 1);
 
 		mLingerTime = LINGER_TIME + CharmManager.getExtraDuration(mPlayer, CHARM_LINGER_TIME);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BezoarCS(), BezoarCS.SKIN_LIST);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
@@ -97,12 +103,7 @@ public class Bezoar extends Ability {
 
 	private void spawnBezoar(Location loc) {
 		World world = loc.getWorld();
-		ItemStack itemBezoar = new ItemStack(Material.LIME_CONCRETE);
-		ItemMeta bezoarMeta = itemBezoar.getItemMeta();
-		bezoarMeta.displayName(Component.text("Bezoar", NamedTextColor.WHITE)
-			.decoration(TextDecoration.ITALIC, false));
-		itemBezoar.setItemMeta(bezoarMeta);
-		ItemUtils.setPlainName(itemBezoar, "Bezoar");
+		ItemStack itemBezoar = mCosmetic.bezoarItem();
 		Item item = world.dropItemNaturally(loc, itemBezoar);
 		item.setGlowing(true);
 		item.setPickupDelay(Integer.MAX_VALUE);
