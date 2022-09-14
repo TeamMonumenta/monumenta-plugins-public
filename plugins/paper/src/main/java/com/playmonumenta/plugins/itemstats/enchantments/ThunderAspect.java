@@ -33,6 +33,7 @@ public class ThunderAspect implements Enchantment {
 	public static final int DURATION_PROJ = 10;
 	public static final int DURATION_MELEE_ELITE = 10;
 	public static final float BONUS_DAMAGE = 1;
+
 	public static final String CHARM_STUN_CHANCE = "Thunder Aspect Stun Chance";
 
 	private static final Particle.DustOptions COLOR_YELLOW = new Particle.DustOptions(Color.fromRGB(251, 231, 30), 1f);
@@ -75,7 +76,7 @@ public class ThunderAspect implements Enchantment {
 				apply(plugin, player, level, enemy);
 			} else {
 
-				double chance = (CHANCE * level) + CharmManager.getLevelPercent(player, CHARM_STUN_CHANCE);
+				double chance = (CHANCE * level) + CharmManager.getLevelPercentDecimal(player, CHARM_STUN_CHANCE);
 
 				if (FastUtils.RANDOM.nextDouble() < chance) {
 					if (!EntityUtils.isElite(enemy) && !(EntityUtils.isBoss(enemy) && !enemy.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
