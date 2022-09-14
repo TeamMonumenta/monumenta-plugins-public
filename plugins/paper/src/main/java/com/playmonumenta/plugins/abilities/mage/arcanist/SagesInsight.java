@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.mage.arcanist;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
@@ -14,6 +15,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -123,7 +125,12 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 
 					mStacks = 0;
 					for (ClassAbility s : mResets) {
-						mPlugin.mTimers.removeCooldown(mPlayer, s);
+						if (ability == ClassAbility.MANA_LANCE) {
+							// Special Treatment for Mana Lance because of charged abilities.
+							Objects.requireNonNull(mPlugin.mAbilityManager.getPlayerAbility(mPlayer, ManaLance.class)).incrementCharge();
+						} else {
+							mPlugin.mTimers.removeCooldown(mPlayer, s);
+						}
 					}
 					mResets.clear();
 				} else {

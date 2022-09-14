@@ -133,4 +133,8 @@ public class ManaLance extends MultipleChargeAbility {
 		return !mPlayer.isSneaking() && ItemUtils.isWand(mainHand);
 	}
 
+	@Override
+	public boolean incrementCharge() {
+		return super.incrementCharge();
+	}
 }

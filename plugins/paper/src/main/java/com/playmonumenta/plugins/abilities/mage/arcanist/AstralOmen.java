@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.mage.arcanist;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.AstralOmenArcaneStacks;
 import com.playmonumenta.plugins.effects.AstralOmenBonusDamage;
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -24,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
 import javax.annotation.Nullable;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -44,10 +45,10 @@ public class AstralOmen extends Ability {
 	public static final String BONUS_DAMAGE_SOURCE = "AstralOmenBonusDamage";
 	public static final String DAMAGED_THIS_TICK_METAKEY = "AstralOmenDamagedThisTick";
 
-	public static final int DAMAGE_1 = 4;
-	public static final int DAMAGE_2 = 8;
+	public static final int DAMAGE = 8;
 	public static final int SIZE = 3;
 	public static final double BONUS_MULTIPLIER = 0.2;
+	public static final double BOW_MULTIPLIER = 0.2;
 	public static final int STACK_TICKS = 10 * Constants.TICKS_PER_SECOND;
 	public static final int BONUS_TICKS = 8 * Constants.TICKS_PER_SECOND;
 	public static final float PULL_SPEED = 0.25f;
@@ -58,7 +59,6 @@ public class AstralOmen extends Ability {
 	public static final String CHARM_RANGE = "Astral Omen Range";
 
 	private final double mLevelBonusMultiplier;
-	private final double mDamage;
 
 	private static final Map<ClassAbility, Type> mElementClassification;
 
@@ -70,26 +70,27 @@ public class AstralOmen extends Ability {
 		mElementClassification.put(ClassAbility.COSMIC_MOONBLADE, Type.ARCANE);
 		// Fire Types
 		mElementClassification.put(ClassAbility.MAGMA_SHIELD, Type.FIRE);
+		mElementClassification.put(ClassAbility.ELEMENTAL_ARROWS_FIRE, Type.FIRE);
 		// Ice Types
 		mElementClassification.put(ClassAbility.FROST_NOVA, Type.ICE);
+		mElementClassification.put(ClassAbility.ELEMENTAL_ARROWS_ICE, Type.ICE);
 		// Thunder Types
 		mElementClassification.put(ClassAbility.THUNDER_STEP, Type.THUNDER);
+		mElementClassification.put(ClassAbility.ELEMENTAL_ARROWS, Type.THUNDER);
 	}
 
 	public enum Type {
-		ARCANE(STACKS_SOURCE_ARCANE, AstralOmenArcaneStacks.COLOR, NamedTextColor.LIGHT_PURPLE),
-		FIRE(STACKS_SOURCE_FIRE, AstralOmenFireStacks.COLOR, NamedTextColor.RED),
-		ICE(STACKS_SOURCE_ICE, AstralOmenIceStacks.COLOR, NamedTextColor.AQUA),
-		THUNDER(STACKS_SOURCE_THUNDER, AstralOmenThunderStacks.COLOR, NamedTextColor.YELLOW);
+		ARCANE(STACKS_SOURCE_ARCANE, AstralOmenArcaneStacks.COLOR),
+		FIRE(STACKS_SOURCE_FIRE, AstralOmenFireStacks.COLOR),
+		ICE(STACKS_SOURCE_ICE, AstralOmenIceStacks.COLOR),
+		THUNDER(STACKS_SOURCE_THUNDER, AstralOmenThunderStacks.COLOR);
 
 		private final String mSource;
 		private final Particle.DustOptions mColor;
-		private final NamedTextColor mTextColor;
 
-		Type(String source, Particle.DustOptions color, NamedTextColor textColor) {
+		Type(String source, Particle.DustOptions color) {
 			mSource = source;
 			mColor = color;
-			mTextColor = textColor;
 		}
 	}
 
@@ -101,26 +102,24 @@ public class AstralOmen extends Ability {
 		mInfo.mShorthandName = "AO";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Dealing spell damage to an enemy marks its fate, giving it an omen based on the spell type (Arcane, Fire, Ice, Thunder). If an enemy hits %s omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, dealing %s magic damage to it and all enemies in a %s-block cube around it. It then takes %s%% more damage from you for %ss. An enemy loses all its omens after %ss of it not gaining another omen. That implosion's damage ignores iframes and itself cannot apply omens.",
+				"Dealing spell damage to an enemy marks its fate, giving it an omen based on the spell type (Arcane, Fire, Ice, Thunder). If an enemy hits %s omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, dealing %s magic damage to it and all enemies in a %s-block cube around it. If the spell was %s, the implosion does an additional %s%% of the bow's original damage. An enemy loses all its omens after %ss of it not gaining another omen. That implosion's damage ignores iframes and itself cannot apply omens.",
 				STACK_THRESHOLD,
-				DAMAGE_1,
+				DAMAGE,
 				SIZE,
-				StringUtils.multiplierToPercentage(BONUS_MULTIPLIER),
-				StringUtils.ticksToSeconds(BONUS_TICKS),
+				ElementalArrows.NAME,
+				StringUtils.multiplierToPercentage(BOW_MULTIPLIER),
 				StringUtils.ticksToSeconds(STACK_TICKS)
 			)
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"The implosion now pulls all enemies inwards. Damage is increased from %s to %s.",
-				DAMAGE_1,
-				DAMAGE_2
+				"The implosion now pulls all enemies inwards. Enemies hit by the implosion now take %s%% more damage from you for %ss.",
+				StringUtils.multiplierToPercentage(BONUS_MULTIPLIER),
+				StringUtils.ticksToSeconds(BONUS_TICKS)
 			)
 		);
 		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
-
-		mDamage = isLevelTwo() ? DAMAGE_2 : DAMAGE_1;
-		mLevelBonusMultiplier = BONUS_MULTIPLIER + CharmManager.getLevelPercentDecimal(player, CHARM_MODIFIER);
+		mLevelBonusMultiplier = (isLevelTwo() ? BONUS_MULTIPLIER : 0) + CharmManager.getLevelPercentDecimal(player, CHARM_MODIFIER);
 	}
 
 	@Override
@@ -155,8 +154,13 @@ public class AstralOmen extends Ability {
 		int stacksThreshold = STACK_THRESHOLD + (int) CharmManager.getLevel(mPlayer, CHARM_STACK);
 		if (combo >= stacksThreshold) { // Adding 1 more stack would hit threshold, which removes all stacks anyway, so don't bother adding then removing
 			World world = enemy.getWorld();
-			float baseDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage);
-			float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, baseDamage);
+			float baseDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
+			float spellDamage;
+			if (ability == ClassAbility.ELEMENTAL_ARROWS || ability == ClassAbility.ELEMENTAL_ARROWS_FIRE || ability == ClassAbility.ELEMENTAL_ARROWS_ICE) {
+				spellDamage = baseDamage + (float) (mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD) * BOW_MULTIPLIER);
+			} else {
+				spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, baseDamage);
+			}
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE))) {
 				if (MetadataUtils.checkOnceThisTick(mPlugin, mob, DAMAGED_THIS_TICK_METAKEY)) {
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, spellDamage, mInfo.mLinkedSpell, true);
@@ -171,7 +175,9 @@ public class AstralOmen extends Ability {
 				}
 			}
 
-			mPlugin.mEffectManager.addEffect(enemy, BONUS_DAMAGE_SOURCE, new AstralOmenBonusDamage(BONUS_TICKS, mLevelBonusMultiplier, mPlayer));
+			if (mLevelBonusMultiplier > 0) {
+				mPlugin.mEffectManager.addEffect(enemy, BONUS_DAMAGE_SOURCE, new AstralOmenBonusDamage(BONUS_TICKS, mLevelBonusMultiplier, mPlayer));
+			}
 
 			Location loc = enemy.getLocation();
 			new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 80, 0, 0, 0, 4).spawnAsPlayerActive(mPlayer);
