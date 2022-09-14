@@ -36,7 +36,8 @@ public class CustomRegeneration extends Effect {
 		}
 	}
 
-	@Override public JsonObject serialize() {
+	@Override
+	public JsonObject serialize() {
 		JsonObject object = new JsonObject();
 
 		object.addProperty("duration", mDuration);
@@ -58,11 +59,7 @@ public class CustomRegeneration extends Effect {
 			sourcePlayer = plugin.getPlayer(UUID.fromString(object.get("sourcePlayer").getAsString()));
 		}
 
-		if (sourcePlayer != null && sourcePlayer.isOnline()) {
-			return new CustomRegeneration(duration, amount, sourcePlayer, plugin);
-		} else {
-			return null;
-		}
+		return new CustomRegeneration(duration, amount, sourcePlayer, plugin);
 	}
 
 	@Override

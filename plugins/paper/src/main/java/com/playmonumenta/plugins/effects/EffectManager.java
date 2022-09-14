@@ -560,6 +560,11 @@ public final class EffectManager implements Listener {
 		return new JsonObject();
 	}
 
+	public @Nullable Effect getEffectFromJson(JsonObject object, Plugin plugin) throws Exception {
+		String effectID = object.get("effectID").getAsString();
+		return mEffectDeserializer.get(effectID).deserialize(object, plugin);
+	}
+
 	public void loadFromJsonObject(Player player, JsonObject object, Plugin plugin) throws Exception {
 		clearEffects(player);
 
@@ -574,8 +579,7 @@ public final class EffectManager implements Listener {
 				JsonArray innerArray = priorityEffect.get(source).getAsJsonArray();
 				for (JsonElement effectJson : innerArray) {
 					JsonObject effectObject = effectJson.getAsJsonObject();
-					String effectID = effectObject.get("effectID").getAsString();
-					Effect effect = mEffectDeserializer.get(effectID).deserialize(effectObject, plugin);
+					Effect effect = getEffectFromJson(effectObject, plugin);
 
 					if (effect != null) {
 						addEffect(player, source, effect);

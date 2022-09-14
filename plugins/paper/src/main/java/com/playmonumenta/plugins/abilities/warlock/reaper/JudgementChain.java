@@ -306,7 +306,7 @@ public class JudgementChain extends Ability {
 		if (mTarget.hasPotionEffect(PotionEffectType.POISON) || mTarget.hasPotionEffect(PotionEffectType.WITHER)
 				|| EntityUtils.hasDamageOverTime(mPlugin, mTarget)) {
 			if (isHostile) {
-				mPlugin.mEffectManager.addEffect(e, DOT_NAME, new CustomDamageOverTime(duration, 1, 20, mPlayer, null, Particle.SQUID_INK));
+				mPlugin.mEffectManager.addEffect(e, DOT_NAME, new CustomDamageOverTime(duration, 1, 20, mPlayer, null));
 			} else if (mPlayer != e) {
 				mPlugin.mEffectManager.addEffect(e, HEAL_NAME, new CustomRegeneration(duration, 0.333, mPlugin));
 			} else {

@@ -53,7 +53,7 @@ public class PestilenceTesseract implements Enchantment {
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(item.getLocation(), EFFECT_RADIUS)) {
 					if (!(mob instanceof Player) && !ZoneUtils.hasZoneProperty(mob.getLocation(), ZoneUtils.ZoneProperty.RESIST_5)) {
-						plugin.mEffectManager.addEffect(mob, Decay.DOT_EFFECT_NAME, new CustomDamageOverTime(600, 1, 10, null, null, Particle.SQUID_INK));
+						plugin.mEffectManager.addEffect(mob, Decay.DOT_EFFECT_NAME, new CustomDamageOverTime(600, 1, 10, null, null));
 						EntityUtils.applySlow(plugin, 600, 0.2, mob);
 					}
 				}

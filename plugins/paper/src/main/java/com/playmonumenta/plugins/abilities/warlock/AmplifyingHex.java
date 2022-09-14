@@ -258,7 +258,7 @@ public class AmplifyingHex extends Ability {
 						}
 
 						// Apply Dot
-						mPlugin.mEffectManager.addEffect(mob, ENHANCED_DOT_EFFECT_NAME, new CustomDamageOverTime(maxDuration, 1, 40 / (dotLevel + 1), mPlayer, null, Particle.SQUID_INK));
+						mPlugin.mEffectManager.addEffect(mob, ENHANCED_DOT_EFFECT_NAME, new CustomDamageOverTime(maxDuration, 1, 40 / (dotLevel + 1), mPlayer, null));
 						// mPlayer.sendMessage("After: DoT at Level " + (int) EntityUtils.getHighestDamageOverTime(mPlugin, mob));
 					}
 				}

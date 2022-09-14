@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -24,43 +26,69 @@ public class SpreadEffectOnDeath extends Effect {
 		mRecurse = recurse;
 	}
 
-	// Dummy constructor for copying
-	public SpreadEffectOnDeath() {
-		this(0, null, 0, 0, false);
-	}
-
 	@Override
 	public void onDeath(EntityDeathEvent event) {
 		LivingEntity entity = event.getEntity();
-		EffectManager manager = Plugin.getInstance().mEffectManager;
+		Plugin plugin = Plugin.getInstance();
+		EffectManager manager = plugin.mEffectManager;
 		Effect effect = manager.getActiveEffect(entity, mSource);
 		if (effect != null) {
-			Location loc = entity.getLocation();
-			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius, entity);
-			for (LivingEntity mob : mobs) {
-				Effect copy = effect.getCopy();
-				if (copy != null) {
-					copy.setDuration(mNewDuration);
-					manager.addEffect(mob, mSource, copy);
+			try {
+				JsonObject serializedEffect = effect.serialize();
+				Location loc = entity.getLocation();
+				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius, entity);
+				for (LivingEntity mob : mobs) {
+					Effect deserializedEffect = manager.getEffectFromJson(serializedEffect, plugin);
+					if (deserializedEffect != null) {
+						deserializedEffect.setDuration(mNewDuration);
+						manager.addEffect(mob, mSource, deserializedEffect);
+					}
 				}
-			}
 
-			// If mRecurse is true, also spread to other mobs the spread effect, so this effect can be chained theoretically infinitely
-			if (mRecurse) {
-				String source = manager.getSource(entity, this);
-				if (source != null) {
-					for (LivingEntity mob : mobs) {
-						Effect copy = this.getCopy();
-						if (copy != null) {
-							copy.setDuration(mNewDuration);
-							manager.addEffect(mob, source, copy);
+				// If mRecurse is true, also spread to other mobs the spread effect, so this effect can be chained theoretically infinitely
+				if (mRecurse) {
+					String source = manager.getSource(entity, this);
+					if (source != null) {
+						JsonObject serializedSpreadEffect = this.serialize();
+						for (LivingEntity mob : mobs) {
+							Effect deserializedSpreadEffect = manager.getEffectFromJson(serializedSpreadEffect, plugin);
+							if (deserializedSpreadEffect != null) {
+								deserializedSpreadEffect.setDuration(mNewDuration);
+								manager.addEffect(mob, mSource, deserializedSpreadEffect);
+							}
 						}
 					}
 				}
-			}
 
-			entity.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.6f, 1.1f);
+				entity.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.6f, 1.1f);
+			} catch (Exception e) {
+				MMLog.warning("Caught exception when spreading effect: " + effect);
+				e.printStackTrace();
+			}
 		}
+	}
+
+	@Override
+	public JsonObject serialize() {
+		JsonObject object = new JsonObject();
+		object.addProperty("effectID", mEffectID);
+		object.addProperty("duration", mDuration);
+		object.addProperty("source", mSource);
+		object.addProperty("radius", mRadius);
+		object.addProperty("newDuration", mNewDuration);
+		object.addProperty("recurse", mRecurse);
+
+		return object;
+	}
+
+	public static SpreadEffectOnDeath deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+		String source = object.get("source").getAsString();
+		double radius = object.get("radius").getAsDouble();
+		int newDuration = object.get("newDuration").getAsInt();
+		boolean recurse = object.get("recurse").getAsBoolean();
+
+		return new SpreadEffectOnDeath(duration, source, radius, newDuration, recurse);
 	}
 
 	@Override

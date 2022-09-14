@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -115,7 +114,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.HAUNTING_SHADES) {
 							EntityUtils.applyVulnerability(plugin, duration, 0.1, damagee);
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.WITHERING_GAZE) {
-							plugin.mEffectManager.addEffect(damagee, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, null, Particle.SQUID_INK));
+							plugin.mEffectManager.addEffect(damagee, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, null));
 						}
 					}
 				}

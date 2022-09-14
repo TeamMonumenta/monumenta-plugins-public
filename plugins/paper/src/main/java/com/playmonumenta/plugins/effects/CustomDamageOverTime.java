@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.Particle;
 import org.bukkit.entity.ArmorStand;
@@ -18,21 +21,14 @@ public class CustomDamageOverTime extends Effect {
 	protected final int mPeriod;
 	protected final @Nullable Player mPlayer;
 	protected final @Nullable ClassAbility mSpell;
-	protected final Particle mParticle;
 	private int mTicks;
 
-	public CustomDamageOverTime(int duration, double damage, int period, @Nullable Player player, @Nullable ClassAbility spell, Particle particle) {
+	public CustomDamageOverTime(int duration, double damage, int period, @Nullable Player player, @Nullable ClassAbility spell) {
 		super(duration, effectID);
 		mDamage = damage;
 		mPeriod = period;
 		mPlayer = player;
 		mSpell = spell;
-		mParticle = particle;
-	}
-
-	// Dummy constructor for copying
-	public CustomDamageOverTime() {
-		this(0, 0, 1, null, null, null);
 	}
 
 	//Magnitude is equal to the level of wither that it is equivalent to, at low levels of wither
@@ -54,9 +50,44 @@ public class CustomDamageOverTime extends Effect {
 			if (mTicks >= mPeriod) {
 				mTicks %= mPeriod;
 				DamageUtils.damage(mPlayer, le, DamageType.AILMENT, mDamage, mSpell, true, false);
-				new PartialParticle(mParticle, le.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1).spawnAsEnemy();
+				new PartialParticle(Particle.SQUID_INK, le.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1).spawnAsEnemy();
 			}
 		}
+	}
+
+	@Override
+	public JsonObject serialize() {
+		JsonObject object = new JsonObject();
+		object.addProperty("effectID", mEffectID);
+		object.addProperty("duration", mDuration);
+		object.addProperty("damage", mDamage);
+		object.addProperty("period", mPeriod);
+		if (mPlayer != null) {
+			object.addProperty("player", mPlayer.getUniqueId().toString());
+		}
+		if (mSpell != null) {
+			object.addProperty("spell", mSpell.name());
+		}
+
+		return object;
+	}
+
+	public static CustomDamageOverTime deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+		double damage = object.get("damage").getAsDouble();
+		int period = object.get("period").getAsInt();
+
+		@Nullable Player player = null;
+		if (object.has("player")) {
+			player = plugin.getPlayer(UUID.fromString(object.get("player").getAsString()));
+		}
+
+		@Nullable ClassAbility spell = null;
+		if (object.has("spell")) {
+			spell = ClassAbility.valueOf(object.get("spell").getAsString());
+		}
+
+		return new CustomDamageOverTime(duration, damage, period, player, spell);
 	}
 
 	@Override
