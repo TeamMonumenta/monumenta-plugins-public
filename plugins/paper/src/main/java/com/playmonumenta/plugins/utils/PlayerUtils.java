@@ -108,25 +108,31 @@ public class PlayerUtils {
 				       .filter(p -> !p.equals(player)
 					                    && playerCountsForLootScaling(p)
 					                    && structures.stream().anyMatch(structure -> structure.isNearby(p)))
-				.toList();
+				       .toList();
 		}
 
 		// Otherwise, perform no loot scaling
 		return Collections.emptyList();
 	}
 
-	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable) {
-		List<Player> players = new ArrayList<Player>();
+	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable, boolean includeDead) {
+		List<Player> players = new ArrayList<>();
 
+		double rangeSquared = range * range;
 		for (Player player : loc.getWorld().getPlayers()) {
-			if (player.getLocation().distanceSquared(loc) < range * range && player.getGameMode() != GameMode.SPECTATOR && player.getHealth() > 0) {
-				if (includeNonTargetable || !AbilityUtils.isStealthed(player)) {
-					players.add(player);
-				}
+			if (player.getLocation().distanceSquared(loc) < rangeSquared
+				    && player.getGameMode() != GameMode.SPECTATOR
+				    && (includeNonTargetable || !AbilityUtils.isStealthed(player))
+				    && (includeDead || player.getHealth() > 0)) {
+				players.add(player);
 			}
 		}
 
 		return players;
+	}
+
+	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable) {
+		return playersInRange(loc, range, includeNonTargetable, false);
 	}
 
 	public static List<Player> otherPlayersInRange(Player player, double radius, boolean includeNonTargetable) {

@@ -143,9 +143,9 @@ public class ChestOverride extends BaseOverride {
 			return false;
 		}
 
-		List<Player> players = PlayerUtils.playersInRange(block.getLocation(), 30, true);
+		List<Player> players = PlayerUtils.playersInRange(block.getLocation(), 30, true, true);
 
-		//Runs replacement with closest player
+		// Runs replacement with any nearby player
 		if (!players.isEmpty()) {
 			Player player = players.get(0);
 			DelveLootTableGroup.setDelveLootTable(player, block);
