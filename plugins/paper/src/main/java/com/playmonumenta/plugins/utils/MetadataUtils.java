@@ -1,7 +1,10 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.function.Supplier;
 import org.bukkit.entity.Entity;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
+import org.bukkit.metadata.Metadatable;
 import org.bukkit.plugin.Plugin;
 
 public class MetadataUtils {
@@ -44,6 +47,42 @@ public class MetadataUtils {
 
 	public static void removeAllMetadata(Plugin plugin) {
 		NmsUtils.getVersionAdapter().removeAllMetadata(plugin);
+	}
+
+	public static <T> T setMetadata(Metadatable metadatable, String key, T value) {
+		metadatable.setMetadata(key, new FixedMetadataValue(com.playmonumenta.plugins.Plugin.getInstance(), value));
+		return value;
+	}
+
+	public static MetadataValue getMetadataValue(Metadatable metadatable, String key) {
+		for (MetadataValue value : metadatable.getMetadata(key)) {
+			if (value.getOwningPlugin() instanceof com.playmonumenta.plugins.Plugin) {
+				return value;
+			}
+		}
+		return null;
+	}
+
+	public static <T> T getMetadata(Metadatable metadatable, String key, T defaultValue) {
+		MetadataValue metadata = getMetadataValue(metadatable, key);
+		if (metadata != null) {
+			return (T) metadata.value();
+		}
+		return defaultValue;
+	}
+
+	public static <T> T getOrSetMetadata(Metadatable metadatable, String key, T value) {
+		return getOrSetMetadata(metadatable, key, () -> value);
+	}
+
+	public static <T> T getOrSetMetadata(Metadatable metadatable, String key, Supplier<T> valueSupplier) {
+		MetadataValue metadata = getMetadataValue(metadatable, key);
+		if (metadata != null) {
+			return (T) metadata.value();
+		}
+		T value = valueSupplier.get();
+		metadatable.setMetadata(key, new FixedMetadataValue(com.playmonumenta.plugins.Plugin.getInstance(), value));
+		return value;
 	}
 
 }

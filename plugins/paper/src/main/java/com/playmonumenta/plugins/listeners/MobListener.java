@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -69,6 +70,7 @@ public class MobListener implements Listener {
 	private static final NamespacedKey ARMED_ARMOR_STAND_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/armed_armor_stand");
 	private static final String SPAWNER_TORCH_LAST_CHECK_TIME_METADATA_KEY = "MonumentaTorchSkipLastCheck";
 	private static final String SPAWNER_TORCH_SKIP_COUNT_METADATA_KEY = "MonumentaTorchSkipCount";
+	private static final String SPAWNER_FIRST_SPAWN_ATTEMPT_METADATA_KEY = "MonumentaFirstSpawnAttempt";
 	/**
 	 * Number of spawn cycles skipped if a torch is present adjacent to a spawner
 	 */
@@ -105,23 +107,23 @@ public class MobListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	void preSpawnerSpawnEvent(PreSpawnerSpawnEvent event) {
 
+		int currentTick = Bukkit.getServer().getCurrentTick();
+
 		// If a torch is adjacent to a spawner, slow down the spawner by making it skip spawn cycles
 		Block spawnerBlock = event.getSpawnerLocation().getBlock();
 		// If the max number of spawn cycle skips has been reached already, the spawner is currently trying to spawn, so don't check torches
-		List<MetadataValue> skipCount = spawnerBlock.getMetadata(SPAWNER_TORCH_SKIP_COUNT_METADATA_KEY);
-		if (skipCount.isEmpty() || skipCount.get(0).asInt() < SPAWNER_TORCH_SPAWN_CYCLE_SKIPS) {
+		int skipCount = MetadataUtils.getMetadata(spawnerBlock, SPAWNER_TORCH_SKIP_COUNT_METADATA_KEY, -1);
+		if (skipCount < SPAWNER_TORCH_SPAWN_CYCLE_SKIPS) {
 			// Make sure we only check at most once per tick and not once per spawn attempt
-			List<MetadataValue> lastCheck = spawnerBlock.getMetadata(SPAWNER_TORCH_LAST_CHECK_TIME_METADATA_KEY);
-			if (lastCheck.isEmpty() || lastCheck.get(0).asInt() != Bukkit.getServer().getCurrentTick()) {
-				spawnerBlock.setMetadata(SPAWNER_TORCH_LAST_CHECK_TIME_METADATA_KEY, new FixedMetadataValue(mPlugin, Bukkit.getServer().getCurrentTick()));
+			if (MetadataUtils.getMetadata(spawnerBlock, SPAWNER_TORCH_LAST_CHECK_TIME_METADATA_KEY, currentTick - 1) != currentTick) {
+				MetadataUtils.setMetadata(spawnerBlock, SPAWNER_TORCH_LAST_CHECK_TIME_METADATA_KEY, currentTick);
 				// Then check for torches
 				for (BlockFace bf : new BlockFace[] {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST}) {
 					Material adjacentType = spawnerBlock.getRelative(bf).getType();
 					if (adjacentType == Material.TORCH || adjacentType == Material.WALL_TORCH) {
 						// If a torch is found, increase the skipped spawn count by one. If this is still less than the configured number of skips, abort the spawn cycle, otherwise proceed with spawning.
-						int newSkipCount = skipCount.isEmpty() ? 0 : skipCount.get(0).asInt() + 1;
-						spawnerBlock.setMetadata(SPAWNER_TORCH_SKIP_COUNT_METADATA_KEY, new FixedMetadataValue(mPlugin, newSkipCount));
-						if (newSkipCount < SPAWNER_TORCH_SPAWN_CYCLE_SKIPS) {
+						MetadataUtils.setMetadata(spawnerBlock, SPAWNER_TORCH_SKIP_COUNT_METADATA_KEY, skipCount + 1);
+						if (skipCount + 1 < SPAWNER_TORCH_SPAWN_CYCLE_SKIPS) {
 							event.setShouldAbortSpawn(true);
 							event.setCancelled(true);
 							return;
@@ -131,6 +133,8 @@ public class MobListener implements Listener {
 				}
 			}
 		}
+
+		int firstSpawnAttempt = MetadataUtils.getOrSetMetadata(spawnerBlock, SPAWNER_FIRST_SPAWN_ATTEMPT_METADATA_KEY, currentTick);
 
 		EntityType type = event.getType();
 		boolean inWater = LocationUtils.isLocationInWater(event.getSpawnLocation());
@@ -150,7 +154,10 @@ public class MobListener implements Listener {
 
 		// Land entities: must not spawn in the air (i.e. must have a block with collision below)
 		// Some entities like creepers don't follow this rule so that they can be used in drop creeper traps
-		if (!EntityUtils.isFlyingMob(type) && !FALLING_MOBS.contains(type)) {
+		// after some ticks of failed spawns, air becomes a valid spawn point for all land mobs.
+		if (!EntityUtils.isFlyingMob(type)
+			    && !FALLING_MOBS.contains(type)
+			    && currentTick - firstSpawnAttempt <= 5) {
 			if (!event.getSpawnLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
 				event.setCancelled(true);
 			}
@@ -240,9 +247,10 @@ public class MobListener implements Listener {
 		spawner.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
 		mob.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
 
-		// Successful spawn: allow torches to disable the next spawn cycle again
+		// Successful spawn: allow torches to disable the next spawn cycle again, and reset spawn attempt matadata
 		spawner.getBlock().removeMetadata(SPAWNER_TORCH_SKIP_COUNT_METADATA_KEY, mPlugin);
 		spawner.getBlock().setMetadata(SPAWNER_TORCH_LAST_CHECK_TIME_METADATA_KEY, new FixedMetadataValue(mPlugin, Bukkit.getServer().getCurrentTick()));
+		Bukkit.getScheduler().runTask(mPlugin, () -> spawner.getBlock().removeMetadata(SPAWNER_FIRST_SPAWN_ATTEMPT_METADATA_KEY, mPlugin));
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
