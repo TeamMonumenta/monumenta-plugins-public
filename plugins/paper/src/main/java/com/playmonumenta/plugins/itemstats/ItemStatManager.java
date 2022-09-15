@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
+import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
@@ -202,6 +203,7 @@ public class ItemStatManager implements Listener {
 							}
 						} else if (stat instanceof Infusion infusion) {
 							double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+							multiplier = infusion.getInfusionType().isRegionScaled() && Shattered.isShattered(item) ? 0 : multiplier;
 							newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
 						}
 					}
@@ -246,7 +248,7 @@ public class ItemStatManager implements Listener {
 					newStats.add(stat, (newArmorAddStats.get(stat) + newMainhandAddStats.get(stat)) * (1 + newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat)));
 				}
 				if (stat instanceof CritScaling || stat instanceof AntiCritScaling ||
-					    stat instanceof StrengthApply || stat instanceof StrengthCancel) {
+					stat instanceof StrengthApply || stat instanceof StrengthCancel) {
 					newStats.add(stat, 1);
 				}
 				if (stat instanceof RegionScalingDamageDealt && (ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.ISLES || ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.RING)) {
