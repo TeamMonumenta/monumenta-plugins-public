@@ -87,7 +87,9 @@ public class DelvesUtils {
 	}
 
 	public static DelvesModifier getWeeklyRotatingModifier() {
-		return DelvesModifier.rotatingDelveModifiers().get(new XoRoShiRo128PlusRandom(DateUtils.getWeeklyVersion()).nextInt(DelvesModifier.rotatingDelveModifiers().size()));
+		List<DelvesModifier> nWeekRotation = DelvesModifier.rotatingDelveModifiers();
+		Collections.shuffle(nWeekRotation, new XoRoShiRo128PlusRandom(DateUtils.getWeeklyVersion() / nWeekRotation.size()));
+		return nWeekRotation.get((int)(DateUtils.getWeeklyVersion() % nWeekRotation.size()));
 	}
 
 	public static ItemStack getRankItem(DelvesModifier mod, int rank, int level) {

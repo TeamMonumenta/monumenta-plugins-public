@@ -23,7 +23,7 @@ public class Astral {
 
 	private static List<String> POSSIBLE_DESCRIPTIONS = Arrays.asList(
 		"Po" + ChatColor.MAGIC + "tesn" + ChatColor.RESET + "e co" + ChatColor.MAGIC + "nsp" + ChatColor.RESET + "icere ira" + ChatColor.MAGIC + "m c" + ChatColor.RESET + "aeli?",
-		"Perc" + ChatColor.MAGIC + "ipi" + ChatColor.RESET + "sne co" + ChatColor.MAGIC + "nple" + ChatColor.RESET + "xu" + ChatColor.MAGIC + "m as" + ChatColor.RESET + "tri?",
+		"Perc" + ChatColor.MAGIC + "ipi" + ChatColor.RESET + "sne co" + ChatColor.MAGIC + "nple" + ChatColor.RESET + "xu" + ChatColor.MAGIC + "m as" + ChatColor.RESET + "trorum?",
 		"Astra " + ChatColor.MAGIC + "consumu" + ChatColor.RESET + "nt omni" + ChatColor.MAGIC + "a",
 		"Pe" + ChatColor.MAGIC + "r as" + ChatColor.RESET + "pera " + ChatColor.MAGIC + "ad a" + ChatColor.RESET + "stra"
 	);

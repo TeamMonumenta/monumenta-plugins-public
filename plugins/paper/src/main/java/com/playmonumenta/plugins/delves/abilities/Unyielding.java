@@ -19,6 +19,9 @@ public class Unyielding {
 	};
 
 	public static void applyModifiers(LivingEntity mob, int level) {
+		if (level == 0) {
+			return;
+		}
 		if (!DelvesUtils.isDelveMob(mob) && EntityUtils.isElite(mob)) {
 			mob.addScoreboardTag(UnyieldingBoss.identityTag);
 			mob.addScoreboardTag(UnyieldingBoss.identityTag + "[damageincrease=0.3,speedincrease=0.1]");

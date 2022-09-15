@@ -234,7 +234,7 @@ public class SpellBullet extends Spell {
 	@Override
 	public int cooldownTicks() {
 		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, true).size() > 0) {
-			if (mPattern.equals("sanae")) {
+			if (mPattern == Pattern.SANAE) {
 				return mCooldown + mDuration + mDelay + mBulletDuration;
 			}
 			return mCooldown + mDuration + mDelay;
