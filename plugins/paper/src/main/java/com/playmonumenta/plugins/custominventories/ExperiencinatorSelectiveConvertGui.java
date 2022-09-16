@@ -224,7 +224,7 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 		if (conversion == null) {
 			return false;
 		}
-		if (!conversion.conversionAllowed(mPlayer, tier, mExperiencinatorItem)) {
+		if (!conversion.conversionAllowed(mPlayer, region, tier, mExperiencinatorItem)) {
 			return false;
 		}
 		return ExperiencinatorUtils.convertSingleItem(mPlayer, item, conversion, conversionRateName);

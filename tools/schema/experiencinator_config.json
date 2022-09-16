@@ -174,9 +174,22 @@
 							"description": "Prerequisites to be able to use this conversion.",
 							"$ref": "prerequisites.json"
 						},
-						"tier_prerequisites": {
+						"region_prerequisites": {
 							"required": false,
 							"propertyOrder": 7,
+							"title": "Region Prerequisites",
+							"description": "A map from item region to prerequisites to be able to convert items from that region.",
+							"type": "object",
+							"patternProperties": {
+								".*": {
+									"headerTemplate": "{{i}}",
+									"$ref": "prerequisites.json"
+								}
+							}
+						},
+						"tier_prerequisites": {
+							"required": false,
+							"propertyOrder": 8,
 							"title": "Tier Prerequisites",
 							"description": "A map from item tier to prerequisites to be able to convert items of that tier.",
 							"type": "object",

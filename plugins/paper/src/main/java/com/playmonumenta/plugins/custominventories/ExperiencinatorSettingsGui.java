@@ -41,6 +41,7 @@ import static org.bukkit.ChatColor.WHITE;
  * |   -  |   -  |   1  |   2  |   3  |   4  |   5  |   U  |   -  |
  * |   -  |  KV  |   x  |   x  |   x  |   x  |   x  |   x  |   -  |
  * |   -  |  CI  |   x  |   x  |   x  |   x  |   x  |   x  |   -  |
+ * |   -  |  AR  |   x  |   x  |   x  |   x  |   x  |   x  |   -  |
  * |   -  |   -  |   -  |   -  |   -  |   -  |   -  |   -  |   -  |
  * ================================================================
  *
@@ -49,9 +50,9 @@ import static org.bukkit.ChatColor.WHITE;
  * KV/CI/1-5: region/tier banners, inert; U only appears after buying the upgrade for it
  * x: actual setting, clickable to cycle settings
  *
- * If Celsian Isles is not available for the current Experiencinator, that line will be missing (and R3 will add another region).
+ * If Celsian Isles and/or Architect's Ring are not available for the current Experiencinator, those lines will be missing.
  *
- * The actual settings used may change the layout from this default.
+ * The actual settings used may change the layout from this default (e.g. add more tiers).
  */
 public final class ExperiencinatorSettingsGui extends CustomInventory {
 
@@ -109,7 +110,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 					continue;
 				}
 				for (Tier tier : tierRates.keySet()) {
-					if (conversion.conversionAllowed(player, tier, experiencinatorItem)) {
+					if (conversion.conversionAllowed(player, region, tier, experiencinatorItem)) {
 						tiers.add(tier);
 						allUsedTiers.add(tier);
 					}
@@ -300,7 +301,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 	}
 
 	private boolean isValidConversion(Conversion conversion, Region region, Tier tier) {
-		if (!conversion.conversionAllowed(mPlayer, tier, mExperiencinatorItem)) {
+		if (!conversion.conversionAllowed(mPlayer, region, tier, mExperiencinatorItem)) {
 			return false;
 		}
 		ExperiencinatorConfig.ConversionRates conversionRates = conversion.getConversionRates(region);
