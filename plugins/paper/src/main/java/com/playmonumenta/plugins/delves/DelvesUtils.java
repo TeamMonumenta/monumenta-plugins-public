@@ -67,15 +67,17 @@ public class DelvesUtils {
 			// Total of 72 points in depths
 			MODIFIER_RANK_CAPS.put(DelvesModifier.ARCANIC, 7);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.INFERNAL, 7);
-			MODIFIER_RANK_CAPS.put(DelvesModifier.TRANSCENDENT, 6);
+			MODIFIER_RANK_CAPS.put(DelvesModifier.TRANSCENDENT, 5);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.SPECTRAL, 7);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.DREADFUL, 5);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.COLOSSAL, 7);
-			MODIFIER_RANK_CAPS.put(DelvesModifier.CHIVALROUS, 3);
+			MODIFIER_RANK_CAPS.put(DelvesModifier.CHIVALROUS, 5);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.BLOODTHIRSTY, 5);
-			MODIFIER_RANK_CAPS.put(DelvesModifier.PERNICIOUS, 6);
+			MODIFIER_RANK_CAPS.put(DelvesModifier.PERNICIOUS, 5);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.LEGIONARY, 7);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.CARAPACE, 7);
+			MODIFIER_RANK_CAPS.put(DelvesModifier.VENGEANCE, 5);
+			MODIFIER_RANK_CAPS.put(DelvesModifier.ECHOES, 0);
 		}
 
 		int maxDepthPoints = 0;
