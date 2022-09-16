@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import org.bukkit.Location;
@@ -69,7 +70,7 @@ public class FlameLaserBoss extends BossAbilityGroup {
 						if (!blocked) {
 							BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE);
 							// Shields don't stop fire!
-							target.setFireTicks(p.FIRE_DURATION);
+							EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), p.FIRE_DURATION, target, boss);
 						}
 					})
 		));

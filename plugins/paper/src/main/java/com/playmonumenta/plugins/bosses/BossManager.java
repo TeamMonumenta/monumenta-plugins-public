@@ -129,6 +129,7 @@ public class BossManager implements Listener {
 	static {
 		/* Stateless bosses are those that have no end location set where a redstone block would be spawned when they die */
 		mStatelessBosses = new HashMap<String, StatelessBossConstructor>();
+		mStatelessBosses.put(ImmortalPassengerBoss.identityTag, (Plugin p, LivingEntity e) -> new ImmortalPassengerBoss(p, e));
 		mStatelessBosses.put(ChestLockBoss.identityTag, (Plugin p, LivingEntity e) -> new ChestLockBoss(p, e));
 		mStatelessBosses.put(UnyieldingBoss.identityTag, (Plugin p, LivingEntity e) -> new UnyieldingBoss(p, e));
 		mStatelessBosses.put(ToughBoss.identityTag, (Plugin p, LivingEntity e) -> new ToughBoss(p, e));
@@ -339,6 +340,7 @@ public class BossManager implements Listener {
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
+		mBossDeserializers.put(ImmortalPassengerBoss.identityTag, (Plugin p, LivingEntity e) -> ImmortalPassengerBoss.deserialize(p, e));
 		mBossDeserializers.put(ChestLockBoss.identityTag, (Plugin p, LivingEntity e) -> ChestLockBoss.deserialize(p, e));
 		mBossDeserializers.put(UnyieldingBoss.identityTag, (Plugin p, LivingEntity e) -> UnyieldingBoss.deserialize(p, e));
 		mBossDeserializers.put(ToughBoss.identityTag, (Plugin p, LivingEntity e) -> ToughBoss.deserialize(p, e));

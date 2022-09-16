@@ -69,7 +69,7 @@ public class LeaveGuild {
 				if (ex != null) {
 					ex.printStackTrace();
 				} else {
-					Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+					Bukkit.getScheduler().runTask(plugin, () -> {
 						MonumentaNetworkChatIntegration.refreshPlayer(player);
 					});
 				}

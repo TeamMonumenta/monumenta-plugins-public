@@ -354,6 +354,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 									double multiplier = (8 - player.getLocation().distance(loc)) / 8;
 									BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 32 * multiplier);
 									player.setFireTicks((int)(20 * 8 * multiplier));
+									EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), (int) (20 * 8 * multiplier), player, mBoss);
 								}
 							}
 						})

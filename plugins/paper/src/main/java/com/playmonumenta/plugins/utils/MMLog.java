@@ -91,6 +91,13 @@ public class MMLog {
 		}
 	}
 
+	public static void warning(String msg, Throwable throwable) {
+		Logger logger = CustomLogger.getInstance();
+		if (logger != null) {
+			logger.log(Level.WARNING, msg, throwable);
+		}
+	}
+
 	public static void severe(Supplier<String> msg) {
 		Logger logger = CustomLogger.getInstance();
 		if (logger != null) {
@@ -102,6 +109,13 @@ public class MMLog {
 		Logger logger = CustomLogger.getInstance();
 		if (logger != null) {
 			logger.severe(msg);
+		}
+	}
+
+	public static void severe(String msg, Throwable throwable) {
+		Logger logger = CustomLogger.getInstance();
+		if (logger != null) {
+			logger.log(Level.SEVERE, msg, throwable);
 		}
 	}
 }

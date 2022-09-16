@@ -8,8 +8,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map.Entry;
-import java.util.UUID;
+import java.util.Comparator;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -55,9 +54,10 @@ public class PlotAccessCustomInventory extends CustomInventory {
 		if (info.mOwnedPlotId > 0) {
 			mAccessList.add(new PlotEntry());
 		}
-		for (Entry<UUID, OtherAccessRecord> entry : info.mOwnerAccessToOtherPlots.entrySet()) {
-			mAccessList.add(new PlotEntry(entry.getValue()));
-		}
+		info.mOwnerAccessToOtherPlots.values().stream()
+			.sorted(Comparator.comparing((OtherAccessRecord access) -> access.mName == null ? "" : access.mName)
+				        .thenComparingInt(access -> access.mPlotId))
+			.forEach(access -> mAccessList.add(new PlotEntry(access)));
 		mNumPages = (int) Math.ceil((double) mAccessList.size() / (double) LOCATIONS.size());
 
 		setLayout(player, 1);

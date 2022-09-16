@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -161,7 +162,7 @@ public class SpellFinalHeatMech extends Spell {
 					BossUtils.bossDamagePercent(mBoss, p, 0.5, null, "Malakut's Dynamo");
 					AbilityUtils.increaseHealingPlayer(p, 20 * 30, -0.85, "Lich");
 					MovementUtils.knockAway(mBoss, p, 0.5f, false);
-					p.setFireTicks(100);
+					EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 5 * 20, p, mBoss);
 				}
 			}
 			mExpL.location(loc).spawnAsBoss();

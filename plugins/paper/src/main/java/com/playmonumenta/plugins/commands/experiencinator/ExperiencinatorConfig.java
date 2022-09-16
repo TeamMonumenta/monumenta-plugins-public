@@ -233,6 +233,7 @@ public final class ExperiencinatorConfig {
 		private final Map<Region, List<ConversionResult>> mResults = new EnumMap<>(Region.class);
 		private final boolean mCompressExistingResults;
 		private final @Nullable QuestPrerequisites mPrerequisites;
+		private final Map<Region, QuestPrerequisites> mRegionPrerequisites = new EnumMap<>(Region.class);
 		private final Map<Tier, QuestPrerequisites> mTierPrerequisites = new EnumMap<>(Tier.class);
 
 		private Conversion(JsonElement element, Location lootTableLocation) throws Exception {
@@ -294,6 +295,16 @@ public final class ExperiencinatorConfig {
 				mPrerequisites = null;
 			}
 
+			JsonElement regionPrerequisitesElement = object.get("region_prerequisites");
+			if (regionPrerequisitesElement != null) {
+				JsonObject prerequisitesObject = regionPrerequisitesElement.getAsJsonObject();
+				for (Entry<String, JsonElement> entry : prerequisitesObject.entrySet()) {
+					Region region = parseItemRegion(entry.getKey());
+					QuestPrerequisites regionPrerequisites = new QuestPrerequisites(entry.getValue());
+					mRegionPrerequisites.put(region, regionPrerequisites);
+				}
+			}
+
 			JsonElement tierPrerequisitesElement = object.get("tier_prerequisites");
 			if (tierPrerequisitesElement != null) {
 				JsonObject prerequisitesObject = tierPrerequisitesElement.getAsJsonObject();
@@ -334,12 +345,14 @@ public final class ExperiencinatorConfig {
 			return mCompressExistingResults;
 		}
 
-		public boolean conversionAllowed(Player player, Tier tier, ItemStack experiencinatorItem) {
+		public boolean conversionAllowed(Player player, Region region, Tier tier, ItemStack experiencinatorItem) {
 			if (!conversionAllowedInGeneral(player, experiencinatorItem)) {
 				return false;
 			}
+			QuestPrerequisites regionPrerequisites = mRegionPrerequisites.get(region);
 			QuestPrerequisites tierPrerequisites = mTierPrerequisites.get(tier);
-			return tierPrerequisites == null || new QuestContext(Plugin.getInstance(), player, null, false, tierPrerequisites, experiencinatorItem).prerequisitesMet();
+			return (regionPrerequisites == null || new QuestContext(Plugin.getInstance(), player, null, false, regionPrerequisites, experiencinatorItem).prerequisitesMet())
+				       && (tierPrerequisites == null || new QuestContext(Plugin.getInstance(), player, null, false, tierPrerequisites, experiencinatorItem).prerequisitesMet());
 		}
 
 		/**

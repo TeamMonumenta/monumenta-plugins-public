@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -67,7 +68,7 @@ public class SpellMagmaShield extends Spell {
 						if (playerDir.dot(toMobVector) > 0.33) {
 							MovementUtils.knockAway(mBoss, p, 0.5f, false);
 							BossUtils.blockableDamage(mBoss, p, DamageType.MAGIC, 25, "Magma Shield", mBoss.getLocation());
-							p.setFireTicks(20 * 5);
+							EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 5, p, mBoss);
 						}
 					}
 					BukkitRunnable runB = new BukkitRunnable() {

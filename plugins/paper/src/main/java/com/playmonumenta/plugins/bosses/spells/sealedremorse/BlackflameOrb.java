@@ -75,7 +75,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 
 					for (Player p : PlayerUtils.playersInRange(loc, 5, true)) {
 						DamageUtils.damage(boss, p, DamageType.MAGIC, DAMAGE, null, false, true, "Blackflame Orb");
-						p.setFireTicks(4 * 20);
+						EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 4 * 20, p, boss);
 					}
 				});
 		mBoss = boss;
@@ -133,7 +133,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 
 		for (Player p : PlayerUtils.playersInRange(loc, 6, true)) {
 			BossUtils.bossDamagePercent(mBoss, p, 0.7, null, "Blackflame Orb");
-			p.setFireTicks(4 * 20);
+			EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 4 * 20, p, mBoss);
 		}
 	}
 }

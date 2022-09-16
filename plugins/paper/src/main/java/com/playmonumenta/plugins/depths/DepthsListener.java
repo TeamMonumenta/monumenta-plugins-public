@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.io.File;
@@ -97,6 +98,8 @@ public class DepthsListener implements Listener {
 	public void playerExpChangeEvent(PlayerExpChangeEvent event) {
 		Player player = event.getPlayer();
 		if (DepthsManager.getInstance().isInSystem(player)) {
+			double xpFactor = 1;
+
 			//Check if anyone in their party has enlightenment levels
 			DepthsParty party = DepthsManager.getInstance().getPartyFromId(DepthsManager.getInstance().mPlayers.get(player.getUniqueId()));
 			int highestLevel = 0;
@@ -111,7 +114,15 @@ public class DepthsListener implements Listener {
 				}
 			}
 			if (highestLevel > 0) {
-				event.setAmount((int) (event.getAmount() * Enlightenment.XP_MULTIPLIER[highestLevel - 1]));
+				xpFactor *= Enlightenment.XP_MULTIPLIER[highestLevel - 1];
+			}
+
+			if (party.mEndlessMode) {
+				xpFactor *= 0.5;
+			}
+
+			if (xpFactor != 1) {
+				event.setAmount((int) Math.round(event.getAmount() * xpFactor));
 			}
 		}
 	}
@@ -186,6 +197,15 @@ public class DepthsListener implements Listener {
 				dp.setDeathRoom(party.getRoomNumber());
 				event.getEntity().sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
 				event.getEntity().sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You reached room " + party.mRoomNumber + "!");
+
+				if (!party.mEndlessMode) {
+					event.setKeepLevel(false);
+					event.setDroppedExp(0);
+					int keptXp = (int) (0.5 * ExperienceUtils.getTotalExperience(event.getPlayer()));
+					int keptLevel = ExperienceUtils.getLevel(keptXp);
+					event.setNewLevel(keptLevel);
+					event.setNewExp(keptXp - ExperienceUtils.getTotalExperience(keptLevel));
+				}
 			}
 		}
 	}

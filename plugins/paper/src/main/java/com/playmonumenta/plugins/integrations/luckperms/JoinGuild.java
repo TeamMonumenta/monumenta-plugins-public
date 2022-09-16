@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.integrations.luckperms;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -13,6 +14,8 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.InheritanceNode;
@@ -22,6 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class JoinGuild {
+	@SuppressWarnings("unchecked")
 	public static void register(Plugin plugin) {
 		// joinguild <playername>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.joinguild");
@@ -71,24 +75,33 @@ public class JoinGuild {
 					@Override
 					public void run() {
 						User user = LuckPermsIntegration.UM.getUser(p.getUniqueId());
+						if (user == null) {
+							founder.sendMessage(Component.text("Failed to add " + p.getName() + " to your guild (luckperms error).", NamedTextColor.RED));
+							p.sendMessage(Component.text("Failed to join guild (luckperms error).", NamedTextColor.RED));
+							return;
+						}
 						user.data().add(InheritanceNode.builder(currentGuild).build());
 						LuckPermsIntegration.UM.saveUser(user).whenComplete((unused, ex) -> {
 							if (ex != null) {
+								MessagingUtils.sendStackTrace(founder, ex);
+								MessagingUtils.sendStackTrace(p, ex);
 								ex.printStackTrace();
+							} else {
+								Bukkit.getScheduler().runTask(plugin, () -> {
+									// Success indicators
+									p.sendMessage(ChatColor.GOLD + "Congratulations! You have joined " + currentGuildName + "!");
+									founder.sendMessage(ChatColor.WHITE + p.getName() + ChatColor.GOLD + " has joined your guild");
+									MonumentaNetworkChatIntegration.refreshPlayer(p);
+									Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+										"execute at " + p.getName()
+											+ " run summon minecraft:firework_rocket ~ ~1 ~ "
+											+ "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
+								});
 							}
 						});
 						LuckPermsIntegration.pushUserUpdate(user);
 					}
 				}.runTaskAsynchronously(plugin);
-
-				// Success indicators
-				p.sendMessage(ChatColor.GOLD + "Congratulations! You have joined " + currentGuildName + "!");
-				founder.sendMessage(ChatColor.WHITE + p.getName() + ChatColor.GOLD + " has joined your guild");
-				MonumentaNetworkChatIntegration.refreshPlayer(p);
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-					"execute at " + p.getName()
-						+ " run summon minecraft:firework_rocket ~ ~1 ~ "
-						+ "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
 			} else {
 				Group group = LuckPermsIntegration.getGuild(p);
 				if (group != null) {

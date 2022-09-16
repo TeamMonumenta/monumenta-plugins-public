@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.io.File;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -19,7 +20,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.annotation.Nullable;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
@@ -51,7 +51,7 @@ public abstract class ExperiencinatorUtils {
 				mConfigLastModTimestamp = lastMod;
 			}
 		} catch (Exception e) {
-			Plugin.getInstance().getLogger().log(Level.SEVERE, e, () -> "Could not (re)load Experiencinator config!");
+			MMLog.severe("Could not (re)load Experiencinator config!", e);
 		}
 	}
 
@@ -107,7 +107,7 @@ public abstract class ExperiencinatorUtils {
 					continue;
 				}
 				Tier tier = ItemStatUtils.getTier(item);
-				if (!conversion.conversionAllowed(player, tier, experiencinatorItem)) { // prerequisites for conversion not met
+				if (!conversion.conversionAllowed(player, region, tier, experiencinatorItem)) { // prerequisites for conversion not met
 					continue;
 				}
 				if (settings.getConversion(region, tier) != conversion.getSettingsId()) { // conversion not enabled

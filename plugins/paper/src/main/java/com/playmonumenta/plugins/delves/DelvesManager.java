@@ -33,7 +33,6 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -326,6 +325,8 @@ public class DelvesManager implements Listener {
 					for (DelvesModifier mod : DelvesModifier.deathTriggerDelvesModifier()) {
 						mod.applyDelve(livingEntity, delvesApplied.getOrDefault(mod, 0));
 					}
+					// Apply unyielding on all elites (i.e. gray evokers)
+					DelvesModifier.UNYIELDING.applyDelve(livingEntity, delvesApplied.getOrDefault(DelvesModifier.UNYIELDING, 0));
 				}
 				//Giving tag so this function doesn't run twice on the same mob
 				livingEntity.addScoreboardTag(HAS_DELVE_MODIFIER_TAG);

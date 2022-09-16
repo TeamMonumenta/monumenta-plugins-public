@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Arrays;
 import java.util.Collections;
@@ -69,7 +70,7 @@ public class FireBombTossBoss extends BossAbilityGroup {
 							if (player.hasLineOfSight(tnt)) {
 								double multiplier = (p.RADIUS - player.getLocation().distance(loc)) / p.RADIUS;
 								BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE * multiplier, p.SPELL_NAME, boss.getLocation());
-								player.setFireTicks((int) (p.FIRE_DURATION * multiplier));
+								EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), (int) (p.FIRE_DURATION * multiplier), player, mBoss);
 							}
 						}
 					})

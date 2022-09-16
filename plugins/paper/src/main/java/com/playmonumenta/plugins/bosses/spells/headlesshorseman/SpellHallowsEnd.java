@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
@@ -75,7 +76,7 @@ public class SpellHallowsEnd extends Spell {
 							int mNDT = player.getNoDamageTicks();
 							player.setNoDamageTicks(0);
 							DamageUtils.damage(mBoss, player, DamageType.MAGIC, 50, null, false, true, "Hallow's End");
-							player.setFireTicks(20 * 8);
+							EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 8, player, mBoss);
 							player.setNoDamageTicks(mNDT);
 							MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
 							if (bounce) {

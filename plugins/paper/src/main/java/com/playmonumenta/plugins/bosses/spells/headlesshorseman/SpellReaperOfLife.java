@@ -160,7 +160,7 @@ public class SpellReaperOfLife extends Spell {
 					for (Player player : PlayerUtils.playersInRange(mCenter, mRange, true)) {
 						if (mCenter.distance(player.getLocation()) < mRange) {
 							BossUtils.bossDamagePercent(mBoss, player, 0.85, (Location)null, "Reaper of Life");
-							player.setFireTicks(20 * 3);
+							EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 3, player, mBoss);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, 20 * 10, 4));
 							player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 10, 2));
 						}

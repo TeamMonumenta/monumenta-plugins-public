@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
+import net.kyori.adventure.text.Component;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.MetaNode;
@@ -28,6 +30,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class CreateGuild {
+	private static final String[] SUGGESTIONS = {"@a[x=-770,y=106,z=-128,dx=7,dy=4,dz=13]"};
 
 	@SuppressWarnings("unchecked")
 	public static void register(Plugin plugin) {
@@ -38,7 +41,7 @@ public class CreateGuild {
 		arguments.add(new TextArgument("guild name"));
 		arguments.add(new TextArgument("guild tag"));
 		arguments.add(new EntitySelectorArgument("founders", EntitySelector.MANY_PLAYERS)
-		              .overrideSuggestions("@a[x=-770,y=106,z=-128,dx=7,dy=4,dz=13]"));
+				.replaceSuggestions(info -> SUGGESTIONS));
 
 		new CommandAPICommand("createguild")
 			.withPermission(perms)
@@ -88,30 +91,6 @@ public class CreateGuild {
 			CommandAPI.fail("Individual founder level requirements not met");
 		}
 
-		// Create guild chat channel
-		MonumentaNetworkChatIntegration.createGuildChannel(guildTag, cleanGuildName);
-
-		// Add tags, display messages and effects
-		for (Player founder : founders) {
-			ScoreboardUtils.setScoreboardValue(founder, "Founder", 1);
-			founder.sendMessage(ChatColor.GOLD + "Congratulations! You have founded a new guild!");
-			founder.playSound(founder.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1.5f);
-
-			// Refresh chat name
-			MonumentaNetworkChatIntegration.refreshPlayer(founder);
-
-			// fireworks!
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at " + founder.getName()
-			                       + " run summon minecraft:firework_rocket ~ ~1 ~ "
-			                       + "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
-		}
-
-		try {
-			MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"A new guild has just been founded. Say hello to " + guildName + "!!\",\"bold\":true}]");
-		} catch (Exception e) {
-			sender.sendMessage(ChatColor.RED + "Broadcasting command failed");
-		}
-
 		// Sort out permissions
 		Executor executor = runnable -> Bukkit.getScheduler().runTask(plugin, runnable);
 		LuckPermsIntegration.GM.createAndLoadGroup(cleanGuildName).thenAcceptAsync(
@@ -121,15 +100,21 @@ public class CreateGuild {
 				group.data().add(MetaNode.builder("guildname", guildName).build());
 				for (Player founder : founders) {
 					User user = LuckPermsIntegration.UM.getUser(founder.getUniqueId());
+					if (user == null) {
+						sender.sendMessage(Component.text("No such luckperms user " + founder.getName()));
+						continue;
+					}
 					user.data().add(InheritanceNode.builder(group).build());
 					LuckPermsIntegration.UM.saveUser(user).whenComplete((unused, ex) -> {
 						if (ex != null) {
+							MessagingUtils.sendStackTrace(sender, ex);
 							ex.printStackTrace();
 						}
 					});
 				}
 				LuckPermsIntegration.GM.saveGroup(group).whenComplete((unused, ex) -> {
 					if (ex != null) {
+						MessagingUtils.sendStackTrace(sender, ex);
 						ex.printStackTrace();
 					}
 				});
@@ -137,7 +122,34 @@ public class CreateGuild {
 			}, executor
 		).whenComplete((unused, ex) -> {
 			if (ex != null) {
+				MessagingUtils.sendStackTrace(sender, ex);
 				ex.printStackTrace();
+			} else {
+				Bukkit.getScheduler().runTask(plugin, () -> {
+					// Create guild chat channel
+					MonumentaNetworkChatIntegration.createGuildChannel(guildTag, cleanGuildName);
+
+					// Add tags, display messages and effects
+					for (Player founder : founders) {
+						ScoreboardUtils.setScoreboardValue(founder, "Founder", 1);
+						founder.sendMessage(ChatColor.GOLD + "Congratulations! You have founded a new guild!");
+						founder.playSound(founder.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1.5f);
+
+						// Refresh chat name
+						MonumentaNetworkChatIntegration.refreshPlayer(founder);
+
+						// fireworks!
+						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at " + founder.getName()
+							+ " run summon minecraft:firework_rocket ~ ~1 ~ "
+							+ "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
+					}
+
+					try {
+						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"A new guild has just been founded. Say hello to " + guildName + "!!\",\"bold\":true}]");
+					} catch (Exception e) {
+						sender.sendMessage(ChatColor.RED + "Broadcasting command failed");
+					}
+				});
 			}
 		});
 	}

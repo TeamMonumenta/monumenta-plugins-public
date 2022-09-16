@@ -191,8 +191,22 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		}
 
 		private double getTotalDamageDealtMultiplier() {
+			boolean isMaxShatter = false;
+			boolean isShatter = false;
+			for (Equipment slot : Equipment.values()) {
+				ItemStack item = getItem(slot);
+
+				if (item != null && Shattered.isShattered(item)) {
+					isShatter = true;
+					if (Shattered.isMaxShatter(item)) {
+						isMaxShatter = true;
+						break;
+					}
+				}
+			}
+
 			return (hasLaterRegionEquipment(true) ? RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER : 1)
-				       * Shattered.getDamageDealtMultiplier(getInfusion(InfusionType.SHATTERED));
+				* (isShatter ? Shattered.getDamageDealtMultiplier(isMaxShatter) : 1);
 		}
 	}
 
@@ -235,7 +249,21 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			damageMultiplier *= RegionScalingDamageTaken.DAMAGE_TAKEN_MULTIPLIER;
 		}
 
-		damageMultiplier *= Shattered.getDamageTakenMultiplier(stats.getInfusion(InfusionType.SHATTERED));
+		boolean isMaxShatter = false;
+		boolean isShatter = false;
+		for (Equipment slot : Equipment.values()) {
+			ItemStack item = stats.getItem(slot);
+
+			if (item != null && Shattered.isShattered(item)) {
+				isShatter = true;
+				if (Shattered.isMaxShatter(item)) {
+					isMaxShatter = true;
+					break;
+				}
+			}
+		}
+
+		damageMultiplier *= (isShatter ? Shattered.getDamageTakenMultiplier(isMaxShatter) : 1);
 
 		damageMultiplier *= 1 - stats.getInfusion(InfusionType.TENACITY) * Tenacity.DAMAGE_REDUCTION_PER_LEVEL;
 
@@ -307,16 +335,16 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		// melee
 		ATTACK_DAMAGE_ADD("+flat Attack Damage", NUMBER, stats -> stats.get(AttributeType.ATTACK_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD)),
 		ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", PERCENT_MODIFIER, stats -> stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY, 1)
-			                                                                      * stats.getTotalDamageDealtMultiplier()
-			                                                                      * (1 + Vigor.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.VIGOR))),
+			* stats.getTotalDamageDealtMultiplier()
+			* (1 + Vigor.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.VIGOR))),
 		TOTAL_ATTACK_DAMAGE("Total Attack Damage", NUMBER, stats -> (1 + stats.get(AttributeType.ATTACK_DAMAGE_ADD)) * ATTACK_DAMAGE_MULTIPLY.get(stats)),
 		ATTACK_SPEED("Attack Speed", NUMBER, stats -> stats.getAttributeAmount(AttributeType.ATTACK_SPEED, 4)),
 
 		// projectile
 		PROJECTILE_DAMAGE_ADD("+flat Projectile Damage", NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD)),
 		PROJECTILE_DAMAGE_MULTIPLY("+% Projectile Damage", PERCENT_MODIFIER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY, 1)
-			                                                                              * stats.getTotalDamageDealtMultiplier()
-			                                                                              * (1 + Focus.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.FOCUS))),
+			* stats.getTotalDamageDealtMultiplier()
+			* (1 + Focus.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.FOCUS))),
 		TOTAL_PROJECTILE_DAMAGE("Total Projectile Damage", NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) * PROJECTILE_DAMAGE_MULTIPLY.get(stats)),
 		PROJECTILE_SPEED("Projectile Speed", NUMBER, stats -> {
 			ItemStack mainhand = stats.getItem(Equipment.MAINHAND);
@@ -348,11 +376,11 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		SPELL_POWER("Spell Power", PERCENT, stats -> stats.get(AttributeType.SPELL_DAMAGE)),
 		MAGIC_DAMAGE_ADD("+flat Magic Damage", NUMBER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_ADD)),
 		MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", PERCENT_MODIFIER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_MULTIPLY, 1)
-			                                                                    * stats.getTotalDamageDealtMultiplier()
-			                                                                    * (1 + Perspicacity.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.PERSPICACITY))),
+			* stats.getTotalDamageDealtMultiplier()
+			* (1 + Perspicacity.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.PERSPICACITY))),
 		TOTAL_SPELL_DAMAGE("Total Spell Damage %", PERCENT, stats -> SPELL_POWER.get(stats) * MAGIC_DAMAGE_MULTIPLY.get(stats)),
 		COOLDOWN_MULTIPLIER("Cooldown Multiplier", PERCENT, stats -> (1 + Aptitude.getCooldownPercentage(stats.get(EnchantmentType.APTITUDE)))
-			                                                             * (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE))), false),
+			* (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE))), false),
 		// misc
 		ARMOR("Total Armor", NUMBER, stats -> stats.get(AttributeType.ARMOR)),
 		AGILITY("Total Agility", NUMBER, stats -> stats.get(AttributeType.AGILITY)),
@@ -794,8 +822,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			if (clickedItem != null && clickedItem.getType() != Material.AIR) {
 				ItemStack item = new ItemStack(clickedItem);
 				if (ShulkerEquipmentListener.isEquipmentBox(item)
-					    && item.getItemMeta() instanceof BlockStateMeta meta
-					    && meta.getBlockState() instanceof ShulkerBox shulker) {
+					&& item.getItemMeta() instanceof BlockStateMeta meta
+					&& meta.getBlockState() instanceof ShulkerBox shulker) {
 					Stats stats;
 					if (event.getClick().isShiftClick()) {
 						stats = event.getClick().isLeftClick() ? mRightStats : mLeftStats;
@@ -823,7 +851,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				boolean targetRightSet = false;
 				if (event.getClick().isShiftClick()) {
 					targetRightSet = event.getClick().isLeftClick();
-					for (Equipment equipment : new Equipment[] {Equipment.HEAD, Equipment.CHEST, Equipment.LEGS, Equipment.FEET}) {
+					for (Equipment equipment : new Equipment[]{Equipment.HEAD, Equipment.CHEST, Equipment.LEGS, Equipment.FEET}) {
 						if (isValid(equipment, item.getType())) {
 							targetSlot = equipment;
 							break;
@@ -889,8 +917,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			warnings.add(Component.text("Build has more than one Curse of Corruption item.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		}
 		if (stats.get(EnchantmentType.TWO_HANDED) > 0
-			    && stats.getItem(Equipment.OFFHAND) != null
-			    && ItemStatUtils.getEnchantmentLevel(stats.getItem(Equipment.OFFHAND), EnchantmentType.WEIGHTLESS) == 0) {
+			&& stats.getItem(Equipment.OFFHAND) != null
+			&& ItemStatUtils.getEnchantmentLevel(stats.getItem(Equipment.OFFHAND), EnchantmentType.WEIGHTLESS) == 0) {
 			warnings.add(Component.text("Build has a Two Handed item, but not a Weightless offhand.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		}
 		if (warnings.isEmpty()) {
@@ -907,7 +935,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	private void generateInventory() {
 
-		for (Stats stats : new Stats[] {mLeftStats, mRightStats}) {
+		for (Stats stats : new Stats[]{mLeftStats, mRightStats}) {
 			stats.mStatCache.clear();
 			stats.mPlayerItemStats.updateStats(stats.getItem(Equipment.MAINHAND), stats.getItem(Equipment.OFFHAND),
 				stats.getItem(Equipment.HEAD), stats.getItem(Equipment.CHEST), stats.getItem(Equipment.LEGS), stats.getItem(Equipment.FEET), true);
@@ -976,11 +1004,11 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		for (Equipment equipment : Equipment.values()) {
 			ItemStack leftItem = mLeftStats.mDisplayedEquipment.get(equipment);
 			mInventory.setItem(equipment.mLeftSlot, leftItem != null && leftItem.getType() != Material.AIR ? leftItem
-				                                        : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && !mSelectedRightEquipmentSet));
+				: makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && !mSelectedRightEquipmentSet));
 
 			ItemStack rightItem = mRightStats.mDisplayedEquipment.get(equipment);
 			mInventory.setItem(equipment.mRightSlot, rightItem != null && rightItem.getType() != Material.AIR ? rightItem
-				                                         : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && mSelectedRightEquipmentSet));
+				: makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && mSelectedRightEquipmentSet));
 		}
 
 		mInventory.setItem(28, getWarningIcon(mLeftStats));

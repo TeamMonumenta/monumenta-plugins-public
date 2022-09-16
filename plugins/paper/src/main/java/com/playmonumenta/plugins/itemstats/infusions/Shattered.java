@@ -29,12 +29,15 @@ public class Shattered implements Infusion {
 
 	public static final int MINING_FATIGUE_AMPLIFIER = 1;
 
-	private static final double DAMAGE_DEALT_MULTIPLIER = -0.04;
-	private static final double DAMAGE_TAKEN_MULTIPLIER = 0.04;
+	private static final double LIGHT_DAMAGE_DEALT_MULTIPLIER = -0.3;
+	private static final double HEAVY_DAMAGE_DEALT_MULTIPLIER = -0.6;
+
+	private static final double LIGHT_DAMAGE_TAKEN_MULTIPLIER = 0.3;
+	private static final double HEAVY_DAMAGE_TAKEN_MULTIPLIER = 0.6;
 
 	private static final UUID NULL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
-	private static final HashSet<UUID> mFatiguePlayers = new HashSet<>();
+	private static final HashSet<UUID> mShatteredDebuff = new HashSet<>();
 
 	@Override
 	public String getName() {
@@ -51,22 +54,30 @@ public class Shattered implements Infusion {
 		return 4998; // just before region scaling
 	}
 
-	public static double getDamageDealtMultiplier(double level) {
-		return 1 + DAMAGE_DEALT_MULTIPLIER * level;
+	public static double getDamageDealtMultiplier(boolean maxShatter) {
+		if (maxShatter) {
+			return 1 + HEAVY_DAMAGE_DEALT_MULTIPLIER;
+		} else {
+			return 1 + LIGHT_DAMAGE_DEALT_MULTIPLIER;
+		}
 	}
 
-	public static double getDamageTakenMultiplier(double level) {
-		return 1 + DAMAGE_TAKEN_MULTIPLIER * level;
+	public static double getDamageTakenMultiplier(boolean maxShatter) {
+		if (maxShatter) {
+			return 1 + HEAVY_DAMAGE_TAKEN_MULTIPLIER;
+		} else {
+			return 1 + LIGHT_DAMAGE_TAKEN_MULTIPLIER;
+		}
 	}
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		event.setDamage(event.getDamage() * getDamageDealtMultiplier(value));
+		event.setDamage(event.getDamage() * getDamageDealtMultiplier(hasMaxShatteredItemEquipped(player)));
 	}
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		event.setDamage(event.getDamage() * getDamageTakenMultiplier(value));
+		event.setDamage(event.getDamage() * getDamageTakenMultiplier(hasMaxShatteredItemEquipped(player)));
 	}
 
 	@Override
@@ -75,13 +86,13 @@ public class Shattered implements Infusion {
 			// Need to delay this code as it checks equipped items which may not yet have changed, as this method is called from within events
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 				if (hasMaxShatteredItemEquipped(player)) {
-					mFatiguePlayers.add(player.getUniqueId());
+					mShatteredDebuff.add(player.getUniqueId());
 					plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 10000000, MINING_FATIGUE_AMPLIFIER, false, false));
-				} else if (mFatiguePlayers.remove(player.getUniqueId())) {
+				} else if (mShatteredDebuff.remove(player.getUniqueId())) {
 					plugin.mPotionManager.removePotion(player, PotionManager.PotionID.ITEM, PotionEffectType.SLOW_DIGGING, MINING_FATIGUE_AMPLIFIER);
 				}
 			});
-		} else if (mFatiguePlayers.remove(player.getUniqueId())) {
+		} else if (mShatteredDebuff.remove(player.getUniqueId())) {
 			plugin.mPotionManager.removePotion(player, PotionManager.PotionID.ITEM, PotionEffectType.SLOW_DIGGING, MINING_FATIGUE_AMPLIFIER);
 		}
 	}
@@ -104,6 +115,14 @@ public class Shattered implements Infusion {
 			}
 		}
 		return false;
+	}
+
+	public static boolean isMaxShatter(ItemStack item) {
+		return ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED) >= MAX_LEVEL;
+	}
+
+	public static boolean isShattered(ItemStack item) {
+		return ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED) > 0;
 	}
 
 	/**
@@ -140,5 +159,4 @@ public class Shattered implements Infusion {
 		ItemStatUtils.generateItemStats(item);
 		return true;
 	}
-
 }
