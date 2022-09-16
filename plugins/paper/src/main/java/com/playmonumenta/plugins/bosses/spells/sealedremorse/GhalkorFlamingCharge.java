@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
 import org.bukkit.Location;
@@ -89,7 +90,7 @@ public class GhalkorFlamingCharge extends SpellBaseCharge {
 							for (Player player : players) {
 								if (mHitbox.overlaps(player.getBoundingBox())) {
 									world.playSound(mParticleLoc, Sound.ENTITY_GENERIC_BURN, 0.5f, 1f);
-									player.setFireTicks(FIRE_DURATION);
+									EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), FIRE_DURATION, player, boss);
 									DamageUtils.damage(boss, player, DamageType.MAGIC, GROUND_DAMAGE, null, false, true, "Flaming Charge");
 								}
 							}

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -81,7 +82,7 @@ public class SpellBurningVengence extends Spell {
 							for (Player player : PlayerUtils.playersInRange(loc, 0.75, true)) {
 								if (mCenter.distance(player.getLocation()) < mRange) {
 									DamageUtils.damage(mBoss, player, DamageType.FIRE, 4, null, false, true, "Burning Vengence");
-									player.setFireTicks(20 * 5);
+									EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 5, player, mBoss);
 									MovementUtils.pullTowardsByUnit(mBoss, player, (float)0.5);
 								}
 							}

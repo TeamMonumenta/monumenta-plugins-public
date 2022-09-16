@@ -77,7 +77,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 
 					for (Player p : PlayerUtils.playersInRange(loc, 5, true)) {
 						DamageUtils.damage(boss, p, DamageType.MAGIC, DAMAGE, null, false, true, "Orb of Bones");
-						p.setFireTicks(4 * 20);
+						EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 4 * 20, p, boss);
 					}
 				});
 		mBossClass = bossClass;
@@ -132,7 +132,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 
 		for (Player p : PlayerUtils.playersInRange(loc, 6, true)) {
 			BossUtils.blockableDamage(mBoss, p, DamageType.MAGIC, DAMAGE, "Orb of Bones", null);
-			p.setFireTicks(4 * 20);
+			EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 4 * 20, p, mBoss);
 		}
 	}
 }

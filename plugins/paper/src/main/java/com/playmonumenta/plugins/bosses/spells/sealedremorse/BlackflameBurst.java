@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -76,7 +77,7 @@ public class BlackflameBurst extends Spell {
 					loc.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 20, 0.5, 0.5, 0.5, 0.5);
 					if (player != null) {
 						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Blackflame Burst", mBoss.getLocation());
-						player.setFireTicks(4 * 20);
+						EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 4 * 20, player, boss);
 					}
 				});
 	}

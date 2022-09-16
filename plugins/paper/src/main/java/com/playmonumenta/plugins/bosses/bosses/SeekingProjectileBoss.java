@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Arrays;
 import java.util.Collections;
@@ -83,7 +84,7 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 						if (target != null) {
 							BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE);
 							if (p.FIRE_DURATION != 0) {
-								target.setFireTicks(p.FIRE_DURATION);
+								EntityUtils.applyFire(plugin, p.FIRE_DURATION, target, boss);
 							}
 							if (p.EFFECT_DURATION != 0) {
 								target.addPotionEffect(new PotionEffect(p.EFFECT, p.EFFECT_DURATION, p.EFFECT_AMPLIFIER, true, true));

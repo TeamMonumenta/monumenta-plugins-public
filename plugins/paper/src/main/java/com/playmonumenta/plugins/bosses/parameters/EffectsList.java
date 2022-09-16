@@ -28,7 +28,7 @@ public class EffectsList {
 
 		static {
 			EFFECT_RUNNER = new HashMap<>();
-			EFFECT_RUNNER.put("fire", (p, boss, duration) -> p.setFireTicks((int) duration));
+			EFFECT_RUNNER.put("fire", (p, boss, duration) -> EntityUtils.applyFire(Plugin.getInstance(), (int) duration, p, boss));
 			EFFECT_RUNNER.put("silence", (p, boss, duration) -> {
 				if (p instanceof Player player) {
 					AbilityUtils.silencePlayer(player, (int) duration);

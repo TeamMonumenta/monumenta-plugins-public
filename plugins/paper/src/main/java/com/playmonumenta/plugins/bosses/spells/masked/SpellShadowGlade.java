@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.masked;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
@@ -77,7 +78,7 @@ public class SpellShadowGlade extends Spell {
 							pPos.getWorld().playSound(pPos, Sound.ENTITY_GHAST_HURT, 1f, 0.7f);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 7 * 20, 3));
 							player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 7 * 20, 1));
-							player.setFireTicks(20 * 7);
+							EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 7, player, null);
 						} else {
 							pPos.getWorld().playSound(pPos, Sound.BLOCK_FIRE_EXTINGUISH, 1f, 0.85f);
 						}

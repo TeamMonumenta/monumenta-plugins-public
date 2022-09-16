@@ -86,14 +86,14 @@ public final class Varcosa extends BossAbilityGroup {
 					},
 
 					// Damage generated at the end of the attack
-					(LivingEntity player, Location loc, boolean blocked) -> {
+					(LivingEntity target, Location loc, boolean blocked) -> {
 						loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
 						loc.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 300, 0.8, 0.8, 0.8, 0);
 
 						if (!blocked) {
-							BossUtils.blockableDamage(boss, player, DamageType.MAGIC, 30);
+							BossUtils.blockableDamage(boss, target, DamageType.MAGIC, 30);
 							// Shields don't stop fire!
-							player.setFireTicks(4 * 20);
+							EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 4 * 20, target, boss);
 						}
 					})));
 

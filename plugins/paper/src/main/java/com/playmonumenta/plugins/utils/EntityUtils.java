@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.effects.RecoilDisable;
 import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -885,8 +886,21 @@ public class EntityUtils {
 		return highest;
 	}
 
-	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player) {
-		applyFire(plugin, fireTicks, target, player, plugin.mItemStatManager.getPlayerItemStats(player));
+	private static void setFireTicksIfLower(int fireTicks, LivingEntity target) {
+		if (target.getFireTicks() < fireTicks && !isFireResistant(target)) {
+			target.setFireTicks(fireTicks);
+		}
+	}
+
+	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, @Nullable LivingEntity applier) {
+		if (applier instanceof Player player) {
+			applyFire(plugin, fireTicks, target, player, plugin.mItemStatManager.getPlayerItemStats(player));
+		} else if (target instanceof Player player) {
+			fireTicks = FireProtection.getFireDuration(fireTicks, plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.FIRE_PROTECTION));
+			setFireTicksIfLower(fireTicks, player);
+		} else {
+			setFireTicksIfLower(fireTicks, target);
+		}
 	}
 
 	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player, @Nullable ItemStatManager.PlayerItemStats playerItemStats) {
@@ -899,9 +913,7 @@ public class EntityUtils {
 			Inferno.apply(plugin, player, inferno, target, fireTicks);
 		}
 
-		if (target.getFireTicks() < fireTicks && !isFireResistant(target)) {
-			target.setFireTicks(fireTicks);
-		}
+		setFireTicksIfLower(fireTicks, target);
 	}
 
 	public static void applyTaunt(Plugin plugin, LivingEntity tauntedEntity, Player targetedPlayer) {

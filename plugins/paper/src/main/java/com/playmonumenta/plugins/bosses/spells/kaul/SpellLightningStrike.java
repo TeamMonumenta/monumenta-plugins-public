@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.particle.PPLightning;
 import com.playmonumenta.plugins.particle.PPPillar;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -24,6 +25,7 @@ import org.bukkit.Particle.DustOptions;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -473,8 +475,9 @@ public class SpellLightningStrike extends Spell {
 						FIRE_RADIUS
 					);
 					burnPlayers.forEach((Player player) -> {
-						player.setFireTicks(FIRE_ALIGHT_TICKS);
-						BossUtils.bossDamagePercent(mKaul.getBoss(), player, FIRE_DAMAGE_MULTIPLIER, fireLocation, "Lightning Strike");
+						LivingEntity boss = mKaul.getBoss();
+						EntityUtils.applyFire(Plugin.getInstance(), FIRE_ALIGHT_TICKS, player, boss);
+						BossUtils.bossDamagePercent(boss, player, FIRE_DAMAGE_MULTIPLIER, fireLocation, "Lightning Strike");
 					});
 				}
 

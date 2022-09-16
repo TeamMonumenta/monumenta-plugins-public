@@ -5,12 +5,12 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityCombustEvent;
-import org.jetbrains.annotations.NotNull;
 
 public class FireProtection extends Protection {
+	public static final double FIRE_DURATION_REDUCTION = 0.1;
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Fire Protection";
 	}
 
@@ -31,7 +31,11 @@ public class FireProtection extends Protection {
 
 	@Override
 	public void onCombust(Plugin plugin, Player player, double value, EntityCombustEvent event) {
-		event.setDuration((int) (event.getDuration() - (event.getDuration() * 0.1 * value)));
+		event.setDuration(getFireDuration(event.getDuration(), value));
+	}
+
+	public static int getFireDuration(int ticks, double value) {
+		return (int) (ticks * (1 - FIRE_DURATION_REDUCTION * value));
 	}
 
 }

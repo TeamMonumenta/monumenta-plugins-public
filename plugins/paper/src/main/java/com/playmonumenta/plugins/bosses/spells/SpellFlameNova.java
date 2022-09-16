@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -51,7 +52,7 @@ public class SpellFlameNova extends SpellBaseAoE {
 	protected void dealDamageAction(Location loc) {
 		for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius, true)) {
 			BossUtils.blockableDamage(mLauncher, player, DamageType.MAGIC, mDamage);
-			player.setFireTicks(mFireTicks);
+			EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), mFireTicks, player, mLauncher);
 		}
 	}
 

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
@@ -125,7 +126,7 @@ public class SpellHellzoneGrenade extends Spell {
 							if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 								BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 35, "Hellzone Grenades", loc);
 								// Shields don't stop fire!
-								player.setFireTicks(20 * 3);
+								EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 3, player, mBoss);
 							}
 						}
 
@@ -145,7 +146,7 @@ public class SpellHellzoneGrenade extends Spell {
 										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.arenaSize && LocationUtils.hasLineOfSight(mBoss, player)) {
 											/* Fire aura can not be blocked */
 											BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null, "Hellzone Grenades");
-											player.setFireTicks(20 * 3);
+											EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 3, player, mBoss);
 										}
 									}
 								}
