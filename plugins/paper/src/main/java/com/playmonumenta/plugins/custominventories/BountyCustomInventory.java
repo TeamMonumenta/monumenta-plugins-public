@@ -6,6 +6,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.delves.DelveCustomInventory;
+import com.playmonumenta.plugins.delves.DelvePreset;
+import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -14,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -65,8 +69,10 @@ public class BountyCustomInventory extends CustomInventory {
 
 	private final List<BountyData> mBounties = new ArrayList<>();
 	private final List<BountyData> mBountyChoices = new ArrayList<>();
+	private final List<DelvePreset> mPresetChoices = new ArrayList<>();
 	private final int mLevel;
 	private final int mRegion;
+	private int mPresetLevel = 0;
 
 	public BountyCustomInventory(Player player, int region, int level) throws Exception {
 		//super creates the GUI with arguments of player to open for, slots in GUI,
@@ -79,14 +85,17 @@ public class BountyCustomInventory extends CustomInventory {
 		}
 		mLevel = level;
 		mRegion = region;
-
 		parseData();
 		if (ScoreboardUtils.getScoreboardValue(player, "R" + region + "Bounties" + 1).orElse(0) != 0 ||
 			ScoreboardUtils.getScoreboardValue(player, "R" + region + "Bounties" + 2).orElse(0) != 0 ||
 			ScoreboardUtils.getScoreboardValue(player, "R" + region + "Bounties" + 3).orElse(0) != 0) {
 			loadFromExisting(player);
 		} else {
-			pickNewBounties(player);
+			if (mPresetLevel == 0 && region == 3) {
+				pickR3DelveLevel();
+			} else {
+				pickNewBounties(player);
+			}
 		}
 	}
 
@@ -106,9 +115,22 @@ public class BountyCustomInventory extends CustomInventory {
 		if (mLevel == 0) {
 			for (int i = 0; i < BOUNTY_L1_LOCATIONS.size(); i++) {
 				if (event.getSlot() == BOUNTY_L1_LOCATIONS.get(i)) {
-					setBounty((Player) event.getWhoClicked(), mBountyChoices.get(i));
+					if (mRegion == 3) {
+						if (mPresetLevel == 0) {
+							mPresetLevel = i + 1;
+							pickNewBounties((Player) event.getWhoClicked());
+							return;
+						}
+						DelvesManager.savePlayerData((Player) event.getWhoClicked(), "ring", mPresetChoices.get(i).mModifiers);
+						setBounty((Player) event.getWhoClicked(), mBountyChoices.get(i), mPresetChoices.get(i));
+					} else {
+						setBounty((Player) event.getWhoClicked(), mBountyChoices.get(i), null);
+					}
 					event.getWhoClicked().closeInventory();
 					return;
+				} else if (event.getSlot() == BOUNTY_L1_LOCATIONS.get(i) + 9) {
+					this.close();
+					new DelveCustomInventory((Player) event.getWhoClicked(), "ring", false, mPresetChoices.get(i)).openInventory((Player) event.getWhoClicked(), getPlugin());
 				}
 			}
 		}
@@ -118,13 +140,21 @@ public class BountyCustomInventory extends CustomInventory {
 		if (mLevel == 0) {
 			Collections.shuffle(mBounties);
 			int usedLocations = 0;
+			List<DelvePreset> presets = new ArrayList<>();
+			if (mRegion == 3) {
+				presets.addAll(DelvePreset.getRandomPresets(mPresetLevel));
+			}
 			for (BountyData bounty : mBounties) {
 				if (bounty.mScoreboardReq == null ||
 					(ScoreboardUtils.getScoreboardValue(player, bounty.mScoreboardReq).orElse(0) >= bounty.mReqMin)) {
-					_inventory.setItem(BOUNTY_L1_LOCATIONS.get(usedLocations++), createBasicItem(
-						bounty.mMaterial, bounty.mName, NamedTextColor.AQUA,
-						false, (bounty.mLevel != 0) ? "Tier " + bounty.mLevel : "", ChatColor.WHITE));
-					tagThemAll(player, "R" + mRegion + "Bounties" + usedLocations, bounty.mID * 100);
+					int bountyTag = bounty.mID * 100;
+					if (mRegion == 3) {
+						DelvePreset preset = presets.get(usedLocations);
+						bountyTag += preset.mId;
+						mPresetChoices.add(preset);
+					}
+					usedLocations++;
+					tagThemAll(player, "R" + mRegion + "Bounties" + usedLocations, bountyTag);
 					mBountyChoices.add(bounty);
 				}
 				if (usedLocations >= BOUNTY_L1_LOCATIONS.size()) {
@@ -140,6 +170,16 @@ public class BountyCustomInventory extends CustomInventory {
 		}
 	}
 
+	private void pickR3DelveLevel() {
+		for (int i = 0; i < BOUNTY_L1_LOCATIONS.size(); i++) {
+			_inventory.setItem(BOUNTY_L1_LOCATIONS.get(i), createBasicItem(
+				Material.SOUL_LANTERN, i + 1, "Level " + (i + 1), NamedTextColor.AQUA,
+				false, "Delve presets will be rolled from level " + (i + 1) + ".", ChatColor.WHITE));
+		}
+		createDelveInfoItem();
+		fillEmpty();
+	}
+
 	private void tagThemAll(Player player, String objective, int score) {
 		List<Player> playersInRange = PlayerUtils.playersInRange(player.getLocation(), RANGE, true);
 		for (Player target : playersInRange) {
@@ -153,13 +193,20 @@ public class BountyCustomInventory extends CustomInventory {
 	private void loadFromExisting(Player player) {
 		if (mLevel == 0) {
 			List<Integer> savedBounties = new ArrayList<>();
+			List<Integer> savedPresets = new ArrayList<>();
 			for (int i = 1; i <= 3; i++) {
 				int currentValue = ScoreboardUtils.getScoreboardValue(player, "R" + mRegion + "Bounties" + i).orElse(0);
 				savedBounties.add(currentValue / 100);
+				savedPresets.add(currentValue % 100);
 			}
 			for (BountyData bounty : mBounties) {
 				if (savedBounties.contains(bounty.mID)) {
 					mBountyChoices.add(bounty);
+				}
+			}
+			for (DelvePreset preset : DelvePreset.values()) {
+				if (savedPresets.contains(preset.mId)) {
+					mPresetChoices.add(preset);
 				}
 			}
 			setLayout();
@@ -174,6 +221,14 @@ public class BountyCustomInventory extends CustomInventory {
 					_inventory.setItem(BOUNTY_L1_LOCATIONS.get(i), createBasicItem(
 						bounty.mMaterial, bounty.mName, NamedTextColor.AQUA,
 						false, (bounty.mLevel != 0) ? "Tier " + bounty.mLevel : "", ChatColor.WHITE));
+				}
+			}
+			for (int i = 0; i < mPresetChoices.size(); i++) {
+				DelvePreset preset = mPresetChoices.get(i);
+				if (preset != null) {
+					_inventory.setItem(BOUNTY_L1_LOCATIONS.get(i) + 9, createBasicItem(
+						preset.mDisplayItem, preset.mName, NamedTextColor.AQUA,
+						false, (preset.mLevel != 0) ? "Tier " + preset.mLevel : "", ChatColor.WHITE));
 				}
 			}
 		}
@@ -192,13 +247,15 @@ public class BountyCustomInventory extends CustomInventory {
 		return true;
 	}
 
-	private void setBounty(Player player, BountyData bounty) {
+	private void setBounty(Player player, BountyData bounty, @Nullable DelvePreset preset) {
 		List<Player> nearbyPlayers = PlayerUtils.playersInRange(player.getLocation(), RANGE, true);
 		for (Player target : nearbyPlayers) {
 			if (ScoreboardUtils.getScoreboardValue(target, BOUNTY_SCOREBOARDS.get(mRegion - 1)).orElse(0) == 0 &&
 				ScoreboardUtils.getScoreboardValue(target, BOUNTY_REWARD_BOARDS.get(mRegion - 1)).orElse(0) == 0 &&
 				confirmMatchingBounties(player, target)) {
-
+				if (preset != null) {
+					ScoreboardUtils.setScoreboardValue(target, DelvePreset.PRESET_SCOREBOARD, preset.mId);
+				}
 				ScoreboardUtils.setScoreboardValue(target, BOUNTY_SCOREBOARDS.get(mRegion - 1), bounty.mID);
 				ScoreboardUtils.setScoreboardValue(target, LORE_SCOREBOARDS.get(mRegion - 1), 1);
 				ScoreboardUtils.setScoreboardValue(target, "R" + mRegion + "Bounties" + 1, 0);
@@ -208,12 +265,21 @@ public class BountyCustomInventory extends CustomInventory {
 				target.sendMessage(Component.text("Your bounty for today is ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)
 					.append(Component.text(bounty.mName, NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true))
 					.append(Component.text("!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)));
+				if (preset != null) {
+					target.sendMessage(Component.text("Your delve preset ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)
+						.append(Component.text(preset.mName, NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true))
+						.append(Component.text(" has been automatically selected!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)));
+				}
 			}
 		}
 	}
 
 	public ItemStack createBasicItem(Material mat, String name, NamedTextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
-		ItemStack item = new ItemStack(mat, 1);
+		return createBasicItem(mat, 1, name, nameColor, nameBold, desc, loreColor);
+	}
+
+	public ItemStack createBasicItem(Material mat, int amt, String name, NamedTextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
+		ItemStack item = new ItemStack(mat, amt);
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(Component.text(name, nameColor)
 			.decoration(TextDecoration.ITALIC, false)
@@ -253,6 +319,12 @@ public class BountyCustomInventory extends CustomInventory {
 		_inventory.setItem(4, createBasicItem(
 			Material.SCUTE, "Choose your bounty!", NamedTextColor.AQUA,
 			false, "Click the bounty you'd like to complete today.", ChatColor.WHITE));
+	}
+
+	public void createDelveInfoItem() {
+		_inventory.setItem(4, createBasicItem(
+			Material.SCUTE, "Choose your preset level!", NamedTextColor.AQUA,
+			false, "Click the level of the delve preset you want to roll from.", ChatColor.WHITE));
 	}
 
 	public void fillEmpty() {

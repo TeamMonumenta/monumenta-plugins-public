@@ -168,7 +168,6 @@ public enum DelvePreset {
 				break;
 			}
 		}
-
 		return presets;
 	}
 
