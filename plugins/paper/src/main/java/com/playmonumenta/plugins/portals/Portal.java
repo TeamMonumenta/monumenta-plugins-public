@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.portals;
 
+import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -12,6 +13,10 @@ import org.bukkit.util.Vector;
 
 public class Portal {
 	private static final double VERTICAL_BOOST = 0.18;
+
+	public int mPortalNum;
+	public UUID mUuid1;
+	public UUID mUuid2;
 
 	public Location mLocation1;
 	public Location mLocation2;
@@ -28,7 +33,10 @@ public class Portal {
 	//The owner of the portal
 	public @Nullable Player mOwner;
 
-	public Portal(Location loc1, Location loc2, BlockFace face, Location b1, Location b2) {
+	public Portal(int portalNum, UUID uuid1, UUID uuid2, Location loc1, Location loc2, BlockFace face, Location b1, Location b2) {
+		mPortalNum = portalNum;
+		mUuid1 = uuid1;
+		mUuid2 = uuid2;
 		mLocation1 = loc1;
 		mLocation2 = loc2;
 		mFacing = face;
@@ -53,35 +61,6 @@ public class Portal {
 			return new Vector(0, 0, 1);
 		}
 		return null;
-	}
-
-	public Vector getOffset(int loc, BlockFace from) {
-
-		if (mFacing == BlockFace.DOWN) {
-			return new Vector(0, -2, 0);
-		} else if (mFacing == BlockFace.UP) {
-			return new Vector(0, 1, 0);
-			//Ignore which side of the portal was entered if the entry was facing up or down
-		} else if (from == BlockFace.UP || from == BlockFace.DOWN) {
-			//For sideways portals, loc 1 will be the lower block and loc 2 will be the upper block. We want players to come out in the middle
-			//This provides more consistency in the puzzles -> less frustration
-			if (loc == 1) {
-				return new Vector(0, .5, 0);
-			}
-			if (loc == 2) {
-				return new Vector(0, -0.5, 0);
-			}
-
-		}
-
-		return new Vector(0, 0, 0);
-	}
-
-	public Location getPortalMidpoint() {
-		Location l = new Location(mLocation1.getWorld(), (mLocation1.getX() + mLocation2.getX()) / 2, (mLocation1.getY() + mLocation2.getY()) / 2, (mLocation1.getZ() + mLocation2.getZ()) / 2);
-		l.setYaw(mFacing.getDirection().toLocation(mLocation1.getWorld()).getYaw());
-		l.setPitch(mFacing.getDirection().toLocation(mLocation1.getWorld()).getPitch());
-		return l;
 	}
 
 	public Location getYaw(Location loc, Entity p) {

@@ -44,6 +44,7 @@ import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.plots.ShopManager;
+import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.protocollib.ProtocolLibIntegration;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventCommand;
@@ -374,6 +375,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ToggleTrail(), this);
 		manager.registerEvents(mVanityManager, this);
 		manager.registerEvents(new BrokenEquipmentListener(), this);
+		manager.registerEvents(PortalManager.getInstance(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")

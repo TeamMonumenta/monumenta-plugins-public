@@ -29,6 +29,7 @@ public class PortalTeleportCheck extends BukkitRunnable {
 		EntityType.ENDER_CRYSTAL,
 		EntityType.EVOKER_FANGS,
 		EntityType.FISHING_HOOK,
+		EntityType.GLOW_ITEM_FRAME,
 		EntityType.HORSE,
 		EntityType.ITEM_FRAME,
 		EntityType.LEASH_HITCH,

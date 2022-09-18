@@ -2,25 +2,37 @@ package com.playmonumenta.plugins.portals;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Rotation;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.GlowItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-public class PortalManager {
+public class PortalManager implements Listener {
 	public static final Set<Material> TRANSPARENT_BLOCKS_1 = Set.of(
 		Material.LIGHT_BLUE_STAINED_GLASS,
 		Material.PURPLE_STAINED_GLASS,
@@ -38,24 +50,36 @@ public class PortalManager {
 		Material.VINE
 	);
 
-	public static Portal mPortal1 = null;
-	public static Portal mPortal2 = null;
+	private static @Nullable PortalManager INSTANCE = null;
 	public static Map<Player, Portal> mPlayerPortal1 = null;
 	public static Map<Player, Portal> mPlayerPortal2 = null;
 	public static Map<Player, PortalTeleportCheck> mPortalTeleportChecks = null;
 	public static Map<Player, PortalAFKCheck> mPortalAFKChecks = null;
+	public static Map<UUID, Map<Long, Set<Portal>>> mPortalsByChunk = null;
 	public static String mCurrentShard = ServerProperties.getShardName();
 
 	//Timer for portals to despawn after placing
 	public static final int PORTAL_AFK_TIMER = 6000;
 
-	public static void spawnPortal(Player player, int portalNum) {
+	private PortalManager() {
+		INSTANCE = this;
+	}
+
+	public static PortalManager getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new PortalManager();
+		}
+		return INSTANCE;
+	}
+
+	public static void spawnPortal(Player player, int portalNum, int gunId) {
 		//Setup map
 		if (mPortalTeleportChecks == null || mPlayerPortal1 == null || mPlayerPortal2 == null) {
-			mPlayerPortal1 = new HashMap<Player, Portal>();
-			mPlayerPortal2 = new HashMap<Player, Portal>();
-			mPortalTeleportChecks = new HashMap<Player, PortalTeleportCheck>();
-			mPortalAFKChecks = new HashMap<Player, PortalAFKCheck>();
+			mPlayerPortal1 = new HashMap<>();
+			mPlayerPortal2 = new HashMap<>();
+			mPortalTeleportChecks = new HashMap<>();
+			mPortalAFKChecks = new HashMap<>();
+			mPortalsByChunk = new HashMap<>();
 		}
 
 		//Raycast player eye to block face
@@ -64,8 +88,8 @@ public class PortalManager {
 		Vector dir = loc.getDirection();
 		dir = dir.multiply(.5);
 		box.shift(dir);
-		World mWorld = player.getWorld();
-		String worldName = mWorld.getName();
+		World world = player.getWorld();
+		String worldName = world.getName();
 		if (worldName.startsWith("Project_Epic")) {
 			worldName = "overworld";
 		}
@@ -93,19 +117,19 @@ public class PortalManager {
 
 		for (int i = 0; i < 50; i++) {
 			box.shift(dir);
-			Location bLoc = box.getCenter().toLocation(mWorld);
+			Location bLoc = box.getCenter().toLocation(world);
 			if (portalNum == 1) {
-				mWorld.spawnParticle(Particle.REDSTONE, bLoc, 3, .15, .15, .15, new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f));
+				world.spawnParticle(Particle.REDSTONE, bLoc, 3, .15, .15, .15, new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f));
 			} else {
-				mWorld.spawnParticle(Particle.REDSTONE, bLoc, 3, .15, .15, .15, new Particle.DustOptions(Color.fromRGB(255, 69, 0), 1.0f));
+				world.spawnParticle(Particle.REDSTONE, bLoc, 3, .15, .15, .15, new Particle.DustOptions(Color.fromRGB(255, 69, 0), 1.0f));
 			}
-			mWorld.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, .5f, 1f);
+			world.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, .5f, 1f);
 			if (bLoc.getBlock().getType().isSolid()) {
 				break;
 			}
 		}
 		//Calculate player primary direction
-		BlockFace playerFacing = null;
+		BlockFace playerFacing;
 		if (Math.abs(dir.getX()) >= Math.abs(dir.getZ())) {
 			if (dir.getX() > 0) {
 				playerFacing = BlockFace.EAST;
@@ -128,27 +152,27 @@ public class PortalManager {
 		Block adjacent = null;
 
 		if (targetFace != BlockFace.UP && targetFace != BlockFace.DOWN) {
-			adjacent = mWorld.getBlockAt(blockHit.getLocation().add(new Vector(0, 1, 0)));
+			adjacent = world.getBlockAt(blockHit.getLocation().add(new Vector(0, 1, 0)));
 		} else if (targetFace == BlockFace.UP) {
 			//Set adjacent for up and down faces
 			if (playerFacing == BlockFace.SOUTH) {
-				adjacent = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, 1)));
+				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, 1)));
 			} else if (playerFacing == BlockFace.NORTH) {
-				adjacent = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, -1)));
+				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, -1)));
 			} else if (playerFacing == BlockFace.EAST) {
-				adjacent = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(1, 0, 0)));
+				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(1, 0, 0)));
 			} else if (playerFacing == BlockFace.WEST) {
-				adjacent = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(-1, 0, 0)));
+				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(-1, 0, 0)));
 			}
 		} else if (targetFace == BlockFace.DOWN) {
 			if (playerFacing == BlockFace.NORTH) {
-				adjacent = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, 1)));
+				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, 1)));
 			} else if (playerFacing == BlockFace.SOUTH) {
-				adjacent = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, -1)));
+				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, -1)));
 			} else if (playerFacing == BlockFace.WEST) {
-				adjacent = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(1, 0, 0)));
+				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(1, 0, 0)));
 			} else if (playerFacing == BlockFace.EAST) {
-				adjacent = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(-1, 0, 0)));
+				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(-1, 0, 0)));
 			}
 		}
 
@@ -161,39 +185,32 @@ public class PortalManager {
 		//Get the open blocks to place the portal on
 		Block portalBlock1 = null;
 		Block portalBlock2 = null;
-		int faceId = 0;
 
 		if (targetFace == BlockFace.UP) {
-			portalBlock1 = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 1, 0)));
-			portalBlock2 = mWorld.getBlockAt(adjacent.getLocation().clone().add(new Vector(0, 1, 0)));
-			faceId = 1;
+			portalBlock1 = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 1, 0)));
+			portalBlock2 = world.getBlockAt(adjacent.getLocation().clone().add(new Vector(0, 1, 0)));
 		} else if (targetFace == BlockFace.DOWN) {
-			portalBlock1 = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, -1, 0)));
-			portalBlock2 = mWorld.getBlockAt(adjacent.getLocation().clone().add(new Vector(0, -1, 0)));
-			faceId = 0;
+			portalBlock1 = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, -1, 0)));
+			portalBlock2 = world.getBlockAt(adjacent.getLocation().clone().add(new Vector(0, -1, 0)));
 		} else if (targetFace == BlockFace.EAST) {
-			portalBlock1 = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(1, 0, 0)));
-			portalBlock2 = mWorld.getBlockAt(adjacent.getLocation().clone().add(new Vector(1, 0, 0)));
-			faceId = 5;
+			portalBlock1 = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(1, 0, 0)));
+			portalBlock2 = world.getBlockAt(adjacent.getLocation().clone().add(new Vector(1, 0, 0)));
 		} else if (targetFace == BlockFace.WEST) {
-			portalBlock1 = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(-1, 0, 0)));
-			portalBlock2 = mWorld.getBlockAt(adjacent.getLocation().clone().add(new Vector(-1, 0, 0)));
-			faceId = 4;
+			portalBlock1 = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(-1, 0, 0)));
+			portalBlock2 = world.getBlockAt(adjacent.getLocation().clone().add(new Vector(-1, 0, 0)));
 		} else if (targetFace == BlockFace.NORTH) {
-			portalBlock1 = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, -1)));
-			portalBlock2 = mWorld.getBlockAt(adjacent.getLocation().clone().add(new Vector(0, 0, -1)));
-			faceId = 2;
+			portalBlock1 = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, -1)));
+			portalBlock2 = world.getBlockAt(adjacent.getLocation().clone().add(new Vector(0, 0, -1)));
 		} else if (targetFace == BlockFace.SOUTH) {
-			portalBlock1 = mWorld.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, 1)));
-			portalBlock2 = mWorld.getBlockAt(adjacent.getLocation().clone().add(new Vector(0, 0, 1)));
-			faceId = 3;
+			portalBlock1 = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, 1)));
+			portalBlock2 = world.getBlockAt(adjacent.getLocation().clone().add(new Vector(0, 0, 1)));
 		}
 
-		if (portalBlock1 == null || portalBlock1.getType() != Material.AIR || portalBlock2 == null || portalBlock2.getType() != Material.AIR || portalBlock1.getState() instanceof ItemFrame) {
+		if (portalBlock1 == null || portalBlock1.getType() != Material.AIR || portalBlock2 == null || portalBlock2.getType() != Material.AIR) {
 			return;
 		}
 		//Check if the desired spots are occupied by other portal
-		ArrayList<Location> occupiedLocations = new ArrayList<Location>();
+		ArrayList<Location> occupiedLocations = new ArrayList<>();
 		if (mPlayerPortal1.values().size() > 0) {
 			for (Portal p : mPlayerPortal1.values()) {
 				if (p != null) {
@@ -217,76 +234,100 @@ public class PortalManager {
 		}
 
 		//Change rotation if needed for up and down blocks
-		int rotation1 = 2;
-		int rotation2 = 0;
+		final Rotation rotation1;
+		final Rotation rotation2;
 		if (targetFace == BlockFace.UP && playerFacing == BlockFace.SOUTH) {
-			rotation1 = 0;
-			rotation2 = 2;
+			rotation1 = Rotation.NONE;
+			rotation2 = Rotation.CLOCKWISE;
 		} else if (targetFace == BlockFace.DOWN && playerFacing == BlockFace.SOUTH) {
-			rotation1 = 0;
-			rotation2 = 2;
+			rotation1 = Rotation.NONE;
+			rotation2 = Rotation.CLOCKWISE_45;
 		} else if (targetFace == BlockFace.UP && playerFacing == BlockFace.EAST) {
-			rotation1 = 3;
-			rotation2 = 1;
+			rotation1 = Rotation.CLOCKWISE_135;
+			rotation2 = Rotation.CLOCKWISE_45;
 		} else if (targetFace == BlockFace.UP && playerFacing == BlockFace.WEST) {
-			rotation1 = 1;
-			rotation2 = 3;
+			rotation1 = Rotation.CLOCKWISE_45;
+			rotation2 = Rotation.CLOCKWISE_135;
 		} else if (targetFace == BlockFace.DOWN && playerFacing == BlockFace.EAST) {
-			rotation1 = 1;
-			rotation2 = 3;
+			rotation1 = Rotation.CLOCKWISE_45;
+			rotation2 = Rotation.CLOCKWISE_135;
 		} else if (targetFace == BlockFace.DOWN && playerFacing == BlockFace.WEST) {
-			rotation1 = 3;
-			rotation2 = 1;
+			rotation1 = Rotation.CLOCKWISE_135;
+			rotation2 = Rotation.CLOCKWISE_45;
+		} else {
+			rotation1 = Rotation.CLOCKWISE;
+			rotation2 = Rotation.NONE;
 		}
 
 		//Destroy old portal
-		mPortal1 = mPlayerPortal1.get(player);
-		mPortal2 = mPlayerPortal2.get(player);
+		Portal portal1 = mPlayerPortal1.get(player);
+		Portal portal2 = mPlayerPortal2.get(player);
 
-		if (mPortal1 != null && portalNum == 1) {
-			CommandUtils.runCommandViaConsole("execute in " + worldName + " positioned " + mPortal1.mLocation1.toCenterLocation().getX() + " " + mPortal1.mLocation1.toCenterLocation().getY() + " " + mPortal1.mLocation1.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
-			CommandUtils.runCommandViaConsole("execute in " + worldName + " positioned " + mPortal1.mLocation2.toCenterLocation().getX() + " " + mPortal1.mLocation2.toCenterLocation().getY() + " " + mPortal1.mLocation2.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
-		} else if (mPortal2 != null && portalNum == 2) {
-			CommandUtils.runCommandViaConsole("execute in " + worldName + " positioned " + mPortal2.mLocation1.toCenterLocation().getX() + " " + mPortal2.mLocation1.toCenterLocation().getY() + " " + mPortal2.mLocation1.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
-			CommandUtils.runCommandViaConsole("execute in " + worldName + " positioned " + mPortal2.mLocation2.toCenterLocation().getX() + " " + mPortal2.mLocation2.toCenterLocation().getY() + " " + mPortal2.mLocation2.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
+		if (portal1 != null && portalNum == 1) {
+			deletePortal(portal1);
+		} else if (portal2 != null && portalNum == 2) {
+			deletePortal(portal2);
 		}
 
-		//Store portals
-		if (portalNum == 1) {
-			mPortal1 = new Portal(portalBlock1.getLocation(), portalBlock2.getLocation(), targetFace, blockHit.getLocation(), adjacent.getLocation());
-			mPortal1.mOwner = player;
-			Portal other = mPlayerPortal2.get(player);
-			mPortal1.mPair = other;
-			if (other != null) {
-				other.mPair = mPortal1;
-			}
-		} else if (portalNum == 2) {
-			mPortal2 = new Portal(portalBlock1.getLocation(), portalBlock2.getLocation(), targetFace, blockHit.getLocation(), adjacent.getLocation());
-			mPortal2.mOwner = player;
-			Portal other = mPlayerPortal1.get(player);
-			mPortal2.mPair = other;
-			if (other != null) {
-				other.mPair = mPortal2;
-			}
-		}
-
-		mPlayerPortal1.put(player, mPortal1);
-		mPlayerPortal2.put(player, mPortal2);
 
 		//Summon the item frames
 		//Replace map ID with the maps for the current shard
-		int mapNum = portalNum + getMapNum(mCurrentShard);
+		int mapNum = portalNum + 2 * gunId + getMapNum(mCurrentShard);
 
+		Location location1 = portalBlock1.getLocation();
+		Location location2 = portalBlock2.getLocation();
+		ItemStack mapItem = new ItemStack(Material.FILLED_MAP, 1);
+		mapItem.editMeta(itemMeta -> {
+			if (itemMeta instanceof MapMeta mapMeta) {
+				// The Bukkit team can learn to deal with this. There's no other way to set an existing map ID.
+				mapMeta.setMapId(mapNum);
+			}
+		});
+		Entity map1 = world.spawn(location1, GlowItemFrame.class, itemFrame -> {
+			itemFrame.setFacingDirection(targetFace);
+			itemFrame.setRotation(rotation1);
+			itemFrame.setItem(mapItem.clone(), false);
+			itemFrame.setVisible(false);
+			itemFrame.setFixed(true);
+		});
+		Entity map2 = world.spawn(location2, GlowItemFrame.class, itemFrame -> {
+			itemFrame.setFacingDirection(targetFace);
+			itemFrame.setRotation(rotation2);
+			itemFrame.setItem(mapItem, false);
+			itemFrame.setVisible(false);
+			itemFrame.setFixed(true);
+		});
+		UUID uuid1 = map1.getUniqueId();
+		UUID uuid2 = map2.getUniqueId();
+
+		//Store portals
 		if (portalNum == 1) {
-			CommandUtils.runCommandViaConsole("execute in " + worldName + " run summon item_frame " + mPortal1.mLocation1.getX() + " " + mPortal1.mLocation1.getY() + " " + mPortal1.mLocation1.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation1 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
-			CommandUtils.runCommandViaConsole("execute in " + worldName + " run summon item_frame " + mPortal1.mLocation2.getX() + " " + mPortal1.mLocation2.getY() + " " + mPortal1.mLocation2.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation2 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
-		} else if (portalNum == 2) {
-			CommandUtils.runCommandViaConsole("execute in " + worldName + " run summon item_frame " + mPortal2.mLocation1.getX() + " " + mPortal2.mLocation1.getY() + " " + mPortal2.mLocation1.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation1 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
-			CommandUtils.runCommandViaConsole("execute in " + worldName + " run summon item_frame " + mPortal2.mLocation2.getX() + " " + mPortal2.mLocation2.getY() + " " + mPortal2.mLocation2.getZ() + " {Facing:" + faceId + "b,ItemRotation:" + rotation2 + "b,Invisible:1b,Invulnerable:1b,Fixed:1b,Item:{id:\"minecraft:filled_map\",Count:1b,tag:{map:" + mapNum + "}}}");
+			portal1 = new Portal(portalNum, uuid1, uuid2, location1, location2, targetFace, blockHit.getLocation(), adjacent.getLocation());
+			portal1.mOwner = player;
+			portal1.mPair = portal2;
+			if (portal2 != null) {
+				portal2.mPair = portal1;
+			}
+		} else {
+			portal2 = new Portal(portalNum, uuid1, uuid2, location1, location2, targetFace, blockHit.getLocation(), adjacent.getLocation());
+			portal2.mOwner = player;
+			portal2.mPair = portal1;
+			if (portal1 != null) {
+				portal1.mPair = portal2;
+			}
 		}
 
+		mPlayerPortal1.put(player, portal1);
+		mPlayerPortal2.put(player, portal2);
+
+		Map<Long, Set<Portal>> worldPortalsByChunk = mPortalsByChunk.computeIfAbsent(world.getUID(), k -> new HashMap<>());
+		long chunkKey1 = location1.getChunk().getChunkKey();
+		long chunkKey2 = location2.getChunk().getChunkKey();
+		worldPortalsByChunk.computeIfAbsent(chunkKey1, k -> new HashSet<>()).add(portal1);
+		worldPortalsByChunk.computeIfAbsent(chunkKey2, k -> new HashSet<>()).add(portal2);
+
 		//Activate teleport logic
-		if (mPortal1 != null && mPortal2 != null) {
+		if (portal1 != null && portal2 != null) {
 			if (mPortalTeleportChecks.get(player) == null) {
 				PortalTeleportCheck ptc = new PortalTeleportCheck(player);
 				ptc.runTaskTimer(Plugin.getInstance(), 0, 1);
@@ -307,51 +348,108 @@ public class PortalManager {
 
 	public static void clearPortal(Player player, int portalNum) {
 		//Don't do anything if the manager isn't loaded
-		if (mPortalTeleportChecks == null || mPlayerPortal1 == null || mPlayerPortal2 == null) {
+		if (mPlayerPortal1 == null || mPlayerPortal2 == null) {
 			return;
 		}
 
-		Portal p = null;
 		if (portalNum == 1) {
-			if (mPlayerPortal1.get(player) != null) {
-				p = mPlayerPortal1.get(player);
-				mPlayerPortal1.remove(player);
+			Portal portal = mPlayerPortal1.get(player);
+			if (portal != null) {
+				deletePortal(portal);
+			}
+		} else if (portalNum == 2) {
+			Portal portal = mPlayerPortal2.get(player);
+			if (portal != null) {
+				deletePortal(portal);
+			}
+		}
+	}
+
+	protected static void deletePortal(Portal portal) {
+		PortalTeleportCheck teleportCheck = mPortalTeleportChecks.get(portal.mOwner);
+		if (teleportCheck != null) {
+			teleportCheck.cancel();
+			mPortalTeleportChecks.remove(portal.mOwner);
+		}
+
+		if (portal.mPortalNum == 1) {
+			mPlayerPortal1.remove(portal.mOwner);
+		} else {
+			mPlayerPortal2.remove(portal.mOwner);
+		}
+
+		if (portal.mPair != null) {
+			portal.mPair.mPair = null;
+		}
+
+		Location loc1 = portal.mLocation1;
+		Location loc2 = portal.mLocation2;
+
+		World world = loc1.getWorld();
+		UUID worldId = world.getUID();
+
+		Map<Long, Set<Portal>> worldPortalsByChunk = mPortalsByChunk.get(worldId);
+		if (worldPortalsByChunk != null) {
+			long chunkKey1 = loc1.getChunk().getChunkKey();
+			long chunkKey2 = loc2.getChunk().getChunkKey();
+
+			Set<Portal> chunkPortals = worldPortalsByChunk.get(chunkKey1);
+			chunkPortals.remove(portal);
+			if (chunkPortals.isEmpty()) {
+				worldPortalsByChunk.remove(chunkKey1);
 			}
 
-		} else if (portalNum == 2) {
-			if (mPlayerPortal2.get(player) != null) {
-				p = mPlayerPortal2.get(player);
-				mPlayerPortal2.remove(player);
+			if (chunkKey1 != chunkKey2) {
+				chunkPortals = worldPortalsByChunk.get(chunkKey2);
+				chunkPortals.remove(portal);
+				if (chunkPortals.isEmpty()) {
+					worldPortalsByChunk.remove(chunkKey2);
+				}
+			}
+
+			if (worldPortalsByChunk.isEmpty()) {
+				mPortalsByChunk.remove(worldId);
 			}
 		}
-		if (mPortalTeleportChecks.get(player) != null) {
-			mPortalTeleportChecks.get(player).cancel();
-			mPortalTeleportChecks.remove(player);
-		}
-		//Kill item frames
-		String worldName = player.getWorld().getName();
-		if (worldName.startsWith("Project_Epic")) {
-			worldName = "overworld";
-		}
-		if (p != null) {
-			CommandUtils.runCommandViaConsole("execute in " + worldName + " positioned " + p.mLocation1.toCenterLocation().getX() + " " + p.mLocation1.toCenterLocation().getY() + " " + p.mLocation1.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
-			CommandUtils.runCommandViaConsole("execute in " + worldName + " positioned " + p.mLocation2.toCenterLocation().getX() + " " + p.mLocation2.toCenterLocation().getY() + " " + p.mLocation2.toCenterLocation().getZ() + " run kill @e[type=item_frame,distance=..0.8]");
+
+		deletePortalMap(portal.mUuid1);
+		deletePortalMap(portal.mUuid2);
+	}
+
+	private static void deletePortalMap(UUID uuid) {
+		Entity itemFrame = Bukkit.getEntity(uuid);
+		if (itemFrame != null) {
+			itemFrame.remove();
 		}
 	}
 
 	public static int getMapNum(String shard) {
-		switch (shard) {
-		case "dev1":
-			return 1;
-		case "valley":
-			return 421;
-		case "isles":
-			return 204;
-		case "build":
-			return 277;
-		default:
-			//Dungeon ids
-			return 439;
+		return switch (shard) {
+			case "dev1" -> 1;
+			case "valley" -> 421;
+			case "isles" -> 204;
+			case "build" -> 277;
+			default ->
+				//Dungeon ids
+				15;
+		};
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void chunkUnloadEvent(ChunkUnloadEvent event) {
+		if (mPortalsByChunk != null) {
+			Chunk chunk = event.getChunk();
+			UUID worldId = chunk.getWorld().getUID();
+			Map<Long, Set<Portal>> worldPortalsByChunk = mPortalsByChunk.get(worldId);
+			if (worldPortalsByChunk != null) {
+				Set<Portal> liveChunkPortals = worldPortalsByChunk.get(chunk.getChunkKey());
+				if (liveChunkPortals != null) {
+					Set<Portal> chunkPortals = new HashSet<>(liveChunkPortals);
+					for (Portal portal : chunkPortals) {
+						deletePortal(portal);
+					}
+				}
+			}
 		}
 	}
 }
