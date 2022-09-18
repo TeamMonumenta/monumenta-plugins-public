@@ -161,4 +161,20 @@ public class StringUtils {
 			return ChatColor.GREEN + "+" + percent + "%";
 		}
 	}
+
+	public static String capitalizeWords(String str) {
+		char[] chars = str.toCharArray();
+		for (int i = 0; i < chars.length; i++) {
+			if (i == 0 || chars[i - 1] == ' ') {
+				if (Character.isLowerCase(chars[i])) {
+					chars[i] = Character.toUpperCase(chars[i]);
+				}
+			} else {
+				if (Character.isUpperCase(chars[i])) {
+					chars[i] = Character.toLowerCase(chars[i]);
+				}
+			}
+		}
+		return String.valueOf(chars);
+	}
 }
