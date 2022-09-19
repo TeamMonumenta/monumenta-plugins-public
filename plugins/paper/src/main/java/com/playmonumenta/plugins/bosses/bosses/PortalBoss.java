@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.portalboss.SpellKnockup;
-import com.playmonumenta.plugins.bosses.spells.portalboss.SpellPortalMiniShatter;
+import com.playmonumenta.plugins.bosses.spells.portalboss.SpellPortalBullet;
 import com.playmonumenta.plugins.bosses.spells.portalboss.SpellPortalPassiveLava;
 import com.playmonumenta.plugins.bosses.spells.portalboss.SpellPortalSummons;
 import com.playmonumenta.plugins.bosses.spells.portalboss.SpellRisingCircles;
@@ -87,8 +87,8 @@ public final class PortalBoss extends BossAbilityGroup {
 		//Spell setup
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 			new SpellKnockup(mBoss, plugin, mCooldownTicks - 30),
-			new SpellPortalSummons(mBoss, mCooldownTicks, mSpawnLoc),
-			new SpellPortalMiniShatter(plugin, mBoss, mSpawnLoc, this, mCooldownTicks),
+			new SpellPortalSummons(mBoss, mCooldownTicks, mSpawnLoc, this),
+			new SpellPortalBullet(plugin, mBoss, mCooldownTicks, this),
 			new SpellRisingCircles(plugin, mBoss, mSpawnLoc, mCooldownTicks)
 		));
 		List<Spell> phase1Passives = Arrays.asList(
@@ -98,8 +98,8 @@ public final class PortalBoss extends BossAbilityGroup {
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
 			new SpellUltimateShulkerMania(plugin, mBoss, mSpawnLoc, mCooldownTicks),
 			new SpellKnockup(mBoss, plugin, mCooldownTicks - 30),
-			new SpellPortalSummons(mBoss, mCooldownTicks, mSpawnLoc),
-			new SpellPortalMiniShatter(plugin, mBoss, mSpawnLoc, this, mCooldownTicks),
+			new SpellPortalSummons(mBoss, mCooldownTicks, mSpawnLoc, this),
+			new SpellPortalBullet(plugin, mBoss, mCooldownTicks, this),
 			new SpellRisingCircles(plugin, mBoss, mSpawnLoc, mCooldownTicks)
 		));
 		List<Spell> phase2Passives = Arrays.asList(
@@ -109,8 +109,8 @@ public final class PortalBoss extends BossAbilityGroup {
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
 			new SpellUltimateShulkerMania(plugin, mBoss, mSpawnLoc, mCooldownTicks),
 			new SpellKnockup(mBoss, plugin, mCooldownTicks - 30),
-			new SpellPortalSummons(mBoss, mCooldownTicks, mSpawnLoc),
-			new SpellPortalMiniShatter(plugin, mBoss, mSpawnLoc, this, mCooldownTicks),
+			new SpellPortalSummons(mBoss, mCooldownTicks, mSpawnLoc, this),
+			new SpellPortalBullet(plugin, mBoss, mCooldownTicks, this),
 			new SpellRisingCircles(plugin, mBoss, mSpawnLoc, mCooldownTicks)
 		));
 		List<Spell> phase3Passives = Arrays.asList(

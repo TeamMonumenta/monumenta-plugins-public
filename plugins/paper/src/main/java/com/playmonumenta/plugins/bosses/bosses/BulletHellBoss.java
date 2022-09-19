@@ -16,6 +16,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
 
 public class BulletHellBoss extends BossAbilityGroup {
 
@@ -78,7 +79,7 @@ public class BulletHellBoss extends BossAbilityGroup {
 		BulletHellBoss.Parameters p = BossParameters.getParameters(boss, identityTag, new BulletHellBoss.Parameters());
 
 		super.constructBoss(new SpellManager(Arrays.asList(
-			new SpellBullet(plugin, boss, p.DURATION, p.DELAY, p.EMISSION_TICKS, p.VELOCITY, p.DETECTION, p.HITBOX_RADIUS, p.COOLDOWN, p.BULLET_DURATION, p.PATTERN,
+			new SpellBullet(plugin, boss, new Vector(0, 0, 0), p.DURATION, p.DELAY, p.EMISSION_TICKS, p.VELOCITY, p.DETECTION, p.HITBOX_RADIUS, p.COOLDOWN, p.BULLET_DURATION, p.PATTERN,
 				p.ACCEL, p.ACCEL_START, p.ACCEL_END, p.PASS_THROUGH, p.ROTATION_SPEED,
 				(Entity entity, int tick) -> {
 					float t = tick/10;

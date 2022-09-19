@@ -28,11 +28,13 @@ public class SpellPortalSummons extends Spell {
 	private final LivingEntity mBoss;
 	private final Location mStartLoc;
 	private int mCooldownTicks;
+	private final PortalBoss mPortalBoss;
 
-	public SpellPortalSummons(LivingEntity boss, int cooldown, Location startLoc) {
+	public SpellPortalSummons(LivingEntity boss, int cooldown, Location startLoc, PortalBoss portalBoss) {
 		mBoss = boss;
 		mCooldownTicks = cooldown;
 		mStartLoc = startLoc;
+		mPortalBoss = portalBoss;
 	}
 
 	@Override
@@ -107,6 +109,7 @@ public class SpellPortalSummons extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return EntityUtils.getNearbyMobs(mBoss.getLocation(), Davey.detectionRange).size() < MAX_MOBS;
+		return EntityUtils.getNearbyMobs(mBoss.getLocation(), Davey.detectionRange).size() < MAX_MOBS && mPortalBoss.mIsHidden;
 	}
+
 }
