@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.cosmetics.skills.warrior.BrambleShellCS;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.internal.com.google.common.collect.ImmutableList;
 import com.playmonumenta.scriptedquests.internal.com.google.common.collect.ImmutableMap;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
@@ -242,8 +243,8 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							// Check costs
 							ItemStack mStrand = InventoryUtils.getItemFromLootTable(player, STRAND_LOOTTABLE);
 							ItemStack mPigment = InventoryUtils.getItemFromLootTable(player, PIGMENT_LOOTTABLE);
-							if (!player.getInventory().containsAtLeast(mPigment, STRAND_PER_DELVE_SKIN) ||
-								!player.getInventory().containsAtLeast(mStrand, GEODE_PER_DEPTH_SKIN)) {
+							if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
+								!player.getInventory().containsAtLeast(mStrand, STRAND_PER_DELVE_SKIN)) {
 								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
 								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
 								return;
@@ -397,9 +398,9 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 				String skin = DEPTH_THEME.get(i);
 				String tokenName = DEPTH_TOKEN.getOrDefault(skin, null).replace('_', ' ');
 				List<String> price = List.of(
-					PIGMENT_PER_SKIN + " twisted pigments and",
-					TALISMAN_PER_DEPTH_SKIN + " " + tokenName + " and",
-					GEODE_PER_DEPTH_SKIN + " voidstained geodes");
+					PIGMENT_PER_SKIN + " Twisted Pigments,",
+					TALISMAN_PER_DEPTH_SKIN + " " + StringUtils.capitalizeWords(tokenName) + " and",
+					GEODE_PER_DEPTH_SKIN + " Voidstained Geodes");
 				ItemStack item = createSkillIcon(skin, DEPTH_COLOR, player, price);
 				mInventory.setItem(currentSlot, item);
 				if (slotToEntryNum(++currentSlot) < 0) {
@@ -457,8 +458,8 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < DELVE_THEME.size();) {
 				String skin = DELVE_THEME.get(i);
 				List<String> price = List.of(
-					PIGMENT_PER_SKIN + " twisted pigments and",
-					STRAND_PER_DELVE_SKIN + " twisted strands");
+					PIGMENT_PER_SKIN + " Twisted Pigments and",
+					STRAND_PER_DELVE_SKIN + " Twisted Strands");
 				ItemStack item = createSkillIcon(skin, DELVE_COLOR, player, price);
 				mInventory.setItem(currentSlot, item);
 				if (slotToEntryNum(++currentSlot) < 0) {

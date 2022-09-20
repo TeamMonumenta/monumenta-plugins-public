@@ -5,10 +5,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.util.ArrayList;
@@ -190,11 +192,21 @@ public class GraveManager {
 	public static void onDeath(Player player, HashMap<EquipmentSlot, ItemStack> equipment) {
 		GraveManager manager = INSTANCES.get(player.getUniqueId());
 		String shard = ServerProperties.getShardName();
+
 		if (equipment.entrySet().stream().filter(e -> e.getKey() != EquipmentSlot.HAND)
 			.map(Map.Entry::getValue)
-			.allMatch(item -> ItemUtils.isNullOrAir(item) || ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED) >= Shattered.MAX_LEVEL)) {
-			player.sendMessage(Component.text("You died but had nothing equipped that could shatter, so no grave was created nor were items shattered further. ", NamedTextColor.GRAY)
-				.append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
+			.allMatch(item -> ItemUtils.isNullOrAir(item)
+				|| ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED) >= Shattered.MAX_LEVEL)) {
+			// Check Lich infusion
+			if (Plugin.getInstance().mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.PHYLACTERY) == 0
+				|| ScoreboardUtils.getScoreboardValue(player, Phylactery.GRAVE_XP_SCOREBOARD).get() == 0) {
+				player.sendMessage(Component.text("You died but had nothing equipped that could shatter, so no grave was created nor were items shattered further. ", NamedTextColor.GRAY)
+					.append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
+			} else if (manager.mGraves.stream().noneMatch(grave -> grave.mGhostGrave && shard.equals(grave.mShardName))) {
+				manager.mGraves.add(new Grave(manager, player, equipment));
+				player.sendMessage(Component.text("You died but had nothing equipped that could shatter, nevertheless you left a grave to store your experience! ", NamedTextColor.GRAY)
+					.append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
+			}
 		} else if (manager.mGraves.stream().noneMatch(grave -> grave.mGhostGrave && shard.equals(grave.mShardName))) {
 			manager.mGraves.add(new Grave(manager, player, equipment));
 			player.sendMessage(Component.text("You died and left a grave! Return to it to repair your items! ", NamedTextColor.RED)
