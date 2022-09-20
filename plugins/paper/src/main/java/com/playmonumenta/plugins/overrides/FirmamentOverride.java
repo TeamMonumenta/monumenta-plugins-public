@@ -180,6 +180,9 @@ public class FirmamentOverride extends BaseOverride {
 			//Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe
 			return false;
 		}
+		if (!player.isSneaking()) {
+			return false;
+		}
 
 		NBTItem nbt = new NBTItem(item);
 		List<String> lore = ItemStatUtils.getPlainLore(nbt);
