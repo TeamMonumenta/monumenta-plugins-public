@@ -41,10 +41,14 @@ public class Ardor implements Infusion {
 		        player.setRemainingAir(Math.min(300, currAir + (AIR_INCREASE * (int) DelveInfusionUtils.getModifiedLevel(plugin, player, level))));
 		    } else {
 				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME,
-					new PercentSpeed(DURATION, PERCENT_SPEED_PER_LEVEL * DelveInfusionUtils.getModifiedLevel(plugin, player, level),
+					new PercentSpeed(DURATION, getMovementSpeedBonus(DelveInfusionUtils.getModifiedLevel(plugin, player, level)),
 						PERCENT_SPEED_EFFECT_NAME));
 		    }
 		}
+	}
+
+	public static double getMovementSpeedBonus(double level) {
+		return PERCENT_SPEED_PER_LEVEL * level;
 	}
 
 }

@@ -29,7 +29,12 @@ public class Pennate implements Infusion {
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.getType() == DamageType.FALL) {
 			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-			event.setDamage(event.getDamage() * (1.0 - (REDUCT_PCT_PER_LEVEL * modifiedLevel)));
+			event.setDamage(event.getDamage() * getFallDamageResistance(modifiedLevel));
 		}
 	}
+
+	public static double getFallDamageResistance(double level) {
+		return 1.0 - REDUCT_PCT_PER_LEVEL * level;
+	}
+
 }

@@ -44,7 +44,7 @@ public class Vengeful implements Infusion {
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 		if (checkLastDamage(player, enemy)) {
-			event.setDamage(event.getDamage() * (1 + (modifiedLevel * DAMAGE_MLT_PER_LVL)));
+			event.setDamage(event.getDamage() * getDamageDealtMultiplier(modifiedLevel));
 			Location halfHeightLocation = LocationUtils.getHalfHeightLocation(enemy);
 			double widerWidthDelta = PartialParticle.getWidthDelta(enemy) * 1.5;
 			PartialParticle partialParticle = new PartialParticle(
@@ -71,7 +71,7 @@ public class Vengeful implements Infusion {
 
 	}
 
-	public boolean checkLastDamage(Player player, LivingEntity enemy) {
+	private boolean checkLastDamage(Player player, LivingEntity enemy) {
 		NavigableSet<Effect> playerEffs = Plugin.getInstance().mEffectManager.getEffects(player, EFFECT_NAME + player.getName());
 		NavigableSet<Effect> enemyEffs = Plugin.getInstance().mEffectManager.getEffects(enemy, EFFECT_NAME + player.getName());
 
@@ -102,4 +102,9 @@ public class Vengeful implements Infusion {
 			return (effPlayerA == effPlayerB && effEntityA == effEntityB);
 		}
 	}
+
+	public static double getDamageDealtMultiplier(double level) {
+		return 1 + DAMAGE_MLT_PER_LVL * level;
+	}
+
 }

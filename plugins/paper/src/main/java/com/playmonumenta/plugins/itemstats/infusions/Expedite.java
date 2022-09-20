@@ -19,7 +19,7 @@ public class Expedite implements Infusion {
 	private static final double PERCENT_SPEED_PER_LEVEL = 0.0125;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "ExpeditePercentSpeedEffect";
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "ExpediteTick";
-	private static final int MAX_STACKS = 3;
+	public static final int MAX_STACKS = 3;
 
 	@Override
 	public String getName() {
@@ -56,4 +56,9 @@ public class Expedite implements Infusion {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
 		}
 	}
+
+	public static double getMovementSpeedBonus(double level, int stacks) {
+		return PERCENT_SPEED_PER_LEVEL * level * stacks;
+	}
+
 }

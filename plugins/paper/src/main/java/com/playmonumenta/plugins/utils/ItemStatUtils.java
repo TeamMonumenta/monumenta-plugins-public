@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
@@ -574,6 +575,11 @@ public class ItemStatUtils {
 		public static final Set<InfusionType> SPAWNABLE_INFUSIONS = Arrays.stream(InfusionType.values())
 			.filter(type -> type.mIsSpawnable)
 			.collect(Collectors.toUnmodifiableSet());
+
+		public static final ImmutableSet<InfusionType> DELVE_INFUSIONS = ImmutableSet.of(
+			ARDOR, AURA, CARAPACE, CHOLER, EMPOWERED, EPOCH, EXECUTION, EXPEDITE, MITOSIS, NATANT,
+			NUTRIMENT, PENNATE, REFLECTION, UNDERSTANDING, UNYIELDING, USURPER, VENGEFUL
+		);
 
 		static final String KEY = "Infusions";
 

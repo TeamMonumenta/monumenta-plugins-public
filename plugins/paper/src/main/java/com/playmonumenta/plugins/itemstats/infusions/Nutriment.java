@@ -24,6 +24,11 @@ public class Nutriment implements Infusion {
 	@Override
 	public void onRegain(Plugin plugin, Player player, double value, EntityRegainHealthEvent event) {
 		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-		event.setAmount(event.getAmount() * (1 + (HEALING_PERCENT_PER_LEVEL * modifiedLevel)));
+		event.setAmount(event.getAmount() * getHealingMultiplier(modifiedLevel));
 	}
+
+	public static double getHealingMultiplier(double level) {
+		return 1 + HEALING_PERCENT_PER_LEVEL * level;
+	}
+
 }

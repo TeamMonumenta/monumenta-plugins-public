@@ -248,15 +248,17 @@ public class DelveInfusionUtils {
 		return cost;
 	}
 
+	public static double getModifiedLevel(Plugin plugin, Player player, int level) {
+		return getModifiedLevel(level, plugin.mItemStatManager.getInfusionLevel(player, InfusionType.UNDERSTANDING));
+	}
 
 	// Caps level at MAX_LEVEL, and then adds the forum infusion bonus
-	public static double getModifiedLevel(Plugin plugin, Player player, int level) {
+	public static double getModifiedLevel(int level, int understanding) {
 		if (level == 0) {
 			return 0;
 		}
-		return Math.min(MAX_LEVEL, level) + Math.min(plugin.mItemStatManager.getInfusionLevel(player, InfusionType.UNDERSTANDING), MAX_LEVEL) * Understanding.POINTS_PER_LEVEL;
+		return Math.min(MAX_LEVEL, level) + Math.min(understanding, MAX_LEVEL) * Understanding.POINTS_PER_LEVEL;
 	}
-
 
 	public static @Nullable DelveInfusionSelection getCurrentInfusion(ItemStack item) {
 		for (DelveInfusionSelection infusionSelection : DelveInfusionSelection.values()) {
