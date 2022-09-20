@@ -22,13 +22,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Locale;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -38,6 +32,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -98,9 +93,29 @@ public class HallowedBeam extends MultipleChargeAbility {
 		if (mPlayer == null) {
 			return;
 		}
-		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, CAST_RANGE, true, true, true);
+		Player player = mPlayer;
+		World world = mPlayer.getWorld();
+		RayTraceResult raytrace = world.rayTrace(
+			mPlayer.getEyeLocation(),
+			player.getLocation().getDirection(),
+			CAST_RANGE,
+			FluidCollisionMode.NEVER,
+			true,
+			0.425, // For future reference, you can increase or decrease this number to change the hitbox size for entity raytracing.
+			e -> {
+				if (!e.getUniqueId().equals(player.getUniqueId()) && e instanceof LivingEntity) {
+					return (e instanceof Player p && p.getGameMode() != GameMode.SPECTATOR)
+						|| !(e instanceof Player);
+				}
+				return false;
+			}
+		);
+
+		if (raytrace == null || raytrace.getHitEntity() == null) {
+			return;
+		}
+		LivingEntity e = (LivingEntity) raytrace.getHitEntity();
 		if (e instanceof Player || EntityUtils.isHostileMob(e)) {
-			Player player = mPlayer;
 
 			PlayerInventory inventory = mPlayer.getInventory();
 			ItemStack inMainHand = inventory.getItemInMainHand();
@@ -119,7 +134,6 @@ public class HallowedBeam extends MultipleChargeAbility {
 					public void run() {
 						Location loc = player.getEyeLocation();
 						Vector dir = loc.getDirection();
-						World world = mPlayer.getWorld();
 
 						LivingEntity applyE = e;
 						//Check if heal should override damage
