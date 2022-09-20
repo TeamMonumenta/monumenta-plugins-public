@@ -66,4 +66,11 @@ public class BaseOverride {
 	public boolean inventoryClickInteraction(Plugin plugin, Player player, ItemStack item, InventoryClickEvent event) {
 		return true;
 	}
+
+	/**
+	 * Called when the player presses the swap key while this item is in the main hand
+	 */
+	public boolean swapHandsInteraction(Plugin plugin, Player player, ItemStack item) {
+		return true;
+	}
 }

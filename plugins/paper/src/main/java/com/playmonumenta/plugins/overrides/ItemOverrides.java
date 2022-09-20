@@ -407,9 +407,9 @@ public final class ItemOverrides {
 	}
 
 	public boolean inventoryClickInteraction(Plugin plugin, Player player, InventoryClickEvent event) {
-		ItemStack cursorItoem = event.getCursor();
+		ItemStack cursorItem = event.getCursor();
 		if ((event.getClick() != ClickType.RIGHT && event.getClick() != ClickType.LEFT)
-			    || (cursorItoem != null && cursorItoem.getType() != Material.AIR)) {
+			    || (cursorItem != null && cursorItem.getType() != Material.AIR)) {
 			return true;
 		}
 		ItemStack item = event.getCurrentItem();
@@ -418,6 +418,15 @@ public final class ItemOverrides {
 		}
 		BaseOverride override = mItems.get(item.getType());
 		return override == null || override.inventoryClickInteraction(plugin, player, item, event);
+	}
+
+	public boolean swapHandsInteraction(Plugin plugin, Player player) {
+		ItemStack item = player.getInventory().getItemInMainHand();
+		if (item == null) {
+			return true;
+		}
+		BaseOverride override = mItems.get(item.getType());
+		return override == null || override.swapHandsInteraction(plugin, player, item);
 	}
 
 	// Returns eventCancelled = true if disallowed, otherwise false

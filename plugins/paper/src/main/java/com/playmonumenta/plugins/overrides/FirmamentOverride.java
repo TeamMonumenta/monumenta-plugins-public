@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBTItem;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -29,7 +28,6 @@ import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Leaves;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -61,12 +59,7 @@ public class FirmamentOverride extends BaseOverride {
 	}
 
 	@Override
-	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
-		return changeMode(item, player);
-	}
-
-	@Override
-	public boolean leftClickBlockInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, Block block) {
+	public boolean swapHandsInteraction(Plugin plugin, Player player, ItemStack item) {
 		return changeMode(item, player);
 	}
 
@@ -185,11 +178,7 @@ public class FirmamentOverride extends BaseOverride {
 	private boolean changeMode(ItemStack item, Player player) {
 		if (!isFirmamentItem(item)) {
 			//Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe
-			return true;
-		}
-
-		if (!player.isSneaking()) {
-			return true;
+			return false;
 		}
 
 		NBTItem nbt = new NBTItem(item);
