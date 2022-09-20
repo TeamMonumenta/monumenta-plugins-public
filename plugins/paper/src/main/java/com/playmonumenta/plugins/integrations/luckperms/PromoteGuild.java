@@ -11,12 +11,17 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
 public class PromoteGuild {
+	@SuppressWarnings("unchecked")
 	public static void register() {
 		// promoteguild <player collection>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.promoteguild");
@@ -27,9 +32,17 @@ public class PromoteGuild {
 		new CommandAPICommand("promoteguild")
 			.withPermission(perms)
 			.withArguments(arguments)
-			.executesPlayer((founder, args) -> {
-				if (!ServerProperties.getShardName().contains("build")) {
-					run(founder, (List<Player>) args[0]);
+			.executes((sender, args) -> {
+				CommandSender callee = sender;
+				if (callee instanceof ProxiedCommandSender proxiedCommandSender) {
+					callee = proxiedCommandSender.getCallee();
+				}
+				if (callee instanceof Player founder) {
+					if (!ServerProperties.getShardName().contains("build")) {
+						run(founder, (List<Player>) args[0]);
+					}
+				} else {
+					callee.sendMessage(Component.text("This command may only be run as a player.", NamedTextColor.RED));
 				}
 			})
 			.register();

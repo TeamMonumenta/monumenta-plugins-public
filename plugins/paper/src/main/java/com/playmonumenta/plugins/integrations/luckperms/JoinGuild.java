@@ -21,6 +21,8 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.InheritanceNode;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -36,9 +38,17 @@ public class JoinGuild {
 		new CommandAPICommand("joinguild")
 			.withPermission(perms)
 			.withArguments(arguments)
-			.executesPlayer((founder, args) -> {
-				if (!ServerProperties.getShardName().contains("build")) {
-					run(plugin, founder, (List<Player>) args[0]);
+			.executes((sender, args) -> {
+				CommandSender callee = sender;
+				if (callee instanceof ProxiedCommandSender proxiedCommandSender) {
+					callee = proxiedCommandSender.getCallee();
+				}
+				if (callee instanceof Player founder) {
+					if (!ServerProperties.getShardName().contains("build")) {
+						run(plugin, founder, (List<Player>) args[0]);
+					}
+				} else {
+					callee.sendMessage(Component.text("This command may only be run as a player.", NamedTextColor.RED));
 				}
 			})
 			.register();
