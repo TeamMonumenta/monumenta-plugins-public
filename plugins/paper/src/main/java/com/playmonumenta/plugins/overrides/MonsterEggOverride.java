@@ -21,6 +21,9 @@ public class MonsterEggOverride extends BaseOverride {
 			return true;
 		}
 		if (ZoneUtils.isInPlot(player)) {
+			if (!EntityListener.PLOT_ANIMAL_EGGS.contains(item.getType())) {
+				return true;
+			}
 			return EntityListener.maySummonPlotAnimal(player.getLocation());
 		}
 		return false;
@@ -47,6 +50,10 @@ public class MonsterEggOverride extends BaseOverride {
 	public boolean blockDispenseInteraction(Plugin plugin, Block block, ItemStack dispensed) {
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		if (blockType.equals(Material.DISPENSER)) {
+			if (!EntityListener.PLOT_ANIMAL_EGGS.contains(dispensed.getType())) {
+				return true;
+			}
+
 			if (ZoneUtils.isInPlot(block.getLocation())) {
 				return EntityListener.maySummonPlotAnimal(block.getLocation());
 			}
