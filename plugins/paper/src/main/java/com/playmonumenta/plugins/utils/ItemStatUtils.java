@@ -164,6 +164,7 @@ public class ItemStatUtils {
 		SHULKER_BOX("shulker", Component.text("Invalid Type", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false)),
 		CHARM("charm", Component.text("Charm", TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false)),
 		RARE_CHARM("rarecharm", Component.text("Rare Charm", TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false)),
+		EPIC_CHARM("epiccharm", Component.text("Epic Charm", TextColor.fromHexString("#B314E3")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
 		QUEST_COMPASS("quest_compass", Component.text("Invalid Type", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false));
 
 		static final String KEY = "Tier";
@@ -321,7 +322,7 @@ public class ItemStatUtils {
 		UGANDA("uganda", Component.text("Uganda 2018", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
 		SILVER("silver", Component.text("Silver Knight's Tomb", TextColor.fromHexString("#C0C0C0")).decoration(TextDecoration.ITALIC, false)),
 		BLUE("blue", Component.text("Coven's Gambit", TextColor.fromHexString("#0C2CA2")).decoration(TextDecoration.ITALIC, false)),
-		BROWN("brown", Component.text("Brown Dungeon", TextColor.fromHexString("#703608")).decoration(TextDecoration.ITALIC, false)),
+		BROWN("brown", Component.text("Cradle of the Broken God", TextColor.fromHexString("#703608")).decoration(TextDecoration.ITALIC, false)),
 		GREEN("green", Component.text("Green Dungeon", TextColor.fromHexString("#4D6E23")).decoration(TextDecoration.ITALIC, false)),
 		RED("red", Component.text("Red Dungeon", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
 		BLACK("black", Component.text("Black Dungeon", TextColor.fromHexString("#454040")).decoration(TextDecoration.ITALIC, false)),
@@ -332,7 +333,7 @@ public class ItemStatUtils {
 		SCIENCE("science", Component.text("P.O.R.T.A.L.", TextColor.fromHexString("#DCE8E3")).decoration(TextDecoration.ITALIC, false)),
 		BLUESTRIKE("bluestrike", Component.text("Masquerader’s Ruin", TextColor.fromHexString("#326DA8")).decoration(TextDecoration.ITALIC, false)),
 		GALLERYOFFEAR("gallerybase", Component.text("Gallery of Fear", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false)),
-		GOFMAPONE("gallery1", Component.text("Map 1", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false)),
+		GOFMAPONE("gallery1", Component.text("Sanguine Halls", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false)),
 		AMBER("amber", Component.text("item name color", TextColor.fromHexString("#FFBF00")).decoration(TextDecoration.ITALIC, false)),
 		GOLD("gold", Component.text("item name color", TextColor.fromHexString("#FFD700")).decoration(TextDecoration.ITALIC, false)),
 		DARKBLUE("darkblue", Component.text("itemnamecolor", TextColor.fromHexString("#FFFFAA")).decoration(TextDecoration.ITALIC, false)),
@@ -1933,7 +1934,7 @@ public class ItemStatUtils {
 					}
 				}
 
-				if (getTier(item) == Tier.CHARM || getTier(item) == Tier.RARE_CHARM) {
+				if (getTier(item) == Tier.CHARM || getTier(item) == Tier.RARE_CHARM || getTier(item) == Tier.EPIC_CHARM) {
 					int charmPower = getCharmPower(item);
 					if (charmPower > 0) {
 						String starString = "";
@@ -2082,7 +2083,7 @@ public class ItemStatUtils {
 		}
 
 		NBTList<String> charmLore = monumenta.getStringList(CHARM_KEY);
-		if (charmLore != null && (getTier(item) == Tier.CHARM || getTier(item) == Tier.RARE_CHARM)) {
+		if (charmLore != null && (getTier(item) == Tier.CHARM || getTier(item) == Tier.RARE_CHARM || getTier(item) == Tier.EPIC_CHARM)) {
 			lore.add(Component.empty());
 			lore.add(Component.text("When in Charm Slot:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 			for (String serializedLine : charmLore) {

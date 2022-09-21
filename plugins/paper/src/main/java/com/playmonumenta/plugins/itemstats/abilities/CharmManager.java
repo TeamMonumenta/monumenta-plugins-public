@@ -767,7 +767,7 @@ public class CharmManager {
 			return false;
 		}
 		// Make sure item has Charm Tier
-		if (!ItemStatUtils.getTier(charm).equals(ItemStatUtils.Tier.CHARM) && !ItemStatUtils.getTier(charm).equals(ItemStatUtils.Tier.RARE_CHARM)) {
+		if (!ItemStatUtils.getTier(charm).equals(ItemStatUtils.Tier.CHARM) && !ItemStatUtils.getTier(charm).equals(ItemStatUtils.Tier.RARE_CHARM) && !ItemStatUtils.getTier(charm).equals(ItemStatUtils.Tier.EPIC_CHARM)) {
 			return false;
 		}
 		// Charm Power Handling

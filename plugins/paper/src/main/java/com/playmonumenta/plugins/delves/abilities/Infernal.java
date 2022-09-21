@@ -81,7 +81,7 @@ public class Infernal {
 		ABILITY_POOL_R2.add(seekingProjectileBoss);
 		seekingProjectileBoss = new ArrayList<>();
 		seekingProjectileBoss.add(ProjectileBoss.identityTag);
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=30,distance=64,speed=0.6,delay=20,cooldown=240,turnradius=0.11,effects=[(fire,100)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=25,distance=64,speed=0.6,delay=20,cooldown=240,turnradius=0.11,effects=[(fire,100)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[(ENTITY_BLAZE_AMBIENT,1,0.5)],soundlaunch=[(ENTITY_BLAZE_SHOOT,0.5,0.5)],soundprojectile=[(ENTITY_BLAZE_BURN,0.4,0.2)],soundhit=[(ENTITY_GENERIC_EXPLODE,0.5,0.5)]]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[particlelaunch=[(EXPLOSION_LARGE,1)],particleprojectile=[(FLAME,3,0,0,0,0.1),(SMOKE_LARGE,2,0.2,0.2,0.2,0)],particlehit=[(FLAME,50,0,0,0,0.3)]]");
 		ABILITY_POOL_R3.add(seekingProjectileBoss);
@@ -114,7 +114,7 @@ public class Infernal {
 		ABILITY_POOL_R2.add(flameTrailBoss);
 		flameTrailBoss = new ArrayList<>();
 		flameTrailBoss.add(FlameTrailBoss.identityTag);
-		flameTrailBoss.add(FlameTrailBoss.identityTag + "[damage=24,spellname=\"" + FLAME_TRAIL_SPELL_NAME + "\"]");
+		flameTrailBoss.add(FlameTrailBoss.identityTag + "[damage=20,spellname=\"" + FLAME_TRAIL_SPELL_NAME + "\"]");
 		ABILITY_POOL_R3.add(flameNovaBoss);
 
 		List<String> fireBombTossBoss = new ArrayList<>();

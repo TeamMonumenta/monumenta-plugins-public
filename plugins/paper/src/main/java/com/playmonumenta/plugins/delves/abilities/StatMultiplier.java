@@ -31,7 +31,7 @@ public class StatMultiplier {
 
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.4;
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
-	public static final double DELVE_MOB_STAT_MULTIPLIER_R3 = 1.5;
+	public static final double DELVE_MOB_STAT_MULTIPLIER_R3 = 1.6;
 
 	static {
 		STAT_COMPENSATION_MAPPINGS.put("white", 1.7);
@@ -52,11 +52,29 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS.put("shiftingcity", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("depths", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("corridors", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("blue", 1.2);
 		STAT_COMPENSATION_MAPPINGS.put("dev1", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev2", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("mobs", 1.0);
 
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("test", 2.0);
+		// Wolfswood
+		final double FOREST = 1.2;
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("coven_fortress", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("locum_vernantia", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("shadowcast_bastille", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("aminita_colony", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("chanterelle_village", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("bewitched_dominion", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("vibrant_hollow", FOREST);
+
+		// Pelias' Keep
+		final double KEEP = 1.2;
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("quelled_convent", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("silvic_quarry", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("doomed_encampment", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("forsaken_manor", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("arx_spirensis", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("submerged_citadel", KEEP);
 	}
 
 	public static double getStatCompensation(String dungeon) {

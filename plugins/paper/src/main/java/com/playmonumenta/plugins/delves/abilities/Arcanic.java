@@ -59,7 +59,7 @@ public class Arcanic {
 		ABILITY_POOL_R2.add(trackingProjectile);
 		trackingProjectile = new ArrayList<>();
 		trackingProjectile.add(ProjectileBoss.identityTag);
-		trackingProjectile.add(ProjectileBoss.identityTag + "[damage=45,speed=0.2,delay=20,cooldown=320,turnradius=3.141,spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		trackingProjectile.add(ProjectileBoss.identityTag + "[damage=40,speed=0.2,delay=20,cooldown=320,turnradius=3.141,spellname=\"" + TRACKING_SPELL_NAME + "\"]");
 		trackingProjectile.add(ProjectileBoss.identityTag + "[soundstart=[(BLOCK_BEACON_POWER_SELECT,1,0.5)],soundlaunch=[(ENTITY_EVOKER_CAST_SPELL,1,0.5)],soundprojectile=[(BLOCK_BEACON_POWER_SELECT,0.4,0.5)],soundhit=[(BLOCK_BEACON_DEACTIVATE,1,0.5)]]");
 		trackingProjectile.add(ProjectileBoss.identityTag + "[particlelaunch=[(SPELL_WITCH,40,0,0,0,0.3)],particleprojectile=[(SPELL_WITCH,6,0,0,0,0.3),(SMOKE_LARGE,2,0.2,0.2,0.2,0)],particlehit=[(SPELL_WITCH,50,0,0,0,0.3)]]");
 		ABILITY_POOL_R3.add(trackingProjectile);
@@ -75,7 +75,7 @@ public class Arcanic {
 		ABILITY_POOL_R2.add(charger);
 		charger = new ArrayList<>();
 		charger.add(ChargerBoss.identityTag);
-		charger.add(ChargerBoss.identityTag + "[damage=45,spellname=\"" + CHARGE_SPELL_NAME + "\"]");
+		charger.add(ChargerBoss.identityTag + "[damage=40,spellname=\"" + CHARGE_SPELL_NAME + "\"]");
 		ABILITY_POOL_R3.add(charger);
 
 		//ProjectileBoss - magic arrow
@@ -93,7 +93,7 @@ public class Arcanic {
 		ABILITY_POOL_R2.add(magicArrow);
 		magicArrow = new ArrayList<>();
 		magicArrow.add(ProjectileBoss.identityTag);
-		magicArrow.add(ProjectileBoss.identityTag + "[damage=45,distance=32,speed=0.8,delay=20,cooldown=160,turnradius=0,spellname=\"" + MAGIC_ARROW_SPELL_NAME + "\"]");
+		magicArrow.add(ProjectileBoss.identityTag + "[damage=40,distance=32,speed=0.8,delay=20,cooldown=160,turnradius=0,spellname=\"" + MAGIC_ARROW_SPELL_NAME + "\"]");
 		magicArrow.add(ProjectileBoss.identityTag + "[soundstart=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1)],soundlaunch=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1.5)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,1.5)]]");
 		magicArrow.add(ProjectileBoss.identityTag + "[particlelaunch=[],particleprojectile=[(FIREWORKS_SPARK,5,0.1,0.1,0.1,0.05),(CRIT_MAGIC,20,0.2,0.2,0.2,0.1)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.25)]]");
 		ABILITY_POOL_R3.add(magicArrow);
