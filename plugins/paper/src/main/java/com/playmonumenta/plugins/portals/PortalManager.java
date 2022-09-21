@@ -118,7 +118,9 @@ public class PortalManager implements Listener {
 		for (int i = 0; i < 50; i++) {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(world);
-			if (portalNum == 1) {
+			if (mCurrentShard.startsWith("portal")) {
+				world.spawnParticle(Particle.REDSTONE, bLoc, 3, .15, .15, .15, getDustOptions(portalNum + (2 * gunId)));
+			} else if (portalNum == 1) {
 				world.spawnParticle(Particle.REDSTONE, bLoc, 3, .15, .15, .15, new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f));
 			} else {
 				world.spawnParticle(Particle.REDSTONE, bLoc, 3, .15, .15, .15, new Particle.DustOptions(Color.fromRGB(255, 69, 0), 1.0f));
@@ -241,7 +243,7 @@ public class PortalManager implements Listener {
 			rotation2 = Rotation.CLOCKWISE;
 		} else if (targetFace == BlockFace.DOWN && playerFacing == BlockFace.SOUTH) {
 			rotation1 = Rotation.NONE;
-			rotation2 = Rotation.CLOCKWISE_45;
+			rotation2 = Rotation.CLOCKWISE;
 		} else if (targetFace == BlockFace.UP && playerFacing == BlockFace.EAST) {
 			rotation1 = Rotation.CLOCKWISE_135;
 			rotation2 = Rotation.CLOCKWISE_45;
@@ -433,6 +435,29 @@ public class PortalManager implements Listener {
 				//Dungeon ids
 				15;
 		};
+	}
+
+	private static Particle.DustOptions getDustOptions(int portalNum) {
+		switch (portalNum) {
+			case 1:
+				return new Particle.DustOptions(Color.fromRGB(253, 255, 54), 1.0f);
+			case 2:
+				return new Particle.DustOptions(Color.fromRGB(0, 222, 60), 1.0f);
+			case 3:
+				return new Particle.DustOptions(Color.fromRGB(255, 1, 0), 1.0f);
+			case 4:
+				return new Particle.DustOptions(Color.fromRGB(209, 85, 0), 1.0f);
+			case 5:
+				return new Particle.DustOptions(Color.fromRGB(176, 75, 213), 1.0f);
+			case 6:
+				return new Particle.DustOptions(Color.fromRGB(61, 175, 227), 1.0f);
+			case 7:
+				return new Particle.DustOptions(Color.fromRGB(237, 125, 163), 1.0f);
+			case 8:
+				return new Particle.DustOptions(Color.fromRGB(122, 85, 50), 1.0f);
+			default:
+				return new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
