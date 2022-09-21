@@ -326,7 +326,7 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	}
 
 	@Override
-	public void setEagleCompanion(Creature entity, DamageAction action, double attackRange) {
+	public void setHuntingCompanion(Creature entity, DamageAction action, double attackRange) {
 		PathfinderMob entityCreature = ((CraftCreature) entity).getHandle();
 
 		//removing panic mode

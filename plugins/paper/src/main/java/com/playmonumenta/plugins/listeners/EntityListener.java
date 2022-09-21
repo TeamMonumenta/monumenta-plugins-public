@@ -57,6 +57,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -856,8 +857,7 @@ public class EntityListener implements Listener {
 		LivingEntity applied = event.getApplied();
 
 		LivingEntity applier;
-		if (event.getApplier() instanceof Projectile) {
-			Projectile proj = (Projectile) event.getApplier();
+		if (event.getApplier() instanceof Projectile proj) {
 			ProjectileSource shooter = proj.getShooter();
 			if (shooter instanceof LivingEntity) {
 				applier = (LivingEntity) shooter;
@@ -870,15 +870,19 @@ public class EntityListener implements Listener {
 			return;
 		}
 
+		PotionEffectType type = event.getEffect().getType();
 		/* Mark as applying slowness so arcane strike won't activate this tick */
 		if (applier instanceof Player && !applied.hasPotionEffect(PotionEffectType.SLOW)
-			&& event.getEffect().getType().equals(PotionEffectType.SLOW)) {
+			&& type.equals(PotionEffectType.SLOW)) {
 			MetadataUtils.checkOnceThisTick(mPlugin, applied, Constants.ENTITY_SLOWED_NONCE_METAKEY);
 		}
 
-		if (applier instanceof Player) {
-			Player player = (Player) applier;
+		if (applier instanceof Player player) {
 			mAbilities.potionEffectApplyEvent(player, event);
+		}
+
+		if (applier instanceof Dolphin && type == PotionEffectType.DOLPHINS_GRACE && applier.getScoreboardTags().contains("boss_no_dolphins_grace")) {
+			event.setCancelled(true);
 		}
 	}
 

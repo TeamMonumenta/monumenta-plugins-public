@@ -20,6 +20,10 @@ public class HuntingCompanionCS implements CosmeticSkill {
 		.build();
 
 	private final String FOX_NAME = "FoxCompanion";
+	private final String AXOLOTL_NAME = "AxolotlCompanion";
+	private final String STRIDER_NAME = "StriderCompanion";
+	private final String EAGLE_NAME = "EagleCompanion";
+	private final String DOLPHIN_NAME = "DolphinCompanion";
 
 	@Override
 	public Cosmetic getCosmetic() {
@@ -40,16 +44,206 @@ public class HuntingCompanionCS implements CosmeticSkill {
 		return FOX_NAME;
 	}
 
+	public String getAxolotlName() {
+		return AXOLOTL_NAME;
+	}
+
+	public String getStriderName() {
+		return STRIDER_NAME;
+	}
+
+	public String getEagleName() {
+		return EAGLE_NAME;
+	}
+
+	public String getDolphinName() {
+		return DOLPHIN_NAME;
+	}
+
+	public void onSummon(World world, Location loc, LivingEntity summon) {
+		switch (summon.getType()) {
+			case FOX -> foxOnSummon(world, loc);
+			case AXOLOTL -> axolotlOnSummon(world, loc);
+			case STRIDER -> striderOnSummon(world, loc);
+			case PARROT -> eagleOnSummon(world, loc);
+			default -> dolphinOnSummon(world, loc);
+		}
+	}
+
 	public void foxOnSummon(World world, Location loc) {
+		foxAmbient(world, loc);
+		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, 2.0f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 0.75f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f);
+	}
+
+	public void axolotlOnSummon(World world, Location loc) {
+		axolotlAmbient(world, loc);
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_SPLASH, 2.0f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1.0f, 1.5f);
+		world.playSound(loc, Sound.ITEM_BUCKET_EMPTY_AXOLOTL, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.5f);
+	}
+
+	public void striderOnSummon(World world, Location loc) {
+		striderAmbient(world, loc);
+		world.playSound(loc, Sound.ENTITY_STRIDER_STEP_LAVA, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f);
+	}
+
+	public void eagleOnSummon(World world, Location loc) {
+		eagleAmbient(world, loc);
+		world.playSound(loc, Sound.ENTITY_PARROT_FLY, 2.0f, 0.5f);
+		world.playSound(loc, Sound.BLOCK_SMALL_DRIPLEAF_FALL, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.5f, 1.5f);
+	}
+
+	public void dolphinOnSummon(World world, Location loc) {
+		dolphinAmbient(world, loc);
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_SPLASH, 2.0f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1.0f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.5f, 1.0f);
+	}
+
+	public void onDespawn(World world, Location loc, LivingEntity summon, Player player) {
+		switch (summon.getType()) {
+			case FOX -> foxOnDespawn(world, loc, player);
+			case AXOLOTL -> axolotlOnDespawn(world, loc, player);
+			case STRIDER -> striderOnDespawn(world, loc, player);
+			case PARROT -> eagleOnDespawn(world, loc, player);
+			default -> dolphinOnDespawn(world, loc, player);
+		}
+	}
+
+	public void foxOnDespawn(World world, Location loc, Player player) {
+		foxAmbient(world, loc);
+		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, 1.5f, 1.0f);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 20).spawnAsPlayerActive(player);
+	}
+
+	public void axolotlOnDespawn(World world, Location loc, Player player) {
+		foxAmbient(world, loc);
+		world.playSound(loc, Sound.ITEM_BUCKET_FILL_AXOLOTL, 1.5f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1.0f, 1.5f);
+		new PartialParticle(Particle.GLOW_SQUID_INK, loc, 5).spawnAsPlayerActive(player);
+	}
+
+	public void striderOnDespawn(World world, Location loc, Player player) {
+		striderAmbient(world, loc);
+		world.playSound(loc, Sound.ENTITY_STRIDER_RETREAT, 1.5f, 1.0f);
+		new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, loc, 5).spawnAsPlayerActive(player);
+	}
+
+	public void eagleOnDespawn(World world, Location loc, Player player) {
+		eagleAmbient(world, loc);
+		world.playSound(loc, Sound.ENTITY_PARROT_IMITATE_PHANTOM, 1.5f, 1.0f);
+		new PartialParticle(Particle.CLOUD, loc, 15).spawnAsPlayerActive(player);
+	}
+
+	public void dolphinOnDespawn(World world, Location loc, Player player) {
+		dolphinAmbient(world, loc);
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_JUMP, 1.5f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1.0f, 1.5f);
+		new PartialParticle(Particle.WATER_BUBBLE, loc, 10).spawnAsPlayerActive(player);
+	}
+
+	public void onAggro(World world, Location loc, Player player, LivingEntity summon) {
+		onAggroParticles(world, loc, player);
+	}
+
+	public void onAggroParticles(World world, Location loc, Player player) {
+		new PartialParticle(Particle.VILLAGER_ANGRY, loc, 25).spawnAsPlayerActive(player);
+	}
+
+	public void onAggroSounds(World world, Location loc, LivingEntity summon) {
+		switch (summon.getType()) {
+			case FOX -> foxOnAggro(world, loc);
+			case AXOLOTL -> axolotlOnAggro(world, loc);
+			case STRIDER -> striderOnAggro(world, loc);
+			case PARROT -> eagleOnAggro(world, loc);
+			default -> dolphinOnAggro(world, loc);
+		}
+	}
+
+	public void foxOnAggro(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_FOX_AGGRO, 1.5f, 1.0f);
+	}
+
+	public void axolotlOnAggro(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_SWIM, 1.5f, 0.5f);
+		world.playSound(loc, Sound.ENTITY_VILLAGER_NO, 0.5f, 3.0f);
+	}
+
+	public void striderOnAggro(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_STRIDER_HURT, 1.5f, 1.0f);
+	}
+
+	public void eagleOnAggro(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, 1.0f, 2.0f);
+	}
+
+	public void dolphinOnAggro(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_HURT, 1.5f, 0.5f);
+	}
+
+	public void onAttack(World world, Location loc, LivingEntity summon) {
+		switch (summon.getType()) {
+			case FOX -> foxOnAttack(world, loc);
+			case AXOLOTL -> axolotlOnAttack(world, loc);
+			case STRIDER -> striderOnAttack(world, loc);
+			case PARROT -> eagleOnAttack(world, loc);
+			default -> dolphinOnAttack(world, loc);
+		}
+	}
+
+	public void foxOnAttack(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_FOX_BITE, 1.5f, 1.0f);
+	}
+
+	public void axolotlOnAttack(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_ATTACK, 1.5f, 1.0f);
+	}
+
+	public void striderOnAttack(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_STRIDER_EAT, 1.5f, 1.0f);
+	}
+
+	public void eagleOnAttack(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, 1.0f, 2.0f);
+	}
+
+	public void dolphinOnAttack(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_ATTACK, 1.5f, 1.0f);
+	}
+
+	public void foxAmbient(World world, Location loc) {
 		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
 		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
 		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.2f);
-		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, 2.0f, 1.0f);
-		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 0.75f, 1.2f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.2f, 1.0f);
 	}
 
-	public void foxOnAggro(World world, Player mPlayer, LivingEntity summon) {
-		new PartialParticle(Particle.VILLAGER_ANGRY, summon.getEyeLocation(), 25).spawnAsPlayerActive(mPlayer);
+	public void axolotlAmbient(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_IDLE_WATER, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_IDLE_WATER, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_IDLE_WATER, 1.5f, 1.2f);
+	}
+
+	public void striderAmbient(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_STRIDER_AMBIENT, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_STRIDER_AMBIENT, 1.5f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_STRIDER_HAPPY, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_STRIDER_HAPPY, 1.5f, 1.2f);
+	}
+
+	public void eagleAmbient(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, 1.5f, 0.6f);
+		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, 1.5f, 1.0f);
+	}
+
+	public void dolphinAmbient(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, 1.5f, 1.2f);
 	}
 }

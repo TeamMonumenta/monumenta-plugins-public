@@ -9,7 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class TwistedCompanionCS extends HuntingCompanionCS {
@@ -41,9 +40,7 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 
 	@Override
 	public void foxOnSummon(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.7f);
-		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.85f);
-		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
+		foxAmbient(world, loc);
 		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, 2.0f, 0.9f);
 		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 1.0f, 1.0f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.2f, 0.85f);
@@ -52,7 +49,14 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 	}
 
 	@Override
-	public void foxOnAggro(World world, Player mPlayer, LivingEntity summon) {
-		new PartialParticle(Particle.SOUL, summon.getEyeLocation(), 15, 0.25, 0.25, 0.25, 0.005).spawnAsPlayerActive(mPlayer);
+	public void onAggroParticles(World world, Location loc, Player player) {
+		new PartialParticle(Particle.SOUL, loc, 15, 0.25, 0.25, 0.25, 0.005).spawnAsPlayerActive(player);
+	}
+
+	@Override
+	public void foxAmbient(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.7f);
+		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.85f);
+		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
 	}
 }

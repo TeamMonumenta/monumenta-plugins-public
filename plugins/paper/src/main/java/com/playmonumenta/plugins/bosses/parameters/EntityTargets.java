@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 
 public class EntityTargets implements Cloneable {
@@ -137,8 +138,13 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return !launcher.equals(entity);
 			}
+		},
+		IS_TARGET {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return launcher instanceof Mob mob && entity.equals(mob.getTarget());
+			}
 		};
-
 	}
 
 	//-----------------------------------------------------PLAYER FILTERS------------------------------------------------------------------------------------

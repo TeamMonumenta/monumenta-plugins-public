@@ -60,6 +60,9 @@ public class ChargerBoss extends BossAbilityGroup {
 		@BossParam(help = "Let you choose the targets of this spell")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
 
+		@BossParam(help = "Minimum distance to target")
+		public double MIN_DISTANCE = 0.0;
+
 		@BossParam(help = "Whenever this mob should change target to charge target after casting")
 		public boolean CHANGE_TARGET = true;
 
@@ -109,7 +112,12 @@ public class ChargerBoss extends BossAbilityGroup {
 			new SpellBaseCharge(plugin, boss, p.COOLDOWN, p.DURATION, p.STOP_ON_HIT,
 			0, 0, 0,
 			() -> {
-				return p.TARGETS.getTargetsList(mBoss);
+				List<? extends LivingEntity> targetList = p.TARGETS.getTargetsList(mBoss);
+				if (p.MIN_DISTANCE > 0) {
+					Location bossLoc = mBoss.getLocation();
+					targetList.removeIf(target -> target.getLocation().distance(bossLoc) < p.MIN_DISTANCE);
+				}
+				return targetList;
 			},
 			// Warning sound/particles at boss location and slow boss
 			(LivingEntity player) -> {
