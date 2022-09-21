@@ -53,7 +53,7 @@ public class CelestialBlessing extends Ability {
 
 	public static final String DAMAGE_EFFECT_NAME = "CelestialBlessingExtraDamage";
 	public static final String CHARM_DAMAGE = "Celestial Blessing Damage Modifier";
-	public static final String CHARM_COOLDOWN = "Celestial Blessing Damage Cooldown";
+	public static final String CHARM_COOLDOWN = "Celestial Blessing Cooldown";
 	public static final String CHARM_RANGE = "Celestial Blessing Range";
 	public static final String CHARM_SPEED = "Celestial Blessing Speed Amplifier";
 	public static final String CHARM_DURATION = "Celestial Blessing Duration";
