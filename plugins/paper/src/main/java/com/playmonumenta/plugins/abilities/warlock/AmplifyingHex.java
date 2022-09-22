@@ -7,20 +7,18 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.AmplifyingHexCS;
-import com.playmonumenta.plugins.effects.CustomDamageOverTime;
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -53,7 +51,6 @@ public class AmplifyingHex extends Ability {
 	private static final double DOT_ANGLE = 0.33;
 	private static final int COOLDOWN = 20 * 10;
 	private static final float KNOCKBACK_SPEED = 0.12f;
-	private static final String ENHANCED_DOT_EFFECT_NAME = "AmplifyingHexDamageOverTimeEffect";
 
 	public static final String CHARM_DAMAGE = "Amplifying Hex Damage";
 	public static final String CHARM_RANGE = "Amplifying Hex Range";
@@ -75,7 +72,7 @@ public class AmplifyingHex extends Ability {
 		mInfo.mShorthandName = "AH";
 		mInfo.mDescriptions.add("Left-click while sneaking with a scythe to fire a magic cone up to 8 blocks in front of you, dealing 2 + (0.5 * number of Skill Points, capped at the maximum available Skill Points for each Region) magic damage to each enemy per debuff (potion effects like Weakness or Wither, as well as Fire and custom effects like Bleed) they have, and an extra +1 damage per extra level of debuff, capped at 2 extra levels. 10% Slowness, Weaken, etc. count as one level. Cooldown: 10s.");
 		mInfo.mDescriptions.add("The range is increased to 10 blocks, extra damage increased to +2 per extra level, and the extra level cap is increased to 3 extra levels.");
-		mInfo.mDescriptions.add("Debuffs on affected mobs are now amplified by one level, up to 3 levels (or 55% for vulnerability).");
+		mInfo.mDescriptions.add("For every 1% health you have above 80% of your max health, Amplifying Hex will deal 1% more damage to enemies and deal 1% max health damage to yourself.");
 		mInfo.mLinkedSpell = ClassAbility.AMPLIFYING;
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -152,14 +149,6 @@ public class AmplifyingHex extends Ability {
 					if (effect != null) {
 						debuffCount++;
 						amplifierCount += Math.min(mAmplifierCap, effect.getAmplifier());
-
-						// mPlayer.sendMessage("Before: " + effect);
-						// Note: Potion Levels based on amplifier starts from 0 (Level 1 Slowness = amplifier is 0)
-						if (isEnhanced() && effect.getAmplifier() < 2) {
-							PotionUtils.PotionInfo potionInfo = new PotionUtils.PotionInfo(effectType, effect.getDuration(), effect.getAmplifier() + 1, effect.isAmbient(), effect.hasParticles(), effect.hasIcon());
-							PotionUtils.apply(mob, potionInfo);
-							// mPlayer.sendMessage("After: " + mob.getPotionEffect(effectType));
-						}
 					}
 				}
 
@@ -187,12 +176,6 @@ public class AmplifyingHex extends Ability {
 				if (EntityUtils.isBleeding(mPlugin, mob)) {
 					debuffCount++;
 					amplifierCount += Math.min(mAmplifierCap, EntityUtils.getBleedLevel(mPlugin, mob) - 1);
-					// mPlayer.sendMessage("Before: Bleeding at Level " + EntityUtils.getBleedLevel(mPlugin, mob));
-
-					if (isEnhanced() && EntityUtils.getBleedLevel(mPlugin, mob) < 3) {
-						EntityUtils.applyBleed(mPlugin, EntityUtils.getBleedTicks(mPlugin, mob), (EntityUtils.getBleedLevel(mPlugin, mob) + 1) * 0.1, mob);
-						// mPlayer.sendMessage("After: Bleeding at Level " + EntityUtils.getBleedLevel(mPlugin, mob));
-					}
 				}
 
 				//Custom slow effect interaction
@@ -201,12 +184,6 @@ public class AmplifyingHex extends Ability {
 					double slowAmp = EntityUtils.getSlowAmount(mPlugin, mob);
 					int slowLevel = (int) Math.floor(slowAmp * 10);
 					amplifierCount += Math.min((int) mAmplifierCap, Math.max(slowLevel - 1, 0));
-					// mPlayer.sendMessage("Before: Slowed at Level " + (slowLevel));
-
-					if (isEnhanced() && slowLevel < 3) {
-						EntityUtils.applySlow(mPlugin, EntityUtils.getSlowTicks(mPlugin, mob), (slowLevel + 1) * 0.1, mob);
-						// mPlayer.sendMessage("After: Slowed at Level " + (int) Math.floor(EntityUtils.getSlowAmount(mPlugin, mob) * 10));
-					}
 				}
 
 				//Custom weaken interaction
@@ -215,12 +192,6 @@ public class AmplifyingHex extends Ability {
 					double weakAmp = EntityUtils.getWeakenAmount(mPlugin, mob);
 					int weakLevel = (int) Math.floor(weakAmp * 10);
 					amplifierCount += Math.min((int) mAmplifierCap, Math.max(weakLevel - 1, 0));
-					// mPlayer.sendMessage("Before: Weakened at Level " + (weakLevel));
-
-					if (isEnhanced() && weakLevel < 3) {
-						EntityUtils.applyWeaken(mPlugin, EntityUtils.getWeakenTicks(mPlugin, mob), (weakLevel + 1) * 0.1, mob);
-						// mPlayer.sendMessage("After: Weakened at Level " + (int) Math.floor(EntityUtils.getWeakenAmount(mPlugin, mob) * 10));
-					}
 				}
 
 				//Custom vuln interaction
@@ -228,14 +199,6 @@ public class AmplifyingHex extends Ability {
 					debuffCount++;
 					double vulnAmp = EntityUtils.getVulnAmount(mPlugin, mob);
 					amplifierCount += Math.min(mAmplifierCap, Math.max((int) Math.floor(vulnAmp * 10) - 1, 0));
-					// mPlayer.sendMessage("Before: Vulnerable at " + vulnAmp * 100 + "%");
-
-					if (isEnhanced() && vulnAmp < 0.55) {
-						double newVulnAmp = (vulnAmp > 0.45) ? 0.55 : vulnAmp + 0.1;
-
-						EntityUtils.applyVulnerability(mPlugin, EntityUtils.getVulnTicks(mPlugin, mob), newVulnAmp, mob);
-						// mPlayer.sendMessage("After: Vulnerable at " + EntityUtils.getVulnAmount(mPlugin, mob) * 100 + "%");
-					}
 				}
 
 				//Custom DoT interaction
@@ -243,29 +206,28 @@ public class AmplifyingHex extends Ability {
 					debuffCount++;
 					int dotLevel = (int) EntityUtils.getHighestDamageOverTime(mPlugin, mob);
 					amplifierCount += (int) Math.min(mAmplifierCap, dotLevel - 1);
-					// mPlayer.sendMessage("Before: DoT at Level " + dotLevel);
-
-					if (isEnhanced() && dotLevel < 3) {
-						int maxDuration = 0;
-						double maxLevel = EntityUtils.getHighestDamageOverTime(mPlugin, mob);
-
-						// We are going to iterate through all DOTs to search for the highest damage DOT.
-						for (Effect effect : mPlugin.mEffectManager.getEffects(mob, CustomDamageOverTime.class)) {
-							if (effect.getMagnitude() == maxLevel) {
-								if (effect.getDuration() > maxDuration) {
-									maxDuration = effect.getDuration();
-								}
-							}
-						}
-
-						// Apply Dot
-						mPlugin.mEffectManager.addEffect(mob, ENHANCED_DOT_EFFECT_NAME, new CustomDamageOverTime(maxDuration, 1, 40 / (dotLevel + 1), mPlayer, null));
-						// mPlayer.sendMessage("After: DoT at Level " + (int) EntityUtils.getHighestDamageOverTime(mPlugin, mob));
-					}
 				}
 
 				if (debuffCount > 0) {
 					double finalDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage);
+
+					double maxHealth = EntityUtils.getMaxHealth(mPlayer);
+					if (isEnhanced() && mPlayer.getHealth() > maxHealth * 0.8) {
+						double percentBoost = mPlayer.getHealth() / maxHealth - 0.8;
+						finalDamage *= (1 + percentBoost);
+						double selfHarm = maxHealth * percentBoost;
+						double absorp = mPlayer.getAbsorptionAmount();
+						double newAbsorp = absorp - selfHarm;
+						if (absorp > 0) {
+							AbsorptionUtils.setAbsorption(mPlayer, (float) Math.max(newAbsorp, 0), -1);
+						}
+						if (newAbsorp < 0) {
+							mPlayer.setHealth(maxHealth + newAbsorp);
+						}
+						//dummy damage
+						DamageUtils.damage(null, mPlayer, new DamageEvent.Metadata(DamageType.OTHER, null, null, null), 0.001, true, false, false);
+					}
+
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.mLinkedSpell, true);
 					MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
 				}

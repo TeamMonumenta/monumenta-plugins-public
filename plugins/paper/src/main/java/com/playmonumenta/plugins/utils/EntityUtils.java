@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.Paralyze;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -697,6 +698,18 @@ public class EntityUtils {
 			.orElse(null);
 	}
 
+	public static void amplifyPotionLevel(LivingEntity en, PotionEffectType effectType, int ampAmount, int ampCap) {
+		PotionEffect effect = en.getPotionEffect(effectType);
+		if (effect != null) {
+			int ampLvl = effect.getAmplifier() + ampAmount;
+			if (ampLvl > ampCap) {
+				ampLvl = Math.max(ampCap, effect.getAmplifier());
+			}
+			PotionUtils.PotionInfo potionInfo = new PotionUtils.PotionInfo(effectType, effect.getDuration(), ampLvl, effect.isAmbient(), effect.hasParticles(), effect.hasIcon());
+			PotionUtils.apply(en, potionInfo);
+		}
+	}
+
 	private static final String VULNERABILITY_EFFECT_NAME = "VulnerabilityEffect";
 
 	public static void applyVulnerability(Plugin plugin, int ticks, double amount, LivingEntity mob) {
@@ -728,6 +741,16 @@ public class EntityUtils {
 			return vuln.getDuration();
 		} else {
 			return 0;
+		}
+	}
+
+	public static void amplifyVuln(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
+		if (isVulnerable(plugin, en)) {
+			int ampLvl = (int) Math.floor(getVulnAmount(plugin, en) * 10) + ampAmount;
+			if (ampLvl > ampCap) {
+				ampLvl = (int) Math.max(ampCap, Math.floor(getVulnAmount(plugin, en) * 10));
+			}
+			applyVulnerability(plugin, EntityUtils.getVulnTicks(plugin, en), ampLvl * 0.1, en);
 		}
 	}
 
@@ -779,6 +802,16 @@ public class EntityUtils {
 		}
 	}
 
+	public static void amplifyBleed(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
+		if (isBleeding(plugin, en)) {
+			int ampLvl = getBleedLevel(plugin, en) + ampAmount;
+			if (ampLvl > ampCap) {
+				ampLvl = Math.max(ampCap, getBleedLevel(plugin, en));
+			}
+			applyBleed(plugin, EntityUtils.getBleedTicks(plugin, en), ampLvl * 0.1, en);
+		}
+	}
+
 	public static final String SLOW_EFFECT_NAME = "SlowEffect";
 
 	public static void applySlow(Plugin plugin, int ticks, double amount, LivingEntity mob) {
@@ -814,6 +847,16 @@ public class EntityUtils {
 		if (slows != null) {
 			Effect slow = slows.last();
 			slow.setDuration(ticks);
+		}
+	}
+
+	public static void amplifySlow(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
+		if (isSlowed(plugin, en)) {
+			int ampLvl = (int) Math.floor(getSlowAmount(plugin, en) * 10) + ampAmount;
+			if (ampLvl > ampCap) {
+				ampLvl = (int) Math.max(ampCap, Math.floor(getSlowAmount(plugin, en) * 10));
+			}
+			applySlow(plugin, EntityUtils.getSlowTicks(plugin, en), ampLvl * 0.1, en);
 		}
 	}
 
@@ -886,6 +929,16 @@ public class EntityUtils {
 		}
 	}
 
+	public static void amplifyWeaken(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
+		if (isWeakened(plugin, en)) {
+			int ampLvl = (int) Math.floor(getWeakenAmount(plugin, en) * 10) + ampAmount;
+			if (ampLvl > ampCap) {
+				ampLvl = (int) Math.max(ampCap, Math.floor(getWeakenAmount(plugin, en) * 10));
+			}
+			applyWeaken(plugin, EntityUtils.getWeakenTicks(plugin, en), ampLvl * 0.1, en);
+		}
+	}
+
 	public static boolean hasDamageOverTime(Plugin plugin, LivingEntity mob) {
 		return plugin.mEffectManager.hasEffect(mob, CustomDamageOverTime.class);
 	}
@@ -900,6 +953,20 @@ public class EntityUtils {
 			highest = Math.max(highest, effect.getMagnitude());
 		}
 		return highest;
+	}
+
+	public static void amplifyDamageOverTime(Plugin plugin, LivingEntity en, String source, int ampAmount, int ampCap) {
+		if (EffectManager.getInstance().hasEffect(en, source)) {
+			Effect dot = EffectManager.getInstance().getActiveEffect(en, source);
+			int duration = dot.getDuration();
+			double level = dot.getMagnitude();
+			double ampLvl = level + ampAmount;
+			if (ampLvl > ampCap) {
+				ampLvl = Math.max(ampCap, ampLvl);
+			}
+			// Apply Dot
+			plugin.mEffectManager.addEffect(en, source, new CustomDamageOverTime(duration, 1, (int) Math.round(40 / ampLvl), null, null));
+		}
 	}
 
 	private static void setFireTicksIfLower(int fireTicks, LivingEntity target) {
