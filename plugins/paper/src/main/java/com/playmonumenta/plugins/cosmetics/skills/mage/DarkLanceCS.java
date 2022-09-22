@@ -38,7 +38,7 @@ public class DarkLanceCS extends ManaLanceCS {
 	}
 
 	@Override
-	public void lanceParticle(Player mPlayer, Location loc, Location endLoc, int iterations) {
+	public void lanceParticle(Player mPlayer, Location loc, Location endLoc, int iterations, double radius) {
 		new PPLine(Particle.DRAGON_BREATH, loc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsPlayerActive(mPlayer);
 		new PPLine(Particle.REDSTONE, loc, endLoc).shiftStart(0.75).countPerMeter(18).delta(0.35).data(DARK_LANCE_COLOR).spawnAsPlayerActive(mPlayer);
 	}
