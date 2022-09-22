@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
@@ -341,6 +342,12 @@ public class CosmeticsGUI extends CustomInventory {
 		} else {
 			// equip vanity equipment from inventory
 			if (mDisplayPage == null) {
+				if (ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SOULBOUND) > 0
+					    && !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, ItemStatUtils.InfusionType.SOULBOUND))) {
+					player.sendMessage(Component.text("This item is soulbound to another player!", NamedTextColor.RED));
+					player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+					return;
+				}
 				item = VanityManager.cleanCopyForDisplay(item);
 				item.setAmount(1);
 				EquipmentSlot slot = ItemUtils.getEquipmentSlot(item);
