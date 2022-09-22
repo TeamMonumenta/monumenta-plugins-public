@@ -25,7 +25,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class MasterworkUtils {
 
-	private static final String ARCHOS_RING = "epic:r3/items/currency/archos_ring";
 	private static final String HYPER_ARCHOS_RING = "epic:r3/items/currency/hyperchromatic_archos_ring";
 	private static final String PULSATING_SHARD = "epic:r3/items/currency/pulsating_shard";
 	private static final String PULSATING_DIAMOND = "epic:r3/items/currency/pulsating_diamond";
