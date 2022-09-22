@@ -1141,6 +1141,30 @@ public class EntityUtils {
 		}
 	}
 
+	public static void removeAttributesContaining(Attributable attributable, Attribute attribute, String modifierName) {
+		AttributeInstance instance = attributable.getAttribute(attribute);
+		if (instance != null) {
+			for (AttributeModifier modifier : instance.getModifiers()) {
+				if (modifier != null && modifier.getName().contains(modifierName)) {
+					instance.removeModifier(modifier);
+				}
+			}
+		}
+	}
+
+	public static boolean hasAttributesContaining(Attributable attributable, Attribute attribute, String modifierName) {
+		AttributeInstance instance = attributable.getAttribute(attribute);
+		if (instance != null) {
+			for (AttributeModifier modifier : instance.getModifiers()) {
+				if (modifier != null && modifier.getName().contains(modifierName)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+
 	public static double getMaxHealth(LivingEntity entity) {
 		AttributeInstance maxHealth = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 		return maxHealth == null ? 0 : maxHealth.getValue();

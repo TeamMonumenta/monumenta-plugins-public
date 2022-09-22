@@ -150,7 +150,7 @@ public class DelveCustomInventory extends CustomInventory {
 		mods = DelvesModifier.valuesList();
 		if (mOwner.getGameMode() != GameMode.CREATIVE) {
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
-			mods.add(DelvesUtils.getWeeklyRotatingModifier());
+			mods.addAll(DelvesUtils.getWeeklyRotatingModifier());
 		}
 		for (int i = 0; i < 7; i++) {
 			if (mPage * 7 + i >= mods.size()) {
@@ -352,7 +352,7 @@ public class DelveCustomInventory extends CustomInventory {
 					List<DelvesModifier> mods = DelvesModifier.valuesList();
 					if (mOwner.getGameMode() != GameMode.CREATIVE) {
 						mods.removeAll(DelvesModifier.rotatingDelveModifiers());
-						mods.add(DelvesUtils.getWeeklyRotatingModifier());
+						mods.addAll(DelvesUtils.getWeeklyRotatingModifier());
 					}
 					DelvesModifier mod = mods.get(column - 1 + (mPage * 7));
 					if (row == 5) {
@@ -382,7 +382,7 @@ public class DelveCustomInventory extends CustomInventory {
 			} else if (mEditableDelvePoint) {
 				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
 				for (DelvesModifier mod : DelvesModifier.values()) {
-					if (DelvesModifier.rotatingDelveModifiers().contains(mod) && DelvesUtils.getWeeklyRotatingModifier() != mod) {
+					if (DelvesModifier.rotatingDelveModifiers().contains(mod) && !DelvesUtils.getWeeklyRotatingModifier().contains(mod)) {
 						continue;
 					} else {
 						mPointSelected.put(mod, DelvesUtils.getMaxPointAssignable(mod, 1000));

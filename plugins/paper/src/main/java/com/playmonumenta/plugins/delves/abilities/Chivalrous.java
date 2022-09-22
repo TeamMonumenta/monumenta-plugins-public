@@ -35,19 +35,19 @@ public class Chivalrous {
 			"Magma Cube Mount"
 	};
 
-	public static final String DESCRIPTION = "Enemies become Knights of Slime and bees.";
+	public static final String DESCRIPTION = "Enemies become Knights of slime and bees.";
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 			{
-				"Enemies have a " + Math.round(SPAWN_CHANCE[0] * 100) + "% chance to be Chivalrous."
+				"Enemies have a " + Math.round(SPAWN_CHANCE[0] * 100) + "% chance to be Chivalrous, gaining 10% damage."
 			}, {
-				"Enemies have a " + Math.round(SPAWN_CHANCE[1] * 100) + "% chance to be Chivalrous."
+				"Enemies have a " + Math.round(SPAWN_CHANCE[1] * 100) + "% chance to be Chivalrous, gaining 10% damage."
 			}, {
-				"Enemies have a " + Math.round(SPAWN_CHANCE[2] * 100) + "% chance to be Chivalrous."
+				"Enemies have a " + Math.round(SPAWN_CHANCE[2] * 100) + "% chance to be Chivalrous, gaining 10% damage."
 			}, {
-				"Enemies have a " + Math.round(SPAWN_CHANCE[3] * 100) + "% chance to be Chivalrous."
+				"Enemies have a " + Math.round(SPAWN_CHANCE[3] * 100) + "% chance to be Chivalrous, gaining 10% damage."
 			}, {
-				"Enemies have a " + Math.round(SPAWN_CHANCE[4] * 100) + "% chance to be Chivalrous."
+				"Enemies have a " + Math.round(SPAWN_CHANCE[4] * 100) + "% chance to be Chivalrous, gaining 10% damage."
 			}
 	};
 

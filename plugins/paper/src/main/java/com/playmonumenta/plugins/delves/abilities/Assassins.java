@@ -16,7 +16,7 @@ public class Assassins {
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 		{
-			"Mobs deal 25% extra damage when not in the player",
+			"Mobs deal 50% extra damage when not in the player",
 			"field of view, and have a 30% chance to become",
 			"\"stealthed,\" gaining new abilities."
 		}

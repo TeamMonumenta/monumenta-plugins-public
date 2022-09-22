@@ -27,6 +27,9 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public String SPAWNEDMOB = "LostSoul";
 
+		@BossParam(help = "Is the spawnedmob from a pool?")
+		public boolean POOL = false;
+
 		@BossParam(help = "Delay of the spell")
 		public int DELAY = 100;
 
@@ -40,9 +43,8 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
-
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellThrowSummon(plugin, boss, p.DETECTION, p.LOBS, p.COOLDOWN, p.SPAWNEDMOB)));
+			new SpellThrowSummon(plugin, boss, p.DETECTION, p.LOBS, p.COOLDOWN, p.SPAWNEDMOB, p.POOL)));
 
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
