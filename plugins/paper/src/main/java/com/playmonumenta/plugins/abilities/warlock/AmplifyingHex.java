@@ -119,8 +119,10 @@ public class AmplifyingHex extends Ability {
 				Vector vec;
 				mRadiusIncrement += 1.25;
 				for (double degree = 30; degree <= 150; degree += 10) {
-					double radian1 = Math.toRadians(degree);
-					vec = new Vector(FastUtils.cos(radian1) * mRadiusIncrement, 0.15, FastUtils.sin(radian1) * mRadiusIncrement);
+					double radian1 = Math.toRadians(degree + mCosmetic.amplifyingAngle(degree, mRadiusIncrement));
+					vec = new Vector(FastUtils.cos(radian1) * mRadiusIncrement,
+						0.15 + mCosmetic.amplifyingHeight(mRadiusIncrement, mRadius + 1),
+						FastUtils.sin(radian1) * mRadiusIncrement);
 					vec = VectorUtils.rotateXAxis(vec, mLoc.getPitch());
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
@@ -137,7 +139,7 @@ public class AmplifyingHex extends Ability {
 
 
 		final Location soundLoc = mPlayer.getLocation();
-		mCosmetic.amplifyingSound(world, soundLoc);
+		mCosmetic.amplifyingEffects(mPlayer, world, soundLoc);
 
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 

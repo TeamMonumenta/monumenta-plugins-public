@@ -29,12 +29,16 @@ public class AdvancingShadowsCS implements CosmeticSkill {
 		return Material.ENDER_EYE;
 	}
 
+	public void tpStart(Player mPlayer) {
+
+	}
+
 	public void tpParticle(Player mPlayer) {
 		new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);
 	}
 
-	public void tpParticleTrack(Player mPlayer, Location loc) {
+	public void tpTrail(Player mPlayer, Location loc, int i) {
 		new PartialParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 4, 0.3, 0.5, 0.3, 1.0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 10, 0.3, 0.5, 0.3, 0.025).spawnAsPlayerActive(mPlayer);
 	}

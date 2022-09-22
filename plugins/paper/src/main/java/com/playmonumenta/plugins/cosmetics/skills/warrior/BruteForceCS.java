@@ -32,7 +32,7 @@ public class BruteForceCS implements CosmeticSkill {
 		return Material.STONE_AXE;
 	}
 
-	public void bruteOnDamage(Player mPlayer, Location loc) {
+	public void bruteOnDamage(Player mPlayer, Location loc, int combo) {
 		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.135).spawnAsPlayerActive(mPlayer);
 	}

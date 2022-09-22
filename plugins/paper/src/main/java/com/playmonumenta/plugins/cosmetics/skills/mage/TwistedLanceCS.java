@@ -1,24 +1,29 @@
 package com.playmonumenta.plugins.cosmetics.skills.mage;
 
+import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
-import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import org.apache.commons.math3.util.FastMath;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 public class TwistedLanceCS extends ManaLanceCS {
 	//Delve theme
 
 	public static final String NAME = "Twisted Lance";
 
-	private static final Particle.DustOptions TWISTED_COLOR = new Particle.DustOptions(Color.fromRGB(127, 0, 0), 1.0f);
-	private static final Particle.DustOptions DARK_COLOR = new Particle.DustOptions(Color.fromRGB(0, 31, 95), 1.0f);
+	private static final Color TWISTED_COLOR = Color.fromRGB(127, 0, 0);
+	private static final Color DARK_COLOR = Color.fromRGB(54, 114, 156);
 
 	@Override
 	public Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName());
+		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+			"Something about this lance is",
+			"wrong... Twisted...");
 	}
 
 	@Override
@@ -32,21 +37,53 @@ public class TwistedLanceCS extends ManaLanceCS {
 	}
 
 	@Override
-	public void lanceHit(Player mPlayer, Location bLoc, World world) {
-		new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 25, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
-		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
+	public void lanceHitBlock(Player mPlayer, Location bLoc, World world) {
+		new PartialParticle(Particle.SMOKE_LARGE, bLoc, 25, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
+		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0.85f);
+		world.playSound(bLoc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1, 0.75f);
 	}
 
 	@Override
-	public void lanceParticle(Player mPlayer, Location loc, Location endLoc) {
-		new PPLine(Particle.SMOKE_NORMAL, loc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0.05).extra(0.001).spawnAsPlayerActive(mPlayer);
-		new PPLine(Particle.SPELL_MOB, loc, endLoc).shiftStart(0.75).countPerMeter(8).delta(0.05).spawnAsPlayerActive(mPlayer);
-		new PPLine(Particle.REDSTONE, loc, endLoc).shiftStart(0.75).countPerMeter(16).delta(0.3).data(TWISTED_COLOR).spawnAsPlayerActive(mPlayer);
-		new PPLine(Particle.REDSTONE, loc, endLoc).shiftStart(0.75).countPerMeter(8).delta(0.3).data(DARK_COLOR).spawnAsPlayerActive(mPlayer);
+	public void lanceParticle(Player mPlayer, Location loc, Location endLoc, int iterations) {
+
+		Location l = loc.clone();
+		Vector dir = loc.getDirection().multiply(0.3333);
+		double rotation = 0;
+		double radius = 0.75;
+		for (int i = 0; i < iterations * 3; i++) {
+			l.add(dir);
+			new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.175, 0.2, 0.2, 0.05).spawnAsPlayerActive(mPlayer);
+			rotation += 6;
+			radius -= 0.75D / (ManaLance.RANGE * 3);
+			for (int j = 0; j < 3; j++) {
+				double radian = Math.toRadians(rotation + (j * 120));
+				Vector vec = new Vector(FastMath.cos(radian) * radius, 0,
+					FastMath.sin(radian) * radius);
+				vec = VectorUtils.rotateXAxis(vec, l.getPitch() + 90);
+				vec = VectorUtils.rotateYAxis(vec, l.getYaw());
+				Location helixLoc = l.clone().add(vec);
+				new PartialParticle(Particle.DUST_COLOR_TRANSITION, helixLoc, 3, 0.05, 0.05, 0.05, 0.25,
+					new Particle.DustTransition(DARK_COLOR, TWISTED_COLOR, 1f)).spawnAsPlayerActive(mPlayer);
+			}
+		}
 	}
 
 	@Override
 	public void lanceSound(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1.3f, 0.9f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.3f, 0.9f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.3f, 1.75f);
+		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.3f, 0.7f);
+		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.3f, 0.7f);
+	}
+
+	@Override
+	public void lanceHit(Location loc, Player mPlayer) {
+		World world = loc.getWorld();
+		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.3f, 0.7f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_BIG_FALL, SoundCategory.PLAYERS, 1.3f, 0);
+		world.playSound(loc, Sound.ENTITY_BEE_STING, SoundCategory.PLAYERS, 1.3f, 0);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 30, 0, 0, 0, 0.15)
+			.spawnAsPlayerActive(mPlayer);
+
 	}
 }

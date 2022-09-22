@@ -9,14 +9,13 @@ import com.playmonumenta.plugins.cosmetics.skills.cleric.DivineJusticeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.plugins.utils.*;
+
 import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -44,6 +43,9 @@ public class DivineJustice extends Ability {
 	private @Nullable Crusade mCrusade;
 
 	private final DivineJusticeCS mCosmetic;
+
+	private int mComboNumber = 0;
+	private BukkitRunnable mComboRunnable = null;
 
 	public DivineJustice(
 		Plugin plugin,
@@ -98,7 +100,30 @@ public class DivineJustice extends Ability {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
 
 			double widerWidthDelta = PartialParticle.getWidthDelta(enemy) * 1.5;
-			mCosmetic.justiceOnDamage(mPlayer, enemy, widerWidthDelta);
+			mCosmetic.justiceOnDamage(mPlayer, enemy, widerWidthDelta, mComboNumber);
+
+			if (mComboNumber == 0 || mComboRunnable != null) {
+				if (mComboRunnable != null) {
+					mComboRunnable.cancel();
+				}
+				mComboRunnable = new BukkitRunnable() {
+					@Override
+					public void run() {
+						mComboNumber = 0;
+						mComboRunnable = null;
+					}
+				};
+				mComboRunnable.runTaskLater(mPlugin, (long) ((1D / mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getValue()) * 20) + 15);
+			}
+			mComboNumber++;
+
+			if (mComboNumber >= 3) {
+				if (mComboRunnable != null) {
+					mComboRunnable.cancel();
+					mComboRunnable = null;
+				}
+				mComboNumber = 0;
+			}
 
 			return true;
 		}
@@ -128,6 +153,7 @@ public class DivineJustice extends Ability {
 			}
 
 			players.add(mPlayer);
+			mCosmetic.justiceKill(mPlayer, entityDeathEvent.getEntity().getLocation());
 			mCosmetic.justiceHealSound(players, mCosmetic.getHealPitchSelf());
 			new BukkitRunnable() {
 				@Override

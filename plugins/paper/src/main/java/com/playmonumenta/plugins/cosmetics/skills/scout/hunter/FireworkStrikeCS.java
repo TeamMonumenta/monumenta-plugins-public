@@ -1,24 +1,35 @@
 package com.playmonumenta.plugins.cosmetics.skills.scout.hunter;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.concurrent.atomic.AtomicBoolean;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import org.apache.commons.math3.util.FastMath;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class FireworkStrikeCS extends PredatorStrikeCS {
 	//Steely predator stirke. Depth set: steel
 
 	public static final String NAME = "Firework Strike";
 
-	private static final Particle.DustOptions GRAY_COLOR = new Particle.DustOptions(Color.fromRGB(130, 130, 130), 1.0f);
-	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(244, 56, 0), 1.0f);
-	private static final Particle.DustOptions ORANGE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 127, 20), 1.0f);
+	private static final float[] YAW_ANGLES = {-75, 75};
+	private static final float EXPLODE_VOLUME = 2f;
+	private static final Color TRAIL_COLOR = Color.fromRGB(255, 255, 199);
+
 
 	@Override
 	public Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName());
+		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+			"These twin fireworks will make",
+			"a spectacle out of your target!");
 	}
 
 	@Override
@@ -32,37 +43,127 @@ public class FireworkStrikeCS extends PredatorStrikeCS {
 	}
 
 	@Override
-	public void strikeParticleReady(Player mPlayer) {
-		new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 0.75, 0), 1, 0.25, 0, 0.25, 0).spawnAsPlayerActive(mPlayer);
+	public void strikeTick(Player mPlayer, int tick) {
+		Location loc = mPlayer.getLocation().add(0, 1, 0);
+
+		for (int i = 0; i < 4; i++) {
+			double rotation = Math.toRadians((tick * 10) + (i * 90));
+			Vector vec = new Vector(FastMath.cos(rotation) * 0.75, 0,
+				FastMath.sin(rotation) * 0.75);
+			Location l = loc.clone().add(vec);
+			if (i % 2 == 0) {
+				new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0,
+					new Particle.DustOptions(TRAIL_COLOR, 1)).spawnAsPlayerActive(mPlayer);
+			} else {
+				new PartialParticle(Particle.CRIT, l.clone().subtract(0, 0.25, 0), 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
+			}
+		}
 	}
 
 	@Override
 	public void strikeParticleProjectile(Player mPlayer, Location bLoc) {
-		new PartialParticle(Particle.FIREWORKS_SPARK, bLoc, 6, 0.15, 0.15, 0.15, 0.125).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIT_MAGIC, bLoc, 10, 0.35, 0.35, 0.35, 0.25).spawnAsPlayerActive(mPlayer);
-	}
-
-	@Override
-	public void strikeParticleExplode(Player mPlayer, Location loc, double radius) {
-		new PartialParticle(Particle.SMOKE_LARGE, loc, 20, 0.1 * radius, 0.1 * radius, 0.1 * radius, 0.2).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, loc, 24, 1.25 * radius, 1.25 * radius, 1.25 * radius, 0.1, GRAY_COLOR).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, loc, 12, 1.25 * radius, 1.25 * radius, 1.25 * radius, 0.1, RED_COLOR).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, loc, 8, 1.25 * radius, 1.25 * radius, 1.25 * radius, 0.1, ORANGE_COLOR).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override
 	public void strikeSoundReady(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, 1, 1.25f);
+		Location loc = mPlayer.getLocation().add(0, 0.15, 0);
+		loc.setPitch(0);
+		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, 0, 1, 0, 0, 45, 0.25f,
+			true, 0, Particle.END_ROD);
+		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, 0, 1, 0, 0, 55, 1.75f,
+			true, 0, 0.35, Particle.CRIT_MAGIC);
+		world.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, SoundCategory.PLAYERS, 1, 1.25f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1, 1.25f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_DOOR_OPEN, SoundCategory.PLAYERS, 1, 1.5f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_DOOR_OPEN, SoundCategory.PLAYERS, 1, 2f);
+		new PartialParticle(Particle.CRIT_MAGIC, loc, 75, 0, 0, 0, 0.75)
+			.spawnAsPlayerActive(mPlayer);
+
 	}
 
 	@Override
-	public void strikeSoundLaunch(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.0f);
+	public void strikeLaunch(World world, Player mPlayer) {
+		Location loc = mPlayer.getLocation().add(0, 0.15, 0);
+		loc.setPitch(0);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1, 0.75f);
+		world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1, 1.4f);
+		world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1, 1.75f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 1, 1.5f);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 25, 0, 0, 0, 0.175)
+			.spawnAsPlayerActive(mPlayer);
+		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, 0, 1, 0, 0, 42, 0.5f,
+			true, 0, Particle.EXPLOSION_NORMAL);
+		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, 0, 1, 0, 0, 55, 2.25f,
+			true, 0, 0.25, Particle.CRIT_MAGIC);
 	}
 
 	@Override
-	public void strikeSoundExplode(World world, Player mPlayer, Location loc) {
-		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 1.25f, 1.25f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 1.25f, 1.25f);
+	public void strikeExplode(World world, Player mPlayer, Location loc, double radius) {
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, EXPLODE_VOLUME, 0.85f);
+		world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, EXPLODE_VOLUME, 0.85f);
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, EXPLODE_VOLUME, 1.5f);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, EXPLODE_VOLUME, 0.8f);
+		}, 10);
+		new PartialParticle(Particle.FLAME, loc, 75, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.END_ROD, loc, 60, 0, 0, 0, 0.25).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 5, 1, 1, 1, 0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, 0, 0, 0, 0.225).spawnAsPlayerActive(mPlayer);
+	}
+
+	@Override
+	public void strikeImpact(Runnable runnable, Location target, Player mPlayer) {
+		Location loc = mPlayer.getLocation().add(0, 1.35, 0);
+
+		AtomicBoolean bool = new AtomicBoolean(false);
+		for (float angle : YAW_ANGLES) {
+			Vector dir = VectorUtils.rotateTargetDirection(loc.getDirection(), angle, -45).multiply(2.25);
+			new BukkitRunnable() {
+				final Location mL = loc.clone();
+				int mT = 0;
+				double mAngle = 0;
+				double mArcCurve = 0;
+				Vector mD = dir.clone();
+
+				@Override
+				public void run() {
+					mT++;
+
+					for (int i = 0; i < 7; i++) {
+						mAngle += 12;
+						mArcCurve += 0.2;
+						mD = dir.clone().add(LocationUtils.getDirectionTo(target, mL).multiply(mArcCurve));
+
+						if (mD.length() > 0.5) {
+							mD.normalize().multiply(0.5);
+						}
+
+						mL.add(mD);
+
+						new PartialParticle(Particle.REDSTONE, mL, 1, 0, 0, 0, 0, new Particle.DustOptions(TRAIL_COLOR, 2.5f))
+							.spawnAsPlayerActive(mPlayer);
+						ParticleUtils.drawParticleCircleExplosion(mPlayer, mL, 0, 1, 0, 90, 2, 0.085f,
+							true, mAngle, Particle.END_ROD);
+						ParticleUtils.drawParticleCircleExplosion(mPlayer, mL, 0, 1, 0, 90, 2, 1f,
+							true, mAngle + 90, Particle.CRIT_MAGIC);
+
+						if (mL.distance(target) < 0.5) {
+							if (!bool.get()) {
+								runnable.run();
+								bool.set(true);
+							}
+
+							this.cancel();
+							return;
+						}
+					}
+
+					if (mT >= 100) {
+						this.cancel();
+					}
+				}
+
+			}.runTaskTimer(Plugin.getInstance(), 0, 1);
+		}
 	}
 }

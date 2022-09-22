@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PredatorStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
@@ -70,19 +71,18 @@ public class PredatorStrike extends Ability {
 		if (mPlayer != null && !mPlayer.isSneaking() && !mActive && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isBowOrTrident(mainHand)) {
-				Player player = mPlayer;
 				mActive = true;
 				ClientModHandler.updateAbility(mPlayer, this);
 				World world = mPlayer.getWorld();
 
-				mCosmetic.strikeSoundReady(world, player);
+				mCosmetic.strikeSoundReady(world, mPlayer);
 				new BukkitRunnable() {
 					int mTicks = 0;
 
 					@Override
 					public void run() {
 						mTicks++;
-						mCosmetic.strikeParticleReady(mPlayer);
+						mCosmetic.strikeTick(mPlayer, mTicks);
 
 						if (!mActive || mTicks >= 20 * 5) {
 							mActive = false;
@@ -110,35 +110,54 @@ public class PredatorStrike extends Ability {
 			box.shift(direction);
 
 			World world = mPlayer.getWorld();
-			mCosmetic.strikeSoundLaunch(world, mPlayer);
+			mCosmetic.strikeLaunch(world, mPlayer);
 
 			Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(loc, MAX_RANGE));
 
+			boolean hit = false;
 			for (double r = 0; r < MAX_RANGE; r += HITBOX_LENGTH) {
 				Location bLoc = box.getCenter().toLocation(world);
 				mCosmetic.strikeParticleProjectile(mPlayer, bLoc);
 
 				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 					bLoc.subtract(direction.multiply(0.5));
-					explode(bLoc);
-					return true;
+					// Snapshot the mobs that would be hit if it were instananeous.
+					// This is very important for the Firework Strike Cosmetic
+					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(bLoc, EXPLODE_RADIUS, mPlayer);
+					mCosmetic.strikeImpact(() -> explode(bLoc, mobs), bLoc, mPlayer);
+					hit = true;
+					break;
 				}
 
 				for (LivingEntity mob : nearbyMobs) {
 					if (mob.getBoundingBox().overlaps(box)) {
 						if (EntityUtils.isHostileMob(mob)) {
-							explode(bLoc);
-							return true;
+							// Snapshot the mobs that would be hit if it were instananeous.
+							// This is very important for the Firework Strike Cosmetic
+							List<LivingEntity> mobs = EntityUtils.getNearbyMobs(bLoc, EXPLODE_RADIUS, mPlayer);
+							mCosmetic.strikeImpact(() -> explode(bLoc, mobs), bLoc, mPlayer);
+							hit = true;
+							break;
 						}
 					}
 				}
+
+				if (hit) {
+					break;
+				}
 				box.shift(shift);
+			}
+			if (!hit) {
+				Location bLoc = box.getCenter().toLocation(world);
+				if (mCosmetic instanceof FireworkStrikeCS) {
+					mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, EXPLODE_RADIUS), bLoc, mPlayer);
+				}
 			}
 		}
 		return true;
 	}
 
-	private void explode(Location loc) {
+	private void explode(Location loc, List<LivingEntity> mobs) {
 		if (mPlayer == null) {
 			return;
 		}
@@ -147,10 +166,8 @@ public class PredatorStrike extends Ability {
 		double damage = ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE));
 		damage *= Sharpshooter.getDamageMultiplier(mPlayer);
 
-		mCosmetic.strikeParticleExplode(mPlayer, loc, EXPLODE_RADIUS);
-		mCosmetic.strikeSoundExplode(world, mPlayer, loc);
+		mCosmetic.strikeExplode(world, mPlayer, loc, EXPLODE_RADIUS);
 
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, EXPLODE_RADIUS, mPlayer);
 		for (LivingEntity mob : mobs) {
 			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
 			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE, damage, mInfo.mLinkedSpell, true);

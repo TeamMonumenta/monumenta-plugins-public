@@ -73,14 +73,13 @@ public class Bezoar extends Ability {
 
 		new BukkitRunnable() {
 			int mT = 0;
-			final BlockData mFallingDustData = Material.LIME_CONCRETE.createBlockData();
 			@Override
 			public void run() {
 				if (mPlayer == null) {
 					return;
 				}
 				mT++;
-				new PartialParticle(Particle.FALLING_DUST, item.getLocation(), 1, 0.2, 0.2, 0.2, mFallingDustData).spawnAsPlayerActive(mPlayer);
+				mCosmetic.bezoarTick(mPlayer, item.getLocation(), mT);
 				for (Player p : PlayerUtils.playersInRange(item.getLocation(), 1, true)) {
 					if (p != mPlayer) {
 						applyEffects(p);
@@ -92,12 +91,7 @@ public class Bezoar extends Ability {
 					}
 
 					item.remove();
-
-					world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-					world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-					world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1f);
-					new PartialParticle(Particle.BLOCK_CRACK, item.getLocation(), 30, 0.15, 0.15, 0.15, 0.75F, Material.LIME_CONCRETE.createBlockData()).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.TOTEM, item.getLocation(), 20, 0, 0, 0, 0.35F).spawnAsPlayerActive(mPlayer);
+					mCosmetic.bezoarPickup(mPlayer, item.getLocation());
 
 					this.cancel();
 					break;

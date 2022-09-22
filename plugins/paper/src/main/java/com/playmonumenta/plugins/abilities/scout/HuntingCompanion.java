@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -26,7 +25,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -157,7 +155,19 @@ public class HuntingCompanion extends Ability {
 
 			mFox.setVelocity(facingDirection.clone().setY(JUMP_HEIGHT).normalize().multiply(VELOCITY));
 			mFox.teleport(mFox.getLocation().setDirection(facingDirection));
-			mCosmetic.foxOnSummon(world, loc);
+			mCosmetic.foxOnSummon(world, loc, mPlayer, mFox);
+
+			BukkitRunnable runnable = new BukkitRunnable() {
+
+				int mT = 0;
+				@Override
+				public void run() {
+					mT++;
+					mCosmetic.foxTick(mFox, mPlayer, mTarget, mT);
+				}
+
+			};
+			runnable.runTaskTimer(mPlugin, 0, 1);
 
 			new BukkitRunnable() {
 				int mTicksElapsed = 0;
@@ -166,13 +176,7 @@ public class HuntingCompanion extends Ability {
 					boolean isOutOfTime = mTicksElapsed >= DURATION;
 					if (isOutOfTime || mFox == null) {
 						if (isOutOfTime && mFox != null) {
-							Location foxLoc = mFox.getLocation();
-
-							world.playSound(foxLoc, Sound.ENTITY_FOX_SNIFF, 1.5f, 1.0f);
-							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
-							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
-							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.2f);
-							new PartialParticle(Particle.SMOKE_NORMAL, foxLoc, 20).spawnAsPlayerActive(mPlayer);
+							mCosmetic.foxDespawn(mPlayer, mFox);
 						}
 						if (mTarget != null) {
 							mTarget.removePotionEffect(PotionEffectType.GLOWING);
@@ -183,6 +187,7 @@ public class HuntingCompanion extends Ability {
 							mFox = null;
 						}
 						this.cancel();
+						runnable.cancel();
 						return;
 					}
 

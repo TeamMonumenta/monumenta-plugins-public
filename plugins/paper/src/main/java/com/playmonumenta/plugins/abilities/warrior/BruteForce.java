@@ -7,17 +7,16 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.BruteForceCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.*;
+
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
+import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class BruteForce extends Ability {
@@ -30,6 +29,9 @@ public class BruteForce extends Ability {
 	private double mMultiplier;
 
 	private final BruteForceCS mCosmetic;
+
+	private int mComboNumber = 0;
+	private BukkitRunnable mComboRunnable = null;
 
 	public BruteForce(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Brute Force");
@@ -52,7 +54,30 @@ public class BruteForce extends Ability {
 			event.setDamage(event.getDamage() + damageBonus);
 
 			Location loc = enemy.getLocation().add(0, 0.75, 0);
-			mCosmetic.bruteOnDamage(mPlayer, loc);
+			mCosmetic.bruteOnDamage(mPlayer, loc, mComboNumber);
+
+			if (mComboNumber == 0 || mComboRunnable != null) {
+				if (mComboRunnable != null) {
+					mComboRunnable.cancel();
+				}
+				mComboRunnable = new BukkitRunnable() {
+					@Override
+					public void run() {
+						mComboNumber = 0;
+						mComboRunnable = null;
+					}
+				};
+				mComboRunnable.runTaskLater(mPlugin, (long) ((1D / mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getValue()) * 20) + 15);
+			}
+			mComboNumber++;
+
+			if (mComboNumber >= 3) {
+				if (mComboRunnable != null) {
+					mComboRunnable.cancel();
+					mComboRunnable = null;
+				}
+				mComboNumber = 0;
+			}
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, BRUTE_FORCE_RADIUS, enemy)) {
 				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damageBonus, mInfo.mLinkedSpell, true);

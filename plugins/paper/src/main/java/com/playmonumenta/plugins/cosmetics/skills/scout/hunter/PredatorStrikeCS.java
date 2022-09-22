@@ -29,7 +29,7 @@ public class PredatorStrikeCS implements CosmeticSkill {
 		return Material.SPECTRAL_ARROW;
 	}
 
-	public void strikeParticleReady(Player mPlayer) {
+	public void strikeTick(Player mPlayer, int tick) {
 		new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation().add(0, 0.75, 0), 1, 0.25, 0, 0.25, 0).spawnAsPlayerActive(mPlayer);
 	}
 
@@ -37,22 +37,22 @@ public class PredatorStrikeCS implements CosmeticSkill {
 		new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLAME, bLoc, 2, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
 	}
-
-	public void strikeParticleExplode(Player mPlayer, Location loc, double radius) {
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 45, radius, radius, radius, 0.125).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.FLAME, loc, 12, radius, radius, radius, 0.1).spawnAsPlayerActive(mPlayer);
-	}
-
 	public void strikeSoundReady(World world, Player mPlayer) {
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, 1, 1.0f);
 	}
 
-	public void strikeSoundLaunch(World world, Player mPlayer) {
+	public void strikeLaunch(World world, Player mPlayer) {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 0.8f);
 	}
 
-	public void strikeSoundExplode(World world, Player mPlayer, Location loc) {
+	public void strikeExplode(World world, Player mPlayer, Location loc, double radius) {
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 45, radius, radius, radius, 0.125).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLAME, loc, 12, radius, radius, radius, 0.1).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.7f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.7f);
+	}
+
+	public void strikeImpact(Runnable runnable, Location l, Player mPlayer) {
+		runnable.run();
 	}
 }

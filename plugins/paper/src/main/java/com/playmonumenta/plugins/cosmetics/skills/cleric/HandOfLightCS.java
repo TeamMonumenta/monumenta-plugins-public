@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import org.bukkit.*;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class HandOfLightCS implements CosmeticSkill {
@@ -31,7 +32,7 @@ public class HandOfLightCS implements CosmeticSkill {
 		return Material.PINK_DYE;
 	}
 
-	public void lightHealEffect(Player mPlayer, Location loc) {
+	public void lightHealEffect(Player mPlayer, Location loc, Player mTarget) {
 		new PartialParticle(Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
 		mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
@@ -46,7 +47,7 @@ public class HandOfLightCS implements CosmeticSkill {
 		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
 	}
 
-	public void lightDamageEffect(Player mPlayer, Location loc) {
+	public void lightDamageEffect(Player mPlayer, Location loc, LivingEntity target) {
 		new PartialParticle(Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
 		mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 0.8f);

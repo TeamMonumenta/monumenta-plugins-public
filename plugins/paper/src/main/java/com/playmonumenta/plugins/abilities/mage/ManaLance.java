@@ -34,6 +34,8 @@ public class ManaLance extends Ability {
 	private static final int COOLDOWN_1 = 5 * 20;
 	private static final int COOLDOWN_2 = 3 * 20;
 
+	public static final int RANGE = 8;
+
 	private final ManaLanceCS mCosmetic;
 
 	public ManaLance(Plugin plugin, @Nullable Player player) {
@@ -67,15 +69,16 @@ public class ManaLance extends Ability {
 		World world = mPlayer.getWorld();
 
 		Location endLoc = loc;
-
-		for (int i = 0; i < 8; i++) {
+		int i = 0;
+		boolean hit = false;
+		while (i < RANGE) {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(world);
 			endLoc = bLoc;
 
 			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 				bLoc.subtract(dir.multiply(0.5));
-				mCosmetic.lanceHit(mPlayer, bLoc, world);
+				mCosmetic.lanceHitBlock(mPlayer, bLoc, world);
 				break;
 			}
 			Iterator<LivingEntity> iter = mobs.iterator();
@@ -85,11 +88,16 @@ public class ManaLance extends Ability {
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true);
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f, true);
 					iter.remove();
+					if (!hit) {
+						mCosmetic.lanceHit(bLoc, mPlayer);
+						hit = true;
+					}
 				}
 			}
+			i++;
 		}
 
-		mCosmetic.lanceParticle(mPlayer, loc, endLoc);
+		mCosmetic.lanceParticle(mPlayer, loc, endLoc, i);
 		mCosmetic.lanceSound(world, mPlayer);
 	}
 

@@ -8,13 +8,12 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-
 
 public class DivineJusticeCS implements CosmeticSkill {
 
@@ -48,7 +47,7 @@ public class DivineJusticeCS implements CosmeticSkill {
 		return HEAL_PITCH_OTHER;
 	}
 
-	public void justiceOnDamage(Player mPlayer, LivingEntity enemy, double widerWidthDelta) {
+	public void justiceOnDamage(Player mPlayer, LivingEntity enemy, double widerWidthDelta, int combo) {
 		PartialParticle partialParticle = new PartialParticle(
 			Particle.END_ROD,
 			LocationUtils.getHalfHeightLocation(enemy),
@@ -68,6 +67,10 @@ public class DivineJusticeCS implements CosmeticSkill {
 			0.15f,
 			1.5f
 		);
+	}
+
+	public void justiceKill(Player mPlayer, Location loc) {
+
 	}
 
 	public void justiceHealSound(List<Player> players, float pitch) {

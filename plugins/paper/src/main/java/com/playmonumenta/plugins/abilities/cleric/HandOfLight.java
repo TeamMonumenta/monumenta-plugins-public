@@ -39,8 +39,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class HandOfLight extends Ability {
 
-	private static final int HEALING_RADIUS = 12;
-	private static final int DAMAGE_RADIUS = 6;
+	public static final int HEALING_RADIUS = 12;
+	public static final int DAMAGE_RADIUS = 6;
 	private static final double HEALING_DOT_ANGLE = 0.33;
 	private static final int HEALING_1_COOLDOWN = 14 * 20;
 	private static final int HEALING_2_COOLDOWN = 10 * 20;
@@ -141,7 +141,7 @@ public class HandOfLight extends Ability {
 
 					Location loc = p.getLocation();
 					mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, 20 * 4, 1, true, true));
-					mCosmetic.lightHealEffect(mPlayer, loc);
+					mCosmetic.lightHealEffect(mPlayer, loc, p);
 				}
 
 				mCosmetic.lightHealCastEffect(world, userLoc, mPlugin, mPlayer, HEALING_RADIUS, HEALING_DOT_ANGLE);
@@ -160,7 +160,7 @@ public class HandOfLight extends Ability {
 					DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, true);
 
 					Location loc = mob.getLocation();
-					mCosmetic.lightDamageEffect(mPlayer, loc);
+					mCosmetic.lightDamageEffect(mPlayer, loc, mob);
 				}
 				mCosmetic.lightDamageCastEffect(world, userLoc, mPlugin, mPlayer, DAMAGE_RADIUS, HEALING_DOT_ANGLE);
 				putOnCooldown();

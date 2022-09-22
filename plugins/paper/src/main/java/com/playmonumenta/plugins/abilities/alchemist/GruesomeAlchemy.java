@@ -90,7 +90,7 @@ public class GruesomeAlchemy extends PotionAbility {
 		}
 
 		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && mAlchemistPotions != null) {
-			mCosmetic.particleOnSwap(mPlayer, mAlchemistPotions.isGruesomeMode());
+			mCosmetic.effectsOnSwap(mPlayer, mAlchemistPotions.isGruesomeMode());
 			mAlchemistPotions.swapMode(mCosmetic.getSwapBrewPitch());
 		}
 	}
@@ -99,7 +99,7 @@ public class GruesomeAlchemy extends PotionAbility {
 	@Override
 	public void cast(Action action) {
 		if (mPlayer != null && mAlchemicalArtillery != null && mAlchemistPotions != null && mAlchemicalArtillery.isActive() && ItemUtils.isBowOrTrident(mPlayer.getInventory().getItemInMainHand()) && !(mHasPanacea && mPlayer.isSneaking())) {
-			mCosmetic.particleOnSwap(mPlayer, mAlchemistPotions.isGruesomeMode());
+			mCosmetic.effectsOnSwap(mPlayer, mAlchemistPotions.isGruesomeMode());
 			mAlchemistPotions.swapMode(mCosmetic.getSwapBrewPitch());
 		}
 	}

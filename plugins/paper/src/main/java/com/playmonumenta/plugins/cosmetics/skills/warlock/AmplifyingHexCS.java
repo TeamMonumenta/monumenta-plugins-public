@@ -34,8 +34,16 @@ public class AmplifyingHexCS implements CosmeticSkill {
 		new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 	}
 
-	public void amplifyingSound(World world, Location soundLoc) {
+	public void amplifyingEffects(Player mPlayer, World world, Location soundLoc) {
 		world.playSound(soundLoc, Sound.ENTITY_BLAZE_DEATH, 1.0f, 0.7f);
 		world.playSound(soundLoc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.65f);
+	}
+
+	public double amplifyingAngle(double angle, double radius) {
+		return 0;
+	}
+
+	public double amplifyingHeight(double radius, double max) {
+		return 0;
 	}
 }
