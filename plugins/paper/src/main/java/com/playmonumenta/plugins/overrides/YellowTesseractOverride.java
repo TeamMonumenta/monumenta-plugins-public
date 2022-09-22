@@ -169,10 +169,107 @@ public class YellowTesseractOverride extends BaseOverride {
 	}
 
 	private void changeSkills(Player player, ItemStack item) {
+		if (!loadAbilityFromLore(player, item)) {
+			resetTesseract(player, item);
+		}
+
+		Location pLoc = player.getLocation();
+		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
+		new PartialParticle(Particle.FIREWORKS_SPARK, pLoc, 10, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 2.5f);
+		player.sendMessage(Component.text("The Tesseract of the Elements has swapped your class!", NamedTextColor.YELLOW));
+
+		if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5)) {
+			ScoreboardUtils.setScoreboardValue(player, "YellowCooldown", 5);
+		}
+	}
+
+	private static void storeSkills(Player player, ItemStack item) {
+		item.setItemMeta(generateAbilityLore(player, item));
+
+		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.SOULBOUND, 1, player.getUniqueId(), false);
+
+		ItemMeta meta = item.getItemMeta();
+		meta.displayName(CONFIGURED);
+		item.setItemMeta(meta);
+
+		Location pLoc = player.getLocation();
+		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
+		new PartialParticle(Particle.SNOWBALL, pLoc, 10, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, 1, 2.5f);
+
+		ItemStatUtils.generateItemStats(item);
+		ItemUtils.setPlainTag(item);
+	}
+
+	private static void clearTesseractLore(ItemStack item) {
+		NBTItem nbt = new NBTItem(item);
+		List<String> lore = ItemStatUtils.getPlainLore(nbt);
+
+		ItemStatUtils.removeInfusion(item, ItemStatUtils.InfusionType.SOULBOUND, false);
+		for (int i = lore.size() - 1; i >= 0; --i) {
+			String line = lore.get(i);
+			if (line.startsWith(CLASS_STR)
+				|| line.startsWith(SPEC_STR)
+				|| line.startsWith(CLASSL_STR)
+				|| line.startsWith(SPECL_STR)
+				|| line.startsWith(ENHANCE_STR)
+				|| line.startsWith(PREFIX)) {
+				ItemStatUtils.removeLore(item, i);
+			}
+		}
+
+		ItemStatUtils.generateItemStats(item);
+	}
+
+	// Returns an ItemMeta containing the lore based of Player's currently equipped skills.
+	public static ItemMeta generateAbilityLore(Player player, ItemStack item) {
+		// Prepare lore first.
+		Integer classLevel = ScoreboardUtils.getScoreboardValue(player, LEVEL).orElse(0);
+		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
+		Integer specLevel = ScoreboardUtils.getScoreboardValue(player, SPEC_LEVEL).orElse(0);
+		Integer totalSpec = ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
+		Integer enhanceLevel = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE).orElse(0);
+		Integer totalEnhance = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
+
+		NBTItem nbt = new NBTItem(item);
+		ItemStack copyItem = item.clone();
+		List<String> lore = ItemStatUtils.getPlainLore(nbt);
+		int newLoreIdx = lore.size();
+
+		if (InventoryUtils.testForItemWithLore(copyItem, CLASS_STR)) {
+			clearTesseractLore(copyItem);
+		}
+
+		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(CLASS_STR + AbilityUtils.getClass(player), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(CLASSL_STR + (totalLevel - classLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(SPEC_STR + AbilityUtils.getSpec(player), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(SPECL_STR + (totalSpec - specLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(ENHANCE_STR + (totalEnhance - enhanceLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+
+		AbilityCollection coll = AbilityManager.getManager().getPlayerAbilities(player);
+		if (coll != null) {
+			for (Ability ability : coll.getAbilitiesIgnoringSilence()) {
+				if (ability.getDisplayName() != null) {
+					ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(PREFIX + ability.getDisplayName() + " : " + ability.getAbilityScore(),
+						NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+				}
+			}
+		}
+
+		ItemStatUtils.generateItemStats(copyItem);
+		ItemUtils.setPlainTag(copyItem);
+
+		return copyItem.getItemMeta();
+	}
+
+	// Load abilities for player from Item Lore. Returns a boolean false if player had too many skills.\
+	// And Tesseract needs to be reset.
+	public static boolean loadAbilityFromLore(Player player, ItemStack item) {
 		ItemMeta meta = item.getItemMeta();
 		List<Component> lore = meta.lore();
 		if (lore == null) {
-			return;
+			return true;
 		}
 		Map<String, Integer> targetSkills = new HashMap<>();
 		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
@@ -263,93 +360,17 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		// If the Tesseract had too many skills, reset the player and the item.
 		if (totalSkillsAdded > totalLevel || totalSpecAdded > totalSpec || totalEnhancementsAdded > totalEnhancement) {
-			player.sendMessage(Component.text("The Tesseract of the Elements has too many skills!", NamedTextColor.RED));
-			resetTesseract(player, item);
+			player.sendMessage(Component.text(ItemUtils.getPlainName(item) + " has too many skills!", NamedTextColor.RED));
 			AbilityManager.getManager().resetPlayerAbilities(player);
 			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
-			return;
+			return false;
 		} else if (totalSkillsAdded < totalLevel || totalSpecAdded < totalSpec || totalEnhancementsAdded < totalEnhancement) {
 			player.sendMessage(Component.text("You have additional skill points to spend!", NamedTextColor.YELLOW));
 		}
+		player.sendMessage(Component.text(ItemUtils.getPlainName(item) + " has stored your skills!", NamedTextColor.YELLOW));
 
 		AbilityManager.getManager().updatePlayerAbilities(player, true);
 
-		Location pLoc = player.getLocation();
-		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
-		new PartialParticle(Particle.FIREWORKS_SPARK, pLoc, 10, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
-		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 2.5f);
-		player.sendMessage(Component.text("The Tesseract of the Elements has swapped your class!", NamedTextColor.YELLOW));
-
-		if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5)) {
-			ScoreboardUtils.setScoreboardValue(player, "YellowCooldown", 5);
-		}
-	}
-
-	private void storeSkills(Player player, ItemStack item) {
-		Integer classLevel = ScoreboardUtils.getScoreboardValue(player, LEVEL).orElse(0);
-		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
-		Integer specLevel = ScoreboardUtils.getScoreboardValue(player, SPEC_LEVEL).orElse(0);
-		Integer totalSpec = ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
-		Integer enhanceLevel = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE).orElse(0);
-		Integer totalEnhance = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
-
-		if (InventoryUtils.testForItemWithLore(item, CLASS_STR)) {
-			clearTesseractLore(item);
-		}
-
-		NBTItem nbt = new NBTItem(item);
-		List<String> lore = ItemStatUtils.getPlainLore(nbt);
-		int newLoreIdx = lore.size();
-
-		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(CLASS_STR + AbilityUtils.getClass(player), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(CLASSL_STR + (totalLevel - classLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(SPEC_STR + AbilityUtils.getSpec(player), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(SPECL_STR + (totalSpec - specLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(ENHANCE_STR + (totalEnhance - enhanceLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-
-		AbilityCollection coll = AbilityManager.getManager().getPlayerAbilities(player);
-		if (coll != null) {
-			for (Ability ability : coll.getAbilitiesIgnoringSilence()) {
-				if (ability.getDisplayName() != null) {
-					ItemStatUtils.addLore(item, newLoreIdx++, Component.text(PREFIX + ability.getDisplayName() + " : " + ability.getAbilityScore(),
-					                                                         NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-				}
-			}
-		}
-
-		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.SOULBOUND, 1, player.getUniqueId(), false);
-
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(CONFIGURED);
-		item.setItemMeta(meta);
-
-		Location pLoc = player.getLocation();
-		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
-		new PartialParticle(Particle.SNOWBALL, pLoc, 10, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
-		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, 1, 2.5f);
-		player.sendMessage(Component.text("The Tesseract of the Elements has stored your skills!", NamedTextColor.YELLOW));
-
-		ItemStatUtils.generateItemStats(item);
-		ItemUtils.setPlainTag(item);
-	}
-
-	private void clearTesseractLore(ItemStack item) {
-		NBTItem nbt = new NBTItem(item);
-		List<String> lore = ItemStatUtils.getPlainLore(nbt);
-
-		ItemStatUtils.removeInfusion(item, ItemStatUtils.InfusionType.SOULBOUND, false);
-		for (int i = lore.size() - 1; i >= 0; --i) {
-			String line = lore.get(i);
-			if (line.startsWith(CLASS_STR)
-				|| line.startsWith(SPEC_STR)
-				|| line.startsWith(CLASSL_STR)
-				|| line.startsWith(SPECL_STR)
-				|| line.startsWith(ENHANCE_STR)
-				|| line.startsWith(PREFIX)) {
-				ItemStatUtils.removeLore(item, i);
-			}
-		}
-
-		ItemStatUtils.generateItemStats(item);
+		return true;
 	}
 }

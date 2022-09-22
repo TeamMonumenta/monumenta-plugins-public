@@ -5,22 +5,29 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
+import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,10 +49,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class ShulkerEquipmentListener implements Listener {
 	private static final String LOCK_STRING = "AdminEquipmentTool";
+	private static final String CHARM_STRING = "CharmLockBox";
+	private static final String PORTAL_EPIC_STRING = "PortalEpicBox";
 
 	private static final ImmutableMap<Integer, Integer> SWAP_SLOTS = ImmutableMap.<Integer, Integer>builder()
 		.put(0, 0)
@@ -64,9 +74,20 @@ public class ShulkerEquipmentListener implements Listener {
 		.put(40, 13)
 		.build();
 
+	private static final ImmutableMap<Integer, Integer> CHARM_SLOTS = ImmutableMap.<Integer, Integer>builder()
+		.put(0, 18)
+		.put(1, 19)
+		.put(2, 20)
+		.put(3, 21)
+		.put(4, 22)
+		.put(5, 23)
+		.put(6, 24)
+		.build();
+
 
 	private final Plugin mPlugin;
-	private final Map<UUID, BukkitRunnable> mCooldowns = new HashMap<>();
+	private final Map<UUID, BukkitRunnable> mLockBoxCooldowns = new HashMap<>();
+	private final Map<UUID, BukkitRunnable> mCharmBoxCooldowns = new HashMap<>();
 
 	public ShulkerEquipmentListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -76,26 +97,26 @@ public class ShulkerEquipmentListener implements Listener {
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (
 			// Must be a right click
-				event.getClick() == null ||
-					!event.getClick().equals(ClickType.RIGHT) ||
-					// Must be placing a single block
-					event.getAction() == null ||
-					!event.getAction().equals(InventoryAction.PICKUP_HALF) ||
-					// Must be a player interacting with their main inventory
-					event.getWhoClicked() == null ||
-					!(event.getWhoClicked() instanceof Player player) ||
-					event.getClickedInventory() == null ||
-					// If it's a player inventory, must be in main inventory
-					// https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
-					(event.getClickedInventory() instanceof PlayerInventory && (event.getSlot() < 9 || event.getSlot() > 35)) ||
-					// Must be a player inventory, ender chest, or regular chest
-					!(event.getClickedInventory() instanceof PlayerInventory ||
-						  event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST) ||
-						  event.getClickedInventory().getType().equals(InventoryType.CHEST)) ||
-					// Must be a click on a shulker box with an empty hand
-					(event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
-					event.getCurrentItem() == null ||
-					!ItemUtils.isShulkerBox(event.getCurrentItem().getType())
+			event.getClick() == null ||
+				!event.getClick().equals(ClickType.RIGHT) ||
+				// Must be placing a single block
+				event.getAction() == null ||
+				!event.getAction().equals(InventoryAction.PICKUP_HALF) ||
+				// Must be a player interacting with their main inventory
+				event.getWhoClicked() == null ||
+				!(event.getWhoClicked() instanceof Player player) ||
+				event.getClickedInventory() == null ||
+				// If it's a player inventory, must be in main inventory
+				// https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
+				(event.getClickedInventory() instanceof PlayerInventory && (event.getSlot() < 9 || event.getSlot() > 35)) ||
+				// Must be a player inventory, ender chest, or regular chest
+				!(event.getClickedInventory() instanceof PlayerInventory ||
+					event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST) ||
+					event.getClickedInventory().getType().equals(InventoryType.CHEST)) ||
+				// Must be a click on a shulker box with an empty hand
+				(event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
+				event.getCurrentItem() == null ||
+				!ItemUtils.isShulkerBox(event.getCurrentItem().getType())
 		) {
 			// Nope!
 			return;
@@ -108,13 +129,13 @@ public class ShulkerEquipmentListener implements Listener {
 		}
 
 		if (player.getLocation().getY() < player.getWorld().getMinHeight()) {
-			player.sendMessage(ChatColor.RED + "You can't use Lockboxes in the void");
+			player.sendMessage(ChatColor.RED + "You can't use this in the void");
 			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
 			return;
 		}
 
 		if (EntityUtils.touchesLava(player)) {
-			player.sendMessage(ChatColor.RED + "You can't use Lockboxes in lava");
+			player.sendMessage(ChatColor.RED + "You can't use this in lava");
 			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
 			return;
 		}
@@ -127,21 +148,21 @@ public class ShulkerEquipmentListener implements Listener {
 				if (sbox.isLocked() && sbox.getLock().equals(LOCK_STRING)) {
 
 					//if on cooldown don't swap
-					if (checkSwapCooldown(player)) {
+					if (checkLockboxSwapCooldown(player)) {
 						player.sendMessage(ChatColor.RED + "Lockbox still on cooldown!");
 						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						event.setCancelled(true);
 						return;
 					}
 
-					swap(player, pInv, sbox);
+					swapEquipment(player, pInv, sbox);
 
 					//check if swapped in radius of boss
 					Location loc = player.getLocation();
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 24)) {
 						if (mob.getScoreboardTags().contains("Boss") && !mob.getScoreboardTags().contains(TrainingDummyBoss.identityTag)) {
 							player.sendMessage(ChatColor.RED + "Close to boss - Lockbox on 15s cooldown!");
-							setSwapCooldown(player);
+							setLockboxSwapCooldown(player);
 						}
 					}
 
@@ -157,6 +178,75 @@ public class ShulkerEquipmentListener implements Listener {
 						itemStatsMap.get(player.getUniqueId()).updateStats(player, true);
 					}
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
+				} else if (sbox.isLocked() && sbox.getLock().equals(CHARM_STRING)) {
+					//if on cooldown don't swap
+					if (checkCharmSwapCooldown(player)) {
+						player.sendMessage(ChatColor.RED + "Charm Box still on cooldown!");
+						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						event.setCancelled(true);
+						return;
+					}
+
+					swapCharms(player, sbox);
+
+					//check if swapped in radius of boss
+					Location loc = player.getLocation();
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 24)) {
+						if (mob.getScoreboardTags().contains("Boss") && !mob.getScoreboardTags().contains(TrainingDummyBoss.identityTag)) {
+							player.sendMessage(ChatColor.RED + "Close to boss - Charm Box on 15s cooldown!");
+							setCharmSwapCooldown(player);
+						}
+					}
+
+					sMeta.setBlockState(sbox);
+					sboxItem.setItemMeta(sMeta);
+
+					if (CharmManager.getInstance().mPlayerCharms.get(player.getUniqueId()) != null) {
+						CharmManager.getInstance().updateCharms(player, CharmManager.getInstance().mPlayerCharms.get(player.getUniqueId()));
+					}
+					event.setCancelled(true);
+				} else if (sbox.isLocked() && sbox.getLock().equals(PORTAL_EPIC_STRING)) {
+					// Shares with Yellow Tesseract Cooldown: Because I am lazy to setup a new cooldown timer thing.
+					boolean safeZone = ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5);
+					int cd = ScoreboardUtils.getScoreboardValue(player, "YellowCooldown").orElse(0);
+					// If the player is in a safezone and the Tesseract is on CD, remove CD and continue.
+					if (safeZone && cd > 0) {
+						ScoreboardUtils.setScoreboardValue(player, "YellowCooldown", 0);
+						cd = 0;
+					}
+
+					// If the CD hasn't hit 0, tell the player and exit.
+					if (cd != 0) {
+						player.sendMessage(Component.text("The Omni Lockbox is on cooldown!", NamedTextColor.RED));
+						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						event.setCancelled(true);
+						return;
+					}
+
+					// Swap Skills, Equipment, Charms
+					swapEquipment(player, pInv, sbox);
+					swapCharms(player, sbox);
+
+					sMeta.setBlockState(sbox);
+					sboxItem.setItemMeta(sMeta);
+
+					swapSkills(player, sboxItem);
+					swapVanity(player, sboxItem);
+
+					player.updateInventory();
+					if (CharmManager.getInstance().mPlayerCharms.get(player.getUniqueId()) != null) {
+						CharmManager.getInstance().updateCharms(player, CharmManager.getInstance().mPlayerCharms.get(player.getUniqueId()));
+					}
+					event.setCancelled(true);
+					Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = mPlugin.mItemStatManager.getPlayerItemStatsMappings();
+					if (itemStatsMap.containsKey(player.getUniqueId())) {
+						itemStatsMap.get(player.getUniqueId()).updateStats(player, true);
+					}
+					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
+
+					if (!ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5)) {
+						ScoreboardUtils.setScoreboardValue(player, "YellowCooldown", 3);
+					}
 				}
 			}
 		}
@@ -164,7 +254,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void blockDispenseEvent(BlockDispenseEvent event) {
-		if (isEquipmentBox(event.getItem())) {
+		if (isEquipmentBox(event.getItem()) || isCharmBox(event.getItem())) {
 			event.setCancelled(true);
 		}
 	}
@@ -173,7 +263,20 @@ public class ShulkerEquipmentListener implements Listener {
 		if (sboxItem != null && ItemUtils.isShulkerBox(sboxItem.getType()) && sboxItem.hasItemMeta()) {
 			if (sboxItem.getItemMeta() instanceof BlockStateMeta sMeta) {
 				if (sMeta.getBlockState() instanceof ShulkerBox sbox) {
-					if (sbox.isLocked() && sbox.getLock().equals(LOCK_STRING)) {
+					if (sbox.isLocked() && (sbox.getLock().equals(LOCK_STRING) || sbox.getLock().equals(PORTAL_EPIC_STRING))) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean isCharmBox(@Nullable ItemStack sboxItem) {
+		if (sboxItem != null && ItemUtils.isShulkerBox(sboxItem.getType()) && sboxItem.hasItemMeta()) {
+			if (sboxItem.getItemMeta() instanceof BlockStateMeta sMeta) {
+				if (sMeta.getBlockState() instanceof ShulkerBox sbox) {
+					if (sbox.isLocked() && (sbox.getLock().equals(CHARM_STRING) || sbox.getLock().equals(PORTAL_EPIC_STRING))) {
 						return true;
 					}
 				}
@@ -187,7 +290,7 @@ public class ShulkerEquipmentListener implements Listener {
 	}
 
 	@SuppressWarnings("PMD.EmptyIfStmt")
-	private void swap(Player player, PlayerInventory pInv, ShulkerBox sbox) {
+	private void swapEquipment(Player player, PlayerInventory pInv, ShulkerBox sbox) {
 		/* Prevent swapping/nesting shulkers */
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
 			ItemStack item = pInv.getItem(slot.getKey());
@@ -258,9 +361,57 @@ public class ShulkerEquipmentListener implements Listener {
 		}
 	}
 
+	private void swapCharms(Player player, ShulkerBox shulkerBox) {
+		List<ItemStack> charmInventory = CharmManager.getInstance().mPlayerCharms.get(player.getUniqueId());
+		List<ItemStack> tempInventory = new ArrayList<>();
+		if (charmInventory != null) {
+			for (ItemStack itemStack : charmInventory) {
+				ItemStack charmCopy = new ItemStack(itemStack);
+				tempInventory.add(charmCopy);
+			}
+
+			charmInventory.clear();
+		}
+		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Charms Swapped");
+		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.0f, 2.0f);
+
+		for (Map.Entry<Integer, Integer> slot : CHARM_SLOTS.entrySet()) {
+			int charmSlot = slot.getKey();
+			int sBoxSlot = slot.getValue();
+
+			if (shulkerBox.getInventory().getItem(sBoxSlot) != null) {
+				ItemStack shulkerBoxCharm = shulkerBox.getInventory().getItem(sBoxSlot);
+				if (CharmManager.getInstance().validateCharm(player, shulkerBoxCharm)) {
+					// If can equip charm, equip.
+					CharmManager.getInstance().addCharm(player, shulkerBoxCharm);
+				} else {
+					player.sendMessage(ChatColor.RED + "Failed to equip charm " + ItemUtils.getPlainName(shulkerBoxCharm) + ", it has been re-added to your inventory.");
+					InventoryUtils.giveItem(player, shulkerBoxCharm);
+				}
+			}
+
+			if (charmSlot < tempInventory.size()) {
+				shulkerBox.getInventory().setItem(sBoxSlot, tempInventory.get(charmSlot));
+			} else {
+				shulkerBox.getInventory().clear(sBoxSlot);
+			}
+		}
+	}
+
+	private void swapSkills(Player player, ItemStack item) {
+		ItemMeta itemMeta = YellowTesseractOverride.generateAbilityLore(player, item);
+		YellowTesseractOverride.loadAbilityFromLore(player, item);
+
+		// Set new lore
+		item.setItemMeta(itemMeta);
+
+		ItemStatUtils.generateItemStats(item);
+		ItemUtils.setPlainTag(item);
+	}
+
 	//Set cooldown after swapping in RADIUS 24 blocks of boss
-	private void setSwapCooldown(Player player) {
-		BukkitRunnable runnable = mCooldowns.remove(player.getUniqueId());
+	private void setLockboxSwapCooldown(Player player) {
+		BukkitRunnable runnable = mLockBoxCooldowns.remove(player.getUniqueId());
 		if (runnable != null) {
 			runnable.cancel();
 		}
@@ -268,17 +419,37 @@ public class ShulkerEquipmentListener implements Listener {
 			@Override
 			public void run() {
 				//Don't need to put anything here - method checks if BukkitRunnable is active
-				mCooldowns.remove(player.getUniqueId());
+				mLockBoxCooldowns.remove(player.getUniqueId());
 			}
 		};
 		runnable.runTaskLater(mPlugin, 20 * 15); //15s cooldown
-		mCooldowns.put(player.getUniqueId(), runnable);
+		mLockBoxCooldowns.put(player.getUniqueId(), runnable);
+	}
+
+	private void setCharmSwapCooldown(Player player) {
+		BukkitRunnable runnable = mCharmBoxCooldowns.remove(player.getUniqueId());
+		if (runnable != null) {
+			runnable.cancel();
+		}
+		runnable = new BukkitRunnable() {
+			@Override
+			public void run() {
+				//Don't need to put anything here - method checks if BukkitRunnable is active
+				mCharmBoxCooldowns.remove(player.getUniqueId());
+			}
+		};
+		runnable.runTaskLater(mPlugin, 20 * 15); //15s cooldown
+		mCharmBoxCooldowns.put(player.getUniqueId(), runnable);
 	}
 
 	//Returns true if cooldown is up right now
 	//False if no cooldowns and the lockbox is activatable now
-	private boolean checkSwapCooldown(Player player) {
-		return mCooldowns.containsKey(player.getUniqueId()) && !mCooldowns.get(player.getUniqueId()).isCancelled();
+	private boolean checkLockboxSwapCooldown(Player player) {
+		return mLockBoxCooldowns.containsKey(player.getUniqueId()) && !mLockBoxCooldowns.get(player.getUniqueId()).isCancelled();
+	}
+
+	private boolean checkCharmSwapCooldown(Player player) {
+		return mCharmBoxCooldowns.containsKey(player.getUniqueId()) && !mCharmBoxCooldowns.get(player.getUniqueId()).isCancelled();
 	}
 
 	public static boolean isPotionInjectorItem(ItemStack item) {
