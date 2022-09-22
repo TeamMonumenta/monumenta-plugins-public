@@ -32,7 +32,7 @@ public class DelveCustomInventory extends CustomInventory {
 	private static final ItemStack REMOVE_ALL_MOD_ITEM = getResetModifiers();
 	private static final ItemStack STARTING_ITEM = new ItemStack(Material.OBSERVER);
 	private static final ItemStack STARTING_ITEM_NOT_ENOUGH_POINTS = new ItemStack(Material.OBSERVER);
-	private static final ItemStack ROTATING_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(Material.MAGENTA_GLAZED_TERRACOTTA, Component.text("Rotating Modifier", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), "One of these modifiers is randomly available each week.");
+	private static final ItemStack ROTATING_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(Material.MAGENTA_GLAZED_TERRACOTTA, Component.text("Rotating Modifier", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), "Some of these modifiers are randomly available each week.");
 	private static final Map<String, String> DUNGEON_FUNCTION_MAPPINGS = new HashMap<>();
 
 	static {
@@ -130,7 +130,7 @@ public class DelveCustomInventory extends CustomInventory {
 		}
 		// Ignore old entropy point so the count doesn't stack. Also, only count up to how many delve points can still be randomly assigned.
 		int entropy = Entropy.getDepthPointsAssigned(mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0)) - Entropy.getDepthPointsAssigned(mIgnoreOldEntropyPoint);
-		int entropyAssignablePoints = mods.stream().filter(mod -> mod != DelvesModifier.ENTROPY)
+		int entropyAssignablePoints = DelvesModifier.entropyAssignable().stream()
 			.mapToInt(mod -> DelvesUtils.getMaxPointAssignable(mod, 1000) - mPointSelected.getOrDefault(mod, 0))
 			.sum();
 		mTotalPoint += Math.min(entropy, entropyAssignablePoints);

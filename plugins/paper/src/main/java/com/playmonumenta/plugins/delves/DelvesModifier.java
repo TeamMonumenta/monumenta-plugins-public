@@ -141,6 +141,15 @@ public enum DelvesModifier {
 		return new ArrayList<>(ROTATING_DELVE_MODIFIERS);
 	}
 
+	public static List<DelvesModifier> entropyAssignable() {
+		List<DelvesModifier> mods = valuesList();
+		mods.remove(ENTROPY);
+		mods.remove(TWISTED);
+		mods.remove(FRAGILE);
+		mods.removeAll(ROTATING_DELVE_MODIFIERS);
+		return mods;
+	}
+
 	public static @Nullable DelvesModifier fromIndex(int index) {
 		if (index < 1 || index > values().length) {
 			return null;

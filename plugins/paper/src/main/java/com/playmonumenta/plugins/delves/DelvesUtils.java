@@ -84,7 +84,10 @@ public class DelvesUtils {
 
 		int maxDepthPoints = 0;
 		for (Map.Entry<DelvesModifier, Integer> entry : MODIFIER_RANK_CAPS.entrySet()) {
-			maxDepthPoints += entry.getValue() * entry.getKey().getPointsPerLevel();
+			if (!DelvesModifier.rotatingDelveModifiers().contains(entry.getKey())
+				|| getWeeklyRotatingModifier().contains(entry.getKey())) {
+				maxDepthPoints += entry.getValue() * entry.getKey().getPointsPerLevel();
+			}
 		}
 
 		MAX_DEPTH_POINTS = maxDepthPoints;
