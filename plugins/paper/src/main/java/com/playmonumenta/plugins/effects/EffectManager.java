@@ -571,6 +571,9 @@ public final class EffectManager implements Listener {
 		String[] keys = {EffectPriority.EARLY.name(), EffectPriority.NORMAL.name(), EffectPriority.LATE.name()};
 
 		for (String priority : keys) {
+			if (object.get(priority) == null) {
+				continue;
+			}
 			JsonObject priorityEffect = object.get(priority).getAsJsonObject();
 
 			JsonArray sourceList = priorityEffect.get("source").getAsJsonArray();
