@@ -33,8 +33,8 @@ public class FrostNova extends Ability {
 	public static final String NAME = "Frost Nova";
 	public static final ClassAbility ABILITY = ClassAbility.FROST_NOVA;
 
-	public static final int DAMAGE_1 = 4;
-	public static final int DAMAGE_2 = 8;
+	public static final int DAMAGE_1 = 5;
+	public static final int DAMAGE_2 = 10;
 	public static final int SIZE = 6;
 	public static final double SLOW_MULTIPLIER_1 = 0.2;
 	public static final double SLOW_MULTIPLIER_2 = 0.4;

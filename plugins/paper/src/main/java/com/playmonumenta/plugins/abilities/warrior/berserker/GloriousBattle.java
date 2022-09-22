@@ -45,7 +45,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	private static final float KNOCK_AWAY_SPEED = 0.4f;
 	private static final String KBR_EFFECT = "GloriousBattleKnockbackResistanceEffect";
 	private static final double DAMAGE_PER = 0.05;
-	private static final int MAX_TARGETING = 6;
+	private static final int MAX_TARGETING = 4;
 	private static final double TARGET_RANGE = 8;
 
 	private static final EnumSet<ClassAbility> AFFECTED_ABILITIES = EnumSet.of(
@@ -77,7 +77,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		mInfo.mShorthandName = "GB";
 		mInfo.mDescriptions.add("Dealing indirect damage with an ability grants you a Glorious Battle stack. Shift and swap hands to consume a stack and charge forwards, gaining full knockback resistance until landing. When you land, deal " + DAMAGE_1 + " damage to the nearest mob within 3 blocks and " +
 				"apply " + (int) DepthsUtils.roundPercent(BLEED_PERCENT) + "% bleed for " + (BLEED_TIME / 20) + " seconds. Additionally, knock back all mobs within 3 blocks.");
-		mInfo.mDescriptions.add("Damage increased to 25. Additionally, you now passively gain 5% melee damage for each mob targeting you within 8 blocks, up to 6 mobs.");
+		mInfo.mDescriptions.add("Damage increased to 25. Additionally, you now passively gain 5% melee damage for each mob targeting you within 8 blocks, up to 4 mobs.");
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mStacks = 0;
@@ -94,8 +94,8 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 
 		mStacks--;
 		Vector dir = mPlayer.getLocation().getDirection();
-		dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1.4));
-		dir.setY(dir.getY() * 0.5 + 0.4);
+		dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1.05));
+		dir.setY(dir.getY() * 0.4 + 0.3);
 		mPlayer.setVelocity(dir);
 		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT, new PercentKnockbackResist(200, 1, KBR_EFFECT));
 		ClientModHandler.updateAbility(mPlayer, this);

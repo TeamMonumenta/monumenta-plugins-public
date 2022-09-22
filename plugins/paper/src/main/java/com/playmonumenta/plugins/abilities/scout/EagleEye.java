@@ -38,7 +38,7 @@ public class EagleEye extends Ability {
 	private static final double EAGLE_EYE_1_VULN_LEVEL = 0.2;
 	private static final double EAGLE_EYE_2_VULN_LEVEL = 0.35;
 	private static final int EAGLE_EYE_RADIUS = 20;
-	private static final double ENHANCEMENT_DAMAGE_PERCENT = 0.3;
+	private static final double ENHANCEMENT_DAMAGE_PERCENT = 0.15;
 
 	public static final String CHARM_DURATION = "Eagle Eye Duration";
 	public static final String CHARM_COOLDOWN = "Eagle Eye Cooldown";

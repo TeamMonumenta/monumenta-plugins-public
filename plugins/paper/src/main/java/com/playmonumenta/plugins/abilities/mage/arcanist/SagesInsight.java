@@ -30,8 +30,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DECAY_TIMER = 20 * 4;
-	private static final int MAX_STACKS = 6;
-	private static final int SPEED_DURATION = 8 * 20;
+	private static final int MAX_STACKS = 7;
+	private static final int SPEED_DURATION = 5 * 20;
 	private static final int ABILITIES_COUNT_1 = 1;
 	private static final int ABILITIES_COUNT_2 = 2;
 	private static final String ATTR_NAME = "SagesExtraSpeedAttr";

@@ -54,9 +54,7 @@ public class ThunderStep extends Ability {
 	public static final int DISTANCE_1 = 8;
 	public static final int DISTANCE_2 = 10;
 	public static final double CHECK_INCREMENT = 0.1;
-	public static final double STUN_SECONDS = 0.5;
-	public static final int STUN_TICKS = (int) (STUN_SECONDS * 20);
-	public static final int COOLDOWN_SECONDS = 22;
+	public static final int COOLDOWN_SECONDS = 20;
 	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
 
 	public static final double BACK_TELEPORT_MAX_DISTANCE = 64;
@@ -65,14 +63,12 @@ public class ThunderStep extends Ability {
 	public static final int ENHANCEMENT_PARALYZE_DURATION = 5 * 20;
 
 	public static final String CHARM_DAMAGE = "Thunder Step Damage";
-	public static final String CHARM_STUN = "Thunder Step Stun Duration";
 	public static final String CHARM_COOLDOWN = "Thunder Step Cooldown";
 	public static final String CHARM_SIZE = "Thunder Step Effect Size";
 	public static final String CHARM_DISTANCE = "Thunder Step Distance";
 
 	private final float mLevelDamage;
 	private final int mLevelDistance;
-	private final boolean mDoStun;
 
 	private int mLastCastTick = -1;
 	private @Nullable Location mLastCastLocation = null;
@@ -98,8 +94,7 @@ public class ThunderStep extends Ability {
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"The thunder attacks now also stun all non-boss enemies for %ss. Damage is increased from %s to %s. Teleport range is increased from %s to %s blocks.",
-				STUN_SECONDS,
+				"Damage is increased from %s to %s. Teleport range is increased from %s to %s blocks.",
 				DAMAGE_1,
 				DAMAGE_2,
 				DISTANCE_1,
@@ -120,7 +115,6 @@ public class ThunderStep extends Ability {
 
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mLevelDistance = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
-		mDoStun = isLevelTwo();
 	}
 
 	/* NOTE
@@ -225,10 +219,6 @@ public class ThunderStep extends Ability {
 				DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, spellDamage, ABILITY, true);
 			}
 
-			if (mDoStun && !EntityUtils.isBoss(enemy)) {
-				int charmStunTicks = CharmManager.getExtraDuration(mPlayer, CHARM_STUN);
-				EntityUtils.applyStun(mPlugin, STUN_TICKS + charmStunTicks, enemy);
-			}
 			if (enhancementParalyze && !EntityUtils.isBoss(enemy)) {
 				EntityUtils.paralyze(mPlugin, ENHANCEMENT_PARALYZE_DURATION, enemy);
 			}

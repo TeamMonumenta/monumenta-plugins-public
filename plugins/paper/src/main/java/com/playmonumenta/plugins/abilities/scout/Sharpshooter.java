@@ -28,7 +28,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 5;
 	private static final int MAX_STACKS = 8;
 	private static final double PERCENT_DAMAGE_PER_STACK = 0.04;
-	private static final double DAMAGE_PER_BLOCK = 0.02;
+	private static final double DAMAGE_PER_BLOCK = 0.015;
 	private static final double MAX_DISTANCE = 16;
 	private static final double ARROW_SAVE_CHANCE = 0.2;
 
@@ -47,7 +47,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		mInfo.mDescriptions.add(String.format("Your arrows deal %d%% more damage.", (int)(PERCENT_BASE_DAMAGE * 100)));
 		mInfo.mDescriptions.add(String.format("Each enemy hit with a critical arrow or trident gives you a stack of Sharpshooter, up to %d. Stacks decay after %d seconds of not gaining a stack. Each stack makes your arrows and tridents deal an additional +%d%% damage. Additionally, passively gain a %d%% chance to not consume arrows when shot.",
 			MAX_STACKS, SHARPSHOOTER_DECAY_TIMER / 20, (int)(PERCENT_DAMAGE_PER_STACK * 100), (int)(ARROW_SAVE_CHANCE * 100)));
-		mInfo.mDescriptions.add(String.format("Your arrows and tridents deal an extra %d%% per block of distance between you and the target, up to %s blocks.", (int)(DAMAGE_PER_BLOCK * 100), (int)MAX_DISTANCE));
+		mInfo.mDescriptions.add(String.format("Your arrows and tridents deal an extra %s%% per block of distance between you and the target, up to %s blocks.", DAMAGE_PER_BLOCK * 100, (int)MAX_DISTANCE));
 		mDisplayItem = new ItemStack(Material.TARGET, 1);
 
 		mMaxStacks = MAX_STACKS + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);

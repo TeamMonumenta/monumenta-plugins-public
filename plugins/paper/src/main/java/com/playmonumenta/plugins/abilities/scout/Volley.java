@@ -39,7 +39,6 @@ public class Volley extends Ability {
 	private static final int VOLLEY_2_ARROW_COUNT = 11;
 	private static final double VOLLEY_1_DAMAGE_MULTIPLIER = 1.3;
 	private static final double VOLLEY_2_DAMAGE_MULTIPLIER = 1.5;
-	private static final double ENHANCEMENT_DAMAGE_MULTIPLIER = 1.1;
 	private static final double ENHANCEMENT_BLEED_POTENCY = 0.1;
 	private static final int ENHANCEMENT_BLEED_DURATION = 4 * 20;
 	public Set<Projectile> mVolley;
@@ -62,7 +61,7 @@ public class Volley extends Ability {
 		mInfo.mShorthandName = "Vly";
 		mInfo.mDescriptions.add(String.format("When you shoot an arrow or trident while sneaking, you shoot a volley consisting of %d projectiles instead. Only one arrow is consumed, and each projectile deals %d%% bonus damage. Cooldown: 15s.", VOLLEY_1_ARROW_COUNT, (int)((VOLLEY_1_DAMAGE_MULTIPLIER - 1) * 100)));
 		mInfo.mDescriptions.add(String.format("Increases the number of projectiles to %d and enhances the bonus damage to %d%%.", VOLLEY_2_ARROW_COUNT, (int)((VOLLEY_2_DAMAGE_MULTIPLIER - 1) * 100)));
-		mInfo.mDescriptions.add(String.format("Volley now fires in a 360 degree arc. The projectiles deal %d%% more damage and inflict %d%% Bleed for %ds.", (int) (100 * (ENHANCEMENT_DAMAGE_MULTIPLIER - 1)), (int)(ENHANCEMENT_BLEED_POTENCY * 100), ENHANCEMENT_BLEED_DURATION / 20));
+		mInfo.mDescriptions.add(String.format("Volley now fires in a 360 degree arc. The projectiles inflict %d%% Bleed for %ds.", (int)(ENHANCEMENT_BLEED_POTENCY * 100), ENHANCEMENT_BLEED_DURATION / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, VOLLEY_COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.ARROW, 1);
@@ -121,7 +120,7 @@ public class Volley extends Ability {
 				if (!isEnhanced()) {
 					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows, arrowSpeed, 5, projectile.getClass());
 				} else {
-					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows * 6, arrowSpeed, 360.0 / (mArrows * 6), projectile.getClass());
+					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows * 5, arrowSpeed, 360.0 / (mArrows * 5), projectile.getClass());
 				}
 
 				int piercing = (projectile instanceof Arrow arrow) ? arrow.getPierceLevel() + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING) : 0;
@@ -164,9 +163,6 @@ public class Volley extends Ability {
 		if (event.getType() == DamageType.PROJECTILE && mVolley.contains(proj)) {
 			if (notBeenHit(enemy)) {
 				double damage = event.getDamage() * mMultiplier * (1 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE));
-				if (isEnhanced()) {
-					damage *= ENHANCEMENT_DAMAGE_MULTIPLIER;
-				}
 				event.setDamage(damage);
 				if (isEnhanced()) {
 					EntityUtils.applyBleed(mPlugin, ENHANCEMENT_BLEED_DURATION, ENHANCEMENT_BLEED_POTENCY, enemy);
