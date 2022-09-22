@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.skills;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsGUI;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
@@ -519,6 +520,11 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		CosmeticSkill skill = CosmeticSkills.getCosmeticSkill(skin);
 		List<String> desc = new ArrayList<>();
 		desc.add("Cosmetic " + skill.getAbilityName().getName());
+		Cosmetic cosmetic = CosmeticSkills.getCosmeticByName(skin);
+		String[] extraLore = new String[0];
+		if (cosmetic != null && cosmetic.getDescription() != null) {
+			extraLore = cosmetic.getDescription();
+		}
 		if (CosmeticsManager.getInstance().playerHasCosmetic(player, CosmeticType.COSMETIC_SKILL, skill.getCosmetic().getName())) {
 			// attach
 			desc.add("Owned");
@@ -527,10 +533,10 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			desc.addAll(price);
 		}
 		return createBasicItem(skill.getDisplayItem(), skin, color,
-			true, desc);
+			true, desc, extraLore);
 	}
 
-	private ItemStack createBasicItem(Material mat, String name, NamedTextColor nameColor, boolean nameBold, List<String> desc) {
+	private ItemStack createBasicItem(Material mat, String name, NamedTextColor nameColor, boolean nameBold, List<String> desc, String... extraLore) {
 		ItemStack item = new ItemStack(mat, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(Component.text(name, nameColor)
@@ -539,6 +545,9 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		List<Component> lore = new ArrayList<>();
 		for (String s : desc) {
 			lore.add(Component.text(s, NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		}
+		for (String s : extraLore) {
+			lore.add(Component.text(s, NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 		}
 		meta.lore(lore);
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);

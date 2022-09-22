@@ -32,13 +32,13 @@ public class DarkLanceCS extends ManaLanceCS {
 	}
 
 	@Override
-	public void lanceHit(Player mPlayer, Location bLoc, World world) {
+	public void lanceHitBlock(Player mPlayer, Location bLoc, World world) {
 		new PartialParticle(Particle.SOUL_FIRE_FLAME, bLoc, 40, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
 		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
 	}
 
 	@Override
-	public void lanceParticle(Player mPlayer, Location loc, Location endLoc) {
+	public void lanceParticle(Player mPlayer, Location loc, Location endLoc, int iterations) {
 		new PPLine(Particle.DRAGON_BREATH, loc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsPlayerActive(mPlayer);
 		new PPLine(Particle.REDSTONE, loc, endLoc).shiftStart(0.75).countPerMeter(18).delta(0.35).data(DARK_LANCE_COLOR).spawnAsPlayerActive(mPlayer);
 	}

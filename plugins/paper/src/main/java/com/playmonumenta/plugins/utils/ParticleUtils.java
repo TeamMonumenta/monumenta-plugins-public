@@ -1,14 +1,14 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import com.playmonumenta.plugins.particle.PartialParticle;
+import java.util.*;
+import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
@@ -32,6 +32,13 @@ public class ParticleUtils {
 		Z_XMAX_YMAX
 	}
 
+	@FunctionalInterface
+	public interface CleaveAnimation {
+
+		void cleaveAnimation(Location loc, int rings);
+
+	}
+
 	// TODO use Consumer?
 	@FunctionalInterface
 	public interface SpawnParticleAction {
@@ -39,6 +46,12 @@ public class ParticleUtils {
 		 * Spawns a particle at the specified location
 		 */
 		void run(Location loc);
+	}
+
+	@FunctionalInterface
+	public interface LineSlashAnimation {
+
+		void lineSlashAnimation(Location loc, double middleProgress, double endProgress, boolean middle);
 	}
 
 	public static void explodingRingEffect(Plugin plugin, Location loc, double radius, double height, int ticks, Collection<Map.Entry<Double, SpawnParticleAction>> particles) {
@@ -214,5 +227,200 @@ public class ParticleUtils {
 
 			world.spawnParticle(Particle.REDSTONE, x, y, z, 1, 0.0, 0.0, 0.0, dustOptions);
 		}
+	}
+
+	public static void drawHalfArc(Location loc, double radius, double angle, double startingDegrees, double endingDegrees,
+								   int rings, double spacing, CleaveAnimation cleaveAnim) {
+		drawHalfArc(loc, radius, angle, startingDegrees, endingDegrees, rings, spacing, false, 40, cleaveAnim);
+	}
+
+	public static void drawHalfArc(Location loc, double radius, double angle, double startingDegrees, double endingDegrees,
+								   int rings, double spacing, boolean reverse, int arcInc, CleaveAnimation cleaveAnim) {
+		double radiusInc = (Math.PI / (endingDegrees - startingDegrees));
+
+		loc = loc.clone();
+
+		Location finalLoc = loc;
+		new BukkitRunnable() {
+			double mDegrees = startingDegrees;
+			double mPI = 0;
+			@Override
+			public void run() {
+				Vector vec;
+
+				for (double d = mDegrees; d < mDegrees + arcInc; d += 5) {
+					double radian1 = FastMath.toRadians(d);
+
+					for (int i = 0; i < rings; i++) {
+						double radiusSpacing = (reverse ? FastMath.cos(mPI) : FastMath.sin(mPI)) * (i * spacing);
+						vec = new Vector(FastMath.cos(radian1) * (radius + radiusSpacing),
+							0, FastMath.sin(radian1) * (radius + radiusSpacing));
+						vec = VectorUtils.rotateZAxis(vec, angle);
+						vec = VectorUtils.rotateXAxis(vec, finalLoc.getPitch());
+						vec = VectorUtils.rotateYAxis(vec, finalLoc.getYaw());
+
+						Location l = finalLoc.clone().add(vec);
+						cleaveAnim.cleaveAnimation(l, i + 1);
+					}
+
+					mPI += radiusInc * 2.5;
+					if (d >= endingDegrees) {
+						this.cancel();
+						return;
+					}
+				}
+
+				mDegrees += 40;
+			}
+
+		}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
+	}
+
+	public static void drawParticleCircleExplosion(Player player, Location loc, double angle,
+												   double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd,
+												   Particle... effects) {
+		drawParticleCircleExplosion(player, loc, angle, radius, yaw, pitch, points, speed, atOrigin, radianAdd, 0, effects);
+	}
+
+	public static void drawParticleCircleExplosion(Player player, Location loc, double angle,
+												   double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd, double y,
+												    Particle... effects) {
+		drawParticleCircleExplosion(player, loc, angle, radius, yaw, pitch, points, speed, atOrigin, radianAdd, y, null, effects);
+	}
+
+	public static void drawParticleCircleExplosion(Player player, Location loc, double angle,
+												   double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd, double y,
+												   Object data, Particle... effects) {
+
+		Vector vec;
+		for (int i = 0; i < points; i++) {
+			double radian = Math.toRadians(((360D / points) * i) + radianAdd);
+			vec = new Vector(FastMath.cos(radian) * radius, y, FastMath.sin(radian) * radius);
+			vec = VectorUtils.rotateZAxis(vec, angle);
+			vec = VectorUtils.rotateXAxis(vec, loc.getPitch() + pitch);
+			vec = VectorUtils.rotateYAxis(vec, loc.getYaw() + yaw);
+
+			vec = vec.normalize();
+
+			Vector nonYVec = new Vector(FastMath.cos(radian) * radius, 0, FastMath.sin(radian) * radius);
+			nonYVec = VectorUtils.rotateZAxis(nonYVec, angle);
+			nonYVec = VectorUtils.rotateXAxis(nonYVec, loc.getPitch() + pitch);
+			nonYVec = VectorUtils.rotateYAxis(nonYVec, loc.getYaw() + yaw);
+			Location l = loc.clone().add(nonYVec);
+
+			for (Particle effect : effects) {
+				new PartialParticle(effect, atOrigin ? loc : l, 1, vec.getX(), vec.getY(), vec.getZ(), speed, data, true, 0).spawnAsPlayerActive(player);
+			}
+		}
+	}
+
+	public static void drawParticleLineSlash(Location loc, Vector dir, double angle, double length, double spacing, int duration, LineSlashAnimation animation) {
+		Location l = loc.clone();
+		l.setDirection(dir);
+
+		List<Vector> points = new ArrayList<>();
+		Vector vec = new Vector(0, 0, 1);
+		vec = VectorUtils.rotateZAxis(vec, angle);
+		vec = VectorUtils.rotateXAxis(vec, l.getPitch());
+		vec = VectorUtils.rotateYAxis(vec, l.getYaw());
+		vec = vec.normalize();
+
+		for (double ln = -length; ln < length; ln += spacing) {
+			Vector point = l.toVector().add(vec.clone().multiply(ln));
+			points.add(point);
+		}
+
+		if (duration <= 0) {
+			boolean midReached = false;
+			for (int i = 0; i < points.size(); i++) {
+				Vector point = points.get(i);
+				boolean middle = !midReached && i == points.size() / 2;
+				if (middle) {
+					midReached = true;
+				}
+				animation.lineSlashAnimation(point.toLocation(loc.getWorld()),
+					1D - (point.distance(l.toVector()) / length), (double) (i + 1) / points.size(), middle);
+			}
+		} else {
+			new BukkitRunnable() {
+				final int mPointsPerTick = (int) (points.size() * (1D / duration));
+				int mT = 0;
+				boolean mMidReached = false;
+				@Override
+				public void run() {
+
+
+					for (int i = mPointsPerTick * mT; i < Math.min(points.size(), mPointsPerTick * (mT + 1)); i++) {
+						Vector point = points.get(i);
+						boolean middle = !mMidReached && i == points.size() / 2;
+						if (middle) {
+							mMidReached = true;
+						}
+						animation.lineSlashAnimation(point.toLocation(loc.getWorld()),
+							1D - (point.distance(l.toVector()) / length), (double) (i + 1) / points.size(), middle);
+					}
+					mT++;
+
+					if (mT >= duration) {
+						this.cancel();
+					}
+				}
+
+			}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
+		}
+	}
+
+	public static void drawCleaveArc(Location loc,
+									 double radius, double angle, double startingDegrees, double endingDegrees, int rings, double extraYaw,
+									 double extraPitch, double spacing, double arcInc, CleaveAnimation cleaveAnim) {
+		double radiusInc = (Math.PI / (endingDegrees - startingDegrees));
+		double finalRadius = radius;
+
+		loc = loc.clone();
+
+		double finalAngle = angle;
+		double finalExtraYaw = extraYaw;
+		Location finalLoc = loc;
+		new BukkitRunnable() {
+			double mDegrees = startingDegrees;
+			double mPI = 0;
+			@Override
+			public void run() {
+				Vector vec;
+
+				for (double d = mDegrees; d < mDegrees + arcInc; d += 5) {
+					double radian1 = FastMath.toRadians(d);
+
+					for (int i = 0; i < rings; i++) {
+						double radiusSpacing = FastMath.sin(mPI) * (i * spacing);
+						vec = new Vector(FastMath.cos(radian1) * (finalRadius + radiusSpacing),
+							0, FastMath.sin(radian1) * (finalRadius + radiusSpacing));
+						vec = VectorUtils.rotateZAxis(vec, finalAngle);
+						vec = VectorUtils.rotateXAxis(vec, finalLoc.getPitch() + extraPitch);
+						vec = VectorUtils.rotateYAxis(vec, finalLoc.getYaw() + finalExtraYaw);
+
+						Location l = finalLoc.clone().add(vec);
+						cleaveAnim.cleaveAnimation(l, i + 1);
+					}
+
+					mPI += radiusInc * 5;
+					if (d >= endingDegrees) {
+						this.cancel();
+						return;
+					}
+				}
+
+				mDegrees += arcInc;
+			}
+
+		}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
+	}
+
+	public static Color getTransition(Color color, Color toColor, double percent) {
+		int red = (int)Math.abs((percent * toColor.getRed()) + ((1 - percent) * color.getRed()));
+		int green = (int)Math.abs((percent * toColor.getGreen()) + ((1 - percent) * color.getGreen()));
+		int blue = (int)Math.abs((percent * toColor.getBlue()) + ((1 - percent) * color.getBlue()));
+
+		return Color.fromRGB(Math.min(red, 255), Math.min(green, 255), Math.min(blue, 255));
 	}
 }

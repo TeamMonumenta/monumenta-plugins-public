@@ -27,6 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -71,6 +72,9 @@ public class DivineJustice extends Ability {
 	private @Nullable Crusade mCrusade;
 
 	private final DivineJusticeCS mCosmetic;
+
+	private int mComboNumber = 0;
+	private BukkitRunnable mComboRunnable = null;
 
 	public DivineJustice(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
@@ -135,7 +139,30 @@ public class DivineJustice extends Ability {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
 
 			double widerWidthDelta = PartialParticle.getWidthDelta(enemy) * 1.5;
-			mCosmetic.justiceOnDamage(mPlayer, enemy, widerWidthDelta);
+			mCosmetic.justiceOnDamage(mPlayer, enemy, widerWidthDelta, mComboNumber);
+
+			if (mComboNumber == 0 || mComboRunnable != null) {
+				if (mComboRunnable != null) {
+					mComboRunnable.cancel();
+				}
+				mComboRunnable = new BukkitRunnable() {
+					@Override
+					public void run() {
+						mComboNumber = 0;
+						mComboRunnable = null;
+					}
+				};
+				mComboRunnable.runTaskLater(mPlugin, (long) ((1D / mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getValue()) * 20) + 15);
+			}
+			mComboNumber++;
+
+			if (mComboNumber >= 3) {
+				if (mComboRunnable != null) {
+					mComboRunnable.cancel();
+					mComboRunnable = null;
+				}
+				mComboNumber = 0;
+			}
 
 			return true;
 		}
@@ -165,6 +192,7 @@ public class DivineJustice extends Ability {
 			}
 
 			players.add(mPlayer);
+			mCosmetic.justiceKill(mPlayer, entityDeathEvent.getEntity().getLocation());
 			mCosmetic.justiceHealSound(players, mCosmetic.getHealPitchSelf());
 			new BukkitRunnable() {
 				@Override

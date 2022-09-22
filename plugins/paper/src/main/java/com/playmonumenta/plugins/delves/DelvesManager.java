@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.delves.abilities.Chronology;
 import com.playmonumenta.plugins.delves.abilities.Colossal;
 import com.playmonumenta.plugins.delves.abilities.Fragile;
 import com.playmonumenta.plugins.delves.abilities.Infernal;
+import com.playmonumenta.plugins.delves.abilities.Riftborn;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
 import com.playmonumenta.plugins.delves.abilities.Twisted;
 import com.playmonumenta.plugins.delves.mobabilities.TwistedMiniBoss;
@@ -37,6 +38,7 @@ import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -306,6 +308,7 @@ public class DelvesManager implements Listener {
 				if (event instanceof SpawnerSpawnEvent) {
 					//normal spawn - handle all the mods
 					List<DelvesModifier> mods = DelvesModifier.valuesList();
+					Riftborn.applyModifiers(((SpawnerSpawnEvent) event).getSpawner().getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
 					Chronology.applyModifiers(((SpawnerSpawnEvent) event).getSpawner(), delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
 					for (DelvesModifier mod : mods) {
 						mod.applyDelve(livingEntity, delvesApplied.getOrDefault(mod, 0));
@@ -343,7 +346,7 @@ public class DelvesManager implements Listener {
 			return;
 		}
 		for (Block b : event.blockList()) {
-			if (b.getType() == Material.CHEST && b.getState() instanceof Chest chest && chest.isLocked()) {
+			if ((b.getType() == Material.CHEST && b.getState() instanceof Chest chest && chest.isLocked()) || b.hasMetadata("Unbreakable")) {
 				event.blockList().remove(b);
 			}
 		}
@@ -433,7 +436,7 @@ public class DelvesManager implements Listener {
 		if (!DUNGEONS.contains(ServerProperties.getShardName())) {
 			return;
 		}
-		if (event.getBlock().getState() instanceof Chest chest && chest.isLocked()) {
+		if ((event.getBlock().getState() instanceof Chest chest && chest.isLocked()) || event.getBlock().hasMetadata("Unbreakable")) {
 			event.setCancelled(true);
 			return;
 		}
@@ -465,13 +468,13 @@ public class DelvesManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
+		EntityUtils.removeAttributesContaining(player, Attribute.GENERIC_MAX_HEALTH, "Whispers");
 		Fragile.applyModifiers(player, getRank(player, DelvesModifier.FRAGILE));
 		for (LivingEntity mob : player.getLocation().getNearbyLivingEntities(25)) {
 			TwistedMiniBoss boss = BossManager.getInstance().getBoss(mob, TwistedMiniBoss.class);
 			if (boss != null) {
 				boss.playerDeath(player);
 			}
-
 		}
 
 	}

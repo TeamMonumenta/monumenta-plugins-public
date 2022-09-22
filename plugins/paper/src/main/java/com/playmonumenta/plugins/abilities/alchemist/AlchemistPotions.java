@@ -11,6 +11,8 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhanceme
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.GruesomeAlchemyCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -88,6 +90,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private static @Nullable ItemStack GRUESOME_POTION = null;
 	private static @Nullable ItemStack BRUTAL_POTION = null;
 
+	private GruesomeAlchemyCS mCosmetic;
+
 	public AlchemistPotions(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 		mInfo.mLinkedSpell = ClassAbility.ALCHEMIST_POTION;
@@ -110,6 +114,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 		mPlayerItemStatsMap = new WeakHashMap<>();
 		mMobsIframeMap = new HashMap<>();
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GruesomeAlchemyCS(), GruesomeAlchemyCS.SKIN_LIST);
 
 		// Scan hotbar for alch potion
 		PlayerInventory inv = player.getInventory();
@@ -232,23 +238,19 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			}
 
 			BRUTAL_POTION = basePotion.clone();
-			PotionMeta meta = (PotionMeta) BRUTAL_POTION.getItemMeta();
-			meta.setColor(Color.BLACK);
-			BRUTAL_POTION.setItemMeta(meta);
-
 			GRUESOME_POTION = basePotion.clone();
-			PotionMeta meta2 = (PotionMeta) GRUESOME_POTION.getItemMeta();
-			meta2.setColor(Color.FUCHSIA);
-			GRUESOME_POTION.setItemMeta(meta2);
 		}
 
-		if (mGruesomeMode && GRUESOME_POTION != null) {
-			potion.setItem(GRUESOME_POTION);
-		} else if (!mGruesomeMode && BRUTAL_POTION != null) {
-			potion.setItem(BRUTAL_POTION);
+		ItemStack item;
+		if (mGruesomeMode) {
+			item = GRUESOME_POTION.clone();
 		} else {
-			MMLog.severe("Failed to get alchemist's potion from loot table!");
+			item = BRUTAL_POTION.clone();
 		}
+		item.editMeta(m -> {
+			((PotionMeta) m).setColor(mCosmetic.splashColor(mGruesomeMode));
+		});
+		potion.setItem(item);
 	}
 
 	@Override
@@ -267,6 +269,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 					apply(entity, potion, isGruesome, playerItemStats);
 				}
 			}
+
+			mCosmetic.particlesOnSplash(mPlayer, potion, isGruesome);
 
 			List<Player> players = PlayerUtils.playersInRange(loc, radius, true);
 			players.remove(mPlayer);
@@ -438,14 +442,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 
 		mGruesomeMode = !mGruesomeMode;
-		String mode = "";
-		if (mGruesomeMode) {
-			mode = "Gruesome";
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 1.25f);
-		} else {
-			mode = "Brutal";
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 0.75f);
-		}
+		String mode = mGruesomeMode ? "Gruesome" : "Brutal";
 
 		mPlayer.sendActionBar(ChatColor.YELLOW + "Alchemist's Potions swapped to " + mode + " mode");
 		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 0.9f, brewPitch);

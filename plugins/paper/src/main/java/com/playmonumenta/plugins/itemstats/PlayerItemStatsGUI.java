@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
@@ -23,14 +24,25 @@ import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken
 import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
+import com.playmonumenta.plugins.itemstats.infusions.Ardor;
+import com.playmonumenta.plugins.itemstats.infusions.Carapace;
+import com.playmonumenta.plugins.itemstats.infusions.Choler;
+import com.playmonumenta.plugins.itemstats.infusions.Epoch;
+import com.playmonumenta.plugins.itemstats.infusions.Execution;
+import com.playmonumenta.plugins.itemstats.infusions.Expedite;
 import com.playmonumenta.plugins.itemstats.infusions.Focus;
+import com.playmonumenta.plugins.itemstats.infusions.Nutriment;
+import com.playmonumenta.plugins.itemstats.infusions.Pennate;
 import com.playmonumenta.plugins.itemstats.infusions.Perspicacity;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemstats.infusions.Tenacity;
+import com.playmonumenta.plugins.itemstats.infusions.Unyielding;
+import com.playmonumenta.plugins.itemstats.infusions.Vengeful;
 import com.playmonumenta.plugins.itemstats.infusions.Vigor;
 import com.playmonumenta.plugins.itemstats.infusions.Vitality;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
@@ -77,12 +89,26 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private enum InfusionSetting {
 		DISABLED("Ignore all infusions in calculations", null),
 		ENABLED("Respect existing infusions on items", null),
+		ENABLED_FULL("Existing infusions + delve infusions fully active", null),
 		VITALITY("20 Vitality + 4 Tenacity", InfusionType.VITALITY),
 		TENACITY("24 Tenacity", InfusionType.TENACITY),
 		VIGOR("24 Vigor", InfusionType.VIGOR),
 		FOCUS("24 Focus", InfusionType.FOCUS),
 		PERSPICACITY("24 Perspicacity", InfusionType.PERSPICACITY),
 		;
+
+		/**
+		 * Set of infusions that are only considered active with the setting {@link #ENABLED_FULL}
+		 */
+		private static final ImmutableSet<InfusionType> CONDITIONAL_DELVE_INFUSIONS = ImmutableSet.of(
+			InfusionType.ARDOR,
+			InfusionType.CARAPACE,
+			InfusionType.CHOLER,
+			InfusionType.EXECUTION,
+			InfusionType.EXPEDITE,
+			InfusionType.MITOSIS,
+			InfusionType.VENGEFUL
+		);
 
 		private final String mDescription;
 		private final @Nullable InfusionType mInfusionType;
@@ -141,8 +167,16 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				return mPlayerItemStats.getItemStats().get(infusion.getItemStat());
 			}
 			InfusionSetting setting = getInfusionSetting();
-			if (setting == InfusionSetting.ENABLED) {
-				return mPlayerItemStats.getItemStats().get(infusion.getItemStat());
+			if (setting == InfusionSetting.ENABLED || setting == InfusionSetting.ENABLED_FULL) {
+				if (setting != InfusionSetting.ENABLED_FULL
+					&& InfusionSetting.CONDITIONAL_DELVE_INFUSIONS.contains(infusion)) {
+					return 0;
+				}
+				double value = mPlayerItemStats.getItemStats().get(infusion.getItemStat());
+				if (InfusionType.DELVE_INFUSIONS.contains(infusion) && infusion != InfusionType.UNDERSTANDING) {
+					return DelveInfusionUtils.getModifiedLevel((int) value, (int) mPlayerItemStats.getItemStats().get(InfusionType.UNDERSTANDING.getItemStat()));
+				}
+				return value;
 			} else if (setting.mInfusionType == infusion) {
 				if (setting == InfusionSetting.VITALITY) {
 					return 20;
@@ -190,27 +224,37 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			return getMaximumRegion(mainhand).compareTo(mPlayerItemStats.getRegion()) > 0;
 		}
 
-		private double getTotalDamageDealtMultiplier() {
-			boolean isMaxShatter = false;
-			boolean isShatter = false;
+		private boolean hasMaxShatteredItemEquipped() {
 			for (Equipment slot : Equipment.values()) {
 				ItemStack item = getItem(slot);
-
-				if (item != null && Shattered.isShattered(item)) {
-					isShatter = true;
-					if (Shattered.isMaxShatter(item)) {
-						isMaxShatter = true;
-						break;
-					}
+				if (item != null && Shattered.isMaxShatter(item)) {
+					return true;
 				}
 			}
+			return false;
+		}
 
-			return (hasLaterRegionEquipment(true) ? RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER : 1)
-				* (isShatter ? Shattered.getDamageDealtMultiplier(isMaxShatter) : 1);
+		private double getTotalDamageDealtMultiplier() {
+
+			double result = 1.0;
+
+			if (getInfusion(InfusionType.SHATTERED) > 0) {
+				result *= Shattered.getDamageDealtMultiplier(hasMaxShatteredItemEquipped());
+			}
+
+			if (hasLaterRegionEquipment(true)) {
+				result *= RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER;
+			}
+
+			result *= Choler.getDamageDealtMultiplier(getInfusion(InfusionType.CHOLER));
+			result *= Execution.getDamageDealtMultiplier(getInfusion(InfusionType.EXECUTION));
+			result *= Vengeful.getDamageDealtMultiplier(getInfusion(InfusionType.VENGEFUL));
+
+			return result;
 		}
 	}
 
-	static double calculateDamageMultiplier(Stats stats, @Nullable Protection protection) {
+	static double getDamageTakenMultiplier(Stats stats, @Nullable Protection protection) {
 		boolean region2 = stats.mPlayerItemStats.getRegion().compareTo(ItemStatUtils.Region.ISLES) >= 0;
 
 		double damageMultiplier = 1;
@@ -249,23 +293,12 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			damageMultiplier *= RegionScalingDamageTaken.DAMAGE_TAKEN_MULTIPLIER;
 		}
 
-		boolean isMaxShatter = false;
-		boolean isShatter = false;
-		for (Equipment slot : Equipment.values()) {
-			ItemStack item = stats.getItem(slot);
-
-			if (item != null && Shattered.isShattered(item)) {
-				isShatter = true;
-				if (Shattered.isMaxShatter(item)) {
-					isMaxShatter = true;
-					break;
-				}
-			}
+		if (stats.getInfusion(InfusionType.SHATTERED) > 0) {
+			damageMultiplier *= Shattered.getDamageTakenMultiplier(stats.hasMaxShatteredItemEquipped());
 		}
 
-		damageMultiplier *= (isShatter ? Shattered.getDamageTakenMultiplier(isMaxShatter) : 1);
-
-		damageMultiplier *= 1 - stats.getInfusion(InfusionType.TENACITY) * Tenacity.DAMAGE_REDUCTION_PER_LEVEL;
+		damageMultiplier *= Tenacity.getDamageTakenMultiplier(stats.getInfusion(InfusionType.TENACITY));
+		damageMultiplier *= Carapace.getDamageTakenMultiplier(stats.getInfusion(InfusionType.CARAPACE));
 
 		return damageMultiplier;
 	}
@@ -287,7 +320,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 		// health and healing
 		HEALTH("Max Health", NUMBER, stats -> stats.getAttributeAmount(AttributeType.MAX_HEALTH, 20) * (1 + Vitality.HEALTH_MOD_PER_LEVEL * stats.getInfusion(InfusionType.VITALITY))),
-		HEALING_RATE("Healing Rate", PERCENT, stats -> Sustenance.getHealingMultiplier(stats.get(EnchantmentType.SUSTENANCE), stats.get(EnchantmentType.CURSE_OF_ANEMIA))),
+		HEALING_RATE("Healing Rate", PERCENT, stats -> Sustenance.getHealingMultiplier(stats.get(EnchantmentType.SUSTENANCE), stats.get(EnchantmentType.CURSE_OF_ANEMIA))
+			* Nutriment.getHealingMultiplier(stats.getInfusion(InfusionType.NUTRIMENT))),
 		EFFECTIVE_HEALING_RATE("Effective Healing Rate", PERCENT, stats -> HEALING_RATE.get(stats) * 20.0 / HEALTH.get(stats)),
 		REGENERATION("Regeneration per second", NUMBER, stats -> 4 * Regeneration.healPer5Ticks(stats.get(EnchantmentType.REGENERATION)) * HEALING_RATE.get(stats)),
 		EFFECTIVE_REGENERATION("Regeneration in %HP/s", PERCENT, stats -> REGENERATION.get(stats) / HEALTH.get(stats)),
@@ -295,13 +329,14 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		EFFECTIVE_LIFE_DRAIN("Life Drain on crit in %HP", PERCENT, stats -> LIFE_DRAIN.get(stats) / HEALTH.get(stats)),
 
 		// These stats are damage taken, but get displayed as damage reduction
-		MELEE_DAMAGE_TAKEN("Melee", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new MeleeProtection()), false, DR_CHANGE_FORMAT),
-		PROJECTILE_DAMAGE_TAKEN("Projectile", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new ProjectileProtection()), false, DR_CHANGE_FORMAT),
-		MAGIC_DAMAGE_TAKEN("Magic", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new MagicProtection()), false, DR_CHANGE_FORMAT),
-		BLAST_DAMAGE_TAKEN("Blast", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new BlastProtection()), false, DR_CHANGE_FORMAT),
-		FIRE_DAMAGE_TAKEN("Fire", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new FireProtection()), false, DR_CHANGE_FORMAT),
-		FALL_DAMAGE_TAKEN("Fall", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, new FeatherFalling()), false, DR_CHANGE_FORMAT),
-		AILMENT_DAMAGE_TAKEN("Ailment", ONE_MINUS_PERCENT, stats -> calculateDamageMultiplier(stats, null), false, DR_CHANGE_FORMAT),
+		MELEE_DAMAGE_TAKEN("Melee", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new MeleeProtection()), false, DR_CHANGE_FORMAT),
+		PROJECTILE_DAMAGE_TAKEN("Projectile", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new ProjectileProtection()), false, DR_CHANGE_FORMAT),
+		MAGIC_DAMAGE_TAKEN("Magic", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new MagicProtection()), false, DR_CHANGE_FORMAT),
+		BLAST_DAMAGE_TAKEN("Blast", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new BlastProtection()), false, DR_CHANGE_FORMAT),
+		FIRE_DAMAGE_TAKEN("Fire", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new FireProtection()), false, DR_CHANGE_FORMAT),
+		FALL_DAMAGE_TAKEN("Fall", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new FeatherFalling())
+			* Pennate.getFallDamageResistance(stats.getInfusion(InfusionType.PENNATE)), false, DR_CHANGE_FORMAT),
+		AILMENT_DAMAGE_TAKEN("Ailment", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, null), false, DR_CHANGE_FORMAT),
 
 		// These stats are effective damage taken, but get displayed as effective damage reduction
 		EFFECTIVE_MELEE_DAMAGE_TAKEN("Melee", ONE_MINUS_PERCENT, stats -> MELEE_DAMAGE_TAKEN.get(stats) * 20.0 / HEALTH.get(stats), false, DR_CHANGE_FORMAT),
@@ -380,13 +415,18 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			* (1 + Perspicacity.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.PERSPICACITY))),
 		TOTAL_SPELL_DAMAGE("Total Spell Damage %", PERCENT, stats -> SPELL_POWER.get(stats) * MAGIC_DAMAGE_MULTIPLY.get(stats)),
 		COOLDOWN_MULTIPLIER("Cooldown Multiplier", PERCENT, stats -> (1 + Aptitude.getCooldownPercentage(stats.get(EnchantmentType.APTITUDE)))
-			* (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE))), false),
+			* (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE)))
+			* (1 + Epoch.getCooldownPercentage(stats.getInfusion(InfusionType.EPOCH))), false),
 		// misc
 		ARMOR("Total Armor", NUMBER, stats -> stats.get(AttributeType.ARMOR)),
 		AGILITY("Total Agility", NUMBER, stats -> stats.get(AttributeType.AGILITY)),
 		MOVEMENT_SPEED("Movement Speed", PERCENT,
-			stats -> stats.getAttributeAmount(AttributeType.SPEED, 0.1, stats.hasLaterRegionEquipment(false) ? RegionScalingDamageTaken.SPEED_EFFECT : 0) / 0.1),
-		KNOCKBACK_RESISTANCE("Knockback Resistance", PERCENT, stats -> stats.getAttributeAmount(AttributeType.KNOCKBACK_RESISTANCE, 0)),
+			stats -> stats.getAttributeAmount(AttributeType.SPEED, 0.1,
+				(stats.hasLaterRegionEquipment(false) ? RegionScalingDamageTaken.SPEED_EFFECT : 0)
+					+ Ardor.getMovementSpeedBonus(stats.getInfusion(InfusionType.ARDOR))
+					+ Expedite.getMovementSpeedBonus(stats.getInfusion(InfusionType.EXPEDITE), Expedite.MAX_STACKS)) / 0.1),
+		KNOCKBACK_RESISTANCE("Knockback Resistance", PERCENT, stats -> Math.min(1, stats.getAttributeAmount(AttributeType.KNOCKBACK_RESISTANCE, 0)
+			+ Unyielding.getKnockbackResistance(stats.getInfusion(InfusionType.UNYIELDING)))),
 		THORNS_DAMAGE("Thorns Damage", NUMBER, stats -> stats.get(AttributeType.THORNS) * stats.getTotalDamageDealtMultiplier()),
 		MINING_SPEED("Mining Speed", NUMBER, stats -> ItemUtils.getMiningSpeed(stats.getItem(Equipment.MAINHAND)) * (stats.hasLaterRegionEquipment(true) ? 0.3 : 1)),
 
@@ -851,7 +891,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				boolean targetRightSet = false;
 				if (event.getClick().isShiftClick()) {
 					targetRightSet = event.getClick().isLeftClick();
-					for (Equipment equipment : new Equipment[]{Equipment.HEAD, Equipment.CHEST, Equipment.LEGS, Equipment.FEET}) {
+					for (Equipment equipment : new Equipment[] {Equipment.HEAD, Equipment.CHEST, Equipment.LEGS, Equipment.FEET}) {
 						if (isValid(equipment, item.getType())) {
 							targetSlot = equipment;
 							break;
@@ -919,7 +959,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		if (stats.get(EnchantmentType.TWO_HANDED) > 0
 			&& stats.getItem(Equipment.OFFHAND) != null
 			&& ItemStatUtils.getEnchantmentLevel(stats.getItem(Equipment.OFFHAND), EnchantmentType.WEIGHTLESS) == 0) {
-			warnings.add(Component.text("Build has a Two Handed item, but not a Weightless offhand.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+			warnings.add(Component.text("Build has a Two Handed item, but a non-Weightless offhand.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		}
 		if (warnings.isEmpty()) {
 			return null;
@@ -935,7 +975,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	private void generateInventory() {
 
-		for (Stats stats : new Stats[]{mLeftStats, mRightStats}) {
+		for (Stats stats : new Stats[] {mLeftStats, mRightStats}) {
 			stats.mStatCache.clear();
 			stats.mPlayerItemStats.updateStats(stats.getItem(Equipment.MAINHAND), stats.getItem(Equipment.OFFHAND),
 				stats.getItem(Equipment.HEAD), stats.getItem(Equipment.CHEST), stats.getItem(Equipment.LEGS), stats.getItem(Equipment.FEET), true);

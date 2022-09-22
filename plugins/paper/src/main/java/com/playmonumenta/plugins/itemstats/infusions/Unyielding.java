@@ -43,12 +43,16 @@ public class Unyielding implements Infusion {
 				double finalLvl = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) level);
 				AttributeInstance knockBack = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 				if (knockBack != null) {
-					AttributeModifier mod = new AttributeModifier(MODIFIER, KB_PER_LEVEL * finalLvl,
+					AttributeModifier mod = new AttributeModifier(MODIFIER, getKnockbackResistance(finalLvl),
 						AttributeModifier.Operation.ADD_SCALAR);
 					knockBack.addModifier(mod);
 				}
 			}
 		}
+	}
+
+	public static double getKnockbackResistance(double level) {
+		return KB_PER_LEVEL * level;
 	}
 
 }

@@ -42,13 +42,17 @@ public class Execution implements Infusion {
 	@Override
 	public void onKill(Plugin plugin, Player player, double value, EntityDeathEvent event, LivingEntity enemy) {
 		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-		double percentDamage = PERCENT_DAMAGE_PER_LEVEL * modifiedLevel;
+		double percentDamage = getDamageDealtMultiplier(modifiedLevel) - 1;
 
 		BlockData fallingDustData = Material.ANVIL.createBlockData();
 		World world = player.getWorld();
 		world.spawnParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 3,
 		                    (enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, fallingDustData);
 		plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME, new PercentDamageDealt(DURATION, percentDamage, AFFECTED_DAMAGE_TYPES));
+	}
+
+	public static double getDamageDealtMultiplier(double level) {
+		return 1 + PERCENT_DAMAGE_PER_LEVEL * level;
 	}
 
 }

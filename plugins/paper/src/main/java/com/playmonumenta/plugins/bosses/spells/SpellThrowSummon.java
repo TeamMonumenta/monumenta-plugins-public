@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
@@ -27,14 +28,16 @@ public class SpellThrowSummon extends Spell {
 	private final int mLobs;
 	private final int mCooldown;
 	private final String mSummonName;
+	private final boolean mFromPool;
 
-	public SpellThrowSummon(Plugin plugin, LivingEntity boss, int range, int lobs, int cooldownTicks, String summonName) {
+	public SpellThrowSummon(Plugin plugin, LivingEntity boss, int range, int lobs, int cooldownTicks, String summonName, boolean fromPool) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
 		mLobs = lobs;
 		mCooldown = cooldownTicks;
 		mSummonName = summonName;
+		mFromPool = fromPool;
 	}
 
 	@Override
@@ -76,7 +79,12 @@ public class SpellThrowSummon extends Spell {
 		Location sLoc = mBoss.getEyeLocation();
 		sLoc.getWorld().playSound(sLoc, Sound.ENTITY_SHULKER_SHOOT, 1, 1);
 		try {
-			Entity e = LibraryOfSoulsIntegration.summon(sLoc, mSummonName);
+			String soul = mSummonName;
+			if (mFromPool) {
+				List<String> souls = LibraryOfSoulsIntegration.getPool(mSummonName).keySet().stream().map((x) -> x.getLabel()).toList();
+				soul = souls.get(FastUtils.RANDOM.nextInt(souls.size()));
+			}
+			Entity e = LibraryOfSoulsIntegration.summon(sLoc, soul);
 			Location pLoc = target.getLocation();
 			Location tLoc = e.getLocation();
 			Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());

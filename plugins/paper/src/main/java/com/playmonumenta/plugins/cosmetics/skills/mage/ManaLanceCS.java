@@ -34,17 +34,21 @@ public class ManaLanceCS implements CosmeticSkill {
 		return Material.TRIDENT;
 	}
 
-	public void lanceHit(Player mPlayer, Location bLoc, World world) {
+	public void lanceHitBlock(Player mPlayer, Location bLoc, World world) {
 		new PartialParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
 	}
 
-	public void lanceParticle(Player mPlayer, Location loc, Location endLoc) {
+	public void lanceParticle(Player mPlayer, Location loc, Location endLoc, int iterations) {
 		new PPLine(Particle.EXPLOSION_NORMAL, loc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0.05).extra(0.025).spawnAsPlayerActive(mPlayer);
 		new PPLine(Particle.REDSTONE, loc, endLoc).shiftStart(0.75).countPerMeter(18).delta(0.35).data(MANA_LANCE_COLOR).spawnAsPlayerActive(mPlayer);
 	}
 
 	public void lanceSound(World world, Player mPlayer) {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
+	}
+
+	public void lanceHit(Location loc, Player mPlayer) {
+
 	}
 }

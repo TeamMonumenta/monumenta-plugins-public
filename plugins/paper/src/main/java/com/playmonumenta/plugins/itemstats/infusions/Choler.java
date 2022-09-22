@@ -31,7 +31,12 @@ public class Choler implements Infusion {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (EntityUtils.isStunned(enemy) || EntityUtils.isSlowed(plugin, enemy) || enemy.getFireTicks() > 0) {
-			event.setDamage(event.getDamage() * (1 + (DAMAGE_MLT_PER_LVL * DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value))));
+			event.setDamage(event.getDamage() * getDamageDealtMultiplier(DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value)));
 		}
 	}
+
+	public static double getDamageDealtMultiplier(double level) {
+		return 1 + DAMAGE_MLT_PER_LVL * level;
+	}
+
 }

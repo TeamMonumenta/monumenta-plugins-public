@@ -71,7 +71,7 @@ public class DelvesCommands {
 				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER)
 			).executes((commandSender, args) -> {
 				int currentPoint = DelvesUtils.getPlayerTotalDelvePoint(null, (Player) args[2], ServerProperties.getShardName());
-				return currentPoint == DelvesUtils.MAX_DEPTH_POINTS ? 1 : -1;
+				return currentPoint >= DelvesUtils.MAX_DEPTH_POINTS ? 1 : -1;
 			}).register();
 
 		new CommandAPICommand(COMMAND)

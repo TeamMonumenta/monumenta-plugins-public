@@ -111,9 +111,13 @@ public class AdvancingShadows extends Ability {
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
+
+			mCosmetic.tpStart(mPlayer);
+			int i = 0;
 			while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET) {
+				i++;
 				loc.add(dir.clone().multiply(0.3333));
-				mCosmetic.tpParticleTrack(mPlayer, loc);
+				mCosmetic.tpTrail(mPlayer, loc, i);
 				if (loc.distance(entity.getLocation()) < ADVANCING_SHADOWS_OFFSET) {
 					double multiplier = ADVANCING_SHADOWS_OFFSET - loc.distance(entity.getLocation());
 					loc.subtract(dir.clone().multiply(multiplier));

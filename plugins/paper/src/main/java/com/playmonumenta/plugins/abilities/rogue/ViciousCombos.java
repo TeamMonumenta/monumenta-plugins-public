@@ -96,7 +96,7 @@ public class ViciousCombos extends Ability {
 								EntityUtils.applyWeaken(mPlugin, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL, mob);
 							}
 						}
-						mCosmetic.comboOnElite(world, loc, mPlayer, VICIOUS_COMBOS_RANGE);
+						mCosmetic.comboOnElite(world, loc, mPlayer, VICIOUS_COMBOS_RANGE, killedEntity);
 
 					} else if (EntityUtils.isHostileMob(killedEntity)) {
 						int timeReduction = isLevelOne() ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
@@ -105,7 +105,7 @@ public class ViciousCombos extends Ability {
 						}
 
 						mPlugin.mTimers.updateCooldowns(mPlayer, timeReduction);
-						mCosmetic.comboOnKill(world, loc, mPlayer, VICIOUS_COMBOS_RANGE);
+						mCosmetic.comboOnKill(world, loc, mPlayer, VICIOUS_COMBOS_RANGE, killedEntity);
 					}
 
 				}

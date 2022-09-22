@@ -36,7 +36,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class CholericFlames extends Ability {
 
-	private static final int RADIUS = 8;
+	public static final int RADIUS = 8;
 	private static final int DAMAGE_1 = 3;
 	private static final int DAMAGE_2 = 5;
 	private static final int DURATION = 7 * 20;
@@ -99,8 +99,7 @@ public class CholericFlames extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		new PartialParticle(Particle.SMOKE_LARGE, loc, 30, 0, 0, 0, 0.15).spawnAsPlayerActive(mPlayer);
-		mCosmetic.flameSound(world, loc);
+		mCosmetic.flameEffects(mPlayer, world, loc);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.mLinkedSpell, true);

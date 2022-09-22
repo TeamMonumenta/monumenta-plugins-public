@@ -153,6 +153,18 @@ public class HuntingCompanion extends Ability {
 				}
 			}
 
+			BukkitRunnable cosmeticRunnable = new BukkitRunnable() {
+				int mT = 0;
+				@Override
+				public void run() {
+					mT++;
+					for (Mob summon : mSummons.keySet()) {
+						mCosmetic.tick(summon, mPlayer, mSummons.get(summon), mT);
+					}
+				}
+			};
+			cosmeticRunnable.runTaskTimer(mPlugin, 0, 1);
+
 			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 			World world = mPlayer.getWorld();
 			mRunnable = new BukkitRunnable() {
@@ -189,6 +201,12 @@ public class HuntingCompanion extends Ability {
 					}
 
 					mTicksElapsed += TICK_INTERVAL;
+				}
+
+				@Override
+				public synchronized void cancel() {
+					super.cancel();
+					cosmeticRunnable.cancel();
 				}
 			};
 			mRunnable.runTaskTimer(mPlugin, 0, TICK_INTERVAL);
@@ -294,7 +312,7 @@ public class HuntingCompanion extends Ability {
 
 		mSummons.put(summon, null);
 
-		mCosmetic.onSummon(loc.getWorld(), loc, summon);
+		mCosmetic.onSummon(loc.getWorld(), loc, mPlayer, summon);
 	}
 
 	private @Nullable Vector getSideOffset(Location loc, Vector facingDirection, boolean eagle) {

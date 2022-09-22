@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.cosmetics;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,8 @@ public class Cosmetic {
 	//Lazy solution for cosmetic skill system
 	public ClassAbility mAbility;
 
+	private String[] mDescription = null;
+
 	public Cosmetic(CosmeticType type, String name) {
 		mName = name;
 		mType = type;
@@ -41,6 +44,12 @@ public class Cosmetic {
 		mAbility = ability;
 	}
 
+	public Cosmetic(CosmeticType type, String name, boolean isEquipped, ClassAbility ability, String... description) {
+		this(type, name, isEquipped);
+		mAbility = ability;
+		mDescription = description;
+	}
+
 	public String getName() {
 		return mName;
 	}
@@ -55,6 +64,10 @@ public class Cosmetic {
 
 	public ClassAbility getAbility() {
 		return mAbility;
+	}
+
+	public String[] getDescription() {
+		return mDescription;
 	}
 
 	public ItemStack getDisplayItem() {
@@ -95,6 +108,12 @@ public class Cosmetic {
 				meta.displayName(Component.text(mName, TextColor.color(0xc0dea9)).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 				List<Component> lore = new ArrayList<>();
 				lore.add(Component.text("Custom " + mType.getDisplayName(), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				Cosmetic cosmetic = CosmeticSkills.getCosmeticByName(mName);
+				if (cosmetic != null && cosmetic.getDescription() != null) {
+					for (String s : cosmetic.getDescription()) {
+						lore.add(Component.text(s, NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+					}
+				}
 				if (mEquipped) {
 					lore.add(Component.text("Currently Equipped", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
 				} else {

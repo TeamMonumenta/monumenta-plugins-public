@@ -60,24 +60,24 @@ public class HuntingCompanionCS implements CosmeticSkill {
 		return DOLPHIN_NAME;
 	}
 
-	public void onSummon(World world, Location loc, LivingEntity summon) {
+	public void onSummon(World world, Location loc, Player player, LivingEntity summon) {
 		switch (summon.getType()) {
-			case FOX -> foxOnSummon(world, loc);
-			case AXOLOTL -> axolotlOnSummon(world, loc);
-			case STRIDER -> striderOnSummon(world, loc);
-			case PARROT -> eagleOnSummon(world, loc);
-			default -> dolphinOnSummon(world, loc);
+			case FOX -> foxOnSummon(world, loc, player, summon);
+			case AXOLOTL -> axolotlOnSummon(world, loc, player, summon);
+			case STRIDER -> striderOnSummon(world, loc, player, summon);
+			case PARROT -> eagleOnSummon(world, loc, player, summon);
+			default -> dolphinOnSummon(world, loc, player, summon);
 		}
 	}
 
-	public void foxOnSummon(World world, Location loc) {
+	public void foxOnSummon(World world, Location loc, Player player, LivingEntity summon) {
 		foxAmbient(world, loc);
 		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, 2.0f, 1.0f);
 		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 0.75f, 1.2f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f);
 	}
 
-	public void axolotlOnSummon(World world, Location loc) {
+	public void axolotlOnSummon(World world, Location loc, Player player, LivingEntity summon) {
 		axolotlAmbient(world, loc);
 		world.playSound(loc, Sound.ENTITY_AXOLOTL_SPLASH, 2.0f, 1.0f);
 		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1.0f, 1.5f);
@@ -85,20 +85,20 @@ public class HuntingCompanionCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.5f);
 	}
 
-	public void striderOnSummon(World world, Location loc) {
+	public void striderOnSummon(World world, Location loc, Player player, LivingEntity summon) {
 		striderAmbient(world, loc);
 		world.playSound(loc, Sound.ENTITY_STRIDER_STEP_LAVA, 1.0f, 1.0f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f);
 	}
 
-	public void eagleOnSummon(World world, Location loc) {
+	public void eagleOnSummon(World world, Location loc, Player player, LivingEntity summon) {
 		eagleAmbient(world, loc);
 		world.playSound(loc, Sound.ENTITY_PARROT_FLY, 2.0f, 0.5f);
 		world.playSound(loc, Sound.BLOCK_SMALL_DRIPLEAF_FALL, 1.0f, 1.0f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.5f, 1.5f);
 	}
 
-	public void dolphinOnSummon(World world, Location loc) {
+	public void dolphinOnSummon(World world, Location loc, Player player, LivingEntity summon) {
 		dolphinAmbient(world, loc);
 		world.playSound(loc, Sound.ENTITY_DOLPHIN_SPLASH, 2.0f, 1.0f);
 		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1.0f, 1.5f);
@@ -107,40 +107,40 @@ public class HuntingCompanionCS implements CosmeticSkill {
 
 	public void onDespawn(World world, Location loc, LivingEntity summon, Player player) {
 		switch (summon.getType()) {
-			case FOX -> foxOnDespawn(world, loc, player);
-			case AXOLOTL -> axolotlOnDespawn(world, loc, player);
-			case STRIDER -> striderOnDespawn(world, loc, player);
-			case PARROT -> eagleOnDespawn(world, loc, player);
-			default -> dolphinOnDespawn(world, loc, player);
+			case FOX -> foxOnDespawn(world, loc, player, summon);
+			case AXOLOTL -> axolotlOnDespawn(world, loc, player, summon);
+			case STRIDER -> striderOnDespawn(world, loc, player, summon);
+			case PARROT -> eagleOnDespawn(world, loc, player, summon);
+			default -> dolphinOnDespawn(world, loc, player, summon);
 		}
 	}
 
-	public void foxOnDespawn(World world, Location loc, Player player) {
+	public void foxOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
 		foxAmbient(world, loc);
 		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, 1.5f, 1.0f);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 20).spawnAsPlayerActive(player);
 	}
 
-	public void axolotlOnDespawn(World world, Location loc, Player player) {
+	public void axolotlOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
 		foxAmbient(world, loc);
 		world.playSound(loc, Sound.ITEM_BUCKET_FILL_AXOLOTL, 1.5f, 1.0f);
 		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1.0f, 1.5f);
 		new PartialParticle(Particle.GLOW_SQUID_INK, loc, 5).spawnAsPlayerActive(player);
 	}
 
-	public void striderOnDespawn(World world, Location loc, Player player) {
+	public void striderOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
 		striderAmbient(world, loc);
 		world.playSound(loc, Sound.ENTITY_STRIDER_RETREAT, 1.5f, 1.0f);
 		new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, loc, 5).spawnAsPlayerActive(player);
 	}
 
-	public void eagleOnDespawn(World world, Location loc, Player player) {
+	public void eagleOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
 		eagleAmbient(world, loc);
 		world.playSound(loc, Sound.ENTITY_PARROT_IMITATE_PHANTOM, 1.5f, 1.0f);
 		new PartialParticle(Particle.CLOUD, loc, 15).spawnAsPlayerActive(player);
 	}
 
-	public void dolphinOnDespawn(World world, Location loc, Player player) {
+	public void dolphinOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
 		dolphinAmbient(world, loc);
 		world.playSound(loc, Sound.ENTITY_DOLPHIN_JUMP, 1.5f, 1.0f);
 		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1.0f, 1.5f);
@@ -148,11 +148,12 @@ public class HuntingCompanionCS implements CosmeticSkill {
 	}
 
 	public void onAggro(World world, Location loc, Player player, LivingEntity summon) {
-		onAggroParticles(world, loc, player);
+		onAggroParticles(player, summon);
+		onAggroSounds(world, loc, summon);
 	}
 
-	public void onAggroParticles(World world, Location loc, Player player) {
-		new PartialParticle(Particle.VILLAGER_ANGRY, loc, 25).spawnAsPlayerActive(player);
+	public void onAggroParticles(Player player, LivingEntity summon) {
+		new PartialParticle(Particle.VILLAGER_ANGRY, summon.getEyeLocation(), 25).spawnAsPlayerActive(player);
 	}
 
 	public void onAggroSounds(World world, Location loc, LivingEntity summon) {
@@ -246,4 +247,35 @@ public class HuntingCompanionCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, 1.5f, 1.0f);
 		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, 1.5f, 1.2f);
 	}
+
+	public void tick(LivingEntity summon, Player player, LivingEntity target, int t) {
+		switch (summon.getType()) {
+			case FOX -> foxTick(summon, player, target, t);
+			case AXOLOTL -> axolotlTick(summon, player, target, t);
+			case STRIDER -> striderTick(summon, player, target, t);
+			case PARROT -> eagleTick(summon, player, target, t);
+			default -> dolphinTick(summon, player, target, t);
+		}
+	}
+
+	public void foxTick(LivingEntity summon, Player player, LivingEntity target, int t) {
+
+	}
+
+	public void axolotlTick(LivingEntity summon, Player player, LivingEntity target, int t) {
+
+	}
+
+	public void striderTick(LivingEntity summon, Player player, LivingEntity target, int t) {
+
+	}
+
+	public void eagleTick(LivingEntity summon, Player player, LivingEntity target, int t) {
+
+	}
+
+	public void dolphinTick(LivingEntity summon, Player player, LivingEntity target, int t) {
+
+	}
+
 }

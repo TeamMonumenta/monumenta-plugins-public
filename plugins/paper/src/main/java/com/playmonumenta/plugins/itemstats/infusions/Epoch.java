@@ -20,7 +20,12 @@ public class Epoch implements Infusion {
 	}
 
 	public static double getCooldownPercentage(Plugin plugin, Player player) {
-		int level = (int)plugin.mItemStatManager.getInfusionLevel(player, InfusionType.EPOCH);
-		return - COOLDOWN_REDUCTION_PER_LEVEL * DelveInfusionUtils.getModifiedLevel(plugin, player, level);
+		int level = plugin.mItemStatManager.getInfusionLevel(player, InfusionType.EPOCH);
+		return getCooldownPercentage(DelveInfusionUtils.getModifiedLevel(plugin, player, level));
 	}
+
+	public static double getCooldownPercentage(double level) {
+		return -COOLDOWN_REDUCTION_PER_LEVEL * level;
+	}
+
 }

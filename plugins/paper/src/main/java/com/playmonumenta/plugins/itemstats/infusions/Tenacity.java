@@ -25,7 +25,11 @@ public class Tenacity implements Infusion {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		double reductionPct = value * DAMAGE_REDUCTION_PER_LEVEL;
-		event.setDamage(event.getDamage() * (1.0 - reductionPct));
+		event.setDamage(event.getDamage() * getDamageTakenMultiplier(value));
 	}
+
+	public static double getDamageTakenMultiplier(double level) {
+		return 1 - level * DAMAGE_REDUCTION_PER_LEVEL;
+	}
+
 }

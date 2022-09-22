@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -26,7 +25,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -150,7 +148,6 @@ public class MagmaShield extends Ability {
 		}
 
 		World world = mPlayer.getWorld();
-		new PartialParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 15, 0.05, 0.05, 0.05, 0.1).spawnAsPlayerActive(mPlayer);
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getLocation();
 			double mRadius = 0;
@@ -179,7 +176,7 @@ public class MagmaShield extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		mCosmetic.magmaSound(world, mPlayer);
+		mCosmetic.magmaEffects(world, mPlayer);
 	}
 
 	@Override

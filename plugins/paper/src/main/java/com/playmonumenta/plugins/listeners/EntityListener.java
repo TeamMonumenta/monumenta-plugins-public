@@ -148,11 +148,14 @@ public class EntityListener implements Listener {
 	);
 
 	public static final EnumSet<EntityType> PLOT_ANIMALS = EnumSet.of(
+		EntityType.AXOLOTL,
 		EntityType.CAT,
 		EntityType.CHICKEN,
 		EntityType.COW,
 		EntityType.DONKEY,
 		EntityType.FOX,
+		EntityType.GOAT,
+		EntityType.HOGLIN,
 		EntityType.HORSE,
 		EntityType.LLAMA,
 		EntityType.MULE,
@@ -166,11 +169,46 @@ public class EntityListener implements Listener {
 		EntityType.RAVAGER,
 		EntityType.SHEEP,
 		EntityType.SHULKER,
+		EntityType.SKELETON_HORSE,
 		EntityType.SLIME,
-		EntityType.WOLF
+		EntityType.STRIDER,
+		EntityType.TRADER_LLAMA,
+		EntityType.TURTLE,
+		EntityType.WOLF,
+		EntityType.ZOMBIE_HORSE
 	);
 
-	public static final int MAX_ANIMALS_IN_PLAYER_PLOT = 64;
+	public static final EnumSet<Material> PLOT_ANIMAL_EGGS = EnumSet.of(
+		Material.AXOLOTL_SPAWN_EGG,
+		Material.CAT_SPAWN_EGG,
+		Material.CHICKEN_SPAWN_EGG,
+		Material.COW_SPAWN_EGG,
+		Material.DONKEY_SPAWN_EGG,
+		Material.FOX_SPAWN_EGG,
+		Material.GOAT_SPAWN_EGG,
+		Material.HOGLIN_SPAWN_EGG,
+		Material.HORSE_SPAWN_EGG,
+		Material.LLAMA_SPAWN_EGG,
+		Material.MULE_SPAWN_EGG,
+		Material.MOOSHROOM_SPAWN_EGG,
+		Material.OCELOT_SPAWN_EGG,
+		Material.PANDA_SPAWN_EGG,
+		Material.PARROT_SPAWN_EGG,
+		Material.PIG_SPAWN_EGG,
+		Material.POLAR_BEAR_SPAWN_EGG,
+		Material.RABBIT_SPAWN_EGG,
+		Material.SHEEP_SPAWN_EGG,
+		Material.SHULKER_SPAWN_EGG,
+		Material.SKELETON_HORSE_SPAWN_EGG,
+		Material.SLIME_SPAWN_EGG,
+		Material.STRIDER_SPAWN_EGG,
+		Material.TRADER_LLAMA_SPAWN_EGG,
+		Material.TURTLE_SPAWN_EGG,
+		Material.WOLF_SPAWN_EGG,
+		Material.ZOMBIE_HORSE_SPAWN_EGG
+	);
+
+	public static final int MAX_ANIMALS_IN_PLAYER_PLOT = 80;
 
 	public static final String INVISIBLE_ITEM_FRAME_NAME = "Invisible Item Frame";
 	private static final NamespacedKey INVISIBLE_ITEM_FRAME_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/invisible_item_frame");
@@ -198,8 +236,7 @@ public class EntityListener implements Listener {
 				Constants.ENTITY_COMBUST_NONCE_METAKEY);
 		}
 
-		if ((combuster instanceof Player) && (combustee.getFireTicks() > 0)) {
-			Player player = (Player) combuster;
+		if ((combuster instanceof Player player) && (combustee.getFireTicks() > 0)) {
 			if (player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)
 				&& combustee instanceof LivingEntity && Inferno.hasInferno(mPlugin, (LivingEntity) combustee)
 				&& mPlugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.INFERNO) < Inferno.getInfernoLevel(mPlugin, (LivingEntity) combustee)) {
@@ -208,8 +245,7 @@ public class EntityListener implements Listener {
 			}
 		}
 
-		if ((combustee instanceof Player)) {
-			Player player = (Player) combustee;
+		if ((combustee instanceof Player player)) {
 
 			if (!mAbilities.playerCombustByEntityEvent(player, event)) {
 				event.setCancelled(true);
@@ -238,28 +274,32 @@ public class EntityListener implements Listener {
 			} else if (damager instanceof Firework) {
 				//  If we're hit by a rocket, cancel the damage.
 				event.setCancelled(true);
+				return;
 			}
 
 			// Disable thorns damage from guardians
 			if (event.getCause() == DamageCause.THORNS && damager instanceof Guardian) {
 				event.setCancelled(true);
+				return;
 			}
 		} else {
 			//  Don't hurt Villagers!
 			if (damagee instanceof Villager) {
 				event.setCancelled(true);
+				return;
 			}
 			// Don't allow creepers to destroy items if either is in water
 			if (damager instanceof Creeper && damagee instanceof Item && (damager.isInWater() || damagee.isInWater())) {
 				event.setCancelled(true);
+				return;
 			}
-			// Don't trigger class effects if the event was already cancelled (NPCs, etc.)
-			if (event.isCancelled() || damagee instanceof ArmorStand || damagee.isInvulnerable()) {
+			if (damagee instanceof ArmorStand || damagee.isInvulnerable()) {
 				return;
 			}
 			// Don't allow evoker fangs to damage non-players
 			if (damager instanceof EvokerFangs) {
 				event.setCancelled(true);
+				return;
 			}
 		}
 
@@ -287,10 +327,6 @@ public class EntityListener implements Listener {
 			if (damagee instanceof Player playerDamagee && !AbilityManager.getManager().isPvPEnabled(playerDamagee)) {
 				damager.remove();
 				event.setCancelled(true);
-				/*
-				 * If we don't return, then the side effects of LivingEntityShotByPlayerEvent() will
-				 * still occur (e.g. wither) despite the damage event being canceled.
-				 */
 				return;
 			}
 		}
@@ -320,13 +356,14 @@ public class EntityListener implements Listener {
 						|| (player.getGameMode().equals(GameMode.ADVENTURE) && !damagee.getScoreboardTags().contains("Removable"))) {
 					// Don't allow it
 					event.setCancelled(true);
+					return;
 				}
 			} else {
 				// This damage is not from a particular entity source - don't allow it
 				event.setCancelled(true);
+				return;
 			}
-			if (!event.isCancelled()
-				&& damagee instanceof ItemFrame frame
+			if (damagee instanceof ItemFrame frame
 				&& INVISIBLE_ITEM_FRAME_NAME.equals(damagee.getCustomName())) {
 				Bukkit.getScheduler().runTask(mPlugin, () -> {
 					if (frame.isValid()) {
@@ -387,6 +424,7 @@ public class EntityListener implements Listener {
 		} else if (damagee instanceof Item) {
 			if (damagee.getTicksLived() <= 100 && (source.equals(DamageCause.ENTITY_EXPLOSION) || source.equals(DamageCause.BLOCK_EXPLOSION))) {
 				event.setCancelled(true);
+				return;
 			}
 		}
 	}
@@ -401,12 +439,12 @@ public class EntityListener implements Listener {
 
 			// Only items and players can activate tripwires
 			// Also pigs, for the pig quest
-			if (entity instanceof Item || entity instanceof Player || entity instanceof Pig ||
-				(entity.getScoreboardTags() != null && entity.getScoreboardTags().contains("block_interact"))) {
+			if (entity instanceof Item || entity instanceof Player || entity instanceof Pig || entity.getScoreboardTags().contains("block_interact")) {
 				return;
 			}
 
 			event.setCancelled(true);
+			return;
 		}
 	}
 
@@ -420,6 +458,7 @@ public class EntityListener implements Listener {
 
 			if (player.getGameMode() == GameMode.ADVENTURE) {
 				event.setCancelled(true);
+				return;
 			}
 		} else if (damager instanceof Projectile projectile) {
 			// If hurt by a projectile from a player in adventure mode.
@@ -428,11 +467,13 @@ public class EntityListener implements Listener {
 			if (source instanceof Player player) {
 				if (player.getGameMode() == GameMode.ADVENTURE) {
 					event.setCancelled(true);
+					return;
 				}
 			}
 		} else if (damager instanceof Creeper creeper) {
 			if (creeper.getScoreboardTags().contains(AlchemicalAberrationBoss.identityTag)) {
 				event.setCancelled(true);
+				return;
 			}
 		}
 	}
@@ -482,6 +523,9 @@ public class EntityListener implements Listener {
 				mPlugin.mItemStatManager.onLaunchProjectile(mPlugin, player, event, proj);
 			}
 
+			/* NOTE:
+			 * Ignore IntelliJ's warning about the method annotation here. onLaunchProjectile can cancel the event.
+			 */
 			if (event.isCancelled()) {
 				return;
 			}
@@ -534,40 +578,41 @@ public class EntityListener implements Listener {
 				// Tridents are handled in ThrowRate
 				if (!mAbilities.playerShotProjectileEvent(player, arrow)) {
 					event.setCancelled(true);
+					return;
 				}
 
 				MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.PLAYER_BOW_SHOT_METAKEY);
 			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
 				ThrownPotion potion = (ThrownPotion) proj;
-				if (potion.getItem() != null) {
-					ItemStack potionItem = potion.getItem();
+				ItemStack potionItem = potion.getItem();
 
-					if (potionItem.getType().equals(Material.SPLASH_POTION)
-						&& potionItem.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
-						ThrownPotion potionClone = (ThrownPotion) potion.getWorld().spawnEntity(potion.getLocation(), EntityType.SPLASH_POTION);
-						ItemStack newPotion = potionItem.clone();
-						if (newPotion.hasItemMeta() && newPotion.getItemMeta().hasLore()) {
-							List<Component> lore = newPotion.lore();
-							lore.removeIf((component) -> !MessagingUtils.plainText(component).contains("* Alchemical Utensil *"));
-							newPotion.lore(lore);
-						}
-						ItemUtils.setPlainTag(newPotion);
-
-						potionClone.setItem(newPotion);
-						potionClone.setShooter(player);
-						potionClone.setVelocity(potion.getVelocity());
-						//this potion should not have other metadata
-						event.setCancelled(true);
-						potion = potionClone;
+				if (potionItem.getType().equals(Material.SPLASH_POTION)
+					&& potionItem.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
+					ThrownPotion potionClone = (ThrownPotion) potion.getWorld().spawnEntity(potion.getLocation(), EntityType.SPLASH_POTION);
+					ItemStack newPotion = potionItem.clone();
+					if (newPotion.hasItemMeta() && newPotion.getItemMeta().hasLore()) {
+						List<Component> lore = newPotion.lore();
+						lore.removeIf((component) -> !MessagingUtils.plainText(component).contains("* Alchemical Utensil *"));
+						newPotion.lore(lore);
 					}
-					if (potionItem.getType() == Material.SPLASH_POTION) {
-						if (!mAbilities.playerThrewSplashPotionEvent(player, potion)) {
-							event.setCancelled(true);
-						}
-					} else if (potionItem.getType() == Material.LINGERING_POTION) {
-						if (!mAbilities.playerThrewLingeringPotionEvent(player, potion)) {
-							event.setCancelled(true);
-						}
+					ItemUtils.setPlainTag(newPotion);
+
+					potionClone.setItem(newPotion);
+					potionClone.setShooter(player);
+					potionClone.setVelocity(potion.getVelocity());
+					//this potion should not have other metadata
+					event.setCancelled(true);
+					potion = potionClone;
+				}
+				if (potionItem.getType() == Material.SPLASH_POTION) {
+					if (!mAbilities.playerThrewSplashPotionEvent(player, potion)) {
+						event.setCancelled(true);
+						return;
+					}
+				} else if (potionItem.getType() == Material.LINGERING_POTION) {
+					if (!mAbilities.playerThrewLingeringPotionEvent(player, potion)) {
+						event.setCancelled(true);
+						return;
 					}
 				}
 			}
@@ -606,7 +651,7 @@ public class EntityListener implements Listener {
 		 *
 		 * Since the ability might modify the affectedEntities list while iterating, need to make a copy of it
 		 */
-		for (LivingEntity entity : new ArrayList<LivingEntity>(affectedEntities)) {
+		for (LivingEntity entity : new ArrayList<>(affectedEntities)) {
 			if (entity instanceof Player player) {
 				affectedPlayers.add(player);
 				if (!mAbilities.playerSplashedByPotionEvent(player, affectedEntities, potion, event)) {
@@ -778,8 +823,7 @@ public class EntityListener implements Listener {
 		Projectile proj = event.getEntity();
 		ProjectileSource source = proj.getShooter();
 
-		if (entity != null && entity instanceof Player) {
-			Player player = (Player) entity;
+		if (entity instanceof Player player) {
 			mAbilities.playerHitByProjectileEvent(player, event);
 
 			// Tipped Arrow shenanigans
@@ -795,7 +839,7 @@ public class EntityListener implements Listener {
 				}
 
 				PotionData data = arrow.getBasePotionData();
-				PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 8) : null;
+				PotionInfo info = PotionUtils.getPotionInfo(data, 8);
 				List<PotionEffect> effects = arrow.hasCustomEffects() ? arrow.getCustomEffects() : null;
 
 				if (info != null) {
@@ -821,9 +865,7 @@ public class EntityListener implements Listener {
 		arrow.setBasePotionData(data);
 
 		if (arrow.hasCustomEffects()) {
-			Iterator<PotionEffect> effectIter = arrow.getCustomEffects().iterator();
-			while (effectIter.hasNext()) {
-				PotionEffect effect = effectIter.next();
+			for (PotionEffect effect : new ArrayList<>(arrow.getCustomEffects())) {
 				arrow.removeCustomEffect(effect.getType());
 			}
 		}
@@ -840,11 +882,11 @@ public class EntityListener implements Listener {
 		}
 
 		if (target != null) {
-			if (target instanceof Player) {
-				Player player = (Player) target;
+			if (target instanceof Player player) {
 				if (AbilityUtils.isStealthed(player)) {
 					event.setTarget(null);
 					event.setCancelled(true);
+					return;
 				} else {
 					mAbilities.entityTargetLivingEntityEvent(player, event);
 				}
@@ -891,11 +933,13 @@ public class EntityListener implements Listener {
 		event.setCancelled(!mPlugin.mItemOverrides.blockChangeInteraction(mPlugin, event.getBlock()));
 		if (event.getEntity() instanceof Wither) {
 			event.setCancelled(true);
+			return;
 		}
 
 		// When sheep eat grass outside of plots, do not change to dirt
 		if (event.getEntity() instanceof Sheep && !ZoneUtils.isInPlot(event.getBlock().getLocation())) {
 			event.setCancelled(true);
+			return;
 		}
 	}
 
@@ -916,7 +960,11 @@ public class EntityListener implements Listener {
 	// Cancel breeding if on a plot full of animals
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityBreedEvent(EntityBreedEvent event) {
-		if (!maySummonPlotAnimal(event.getEntity().getLocation())) {
+		Entity entity = event.getEntity();
+		if (!PLOT_ANIMALS.contains(entity.getType())) {
+			return;
+		}
+		if (!maySummonPlotAnimal(entity.getLocation())) {
 			event.setCancelled(true);
 		}
 	}
@@ -934,7 +982,7 @@ public class EntityListener implements Listener {
 		}
 
 		Optional<Zone> optionalZone = ZoneUtils.getZone(loc);
-		if (!optionalZone.isPresent()) {
+		if (optionalZone.isEmpty()) {
 			// Fall back on killinator functions for plots world
 			return true;
 		}
@@ -965,7 +1013,7 @@ public class EntityListener implements Listener {
 		if (animalsRemaining != lastWarningCount && animalsRemaining <= 5) {
 			String msg;
 			if (animalsRemaining >= 2) {
-				msg = "You may have " + Integer.toString(animalsRemaining) + " more animals on your plot.";
+				msg = "You may have " + animalsRemaining + " more animals on your plot.";
 			} else if (animalsRemaining == 1) {
 				msg = "You may have 1 more animal on your plot.";
 			} else if (animalsRemaining == 0) {

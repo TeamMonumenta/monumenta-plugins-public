@@ -151,11 +151,10 @@ public class FirmamentOverride {
 	public static boolean changeMode(ItemStack item, Player player) {
 		if (!isFirmamentItem(item)) {
 			//Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe
-			return true;
+			return false;
 		}
-
 		if (!player.isSneaking()) {
-			return true;
+			return false;
 		}
 
 		NBTItem nbt = new NBTItem(item);

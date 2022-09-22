@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PredatorStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -51,6 +52,7 @@ public class PredatorStrike extends Ability {
 
 	private boolean mActive = false;
 	private final double mDistanceScale;
+	private final double mExplodeRadius;
 
 	private final PredatorStrikeCS mCosmetic;
 
@@ -68,6 +70,7 @@ public class PredatorStrike extends Ability {
 		mDisplayItem = new ItemStack(Material.SPECTRAL_ARROW, 1);
 
 		mDistanceScale = isLevelOne() ? DISTANCE_SCALE_1 : DISTANCE_SCALE_2;
+		mExplodeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EXPLODE_RADIUS);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PredatorStrikeCS(), PredatorStrikeCS.SKIN_LIST);
 	}
@@ -77,19 +80,18 @@ public class PredatorStrike extends Ability {
 		if (mPlayer != null && !mPlayer.isSneaking() && !mActive && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isBowOrTrident(mainHand) || mainHand.getType() == Material.SNOWBALL) {
-				Player player = mPlayer;
 				mActive = true;
 				ClientModHandler.updateAbility(mPlayer, this);
 				World world = mPlayer.getWorld();
 
-				mCosmetic.strikeSoundReady(world, player);
+				mCosmetic.strikeSoundReady(world, mPlayer);
 				new BukkitRunnable() {
 					int mTicks = 0;
 
 					@Override
 					public void run() {
 						mTicks++;
-						mCosmetic.strikeParticleReady(mPlayer);
+						mCosmetic.strikeTick(mPlayer, mTicks);
 
 						if (!mActive || mTicks >= 20 * 5) {
 							mActive = false;
@@ -117,47 +119,63 @@ public class PredatorStrike extends Ability {
 			box.shift(direction);
 
 			World world = mPlayer.getWorld();
-			mCosmetic.strikeSoundLaunch(world, mPlayer);
+			mCosmetic.strikeLaunch(world, mPlayer);
 
 			Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(loc, MAX_RANGE));
 
+			boolean hit = false;
 			for (double r = 0; r < MAX_RANGE; r += HITBOX_LENGTH) {
 				Location bLoc = box.getCenter().toLocation(world);
 				mCosmetic.strikeParticleProjectile(mPlayer, bLoc);
 
 				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 					bLoc.subtract(direction.multiply(0.5));
-					explode(bLoc);
-					return true;
+					// Snapshot the mobs that would be hit if it were instananeous.
+					// This is very important for the Firework Strike Cosmetic
+					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(bLoc, mExplodeRadius, mPlayer);
+					mCosmetic.strikeImpact(() -> explode(bLoc, mobs), bLoc, mPlayer);
+					hit = true;
+					break;
 				}
 
 				for (LivingEntity mob : nearbyMobs) {
 					if (mob.getBoundingBox().overlaps(box)) {
 						if (EntityUtils.isHostileMob(mob)) {
-							explode(bLoc);
-							return true;
+							// Snapshot the mobs that would be hit if it were instananeous.
+							// This is very important for the Firework Strike Cosmetic
+							List<LivingEntity> mobs = EntityUtils.getNearbyMobs(bLoc, mExplodeRadius, mPlayer);
+							mCosmetic.strikeImpact(() -> explode(bLoc, mobs), bLoc, mPlayer);
+							hit = true;
+							break;
 						}
 					}
 				}
+
+				if (hit) {
+					break;
+				}
 				box.shift(shift);
+			}
+			if (!hit) {
+				Location bLoc = box.getCenter().toLocation(world);
+				if (mCosmetic instanceof FireworkStrikeCS) {
+					mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, mExplodeRadius), bLoc, mPlayer);
+				}
 			}
 		}
 		return true;
 	}
 
-	private void explode(Location loc) {
+	private void explode(Location loc, List<LivingEntity> mobs) {
 		if (mPlayer == null) {
 			return;
 		}
 		World world = mPlayer.getWorld();
 
-		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EXPLODE_RADIUS);
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE)));
 
-		mCosmetic.strikeParticleExplode(mPlayer, loc, radius);
-		mCosmetic.strikeSoundExplode(world, mPlayer, loc);
+		mCosmetic.strikeExplode(world, mPlayer, loc, mExplodeRadius);
 
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius, mPlayer);
 		for (LivingEntity mob : mobs) {
 			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
 			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, damage, mInfo.mLinkedSpell, true);

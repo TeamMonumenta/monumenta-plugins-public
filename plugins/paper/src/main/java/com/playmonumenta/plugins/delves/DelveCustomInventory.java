@@ -39,7 +39,7 @@ public class DelveCustomInventory extends CustomInventory {
 	private static final ItemStack BOUNTY_SELECTION_ITEM = getBountySelection();
 	private static final ItemStack STARTING_ITEM = new ItemStack(Material.OBSERVER);
 	private static final ItemStack STARTING_ITEM_NOT_ENOUGH_POINTS = new ItemStack(Material.OBSERVER);
-	private static final ItemStack ROTATING_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(Material.MAGENTA_GLAZED_TERRACOTTA, Component.text("Rotating Modifier", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), "One of these modifiers is randomly available each week.");
+	private static final ItemStack ROTATING_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(Material.MAGENTA_GLAZED_TERRACOTTA, Component.text("Rotating Modifier", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), "Some of these modifiers are randomly available each week. Selecting at least one will result in 25% increased XP.");
 	private static final Map<String, String> DUNGEON_FUNCTION_MAPPINGS = new HashMap<>();
 
 	static {
@@ -154,7 +154,7 @@ public class DelveCustomInventory extends CustomInventory {
 		}
 		// Ignore old entropy point so the count doesn't stack. Also, only count up to how many delve points can still be randomly assigned.
 		int entropy = Entropy.getDepthPointsAssigned(mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0)) - Entropy.getDepthPointsAssigned(mIgnoreOldEntropyPoint);
-		int entropyAssignablePoints = mods.stream().filter(mod -> mod != DelvesModifier.ENTROPY)
+		int entropyAssignablePoints = DelvesModifier.entropyAssignable().stream()
 			.mapToInt(mod -> DelvesUtils.getMaxPointAssignable(mod, 1000) - mPointSelected.getOrDefault(mod, 0))
 			.sum();
 		mTotalPoint += Math.min(entropy, entropyAssignablePoints);
@@ -174,7 +174,7 @@ public class DelveCustomInventory extends CustomInventory {
 		mods = DelvesModifier.valuesList();
 		if (mOwner.getGameMode() != GameMode.CREATIVE) {
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
-			mods.add(DelvesUtils.getWeeklyRotatingModifier());
+			mods.addAll(DelvesUtils.getWeeklyRotatingModifier());
 		}
 		for (int i = 0; i < 7; i++) {
 			if (mPage * 7 + i >= mods.size()) {
@@ -404,7 +404,7 @@ public class DelveCustomInventory extends CustomInventory {
 					List<DelvesModifier> mods = DelvesModifier.valuesList();
 					if (mOwner.getGameMode() != GameMode.CREATIVE) {
 						mods.removeAll(DelvesModifier.rotatingDelveModifiers());
-						mods.add(DelvesUtils.getWeeklyRotatingModifier());
+						mods.addAll(DelvesUtils.getWeeklyRotatingModifier());
 					}
 					DelvesModifier mod = mods.get(column - 1 + (mPage * 7));
 					if (row == 5) {
@@ -434,7 +434,7 @@ public class DelveCustomInventory extends CustomInventory {
 			} else if (mEditableDelvePoint) {
 				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
 				for (DelvesModifier mod : DelvesModifier.values()) {
-					if (DelvesModifier.rotatingDelveModifiers().contains(mod) && DelvesUtils.getWeeklyRotatingModifier() != mod) {
+					if (DelvesModifier.rotatingDelveModifiers().contains(mod) && !DelvesUtils.getWeeklyRotatingModifier().contains(mod)) {
 						continue;
 					} else {
 						mPointSelected.put(mod, DelvesUtils.getMaxPointAssignable(mod, 1000));

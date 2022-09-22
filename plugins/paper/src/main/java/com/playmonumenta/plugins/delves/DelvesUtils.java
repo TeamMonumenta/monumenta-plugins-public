@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import it.unimi.dsi.util.XoRoShiRo128PlusRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -59,6 +60,7 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.UNYIELDING, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.ASTRAL, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.CHRONOLOGY, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.RIFTBORN, 1);
 
 		// Depths endless changes- use dev2 for testing
 		if (ServerProperties.getShardName().startsWith("depths")
@@ -82,14 +84,23 @@ public class DelvesUtils {
 
 		int maxDepthPoints = 0;
 		for (Map.Entry<DelvesModifier, Integer> entry : MODIFIER_RANK_CAPS.entrySet()) {
-			maxDepthPoints += entry.getValue() * entry.getKey().getPointsPerLevel();
+			if (!DelvesModifier.rotatingDelveModifiers().contains(entry.getKey())
+				|| getWeeklyRotatingModifier().contains(entry.getKey())) {
+				maxDepthPoints += entry.getValue() * entry.getKey().getPointsPerLevel();
+			}
 		}
 
 		MAX_DEPTH_POINTS = maxDepthPoints;
 	}
 
-	public static DelvesModifier getWeeklyRotatingModifier() {
-		List<DelvesModifier> nWeekRotation = DelvesModifier.rotatingDelveModifiers();
+	public static List<DelvesModifier> getWeeklyRotatingModifier() {
+		List<List<DelvesModifier>> nWeekRotation = new ArrayList<>();
+		List<DelvesModifier> rotatingMods = DelvesModifier.rotatingDelveModifiers();
+		for (int i = 0; i < rotatingMods.size() - 1; i++) {
+			for (int j = i + 1; j < rotatingMods.size(); j++) {
+				nWeekRotation.add(Arrays.asList(rotatingMods.get(i), rotatingMods.get(j)));
+			}
+		}
 		Collections.shuffle(nWeekRotation, new XoRoShiRo128PlusRandom(DateUtils.getWeeklyVersion() / nWeekRotation.size()));
 		return nWeekRotation.get((int)(DateUtils.getWeeklyVersion() % nWeekRotation.size()));
 	}

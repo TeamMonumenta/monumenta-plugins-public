@@ -35,8 +35,13 @@ public class Carapace implements Infusion {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				plugin.mEffectManager.addEffect(player, DAMAGE_REDUCTION_EFFECT_NAME, new PercentDamageReceived(DURATION, -DAMAGE_REDUCTION_PER_LEVEL * modifiedLevel));
+				plugin.mEffectManager.addEffect(player, DAMAGE_REDUCTION_EFFECT_NAME, new PercentDamageReceived(DURATION, getDamageTakenMultiplier(modifiedLevel) - 1));
 			}
 		}.runTaskLater(plugin, 1);
 	}
+
+	public static double getDamageTakenMultiplier(double level) {
+		return 1 - DAMAGE_REDUCTION_PER_LEVEL * level;
+	}
+
 }
