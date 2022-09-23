@@ -36,6 +36,7 @@ public class BountyCustomInventory extends CustomInventory {
 	private static final int RANGE = 10;
 
 	private static final List<Integer> BOUNTY_L1_LOCATIONS = new ArrayList<>(Arrays.asList(19, 22, 25));
+	private static final List<Integer> PRESET_L1_LOCATIONS = new ArrayList<>(Arrays.asList(19, 21, 23, 25));
 	private static final List<String> BOUNTY_SCOREBOARDS = new ArrayList<>(Arrays.asList("DailyQuest", "Daily2Quest", "Daily3Quest"));
 	private static final List<String> BOUNTY_REWARD_BOARDS = new ArrayList<>(Arrays.asList("DailyReward", "Daily2Reward", "Daily3Reward"));
 	private static final List<String> LORE_SCOREBOARDS = new ArrayList<>(Arrays.asList("DailyLoreReq", "Daily2LoreReq", "Daily3LoreReq"));
@@ -72,7 +73,7 @@ public class BountyCustomInventory extends CustomInventory {
 	private final List<DelvePreset> mPresetChoices = new ArrayList<>();
 	private final int mLevel;
 	private final int mRegion;
-	private int mPresetLevel = 0;
+	private int mPresetLevel = -1;
 
 	public BountyCustomInventory(Player player, int region, int level) throws Exception {
 		//super creates the GUI with arguments of player to open for, slots in GUI,
@@ -91,7 +92,7 @@ public class BountyCustomInventory extends CustomInventory {
 			ScoreboardUtils.getScoreboardValue(player, "R" + region + "Bounties" + 3).orElse(0) != 0) {
 			loadFromExisting(player);
 		} else {
-			if (mPresetLevel == 0 && region == 3) {
+			if (mPresetLevel == -1 && region == 3) {
 				pickR3DelveLevel();
 			} else {
 				pickNewBounties(player);
@@ -113,18 +114,23 @@ public class BountyCustomInventory extends CustomInventory {
 		}
 
 		if (mLevel == 0) {
+			for (int i = 0; i < PRESET_L1_LOCATIONS.size(); i++) {
+				if (event.getSlot() == PRESET_L1_LOCATIONS.get(i)) {
+					if (mPresetLevel == -1) {
+						mPresetLevel = i;
+						for (int j = 0; j < PRESET_L1_LOCATIONS.size(); j++) {
+							_inventory.setItem(PRESET_L1_LOCATIONS.get(j), new ItemStack(FILLER, 1));
+						}
+						pickNewBounties((Player) event.getWhoClicked());
+						return;
+					}
+				}
+			}
 			for (int i = 0; i < BOUNTY_L1_LOCATIONS.size(); i++) {
 				if (event.getSlot() == BOUNTY_L1_LOCATIONS.get(i)) {
-					if (mRegion == 3) {
-						if (mPresetLevel == 0) {
-							mPresetLevel = i + 1;
-							pickNewBounties((Player) event.getWhoClicked());
-							return;
-						}
+					setBounty((Player) event.getWhoClicked(), mBountyChoices.get(i), mPresetChoices.isEmpty() ? null : mPresetChoices.get(i));
+					if (!mPresetChoices.isEmpty()) {
 						DelvesManager.savePlayerData((Player) event.getWhoClicked(), "ring", mPresetChoices.get(i).mModifiers);
-						setBounty((Player) event.getWhoClicked(), mBountyChoices.get(i), mPresetChoices.get(i));
-					} else {
-						setBounty((Player) event.getWhoClicked(), mBountyChoices.get(i), null);
 					}
 					event.getWhoClicked().closeInventory();
 					return;
@@ -141,14 +147,14 @@ public class BountyCustomInventory extends CustomInventory {
 			Collections.shuffle(mBounties);
 			int usedLocations = 0;
 			List<DelvePreset> presets = new ArrayList<>();
-			if (mRegion == 3) {
+			if (mRegion == 3 && mPresetLevel > 0) {
 				presets.addAll(DelvePreset.getRandomPresets(mPresetLevel));
 			}
 			for (BountyData bounty : mBounties) {
 				if (bounty.mScoreboardReq == null ||
 					(ScoreboardUtils.getScoreboardValue(player, bounty.mScoreboardReq).orElse(0) >= bounty.mReqMin)) {
 					int bountyTag = bounty.mID * 100;
-					if (mRegion == 3) {
+					if (mRegion == 3 && mPresetLevel > 0) {
 						DelvePreset preset = presets.get(usedLocations);
 						bountyTag += preset.mId;
 						mPresetChoices.add(preset);
@@ -171,10 +177,13 @@ public class BountyCustomInventory extends CustomInventory {
 	}
 
 	private void pickR3DelveLevel() {
-		for (int i = 0; i < BOUNTY_L1_LOCATIONS.size(); i++) {
-			_inventory.setItem(BOUNTY_L1_LOCATIONS.get(i), createBasicItem(
-				Material.SOUL_LANTERN, i + 1, "Level " + (i + 1), NamedTextColor.AQUA,
-				false, "Delve presets will be rolled from level " + (i + 1) + ".", ChatColor.WHITE));
+		_inventory.setItem(PRESET_L1_LOCATIONS.get(0), createBasicItem(
+			Material.LANTERN, 1, "None", NamedTextColor.AQUA,
+			false, "Delve presets will not be applied.", ChatColor.WHITE));
+		for (int i = 1; i < PRESET_L1_LOCATIONS.size(); i++) {
+			_inventory.setItem(PRESET_L1_LOCATIONS.get(i), createBasicItem(
+				Material.SOUL_LANTERN, i, "Level " + i, NamedTextColor.AQUA,
+				false, "Delve presets will be rolled from level " + i + ".", ChatColor.WHITE));
 		}
 		createDelveInfoItem();
 		fillEmpty();
@@ -194,21 +203,29 @@ public class BountyCustomInventory extends CustomInventory {
 		if (mLevel == 0) {
 			List<Integer> savedBounties = new ArrayList<>();
 			List<Integer> savedPresets = new ArrayList<>();
+			BountyData[] orderedBounties = new BountyData[3];
+			DelvePreset[] orderedPresets = new DelvePreset[3];
 			for (int i = 1; i <= 3; i++) {
 				int currentValue = ScoreboardUtils.getScoreboardValue(player, "R" + mRegion + "Bounties" + i).orElse(0);
 				savedBounties.add(currentValue / 100);
 				savedPresets.add(currentValue % 100);
 			}
 			for (BountyData bounty : mBounties) {
-				if (savedBounties.contains(bounty.mID)) {
-					mBountyChoices.add(bounty);
+				for (int i = 0; i < savedBounties.size(); i++) {
+					if (savedBounties.get(i) == bounty.mID) {
+						orderedBounties[i] = bounty;
+					}
 				}
 			}
 			for (DelvePreset preset : DelvePreset.values()) {
-				if (savedPresets.contains(preset.mId)) {
-					mPresetChoices.add(preset);
+				for (int i = 0; i < savedPresets.size(); i++) {
+					if (savedPresets.get(i) == preset.mId) {
+						orderedPresets[i] = preset;
+					}
 				}
 			}
+			mBountyChoices.addAll(Arrays.asList(orderedBounties));
+			mPresetChoices.addAll(Arrays.asList(orderedPresets));
 			setLayout();
 		}
 	}
