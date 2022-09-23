@@ -261,7 +261,7 @@ public class ItemStatUtils {
 		CASINO1("casino1", Component.text("Rock's Little Casino", TextColor.fromHexString("#EDC863")).decoration(TextDecoration.ITALIC, false)),
 		CASINO2("casino2", Component.text("Monarch's Cozy Casino", TextColor.fromHexString("#1773B1")).decoration(TextDecoration.ITALIC, false)),
 		CASINO3("casino3", Component.text("Stick's Placeholder Name Casino", TextColor.fromHexString("#C4BBA5")).decoration(TextDecoration.ITALIC, false)),
-		QUEST("quest", Component.text("Stick's Placeholder Name Casino", TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false)),
+		QUEST("quest", Component.text("Quest Item", TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false)),
 		LABS("labs", Component.text("Alchemy Labs", TextColor.fromHexString("#B4ACC3")).decoration(TextDecoration.ITALIC, false)),
 		WHITE("white", Component.text("Halls of Wind and Blood", TextColor.fromHexString("#FFFFFF")).decoration(TextDecoration.ITALIC, false)),
 		ORANGE("orange", Component.text("Fallen Menagerie", TextColor.fromHexString("#FFAA00")).decoration(TextDecoration.ITALIC, false)),
