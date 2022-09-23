@@ -81,7 +81,7 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 				new Particle.DustOptions(TWIST_COLOR_TIP, 1)).spawnAsPlayerActive(mPlayer);
 		}
 
-		if (mTarget != null) {
+		if (mTarget != null && !mTarget.isDead() && mTarget.isValid()) {
 			loc = LocationUtils.getHalfHeightLocation(mTarget);
 			for (int i = 0; i < 2; i++) {
 				double rotation = Math.toRadians((t * 10) + (i * 180));

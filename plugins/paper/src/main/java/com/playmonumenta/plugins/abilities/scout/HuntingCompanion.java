@@ -163,6 +163,10 @@ public class HuntingCompanion extends Ability {
 				@Override
 				public void run() {
 					mT++;
+					if (mFox == null || mFox.isDead() || !mFox.isValid()) {
+						this.cancel();
+						return;
+					}
 					mCosmetic.foxTick(mFox, mPlayer, mTarget, mT);
 				}
 
