@@ -32,7 +32,7 @@ public class DelveCustomInventory extends CustomInventory {
 	private static final ItemStack REMOVE_ALL_MOD_ITEM = getResetModifiers();
 	private static final ItemStack STARTING_ITEM = new ItemStack(Material.OBSERVER);
 	private static final ItemStack STARTING_ITEM_NOT_ENOUGH_POINTS = new ItemStack(Material.OBSERVER);
-	private static final ItemStack ROTATING_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(Material.MAGENTA_GLAZED_TERRACOTTA, Component.text("Rotating Modifier", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), "Some of these modifiers are randomly available each week. Selecting at least one will result in 25% increased XP.");
+	private static final ItemStack ROTATING_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(Material.MAGENTA_GLAZED_TERRACOTTA, Component.text("Rotating Modifier", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), new String[] {"Some of these modifiers are randomly available each week.", "Selecting at least one will result in 25% increased XP."});
 	private static final Map<String, String> DUNGEON_FUNCTION_MAPPINGS = new HashMap<>();
 
 	static {
