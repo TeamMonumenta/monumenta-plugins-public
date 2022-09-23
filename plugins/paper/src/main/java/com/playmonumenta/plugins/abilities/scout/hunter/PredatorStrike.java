@@ -124,7 +124,8 @@ public class PredatorStrike extends Ability {
 					// Snapshot the mobs that would be hit if it were instananeous.
 					// This is very important for the Firework Strike Cosmetic
 					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(bLoc, EXPLODE_RADIUS, mPlayer);
-					mCosmetic.strikeImpact(() -> explode(bLoc, mobs), bLoc, mPlayer);
+					mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, EXPLODE_RADIUS), bLoc, mPlayer);
+					explode(bLoc, mobs);
 					hit = true;
 					break;
 				}
@@ -135,7 +136,8 @@ public class PredatorStrike extends Ability {
 							// Snapshot the mobs that would be hit if it were instananeous.
 							// This is very important for the Firework Strike Cosmetic
 							List<LivingEntity> mobs = EntityUtils.getNearbyMobs(bLoc, EXPLODE_RADIUS, mPlayer);
-							mCosmetic.strikeImpact(() -> explode(bLoc, mobs), bLoc, mPlayer);
+							mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, EXPLODE_RADIUS), bLoc, mPlayer);
+							explode(bLoc, mobs);
 							hit = true;
 							break;
 						}
