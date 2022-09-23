@@ -118,7 +118,8 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		BORDER_ITEMS.add(new TeleportEntry(3, 24, "Valley of Forgotten Pharaohs", "A plot in the hostile town within the gray dungeon.", Material.GRAY_WOOL, "Gray", 1, "dungeons/gray"));
 		BORDER_ITEMS.add(new TeleportEntry(3, 25, "Grasp of Avarice", "A plot found at the end of the orange branch of the dungeon.", Material.PURPLE_WOOL, "Purple", 1, "dungeons/purple"));
 		BORDER_ITEMS.add(new TeleportEntry(3, 26, "Echoes of Oblivion", "Warp to another time with this plot located in Era 3!", Material.CYAN_CONCRETE_POWDER, "Teal", 1, "dungeons/teal"));
-		BORDER_ITEMS.add(new TeleportEntry(3, 31, "Christmas Night", "Not a creature was stirring, not even a mouse...", Material.SPRUCE_SAPLING, null, 0, "christmas_night"));
+		BORDER_ITEMS.add(new TeleportEntry(3, 30, "Christmas Night", "Not a creature was stirring, not even a mouse...", Material.SPRUCE_SAPLING, null, 0, "christmas_night"));
+		BORDER_ITEMS.add(new TeleportEntry(3, 32, "Gyrhaeddant's Lair", "A plot directly below the tentacles of the depths boss", Material.CRIMSON_HYPHAE, null, 0, "pois/gyrhaeddant"));
 	}
 
 	private int mCurrentPage;
