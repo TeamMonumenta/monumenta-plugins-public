@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
@@ -62,6 +61,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	private int mTicks;
 
 	private boolean mHasSmokescreen = false;
+	private int mLastCastTicks = 0;
 
 	public BodkinBlitz(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Bodkin Blitz");
@@ -92,8 +92,8 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mStealthDuration = (isLevelOne() ? STEALTH_DURATION_1 : STEALTH_DURATION_2) + CharmManager.getExtraDuration(player, CHARM_STEALTH);
 		mBonusDmg = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? BONUS_DMG_1 : BONUS_DMG_2);
 
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mHasSmokescreen = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Smokescreen.class) != null;
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			mHasSmokescreen = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Smokescreen.class) != null;
 		});
 	}
 
@@ -109,6 +109,13 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		if (mHasSmokescreen && loc.getPitch() > 50) {
 			return;
 		}
+
+		int ticks = mPlayer.getTicksLived();
+		// Prevent double casting on accident
+		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
+			return;
+		}
+		mLastCastTicks = ticks;
 
 		if (!consumeCharge()) {
 			return;
@@ -215,8 +222,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 			mTicks = 0;
 			mRunnable.cancel();
 			mRunnable = null;
-			if (enemy instanceof Mob) {
-				Mob m = (Mob) enemy;
+			if (enemy instanceof Mob m) {
 				if (m.getTarget() == null || !m.getTarget().getUniqueId().equals(mPlayer.getUniqueId())) {
 					Location entityLoc = m.getLocation().clone().add(0, 1, 0);
 

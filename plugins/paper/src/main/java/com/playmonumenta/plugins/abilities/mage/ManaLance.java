@@ -79,15 +79,16 @@ public class ManaLance extends MultipleChargeAbility {
 			return;
 		}
 
-		float damage = mDamage;
-		damage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-		damage = SpellPower.getSpellDamage(mPlugin, mPlayer, damage);
 		int ticks = mPlayer.getTicksLived();
 		// Prevent double casting on accident
 		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
 			return;
 		}
 		mLastCastTicks = ticks;
+
+		float damage = mDamage;
+		damage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
+		damage = SpellPower.getSpellDamage(mPlugin, mPlayer, damage);
 
 		Location loc = mPlayer.getEyeLocation();
 		BoundingBox box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
