@@ -291,6 +291,15 @@ public final class ItemOverrides {
 		mItems.put(Material.SPRUCE_TRAPDOOR, trapdoorOverride);
 		mItems.put(Material.WARPED_TRAPDOOR, trapdoorOverride);
 
+		BaseOverride doorOverride = new DoorOverride();
+		mItems.put(Material.ACACIA_DOOR, doorOverride);
+		mItems.put(Material.BIRCH_DOOR, doorOverride);
+		mItems.put(Material.CRIMSON_DOOR, doorOverride);
+		mItems.put(Material.DARK_OAK_DOOR, doorOverride);
+		mItems.put(Material.JUNGLE_DOOR, doorOverride);
+		mItems.put(Material.OAK_DOOR, doorOverride);
+		mItems.put(Material.SPRUCE_DOOR, doorOverride);
+		mItems.put(Material.WARPED_DOOR, doorOverride);
 
 		BaseOverride unbreakableOverride = new UnbreakableOnBedrockOverride();
 		mItems.put(Material.SPAWNER, unbreakableOverride);
