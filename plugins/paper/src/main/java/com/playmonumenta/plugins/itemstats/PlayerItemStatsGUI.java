@@ -693,7 +693,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		if (otherPlayer != null) {
 			setEquipmentFromPlayer(true, otherPlayer);
 		}
-		ItemStatUtils.Region region = Stream.of(mLeftStats.getMaximumRegion(false), mRightStats.getMaximumRegion(false)).max(Comparator.naturalOrder()).orElse(ItemStatUtils.Region.VALLEY);
+		ItemStatUtils.Region region = Stream.of(mLeftStats.getMaximumRegion(false), mRightStats.getMaximumRegion(false))
+			                              .max(Comparator.naturalOrder())
+			                              .orElse(ServerProperties.getClassSpecializationsEnabled() ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY);
 		mLeftStats.mPlayerItemStats.setRegion(region);
 		mRightStats.mPlayerItemStats.setRegion(region);
 		generateInventory();
@@ -977,12 +979,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		ItemMeta swapItemMeta = swapItem.getItemMeta();
 		swapItemMeta.displayName(Component.text("Swap Equipment Sets", NamedTextColor.WHITE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 		swapItem.setItemMeta(swapItemMeta);
-		ItemUtils.setPlainName(swapItem);
 		mInventory.setItem(SWAP_EQUIPMENT_SET_SLOT, swapItem);
 
-		if (ServerProperties.getClassSpecializationsEnabled()) {
-			mLeftStats.mPlayerItemStats.setRegion(ItemStatUtils.Region.ISLES);
-		}
 		mInventory.setItem(REGION_SETTING_SLOT, REGION_ICONS.get(mLeftStats.mPlayerItemStats.getRegion()));
 
 		for (StatItem statItem : STAT_ITEMS) {
@@ -999,10 +997,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				meta.displayName(stat.getDisplay(false));
 			}
 			meta.lore(stat.getDisplayLore());
-
 			item.setItemMeta(meta);
-			ItemUtils.setPlainName(item);
-
 			mInventory.setItem(stat.getSlot(), item);
 		}
 
@@ -1027,7 +1022,6 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			}
 			meta.lore(lore);
 			item.setItemMeta(meta);
-			ItemUtils.setPlainName(item);
 			return item;
 		};
 		mInventory.setItem(INFUSION_SETTINGS_LEFT_SLOT, makeInfusionSettingsItem.apply(true, mLeftStats.mInfusionSetting));
@@ -1046,6 +1040,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		mInventory.setItem(28, getWarningIcon(mLeftStats));
 		mInventory.setItem(34, getWarningIcon(mRightStats));
 
+		for (ItemStack item : mInventory) {
+			ItemUtils.setPlainTag(item);
+		}
 		GUIUtils.fillWithFiller(mInventory, Material.BLACK_STAINED_GLASS_PANE);
 
 	}

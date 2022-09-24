@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
 import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -189,7 +190,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			mInventory.setItem(P1_RESET_SPEC_LOC, specItem);
 		}
 		makeRemainingCountItems(player);
-		fillEmpty();
+		fillEmptyAndSetPlainTags();
 	}
 
 	public void makePageTwo(PlayerClass userClass, Player player) {
@@ -231,7 +232,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 
 		makeRemainingCountItems(player);
-		fillEmpty();
+		fillEmptyAndSetPlainTags();
 	}
 
 	public void makePageThree(PlayerClass userClass, PlayerSpec spec, Player player) {
@@ -259,7 +260,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				NamedTextColor.GRAY, false, "Return to the skill selection page.", ChatColor.GRAY);
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 		makeRemainingCountItems(player);
-		fillEmpty();
+		fillEmptyAndSetPlainTags();
 	}
 
 	public void applyAbilityChosen(int chosenSlot, Player player, int level) {
@@ -430,16 +431,15 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 		int currentSkillCount = ScoreboardUtils.getScoreboardValue(player, ABILITY_SKILLCOUNT);
 		ItemStack summaryItem = createBasicItem(currentSkillCount == 0 ? Material.BARRIER : Material.GRASS_BLOCK, "Skill Points", NamedTextColor.WHITE, false,
-				"You have " + currentSkillCount + " skill points remaining.", ChatColor.LIGHT_PURPLE);
+			"You have " + currentSkillCount + " skill points remaining.", ChatColor.LIGHT_PURPLE);
 		summaryItem.setAmount(currentSkillCount > 0 ? currentSkillCount : 1);
 		mInventory.setItem(COMMON_REMAINING_SKILL_LOC, summaryItem);
 	}
 
-	public void fillEmpty() {
-		for (int i = 0; i < 54; i++) {
-			if (mInventory.getItem(i) == null) {
-				mInventory.setItem(i, new ItemStack(FILLER, 1));
-			}
+	public void fillEmptyAndSetPlainTags() {
+		for (ItemStack item : mInventory) {
+			ItemUtils.setPlainTag(item);
 		}
+		GUIUtils.fillWithFiller(mInventory, FILLER);
 	}
 }
