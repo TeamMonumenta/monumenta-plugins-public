@@ -15,6 +15,8 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	// https://minecraft.fandom.com/wiki/Commands/particle#Arguments
 	// https://papermc.io/javadocs/paper/1.16/org/bukkit/entity/Player.html#spawnParticle-org.bukkit.Particle-org.bukkit.Location-int-double-double-double-double-T-
 
+	private static final int PARTICLE_SPAWN_DISTANCE = 30;
+
 	public Particle mParticle;
 	public Location mLocation;
 	public int mCount = 1;
@@ -380,8 +382,10 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	}
 
 	private SelfT forEachNearbyPlayer(Consumer<Player> playerAction) {
-		for (Player player : mLocation.getNearbyPlayers(100)) {
-			playerAction.accept(player);
+		for (Player player : mLocation.getWorld().getPlayers()) {
+			if (player.getLocation().distance(mLocation) < PARTICLE_SPAWN_DISTANCE) {
+				playerAction.accept(player);
+			}
 		}
 		return getSelf();
 	}

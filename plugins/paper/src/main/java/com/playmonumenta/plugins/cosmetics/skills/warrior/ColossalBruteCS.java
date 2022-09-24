@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.*;
@@ -53,18 +54,23 @@ public class ColossalBruteCS extends BruteForceCS {
 					new Particle.DustOptions(
 						ParticleUtils.getTransition(COLO_COLOR_BASE, COLO_COLOR_TIP, ring / 8D),
 						0.6f + (ring * 0.1f)
-					)).spawnAsPlayerActive(mPlayer);
+					))
+					.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 			});
 		mPlayer.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 1f, GOLEM_PITCHES[combo]);
 		mPlayer.getWorld().playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 0.65f);
 		mPlayer.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 1f, 0.75f);
 		if (combo == 2) {
 			mPlayer.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, 1f, 0.55f);
-			new PartialParticle(Particle.SMOKE_LARGE, loc, 16, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.SMOKE_NORMAL, loc, 40, 0, 0, 0, 0.15).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SMOKE_LARGE, loc, 16, 0, 0, 0, 0.125)
+				.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SMOKE_NORMAL, loc, 40, 0, 0, 0, 0.15)
+				.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		}
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 55, 0, 0, 0, 0.15).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.75).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 55, 0, 0, 0, 0.15)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.75)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		new BukkitRunnable() {
 
 			double mRadius = 0;
@@ -76,16 +82,17 @@ public class ColossalBruteCS extends BruteForceCS {
 				for (int i = 0; i < 2; i++) {
 					mRadius += 0.3;
 					for (int degree = 0; degree < 360; degree += 5) {
-						double radian = Math.toRadians(degree);
-						Vector vec = new Vector(FastMath.cos(radian) * mRadius, 0,
-							FastMath.sin(radian) * mRadius);
+						double radian = FastMath.toRadians(degree);
+						Vector vec = new Vector(FastUtils.cos(radian) * mRadius, 0,
+							FastUtils.sin(radian) * mRadius);
 						Location loc = mL.clone().add(vec);
 						new PartialParticle(Particle.DUST_COLOR_TRANSITION, loc, 1, 0, 0, 0, 0,
 							new Particle.DustTransition(
 								ParticleUtils.getTransition(COLO_COLOR_BASE, COLO_COLOR_TIP, mRadius / RADIUS),
 								ParticleUtils.getTransition(TWIST_COLOR_BASE, TWIST_COLOR_TIP, mRadius / RADIUS),
 								0.8f
-							)).spawnAsPlayerActive(mPlayer);
+							))
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					}
 				}
 
