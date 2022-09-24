@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.*;
@@ -60,6 +61,6 @@ public class AvalanchexCS extends AmplifyingHexCS {
 	public double amplifyingHeight(double radius, double max) {
 		radius -= 1.75;
 		max -= 1.75;
-		return FastMath.sin((radius / max) * Math.PI) * 1.5;
+		return FastUtils.sin((radius / max) * Math.PI) * 1.5;
 	}
 }

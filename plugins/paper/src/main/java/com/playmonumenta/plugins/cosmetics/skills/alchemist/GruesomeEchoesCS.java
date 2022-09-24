@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -46,7 +47,8 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 			spawnRing(mPlayer.getLocation(), mPlayer, TWISTED_COLOR);
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 1, 0.75f);
 		}
-		new PartialParticle(Particle.SOUL, mPlayer.getLocation().clone().add(0, 1, 0), 10, 0.4, 0.4, 0.4, 0.02).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SOUL, mPlayer.getLocation().clone().add(0, 1, 0), 10, 0.4, 0.4, 0.4, 0.02)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PHANTOM_AMBIENT, SoundCategory.PLAYERS, 2f, 0.5f);
 	}
 
@@ -61,8 +63,10 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.ENTITY_HUSK_STEP, SoundCategory.PLAYERS, 1f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_HUSK_STEP, SoundCategory.PLAYERS, 1f, 0.5f);
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 35, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SOUL, loc, 15, 0, 0, 0, 0.075).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 35, 0, 0, 0, 0.125)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SOUL, loc, 15, 0, 0, 0, 0.075)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override
@@ -85,12 +89,13 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 				for (int i = 0; i < 3; i++) {
 					mRadius -= 0.25;
 					for (int degree = 0; degree < 360; degree += 9) {
-						double radian = Math.toRadians(degree);
-						Vector vec = new Vector(FastMath.cos(radian) * mRadius, 0,
-							FastMath.sin(radian) * mRadius);
+						double radian = FastMath.toRadians(degree);
+						Vector vec = new Vector(FastUtils.cos(radian) * mRadius, 0,
+							FastUtils.sin(radian) * mRadius);
 						Location loc = l.clone().add(vec);
 						new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0,
-							new Particle.DustOptions(color, 0.75f)).spawnAsPlayerActive(mPlayer);
+							new Particle.DustOptions(color, 0.75f))
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					}
 					if (mRadius <= 0) {
 						this.cancel();

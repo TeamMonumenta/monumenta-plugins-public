@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.skills.scout.hunter;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -47,15 +48,17 @@ public class FireworkStrikeCS extends PredatorStrikeCS {
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
 
 		for (int i = 0; i < 4; i++) {
-			double rotation = Math.toRadians((tick * 10) + (i * 90));
-			Vector vec = new Vector(FastMath.cos(rotation) * 0.75, 0,
-				FastMath.sin(rotation) * 0.75);
+			double rotation = FastMath.toRadians((tick * 10) + (i * 90));
+			Vector vec = new Vector(FastUtils.cos(rotation) * 0.75, 0,
+				FastUtils.sin(rotation) * 0.75);
 			Location l = loc.clone().add(vec);
 			if (i % 2 == 0) {
 				new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0,
-					new Particle.DustOptions(TRAIL_COLOR, 1)).spawnAsPlayerActive(mPlayer);
+					new Particle.DustOptions(TRAIL_COLOR, 1))
+					.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 			} else {
-				new PartialParticle(Particle.CRIT, l.clone().subtract(0, 0.25, 0), 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CRIT, l.clone().subtract(0, 0.25, 0), 1, 0, 0, 0, 0)
+					.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 			}
 		}
 	}
@@ -77,6 +80,7 @@ public class FireworkStrikeCS extends PredatorStrikeCS {
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_DOOR_OPEN, SoundCategory.PLAYERS, 1, 1.5f);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_DOOR_OPEN, SoundCategory.PLAYERS, 1, 2f);
 		new PartialParticle(Particle.CRIT_MAGIC, loc, 75, 0, 0, 0, 0.75)
+			.minimumMultiplier(false)
 			.spawnAsPlayerActive(mPlayer);
 
 	}
@@ -90,7 +94,7 @@ public class FireworkStrikeCS extends PredatorStrikeCS {
 		world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1, 1.75f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 1, 1.5f);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 25, 0, 0, 0, 0.175)
-			.spawnAsPlayerActive(mPlayer);
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, 0, 1, 0, 0, 42, 0.5f,
 			true, 0, Particle.EXPLOSION_NORMAL);
 		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, 0, 1, 0, 0, 55, 2.25f,
@@ -105,10 +109,14 @@ public class FireworkStrikeCS extends PredatorStrikeCS {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, EXPLODE_VOLUME, 0.8f);
 		}, 10);
-		new PartialParticle(Particle.FLAME, loc, 75, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.END_ROD, loc, 60, 0, 0, 0, 0.25).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 5, 1, 1, 1, 0).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, 0, 0, 0, 0.225).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLAME, loc, 75, 0, 0, 0, 0.2)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.END_ROD, loc, 60, 0, 0, 0, 0.25)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 5, 1, 1, 1, 0)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, 0, 0, 0, 0.225)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override
@@ -141,7 +149,7 @@ public class FireworkStrikeCS extends PredatorStrikeCS {
 						mL.add(mD);
 
 						new PartialParticle(Particle.REDSTONE, mL, 1, 0, 0, 0, 0, new Particle.DustOptions(TRAIL_COLOR, 2.5f))
-							.spawnAsPlayerActive(mPlayer);
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 						ParticleUtils.drawParticleCircleExplosion(mPlayer, mL, 0, 1, 0, 90, 2, 0.085f,
 							true, mAngle, Particle.END_ROD);
 						ParticleUtils.drawParticleCircleExplosion(mPlayer, mL, 0, 1, 0, 90, 2, 1f,

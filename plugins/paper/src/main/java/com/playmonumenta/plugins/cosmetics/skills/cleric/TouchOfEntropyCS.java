@@ -45,7 +45,8 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 	@Override
 	public void lightHealEffect(Player mPlayer, Location loc, Player mTarget) {
 		Location l = loc.clone().add(0, 1, 0);
-		new PartialParticle(Particle.HEART, l, 7, 0.7, 0.7, 0.7, 0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.HEART, l, 7, 0.7, 0.7, 0.7, 0)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 2.0f, 1.2f);
 
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-0.75, 0.75),
@@ -63,7 +64,8 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 	@Override
 	public void lightDamageEffect(Player mPlayer, Location loc, LivingEntity target) {
 		loc = loc.clone().add(0, 1, 0);
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		mPlayer.getWorld().playSound(loc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.PLAYERS, 1.5f, 0f);
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-1, 1), FastUtils.randomDoubleInRange(-0.5, 0.5),
 			FastUtils.randomDoubleInRange(-1, 1)), LocationUtils.getHalfHeightLocation(target),
@@ -94,20 +96,23 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 				for (int i = 0; i < 4; i++) {
 					mRadius += damage ? -0.5 : 0.5;
 					for (double degree = 30; degree <= 150; degree += 5) {
-						double radian1 = Math.toRadians(degree);
-						double percent = Math.abs(degree - 90) / 60;
-						double y = 1 * FastMath.sin(Math.PI * ((mRadius + 0.5) / range));
+						double radian1 = FastMath.toRadians(degree);
+						double percent = FastMath.abs(degree - 90) / 60;
+						double y = 1 * FastUtils.sin(Math.PI * ((mRadius + 0.5) / range));
 						vec = new Vector(FastUtils.cos(radian1) * mRadius, y, FastUtils.sin(radian1) * mRadius);
 						vec = VectorUtils.rotateXAxis(vec, mLoc.getPitch());
 						vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 						Location l = mLoc.clone().add(0, 0.125, 0).add(vec);
 						new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
-							new Particle.DustOptions(damage ? ENTRO_COLOR : DRAIN_COLOR, 0.75f + (float) (percent * 0.5f))).spawnAsPlayerActive(mPlayer);
+							new Particle.DustOptions(damage ? ENTRO_COLOR : DRAIN_COLOR, 0.75f + (float) (percent * 0.5f)))
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 						if (damage) {
-							new PartialParticle(Particle.SMOKE_NORMAL, l, 1, 0.125f, 0.125f, 0.125f, 0.075).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.SMOKE_NORMAL, l, 1, 0.125f, 0.125f, 0.125f, 0.075)
+								.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 						} else {
-							new PartialParticle(Particle.PORTAL, l, 3, 0, 0, 0, 0.15).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.PORTAL, l, 3, 0, 0, 0, 0.15)
+								.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 							Color c = FastUtils.RANDOM.nextBoolean() ? DRAIN_COLOR : DRAIN_COLOR_LIGHT;
 							double red = c.getRed() / 255D;
 							double green = c.getGreen() / 255D;
@@ -161,8 +166,9 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 					if (damage) {
 						new PartialParticle(Particle.REDSTONE, mL, 2, 0.075, 0.075, 0.075, 0,
 							new Particle.DustOptions(ENTRO_COLOR, 1.25f))
-							.spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.SMOKE_NORMAL, mL, 2, 0.1, 0.1, 0.1, 0.035).spawnAsPlayerActive(mPlayer);
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SMOKE_NORMAL, mL, 2, 0.1, 0.1, 0.1, 0.035)
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					} else {
 
 						for (int j = 0; j < 2; j++) {
@@ -180,23 +186,27 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 						Color c = FastUtils.RANDOM.nextBoolean() ? DRAIN_COLOR : DRAIN_COLOR_LIGHT;
 						new PartialParticle(Particle.REDSTONE, mL, 1, 0, 0, 0, 0,
 							new Particle.DustOptions(c, 1.4f))
-							.spawnAsPlayerActive(mPlayer);
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					}
 
 					if (mT > 5 && mL.distance(to) < 0.35) {
 						if (damage) {
 							world.playSound(mL, Sound.ENTITY_GHAST_DEATH, SoundCategory.PLAYERS, 0.85f, 0.65f);
 							world.playSound(mL, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 0.85f, 0.5f);
-							new PartialParticle(Particle.SMOKE_NORMAL, mL, 35, 0, 0, 0, 0.1F).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.SMOKE_NORMAL, mL, 35, 0, 0, 0, 0.1F)
+								.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 						} else {
 							world.playSound(mL, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.PLAYERS, 1f, 1.75f);
 							world.playSound(mL, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 1f, 0.65f);
 							new PartialParticle(Particle.SPELL, target.getLocation().add(0, 1, 0), 20, 0.4f, 0.4f, 0.4f, 0.6F)
 								.spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.END_ROD, target.getLocation().add(0, 1, 0), 15, 0, 0, 0, 0.15f).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.CRIT_MAGIC, mL, 45, 0, 0, 0, 0.75F).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.END_ROD, target.getLocation().add(0, 1, 0), 15, 0, 0, 0, 0.15f)
+								.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.CRIT_MAGIC, mL, 45, 0, 0, 0, 0.75F)
+								.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 						}
-						new PartialParticle(Particle.CRIT_MAGIC, mL, 25, 0, 0, 0, 0.6F).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CRIT_MAGIC, mL, 25, 0, 0, 0, 0.6F)
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 						this.cancel();
 						return;
 					}

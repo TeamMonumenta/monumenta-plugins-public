@@ -194,7 +194,7 @@ public class TranscCombosCS extends ViciousCombosCS {
 			(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
 				float size = (float) (0.5f + (0.3f * middleProgress));
 				new PartialParticle(Particle.REDSTONE, lineLoc, 3, 0.05, 0.05, 0.05, 0.25,
-					new Particle.DustOptions(color, size)).spawnAsPlayerActive(mPlayer);
+					new Particle.DustOptions(color, size)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 			});
 
 		world.playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 2f, 0.75f);
@@ -208,7 +208,7 @@ public class TranscCombosCS extends ViciousCombosCS {
 				(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
 					float size = (float) (0.5f + (0.3f * middleProgress));
 					new PartialParticle(Particle.REDSTONE, lineLoc, 3, 0.05, 0.05, 0.05, 0.25,
-						new Particle.DustOptions(color, size)).spawnAsPlayerActive(mPlayer);
+						new Particle.DustOptions(color, size)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 				});
 
 			ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, -35, 1, 0, 0, 75, 2.25f,
@@ -241,16 +241,16 @@ public class TranscCombosCS extends ViciousCombosCS {
 
 		loc.setDirection(dir);
 
-		ParticleUtils.drawParticleLineSlash(loc, dir, 0, LINE_LENGTH, 0.05, 5,
+		ParticleUtils.drawParticleLineSlash(loc, dir, 0, LINE_LENGTH, 0.075, 5,
 			(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
 				float size = (float) (0.3f + (0.35f * middleProgress));
 				new PartialParticle(Particle.REDSTONE, lineLoc, 3, 0.05, 0.05, 0.05, 0.25,
-					new Particle.DustOptions(TRANSC_LINE_COLOR, size)).spawnAsPlayerActive(mPlayer);
+					new Particle.DustOptions(TRANSC_LINE_COLOR, size)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 				if (middle) {
 
 					ParticleUtils.drawParticleCircleExplosion(mPlayer, lineLoc.clone().setDirection(dir), 0, 1, 0, 90, 60, 1.75f,
 						true, 0, 0, Particle.CRIT_MAGIC);
-					new PartialParticle(Particle.END_ROD, lineLoc, 3, 0, 0, 0, 0.15f).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.END_ROD, lineLoc, 3, 0, 0, 0, 0.15f).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 				}
 
 			});

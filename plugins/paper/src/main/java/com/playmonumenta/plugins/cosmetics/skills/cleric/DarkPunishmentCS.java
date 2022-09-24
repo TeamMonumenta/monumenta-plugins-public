@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.List;
@@ -82,7 +83,8 @@ public class DarkPunishmentCS extends DivineJusticeCS {
 			0, 0, 0, 0.1
 		).spawnAsPlayerActive(mPlayer);
 		partialParticle.mParticle = Particle.SPELL_WITCH;
-		partialParticle.spawnAsPlayerActive(mPlayer);
+		partialParticle
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
 		ParticleUtils.drawHalfArc(loc, 2.1, ANGLE[combo], -20, 140, 7, 0.2,
@@ -92,7 +94,8 @@ public class DarkPunishmentCS extends DivineJusticeCS {
 					ParticleUtils.getTransition(BASE_COLOR, TIP_COLOR, ring / 7D),
 					ParticleUtils.getTransition(BASE_COLOR_TRANSITION, TIP_COLOR_TRANSITION, ring / 7D),
 					0.6f + (ring * 0.1f)
-				)).spawnAsPlayerActive(mPlayer);
+				))
+				.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		});
 	}
 
@@ -101,7 +104,8 @@ public class DarkPunishmentCS extends DivineJusticeCS {
 		loc.add(0, 0.125, 0);
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.5f, 1.65f);
-		new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.175).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.175)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 
 		new BukkitRunnable() {
 
@@ -114,16 +118,16 @@ public class DarkPunishmentCS extends DivineJusticeCS {
 				for (int i = 0; i < 2; i++) {
 					mRadius += 0.33;
 					for (int degree = 0; degree < 360; degree += 5) {
-						double radian = Math.toRadians(degree);
-						Vector vec = new Vector(FastMath.cos(radian) * mRadius, 0,
-							FastMath.sin(radian) * mRadius);
+						double radian = FastMath.toRadians(degree);
+						Vector vec = new Vector(FastUtils.cos(radian) * mRadius, 0,
+							FastUtils.sin(radian) * mRadius);
 						Location loc = mL.clone().add(vec);
 						new PartialParticle(Particle.DUST_COLOR_TRANSITION, loc, 1, 0, 0, 0, 0,
 							new Particle.DustTransition(
 								ParticleUtils.getTransition(BASE_COLOR, TIP_COLOR, mRadius / RADIUS),
 								ParticleUtils.getTransition(BASE_COLOR_TRANSITION, TIP_COLOR_TRANSITION, mRadius / RADIUS),
 								0.65f
-							)).spawnAsPlayerActive(mPlayer);
+							)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					}
 				}
 

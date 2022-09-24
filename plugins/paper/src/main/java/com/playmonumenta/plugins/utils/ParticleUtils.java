@@ -252,9 +252,9 @@ public class ParticleUtils {
 					double radian1 = FastMath.toRadians(d);
 
 					for (int i = 0; i < rings; i++) {
-						double radiusSpacing = (reverse ? FastMath.cos(mPI) : FastMath.sin(mPI)) * (i * spacing);
-						vec = new Vector(FastMath.cos(radian1) * (radius + radiusSpacing),
-							0, FastMath.sin(radian1) * (radius + radiusSpacing));
+						double radiusSpacing = (reverse ? FastUtils.cos(mPI) : FastUtils.sin(mPI)) * (i * spacing);
+						vec = new Vector(FastUtils.cos(radian1) * (radius + radiusSpacing),
+							0, FastUtils.sin(radian1) * (radius + radiusSpacing));
 						vec = VectorUtils.rotateZAxis(vec, angle);
 						vec = VectorUtils.rotateXAxis(vec, finalLoc.getPitch());
 						vec = VectorUtils.rotateYAxis(vec, finalLoc.getYaw());
@@ -294,22 +294,26 @@ public class ParticleUtils {
 
 		Vector vec;
 		for (int i = 0; i < points; i++) {
-			double radian = Math.toRadians(((360D / points) * i) + radianAdd);
-			vec = new Vector(FastMath.cos(radian) * radius, y, FastMath.sin(radian) * radius);
+			double radian = FastMath.toRadians(((360D / points) * i) + radianAdd);
+			vec = new Vector(FastUtils.cos(radian) * radius, y, FastUtils.sin(radian) * radius);
 			vec = VectorUtils.rotateZAxis(vec, angle);
 			vec = VectorUtils.rotateXAxis(vec, loc.getPitch() + pitch);
 			vec = VectorUtils.rotateYAxis(vec, loc.getYaw() + yaw);
 
 			vec = vec.normalize();
 
-			Vector nonYVec = new Vector(FastMath.cos(radian) * radius, 0, FastMath.sin(radian) * radius);
-			nonYVec = VectorUtils.rotateZAxis(nonYVec, angle);
-			nonYVec = VectorUtils.rotateXAxis(nonYVec, loc.getPitch() + pitch);
-			nonYVec = VectorUtils.rotateYAxis(nonYVec, loc.getYaw() + yaw);
-			Location l = loc.clone().add(nonYVec);
+			Location l = loc.clone();
+			if (y > 0) {
+				Vector nonYVec = new Vector(FastUtils.cos(radian) * radius, 0, FastUtils.sin(radian) * radius);
+				nonYVec = VectorUtils.rotateZAxis(nonYVec, angle);
+				nonYVec = VectorUtils.rotateXAxis(nonYVec, loc.getPitch() + pitch);
+				nonYVec = VectorUtils.rotateYAxis(nonYVec, loc.getYaw() + yaw);
+				l = l.add(nonYVec);
+			}
 
 			for (Particle effect : effects) {
-				new PartialParticle(effect, atOrigin ? loc : l, 1, vec.getX(), vec.getY(), vec.getZ(), speed, data, true, 0).spawnAsPlayerActive(player);
+				new PartialParticle(effect, atOrigin ? loc : l, 1, vec.getX(), vec.getY(), vec.getZ(), speed, data, true, 0)
+					.minimumMultiplier(false).spawnAsPlayerActive(player);
 			}
 		}
 	}
@@ -350,7 +354,7 @@ public class ParticleUtils {
 				public void run() {
 
 
-					for (int i = mPointsPerTick * mT; i < Math.min(points.size(), mPointsPerTick * (mT + 1)); i++) {
+					for (int i = mPointsPerTick * mT; i < FastMath.min(points.size(), mPointsPerTick * (mT + 1)); i++) {
 						Vector point = points.get(i);
 						boolean middle = !mMidReached && i == points.size() / 2;
 						if (middle) {
@@ -392,9 +396,9 @@ public class ParticleUtils {
 					double radian1 = FastMath.toRadians(d);
 
 					for (int i = 0; i < rings; i++) {
-						double radiusSpacing = FastMath.sin(mPI) * (i * spacing);
-						vec = new Vector(FastMath.cos(radian1) * (finalRadius + radiusSpacing),
-							0, FastMath.sin(radian1) * (finalRadius + radiusSpacing));
+						double radiusSpacing = FastUtils.sin(mPI) * (i * spacing);
+						vec = new Vector(FastUtils.cos(radian1) * (finalRadius + radiusSpacing),
+							0, FastUtils.sin(radian1) * (finalRadius + radiusSpacing));
 						vec = VectorUtils.rotateZAxis(vec, finalAngle);
 						vec = VectorUtils.rotateXAxis(vec, finalLoc.getPitch() + extraPitch);
 						vec = VectorUtils.rotateYAxis(vec, finalLoc.getYaw() + finalExtraYaw);

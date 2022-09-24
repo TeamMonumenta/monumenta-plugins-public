@@ -67,18 +67,21 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 
 					for (int j = 0; j < 36; j++) {
 						final int degree = (360 / 36) * j;
-						Vector vec = new Vector(FastMath.cos(degree) * mRadius, 0, FastMath.sin(degree) * mRadius);
+						Vector vec = new Vector(FastUtils.cos(degree) * mRadius, 0, FastUtils.sin(degree) * mRadius);
 						Location l = loc.clone().add(vec);
 
 						if (mRadius >= 2 && FastUtils.RANDOM.nextInt(30) == 0) {
 							spawnTendril(l, mPlayer);
 						}
 
-						vec = new Vector(FastMath.cos(degree) * mRadius, 2 * FastMath.pow(mRadius / (CholericFlames.RADIUS + 1), 3), FastMath.sin(degree) * mRadius);
+						vec = new Vector(FastUtils.cos(degree) * mRadius, 2 * FastMath.pow(mRadius / (CholericFlames.RADIUS + 1), 3), FastUtils.sin(degree) * mRadius);
 						l = loc.clone().add(vec);
-						new PartialParticle(Particle.SOUL_FIRE_FLAME, l, 1, 0.1, 0.1, 0.1, 0.04).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.SOUL, l, 1, 0.15, 0.15, 0.15, 0.01).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.SMOKE_NORMAL, l, 5, 0.1, 0.1, 0.1, 0.075).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SOUL_FIRE_FLAME, l, 1, 0.1, 0.1, 0.1, 0.04)
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SOUL, l, 1, 0.15, 0.15, 0.15, 0.01)
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SMOKE_NORMAL, l, 5, 0.1, 0.1, 0.1, 0.075)
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					}
 				}
 
@@ -117,12 +120,13 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 					double pi = (Math.PI * 2) * (1f - (mJ / (ITERATIONS * DURATION)));
 
 
-					Vector vec = new Vector(mXMult * FastMath.cos(pi), 0,
-						mZMult * FastMath.sin(pi));
+					Vector vec = new Vector(mXMult * FastUtils.cos(pi), 0,
+						mZMult * FastUtils.sin(pi));
 					Location tendrilLoc = mL.clone().add(vec);
 
 					new PartialParticle(Particle.REDSTONE, tendrilLoc, 3, offset, offset, offset, 0, new Particle.DustOptions(
 						ParticleUtils.getTransition(TWIST_COLOR_TIP, TWIST_COLOR_BASE, transition), size))
+						.minimumMultiplier(false)
 						.spawnAsPlayerActive(mPlayer);
 
 					mL.add(0, 0.25, 0);
