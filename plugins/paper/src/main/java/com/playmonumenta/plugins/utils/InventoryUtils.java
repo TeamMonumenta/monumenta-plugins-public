@@ -301,12 +301,18 @@ public class InventoryUtils {
 	}
 
 	public static void giveItem(final Player player, final ItemStack item) {
+		giveItem(player, item, false);
+	}
+
+	public static void giveItem(final Player player, final ItemStack item, boolean silent) {
 		final PlayerInventory inv = player.getInventory();
 		if (canFitInInventory(item, inv)) {
 			inv.addItem(item);
 		} else {
 			dropTempOwnedItem(item, player.getLocation(), player);
-			player.sendMessage(Component.text("Your inventory is full! Some items were dropped on the ground!", NamedTextColor.RED));
+			if (!silent) {
+				player.sendMessage(Component.text("Your inventory is full! Some items were dropped on the ground!", NamedTextColor.RED));
+			}
 		}
 	}
 

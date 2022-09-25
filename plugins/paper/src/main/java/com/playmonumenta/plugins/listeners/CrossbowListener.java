@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -24,7 +25,7 @@ public class CrossbowListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		//Has to be an arrow
 		if (!(event.getEntity() instanceof Arrow arrow)
@@ -60,7 +61,7 @@ public class CrossbowListener implements Listener {
 					    && arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
 					arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
 					if (player.getGameMode() != GameMode.CREATIVE) {
-						player.getInventory().addItem(new ItemStack(Material.ARROW));
+						InventoryUtils.giveItem(player, new ItemStack(Material.ARROW), true);
 					}
 				}
 
