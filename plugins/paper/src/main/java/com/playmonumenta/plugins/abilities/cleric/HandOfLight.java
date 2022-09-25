@@ -61,8 +61,10 @@ public class HandOfLight extends Ability {
 	public static final String CHARM_RANGE = "Hand of Light Range";
 	public static final String CHARM_HEALING = "Hand of Light Healing";
 
+	private final double mHealingRange;
 	private final int mFlat;
 	private final double mPercent;
+	private final double mDamageRange;
 	private final double mDamagePer;
 	private final double mDamageMax;
 	private boolean mDamageMode;
@@ -93,8 +95,11 @@ public class HandOfLight extends Ability {
 		mDisplayItem = new ItemStack(Material.PINK_DYE, 1);
 		mInfo.mIgnoreCooldown = true;
 
+		mHealingRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, HEALING_RADIUS);
 		mFlat = isLevelOne() ? FLAT_1 : FLAT_2;
 		mPercent = isLevelOne() ? PERCENT_1 : PERCENT_2;
+
+		mDamageRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, DAMAGE_RADIUS);
 		mDamagePer = isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2;
 		mDamageMax = isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
 
@@ -147,7 +152,7 @@ public class HandOfLight extends Ability {
 		Location userLoc = mPlayer.getLocation();
 
 		if (!mDamageMode) {
-			List<Player> nearbyPlayers = PlayerUtils.otherPlayersInRange(mPlayer, CharmManager.getRadius(mPlayer, CHARM_RANGE, HEALING_RADIUS), true);
+			List<Player> nearbyPlayers = PlayerUtils.otherPlayersInRange(mPlayer, mHealingRange, true);
 			if (!isEnhanced()) {
 				nearbyPlayers.removeIf(p -> playerDir.dot(p.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && p.getLocation().distance(userLoc) > 2);
 			}
@@ -165,7 +170,9 @@ public class HandOfLight extends Ability {
 					mCosmetic.lightHealEffect(mPlayer, loc, p);
 				}
 
-				mCosmetic.lightHealCastEffect(world, userLoc, mPlugin, mPlayer, (float) CharmManager.getRadius(mPlayer, CHARM_RANGE, HEALING_RADIUS), HEALING_DOT_ANGLE);
+				doEnhancementEffect(userLoc);
+
+				mCosmetic.lightHealCastEffect(world, userLoc, mPlugin, mPlayer, (float) mHealingRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1);
 
 				double cooldown = getModifiedCooldown();
 				if (isEnhanced()) {
@@ -174,7 +181,7 @@ public class HandOfLight extends Ability {
 				putOnCooldown((int) cooldown);
 			}
 		} else {
-			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(userLoc, CharmManager.getRadius(mPlayer, CHARM_RANGE, DAMAGE_RADIUS));
+			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(userLoc, mDamageRange);
 			if (!isEnhanced()) {
 				nearbyMobs.removeIf(mob -> playerDir.dot(mob.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && mob.getLocation().distance(userLoc) > 2);
 			}
@@ -192,14 +199,20 @@ public class HandOfLight extends Ability {
 					Location loc = mob.getLocation();
 					mCosmetic.lightDamageEffect(mPlayer, loc, mob);
 				}
-				mCosmetic.lightDamageCastEffect(world, userLoc, mPlugin, mPlayer, (float) CharmManager.getRadius(mPlayer, CHARM_RANGE, DAMAGE_RADIUS), HEALING_DOT_ANGLE);
+
+				doEnhancementEffect(userLoc);
+
+				mCosmetic.lightDamageCastEffect(world, userLoc, mPlugin, mPlayer, (float) mDamageRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1);
+
 				putOnCooldown();
 			}
 		}
+	}
+
+	private void doEnhancementEffect(Location userLoc) {
 		if (isEnhanced()) {
-			double radius = CharmManager.getRadius(mPlayer, CHARM_RANGE, DAMAGE_RADIUS);
-			EntityUtils.getNearbyMobs(userLoc, radius).stream()
-				.filter(mob -> mob.getLocation().distanceSquared(userLoc) <= radius * radius)
+			EntityUtils.getNearbyMobs(userLoc, mHealingRange).stream()
+				.filter(mob -> mob.getLocation().distanceSquared(userLoc) <= mHealingRange * mHealingRange)
 				.filter(mob -> Crusade.enemyTriggersAbilities(mob, mCrusade))
 				.forEach(mob -> EntityUtils.applyStun(mPlugin, ENHANCEMENT_UNDEAD_STUN_DURATION, mob));
 		}
