@@ -1041,7 +1041,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		mInventory.setItem(34, getWarningIcon(mRightStats));
 
 		for (ItemStack item : mInventory) {
-			ItemUtils.setPlainTag(item);
+			if (item != null) {
+				ItemUtils.setPlainTag(item);
+			}
 		}
 		GUIUtils.fillWithFiller(mInventory, Material.BLACK_STAINED_GLASS_PANE);
 

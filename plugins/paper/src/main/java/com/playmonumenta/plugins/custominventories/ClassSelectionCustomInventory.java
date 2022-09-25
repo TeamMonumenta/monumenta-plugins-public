@@ -438,7 +438,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 	public void fillEmptyAndSetPlainTags() {
 		for (ItemStack item : mInventory) {
-			ItemUtils.setPlainTag(item);
+			if (item != null) {
+				ItemUtils.setPlainTag(item);
+			}
 		}
 		GUIUtils.fillWithFiller(mInventory, FILLER);
 	}
