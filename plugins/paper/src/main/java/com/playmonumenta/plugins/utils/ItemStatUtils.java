@@ -2528,7 +2528,7 @@ public class ItemStatUtils {
 				return;
 			}
 
-			removeLore(item, index);
+			removeCharmEffect(item, index);
 			if (lore.charAt(0) == '+') {
 				Component text = Component.text(lore, TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false);
 				addCharmEffect(item, index, text);
@@ -2565,7 +2565,7 @@ public class ItemStatUtils {
 				return;
 			}
 
-			removeLore(item, index);
+			removeCharmEffect(item, index);
 			if (lore.charAt(0) == '+') {
 				Component text = Component.text(lore, TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false);
 				addCharmEffect(item, index, text);
