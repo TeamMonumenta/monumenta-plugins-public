@@ -54,7 +54,7 @@ public class CelestialBlessing extends Ability {
 	public static final String DAMAGE_EFFECT_NAME = "CelestialBlessingExtraDamage";
 	public static final String CHARM_DAMAGE = "Celestial Blessing Damage Modifier";
 	public static final String CHARM_COOLDOWN = "Celestial Blessing Cooldown";
-	public static final String CHARM_RANGE = "Celestial Blessing Range";
+	public static final String CHARM_RADIUS = "Celestial Blessing Radius";
 	public static final String CHARM_SPEED = "Celestial Blessing Speed Amplifier";
 	public static final String CHARM_DURATION = "Celestial Blessing Duration";
 
@@ -85,7 +85,7 @@ public class CelestialBlessing extends Ability {
 
 		World world = mPlayer.getWorld();
 
-		List<Player> affectedPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RANGE, CELESTIAL_RADIUS), true);
+		List<Player> affectedPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, CELESTIAL_RADIUS), true);
 
 		// Don't buff players that have their class disabled
 		affectedPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class"));

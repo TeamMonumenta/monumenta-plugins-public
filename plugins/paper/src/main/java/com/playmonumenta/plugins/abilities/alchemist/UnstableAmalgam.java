@@ -168,6 +168,7 @@ public class UnstableAmalgam extends Ability {
 
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, UNSTABLE_AMALGAM_RADIUS);
 		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, UNSTABLE_AMALGAM_KNOCKBACK_SPEED);
+		float playerVertical = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, 2);
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius, mAmalgam);
 		mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
@@ -199,10 +200,10 @@ public class UnstableAmalgam extends Ability {
 			for (Player player : PlayerUtils.playersInRange(loc, radius, true)) {
 				if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 					if (!player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(0) == 100) {
-						MovementUtils.knockAwayRealistic(loc, player, knockback, 2f, false);
+						MovementUtils.knockAwayRealistic(loc, player, knockback, playerVertical, false);
 					} else if (player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(1) > 0) {
 						//by default any Alch can use Rocket Jump with his UA
-						MovementUtils.knockAwayRealistic(loc, player, knockback, 2f, false);
+						MovementUtils.knockAwayRealistic(loc, player, knockback, playerVertical, false);
 					}
 				}
 			}

@@ -59,7 +59,7 @@ public class Smokescreen extends Ability {
 			String.format("Leave a %s block radius persistent cloud on the ground for %s seconds after activating. Enemies in the cloud gain the same debuffs for %s seconds, pulsing every second.",
 				ENHANCEMENT_SMOKECLOUD_RADIUS,
 				ENHANCEMENT_SMOKECLOUD_DURATION / 20,
-				ENHANCEMENT_SMOKECLOUD_EFFECT_DURATION));
+				ENHANCEMENT_SMOKECLOUD_EFFECT_DURATION / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, SMOKESCREEN_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.DEAD_TUBE_CORAL, 1);

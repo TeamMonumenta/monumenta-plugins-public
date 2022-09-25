@@ -53,7 +53,7 @@ public class ArcaneStrike extends Ability {
 	private static final int COOLDOWN = 5 * 20;
 
 	public static final String CHARM_DAMAGE = "Arcane Strike Damage";
-	public static final String CHARM_RANGE = "Arcane Strike Range";
+	public static final String CHARM_RADIUS = "Arcane Strike Radius";
 	public static final String CHARM_BONUS = "Arcane Strike Bonus Damage";
 	public static final String CHARM_COOLDOWN = "Arcane Strike Cooldown";
 
@@ -88,7 +88,7 @@ public class ArcaneStrike extends Ability {
 		if (event.getType() == DamageType.MELEE && mPlayer != null && mPlayer.getCooledAttackStrength(0) == 1) {
 			putOnCooldown();
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS), mPlayer)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, RADIUS), mPlayer)) {
 				float preSpellPowerDamage = mDamageBonus;
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)

@@ -50,7 +50,7 @@ public class LuminousInfusion extends Ability {
 
 	public static final String CHARM_DAMAGE = "Luminous Infusion Damage";
 	public static final String CHARM_COOLDOWN = "Luminous Infusion Cooldown";
-	public static final String CHARM_RANGE = "Luminous Infusion Range";
+	public static final String CHARM_RADIUS = "Luminous Infusion Radius";
 
 	private boolean mActive = false;
 
@@ -160,7 +160,7 @@ public class LuminousInfusion extends Ability {
 		world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.8f, 1.1f);
 
 		// Exclude the damagee so that the knockaway is valid
-		List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, RADIUS), damagee);
+		List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), damagee);
 		for (LivingEntity e : affected) {
 			// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
 			double volume = 0.6 / Math.sqrt(affected.size());

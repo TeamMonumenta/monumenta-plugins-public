@@ -40,9 +40,9 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	private static final int STEALTH_DURATION = (int)(2.5 * 20);
 	private static final int BOSS_DAMAGE_THRESHOLD = 300;
 
-	public static final String CHARM_DAMAGE = "Cloak And Dagger Damage";
-	public static final String CHARM_STACKS = "Cloak And Dagger Max Stacks";
-	public static final String CHARM_STEALTH = "Cloak And Dagger Stealth Duration";
+	public static final String CHARM_DAMAGE = "Cloak and Dagger Damage";
+	public static final String CHARM_STACKS = "Cloak and Dagger Max Stacks";
+	public static final String CHARM_STEALTH = "Cloak and Dagger Stealth Duration";
 
 	private final KillTriggeredAbilityTracker mTracker;
 
