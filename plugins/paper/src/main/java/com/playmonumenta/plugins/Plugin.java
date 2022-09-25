@@ -230,6 +230,7 @@ public class Plugin extends JavaPlugin {
 		Stuck.register(this);
 		GlowingCommand.register();
 		VirtualFirmament.register();
+		RocketJump.register();
 		ExperiencinatorCommand.register();
 		EventCommand.register();
 		Eggify.register();
