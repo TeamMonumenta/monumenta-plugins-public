@@ -298,7 +298,9 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(ThrowSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new ThrowSummonBoss(p, e));
 		mStatelessBosses.put(PotionThrowBoss.identityTag, (Plugin p, LivingEntity e) -> new PotionThrowBoss(p, e));
 		mStatelessBosses.put(TwistedMiniBoss.identityTag, (Plugin p, LivingEntity e) -> new TwistedMiniBoss(p, e));
-
+		mStatelessBosses.put(BrownPositiveBoss.identityTag, (Plugin p, LivingEntity e) -> new BrownPositiveBoss(p, e));
+		mStatelessBosses.put(BrownNegativeBoss.identityTag, (Plugin p, LivingEntity e) -> new BrownNegativeBoss(p, e));
+		mStatelessBosses.put(BrownMagnetSwapBoss.identityTag, (Plugin p, LivingEntity e) -> new BrownMagnetSwapBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -542,6 +544,9 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(MageCosmicMoonbladeBoss.identityTag, (Plugin p, LivingEntity e) -> MageCosmicMoonbladeBoss.deserialize(p, e));
 		mBossDeserializers.put(ScoutVolleyBoss.identityTag, (Plugin p, LivingEntity e) -> ScoutVolleyBoss.deserialize(p, e));
 		mBossDeserializers.put(TwistedMiniBoss.identityTag, (Plugin p, LivingEntity e) -> TwistedMiniBoss.deserialize(p, e));
+		mBossDeserializers.put(BrownNegativeBoss.identityTag, (Plugin p, LivingEntity e) -> BrownNegativeBoss.deserialize(p, e));
+		mBossDeserializers.put(BrownPositiveBoss.identityTag, (Plugin p, LivingEntity e) -> BrownPositiveBoss.deserialize(p, e));
+		mBossDeserializers.put(BrownMagnetSwapBoss.identityTag, (Plugin p, LivingEntity e) -> BrownMagnetSwapBoss.deserialize(p, e));
 
 
 		/***************************************************
@@ -602,6 +607,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(PotionThrowBoss.identityTag, new PotionThrowBoss.Parameters());
 		mBossParameters.put(GenericTargetBoss.identityTag, new GenericTargetBoss.Parameters());
 		mBossParameters.put(LimitedLifespanBoss.identityTag, new LimitedLifespanBoss.Parameters());
+		mBossParameters.put(BrownMagnetSwapBoss.identityTag, new BrownMagnetSwapBoss.Parameters());
 	}
 
 	/********************************************************************************
