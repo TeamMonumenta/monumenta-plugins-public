@@ -34,35 +34,15 @@ public class ShulkerBoxOverride extends BaseOverride {
 		return true;
 	}
 
-
-	@Override
-	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
-		// (It all returns true)
-		if (WorldshaperOverride.isWorldshaperItem(item)) {
-			return WorldshaperOverride.changeMode(item, player);
-		} else {
-			return true;
-		}
-	}
-
-	@Override
-	public boolean leftClickBlockInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, Block block) {
-		// This also all returns true.
-		if (WorldshaperOverride.isWorldshaperItem(item)) {
-			return WorldshaperOverride.changeMode(item, player);
-		} else {
-			return true;
-		}
-	}
-
 	@Override
 	public boolean swapHandsInteraction(Plugin plugin, Player player, ItemStack item) {
 		// (It all returns true)
 		if (FirmamentOverride.isFirmamentItem(item)) {
 			return FirmamentOverride.changeMode(item, player);
-		} else {
-			return true;
+		} else if (WorldshaperOverride.isWorldshaperItem(item)) {
+			return WorldshaperOverride.changeMode(item, player);
 		}
+		return true;
 	}
 
 	@Override

@@ -42,7 +42,7 @@ public class MagmaShield extends Ability {
 	public static final int DAMAGE_1 = 6;
 	public static final int DAMAGE_2 = 12;
 	public static final int SIZE = 6;
-	public static final int FIRE_SECONDS = 4;
+	public static final int FIRE_SECONDS = 6;
 	public static final int FIRE_TICKS = FIRE_SECONDS * 20;
 	public static final float KNOCKBACK = 0.5f;
 	// 70° on each side of look direction for XZ-plane (flattened Y),
@@ -50,11 +50,11 @@ public class MagmaShield extends Ability {
 	public static final int ANGLE = 70;
 	public static final int COOLDOWN_SECONDS = 12;
 	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
-	public static final float ENHANCEMENT_FIRE_DAMAGE_BONUS = 1;
+	public static final float ENHANCEMENT_FIRE_DAMAGE_BONUS = 0.5f;
 	public static final float ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS = 0.2f;
 	public static final String ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME = "MagmaShieldFireDamageBonus";
 	public static final String ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME = "MagmaShieldFireAbilityDamageBonus";
-	public static final int ENHANCEMENT_BONUS_DURATION = 8 * 20;
+	public static final int ENHANCEMENT_BONUS_DURATION = 6 * 20;
 
 	public static final String CHARM_DAMAGE = "Magma Shield Damage";
 	public static final String CHARM_RANGE = "Magma Shield Range";

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.FirstStrikeCooldown;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 public class FirstStrike implements Enchantment {
 
 	private static final double DAMAGE_PER_LEVEL = 0.1;
+	private static final double PROJ_REDUCTION = 0.75;
 	private static final int DURATION = 3 * 20;
 	private static final String SOURCE = "FirstStrikeDisable";
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(244, 141, 123), 0.75f);
@@ -42,10 +44,16 @@ public class FirstStrike implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		DamageEvent.DamageType type = event.getType();
-		if ((type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageEvent.DamageType.PROJECTILE) {
+		DamageType type = event.getType();
+		if (((type == DamageType.MELEE || type == DamageType.MELEE_ENCH || type == DamageType.MELEE_SKILL)
+			&& ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand()))
+			|| type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
 			if (plugin.mEffectManager.getEffects(player, SOURCE) == null) {
-				event.setDamage(event.getDamage() * (1 + (DAMAGE_PER_LEVEL * level)));
+				double damage = event.getDamage() * (1 + (DAMAGE_PER_LEVEL * level));
+				if (type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
+					damage *= PROJ_REDUCTION;
+				}
+				event.setDamage(damage);
 
 				double widthDelta = PartialParticle.getWidthDelta(enemy);
 				double doubleWidthDelta = widthDelta * 2;

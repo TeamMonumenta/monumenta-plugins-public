@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 
 public class Sniper implements Enchantment {
-	public static final int DISTANCE = 16;
+	public static final int DISTANCE = 12;
 	public static final int DAMAGE_PER_LEVEL = 2;
 	public static final String CHARM_DAMAGE = "Sniper Damage";
 

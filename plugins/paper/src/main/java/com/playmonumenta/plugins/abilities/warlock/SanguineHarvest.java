@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -48,12 +47,11 @@ public class SanguineHarvest extends Ability {
 	private static final int COOLDOWN = 20 * 20;
 	private static final double HITBOX_LENGTH = 0.55;
 
-	private static final double ENHANCEMENT_DMG_INCREASE = 0.05;
+	private static final double ENHANCEMENT_DMG_INCREASE = 0.03;
 	private static final int ENHANCEMENT_BLIGHT_DURATION = 20 * 6;
 	private static final String BLIGHT_EFFECT_NAME = "SanguineHarvestBlightEffect";
 
 	private static final String SANGUINE_NAME = "SanguineEffect";
-	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "SanguineHarvestTickRightClicked";
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(179, 0, 0), 1.0f);
 
@@ -74,9 +72,9 @@ public class SanguineHarvest extends Ability {
 		super(plugin, player, "Sanguine Harvest");
 		mInfo.mScoreboardId = "SanguineHarvest";
 		mInfo.mShorthandName = "SH";
-		mInfo.mDescriptions.add("Enemies you damage with an ability are afflicted with Bleed I for 10 seconds. Bleed gives mobs 10% Slowness and 10% Weaken per level if the mob is below 50% Max Health. Additionally, double right click while holding a scythe and not sneaking to fire a burst of darkness. This projectile travels up to 8 blocks and upon contact with a surface or an enemy, it explodes, knocking back and marking all mobs within 3 blocks of the explosion for a harvest. Any player that kills a marked mob is healed for 5% of max health. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Enemies you damage with an ability are afflicted with Bleed I for 10 seconds. Bleed gives mobs 10% Slowness and 10% Weaken per level if the mob is below 50% Max Health. Additionally, right click while holding a scythe and not sneaking to fire a burst of darkness. This projectile travels up to 8 blocks and upon contact with a surface or an enemy, it explodes, knocking back and marking all mobs within 3 blocks of the explosion for a harvest. Any player that kills a marked mob is healed for 5% of max health. Cooldown: 20s.");
 		mInfo.mDescriptions.add("Increase passive Bleed level to II, and increase the radius to 4 blocks. Players killing a marked mob are healed by 10%.");
-		mInfo.mDescriptions.add("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. Mobs standing on these Blighted blocks take 5% extra damage per debuff. The Blight disappears after 6s and is not counted as a debuff.");
+		mInfo.mDescriptions.add("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. Mobs standing on these Blighted blocks take 3% extra damage per debuff. The Blight disappears after 6s and is not counted as a debuff.");
 		mInfo.mLinkedSpell = ClassAbility.SANGUINE_HARVEST;
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -95,103 +93,85 @@ public class SanguineHarvest extends Ability {
 		if (!ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()) || mPlayer.isSneaking()) {
 			return;
 		}
-		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
-			mRightClicks++;
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (mRightClicks > 0) {
-						mRightClicks--;
-					}
-					this.cancel();
-				}
-			}.runTaskLater(mPlugin, 5);
-		}
-		if (mRightClicks < 2) {
-			return;
-		} else {
-			mRightClicks = 0;
 
-			putOnCooldown();
+		Location loc = mPlayer.getEyeLocation();
+		Vector direction = loc.getDirection();
+		Vector shift = direction.normalize().multiply(HITBOX_LENGTH);
+		BoundingBox box = BoundingBox.of(loc, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
+		box.shift(direction);
 
-			Location loc = mPlayer.getEyeLocation();
-			Vector direction = loc.getDirection();
-			Vector shift = direction.normalize().multiply(HITBOX_LENGTH);
-			BoundingBox box = BoundingBox.of(loc, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
-			box.shift(direction);
+		World world = mPlayer.getWorld();
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.9f);
 
-			World world = mPlayer.getWorld();
-			world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.9f);
+		Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(loc, RANGE));
 
-			Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(loc, RANGE));
+		if (isEnhanced()) {
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 1);
+			Vector v;
+			for (double degree = -40; degree < 40; degree += 10) {
+				for (double r = 0; r <= RANGE; r += 0.55) {
+					double radian = Math.toRadians(degree);
+					v = new Vector(Math.cos(radian) * r, 0, Math.sin(radian) * r);
+					v = VectorUtils.rotateZAxis(v, mPlayer.getLocation().getPitch());
+					v = VectorUtils.rotateYAxis(v, mPlayer.getLocation().getYaw() + 90);
 
-			if (isEnhanced()) {
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 1);
-				Vector v;
-				for (double degree = -40; degree < 40; degree += 10) {
-					for (double r = 0; r <= RANGE; r += 0.55) {
-						double radian = Math.toRadians(degree);
-						v = new Vector(Math.cos(radian) * r, 0, Math.sin(radian) * r);
-						v = VectorUtils.rotateZAxis(v, mPlayer.getLocation().getPitch());
-						v = VectorUtils.rotateYAxis(v, mPlayer.getLocation().getYaw() + 90);
+					Location location = mPlayer.getEyeLocation().clone().add(v);
 
-						Location location = mPlayer.getEyeLocation().clone().add(v);
+					Location marker = location.clone();
 
-						Location marker = location.clone();
-
-						// If enhanced, we want to find where the lowest block is.
-						// First, search downwards by 5 blocks until a block is reached.
-						// And then set it to just above the block as the saved location.
-						while (marker.distance(location) <= 5) {
-							Block block = marker.getBlock();
-							if (block.isSolid()) {
-								// Success, add this location as cursed.
-								marker.setY(1.1 + (int) marker.getY());
-								mMarkedLocations.add(marker);
-								break;
-							} else {
-								marker.add(0, -1, 0);
-							}
-						}
-
-						if (location.getBlock().isSolid()) {
-							// Break here because I decided that this ability shouldn't pass through blocks.
-							// How mean!
+					// If enhanced, we want to find where the lowest block is.
+					// First, search downwards by 5 blocks until a block is reached.
+					// And then set it to just above the block as the saved location.
+					while (marker.distance(location) <= 5) {
+						Block block = marker.getBlock();
+						if (block.isSolid()) {
+							// Success, add this location as cursed.
+							marker.setY(1.1 + (int) marker.getY());
+							mMarkedLocations.add(marker);
 							break;
+						} else {
+							marker.add(0, -1, 0);
 						}
+					}
+
+					if (location.getBlock().isSolid()) {
+						// Break here because I decided that this ability shouldn't pass through blocks.
+						// How mean!
+						break;
 					}
 				}
 			}
-
-			for (double r = 0; r < RANGE; r += HITBOX_LENGTH) {
-				Location bLoc = box.getCenter().toLocation(world);
-
-				new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.REDSTONE, bLoc, 16, 0.2, 0.2, 0.2, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
-
-				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
-					bLoc.subtract(direction.multiply(0.5));
-					explode(bLoc);
-					runMarkerRunnable();
-					return;
-				}
-
-				Iterator<LivingEntity> iter = nearbyMobs.iterator();
-				while (iter.hasNext()) {
-					LivingEntity mob = iter.next();
-					if (mob.getBoundingBox().overlaps(box)) {
-						if (EntityUtils.isHostileMob(mob)) {
-							explode(bLoc);
-							runMarkerRunnable();
-							return;
-						}
-					}
-				}
-				box.shift(shift);
-			}
-
-			runMarkerRunnable();
 		}
+
+		for (double r = 0; r < RANGE; r += HITBOX_LENGTH) {
+			Location bLoc = box.getCenter().toLocation(world);
+
+			new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, bLoc, 16, 0.2, 0.2, 0.2, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
+
+			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
+				bLoc.subtract(direction.multiply(0.5));
+				explode(bLoc);
+				runMarkerRunnable();
+				return;
+			}
+
+			Iterator<LivingEntity> iter = nearbyMobs.iterator();
+			while (iter.hasNext()) {
+				LivingEntity mob = iter.next();
+				if (mob.getBoundingBox().overlaps(box)) {
+					if (EntityUtils.isHostileMob(mob)) {
+						explode(bLoc);
+						runMarkerRunnable();
+						return;
+					}
+				}
+			}
+			box.shift(shift);
+		}
+
+		runMarkerRunnable();
+		putOnCooldown();
 	}
 
 	private void explode(Location loc) {
@@ -244,7 +224,6 @@ public class SanguineHarvest extends Ability {
 							List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(location, 1);
 							for (LivingEntity mob : nearbyMobs) {
 								if (mob.getBoundingBox().overlaps(boundingBox) && !EntityUtils.isBlighted(mPlugin, mob)) {
-									// mPlayer.sendMessage("Marked: " + mob.getName());
 									mPlugin.mEffectManager.addEffect(mob, BLIGHT_EFFECT_NAME, new SanguineHarvestBlight(20, ENHANCEMENT_DMG_INCREASE, mPlugin));
 								}
 							}
