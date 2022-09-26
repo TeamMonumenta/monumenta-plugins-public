@@ -612,8 +612,18 @@ public class EntityTargets implements Cloneable {
 		return this;
 	}
 
+	public EntityTargets setOptional(boolean opt) {
+		mOptional = opt;
+		return this;
+	}
+
 	public EntityTargets setLimit(Limit limit) {
 		mLimit = limit;
+		return this;
+	}
+
+	public EntityTargets setFilters(List<EntityFilter> filters) {
+		mFilters = filters;
 		return this;
 	}
 
