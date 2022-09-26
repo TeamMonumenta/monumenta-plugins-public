@@ -6,7 +6,6 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 public class BlockLockBoss extends BossAbilityGroup {
@@ -33,7 +32,7 @@ public class BlockLockBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void unload() {
 		mLoc.getBlock().removeMetadata("Unbreakable", Plugin.getInstance());
 	}
 

@@ -38,7 +38,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
@@ -322,16 +321,12 @@ public class DelvesManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
 		if (!DUNGEONS.contains(ServerProperties.getShardName())) {
 			return;
 		}
-		for (Block b : event.blockList()) {
-			if ((b.getType() == Material.CHEST && b.getState() instanceof Chest chest && chest.isLocked()) || b.hasMetadata("Unbreakable")) {
-				event.blockList().remove(b);
-			}
-		}
+		event.blockList().removeIf(b -> (b.getType() == Material.CHEST && b.getState() instanceof Chest chest && chest.isLocked()) || b.hasMetadata("Unbreakable"));
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -413,8 +408,8 @@ public class DelvesManager implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
-	public void onBlockBreakEvent(BlockBreakEvent event) {
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void onBlockBreakEventEarly(BlockBreakEvent event) {
 		if (!DUNGEONS.contains(ServerProperties.getShardName())) {
 			return;
 		}
@@ -422,7 +417,12 @@ public class DelvesManager implements Listener {
 			event.setCancelled(true);
 			return;
 		}
-		if (event.getBlock().getType() != Material.SPAWNER) {
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onBlockBreakEventLate(BlockBreakEvent event) {
+		if (!DUNGEONS.contains(ServerProperties.getShardName())
+			    || event.getBlock().getType() != Material.SPAWNER) {
 			return;
 		}
 
