@@ -101,6 +101,10 @@ public class DelvesManager implements Listener {
 		DUNGEONS.add("depths");
 		DUNGEONS.add("corridors");
 		DUNGEONS.add("ring");
+		DUNGEONS.add("ruin");
+		DUNGEONS.add("skt");
+		DUNGEONS.add("portal");
+		DUNGEONS.add("blue");
 		DUNGEONS.add("futurama");
 	}
 

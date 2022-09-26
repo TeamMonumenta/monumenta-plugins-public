@@ -34,6 +34,7 @@ public class StatMultiplier {
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R3 = 1.6;
 
 	static {
+		//r1 shards
 		STAT_COMPENSATION_MAPPINGS.put("white", 1.7);
 		STAT_COMPENSATION_MAPPINGS.put("orange", 1.5);
 		STAT_COMPENSATION_MAPPINGS.put("magenta", 1.4);
@@ -41,6 +42,9 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS.put("yellow", 1.1);
 		STAT_COMPENSATION_MAPPINGS.put("willows", 1.2);
 		STAT_COMPENSATION_MAPPINGS.put("reverie", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("corridors", 1.0);
+
+		//r2 shards
 		STAT_COMPENSATION_MAPPINGS.put("lime", 1.6);
 		STAT_COMPENSATION_MAPPINGS.put("pink", 1.4);
 		STAT_COMPENSATION_MAPPINGS.put("gray", 1.4);
@@ -51,8 +55,14 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS.put("forum", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("shiftingcity", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("depths", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("corridors", 1.0);
+
+		//r3 shards
 		STAT_COMPENSATION_MAPPINGS.put("blue", 1.2);
+		STAT_COMPENSATION_MAPPINGS.put("ruin", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("portal", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("skt", 1.0);
+
+		//dev shards
 		STAT_COMPENSATION_MAPPINGS.put("dev1", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev2", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("mobs", 1.0);
