@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
@@ -35,6 +36,8 @@ public final class NovaBoss extends BossAbilityGroup {
 		public int COOLDOWN = 8 * 20;
 		@BossParam(help = "not written")
 		public boolean CAN_MOVE = false;
+		@BossParam(help = "Whether or not the nova attack can be blocked by a shield. (Default = true)")
+		public boolean CAN_BLOCK = true;
 		@BossParam(help = "You should not use this. use TARGETS instead.", deprecated = true)
 		public boolean NEED_LINE_OF_SIGHT = true;
 
@@ -111,11 +114,19 @@ public final class NovaBoss extends BossAbilityGroup {
 				protected void dealDamageAction(Location loc) {
 					for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
 						if (p.DAMAGE > 0) {
-							BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+							if (p.CAN_BLOCK) {
+								BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+							} else {
+								DamageUtils.damage(boss, target, DamageType.MAGIC, p.DAMAGE, null, false, true, p.SPELL_NAME);
+							}
 						}
 
 						if (p.DAMAGE_PERCENTAGE > 0.0) {
-							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+							if (p.CAN_BLOCK) {
+								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+							} else {
+								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME, false);
+							}
 						}
 						p.EFFECTS.apply(target, mBoss);
 					}
