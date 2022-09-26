@@ -15,10 +15,11 @@ public class SacredProvisions extends Ability {
 	public static final float PROVISIONS_2_CHANCE = 0.4f;
 	public static double ENHANCEMENT_HEALING_BONUS = 0.1;
 	public static int ENHANCEMENT_HEALING_HUNGER_REQUIREMENT = 19;
+
 	public static final String CHARM_CHANCE = "Sacred Provisions Chance";
 	public static final String CHARM_RANGE = "Sacred Provisions Range";
 
-	private double mChance;
+	private final double mChance;
 
 	public SacredProvisions(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Sacred Provisions");
@@ -31,11 +32,11 @@ public class SacredProvisions extends Ability {
 			(int) (100 * ENHANCEMENT_HEALING_BONUS), (int) (100 * ENHANCEMENT_HEALING_HUNGER_REQUIREMENT / 20.0)));
 		mDisplayItem = new ItemStack(Material.COOKED_BEEF, 1);
 
-		mChance = (isLevelOne() ? PROVISIONS_1_CHANCE : PROVISIONS_2_CHANCE) * CharmManager.getLevelPercentDecimal(mPlayer, CHARM_CHANCE);
+		mChance = (isLevelOne() ? PROVISIONS_1_CHANCE : PROVISIONS_2_CHANCE) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_CHANCE);
 	}
 
 	public boolean isInRange(Player player) {
-		return mPlayer != null && CharmManager.getRadius(mPlayer, SacredProvisions.CHARM_RANGE, PROVISIONS_RANGE) >= mPlayer.getLocation().distance(player.getLocation());
+		return mPlayer != null && CharmManager.getRadius(mPlayer, CHARM_RANGE, PROVISIONS_RANGE) >= mPlayer.getLocation().distance(player.getLocation());
 	}
 
 	public double getChance() {
