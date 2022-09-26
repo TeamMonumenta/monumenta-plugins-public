@@ -604,6 +604,8 @@ public class CharmManager {
 			CholericFlames.CHARM_HUNGER,
 			CholericFlames.CHARM_KNOCKBACK,
 			CholericFlames.CHARM_RANGE,
+			CholericFlames.CHARM_INFERNO_CAP,
+			CholericFlames.CHARM_ENHANCEMENT_RADIUS,
 			CursedWound.CHARM_DAMAGE,
 			CursedWound.CHARM_DOT,
 			CursedWound.CHARM_CAP,
