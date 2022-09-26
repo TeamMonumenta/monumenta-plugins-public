@@ -318,6 +318,15 @@ public abstract class BossAbilityGroup {
 
 	}
 
+	// Only acts on fire applied by the plugin
+	public void bossIgnited(int ticks) {
+
+	}
+
+	public void bossPassengerHurt(DamageEvent event) {
+
+	}
+
 	/*
 	 * Boss was stunned by a player. Mobs with the "Boss" tag can't be stunned
 	 */

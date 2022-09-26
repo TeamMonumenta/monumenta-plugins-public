@@ -12,26 +12,38 @@ public class CustomEffectApplyEvent extends Event implements Cancellable {
 
 	private boolean mIsCancelled;
 
-	private final Entity mEntity;
-	private final Entity mApplier;
-	private final Effect mEffect;
+	private Entity mEntity;
+	private Effect mEffect;
+	private String mSource;
 
-	public CustomEffectApplyEvent(Entity entity, Entity applier, Effect effect) {
+	public CustomEffectApplyEvent(Entity entity, Effect effect, String source) {
 		mEntity = entity;
-		mApplier = applier;
 		mEffect = effect;
+		mSource = source;
 	}
 
 	public Entity getEntity() {
 		return mEntity;
 	}
 
-	public Entity getApplier() {
-		return mApplier;
-	}
-
 	public Effect getEffect() {
 		return mEffect;
+	}
+
+	public String getSource() {
+		return mSource;
+	}
+
+	public void setEntity(Entity entity) {
+		mEntity = entity;
+	}
+
+	public void setEffect(Effect effect) {
+		mEffect = effect;
+	}
+
+	public void setSource(String source) {
+		mSource = source;
 	}
 
 	@Override
