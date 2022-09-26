@@ -128,7 +128,7 @@ public class ArcaneStrike extends Ability {
 					int wind = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.WIND_ASPECT);
 					if (wind > 0) {
 						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
-						WindAspect.launch(mob, wind);
+						WindAspect.launch(mPlugin, mob, wind);
 					}
 				}
 

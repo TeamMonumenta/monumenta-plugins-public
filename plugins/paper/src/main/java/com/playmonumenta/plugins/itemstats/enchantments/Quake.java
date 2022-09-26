@@ -107,7 +107,7 @@ public class Quake implements Enchantment {
 				}
 				if (wind > 0) {
 					PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
-					WindAspect.launch(mob, wind);
+					WindAspect.launch(plugin, mob, wind);
 				}
 			}
 

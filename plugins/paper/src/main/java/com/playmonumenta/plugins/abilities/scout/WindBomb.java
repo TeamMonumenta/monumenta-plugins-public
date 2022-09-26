@@ -6,14 +6,20 @@ import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.WindBombAirTag;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.tuple.Triple;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -39,8 +45,8 @@ public class WindBomb extends Ability {
 	private static final int SLOW_FALL_EFFECT = 0;
 	private static final int COOLDOWN_1 = 20 * 15;
 	private static final int COOLDOWN_2 = 20 * 10;
-	private static final int DAMAGE_1 = 8;
-	private static final int DAMAGE_2 = 10;
+	private static final double DAMAGE_FRACTION_1 = 0.4;
+	private static final double DAMAGE_FRACTION_2 = 0.5;
 	private static final double MIDAIR_DAMAGE_BONUS = 0.2;
 	private static final int RADIUS = 3;
 	private static final double VELOCITY = 1.5;
@@ -63,23 +69,23 @@ public class WindBomb extends Ability {
 	public static final String CHARM_VORTEX_DURATION = "Wind Bomb Vortex Duration";
 	public static final String CHARM_VORTEX_RADIUS = "Wind Bomb Vortex Radius";
 
-	private final double mDamage;
+	private final double mDamageFraction;
 
-	private @Nullable Snowball mProj = null;
+	private final List<Triple<Snowball, Double, ItemStatManager.PlayerItemStats>> mProjectiles = new ArrayList<>();
 
 	public WindBomb(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Wind Bomb");
 		mInfo.mScoreboardId = "WindBomb";
 		mInfo.mShorthandName = "WB";
 		mInfo.mLinkedSpell = ClassAbility.WIND_BOMB;
-		mInfo.mDescriptions.add(String.format("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, deals %d projectile damage to mobs in a a %d block radius and launches them into the air, giving them Slow Falling and %d%% Weaken for %ds. Cooldown: %ds.",
-			DAMAGE_1, RADIUS, (int)(WEAKEN_EFFECT * 100), DURATION / 20, COOLDOWN_1 / 20));
-		mInfo.mDescriptions.add(String.format("The damage is increased to %d and the cooldown is reduced to %ds. Additionally, you deal %d%% more damage to enemies made airborne by this skill, until they hit the ground.", DAMAGE_2, COOLDOWN_2 / 20, (int)(MIDAIR_DAMAGE_BONUS * 100)));
-		mInfo.mDescriptions.add(String.format("On impact, generate a vortex that pulls mobs within %s blocks toward the center for %d seconds.", (int)PULL_RADIUS, PULL_DURATION / 20));
+		mInfo.mDescriptions.add(String.format("Press the swap key while sneaking and holding a projectile weapon to throw a projectile that, upon contact with the ground or an enemy, deals %s%% of your projectile damage to mobs in a %d block radius and launches them into the air, giving them Slow Falling and %d%% Weaken for %ds. Cooldown: %ds.",
+			(int) (DAMAGE_FRACTION_1 * 100), RADIUS, (int) (WEAKEN_EFFECT * 100), DURATION / 20, COOLDOWN_1 / 20));
+		mInfo.mDescriptions.add(String.format("The damage is increased to %s%% of your projectile damage and the cooldown is reduced to %ds. Additionally, you deal %d%% more damage to enemies made airborne by this skill, until they hit the ground.", (int) (DAMAGE_FRACTION_2 * 100), COOLDOWN_2 / 20, (int) (MIDAIR_DAMAGE_BONUS * 100)));
+		mInfo.mDescriptions.add(String.format("On impact, generate a vortex that pulls mobs within %s blocks toward the center for %d seconds.", (int) PULL_RADIUS, PULL_DURATION / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.TNT, 1);
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2);
+		mDamageFraction = isLevelOne() ? DAMAGE_FRACTION_1 : DAMAGE_FRACTION_2;
 	}
 
 	@Override
@@ -90,21 +96,54 @@ public class WindBomb extends Ability {
 			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 				return;
 			}
+
+			ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
+			if (!(ItemUtils.isBowOrTrident(mainhand) || mainhand.getType() == Material.SNOWBALL)) {
+				return;
+			}
+
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
 			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.25f);
-			mProj = world.spawn(mPlayer.getEyeLocation(), Snowball.class);
-			mProj.setVelocity(loc.getDirection().normalize().multiply(VELOCITY));
-			mProj.setShooter(mPlayer);
-			mPlugin.mProjectileEffectTimers.addEntity(mProj, Particle.CLOUD);
+			Snowball proj = world.spawn(mPlayer.getEyeLocation(), Snowball.class);
+			proj.setVelocity(loc.getDirection().normalize().multiply(VELOCITY));
+			proj.setShooter(mPlayer);
+			mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.CLOUD);
+			proj.setCustomName("Wind Bomb");
+
+			double damage = ItemStatUtils.getAttributeAmount(mainhand, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
+			damage *= mDamageFraction;
+			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
+
+			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+
+			mProjectiles.add(Triple.of(proj, damage, playerItemStats));
 			putOnCooldown();
+
+			// Clear out list just in case
+			mProjectiles.removeIf(triple -> triple.getLeft().isDead() || !triple.getLeft().isValid());
 		}
 	}
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (mPlayer != null && mProj != null && mProj == proj) {
-			mProj = null;
+		if (mPlayer == null) {
+			return;
+		}
+
+		Triple<Snowball, Double, ItemStatManager.PlayerItemStats> triple = null;
+		for (Triple<Snowball, Double, ItemStatManager.PlayerItemStats> testTriple : mProjectiles) {
+			if (testTriple.getLeft() == proj) {
+				triple = testTriple;
+				break;
+			}
+		}
+
+		if (triple != null) {
+			mProjectiles.remove(triple);
+			double damage = triple.getMiddle();
+			ItemStatManager.PlayerItemStats playerItemStats = triple.getRight();
+
 			Location loc = proj.getLocation();
 			World world = proj.getWorld();
 
@@ -127,9 +166,11 @@ public class WindBomb extends Ability {
 
 			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 			double weaken = WEAKEN_EFFECT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS);
-			float velocity = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEIGHT, LAUNCH_VELOCITY);
+			// Velocity scales with the square root of the maximum height
+			double velocityMultSquared = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEIGHT, 1);
+			float velocity = (float) (LAUNCH_VELOCITY * Math.sqrt(velocityMultSquared));
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius, mPlayer)) {
-				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.PROJECTILE_SKILL, mDamage, mInfo.mLinkedSpell, true, false);
+				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, playerItemStats), damage, true, false, false);
 				if (!EntityUtils.isBoss(mob)) {
 					mob.setVelocity(new Vector(0.f, velocity, 0.f));
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, duration, SLOW_FALL_EFFECT, true, false));
