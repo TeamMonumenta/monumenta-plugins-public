@@ -1,20 +1,15 @@
 package com.playmonumenta.plugins.parrots;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
-import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Parrot;
@@ -148,23 +143,25 @@ public class ParrotManager implements Listener {
 		// Periodically updates all players' parrots.
 		// Workaround for an Optifine bug that only shows custom parrot textures if the parrot has been a standalone entity before it was put on a shoulder.
 		// Updates only a few players at a time to spread out server load, as this causes noticeable lag when done for many players at once.
-		new BukkitRunnable() {
-			Iterator<? extends Player> mPlayers = Collections.emptyIterator();
-
-			@Override
-			public void run() {
-				if (!mPlayers.hasNext()) {
-					mPlayers = ImmutableList.copyOf(Bukkit.getOnlinePlayers()).iterator();
-				}
-				for (int i = 0; i < 10 && mPlayers.hasNext(); i++) {
-					Player player = mPlayers.next();
-					// Flying players lose parrots almost instantly, causing flickering, so don't update parrots for them. They'll get their parrots back once they land.
-					if (player.isValid() && !player.isFlying() && !PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
-						respawnParrots(player);
-					}
-				}
-			}
-		}.runTaskTimer(plugin, 10 * 20L, 3 * 20L); // low priority task, so can start after a long delay
+		// TODO temporarily disabled because Optifine is no longer displaying shoulder parrot textures even with this hack
+		// Since it worked with 1.18 client and 1.16 server, somehow it must still be possible, so this is left in as a base to work off of.
+//		new BukkitRunnable() {
+//			Iterator<? extends Player> mPlayers = Collections.emptyIterator();
+//
+//			@Override
+//			public void run() {
+//				if (!mPlayers.hasNext()) {
+//					mPlayers = ImmutableList.copyOf(Bukkit.getOnlinePlayers()).iterator();
+//				}
+//				for (int i = 0; i < 10 && mPlayers.hasNext(); i++) {
+//					Player player = mPlayers.next();
+//					// Flying players lose parrots almost instantly, causing flickering, so don't update parrots for them. They'll get their parrots back once they land.
+//					if (player.isValid() && !player.isFlying() && !PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
+//						respawnParrots(player);
+//					}
+//				}
+//			}
+//		}.runTaskTimer(plugin, 10 * 20L, 10 * 20L); // low priority task, so can start after a long delay
 	}
 
 	private static void respawnParrots(Player player) {

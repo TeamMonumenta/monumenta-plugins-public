@@ -21,8 +21,10 @@ public class Riftborn {
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 		{
-			"There is a 7.5% chance that a void gate spawns near a spawner,",
-			"which summons enemies and while it's alive the spawner is unbreakable."
+			"There is a 7.5% chance to spawn",
+			"a void gate near a spawner, which",
+			"summons rift enemies and protects",
+			"the spawner from destruction."
 		}
 	};
 

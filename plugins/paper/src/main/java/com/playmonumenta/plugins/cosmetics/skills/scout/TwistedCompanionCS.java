@@ -76,9 +76,9 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 	public void foxTick(LivingEntity summon, Player player, LivingEntity target, int t) {
 		Location loc = LocationUtils.getHalfHeightLocation(summon);
 		for (int i = 0; i < 2; i++) {
-			double rotation = Math.toRadians((t * 10) + (i * 180));
-			Vector vec = new Vector(FastMath.cos(rotation) * HELIX_RADIUS, 0,
-				FastMath.sin(rotation) * HELIX_RADIUS);
+			double rotation = FastMath.toRadians((t * 10) + (i * 180));
+			Vector vec = new Vector(FastUtils.cos(rotation) * HELIX_RADIUS, 0,
+				FastUtils.sin(rotation) * HELIX_RADIUS);
 			vec = VectorUtils.rotateXAxis(vec, 90);
 			vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 			Location l = loc.clone().add(vec);
@@ -86,22 +86,22 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 				new Particle.DustOptions(TWIST_COLOR_TIP, 1)).spawnAsPlayerActive(player);
 		}
 
-		if (target != null) {
+		if (target != null && !target.isDead() && target.isValid()) {
 			loc = LocationUtils.getHalfHeightLocation(target);
 			for (int i = 0; i < 2; i++) {
-				double rotation = Math.toRadians((t * 10) + (i * 180));
-				Vector vec = new Vector(FastMath.cos(rotation), 0,
-					FastMath.sin(rotation));
+				double rotation = FastMath.toRadians((t * 10) + (i * 180));
+				Vector vec = new Vector(FastUtils.cos(rotation), 0,
+					FastUtils.sin(rotation));
 				Location l = loc.clone().add(vec);
 				new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0.05, 0.05, 0,
-					new Particle.DustOptions(TWIST_COLOR_TIP, 1)).spawnAsPlayerActive(player);
+					new Particle.DustOptions(TWIST_COLOR_TIP, 1)).minimumMultiplier(false).spawnAsPlayerActive(player);
 			}
 		}
 	}
 
 	@Override
 	public void onAggroParticles(Player mPlayer, LivingEntity summon) {
-		new PartialParticle(Particle.SOUL, summon.getEyeLocation(), 15, 0.25, 0.25, 0.25, 0.005).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SOUL, summon.getEyeLocation(), 15, 0.25, 0.25, 0.25, 0.005).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override
@@ -109,8 +109,8 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.5f, 0.8f);
 		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 1.5f, 1.5f);
 		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.5f, 0.7f);
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 35, 0.15, 0.15, 0.15, 0.125F).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CRIT, loc, 30, 0, 0, 0, 0.6F).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 35, 0.15, 0.15, 0.15, 0.125F).minimumMultiplier(false).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT, loc, 30, 0, 0, 0, 0.6F).minimumMultiplier(false).spawnAsPlayerActive(player);
 
 		spawnRing(loc, player, 2);
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-1, 1), 1,
@@ -132,15 +132,15 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 				for (int i = 0; i < 2; i++) {
 					mRadius += 0.35;
 					for (int degree = 0; degree < 360; degree += 5) {
-						double radian = Math.toRadians(degree);
-						Vector vec = new Vector(FastMath.cos(radian) * mRadius, 0,
-							FastMath.sin(radian) * mRadius);
+						double radian = FastMath.toRadians(degree);
+						Vector vec = new Vector(FastUtils.cos(radian) * mRadius, 0,
+							FastUtils.sin(radian) * mRadius);
 						Location loc = l.clone().add(vec);
 						new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0,
 							new Particle.DustOptions(
 								ParticleUtils.getTransition(TWIST_COLOR_BASE, TWIST_COLOR_TIP, mRadius / RADIUS),
 								0.75f
-							)).spawnAsPlayerActive(mPlayer);
+							)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					}
 				}
 
@@ -181,14 +181,19 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 					mL.add(mD);
 
 					new PartialParticle(Particle.REDSTONE, mL, 3, 0.15, 0.15, 0.15, 0, new Particle.DustOptions(TWIST_COLOR_TIP, 1.5f))
+						.minimumMultiplier(false)
 						.spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SMOKE_NORMAL, mL, 2, 0.15, 0.15, 0.15, 0.05F).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SMOKE_NORMAL, mL, 2, 0.15, 0.15, 0.15, 0.05F)
+						.minimumMultiplier(false)
+						.spawnAsPlayerActive(mPlayer);
 
 					if (mT > 5 && mL.distance(to) < 0.35) {
 						world.playSound(mL, Sound.ENTITY_FOX_AGGRO, SoundCategory.PLAYERS, 1.25f, 0);
 						world.playSound(mL, Sound.ENTITY_FOX_BITE, SoundCategory.PLAYERS, 1.25f, 0.5f);
-						new PartialParticle(Particle.CRIT, mL, 20, 0, 0, 0, 0.6F).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.SMOKE_NORMAL, mL, 25, 0, 0, 0, 0.1F).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CRIT, mL, 20, 0, 0, 0, 0.6F)
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SMOKE_NORMAL, mL, 25, 0, 0, 0, 0.1F)
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 						this.cancel();
 						return;
 					}

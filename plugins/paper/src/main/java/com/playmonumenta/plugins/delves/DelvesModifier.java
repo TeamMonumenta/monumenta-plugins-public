@@ -158,13 +158,19 @@ public enum DelvesModifier {
 	}
 
 	public static ItemStack createIcon(Material material, Component name, String description) {
+		return createIcon(material, name, new String[] {description});
+	}
+
+	public static ItemStack createIcon(Material material, Component name, String[] description) {
 		ItemStack stack = new ItemStack(material);
 
 		ItemMeta meta = stack.getItemMeta();
 		meta.addItemFlags(ItemFlag.values());
 		meta.displayName(name);
 		List<Component> lore = new ArrayList<>();
-		lore.add(Component.text(description, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+		for (String descp : description) {
+			lore.add(Component.text(descp, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+		}
 		meta.lore(lore);
 		stack.setItemMeta(meta);
 

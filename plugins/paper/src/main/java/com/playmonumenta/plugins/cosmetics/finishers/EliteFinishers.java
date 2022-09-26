@@ -19,6 +19,7 @@ public class EliteFinishers {
 			.put(DefaultDanceFinisher.NAME, new DefaultDanceFinisher())
 			.put(USAFireworkFinisher.NAME, new USAFireworkFinisher())
 			.put(SplishSplashFinisher.NAME, new SplishSplashFinisher())
+			.put(MegalovaniaFinisher.NAME, new MegalovaniaFinisher())
 			.put(FrozenSolidFinisher.NAME, new FrozenSolidFinisher())
 			.build();
 

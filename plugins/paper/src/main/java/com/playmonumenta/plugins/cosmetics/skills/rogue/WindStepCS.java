@@ -40,8 +40,10 @@ public class WindStepCS extends AdvancingShadowsCS {
 		loc.setPitch(loc.getPitch() + 90);
 		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, 0, 1, 0, 0, 40, 0.3f,
 			false, 0, -1.25, Particle.CLOUD);
-		new PartialParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 1.1, 0), 25, 0.35, 0.5, 0.35, 0.1).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 1.1, 0), 7, 0.3, 0.5, 0.3, 0.025).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 1.1, 0), 25, 0.35, 0.5, 0.35, 0.1)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 1.1, 0), 7, 0.3, 0.5, 0.3, 0.025)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override
@@ -51,19 +53,20 @@ public class WindStepCS extends AdvancingShadowsCS {
 			Location l = loc.clone().add(0, 1.2, 0).add(dir.multiply(FastUtils.randomDoubleInRange(0.9, 1.25)));
 			ParticleUtils.drawParticleLineSlash(l, l.getDirection(), 0, 1.75, 0.1, FastUtils.RANDOM.nextInt(5, 8),
 				(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
-					new PartialParticle(Particle.ELECTRIC_SPARK, lineLoc, 1, 0, 0, 0, 0.05).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.ELECTRIC_SPARK, lineLoc, 1, 0, 0, 0, 0.05)
+						.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 			});
 		}
 
 		for (int j = 0; j < 3; j++) {
 			double radian = FastMath.toRadians((i * 8) + (j * 120));
-			Vector vec = new Vector(FastMath.cos(radian) * 1.1, 0, FastMath.sin(radian) * 1.1);
+			Vector vec = new Vector(FastUtils.cos(radian) * 1.1, 0, FastUtils.sin(radian) * 1.1);
 			vec = VectorUtils.rotateXAxis(vec, loc.getPitch() + 90);
 			vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 			Location l = loc.clone().add(0, 1.15, 0).add(vec);
 			new PartialParticle(Particle.REDSTONE, l, 5, 0.125f, 0.125f, 0.125f, 0,
 				new Particle.DustOptions(TRAIL_COLOR_BRIGHT, 1.7f))
-				.spawnAsPlayerActive(mPlayer);
+				.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		}
 
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc.clone().add(0, 1, 0), 1, 0.25, 0.5, 0.25, 0.2).spawnAsPlayerActive(mPlayer);

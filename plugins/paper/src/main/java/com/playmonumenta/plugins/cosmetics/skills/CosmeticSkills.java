@@ -68,7 +68,8 @@ public class CosmeticSkills {
 	 */
 
 	public static Cosmetic getCosmeticByName(String name) {
-		return COSMETIC_SKILLS.get(name).getCosmetic();
+		CosmeticSkill cs = COSMETIC_SKILLS.getOrDefault(name, null);
+		return cs != null ? cs.getCosmetic() : null;
 	}
 
 	public static CosmeticSkill getCosmeticSkill(String name) {

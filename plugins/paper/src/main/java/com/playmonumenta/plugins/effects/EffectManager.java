@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.Collections;
 import java.util.Comparator;
@@ -417,13 +418,21 @@ public final class EffectManager implements Listener {
 	 * @param effect the effect to be applied
 	 */
 	public void addEffect(Entity entity, String source, Effect effect) {
-		Effects effects = mEntities.get(entity);
-		if (effects == null) {
-			effects = new Effects(entity);
-			mEntities.put(entity, effects);
-		}
+		// The event may be cancelled, and all 3 parameters may be modified
+		CustomEffectApplyEvent event = new CustomEffectApplyEvent(entity, effect, source);
+		if (event.callEvent()) {
+			entity = event.getEntity();
+			source = event.getSource();
+			effect = event.getEffect();
 
-		effects.addEffect(source, effect);
+			Effects effects = mEntities.get(entity);
+			if (effects == null) {
+				effects = new Effects(entity);
+				mEntities.put(entity, effects);
+			}
+
+			effects.addEffect(source, effect);
+		}
 	}
 
 	/**

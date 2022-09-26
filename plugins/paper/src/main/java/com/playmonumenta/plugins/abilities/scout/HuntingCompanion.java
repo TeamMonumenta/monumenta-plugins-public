@@ -133,7 +133,6 @@ public class HuntingCompanion extends Ability {
 
 			double multiply = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
 			double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (multiply != 0 ? multiply : 1);
-			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
@@ -158,8 +157,15 @@ public class HuntingCompanion extends Ability {
 				@Override
 				public void run() {
 					mT++;
-					for (Mob summon : mSummons.keySet()) {
-						mCosmetic.tick(summon, mPlayer, mSummons.get(summon), mT);
+					for (Mob summon : new ArrayList<>(mSummons.keySet())) {
+						if (summon.isDead() || !summon.isValid()) {
+							mSummons.remove(summon);
+						} else {
+							mCosmetic.tick(summon, mPlayer, mSummons.get(summon), mT);
+						}
+					}
+					if (mSummons.isEmpty()) {
+						this.cancel();
 					}
 				}
 			};

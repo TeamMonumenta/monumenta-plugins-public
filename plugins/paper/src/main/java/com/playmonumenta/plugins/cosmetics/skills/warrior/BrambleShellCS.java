@@ -88,6 +88,7 @@ public class BrambleShellCS extends CounterStrikeCS {
 						new Particle.DustOptions(
 							EARTH_COLOR, 1.125f * (1F - (0.75f * progress))
 						))
+						.minimumMultiplier(false)
 						.spawnAsPlayerActive(mPlayer);
 				}
 

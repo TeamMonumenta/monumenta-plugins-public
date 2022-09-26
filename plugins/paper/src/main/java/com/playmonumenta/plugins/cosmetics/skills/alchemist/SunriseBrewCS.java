@@ -64,14 +64,16 @@ public class SunriseBrewCS extends BezoarCS {
 			double radian = FastMath.toRadians((tick * 6) + (i * 180));
 			Vector vec = new Vector(FastMath.cos(radian) * 0.65, 0.125, FastMath.sin(radian) * 0.65);
 			Location l = loc.clone().add(vec);
-			new PartialParticle(Particle.SPELL, l, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SPELL, l, 1, 0, 0, 0, 0)
+				.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		}
 
 		for (int i = 0; i < 2; i++) {
 			double radian = FastMath.toRadians((tick * 6) + (i * 180) + 90);
 			Vector vec = new Vector(FastMath.cos(radian) * 0.65, 0.125, FastMath.sin(radian) * 0.65);
 			Location l = loc.clone().add(vec);
-			new PartialParticle(Particle.REDSTONE, l, 2, 0.1, 0.1, 0.1, 0, SUNDROP_COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, l, 2, 0.1, 0.1, 0.1, 0, SUNDROP_COLOR)
+				.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		}
 	}
 
@@ -84,8 +86,10 @@ public class SunriseBrewCS extends BezoarCS {
 		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1, 2f);
 
 		loc.setPitch(0);
-		new PartialParticle(Particle.CRIT_MAGIC, loc, 60, 0, 0, 0, 0.75F).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.END_ROD, loc, 45, 0, 0, 0, 0.2F).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CRIT_MAGIC, loc, 60, 0, 0, 0, 0.75F)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.END_ROD, loc, 45, 0, 0, 0, 0.2F)
+			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc.clone().add(0, 0.15, 0), 0, 1, 0, 0, 50, 0.3f,
 			true, 0, Particle.END_ROD);
 		new BukkitRunnable() {
@@ -99,11 +103,12 @@ public class SunriseBrewCS extends BezoarCS {
 				for (int i = 0; i < 2; i++) {
 					mRadius += 0.25;
 					for (int degree = 0; degree < 360; degree += 6) {
-						double radian = Math.toRadians(degree);
-						Vector vec = new Vector(FastMath.cos(radian) * mRadius, 0.75 * FastMath.sin(Math.PI * (mRadius / RADIUS)),
-							FastMath.sin(radian) * mRadius);
+						double radian = FastMath.toRadians(degree);
+						Vector vec = new Vector(FastUtils.cos(radian) * mRadius, 0.75 * FastUtils.sin(Math.PI * (mRadius / RADIUS)),
+							FastUtils.sin(radian) * mRadius);
 						Location loc = mL.clone().add(vec);
-						new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, SUNDROP_RING_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, SUNDROP_RING_COLOR)
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 					}
 				}
 
@@ -155,8 +160,10 @@ public class SunriseBrewCS extends BezoarCS {
 					if (mT > 5 && mL.distance(to) < 0.35) {
 						world.playSound(mL, Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, SoundCategory.PLAYERS, 1, 0.75f);
 						world.playSound(mL, Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, SoundCategory.PLAYERS, 1, 0.5f);
-						new PartialParticle(Particle.CRIT_MAGIC, mL, 15, 0, 0, 0, 0.6F).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.END_ROD, mL, 3, 0, 0, 0, 0.125F).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CRIT_MAGIC, mL, 15, 0, 0, 0, 0.6F)
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.END_ROD, mL, 3, 0, 0, 0, 0.125F)
+							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 						this.cancel();
 						return;
 					}

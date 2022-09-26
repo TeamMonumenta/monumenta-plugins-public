@@ -517,10 +517,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public boolean isAlchemistPotion(ThrownPotion potion) {
-		if (BRUTAL_POTION == null || GRUESOME_POTION == null) {
-			return false;
-		}
-
-		return potion.getItem().equals(BRUTAL_POTION) || potion.getItem().equals(GRUESOME_POTION);
+		return BRUTAL_POTION != null && ItemUtils.getPlainNameIfExists(BRUTAL_POTION).equals(ItemUtils.getPlainNameIfExists(potion.getItem()));
 	}
 }

@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
@@ -21,6 +22,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -36,6 +38,8 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
+
 
 public class AlchemicalArtillery extends PotionAbility {
 	public static final String ARTILLERY_POTION_TAG = "ArtilleryPotion";
@@ -81,12 +85,24 @@ public class AlchemicalArtillery extends PotionAbility {
 			&& mActive && projectile instanceof AbstractArrow arrow
 			&& (arrow.isCritical() || arrow instanceof Trident) && mAlchemistPotions.decrementCharge()) {
 			ThrownPotion pot = mPlayer.getWorld().spawn(arrow.getLocation(), ThrownPotion.class);
-			pot.setVelocity(arrow.getVelocity());
+			Vector velocity = arrow.getVelocity();
+			double speed = velocity.length();
+			if (speed > 5) { // fast potions tend to explode in your face, so limit speed to some acceptable value
+				velocity = velocity.normalize().multiply(5);
+			}
+			pot.setVelocity(velocity);
 			pot.setShooter(mPlayer);
 			mAlchemistPotions.setPotionToAlchemistPotion(pot);
 
 			arrow.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
+
+			// give back a normal arrow when a crossbow is shot
+			if (mPlayer.getInventory().getItemInMainHand().getType() == Material.CROSSBOW
+				    && mPlayer.getGameMode() != GameMode.CREATIVE
+				    && arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
+				InventoryUtils.giveItem(mPlayer, new ItemStack(Material.ARROW), true);
+			}
 
 			double bownus = 0;
 			if (isLevelTwo()) {
@@ -99,6 +115,8 @@ public class AlchemicalArtillery extends PotionAbility {
 			}
 
 			pot.setMetadata(ARTILLERY_POTION_TAG, new FixedMetadataValue(mPlugin, bownus));
+
+			return false;
 		}
 
 		return true;

@@ -231,6 +231,19 @@ public class Boss {
 		}
 	}
 
+	// Only acts on fire applied by the plugin
+	public void bossIgnited(int ticks) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossIgnited(ticks);
+		}
+	}
+
+	public void onPassengerHurt(DamageEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossPassengerHurt(event);
+		}
+	}
+
 	/*
 	 * Boss was stunned by a player. Mobs with the "Boss" tag can't be stunned
 	 */

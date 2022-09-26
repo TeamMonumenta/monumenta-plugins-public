@@ -969,9 +969,12 @@ public class EntityUtils {
 		}
 	}
 
-	private static void setFireTicksIfLower(int fireTicks, LivingEntity target) {
+	public static void setFireTicksIfLower(int fireTicks, LivingEntity target) {
 		if (target.getFireTicks() < fireTicks && !isFireResistant(target)) {
 			target.setFireTicks(fireTicks);
+			if (!(target instanceof Player)) {
+				BossManager.getInstance().bossIgnited(target, fireTicks);
+			}
 		}
 	}
 

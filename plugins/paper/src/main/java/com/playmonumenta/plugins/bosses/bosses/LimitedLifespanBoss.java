@@ -18,6 +18,9 @@ public class LimitedLifespanBoss extends BossAbilityGroup {
 		@BossParam(help = "Lifetime of the boss, in seconds")
 		public int LIFETIME = 60;
 
+		@BossParam(help = "If true, the boss will be deleted instead of killed when time runs out, skipping the death animation, drops, etc.")
+		public boolean DELETE = false;
+
 		@BossParam(help = "Particles summoned when the boss dies due to running out of time")
 		public ParticlesList PARTICLES = ParticlesList.fromString("[]");
 
@@ -39,7 +42,11 @@ public class LimitedLifespanBoss extends BossAbilityGroup {
 			if (boss.isValid()) {
 				p.PARTICLES.spawn(boss, boss.getLocation());
 				p.SOUNDS.play(boss.getLocation());
-				boss.setHealth(0);
+				if (p.DELETE) {
+					boss.remove();
+				} else {
+					boss.setHealth(0);
+				}
 			}
 		}, Math.max(0, p.LIFETIME * 20L - boss.getTicksLived()));
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), 0, null);

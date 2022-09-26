@@ -59,13 +59,13 @@ public class WhispersBoss extends BossAbilityGroup {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (!player.isDead() && player.getAbsorptionAmount() == 0 && !event.isCancelled()) {
+					if (!player.isDead() && !mBoss.isDead() && !event.isCancelled()) {
 						mStolenPlayers.add(player);
 						player.playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 5, 1f);
-						DamageUtils.damage(null, damagee, new DamageEvent.Metadata(DamageType.TRUE, null, null, "Whispers"), trueDamage * resistanceMod, true, false, false);
+						if (player.getAbsorptionAmount() == 0) {
+							DamageUtils.damage(null, damagee, new DamageEvent.Metadata(DamageType.TRUE, null, null, "Whispers"), trueDamage * resistanceMod, true, false, false);
+						}
 						EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier("Whispers" + mBoss.getUniqueId(), -mParam.PERCENT_DAMAGE / 100.0, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
-						EntityUtils.addAttribute(mBoss, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier("Whispers", trueDamage, AttributeModifier.Operation.ADD_NUMBER));
-						mBoss.setHealth(mBoss.getHealth() + trueDamage);
 						BukkitRunnable cleanse = new BukkitRunnable() {
 							@Override
 							public void run() {

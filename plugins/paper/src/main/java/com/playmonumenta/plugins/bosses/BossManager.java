@@ -607,6 +607,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(PotionThrowBoss.identityTag, new PotionThrowBoss.Parameters());
 		mBossParameters.put(GenericTargetBoss.identityTag, new GenericTargetBoss.Parameters());
 		mBossParameters.put(LimitedLifespanBoss.identityTag, new LimitedLifespanBoss.Parameters());
+		mBossParameters.put(ImmortalMountBoss.identityTag, new ImmortalMountBoss.Parameters());
 		mBossParameters.put(BrownMagnetSwapBoss.identityTag, new BrownMagnetSwapBoss.Parameters());
 		mBossParameters.put(BrownPositiveBoss.identityTag, new BrownPositiveBoss.Parameters());
 		mBossParameters.put(BrownNegativeBoss.identityTag, new BrownNegativeBoss.Parameters());
@@ -856,6 +857,14 @@ public class BossManager implements Listener {
 			}
 			boss.setLastHitBy(source);
 		}
+
+		Entity vehicle = damagee.getVehicle();
+		if (vehicle instanceof LivingEntity mount) {
+			Boss mountBoss = mBosses.get(mount.getUniqueId());
+			if (mountBoss != null) {
+				mountBoss.onPassengerHurt(event);
+			}
+		}
 	}
 
 	// Must be before player items and abilities, which use priority HIGH
@@ -1003,6 +1012,15 @@ public class BossManager implements Listener {
 
 		if (boss != null) {
 			boss.bossExploded(event);
+		}
+	}
+
+	// Only acts on fire applied by the plugin, called in EntityUtils
+	public void bossIgnited(Entity entity, int ticks) {
+		Boss boss = mBosses.get(entity.getUniqueId());
+
+		if (boss != null) {
+			boss.bossIgnited(ticks);
 		}
 	}
 

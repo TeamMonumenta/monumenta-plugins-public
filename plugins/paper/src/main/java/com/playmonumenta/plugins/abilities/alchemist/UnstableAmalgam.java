@@ -15,7 +15,9 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -42,6 +44,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class UnstableAmalgam extends Ability {
@@ -69,6 +72,7 @@ public class UnstableAmalgam extends Ability {
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private @Nullable Slime mAmalgam;
+	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 	private final double mDamage;
 	private final Map<ThrownPotion, ItemStatManager.PlayerItemStats> mEnhancementPotionPlayerStat;
 
@@ -77,11 +81,12 @@ public class UnstableAmalgam extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.UNSTABLE_AMALGAM;
 		mInfo.mScoreboardId = "UnstableAmalgam";
 		mInfo.mShorthandName = "UA";
-		mInfo.mDescriptions.add("Shift left click while holding an Alchemist's Bag to consume a potion to place an Amalgam with 1 health at the location you are looking, up to 7 blocks away. When the Amalgam dies, or after 3 seconds, it explodes, dealing your Alchemist Potion's damage + 12 magic damage to mobs in a 4 block radius and applying potion effects from all abilities. Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Shift left click while holding an Alchemist's Bag to consume a potion to place an Amalgam with 1 health at the location you are looking, up to 7 blocks away. Shift left click again to detonate it, dealing your Alchemist Potion's damage + 12 magic damage to mobs in a 4 block radius and applying potion effects from all abilities. The Amalgam also explodes when killed, or 3 seconds after being placed. Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion. Cooldown: 20s.");
 		mInfo.mDescriptions.add("The damage is increased to 20 and the cooldown is reduced to 16s.");
 		mInfo.mDescriptions.add("Enemies and allies affected by the Amalgam become unstable for 8s. When an unstable mob is damaged by an unstable player or dies for any reason, a potion that deals 40% of your potion damage is dropped at its location. Each unstable player can only trigger this once. These potions apply both Brutal and Gruesome effects.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? UNSTABLE_AMALGAM_1_COOLDOWN : UNSTABLE_AMALGAM_2_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.GUNPOWDER, 1);
 
 		mAmalgam = null;
@@ -96,17 +101,42 @@ public class UnstableAmalgam extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer != null && mAlchemistPotions != null && mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && mAlchemistPotions.decrementCharge()) {
+		// cast preconditions
+		if (mPlayer == null || mAlchemistPotions == null || !mPlayer.isSneaking() || !ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
+			return;
+		}
+		// prevent double casts in the same tick (while normal cast has this check, this ability is also cast on melee damage, which bypasses that check)
+		if (!MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "UnstableAmalgamCast")) {
+			return;
+		}
+
+		// explode existing amalgam
+		if (mAmalgam != null) {
+			explode(mAmalgam.getLocation());
+			mAmalgam.remove();
+			mAmalgam = null;
+			return;
+		}
+		if (isTimerActive()) {
+			return;
+		}
+
+		// cast new amalgam
+		if (mAlchemistPotions.decrementCharge()) {
 			putOnCooldown();
 
 			Location loc = mPlayer.getEyeLocation();
-			Vector dir = loc.getDirection().normalize().multiply(0.5);
+			double step = 0.125;
+			Vector dir = loc.getDirection().normalize().multiply(step);
 			double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, UNSTABLE_AMALGAM_CAST_RANGE);
-			for (double i = 0; i < range; i += 0.5) {
+			for (double i = 0; i < range; i += step) {
 				loc.add(dir);
 
-				if (loc.getBlock().getType().isSolid()) {
-					break;
+				if (NmsUtils.getVersionAdapter().hasCollision(loc.getWorld(), BoundingBox.of(loc, 0.21, 0.21, 0.21))) {
+					loc.subtract(dir);
+					spawnAmalgam(loc);
+
+					return;
 				}
 			}
 
@@ -119,7 +149,8 @@ public class UnstableAmalgam extends Ability {
 			return;
 		}
 
-		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+		mPlayerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+
 		int duration = UNSTABLE_AMALGAM_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 
 		loc.setY(loc.getBlockY() + 1);
@@ -145,7 +176,7 @@ public class UnstableAmalgam extends Ability {
 					}
 
 					if (mAmalgam.isDead() || mTicks >= duration) {
-						explode(mAmalgam.getLocation(), playerItemStats);
+						explode(mAmalgam.getLocation());
 						mAmalgam.remove();
 						mAmalgam = null;
 						this.cancel();
@@ -161,7 +192,7 @@ public class UnstableAmalgam extends Ability {
 		}
 	}
 
-	private void explode(Location loc, ItemStatManager.PlayerItemStats playerItemStats) {
+	private void explode(Location loc) {
 		if (mPlayer == null || !mPlayer.isOnline() || mAlchemistPotions == null) {
 			return;
 		}
@@ -175,7 +206,7 @@ public class UnstableAmalgam extends Ability {
 
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage + mAlchemistPotions.getDamage());
 		for (LivingEntity mob : mobs) {
-			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, false);
+			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, mPlayerItemStats), damage, true, true, false);
 
 			mAlchemistPotions.applyEffects(mob, false);
 			mAlchemistPotions.applyEffects(mob, true);
@@ -188,11 +219,11 @@ public class UnstableAmalgam extends Ability {
 			int duration = UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_INSTABILITY_DURATION);
 
 			if (!mobs.isEmpty()) {
-				unstableMobs(mobs, playerItemStats, duration);
+				unstableMobs(mobs, duration);
 			}
 
 			for (Player player : PlayerUtils.playersInRange(loc, radius, true)) {
-				unstableAlly(player, playerItemStats, duration);
+				unstableAlly(player, duration);
 			}
 		}
 
@@ -218,7 +249,7 @@ public class UnstableAmalgam extends Ability {
 	}
 
 
-	private void unstableMobs(List<LivingEntity> mobs, ItemStatManager.PlayerItemStats playerItemStats, int duration) {
+	private void unstableMobs(List<LivingEntity> mobs, int duration) {
 		if (mPlayer == null || mAlchemistPotions == null) {
 			return;
 		}
@@ -236,7 +267,7 @@ public class UnstableAmalgam extends Ability {
 						ThrownPotion potion = mPlayer.launchProjectile(ThrownPotion.class);
 						potion.teleport(mob.getEyeLocation());
 						potion.setVelocity(new Vector(0, -1, 0));
-						setEnhancementThrownPotion(potion, playerItemStats);
+						setEnhancementThrownPotion(potion, mPlayerItemStats);
 					}
 				}
 
@@ -247,9 +278,9 @@ public class UnstableAmalgam extends Ability {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	private void unstableAlly(Player player, ItemStatManager.PlayerItemStats playerItemStats, int duration) {
+	private void unstableAlly(Player player, int duration) {
 		if (mPlayer != null) {
-			mPlugin.mEffectManager.addEffect(player, UNSTABLE_AMALGAM_ENHANCEMENT_EFFECT_NAME, new UnstableAmalgamEnhancementEffect(duration, mPlayer, this, playerItemStats));
+			mPlugin.mEffectManager.addEffect(player, UNSTABLE_AMALGAM_ENHANCEMENT_EFFECT_NAME, new UnstableAmalgamEnhancementEffect(duration, mPlayer, this, mPlayerItemStats));
 		}
 	}
 
