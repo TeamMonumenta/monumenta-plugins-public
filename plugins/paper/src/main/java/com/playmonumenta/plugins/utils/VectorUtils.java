@@ -75,8 +75,8 @@ public class VectorUtils {
 
 	// convert [yaw, pitch] in degrees to direction vector
 	public static Vector rotationToVector(double yaw, double pitch) {
-		double x = FastUtils.sinDeg(yaw) * FastUtils.cos(pitch);
-		double z = -FastUtils.cosDeg(yaw) * FastUtils.cos(pitch);
+		double x = -FastUtils.sinDeg(yaw) * FastUtils.cosDeg(pitch);
+		double z = FastUtils.cosDeg(yaw) * FastUtils.cosDeg(pitch);
 		double y = -FastUtils.sinDeg(pitch);
 		return new Vector(x, y, z);
 	}
