@@ -126,7 +126,7 @@ public class SeasonalEventListener implements Listener {
 					if (waves > 0) {
 						SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, waves);
 					}
-				} else if (mission.mType == WeeklyMissionType.DAILY_BOUNTY && (content == MonumentaContent.KINGS_BOUNTY || content == MonumentaContent.CELSIAN_BOUNTY)) {
+				} else if (mission.mType == WeeklyMissionType.DAILY_BOUNTY && (content == MonumentaContent.KINGS_BOUNTY || content == MonumentaContent.CELSIAN_BOUNTY || content == MonumentaContent.RING_BOUNTY)) {
 					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
 				} else if (mission.mType == WeeklyMissionType.DELVE_BOUNTY && content == MonumentaContent.DELVE_BOUNTY) {
 					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
