@@ -2,6 +2,7 @@ package com.playmonumenta.plugins;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.commands.*;
@@ -223,6 +224,7 @@ public class Plugin extends JavaPlugin {
 		WorldNameCommand.register();
 		ToggleTrail.register();
 		MonumentaTrigger.register();
+		BlueStrikeDaggerCraftingBoss.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

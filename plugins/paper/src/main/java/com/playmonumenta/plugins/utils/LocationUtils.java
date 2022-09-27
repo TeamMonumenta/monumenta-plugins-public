@@ -417,6 +417,50 @@ public class LocationUtils {
 		return false;
 	}
 
+	public static void travelTillMaxDistance(
+		World world,
+		BoundingBox movingBoundingBox,
+		double maxDistance,
+		Vector vector,
+		double increment,
+		@Nullable TravelAction travelAction,
+		int actionFrequency,
+		int actionChance
+	) {
+		Vector start = movingBoundingBox.getCenter(); // For checking if exceeded maxDistance
+		Vector vectorIncrement = vector.clone().normalize().multiply(increment);
+		int frequencyTracker = actionFrequency; // For deciding whether to run travelAction for this interval
+
+		// this box always moves along a straight line, even if wiggle room is enabled
+		BoundingBox testBox = movingBoundingBox.clone();
+
+		double maxIterations = maxDistance / increment * 1.1;
+		for (int i = 0; i < maxIterations; i++) {
+			testBox.shift(vectorIncrement);
+			Vector testBoxCentre = testBox.getCenter();
+
+			if (start.distanceSquared(testBoxCentre) > maxDistance * maxDistance) {
+				// Gone too far
+				return;
+			}
+			movingBoundingBox.copy(testBox);
+
+			// The central location of the bounding box is valid;
+			// it was not reverse shifted. Run travelAction if frequency is right
+			if (travelAction != null) {
+				if (frequencyTracker >= actionFrequency) {
+					actionFrequency = 1;
+
+					if (actionChance <= 1 || FastUtils.RANDOM.nextInt(actionChance) == 0) {
+						travelAction.run(testBoxCentre.toLocation(world));
+					}
+				} else {
+					actionFrequency++;
+				}
+			}
+		}
+	}
+
 	// Adds part or all of y height above feet location, based on multiplier. Player height 1.8, player sneaking height 1.5
 	public static Location getHeightLocation(Entity entity, double heightMultiplier) {
 		return entity.getLocation().add(0, entity.getHeight() * heightMultiplier, 0);

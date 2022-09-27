@@ -80,9 +80,9 @@ public class SpellBaseSummon extends Spell {
 	 * @param canBeStopped          if the spell can be stopped when the bos is stunned
 	 * @param canMove               if the bos can move while casting
 	 * @param singleTarget          if the spell will only launch at one random pos
-	 * @param summonQuantity        return the number of mob that will be spawened at each pos
-	 * @param spawningLocations     return a list of spawning location
-	 * @param summonMob             return the mob spawned at the given locatio
+	 * @param summonQuantity        return the number of mob that will be spawned at each pos
+	 * @param spawningLocations     return a list of spawning locations
+	 * @param summonMob             return the mob spawned at the given location
 	 * @param bossAnimation         animation for the boss
 	 * @param summonAnimation       animation for each summon mob
 	 */

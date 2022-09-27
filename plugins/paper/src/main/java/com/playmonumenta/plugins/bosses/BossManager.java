@@ -9,6 +9,12 @@ import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBos
 import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeTargetNPCBoss;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeTurretBoss;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.DropShardBoss;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.LavaCannonBoss;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.Samwell;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayBookSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
@@ -276,6 +282,11 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(BlueEarthBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueEarthBoss(p, e));
 		mStatelessBosses.put(BlueAirBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueAirBoss(p, e));
 		mStatelessBosses.put(BlueWaterBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueWaterBoss(p, e));
+		mStatelessBosses.put(DropShardBoss.identityTag, (Plugin p, LivingEntity e) -> new DropShardBoss(p, e));
+		mStatelessBosses.put(BlueStrikeDaggerCraftingBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeDaggerCraftingBoss(p, e));
+		mStatelessBosses.put(BlueStrikeTargetNPCBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeTargetNPCBoss(p, e));
+		mStatelessBosses.put(BlueStrikeTurretBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeTurretBoss(p, e));
+		mStatelessBosses.put(LavaCannonBoss.identityTag, (Plugin p, LivingEntity e) -> new LavaCannonBoss(p, e));
 
 		mStatelessBosses.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> new LichMageBoss(p, e));
 		mStatelessBosses.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> new LichRogueBoss(p, e));
@@ -337,6 +348,7 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(RKitxet.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new RKitxet(p, e, s, l));
 		mStatefulBosses.put(VerdantMinibossBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VerdantMinibossBoss(p, e, s, l));
 		mStatefulBosses.put(PortalBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new PortalBoss(p, e, s, l));
+		mStatefulBosses.put(Samwell.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Samwell(p, e, s, l));
 
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
@@ -516,7 +528,11 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(BlueEarthBoss.identityTag, (Plugin p, LivingEntity e) -> BlueEarthBoss.deserialize(p, e));
 		mBossDeserializers.put(BlueAirBoss.identityTag, (Plugin p, LivingEntity e) -> BlueAirBoss.deserialize(p, e));
 		mBossDeserializers.put(BlueWaterBoss.identityTag, (Plugin p, LivingEntity e) -> BlueWaterBoss.deserialize(p, e));
-
+		mBossDeserializers.put(Samwell.identityTag, (Plugin p, LivingEntity e) -> Samwell.deserialize(p, e));
+		mBossDeserializers.put(BlueStrikeDaggerCraftingBoss.identityTag, (Plugin p, LivingEntity e) -> BlueStrikeDaggerCraftingBoss.deserialize(p, e));
+		mBossDeserializers.put(BlueStrikeTargetNPCBoss.identityTag, (Plugin p, LivingEntity e) -> BlueStrikeTargetNPCBoss.deserialize(p, e));
+		mBossDeserializers.put(BlueStrikeTurretBoss.identityTag, (Plugin p, LivingEntity e) -> BlueStrikeTurretBoss.deserialize(p, e));
+		mBossDeserializers.put(LavaCannonBoss.identityTag, (Plugin p, LivingEntity e) -> LavaCannonBoss.deserialize(p, e));
 
 		mBossDeserializers.put(Lich.identityTag, (Plugin p, LivingEntity e) -> Lich.deserialize(p, e));
 		mBossDeserializers.put(LichAlchBoss.identityTag, (Plugin p, LivingEntity e) -> LichAlchBoss.deserialize(p, e));
