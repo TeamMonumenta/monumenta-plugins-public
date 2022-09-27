@@ -38,6 +38,11 @@ public class BonusSoulThreads extends SingleArgumentEffect {
 	}
 
 	@Override
+	public boolean isBuff() {
+		return true;
+	}
+
+	@Override
 	public @Nullable String getSpecificDisplay() {
 		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Soul Thread Drops";
 	}

@@ -20,6 +20,11 @@ public class PercentExperience extends SingleArgumentEffect {
 		event.setAmount((int) (event.getAmount() * (1 + mAmount)));
 	}
 
+	@Override
+	public boolean isBuff() {
+		return true;
+	}
+
 	public static PercentExperience deserialize(JsonObject object, Plugin plugin) {
 		int duration = object.get("duration").getAsInt();
 		double amount = object.get("amount").getAsDouble();

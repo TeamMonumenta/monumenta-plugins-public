@@ -43,6 +43,11 @@ public class PercentAttackSpeed extends Effect {
 	}
 
 	@Override
+	public boolean isBuff() {
+		return mAmount > 0;
+	}
+
+	@Override
 	public @Nullable String getSpecificDisplay() {
 		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Attack Speed";
 	}

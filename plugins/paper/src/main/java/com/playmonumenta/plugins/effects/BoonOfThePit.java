@@ -9,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 public class BoonOfThePit extends ZeroArgumentEffect {
+	public static final String GENERIC_NAME = "BoonOfThePit";
 	public static final String effectID = "BoonOfThePit";
 
 	public static double DAMAGE_BONUS = 1.2;
@@ -39,6 +40,11 @@ public class BoonOfThePit extends ZeroArgumentEffect {
 		int duration = object.get("duration").getAsInt();
 
 		return new BoonOfThePit(duration);
+	}
+
+	@Override
+	public boolean isBuff() {
+		return true;
 	}
 
 	@Override

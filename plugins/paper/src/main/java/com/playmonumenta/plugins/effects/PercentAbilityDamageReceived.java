@@ -29,6 +29,11 @@ public class PercentAbilityDamageReceived extends Effect {
 	}
 
 	@Override
+	public boolean isBuff() {
+		return mAmount < 0;
+	}
+
+	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
 		if (event.getAbility() != null && mAffectedAbilities.contains(event.getAbility())) {
 			double amount = mAmount;

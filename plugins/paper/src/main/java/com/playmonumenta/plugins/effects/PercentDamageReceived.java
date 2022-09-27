@@ -41,6 +41,11 @@ public class PercentDamageReceived extends Effect {
 		return mAmount < 0;
 	}
 
+	@Override
+	public boolean isBuff() {
+		return mAmount > 0;
+	}
+
 	public EnumSet<DamageType> getAffectedDamageTypes() {
 		return mAffectedDamageTypes;
 	}

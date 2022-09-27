@@ -19,6 +19,11 @@ public class PercentHeal extends SingleArgumentEffect {
 	}
 
 	@Override
+	public boolean isBuff() {
+		return mAmount > 0;
+	}
+
+	@Override
 	public boolean entityRegainHealthEvent(EntityRegainHealthEvent event) {
 		event.setAmount(event.getAmount() * (1 + mAmount));
 		return mAmount > -1;

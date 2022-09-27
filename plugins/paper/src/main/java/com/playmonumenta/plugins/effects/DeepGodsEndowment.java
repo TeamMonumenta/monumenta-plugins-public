@@ -22,6 +22,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class DeepGodsEndowment extends ZeroArgumentEffect {
+	public static final String GENERIC_NAME = "DeepGodsEndowment";
 	public static final String effectID = "DeepGodsEndowment";
 
 	public static int HITS_NEEDED = 5;
@@ -136,6 +137,11 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 		int duration = object.get("duration").getAsInt();
 
 		return new DeepGodsEndowment(duration);
+	}
+
+	@Override
+	public boolean isBuff() {
+		return true;
 	}
 
 	@Override

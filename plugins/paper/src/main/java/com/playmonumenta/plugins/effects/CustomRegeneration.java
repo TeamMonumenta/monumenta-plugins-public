@@ -63,6 +63,11 @@ public class CustomRegeneration extends Effect {
 	}
 
 	@Override
+	public boolean isBuff() {
+		return true;
+	}
+
+	@Override
 	public @Nullable String getSpecificDisplay() {
 		return "+" + StringUtils.to2DP(mAmount) + " Regeneration Per Second";
 	}

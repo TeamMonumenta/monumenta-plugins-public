@@ -23,6 +23,11 @@ public class AbilityCooldownDecrease extends SingleArgumentEffect {
 		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Ability Cooldown Decrease";
 	}
 
+	@Override
+	public boolean isBuff() {
+		return true;
+	}
+
 	public static AbilityCooldownDecrease deserialize(JsonObject object, Plugin plugin) {
 		int duration = object.get("duration").getAsInt();
 		double amount = object.get("amount").getAsDouble();

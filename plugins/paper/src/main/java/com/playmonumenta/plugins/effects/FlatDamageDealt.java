@@ -79,6 +79,11 @@ public class FlatDamageDealt extends Effect {
 	}
 
 	@Override
+	public boolean isBuff() {
+		return mAmount > 0;
+	}
+
+	@Override
 	public @Nullable String getSpecificDisplay() {
 		return "+" + StringUtils.to2DP(mAmount) + " Flat Damage Dealt";
 	}

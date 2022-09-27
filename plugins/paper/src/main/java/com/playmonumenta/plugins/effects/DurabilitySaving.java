@@ -31,6 +31,11 @@ public class DurabilitySaving extends SingleArgumentEffect {
 	}
 
 	@Override
+	public boolean isBuff() {
+		return true;
+	}
+
+	@Override
 	public @Nullable String getSpecificDisplay() {
 		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Durability Saving";
 	}

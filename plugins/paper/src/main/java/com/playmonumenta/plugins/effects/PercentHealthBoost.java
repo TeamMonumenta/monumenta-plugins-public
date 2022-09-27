@@ -4,20 +4,20 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class PercentKnockbackResist extends Effect {
-	public static final String effectID = "PercentKnockbackResist";
-	public static final String GENERIC_NAME = "PercentKnockbackResist";
+public class PercentHealthBoost extends Effect {
+	public static final String effectID = "PercentHealthBoost";
+	public static final String GENERIC_NAME = "PercentHealthBoost";
 
 	private final double mAmount;
 	private final String mModifierName;
 
-	public PercentKnockbackResist(int duration, double amount, String modifierName) {
+	public PercentHealthBoost(int duration, double amount, String modifierName) {
 		super(duration, effectID);
 		mAmount = amount;
 		mModifierName = modifierName;
@@ -40,15 +40,16 @@ public class PercentKnockbackResist extends Effect {
 
 	@Override
 	public void entityGainEffect(Entity entity) {
-		if (entity instanceof Attributable attributable) {
-			EntityUtils.addAttribute(attributable, Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.ADD_NUMBER));
+		if (entity instanceof LivingEntity le) {
+			EntityUtils.addAttribute(le, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			le.setHealth(le.getHealth() + le.getMaxHealth() * mAmount);
 		}
 	}
 
 	@Override
 	public void entityLoseEffect(Entity entity) {
-		if (entity instanceof Attributable attributable) {
-			EntityUtils.removeAttribute(attributable, Attribute.GENERIC_KNOCKBACK_RESISTANCE, mModifierName);
+		if (entity instanceof LivingEntity le) {
+			EntityUtils.removeAttribute(le, Attribute.GENERIC_MAX_HEALTH, mModifierName);
 		}
 	}
 
@@ -63,21 +64,21 @@ public class PercentKnockbackResist extends Effect {
 		return object;
 	}
 
-	public static PercentKnockbackResist deserialize(JsonObject object, Plugin plugin) {
+	public static PercentHealthBoost deserialize(JsonObject object, Plugin plugin) {
 		int duration = object.get("duration").getAsInt();
 		double amount = object.get("amount").getAsDouble();
 		String modName = object.get("modifierName").getAsString();
 
-		return new PercentKnockbackResist(duration, amount, modName);
+		return new PercentHealthBoost(duration, amount, modName);
 	}
 
 	@Override
 	public @Nullable String getSpecificDisplay() {
-		return StringUtils.to2DP(mAmount * 10) + " Knockback Resistance";
+		return StringUtils.to2DP(mAmount * 100) + "% Max Health";
 	}
 
 	@Override
 	public String toString() {
-		return String.format("PercentKnockbackResist duration:%d modifier:%s amount:%f", this.getDuration(), mModifierName, mAmount);
+		return String.format("PercentHealthBoost duration:%d modifier:%s amount:%f", this.getDuration(), mModifierName, mAmount);
 	}
 }

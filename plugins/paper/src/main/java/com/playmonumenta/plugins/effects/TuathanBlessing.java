@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class TuathanBlessing extends ZeroArgumentEffect {
+	public static final String GENERIC_NAME = "TuathanBlessing";
 	public static final String effectID = "TuathanBlessing";
 
 	public static int RADIUS = 12;
@@ -26,6 +27,11 @@ public class TuathanBlessing extends ZeroArgumentEffect {
 				Plugin.getInstance().mEffectManager.addEffect(player, DEFENSE_EFFECT, new PercentDamageReceived(25, -1 * AMOUNT));
 			}
 		}
+	}
+
+	@Override
+	public boolean isBuff() {
+		return true;
 	}
 
 	public static TuathanBlessing deserialize(JsonObject object, Plugin plugin) {

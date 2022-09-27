@@ -6,11 +6,13 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeSet;
@@ -123,6 +125,16 @@ public final class EffectManager implements Listener {
 			return effectSet;
 		}
 
+		public List<Effect> getEffects() {
+			List<Effect> effects = new ArrayList<>();
+			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
+				for (NavigableSet<Effect> eff : priorityEffects.values()) {
+					effects.add(eff.last());
+				}
+			}
+			return effects;
+		}
+
 		public boolean hasEffect(String source) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
 				NavigableSet<Effect> effectGroup = priorityEffects.get(source);
@@ -226,9 +238,11 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(AstralOmenThunderStacks.effectID, AstralOmenThunderStacks::deserialize);
 		mEffectDeserializer.put(Bleed.effectID, Bleed::deserialize);
 		mEffectDeserializer.put(BonusSoulThreads.effectID, BonusSoulThreads::deserialize);
+		mEffectDeserializer.put(BoonOfKnightlyPrayer.effectID, BoonOfKnightlyPrayer::deserialize);
 		mEffectDeserializer.put(BoonOfThePit.effectID, BoonOfThePit::deserialize);
 		mEffectDeserializer.put(CourageEffect.effectID, CourageEffect::deserialize);
 		mEffectDeserializer.put(CrystalineBlessing.effectID, CrystalineBlessing::deserialize);
+		mEffectDeserializer.put(CustomAbsorption.effectID, CustomAbsorption::deserialize);
 		mEffectDeserializer.put(CustomDamageOverTime.effectID, CustomDamageOverTime::deserialize);
 		mEffectDeserializer.put(CustomRegeneration.effectID, CustomRegeneration::deserialize);
 		mEffectDeserializer.put(DeepGodsEndowment.effectID, DeepGodsEndowment::deserialize);
@@ -250,6 +264,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(PercentDamageReceived.effectID, PercentDamageReceived::deserialize);
 		mEffectDeserializer.put(PercentExperience.effectID, PercentExperience::deserialize);
 		mEffectDeserializer.put(PercentHeal.effectID, PercentHeal::deserialize);
+		mEffectDeserializer.put(PercentHealthBoost.effectID, PercentHealthBoost::deserialize);
 		mEffectDeserializer.put(PercentKnockbackResist.effectID, PercentKnockbackResist::deserialize);
 		mEffectDeserializer.put(PercentSpeed.effectID, PercentSpeed::deserialize);
 		mEffectDeserializer.put(RecoilDisable.effectID, RecoilDisable::deserialize);
@@ -464,6 +479,11 @@ public final class EffectManager implements Listener {
 			return effects.getEffects(type);
 		}
 		return Collections.emptyNavigableSet();
+	}
+
+	public List<Effect> getEffects(Entity entity) {
+		Effects effects = mEntities.get(entity);
+		return effects.getEffects();
 	}
 
 	public @Nullable Effect getActiveEffect(Entity entity, String source) {

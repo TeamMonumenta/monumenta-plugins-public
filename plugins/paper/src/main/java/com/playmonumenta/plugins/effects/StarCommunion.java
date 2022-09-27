@@ -12,6 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class StarCommunion extends ZeroArgumentEffect {
+	public static final String GENERIC_NAME = "StarCommunion";
 	public static final String effectID = "StarCommunion";
 
 	public static final double HEALTH_THRESHOLD = 0.9;
@@ -38,6 +39,11 @@ public class StarCommunion extends ZeroArgumentEffect {
 				new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, DARK_COLOR).spawnAsPlayerBuff((Player) entity);
 			}
 		}
+	}
+
+	@Override
+	public boolean isBuff() {
+		return true;
 	}
 
 	public static StarCommunion deserialize(JsonObject object, Plugin plugin) {

@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class SilverPrayer extends ZeroArgumentEffect {
+	public static final String GENERIC_NAME = "SilverPrayer";
 	public static final String effectID = "SilverPrayer";
 
 	public static final String EFFECT_NAME = "SilverPrayerKnockbackRes";
@@ -25,6 +26,11 @@ public class SilverPrayer extends ZeroArgumentEffect {
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean isBuff() {
+		return true;
 	}
 
 	public static SilverPrayer deserialize(JsonObject object, Plugin plugin) {

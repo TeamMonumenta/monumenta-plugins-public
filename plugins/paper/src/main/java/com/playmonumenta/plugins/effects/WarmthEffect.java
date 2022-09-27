@@ -33,6 +33,11 @@ public class WarmthEffect extends Effect {
 	}
 
 	@Override
+	public boolean isBuff() {
+		return true;
+	}
+
+	@Override
 	public JsonObject serialize() {
 		JsonObject object = new JsonObject();
 

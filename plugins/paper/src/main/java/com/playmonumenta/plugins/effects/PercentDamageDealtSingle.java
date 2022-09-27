@@ -30,6 +30,11 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 	}
 
 	@Override
+	public boolean isBuff() {
+		return mAmount > 0;
+	}
+
+	@Override
 	public JsonObject serialize() {
 		JsonObject object = new JsonObject();
 		object.addProperty("effectID", mEffectID);

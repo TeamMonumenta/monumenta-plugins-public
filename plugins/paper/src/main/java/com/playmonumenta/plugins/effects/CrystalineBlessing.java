@@ -15,6 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class CrystalineBlessing extends ZeroArgumentEffect {
+	public static final String GENERIC_NAME = "CrystalineBlessing";
 	public static final String effectID = "CrystalineBlessing";
 
 	private static final int DUR = 3 * 20;
@@ -40,6 +41,11 @@ public class CrystalineBlessing extends ZeroArgumentEffect {
 		int duration = object.get("duration").getAsInt();
 
 		return new CrystalineBlessing(duration);
+	}
+
+	@Override
+	public boolean isBuff() {
+		return true;
 	}
 
 	@Override

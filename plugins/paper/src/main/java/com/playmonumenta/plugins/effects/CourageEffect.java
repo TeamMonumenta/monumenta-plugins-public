@@ -103,6 +103,11 @@ public class CourageEffect extends Effect {
 	}
 
 	@Override
+	public boolean isBuff() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		String types = "any";
 		if (mAffectedDamageTypes != null) {

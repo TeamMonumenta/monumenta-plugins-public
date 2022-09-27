@@ -141,6 +141,12 @@ public abstract class Effect implements Comparable<Effect> {
 		return false;
 	}
 
+	// This is used by the Heavenly Boon enhancement to determine if the effect should be stored and transferred
+	// Default to false, only make true for relatively simple effects
+	public boolean isBuff() {
+		return false;
+	}
+
 	/**
 	 * Ticks the effect, called regularly
 	 *
@@ -168,4 +174,5 @@ public abstract class Effect implements Comparable<Effect> {
 	/* Must implement this method to print info about what the effect does for debug */
 	@Override
 	public abstract String toString();
+
 }

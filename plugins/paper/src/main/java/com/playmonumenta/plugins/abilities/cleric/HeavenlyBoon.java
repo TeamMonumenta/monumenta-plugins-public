@@ -4,10 +4,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -116,6 +118,9 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 					PotionUtils.applyPotion(mPlugin, p, effect);
 				}
 
+				// Apply custom effects from potion
+				ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem());
+
 				/* Remove this player from the "usual" application of potion effects */
 				affectedEntities.remove(p);
 			}
@@ -148,6 +153,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			ItemStack potions;
 
 			if (isLevelOne()) {
+				// TODO: CHANGE ALL OF THESE POTIONS TO NEW CUSTOM POTIONS ONCE THEY ARE MADE
 				int rand = FastUtils.RANDOM.nextInt(4);
 				if (rand == 0 || rand == 1) {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, mDuration, 0,
@@ -195,6 +201,11 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 							}
 							return Math.min(potionInfo.mDuration + Math.min((int) (potionInfo.mDuration * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_BOOST), ENHANCEMENT_POTION_EFFECT_MAX_DURATION);
 						});
+					for (Effect e : mPlugin.mEffectManager.getEffects(p)) {
+						if (e.isBuff()) {
+							e.setDuration(Math.min(e.getDuration() + Math.min((int) (e.getDuration() * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_BOOST), ENHANCEMENT_POTION_EFFECT_MAX_DURATION));
+						}
+					}
 				}
 			}
 		}

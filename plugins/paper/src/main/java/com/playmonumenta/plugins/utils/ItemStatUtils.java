@@ -1207,6 +1207,61 @@ public class ItemStatUtils {
 		generateItemStats(item);
 	}
 
+	public static void removeConsumeEffect(final ItemStack item, final EffectType type) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompoundList effects = getEffects(nbt);
+
+		if (effects == null || effects.isEmpty()) {
+			return;
+		}
+
+		int i = 0;
+		for (NBTListCompound effect : effects) {
+			if (type.getType().equals(effect.getString(EFFECT_TYPE_KEY))) {
+				effects.remove(i);
+				break;
+			}
+			i++;
+		}
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+		generateItemStats(item);
+	}
+
+
+	public static void removeConsumeEffect(final ItemStack item, final int i) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompoundList effects = getEffects(nbt);
+
+		if (effects == null || effects.isEmpty()) {
+			return;
+		}
+
+		effects.remove(i);
+		item.setItemMeta(nbt.getItem().getItemMeta());
+		generateItemStats(item);
+	}
+
+	public static boolean isConsumable(final ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return false;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompoundList effects = getEffects(nbt);
+
+		if (effects == null || effects.isEmpty()) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public static NBTCompoundList getEffects(final NBTItem nbt) {
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
@@ -1777,6 +1832,7 @@ public class ItemStatUtils {
 		} else {
 			// There is probably a cleaner way to clean up unused NBT, not sure if recursion directly works due to the existence of both NBTCompounds and NBTCompoundLists
 			// TODO: clean up other unused things from item (e.g. empty lore, reset hideflags if no NBT)
+
 			Set<String> keys;
 
 			NBTCompound stock = monumenta.getCompound(STOCK_KEY);
@@ -2114,9 +2170,7 @@ public class ItemStatUtils {
 		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		meta.addItemFlags(ItemFlag.HIDE_DYE);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-		if (item.getType().name().contains("PATTERN") || item.getType().name().contains("SHIELD")) {
-			meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-		}
+		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 
 		boolean hasDummyArmorToughnessAttribute = false;
 		if (meta.hasAttributeModifiers()) {
@@ -2648,6 +2702,27 @@ public class ItemStatUtils {
 
 			addConsumeEffect(item, EffectType.fromType(type), strength, duration, null);
 		}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("del"));
+		arguments.add(new IntegerArgument("index", 0));
+
+		new CommandAPICommand("editconsume").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			removeConsumeEffect(item, index);
+
+			generateItemStats(item);
+		}).register();
 	}
 
 	public static void registerEnchCommand() {
@@ -2821,6 +2896,10 @@ public class ItemStatUtils {
 						removeAttribute(item, attr, op, slot);
 					}
 				}
+			}
+
+			for (EffectType eff : EffectType.values()) {
+				removeConsumeEffect(item, eff);
 			}
 
 			editItemInfo(item, Region.NONE, Tier.NONE, Masterwork.NONE, Location.NONE);
