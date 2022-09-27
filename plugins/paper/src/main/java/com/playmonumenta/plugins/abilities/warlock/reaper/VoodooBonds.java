@@ -40,6 +40,7 @@ public class VoodooBonds extends Ability {
 	private static final double DAMAGE_2 = 0.3;
 	private static final int DURATION_1 = 20 * 5;
 	private static final int DURATION_2 = 20 * 7;
+	public static final String EFFECT_NAME = "VoodooBondsEffect";
 
 	public static final String CHARM_COOLDOWN = "Voodoo Bonds Cooldown";
 	public static final String CHARM_TRANSFER_DAMAGE = "Voodoo Bonds Transfer Damage";
@@ -110,7 +111,7 @@ public class VoodooBonds extends Ability {
 			//better effects
 			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 0.75f);
 			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01).spawnAsPlayerActive(mPlayer);
-			mPlugin.mEffectManager.addEffect(p, "VoodooBondsEffect",
+			mPlugin.mEffectManager.addEffect(p, EFFECT_NAME,
 					new VoodooBondsOtherPlayer(getModifiedCooldown(), mTransferDuration, mPlayer, mPlugin));
 		}
 	}

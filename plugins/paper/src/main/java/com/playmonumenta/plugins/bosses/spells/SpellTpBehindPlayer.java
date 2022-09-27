@@ -13,7 +13,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -29,7 +28,7 @@ public class SpellTpBehindPlayer extends Spell {
 	private static final int VERTICAL_DISTANCE_TO_PLAYER = 3;
 
 	private final Plugin mPlugin;
-	protected final Entity mLauncher;
+	protected final LivingEntity mLauncher;
 	private final int mCooldown;
 	private final int mRange;
 	private final int mTPDelay;
@@ -37,11 +36,11 @@ public class SpellTpBehindPlayer extends Spell {
 	private final boolean mRandom;
 
 
-	public SpellTpBehindPlayer(Plugin plugin, Entity launcher, int cooldown) {
+	public SpellTpBehindPlayer(Plugin plugin, LivingEntity launcher, int cooldown) {
 		this(plugin, launcher, cooldown, 20, 50, 10, false);
 	}
 
-	public SpellTpBehindPlayer(Plugin plugin, Entity launcher, int cooldown, int range, int delay, int stun, boolean random) {
+	public SpellTpBehindPlayer(Plugin plugin, LivingEntity launcher, int cooldown, int range, int delay, int stun, boolean random) {
 		mPlugin = plugin;
 		mLauncher = launcher;
 		mCooldown = cooldown;
@@ -113,13 +112,14 @@ public class SpellTpBehindPlayer extends Spell {
 							world.spawnParticle(Particle.SMOKE_LARGE, loc, 12, 0, 0.45, 0, 0.125);
 
 							mLauncher.teleport(locTest);
-							if (mLauncher instanceof Mob) {
-								((Mob) mLauncher).setTarget(target);
+							if (mLauncher instanceof Mob mob) {
+								mob.setTarget(target);
 								// For some reason just setting the target doesn't seem to be enough, so try again a tick later
 								Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-									((Mob) mLauncher).setTarget(target);
+									mob.setTarget(target);
 								}, 1);
 							}
+							onTeleport(target);
 
 							locTest.add(0, mLauncher.getHeight() / 2, 0);
 							world.spawnParticle(Particle.SPELL_WITCH, locTest, 30, 0.25, 0.45, 0.25, 1);
@@ -129,8 +129,8 @@ public class SpellTpBehindPlayer extends Spell {
 							// The mPlugin here is of the incorrect type for some reason
 							if (mLauncher instanceof Creeper) {
 								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mTPStun + TP_STUN_CREEPER_INCRISED, (LivingEntity) mLauncher);
-							} else if (mLauncher instanceof LivingEntity) {
-								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mTPStun, (LivingEntity) mLauncher);
+							} else {
+								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mTPStun, mLauncher);
 							}
 
 							// Janky way to break out of nested loop
@@ -144,6 +144,10 @@ public class SpellTpBehindPlayer extends Spell {
 
 		runnable.runTaskLater(mPlugin, mTPDelay);
 		mActiveRunnables.add(runnable);
+	}
+
+	protected void onTeleport(Player player) {
+		// Does nothing, can be overridden by extending spells
 	}
 
 	protected void animation(Player target) {

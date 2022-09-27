@@ -2,11 +2,14 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import java.util.Optional;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Team;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ScoreboardUtils {
 	public static Optional<Integer> getScoreboardValue(String scoreHolder, String objectiveName) {
@@ -72,6 +75,42 @@ public class ScoreboardUtils {
 			player.getScoreboardTags().add(tag);
 		}
 		return !removed;
+	}
+
+	public static Team createTeam(String teamName) {
+		return Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(teamName);
+	}
+
+	public static Team createTeam(String teamName, NamedTextColor color) {
+		Team team = createTeam(teamName);
+		team.color(color);
+		return team;
+	}
+
+	public static @Nullable Team getExistingTeam(String teamName) {
+		return Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName);
+	}
+
+	public static Team getExistingTeamOrCreate(String teamName) {
+		Team team = getExistingTeam(teamName);
+		if (team == null) {
+			team = createTeam(teamName);
+		}
+		return team;
+	}
+
+	public static Team getExistingTeamOrCreate(String teamName, NamedTextColor color) {
+		Team team = getExistingTeam(teamName);
+		if (team == null) {
+			team = createTeam(teamName, color);
+		} else if (team.color() != color) {
+			team.color(color);
+		}
+		return team;
+	}
+
+	public static @Nullable Team getEntityTeam(Entity entity) {
+		return Bukkit.getScoreboardManager().getMainScoreboard().getEntityTeam(entity);
 	}
 
 }

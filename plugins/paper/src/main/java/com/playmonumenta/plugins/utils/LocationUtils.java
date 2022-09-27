@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -562,5 +563,39 @@ public class LocationUtils {
 
 	public static boolean isInSnowyBiome(Location loc) {
 		return SNOWY_BIOMES.contains(loc.getBlock().getBiome());
+	}
+
+	public static double xzDistance(Location loc1, Location loc2) {
+		Location flat1 = loc1.clone();
+		flat1.setY(loc2.getY());
+		return flat1.distance(loc2);
+	}
+
+	public static Location randomLocationInCircle(Location center, double radius) {
+		double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
+		double r = Math.sqrt(FastUtils.RANDOM.nextDouble()) * radius;
+		return center.clone().add(r * FastUtils.cos(theta), 0, r * FastUtils.sin(theta));
+	}
+
+	public static Location fallToGround(Location loc, double minHeight) {
+		Location clone = loc.clone();
+
+		// If below minHeight, go up to it
+		if (clone.getY() <= minHeight) {
+			clone.setY(minHeight);
+			return clone;
+		}
+
+		Block block = clone.getBlock();
+		if (block.isSolid()) {
+			// If inside a block, go to the top of the block
+			clone.setY(Math.max(block.getBoundingBox().getMaxY(), minHeight));
+			return clone;
+		} else {
+			// If not inside a block, go one block down and try again
+			Block below = block.getRelative(BlockFace.DOWN);
+			clone.setY(below.getY() + 0.5);
+			return fallToGround(clone, minHeight);
+		}
 	}
 }

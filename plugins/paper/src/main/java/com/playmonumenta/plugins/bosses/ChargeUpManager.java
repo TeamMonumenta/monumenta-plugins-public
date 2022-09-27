@@ -70,6 +70,16 @@ public class ChargeUpManager {
 		return mTime >= mChargeTime;
 	}
 
+	public boolean previousTick() {
+		return previousTick(1);
+	}
+
+	public boolean previousTick(int time) {
+		mTime -= time;
+		update();
+		return mTime <= 0;
+	}
+
 	public void setTitle(String title) {
 		mBar.setTitle(title);
 		mTitle = title;

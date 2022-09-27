@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -65,7 +66,7 @@ public class EagleEye extends Ability {
 		mInfo.mIgnoreCooldown = true;
 
 		mVulnLevel = (isLevelOne() ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
-		createTeams();
+		mEagleEyeTeam = ScoreboardUtils.getExistingTeamOrCreate("eagleEyeColor", NamedTextColor.YELLOW);
 	}
 
 
@@ -154,14 +155,5 @@ public class EagleEye extends Ability {
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		return !ItemUtils.isPickaxe(inMainHand) && inMainHand.getType() != Material.HEART_OF_THE_SEA;
-	}
-
-	private void createTeams() {
-		mEagleEyeTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("eagleEyeColor");
-
-		if (mEagleEyeTeam == null) {
-			mEagleEyeTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("eagleEyeColor");
-			mEagleEyeTeam.color(NamedTextColor.YELLOW);
-		}
 	}
 }

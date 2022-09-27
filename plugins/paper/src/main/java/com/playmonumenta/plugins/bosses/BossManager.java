@@ -349,6 +349,7 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(VerdantMinibossBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VerdantMinibossBoss(p, e, s, l));
 		mStatefulBosses.put(PortalBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new PortalBoss(p, e, s, l));
 		mStatefulBosses.put(Samwell.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Samwell(p, e, s, l));
+		mStatefulBosses.put(TealSpirit.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new TealSpirit(p, e, s, l));
 
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
@@ -563,6 +564,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(BrownNegativeBoss.identityTag, (Plugin p, LivingEntity e) -> BrownNegativeBoss.deserialize(p, e));
 		mBossDeserializers.put(BrownPositiveBoss.identityTag, (Plugin p, LivingEntity e) -> BrownPositiveBoss.deserialize(p, e));
 		mBossDeserializers.put(BrownMagnetSwapBoss.identityTag, (Plugin p, LivingEntity e) -> BrownMagnetSwapBoss.deserialize(p, e));
+		mBossDeserializers.put(TealSpirit.identityTag, (Plugin p, LivingEntity e) -> TealSpirit.deserialize(p, e));
 
 
 		/***************************************************
