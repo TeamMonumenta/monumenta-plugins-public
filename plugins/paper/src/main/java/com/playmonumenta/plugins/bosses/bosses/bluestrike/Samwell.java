@@ -323,7 +323,7 @@ public class Samwell extends BossAbilityGroup {
 						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * (1.0 / 4.0));
 						mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("I'm done with you! That dagger is too much. I don't get why Blue can't heal from it? Is it another wool?!", NamedTextColor.RED)));
 						mPhase = 4;
-						Team blackTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Black");
+						Team blackTeam = ScoreboardUtils.getExistingTeamOrCreate("Black", NamedTextColor.BLACK);
 						blackTeam.addEntry(mBoss.getUniqueId().toString());
 						changePhaseNormal();
 					}

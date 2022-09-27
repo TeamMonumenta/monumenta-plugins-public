@@ -8,11 +8,11 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
@@ -27,7 +27,6 @@ public class BlueStrikeTargetNPCBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_bluestriketargetnpc";
 	public LivingEntity mTarget;
 	public LivingEntity mSamwell;
-	private Team mRedTeam;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new BlueStrikeTargetNPCBoss(plugin, boss);
@@ -35,8 +34,8 @@ public class BlueStrikeTargetNPCBoss extends BossAbilityGroup {
 
 	public BlueStrikeTargetNPCBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		createTeams();
-		mRedTeam.addEntry(boss.getUniqueId().toString());
+		Team redTeam = ScoreboardUtils.getExistingTeamOrCreate("Red", NamedTextColor.RED);
+		redTeam.addEntry(boss.getUniqueId().toString());
 		mBoss.setGlowing(true);
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), 100, EnumSet.of(EntityType.VILLAGER));
@@ -99,15 +98,6 @@ public class BlueStrikeTargetNPCBoss extends BossAbilityGroup {
 		if (event.getTarget() != mTarget) {
 			// Ignore everything other than target
 			event.setTarget(mTarget);
-		}
-	}
-
-	private void createTeams() {
-		mRedTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Red");
-
-		if (mRedTeam == null) {
-			mRedTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("Red");
-			mRedTeam.color(NamedTextColor.RED);
 		}
 	}
 }

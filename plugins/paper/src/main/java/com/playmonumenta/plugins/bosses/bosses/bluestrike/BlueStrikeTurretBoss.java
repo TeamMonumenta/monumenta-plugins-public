@@ -8,11 +8,11 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -33,16 +33,14 @@ public class BlueStrikeTurretBoss extends BossAbilityGroup {
 	public LivingEntity mTarget;
 	public LivingEntity mSamwell;
 
-	private Team mRedTeam;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new BlueStrikeTurretBoss(plugin, boss);
 	}
 
 	public BlueStrikeTurretBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		createTeams();
-		mRedTeam.addEntry(boss.getUniqueId().toString());
+		Team redTeam = ScoreboardUtils.getExistingTeamOrCreate("Red", NamedTextColor.RED);
+		redTeam.addEntry(boss.getUniqueId().toString());
 		mBoss.setGlowing(true);
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), 100, EnumSet.of(EntityType.VILLAGER));
@@ -153,14 +151,5 @@ public class BlueStrikeTurretBoss extends BossAbilityGroup {
 				mTicks += 2;
 			}
 		}.runTaskTimer(mPlugin, 0, 2);
-	}
-
-	private void createTeams() {
-		mRedTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Red");
-
-		if (mRedTeam == null) {
-			mRedTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("Red");
-			mRedTeam.color(NamedTextColor.RED);
-		}
 	}
 }

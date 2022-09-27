@@ -11,12 +11,12 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -46,7 +46,6 @@ public class LavaCannonBoss extends BossAbilityGroup {
 	private PartialParticle mPWarning;
 
 	private String SPELL_NAME = "Lava Cannon";
-	private Team mDarkRedTeam;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new LavaCannonBoss(plugin, boss);
@@ -54,8 +53,8 @@ public class LavaCannonBoss extends BossAbilityGroup {
 
 	public LavaCannonBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		createTeams();
-		mDarkRedTeam.addEntry(boss.getUniqueId().toString());
+		Team darkRedTeam = ScoreboardUtils.getExistingTeamOrCreate("DarkRed", NamedTextColor.DARK_RED);
+		darkRedTeam.addEntry(boss.getUniqueId().toString());
 		boss.setGlowing(true);
 
 		// Get nearest entity called Samwell.
@@ -182,15 +181,6 @@ public class LavaCannonBoss extends BossAbilityGroup {
 			return 5 * 20;
 		} else {
 			return 70;
-		}
-	}
-
-	private void createTeams() {
-		mDarkRedTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("DarkRed");
-
-		if (mDarkRedTeam == null) {
-			mDarkRedTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("DarkRed");
-			mDarkRedTeam.color(NamedTextColor.DARK_RED);
 		}
 	}
 }
