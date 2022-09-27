@@ -72,7 +72,7 @@ public class Taboo extends Ability {
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
 
-		if (mPlayer != null && mPlayer.isSneaking() && mAlchemistPotions != null && (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) || (mAlchemicalArtillery != null && mAlchemicalArtillery.isActive() && ItemUtils.isBowOrTrident(mPlayer.getInventory().getItemInMainHand())))) {
+		if (mPlayer != null && mPlayer.isSneaking() && mAlchemistPotions != null && (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) || (mAlchemicalArtillery != null && mAlchemicalArtillery.isActive() && ItemUtils.isProjectileWeapon(mPlayer.getInventory().getItemInMainHand())))) {
 			World world = mPlayer.getWorld();
 			if (mActive) {
 				if (mPlayer.getLocation().getPitch() > 50 && isLevelTwo()) {

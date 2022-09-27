@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -116,7 +117,7 @@ public class Skyhook extends DepthsAbility {
 			return true;
 		}
 
-		if (mPlayer.isSneaking()) {
+		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			mInfo.mCooldown = (int) (COOLDOWN[mRarity - 1] * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
 			World world = mPlayer.getWorld();
@@ -137,7 +138,7 @@ public class Skyhook extends DepthsAbility {
 
 				@Override
 				public void run() {
-					if (projectile == null || mT > MAX_TICKS) {
+					if (mT > MAX_TICKS) {
 						mPlugin.mProjectileEffectTimers.removeEntity(projectile);
 						projectile.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
 						projectile.remove();
@@ -159,7 +160,7 @@ public class Skyhook extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting a bow while sneaking shoots out a skyhook. When the skyhook lands, you dash to the location and reduce all other ability cooldowns by 1% per block traveled. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
+		return "Shooting a projectile while sneaking shoots out a skyhook. When the skyhook lands, you dash to the location and reduce all other ability cooldowns by 1% per block traveled. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
 	}
 
 	@Override

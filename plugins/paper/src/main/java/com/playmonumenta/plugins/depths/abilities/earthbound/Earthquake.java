@@ -38,7 +38,7 @@ public class Earthquake extends DepthsAbility {
 	public static final int[] DAMAGE = {20, 25, 30, 35, 40, 50};
 	public static final int[] SILENCE_DURATION = {80, 90, 100, 110, 120, 140};
 	public static final int EARTHQUAKE_TIME = 20;
-	public static final int RADIUS = 4;
+	public static final double RADIUS = 4;
 	public static final double KNOCKBACK = 0.8;
 	public static final int MAX_TICKS = 4 * 20;
 	public static final String EARTHQUAKE_ARROW_METADATA = "EarthquakeArrow";
@@ -58,8 +58,8 @@ public class Earthquake extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity damager = event.getDamager();
-		if (event.getType() == DamageType.PROJECTILE && damager instanceof AbstractArrow && mPlayerItemStatsMap.containsKey(damager)) {
-			quake((Projectile) damager, enemy.getLocation());
+		if (event.getType() == DamageType.PROJECTILE && damager instanceof AbstractArrow arrow && mPlayerItemStatsMap.containsKey(damager)) {
+			quake(arrow, enemy.getLocation());
 		}
 		return false; // prevents multiple calls by removing the arrow (from the world and the player stats map)
 	}
@@ -131,7 +131,7 @@ public class Earthquake extends DepthsAbility {
 			return true;
 		}
 
-		if (mPlayer.isSneaking()) {
+		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
 			World world = mPlayer.getWorld();
@@ -174,7 +174,7 @@ public class Earthquake extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting a bow or trident while sneaking causes an earthquake " + EARTHQUAKE_TIME / 20 + " second after impact. The earthquake deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to mobs in a " + RADIUS + " block radius, silencing for " + DepthsUtils.getRarityColor(rarity) + (float) SILENCE_DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds and knocking upward. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Shooting a projectile while sneaking causes an earthquake " + EARTHQUAKE_TIME / 20 + " second after impact. The earthquake deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to mobs in a " + (int) RADIUS + " block radius, silencing for " + DepthsUtils.getRarityColor(rarity) + (float) SILENCE_DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds and knocking upward. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

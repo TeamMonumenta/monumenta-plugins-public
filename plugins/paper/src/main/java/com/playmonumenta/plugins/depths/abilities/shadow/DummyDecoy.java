@@ -134,7 +134,7 @@ public class DummyDecoy extends DepthsAbility {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (e != null && e.isValid() && !e.isDead()) {
+				if (e.isValid() && !e.isDead()) {
 					DamageUtils.damage(null, e, DamageType.OTHER, 10000);
 				}
 			}
@@ -147,7 +147,7 @@ public class DummyDecoy extends DepthsAbility {
 			return true;
 		}
 
-		if (mPlayer.isSneaking()) {
+		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
 			execute(projectile);
@@ -158,7 +158,7 @@ public class DummyDecoy extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting a bow, crossbow, or trident while sneaking fires a cursed arrow. When the arrow lands, it spawns a dummy decoy at the location with " + DepthsUtils.getRarityColor(rarity) + HEALTH[rarity - 1] + ChatColor.WHITE + " health that lasts for up to " + MAX_TICKS / 20 + " seconds. The decoy aggros mobs within " + AGGRO_RADIUS + " blocks on a regular interval. On death, the decoy explodes, stunning mobs in a " + STUN_RADIUS + " block radius for " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundDouble(STUN_TICKS[rarity - 1] / 20.0) + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Shooting a projectile while sneaking fires a cursed projectile. When the projectile lands, it spawns a dummy decoy at that location with " + DepthsUtils.getRarityColor(rarity) + HEALTH[rarity - 1] + ChatColor.WHITE + " health that lasts for up to " + MAX_TICKS / 20 + " seconds. The decoy aggros mobs within " + AGGRO_RADIUS + " blocks on a regular interval. On death, the decoy explodes, stunning mobs in a " + STUN_RADIUS + " block radius for " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundDouble(STUN_TICKS[rarity - 1] / 20.0) + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

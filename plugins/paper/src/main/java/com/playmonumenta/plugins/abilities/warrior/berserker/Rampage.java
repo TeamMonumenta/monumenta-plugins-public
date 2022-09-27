@@ -73,7 +73,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	@Override
 	public void cast(Action action) {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (ItemUtils.isBowOrTrident(inMainHand) || ItemUtils.isSomePotion(inMainHand) || inMainHand.getType().isBlock()
+		if (ItemUtils.isShootableItem(inMainHand) || ItemUtils.isSomePotion(inMainHand) || inMainHand.getType().isBlock()
 				|| inMainHand.getType().isEdible()) {
 			return;
 		}

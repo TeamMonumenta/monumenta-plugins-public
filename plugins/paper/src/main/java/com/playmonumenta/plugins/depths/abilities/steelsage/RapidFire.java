@@ -19,14 +19,20 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class RapidFire extends DepthsAbility {
 
@@ -36,7 +42,7 @@ public class RapidFire extends DepthsAbility {
 	public static final int COOLDOWN = 18 * 20;
 	public static final String META_DATA_TAG = "RapidFireArrow";
 
-	private WeakHashMap<Arrow, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public RapidFire(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -52,9 +58,11 @@ public class RapidFire extends DepthsAbility {
 	@Override
 	public void cast(Action action) {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!ItemUtils.isSomeBow(inMainHand) || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (!ItemUtils.isProjectileWeapon(inMainHand) || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			return;
 		}
+
+		World world = mPlayer.getWorld();
 		new BukkitRunnable() {
 			int mCount = 0;
 			@Override
@@ -66,27 +74,44 @@ public class RapidFire extends DepthsAbility {
 				}
 
 				ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-				if (ItemUtils.isSomeBow(inMainHand)) {
-					Arrow arrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 3.0f, 0, Arrow.class);
-					arrow.setCritical(true);
-					arrow.setShooter(mPlayer);
-					arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+				if (ItemUtils.isProjectileWeapon(inMainHand)) {
+					Location eyeLoc = mPlayer.getEyeLocation();
+					Vector direction = mPlayer.getLocation().getDirection();
+					Projectile proj;
+					switch (inMainHand.getType()) {
+						case BOW, CROSSBOW -> proj = world.spawnArrow(eyeLoc, direction, 3.0f, 0, Arrow.class);
+						case TRIDENT -> proj = world.spawnArrow(eyeLoc, direction, 3.0f, 0, Trident.class);
+						case SNOWBALL -> {
+							proj = world.spawn(eyeLoc, Snowball.class);
+							proj.setVelocity(direction.normalize().multiply(3.0f));
+						}
+						default -> {
+							// How did we get here?
+							return;
+						}
+					}
 
-					mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+					if (proj instanceof AbstractArrow arrow) {
+						arrow.setCritical(true);
+						arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+					}
 
-					mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.ASH);
+					proj.setShooter(mPlayer);
+
+					mPlayerItemStatsMap.put(proj, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+
+					mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.ASH);
 					Location loc = mPlayer.getLocation().add(0, 1, 0);
 					loc.getWorld().playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, 1, 0.65f);
 					loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.45f);
-					ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
+					ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(proj);
 					Bukkit.getPluginManager().callEvent(eventLaunch);
-					if (arrow.hasMetadata(Skyhook.SKYHOOK_ARROW_METADATA)) {
-						arrow.removeMetadata(Skyhook.SKYHOOK_ARROW_METADATA, mPlugin);
+					if (proj.hasMetadata(Skyhook.SKYHOOK_ARROW_METADATA)) {
+						proj.removeMetadata(Skyhook.SKYHOOK_ARROW_METADATA, mPlugin);
 					}
 					mCount++;
 				} else {
 					this.cancel();
-					return;
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 3);
@@ -100,12 +125,12 @@ public class RapidFire extends DepthsAbility {
 			return false;
 		}
 
-		if (event.getDamager() instanceof Arrow arrow) {
-			ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(arrow);
+		if (event.getDamager() instanceof Projectile proj) {
+			ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(proj);
 			if (playerItemStats != null) {
 				DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, playerItemStats), DAMAGE, true, true, false);
 				event.setCancelled(true);
-				arrow.remove();
+				proj.remove();
 			}
 		}
 		return false; // prevents multiple calls itself
@@ -113,7 +138,7 @@ public class RapidFire extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return String.format("Left clicking with a bow shoots a flurry of " + DepthsUtils.getRarityColor(rarity) + ARROWS[rarity - 1] + ChatColor.WHITE + " arrows in the direction that you are looking that deal " + DAMAGE + " projectile damage, bypassing iframes. Cooldown: " + COOLDOWN / 20 + "s.");
+		return "Left clicking with a projectile weapon shoots a flurry of " + DepthsUtils.getRarityColor(rarity) + ARROWS[rarity - 1] + ChatColor.WHITE + " projectiles in the direction that you are looking that deal " + DAMAGE + " projectile damage, bypassing iframes. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

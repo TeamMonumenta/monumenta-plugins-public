@@ -71,7 +71,7 @@ public class Panacea extends Ability {
 		super(plugin, player, "Panacea");
 		mInfo.mScoreboardId = "Panacea";
 		mInfo.mShorthandName = "Pn";
-		mInfo.mDescriptions.add("Shift left click with a bow, crossbow, or trident to shoot a mixture that deals 60% of your potion damage and applies 100% Slow for 1.5s to every enemy touched and adds 2 absorption health to other players, lasting 24 seconds, maximum 16. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 24s.");
+		mInfo.mDescriptions.add("Shift left click with a projectile weapon to shoot a mixture that deals 60% of your potion damage and applies 100% Slow for 1.5s to every enemy touched and adds 2 absorption health to other players, lasting 24 seconds, maximum 16. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 24s.");
 		mInfo.mDescriptions.add("Absorption health added is increased to 4, and Slow duration is increased to 2s.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mLinkedSpell = ClassAbility.PANACEA;
@@ -216,6 +216,6 @@ public class Panacea extends Ability {
 			return false;
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSneaking() && ItemUtils.isBowOrTrident(inMainHand);
+		return mPlayer.isSneaking() && ItemUtils.isProjectileWeapon(inMainHand);
 	}
 }

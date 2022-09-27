@@ -951,6 +951,14 @@ public class ItemUtils {
 		}
 	}
 
+	public static boolean isProjectileWeapon(@Nullable ItemStack itemStack) {
+		if (itemStack != null) {
+			return isBowOrTrident(itemStack) || (itemStack.getType() == Material.SNOWBALL && ItemStatUtils.getAttributeAmount(itemStack, ItemStatUtils.AttributeType.THROW_RATE, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) > 0);
+		} else {
+			return false;
+		}
+	}
+
 	/*
 	 * Does not count shattered hoes.
 	 */

@@ -33,7 +33,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.entity.Trident;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -82,10 +81,9 @@ public class AlchemicalArtillery extends PotionAbility {
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (mPlayer != null && mAlchemistPotions != null
-			&& mActive && projectile instanceof AbstractArrow arrow
-			&& (arrow.isCritical() || arrow instanceof Trident) && mAlchemistPotions.decrementCharge()) {
-			ThrownPotion pot = mPlayer.getWorld().spawn(arrow.getLocation(), ThrownPotion.class);
-			Vector velocity = arrow.getVelocity();
+			&& mActive && EntityUtils.isAbilityTriggeringProjectile(projectile, true) && mAlchemistPotions.decrementCharge()) {
+			ThrownPotion pot = mPlayer.getWorld().spawn(projectile.getLocation(), ThrownPotion.class);
+			Vector velocity = projectile.getVelocity();
 			double speed = velocity.length();
 			if (speed > 5) { // fast potions tend to explode in your face, so limit speed to some acceptable value
 				velocity = velocity.normalize().multiply(5);
@@ -94,12 +92,13 @@ public class AlchemicalArtillery extends PotionAbility {
 			pot.setShooter(mPlayer);
 			mAlchemistPotions.setPotionToAlchemistPotion(pot);
 
-			arrow.remove();
-			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
+			projectile.remove();
+			mPlugin.mProjectileEffectTimers.removeEntity(projectile);
 
 			// give back a normal arrow when a crossbow is shot
 			if (mPlayer.getInventory().getItemInMainHand().getType() == Material.CROSSBOW
 				    && mPlayer.getGameMode() != GameMode.CREATIVE
+					&& projectile instanceof AbstractArrow arrow
 				    && arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
 				InventoryUtils.giveItem(mPlayer, new ItemStack(Material.ARROW), true);
 			}

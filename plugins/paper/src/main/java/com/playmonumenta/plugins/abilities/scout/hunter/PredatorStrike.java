@@ -61,7 +61,7 @@ public class PredatorStrike extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.PREDATOR_STRIKE;
 		mInfo.mScoreboardId = "PredatorStrike";
 		mInfo.mShorthandName = "PrS";
-		mInfo.mDescriptions.add(String.format("Left-clicking with a bow, trident, or snowball while not sneaking will prime a Predator Strike that unprimes after 5s. When you fire a critical arrow, it will instantaneously travel in a straight line for up to %d blocks or until it hits an enemy or block and damages enemies in a %s block radius. This ability deals 100%% of your projectile base damage increased by %d%% for every block of distance from you and the target (up to %d blocks, or %d%% total). Hit targets contribute to Sharpshooter stacks. Cooldown: %ds.",
+		mInfo.mDescriptions.add(String.format("Left-clicking with a projectile weapon while not sneaking will prime a Predator Strike that unprimes after 5s. When you fire a critical projectile, it will instantaneously travel in a straight line for up to %d blocks or until it hits an enemy or block and damages enemies in a %s block radius. This ability deals 100%% of your projectile base damage increased by %d%% for every block of distance from you and the target (up to %d blocks, or %d%% total). Cooldown: %ds.",
 			MAX_RANGE, EXPLODE_RADIUS, (int)(DISTANCE_SCALE_1 * 100), MAX_DAMAGE_RANGE, MAX_DAMAGE_RANGE * (int)(DISTANCE_SCALE_1 * 100) + 100, COOLDOWN_1 / 20));
 		mInfo.mDescriptions.add(String.format("Damage now increases %d%% for each block of distance (up to %d%%). Cooldown: %ds.", (int)(DISTANCE_SCALE_2 * 100), MAX_DAMAGE_RANGE * (int)(DISTANCE_SCALE_2 * 100) + 100, COOLDOWN_2 / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
@@ -79,7 +79,7 @@ public class PredatorStrike extends Ability {
 	public void cast(Action action) {
 		if (mPlayer != null && !mPlayer.isSneaking() && !mActive && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (ItemUtils.isBowOrTrident(mainHand) || mainHand.getType() == Material.SNOWBALL) {
+			if (ItemUtils.isProjectileWeapon(mainHand)) {
 				mActive = true;
 				ClientModHandler.updateAbility(mPlayer, this);
 				World world = mPlayer.getWorld();

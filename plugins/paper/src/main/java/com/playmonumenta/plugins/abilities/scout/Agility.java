@@ -46,9 +46,10 @@ public class Agility extends Ability {
 		mDisplayItem = new ItemStack(Material.GOLDEN_PICKAXE, 1);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
+			AbilityManager abilityManager = mPlugin.mAbilityManager;
 			mScoutAbilities = Stream.of(WindBomb.class, Volley.class, HuntingCompanion.class, EagleEye.class,
 					WhirlingBlade.class, TacticalManeuver.class, Quickdraw.class, PredatorStrike.class)
-				.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c))
+				.map(c -> abilityManager.getPlayerAbilityIgnoringSilence(player, c))
 				.filter(Objects::nonNull)
 				.toArray(Ability[]::new);
 		});

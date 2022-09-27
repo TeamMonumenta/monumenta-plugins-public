@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.util.ArrayList;
@@ -1364,5 +1365,20 @@ public class EntityUtils {
 			angleCounterclockwise = -angleCounterclockwise;
 		}
 		return (float)angleCounterclockwise;
+	}
+
+	public static boolean isAbilityTriggeringProjectile(Projectile proj, boolean requireCritical) {
+		if (proj instanceof AbstractArrow arrow) {
+			if (!requireCritical) {
+				return true;
+			} else if (arrow.isCritical()) {
+				return true;
+			} else if (arrow instanceof Trident) {
+				return true;
+			}
+		} else if (proj instanceof Snowball && DamageListener.getProjectileItemStats(proj) != null) {
+			return true;
+		}
+		return false;
 	}
 }

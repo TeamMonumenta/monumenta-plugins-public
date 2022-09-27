@@ -39,7 +39,7 @@ public class Pyroblast extends DepthsAbility {
 	private static final int RADIUS = 4;
 	private static final int DURATION = 4 * 20;
 
-	private WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public Pyroblast(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -54,8 +54,8 @@ public class Pyroblast extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity damager = event.getDamager();
-		if (event.getType() == DamageType.PROJECTILE && damager != null && damager instanceof AbstractArrow && mPlayerItemStatsMap.containsKey(damager)) {
-			explode((Projectile) damager, enemy.getLocation());
+		if (event.getType() == DamageType.PROJECTILE && damager instanceof AbstractArrow arrow && mPlayerItemStatsMap.containsKey(damager)) {
+			explode(arrow, enemy.getLocation());
 		}
 		return false; // prevents multiple calls itself by removing the arrow
 	}
@@ -91,7 +91,7 @@ public class Pyroblast extends DepthsAbility {
 			return true;
 		}
 
-		if (mPlayer.isSneaking()) {
+		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
 			World world = mPlayer.getWorld();
@@ -134,7 +134,7 @@ public class Pyroblast extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting a bow or trident while sneaking fires an exploding arrow, which deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage within a " + RADIUS + " block radius of it and sets nearby mobs on fire for " + DURATION / 20 + " seconds upon impact. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Shooting a projectile while sneaking fires an exploding projectile, which deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage within a " + RADIUS + " block radius of it and sets nearby mobs on fire for " + DURATION / 20 + " seconds upon impact. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

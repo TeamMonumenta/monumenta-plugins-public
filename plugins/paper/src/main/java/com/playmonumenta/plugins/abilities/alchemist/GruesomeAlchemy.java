@@ -106,7 +106,7 @@ public class GruesomeAlchemy extends PotionAbility {
 	//Alchemical Artillery integration
 	@Override
 	public void cast(Action action) {
-		if (mPlayer != null && mAlchemicalArtillery != null && mAlchemistPotions != null && mAlchemicalArtillery.isActive() && ItemUtils.isBowOrTrident(mPlayer.getInventory().getItemInMainHand()) && !(mHasPanacea && mPlayer.isSneaking())) {
+		if (mPlayer != null && mAlchemicalArtillery != null && mAlchemistPotions != null && mAlchemicalArtillery.isActive() && ItemUtils.isProjectileWeapon(mPlayer.getInventory().getItemInMainHand()) && !(mHasPanacea && mPlayer.isSneaking())) {
 			mCosmetic.effectsOnSwap(mPlayer, mAlchemistPotions.isGruesomeMode());
 			mAlchemistPotions.swapMode(mCosmetic.getSwapBrewPitch());
 		}

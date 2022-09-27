@@ -246,7 +246,7 @@ public class HandOfLight extends Ability {
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 
 		//Must be holding weapon, tool, or shield
-		if (ItemUtils.isBowOrTrident(mainhand) || ItemUtils.isSomePotion(mainhand) || mainhand.getType().isBlock()
+		if (ItemUtils.isShootableItem(mainhand) || ItemUtils.isSomePotion(mainhand) || mainhand.getType().isBlock()
 			    || mainhand.getType().isEdible() || mainhand.getType() == Material.COMPASS) {
 			return false;
 		}

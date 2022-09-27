@@ -126,13 +126,14 @@ public class HuntingCompanion extends Ability {
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && (ItemUtils.isBowOrTrident(inMainHand) || inMainHand.getType() == Material.SNOWBALL)) {
+		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isProjectileWeapon(inMainHand)) {
 			putOnCooldown();
 
 			clearSummons();
 
 			double multiply = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
-			double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (multiply != 0 ? multiply : 1);
+			double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(inMainHand, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (multiply != 0 ? multiply : 1);
+			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 

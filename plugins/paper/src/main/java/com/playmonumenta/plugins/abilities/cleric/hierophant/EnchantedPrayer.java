@@ -76,7 +76,7 @@ public class EnchantedPrayer extends Ability {
 		}
 
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (ItemUtils.isSomeBow(mainHand)) {
+		if (ItemUtils.isProjectileWeapon(mainHand)) {
 			return;
 		}
 

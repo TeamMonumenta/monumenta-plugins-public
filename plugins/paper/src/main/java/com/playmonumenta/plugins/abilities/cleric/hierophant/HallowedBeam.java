@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
@@ -23,7 +22,14 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Locale;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -75,7 +81,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		super(plugin, player, "Hallowed Beam");
 		mInfo.mScoreboardId = "HallowedBeam";
 		mInfo.mShorthandName = "HB";
-		mInfo.mDescriptions.add("Left-click with a bow or crossbow while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 30% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals projectile damage equal to the used weapon's projectile damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a bow will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). This skill can only apply Recoil twice before touching the ground. Cooldown: 16s each charge.");
+		mInfo.mDescriptions.add("Left-click with a projectile weapon while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 30% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals projectile damage equal to the used weapon's projectile damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a bow will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). This skill can only apply Recoil twice before touching the ground. Cooldown: 16s each charge.");
 		mInfo.mDescriptions.add("Hallowed Beam gains a third charge (and can apply Recoil three times before touching the ground), the cooldown is reduced to 12 seconds, and players healed by it gain 10% damage resistance for 5 seconds.");
 		mInfo.mLinkedSpell = ClassAbility.HALLOWED_BEAM;
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? HALLOWED_1_COOLDOWN : HALLOWED_2_COOLDOWN);
@@ -89,11 +95,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 			mMode = Mode.values()[Math.max(0, Math.min(modeIndex, Mode.values().length - 1))];
 		}
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mCrusade = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
+		});
 	}
 
 	@Override
@@ -130,7 +134,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			PlayerInventory inventory = mPlayer.getInventory();
 			ItemStack inMainHand = inventory.getItemInMainHand();
 
-			if (ItemUtils.isBowOrTrident(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand())) {
+			if (ItemUtils.isProjectileWeapon(inMainHand)) {
 				int ticks = mPlayer.getTicksLived();
 				// Prevent double casting on accident
 				if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
@@ -289,7 +293,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		PlayerInventory inventory = mPlayer.getInventory();
 		ItemStack inMainHand = inventory.getItemInMainHand();
 
-		if (ItemUtils.isBowOrTrident(inMainHand) && !mPlayer.isSneaking()) {
+		if (ItemUtils.isProjectileWeapon(inMainHand) && !mPlayer.isSneaking()) {
 			event.setCancelled(true);
 			if (mMode == Mode.DEFAULT) {
 				mMode = Mode.HEALING;

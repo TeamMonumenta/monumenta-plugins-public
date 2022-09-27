@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -51,7 +50,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	private final float mKnockback;
 
 	private int mLastCastTicks = 0;
-	private @Nullable WindBomb mWindBomb;
+	private boolean mHasWindBomb;
 
 	public WhirlingBlade(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Whirling Blade");
@@ -68,25 +67,26 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		mMaxCharges = BLADE_MAX_CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mWindBomb = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WindBomb.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mHasWindBomb = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, WindBomb.class) != null;
+		});
 	}
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
 
-		if (mWindBomb != null && mPlayer.isSneaking()) {
+		if (mPlayer == null) {
+			return;
+		}
+
+		if (mHasWindBomb && mPlayer.isSneaking()) {
 			return;
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		if (ItemUtils.isSomeBow(inMainHand) || ItemUtils.isSomeBow(inOffHand) || ItemUtils.isSomePotion(inMainHand) || inMainHand.getType().isBlock()
-			|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.TRIDENT || inMainHand.getType() == Material.COMPASS || inMainHand.getType() == Material.SHIELD || inMainHand.getType() == Material.SNOWBALL) {
+		if (ItemUtils.isShootableItem(inMainHand) || ItemUtils.isSomePotion(inMainHand) || inMainHand.getType().isBlock()
+			|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.TRIDENT || inMainHand.getType() == Material.COMPASS || inMainHand.getType() == Material.SHIELD) {
 			return;
 		}
 

@@ -146,6 +146,6 @@ public class ShieldBash extends Ability {
 	public boolean runCheck() {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return !ItemUtils.isSomeBow(mainHand) && (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD);
+		return !ItemUtils.isShootableItem(mainHand) && (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD);
 	}
 }

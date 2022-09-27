@@ -66,13 +66,13 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 	@Override
 	public void cast(Action action) {
-		if ((!mPlayer.isSprinting() && !mPlayer.isSneaking()) || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+		if (mPlayer == null || (!mPlayer.isSprinting() && !mPlayer.isSneaking()) || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return;
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (ItemUtils.isBowOrTrident(inMainHand) || ItemUtils.isSomePotion(inMainHand) || inMainHand.getType().isBlock()
-				|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.COMPASS || inMainHand.getType() == Material.SHIELD || inMainHand.getType() == Material.SNOWBALL) {
+		if (ItemUtils.isShootableItem(inMainHand) || ItemUtils.isSomePotion(inMainHand) || inMainHand.getType().isBlock()
+				|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.COMPASS || inMainHand.getType() == Material.SHIELD) {
 			return;
 		}
 

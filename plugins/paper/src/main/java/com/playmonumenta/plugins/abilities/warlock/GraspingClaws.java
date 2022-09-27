@@ -29,13 +29,11 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Trident;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -80,13 +78,13 @@ public class GraspingClaws extends Ability {
 
 	private final double mAmplifier;
 	private final double mDamage;
-	private final WeakHashMap<AbstractArrow, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public GraspingClaws(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Grasping Claws");
 		mInfo.mScoreboardId = "GraspingClaws";
 		mInfo.mShorthandName = "GC";
-		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow or crossbow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given 20% Slowness for 8 seconds and take 3 magic damage. Cooldown: 16s.");
+		mInfo.mDescriptions.add("Left-clicking while shifted while holding a projectile weapon fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given 20% Slowness for 8 seconds and take 3 magic damage. Cooldown: 16s.");
 		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, and their Slowness is increased to 30%.");
 		mInfo.mDescriptions.add("At the location that the arrow lands, summon an impenetrable cage. Non-boss mobs within a 6 block radius of the location cannot enter or exit the cage, and players within the cage are granted +10% damage and 5% max health healing every 2 seconds. The cage disappears after 6 seconds. Mobs that are immune to crowd control cannot be trapped.");
 		mInfo.mLinkedSpell = ClassAbility.GRASPING_CLAWS;
@@ -105,15 +103,17 @@ public class GraspingClaws extends Ability {
 			return;
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && ItemUtils.isBowOrTrident(inMainHand)) {
-			AbstractArrow arrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 1.5f, 0,
-				(Class<? extends AbstractArrow>) (inMainHand.getType() == Material.TRIDENT ? Trident.class : Arrow.class));
-			arrow.setShooter(mPlayer);
-			arrow.setDamage(0);
-			arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
-			arrow.setVelocity(arrow.getVelocity().multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PROJ_SPEED, 1)));
-			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SPELL_WITCH);
-			mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && ItemUtils.isProjectileWeapon(inMainHand)) {
+			World world = mPlayer.getWorld();
+			Location eyeLoc = mPlayer.getEyeLocation();
+			Vector direction = mPlayer.getLocation().getDirection();
+			float speed = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PROJ_SPEED, 1.5);
+			Snowball proj = world.spawn(eyeLoc, Snowball.class);
+			proj.setVelocity(direction.normalize().multiply(speed));
+			proj.setShooter(mPlayer);
+			proj.setCustomName("Grasping Claws Projectile");
+			mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SPELL_WITCH);
+			mPlayerItemStatsMap.put(proj, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 			putOnCooldown();
 		}
 	}

@@ -17,10 +17,9 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -58,7 +57,7 @@ public class PinningShot extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() != DamageType.PROJECTILE || (!(event.getDamager() instanceof AbstractArrow) && !(event.getDamager() instanceof Snowball))) {
+		if (event.getType() != DamageType.PROJECTILE || !(event.getDamager() instanceof Projectile proj) || !EntityUtils.isAbilityTriggeringProjectile(proj, true)) {
 			return false;
 		}
 

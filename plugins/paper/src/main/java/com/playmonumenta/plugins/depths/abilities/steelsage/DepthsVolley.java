@@ -29,7 +29,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
@@ -136,7 +135,7 @@ public class DepthsVolley extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity damager = event.getDamager();
-		if (event.getType() == DamageType.PROJECTILE && (damager instanceof AbstractArrow || damager instanceof Snowball) && mDepthsVolley.contains(damager)) {
+		if (event.getType() == DamageType.PROJECTILE && damager instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false) && mDepthsVolley.contains(proj)) {
 			if (notBeenHit(enemy)) {
 				double damageMultiplier = DAMAGE_MULTIPLIER[mRarity - 1];
 				event.setDamage(event.getDamage() * damageMultiplier);
@@ -159,7 +158,7 @@ public class DepthsVolley extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting an arrow or trident while sneaking shoots a volley consisting of " + DepthsUtils.getRarityColor(rarity) + ARROWS[rarity - 1] + ChatColor.WHITE + " arrows instead. Only one arrow is consumed, and each arrow's damage is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE_MULTIPLIER[rarity - 1] + ChatColor.WHITE + ". Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Shooting a projectile while sneaking shoots a volley consisting of " + DepthsUtils.getRarityColor(rarity) + ARROWS[rarity - 1] + ChatColor.WHITE + " projectiles instead. Only one arrow is consumed, and each projectile's damage is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE_MULTIPLIER[rarity - 1] + ChatColor.WHITE + ". Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

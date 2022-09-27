@@ -14,13 +14,11 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Stray;
-import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
@@ -55,7 +53,7 @@ public class ElementalArrows extends Ability {
 		mInfo.mScoreboardId = "Elemental";
 		mInfo.mShorthandName = "EA";
 		mInfo.mDescriptions.add(
-			String.format("Your fully drawn arrows and tridents are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with %s%% Slowness for %s seconds. Projectiles shot this way deal magical damage instead of projectile damage. Ice arrows deal %s extra damage to Blazes. Fire arrows deal %s extra damage to strays. This skill can not apply Spellshock.",
+			String.format("Your fully drawn projectiles are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with %s%% Slowness for %s seconds. Projectiles shot this way deal magical damage instead of projectile damage. Ice arrows deal %s extra damage to Blazes. Fire arrows deal %s extra damage to strays. This skill can not apply Spellshock.",
 				(int) (SLOW_AMPLIFIER * 100),
 				ELEMENTAL_ARROWS_DURATION / 20,
 				ELEMENTAL_ARROWS_BONUS_DAMAGE,
@@ -80,10 +78,10 @@ public class ElementalArrows extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer == null || !(event.getDamager() instanceof AbstractArrow arrow)) {
+		if (mPlayer == null || !(event.getDamager() instanceof Projectile proj) || !EntityUtils.isAbilityTriggeringProjectile(proj, true)) {
 			return false;
 		}
-		ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(arrow);
+		ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(proj);
 
 		double damage = event.getDamage();
 		double targetDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
@@ -92,7 +90,7 @@ public class ElementalArrows extends Ability {
 		double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, ELEMENTAL_ARROWS_RADIUS);
 		int duration = ELEMENTAL_ARROWS_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 
-		if (arrow.hasMetadata("ElementalArrowsFireArrow")) {
+		if (proj.hasMetadata("ElementalArrowsFireArrow")) {
 			if (isLevelTwo()) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius, enemy)) {
 					EntityUtils.applyFire(mPlugin, duration, mob, mPlayer, playerItemStats);
@@ -107,7 +105,7 @@ public class ElementalArrows extends Ability {
 			event.setDamage(0);
 			DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.MAGIC, ABILITY_FIRE, playerItemStats), targetDamage, true, true, false);
 			mLastDamage = event.getDamage();
-		} else if (arrow.hasMetadata("ElementalArrowsIceArrow")) {
+		} else if (proj.hasMetadata("ElementalArrowsIceArrow")) {
 			if (isLevelTwo()) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius, enemy)) {
 					EntityUtils.applySlow(mPlugin, duration, SLOW_AMPLIFIER, mob);
@@ -122,7 +120,7 @@ public class ElementalArrows extends Ability {
 			event.setDamage(0);
 			DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.MAGIC, ABILITY_ICE, playerItemStats), targetDamage, true, true, false);
 			mLastDamage = event.getDamage();
-		} else if (arrow.hasMetadata("ElementalArrowsThunderArrow")) {
+		} else if (proj.hasMetadata("ElementalArrowsThunderArrow")) {
 			putOnCooldown();
 			targetDamage *= 1 + ENHANCED_DAMAGE_MULTIPLIER;
 			areaDamage *= 1 + ENHANCED_DAMAGE_MULTIPLIER;
@@ -148,7 +146,7 @@ public class ElementalArrows extends Ability {
 		if (mPlayer == null) {
 			return true;
 		}
-		if ((projectile instanceof AbstractArrow arrow && arrow.isCritical()) || projectile instanceof Trident) {
+		if (EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
 			if (isEnhanced() && !isTimerActive()) {
 				projectile.setMetadata("ElementalArrowsThunderArrow", new FixedMetadataValue(mPlugin, 0));
 				projectile.setFireTicks(0);

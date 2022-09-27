@@ -49,14 +49,12 @@ public class Swiftness extends Ability {
 		mInfo.mScoreboardId = "Swiftness";
 		mInfo.mShorthandName = "Swf";
 		mInfo.mDescriptions.add(String.format("Gain +%d%% Speed when you are not inside a town.", (int)(SWIFTNESS_SPEED_BONUS * 100)));
-		mInfo.mDescriptions.add(String.format("In addition, gain Jump Boost %s when you are not inside a town. Swap hands looking up, not sneaking, and not holding a bow, crossbow, or trident to toggle the Jump Boost.", StringUtils.toRoman(SWIFTNESS_EFFECT_JUMP_LVL + 1)));
+		mInfo.mDescriptions.add(String.format("In addition, gain Jump Boost %s when you are not inside a town. Swap hands looking up, not sneaking, and not holding a projectile weapon to toggle the Jump Boost.", StringUtils.toRoman(SWIFTNESS_EFFECT_JUMP_LVL + 1)));
 		mInfo.mDescriptions.add(String.format("You now have a %d%% chance to dodge any projectile or melee attack.", (int)(DODGE_CHANCE * 100)));
 		mDisplayItem = new ItemStack(Material.RABBIT_FOOT, 1);
 		if (player != null) {
 			addModifier(player);
 		}
-
-
 	}
 
 	@Override
@@ -99,7 +97,7 @@ public class Swiftness extends Ability {
 
 		event.setCancelled(true);
 
-		if (mPlayer.isSneaking() || mPlayer.getLocation().getPitch() >= -45 || ItemUtils.isBowOrTrident(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer.isSneaking() || mPlayer.getLocation().getPitch() >= -45 || ItemUtils.isProjectileWeapon(mPlayer.getInventory().getItemInMainHand())) {
 			return;
 		}
 
