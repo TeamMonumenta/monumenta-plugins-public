@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -32,7 +31,7 @@ public class ChoirBells extends Ability {
 	private static final double VULNERABILITY_EFFECT_2 = 0.35;
 	private static final double SLOWNESS_AMPLIFIER_1 = 0.1;
 	private static final double SLOWNESS_AMPLIFIER_2 = 0.2;
-	private static final int COOLDOWN = 20 * 20;
+	private static final int COOLDOWN = 16 * 20;
 	private static final int CHOIR_BELLS_RANGE = 10;
 	private static final double CHOIR_BELLS_CONICAL_THRESHOLD = 1d / 3;
 	private static final int DAMAGE = 4;
@@ -57,7 +56,7 @@ public class ChoirBells extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.CHOIR_BELLS;
 		mInfo.mScoreboardId = "ChoirBells";
 		mInfo.mShorthandName = "CB";
-		mInfo.mDescriptions.add("While not sneaking, pressing the swap key afflicts all enemies in front of you within a 10-block cube around you with 10% slowness for 8s. Undead enemies also switch targets over to you, are dealt " + DAMAGE + " magic damage, and are afflicted with 20% vulnerability and 20% weakness for 8s. Cooldown: 20s.");
+		mInfo.mDescriptions.add("While not sneaking, pressing the swap key afflicts all enemies in front of you within a 10-block cube around you with 10% slowness for 8s. Undead enemies also switch targets over to you, are dealt " + DAMAGE + " magic damage, and are afflicted with 20% vulnerability and 20% weakness for 8s. Cooldown: 16s.");
 		mInfo.mDescriptions.add("Slowness is increased from 10% to 20%. Vulnerability and weakness are increased from 20% to 35%.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
@@ -66,11 +65,9 @@ public class ChoirBells extends Ability {
 		mWeakenEffect = CharmManager.getLevelPercentDecimal(player, CHARM_WEAKEN) + (isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2);
 		mVulnerabilityEffect = CharmManager.getLevelPercentDecimal(player, CHARM_VULN) + (isLevelOne() ? VULNERABILITY_EFFECT_1 : VULNERABILITY_EFFECT_2);
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mCrusade = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
+		});
 	}
 
 	@Override

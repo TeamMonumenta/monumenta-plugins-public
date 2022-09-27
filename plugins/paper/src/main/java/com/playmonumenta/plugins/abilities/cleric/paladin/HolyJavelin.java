@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
@@ -39,7 +38,7 @@ public class HolyJavelin extends Ability {
 	private static final double HITBOX_LENGTH = 0.75;
 	private static final int RANGE = 12;
 	private static final int UNDEAD_DAMAGE_1 = 18;
-	private static final int UNDEAD_DAMAGE_2 = 24;
+	private static final int UNDEAD_DAMAGE_2 = 32;
 	private static final int DAMAGE_1 = 9;
 	private static final int DAMAGE_2 = 12;
 	private static final int FIRE_DURATION = 5 * 20;
@@ -62,20 +61,18 @@ public class HolyJavelin extends Ability {
 		mInfo.mScoreboardId = "HolyJavelin";
 		mInfo.mShorthandName = "HJ";
 		mInfo.mDescriptions.add("While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to 12 blocks or until it hits a solid block. It deals 18 magic damage to all enemies in a 0.75-block cube around it along its path, or 9 magic damage to non-undead, and sets them all on fire for 5s. Cooldown: 12s.");
-		mInfo.mDescriptions.add("Attacking an undead enemy with that left-click now transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. Damage is increased from 18 to 24, and from 9 to 18 against non-undead.");
+		mInfo.mDescriptions.add("Attacking an undead enemy with that left-click now transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. Damage is increased from 18 to 32, and from 9 to 18 against non-undead.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.TRIDENT, 1);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mUndeadDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2);
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
-				mDivineJustice = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, DivineJustice.class);
-				mLuminousInfusion = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, LuminousInfusion.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mCrusade = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
+			mDivineJustice = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, DivineJustice.class);
+			mLuminousInfusion = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, LuminousInfusion.class);
+		});
 	}
 
 	@Override

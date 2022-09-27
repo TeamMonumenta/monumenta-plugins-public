@@ -26,7 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class EnchantedPrayer extends Ability {
 
-	private static final int ENCHANTED_PRAYER_COOLDOWN = 20 * 18;
+	private static final int ENCHANTED_PRAYER_COOLDOWN = 20 * 15;
 	private static final int ENCHANTED_PRAYER_1_DAMAGE = 7;
 	private static final int ENCHANTED_PRAYER_2_DAMAGE = 12;
 	private static final double ENCHANTED_PRAYER_1_HEAL = 0.1;
@@ -47,12 +47,11 @@ public class EnchantedPrayer extends Ability {
 	public static final String CHARM_EFFECT_RANGE = "Enchanted Prayer Attack Range";
 	public static final String CHARM_COOLDOWN = "Enchanted Prayer Cooldown";
 
-
 	public EnchantedPrayer(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Enchanted Prayer");
 		mInfo.mScoreboardId = "EPrayer";
 		mInfo.mShorthandName = "EP";
-		mInfo.mDescriptions.add("Swapping while shifted enchants the weapons of all players in a 15 block radius with holy magic. Their next melee or projectile attack deals an additional 7 damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 18s.");
+		mInfo.mDescriptions.add("Swapping while shifted enchants the weapons of all players in a 15 block radius with holy magic. Their next melee or projectile attack deals an additional 7 damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 15s.");
 		mInfo.mDescriptions.add("Damage is increased to 12. Healing is increased to 20% of max health.");
 		mInfo.mLinkedSpell = ClassAbility.ENCHANTED_PRAYER;
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, ENCHANTED_PRAYER_COOLDOWN);
