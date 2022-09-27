@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.cosmetics.skills.warrior.BrambleShellCS;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.internal.com.google.common.collect.ImmutableList;
 import com.playmonumenta.scriptedquests.internal.com.google.common.collect.ImmutableMap;
@@ -25,6 +26,7 @@ import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -71,6 +73,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 
 	//GUI constants
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final Material LOCKED = Material.BARRIER;
 	private static final int LINE = 5;
 	private static final int INTRO_LOC = 4;
 	private static final int ENTRY_START = 10;
@@ -79,6 +82,9 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private static final int BACK_LOC = (LINE - 1) * 9 + 4;
 	private static final int PREV_PAGE_LOC = (LINE - 1) * 9 + 0;
 	private static final int NEXT_PAGE_LOC = (LINE - 1) * 9 + 8;
+
+	private static final String R1MONUMENT_SCB = "R1Complete";
+	private static final String DEPTHS_SCB = "Depths";
 	private static final NamedTextColor DEPTH_COLOR = NamedTextColor.DARK_PURPLE;
 	private static final NamedTextColor DELVE_COLOR = NamedTextColor.DARK_RED;
 	private static final int DEPTH_ENTRY_LOC = 20;
@@ -294,6 +300,11 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 				case Gallery:
 					break;
 				default:
+					//Reject: related content not discovered
+					if (item.getType() == LOCKED) {
+						return;
+					}
+
 					//Home page, choose skin set
 					if (slot == DEPTH_ENTRY_LOC) {
 						mPageNumber = 1;
@@ -350,12 +361,26 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 				mInventory.setItem(INTRO_LOC, introItem);
 
 				// Depth theme entry
-				ItemStack depthItem = createPageIcon(Material.BLACKSTONE, "Darkest Depths", DEPTH_COLOR, DEPTH_INTRO);
-				mInventory.setItem(DEPTH_ENTRY_LOC, depthItem);
+				if (ScoreboardUtils.getScoreboardValue(player, DEPTHS_SCB).get() > 0 || player.getGameMode() == GameMode.CREATIVE) {
+					ItemStack depthItem = createPageIcon(Material.BLACKSTONE, "Darkest Depths", DEPTH_COLOR, DEPTH_INTRO);
+					mInventory.setItem(DEPTH_ENTRY_LOC, depthItem);
+				} else {
+					ItemStack depthItem = createPageIcon(LOCKED, "Da" + ChatColor.MAGIC + "rkest Dep" + ChatColor.RESET + "ths", DEPTH_COLOR,
+						List.of("Complete " + ChatColor.MAGIC + "Darke" + ChatColor.RESET + "st D" + ChatColor.MAGIC + "epth" + ChatColor.RESET + "s",
+							"to unlock this theme!"));
+					mInventory.setItem(DEPTH_ENTRY_LOC, depthItem);
+				}
 
 				// Delve theme entry
-				ItemStack delveItem = createPageIcon(Material.NETHERITE_BLOCK, "Dungeon Delves", DELVE_COLOR, DELVE_INTRO);
-				mInventory.setItem(DELVE_ENTRY_LOC, delveItem);
+				if (ScoreboardUtils.getScoreboardValue(player, R1MONUMENT_SCB).get() > 0 || player.getGameMode() == GameMode.CREATIVE) {
+					ItemStack delveItem = createPageIcon(Material.NETHERITE_BLOCK, "Dungeon Delves", DELVE_COLOR, DELVE_INTRO);
+					mInventory.setItem(DELVE_ENTRY_LOC, delveItem);
+				} else {
+					ItemStack delveItem = createPageIcon(LOCKED, ChatColor.MAGIC + "Dungeon D" + ChatColor.RESET + "elves", DELVE_COLOR,
+						List.of("Complete Monument of King's Valley",
+							"to unlock this theme!"));
+					mInventory.setItem(DELVE_ENTRY_LOC, delveItem);
+				}
 
 				// Prestige theme entry
 				final boolean prestige_enable = false;
