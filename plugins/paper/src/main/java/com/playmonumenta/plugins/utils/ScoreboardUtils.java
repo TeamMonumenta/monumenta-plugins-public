@@ -113,4 +113,14 @@ public class ScoreboardUtils {
 		return Bukkit.getScoreboardManager().getMainScoreboard().getEntityTeam(entity);
 	}
 
+	public static void addEntityToTeam(Entity entity, String teamName) {
+		Team team = getExistingTeamOrCreate(teamName);
+
+		if (entity instanceof Player player) {
+			team.addEntry(player.getName());
+		} else {
+			team.addEntry(entity.getUniqueId().toString());
+		}
+	}
+
 }

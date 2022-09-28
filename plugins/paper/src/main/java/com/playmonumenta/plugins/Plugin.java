@@ -18,6 +18,8 @@ import com.playmonumenta.plugins.depths.DepthsGUICommands;
 import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.gallery.GalleryCommands;
+import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.guis.SinglePageGUIManager;
 import com.playmonumenta.plugins.infinitytower.TowerCommands;
 import com.playmonumenta.plugins.infinitytower.TowerManager;
@@ -386,6 +388,13 @@ public class Plugin extends JavaPlugin {
 			manager.registerEvents(new DepthsListener(this), this);
 		}
 
+		if (ServerProperties.getShardName().contains("gallery")
+				|| ServerProperties.getShardName().startsWith("dev")) {
+			GalleryCommands.register();
+			manager.registerEvents(new GalleryManager(this), this);
+
+		}
+
 		//TODO Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			int mTicks = 0;
@@ -521,6 +530,10 @@ public class Plugin extends JavaPlugin {
 	public void onDisable() {
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
+
+		if (ServerProperties.getShardName().contains("gallery")) {
+			GalleryManager.close(); //TODO - test this
+		}
 
 		TowerManager.unload();
 		mChessManager.unloadAll();

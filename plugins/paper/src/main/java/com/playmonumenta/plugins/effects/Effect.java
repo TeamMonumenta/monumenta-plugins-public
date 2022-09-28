@@ -163,7 +163,7 @@ public abstract class Effect implements Comparable<Effect> {
 		return null;
 	}
 
-	public final @Nullable String getDisplay() {
+	public @Nullable String getDisplay() {
 		String specificDisplay = getSpecificDisplay();
 		if (specificDisplay != null) {
 			return ChatColor.GREEN + specificDisplay + " " + ChatColor.GRAY + StringUtils.intToMinuteAndSeconds(mDuration / 20);
