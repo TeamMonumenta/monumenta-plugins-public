@@ -93,6 +93,7 @@ public class SanguineHarvest extends Ability {
 		if (!ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()) || mPlayer.isSneaking()) {
 			return;
 		}
+		putOnCooldown();
 
 		Location loc = mPlayer.getEyeLocation();
 		Vector direction = loc.getDirection();
@@ -169,9 +170,6 @@ public class SanguineHarvest extends Ability {
 			}
 			box.shift(shift);
 		}
-
-		runMarkerRunnable();
-		putOnCooldown();
 	}
 
 	private void explode(Location loc) {
