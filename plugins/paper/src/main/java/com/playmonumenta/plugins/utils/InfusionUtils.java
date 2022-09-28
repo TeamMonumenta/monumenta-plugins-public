@@ -20,8 +20,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class InfusionUtils {
 
-	/**When set to true the refund function will return all the XP used for the infusion, when false only the 50% */
+	/**
+	 * When set to true the refund function will return all the XP used for the infusion, when false only the 50%
+	 */
 	public static final boolean FULL_REFUND = false;
+	public static final String PULSATING_GOLD = "epic:r1/items/currency/pulsating_gold";
+	public static final String PULSATING_EMERALD = "epic:r2/items/currency/pulsating_emerald";
+	public static final String PULSATING_DIAMOND = "epic:r3/items/currency/pulsating_diamond";
 
 	public enum InfusionSelection {
 		ACUMEN("acumen", "Acumen"),
@@ -91,70 +96,91 @@ public class InfusionUtils {
 		int xp = ExperienceUtils.getTotalExperience(player);
 		int refundXP = 0;
 
-		switch (ItemStatUtils.getTier(item)) {
-			case UNCOMMON:
-			case UNIQUE:
-			case EVENT:
-			case RARE:
-			case PATRON:
-				switch (level) {
-					case 1:
-						refundXP = ExperienceUtils.LEVEL_30;
-						break;
-					case 2:
-						refundXP = ExperienceUtils.LEVEL_30 + ExperienceUtils.LEVEL_40;
-						break;
-					case 3:
-						refundXP = ExperienceUtils.LEVEL_30 + ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50;
-						break;
-					case 4:
-						refundXP = ExperienceUtils.LEVEL_30 + ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60;
-						break;
-					default:
-					case 0:
-						break;
-				}
-				break;
-			case ARTIFACT:
-				switch (level) {
-					case 1:
-						refundXP = ExperienceUtils.LEVEL_40;
-						break;
-					case 2:
-						refundXP = ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50;
-						break;
-					case 3:
-						refundXP = ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60;
-						break;
-					case 4:
-						refundXP = ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60 + ExperienceUtils.LEVEL_70;
-						break;
-					default:
-					case 0:
-						break;
-				}
-				break;
-			case EPIC:
-				switch (level) {
-					case 1:
-						refundXP = ExperienceUtils.LEVEL_50;
-						break;
-					case 2:
-						refundXP = ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60;
-						break;
-					case 3:
-						refundXP = ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60 + ExperienceUtils.LEVEL_70;
-						break;
-					case 4:
-						refundXP = ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60 + ExperienceUtils.LEVEL_70 + ExperienceUtils.LEVEL_80;
-						break;
-					default:
-					case 0:
-						break;
-				}
-				break;
-			default:
-				CommandAPI.fail("Invalid item. Item must be infused!");
+		if (region == Region.VALLEY || region == Region.ISLES) {
+			switch (ItemStatUtils.getTier(item)) {
+				case UNCOMMON:
+				case UNIQUE:
+				case EVENT:
+				case RARE:
+				case PATRON:
+					switch (level) {
+						case 1:
+							refundXP = ExperienceUtils.LEVEL_30;
+							break;
+						case 2:
+							refundXP = ExperienceUtils.LEVEL_30 + ExperienceUtils.LEVEL_40;
+							break;
+						case 3:
+							refundXP = ExperienceUtils.LEVEL_30 + ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50;
+							break;
+						case 4:
+							refundXP = ExperienceUtils.LEVEL_30 + ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60;
+							break;
+						default:
+						case 0:
+							break;
+					}
+					break;
+				case ARTIFACT:
+					switch (level) {
+						case 1:
+							refundXP = ExperienceUtils.LEVEL_40;
+							break;
+						case 2:
+							refundXP = ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50;
+							break;
+						case 3:
+							refundXP = ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60;
+							break;
+						case 4:
+							refundXP = ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60 + ExperienceUtils.LEVEL_70;
+							break;
+						default:
+						case 0:
+							break;
+					}
+					break;
+				case EPIC:
+					switch (level) {
+						case 1:
+							refundXP = ExperienceUtils.LEVEL_50;
+							break;
+						case 2:
+							refundXP = ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60;
+							break;
+						case 3:
+							refundXP = ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60 + ExperienceUtils.LEVEL_70;
+							break;
+						case 4:
+							refundXP = ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60 + ExperienceUtils.LEVEL_70 + ExperienceUtils.LEVEL_80;
+							break;
+						default:
+						case 0:
+							break;
+					}
+					break;
+				default:
+					CommandAPI.fail("Invalid item. Item must be infused!");
+			}
+		} else if (region == Region.RING) {
+			// All Ring items has same infusion price, Artifact level.
+			switch (level) {
+				case 1:
+					refundXP = ExperienceUtils.LEVEL_40;
+					break;
+				case 2:
+					refundXP = ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50;
+					break;
+				case 3:
+					refundXP = ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60;
+					break;
+				case 4:
+					refundXP = ExperienceUtils.LEVEL_40 + ExperienceUtils.LEVEL_50 + ExperienceUtils.LEVEL_60 + ExperienceUtils.LEVEL_70;
+					break;
+				default:
+				case 0:
+					break;
+			}
 		}
 
 		refundXP = (FULL_REFUND ? refundXP : refundXP / 2) * item.getAmount();
@@ -164,12 +190,11 @@ public class InfusionUtils {
 	private static void giveMaterials(Player player, Region region, int refundMaterials) throws WrapperCommandSyntaxException {
 		ItemStack stack;
 		if (region.equals(Region.VALLEY)) {
-			stack = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
+			stack = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_GOLD));
 		} else if (region.equals(Region.ISLES)) {
-			stack = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
-		// TODO: The stuff below
-		// else if (region.equals(Region.RING)) {
-		// stack = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r3/items/currency/pulsating_diamond"));
+			stack = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_EMERALD));
+		} else if (region.equals(Region.RING)) {
+			stack = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_DIAMOND));
 		} else {
 			CommandAPI.fail("Item must have a Region tag!");
 			return;
@@ -236,6 +261,10 @@ public class InfusionUtils {
 	 * Gets the infusion cost multiplier for the given item, or -1 if the item is not of a tier that can be infused.
 	 */
 	public static int getCostMultiplier(ItemStack item) {
+		if (ItemStatUtils.getRegion(item) == Region.RING) {
+			return 3;
+		}
+
 		switch (ItemStatUtils.getTier(item)) {
 			case UNCOMMON:
 			case UNIQUE:
@@ -376,7 +405,7 @@ public class InfusionUtils {
 		}
 
 		Region region = ItemStatUtils.getRegion(item);
-		if (region != Region.VALLEY && region != Region.ISLES) {
+		if (region != Region.VALLEY && region != Region.ISLES && region != Region.RING) {
 			return false;
 		}
 
@@ -388,6 +417,7 @@ public class InfusionUtils {
 			case PATRON:
 			case ARTIFACT:
 			case EPIC:
+			case LEGENDARY:
 				break;
 			default:
 				return false;
@@ -452,12 +482,16 @@ public class InfusionUtils {
 
 		ItemStack currency = null;
 
+		if (ItemStatUtils.getRegion(item) == Region.RING) {
+			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_DIAMOND));
+		}
+
 		if (ItemStatUtils.getRegion(item) == Region.ISLES) {
-			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
+			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_EMERALD));
 		}
 
 		if (ItemStatUtils.getRegion(item) == Region.VALLEY) {
-			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
+			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_GOLD));
 		}
 
 		if (currency == null) {
@@ -494,10 +528,12 @@ public class InfusionUtils {
 
 		//currency
 		ItemStack currency = null;
-		if (ItemStatUtils.getRegion(item) == Region.ISLES) {
-			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
+		if (ItemStatUtils.getRegion(item) == Region.RING) {
+			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_DIAMOND));
+		} else if (ItemStatUtils.getRegion(item) == Region.ISLES) {
+			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_EMERALD));
 		} else if (ItemStatUtils.getRegion(item) == Region.VALLEY) {
-			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
+			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_GOLD));
 		}
 
 		if (currency == null) {

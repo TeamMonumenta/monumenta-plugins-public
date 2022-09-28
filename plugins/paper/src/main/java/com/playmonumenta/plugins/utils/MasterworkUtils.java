@@ -45,6 +45,9 @@ public class MasterworkUtils {
 	private static final String BLUE_FRAG = "epic:r3/fragments/blue_fragment";
 	private static final String BLUE_MAT = "epic:r3/items/currency/sorceress_stave";
 
+	private static final String BROWN_FRAG = "epic:r3/fragments/brown_fragment";
+	private static final String BROWN_MAT = "epic:r3/items/currency/broken_god_gearframe";
+
 	private static final String PORTAL_FRAG = "epic:r3/fragments/companion_fragment";
 	private static final String PORTAL_MAT = "epic:r3/items/currency/corrupted_circuit";
 
@@ -94,9 +97,19 @@ public class MasterworkUtils {
 		BLUE_SEVENB("blue_7b", BLUE_MAT, 32, POTENCY_AUGMENT, 16),
 		BLUE_SEVENC("blue_7c", BLUE_MAT, 32, ALACRITY_AUGMENT, 16),
 
+		BROWN_ONE("brown_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
+		BROWN_TWO("brown_2", BROWN_FRAG, 2, HYPER_ARCHOS_RING, 2),
+		BROWN_THREE("brown_3", BROWN_FRAG, 3, HYPER_ARCHOS_RING, 3),
+		BROWN_FOUR("brown_4", PULSATING_DIAMOND, 6, HYPER_ARCHOS_RING, 4),
+		BROWN_FIVE("brown_5", PULSATING_DIAMOND, 12, HYPER_ARCHOS_RING, 4),
+		BROWN_SIX("brown_6", BROWN_MAT, 16, HYPER_ARCHOS_RING, 4),
+		BROWN_SEVENA("brown_7a", BROWN_MAT, 32, FORTITUDE_AUGMENT, 16),
+		BROWN_SEVENB("brown_7b", BROWN_MAT, 32, POTENCY_AUGMENT, 16),
+		BROWN_SEVENC("brown_7c", BROWN_MAT, 32, ALACRITY_AUGMENT, 16),
+
 		PORTAL_ONE("science_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
 		PORTAL_TWO("science_2", INVALID_ITEM, 1, INVALID_ITEM, 1),
-		PORTAL_THREE("science_3", PORTAL_FRAG, 3, HYPER_ARCHOS_RING, 2),
+		PORTAL_THREE("science_3", PORTAL_FRAG, 3, HYPER_ARCHOS_RING, 3),
 		PORTAL_FOUR("science_4", PULSATING_DIAMOND, 6, HYPER_ARCHOS_RING, 4),
 		PORTAL_FIVE("science_5", PULSATING_DIAMOND, 12, HYPER_ARCHOS_RING, 4),
 		PORTAL_SIX("science_6", PORTAL_MAT, 16, HYPER_ARCHOS_RING, 4),
@@ -106,7 +119,7 @@ public class MasterworkUtils {
 
 		MASK_ONE("bluestrike_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
 		MASK_TWO("bluestrike_2", INVALID_ITEM, 1, INVALID_ITEM, 1),
-		MASK_THREE("bluestrike_3", MASK_FRAG, 3, HYPER_ARCHOS_RING, 2),
+		MASK_THREE("bluestrike_3", MASK_FRAG, 3, HYPER_ARCHOS_RING, 3),
 		MASK_FOUR("bluestrike_4", PULSATING_DIAMOND, 6, HYPER_ARCHOS_RING, 4),
 		MASK_FIVE("bluestrike_5", PULSATING_DIAMOND, 12, HYPER_ARCHOS_RING, 4),
 		MASK_SIX("bluestrike_6", MASK_MAT, 16, HYPER_ARCHOS_RING, 4),
