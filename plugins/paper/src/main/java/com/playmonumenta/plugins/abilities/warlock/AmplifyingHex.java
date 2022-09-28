@@ -139,6 +139,23 @@ public class AmplifyingHex extends Ability {
 
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 
+		double maxHealth = EntityUtils.getMaxHealth(mPlayer);
+		double percentBoost = 0;
+		if (isEnhanced() && mPlayer.getHealth() > maxHealth * 0.8) {
+			percentBoost = mPlayer.getHealth() / maxHealth - 0.8;
+			double selfHarm = maxHealth * percentBoost;
+			double absorp = mPlayer.getAbsorptionAmount();
+			double newAbsorp = absorp - selfHarm;
+			if (absorp > 0) {
+				AbsorptionUtils.setAbsorption(mPlayer, (float) Math.max(newAbsorp, 0), -1);
+			}
+			if (newAbsorp < 0) {
+				mPlayer.setHealth(maxHealth + newAbsorp);
+			}
+			//dummy damage
+			DamageUtils.damage(null, mPlayer, new DamageEvent.Metadata(DamageType.OTHER, null, null, null), 0.001, true, false, false);
+		}
+
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius, mPlayer)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 			if (playerDir.dot(toMobVector) > CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, DOT_ANGLE)) {
@@ -210,24 +227,7 @@ public class AmplifyingHex extends Ability {
 
 				if (debuffCount > 0) {
 					double finalDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage);
-
-					double maxHealth = EntityUtils.getMaxHealth(mPlayer);
-					if (isEnhanced() && mPlayer.getHealth() > maxHealth * 0.8) {
-						double percentBoost = mPlayer.getHealth() / maxHealth - 0.8;
-						finalDamage *= (1 + percentBoost);
-						double selfHarm = maxHealth * percentBoost;
-						double absorp = mPlayer.getAbsorptionAmount();
-						double newAbsorp = absorp - selfHarm;
-						if (absorp > 0) {
-							AbsorptionUtils.setAbsorption(mPlayer, (float) Math.max(newAbsorp, 0), -1);
-						}
-						if (newAbsorp < 0) {
-							mPlayer.setHealth(maxHealth + newAbsorp);
-						}
-						//dummy damage
-						DamageUtils.damage(null, mPlayer, new DamageEvent.Metadata(DamageType.OTHER, null, null, null), 0.001, true, false, false);
-					}
-
+					finalDamage *= (1 + percentBoost);
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.mLinkedSpell, true);
 					MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
 				}
