@@ -235,6 +235,10 @@ public enum EffectType {
 			}
 		}
 
+		if (effectType == EffectType.STARVATION) {
+			return Component.text(effectType.mName + " " + ItemStatUtils.toRomanNumerals((int) strength), TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false);
+		}
+
 		if (effectType.isVanilla()) {
 			if (effectType.getType().contains("Instant")) {
 				return Component.text(effectType.mName + " " + ItemStatUtils.toRomanNumerals((int) strength), TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false);

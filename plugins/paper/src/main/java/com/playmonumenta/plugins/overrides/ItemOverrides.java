@@ -364,8 +364,11 @@ public final class ItemOverrides {
 		mItems.put(Material.APPLE, horseFoodOverride);
 		mItems.put(Material.GOLDEN_CARROT, horseFoodOverride);
 		mItems.put(Material.HAY_BLOCK, horseFoodOverride);
-		mItems.put(Material.ENCHANTED_GOLDEN_APPLE, horseFoodOverride);
-		// GOLDEN_APPLE is in GoldenAppleOverride, which manually calls this override
+		// GOLDEN_APPLE + ENCHANTED_GOLDEN_APPLE are in GoldenAppleOverride, which manually calls this override
+
+		BaseOverride goldenAppleOverride = new GoldenAppleOverride();
+		mItems.put(Material.GOLDEN_APPLE, goldenAppleOverride);
+		mItems.put(Material.ENCHANTED_GOLDEN_APPLE, goldenAppleOverride);
 
 		BaseOverride lodestoneOverride = new LodestoneOverride();
 		mItems.put(Material.LODESTONE, lodestoneOverride);
