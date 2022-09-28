@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.Agility;
 import com.playmonumenta.plugins.itemstats.attributes.Armor;
 import com.playmonumenta.plugins.itemstats.attributes.AttackDamageAdd;
@@ -2456,20 +2457,8 @@ public class ItemStatUtils {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
-			String hexColor = "#C8A2C8";
-			if (lore.charAt(0) == '+') {
-				if (lore.endsWith("Cooldown")) {
-					hexColor = "#D02E28";
-				} else {
-					hexColor = "#4AC2E5";
-				}
-			} else if (lore.charAt(0) == '-') {
-				if (lore.endsWith("Cooldown")) {
-					hexColor = "#4AC2E5";
-				} else {
-					hexColor = "#D02E28";
-				}
-			}
+
+			String hexColor = CharmManager.getCharmEffectColor(lore.charAt(0) == '+', lore);
 
 			Component text = Component.text(lore, TextColor.fromHexString(hexColor)).decoration(TextDecoration.ITALIC, false);
 			addCharmEffect(item, index, text);

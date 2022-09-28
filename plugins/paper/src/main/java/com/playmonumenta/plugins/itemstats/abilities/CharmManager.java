@@ -170,18 +170,20 @@ public class CharmManager {
 
 	public List<String> mCharmEffectList;
 
+	public List<String> mFlippedColorEffectSubstrings;
+
 	public Map<UUID, List<ItemStack>> mPlayerCharms;
 
 	public Map<UUID, Map<String, Double>> mPlayerCharmEffectMap;
 
 	public Map<UUID, Multimap<ClassAbility, Effect>> mPlayerAbilityEffectMap;
 
-
 	private CharmManager() {
 		mPlayerCharms = new HashMap<>();
 		mPlayerCharmEffectMap = new HashMap<UUID, Map<String, Double>>();
 		mPlayerAbilityEffectMap = new HashMap<>();
 		loadCharmEffects();
+		loadFlippedColorEffects();
 	}
 
 	public static CharmManager getInstance() {
@@ -733,6 +735,79 @@ public class CharmManager {
 		);
 	}
 
+	public void loadFlippedColorEffects() {
+		mFlippedColorEffectSubstrings = Arrays.asList(
+			JunglesNourishment.CHARM_COOLDOWN,
+			RageOfTheKeter.CHARM_COOLDOWN,
+			IntoxicatingWarmth.CHARM_COOLDOWN,
+			TemporalBender.CHARM_COOLDOWN,
+			LiquidCourage.CHARM_COOLDOWN,
+			ManaLance.CHARM_COOLDOWN,
+			ThunderStep.CHARM_COOLDOWN,
+			PrismaticShield.CHARM_COOLDOWN,
+			FrostNova.CHARM_COOLDOWN,
+			MagmaShield.CHARM_COOLDOWN,
+			ArcaneStrike.CHARM_COOLDOWN,
+			CosmicMoonblade.CHARM_COOLDOWN,
+			CosmicMoonblade.CHARM_SPELL_COOLDOWN,
+			Blizzard.CHARM_COOLDOWN,
+			Starfall.CHARM_COOLDOWN,
+			ElementalSpiritFire.CHARM_COOLDOWN,
+			CelestialBlessing.CHARM_COOLDOWN,
+			CleansingRain.CHARM_COOLDOWN,
+			HandOfLight.CHARM_COOLDOWN,
+			HolyJavelin.CHARM_COOLDOWN,
+			ChoirBells.CHARM_COOLDOWN,
+			LuminousInfusion.CHARM_COOLDOWN,
+			EnchantedPrayer.CHARM_COOLDOWN,
+			ThuribleProcession.CHARM_COOLDOWN,
+			HallowedBeam.CHARM_COOLDOWN,
+			AdvancingShadows.CHARM_COOLDOWN,
+			ByMyBlade.CHARM_COOLDOWN,
+			DaggerThrow.CHARM_COOLDOWN,
+			EscapeDeath.CHARM_COOLDOWN,
+			Smokescreen.CHARM_COOLDOWN,
+			BladeDance.CHARM_COOLDOWN,
+			WindWalk.CHARM_COOLDOWN,
+			BodkinBlitz.CHARM_COOLDOWN,
+			DefensiveLine.CHARM_COOLDOWN,
+			Riposte.CHARM_COOLDOWN,
+			ShieldBash.CHARM_COOLDOWN,
+			MeteorSlam.CHARM_COOLDOWN,
+			Bodyguard.CHARM_COOLDOWN,
+			Challenge.CHARM_COOLDOWN,
+			ShieldWall.CHARM_COOLDOWN,
+			IronTincture.CHARM_COOLDOWN,
+			UnstableAmalgam.CHARM_COOLDOWN,
+			Panacea.CHARM_COOLDOWN,
+			TransmutationRing.CHARM_COOLDOWN,
+			WardingRemedy.CHARM_COOLDOWN,
+			EsotericEnhancements.CHARM_COOLDOWN,
+			ScorchedEarth.CHARM_COOLDOWN,
+			Taboo.CHARM_COOLDOWN,
+			AmplifyingHex.CHARM_COOLDOWN,
+			CholericFlames.CHARM_COOLDOWN,
+			GraspingClaws.CHARM_COOLDOWN,
+			MelancholicLament.CHARM_COOLDOWN,
+			SanguineHarvest.CHARM_COOLDOWN,
+			SoulRend.CHARM_COOLDOWN,
+			HauntingShades.CHARM_COOLDOWN,
+			WitheringGaze.CHARM_COOLDOWN,
+			DarkPact.CHARM_COOLDOWN,
+			JudgementChain.CHARM_COOLDOWN,
+			VoodooBonds.CHARM_COOLDOWN,
+			EagleEye.CHARM_COOLDOWN,
+			HuntingCompanion.CHARM_COOLDOWN,
+			Volley.CHARM_COOLDOWN,
+			WindBomb.CHARM_COOLDOWN,
+			PredatorStrike.CHARM_COOLDOWN,
+			Quickdraw.CHARM_COOLDOWN,
+			TacticalManeuver.CHARM_COOLDOWN,
+			WhirlingBlade.CHARM_COOLDOWN,
+			EnergizingElixir.CHARM_PRICE
+		);
+	}
+
 	public boolean addCharm(Player p, ItemStack charm) {
 
 		if (p != null && mPlayerCharms.get(p.getUniqueId()) != null && validateCharm(p, charm)) {
@@ -1061,19 +1136,13 @@ public class CharmManager {
 					desc = desc.substring(0, desc.length() - 2);
 				}
 
+				String charmColor = getCharmEffectColor(allEffects.get(s) > 0, s);
+
 				if (s.contains("%")) {
-					if ((allEffects.get(s) > 0 && !s.contains("Cooldown")) || (allEffects.get(s) < 0 && s.contains("Cooldown"))) {
-						components.add(Component.text(desc + "%", TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false));
-					} else {
-						components.add(Component.text(desc + "%", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false));
-					}
-				} else {
-					if ((allEffects.get(s) > 0 && !s.contains("Cooldown")) || (allEffects.get(s) > 0 && s.contains("Cooldown"))) {
-						components.add(Component.text(desc, TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false));
-					} else {
-						components.add(Component.text(desc, TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false));
-					}
+					desc += "%";
 				}
+
+				components.add(Component.text(desc, TextColor.fromHexString(charmColor)).decoration(TextDecoration.ITALIC, false));
 			}
 		}
 		//Now add the custom charm effects
@@ -1244,6 +1313,26 @@ public class CharmManager {
 		double percentLevel = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
 
 		return (baseValue + flatLevel) * ((percentLevel / 100.0) + 1);
+	}
+
+	public static String getCharmEffectColor(boolean isPositive, String charmEffectName) {
+		String outColor = "#4AC2E5";
+		if (isPositive) {
+			for (String s : mInstance.mFlippedColorEffectSubstrings) {
+				if (charmEffectName.contains(s)) {
+					outColor = "#D02E28";
+					break;
+				}
+			}
+		} else {
+			for (String s : mInstance.mFlippedColorEffectSubstrings) {
+				if (charmEffectName.contains(s)) {
+					break;
+				}
+			}
+			outColor = "#D02E28";
+		}
+		return outColor;
 	}
 
 	private static class CharmParsedInfo {
