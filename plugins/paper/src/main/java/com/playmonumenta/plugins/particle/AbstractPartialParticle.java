@@ -15,7 +15,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	// https://minecraft.fandom.com/wiki/Commands/particle#Arguments
 	// https://papermc.io/javadocs/paper/1.16/org/bukkit/entity/Player.html#spawnParticle-org.bukkit.Particle-org.bukkit.Location-int-double-double-double-double-T-
 
-	private static final int PARTICLE_SPAWN_DISTANCE = 30;
+	private static final int PARTICLE_SPAWN_DISTANCE = 50;
 
 	public Particle mParticle;
 	public Location mLocation;

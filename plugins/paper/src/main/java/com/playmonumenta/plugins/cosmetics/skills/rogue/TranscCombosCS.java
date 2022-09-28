@@ -50,18 +50,18 @@ public class TranscCombosCS extends ViciousCombosCS {
 		eLoc.setPitch(0);
 		eLoc.setYaw(mPlayer.getLocation().getYaw());
 
-		world.playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 2f, 0.75f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 2f, 0.85f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 2f, 1.25f);
+		world.playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 1, 0.75f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 0.85f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1.25f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 0.75f);
 
 		Location finalLoc = loc;
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			world.playSound(finalLoc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 2f, 1.25f);
-			world.playSound(finalLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 2f, 1.25f);
-			world.playSound(finalLoc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 2f, 1.25f);
-			world.playSound(finalLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 2f, 1.25f);
-			world.playSound(finalLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 0.75f);
+			world.playSound(finalLoc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 1, 1.25f);
+			world.playSound(finalLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 1.25f);
+			world.playSound(finalLoc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 1, 1.25f);
+			world.playSound(finalLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1.25f);
+			world.playSound(finalLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1, 0.75f);
 			world.playSound(finalLoc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1f, 0.75f);
 		}, 2);
 
@@ -241,7 +241,7 @@ public class TranscCombosCS extends ViciousCombosCS {
 
 		loc.setDirection(dir);
 
-		ParticleUtils.drawParticleLineSlash(loc, dir, 0, LINE_LENGTH, 0.075, 5,
+		ParticleUtils.drawParticleLineSlash(loc, dir, 0, LINE_LENGTH, 0.05, 5,
 			(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
 				float size = (float) (0.3f + (0.35f * middleProgress));
 				new PartialParticle(Particle.REDSTONE, lineLoc, 3, 0.05, 0.05, 0.05, 0.25,
