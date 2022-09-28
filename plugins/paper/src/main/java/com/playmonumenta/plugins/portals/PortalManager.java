@@ -39,7 +39,8 @@ public class PortalManager implements Listener {
 		Material.AIR,
 		Material.WATER,
 		Material.LAVA,
-		Material.VINE
+		Material.VINE,
+		Material.LIGHT
 	);
 	public static final Set<Material> TRANSPARENT_BLOCKS_2 = Set.of(
 		Material.ORANGE_STAINED_GLASS,
@@ -47,7 +48,8 @@ public class PortalManager implements Listener {
 		Material.AIR,
 		Material.WATER,
 		Material.LAVA,
-		Material.VINE
+		Material.VINE,
+		Material.LIGHT
 	);
 
 	private static @Nullable PortalManager INSTANCE = null;
