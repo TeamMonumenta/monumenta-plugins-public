@@ -193,8 +193,10 @@ public class CharmManager {
 		return mInstance;
 	}
 
+	// Adding new Charm Effects:
+	// Add the string in this list, with other effects from the same ability/enchantment
+	// If it is a "debuff" (i.e. a greater number is worse), then ALSO list it in the next method
 	public void loadCharmEffects() {
-		//TODO load new charm effects here
 		mCharmEffectList = Arrays.asList(
 			// Custom Enchantments
 			Inferno.CHARM_DAMAGE,
@@ -742,6 +744,7 @@ public class CharmManager {
 			IntoxicatingWarmth.CHARM_COOLDOWN,
 			TemporalBender.CHARM_COOLDOWN,
 			LiquidCourage.CHARM_COOLDOWN,
+			ElementalArrows.CHARM_THUNDER_COOLDOWN,
 			ManaLance.CHARM_COOLDOWN,
 			ThunderStep.CHARM_COOLDOWN,
 			PrismaticShield.CHARM_COOLDOWN,
@@ -778,13 +781,16 @@ public class CharmManager {
 			Challenge.CHARM_COOLDOWN,
 			ShieldWall.CHARM_COOLDOWN,
 			IronTincture.CHARM_COOLDOWN,
+			EnergizingElixir.CHARM_PRICE,
 			UnstableAmalgam.CHARM_COOLDOWN,
 			Panacea.CHARM_COOLDOWN,
 			TransmutationRing.CHARM_COOLDOWN,
 			WardingRemedy.CHARM_COOLDOWN,
 			EsotericEnhancements.CHARM_COOLDOWN,
+			EsotericEnhancements.CHARM_FUSE,
 			ScorchedEarth.CHARM_COOLDOWN,
 			Taboo.CHARM_COOLDOWN,
+			Taboo.CHARM_SELF_DAMAGE,
 			AmplifyingHex.CHARM_COOLDOWN,
 			CholericFlames.CHARM_COOLDOWN,
 			GraspingClaws.CHARM_COOLDOWN,
@@ -803,8 +809,7 @@ public class CharmManager {
 			PredatorStrike.CHARM_COOLDOWN,
 			Quickdraw.CHARM_COOLDOWN,
 			TacticalManeuver.CHARM_COOLDOWN,
-			WhirlingBlade.CHARM_COOLDOWN,
-			EnergizingElixir.CHARM_PRICE
+			WhirlingBlade.CHARM_COOLDOWN
 		);
 	}
 
