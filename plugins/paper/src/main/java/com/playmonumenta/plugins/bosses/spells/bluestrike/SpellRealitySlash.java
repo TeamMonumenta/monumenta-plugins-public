@@ -37,7 +37,6 @@ public class SpellRealitySlash extends Spell {
 
 	private boolean mCooldown;
 	private int mPhase;
-	private boolean mRemoveLines;
 
 	private static final Particle.DustOptions BLACK_COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.0f);
 
@@ -244,7 +243,7 @@ public class SpellRealitySlash extends Spell {
 					}
 				}
 
-				if (mT >= LINGERING_DURATION || mRemoveLines || mPhase != mSamwell.mPhase) {
+				if (mT >= LINGERING_DURATION || mPhase != mSamwell.mPhase || mSamwell.mDefeated) {
 					this.cancel();
 					for (Map.Entry<Location, Material> e : oldBlocks.entrySet()) {
 						if (e.getKey().getBlock().getType() != Material.AIR) {
@@ -268,13 +267,6 @@ public class SpellRealitySlash extends Spell {
 		} else {
 			return 5 * 20;
 		}
-	}
-
-	@Override
-	public void cancel() {
-		super.cancel();
-
-		mRemoveLines = true;
 	}
 
 	@Override
