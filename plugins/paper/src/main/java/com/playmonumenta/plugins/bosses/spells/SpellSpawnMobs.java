@@ -11,6 +11,7 @@ public class SpellSpawnMobs extends Spell {
 	public static final int MOB_CAP = 15;
 
 	private final int mSummonRange;
+	private final int mMinSummonRange;
 	private final int mCooldownTicks;
 	private final String mSummonName;
 	private final int mSpawns;
@@ -18,8 +19,13 @@ public class SpellSpawnMobs extends Spell {
 	private final LivingEntity mBoss;
 
 	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, int range) {
+		this(boss, spawns, losname, cooldown, range, 0);
+	}
+
+	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, int range, int minrange) {
 		mBoss = boss;
 		mSummonRange = range;
+		mMinSummonRange = minrange;
 		mCooldownTicks = cooldown;
 		mSummonName = losname;
 		mSpawns = spawns;
@@ -28,9 +34,14 @@ public class SpellSpawnMobs extends Spell {
 	@Override
 	public void run() {
 		Location loc = mBoss.getLocation();
+
 		for (int i = 0; i < mSpawns; i++) {
-			double x = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
-			double z = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
+			double r = FastUtils.randomDoubleInRange(mMinSummonRange, mSummonRange);
+			double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
+
+			double x = r * Math.cos(theta);
+			double z = r * Math.sin(theta);
+
 			Location sLoc = loc.clone().add(x, 0.25, z);
 			LibraryOfSoulsIntegration.summon(sLoc, mSummonName);
 		}

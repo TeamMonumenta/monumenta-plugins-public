@@ -14,6 +14,8 @@ public class SpawnMobsBoss extends BossAbilityGroup {
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "not written")
 		public int RANGE = 9;
+		@BossParam(help = "Minimum Distance from Boss to spawn each mob.")
+		public int MIN_RANGE = 0;
 		@BossParam(help = "not written")
 		public int DELAY = 100;
 		@BossParam(help = "not written")
@@ -36,7 +38,7 @@ public class SpawnMobsBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellSpawnMobs(boss, p.SPAWNCOUNT, p.SPAWNEDMOB, p.COOLDOWN, p.RANGE)
+			new SpellSpawnMobs(boss, p.SPAWNCOUNT, p.SPAWNEDMOB, p.COOLDOWN, p.RANGE, p.MIN_RANGE)
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
