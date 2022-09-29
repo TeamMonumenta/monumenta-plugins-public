@@ -52,6 +52,7 @@ public class JudgementChain extends Ability {
 	private static final double BUFF_AMOUNT = 0.1;
 	private static final int RANGE = 16;
 	private static final double HITBOX_LENGTH = 0.5;
+	private static final double L2_RESIST_AMOUNT = -0.1;
 
 	private static final String EFFECT_NAME = "JudgementChainEffectName";
 	private static final String SPEED_NAME = "JudgementChainSpeedEffect";
@@ -62,6 +63,7 @@ public class JudgementChain extends Ability {
 	private static final String HEAL_NAME = "JudgementChainRegenEffect";
 	private static final String DOT_NAME = "JudgementChainDOTEffect";
 	private static final String HEAL_RATE_NAME = "JudgementChainPercentHealEffect";
+	private static final String L2_RESIST_NAME = "JudgementChainL2DefenseEffect";
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
 		DamageType.MELEE,
 		DamageType.MELEE_ENCH,
@@ -90,7 +92,7 @@ public class JudgementChain extends Ability {
 		mInfo.mScoreboardId = "JudgementChain";
 		mInfo.mShorthandName = "JC";
 		mInfo.mDescriptions.add("Press the swap key while not sneaking targeting a non-boss hostile mob to conjure an unbreakable chain, linking the Reaper and the mob. As long as another mob is within 8 blocks, the mob becomes immortal for 20 seconds, can only target or damage the Reaper, is slowed by 25%, and deals 50% less damage. All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at 10%. Pressing swap while a mob is already chained will pull it towards you, dealing 20 magic damage and breaking the chain. Walking 16+ blocks away will deal damage but not pull the mob. Cooldown: 25s.");
-		mInfo.mDescriptions.add("When breaking the chain, apply all the positively inverted debuffs to other players and all debuffs (capped at 10%) to other mobs in an 8 block radius of the player for 10s. Additionally, deal 20 magic damage to all mobs in a 4 block radius of the player.");
+		mInfo.mDescriptions.add("While a mob is chained, the reaper gains 10% damage resistance. When breaking the chain, apply all the positively inverted debuffs to other players and all debuffs (capped at 10%) to other mobs in an 8 block radius of the player for 10s. Additionally, deal 20 magic damage to all mobs in a 4 block radius of the player.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.CHAIN, 1);
@@ -169,6 +171,7 @@ public class JudgementChain extends Ability {
 						}
 
 						applyEffects(mPlayer, false);
+						mPlugin.mEffectManager.addEffect(mPlayer, L2_RESIST_NAME, new PercentDamageReceived(20, L2_RESIST_AMOUNT));
 
 						List<LivingEntity> mobs = EntityUtils.getMobsInLine(l, chainVector, l.distance(mLoc), HITBOX_LENGTH);
 						mobs.remove(mTarget);

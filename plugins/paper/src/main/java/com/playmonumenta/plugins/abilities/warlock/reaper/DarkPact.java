@@ -35,14 +35,11 @@ public class DarkPact extends Ability {
 	private static final int PERCENT_HEAL = -1;
 	private static final String AESTHETICS_EFFECT_NAME = "DarkPactAestheticsEffect";
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "DarkPactPercentDamageDealtEffect";
-	private static final String PERCENT_ATKS_EFFECT_NAME = "DarkPactPercentAtksEffect";
 	private static final int DURATION = 20 * 7;
 	private static final int DURATION_INCREASE_ON_KILL = 20 * 1;
-	private static final double PERCENT_DAMAGE_DEALT_1 = 0.3;
-	private static final double PERCENT_DAMAGE_DEALT_2 = 0.6;
+	private static final double PERCENT_DAMAGE_DEALT_1 = 0.4;
+	private static final double PERCENT_DAMAGE_DEALT_2 = 0.7;
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE);
-	private static final double PERCENT_ATKS_1 = 0.1;
-	private static final double PERCENT_ATKS_2 = 0.2;
 	private static final int ABSORPTION_ON_KILL = 1;
 	private static final int MAX_ABSORPTION = 6;
 	private static final int COOLDOWN = 20 * 14;
@@ -56,7 +53,6 @@ public class DarkPact extends Ability {
 	public static final String CHARM_ABSORPTION = "Dark Pact Absorption Health Per Kill";
 
 	private final double mPercentDamageDealt;
-	private final double mPercentAtks;
 	private @Nullable JudgementChain mJudgementChain;
 	private boolean mActive = false;
 
@@ -64,14 +60,13 @@ public class DarkPact extends Ability {
 		super(plugin, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain +10% attack speed, and deal +30% melee damage on your scythe attacks. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
-		mInfo.mDescriptions.add("You gain +20% attack speed and attacks with a scythe deal +60% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
+		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, your scythe attacks deal +40% melee damage. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
+		mInfo.mDescriptions.add("Attacks with a scythe deal +70% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.SOUL_SAND, 1);
 		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? PERCENT_DAMAGE_DEALT_1 : PERCENT_DAMAGE_DEALT_2);
-		mPercentAtks = CharmManager.getLevelPercentDecimal(player, CHARM_ATTACK_SPEED) + (isLevelOne() ? PERCENT_ATKS_1 : PERCENT_ATKS_2);
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -101,7 +96,6 @@ public class DarkPact extends Ability {
 			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(duration, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES, 0, (entity, enemy) -> entity instanceof Player player && ItemUtils.isHoe(player.getInventory().getItemInMainHand())));
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_ATKS_EFFECT_NAME, new PercentAttackSpeed(duration, mPercentAtks, PERCENT_ATKS_EFFECT_NAME));
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(duration, PERCENT_HEAL));
 			mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(duration,
 					(entity, fourHertz, twoHertz, oneHertz) -> {
@@ -134,12 +128,6 @@ public class DarkPact extends Ability {
 		NavigableSet<Effect> percentDamageEffects = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME);
 		if (percentDamageEffects != null) {
 			for (Effect effect : percentDamageEffects) {
-				effect.setDuration(effect.getDuration() + duration);
-			}
-		}
-		NavigableSet<Effect> percentAtksEffects = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_ATKS_EFFECT_NAME);
-		if (percentAtksEffects != null) {
-			for (Effect effect : percentAtksEffects) {
 				effect.setDuration(effect.getDuration() + duration);
 			}
 		}

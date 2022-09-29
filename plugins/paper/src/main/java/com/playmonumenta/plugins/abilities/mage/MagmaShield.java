@@ -51,7 +51,7 @@ public class MagmaShield extends Ability {
 	public static final int COOLDOWN_SECONDS = 12;
 	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
 	public static final float ENHANCEMENT_FIRE_DAMAGE_BONUS = 0.5f;
-	public static final float ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS = 0.2f;
+	public static final float ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS = 0.35f;
 	public static final String ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME = "MagmaShieldFireDamageBonus";
 	public static final String ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME = "MagmaShieldFireAbilityDamageBonus";
 	public static final int ENHANCEMENT_BONUS_DURATION = 6 * 20;

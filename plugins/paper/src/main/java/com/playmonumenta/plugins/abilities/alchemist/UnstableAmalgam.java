@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.UnstableAmalgamEnhancementEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -59,7 +58,6 @@ public class UnstableAmalgam extends Ability {
 	private static final float UNSTABLE_AMALGAM_KNOCKBACK_SPEED = 2.5f;
 	private static final int UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION = 20 * 8;
 	private static final double UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE = 0.4;
-	private static final String UNSTABLE_AMALGAM_ENHANCEMENT_EFFECT_NAME = "UnstableAmalgamEnhancementEffectName";
 
 	public static final String CHARM_COOLDOWN = "Unstable Amalgam Cooldown";
 	public static final String CHARM_DAMAGE = "Unstable Amalgam Damage";
@@ -83,7 +81,7 @@ public class UnstableAmalgam extends Ability {
 		mInfo.mShorthandName = "UA";
 		mInfo.mDescriptions.add("Shift left click while holding an Alchemist's Bag to consume a potion to place an Amalgam with 1 health at the location you are looking, up to 7 blocks away. Shift left click again to detonate it, dealing your Alchemist Potion's damage + 12 magic damage to mobs in a 4 block radius and applying potion effects from all abilities. The Amalgam also explodes when killed, or 3 seconds after being placed. Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion. Cooldown: 20s.");
 		mInfo.mDescriptions.add("The damage is increased to 20 and the cooldown is reduced to 16s.");
-		mInfo.mDescriptions.add("Enemies and allies affected by the Amalgam become unstable for 8s. When an unstable mob is damaged by an unstable player or dies for any reason, a potion that deals 40% of your potion damage is dropped at its location. Each unstable player can only trigger this once. These potions apply both Brutal and Gruesome effects.");
+		mInfo.mDescriptions.add("Enemies hit by the Amalgam's explosion become unstable. When an unstable mob is killed, a potion that deals 40% of your potion damage is dropped at its location. These potions apply both Brutal and Gruesome effects.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? UNSTABLE_AMALGAM_1_COOLDOWN : UNSTABLE_AMALGAM_2_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
@@ -221,10 +219,6 @@ public class UnstableAmalgam extends Ability {
 			if (!mobs.isEmpty()) {
 				unstableMobs(mobs, duration);
 			}
-
-			for (Player player : PlayerUtils.playersInRange(loc, radius, true)) {
-				unstableAlly(player, duration);
-			}
 		}
 
 		if (!ZoneUtils.hasZoneProperty(loc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
@@ -271,17 +265,11 @@ public class UnstableAmalgam extends Ability {
 					}
 				}
 
-				if (mobs.isEmpty() || mTimes >= duration) {
+				if (mobs.isEmpty() || mTimes >= duration || !mPlayer.isValid()) {
 					cancel();
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
-	}
-
-	private void unstableAlly(Player player, int duration) {
-		if (mPlayer != null) {
-			mPlugin.mEffectManager.addEffect(player, UNSTABLE_AMALGAM_ENHANCEMENT_EFFECT_NAME, new UnstableAmalgamEnhancementEffect(duration, mPlayer, this, mPlayerItemStats));
-		}
 	}
 
 	public void setEnhancementThrownPotion(ThrownPotion potion, ItemStatManager.PlayerItemStats playerItemStats) {

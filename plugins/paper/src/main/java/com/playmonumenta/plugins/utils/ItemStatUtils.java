@@ -336,7 +336,7 @@ public class ItemStatUtils {
 		SCIENCE("science", Component.text("P.O.R.T.A.L.", TextColor.fromHexString("#DCE8E3")).decoration(TextDecoration.ITALIC, false)),
 		BLUESTRIKE("bluestrike", Component.text("Masquerader’s Ruin", TextColor.fromHexString("#326DA8")).decoration(TextDecoration.ITALIC, false)),
 		GALLERYOFFEAR("gallerybase", Component.text("Gallery of Fear", TextColor.fromHexString("#39B14E")).decoration(TextDecoration.ITALIC, false)),
-		GOFMAPONE("gallery1", Component.text("Sanguine Halls", TextColor.fromHexString("#AB000")).decoration(TextDecoration.ITALIC, false)),
+		GOFMAPONE("gallery1", Component.text("Sanguine Halls", TextColor.fromHexString("#AB0000")).decoration(TextDecoration.ITALIC, false)),
 		AMBER("amber", Component.text("item name color", TextColor.fromHexString("#FFBF00")).decoration(TextDecoration.ITALIC, false)),
 		GOLD("gold", Component.text("item name color", TextColor.fromHexString("#FFD700")).decoration(TextDecoration.ITALIC, false)),
 		DARKBLUE("darkblue", Component.text("itemnamecolor", TextColor.fromHexString("#FFFFAA")).decoration(TextDecoration.ITALIC, false)),

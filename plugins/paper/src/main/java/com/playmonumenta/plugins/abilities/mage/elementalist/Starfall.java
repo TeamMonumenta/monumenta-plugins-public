@@ -34,7 +34,7 @@ public class Starfall extends Ability {
 	public static final int DAMAGE_2 = 23;
 	public static final int SIZE = 5;
 	public static final int DISTANCE = 25;
-	public static final int FIRE_SECONDS = 3;
+	public static final int FIRE_SECONDS = 5;
 	public static final int FIRE_TICKS = FIRE_SECONDS * 20;
 	public static final float KNOCKBACK = 0.7f;
 	public static final int COOLDOWN_SECONDS = 18;
