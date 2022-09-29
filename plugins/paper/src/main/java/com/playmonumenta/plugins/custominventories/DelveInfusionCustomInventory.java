@@ -303,7 +303,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack keepItem = new ItemStack(Material.CRACKED_STONE_BRICKS);
 		ItemMeta keepMeta = keepItem.getItemMeta();
 		keepMeta.displayName(Component.text("Grace", TextColor.fromCSSHexString("#C4BBA5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(keepMeta, "Gain 2% attack speed per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(keepMeta, "Gain 1.5% attack speed per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		keepItem.setItemMeta(keepMeta);
 		mDelvePannelList.add(keepItem);
 
@@ -574,7 +574,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.CRACKED_STONE_BRICKS, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Grace level " + (i + 1), TextColor.fromCSSHexString("#C4BBA5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Gain " + 2 * (i + 1) + "% attack speed.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Gain " + 1.5 * (i + 1) + "% attack speed.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			keepItems.add(pannel);
 		}
