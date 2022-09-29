@@ -102,7 +102,7 @@ public class ThunderStep extends Ability {
 			)
 		);
 		mInfo.mDescriptions.add(
-			String.format("Within %ss of casting, use the same trigger to return to the original starting location, stunning but not damaging nearby mobs." +
+			String.format("Within %ss of casting, use the same trigger to return to the original starting location." +
 					" If you do not do so, your next Thunder Step within %ss will paralyze enemies for %ss.",
 				BACK_TELEPORT_MAX_DELAY / 20,
 				ENHANCEMENT_BONUS_DAMAGE_TIMER / 20,
