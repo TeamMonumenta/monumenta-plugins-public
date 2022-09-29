@@ -60,6 +60,10 @@ public class Stamina implements Enchantment {
 
 	private void applyStamina(Plugin plugin, Player player, double level, DamageType type) {
 		NavigableSet<Effect> s = plugin.mEffectManager.getEffects(player, STAMINA_EFFECT);
+		if (s != null && s.last().getDuration() > DURATION - 20) {
+			// attacked within 1s, do not run anything/refresh effect
+			return;
+		}
 		double currStamina = 0;
 		if (s != null) {
 			currStamina = s.last().getMagnitude();
