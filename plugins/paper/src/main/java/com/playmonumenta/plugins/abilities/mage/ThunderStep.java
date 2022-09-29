@@ -64,7 +64,7 @@ public class ThunderStep extends Ability {
 
 	public static final String CHARM_DAMAGE = "Thunder Step Damage";
 	public static final String CHARM_COOLDOWN = "Thunder Step Cooldown";
-	public static final String CHARM_SIZE = "Thunder Step Effect Size";
+	public static final String CHARM_RADIUS = "Thunder Step Radius";
 	public static final String CHARM_DISTANCE = "Thunder Step Distance";
 
 	private final float mLevelDamage;
@@ -203,11 +203,13 @@ public class ThunderStep extends Ability {
 	private void doDamage(Location location, float spellDamage, boolean enhancementParalyze) {
 		World world = location.getWorld();
 		world.playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 1.5f);
-		new PartialParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_AQUA).spawnAsPlayerActive(mPlayer);
+		double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, SIZE);
+
+		double ratio = radius / SIZE;
+		new PartialParticle(Particle.REDSTONE, location, (int) (100 * ratio * ratio), 2.5 * ratio, 2.5 * ratio, 2.5 * ratio, 3, COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, location, (int) (100 * ratio * ratio), 2.5 * ratio, 2.5 * ratio, 2.5 * ratio, 3, COLOR_AQUA).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10).spawnAsPlayerActive(mPlayer);
-		double size = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, SIZE);
-		List<LivingEntity> enemies = EntityUtils.getNearbyMobs(location, size);
+		List<LivingEntity> enemies = EntityUtils.getNearbyMobs(location, radius);
 		// The more enemies, the fewer particles for each one
 		int mobParticles = Math.max(
 			1,

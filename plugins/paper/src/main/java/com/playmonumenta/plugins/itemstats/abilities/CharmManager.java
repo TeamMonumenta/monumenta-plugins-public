@@ -249,7 +249,7 @@ public class CharmManager {
 			ThunderStep.CHARM_DAMAGE,
 			ThunderStep.CHARM_COOLDOWN,
 			ThunderStep.CHARM_DISTANCE,
-			ThunderStep.CHARM_SIZE,
+			ThunderStep.CHARM_RADIUS,
 			PrismaticShield.CHARM_DURATION,
 			PrismaticShield.CHARM_KNOCKBACK,
 			PrismaticShield.CHARM_STUN,
