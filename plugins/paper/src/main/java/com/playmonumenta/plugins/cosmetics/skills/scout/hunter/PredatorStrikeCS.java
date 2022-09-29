@@ -37,6 +37,7 @@ public class PredatorStrikeCS implements CosmeticSkill {
 		new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLAME, bLoc, 2, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
 	}
+
 	public void strikeSoundReady(World world, Player mPlayer) {
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, 1, 1.0f);
 	}

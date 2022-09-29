@@ -103,10 +103,8 @@ public class Volley extends Ability {
 			public void run() {
 				// Store PotionData from the original arrow only if it is weakness or slowness
 				PotionData tArrowData = null;
-				int fireticks = 0;
 
 				if (projectile instanceof Arrow regularArrow) {
-					fireticks = regularArrow.getFireTicks();
 					if (regularArrow.hasCustomEffects()) {
 						tArrowData = regularArrow.getBasePotionData();
 						if (tArrowData.getType() != PotionType.SLOWNESS && tArrowData.getType() != PotionType.WEAKNESS) {

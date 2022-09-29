@@ -59,7 +59,7 @@ public class AmplifyingHex extends Ability {
 	public static final String CHARM_EFFECT = "Amplifying Hex Damage per Effect Potency";
 
 	private final float mAmplifierDamage;
-	private final float mAmplifierCap;
+	private final int mAmplifierCap;
 	private final float mRadius;
 	private float mRegionCap;
 	private float mDamage = 0f;
@@ -78,7 +78,7 @@ public class AmplifyingHex extends Ability {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
 		mAmplifierDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2);
-		mAmplifierCap = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2);
+		mAmplifierCap = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2);
 		mRadius = (float) CharmManager.getRadius(player, CHARM_RANGE, isLevelOne() ? RADIUS_1 : RADIUS_2);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AmplifyingHexCS(), AmplifyingHexCS.SKIN_LIST);

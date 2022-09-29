@@ -923,7 +923,7 @@ public class EntityListener implements Listener {
 			mAbilities.potionEffectApplyEvent(player, event);
 		}
 
-		if (applier instanceof Dolphin && type == PotionEffectType.DOLPHINS_GRACE && applier.getScoreboardTags().contains("boss_no_dolphins_grace")) {
+		if (applier instanceof Dolphin && type.equals(PotionEffectType.DOLPHINS_GRACE) && applier.getScoreboardTags().contains("boss_no_dolphins_grace")) {
 			event.setCancelled(true);
 		}
 	}

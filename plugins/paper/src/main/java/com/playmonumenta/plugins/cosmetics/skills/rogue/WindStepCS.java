@@ -17,6 +17,7 @@ public class WindStepCS extends AdvancingShadowsCS {
 
 	public static final String NAME = "Wind Step";
 	private static final Color TRAIL_COLOR_BRIGHT = Color.fromRGB(227, 255, 234);
+
 	@Override
 	public Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),

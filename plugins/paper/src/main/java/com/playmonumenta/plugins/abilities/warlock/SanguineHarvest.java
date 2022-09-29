@@ -64,7 +64,6 @@ public class SanguineHarvest extends Ability {
 	private final double mRadius;
 	private final double mBleedLevel;
 	private final double mHealPercent;
-	private int mRightClicks = 0;
 
 	private ArrayList<Location> mMarkedLocations = new ArrayList<>(); // To mark locations (Even if block is not replaced)
 

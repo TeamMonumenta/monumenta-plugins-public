@@ -65,7 +65,6 @@ public class Quickdraw extends Ability {
 			return;
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isProjectileWeapon(inMainHand)) {
 			World world = mPlayer.getWorld();
 
