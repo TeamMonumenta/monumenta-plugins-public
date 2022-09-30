@@ -91,7 +91,7 @@ public class PercentDamageDealt extends Effect {
 
 	@Override
 	public @Nullable String getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Damage Dealt";
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + StringUtils.getDamageTypeString(mAffectedDamageTypes) + " Damage Dealt";
 	}
 
 	@Override

@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.events.DamageEvent;
 import java.text.DecimalFormat;
+import java.util.EnumSet;
 import java.util.TreeMap;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StringUtils {
 
@@ -168,6 +171,38 @@ public class StringUtils {
 		} else {
 			return Double.toString(d);
 		}
+	}
+
+	public static String getDamageTypeString(@Nullable EnumSet<DamageEvent.DamageType> types) {
+		String string = "";
+
+		if (types != null) {
+			for (DamageEvent.DamageType type : types) {
+				String typeString;
+				switch (type) {
+					case MELEE, MELEE_ENCH, MELEE_SKILL -> typeString = "Melee";
+					case PROJECTILE, PROJECTILE_SKILL -> typeString = "Projectile";
+					case MAGIC -> typeString = "Magic";
+					// We don't care about other types for now
+					default -> typeString = null;
+				}
+				if (typeString != null) {
+					if (!string.isEmpty() && !typeString.equals(string)) {
+						// There's two different types here - don't specify
+						string = "";
+						break;
+					}
+					string = typeString;
+				}
+			}
+		}
+
+		// Add a space before
+		if (!string.isEmpty()) {
+			string = " " + string;
+		}
+
+		return string;
 	}
 
 	public static String capitalizeWords(String str) {

@@ -85,7 +85,7 @@ public class FlatDamageDealt extends Effect {
 
 	@Override
 	public @Nullable String getSpecificDisplay() {
-		return "+" + StringUtils.to2DP(mAmount) + " Flat Damage Dealt";
+		return "+" + StringUtils.to2DP(mAmount) + StringUtils.getDamageTypeString(mAffectedDamageTypes) + " Flat Damage Dealt";
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -39,7 +40,6 @@ public class NegateDamage extends Effect {
 
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
-		//TODO this might have order issues, i.e. triggering after riposte
 		if (mCount > 0 && (mAffectedTypes == null || mAffectedTypes.contains(event.getType())) && !event.isCancelled() && !event.isBlockedByShield()) {
 			event.setCancelled(true);
 			World world = entity.getWorld();
@@ -97,6 +97,14 @@ public class NegateDamage extends Effect {
 	@Override
 	public boolean isBuff() {
 		return true;
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		if (mCount <= 0) {
+			return null;
+		}
+		return "+" + mCount + StringUtils.getDamageTypeString(mAffectedTypes) + " Damage Blocked";
 	}
 
 	@Override
