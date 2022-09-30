@@ -7,11 +7,14 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -145,6 +148,29 @@ public class CharmsCommand extends GenericCommand {
 			Player player = (Player) args[0];
 			new CharmsGUI(player).openInventory(player, plugin);
 		}).register();
+
+		arguments.clear();
+		arguments.add(new LiteralArgument("search"));
+		arguments.add(new GreedyStringArgument("key"));
+
+		new CommandAPICommand("charm")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				String key = (String) args[0];
+				List<String> results = new ArrayList<>();
+				for (String effect : CharmManager.getInstance().mCharmEffectList) {
+					if (effect.contains(key)) {
+						results.add(effect);
+					}
+				}
+				if (results.isEmpty()) {
+					player.sendMessage(ChatColor.RED + "No effects found containing " + ChatColor.DARK_RED + key);
+				} else {
+					player.sendMessage("Found " + results.size() + " effects containing " + ChatColor.GREEN + key);
+					results.forEach(effect -> player.sendMessage(Component.text(effect, TextColor.fromHexString("#4AC2E5"))));
+				}
+			}).register();
 
 	}
 }
