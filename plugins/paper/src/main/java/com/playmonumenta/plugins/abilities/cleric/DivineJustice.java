@@ -274,15 +274,20 @@ public class DivineJustice extends Ability {
 	}
 
 	public void applyEnhancementEffect(Player player, boolean fromBoneShard) {
+		int existingEffectDuration = 0;
 		double existingEffectAmount = 0;
 		NavigableSet<Effect> existingEffects = mPlugin.mEffectManager.clearEffects(player, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
 		if (existingEffects != null) {
-			existingEffectAmount = existingEffects.stream().findFirst().get().getMagnitude();
+			Effect existingEffect = existingEffects.stream().findFirst().get();
+			existingEffectDuration = existingEffect.getDuration();
+			existingEffectAmount = existingEffect.getMagnitude();
 		}
+
+		int duration = fromBoneShard ? ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION : Math.max(existingEffectDuration, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION);
+		double bonusDamage = fromBoneShard ? ENHANCEMENT_BONUS_DAMAGE_MAX : Math.min(existingEffectAmount + ENHANCEMENT_ASH_BONUS_DAMAGE, ENHANCEMENT_BONUS_DAMAGE_MAX);
+
 		mPlugin.mEffectManager.addEffect(player, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME,
-			new PercentDamageDealt(fromBoneShard ? ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION : ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION,
-				fromBoneShard ? ENHANCEMENT_BONUS_DAMAGE_MAX : Math.min(existingEffectAmount + ENHANCEMENT_ASH_BONUS_DAMAGE, ENHANCEMENT_BONUS_DAMAGE_MAX),
-				null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy, mCrusade)));
+			new PercentDamageDealt(duration, bonusDamage, null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy, mCrusade)));
 	}
 
 	@Override
