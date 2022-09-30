@@ -433,6 +433,7 @@ public class CharmManager {
 			DefensiveLine.CHARM_DURATION,
 			DefensiveLine.CHARM_KNOCKBACK,
 			DefensiveLine.CHARM_REDUCTION,
+			DefensiveLine.CHARM_RANGE,
 			DefensiveLine.CHARM_NEGATIONS,
 			Frenzy.CHARM_ATTACK_SPEED,
 			Frenzy.CHARM_SPEED,

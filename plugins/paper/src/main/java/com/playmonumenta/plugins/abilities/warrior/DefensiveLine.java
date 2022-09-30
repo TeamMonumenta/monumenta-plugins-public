@@ -44,7 +44,7 @@ public class DefensiveLine extends Ability {
 	public static final String CHARM_REDUCTION = "Defensive Line Resistance";
 	public static final String CHARM_DURATION = "Defensive Line Duration";
 	public static final String CHARM_COOLDOWN = "Defensive Line Cooldown";
-	public static final String CHARM_RADIUS = "Defensive Line Range";
+	public static final String CHARM_RANGE = "Defensive Line Range";
 	public static final String CHARM_KNOCKBACK = "Defensive Line Knockback";
 	public static final String CHARM_NEGATIONS = "Defensive Line Damage Negation";
 
@@ -79,7 +79,7 @@ public class DefensiveLine extends Ability {
 
 					int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 
-					List<Player> players = PlayerUtils.playersInRange(location, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), true);
+					List<Player> players = PlayerUtils.playersInRange(location, CharmManager.getRadius(mPlayer, CHARM_RANGE, RADIUS), true);
 					players.removeIf(player -> player.getScoreboardTags().contains("disable_class"));
 
 					for (Player player : players) {
@@ -91,7 +91,7 @@ public class DefensiveLine extends Ability {
 							mPlugin.mEffectManager.addEffect(player, NEGATE_DAMAGE_EFFECT_NAME, new NegateDamage(duration, (int) (1 + CharmManager.getLevel(mPlayer, CHARM_NEGATIONS)), EnumSet.of(DamageEvent.DamageType.MELEE), new PartialParticle(Particle.FIREWORKS_SPARK, loc, 5, 0, 0, 0, 0.25f)));
 						}
 
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, KNOCK_AWAY_RADIUS), mPlayer)) {
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, KNOCK_AWAY_RADIUS), mPlayer)) {
 							MovementUtils.knockAway(player, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED), true);
 						}
 					}
