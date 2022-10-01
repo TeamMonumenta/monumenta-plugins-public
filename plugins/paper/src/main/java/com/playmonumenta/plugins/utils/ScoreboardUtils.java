@@ -123,4 +123,10 @@ public class ScoreboardUtils {
 		}
 	}
 
+	public static int getScoreOrDefault(Entity entity, String objectiveName, int defaultResult) {
+		if (!getScoreboardValue(entity, objectiveName).isPresent()) {
+			return defaultResult;
+		}
+		return getScoreboardValue(entity, objectiveName).get();
+	}
 }

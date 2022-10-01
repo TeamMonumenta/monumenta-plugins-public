@@ -94,7 +94,7 @@ public class CosmeticSkills {
 		return COSMETIC_SKILLS.keySet().toArray(new String[0]);
 	}
 
-	public static ImmutableList<String> getDepthNames() {
+	public static ImmutableList<String> getDepthsNames() {
 		return ImmutableList.<String>builder()
 			.add(SunriseBrewCS.NAME)
 			.add(DarkPunishmentCS.NAME)
@@ -106,7 +106,7 @@ public class CosmeticSkills {
 			.build();
 	}
 
-	public static ImmutableList<String> getDelveNames() {
+	public static ImmutableList<String> getDelvesNames() {
 		return ImmutableList.<String>builder()
 			.add(GruesomeEchoesCS.NAME)
 			.add(TouchOfEntropyCS.NAME)

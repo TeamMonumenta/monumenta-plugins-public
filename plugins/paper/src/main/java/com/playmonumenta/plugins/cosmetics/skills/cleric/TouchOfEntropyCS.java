@@ -98,12 +98,12 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 					for (double degree = 30; degree <= 150; degree += 5) {
 						double radian1 = FastMath.toRadians(degree);
 						double percent = FastMath.abs(degree - 90) / 60;
-						double y = 1 * FastUtils.sin(Math.PI * ((mRadius + 0.5) / range));
+						double y = 0.6 * FastUtils.sin(Math.PI * ((mRadius + 0.5) / range));
 						vec = new Vector(FastUtils.cos(radian1) * mRadius, y, FastUtils.sin(radian1) * mRadius);
 						vec = VectorUtils.rotateXAxis(vec, mLoc.getPitch());
 						vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
-						Location l = mLoc.clone().add(0, 0.125, 0).add(vec);
+						Location l = mLoc.clone().add(0, 0.1, 0).add(vec);
 						new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 							new Particle.DustOptions(damage ? ENTRO_COLOR : DRAIN_COLOR, 0.75f + (float) (percent * 0.5f)))
 							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
@@ -111,7 +111,7 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 							new PartialParticle(Particle.SMOKE_NORMAL, l, 1, 0.125f, 0.125f, 0.125f, 0.075)
 								.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 						} else {
-							new PartialParticle(Particle.PORTAL, l, 3, 0, 0, 0, 0.15)
+							new PartialParticle(Particle.PORTAL, l, 2, 0, 0, 0, 0.15)
 								.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 							Color c = FastUtils.RANDOM.nextBoolean() ? DRAIN_COLOR : DRAIN_COLOR_LIGHT;
 							double red = c.getRed() / 255D;
