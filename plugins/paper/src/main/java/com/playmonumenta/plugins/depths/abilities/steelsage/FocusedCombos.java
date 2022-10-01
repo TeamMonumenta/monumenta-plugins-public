@@ -12,10 +12,9 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
+import org.bukkit.entity.Projectile;
 
 public class FocusedCombos extends DepthsAbility {
 
@@ -34,7 +33,7 @@ public class FocusedCombos extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getDamager() instanceof AbstractArrow proj && event.getType() == DamageType.PROJECTILE && (proj.isCritical() || proj instanceof Trident)) {
+		if (event.getDamager() instanceof Projectile proj && event.getType() == DamageType.PROJECTILE && EntityUtils.isAbilityTriggeringProjectile(proj, true)) {
 			mComboCount++;
 
 			if (mComboCount >= 3) {
@@ -53,7 +52,7 @@ public class FocusedCombos extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Every third critical arrow shot deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " times damage and applies " + DepthsUtils.roundPercent(BLEED_AMOUNT) + "% Bleed for " + BLEED_DURATION / 20 + " seconds.";
+		return "Every third critical projectile shot deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " times damage and applies " + DepthsUtils.roundPercent(BLEED_AMOUNT) + "% Bleed for " + BLEED_DURATION / 20 + " seconds.";
 	}
 
 	@Override

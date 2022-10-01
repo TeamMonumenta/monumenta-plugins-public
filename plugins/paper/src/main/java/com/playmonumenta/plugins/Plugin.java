@@ -2,6 +2,7 @@ package com.playmonumenta.plugins;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.commands.*;
@@ -17,6 +18,8 @@ import com.playmonumenta.plugins.depths.DepthsGUICommands;
 import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.gallery.GalleryCommands;
+import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.guis.SinglePageGUIManager;
 import com.playmonumenta.plugins.infinitytower.TowerCommands;
 import com.playmonumenta.plugins.infinitytower.TowerManager;
@@ -33,36 +36,9 @@ import com.playmonumenta.plugins.inventories.LootChestsInInventory;
 import com.playmonumenta.plugins.inventories.PlayerInventoryView;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
-import com.playmonumenta.plugins.listeners.ArrowListener;
-import com.playmonumenta.plugins.listeners.AuditListener;
-import com.playmonumenta.plugins.listeners.BlockInteractionsListener;
-import com.playmonumenta.plugins.listeners.BrewingListener;
-import com.playmonumenta.plugins.listeners.BrokenEquipmentListener;
-import com.playmonumenta.plugins.listeners.CrossbowListener;
-import com.playmonumenta.plugins.listeners.DamageListener;
-import com.playmonumenta.plugins.listeners.EntityListener;
-import com.playmonumenta.plugins.listeners.ExceptionListener;
-import com.playmonumenta.plugins.listeners.GraveListener;
-import com.playmonumenta.plugins.listeners.ItemDropListener;
-import com.playmonumenta.plugins.listeners.JunkItemListener;
-import com.playmonumenta.plugins.listeners.LootTableManager;
-import com.playmonumenta.plugins.listeners.MobListener;
-import com.playmonumenta.plugins.listeners.PlayerListener;
-import com.playmonumenta.plugins.listeners.PortableEnderListener;
-import com.playmonumenta.plugins.listeners.PotionConsumeListener;
-import com.playmonumenta.plugins.listeners.QuiverListener;
-import com.playmonumenta.plugins.listeners.RepairExplosionsListener;
-import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
-import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
-import com.playmonumenta.plugins.listeners.SpawnerListener;
-import com.playmonumenta.plugins.listeners.StasisListener;
-import com.playmonumenta.plugins.listeners.TradeListener;
-import com.playmonumenta.plugins.listeners.TridentListener;
-import com.playmonumenta.plugins.listeners.VehicleListener;
-import com.playmonumenta.plugins.listeners.WitchListener;
-import com.playmonumenta.plugins.listeners.WorldListener;
-import com.playmonumenta.plugins.listeners.ZoneListener;
+import com.playmonumenta.plugins.listeners.*;
 import com.playmonumenta.plugins.minigames.chess.ChessManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
@@ -71,6 +47,7 @@ import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.plots.ShopManager;
+import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.protocollib.ProtocolLibIntegration;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventCommand;
@@ -146,6 +123,7 @@ public class Plugin extends JavaPlugin {
 	public ChessManager mChessManager;
 	public TowerManager mTowerManager;
 	public SignUtils mSignUtils;
+	public CharmManager mCharmManager;
 	public ItemOverrides mItemOverrides;
 	public CosmeticsManager mCosmeticsManager;
 	public SeasonalEventManager mSeasonalEventManager;
@@ -219,12 +197,14 @@ public class Plugin extends JavaPlugin {
 		ItemStatUtils.registerNameCommand();
 		ItemStatUtils.registerEnchCommand();
 		ItemStatUtils.registerAttrCommand();
+		ItemStatUtils.registerCharmCommand();
 		ItemStatUtils.registerConsumeCommand();
 		ItemStatUtils.registerRemoveCommand();
 		PlayerItemStatsGUICommand.register(this);
 		AuditLogCommand.register();
 		PickLevelAfterAnvils.register();
 		GenerateItems.register();
+		GenerateCharms.register();
 		JingleBells.register();
 		Spawn.register();
 		Stuck.register(this);
@@ -242,8 +222,11 @@ public class Plugin extends JavaPlugin {
 		PartialParticleCommand.register();
 		CustomEffect.register();
 		EffectFromPotionCommand.register(this);
+		CharmsCommand.register(this);
 		WorldNameCommand.register();
+		ToggleTrail.register();
 		MonumentaTrigger.register();
+		BlueStrikeDaggerCraftingBoss.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -320,6 +303,8 @@ public class Plugin extends JavaPlugin {
 		mVanityManager = new VanityManager();
 
 		new ClientModHandler(this);
+		mCharmManager = CharmManager.getInstance();
+
 		DailyReset.startTimer(this);
 
 		//  Load info.
@@ -390,14 +375,24 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new SeasonalEventListener(), this);
 		manager.registerEvents(CosmeticsManager.getInstance(), this);
 		manager.registerEvents(new LootTableManager(), this);
+		manager.registerEvents(new CharmListener(this), this);
 		manager.registerEvents(new QuiverListener(), this);
+		manager.registerEvents(new ToggleTrail(), this);
 		manager.registerEvents(mVanityManager, this);
 		manager.registerEvents(new BrokenEquipmentListener(), this);
+		manager.registerEvents(PortalManager.getInstance(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")
 				|| ServerProperties.getShardName().startsWith("dev")) {
 			manager.registerEvents(new DepthsListener(this), this);
+		}
+
+		if (ServerProperties.getShardName().contains("gallery")
+				|| ServerProperties.getShardName().startsWith("dev")) {
+			GalleryCommands.register();
+			manager.registerEvents(new GalleryManager(this), this);
+
 		}
 
 		//TODO Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
@@ -535,6 +530,10 @@ public class Plugin extends JavaPlugin {
 	public void onDisable() {
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
+
+		if (ServerProperties.getShardName().contains("gallery")) {
+			GalleryManager.close(); //TODO - test this
+		}
 
 		TowerManager.unload();
 		mChessManager.unloadAll();

@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import net.kyori.adventure.text.Component;
@@ -15,11 +17,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Stasis extends ZeroArgumentEffect {
+	public static final String effectID = "Stasis";
 
 	public static final String GENERIC_NAME = "Stasis";
 
 	public Stasis(int duration) {
-		super(duration);
+		super(duration, effectID);
 	}
 
 	// Most functionality handled in StasisListener
@@ -57,6 +60,12 @@ public class Stasis extends ZeroArgumentEffect {
 			AbilityManager.getManager().updatePlayerAbilities(player, false);
 			AbilityManager.getManager().getPlayerAbilities(player).unsilence();
 		}
+	}
+
+	public static Stasis deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+
+		return new Stasis(duration);
 	}
 
 	@Override

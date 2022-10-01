@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -56,9 +57,16 @@ public final class MeteorSlam extends Ability {
 	public static final int COOLDOWN_SECONDS_2 = 6;
 	public static final int COOLDOWN_TICKS_2 = COOLDOWN_SECONDS_2 * 20;
 
+	public static final String CHARM_DAMAGE = "Meteor Slam Damage";
+	public static final String CHARM_RADIUS = "Meteor Slam Radius";
+	public static final String CHARM_JUMP_BOOST = "Meteor Slam Jump Boost";
+	public static final String CHARM_DURATION = "Meteor Slam Duration";
+	public static final String CHARM_THRESHOLD = "Meteor Slam Fall Requirement";
+	public static final String CHARM_COOLDOWN = "Meteor Slam Cooldown";
+
 	private final double mLevelDamage;
 	private final double mLevelReducedDamage;
-	private final int mLevelSize;
+	private final double mLevelSize;
 	private final int mLevelJumpAmplifier;
 	private final BukkitRunnable mSlamAttackRunner;
 	private boolean mHasGloriousBattle = false;
@@ -104,13 +112,12 @@ public final class MeteorSlam extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.FIRE_CHARGE, 1);
 
-		boolean isUpgraded = getAbilityScore() == 2;
-		mInfo.mCooldown = isUpgraded ? COOLDOWN_TICKS_2 : COOLDOWN_TICKS_1;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_TICKS_1 : COOLDOWN_TICKS_2);
 
-		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
-		mLevelReducedDamage = isUpgraded ? REDUCED_DAMAGE_2 : REDUCED_DAMAGE_1;
-		mLevelSize = isUpgraded ? SIZE_2 : SIZE_1;
-		mLevelJumpAmplifier = isUpgraded ? JUMP_AMPLIFIER_2 : JUMP_AMPLIFIER_1;
+		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mLevelReducedDamage = isLevelOne() ? REDUCED_DAMAGE_1 : REDUCED_DAMAGE_2;
+		mLevelSize = CharmManager.getRadius(mPlayer, CHARM_RADIUS, (isLevelOne() ? SIZE_1 : SIZE_2));
+		mLevelJumpAmplifier = (isLevelOne() ? JUMP_AMPLIFIER_1 : JUMP_AMPLIFIER_2) + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST);
 
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
 			mHasGloriousBattle = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, GloriousBattle.class) != null;
@@ -142,7 +149,7 @@ public final class MeteorSlam extends Ability {
 
 					// If first tick landing, should still have old mFallFromY to calculate using
 					// Therefore can damage if eligible
-					if (calculateFallDistance() > AUTOMATIC_THRESHOLD) {
+					if (calculateFallDistance() > (AUTOMATIC_THRESHOLD + CharmManager.getLevel(mPlayer, CHARM_THRESHOLD))) {
 						// Only for checking in LivingEntityDamagedByPlayerEvent below,
 						// so doesn't slam twice, since this doesn't yet set fall distance to 0
 						MetadataUtils.checkOnceThisTick(plugin, player, SLAM_ONCE_THIS_TICK_METAKEY);
@@ -178,7 +185,7 @@ public final class MeteorSlam extends Ability {
 			    && (!mHasGloriousBattle || !mPlayer.isSneaking())) {
 			putOnCooldown();
 
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION_TICKS, mLevelJumpAmplifier, true, false));
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mLevelJumpAmplifier, true, false));
 
 			World world = mPlayer.getWorld();
 			Location location = mPlayer.getLocation().add(0, 0.15, 0);
@@ -231,6 +238,7 @@ public final class MeteorSlam extends Ability {
 		}
 		double fallDistance = calculateFallDistance();
 		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * mLevelDamage + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * mLevelReducedDamage;
+		slamDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, slamDamage);
 
 		for (LivingEntity enemy : EntityUtils.getNearbyMobs(location, mLevelSize)) {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.mLinkedSpell, true);
@@ -242,7 +250,7 @@ public final class MeteorSlam extends Ability {
 		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, volumeScale * 2, 1.25F);
 		new PartialParticle(Particle.FLAME, location, 60, 0F, 0F, 0F, 0.2F).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, location, 20, 0F, 0F, 0F, 0.3F).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.LAVA, location, 3 * mLevelSize * mLevelSize, mLevelSize, 0.25f, mLevelSize, 0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.LAVA, location, (int) (3 * mLevelSize * mLevelSize), mLevelSize, 0.25f, mLevelSize, 0).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override

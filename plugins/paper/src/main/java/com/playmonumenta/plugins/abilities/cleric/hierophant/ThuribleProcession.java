@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -31,7 +32,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	private static final int EFFECTS_DURATION = 20 * 8;
 	private static final int PASSIVE_DURATION = 50; //50 ticks; 20 * 2.5
 	private static final int THURIBLE_RADIUS = 30;
-	private static final int THURIBLE_COOLDOWN = 8;
+	private static final int THURIBLE_COOLDOWN = 8 * 20;
 	private static final double EFFECT_PERCENT_1 = 0.10;
 	private static final double EFFECT_PERCENT_2 = 0.15;
 	private static final int MAX_BUFFS = 4;
@@ -41,6 +42,13 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	public static final String PERCENT_DAMAGE_EFFECT_NAME = "ThuribleProcessionPercentDamageEffect";
 	private static final String PERCENT_HEAL_EFFECT_NAME = "ThuribleProcessionPercentHealEffect";
 	private static final String[] EFFECTS_NAMES = new String[] {PERCENT_ATTACK_SPEED_EFFECT_NAME, PERCENT_SPEED_EFFECT_NAME, PERCENT_DAMAGE_EFFECT_NAME, PERCENT_HEAL_EFFECT_NAME};
+
+	public static final String CHARM_DAMAGE = "Thurible Procession Damage Amplifier";
+	public static final String CHARM_ATTACK = "Thurible Procession Attack Speed Amplifier";
+	public static final String CHARM_SPEED = "Thurible Procession Speed Amplifier";
+	public static final String CHARM_EFFECT_DURATION = "Thurible Procession Effect Duration";
+	public static final String CHARM_COOLDOWN = "Thurible Procession Cooldown";
+	public static final String CHARM_HEAL = "Thurible Procession Heal";
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(255, 195, 0), 1.0f);
 
@@ -53,7 +61,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 		mInfo.mShorthandName = "TP";
 		mInfo.mDescriptions.add("The Hierophant passively builds up buffs when other players are within 30 blocks, which are applied to all players in the radius. Buffs end and the buildup resets upon a melee attack on a hostile mob, unless the full set of buffs have been obtained. Then all players (including the Hierophant) get 8 seconds of all built-up buffs. After these 8 seconds the timer resets and the Procession begins anew. Progression - +10% Attack Speed (after 4s of no melee), +10% Speed (after 8s of no melee), +10% Attack and Projectile Damage (after 12s of no melee), Cleric's passive heal is doubled, to 10% of max health every 5s (after 16s of no melee)");
 		mInfo.mDescriptions.add("Progression - +15% Attack Speed (after 4s of no melee), +15% Speed (after 8s of no melee), +15% Attack and Projectile Damage (after 12s of no melee), Cleric's passive heal is tripled, to 15% of max health every 5s (after 16s of no melee)");
-		mInfo.mCooldown = 20 * THURIBLE_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, THURIBLE_COOLDOWN);
 		mInfo.mLinkedSpell = ClassAbility.THURIBLE_PROCESSION;
 		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
 	}
@@ -135,7 +143,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 		List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
 		if (players.size() > 1) {
 			for (Player pl : players) {
-				Effect[] effects = getEffectArray(duration);
+				Effect[] effects = getEffectArray(duration + CharmManager.getExtraDuration(mPlayer, CHARM_EFFECT_DURATION));
 				for (int i = 0; i < mBuffs; i++) {
 					mPlugin.mEffectManager.addEffect(pl, EFFECTS_NAMES[i], effects[i]);
 				}
@@ -144,9 +152,9 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	}
 
 	private Effect[] getEffectArray(int duration) {
-		return getAbilityScore() == 1
-				? new Effect[] {new PercentAttackSpeed(duration, EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, EFFECT_PERCENT_1, AFFECTED_DAMAGE_TYPES), new ThuribleBonusHealing(duration, EFFECT_PERCENT_1)}
-				: new Effect[] {new PercentAttackSpeed(duration, EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, EFFECT_PERCENT_2, AFFECTED_DAMAGE_TYPES), new ThuribleBonusHealing(duration, EFFECT_PERCENT_2)};
+		return isLevelOne()
+				? new Effect[] {new PercentAttackSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK) + EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED) + EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + EFFECT_PERCENT_1, AFFECTED_DAMAGE_TYPES), new ThuribleBonusHealing(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + EFFECT_PERCENT_1)}
+				: new Effect[] {new PercentAttackSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK) + EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED) + EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + EFFECT_PERCENT_2, AFFECTED_DAMAGE_TYPES), new ThuribleBonusHealing(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + EFFECT_PERCENT_2)};
 	}
 
 	@Override

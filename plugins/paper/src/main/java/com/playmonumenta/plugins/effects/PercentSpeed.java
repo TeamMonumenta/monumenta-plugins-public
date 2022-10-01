@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -12,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PercentSpeed extends Effect {
+	public static final String effectID = "PercentSpeed";
 	public static final String GENERIC_NAME = "PercentSpeed";
 
 	private final double mAmount;
@@ -20,14 +23,28 @@ public class PercentSpeed extends Effect {
 	private boolean mWasInNoMobilityZone = false;
 
 	public PercentSpeed(int duration, double amount, String modifierName) {
-		super(duration);
+		super(duration, effectID);
 		mAmount = amount;
 		mModifierName = modifierName;
+	}
+
+	public boolean isSlow() {
+		return mAmount < 0;
 	}
 
 	@Override
 	public double getMagnitude() {
 		return Math.abs(mAmount);
+	}
+
+	@Override
+	public boolean isDebuff() {
+		return mAmount < 0;
+	}
+
+	@Override
+	public boolean isBuff() {
+		return mAmount > 0;
 	}
 
 	@Override
@@ -57,6 +74,25 @@ public class PercentSpeed extends Effect {
 
 			mWasInNoMobilityZone = isInNoMobilityZone;
 		}
+	}
+
+	@Override
+	public JsonObject serialize() {
+		JsonObject object = new JsonObject();
+		object.addProperty("effectID", mEffectID);
+		object.addProperty("duration", mDuration);
+		object.addProperty("amount", mAmount);
+		object.addProperty("modifierName", mModifierName);
+
+		return object;
+	}
+
+	public static PercentSpeed deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+		double amount = object.get("amount").getAsDouble();
+		String modifierName = object.get("modifierName").getAsString();
+
+		return new PercentSpeed(duration, amount, modifierName);
 	}
 
 	@Override

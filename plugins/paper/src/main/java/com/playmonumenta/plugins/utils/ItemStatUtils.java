@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.Agility;
 import com.playmonumenta.plugins.itemstats.attributes.Armor;
 import com.playmonumenta.plugins.itemstats.attributes.AttackDamageAdd;
@@ -29,6 +30,7 @@ import de.tr7zw.nbtapi.NBTList;
 import de.tr7zw.nbtapi.NBTListCompound;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.SuggestionInfo;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.DoubleArgument;
@@ -47,9 +49,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -79,6 +83,8 @@ public class ItemStatUtils {
 	static final String LEVEL_KEY = "Level";
 	static final String INFUSER_KEY = "Infuser";
 	static final String ATTRIBUTE_NAME_KEY = "AttributeName";
+	static final String CHARM_KEY = "CharmText";
+	static final String CHARM_POWER_KEY = "CharmPower";
 	static final String AMOUNT_KEY = "Amount";
 	static final String EFFECT_TYPE_KEY = "EffectType";
 	static final String EFFECT_DURATION_KEY = "EffectDuration";
@@ -147,7 +153,8 @@ public class ItemStatUtils {
 		UNCOMMON("uncommon", Component.text("Uncommon", TextColor.fromHexString("#C0C0C0")).decoration(TextDecoration.ITALIC, false)),
 		RARE("rare", Component.text("Rare", TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false)),
 		ARTIFACT("artifact", Component.text("Artifact", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
-		EPIC("epic", Component.text("Epic", TextColor.fromHexString("#FFD700")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
+		EPIC("epic", Component.text("Epic", TextColor.fromHexString("#B314E3")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
+		LEGENDARY("legendary", Component.text("Legendary", TextColor.fromHexString("#FFD700")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
 		UNIQUE("unique", Component.text("Unique", TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false)),
 		PATRON("patron", Component.text("Patron Made", TextColor.fromHexString("#82DB17")).decoration(TextDecoration.ITALIC, false)),
 		EVENT("event", Component.text("Event", TextColor.fromHexString("#7FFFD4")).decoration(TextDecoration.ITALIC, false)),
@@ -157,6 +164,9 @@ public class ItemStatUtils {
 		TROPHY("trophy", Component.text("Trophy", TextColor.fromHexString("#CAFFFD")).decoration(TextDecoration.ITALIC, false)),
 		OBFUSCATED("obfuscated", Component.text("Stick_:)", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true)),
 		SHULKER_BOX("shulker", Component.text("Invalid Type", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false)),
+		CHARM("charm", Component.text("Charm", TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false)),
+		RARE_CHARM("rarecharm", Component.text("Rare Charm", TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false)),
+		EPIC_CHARM("epiccharm", Component.text("Epic Charm", TextColor.fromHexString("#B314E3")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
 		QUEST_COMPASS("quest_compass", Component.text("Invalid Type", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false));
 
 		static final String KEY = "Tier";
@@ -194,12 +204,65 @@ public class ItemStatUtils {
 		}
 	}
 
+	public enum Masterwork {
+		NONE("none", DUMMY_LORE_TO_REMOVE),
+		ZERO("0", Component.text("", NamedTextColor.DARK_GRAY).append(Component.text("☆☆☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		I("1", Component.text("★", TextColor.fromHexString("#FFB43E")).append(Component.text("☆☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		II("2", Component.text("★★", TextColor.fromHexString("#FFB43E")).append(Component.text("☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		III("3", Component.text("★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		IV("4", Component.text("★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		V("5", Component.text("★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		VI("6", Component.text("★★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		VIIA("7a", Component.text("★★★★★★★", TextColor.fromHexString("#D02E28")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		VIIB("7b", Component.text("★★★★★★★", TextColor.fromHexString("#4AC2E5")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		VIIC("7c", Component.text("★★★★★★★", TextColor.fromHexString("#FFFA75")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		ERROR("error", Component.text("ERROR", TextColor.fromHexString("#704C8A")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true));
+
+		static final String KEY = "Masterwork";
+
+		final String mName;
+		final Component mDisplay;
+		final String mPlainDisplay;
+
+		Masterwork(String name, Component display) {
+			mName = name;
+			mDisplay = display;
+			mPlainDisplay = MessagingUtils.plainText(display);
+		}
+
+		public String getName() {
+			return mName;
+		}
+
+		public Component getDisplay() {
+			return mDisplay;
+		}
+
+		public String getPlainDisplay() {
+			return mPlainDisplay;
+		}
+
+		public static Masterwork getMasterwork(String name) {
+			for (Masterwork m : Masterwork.values()) {
+				if (m.getName().equals(name)) {
+					return m;
+				}
+			}
+
+			return Masterwork.NONE;
+		}
+	}
+
 	public enum Location {
 		NONE("none", DUMMY_LORE_TO_REMOVE),
 		OVERWORLD1("overworld1", Component.text("King's Valley Overworld", TextColor.fromHexString("#DCAE32")).decoration(TextDecoration.ITALIC, false)),
 		OVERWORLD2("overworld2", Component.text("Celsian Isles Overworld", TextColor.fromHexString("#32D7DC")).decoration(TextDecoration.ITALIC, false)),
+		FOREST("forest", Component.text("The Wolfswood", TextColor.fromHexString("#4C8F4D")).decoration(TextDecoration.ITALIC, false)),
+		KEEP("keep", Component.text("Pelias' Keep", TextColor.fromHexString("#C4BBA5")).decoration(TextDecoration.ITALIC, false)),
 		CASINO1("casino1", Component.text("Rock's Little Casino", TextColor.fromHexString("#EDC863")).decoration(TextDecoration.ITALIC, false)),
 		CASINO2("casino2", Component.text("Monarch's Cozy Casino", TextColor.fromHexString("#1773B1")).decoration(TextDecoration.ITALIC, false)),
+		CASINO3("casino3", Component.text("Sticks and Stones Tavern", TextColor.fromHexString("#C6C2B6")).decoration(TextDecoration.ITALIC, false)),
+		QUEST("quest", Component.text("Quest Item", TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false)),
 		LABS("labs", Component.text("Alchemy Labs", TextColor.fromHexString("#B4ACC3")).decoration(TextDecoration.ITALIC, false)),
 		WHITE("white", Component.text("Halls of Wind and Blood", TextColor.fromHexString("#FFFFFF")).decoration(TextDecoration.ITALIC, false)),
 		ORANGE("orange", Component.text("Fallen Menagerie", TextColor.fromHexString("#FFAA00")).decoration(TextDecoration.ITALIC, false)),
@@ -260,18 +323,22 @@ public class ItemStatUtils {
 		HOLIDAYSKIN("holidayskin", Component.text("Holiday Skin", TextColor.fromHexString("#B00C2F")).decoration(TextDecoration.ITALIC, false)),
 		TRANSMOG("transmogrifier", Component.text("Transmogrifier", TextColor.fromHexString("#6F2DA8")).decoration(TextDecoration.ITALIC, false)),
 		UGANDA("uganda", Component.text("Uganda 2018", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
-		BLUE("blue", Component.text("You're only here to try and sneak leaks in the code", TextColor.fromHexString("#0C2CA2")).decoration(TextDecoration.ITALIC, false)),
-		BROWN("brown", Component.text("Hellborn Skylands", TextColor.fromHexString("#65350F")).decoration(TextDecoration.ITALIC, false)),
-		GREEN("green", Component.text("Skyborn Helllands", TextColor.fromHexString("#4D6E23")).decoration(TextDecoration.ITALIC, false)),
-		RED("red", Component.text("Region 3 duh", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
-		BLACK("black", Component.text("Calder's House", TextColor.fromHexString("#000000")).decoration(TextDecoration.ITALIC, false)),
+		SILVER("silver", Component.text("Silver Knight's Tomb", TextColor.fromHexString("#C0C0C0")).decoration(TextDecoration.ITALIC, false)),
+		BLUE("blue", Component.text("Coven's Gambit", TextColor.fromHexString("#0C2CA2")).decoration(TextDecoration.ITALIC, false)),
+		BROWN("brown", Component.text("Cradle of the Broken God", TextColor.fromHexString("#703608")).decoration(TextDecoration.ITALIC, false)),
+		GREEN("green", Component.text("Green Dungeon", TextColor.fromHexString("#4D6E23")).decoration(TextDecoration.ITALIC, false)),
+		RED("red", Component.text("Red Dungeon", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
+		BLACK("black", Component.text("Black Dungeon", TextColor.fromHexString("#454040")).decoration(TextDecoration.ITALIC, false)),
 		LIGHT("light", Component.text("Arena of Terth", TextColor.fromHexString("#FFFFAA")).decoration(TextDecoration.ITALIC, false)),
 		PASS("seasonpass", Component.text("Seasonal Pass", TextColor.fromHexString("#FFF63C")).decoration(TextDecoration.ITALIC, false)),
 		BLITZ("blitz", Component.text("Plunderer's Blitz", TextColor.fromHexString("#DAAD3E")).decoration(TextDecoration.ITALIC, false)),
 		SOULTHREAD("soul", Component.text("Soulwoven", TextColor.fromHexString("#7FFFD4")).decoration(TextDecoration.ITALIC, false)),
+		SCIENCE("science", Component.text("P.O.R.T.A.L.", TextColor.fromHexString("#DCE8E3")).decoration(TextDecoration.ITALIC, false)),
+		BLUESTRIKE("bluestrike", Component.text("Masquerader’s Ruin", TextColor.fromHexString("#326DA8")).decoration(TextDecoration.ITALIC, false)),
+		GALLERYOFFEAR("gallerybase", Component.text("Gallery of Fear", TextColor.fromHexString("#39B14E")).decoration(TextDecoration.ITALIC, false)),
+		GOFMAPONE("gallery1", Component.text("Sanguine Halls", TextColor.fromHexString("#AB0000")).decoration(TextDecoration.ITALIC, false)),
 		AMBER("amber", Component.text("item name color", TextColor.fromHexString("#FFBF00")).decoration(TextDecoration.ITALIC, false)),
 		GOLD("gold", Component.text("item name color", TextColor.fromHexString("#FFD700")).decoration(TextDecoration.ITALIC, false)),
-		SILVER("silver", Component.text("item name color", TextColor.fromHexString("#C0C0C0")).decoration(TextDecoration.ITALIC, false)),
 		DARKBLUE("darkblue", Component.text("itemnamecolor", TextColor.fromHexString("#FFFFAA")).decoration(TextDecoration.ITALIC, false)),
 		INDIGO("indigo", Component.text("item name color", TextColor.fromHexString("#6F00FF")).decoration(TextDecoration.ITALIC, false)),
 		MIDBLUE("midblue", Component.text("itemnamecolor", TextColor.fromHexString("#366EF8")).decoration(TextDecoration.ITALIC, false));
@@ -349,10 +416,12 @@ public class ItemStatUtils {
 		INURE(new Inure(), true, false, false, true),
 		POISE(new Poise(), true, false, false, true),
 		STEADFAST(new Steadfast(), true, false, false, true),
+		GUARD(new Guard(), true, false, false, true),
 		TEMPO(new Tempo(), true, false, false, true),
 		REFLEXES(new Reflexes(), true, false, false, true),
 		ETHEREAL(new Ethereal(), true, false, false, true),
 		EVASION(new Evasion(), true, false, false, true),
+		CLOAKED(new Cloaked(), true, false, false, true),
 		ADAPTABILITY(new Adaptability(), false, false, false, true),
 		// Custom Enchants
 		ABYSSAL(new Abyssal(), true, false, false, true),
@@ -361,21 +430,30 @@ public class ItemStatUtils {
 		ARCANE_THRUST(new ArcaneThrust(), true, false, false, true),
 		ASHES_OF_ETERNITY(new AshesOfEternity(), false, false, false, true),
 		BLEEDING(new Bleeding(), true, false, false, true),
+		BROOMSTICK(new Broomstick(), false, false, false, false),
 		CHAOTIC(new Chaotic(), true, false, false, true),
 		DARKSIGHT(new Darksight(), false, false, false, false),
 		DECAY(new Decay(), true, false, false, true),
 		DUELIST(new Duelist(), true, false, false, true),
 		ERUPTION(new Eruption(), true, false, false, true),
+		EXCAVATOR(new Excavator(), false, false, false, true),
+		EXPLODING(new Explosive(), true, false, false, true),
 		ICE_ASPECT(new IceAspect(), true, false, false, true),
 		FIRE_ASPECT(new FireAspect(), true, false, false, true),
 		THUNDER_ASPECT(new ThunderAspect(), true, false, false, true),
+		WIND_ASPECT(new WindAspect(), true, false, false, true),
+		EARTH_ASPECT(new EarthAspect(), true, false, false, true),
+		FIRST_STRIKE(new FirstStrike(), true, false, false, true),
 		GILLS(new Gills(), false, false, false, false),
 		HEX_EATER(new HexEater(), true, false, false, true),
 		INFERNO(new Inferno(), true, false, false, true),
+		INTOXICATING_WARMTH(new IntoxicatingWarmth(), false, false, false, false),
 		INSTANT_DRINK(new InstantDrink(), false, false, false, false),
 		INTUITION(new Intuition(), false, false, false, true),
 		JUNGLES_NOURISHMENT(new JunglesNourishment(), false, false, false, false),
 		LIFE_DRAIN(new LifeDrain(), true, false, false, true),
+		LIQUID_COURAGE(new LiquidCourage(), false, false, false, false),
+		MULTILOAD(new Multiload(), true, false, false, true),
 		MULTITOOL(new Multitool(), true, false, false, false),
 		RADIANT(new Radiant(), false, false, false, false),
 		REGENERATION(new Regeneration(), true, false, false, true),
@@ -392,15 +470,20 @@ public class ItemStatUtils {
 		SLAYER(new Slayer(), true, false, false, true),
 		SMITE(new Smite(), true, false, false, true),
 		SNIPER(new Sniper(), true, false, false, true),
+		STAMINA(new Stamina(), true, false, false, true),
 		STARVATION(new Starvation(), false, true, false, false),
 		SUSTENANCE(new Sustenance(), true, false, false, true),
 		WEIGHTLESS(new Weightless(), false, false, false, false),
+		TEMPORAL_BENDER(new TemporalBender(), false, false, false, false),
 		THROWING_KNIFE(new ThrowingKnife(), false, false, false, false),
 		TRIAGE(new Triage(), true, false, false, true),
+		TRIVIUM(new Trivium(), true, false, false, true),
+
 		// Curses
 		CURSE_OF_ANEMIA(new CurseOfAnemia(), true, true, false, false),
 		CURSE_OF_BINDING(Enchantment.BINDING_CURSE, "Curse of Binding", false, true, false, false),
 		CURSE_OF_VANISHING(Enchantment.VANISHING_CURSE, "Curse of Vanishing", false, true, false, false),
+		CURSE_OF_INSTABILITY(new CurseOfInstability(), false, true, false, false),
 		CURSE_OF_IRREPARIBILITY(new CurseOfIrreparability(), false, true, false, false),
 		CURSE_OF_CRIPPLING(new CurseOfCrippling(), true, true, false, false),
 		CURSE_OF_CORRUPTION(new CurseOfCorruption(), false, true, false, false),
@@ -408,6 +491,12 @@ public class ItemStatUtils {
 		CURSE_OF_SHRAPNEL(new CurseOfShrapnel(), true, true, false, false),
 		TWO_HANDED(new TwoHanded(), false, true, false, false),
 		INEPTITUDE(new Ineptitude(), true, true, false, false),
+		MELEE_FRAGILITY(new MeleeFragility(), true, true, false, false),
+		BLAST_FRAGILITY(new BlastFragility(), true, true, false, false),
+		PROJECTILE_FRAGILITY(new ProjectileFragility(), true, true, false, false),
+		MAGIC_FRAGILITY(new MagicFragility(), true, true, false, false),
+		FIRE_FRAGILITY(new FireFragility(), true, true, false, false),
+		FALL_FRAGILITY(new FallFragility(), true, true, false, false),
 		// Durability
 		UNBREAKING(Enchantment.DURABILITY, "Unbreaking", true, false, false, false),
 		UNBREAKABLE(null, "Unbreakable", false, false, false, false),
@@ -484,7 +573,7 @@ public class ItemStatUtils {
 
 		public boolean isItemTypeEnchantment() {
 			return this == MAGIC_WAND
-				       || this == ALCHEMICAL_ALEMBIC;
+				|| this == ALCHEMICAL_ALEMBIC;
 		}
 
 		public boolean isRegionScaled() {
@@ -493,11 +582,11 @@ public class ItemStatUtils {
 
 		public boolean isHidden() {
 			return this == MAINHAND_OFFHAND_DISABLE
-				       || this == OFFHAND_MAINHAND_DISABLE
-				       || this == HIDE_ATTRIBUTES
-				       || this == HIDE_ENCHANTS
-				       || this == HIDE_INFO
-				       || this == NO_GLINT;
+				|| this == OFFHAND_MAINHAND_DISABLE
+				|| this == HIDE_ATTRIBUTES
+				|| this == HIDE_ENCHANTS
+				|| this == HIDE_INFO
+				|| this == NO_GLINT;
 		}
 
 		public Component getDisplay(int level) {
@@ -520,21 +609,27 @@ public class ItemStatUtils {
 	public enum InfusionType {
 		// Infusions
 		ACUMEN(new Acumen(), "", true, false, false, true),
+		ANTIGRAV(new AntiGrav(), "", true, false, false, true),
 		ARDOR(new Ardor(), "", true, false, false, true),
 		AURA(new Aura(), "", true, false, false, true),
 		CARAPACE(new Carapace(), "", true, false, false, true),
 		CHOLER(new Choler(), "", true, false, false, true),
 		EMPOWERED(new Empowered(), "", true, false, false, true),
+		ENERGIZE(new Energize(), "", true, false, false, true),
 		EPOCH(new Epoch(), "", true, false, false, true),
 		EXECUTION(new Execution(), "", true, false, false, true),
 		EXPEDITE(new Expedite(), "", true, false, false, true),
 		FOCUS(new Focus(), "", true, false, false, true),
+		GRACE(new Grace(), "", true, false, false, true),
 		MITOSIS(new Mitosis(), "", true, false, false, true),
 		NATANT(new Natant(), "", true, false, false, true),
 		NUTRIMENT(new Nutriment(), "", true, false, false, true),
 		PENNATE(new Pennate(), "", true, false, false, true),
 		PERSPICACITY(new Perspicacity(), "", true, false, false, true),
+		QUENCH(new Quench(), "", true, false, false, true),
 		REFLECTION(new Reflection(), "", true, false, false, true),
+		REFRESH(new Refresh(), "", true, false, false, true),
+		SOOTHING(new Soothing(), "", true, false, false, true),
 		TENACITY(new Tenacity(), "", true, false, false, true),
 		UNDERSTANDING(new Understanding(), "", true, false, false, true),
 		UNYIELDING(new Unyielding(), "", true, false, false, true),
@@ -905,7 +1000,10 @@ public class ItemStatUtils {
 		ROMAN_NUMERAL_VALUES.put(1, "I");
 	}
 
-	static String toRomanNumerals(int value) {
+	public static String toRomanNumerals(int value) {
+		if (value == 0) {
+			return "0";
+		}
 		int nextNumeralValue = ROMAN_NUMERAL_VALUES.floorKey(value);
 		if (value == nextNumeralValue) {
 			return ROMAN_NUMERAL_VALUES.get(value);
@@ -914,7 +1012,7 @@ public class ItemStatUtils {
 		return ROMAN_NUMERAL_VALUES.get(nextNumeralValue) + toRomanNumerals(value - nextNumeralValue);
 	}
 
-	public static void editItemInfo(final ItemStack item, final Region region, final Tier tier, final Location location) {
+	public static void editItemInfo(final ItemStack item, final Region region, final Tier tier, final Masterwork masterwork, final Location location) {
 		if (item.getType() == Material.AIR) {
 			return;
 		}
@@ -931,6 +1029,12 @@ public class ItemStatUtils {
 			monumenta.removeKey(Tier.KEY);
 		} else {
 			monumenta.setString(Tier.KEY, tier.getName());
+		}
+
+		if (masterwork == Masterwork.NONE) {
+			monumenta.removeKey(Masterwork.KEY);
+		} else {
+			monumenta.setString(Masterwork.KEY, masterwork.getName());
 		}
 
 		if (location == Location.NONE) {
@@ -993,6 +1097,97 @@ public class ItemStatUtils {
 		return plainLore;
 	}
 
+	public static void addCharmEffect(final ItemStack item, final int index, final Component line) {
+		if (item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTList<String> charmLore = nbt.addCompound(MONUMENTA_KEY).getStringList(CHARM_KEY);
+		String serializedLine = MessagingUtils.toGson(line).toString();
+		if (index < charmLore.size()) {
+			charmLore.add(index, serializedLine);
+		} else {
+			charmLore.add(serializedLine);
+		}
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
+	public static void removeCharmEffect(final ItemStack item, final int index) {
+		if (item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTList<String> lore = nbt.addCompound(MONUMENTA_KEY).getStringList(CHARM_KEY);
+		if (lore.size() > 0 && index < lore.size()) {
+			lore.remove(index);
+		} else if (lore.size() > 0) {
+			lore.remove(lore.size() - 1);
+		}
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
+	public static List<Component> getCharmEffects(final ItemStack item) {
+		return getCharmEffects(new NBTItem(item));
+	}
+
+	public static List<Component> getCharmEffects(final NBTItem nbt) {
+		List<Component> lore = new ArrayList<>();
+		for (String serializedLine : nbt.addCompound(MONUMENTA_KEY).getStringList(CHARM_KEY)) {
+			lore.add(MessagingUtils.fromGson(serializedLine));
+		}
+		return lore;
+	}
+
+	public static List<String> getPlainCharmLore(final NBTItem nbt) {
+		List<String> plainLore = new ArrayList<>();
+		for (Component line : getCharmEffects(nbt)) {
+			plainLore.add(MessagingUtils.plainText(line));
+		}
+		return plainLore;
+	}
+
+	public static void setCharmPower(final ItemStack item, final int level) {
+		if (item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound charmPower = nbt.addCompound(MONUMENTA_KEY);
+		charmPower.setInteger(CHARM_POWER_KEY, level);
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
+	public static void removeCharmPower(final ItemStack item) {
+		if (item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound charmPower = nbt.getCompound(CHARM_POWER_KEY);
+		if (charmPower == null) {
+			return;
+		}
+		charmPower.removeKey(CHARM_POWER_KEY);
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
+	public static int getCharmPower(final ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return 0;
+		}
+		return getCharmPower(new NBTItem(item));
+	}
+
+	public static int getCharmPower(final NBTItem nbt) {
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return 0;
+		}
+		return monumenta.getInteger(CHARM_POWER_KEY);
+	}
+
 	public static void addConsumeEffect(final ItemStack item, final EffectType type, final double strength, final int duration, @Nullable String source) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
@@ -1011,6 +1206,61 @@ public class ItemStatUtils {
 		item.setItemMeta(nbt.getItem().getItemMeta());
 
 		generateItemStats(item);
+	}
+
+	public static void removeConsumeEffect(final ItemStack item, final EffectType type) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompoundList effects = getEffects(nbt);
+
+		if (effects == null || effects.isEmpty()) {
+			return;
+		}
+
+		int i = 0;
+		for (NBTListCompound effect : effects) {
+			if (type.getType().equals(effect.getString(EFFECT_TYPE_KEY))) {
+				effects.remove(i);
+				break;
+			}
+			i++;
+		}
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+		generateItemStats(item);
+	}
+
+
+	public static void removeConsumeEffect(final ItemStack item, final int i) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompoundList effects = getEffects(nbt);
+
+		if (effects == null || effects.isEmpty()) {
+			return;
+		}
+
+		effects.remove(i);
+		item.setItemMeta(nbt.getItem().getItemMeta());
+		generateItemStats(item);
+	}
+
+	public static boolean isConsumable(final ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return false;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompoundList effects = getEffects(nbt);
+
+		if (effects == null || effects.isEmpty()) {
+			return false;
+		}
+
+		return true;
 	}
 
 	public static NBTCompoundList getEffects(final NBTItem nbt) {
@@ -1047,7 +1297,6 @@ public class ItemStatUtils {
 		}
 		NBTItem nbt = new NBTItem(item);
 		NBTCompound enchantments = ItemStatUtils.getEnchantments(nbt);
-
 		return getEnchantmentLevel(enchantments, type);
 	}
 
@@ -1399,6 +1648,28 @@ public class ItemStatUtils {
 		return Tier.NONE;
 	}
 
+	public static Masterwork getMasterwork(final @Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return Masterwork.NONE;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return Masterwork.NONE;
+		}
+
+		if (getRegion(item) != Region.RING) {
+			return Masterwork.NONE;
+		}
+
+		String tierString = monumenta.getString(Masterwork.KEY);
+		if (tierString != null) {
+			return Masterwork.getMasterwork(tierString);
+		}
+
+		return Masterwork.NONE;
+	}
+
 	public static Location getLocation(final @Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return Location.NONE;
@@ -1562,6 +1833,7 @@ public class ItemStatUtils {
 		} else {
 			// There is probably a cleaner way to clean up unused NBT, not sure if recursion directly works due to the existence of both NBTCompounds and NBTCompoundLists
 			// TODO: clean up other unused things from item (e.g. empty lore, reset hideflags if no NBT)
+
 			Set<String> keys;
 
 			NBTCompound stock = monumenta.getCompound(STOCK_KEY);
@@ -1690,11 +1962,55 @@ public class ItemStatUtils {
 			String regionString = monumenta.getString(Region.KEY);
 			if (regionString != null) {
 				Region region = Region.getRegion(regionString);
+				Masterwork masterwork = Masterwork.getMasterwork(monumenta.getString(Masterwork.KEY));
+				Tier tier = Tier.getTier(monumenta.getString(Tier.KEY));
 				if (region != null) {
-					Tier tier = Tier.getTier(monumenta.getString(Tier.KEY));
+					// For R3 items, set tier to match masterwork level
+					if (region == Region.RING) {
+						if (masterwork != null && masterwork != Masterwork.ERROR && masterwork != Masterwork.NONE) {
+							switch (Objects.requireNonNull(masterwork)) {
+								case ZERO:
+								case I:
+								case II:
+								case III:
+									tier = Tier.RARE;
+									break;
+								case IV:
+								case V:
+									tier = Tier.ARTIFACT;
+									break;
+								case VI:
+									tier = Tier.EPIC;
+									break;
+								case VIIA:
+								case VIIB:
+								case VIIC:
+									tier = Tier.LEGENDARY;
+									break;
+								default:
+									break;
+							}
+							monumenta.setString(Tier.KEY, tier.getName());
+						}
+					}
 					if (tier != null && tier != Tier.NONE) {
 						lore.add(region.getDisplay().append(tier.getDisplay()));
 					}
+				}
+
+				if (getTier(item) == Tier.CHARM || getTier(item) == Tier.RARE_CHARM || getTier(item) == Tier.EPIC_CHARM) {
+					int charmPower = getCharmPower(item);
+					if (charmPower > 0) {
+						String starString = "";
+						for (int i = 0; i < charmPower; i++) {
+							starString += "★";
+						}
+						lore.add(Component.text("Charm Power : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false)));
+					}
+				}
+
+				if (masterwork != null && masterwork != Masterwork.NONE) {
+					lore.add(Component.text("Masterwork : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(masterwork.getDisplay()));
 				}
 
 				Location location = Location.getLocation(monumenta.getString(Location.KEY));
@@ -1830,6 +2146,16 @@ public class ItemStatUtils {
 			}
 		}
 
+		NBTList<String> charmLore = monumenta.getStringList(CHARM_KEY);
+		if (charmLore != null && (getTier(item) == Tier.CHARM || getTier(item) == Tier.RARE_CHARM || getTier(item) == Tier.EPIC_CHARM)) {
+			lore.add(Component.empty());
+			lore.add(Component.text("When in Charm Slot:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			for (String serializedLine : charmLore) {
+				Component lineAdd = MessagingUtils.fromGson(serializedLine);
+				lore.add(lineAdd);
+			}
+		}
+
 		Set<String> keys = monumenta.getKeys();
 		if (keys == null || keys.isEmpty()) {
 			nbt.removeKey(MONUMENTA_KEY);
@@ -1845,9 +2171,7 @@ public class ItemStatUtils {
 		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		meta.addItemFlags(ItemFlag.HIDE_DYE);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-		if (item.getType().name().contains("PATTERN") || item.getType().name().contains("SHIELD")) {
-			meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-		}
+		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 
 		boolean hasDummyArmorToughnessAttribute = false;
 		if (meta.hasAttributeModifiers()) {
@@ -1886,6 +2210,12 @@ public class ItemStatUtils {
 			tiers[i] = tiersRaw[i].getName();
 		}
 
+		Masterwork[] masterworkRaw = Masterwork.values();
+		String[] ms = new String[masterworkRaw.length];
+		for (int i = 0; i < ms.length; i++) {
+			ms[i] = masterworkRaw[i].getName();
+		}
+
 		Location[] locationsRaw = Location.values();
 		String[] locations = new String[locationsRaw.length];
 		for (int i = 0; i < locations.length; i++) {
@@ -1896,6 +2226,7 @@ public class ItemStatUtils {
 		arguments.add(new StringArgument("region").overrideSuggestions(regions));
 		arguments.add(new StringArgument("tier").overrideSuggestions(tiers));
 		arguments.add(new StringArgument("location").overrideSuggestions(locations));
+		arguments.add(new StringArgument("masterwork").overrideSuggestions(ms));
 
 		new CommandAPICommand("editinfo").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
 			if (player.getGameMode() != GameMode.CREATIVE) {
@@ -1905,13 +2236,42 @@ public class ItemStatUtils {
 			Region region = Region.getRegion((String) args[0]);
 			Tier tier = Tier.getTier((String) args[1]);
 			Location location = Location.getLocation((String) args[2]);
+			Masterwork m = Masterwork.getMasterwork((String) args[3]);
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
 
-			editItemInfo(item, region, tier, location);
+			// For R3 items, set tier to match masterwork level
+			if (region == Region.RING) {
+				if (m != Masterwork.ERROR && m != Masterwork.NONE) {
+					switch (Objects.requireNonNull(m)) {
+						case ZERO:
+						case I:
+						case II:
+						case III:
+							tier = Tier.RARE;
+							break;
+						case IV:
+						case V:
+							tier = Tier.ARTIFACT;
+							break;
+						case VI:
+							tier = Tier.EPIC;
+							break;
+						case VIIA:
+						case VIIB:
+						case VIIC:
+							tier = Tier.LEGENDARY;
+							break;
+						default:
+							break;
+					}
+				}
+			}
+
+			editItemInfo(item, region, tier, m, location);
 
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
@@ -2061,6 +2421,209 @@ public class ItemStatUtils {
 		}).register();
 	}
 
+	public static void registerCharmCommand() {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.editcharm");
+
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new MultiLiteralArgument("add"));
+		arguments.add(new IntegerArgument("index", 0));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			addCharmEffect(item, index, Component.empty());
+
+			generateItemStats(item);
+		}).register();
+
+		arguments.add(new GreedyStringArgument("charm"));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			String lore = (String) args[2];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			String hexColor = CharmManager.getCharmEffectColor(lore.charAt(0) == '+', lore);
+
+			Component text = Component.text(lore, TextColor.fromHexString(hexColor)).decoration(TextDecoration.ITALIC, false);
+			addCharmEffect(item, index, text);
+
+			generateItemStats(item);
+		}).register();
+
+		Function<SuggestionInfo, String[]> suggestions = suggestionInfo -> Plugin.getInstance().mCharmManager.mCharmEffectList.toArray(String[]::new);
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("add"));
+		arguments.add(new IntegerArgument("index", 0));
+		arguments.add(new DoubleArgument("value"));
+		arguments.add(new MultiLiteralArgument("flat", "percent"));
+		arguments.add(new GreedyStringArgument("charm").includeSuggestions(suggestions));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			Double value = (Double) args[2];
+			String valueType = (String) args[3];
+			String charm = (String) args[4];
+			String lore = (value > 0 ? "+" : "") + StringUtils.formatDecimal(value) + (valueType.equals("percent") ? "%" : "") + " " + charm;
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+			String hexColor = "#C8A2C8";
+			if (lore.charAt(0) == '+') {
+				if (lore.endsWith("Cooldown")) {
+					hexColor = "#D02E28";
+				} else {
+					hexColor = "#4AC2E5";
+				}
+			} else if (lore.charAt(0) == '-') {
+				if (lore.endsWith("Cooldown")) {
+					hexColor = "#4AC2E5";
+				} else {
+					hexColor = "#D02E28";
+				}
+			}
+
+			Component text = Component.text(lore, TextColor.fromHexString(hexColor)).decoration(TextDecoration.ITALIC, false);
+			addCharmEffect(item, index, text);
+
+			generateItemStats(item);
+		}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("del"));
+		arguments.add(new IntegerArgument("index", 0));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			removeCharmEffect(item, index);
+
+			generateItemStats(item);
+		}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("power"));
+		arguments.add(new IntegerArgument("amount", 0));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer power = (Integer) args[1];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			if (power > 0) {
+				setCharmPower(item, power);
+			} else {
+				removeCharmPower(item);
+			}
+
+			generateItemStats(item);
+		}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("replace"));
+		arguments.add(new IntegerArgument("index", 0));
+		arguments.add(new GreedyStringArgument("charm"));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			String lore = (String) args[2];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			removeCharmEffect(item, index);
+			if (lore.charAt(0) == '+') {
+				Component text = Component.text(lore, TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false);
+				addCharmEffect(item, index, text);
+			} else if (lore.charAt(0) == '-') {
+				Component text = Component.text(lore, TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false);
+				addCharmEffect(item, index, text);
+			} else {
+				Component text = Component.text(lore, TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false);
+				addCharmEffect(item, index, text);
+			}
+
+			generateItemStats(item);
+		}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("replace"));
+		arguments.add(new IntegerArgument("index", 0));
+		arguments.add(new DoubleArgument("value"));
+		arguments.add(new MultiLiteralArgument("flat", "percent"));
+		arguments.add(new GreedyStringArgument("charm").includeSuggestions(suggestions));
+		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			Double value = (Double) args[2];
+			String valueType = (String) args[3];
+			String charm = (String) args[4];
+			String lore = (value > 0 ? "+" : "") + StringUtils.formatDecimal(value) + (valueType.equals("percent") ? "%" : "") + " " + charm;
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			removeCharmEffect(item, index);
+			if (lore.charAt(0) == '+') {
+				Component text = Component.text(lore, TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false);
+				addCharmEffect(item, index, text);
+			} else if (lore.charAt(0) == '-') {
+				Component text = Component.text(lore, TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false);
+				addCharmEffect(item, index, text);
+			} else {
+				Component text = Component.text(lore, TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false);
+				addCharmEffect(item, index, text);
+			}
+
+			generateItemStats(item);
+		}).register();
+	}
+
 	public static void registerNameCommand() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.editname");
 
@@ -2127,6 +2690,27 @@ public class ItemStatUtils {
 			}
 
 			addConsumeEffect(item, EffectType.fromType(type), strength, duration, null);
+		}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("del"));
+		arguments.add(new IntegerArgument("index", 0));
+
+		new CommandAPICommand("editconsume").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+				return;
+			}
+			Integer index = (Integer) args[1];
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item.getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				return;
+			}
+
+			removeConsumeEffect(item, index);
+
+			generateItemStats(item);
 		}).register();
 	}
 
@@ -2303,7 +2887,11 @@ public class ItemStatUtils {
 				}
 			}
 
-			editItemInfo(item, Region.NONE, Tier.NONE, Location.NONE);
+			for (EffectType eff : EffectType.values()) {
+				removeConsumeEffect(item, eff);
+			}
+
+			editItemInfo(item, Region.NONE, Tier.NONE, Masterwork.NONE, Location.NONE);
 
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
@@ -2318,7 +2906,7 @@ public class ItemStatUtils {
 	}
 
 	// Returns true if the item has mainhand attack damage OR doesn't have mainhand projectile damage (i.e. any ranged weapon that is not also a melee weapon)
-	public static boolean isNotExlusivelyRanged(@Nullable ItemStack item) {
+	public static boolean isNotExclusivelyRanged(@Nullable ItemStack item) {
 		return item != null && (getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0 || getAttributeAmount(item, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) == 0);
 	}
 }

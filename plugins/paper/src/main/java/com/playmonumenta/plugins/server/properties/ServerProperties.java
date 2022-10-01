@@ -31,6 +31,9 @@ public class ServerProperties {
 	private boolean mIsSleepingEnabled = true;
 	private boolean mKeepLowTierInventory = false;
 	private boolean mClassSpecializationsEnabled = false;
+	//TODO change this to false once r3 launches!
+	private boolean mCharmsEnabled = true;
+	private boolean mAbilityEnhancementsEnabled = false;
 	private boolean mAuditMessagesEnabled = true;
 	private boolean mRepairExplosions = false;
 	private boolean mPreventDungeonItemTransfer = true;
@@ -71,6 +74,14 @@ public class ServerProperties {
 
 	public static boolean getClassSpecializationsEnabled() {
 		return INSTANCE.mClassSpecializationsEnabled;
+	}
+
+	public static boolean getCharmsEnabled() {
+		return INSTANCE.mCharmsEnabled;
+	}
+
+	public static boolean getAbilityEnhancementsEnabled() {
+		return INSTANCE.mAbilityEnhancementsEnabled;
 	}
 
 	public static boolean getAuditMessagesEnabled() {
@@ -130,6 +141,7 @@ public class ServerProperties {
 			mIsSleepingEnabled = getPropertyValueBool(object, "isSleepingEnabled", mIsSleepingEnabled);
 			mKeepLowTierInventory = getPropertyValueBool(object, "keepLowTierInventory", mKeepLowTierInventory);
 			mClassSpecializationsEnabled = getPropertyValueBool(object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
+			mAbilityEnhancementsEnabled = getPropertyValueBool(object, "abilityEnhancementsEnabled", mAbilityEnhancementsEnabled);
 			mAuditMessagesEnabled = getPropertyValueBool(object, "auditMessagesEnabled", mAuditMessagesEnabled);
 			mRepairExplosions = getPropertyValueBool(object, "repairExplosions", mRepairExplosions);
 			mPreventDungeonItemTransfer = getPropertyValueBool(object, "preventDungeonItemTransfer", mPreventDungeonItemTransfer);
@@ -170,6 +182,8 @@ public class ServerProperties {
 		out.add("isSleepingEnabled = " + mIsSleepingEnabled);
 		out.add("keepLowTierInventory = " + mKeepLowTierInventory);
 		out.add("classSpecializationsEnabled = " + mClassSpecializationsEnabled);
+		out.add("charmsEnabled = " + mCharmsEnabled);
+		out.add("abilityEnhancementsEnabled = " + mAbilityEnhancementsEnabled);
 		out.add("auditMessagesEnabled = " + mAuditMessagesEnabled);
 		out.add("repairExplosions = " + mRepairExplosions);
 		out.add("preventDungeonItemTransfer = " + mPreventDungeonItemTransfer);
@@ -210,10 +224,10 @@ public class ServerProperties {
 		return value;
 	}
 
-	private String getPropertyValueString(JsonObject object, String properyName, String defaultVal) {
+	private String getPropertyValueString(JsonObject object, String propertyName, String defaultVal) {
 		String value = defaultVal;
 
-		JsonElement element = object.get(properyName);
+		JsonElement element = object.get(propertyName);
 		if (element != null) {
 			value = element.getAsString();
 		}

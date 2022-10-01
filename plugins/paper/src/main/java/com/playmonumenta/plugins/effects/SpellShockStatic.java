@@ -7,12 +7,13 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 
 public class SpellShockStatic extends Effect {
+	public static final String effectID = "SpellShockStatic";
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
 
 	private boolean mTriggered = false;
 
 	public SpellShockStatic(int duration) {
-		super(duration);
+		super(duration, effectID);
 	}
 
 	public boolean isTriggered() {

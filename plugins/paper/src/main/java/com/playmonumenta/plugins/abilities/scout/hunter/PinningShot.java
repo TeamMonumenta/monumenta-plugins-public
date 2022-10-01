@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -16,13 +17,11 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-
 
 public class PinningShot extends Ability {
 
@@ -34,6 +33,9 @@ public class PinningShot extends Ability {
 	private static final double PINNING_WEAKEN_1 = 0.3;
 	private static final double PINNING_WEAKEN_2 = 0.6;
 
+	public static final String CHARM_DAMAGE = "Pinning Shot Max Health Damage";
+	public static final String CHARM_WEAKEN = "Pinning Shot Weakness Amplifier";
+
 	private final double mDamageMultiplier;
 	private final double mWeaken;
 
@@ -44,17 +46,18 @@ public class PinningShot extends Ability {
 		mInfo.mScoreboardId = "PinningShot";
 		mInfo.mShorthandName = "PSh";
 		mInfo.mLinkedSpell = ClassAbility.PINNING_SHOT;
-		mInfo.mDescriptions.add("The first time you shoot a non-boss enemy, pin it for 2.5s. Pinned enemies are afflicted with 100% Slowness and 30% Weaken (Bosses receive 30% Slowness and no Weaken). Shooting a pinned non-boss enemy deals 10% of its max health on top of regular damage and removes the pin. A mob cannot be pinned more than once.");
-		mInfo.mDescriptions.add("Weaken increased to 60% and bonus damage increased to 20% max health.");
+		mInfo.mDescriptions.add(String.format("The first time you shoot a non-boss enemy, pin it for %ss. Pinned enemies are afflicted with %d%% Slowness and %d%% Weaken (Bosses receive %d%% Slowness and no Weaken). Shooting a pinned non-boss enemy deals %d%% of its max health on top of regular damage and removes the pin. A mob cannot be pinned more than once.",
+			PINNING_SHOT_DURATION / 20.0, (int)(PINNING_SLOW * 100), (int)(PINNING_WEAKEN_1 * 100), (int)(PINNING_SLOW_BOSS * 100), (int)(PINNING_SHOT_1_DAMAGE_MULTIPLIER * 100)));
+		mInfo.mDescriptions.add(String.format("Weaken increased to %d%% and bonus damage increased to %d%% max health.", (int)(PINNING_WEAKEN_2 * 100), (int)(PINNING_SHOT_2_DAMAGE_MULTIPLIER * 100)));
 		mDisplayItem = new ItemStack(Material.CROSSBOW, 1);
 
-		mDamageMultiplier = getAbilityScore() == 1 ? PINNING_SHOT_1_DAMAGE_MULTIPLIER : PINNING_SHOT_2_DAMAGE_MULTIPLIER;
-		mWeaken = getAbilityScore() == 1 ? PINNING_WEAKEN_1 : PINNING_WEAKEN_2;
+		mDamageMultiplier = (isLevelOne() ? PINNING_SHOT_1_DAMAGE_MULTIPLIER : PINNING_SHOT_2_DAMAGE_MULTIPLIER) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mWeaken = (isLevelOne() ? PINNING_WEAKEN_1 : PINNING_WEAKEN_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() != DamageType.PROJECTILE || !(event.getDamager() instanceof AbstractArrow)) {
+		if (event.getType() != DamageType.PROJECTILE || !(event.getDamager() instanceof Projectile proj) || !EntityUtils.isAbilityTriggeringProjectile(proj, true)) {
 			return false;
 		}
 

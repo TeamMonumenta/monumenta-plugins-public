@@ -12,6 +12,7 @@ import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Projectile;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -46,8 +47,10 @@ public class SpellVolley extends Spell {
 			public void run() {
 				w.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 3, 1);
 				w.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.HOSTILE, 3, 1);
-				List<AbstractArrow> projectiles = EntityUtils.spawnArrowVolley(mBoss, 10, 2, 5.0, Arrow.class);
-				for (AbstractArrow proj : projectiles) {
+				List<Projectile> projectiles = EntityUtils.spawnVolley(mBoss, 10, 2, 5.0, Arrow.class);
+				for (Projectile projectile : projectiles) {
+					AbstractArrow proj = (AbstractArrow) projectile;
+
 					proj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 					proj.setDamage(20);
 

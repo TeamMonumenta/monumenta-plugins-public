@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -27,7 +27,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -48,34 +47,53 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	private static final int TELEPORT_TICKS = 4;
 	private static final int MAX_CHARGES = 2;
 
+	public static final String CHARM_COOLDOWN = "Bodkin Blitz Cooldown";
+	public static final String CHARM_CHARGE = "Bodkin Blitz Charge";
+	public static final String CHARM_DAMAGE = "Bodkin Blitz Damage";
+	public static final String CHARM_STEALTH = "Bodkin Blitz Stealth Duration";
+	public static final String CHARM_DISTANCE = "Bodkin Blitz Distance";
+
 	private final int mStealthDuration;
-	private final int mBonusDmg;
+	private final double mBonusDmg;
 
 	private @Nullable BukkitRunnable mRunnable = null;
 	private boolean mTeleporting = false;
 	private int mTicks;
 
 	private boolean mHasSmokescreen = false;
+	private int mLastCastTicks = 0;
 
 	public BodkinBlitz(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Bodkin Blitz");
 		mInfo.mLinkedSpell = ClassAbility.BODKIN_BLITZ;
 		mInfo.mScoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";
-		mInfo.mDescriptions.add("Sneak right click while holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. Upon teleporting, your next melee attack deals 7 bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: 20s. Charges: 2.");
-		mInfo.mDescriptions.add("Range increased to 14 blocks, Stealth increased to 1.5 seconds. Upon teleporting, your next melee attack deals 14 bonus damage if your target is not focused on you. Cooldown: 18s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mDescriptions.add(
+			String.format("Sneak right click while holding two swords to teleport %s blocks forwards. Gain %s second of Stealth upon teleporting. Upon teleporting, your next melee attack deals %s bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: %ss. Charges: %s.",
+				DISTANCE_1,
+				STEALTH_DURATION_1 / 20,
+				BONUS_DMG_1,
+				COOLDOWN_1 / 20,
+				MAX_CHARGES
+				));
+		mInfo.mDescriptions.add(
+			String.format("Range increased to %s blocks, Stealth increased to %s seconds. Upon teleporting, your next melee attack deals %s bonus damage if your target is not focused on you. Cooldown: %ss.",
+				DISTANCE_2,
+				STEALTH_DURATION_2 / 20.0,
+				BONUS_DMG_2,
+				COOLDOWN_2 / 20));
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
-		mMaxCharges = MAX_CHARGES;
+		mMaxCharges = MAX_CHARGES + (int) CharmManager.getLevel(player, CHARM_CHARGE);
 		mCharges = getTrackedCharges();
 
-		mStealthDuration = getAbilityScore() == 1 ? STEALTH_DURATION_1 : STEALTH_DURATION_2;
-		mBonusDmg = getAbilityScore() == 1 ? BONUS_DMG_1 : BONUS_DMG_2;
+		mStealthDuration = (isLevelOne() ? STEALTH_DURATION_1 : STEALTH_DURATION_2) + CharmManager.getExtraDuration(player, CHARM_STEALTH);
+		mBonusDmg = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? BONUS_DMG_1 : BONUS_DMG_2);
 
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mHasSmokescreen = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Smokescreen.class) != null;
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			mHasSmokescreen = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Smokescreen.class) != null;
 		});
 	}
 
@@ -92,6 +110,13 @@ public class BodkinBlitz extends MultipleChargeAbility {
 			return;
 		}
 
+		int ticks = mPlayer.getTicksLived();
+		// Prevent double casting on accident
+		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
+			return;
+		}
+		mLastCastTicks = ticks;
+
 		if (!consumeCharge()) {
 			return;
 		}
@@ -105,7 +130,8 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		new BukkitRunnable() {
 			final BoundingBox mPlayerBox = mPlayer.getBoundingBox();
 			final Vector mDirection = mPlayer.getLocation().getDirection().normalize();
-			final double mDistancePerTick = 1.0 * (getAbilityScore() == 1 ? DISTANCE_1 : DISTANCE_2) / TELEPORT_TICKS;
+			double mDistance = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
+			final double mDistancePerTick = mDistance / TELEPORT_TICKS;
 			int mTick = 0;
 			Location mLastTpLoc = mPlayer.getLocation();
 
@@ -145,7 +171,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 				mTick++;
 				if (mTick >= TELEPORT_TICKS) {
 					tpLoc.setDirection(mPlayer.getLocation().getDirection());
-					mPlayer.teleport(tpLoc, TeleportCause.UNKNOWN);
+					mPlayer.teleport(tpLoc);
 
 					mTeleporting = false;
 
@@ -196,8 +222,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 			mTicks = 0;
 			mRunnable.cancel();
 			mRunnable = null;
-			if (enemy instanceof Mob) {
-				Mob m = (Mob) enemy;
+			if (enemy instanceof Mob m) {
 				if (m.getTarget() == null || !m.getTarget().getUniqueId().equals(mPlayer.getUniqueId())) {
 					Location entityLoc = m.getLocation().clone().add(0, 1, 0);
 

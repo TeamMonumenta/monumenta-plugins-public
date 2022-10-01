@@ -6,13 +6,22 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.itemstats.enchantments.Bleeding;
+import com.playmonumenta.plugins.itemstats.enchantments.Decay;
+import com.playmonumenta.plugins.itemstats.enchantments.FireAspect;
+import com.playmonumenta.plugins.itemstats.enchantments.IceAspect;
+import com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect;
+import com.playmonumenta.plugins.itemstats.enchantments.WindAspect;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
@@ -24,6 +33,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -39,23 +49,38 @@ public class ArcaneStrike extends Ability {
 	private static final int DAMAGE_2 = 7;
 	private static final int BONUS_DAMAGE_1 = 2;
 	private static final int BONUS_DAMAGE_2 = 3;
+	private static final double ENHANCEMENT_DAMAGE_MULTIPLIER = 1.2;
 	private static final int COOLDOWN = 5 * 20;
-	public static final ClassAbility ABILITY = ClassAbility.ARCANE_STRIKE;
 
-	private final int mDamageBonus;
-	private final int mDamageBonusAffected;
+	public static final String CHARM_DAMAGE = "Arcane Strike Damage";
+	public static final String CHARM_RADIUS = "Arcane Strike Radius";
+	public static final String CHARM_BONUS = "Arcane Strike Bonus Damage";
+	public static final String CHARM_COOLDOWN = "Arcane Strike Cooldown";
+
+	private final float mDamageBonus;
+	private final float mDamageBonusAffected;
 
 	public ArcaneStrike(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Arcane Strike");
 		mInfo.mLinkedSpell = ClassAbility.ARCANE_STRIKE;
 		mInfo.mScoreboardId = "ArcaneStrike";
 		mInfo.mShorthandName = "AS";
-		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 4 magic damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 5s.");
-		mInfo.mDescriptions.add("The damage is increased to 7. Mobs that are on fire or slowed take 3 additional damage.");
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mDescriptions.add(
+			String.format("When you attack an enemy with a wand, you unleash an arcane explosion dealing %s arcane magic damage to all mobs in a %s block radius around the target. Enemies that are on fire or slowed take %s extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: %ss.",
+				DAMAGE_1,
+				(int) RADIUS,
+				BONUS_DAMAGE_1,
+				COOLDOWN / 20
+			));
+		mInfo.mDescriptions.add(
+			String.format("The damage is increased to %s. Mobs that are on fire or slowed take %s additional damage.",
+				DAMAGE_2,
+				BONUS_DAMAGE_2));
+		mInfo.mDescriptions.add("Your enchantment on-hit effects are now also applied to all other enemies hit in the radius. Also this skill's damage is increased by 20%.");
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
-		mDamageBonus = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
-		mDamageBonusAffected = getAbilityScore() == 1 ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2;
+		mDamageBonus = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mDamageBonusAffected = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_BONUS, isLevelOne() ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2);
 	}
 
 	@Override
@@ -63,18 +88,56 @@ public class ArcaneStrike extends Ability {
 		if (event.getType() == DamageType.MELEE && mPlayer != null && mPlayer.getCooledAttackStrength(0) == 1) {
 			putOnCooldown();
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), RADIUS, mPlayer)) {
-				float dmg = SpellPower.getSpellDamage(mPlugin, mPlayer, mDamageBonus);
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, RADIUS), mPlayer)) {
+				float preSpellPowerDamage = mDamageBonus;
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)
 				if (EntityUtils.isSlowed(mPlugin, mob) || (mob.hasPotionEffect(PotionEffectType.SLOW)
-					                                           && !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
-					    || (mob.getFireTicks() > 0
-						        && !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
-					dmg += SpellPower.getSpellDamage(mPlugin, mPlayer, mDamageBonusAffected);
+					&& !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
+					|| (mob.getFireTicks() > 0
+					&& !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
+					preSpellPowerDamage += mDamageBonusAffected;
+				}
+
+				float dmg = SpellPower.getSpellDamage(mPlugin, mPlayer, preSpellPowerDamage);
+
+				if (isEnhanced() && mob != enemy) {
+					ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+					int fire = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.FIRE_ASPECT);
+					if (fire > 0) {
+						FireAspect.apply(mPlugin, mPlayer, fire * FireAspect.FIRE_ASPECT_DURATION, mob);
+					}
+					int ice = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.ICE_ASPECT);
+					if (ice > 0) {
+						IceAspect.apply(mPlugin, mPlayer, ice, IceAspect.ICE_ASPECT_DURATION, mob, true);
+						dmg += IceAspect.getBonusDamage(mob);
+					}
+					int thunder = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.THUNDER_ASPECT);
+					if (thunder > 0) {
+						ThunderAspect.apply(mPlugin, mPlayer, thunder, mob);
+						dmg += ThunderAspect.getBonusDamage(mob);
+					}
+					int decay = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.DECAY);
+					if (decay > 0) {
+						Decay.apply(mPlugin, mob, Decay.DURATION, decay, mPlayer);
+					}
+					int bleed = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.BLEEDING);
+					if (bleed > 0) {
+						Bleeding.apply(mPlugin, mPlayer, bleed, Bleeding.DURATION, mob);
+					}
+					int wind = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.WIND_ASPECT);
+					if (wind > 0) {
+						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
+						WindAspect.launch(mPlugin, mob, wind);
+					}
+				}
+
+				if (isEnhanced()) {
+					dmg = (float) (dmg * ENHANCEMENT_DAMAGE_MULTIPLIER);
 				}
 
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, dmg, mInfo.mLinkedSpell, true, true);
+
 			}
 
 			Location locD = enemy.getLocation().add(0, 1, 0);
@@ -89,6 +152,7 @@ public class ArcaneStrike extends Ability {
 			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
 			new BukkitRunnable() {
 				double mD = 30;
+
 				@Override
 				public void run() {
 					Vector vec;

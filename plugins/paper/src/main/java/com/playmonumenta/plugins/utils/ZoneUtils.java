@@ -30,6 +30,7 @@ public class ZoneUtils {
 		NO_EQUIPMENT_DAMAGE("No Equipment Damage"),
 		NO_NATURAL_SPAWNS("No Natural Spawns"),
 		NO_TRAPDOOR_CLICKS("No Trapdoor Clicks"),
+		NO_DOOR_CLICKS("No Door Clicks"),
 		BIG_DOOR_DOWN_CCW("Big Door Down is CCW"),
 		BIG_DOOR_DOWN_CW("Big Door Down is CW"),
 		NO_VEHICLES("No Vehicles"),
@@ -38,7 +39,10 @@ public class ZoneUtils {
 		WINTER_SNOWBALLS_ONLY("Winter Snowballs Only"),
 		NO_POTIONS("No Potions"),
 		NO_FALL_DAMAGE("No Fall Damage"),
-		RESTRICTED("Restricted");
+		RESTRICTED("Restricted"),
+		BROOMSTICK_ENABLED("Broomstick Enabled"),
+		BLOCKBREAK_DISABLED("Blockbreak Disabled"),
+		BONE_MEAL_DISABLED("Bone Meal Disabled");
 
 		private final String mPropertyName;
 

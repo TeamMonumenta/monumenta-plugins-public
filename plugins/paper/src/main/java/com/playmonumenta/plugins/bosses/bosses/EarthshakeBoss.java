@@ -2,11 +2,13 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellEarthshake;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -48,8 +50,11 @@ public class EarthshakeBoss extends BossAbilityGroup {
 		@BossParam(help = "Players hit will be pushed up by this amount, plus 0.5 if standing close to the center")
 		public double KNOCK_UP_SPEED = 1.0;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "You should not use this. use TARGETS instead.", deprecated = true)
 		public boolean LINE_OF_SIGHT = true;
+
+		@BossParam(help = "target of this spell")
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT;
 
 		@BossParam(help = "Sound played at the targeted player when the boss starts charging the ability ability")
 		public SoundsList SOUND_WARNING = SoundsList.fromString("[(ENTITY_ELDER_GUARDIAN_CURSE,5,0.75)]");
@@ -97,11 +102,13 @@ public class EarthshakeBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
+		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT) {
+			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RANGE, false, EntityTargets.Limit.DEFAULT_ONE, p.LINE_OF_SIGHT ? List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT) : Collections.emptyList());
+		}
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellEarthshake(plugin, boss, p)
 		));
-
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}
 }

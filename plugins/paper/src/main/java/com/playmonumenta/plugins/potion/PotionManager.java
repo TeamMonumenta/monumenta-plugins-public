@@ -8,10 +8,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import java.util.function.ToIntFunction;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 public class PotionManager {
 	//  Player ID / Player Potion Info
@@ -156,6 +157,13 @@ public class PotionManager {
 		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
 		if (potionInfo != null) {
 			potionInfo.updatePotionStatus(player, ticks);
+		}
+	}
+
+	public void modifyPotionDuration(Player player, ToIntFunction<PotionInfo> function) {
+		PlayerPotionInfo info = mPlayerPotions.get(player.getUniqueId());
+		if (info != null) {
+			info.modifyPotionDuration(player, function);
 		}
 	}
 

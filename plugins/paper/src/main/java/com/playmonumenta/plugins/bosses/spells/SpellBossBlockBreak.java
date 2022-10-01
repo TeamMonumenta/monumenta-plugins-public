@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -78,6 +79,10 @@ public class SpellBossBlockBreak extends Spell {
 		}
 
 		Location l = mBoss.getLocation();
+
+		if (ZoneUtils.hasZoneProperty(l, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
+			return;
+		}
 
 		int shift = 0;
 

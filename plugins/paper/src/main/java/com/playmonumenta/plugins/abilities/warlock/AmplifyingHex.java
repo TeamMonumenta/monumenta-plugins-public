@@ -9,16 +9,17 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.AmplifyingHexCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
@@ -33,7 +34,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
 
 
 public class AmplifyingHex extends Ability {
@@ -52,20 +52,15 @@ public class AmplifyingHex extends Ability {
 	private static final int COOLDOWN = 20 * 10;
 	private static final float KNOCKBACK_SPEED = 0.12f;
 
-	private static final List<PotionEffectType> DEBUFFS = Arrays.asList(
-	                                                          PotionEffectType.WITHER,
-	                                                          PotionEffectType.SLOW,
-	                                                          PotionEffectType.WEAKNESS,
-	                                                          PotionEffectType.SLOW_DIGGING,
-	                                                          PotionEffectType.POISON,
-	                                                          PotionEffectType.BLINDNESS,
-	                                                          PotionEffectType.CONFUSION,
-	                                                          PotionEffectType.HUNGER
-	                                                      );
+	public static final String CHARM_DAMAGE = "Amplifying Hex Damage";
+	public static final String CHARM_RANGE = "Amplifying Hex Range";
+	public static final String CHARM_COOLDOWN = "Amplifying Hex Cooldown";
+	public static final String CHARM_CONE = "Amplifying Hex Cone";
+	public static final String CHARM_EFFECT = "Amplifying Hex Damage per Effect Potency";
 
-	private final int mAmplifierDamage;
+	private final float mAmplifierDamage;
 	private final int mAmplifierCap;
-	private final int mRadius;
+	private final float mRadius;
 	private float mRegionCap;
 	private float mDamage = 0f;
 
@@ -77,22 +72,23 @@ public class AmplifyingHex extends Ability {
 		mInfo.mShorthandName = "AH";
 		mInfo.mDescriptions.add("Left-click while sneaking with a scythe to fire a magic cone up to 8 blocks in front of you, dealing 2 + (0.5 * number of Skill Points, capped at the maximum available Skill Points for each Region) magic damage to each enemy per debuff (potion effects like Weakness or Wither, as well as Fire and custom effects like Bleed) they have, and an extra +1 damage per extra level of debuff, capped at 2 extra levels. 10% Slowness, Weaken, etc. count as one level. Cooldown: 10s.");
 		mInfo.mDescriptions.add("The range is increased to 10 blocks, extra damage increased to +2 per extra level, and the extra level cap is increased to 3 extra levels.");
+		mInfo.mDescriptions.add("For every 1% health you have above 80% of your max health, Amplifying Hex will deal 1% more damage to enemies and deal 1% max health damage to yourself.");
 		mInfo.mLinkedSpell = ClassAbility.AMPLIFYING;
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
-		mAmplifierDamage = getAbilityScore() == 1 ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2;
-		mAmplifierCap = getAbilityScore() == 1 ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2;
-		mRadius = getAbilityScore() == 1 ? RADIUS_1 : RADIUS_2;
+		mAmplifierDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2);
+		mAmplifierCap = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2);
+		mRadius = (float) CharmManager.getRadius(player, CHARM_RANGE, isLevelOne() ? RADIUS_1 : RADIUS_2);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AmplifyingHexCS(), AmplifyingHexCS.SKIN_LIST);
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				int skillPoints = Stream.of(AmplifyingHex.class, CholericFlames.class, GraspingClaws.class, SoulRend.class,
-				                            SanguineHarvest.class, MelancholicLament.class, CursedWound.class, PhlegmaticResolve.class)
+						SanguineHarvest.class, MelancholicLament.class, CursedWound.class, PhlegmaticResolve.class)
 					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c))
-					.mapToInt(a -> a == null ? 0 : a.getAbilityScore())
+					.mapToInt(a -> a == null ? 0 : Math.min(a.getAbilityScore(), 2))
 					.sum();
 				mDamage = DAMAGE_PER_SKILL_POINT * skillPoints;
 			});
@@ -143,12 +139,29 @@ public class AmplifyingHex extends Ability {
 
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 
+		double maxHealth = EntityUtils.getMaxHealth(mPlayer);
+		double percentBoost = 0;
+		if (isEnhanced() && mPlayer.getHealth() > maxHealth * 0.8) {
+			percentBoost = mPlayer.getHealth() / maxHealth - 0.8;
+			double selfHarm = maxHealth * percentBoost;
+			double absorp = mPlayer.getAbsorptionAmount();
+			double newAbsorp = absorp - selfHarm;
+			if (absorp > 0) {
+				AbsorptionUtils.setAbsorption(mPlayer, (float) Math.max(newAbsorp, 0), -1);
+			}
+			if (newAbsorp < 0) {
+				mPlayer.setHealth(maxHealth + newAbsorp);
+			}
+			//dummy damage
+			DamageUtils.damage(null, mPlayer, new DamageEvent.Metadata(DamageType.OTHER, null, null, null), 0.001, true, false, false);
+		}
+
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius, mPlayer)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
-			if (playerDir.dot(toMobVector) > DOT_ANGLE) {
+			if (playerDir.dot(toMobVector) > CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, DOT_ANGLE)) {
 				int debuffCount = 0;
 				int amplifierCount = 0;
-				for (PotionEffectType effectType : DEBUFFS) {
+				for (PotionEffectType effectType : AbilityUtils.DEBUFFS) {
 					PotionEffect effect = mob.getPotionEffect(effectType);
 					if (effect != null) {
 						debuffCount++;
@@ -159,18 +172,22 @@ public class AmplifyingHex extends Ability {
 				if (mob.getFireTicks() > 0) {
 					debuffCount++;
 					amplifierCount += Math.min(mAmplifierCap, Inferno.getInfernoLevel(mPlugin, mob));
+					// mPlayer.sendMessage("On Fire");
 				}
 
 				if (EntityUtils.isStunned(mob)) {
 					debuffCount++;
+					// mPlayer.sendMessage("On Stun");
 				}
 
 				if (EntityUtils.isParalyzed(mPlugin, mob)) {
 					debuffCount++;
+					// mPlayer.sendMessage("On Paralyzed");
 				}
 
 				if (EntityUtils.isSilenced(mob)) {
 					debuffCount++;
+					// mPlayer.sendMessage("On Silenced");
 				}
 
 				if (EntityUtils.isBleeding(mPlugin, mob)) {
@@ -182,14 +199,16 @@ public class AmplifyingHex extends Ability {
 				if (EntityUtils.isSlowed(mPlugin, mob) && mob.getPotionEffect(PotionEffectType.SLOW) == null) {
 					debuffCount++;
 					double slowAmp = EntityUtils.getSlowAmount(mPlugin, mob);
-					amplifierCount += Math.min(mAmplifierCap, Math.max((int) Math.floor(slowAmp * 10) - 1, 0));
+					int slowLevel = (int) Math.floor(slowAmp * 10);
+					amplifierCount += Math.min((int) mAmplifierCap, Math.max(slowLevel - 1, 0));
 				}
 
 				//Custom weaken interaction
-				if (EntityUtils.isWeakened(mPlugin, mob) && mob.getPotionEffect(PotionEffectType.WEAKNESS) == null) {
+				if (EntityUtils.isWeakened(mPlugin, mob)) {
 					debuffCount++;
 					double weakAmp = EntityUtils.getWeakenAmount(mPlugin, mob);
-					amplifierCount += Math.min(mAmplifierCap, Math.max((int) Math.floor(weakAmp * 10) - 1, 0));
+					int weakLevel = (int) Math.floor(weakAmp * 10);
+					amplifierCount += Math.min((int) mAmplifierCap, Math.max(weakLevel - 1, 0));
 				}
 
 				//Custom vuln interaction
@@ -202,11 +221,13 @@ public class AmplifyingHex extends Ability {
 				//Custom DoT interaction
 				if (EntityUtils.hasDamageOverTime(mPlugin, mob)) {
 					debuffCount++;
-					amplifierCount += Math.min(mAmplifierCap, (int) EntityUtils.getHighestDamageOverTime(mPlugin, mob) - 1);
+					int dotLevel = (int) EntityUtils.getHighestDamageOverTime(mPlugin, mob);
+					amplifierCount += (int) Math.min(mAmplifierCap, dotLevel - 1);
 				}
 
 				if (debuffCount > 0) {
-					float finalDamage = debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage;
+					double finalDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage);
+					finalDamage *= (1 + percentBoost);
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.mLinkedSpell, true);
 					MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
 				}

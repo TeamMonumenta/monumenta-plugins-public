@@ -17,9 +17,9 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -41,7 +41,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && !arrow.hasMetadata(RapidFire.META_DATA_TAG) && EntityUtils.isHostileMob(enemy)) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false) && !proj.hasMetadata(RapidFire.META_DATA_TAG) && EntityUtils.isHostileMob(enemy)) {
 			LivingEntity nearestMob = EntityUtils.getNearestMob(enemy.getLocation(), SPLIT_ARROW_CHAIN_RANGE, enemy);
 
 			if (nearestMob != null && !nearestMob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
@@ -62,7 +62,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 					world.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
 					world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 
-					if (arrow instanceof SpectralArrow) {
+					if (proj instanceof SpectralArrow) {
 						nearestMob.addPotionEffect(SPECTRAL_ARROW_EFFECT);
 					}
 
@@ -77,7 +77,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When you shoot an enemy with an arrow or trident, the nearest enemy within " + SPLIT_ARROW_CHAIN_RANGE + " blocks takes " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE_MOD[rarity - 1]) + "%" + ChatColor.WHITE + " of the arrow's damage. Bypasses iframes.";
+		return "When you shoot an enemy with a projectile, the nearest enemy within " + SPLIT_ARROW_CHAIN_RANGE + " blocks takes " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE_MOD[rarity - 1]) + "%" + ChatColor.WHITE + " of the projectile's damage.";
 	}
 
 	@Override

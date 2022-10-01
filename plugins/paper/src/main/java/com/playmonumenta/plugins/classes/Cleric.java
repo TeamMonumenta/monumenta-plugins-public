@@ -43,6 +43,7 @@ public class Cleric extends PlayerClass {
 		mDisplayItem = new ItemStack(Material.POPPY, 1);
 		mClassDescription = "Clerics are mighty healers and specialize in fighting the undead.";
 		mClassPassiveDescription = "You and all allies in a 12 block radius heal 5% of max health every 5s while under 50% health.";
+		mClassPassiveName = "Rejuvenation";
 
 		mSpecOne.mAbilities.add(new HolyJavelin(plugin, player));
 		mSpecOne.mAbilities.add(new ChoirBells(plugin, player));

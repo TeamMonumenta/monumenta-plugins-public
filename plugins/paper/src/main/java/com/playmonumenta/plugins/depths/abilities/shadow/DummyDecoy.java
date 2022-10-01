@@ -28,6 +28,9 @@ import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -53,31 +56,35 @@ public class DummyDecoy extends DepthsAbility {
 		mInfo.mIgnoreCooldown = true;
 	}
 
-	public void execute(AbstractArrow arrow) {
+	public void execute(Projectile proj) {
 
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, 1, 1.4f);
 
-		arrow.setPierceLevel(0);
-		arrow.setCritical(true);
-		arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-		arrow.setMetadata(DUMMY_DECOY_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
+		if (proj instanceof AbstractArrow arrow) {
+			arrow.setPierceLevel(0);
+			arrow.setCritical(true);
+			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+		}
 
-		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SPELL_WITCH);
+		proj.setMetadata(DUMMY_DECOY_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
+
+		mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SPELL_WITCH);
 
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 
-				if (mT > MAX_TICKS || !arrow.isValid() || !arrow.hasMetadata(DUMMY_DECOY_ARROW_METADATA)) {
-					arrow.remove();
+				if (mT > MAX_TICKS || !proj.isValid() || !proj.hasMetadata(DUMMY_DECOY_ARROW_METADATA)) {
+					proj.remove();
 					this.cancel();
 					return;
 				}
 
-				if (arrow.getVelocity().length() < .05 || arrow.isOnGround()) {
-					spawnDecoy(arrow, arrow.getLocation());
+				if (proj.getVelocity().length() < .05 || proj.isOnGround()) {
+					spawnDecoy(proj, proj.getLocation());
 					this.cancel();
 					return;
 				}
@@ -88,10 +95,19 @@ public class DummyDecoy extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.isValid() && arrow.hasMetadata(DUMMY_DECOY_ARROW_METADATA)) {
-			spawnDecoy(arrow, enemy.getLocation());
+		Entity damager = event.getDamager();
+		if (event.getType() == DamageType.PROJECTILE && damager instanceof AbstractArrow && damager.isValid() && damager.hasMetadata(DUMMY_DECOY_ARROW_METADATA)) {
+			spawnDecoy(damager, enemy.getLocation());
 		}
 		return false; // prevents multiple calls itself
+	}
+
+	// Since Snowballs disappear after landing, we need an extra detection for when it hits the ground.
+	@Override
+	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
+		if (mPlayer != null && proj instanceof Snowball && proj.hasMetadata(DUMMY_DECOY_ARROW_METADATA)) {
+			spawnDecoy(proj, proj.getLocation());
+		}
 	}
 
 	private void spawnDecoy(Entity arrow, Location loc) {
@@ -118,7 +134,7 @@ public class DummyDecoy extends DepthsAbility {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (e != null && e.isValid() && !e.isDead()) {
+				if (e.isValid() && !e.isDead()) {
 					DamageUtils.damage(null, e, DamageType.OTHER, 10000);
 				}
 			}
@@ -126,15 +142,15 @@ public class DummyDecoy extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
+	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			return true;
 		}
 
-		if (mPlayer.isSneaking()) {
+		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
-			execute(arrow);
+			execute(projectile);
 		}
 
 		return true;
@@ -142,7 +158,7 @@ public class DummyDecoy extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting a bow, crossbow, or trident while sneaking fires a cursed arrow. When the arrow lands, it spawns a dummy decoy at the location with " + DepthsUtils.getRarityColor(rarity) + HEALTH[rarity - 1] + ChatColor.WHITE + " health that lasts for up to " + MAX_TICKS / 20 + " seconds. The decoy aggros mobs within " + AGGRO_RADIUS + " blocks on a regular interval. On death, the decoy explodes, stunning mobs in a " + STUN_RADIUS + " block radius for " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundDouble(STUN_TICKS[rarity - 1] / 20.0) + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Shooting a projectile while sneaking fires a cursed projectile. When the projectile lands, it spawns a dummy decoy at that location with " + DepthsUtils.getRarityColor(rarity) + HEALTH[rarity - 1] + ChatColor.WHITE + " health that lasts for up to " + MAX_TICKS / 20 + " seconds. The decoy aggros mobs within " + AGGRO_RADIUS + " blocks on a regular interval. On death, the decoy explodes, stunning mobs in a " + STUN_RADIUS + " block radius for " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundDouble(STUN_TICKS[rarity - 1] / 20.0) + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.classes;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
+import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
 import com.playmonumenta.plugins.abilities.mage.MagmaShield;
@@ -22,9 +23,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-
-
-
 public class Mage extends PlayerClass {
 
 	Mage(Plugin plugin, @Nullable Player player) {
@@ -42,7 +40,8 @@ public class Mage extends PlayerClass {
 		mChatColor = ChatColor.LIGHT_PURPLE;
 		mDisplayItem = new ItemStack(Material.BLAZE_ROD, 1);
 		mClassDescription = "Mages are masters of area control, freezing, wounding, and igniting enemies with their strikes.";
-		mClassPassiveDescription = "After casting a spell, your next melee attack with a wand deals 20% more damage.";
+		mClassPassiveDescription = String.format("After casting a spell, your next melee attack with a wand deals %s%% more damage.", (int)(Channeling.PERCENT_MELEE_INCREASE * 100));
+		mClassPassiveName = "Channeling";
 
 		mSpecOne.mAbilities.add(new AstralOmen(plugin, player));
 		mSpecOne.mAbilities.add(new CosmicMoonblade(plugin, player));

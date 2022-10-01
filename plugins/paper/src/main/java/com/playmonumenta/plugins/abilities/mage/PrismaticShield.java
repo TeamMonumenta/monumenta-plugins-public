@@ -4,11 +4,16 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.HashSet;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -30,18 +35,50 @@ public class PrismaticShield extends Ability {
 	private static final int COOLDOWN_2 = 70 * 20;
 	private static final float KNOCKBACK_SPEED = 0.7f;
 	private static final int STUN_DURATION = 20;
+	private static final int HEAL_DURATION = 3 * 20;
+	private static final int HEAL_PERCENT = 5;
+	private static final String HEALED_THIS_TICK_METAKEY = "PrismaticShieldHealedThisTick";
+
+	public static final String CHARM_ABSORPTION = "Prismatic Shield Absorption Health";
+	public static final String CHARM_COOLDOWN = "Prismatic Shield Cooldown";
+	public static final String CHARM_KNOCKBACK = "Prismatic Shield Knockback";
+	public static final String CHARM_STUN = "Prismatic Shield Stun Duration";
+	public static final String CHARM_DURATION = "Prismatic Shield Absorption Duration";
+	public static final String CHARM_TRIGGER = "Prismatic Shield Trigger Health";
 
 	private final int mAbsorptionHealth;
+
+	private int mLastActivation = -1;
+	private final Set<ClassAbility> mHealedFromAbilitiesThisTick = new HashSet<>();
+	private boolean mHealedFromBlizzard = false;
 
 	public PrismaticShield(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Prismatic Shield");
 		mInfo.mLinkedSpell = ClassAbility.PRISMATIC_SHIELD;
 		mInfo.mScoreboardId = "Prismatic";
 		mInfo.mShorthandName = "PS";
-		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive 2 Absorption hearts which lasts up to 12 s. In addition enemies within four blocks are knocked back. Cooldown: 90s.");
-		mInfo.mDescriptions.add("The shield is improved to 4 Absorption hearts. Enemies within four blocks are knocked back and stunned for 1 s. Cooldown: 70s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
-		mAbsorptionHealth = getAbilityScore() == 1 ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2;
+		mInfo.mDescriptions.add(
+			String.format("When your health drops below %s hearts (including if the attack would've killed you), you receive %s Absorption hearts which lasts up to %s s. In addition enemies within %s blocks are knocked back. Cooldown: %ss.",
+				TRIGGER_HEALTH / 2,
+				ABSORPTION_HEALTH_1 / 2,
+				DURATION / 20,
+				(int)RADIUS,
+				COOLDOWN_1 / 20
+				));
+		mInfo.mDescriptions.add(
+			String.format("The shield is improved to %s Absorption hearts. Enemies within %s blocks are knocked back and stunned for %s s. Cooldown: %ss.",
+				ABSORPTION_HEALTH_2 / 2,
+				(int)RADIUS,
+				STUN_DURATION / 20,
+				COOLDOWN_2 / 20));
+		mInfo.mDescriptions.add(
+			String.format("After Prismatic Shield is activated, in the next %ss, every spell that deals damage to at least one enemy will heal you for %s%% of your max health.",
+				HEAL_DURATION / 20,
+				HEAL_PERCENT)
+		);
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
+		mInfo.mIgnoreCooldown = true;
+		mAbsorptionHealth = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 	}
 
@@ -52,7 +89,7 @@ public class PrismaticShield extends Ability {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (!event.isBlocked() && mPlayer != null) {
+		if (!event.isBlocked() && mPlayer != null && !isTimerActive()) {
 			// Calculate whether this effect should not be run based on player health.
 			// It is intentional that Prismatic Shield saves you from death if you take a buttload of damage somehow.
 			double healthRemaining = mPlayer.getHealth() - event.getFinalDamage(true);
@@ -61,7 +98,7 @@ public class PrismaticShield extends Ability {
 			boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -4 * (mAbsorptionHealth + 1);
 
 
-			if (healthRemaining > TRIGGER_HEALTH) {
+			if (healthRemaining > CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TRIGGER, TRIGGER_HEALTH)) {
 				return;
 			} else if (dealDamageLater) {
 				// The player has taken fatal damage BUT will be saved by the absorption, so set damage to 0 and compensate later
@@ -70,16 +107,20 @@ public class PrismaticShield extends Ability {
 
 			// Put on cooldown before processing results to prevent infinite recursion
 			putOnCooldown();
+			mLastActivation = mPlayer.getTicksLived();
+			mHealedFromAbilitiesThisTick.clear();
+			mHealedFromBlizzard = false;
 
 			// Conditions match - prismatic shield
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
-				MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
-				if (getAbilityScore() == 2) {
-					EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
+				float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK_SPEED);
+				MovementUtils.knockAway(mPlayer, mob, knockback, true);
+				if (isLevelTwo()) {
+					EntityUtils.applyStun(mPlugin, STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), mob);
 				}
 			}
 
-			AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, DURATION);
+			AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION));
 			World world = mPlayer.getWorld();
 			new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1).spawnAsPlayerActive(mPlayer);
@@ -96,5 +137,34 @@ public class PrismaticShield extends Ability {
 	@Override
 	public void onHurtFatal(DamageEvent event) {
 		onHurt(event, null, null);
+	}
+
+	@Override
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (isEnhanced()
+			    && mPlayer != null
+			    && mPlayer.getTicksLived() <= mLastActivation + HEAL_DURATION
+			    && event.getAbility() != null
+			    && event.getAbility() != ClassAbility.SPELLSHOCK
+			    && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
+			if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, HEALED_THIS_TICK_METAKEY)) {
+				// new tick, clear abilities encountered this tick
+				mHealedFromAbilitiesThisTick.clear();
+			}
+			if (!mHealedFromAbilitiesThisTick.add(event.getAbility())) {
+				// already healed for this ability this tick, abort
+				return false;
+			}
+			if (event.getAbility() == ClassAbility.BLIZZARD) {
+				// Blizzard needs special handling as it deals damage multiple times. Only one damage tick can heal over the entire duration.
+				// Elementalist should not be able to re-cast Blizzard quickly, so this should also be a correct limit to number of casts (1).
+				if (mHealedFromBlizzard) {
+					return false;
+				}
+				mHealedFromBlizzard = true;
+			}
+			PlayerUtils.healPlayer(mPlugin, mPlayer, HEAL_PERCENT / 100.0 * EntityUtils.getMaxHealth(mPlayer));
+		}
+		return false; // there may be multiple spells cast in the same tick, need to check them all. No recursion possible as this doesn't deal damage.
 	}
 }

@@ -30,6 +30,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -193,7 +194,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 						tpLoc.add(FastUtils.randomDoubleInRange(-6, 6), 0, FastUtils.randomDoubleInRange(-6, 6));
 						tpLoc.setYaw(tpLoc.getYaw() + FastUtils.randomFloatInRange(-30, 30));
 						tpLoc.setPitch(tpLoc.getPitch() + FastUtils.randomFloatInRange(-10, 10));
-						player.teleport(tpLoc);
+						player.teleport(tpLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 						player.playSound(tpLoc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 						player.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
 						player.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
@@ -257,7 +258,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		}
 		Location loc = mOrigPlayerLocs.get(player);
 		if (loc != null) {
-			player.teleport(loc);
+			player.teleport(loc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 			mOrigPlayerLocs.remove(player);
 		}
 		player.getWorld().spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);

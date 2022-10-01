@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -47,6 +48,10 @@ public class LuminousInfusion extends Ability {
 	private static final int COOLDOWN = 20 * 14;
 	private static final float KNOCKBACK_SPEED = 0.7f;
 
+	public static final String CHARM_DAMAGE = "Luminous Infusion Damage";
+	public static final String CHARM_COOLDOWN = "Luminous Infusion Cooldown";
+	public static final String CHARM_RADIUS = "Luminous Infusion Radius";
+
 	private boolean mActive = false;
 
 	private @Nullable Crusade mCrusade;
@@ -58,12 +63,12 @@ public class LuminousInfusion extends Ability {
 		mInfo.mShorthandName = "LI";
 		mInfo.mDescriptions.add("While sneaking, pressing the swap key charges your hands with holy light. The next time you damage an undead enemy, your attack is infused with explosive power, dealing 20 magic damage to it and all enemies in a 4-block cube around it, or 10 against non-undead, and knocking other enemies away from it. Cooldown: 14s.");
 		mInfo.mDescriptions.add("Your melee attacks now passively deal 15% magic damage to undead enemies, and Divine Justice now passively deals 15% more total damage. Damaging an undead enemy now passively sets it on fire for 3s.");
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 
-		mDoMultiplierAndFire = getAbilityScore() == 2;
+		mDoMultiplierAndFire = isLevelTwo();
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -146,7 +151,7 @@ public class LuminousInfusion extends Ability {
 		mActive = false;
 		ClientModHandler.updateAbility(mPlayer, this);
 
-		DamageUtils.damage(mPlayer, damagee, DamageType.MAGIC, DAMAGE_UNDEAD_1, mInfo.mLinkedSpell);
+		DamageUtils.damage(mPlayer, damagee, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_UNDEAD_1), mInfo.mLinkedSpell);
 
 		Location loc = damagee.getLocation();
 		World world = mPlayer.getWorld();
@@ -155,7 +160,7 @@ public class LuminousInfusion extends Ability {
 		world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.8f, 1.1f);
 
 		// Exclude the damagee so that the knockaway is valid
-		List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, RADIUS, damagee);
+		List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), damagee);
 		for (LivingEntity e : affected) {
 			// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
 			double volume = 0.6 / Math.sqrt(affected.size());
@@ -180,9 +185,9 @@ public class LuminousInfusion extends Ability {
 				if (mDoMultiplierAndFire) {
 					EntityUtils.applyFire(Plugin.getInstance(), FIRE_DURATION_2, e, mPlayer);
 				}
-				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, DAMAGE_UNDEAD_1, mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_UNDEAD_1), mInfo.mLinkedSpell);
 			} else {
-				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, DAMAGE_1, mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_1), mInfo.mLinkedSpell);
 			}
 			MovementUtils.knockAway(loc, e, KNOCKBACK_SPEED, KNOCKBACK_SPEED / 2, true);
 		}

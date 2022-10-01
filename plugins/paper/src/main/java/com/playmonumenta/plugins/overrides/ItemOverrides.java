@@ -261,6 +261,7 @@ public final class ItemOverrides {
 		mItems.put(Material.FLINT_AND_STEEL, new FlintAndSteelOverride());
 		mItems.put(Material.PUFFERFISH, new PufferfishOverride());
 		mItems.put(Material.END_CRYSTAL, new EndCrystalOverride());
+		mItems.put(Material.QUARTZ, new QuartzOverride());
 
 		BaseOverride signOverride = new SignOverride();
 		mItems.put(Material.ACACIA_SIGN, signOverride);
@@ -290,6 +291,15 @@ public final class ItemOverrides {
 		mItems.put(Material.SPRUCE_TRAPDOOR, trapdoorOverride);
 		mItems.put(Material.WARPED_TRAPDOOR, trapdoorOverride);
 
+		BaseOverride doorOverride = new DoorOverride();
+		mItems.put(Material.ACACIA_DOOR, doorOverride);
+		mItems.put(Material.BIRCH_DOOR, doorOverride);
+		mItems.put(Material.CRIMSON_DOOR, doorOverride);
+		mItems.put(Material.DARK_OAK_DOOR, doorOverride);
+		mItems.put(Material.JUNGLE_DOOR, doorOverride);
+		mItems.put(Material.OAK_DOOR, doorOverride);
+		mItems.put(Material.SPRUCE_DOOR, doorOverride);
+		mItems.put(Material.WARPED_DOOR, doorOverride);
 
 		BaseOverride unbreakableOverride = new UnbreakableOnBedrockOverride();
 		mItems.put(Material.SPAWNER, unbreakableOverride);
@@ -326,24 +336,24 @@ public final class ItemOverrides {
 		mItems.put(Material.POTTED_WARPED_FUNGUS, flowerOverride);
 		mItems.put(Material.POTTED_WARPED_ROOTS, flowerOverride);
 
-		BaseOverride firmamentOverride = new FirmamentOverride();
-		mItems.put(Material.SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.WHITE_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.ORANGE_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.MAGENTA_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.LIGHT_BLUE_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.YELLOW_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.LIME_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.PINK_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.GRAY_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.LIGHT_GRAY_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.CYAN_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.PURPLE_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.BLUE_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.BROWN_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.GREEN_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.RED_SHULKER_BOX, firmamentOverride);
-		mItems.put(Material.BLACK_SHULKER_BOX, firmamentOverride);
+		BaseOverride shulkerBoxOverride = new ShulkerBoxOverride();
+		mItems.put(Material.SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.WHITE_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.ORANGE_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.MAGENTA_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.LIGHT_BLUE_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.YELLOW_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.LIME_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.PINK_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.GRAY_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.LIGHT_GRAY_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.CYAN_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.PURPLE_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.BLUE_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.BROWN_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.GREEN_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.RED_SHULKER_BOX, shulkerBoxOverride);
+		mItems.put(Material.BLACK_SHULKER_BOX, shulkerBoxOverride);
 
 		BaseOverride noAdventurePlaceOverride = new NoAdventureModePlacementOverride();
 		mItems.put(Material.LILY_PAD, noAdventurePlaceOverride);
@@ -354,11 +364,17 @@ public final class ItemOverrides {
 		mItems.put(Material.APPLE, horseFoodOverride);
 		mItems.put(Material.GOLDEN_CARROT, horseFoodOverride);
 		mItems.put(Material.HAY_BLOCK, horseFoodOverride);
-		mItems.put(Material.ENCHANTED_GOLDEN_APPLE, horseFoodOverride);
-		// GOLDEN_APPLE is in GoldenAppleOverride, which manually calls this override
+		// GOLDEN_APPLE + ENCHANTED_GOLDEN_APPLE are in GoldenAppleOverride, which manually calls this override
+
+		BaseOverride goldenAppleOverride = new GoldenAppleOverride();
+		mItems.put(Material.GOLDEN_APPLE, goldenAppleOverride);
+		mItems.put(Material.ENCHANTED_GOLDEN_APPLE, goldenAppleOverride);
 
 		BaseOverride lodestoneOverride = new LodestoneOverride();
 		mItems.put(Material.LODESTONE, lodestoneOverride);
+
+		BaseOverride boneMealOverride = new BoneMealOverride();
+		mItems.put(Material.BONE_MEAL, boneMealOverride);
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, @Nullable Block block, PlayerInteractEvent event) {
@@ -380,7 +396,7 @@ public final class ItemOverrides {
 	}
 
 	public boolean leftClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item,
-	                                    @Nullable Block block) {
+										@Nullable Block block) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		BaseOverride itemOverride = mItems.get(itemType);
@@ -399,7 +415,7 @@ public final class ItemOverrides {
 	}
 
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity,
-	                                           ItemStack itemInHand) {
+											   ItemStack itemInHand) {
 		Material itemType = (itemInHand != null) ? itemInHand.getType() : Material.AIR;
 		BaseOverride override = mItems.get(itemType);
 
@@ -437,7 +453,7 @@ public final class ItemOverrides {
 		// Prevent players from breaking blocks in safezones from outside of them
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
 			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE) &&
-				    !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+				!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 				// Allow breaking if the player would be in survival mode at that spot
 				if (!ZoneUtils.isInPlot(block.getLocation())) {
 					eventCancelled = true;
@@ -449,7 +465,7 @@ public final class ItemOverrides {
 	}
 
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item,
-	                                     BlockPlaceEvent event) {
+										 BlockPlaceEvent event) {
 		boolean eventCancelled = false;
 
 		//  If it's not a certain lore item go ahead and run the normal override place interaction.
@@ -460,11 +476,11 @@ public final class ItemOverrides {
 
 		//  Don't allow placing of certain items with Lore.
 		if (item.hasItemMeta()
-		    && item.getItemMeta().hasLore()
-		    && player.getGameMode() != GameMode.CREATIVE
-		    && !(EXCEPTION_LORED_MATERIALS.contains(item.getType())
-		         || (EXCEPTION_PRECISE_LORED_MATERIALS.containsKey(item.getType())
-			         && InventoryUtils.testForItemWithLore(item, EXCEPTION_PRECISE_LORED_MATERIALS.get(item.getType()))))) {
+			&& item.getItemMeta().hasLore()
+			&& player.getGameMode() != GameMode.CREATIVE
+			&& !(EXCEPTION_LORED_MATERIALS.contains(item.getType())
+			|| (EXCEPTION_PRECISE_LORED_MATERIALS.containsKey(item.getType())
+			&& InventoryUtils.testForItemWithLore(item, EXCEPTION_PRECISE_LORED_MATERIALS.get(item.getType()))))) {
 			eventCancelled |= true;
 		}
 
@@ -479,8 +495,8 @@ public final class ItemOverrides {
 			Material blockPlacedMat = event.getBlockPlaced().getType();
 			if (belowMat.equals(Material.BEDROCK) &&
 				(blockPlacedMat.equals(Material.RAIL) ||
-				 blockPlacedMat.equals(Material.POWERED_RAIL) ||
-				 blockPlacedMat.equals(Material.DETECTOR_RAIL))) {
+					blockPlacedMat.equals(Material.POWERED_RAIL) ||
+					blockPlacedMat.equals(Material.DETECTOR_RAIL))) {
 				eventCancelled = true;
 			}
 		}
@@ -501,7 +517,7 @@ public final class ItemOverrides {
 
 		// Don't allow blocks to break if they're on the server's list of unbreakable blocks
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE &&
-		    ServerProperties.getUnbreakableBlocks().contains(block.getType())) {
+			ServerProperties.getUnbreakableBlocks().contains(block.getType())) {
 			eventCancelled = true;
 		}
 

@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 public class Ethereal implements Enchantment {
 
 	private static final double AGIL_BONUS_PER_LEVEL = 0.2;
-	private static final int PAST_HIT_DURATION_TIME = 2 * 20;
+	private static final int PAST_HIT_DURATION_TIME = (int) (1.5 * 20);
 	private static final String ETHEREAL_EFFECT_NAME = "EtherealEffect";
 
 	@Override

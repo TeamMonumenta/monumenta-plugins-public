@@ -2,13 +2,15 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.effects.SpellShockExplosion;
 import com.playmonumenta.plugins.effects.SpellShockStatic;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -40,6 +42,7 @@ public class Spellshock extends Ability {
 	public static final String SPELL_SHOCK_STATIC_EFFECT_NAME = "SpellShockStaticEffect";
 	public static final String PERCENT_SPEED_EFFECT_NAME = "SpellShockPercentSpeedEffect";
 	public static final String PERCENT_SLOW_EFFECT_NAME = "SpellShockPercentSlowEffect";
+	public static final String ENHANCEMENT_EFFECT_NAME = "SpellShockEnhancementEffect";
 
 	public static final float DAMAGE_1 = 0.20f;
 	public static final float DAMAGE_2 = 0.30f;
@@ -50,6 +53,15 @@ public class Spellshock extends Ability {
 	public static final int DURATION_TICKS = 6 * 20;
 	public static final int SLOW_DURATION = 10;
 	public static final double SLOW_MULTIPLIER = -0.3;
+	public static final int ENHANCEMENT_DAMAGE = 6;
+	public static final double ENHANCEMENT_RADIUS = 2.5;
+
+	public static final String CHARM_SPELL = "Spellshock Spell Amplifier";
+	public static final String CHARM_MELEE = "Spellshock Melee Amplifier";
+	public static final String CHARM_SPEED = "Spellshock Speed Amplifier";
+	public static final String CHARM_SLOW = "Spellshock Slowness Amplifier";
+	public static final String CHARM_DETONATION_DAMAGE = "Spellshock Detonation Damage";
+	public static final String CHARM_DETONATION_RADIUS = "Spellshock Detonation Radius";
 
 	private final float mLevelDamage;
 	private final float mMeleeBonus;
@@ -60,12 +72,27 @@ public class Spellshock extends Ability {
 
 		mInfo.mScoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";
-		mInfo.mDescriptions.add("Hitting an enemy with a spell inflicts static for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 20% of the triggering spell's damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick. If a static mob is struck by a melee attack, it takes 10% more damage on the hit and is slowed by 30% for 0.5 seconds, clearing the static.");
-		mInfo.mDescriptions.add("Damage is increased to 30% for spells and 15% for melee. Additionally, gain +20% speed for 2 seconds whenever a spellshock is triggered.");
+		mInfo.mDescriptions.add(
+			String.format("Hitting an enemy with a spell inflicts static for %s seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals %s%% of the triggering spell's damage to all mobs in a %s block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick. If a static mob is struck by a melee attack, it takes %s%% more damage on the hit and is slowed by %s%% for %s seconds, clearing the static.",
+				DURATION_TICKS / 20,
+				(int)(DAMAGE_1 * 100),
+				SIZE,
+				(int)(MELEE_BONUS_1 * 100),
+				(int)(-SLOW_MULTIPLIER * 100),
+				SLOW_DURATION / 20.0));
+		mInfo.mDescriptions.add(
+			String.format("Damage is increased to %s%% for spells and %s%% for melee. Additionally, gain +%s%% speed for 2 seconds whenever a spellshock is triggered.",
+				(int)(DAMAGE_2 * 100),
+				(int)(MELEE_BONUS_2 * 100),
+				(int)(SPEED_MULTIPLIER * 100)));
+		mInfo.mDescriptions.add(
+			String.format("When an enemy that had ever had static applied dies, they explode, dealing %s damage to enemies in a %s block radius.",
+				ENHANCEMENT_DAMAGE,
+				ENHANCEMENT_RADIUS));
 		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
 
-		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
-		mMeleeBonus = getAbilityScore() == 2 ? MELEE_BONUS_2 : MELEE_BONUS_1;
+		mLevelDamage = (isLevelOne() ? DAMAGE_1 : DAMAGE_2) + (float) CharmManager.getLevelPercentDecimal(player, CHARM_SPELL);
+		mMeleeBonus = (isLevelOne() ? MELEE_BONUS_1 : MELEE_BONUS_2) + (float) CharmManager.getLevelPercentDecimal(player, CHARM_MELEE);
 	}
 
 	@Override
@@ -78,12 +105,12 @@ public class Spellshock extends Ability {
 			NavigableSet<Effect> effectGroupOriginal = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
 			if (effectGroupOriginal != null) {
 				event.setDamage(event.getDamage() * (1 + mMeleeBonus));
-				mPlugin.mEffectManager.addEffect(enemy, PERCENT_SLOW_EFFECT_NAME, new PercentSpeed(SLOW_DURATION, SLOW_MULTIPLIER, PERCENT_SLOW_EFFECT_NAME));
+				mPlugin.mEffectManager.addEffect(enemy, PERCENT_SLOW_EFFECT_NAME, new PercentSpeed(SLOW_DURATION, SLOW_MULTIPLIER - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), PERCENT_SLOW_EFFECT_NAME));
 				for (Effect e : effectGroupOriginal) {
 					e.clearEffect();
 				}
 			}
-		} else if (event.getAbility() != null && event.getAbility() != Blizzard.ABILITY && event.getAbility() != ArcaneStrike.ABILITY && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
+		} else if (event.getAbility() != null && event.getAbility() != ClassAbility.BLIZZARD && event.getAbility() != ClassAbility.ARCANE_STRIKE && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
 			// Check if the mob has static, and trigger it if possible; otherwise, apply/refresh it
 			NavigableSet<Effect> effectGroupOriginal = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
 			if (effectGroupOriginal != null) {
@@ -92,8 +119,8 @@ public class Spellshock extends Ability {
 				if (!effectOriginal.isTriggered()) {
 					effectOriginal.trigger();
 
-					if (getAbilityScore() > 1) {
-						mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION_TICKS, SPEED_MULTIPLIER, PERCENT_SPEED_EFFECT_NAME));
+					if (isLevelTwo()) {
+						mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION_TICKS, SPEED_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), PERCENT_SPEED_EFFECT_NAME));
 					}
 
 					Location loc = enemy.getLocation().add(0, 1, 0);
@@ -163,6 +190,10 @@ public class Spellshock extends Ability {
 					}
 				} else {
 					mPlugin.mEffectManager.addEffect(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION_TICKS));
+					if (isEnhanced() && !mPlugin.mEffectManager.hasEffect(enemy, ENHANCEMENT_EFFECT_NAME)) {
+						mPlugin.mEffectManager.addEffect(enemy, ENHANCEMENT_EFFECT_NAME,
+							new SpellShockExplosion(mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer), SpellPower.getSpellDamage(mPlugin, mPlayer, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DETONATION_DAMAGE, ENHANCEMENT_DAMAGE)), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DETONATION_RADIUS, ENHANCEMENT_RADIUS), mPlayer.getUniqueId()));
+					}
 				}
 			}
 		}

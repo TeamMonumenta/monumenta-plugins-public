@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import org.bukkit.entity.LivingEntity;
@@ -13,6 +14,7 @@ public class Regicide implements Enchantment {
 
 	private static final double DAMAGE_BONUS_PER_LEVEL = 0.1;
 	private static final double BOSS_BONUS_PER_LEVEL = 0.05;
+	public static final String CHARM_DAMAGE = "Regicide Damage";
 
 	@Override
 	public String getName() {
@@ -29,11 +31,11 @@ public class Regicide implements Enchantment {
 		return 28;
 	}
 
-	public static double calculateDamage(double level, LivingEntity target, DamageEvent event) {
+	public static double calculateDamage(double level, Player player, LivingEntity target, DamageEvent event) {
 		if (EntityUtils.isElite(target)) {
-			return event.getDamage() * (1 + DAMAGE_BONUS_PER_LEVEL * level);
+			return event.getDamage() * (1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_BONUS_PER_LEVEL * level));
 		} else if (EntityUtils.isBoss(target)) {
-			return event.getDamage() * (1 + BOSS_BONUS_PER_LEVEL * level);
+			return event.getDamage() * (1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, BOSS_BONUS_PER_LEVEL * level));
 		} else {
 			return event.getDamage();
 		}
@@ -45,7 +47,7 @@ public class Regicide implements Enchantment {
 			    && event.getType() != DamageType.POISON
 			    && event.getType() != DamageType.FALL
 			    && event.getType() != DamageType.OTHER) {
-			event.setDamage(calculateDamage(level, target, event));
+			event.setDamage(calculateDamage(level, player, target, event));
 		}
 	}
 }

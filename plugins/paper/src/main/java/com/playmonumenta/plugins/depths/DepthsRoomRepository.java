@@ -16,6 +16,7 @@ import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
@@ -429,7 +430,7 @@ public class DepthsRoomRepository {
 					if (p == null) {
 						dp.offlineTeleport(l);
 					} else {
-						p.teleport(l);
+						p.teleport(l, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 						PotionUtils.applyPotion(Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 						p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Your party earned " + treasure + " treasure score for clearing floor " + party.getFloor() + "! Sending your party to next floor.");
 					}

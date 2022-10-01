@@ -93,7 +93,7 @@ public class EffectFromPotionCommand {
 			ItemStack potion = player.getInventory().getItem(slot);
 
 			// If item is a potion, apply effects
-			if (potion.getItemMeta() instanceof PotionMeta potionMeta) {
+			if (potion.getItemMeta() instanceof PotionMeta potionMeta || ItemStatUtils.isConsumable(potion)) {
 				ItemStack updatedPotion = consumePotion(plugin, player, potion);
 
 				player.getInventory().setItem(slot, updatedPotion);
@@ -109,7 +109,7 @@ public class EffectFromPotionCommand {
 				ItemStack potion = shulkerBoxMetaBlockState.getInventory().getItem(subSlot);
 
 				// If item is indeed a potion, apply effects.
-				if (potion.getItemMeta() instanceof PotionMeta) {
+				if (potion.getItemMeta() instanceof PotionMeta || ItemStatUtils.isConsumable(potion)) {
 					ItemStack updatedPotion = consumePotion(plugin, player, potion);
 
 					// Set potion into the shulkerbox
@@ -132,10 +132,15 @@ public class EffectFromPotionCommand {
 	 */
 	private static ItemStack consumePotion(Plugin plugin, Player player, ItemStack potion) {
 		// Potion Meta to apply effects!
-		PotionMeta potionMeta = (PotionMeta) potion.getItemMeta();
-		ItemStack updatedPotion;
+		if (potion.getItemMeta() instanceof PotionMeta potionMeta) {
+			PotionUtils.applyPotion(plugin, player, potionMeta);
+		}
 
-		PotionUtils.applyPotion(plugin, player, potionMeta);
+		if (ItemStatUtils.isConsumable(potion)) {
+			ItemStatUtils.applyCustomEffects(plugin, player, potion);
+		}
+
+		ItemStack updatedPotion;
 
 		// Test for Starvation.
 		int starvation = ItemStatUtils.getEnchantmentLevel(potion, ItemStatUtils.EnchantmentType.STARVATION);

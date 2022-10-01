@@ -17,10 +17,10 @@ import com.playmonumenta.plugins.depths.abilities.aspects.ScytheAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.BottledSunlight;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.DepthsRejuvenation;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Enlightenment;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.RadiantBlessing;
-import com.playmonumenta.plugins.depths.abilities.dawnbringer.Rejuvenation;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.SoothingCombos;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.TotemOfSalvation;
@@ -63,7 +63,7 @@ import com.playmonumenta.plugins.depths.abilities.shadow.CloakOfShadows;
 import com.playmonumenta.plugins.depths.abilities.shadow.DarkCombos;
 import com.playmonumenta.plugins.depths.abilities.shadow.DeadlyStrike;
 import com.playmonumenta.plugins.depths.abilities.shadow.DepthsAdvancingShadows;
-import com.playmonumenta.plugins.depths.abilities.shadow.Dethroner;
+import com.playmonumenta.plugins.depths.abilities.shadow.DepthsDethroner;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
 import com.playmonumenta.plugins.depths.abilities.shadow.ShadowSlam;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsSharpshooter;
@@ -493,7 +493,7 @@ public class DepthsManager {
 			new ChaosDagger(plugin, null),
 			new DarkCombos(plugin, null),
 			new DeadlyStrike(plugin, null),
-			new Dethroner(plugin, null),
+			new DepthsDethroner(plugin, null),
 			new DummyDecoy(plugin, null),
 			new CloakOfShadows(plugin, null),
 			new ShadowSlam(plugin, null),
@@ -503,7 +503,7 @@ public class DepthsManager {
 			new Enlightenment(plugin, null),
 			new LightningBottle(plugin, null),
 			new RadiantBlessing(plugin, null),
-			new Rejuvenation(plugin, null),
+			new DepthsRejuvenation(plugin, null),
 			new SoothingCombos(plugin, null),
 			new Sundrops(plugin, null),
 			new TotemOfSalvation(plugin, null),

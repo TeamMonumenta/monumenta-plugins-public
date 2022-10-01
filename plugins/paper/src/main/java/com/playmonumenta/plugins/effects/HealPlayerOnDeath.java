@@ -6,11 +6,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 public class HealPlayerOnDeath extends Effect {
+	public static final String effectID = "HealPlayerOnDeath";
+
 	private final double mAmount;
 	private final Player mPlayer;
 
 	public HealPlayerOnDeath(int duration, double amount, Player player) {
-		super(duration);
+		super(duration, effectID);
 		mAmount = amount;
 		mPlayer = player;
 	}

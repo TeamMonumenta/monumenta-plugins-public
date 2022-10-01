@@ -89,6 +89,7 @@ public interface VersionAdapter {
 	 */
 	void setFriendly(Creature entity, DamageAction action, Predicate<LivingEntity> predicate, double attackRange);
 
+	void setHuntingCompanion(Creature entity, DamageAction action, double attackRange);
 
 	interface DamageAction {
 		void damage(LivingEntity entity);

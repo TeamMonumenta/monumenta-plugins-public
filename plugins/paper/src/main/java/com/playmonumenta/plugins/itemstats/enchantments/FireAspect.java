@@ -20,7 +20,7 @@ import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 public class FireAspect implements Enchantment {
-	private static final int FIRE_ASPECT_DURATION = 20 * 4;
+	public static final int FIRE_ASPECT_DURATION = 20 * 4;
 
 	@Override
 	public String getName() {
@@ -43,21 +43,29 @@ public class FireAspect implements Enchantment {
 	}
 
 	@Override
-	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		DamageType type = event.getType();
-		if ((type == DamageType.MELEE && ItemStatUtils.isNotExlusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
-			int duration = (int) (FIRE_ASPECT_DURATION * value * (type == DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
+		if ((type == DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
+			int duration = (int) (FIRE_ASPECT_DURATION * level * (type == DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
 			ItemStatManager.PlayerItemStats playerItemStats;
 			if (event.getDamager() instanceof Projectile proj) {
 				playerItemStats = DamageListener.getProjectileItemStats(proj);
 			} else {
 				playerItemStats = plugin.mItemStatManager.getPlayerItemStats(player);
 			}
-			EntityUtils.applyFire(plugin, duration, enemy, player, playerItemStats);
-			// So that fire resistant mobs don't get fire particles
-			if (enemy.getFireTicks() > 0) {
-				player.getWorld().spawnParticle(Particle.FLAME, enemy.getLocation().add(0, 1, 0), 6, 0.5, 0.5, 0.5, 0.001);
-			}
+			apply(plugin, player, playerItemStats, duration, enemy);
+		}
+	}
+
+	public static void apply(Plugin plugin, Player player, int duration, LivingEntity enemy) {
+		apply(plugin, player, plugin.mItemStatManager.getPlayerItemStats(player), duration, enemy);
+	}
+
+	public static void apply(Plugin plugin, Player player, ItemStatManager.PlayerItemStats playerItemStats, int duration, LivingEntity enemy) {
+		EntityUtils.applyFire(plugin, duration, enemy, player, playerItemStats);
+		// So that fire resistant mobs don't get fire particles
+		if (enemy.getFireTicks() > 0) {
+			enemy.getWorld().spawnParticle(Particle.FLAME, enemy.getLocation().add(0, 1, 0), 6, 0.5, 0.5, 0.5, 0.001);
 		}
 	}
 

@@ -20,12 +20,12 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
-import com.playmonumenta.plugins.abilities.cleric.ClericPassive;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
+import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
@@ -35,9 +35,9 @@ import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
+import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
-import com.playmonumenta.plugins.abilities.mage.MagePassive;
 import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
@@ -64,9 +64,9 @@ import com.playmonumenta.plugins.abilities.other.PvP;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
 import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
+import com.playmonumenta.plugins.abilities.rogue.Dethroner;
 import com.playmonumenta.plugins.abilities.rogue.Dodging;
 import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
-import com.playmonumenta.plugins.abilities.rogue.RoguePassive;
 import com.playmonumenta.plugins.abilities.rogue.Skirmisher;
 import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
@@ -79,10 +79,10 @@ import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
 import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
-import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
+import com.playmonumenta.plugins.abilities.scout.Versatile;
 import com.playmonumenta.plugins.abilities.scout.Volley;
 import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
@@ -93,13 +93,13 @@ import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
+import com.playmonumenta.plugins.abilities.warlock.Culling;
 import com.playmonumenta.plugins.abilities.warlock.CursedWound;
 import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
 import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
 import com.playmonumenta.plugins.abilities.warlock.PhlegmaticResolve;
 import com.playmonumenta.plugins.abilities.warlock.SanguineHarvest;
 import com.playmonumenta.plugins.abilities.warlock.SoulRend;
-import com.playmonumenta.plugins.abilities.warlock.WarlockPassive;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
@@ -109,11 +109,11 @@ import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.abilities.warrior.BruteForce;
 import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
 import com.playmonumenta.plugins.abilities.warrior.DefensiveLine;
+import com.playmonumenta.plugins.abilities.warrior.Formidable;
 import com.playmonumenta.plugins.abilities.warrior.Frenzy;
 import com.playmonumenta.plugins.abilities.warrior.Riposte;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
-import com.playmonumenta.plugins.abilities.warrior.WarriorPassive;
 import com.playmonumenta.plugins.abilities.warrior.WeaponMastery;
 import com.playmonumenta.plugins.abilities.warrior.berserker.GloriousBattle;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
@@ -131,6 +131,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Vitality;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -147,6 +148,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -154,7 +158,6 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -164,6 +167,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -174,6 +178,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class AbilityManager {
 
@@ -230,7 +235,7 @@ public class AbilityManager {
 			new ThunderStep(mPlugin, null),
 			new ElementalArrows(mPlugin, null),
 			new FrostNova(mPlugin, null),
-			new MagePassive(mPlugin, null),
+			new Channeling(mPlugin, null),
 			new MagmaShield(mPlugin, null),
 			new ManaLance(mPlugin, null),
 			new Spellshock(mPlugin, null),
@@ -241,7 +246,7 @@ public class AbilityManager {
 			new ByMyBlade(mPlugin, null),
 			new DaggerThrow(mPlugin, null),
 			new Dodging(mPlugin, null),
-			new RoguePassive(mPlugin, null),
+			new Dethroner(mPlugin, null),
 			new Smokescreen(mPlugin, null),
 			new ViciousCombos(mPlugin, null),
 			new Skirmisher(mPlugin, null),
@@ -253,7 +258,7 @@ public class AbilityManager {
 			new Volley(mPlugin, null),
 			new Swiftness(mPlugin, null),
 			new EagleEye(mPlugin, null),
-			new ScoutPassive(mPlugin, null),
+			new Versatile(mPlugin, null),
 			new SwiftCuts(mPlugin, null),
 			new Sharpshooter(mPlugin, null),
 			new WindBomb(mPlugin, null),
@@ -265,7 +270,7 @@ public class AbilityManager {
 			new Riposte(mPlugin, null),
 			new ShieldBash(mPlugin, null),
 			new Toughness(mPlugin, null),
-			new WarriorPassive(mPlugin, null),
+			new Formidable(mPlugin, null),
 			new WeaponMastery(mPlugin, null),
 			new BruteForce(mPlugin, null),
 
@@ -273,7 +278,7 @@ public class AbilityManager {
 			new CelestialBlessing(mPlugin, null),
 			new CleansingRain(mPlugin, null),
 			new HandOfLight(mPlugin, null),
-			new ClericPassive(mPlugin, null),
+			new Rejuvenation(mPlugin, null),
 			new DivineJustice(mPlugin, null),
 			new HeavenlyBoon(mPlugin, null),
 			new Crusade(mPlugin, null),
@@ -286,7 +291,7 @@ public class AbilityManager {
 			new CholericFlames(mPlugin, null),
 			new CursedWound(mPlugin, null),
 			new GraspingClaws(mPlugin, null),
-			new WarlockPassive(mPlugin, null),
+			new Culling(mPlugin, null),
 			new SanguineHarvest(mPlugin, null),
 			new SoulRend(mPlugin, null),
 			new MelancholicLament(mPlugin, null),
@@ -434,9 +439,9 @@ public class AbilityManager {
 		}
 		// This zooms the player's screen obnoxiously, so try not to do it if it's not needed
 		if (movementSpeed != null
-			    && movementSpeed.getValue() != 0.1
-			    && !player.getGameMode().equals(GameMode.CREATIVE)
-			    && !player.getGameMode().equals(GameMode.SPECTATOR)) {
+			&& movementSpeed.getValue() != 0.1
+			&& !player.getGameMode().equals(GameMode.CREATIVE)
+			&& !player.getGameMode().equals(GameMode.SPECTATOR)) {
 			movementSpeed.setBaseValue(0.1);
 		}
 
@@ -667,8 +672,8 @@ public class AbilityManager {
 		return conditionalCastCancellable(player, (ability) -> ability.playerCombustByEntityEvent(event));
 	}
 
-	public boolean playerShotArrowEvent(Player player, AbstractArrow arrow) {
-		return conditionalCastCancellable(player, (ability) -> ability.playerShotArrowEvent(arrow));
+	public boolean playerShotProjectileEvent(Player player, Projectile projectile) {
+		return conditionalCastCancellable(player, (ability) -> ability.playerShotProjectileEvent(projectile));
 	}
 
 	public boolean playerThrewSplashPotionEvent(Player player, ThrownPotion potion) {
@@ -756,6 +761,14 @@ public class AbilityManager {
 		conditionalCast(player, (ability) -> ability.playerSwapHandItemsEvent(event));
 	}
 
+	public void playerRegainHealthEvent(Player player, EntityRegainHealthEvent event) {
+		conditionalCast(player, (ability) -> ability.playerRegainHealthEvent(event));
+	}
+
+	public void playerTeleportEvent(Player player, PlayerTeleportEvent event) {
+		conditionalCast(player, (ability) -> ability.playerTeleportEvent(event));
+	}
+
 	public void playerQuitEvent(Player player, PlayerQuitEvent event) {
 		conditionalCast(player, (ability) -> ability.playerQuitEvent(event));
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
@@ -777,6 +790,18 @@ public class AbilityManager {
 	}
 
 	public void playerJoinEvent(Player player, PlayerJoinEvent event) {
+		// Anticheat for skills
+		AbilityUtils.ensureSkillAlignmentWithClassAndSpec(player);
+		int skillDifference = AbilityUtils.skillDiff(player);
+		if (skillDifference > 0) {
+			player.sendMessage(Component.text("You had more skills than expected. Available skills have been reset.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+			AbilityManager.getManager().resetPlayerAbilities(player);
+			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
+		} else if (skillDifference < 0) {
+			player.sendMessage(Component.text("You had less skills than expected. Available skills may have been updated.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+			AbilityManager.getManager().resetPlayerAbilities(player);
+			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
+		}
 		UUID uuid = player.getUniqueId();
 		JsonObject chargesData = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_PLUGIN_DATA);
 		if (chargesData != null) {
@@ -817,7 +842,7 @@ public class AbilityManager {
 					} else if (abilityInfo.mTrigger == AbilityTrigger.RIGHT_CLICK) {
 						if (
 							action == Action.RIGHT_CLICK_AIR
-							|| (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked))
+								|| (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked))
 						) {
 							if (ability.canCast()) {
 								ability.cast(action);
@@ -871,11 +896,13 @@ public class AbilityManager {
 				ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
 			}
 		}
-		// Reset Skill and SkillSpec
-		int skill = ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0);
-		int spec = ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0);
-		ScoreboardUtils.setScoreboardValue(player, "Skill", skill);
-		ScoreboardUtils.setScoreboardValue(player, "SkillSpec", spec);
+		// Reset Skill and SkillSpec and Enhancements
+		int skill = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_LEVEL).orElse(0);
+		int spec = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_SPEC).orElse(0);
+		int enhance = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SKILL, skill);
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SPEC, spec);
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE, enhance);
 
 		// Run updatePlayerAbilities to clear existing ability effects.
 		updatePlayerAbilities(player, true);

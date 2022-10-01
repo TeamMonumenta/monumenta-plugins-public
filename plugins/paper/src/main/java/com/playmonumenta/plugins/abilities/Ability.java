@@ -2,26 +2,43 @@ package com.playmonumenta.plugins.abilities;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
 import com.playmonumenta.plugins.itemstats.enchantments.Ineptitude;
 import com.playmonumenta.plugins.itemstats.infusions.Epoch;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collection;
+import java.util.NavigableSet;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.*;
-import org.bukkit.event.player.*;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
-
 
 public abstract class Ability {
 	protected final Plugin mPlugin;
@@ -56,6 +73,7 @@ public abstract class Ability {
 
 	/**
 	 * Gets the AbilityInfo object, which contains the small data side of the ability itself, and is required to have for any ability.
+	 *
 	 * @return the AbilityInfo object. Never null.
 	 */
 	public AbilityInfo getInfo() {
@@ -121,7 +139,22 @@ public abstract class Ability {
 		double aptitudePercent = Aptitude.getCooldownPercentage(mPlugin, mPlayer);
 		double ineptitudePercent = Ineptitude.getCooldownPercentage(mPlugin, mPlayer);
 
-		return (int) (baseCooldown * (1 + epochPercent) * (1 + aptitudePercent) * (1 + ineptitudePercent));
+		//Potion effects
+		double effectPercent = 0;
+
+		NavigableSet<Effect> effInc = Plugin.getInstance().mEffectManager.getEffects(mPlayer, "AbilityCooldownIncrease");
+		if (effInc != null) {
+			Effect inc = effInc.last();
+			effectPercent += inc.getMagnitude(); // this is always positive
+		}
+
+		NavigableSet<Effect> effDec = Plugin.getInstance().mEffectManager.getEffects(mPlayer, "AbilityCooldownDecrease");
+		if (effDec != null) {
+			Effect dec = effDec.last();
+			effectPercent += dec.getMagnitude(); // this is always negative
+		}
+
+		return (int) (baseCooldown * (1 + epochPercent) * (1 + aptitudePercent) * (1 + ineptitudePercent) * (1 + effectPercent));
 	}
 
 	/**
@@ -132,13 +165,17 @@ public abstract class Ability {
 	}
 
 	public void putOnCooldown() {
+		putOnCooldown(getModifiedCooldown());
+	}
+
+	public void putOnCooldown(int cooldown) {
 		if (mPlayer == null) {
 			return;
 		}
 		AbilityInfo info = getInfo();
 		if (info.mLinkedSpell != null) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.mLinkedSpell)) {
-				mPlugin.mTimers.addCooldown(mPlayer, info.mLinkedSpell, getModifiedCooldown());
+				mPlugin.mTimers.addCooldown(mPlayer, info.mLinkedSpell, cooldown);
 				PlayerUtils.callAbilityCastEvent(mPlayer, info.mLinkedSpell);
 			}
 		}
@@ -146,6 +183,7 @@ public abstract class Ability {
 
 	/**
 	 * A combination of both runCheck and isOnCooldown.
+	 *
 	 * @return true or false
 	 */
 	public final boolean canCast() {
@@ -191,7 +229,8 @@ public abstract class Ability {
 		return true;
 	}
 
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
+	// Specifically called for: AbstractArrows and Snowballs
+	public boolean playerShotProjectileEvent(Projectile projectile) {
 		return true;
 	}
 
@@ -204,13 +243,13 @@ public abstract class Ability {
 	}
 
 	public boolean playerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities,
-	                                           ThrownPotion potion, PotionSplashEvent event) {
+											   ThrownPotion potion, PotionSplashEvent event) {
 		return true;
 	}
 
 	// Called when entities are hit by a potion a player threw
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities,
-	                                       ThrownPotion potion, PotionSplashEvent event) {
+										   ThrownPotion potion, PotionSplashEvent event) {
 		return true;
 	}
 
@@ -274,7 +313,15 @@ public abstract class Ability {
 
 	}
 
+	public void playerRegainHealthEvent(EntityRegainHealthEvent event) {
+
+	}
+
 	public void playerQuitEvent(PlayerQuitEvent event) {
+
+	}
+
+	public void playerTeleportEvent(PlayerTeleportEvent event) {
 
 	}
 
@@ -306,13 +353,25 @@ public abstract class Ability {
 	 */
 	public int getAbilityScore(Ability this) {
 		AbilityInfo info = mInfo;
-		if (mPlayer != null && info != null && info.mScoreboardId != null) {
+		if (mPlayer != null && info.mScoreboardId != null) {
 			if (mScore == null) {
 				mScore = ScoreboardUtils.getScoreboardValue(mPlayer, info.mScoreboardId).orElse(0);
 			}
 			return mScore;
 		}
 		return 0;
+	}
+
+	public boolean isLevelOne() {
+		return getAbilityScore() % 2 == 1;
+	}
+
+	public boolean isLevelTwo() {
+		return getAbilityScore() % 2 == 0 && getAbilityScore() > 0;
+	}
+
+	public boolean isEnhanced() {
+		return getAbilityScore() > 2 && ServerProperties.getAbilityEnhancementsEnabled();
 	}
 
 	public @Nullable Component getLevelHover(boolean useShorthand) {

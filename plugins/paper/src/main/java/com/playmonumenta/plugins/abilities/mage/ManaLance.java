@@ -1,12 +1,13 @@
 package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.ManaLanceCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -26,15 +27,21 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 
-
-public class ManaLance extends Ability {
+public class ManaLance extends MultipleChargeAbility {
 
 	private static final float DAMAGE_1 = 6.0f;
 	private static final float DAMAGE_2 = 7.0f;
 	private static final int COOLDOWN_1 = 5 * 20;
 	private static final int COOLDOWN_2 = 3 * 20;
+	private static final int RANGE = 8;
 
-	public static final int RANGE = 8;
+	public static final String CHARM_DAMAGE = "Mana Lance Damage";
+	public static final String CHARM_COOLDOWN = "Mana Lance Cooldown";
+	public static final String CHARM_RANGE = "Mana Lance Range";
+	public static final String CHARM_CHARGES = "Mana Lance Charge";
+
+	private float mDamage;
+	private int mLastCastTicks = 0;
 
 	private final ManaLanceCS mCosmetic;
 
@@ -43,11 +50,25 @@ public class ManaLance extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.MANA_LANCE;
 		mInfo.mScoreboardId = "ManaLance";
 		mInfo.mShorthandName = "ML";
-		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 6 magic damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: 5s.");
-		mInfo.mDescriptions.add("The beam instead deals 7 damage. Cooldown: 3s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mDescriptions.add(
+			String.format("Right clicking with a wand fires forth a piercing beam of Mana going %s blocks, dealing %s arcane magic damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: %ss.",
+				RANGE,
+				(int) DAMAGE_1,
+				COOLDOWN_1 / 20
+			));
+		mInfo.mDescriptions.add(
+			String.format("The beam instead deals %s damage. Cooldown: %ss.",
+				(int) DAMAGE_2,
+				COOLDOWN_2 / 20));
+		mInfo.mDescriptions.add("Mana lance now has two charges.");
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.TRIDENT, 1);
+
+		mMaxCharges = (isEnhanced() ? 2 : 1) + (int) CharmManager.getLevel(player, CHARM_CHARGES);
+		mInfo.mIgnoreCooldown = true;
+		mCharges = getTrackedCharges();
+		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ManaLanceCS(), ManaLanceCS.SKIN_LIST);
 	}
@@ -57,9 +78,17 @@ public class ManaLance extends Ability {
 		if (mPlayer == null) {
 			return;
 		}
-		float damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+
+		int ticks = mPlayer.getTicksLived();
+		// Prevent double casting on accident
+		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
+			return;
+		}
+		mLastCastTicks = ticks;
+
+		float damage = mDamage;
+		damage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 		damage = SpellPower.getSpellDamage(mPlugin, mPlayer, damage);
-		putOnCooldown();
 
 		Location loc = mPlayer.getEyeLocation();
 		BoundingBox box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
@@ -71,7 +100,8 @@ public class ManaLance extends Ability {
 		Location endLoc = loc;
 		int i = 0;
 		boolean hit = false;
-		while (i < RANGE) {
+		int range = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RANGE);
+		while (i < range) {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(world);
 			endLoc = bLoc;
@@ -97,7 +127,7 @@ public class ManaLance extends Ability {
 			i++;
 		}
 
-		mCosmetic.lanceParticle(mPlayer, loc, endLoc, i);
+		mCosmetic.lanceParticle(mPlayer, loc, endLoc, i, range);
 		mCosmetic.lanceSound(world, mPlayer);
 	}
 
@@ -110,4 +140,8 @@ public class ManaLance extends Ability {
 		return !mPlayer.isSneaking() && ItemUtils.isWand(mainHand);
 	}
 
+	@Override
+	public boolean incrementCharge() {
+		return super.incrementCharge();
+	}
 }

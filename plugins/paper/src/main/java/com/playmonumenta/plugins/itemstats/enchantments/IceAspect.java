@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -25,8 +26,11 @@ import org.bukkit.entity.Player;
 public class IceAspect implements Enchantment {
 	public static final int ICE_ASPECT_DURATION = 20 * 4;
 	public static final double SLOW_PER_LEVEL = 0.1;
-
+	public static final float BONUS_DAMAGE = 1.0f;
 	private static final Particle.DustOptions COLOR_LIGHT_BLUE = new Particle.DustOptions(Color.fromRGB(85, 170, 255), 0.75f);
+	public static final String LEVEL_METAKEY = "IceAspectLevelMetakey";
+	public static final String CHARM_SLOW = "Ice Aspect Slow Amplifier";
+	public static final String CHARM_DURATION = "Ice Aspect Slow Duration";
 
 	@Override
 	public String getName() {
@@ -49,13 +53,11 @@ public class IceAspect implements Enchantment {
 	}
 
 	@Override
-	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		DamageType type = event.getType();
-		if ((type == DamageType.MELEE && ItemStatUtils.isNotExlusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
+		if ((type == DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
 			int duration = (int) (ICE_ASPECT_DURATION * (type == DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
-			if (type == DamageType.MELEE) {
-				player.getWorld().spawnParticle(Particle.SNOWBALL, enemy.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
-			} else {
+			if (type == DamageType.PROJECTILE) {
 				double widthDelta = PartialParticle.getWidthDelta(enemy);
 				double widerWidthDelta = widthDelta * 1.5;
 				double doubleWidthDelta = widthDelta * 2;
@@ -123,11 +125,22 @@ public class IceAspect implements Enchantment {
 				);
 			}
 
-			EntityUtils.applySlow(plugin, duration, value * SLOW_PER_LEVEL, enemy);
+			apply(plugin, player, level, duration, enemy, type == DamageType.MELEE);
 
 			if (enemy instanceof Blaze) {
 				event.setDamage(event.getDamage() + 1.0);
 			}
 		}
+	}
+
+	public static void apply(Plugin plugin, Player player, double level, int duration, LivingEntity enemy, boolean particles) {
+		EntityUtils.applySlow(plugin, duration + CharmManager.getExtraDuration(player, CHARM_DURATION), (level * SLOW_PER_LEVEL) + CharmManager.getLevelPercent(player, CHARM_SLOW), enemy);
+		if (particles) {
+			player.getWorld().spawnParticle(Particle.SNOWBALL, enemy.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
+		}
+	}
+
+	public static float getBonusDamage(LivingEntity enemy) {
+		return enemy instanceof Blaze ? BONUS_DAMAGE : 0;
 	}
 }

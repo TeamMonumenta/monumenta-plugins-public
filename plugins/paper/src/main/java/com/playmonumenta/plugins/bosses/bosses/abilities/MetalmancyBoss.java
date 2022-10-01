@@ -31,7 +31,7 @@ public class MetalmancyBoss extends BossAbilityGroup {
 		return new MetalmancyBoss(plugin, boss);
 	}
 
-	public MetalmancyBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public MetalmancyBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		boss.setInvulnerable(true);

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
+import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -13,11 +14,13 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerRiptideEvent;
 
 public interface ItemStat {
 
@@ -49,11 +52,11 @@ public interface ItemStat {
 	/**
 	 * Runs action every 5 ticks.
 	 *
-	 * @param plugin   monumenta plugin
-	 * @param player   the Player running the action
-	 * @param value    the value of ItemStat possessed by the Player
-	 * @param twoHz true every 10 ticks
-	 * @param oneHz true every 20 ticks
+	 * @param plugin monumenta plugin
+	 * @param player the Player running the action
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param twoHz  true every 10 ticks
+	 * @param oneHz  true every 20 ticks
 	 */
 	default void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 
@@ -91,18 +94,20 @@ public interface ItemStat {
 	 * <br>
 	 * This is called in addition to onHurt() and related methods.
 	 *
-	 * @param plugin  monumenta plugin
-	 * @param player  the Player receiving damage
-	 * @param value   the value of ItemStat possessed by the Player
-	 * @param event   the associated DamageEvent
+	 * @param plugin monumenta plugin
+	 * @param player the Player receiving damage
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated DamageEvent
 	 */
 	default void onHurtFatal(Plugin plugin, Player player, double value, DamageEvent event) {
 
 	}
 
 	// TODO: convert everything in CrossbowListener over to the custom enchants system
+
 	/**
 	 * Player launched a Projectile (e.g. arrow, potion).
+	 *
 	 * @param plugin     monumenta plugin
 	 * @param player     the Player launching Projectile
 	 * @param value      the value of ItemStat possessed by the Player
@@ -110,6 +115,31 @@ public interface ItemStat {
 	 * @param projectile the Projectile being launched
 	 */
 	default void onLaunchProjectile(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
+
+	}
+
+	/**
+	 * Player Projectile hit something.
+	 *
+	 * @param plugin     monumenta plugin
+	 * @param player     the Player launching Projectile
+	 * @param value      the value of ItemStat possessed by the Player
+	 * @param event      the associated ProjectileLaunchEvent
+	 * @param projectile the Projectile being launched
+	 */
+	default void onProjectileHit(Plugin plugin, Player player, double value, ProjectileHitEvent event, Projectile projectile) {
+
+	}
+
+	/**
+	 * Player loads a Crossbow (e.g. arrow, fireworks)
+	 *
+	 * @param plugin monumenta plugin
+	 * @param player the Player loading projectile
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated EntityLoadCrossbowEvent
+	 */
+	default void onLoadCrossbow(Plugin plugin, Player player, double value, EntityLoadCrossbowEvent event) {
 
 	}
 
@@ -216,10 +246,10 @@ public interface ItemStat {
 	 * Called whenever the player dies a non-safe death
 	 * i.e. a grave was formed and exp was dropped
 	 *
-	 * @param plugin  monumenta plugin
-	 * @param player  the Player who died
-	 * @param value   the value of ItemStat possessed by the Player
-	 * @param event   the associated PlayerDeathEvent
+	 * @param plugin monumenta plugin
+	 * @param player the Player who died
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated PlayerDeathEvent
 	 */
 	default void onDeath(Plugin plugin, Player player, double value, PlayerDeathEvent event) {
 
@@ -228,9 +258,9 @@ public interface ItemStat {
 	/**
 	 * Called whenever an item spawns or is loaded into an existing chunk.
 	 *
-	 * @param plugin  monumenta plugin
-	 * @param item    the Item spawned
-	 * @param value   the value of ItemStat possessed by the Item
+	 * @param plugin monumenta plugin
+	 * @param item   the Item spawned
+	 * @param value  the value of ItemStat possessed by the Item
 	 */
 	default void onSpawn(Plugin plugin, Item item, double value) {
 
@@ -238,12 +268,24 @@ public interface ItemStat {
 
 	/**
 	 * Called when an entity is ignited
+	 *
 	 * @param plugin monumenta plugin
 	 * @param player the Player changing experience
 	 * @param value  the value of ItemStat possessed by the Player
 	 * @param event  the associated PlayerExpChangeEvent
 	 */
 	default void onCombust(Plugin plugin, Player player, double value, EntityCombustEvent event) {
+
+	}
+
+	/**
+	 * Called when a player riptides (hopefully???)
+	 * @param plugin monumenta plugin
+	 * @param player the Player riptiding
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated PlayerRiptdieEvent
+	 */
+	default void onRiptide(Plugin plugin, Player player, double value, PlayerRiptideEvent event) {
 
 	}
 }

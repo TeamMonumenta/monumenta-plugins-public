@@ -97,7 +97,7 @@ public class PlayerTracking implements EntityTracking {
 				Point loc = new Point(location);
 
 				// First we'll check if the player is too high, if so they shouldn't be here.
-				if (loc.mY >= 255 && (player.isOnGround() || player.isInsideVehicle())) {
+				if (loc.mY >= location.getWorld().getMaxHeight() - 1 && (player.isOnGround() || player.isInsideVehicle())) {
 					// Double check to make sure they're on the ground as it can trigger a false positive.
 					Block below = player.getWorld().getBlockAt(location.subtract(0, 1, 0));
 					if (below != null && below.getType() == Material.AIR) {

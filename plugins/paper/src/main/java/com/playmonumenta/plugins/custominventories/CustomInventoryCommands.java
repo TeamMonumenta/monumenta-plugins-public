@@ -176,14 +176,33 @@ public class CustomInventoryCommands {
 				new ClassSelectionCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
+		new CommandAPICommand("openmasterworkgui")
+			.withPermission("monumenta.command.openmasterworkgui")
+			.executesPlayer((player, args) -> {
+				Bukkit.getScheduler().runTaskLater(plugin, () -> {
+					new MasterworkCustomInventory(player).openInventory(player, plugin);
+				}, 1);
+
+			})
+			.register();
+		new CommandAPICommand("openmasterworkgui")
+			.withPermission("monumenta.command.openmasterworkgui")
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				Bukkit.getScheduler().runTaskLater(plugin, () -> {
+					new MasterworkCustomInventory(player).openInventory(player, plugin);
+				}, 1);
+			})
+			.register();
 
 		List<Argument> arguments = new ArrayList<>();
 		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
 		arguments.add(new IntegerArgument("region #"));
 		arguments.add(new IntegerArgument("level"));
 
-		List<String> questScore = new ArrayList<>(Arrays.asList("DailyQuest", "Daily2Quest"));
-		List<String> rewardScore = new ArrayList<>(Arrays.asList("DailyReward", "Daily2Reward"));
+		List<String> questScore = new ArrayList<>(Arrays.asList("DailyQuest", "Daily2Quest", "Daily3Quest"));
+		List<String> rewardScore = new ArrayList<>(Arrays.asList("DailyReward", "Daily2Reward", "Daily3Reward"));
 
 		new CommandAPICommand("openbountygui")
 			.withPermission("monumenta.command.openbountygui")

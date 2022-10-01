@@ -2,13 +2,13 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.HandOfLightCS;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -36,7 +36,6 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 
-
 public class HandOfLight extends Ability {
 
 	public static final int HEALING_RADIUS = 12;
@@ -52,12 +51,22 @@ public class HandOfLight extends Ability {
 	private static final int DAMAGE_PER_2 = 3;
 	private static final int DAMAGE_MAX_1 = 8;
 	private static final int DAMAGE_MAX_2 = 9;
-	public static final String DAMAGE_MODE_TAG = "ClericHOLDamageMode";
+	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED = 0.025;
+	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_MAX = 0.5;
+	private static final int ENHANCEMENT_UNDEAD_STUN_DURATION = 10;
+	private static final String DAMAGE_MODE_TAG = "ClericHOLDamageMode";
 
-	private int mFlat;
-	private double mPercent;
-	private int mDamagePer;
-	private int mDamageMax;
+	public static final String CHARM_DAMAGE = "Hand of Light Damage";
+	public static final String CHARM_COOLDOWN = "Hand of Light Cooldown";
+	public static final String CHARM_RANGE = "Hand of Light Range";
+	public static final String CHARM_HEALING = "Hand of Light Healing";
+
+	private final double mHealingRange;
+	private final int mFlat;
+	private final double mPercent;
+	private final double mDamageRange;
+	private final double mDamagePer;
+	private final double mDamageMax;
 	private boolean mDamageMode;
 
 	private @Nullable Crusade mCrusade;
@@ -73,25 +82,36 @@ public class HandOfLight extends Ability {
 		mInfo.mShorthandName = "HoL";
 		mInfo.mDescriptions.add("Right click while holding a weapon or tool to heal all other players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. If holding a shield, the trigger is changed to crouch + right click. Additionally, swap hands while looking up and not sneaking to change to damage mode. In damage mode, instead of healing players, damage all mobs in a 6 block radius in front of you magic damage equal to 2 times the number of undead mobs in the range, up to 8 damage. Cooldown: 14s.");
 		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health. In damage mode, deal 3 damage per undead mob, up to 9 damage. Cooldown: 10s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
+		mInfo.mDescriptions.add(
+			String.format("The cone is changed to a sphere of equal range, centered on the Cleric." +
+				              " The cooldown is reduced by %s%% for each 4 health healed, capped at %s%% cooldown." +
+				              " All Undead caught in the radius are stunned for %ss",
+				(int) (ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED * 100),
+				(int) (ENHANCEMENT_COOLDOWN_REDUCTION_MAX * 100),
+				ENHANCEMENT_UNDEAD_STUN_DURATION / 20.0
+			));
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.PINK_DYE, 1);
 		mInfo.mIgnoreCooldown = true;
 
-		mFlat = getAbilityScore() == 1 ? FLAT_1 : FLAT_2;
-		mPercent = getAbilityScore() == 1 ? PERCENT_1 : PERCENT_2;
-		mDamagePer = getAbilityScore() == 1 ? DAMAGE_PER_1 : DAMAGE_PER_2;
-		mDamageMax = getAbilityScore() == 1 ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
+		mHealingRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, HEALING_RADIUS);
+		mFlat = isLevelOne() ? FLAT_1 : FLAT_2;
+		mPercent = isLevelOne() ? PERCENT_1 : PERCENT_2;
+
+		mDamageRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, DAMAGE_RADIUS);
+		mDamagePer = isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2;
+		mDamageMax = isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
 
 		mDamageMode = player != null && player.getScoreboardTags().contains(DAMAGE_MODE_TAG);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HandOfLightCS(), HandOfLightCS.SKIN_LIST);
 
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
 
-			mHasCleansingRain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, CleansingRain.class) != null;
-			mHasLuminousInfusion = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, LuminousInfusion.class) != null;
+			mHasCleansingRain = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, CleansingRain.class) != null;
+			mHasLuminousInfusion = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, LuminousInfusion.class) != null;
 		});
 	}
 
@@ -101,7 +121,7 @@ public class HandOfLight extends Ability {
 			return;
 		}
 
-		if (isTimerActive() || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (isTimerActive()) {
 			return;
 		}
 
@@ -132,28 +152,45 @@ public class HandOfLight extends Ability {
 		Location userLoc = mPlayer.getLocation();
 
 		if (!mDamageMode) {
-			List<Player> nearbyPlayers = PlayerUtils.otherPlayersInRange(mPlayer, HEALING_RADIUS, true);
-			nearbyPlayers.removeIf(p -> (playerDir.dot(p.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && p.getLocation().distance(userLoc) > 2) || p.getScoreboardTags().contains("disable_class"));
+			List<Player> nearbyPlayers = PlayerUtils.otherPlayersInRange(mPlayer, mHealingRange, true);
+			if (!isEnhanced()) {
+				nearbyPlayers.removeIf(p -> playerDir.dot(p.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && p.getLocation().distance(userLoc) > 2);
+			}
+			nearbyPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class"));
 			if (nearbyPlayers.size() > 0) {
+				double healthHealed = 0;
 				for (Player p : nearbyPlayers) {
 					double maxHealth = EntityUtils.getMaxHealth(p);
-					PlayerUtils.healPlayer(mPlugin, p, mFlat + mPercent * maxHealth, mPlayer);
+					double healthBeforeHeal = p.getHealth();
+					PlayerUtils.healPlayer(mPlugin, p, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, mFlat + mPercent * maxHealth), mPlayer);
+					healthHealed += p.getHealth() - healthBeforeHeal;
 
 					Location loc = p.getLocation();
 					mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, 20 * 4, 1, true, true));
 					mCosmetic.lightHealEffect(mPlayer, loc, p);
 				}
 
-				mCosmetic.lightHealCastEffect(world, userLoc, mPlugin, mPlayer, HEALING_RADIUS, HEALING_DOT_ANGLE);
-				putOnCooldown();
+				doEnhancementEffect(userLoc);
+
+				mCosmetic.lightHealCastEffect(world, userLoc, mPlugin, mPlayer, (float) mHealingRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1);
+
+				double cooldown = getModifiedCooldown();
+				if (isEnhanced()) {
+					cooldown *= 1 - Math.min((healthHealed / 4) * ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED, ENHANCEMENT_COOLDOWN_REDUCTION_MAX);
+				}
+				putOnCooldown((int) cooldown);
 			}
 		} else {
-			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(userLoc, DAMAGE_RADIUS);
-			nearbyMobs.removeIf(mob -> (playerDir.dot(mob.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && mob.getLocation().distance(userLoc) > 2) || mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(userLoc, mDamageRange);
+			if (!isEnhanced()) {
+				nearbyMobs.removeIf(mob -> playerDir.dot(mob.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && mob.getLocation().distance(userLoc) > 2);
+			}
+			nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
 			List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
 			undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob, mCrusade));
-			int damage = Math.min(undeadMobs.size() * mDamagePer, mDamageMax);
+			double damage = Math.min(undeadMobs.size() * mDamagePer, mDamageMax);
+			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 
 			if (damage > 0) {
 				for (LivingEntity mob : nearbyMobs) {
@@ -162,9 +199,22 @@ public class HandOfLight extends Ability {
 					Location loc = mob.getLocation();
 					mCosmetic.lightDamageEffect(mPlayer, loc, mob);
 				}
-				mCosmetic.lightDamageCastEffect(world, userLoc, mPlugin, mPlayer, DAMAGE_RADIUS, HEALING_DOT_ANGLE);
+
+				doEnhancementEffect(userLoc);
+
+				mCosmetic.lightDamageCastEffect(world, userLoc, mPlugin, mPlayer, (float) mDamageRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1);
+
 				putOnCooldown();
 			}
+		}
+	}
+
+	private void doEnhancementEffect(Location userLoc) {
+		if (isEnhanced()) {
+			EntityUtils.getNearbyMobs(userLoc, mHealingRange).stream()
+				.filter(mob -> mob.getLocation().distanceSquared(userLoc) <= mHealingRange * mHealingRange)
+				.filter(mob -> Crusade.enemyTriggersAbilities(mob, mCrusade))
+				.forEach(mob -> EntityUtils.applyStun(mPlugin, ENHANCEMENT_UNDEAD_STUN_DURATION, mob));
 		}
 	}
 
@@ -196,8 +246,8 @@ public class HandOfLight extends Ability {
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 
 		//Must be holding weapon, tool, or shield
-		if (ItemUtils.isSomeBow(mainhand) || ItemUtils.isSomePotion(mainhand) || mainhand.getType().isBlock()
-			    || mainhand.getType().isEdible() || mainhand.getType() == Material.TRIDENT || mainhand.getType() == Material.COMPASS) {
+		if (ItemUtils.isShootableItem(mainhand) || ItemUtils.isSomePotion(mainhand) || mainhand.getType().isBlock()
+			    || mainhand.getType().isEdible() || mainhand.getType() == Material.COMPASS) {
 			return false;
 		}
 

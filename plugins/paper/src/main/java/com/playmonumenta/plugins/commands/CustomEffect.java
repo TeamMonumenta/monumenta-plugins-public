@@ -1,9 +1,14 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.AbilityCooldownDecrease;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.ArrowSaving;
 import com.playmonumenta.plugins.effects.BonusSoulThreads;
+import com.playmonumenta.plugins.effects.BoonOfKnightlyPrayer;
+import com.playmonumenta.plugins.effects.BoonOfThePit;
+import com.playmonumenta.plugins.effects.CrystalineBlessing;
+import com.playmonumenta.plugins.effects.DeepGodsEndowment;
 import com.playmonumenta.plugins.effects.DurabilitySaving;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -11,7 +16,10 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentExperience;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.effects.SilverPrayer;
+import com.playmonumenta.plugins.effects.StarCommunion;
 import com.playmonumenta.plugins.effects.Stasis;
+import com.playmonumenta.plugins.effects.TuathanBlessing;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.DoubleArgument;
@@ -54,6 +62,16 @@ public class CustomEffect {
 		singleArgumentEffects.put("arrowsaving", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, ArrowSaving.GENERIC_NAME), new ArrowSaving(duration, amount)));
 		singleArgumentEffects.put("durabilitysaving", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, DurabilitySaving.GENERIC_NAME), new DurabilitySaving(duration, amount)));
 		singleArgumentEffects.put("soul", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, BonusSoulThreads.GENERIC_NAME), new BonusSoulThreads(duration, amount)));
+		singleArgumentEffects.put("cdr", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, AbilityCooldownDecrease.GENERIC_NAME), new AbilityCooldownDecrease(duration, amount)));
+
+		// R3 Shrine Effects
+		singleArgumentEffects.put("boonofthepit", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, BoonOfThePit.GENERIC_NAME), new BoonOfThePit(duration)));
+		singleArgumentEffects.put("boonofknightlyprayer", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, BoonOfKnightlyPrayer.GENERIC_NAME), new BoonOfKnightlyPrayer(duration)));
+		singleArgumentEffects.put("crystalineblessing", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, CrystalineBlessing.GENERIC_NAME), new CrystalineBlessing(duration)));
+		singleArgumentEffects.put("deepgodsendowment", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, DeepGodsEndowment.GENERIC_NAME), new DeepGodsEndowment(duration)));
+		singleArgumentEffects.put("silverprayer", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, SilverPrayer.GENERIC_NAME), new SilverPrayer(duration)));
+		singleArgumentEffects.put("starcommunion", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, StarCommunion.GENERIC_NAME), new StarCommunion(duration)));
+		singleArgumentEffects.put("tuathanblessing", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, TuathanBlessing.GENERIC_NAME), new TuathanBlessing(duration)));
 
 		HashMap<String, String> translations = new HashMap<>();
 		translations.put("stasis", Stasis.GENERIC_NAME);
@@ -67,6 +85,14 @@ public class CustomEffect {
 		translations.put("arrowsaving", ArrowSaving.GENERIC_NAME);
 		translations.put("durabilitysaving", DurabilitySaving.GENERIC_NAME);
 		translations.put("soul", BonusSoulThreads.GENERIC_NAME);
+		translations.put("cdr", AbilityCooldownDecrease.GENERIC_NAME);
+		translations.put("boonofthepit", BoonOfThePit.GENERIC_NAME);
+		translations.put("boonofknightlyprayer", BoonOfKnightlyPrayer.GENERIC_NAME);
+		translations.put("crystalineblessing", CrystalineBlessing.GENERIC_NAME);
+		translations.put("deepgodsendowment", DeepGodsEndowment.GENERIC_NAME);
+		translations.put("silverprayer", SilverPrayer.GENERIC_NAME);
+		translations.put("starcommunion", StarCommunion.GENERIC_NAME);
+		translations.put("tuathanblessing", TuathanBlessing.GENERIC_NAME);
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
@@ -227,6 +253,69 @@ public class CustomEffect {
 				for (Entity entity : (Collection<Entity>) args[0]) {
 					Plugin.getInstance().mEffectManager.clearEffects(entity, source);
 				}
+			}).register();
+
+		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
+			.withArguments(
+				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new MultiLiteralArgument("clear"),
+				new StringArgument("effect")
+					.replaceSuggestions((info) ->
+						translations.keySet().stream().toList().toArray(String[]::new)
+					),
+				new StringArgument("source")
+			).executes((sender, args) -> {
+				String source = (String) args[3];
+				String translation = translations.get(source);
+				if (translation != null) {
+					source = translation;
+				}
+				for (Entity entity : (Collection<Entity>) args[0]) {
+					Plugin.getInstance().mEffectManager.clearEffects(entity, source);
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
+			.withArguments(
+				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new MultiLiteralArgument("haseffect"),
+				new StringArgument("effect")
+					.replaceSuggestions((info) ->
+						translations.keySet().stream().toList().toArray(String[]::new)
+					)
+			).executes((sender, args) -> {
+				String source = (String) args[2];
+				String translation = translations.get(source);
+				if (translation != null) {
+					source = translation;
+				}
+				boolean out = true;
+				for (Entity entity : (Collection<Entity>) args[0]) {
+					out = out && Plugin.getInstance().mEffectManager.hasEffect(entity, source);
+				}
+				return out ? 1 : 0;
+			}).register();
+
+		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
+			.withArguments(
+				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new MultiLiteralArgument("haseffect"),
+				new StringArgument("effect")
+					.replaceSuggestions((info) ->
+						translations.keySet().stream().toList().toArray(String[]::new)
+					),
+				new StringArgument("source")
+			).executes((sender, args) -> {
+				String source = (String) args[3];
+				String translation = translations.get(source);
+				if (translation != null) {
+					source = translation;
+				}
+				boolean out = true;
+				for (Entity entity : (Collection<Entity>) args[0]) {
+					out = out && Plugin.getInstance().mEffectManager.hasEffect(entity, source);
+				}
+				return out ? 1 : 0;
 			}).register();
 	}
 

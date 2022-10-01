@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
 import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
+import com.playmonumenta.plugins.abilities.rogue.Dethroner;
 import com.playmonumenta.plugins.abilities.rogue.Dodging;
 import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
 import com.playmonumenta.plugins.abilities.rogue.Skirmisher;
@@ -15,14 +16,13 @@ import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
+import com.playmonumenta.plugins.utils.StringUtils;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-
 
 public class Rogue extends PlayerClass {
 
@@ -39,7 +39,8 @@ public class Rogue extends PlayerClass {
 		mClassName = "Rogue";
 		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
 		mClassDescription = "Rogues excel in one-on-one battles, using precise strikes to bring down dangerous elite enemies.";
-		mClassPassiveDescription = "While holding two swords, deal 30% damage to elite enemies, and 15% more to bosses.";
+		mClassPassiveDescription = String.format("While holding two swords, deal %s%% damage to elite enemies, and %s%% more to bosses.", StringUtils.multiplierToPercentage(Dethroner.PASSIVE_DAMAGE_ELITE_MODIFIER - 1), StringUtils.multiplierToPercentage(Dethroner.PASSIVE_DAMAGE_BOSS_MODIFIER - 1));
+		mClassPassiveName = "Dethroner";
 
 		mSpecOne.mAbilities.add(new BladeDance(plugin, player));
 		mSpecOne.mAbilities.add(new DeadlyRonde(plugin, player));

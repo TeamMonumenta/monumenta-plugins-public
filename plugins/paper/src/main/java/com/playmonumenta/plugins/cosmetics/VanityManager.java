@@ -321,6 +321,7 @@ public class VanityManager implements Listener {
 					meta.lore(lore);
 					itemStack.setItemMeta(meta);
 				}
+				VirtualItemsReplacer.markVirtual(itemStack);
 				return;
 			}
 			ItemMeta vanityMeta = vanityItem.getItemMeta();

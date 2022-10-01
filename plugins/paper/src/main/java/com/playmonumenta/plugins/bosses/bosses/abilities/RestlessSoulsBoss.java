@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -52,7 +51,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		return new RestlessSoulsBoss(plugin, boss);
 	}
 
-	public RestlessSoulsBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public RestlessSoulsBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		boss.setInvulnerable(true);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
@@ -105,7 +104,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 					if (ability != null && plugin.mTimers.isAbilityOnCooldown(p.getUniqueId(), ability.getInfo().mLinkedSpell)) {
 						if (ability.getInfo().mLinkedSpell == ClassAbility.CHOLERIC_FLAMES) {
 							EntityUtils.applyFire(plugin, duration, damagee, p, playerItemStats);
-							if (ability.getAbilityScore() == 2) {
+							if (ability.isLevelTwo()) {
 								PotionUtils.applyPotion(p, damagee, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true));
 							}
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.GRASPING_CLAWS) {
@@ -115,7 +114,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.HAUNTING_SHADES) {
 							EntityUtils.applyVulnerability(plugin, duration, 0.1, damagee);
 						} else if (ability.getInfo().mLinkedSpell == ClassAbility.WITHERING_GAZE) {
-							plugin.mEffectManager.addEffect(damagee, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, null, Particle.SQUID_INK));
+							plugin.mEffectManager.addEffect(damagee, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, null));
 						}
 					}
 				}

@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -29,7 +28,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.Vector;
 
 public class DepthsAdvancingShadows extends DepthsAbility {
@@ -38,8 +36,6 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	public static final int[] DAMAGE = {5, 6, 7, 8, 9, 11};
 
 	private static final int ADVANCING_SHADOWS_RANGE = 12;
-	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED = 0.5f;
-	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE = 4;
 	private static final double ADVANCING_SHADOWS_OFFSET = 2.7;
 	private static final int COOLDOWN = 18 * 20;
 	private static final int DAMAGE_DURATION = 5 * 20;
@@ -65,7 +61,6 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 
 		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
 		if (origDistance <= ADVANCING_SHADOWS_RANGE && !entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
-			int advancingShadows = getAbilityScore();
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
@@ -129,21 +124,11 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
 
 			if (!(mPlayer.getInventory().getItemInOffHand().getType() == Material.SHIELD) && (loc.distance(entity.getLocation()) <= origDistance)) {
-				mPlayer.teleport(loc, TeleportCause.UNKNOWN);
+				mPlayer.teleport(loc);
 			}
 			playerLoc = mPlayer.getLocation();
 
 			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new FlatDamageDealt(DAMAGE_DURATION, DAMAGE[mRarity - 1], EnumSet.of(DamageType.MELEE)));
-			float range = ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE;
-			float speed = ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED;
-			if (advancingShadows > 1) {
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
-				                                                  range, mPlayer)) {
-					if (mob != entity) {
-						MovementUtils.knockAway(entity, mob, speed, true);
-					}
-				}
-			}
 
 			world.spawnParticle(Particle.SPELL_WITCH, playerLoc.clone().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
 			world.spawnParticle(Particle.SMOKE_LARGE, playerLoc.clone().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);

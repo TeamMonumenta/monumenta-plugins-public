@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
@@ -19,6 +20,7 @@ import org.bukkit.potion.PotionEffectType;
 public class HexEater implements Enchantment {
 
 	private static double DAMAGE = 0.5;
+	public static final String CHARM_DAMAGE = "Hex Eater Damage";
 
 	@Override
 	public String getName() {
@@ -88,10 +90,11 @@ public class HexEater implements Enchantment {
 
 		if (effects > 0) {
 			//Trident throw does not rely on player attack strength
+			double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * effects * DAMAGE);
 			if (tridentThrow) {
-				event.setDamage(event.getDamage() + level * effects * DAMAGE);
+				event.setDamage(event.getDamage() + damage);
 			} else {
-				event.setDamage(event.getDamage() + level * effects * DAMAGE * player.getCooledAttackStrength(0));
+				event.setDamage(event.getDamage() + damage * player.getCooledAttackStrength(0));
 			}
 			player.getWorld().spawnParticle(Particle.SPELL_WITCH, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
 		}

@@ -96,8 +96,12 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 
 		// %monumenta_level%
 		if (identifier.equalsIgnoreCase("level")) {
+			int charmPower = ScoreboardUtils.getScoreboardValue(player, "CharmPower").orElse(0);
+			charmPower = (charmPower > 0) ? charmPower / 3 + 1 : 0;
 			return Integer.toString(ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0) +
-				                                    ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0));
+				ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0) +
+				ScoreboardUtils.getScoreboardValue(player, "Enhancements").orElse(0) +
+				charmPower);
 		}
 
 		if (identifier.equalsIgnoreCase("shard")) {
@@ -188,7 +192,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 
 		if (identifier.startsWith("effect_")) {
 			List<String> effectDisplays = new ArrayList<>();
-			List<Effect> effects = mPlugin.mEffectManager.getPriorityEffects(player);
+			List<Effect> effects = new ArrayList<>(mPlugin.mEffectManager.getPriorityEffects(player).values());
 			effects.sort(new EffectManager.SortEffectsByDuration());
 
 			for (Effect effect : effects) {

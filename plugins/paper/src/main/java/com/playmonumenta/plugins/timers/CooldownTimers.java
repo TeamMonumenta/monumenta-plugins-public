@@ -116,8 +116,9 @@ public class CooldownTimers {
 
 	/**
 	 * Reduces the players ticks on all of their cooldowns.
+	 *
 	 * @param player The player whose cooldown ticks will be updated
-	 * @param ticks The cooldown reduction in ticks
+	 * @param ticks  The cooldown reduction in ticks
 	 */
 	public void updateCooldowns(Player player, int ticks) {
 		HashMap<ClassAbility, Integer> cds = mTimers.get(player.getUniqueId());

@@ -30,9 +30,11 @@ public class Transcendent {
 
 	private static final List<List<String>> ABILITY_POOL_MELEE_R1;
 	private static final List<List<String>> ABILITY_POOL_MELEE_R2;
+	private static final List<List<String>> ABILITY_POOL_MELEE_R3;
 
 	private static final List<List<String>> ABILITY_POOL_R1;
 	private static final List<List<String>> ABILITY_POOL_R2;
+	private static final List<List<String>> ABILITY_POOL_R3;
 
 	private static final String TRACKING_SPELL_NAME = "Transcendental Missile";
 	private static final String WRATH_SPELL_NAME = "Transcendental Wrath";
@@ -41,9 +43,11 @@ public class Transcendent {
 	static {
 		ABILITY_POOL_MELEE_R1 = new ArrayList<>();
 		ABILITY_POOL_MELEE_R2 = new ArrayList<>();
+		ABILITY_POOL_MELEE_R3 = new ArrayList<>();
 
 		ABILITY_POOL_R1 = new ArrayList<>();
 		ABILITY_POOL_R2 = new ArrayList<>();
+		ABILITY_POOL_R3 = new ArrayList<>();
 
 		List<String> seekingProjectileBoss = new ArrayList<>();
 		seekingProjectileBoss.add(ProjectileBoss.identityTag);
@@ -59,6 +63,13 @@ public class Transcendent {
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[particlelaunch=[(EXPLOSION_LARGE,1)],particleprojectile=[(FIREWORKS_SPARK,3,0,0,0,0.1),(SPELL_WITCH,10,0.2,0.2,0.2,0),(END_ROD,2,0.2,0.2,0.2,0)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.3)]]");
 		ABILITY_POOL_MELEE_R2.add(seekingProjectileBoss);
 		ABILITY_POOL_R2.add(seekingProjectileBoss);
+		seekingProjectileBoss = new ArrayList<>();
+		seekingProjectileBoss.add(ProjectileBoss.identityTag);
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=24,distance=32,speed=0.7,delay=10,cooldown=25,turnradius=0.06,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[particlelaunch=[(EXPLOSION_LARGE,1)],particleprojectile=[(FIREWORKS_SPARK,3,0,0,0,0.1),(SPELL_WITCH,10,0.2,0.2,0.2,0),(END_ROD,2,0.2,0.2,0.2,0)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.3)]]");
+		ABILITY_POOL_MELEE_R3.add(seekingProjectileBoss);
+		ABILITY_POOL_R3.add(seekingProjectileBoss);
 
 		List<String> commanderBoss = new ArrayList<>();
 		commanderBoss.add(CommanderBoss.identityTag);
@@ -66,6 +77,8 @@ public class Transcendent {
 		ABILITY_POOL_R1.add(commanderBoss);
 		ABILITY_POOL_MELEE_R2.add(commanderBoss);
 		ABILITY_POOL_R2.add(commanderBoss);
+		ABILITY_POOL_MELEE_R3.add(commanderBoss);
+		ABILITY_POOL_R3.add(commanderBoss);
 
 		List<String> wrathBoss = new ArrayList<>();
 		wrathBoss.add(WrathBoss.identityTag);
@@ -77,6 +90,11 @@ public class Transcendent {
 		wrathBoss.add(WrathBoss.identityTag + "[damage=18,spellname=\"" + WRATH_SPELL_NAME + "\"]");
 		wrathBoss.add(DodgeBoss.identityTag);
 		ABILITY_POOL_MELEE_R2.add(wrathBoss);
+		wrathBoss = new ArrayList<>();
+		wrathBoss.add(WrathBoss.identityTag);
+		wrathBoss.add(WrathBoss.identityTag + "[damage=27,spellname=\"" + WRATH_SPELL_NAME + "\"]");
+		wrathBoss.add(DodgeBoss.identityTag);
+		ABILITY_POOL_MELEE_R3.add(wrathBoss);
 
 	}
 
@@ -105,13 +123,13 @@ public class Transcendent {
 			Material material = mainhand == null ? null : mainhand.getType();
 			if (material == Material.BOW || material == Material.CROSSBOW || material == Material.TRIDENT
 				    || mob instanceof Evoker) {
-				List<List<String>> abilityPool = ServerProperties.getClassSpecializationsEnabled() ? ABILITY_POOL_R2 : ABILITY_POOL_R1;
+				List<List<String>> abilityPool = ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? ABILITY_POOL_R3 : ABILITY_POOL_R2) : ABILITY_POOL_R1;
 				List<String> ability = abilityPool.get(FastUtils.RANDOM.nextInt(abilityPool.size()));
 				for (String abilityTag : ability) {
 					mob.addScoreboardTag(abilityTag);
 				}
 			} else {
-				List<List<String>> abilityPool = ServerProperties.getClassSpecializationsEnabled() ? ABILITY_POOL_MELEE_R2 : ABILITY_POOL_MELEE_R1;
+				List<List<String>> abilityPool = ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? ABILITY_POOL_MELEE_R3 : ABILITY_POOL_MELEE_R2) : ABILITY_POOL_MELEE_R1;
 				List<String> ability = abilityPool.get(FastUtils.RANDOM.nextInt(abilityPool.size()));
 				for (String abilityTag : ability) {
 					mob.addScoreboardTag(abilityTag);

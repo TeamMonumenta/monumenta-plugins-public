@@ -1,12 +1,15 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,7 +19,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionType;
 
-
 public class CrossbowListener implements Listener {
 
 	private Plugin mPlugin;
@@ -25,15 +27,29 @@ public class CrossbowListener implements Listener {
 		mPlugin = plugin;
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entityLoadCrossbowEvent(EntityLoadCrossbowEvent event) {
+		Entity entity = event.getEntity();
+
+		if (entity instanceof Player player) {
+			mPlugin.mItemStatManager.onLoadCrossbow(mPlugin, player, event);
+			if (event.isCancelled()) {
+				return;
+			}
+		}
+	}
+
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		//Has to be an arrow
-		if (!(event.getEntity() instanceof Arrow arrow)
-			    || !(arrow.getShooter() instanceof LivingEntity shooter)) {
+		if (!EntityUtils.isSomeArrow(event.getEntity())
+				|| !(event.getEntity().getShooter() instanceof LivingEntity)) {
 			return;
 		}
 
+		LivingEntity shooter = (LivingEntity) event.getEntity().getShooter();
 		ItemStack item = shooter.getEquipment().getItemInMainHand();
+		AbstractArrow arrow = (AbstractArrow) event.getEntity();
 
 		//For non player entities that shoot a crossbow
 		if (item.getType().equals(Material.CROSSBOW) && !(arrow.getShooter() instanceof Player)) {
@@ -56,8 +72,9 @@ public class CrossbowListener implements Listener {
 
 				//Infinity gives arrow to player if the arrow shot had no potion nor custom effects
 				if (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0
-					    && !arrow.hasCustomEffects()
-					    && arrow.getBasePotionData().getType() == PotionType.UNCRAFTABLE // plain arrow
+						&& arrow instanceof Arrow regularArrow
+					    && !regularArrow.hasCustomEffects()
+					    && regularArrow.getBasePotionData().getType() == PotionType.UNCRAFTABLE // plain arrow
 					    && arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
 					arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
 					if (player.getGameMode() != GameMode.CREATIVE) {
@@ -67,15 +84,15 @@ public class CrossbowListener implements Listener {
 
 				//Flame level metadata given, based off of mainhand if both have enchants
 				if (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_FIRE) > 0
-						|| itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_FIRE) > 0) {
+					|| itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_FIRE) > 0) {
 					arrow.setFireTicks(100);
 				}
 
 				//Sets Punch manually to the arrow
 				if (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK) > 0
-						|| itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK) > 0) {
+					|| itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK) > 0) {
 					int level = itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK) > 0 ?
-							itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK) : itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK);
+						itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK) : itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK);
 					arrow.setKnockbackStrength(level);
 				}
 				//Has to manually call projectile launch event because of arrow changes

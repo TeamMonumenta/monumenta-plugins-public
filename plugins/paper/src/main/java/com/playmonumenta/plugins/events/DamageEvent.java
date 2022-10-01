@@ -44,47 +44,47 @@ public class DamageEvent extends Event implements Cancellable {
 		public static DamageType getType(DamageCause cause) {
 			// List every cause for completeness
 			switch (cause) {
-			case CONTACT:
-			case ENTITY_ATTACK:
-			case FALLING_BLOCK:
-				return DamageType.MELEE;
-			case ENTITY_SWEEP_ATTACK:
-				return DamageType.MELEE_ENCH;
-			case PROJECTILE:
-				return DamageType.PROJECTILE;
-			case DRAGON_BREATH:
-			case MAGIC:
-				return DamageType.MAGIC;
-			case THORNS:
-				return DamageType.THORNS;
-			case BLOCK_EXPLOSION:
-			case ENTITY_EXPLOSION:
-				return DamageType.BLAST;
-			case FIRE:
-			case FIRE_TICK:
-			case HOT_FLOOR:
-			case LAVA:
-				return DamageType.FIRE;
-			case FALL:
-			case FLY_INTO_WALL:
-				return DamageType.FALL;
-			case POISON:
-				return DamageType.POISON;
-			case WITHER:
-				return DamageType.AILMENT;
-			case CRAMMING:
-			case CUSTOM:
-			case DROWNING:
-			case DRYOUT:
-			case LIGHTNING:
-			case MELTING:
-			case STARVATION:
-			case SUFFOCATION:
-			case SUICIDE:
-			case VOID:
-				return DamageType.OTHER;
-			default:
-				return DamageType.OTHER;
+				case CONTACT:
+				case ENTITY_ATTACK:
+				case FALLING_BLOCK:
+					return DamageType.MELEE;
+				case ENTITY_SWEEP_ATTACK:
+					return DamageType.MELEE_ENCH;
+				case PROJECTILE:
+					return DamageType.PROJECTILE;
+				case DRAGON_BREATH:
+				case MAGIC:
+					return DamageType.MAGIC;
+				case THORNS:
+					return DamageType.THORNS;
+				case BLOCK_EXPLOSION:
+				case ENTITY_EXPLOSION:
+					return DamageType.BLAST;
+				case FIRE:
+				case FIRE_TICK:
+				case HOT_FLOOR:
+				case LAVA:
+					return DamageType.FIRE;
+				case FALL:
+				case FLY_INTO_WALL:
+					return DamageType.FALL;
+				case POISON:
+					return DamageType.POISON;
+				case WITHER:
+					return DamageType.AILMENT;
+				case CRAMMING:
+				case CUSTOM:
+				case DROWNING:
+				case DRYOUT:
+				case LIGHTNING:
+				case MELTING:
+				case STARVATION:
+				case SUFFOCATION:
+				case SUICIDE:
+				case VOID:
+					return DamageType.OTHER;
+				default:
+					return DamageType.OTHER;
 			}
 		}
 
@@ -121,7 +121,7 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public static class Metadata {
 
-		private final DamageType mType;
+		private DamageType mType;
 		private final @Nullable ClassAbility mAbility;
 		private final @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 		private final @Nullable String mBossSpellName;
@@ -238,6 +238,10 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public DamageType getType() {
 		return mMetadata.mType;
+	}
+
+	public void setType(DamageType newType) {
+		mMetadata.mType = newType;
 	}
 
 	public @Nullable ClassAbility getAbility() {

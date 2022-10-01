@@ -19,20 +19,23 @@ import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EnchantedPrayerAoE extends Effect {
+	public static final String effectID = "EnchantedPrayerAoE";
 
 	private final Plugin mPlugin;
-	private final int mDamageAmount;
+	private final double mDamageAmount;
 	private final double mHealAmount;
 	private final Player mPlayer;
 	private final EnumSet<DamageType> mAffectedDamageTypes;
+	private final double mEffectSize;
 
-	public EnchantedPrayerAoE(Plugin plugin, int duration, int damageAmount, double healAmount, Player player, EnumSet<DamageType> affectedDamageTypes) {
-		super(duration);
+	public EnchantedPrayerAoE(Plugin plugin, int duration, double damageAmount, double healAmount, Player player, EnumSet<DamageType> affectedDamageTypes, double size) {
+		super(duration, effectID);
 		mPlugin = plugin;
 		mDamageAmount = damageAmount;
 		mHealAmount = healAmount;
 		mPlayer = player;
 		mAffectedDamageTypes = affectedDamageTypes;
+		mEffectSize = size;
 	}
 
 	// This needs to trigger after any percent damage
@@ -54,7 +57,7 @@ public class EnchantedPrayerAoE extends Effect {
 			world.playSound(enemy.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
 			new PartialParticle(Particle.SPELL_INSTANT, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.FIREWORKS_SPARK, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 75, 0, 0, 0, 0.3).spawnAsPlayerActive(mPlayer);
-			for (LivingEntity le : EntityUtils.getNearbyMobs(enemy.getLocation(), 3.5)) {
+			for (LivingEntity le : EntityUtils.getNearbyMobs(enemy.getLocation(), mEffectSize)) {
 				DamageUtils.damage(mPlayer, le, DamageType.MAGIC, mDamageAmount, ClassAbility.ENCHANTED_PRAYER, true, true);
 			}
 			double maxHealth = EntityUtils.getMaxHealth(mPlayer);
@@ -81,6 +84,6 @@ public class EnchantedPrayerAoE extends Effect {
 
 	@Override
 	public String toString() {
-		return String.format("EnchantedPrayerAoE duration:%d player:%s amount:%d", this.getDuration(), mPlayer.getName(), mDamageAmount);
+		return String.format("EnchantedPrayerAoE duration:%d player:%s amount:%f", this.getDuration(), mPlayer.getName(), mDamageAmount);
 	}
 }

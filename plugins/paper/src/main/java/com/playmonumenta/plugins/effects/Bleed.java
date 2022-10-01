@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -11,6 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Bleed extends SingleArgumentEffect {
+	public static final String effectID = "Bleed";
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
 
@@ -20,7 +22,7 @@ public class Bleed extends SingleArgumentEffect {
 	private final Plugin mPlugin;
 
 	public Bleed(int duration, double amount, Plugin plugin) {
-		super(duration, amount);
+		super(duration, amount, effectID);
 		mPlugin = plugin;
 	}
 
@@ -41,14 +43,27 @@ public class Bleed extends SingleArgumentEffect {
 						@Override
 						public void run() {
 							mPlugin.mEffectManager.addEffect(le, PERCENT_SPEED_EFFECT_NAME,
-							                                 new PercentSpeed(20, -mAmount, PERCENT_SPEED_EFFECT_NAME));
+								new PercentSpeed(20, -mAmount, PERCENT_SPEED_EFFECT_NAME));
 							mPlugin.mEffectManager.addEffect(le, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
-									new PercentDamageDealt(20, -mAmount));
+								new PercentDamageDealt(20, -mAmount));
 						}
 					}.runTaskLater(mPlugin, 0);
 				}
 			}
 		}
+	}
+
+	public static Bleed deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+		double amount = object.get("amount").getAsDouble();
+
+		return new Bleed(duration, amount, plugin);
+	}
+
+
+	@Override
+	public boolean isDebuff() {
+		return true;
 	}
 
 	@Override

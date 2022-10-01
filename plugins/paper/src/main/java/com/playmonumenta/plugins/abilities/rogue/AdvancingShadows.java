@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.cosmetics.skills.rogue.AdvancingShadowsCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -27,11 +28,9 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
-
 
 public class AdvancingShadows extends Ability {
 
@@ -44,14 +43,24 @@ public class AdvancingShadows extends Ability {
 	private static final double DAMAGE_BONUS_1 = 0.3;
 	private static final double DAMAGE_BONUS_2 = 0.4;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
+	private static final double ENHANCEMENT_BONUS_DAMAGE = 0.2;
+	private static final int ENHANCEMENT_BONUS_DAMAGE_DURATION = 20 * 5;
+
+	public static final String CHARM_DAMAGE = "Advancing Shadows Damage Multiplier";
+	public static final String CHARM_COOLDOWN = "Advancing Shadows Cooldown";
+	public static final String CHARM_RANGE = "Advancing Shadows Range";
+	public static final String CHARM_KNOCKBACK = "Advancing Shadows Knockback";
 
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "AdvancingShadowsPercentDamageDealtEffect";
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE, DamageType.MELEE_ENCH, DamageType.MELEE_SKILL);
+	private static final String ENHANCEMENT_EFFECT_NAME = "AdvancingShadowsEnhancementPercentDamageDealtEffect";
 
 	private @Nullable LivingEntity mTarget = null;
-	private @Nullable BladeDance mBladeDance;
+	private boolean mHasBladeDance;
 
 	private final double mPercentDamageDealt;
+	private final double mActivationRange;
+
 	private final AdvancingShadowsCS mCosmetic;
 
 	public AdvancingShadows(Plugin plugin, @Nullable Player player) {
@@ -59,33 +68,46 @@ public class AdvancingShadows extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.ADVANCING_SHADOWS;
 		mInfo.mScoreboardId = "AdvancingShadows";
 		mInfo.mShorthandName = "AS";
-		mInfo.mCooldown = ADVANCING_SHADOWS_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, ADVANCING_SHADOWS_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within " + (ADVANCING_SHADOWS_RANGE_1 - 1) + " blocks and gain +30% Melee Damage for 5 seconds. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Damage increased to +40% Melee Damage for 5s, teleport range is increased to " + (ADVANCING_SHADOWS_RANGE_2 - 1) + " blocks and all hostile non-target mobs within " + ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE + " blocks are knocked away from the target.");
+		mInfo.mIgnoreCooldown = true;
+		mInfo.mDescriptions.add(
+			String.format("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within %s blocks and gain +%s%% Melee Damage for %s seconds. Cooldown: %ss.",
+				ADVANCING_SHADOWS_RANGE_1 - 1,
+				(int)(DAMAGE_BONUS_1 * 100),
+				DURATION / 20,
+				ADVANCING_SHADOWS_COOLDOWN / 20));
+		mInfo.mDescriptions.add(
+			String.format("Damage increased to +%s%% Melee Damage for %ss, teleport range is increased to %s blocks and all hostile non-target mobs within %s blocks are knocked away from the target.",
+				(int)(DAMAGE_BONUS_2 * 100),
+				DURATION / 20,
+				ADVANCING_SHADOWS_RANGE_2 - 1,
+				(int)ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE));
+		mInfo.mDescriptions.add(
+			String.format("You deal %s%% extra damage for %ss to the target.",
+				(int)(ENHANCEMENT_BONUS_DAMAGE * 100),
+				ENHANCEMENT_BONUS_DAMAGE_DURATION / 20));
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
-		mPercentDamageDealt = getAbilityScore() == 1 ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2;
+		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2);
+		mActivationRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, (isLevelOne() ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2));
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AdvancingShadowsCS(), AdvancingShadowsCS.SKIN_LIST);
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mBladeDance = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, BladeDance.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mHasBladeDance = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, BladeDance.class) != null;
+		});
 	}
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer == null || mTarget == null) {
+		if (mPlayer == null || mTarget == null || isTimerActive()) {
 			return;
 		}
 
 		LivingEntity entity = mTarget;
-		double maxRange = getActivationRange();
+		double maxRange = mActivationRange;
 		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
 		if (origDistance <= maxRange) {
-			int advancingShadows = getAbilityScore();
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
@@ -152,17 +174,21 @@ public class AdvancingShadows extends Ability {
 			mCosmetic.tpSound(world, mPlayer);
 
 			if (loc.distance(entity.getLocation()) <= origDistance) {
-				mPlayer.teleport(loc, TeleportCause.UNKNOWN);
+				mPlayer.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
 			}
 
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES));
-			if (advancingShadows > 1) {
+			if (isLevelTwo()) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
-						ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
+					ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
 					if (mob != entity) {
-						MovementUtils.knockAway(entity, mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED, true);
+						MovementUtils.knockAway(entity, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED), true);
 					}
 				}
+			}
+
+			if (isEnhanced()) {
+				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCEMENT_EFFECT_NAME, new PercentDamageDealt(ENHANCEMENT_BONUS_DAMAGE_DURATION, ENHANCEMENT_BONUS_DAMAGE, null, 0, (player, enemy) -> enemy == entity));
 			}
 
 			mCosmetic.tpParticle(mPlayer);
@@ -178,14 +204,14 @@ public class AdvancingShadows extends Ability {
 		if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			if (!mPlayer.isSneaking()) {
 				// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
-				if (mBladeDance != null && mPlayer.getLocation().getPitch() >= 50) {
+				if (mHasBladeDance && mPlayer.getLocation().getPitch() >= 50) {
 					return false;
 				}
 
 				// Basically makes sure if the target is in LoS and if there is
 				// a path.
 				Location eyeLoc = mPlayer.getEyeLocation();
-				Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), (int)getActivationRange());
+				Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), (int) Math.ceil(mActivationRange));
 				ray.mThroughBlocks = false;
 				ray.mThroughNonOccluding = false;
 				if (AbilityManager.getManager().isPvPEnabled(mPlayer)) {
@@ -206,14 +232,5 @@ public class AdvancingShadows extends Ability {
 			}
 		}
 		return false;
-	}
-
-	private double getActivationRange() {
-		if (mPlayer == null) {
-			return 0;
-		}
-		int advancingShadows = getAbilityScore();
-		int range = (advancingShadows == 1) ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
-		return range;
 	}
 }

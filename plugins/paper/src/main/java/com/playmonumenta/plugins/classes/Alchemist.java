@@ -41,7 +41,8 @@ public class Alchemist extends PlayerClass {
 		mDisplayItem = new ItemStack(Material.POTION, 1);
 		mClassDescription = "Alchemists employ magic potions to weaken and destroy their enemies.";
 		mClassPassiveDescription = "You gain 1 potion every 2 seconds, up to a maximum of 8. Each skill point" +
-				" increases your potion damage by 0.5. Each spec point increases potion damage by 2.5.";
+				" increases your potion damage by 0.5. Each spec point and enhancement point increases potion damage by 2.5.";
+		mClassPassiveName = "Alchemist Potions";
 
 		mSpecOne.mAbilities.add(new Taboo(plugin, player));
 		mSpecOne.mAbilities.add(new ScorchedEarth(plugin, player));

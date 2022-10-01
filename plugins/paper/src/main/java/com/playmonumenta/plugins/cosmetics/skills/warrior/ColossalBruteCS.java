@@ -25,6 +25,7 @@ public class ColossalBruteCS extends BruteForceCS {
 	private static final double[] ANGLE = {240, 290, 270};
 	private static final float[] PITCHES = {0.85f, 1.15f, 0.55f};
 	private static final float[] GOLEM_PITCHES = {0.6f, 0.775f, 0.5f};
+
 	@Override
 	public Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -11,6 +12,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Color;
@@ -21,6 +23,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 
 public class Quake implements Enchantment {
@@ -32,6 +36,8 @@ public class Quake implements Enchantment {
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
 	private static final String MELEE_DAMAGE_DEALT_METADATA = "QuakeMeleeDamageDealt";
 	private static final String MELEED_THIS_TICK_METADATA = "QuakeMeleeThisTick";
+	public static final String CHARM_DAMAGE = "Quake Damage";
+	public static final String CHARM_RADIUS = "Quake Radius";
 
 	@Override
 	public String getName() {
@@ -67,7 +73,8 @@ public class Quake implements Enchantment {
 				return;
 			}
 
-			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(target.getLocation(), RADIUS);
+			double radius = CharmManager.getRadius(player, CHARM_RADIUS, RADIUS);
+			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(target.getLocation(), radius);
 
 			//Get enchant levels on weapon
 			int fire = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.FIRE_ASPECT);
@@ -75,17 +82,19 @@ public class Quake implements Enchantment {
 			int thunder = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.THUNDER_ASPECT);
 			int decay = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.DECAY);
 			int bleed = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.BLEEDING);
+			int wind = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT);
 			/*
-			*Damage any mobs in the area
-			*Need to cast it because the methods only take integers
-			*/
+			 *Damage any mobs in the area
+			 *Need to cast it because the methods only take integers
+			 */
 			for (LivingEntity mob : mobs) {
-				DamageUtils.damage(player, mob, DamageType.OTHER, damage * DAMAGE_MODIFIER_PER_LEVEL * level, null, false, true);
+				double finalDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, damage * DAMAGE_MODIFIER_PER_LEVEL * level);
+				DamageUtils.damage(player, mob, DamageType.OTHER, finalDamage, null, false, true);
 				if (fire > 0) {
 					EntityUtils.applyFire(plugin, 80 * fire, mob, player);
 				}
 				if (ice > 0) {
-					EntityUtils.applySlow(plugin, IceAspect.ICE_ASPECT_DURATION, ice * 0.1, mob);
+					EntityUtils.applySlow(plugin, IceAspect.ICE_ASPECT_DURATION + CharmManager.getExtraDuration(player, IceAspect.CHARM_DURATION), (ice * 0.1) + CharmManager.getLevelPercent(player, IceAspect.CHARM_SLOW), mob);
 				}
 				if (thunder > 0 && FastUtils.RANDOM.nextDouble() < thunder * ThunderAspect.CHANCE) {
 					EntityUtils.applyStun(plugin, ThunderAspect.DURATION_MELEE, mob);
@@ -95,6 +104,10 @@ public class Quake implements Enchantment {
 				}
 				if (bleed > 0) {
 					EntityUtils.applyBleed(plugin, Bleeding.DURATION, bleed * Bleeding.AMOUNT_PER_LEVEL, mob);
+				}
+				if (wind > 0) {
+					PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
+					WindAspect.launch(plugin, mob, wind);
 				}
 			}
 

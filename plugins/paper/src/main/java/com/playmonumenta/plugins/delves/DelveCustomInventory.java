@@ -1,19 +1,25 @@
 package com.playmonumenta.plugins.delves;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.custominventories.BountyCustomInventory;
 import com.playmonumenta.plugins.delves.abilities.Entropy;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -30,6 +36,7 @@ public class DelveCustomInventory extends CustomInventory {
 	private static final ItemStack WHITE_ITEM = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
 	private static final ItemStack SELECT_ALL_MOD_ITEM = getSelectAllModifiers();
 	private static final ItemStack REMOVE_ALL_MOD_ITEM = getResetModifiers();
+	private static final ItemStack BOUNTY_SELECTION_ITEM = getBountySelection();
 	private static final ItemStack STARTING_ITEM = new ItemStack(Material.OBSERVER);
 	private static final ItemStack STARTING_ITEM_NOT_ENOUGH_POINTS = new ItemStack(Material.OBSERVER);
 	private static final ItemStack ROTATING_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(Material.MAGENTA_GLAZED_TERRACOTTA, Component.text("Rotating Modifier", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), new String[] {"Some of these modifiers are randomly available each week.", "Selecting at least one will result in 25% increased XP."});
@@ -57,6 +64,10 @@ public class DelveCustomInventory extends CustomInventory {
 
 		meta = REMOVE_ALL_MOD_ITEM.getItemMeta();
 		meta.displayName(Component.text("Remove all modifiers!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+		REMOVE_ALL_MOD_ITEM.setItemMeta(meta);
+
+		meta = BOUNTY_SELECTION_ITEM.getItemMeta();
+		meta.displayName(Component.text("Back to bounty selection!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 		REMOVE_ALL_MOD_ITEM.setItemMeta(meta);
 
 
@@ -93,6 +104,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 	private static final int TOTAL_POINT_SLOT = 0;
 	private static final int START_SLOT = 8;
+	private static final int PRESET_SLOT = 36;
 	private static final int PAGE_LEFT_SLOT = 45;
 	private static final int PAGE_RIGHT_SLOT = 53;
 
@@ -104,20 +116,32 @@ public class DelveCustomInventory extends CustomInventory {
 	private int mPage = 0;
 	private int mTotalPoint = 0;
 	private int mIgnoreOldEntropyPoint;
+	@Nullable
+	private DelvePreset mPreset;
 
 	private final Map<DelvesModifier, Integer> mPointSelected = new HashMap<>();
 
-	public DelveCustomInventory(Player owner, String dungeon, boolean editable) {
+	public DelveCustomInventory(Player owner, String dungeon, boolean editable, @Nullable DelvePreset preset) {
 		super(owner, 54, "Delve Modifiers " + (editable ? "Selection" : "Selected"));
 		mEditableDelvePoint = editable;
 		mDungeonName = dungeon;
 		mOwner = owner;
-		for (DelvesModifier mod : DelvesModifier.values()) {
-			mPointSelected.put(mod, DelvesUtils.getDelveModLevel(owner, dungeon, mod));
+		if (preset == null) {
+			for (DelvesModifier mod : DelvesModifier.values()) {
+				mPointSelected.put(mod, DelvesUtils.getDelveModLevel(owner, dungeon, mod));
+			}
+		} else {
+			for (Map.Entry<DelvesModifier, Integer> entry : preset.mModifiers.entrySet()) {
+				mPointSelected.put(entry.getKey(), entry.getValue());
+			}
 		}
 		mIgnoreOldEntropyPoint = mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0);
-
+		mPreset = preset;
 		loadInv();
+	}
+
+	public DelveCustomInventory(Player owner, String dungeon, boolean editable) {
+		this(owner, dungeon, editable, null);
 	}
 
 	private void loadInv() {
@@ -176,6 +200,21 @@ public class DelveCustomInventory extends CustomInventory {
 			mInventory.setItem(PAGE_LEFT_SLOT, getPreviousPage());
 		} else if (mEditableDelvePoint) {
 			mInventory.setItem(PAGE_LEFT_SLOT, REMOVE_ALL_MOD_ITEM);
+			if (mDungeonName.equals("ring") && mEditableDelvePoint && ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0) > 0) {
+				DelvePreset delvePreset = DelvePreset.getDelvePreset(ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0));
+				ItemStack presetItem = new ItemStack(delvePreset.mDisplayItem, 1);
+				ItemMeta meta = presetItem.getItemMeta();
+				meta.displayName(Component.text("Use Bounty Preset", NamedTextColor.WHITE)
+					.decoration(TextDecoration.ITALIC, false)
+					.decoration(TextDecoration.BOLD, true));
+				GUIUtils.splitLoreLine(meta, delvePreset.mName, 30, ChatColor.AQUA, true);
+				meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+				meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+				presetItem.setItemMeta(meta);
+				mInventory.setItem(PRESET_SLOT, presetItem);
+			}
+		} else if (mPreset != null) {
+			mInventory.setItem(PAGE_LEFT_SLOT, BOUNTY_SELECTION_ITEM);
 		}
 
 		if (TOTAL_DELVE_MOD - ((mPage + 1) * 7) > 0) {
@@ -224,10 +263,12 @@ public class DelveCustomInventory extends CustomInventory {
 
 		lore.add(Component.text(""));
 
-		double dungeonMultiplier = StatMultiplier.getStatCompensation(mDungeonName);
-		lore.add(Component.text("Stat Multipliers from Base Dungeon:", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text(String.format("- Damage Multiplier: x%.3f", dungeonMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text(String.format("- Health Multiplier: x%.3f", dungeonMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+		if (!mDungeonName.equals("ring")) {
+			double dungeonMultiplier = StatMultiplier.getStatCompensation(mDungeonName);
+			lore.add(Component.text("Stat Multipliers from Base Dungeon:", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(String.format("- Damage Multiplier: x%.3f", dungeonMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(String.format("- Health Multiplier: x%.3f", dungeonMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+		}
 
 		lore.add(Component.text(""));
 
@@ -295,6 +336,17 @@ public class DelveCustomInventory extends CustomInventory {
 
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(Component.text("Reset Modifiers", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+		item.setItemMeta(meta);
+		ItemUtils.setPlainName(item);
+
+		return item;
+	}
+
+	private static ItemStack getBountySelection() {
+		ItemStack item = new ItemStack(Material.BARRIER, 1);
+
+		ItemMeta meta = item.getItemMeta();
+		meta.displayName(Component.text("Bounty Selection", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 		item.setItemMeta(meta);
 		ItemUtils.setPlainName(item);
 
@@ -399,6 +451,20 @@ public class DelveCustomInventory extends CustomInventory {
 				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1f, 0.5f);
 				mPointSelected.forEach((mod, value) -> mPointSelected.put(mod, 0));
 				mIgnoreOldEntropyPoint = 0;
+			} else if (mPreset != null) {
+				this.close();
+				try {
+					new BountyCustomInventory(playerWhoClicked, 3, 0).openInventory(playerWhoClicked, getPlugin());
+				} catch (Exception e) {
+					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), e);
+				}
+			}
+		}
+
+		if (slot == PRESET_SLOT && mPage == 0 && mDungeonName.equals("ring") && mEditableDelvePoint && ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0) > 0) {
+			DelvePreset delvePreset = DelvePreset.getDelvePreset(ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0));
+			for (Map.Entry<DelvesModifier, Integer> entry : delvePreset.mModifiers.entrySet()) {
+				mPointSelected.put(entry.getKey(), entry.getValue());
 			}
 		}
 

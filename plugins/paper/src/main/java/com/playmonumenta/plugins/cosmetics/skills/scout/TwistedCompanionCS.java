@@ -10,8 +10,13 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import org.apache.commons.math3.util.FastMath;
-import org.bukkit.*;
-import org.bukkit.entity.Fox;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -52,7 +57,7 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 	}
 
 	@Override
-	public void foxOnSummon(World world, Location loc, Player mPlayer, Fox mFox) {
+	public void foxOnSummon(World world, Location loc, Player player, LivingEntity summon) {
 		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.PLAYERS, 1.5f, 0.7f);
 		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.PLAYERS, 1.5f, 0.85f);
 		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.PLAYERS, 1.5f, 1.0f);
@@ -62,14 +67,14 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.5f, 0.8f);
 		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 1.5f, 1.5f);
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-1, 1), 1,
-			FastUtils.randomDoubleInRange(-1, 1)), mPlayer.getLocation().add(0, 1.35, 0), mPlayer, mFox);
+			FastUtils.randomDoubleInRange(-1, 1)), player.getLocation().add(0, 1.35, 0), player, summon);
 
-		spawnRing(mPlayer.getLocation(), mPlayer, 3);
+		spawnRing(player.getLocation(), player, 3);
 	}
 
 	@Override
-	public void foxTick(Fox mFox, Player mPlayer, LivingEntity mTarget, int t) {
-		Location loc = LocationUtils.getHalfHeightLocation(mFox);
+	public void foxTick(LivingEntity summon, Player player, LivingEntity target, int t) {
+		Location loc = LocationUtils.getHalfHeightLocation(summon);
 		for (int i = 0; i < 2; i++) {
 			double rotation = FastMath.toRadians((t * 10) + (i * 180));
 			Vector vec = new Vector(FastUtils.cos(rotation) * HELIX_RADIUS, 0,
@@ -78,42 +83,38 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 			vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 			Location l = loc.clone().add(vec);
 			new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0,
-				new Particle.DustOptions(TWIST_COLOR_TIP, 1)).spawnAsPlayerActive(mPlayer);
+				new Particle.DustOptions(TWIST_COLOR_TIP, 1)).spawnAsPlayerActive(player);
 		}
 
-		if (mTarget != null && !mTarget.isDead() && mTarget.isValid()) {
-			loc = LocationUtils.getHalfHeightLocation(mTarget);
+		if (target != null && !target.isDead() && target.isValid()) {
+			loc = LocationUtils.getHalfHeightLocation(target);
 			for (int i = 0; i < 2; i++) {
 				double rotation = FastMath.toRadians((t * 10) + (i * 180));
 				Vector vec = new Vector(FastUtils.cos(rotation), 0,
 					FastUtils.sin(rotation));
 				Location l = loc.clone().add(vec);
 				new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0.05, 0.05, 0,
-					new Particle.DustOptions(TWIST_COLOR_TIP, 1)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					new Particle.DustOptions(TWIST_COLOR_TIP, 1)).minimumMultiplier(false).spawnAsPlayerActive(player);
 			}
 		}
 	}
 
 	@Override
-	public void foxOnAggro(World world, Player mPlayer, Fox mFox) {
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 1.2f, 0.5f);
-		world.playSound(mFox.getLocation(), Sound.ENTITY_FOX_AGGRO, SoundCategory.PLAYERS, 1.6f, 0.5f);
-		new PartialParticle(Particle.SOUL, mFox.getEyeLocation(), 15, 0.25, 0.25, 0.25, 0.005).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+	public void onAggroParticles(Player mPlayer, LivingEntity summon) {
+		new PartialParticle(Particle.SOUL, summon.getEyeLocation(), 15, 0.25, 0.25, 0.25, 0.005).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override
-	public void foxDespawn(Player mPlayer, Fox mFox) {
-		World world = mFox.getLocation().getWorld();
-		Location foxLoc = mFox.getLocation();
-		world.playSound(foxLoc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.5f, 0.8f);
-		world.playSound(foxLoc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 1.5f, 1.5f);
-		world.playSound(foxLoc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.5f, 0.7f);
-		new PartialParticle(Particle.SMOKE_NORMAL, foxLoc, 35, 0.15, 0.15, 0.15, 0.125F).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIT, foxLoc, 30, 0, 0, 0, 0.6F).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+	public void foxOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 1.5f, 1.5f);
+		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.5f, 0.7f);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 35, 0.15, 0.15, 0.15, 0.125F).minimumMultiplier(false).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT, loc, 30, 0, 0, 0, 0.6F).minimumMultiplier(false).spawnAsPlayerActive(player);
 
-		spawnRing(mFox.getLocation(), mPlayer, 2);
+		spawnRing(loc, player, 2);
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-1, 1), 1,
-			FastUtils.randomDoubleInRange(-1, 1)), LocationUtils.getHalfHeightLocation(mFox), mPlayer, mPlayer);
+			FastUtils.randomDoubleInRange(-1, 1)), LocationUtils.getHalfHeightLocation(summon), player, player);
 	}
 
 	private void spawnRing(Location loc, Player mPlayer, double r) {

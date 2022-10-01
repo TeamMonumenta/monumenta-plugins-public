@@ -35,6 +35,7 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -314,7 +315,7 @@ public class SpellDimensionDoor extends Spell {
 		if (tele.getBlock().getType() != Material.AIR) {
 			tele = shadowLoc.clone().subtract(5, 0, 0);
 		}
-		p.teleport(tele);
+		p.teleport(tele, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 		p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
 		mShadowed.add(p);
 
@@ -409,14 +410,14 @@ public class SpellDimensionDoor extends Spell {
 					Location leaveLoc = tLoc.clone().add(0, 1.5, 0);
 					mShadowed.remove(p);
 					if (byPortal) {
-						p.teleport(leaveLoc);
+						p.teleport(leaveLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 						p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 5, 10));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 5, 0));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 5, 1));
 						p.sendMessage(ChatColor.AQUA + "Something feels different. The shadows aren't clinging to me anymore.");
 					} else {
-						p.teleport(leaveLoc);
+						p.teleport(leaveLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 						DamageUtils.damage(mBoss, p, DamageType.OTHER, 1);
 						p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1, 1);
 					}
@@ -429,7 +430,7 @@ public class SpellDimensionDoor extends Spell {
 				}
 				if (p.getLastDamageCause() != null && p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.SUFFOCATION && !mTrigger) {
 					//something went wrong with the other check, catching wrong tp
-					p.teleport(shadowLoc.clone().add(-5, 0, 0));
+					p.teleport(shadowLoc.clone().add(-5, 0, 0), PlayerTeleportEvent.TeleportCause.UNKNOWN);
 					spectre.teleport(shadowLoc.clone().add(5, 0, 0));
 					mTrigger = true;
 				}

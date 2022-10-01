@@ -2,11 +2,11 @@ package com.playmonumenta.plugins.abilities.warrior.guardian;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -34,8 +34,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-
-
 public class ShieldWall extends Ability {
 
 	private static final int SHIELD_WALL_1_DURATION = 8 * 30;
@@ -43,6 +41,16 @@ public class ShieldWall extends Ability {
 	private static final int SHIELD_WALL_DAMAGE = 3;
 	private static final int SHIELD_WALL_1_COOLDOWN = 20 * 30;
 	private static final int SHIELD_WALL_2_COOLDOWN = 20 * 20;
+	private static final int SHIELD_WALL_ANGLE = 180;
+	private static final float SHIELD_WALL_2_KNOCKBACK = 0.3f;
+
+	public static final String CHARM_DURATION = "Shield Wall Duration";
+	public static final String CHARM_DAMAGE = "Shield Wall Damage";
+	public static final String CHARM_COOLDOWN = "Shield Wall Cooldown";
+	public static final String CHARM_ANGLE = "Shield Wall Angle";
+	public static final String CHARM_KNOCKBACK = "Shield Wall Knockback";
+
+	private int mDuration;
 
 	public ShieldWall(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Shield Wall");
@@ -50,10 +58,12 @@ public class ShieldWall extends Ability {
 		mInfo.mShorthandName = "SW";
 		mInfo.mDescriptions.add("Press the swap key while holding a shield in either hand to create a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 3 melee damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The shield lasts 10 seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown: 20s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN);
 		mInfo.mLinkedSpell = ClassAbility.SHIELD_WALL;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.STONE_BRICK_WALL, 1);
+
+		mDuration = (isLevelOne() ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION) + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 	}
 
 	@Override
@@ -63,8 +73,10 @@ public class ShieldWall extends Ability {
 		}
 		event.setCancelled(true);
 		if (!isTimerActive()) {
-			int time = getAbilityScore() == 1 ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
-			boolean knockback = getAbilityScore() != 1;
+			float knockback = (float) (isLevelTwo() ? CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, SHIELD_WALL_2_KNOCKBACK) : 0);
+			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_WALL_DAMAGE);
+			double angle = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, SHIELD_WALL_ANGLE);
+
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
@@ -86,7 +98,7 @@ public class ShieldWall extends Ability {
 					mT++;
 					Vector vec;
 					for (int y = 0; y < 5; y++) {
-						for (double degree = 0; degree < 180; degree += 10) {
+						for (double degree = 0; degree < angle; degree += 10) {
 							double radian1 = Math.toRadians(degree);
 							vec = new Vector(FastUtils.cos(radian1) * 4, y, FastUtils.sin(radian1) * 4);
 							vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
@@ -107,8 +119,7 @@ public class ShieldWall extends Ability {
 						for (Entity e :world.getNearbyEntities(box)) {
 							Location eLoc = e.getLocation();
 							if (e instanceof Projectile proj) {
-								if (proj.getShooter() instanceof LivingEntity shooter
-										&& (!(proj.getShooter() instanceof Player) || AbilityManager.getManager().isPvPEnabled((Player) shooter))) {
+								if (proj.getShooter() instanceof LivingEntity shooter && !(shooter instanceof Player)) {
 									proj.remove();
 									new PartialParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f).spawnAsPlayerActive(mPlayer);
 									world.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
@@ -121,18 +132,18 @@ public class ShieldWall extends Ability {
 									mMobsAlreadyHit.add(le);
 									Vector v = le.getVelocity();
 
-									DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(DamageType.MELEE_SKILL, mInfo.mLinkedSpell, playerItemStats), SHIELD_WALL_DAMAGE, true, true, false);
+									DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(DamageType.MELEE_SKILL, mInfo.mLinkedSpell, playerItemStats), damage, false, true, false);
 
 									//Bosses should not be affected by slowness or knockback.
-									if (knockback && !e.getScoreboardTags().contains("Boss")) {
-										MovementUtils.knockAway(mLoc, le, 0.3f, true);
+									if (knockback > 0 && !e.getScoreboardTags().contains("Boss")) {
+										MovementUtils.knockAway(mLoc, le, knockback, true);
 										new PartialParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f).spawnAsPlayerActive(mPlayer);
 										world.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
 									} else {
 										le.setVelocity(v);
 									}
 								} else if (le.getNoDamageTicks() + 5 < le.getMaximumNoDamageTicks()) {
-									if (knockback && !e.getScoreboardTags().contains("Boss")) {
+									if (knockback > 0 && !e.getScoreboardTags().contains("Boss")) {
 										/*
 										 * This is a temporary fix while we decide how to handle KBR mobs with Shield Wall level 2.
 										 *
@@ -163,7 +174,7 @@ public class ShieldWall extends Ability {
 					}
 					mMobsAlreadyHit = mobsAlreadyHitAdjusted;
 					mMobsHitThisTick.clear();
-					if (mT >= time) {
+					if (mT >= mDuration) {
 						this.cancel();
 						mBoxes.clear();
 					}

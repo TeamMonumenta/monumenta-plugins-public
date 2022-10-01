@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,6 +26,9 @@ import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -40,17 +44,27 @@ public class Skyhook extends DepthsAbility {
 		mDisplayMaterial = Material.FISHING_ROD;
 		mTree = DepthsTree.WINDWALKER;
 		mInfo.mLinkedSpell = ClassAbility.SKYHOOK;
-		mInfo.mCooldown = getAbilityScore() == 0 ? COOLDOWN[0] : COOLDOWN[mRarity - 1];
+		mInfo.mCooldown = mRarity == 0 ? COOLDOWN[0] : COOLDOWN[mRarity - 1];
 		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(SKYHOOK_ARROW_METADATA)) {
-			hook(arrow);
-			arrow.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
+		Entity damager = event.getDamager();
+		if (event.getType() == DamageType.PROJECTILE && damager instanceof AbstractArrow && damager.hasMetadata(SKYHOOK_ARROW_METADATA)) {
+			hook(damager);
+			damager.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
 		}
 		return false; // prevents multiple calls itself
+	}
+
+	// Since Snowballs disappear after landing, we need an extra detection for when it hits the ground.
+	@Override
+	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
+		if (mPlayer != null && proj instanceof Snowball && proj.hasMetadata(SKYHOOK_ARROW_METADATA)) {
+			hook(proj);
+			proj.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
+		}
 	}
 
 	private void hook(Entity arrow) {
@@ -98,38 +112,41 @@ public class Skyhook extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || arrow.hasMetadata(RapidFire.META_DATA_TAG)) {
+	public boolean playerShotProjectileEvent(Projectile projectile) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || projectile.hasMetadata(RapidFire.META_DATA_TAG)) {
 			return true;
 		}
 
-		if (mPlayer.isSneaking()) {
+		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			mInfo.mCooldown = (int) (COOLDOWN[mRarity - 1] * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
 			world.playSound(loc, Sound.ITEM_CROSSBOW_QUICK_CHARGE_3, 1, 1.0f);
 
-			arrow.setPierceLevel(0);
-			arrow.setCritical(true);
-			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-			arrow.setMetadata(SKYHOOK_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
+			if (projectile instanceof AbstractArrow arrow) {
+				arrow.setPierceLevel(0);
+				arrow.setCritical(true);
+				arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+			}
+			projectile.setMetadata(SKYHOOK_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
 
-			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
+			mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.FIREWORKS_SPARK);
 
 			new BukkitRunnable() {
 				int mT = 0;
+
 				@Override
 				public void run() {
-					if (arrow == null || mT > MAX_TICKS) {
-						mPlugin.mProjectileEffectTimers.removeEntity(arrow);
-						arrow.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
-						arrow.remove();
+					if (mT > MAX_TICKS) {
+						mPlugin.mProjectileEffectTimers.removeEntity(projectile);
+						projectile.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
+						projectile.remove();
 						this.cancel();
 					}
 
-					if (arrow.getVelocity().length() < .05 || arrow.isOnGround()) {
-						hook(arrow);
+					if (projectile.getVelocity().length() < .05 || projectile.isOnGround()) {
+						hook(projectile);
 						this.cancel();
 					}
 					mT++;
@@ -143,7 +160,7 @@ public class Skyhook extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting a bow while sneaking shoots out a skyhook. When the skyhook lands, you dash to the location and reduce all other ability cooldowns by 1% per block traveled. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
+		return "Shooting a projectile while sneaking shoots out a skyhook. When the skyhook lands, you dash to the location and reduce all other ability cooldowns by 1% per block traveled. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
 	}
 
 	@Override

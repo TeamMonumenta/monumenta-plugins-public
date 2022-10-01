@@ -850,7 +850,7 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		Location loc = player.getLocation();
 
-		//Manually forces the player in place during the riptide if they use it out of water (in rain)
+		//Manually forces the player in place during the riptide if they use it out of water (in rain) or have the riptide disable effect
 		if (StasisListener.isInStasis(player) || !mPlugin.mItemOverrides.playerRiptide(mPlugin, player, event)) {
 			player.teleport(loc);
 			player.setCooldown(Material.TRIDENT, 15*20);
@@ -864,7 +864,10 @@ public class PlayerListener implements Listener {
 					player.setVelocity(player.getVelocity().multiply(0));
 				}
 			}.runTaskTimer(mPlugin, 0, 2);
+			return;
 		}
+
+		mPlugin.mItemStatManager.onRiptide(mPlugin, player, event);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -900,6 +903,8 @@ public class PlayerListener implements Listener {
 		if (!cause.equals(TeleportCause.UNKNOWN) && !cause.equals(TeleportCause.ENDER_PEARL) && !player.getGameMode().equals(GameMode.SPECTATOR) && !cause.equals(TeleportCause.SPECTATE)) {
 			runTeleportRunnable(player, loc);
 		}
+
+		mPlugin.mAbilityManager.playerTeleportEvent(player, event);
 	}
 
 	public void runTeleportRunnable(Player player, Location loc) {
@@ -1022,7 +1027,7 @@ public class PlayerListener implements Listener {
 								player.setGameMode(mode);
 
 							} else if (mTicks >= BED_TELE_TIME + 1) {
-								player.teleport(teleLoc);
+								player.teleport(teleLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 
 								world.playSound(teleLoc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1.0f, 1.3f);
 
@@ -1128,9 +1133,9 @@ public class PlayerListener implements Listener {
 	//Player is healed.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onRegain(EntityRegainHealthEvent event) {
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
-			mPlugin.mItemStatManager.onRegain(mPlugin, player, event);
+		if (event.getEntity() instanceof Player player) {
+			mPlugin.mItemStatManager.playerRegainHealthEvent(mPlugin, player, event);
+			mPlugin.mAbilityManager.playerRegainHealthEvent(player, event);
 		}
 	}
 

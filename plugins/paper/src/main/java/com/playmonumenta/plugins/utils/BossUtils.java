@@ -147,14 +147,22 @@ public class BossUtils {
 		return bossDamagePercent(boss, target, percentHealth, null, false, cause);
 	}
 
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, String cause, boolean canBlock) {
+		return bossDamagePercent(boss, target, percentHealth, null, false, canBlock, cause);
+	}
+
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, @Nullable String cause) {
 		return bossDamagePercent(boss, target, percentHealth, location, false, cause);
+	}
+
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause) {
+		return bossDamagePercent(boss, target, percentHealth, location, raw, true, cause);
 	}
 
 	/*
 	 * Returns whether or not the player survived (true) or was killed (false)
 	 */
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, boolean canBlock, @Nullable String cause) {
 		if (percentHealth <= 0) {
 			return true;
 		}
@@ -165,7 +173,7 @@ public class BossUtils {
 
 		double toTake = raw ? percentHealth : EntityUtils.getMaxHealth(target) * percentHealth;
 
-		if (target instanceof Player player && bossDamageBlocked(player, location)) {
+		if (target instanceof Player player && canBlock && bossDamageBlocked(player, location)) {
 			/*
 			 * One second of cooldown for every 2 points of damage
 			 * Since this is % based, compute cooldown based on "Normal" health

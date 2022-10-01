@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -14,11 +16,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class AbilitySilence extends ZeroArgumentEffect {
 	public static final String GENERIC_NAME = "Silence";
+	public static final String effectID = "AbilitySilence";
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.0f);
 
 	public AbilitySilence(int duration) {
-		super(duration);
+		super(duration, effectID);
 	}
 
 	@Override
@@ -55,6 +58,12 @@ public class AbilitySilence extends ZeroArgumentEffect {
 		if (fourHertz) {
 			new PartialParticle(Particle.REDSTONE, entity.getLocation().add(0, 0.5, 0), 4, 0.2, 0.4, 0.2, 0, COLOR).spawnAsEntityBuff(entity);
 		}
+	}
+
+	public static AbilitySilence deserialize(JsonObject object, Plugin plugin) {
+		int duration = object.get("duration").getAsInt();
+
+		return new AbilitySilence(duration);
 	}
 
 	@Override

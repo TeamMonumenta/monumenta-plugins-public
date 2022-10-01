@@ -7,9 +7,14 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.*;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
-import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeTargetNPCBoss;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeTurretBoss;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.DropShardBoss;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.LavaCannonBoss;
+import com.playmonumenta.plugins.bosses.bosses.bluestrike.Samwell;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayBookSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
@@ -273,7 +278,15 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(ScoutVolleyBoss.identityTag, (Plugin p, LivingEntity e) -> new ScoutVolleyBoss(p, e));
 		mStatelessBosses.put(WarlockAmpHexBoss.identityTag, (Plugin p, LivingEntity e) -> new WarlockAmpHexBoss(p, e));
 		mStatelessBosses.put(LimitedLifespanBoss.identityTag, (Plugin p, LivingEntity e) -> new LimitedLifespanBoss(p, e));
-
+		mStatelessBosses.put(BlueFireBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueFireBoss(p, e));
+		mStatelessBosses.put(BlueEarthBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueEarthBoss(p, e));
+		mStatelessBosses.put(BlueAirBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueAirBoss(p, e));
+		mStatelessBosses.put(BlueWaterBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueWaterBoss(p, e));
+		mStatelessBosses.put(DropShardBoss.identityTag, (Plugin p, LivingEntity e) -> new DropShardBoss(p, e));
+		mStatelessBosses.put(BlueStrikeDaggerCraftingBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeDaggerCraftingBoss(p, e));
+		mStatelessBosses.put(BlueStrikeTargetNPCBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeTargetNPCBoss(p, e));
+		mStatelessBosses.put(BlueStrikeTurretBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeTurretBoss(p, e));
+		mStatelessBosses.put(LavaCannonBoss.identityTag, (Plugin p, LivingEntity e) -> new LavaCannonBoss(p, e));
 
 		mStatelessBosses.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> new LichMageBoss(p, e));
 		mStatelessBosses.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> new LichRogueBoss(p, e));
@@ -290,14 +303,15 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(LichShieldBoss.identityTag, (Plugin p, LivingEntity e) -> new LichShieldBoss(p, e));
 		mStatelessBosses.put(LichKeyGlowBoss.identityTag, (Plugin p, LivingEntity e) -> new LichKeyGlowBoss(p, e));
 		mStatelessBosses.put(FestiveTessUpgradeSnowmenBoss.identityTag, (Plugin p, LivingEntity e) -> new FestiveTessUpgradeSnowmenBoss(p, e));
-		mStatelessBosses.put(HuntingCompanionBoss.identityTag, (Plugin p, LivingEntity e) -> new HuntingCompanionBoss(p, e));
 		mStatelessBosses.put(MetalmancyBoss.identityTag, (Plugin p, LivingEntity e) -> new MetalmancyBoss(p, e));
 		mStatelessBosses.put(RestlessSoulsBoss.identityTag, (Plugin p, LivingEntity e) -> new RestlessSoulsBoss(p, e));
 		mStatelessBosses.put(AlchemicalAberrationBoss.identityTag, (Plugin p, LivingEntity e) -> new AlchemicalAberrationBoss(p, e));
 		mStatelessBosses.put(ThrowSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new ThrowSummonBoss(p, e));
 		mStatelessBosses.put(PotionThrowBoss.identityTag, (Plugin p, LivingEntity e) -> new PotionThrowBoss(p, e));
 		mStatelessBosses.put(TwistedMiniBoss.identityTag, (Plugin p, LivingEntity e) -> new TwistedMiniBoss(p, e));
-
+		mStatelessBosses.put(BrownPositiveBoss.identityTag, (Plugin p, LivingEntity e) -> new BrownPositiveBoss(p, e));
+		mStatelessBosses.put(BrownNegativeBoss.identityTag, (Plugin p, LivingEntity e) -> new BrownNegativeBoss(p, e));
+		mStatelessBosses.put(BrownMagnetSwapBoss.identityTag, (Plugin p, LivingEntity e) -> new BrownMagnetSwapBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -333,6 +347,9 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(BeastOfTheBlackFlame.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new BeastOfTheBlackFlame(p, e, s, l));
 		mStatefulBosses.put(RKitxet.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new RKitxet(p, e, s, l));
 		mStatefulBosses.put(VerdantMinibossBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VerdantMinibossBoss(p, e, s, l));
+		mStatefulBosses.put(PortalBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new PortalBoss(p, e, s, l));
+		mStatefulBosses.put(Samwell.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Samwell(p, e, s, l));
+		mStatefulBosses.put(TealSpirit.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new TealSpirit(p, e, s, l));
 
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
@@ -508,7 +525,15 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(BlockPlacerBoss.identityTag, (Plugin p, LivingEntity e) -> BlockPlacerBoss.deserialize(p, e));
 		mBossDeserializers.put(PotionThrowBoss.identityTag, (Plugin p, LivingEntity e) -> PotionThrowBoss.deserialize(p, e));
 		mBossDeserializers.put(LimitedLifespanBoss.identityTag, (Plugin p, LivingEntity e) -> LimitedLifespanBoss.deserialize(p, e));
-
+		mBossDeserializers.put(BlueFireBoss.identityTag, (Plugin p, LivingEntity e) -> BlueFireBoss.deserialize(p, e));
+		mBossDeserializers.put(BlueEarthBoss.identityTag, (Plugin p, LivingEntity e) -> BlueEarthBoss.deserialize(p, e));
+		mBossDeserializers.put(BlueAirBoss.identityTag, (Plugin p, LivingEntity e) -> BlueAirBoss.deserialize(p, e));
+		mBossDeserializers.put(BlueWaterBoss.identityTag, (Plugin p, LivingEntity e) -> BlueWaterBoss.deserialize(p, e));
+		mBossDeserializers.put(Samwell.identityTag, (Plugin p, LivingEntity e) -> Samwell.deserialize(p, e));
+		mBossDeserializers.put(BlueStrikeDaggerCraftingBoss.identityTag, (Plugin p, LivingEntity e) -> BlueStrikeDaggerCraftingBoss.deserialize(p, e));
+		mBossDeserializers.put(BlueStrikeTargetNPCBoss.identityTag, (Plugin p, LivingEntity e) -> BlueStrikeTargetNPCBoss.deserialize(p, e));
+		mBossDeserializers.put(BlueStrikeTurretBoss.identityTag, (Plugin p, LivingEntity e) -> BlueStrikeTurretBoss.deserialize(p, e));
+		mBossDeserializers.put(LavaCannonBoss.identityTag, (Plugin p, LivingEntity e) -> LavaCannonBoss.deserialize(p, e));
 
 		mBossDeserializers.put(Lich.identityTag, (Plugin p, LivingEntity e) -> Lich.deserialize(p, e));
 		mBossDeserializers.put(LichAlchBoss.identityTag, (Plugin p, LivingEntity e) -> LichAlchBoss.deserialize(p, e));
@@ -526,16 +551,20 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(LichShieldBoss.identityTag, (Plugin p, LivingEntity e) -> LichShieldBoss.deserialize(p, e));
 		mBossDeserializers.put(LichKeyGlowBoss.identityTag, (Plugin p, LivingEntity e) -> LichKeyGlowBoss.deserialize(p, e));
 		mBossDeserializers.put(FestiveTessUpgradeSnowmenBoss.identityTag, (Plugin p, LivingEntity e) -> FestiveTessUpgradeSnowmenBoss.deserialize(p, e));
-		mBossDeserializers.put(HuntingCompanionBoss.identityTag, (Plugin p, LivingEntity e) -> HuntingCompanionBoss.deserialize(p, e));
 		mBossDeserializers.put(MetalmancyBoss.identityTag, (Plugin p, LivingEntity e) -> MetalmancyBoss.deserialize(p, e));
 		mBossDeserializers.put(RestlessSoulsBoss.identityTag, (Plugin p, LivingEntity e) -> RestlessSoulsBoss.deserialize(p, e));
 		mBossDeserializers.put(AlchemicalAberrationBoss.identityTag, (Plugin p, LivingEntity e) -> AlchemicalAberrationBoss.deserialize(p, e));
 		mBossDeserializers.put(ThrowSummonBoss.identityTag, (Plugin p, LivingEntity e) -> ThrowSummonBoss.deserialize(p, e));
 		mBossDeserializers.put(HostileBoss.identityTag, (Plugin p, LivingEntity e) -> HostileBoss.deserialize(p, e));
 		mBossDeserializers.put(FriendlyBoss.identityTag, (Plugin p, LivingEntity e) -> FriendlyBoss.deserialize(p, e));
+		mBossDeserializers.put(PortalBoss.identityTag, (Plugin p, LivingEntity e) -> PortalBoss.deserialize(p, e));
 		mBossDeserializers.put(MageCosmicMoonbladeBoss.identityTag, (Plugin p, LivingEntity e) -> MageCosmicMoonbladeBoss.deserialize(p, e));
 		mBossDeserializers.put(ScoutVolleyBoss.identityTag, (Plugin p, LivingEntity e) -> ScoutVolleyBoss.deserialize(p, e));
 		mBossDeserializers.put(TwistedMiniBoss.identityTag, (Plugin p, LivingEntity e) -> TwistedMiniBoss.deserialize(p, e));
+		mBossDeserializers.put(BrownNegativeBoss.identityTag, (Plugin p, LivingEntity e) -> BrownNegativeBoss.deserialize(p, e));
+		mBossDeserializers.put(BrownPositiveBoss.identityTag, (Plugin p, LivingEntity e) -> BrownPositiveBoss.deserialize(p, e));
+		mBossDeserializers.put(BrownMagnetSwapBoss.identityTag, (Plugin p, LivingEntity e) -> BrownMagnetSwapBoss.deserialize(p, e));
+		mBossDeserializers.put(TealSpirit.identityTag, (Plugin p, LivingEntity e) -> TealSpirit.deserialize(p, e));
 
 
 		/***************************************************
@@ -597,6 +626,9 @@ public class BossManager implements Listener {
 		mBossParameters.put(GenericTargetBoss.identityTag, new GenericTargetBoss.Parameters());
 		mBossParameters.put(LimitedLifespanBoss.identityTag, new LimitedLifespanBoss.Parameters());
 		mBossParameters.put(ImmortalMountBoss.identityTag, new ImmortalMountBoss.Parameters());
+		mBossParameters.put(BrownMagnetSwapBoss.identityTag, new BrownMagnetSwapBoss.Parameters());
+		mBossParameters.put(BrownPositiveBoss.identityTag, new BrownPositiveBoss.Parameters());
+		mBossParameters.put(BrownNegativeBoss.identityTag, new BrownNegativeBoss.Parameters());
 	}
 
 	/********************************************************************************
@@ -619,7 +651,7 @@ public class BossManager implements Listener {
 					continue;
 				}
 
-				processEntity((LivingEntity)entity);
+				processEntity((LivingEntity) entity);
 			}
 		}
 
@@ -759,7 +791,7 @@ public class BossManager implements Listener {
 		if (proj != null) {
 			ProjectileSource shooter = proj.getShooter();
 			if (shooter != null && shooter instanceof LivingEntity) {
-				Boss boss = mBosses.get(((LivingEntity)shooter).getUniqueId());
+				Boss boss = mBosses.get(((LivingEntity) shooter).getUniqueId());
 				if (boss != null) {
 					boss.bossProjectileHit(event);
 				}
@@ -935,9 +967,9 @@ public class BossManager implements Listener {
 			Entity snowman = Bukkit.getEntity(UUID.fromString(player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString()));
 			Component snowmanName = snowman != null ? snowman.customName() : null;
 			Component deathMessage = Component.text("")
-					.append(Component.selector(player.getName()))
-					.append(Component.text(" was snowballed by "))
-					.append(snowmanName != null ? snowmanName : Component.text("a snowman"));
+				.append(Component.selector(player.getName()))
+				.append(Component.text(" was snowballed by "))
+				.append(snowmanName != null ? snowmanName : Component.text("a snowman"));
 			event.deathMessage(deathMessage);
 			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
 		}
@@ -1081,8 +1113,8 @@ public class BossManager implements Listener {
 			if (mStatefulBosses.get(requestedTag) != null) {
 				if (sender != null) {
 					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
-									   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
-									   "' but it requires positional arguments");
+						ChatColor.GREEN + requestedTag + ChatColor.GOLD +
+						"' but it requires positional arguments");
 					sender.sendMessage(ChatColor.GOLD + "Try again with some ending location coordinates");
 				}
 			} else {
@@ -1108,8 +1140,8 @@ public class BossManager implements Listener {
 			if (INSTANCE.mStatelessBosses.get(requestedTag) != null) {
 				if (sender != null) {
 					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
-									   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
-									   "' but it does not take positional arguments");
+						ChatColor.GREEN + requestedTag + ChatColor.GOLD +
+						"' but it does not take positional arguments");
 					sender.sendMessage(ChatColor.GOLD + "Try again without the coordinates");
 				}
 			} else {

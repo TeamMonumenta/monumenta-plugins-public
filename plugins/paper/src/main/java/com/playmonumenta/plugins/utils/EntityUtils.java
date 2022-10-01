@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.Paralyze;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -18,6 +19,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.util.ArrayList;
@@ -71,21 +73,6 @@ public class EntityUtils {
 		EntityType.SKELETON_HORSE,
 		EntityType.PHANTOM,
 		EntityType.DROWNED
-	);
-
-	private static final EnumSet<EntityType> WATER_MOBS = EnumSet.of(
-		EntityType.AXOLOTL,
-		EntityType.DOLPHIN,
-		EntityType.DROWNED,
-		EntityType.GLOW_SQUID,
-		EntityType.GUARDIAN,
-		EntityType.ELDER_GUARDIAN,
-		EntityType.SQUID,
-		EntityType.TURTLE,
-		EntityType.COD,
-		EntityType.SALMON,
-		EntityType.TROPICAL_FISH,
-		EntityType.PUFFERFISH
 	);
 
 	private static final EnumSet<EntityType> BEAST_MOBS = EnumSet.of(
@@ -164,6 +151,21 @@ public class EntityUtils {
 		EntityType.PARROT,
 		EntityType.PHANTOM,
 		EntityType.VEX
+	);
+
+	private static final EnumSet<EntityType> WATER_MOBS = EnumSet.of(
+		EntityType.AXOLOTL,
+		EntityType.DOLPHIN,
+		EntityType.DROWNED,
+		EntityType.GLOW_SQUID,
+		EntityType.GUARDIAN,
+		EntityType.ELDER_GUARDIAN,
+		EntityType.SQUID,
+		EntityType.TURTLE,
+		EntityType.COD,
+		EntityType.SALMON,
+		EntityType.TROPICAL_FISH,
+		EntityType.PUFFERFISH
 	);
 
 	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";
@@ -265,20 +267,6 @@ public class EntityUtils {
 		return UNDEAD_MOBS.contains(mob.getType());
 	}
 
-	/**
-	 * Checks if the mob can usually spawn in water
-	 */
-	public static boolean isWaterMob(LivingEntity mob) {
-		return isWaterMob(mob.getType());
-	}
-
-	/**
-	 * Checks if the mob can usually spawn in water
-	 */
-	public static boolean isWaterMob(EntityType type) {
-		return WATER_MOBS.contains(type);
-	}
-
 	// Affected by Slayer
 	public static boolean isBeast(LivingEntity mob) {
 		return BEAST_MOBS.contains(mob.getType());
@@ -295,6 +283,14 @@ public class EntityUtils {
 
 	public static boolean isFlyingMob(EntityType type) {
 		return FLYING_MOBS.contains(type);
+	}
+
+	public static boolean isWaterMob(LivingEntity mob) {
+		return isWaterMob(mob.getType());
+	}
+
+	public static boolean isWaterMob(EntityType type) {
+		return WATER_MOBS.contains(type);
 	}
 
 	// Affected by Abyssal
@@ -431,7 +427,7 @@ public class EntityUtils {
 		return null;
 	}
 
-	public static AbstractArrow spawnArrow(LivingEntity player, double yawOffset, double pitchOffset, Vector offset, float speed, Class<? extends AbstractArrow> arrowClass) {
+	public static Projectile spawnProjectile(LivingEntity player, double yawOffset, double pitchOffset, Vector offset, float speed, Class<? extends Projectile> projectileClass) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
 
@@ -450,17 +446,19 @@ public class EntityUtils {
 		World world = player.getWorld();
 
 		// Spawn the arrow at the specified location, direction, and speed
-		AbstractArrow arrow = world.spawnArrow(loc, dir, speed, 0.0f, arrowClass);
-		arrow.setShooter(player);
-		return arrow;
+		Projectile projectile = world.spawn(loc, projectileClass);
+		projectile.setVelocity(dir.normalize().multiply(speed));
+		projectile.setShooter(player);
+		return projectile;
 	}
 
-	public static List<AbstractArrow> spawnArrowVolley(LivingEntity player, int numProjectiles, float speed, double spacing, Class<? extends AbstractArrow> arrowClass) {
-		List<AbstractArrow> projectiles = new ArrayList<>();
+
+	public static List<Projectile> spawnVolley(LivingEntity player, int numProjectiles, float speed, double spacing, Class<? extends Projectile> projectileClass) {
+		List<Projectile> projectiles = new ArrayList<>();
 
 		for (int i = 0; i < numProjectiles; i++) {
 			double yaw = spacing * (i - (numProjectiles - 1) / 2f);
-			AbstractArrow arrow = spawnArrow(player, yaw, 0.0, new Vector(0, 0, 0), speed, arrowClass);
+			Projectile arrow = spawnProjectile(player, yaw, 0.0, new Vector(0, 0, 0), speed, projectileClass);
 			projectiles.add(arrow);
 		}
 
@@ -701,6 +699,18 @@ public class EntityUtils {
 			.orElse(null);
 	}
 
+	public static void amplifyPotionLevel(LivingEntity en, PotionEffectType effectType, int ampAmount, int ampCap) {
+		PotionEffect effect = en.getPotionEffect(effectType);
+		if (effect != null) {
+			int ampLvl = effect.getAmplifier() + ampAmount;
+			if (ampLvl > ampCap) {
+				ampLvl = Math.max(ampCap, effect.getAmplifier());
+			}
+			PotionUtils.PotionInfo potionInfo = new PotionUtils.PotionInfo(effectType, effect.getDuration(), ampLvl, effect.isAmbient(), effect.hasParticles(), effect.hasIcon());
+			PotionUtils.apply(en, potionInfo);
+		}
+	}
+
 	private static final String VULNERABILITY_EFFECT_NAME = "VulnerabilityEffect";
 
 	public static void applyVulnerability(Plugin plugin, int ticks, double amount, LivingEntity mob) {
@@ -723,6 +733,36 @@ public class EntityUtils {
 		} else {
 			return 0;
 		}
+	}
+
+	public static int getVulnTicks(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> vulns = plugin.mEffectManager.getEffects(mob, VULNERABILITY_EFFECT_NAME);
+		if (vulns != null) {
+			Effect vuln = vulns.last();
+			return vuln.getDuration();
+		} else {
+			return 0;
+		}
+	}
+
+	public static void amplifyVuln(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
+		if (isVulnerable(plugin, en)) {
+			int ampLvl = (int) Math.floor(getVulnAmount(plugin, en) * 10) + ampAmount;
+			if (ampLvl > ampCap) {
+				ampLvl = (int) Math.max(ampCap, Math.floor(getVulnAmount(plugin, en) * 10));
+			}
+			applyVulnerability(plugin, EntityUtils.getVulnTicks(plugin, en), ampLvl * 0.1, en);
+		}
+	}
+
+	private static final String BLIGHT_EFFECT_NAME = "SanguineHarvestBlightEffect";
+
+	public static boolean isBlighted(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> blight = plugin.mEffectManager.getEffects(mob, BLIGHT_EFFECT_NAME);
+		if (blight != null) {
+			return true;
+		}
+		return false;
 	}
 
 	private static final String BLEED_EFFECT_NAME = "BleedEffect";
@@ -763,6 +803,16 @@ public class EntityUtils {
 		}
 	}
 
+	public static void amplifyBleed(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
+		if (isBleeding(plugin, en)) {
+			int ampLvl = getBleedLevel(plugin, en) + ampAmount;
+			if (ampLvl > ampCap) {
+				ampLvl = Math.max(ampCap, getBleedLevel(plugin, en));
+			}
+			applyBleed(plugin, EntityUtils.getBleedTicks(plugin, en), ampLvl * 0.1, en);
+		}
+	}
+
 	public static final String SLOW_EFFECT_NAME = "SlowEffect";
 
 	public static void applySlow(Plugin plugin, int ticks, double amount, LivingEntity mob) {
@@ -798,6 +848,16 @@ public class EntityUtils {
 		if (slows != null) {
 			Effect slow = slows.last();
 			slow.setDuration(ticks);
+		}
+	}
+
+	public static void amplifySlow(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
+		if (isSlowed(plugin, en)) {
+			int ampLvl = (int) Math.floor(getSlowAmount(plugin, en) * 10) + ampAmount;
+			if (ampLvl > ampCap) {
+				ampLvl = (int) Math.max(ampCap, Math.floor(getSlowAmount(plugin, en) * 10));
+			}
+			applySlow(plugin, EntityUtils.getSlowTicks(plugin, en), ampLvl * 0.1, en);
 		}
 	}
 
@@ -870,6 +930,16 @@ public class EntityUtils {
 		}
 	}
 
+	public static void amplifyWeaken(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
+		if (isWeakened(plugin, en)) {
+			int ampLvl = (int) Math.floor(getWeakenAmount(plugin, en) * 10) + ampAmount;
+			if (ampLvl > ampCap) {
+				ampLvl = (int) Math.max(ampCap, Math.floor(getWeakenAmount(plugin, en) * 10));
+			}
+			applyWeaken(plugin, EntityUtils.getWeakenTicks(plugin, en), ampLvl * 0.1, en);
+		}
+	}
+
 	public static boolean hasDamageOverTime(Plugin plugin, LivingEntity mob) {
 		return plugin.mEffectManager.hasEffect(mob, CustomDamageOverTime.class);
 	}
@@ -884,6 +954,20 @@ public class EntityUtils {
 			highest = Math.max(highest, effect.getMagnitude());
 		}
 		return highest;
+	}
+
+	public static void amplifyDamageOverTime(Plugin plugin, LivingEntity en, String source, int ampAmount, int ampCap) {
+		if (EffectManager.getInstance().hasEffect(en, source)) {
+			Effect dot = EffectManager.getInstance().getActiveEffect(en, source);
+			int duration = dot.getDuration();
+			double level = dot.getMagnitude();
+			double ampLvl = level + ampAmount;
+			if (ampLvl > ampCap) {
+				ampLvl = Math.max(ampCap, ampLvl);
+			}
+			// Apply Dot
+			plugin.mEffectManager.addEffect(en, source, new CustomDamageOverTime(duration, 1, (int) Math.round(40 / ampLvl), null, null));
+		}
 	}
 
 	public static void setFireTicksIfLower(int fireTicks, LivingEntity target) {
@@ -1026,6 +1110,15 @@ public class EntityUtils {
 			return true;
 		}
 		return false;
+	}
+
+	public static boolean isRiptideDisable(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> disable = plugin.mEffectManager.getEffects(mob, NO_RECOIL_EFFECT_NAME);
+		if (disable != null) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private static final String ARROW_IFRAMES_EFFECT_NAME = "SplitArrrowIframesEffect";
@@ -1272,5 +1365,20 @@ public class EntityUtils {
 			angleCounterclockwise = -angleCounterclockwise;
 		}
 		return (float)angleCounterclockwise;
+	}
+
+	public static boolean isAbilityTriggeringProjectile(Projectile proj, boolean requireCritical) {
+		if (proj instanceof AbstractArrow arrow) {
+			if (!requireCritical) {
+				return true;
+			} else if (arrow.isCritical()) {
+				return true;
+			} else if (arrow instanceof Trident) {
+				return true;
+			}
+		} else if (proj instanceof Snowball && DamageListener.getProjectileItemStats(proj) != null) {
+			return true;
+		}
+		return false;
 	}
 }

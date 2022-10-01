@@ -57,6 +57,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -516,7 +517,12 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			mPlugin.mItemStatManager.onLaunchProjectile(mPlugin, player, event, proj);
+			// We already have a crossbowListener, we don't want to run the onLaunchProjectile twice.
+			// We do want it to run for everything else though
+			if (player.getInventory().getItemInMainHand().getType() != Material.CROSSBOW) {
+				mPlugin.mItemStatManager.onLaunchProjectile(mPlugin, player, event, proj);
+			}
+
 			/* NOTE:
 			 * Ignore IntelliJ's warning about the method annotation here. onLaunchProjectile can cancel the event.
 			 */
@@ -529,10 +535,14 @@ public class EntityListener implements Listener {
 			if (event.getEntityType() == EntityType.SNOWBALL) {
 				Snowball origBall = (Snowball) proj;
 				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
+				if (!mAbilities.playerShotProjectileEvent(player, proj)) {
+					event.setCancelled(true);
+				}
 
-				// Check if the player has an infinity snowball
+				// Check if the player has an infinity snowball and not throw rate
 				if (itemInMainHand.getType().equals(Material.SNOWBALL)
-					&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
+					&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0
+					&& ItemStatUtils.getAttributeAmount(itemInMainHand, ItemStatUtils.AttributeType.THROW_RATE, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) == 0) {
 					Snowball newBall = (Snowball) origBall.getWorld().spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 
 					// Copy the item's name/etc so it can be textured
@@ -566,7 +576,7 @@ public class EntityListener implements Listener {
 			} else if (event.getEntity() instanceof AbstractArrow arrow) {
 				// Includes arrows and spectral arrows
 				// Tridents are handled in ThrowRate
-				if (!mAbilities.playerShotArrowEvent(player, arrow)) {
+				if (!mAbilities.playerShotProjectileEvent(player, arrow)) {
 					event.setCancelled(true);
 					return;
 				}
@@ -844,6 +854,7 @@ public class EntityListener implements Listener {
 
 		if (source instanceof Player) {
 			mAbilities.projectileHitEvent((Player) source, event, proj);
+			mPlugin.mItemStatManager.onProjectileHit(mPlugin, (Player) source, event, proj);
 		}
 
 		mPlugin.mProjectileEffectTimers.removeEntity(proj);
@@ -901,14 +912,19 @@ public class EntityListener implements Listener {
 			return;
 		}
 
+		PotionEffectType type = event.getEffect().getType();
 		/* Mark as applying slowness so arcane strike won't activate this tick */
 		if (applier instanceof Player && !applied.hasPotionEffect(PotionEffectType.SLOW)
-			&& event.getEffect().getType().equals(PotionEffectType.SLOW)) {
+			&& type.equals(PotionEffectType.SLOW)) {
 			MetadataUtils.checkOnceThisTick(mPlugin, applied, Constants.ENTITY_SLOWED_NONCE_METAKEY);
 		}
 
 		if (applier instanceof Player player) {
 			mAbilities.potionEffectApplyEvent(player, event);
+		}
+
+		if (applier instanceof Dolphin && type.equals(PotionEffectType.DOLPHINS_GRACE) && applier.getScoreboardTags().contains("boss_no_dolphins_grace")) {
+			event.setCancelled(true);
 		}
 	}
 

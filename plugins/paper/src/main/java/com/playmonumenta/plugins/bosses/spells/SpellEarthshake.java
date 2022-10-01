@@ -6,10 +6,8 @@ import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Location;
@@ -52,26 +50,25 @@ public class SpellEarthshake extends Spell {
 
 	@Override
 	public void run() {
-		Player target = null;
-		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), mParameters.RANGE, false);
-		if (!players.isEmpty()) {
-			// Single target chooses a random player within range
-			Collections.shuffle(players);
-			for (Player player : players) {
-				if (!mParameters.LINE_OF_SIGHT || LocationUtils.hasLineOfSight(mLauncher, player)) {
-					target = player;
-					mParameters.SOUND_WARNING.play(player.getLocation());
-					break;
-				}
-			}
+		for (LivingEntity target : mParameters.TARGETS.getTargetsList(mLauncher)) {
+			mParameters.SOUND_WARNING.play(target.getLocation());
+			performEarthshake(target);
 		}
+	}
+
+	@Override
+	public int cooldownTicks() {
+		return mParameters.COOLDOWN;
+	}
+
+	protected void performEarthshake(LivingEntity target) {
 		if (target == null) {
 			return;
 		}
-		Location targetLocation = target.getLocation();
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+			final Location mTargetLocation = target.getLocation().clone();
 
 			@Override
 			public void run() {
@@ -81,20 +78,14 @@ public class SpellEarthshake extends Spell {
 					return;
 				}
 				mTicks++;
-				chargeActions(targetLocation, mTicks);
+				chargeActions(mTargetLocation, mTicks);
 				if (mTicks >= mParameters.FUSE_TIME) {
 					this.cancel();
-					performExplosion(targetLocation);
+					performExplosion(mTargetLocation);
 				}
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
-
-	}
-
-	@Override
-	public int cooldownTicks() {
-		return mParameters.COOLDOWN;
 	}
 
 	protected void chargeActions(Location loc, int ticks) {

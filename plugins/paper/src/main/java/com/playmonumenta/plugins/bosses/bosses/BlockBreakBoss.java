@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -23,7 +22,7 @@ public class BlockBreakBoss extends BossAbilityGroup {
 	public BlockBreakBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Parameters p = Parameters.getParameters(boss, identityTag, new Parameters());
-		List<Spell> passiveSpells = Arrays.asList(p.ADAPT_TO_BOUNDING_BOX ? new SpellBlockBreak(boss, true) : new SpellBlockBreak(boss));
+		List<Spell> passiveSpells = List.of(new SpellBlockBreak(boss, p.ADAPT_TO_BOUNDING_BOX));
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}

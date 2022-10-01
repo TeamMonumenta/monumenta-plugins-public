@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
@@ -109,18 +110,29 @@ public final class EffectManager implements Listener {
 			return null;
 		}
 
-		public NavigableSet<? extends Effect> getEffects(Class<? extends Effect> cls) {
-			NavigableSet<Effect> effectSet = new TreeSet<Effect>();
+		@SuppressWarnings("unchecked")
+		public <T extends Effect> NavigableSet<T> getEffects(Class<T> cls) {
+			NavigableSet<T> effectSet = new TreeSet<>();
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
 				for (NavigableSet<Effect> effects : priorityEffects.values()) {
 					for (Effect effect : effects) {
 						if (cls.isInstance(effect)) {
-							effectSet.add(effect);
+							effectSet.add((T) effect);
 						}
 					}
 				}
 			}
 			return effectSet;
+		}
+
+		public List<Effect> getEffects() {
+			List<Effect> effects = new ArrayList<>();
+			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
+				for (NavigableSet<Effect> eff : priorityEffects.values()) {
+					effects.add(eff.last());
+				}
+			}
+			return effects;
 		}
 
 		public boolean hasEffect(String source) {
@@ -170,6 +182,18 @@ public final class EffectManager implements Listener {
 			}
 		}
 
+		public @Nullable String getSource(Effect effect) {
+			for (EffectPriority priority : mPriorityMap.keySet()) {
+				HashMap<String, NavigableSet<Effect>> sourceMap = mPriorityMap.get(priority);
+				for (String source : sourceMap.keySet()) {
+					if (sourceMap.get(source).contains(effect)) {
+						return source;
+					}
+				}
+			}
+			return null;
+		}
+
 		/**
 		 * Gets all effects as a json object
 		 */
@@ -177,17 +201,92 @@ public final class EffectManager implements Listener {
 			JsonObject ret = new JsonObject();
 			for (Map.Entry<EffectPriority, HashMap<String, NavigableSet<Effect>>> priorityEntries : mPriorityMap.entrySet()) {
 				JsonObject mid = new JsonObject();
+				JsonArray source = new JsonArray();
 				for (Map.Entry<String, NavigableSet<Effect>> effects : priorityEntries.getValue().entrySet()) {
 					JsonArray inner = new JsonArray();
 					for (Effect effect : effects.getValue()) {
-						inner.add(effect.toString());
+						inner.add(effect.serialize());
 					}
 					mid.add(effects.getKey(), inner);
+					source.add(effects.getKey());
 				}
+				mid.add("source", source);
 				ret.add(priorityEntries.getKey().name(), mid);
 			}
 			return ret;
 		}
+	}
+
+	@FunctionalInterface
+	public interface EffectDeserializer {
+		Effect deserialize(JsonObject object, Plugin plugin) throws Exception;
+	}
+
+	private static final Map<String, EffectDeserializer> mEffectDeserializer;
+
+	static {
+		mEffectDeserializer = new HashMap<>();
+		mEffectDeserializer.put(AbilityCooldownDecrease.effectID, AbilityCooldownDecrease::deserialize);
+		mEffectDeserializer.put(AbilityCooldownIncrease.effectID, AbilityCooldownIncrease::deserialize);
+		mEffectDeserializer.put(AbilitySilence.effectID, AbilitySilence::deserialize);
+		mEffectDeserializer.put(Aesthetics.effectID, Aesthetics::deserialize);
+		mEffectDeserializer.put(ArrowSaving.effectID, ArrowSaving::deserialize);
+		mEffectDeserializer.put(AstralOmenBonusDamage.effectID, AstralOmenBonusDamage::deserialize);
+		mEffectDeserializer.put(AstralOmenArcaneStacks.effectID, AstralOmenArcaneStacks::deserialize);
+		mEffectDeserializer.put(AstralOmenFireStacks.effectID, AstralOmenFireStacks::deserialize);
+		mEffectDeserializer.put(AstralOmenIceStacks.effectID, AstralOmenIceStacks::deserialize);
+		mEffectDeserializer.put(AstralOmenThunderStacks.effectID, AstralOmenThunderStacks::deserialize);
+		mEffectDeserializer.put(Bleed.effectID, Bleed::deserialize);
+		mEffectDeserializer.put(BonusSoulThreads.effectID, BonusSoulThreads::deserialize);
+		mEffectDeserializer.put(BoonOfKnightlyPrayer.effectID, BoonOfKnightlyPrayer::deserialize);
+		mEffectDeserializer.put(BoonOfThePit.effectID, BoonOfThePit::deserialize);
+		mEffectDeserializer.put(CourageEffect.effectID, CourageEffect::deserialize);
+		mEffectDeserializer.put(CrystalineBlessing.effectID, CrystalineBlessing::deserialize);
+		mEffectDeserializer.put(CustomAbsorption.effectID, CustomAbsorption::deserialize);
+		mEffectDeserializer.put(CustomDamageOverTime.effectID, CustomDamageOverTime::deserialize);
+		mEffectDeserializer.put(CustomRegeneration.effectID, CustomRegeneration::deserialize);
+		mEffectDeserializer.put(DeepGodsEndowment.effectID, DeepGodsEndowment::deserialize);
+		mEffectDeserializer.put(DurabilitySaving.effectID, DurabilitySaving::deserialize);
+		mEffectDeserializer.put(EnchantedPrayerAoE.effectID, EnchantedPrayerAoE::deserialize);
+		mEffectDeserializer.put(FirstStrikeCooldown.effectID, FirstStrikeCooldown::deserialize);
+		mEffectDeserializer.put(FlatDamageDealt.effectID, FlatDamageDealt::deserialize);
+		mEffectDeserializer.put(HealPlayerOnDeath.effectID, HealPlayerOnDeath::deserialize);
+		mEffectDeserializer.put(InfernoDamage.effectID, InfernoDamage::deserialize);
+		mEffectDeserializer.put(ItemCooldown.effectID, ItemCooldown::deserialize);
+		mEffectDeserializer.put(JudgementChainMobEffect.effectID, JudgementChainMobEffect::deserialize);
+		mEffectDeserializer.put(NegateDamage.effectID, NegateDamage::deserialize);
+		mEffectDeserializer.put(OnHitTimerEffect.effectID, OnHitTimerEffect::deserialize);
+		mEffectDeserializer.put(Paralyze.effectID, Paralyze::deserialize);
+		mEffectDeserializer.put(PercentAbilityDamageReceived.effectID, PercentAbilityDamageReceived::deserialize);
+		mEffectDeserializer.put(PercentAttackSpeed.effectID, PercentAttackSpeed::deserialize);
+		mEffectDeserializer.put(PercentDamageDealt.effectID, PercentDamageDealt::deserialize);
+		mEffectDeserializer.put(PercentDamageDealtSingle.effectID, PercentDamageDealtSingle::deserialize);
+		mEffectDeserializer.put(PercentDamageReceived.effectID, PercentDamageReceived::deserialize);
+		mEffectDeserializer.put(PercentExperience.effectID, PercentExperience::deserialize);
+		mEffectDeserializer.put(PercentHeal.effectID, PercentHeal::deserialize);
+		mEffectDeserializer.put(PercentHealthBoost.effectID, PercentHealthBoost::deserialize);
+		mEffectDeserializer.put(PercentKnockbackResist.effectID, PercentKnockbackResist::deserialize);
+		mEffectDeserializer.put(PercentSpeed.effectID, PercentSpeed::deserialize);
+		mEffectDeserializer.put(RecoilDisable.effectID, RecoilDisable::deserialize);
+		mEffectDeserializer.put(RiptideDisable.effectID, RiptideDisable::deserialize);
+		mEffectDeserializer.put(SanctifiedArmorHeal.effectID, SanctifiedArmorHeal::deserialize);
+		mEffectDeserializer.put(SanguineHarvestBlight.effectID, SanguineHarvestBlight::deserialize);
+		mEffectDeserializer.put(SanguineMark.effectID, SanguineMark::deserialize);
+		mEffectDeserializer.put(ScorchedEarthDamage.effectID, ScorchedEarthDamage::deserialize);
+		mEffectDeserializer.put(SilverPrayer.effectID, SilverPrayer::deserialize);
+		mEffectDeserializer.put(SpellShockExplosion.effectID, SpellShockExplosion::deserialize);
+		mEffectDeserializer.put(SpellShockStatic.effectID, SpellShockStatic::deserialize);
+		mEffectDeserializer.put(SplitArrowIframesEffect.effectID, SplitArrowIframesEffect::deserialize);
+		mEffectDeserializer.put(SpreadEffectOnDeath.effectID, SpreadEffectOnDeath::deserialize);
+		mEffectDeserializer.put(StarCommunion.effectID, StarCommunion::deserialize);
+		mEffectDeserializer.put(Stasis.effectID, Stasis::deserialize);
+		mEffectDeserializer.put(ThuribleBonusHealing.effectID, ThuribleBonusHealing::deserialize);
+		mEffectDeserializer.put(TuathanBlessing.effectID, TuathanBlessing::deserialize);
+		mEffectDeserializer.put(VengefulTag.effectID, VengefulTag::deserialize);
+		mEffectDeserializer.put(VoodooBondsOtherPlayer.effectID, VoodooBondsOtherPlayer::deserialize);
+		mEffectDeserializer.put(VoodooBondsReaper.effectID, VoodooBondsReaper::deserialize);
+		mEffectDeserializer.put(WarmthEffect.effectID, WarmthEffect::deserialize);
+		mEffectDeserializer.put(WindBombAirTag.effectID, WindBombAirTag::deserialize);
 	}
 
 	private static final int PERIOD = 5;
@@ -357,8 +456,7 @@ public final class EffectManager implements Listener {
 	 * @param source the source of effects to be retrieved
 	 * @return the set of effects if they exist, null otherwise
 	 */
-	public @Nullable
-	NavigableSet<Effect> getEffects(Entity entity, String source) {
+	public @Nullable NavigableSet<Effect> getEffects(Entity entity, String source) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.getEffects(source);
@@ -374,12 +472,26 @@ public final class EffectManager implements Listener {
 	 * @param type   the class of effect
 	 * @return the set of effects if they exist, an empty set otherwise
 	 */
-	public NavigableSet<? extends Effect> getEffects(Entity entity, Class<? extends Effect> type) {
+	public <T extends Effect> NavigableSet<T> getEffects(Entity entity, Class<T> type) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.getEffects(type);
 		}
 		return Collections.emptyNavigableSet();
+	}
+
+	public List<Effect> getEffects(Entity entity) {
+		Effects effects = mEntities.get(entity);
+		return effects.getEffects();
+	}
+
+	public @Nullable Effect getActiveEffect(Entity entity, String source) {
+		NavigableSet<Effect> effects = getEffects(entity, source);
+		if (effects != null) {
+			return effects.last();
+		}
+
+		return null;
 	}
 
 	/**
@@ -412,15 +524,13 @@ public final class EffectManager implements Listener {
 		return false;
 	}
 
-	public List<Effect> getPriorityEffects(Entity entity) {
+	public HashMap<String, Effect> getPriorityEffects(Entity entity) {
 		EffectManager.Effects effects = mEntities.get(entity);
-		List<Effect> output = new ArrayList<>();
+		HashMap<String, Effect> output = new HashMap<>();
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
-				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
-					if (!effectGroup.isEmpty()) {
-						output.add(effectGroup.last());
-					}
+				for (String source : priorityEffects.keySet()) {
+					output.put(source, priorityEffects.get(source).last());
 				}
 			}
 		}
@@ -435,8 +545,7 @@ public final class EffectManager implements Listener {
 	 * @param source the source of effects to be cleared
 	 * @return the set of effects if effects were removed, null otherwise
 	 */
-	public @Nullable
-	NavigableSet<Effect> clearEffects(Entity entity, String source) {
+	public @Nullable NavigableSet<Effect> clearEffects(Entity entity, String source) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.clearEffects(source);
@@ -458,6 +567,14 @@ public final class EffectManager implements Listener {
 		}
 	}
 
+	public @Nullable String getSource(Entity entity, Effect effect) {
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			return effects.getSource(effect);
+		}
+		return null;
+	}
+
 	/**
 	 * Gets all effects for an entity as a single json object
 	 *
@@ -469,6 +586,38 @@ public final class EffectManager implements Listener {
 			return effects.getAsJsonObject();
 		}
 		return new JsonObject();
+	}
+
+	public @Nullable Effect getEffectFromJson(JsonObject object, Plugin plugin) throws Exception {
+		String effectID = object.get("effectID").getAsString();
+		return mEffectDeserializer.get(effectID).deserialize(object, plugin);
+	}
+
+	public void loadFromJsonObject(Player player, JsonObject object, Plugin plugin) throws Exception {
+		clearEffects(player);
+
+		String[] keys = {EffectPriority.EARLY.name(), EffectPriority.NORMAL.name(), EffectPriority.LATE.name()};
+
+		for (String priority : keys) {
+			if (object.get(priority) == null) {
+				continue;
+			}
+			JsonObject priorityEffect = object.get(priority).getAsJsonObject();
+
+			JsonArray sourceList = priorityEffect.get("source").getAsJsonArray();
+			for (JsonElement sourceElement : sourceList) {
+				String source = sourceElement.getAsString();
+				JsonArray innerArray = priorityEffect.get(source).getAsJsonArray();
+				for (JsonElement effectJson : innerArray) {
+					JsonObject effectObject = effectJson.getAsJsonObject();
+					Effect effect = getEffectFromJson(effectObject, plugin);
+
+					if (effect != null) {
+						addEffect(player, source, effect);
+					}
+				}
+			}
+		}
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -511,6 +660,7 @@ public final class EffectManager implements Listener {
 		}
 	}
 
+	//Called in DamageListener
 	//@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void damageEvent(DamageEvent event) {
 		if (event.isCancelled()) {

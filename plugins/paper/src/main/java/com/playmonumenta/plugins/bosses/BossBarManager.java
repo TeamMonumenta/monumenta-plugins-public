@@ -86,11 +86,15 @@ public class BossBarManager {
 
 		if (!Double.isFinite(progress) || progress > 1.0f || progress < 0f) {
 			mPlugin.getLogger().severe("Boss '" + mBoss.getCustomName() + "' has invalid health " +
-				                           mBoss.getHealth() + " out of max " +
-				                           EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 0));
+				mBoss.getHealth() + " out of max " +
+				EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 0));
 		} else {
 			mBar.setProgress(progress);
 		}
+	}
+
+	public void setColor(BarColor barColor) {
+		mBar.setColor(barColor);
 	}
 
 	public void remove() {

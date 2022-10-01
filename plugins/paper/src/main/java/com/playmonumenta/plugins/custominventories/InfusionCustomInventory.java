@@ -383,14 +383,19 @@ public class InfusionCustomInventory extends CustomInventory {
 
 				if (currency > 0) {
 					Region region = ItemStatUtils.getRegion(item);
+					if (region == Region.RING) {
+						itemLore.add(Component.text("and " + currency + " Pulsating Diamonds", NamedTextColor.GRAY)
+							.decoration(TextDecoration.ITALIC, false));
+					}
+
 					if (region == Region.ISLES) {
 						itemLore.add(Component.text("and " + currency + " Pulsating Emeralds", NamedTextColor.GRAY)
-								.decoration(TextDecoration.ITALIC, false));
+							.decoration(TextDecoration.ITALIC, false));
 					}
 
 					if (region == Region.VALLEY) {
 						itemLore.add(Component.text("and " + currency + " Pulsating Gold", NamedTextColor.GRAY)
-								.decoration(TextDecoration.ITALIC, false));
+							.decoration(TextDecoration.ITALIC, false));
 					}
 				}
 				infuseMeta.lore(itemLore);

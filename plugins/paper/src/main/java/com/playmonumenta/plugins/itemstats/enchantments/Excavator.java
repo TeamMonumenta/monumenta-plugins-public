@@ -1,0 +1,129 @@
+package com.playmonumenta.plugins.itemstats.enchantments;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.*;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+
+public class Excavator implements Enchantment {
+
+	@Override
+	public String getName() {
+		return "Excavator";
+	}
+
+	@Override
+	public EnchantmentType getEnchantmentType() {
+		return EnchantmentType.EXCAVATOR;
+	}
+
+	@Override
+	public EnumSet<Slot> getSlots() {
+		return EnumSet.of(Slot.MAINHAND);
+	}
+
+	@Override
+	public void onBlockBreak(Plugin plugin, Player player, double level, BlockBreakEvent event) {
+		Block block = event.getBlock();
+		if (mIgnoredMats.contains(block.getType())) {
+			return;
+		}
+
+		BlockFace brokenFace = player.getTargetBlockFace(7);
+		if (brokenFace == null) {
+			player.sendMessage("Somehow, the blockface was null");
+		}
+
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		switch (brokenFace) {
+			case UP:
+			case DOWN:
+				for (int x = -1; x <= 1; x++) {
+					for (int z = -1; z <= 1; z++) {
+						Block relative = block.getRelative(x, 0, z);
+						if (canBreakBlock(relative, player)) {
+							relative.breakNaturally(mainHand, true);
+							ItemUtils.damageItem(mainHand, 1, true);
+						}
+					}
+				}
+				break;
+			case WEST:
+			case EAST:
+				for (int z = -1; z <= 1; z++) {
+					for (int y = -1; y <= 1; y++) {
+						Block relative = block.getRelative(0, y, z);
+						if (canBreakBlock(relative, player)) {
+							relative.breakNaturally(mainHand, true);
+							ItemUtils.damageItem(mainHand, 1, true);
+						}
+					}
+				}
+				break;
+			case NORTH:
+			case SOUTH:
+				for (int x = -1; x <= 1; x++) {
+					for (int y = -1; y <= 1; y++) {
+						Block relative = block.getRelative(x, y, 0);
+						if (canBreakBlock(relative, player)) {
+							relative.breakNaturally(mainHand, true);
+							ItemUtils.damageItem(mainHand, 1, true);
+						}
+					}
+				}
+				break;
+			default:
+				player.sendMessage("Block face was Non-Cartesian.");
+				break;
+		}
+	}
+
+	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
+		Material.AIR,
+		Material.COMMAND_BLOCK,
+		Material.CHAIN_COMMAND_BLOCK,
+		Material.REPEATING_COMMAND_BLOCK,
+		Material.BEDROCK,
+		Material.BARRIER,
+		Material.SPAWNER,
+		Material.CHEST,
+		Material.TRAPPED_CHEST
+	);
+
+	private boolean canBreakBlock(Block block, Player player) {
+		if (block.isLiquid() || block.isEmpty()) {
+			return false;
+		}
+
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		mainHand = mainHand.clone();
+		mainHand.addEnchantment(org.bukkit.enchantments.Enchantment.SILK_TOUCH, 1);
+		if (block.getDrops(mainHand).size() == 0) {
+			return false;
+		}
+
+		if (ServerProperties.getUnbreakableBlocks().contains(block.getType())) {
+			return false;
+		}
+
+		if (mIgnoredMats.contains(block.getType())) {
+			return false;
+		}
+
+		if (!ZoneUtils.playerCanInteractWithBlock(player, block)) {
+			return false;
+		}
+
+		return true;
+	}
+}

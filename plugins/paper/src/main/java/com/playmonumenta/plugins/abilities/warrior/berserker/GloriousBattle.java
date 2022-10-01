@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -37,14 +38,14 @@ import org.bukkit.util.Vector;
 
 public class GloriousBattle extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DAMAGE_1 = 20;
-	private static final int DAMAGE_2 = 30;
+	private static final int DAMAGE_2 = 25;
 	private static final double RADIUS = 3;
 	private static final double BLEED_PERCENT = 0.2;
 	private static final int BLEED_TIME = 4 * 20;
 	private static final float KNOCK_AWAY_SPEED = 0.4f;
 	private static final String KBR_EFFECT = "GloriousBattleKnockbackResistanceEffect";
 	private static final double DAMAGE_PER = 0.05;
-	private static final int MAX_TARGETING = 6;
+	private static final int MAX_TARGETING = 4;
 	private static final double TARGET_RANGE = 8;
 
 	private static final EnumSet<ClassAbility> AFFECTED_ABILITIES = EnumSet.of(
@@ -54,9 +55,19 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		ClassAbility.METEOR_SLAM,
 		ClassAbility.RAMPAGE);
 
+	public static final String CHARM_CHARGES = "Glorious Battle Charges";
+	public static final String CHARM_DAMAGE = "Glorious Battle Damage";
+	public static final String CHARM_RADIUS = "Glorious Battle Radius";
+	public static final String CHARM_BLEED_AMPLIFIER = "Glorious Battle Bleed Amplifier";
+	public static final String CHARM_BLEED_DURATION = "Glorious Battle Bleed Duration";
+	public static final String CHARM_VELOCITY = "Glorious Battle Velocity";
+	public static final String CHARM_KNOCKBACK = "Glorious Battle Knockback";
+	public static final String CHARM_DAMAGE_MODIFIER = "Glorious Battle Damage Modifier";
+
 	private int mStacks;
 	private final int mStackLimit;
 	private final double mDamage;
+	private @Nullable BukkitRunnable mRunnable;
 
 	public GloriousBattle(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Glorious Battle");
@@ -66,11 +77,11 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		mInfo.mShorthandName = "GB";
 		mInfo.mDescriptions.add("Dealing indirect damage with an ability grants you a Glorious Battle stack. Shift and swap hands to consume a stack and charge forwards, gaining full knockback resistance until landing. When you land, deal " + DAMAGE_1 + " damage to the nearest mob within 3 blocks and " +
 				"apply " + (int) DepthsUtils.roundPercent(BLEED_PERCENT) + "% bleed for " + (BLEED_TIME / 20) + " seconds. Additionally, knock back all mobs within 3 blocks.");
-		mInfo.mDescriptions.add("Damage increased to 30. Additionally, you now passively gain 5% melee damage for each mob targeting you within 8 blocks, up to 6 mobs.");
+		mInfo.mDescriptions.add("Damage increased to 25. Additionally, you now passively gain 5% melee damage for each mob targeting you within 8 blocks, up to 4 mobs.");
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
-		mStackLimit = 1;
 		mStacks = 0;
+		mStackLimit = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 	}
 
 	@Override
@@ -83,8 +94,8 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 
 		mStacks--;
 		Vector dir = mPlayer.getLocation().getDirection();
-		dir.multiply(1.4);
-		dir.setY(dir.getY() * 0.5 + 0.4);
+		dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1.05));
+		dir.setY(dir.getY() * 0.4 + 0.3);
 		mPlayer.setVelocity(dir);
 		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT, new PercentKnockbackResist(200, 1, KBR_EFFECT));
 		ClientModHandler.updateAbility(mPlayer, this);
@@ -94,7 +105,11 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		new PartialParticle(Particle.CRIMSON_SPORE, location, 25, 1, 0, 1, 0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CRIT, location, 15, 1, 0, 1, 0).spawnAsPlayerActive(mPlayer);
 
-		new BukkitRunnable() {
+		if (mRunnable != null) {
+			mRunnable.cancel();
+		}
+
+		mRunnable = new BukkitRunnable() {
 			int mT = 0;
 			@Override
 			public void run() {
@@ -102,7 +117,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 				if (mPlayer.isOnGround()) {
 					mPlugin.mEffectManager.clearEffects(mPlayer, KBR_EFFECT);
 
-					double radius = RADIUS;
+					double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 					Location location = mPlayer.getLocation();
 					World world = mPlayer.getWorld();
 					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(location, radius);
@@ -114,11 +129,12 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 						return;
 					}
 
-					EntityUtils.applyBleed(mPlugin, BLEED_TIME, BLEED_PERCENT, nearest);
-					DamageUtils.damage(mPlayer, nearest, DamageType.MELEE_SKILL, mDamage, ClassAbility.GLORIOUS_BATTLE, true);
+					EntityUtils.applyBleed(mPlugin, BLEED_TIME + CharmManager.getExtraDuration(mPlayer, CHARM_BLEED_DURATION), BLEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER), nearest);
+					DamageUtils.damage(mPlayer, nearest, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage), ClassAbility.GLORIOUS_BATTLE, true);
 
+					float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED);
 					for (LivingEntity mob : mobs) {
-						MovementUtils.knockAway(mPlayer, mob, KNOCK_AWAY_SPEED, true);
+						MovementUtils.knockAway(mPlayer, mob, knockback, true);
 					}
 
 					world.playSound(location, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.PLAYERS, 0.8f, 0.65f);
@@ -132,7 +148,8 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 10, 1);
+		};
+		mRunnable.runTaskTimer(mPlugin, 10, 1);
 	}
 
 	@Override
@@ -153,7 +170,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		}
 
 		DamageEvent.DamageType type = event.getType();
-		if (getAbilityScore() > 1 && (type == DamageType.MELEE || type == DamageType.MELEE_SKILL || type == DamageType.MELEE_ENCH)) {
+		if (isLevelTwo() && (type == DamageType.MELEE || type == DamageType.MELEE_SKILL || type == DamageType.MELEE_ENCH)) {
 			int count = 0;
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), TARGET_RANGE)) {
 				if (le instanceof Mob mob && mob.getTarget() == mPlayer) {
@@ -164,7 +181,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 				if (count > MAX_TARGETING) {
 					count = MAX_TARGETING;
 				}
-				event.setDamage(event.getDamage() * (1 + count * DAMAGE_PER));
+				event.setDamage(event.getDamage() * (1 + count * (DAMAGE_PER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MODIFIER))));
 			}
 		}
 

@@ -3,13 +3,16 @@ package com.playmonumenta.plugins.abilities.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,15 +37,39 @@ public class EscapeDeath extends Ability {
 	private static final String PERCENT_SPEED_EFFECT_NAME = "EscapeDeathPercentSpeedEffect";
 	private static final int JUMP_BOOST_AMPLIFIER = 2;
 	private static final int COOLDOWN = 60 * 20;
+	private static final int ENHANCEMENT_DURATION = 4 * 20;
+	private static final double ENHANCEMENT_HEAL_PERCENT = 0.05;
+	private static final String ESCAPE_DEATH_ENHANCEMENT_REGEN = "EscapeDeathEnhancementRegenEffect";
+
+	public static final String CHARM_ABSORPTION = "Escape Death Absorption Health";
+	public static final String CHARM_JUMP = "Escape Death Jump Boost Amplifier";
+	public static final String CHARM_SPEED = "Escape Death Speed Amplifier";
+	public static final String CHARM_COOLDOWN = "Escape Death Cooldown";
+	public static final String CHARM_STUN_DURATION = "Escape Death Stun Duration";
 
 	public EscapeDeath(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Escape Death");
 		mInfo.mLinkedSpell = ClassAbility.ESCAPE_DEATH;
 		mInfo.mScoreboardId = "EscapeDeath";
 		mInfo.mShorthandName = "ED";
-		mInfo.mDescriptions.add("When taking damage from a mob leaves you below 5 hearts, throw a paralyzing grenade that stuns all enemies within 5 blocks for 3 seconds. Cooldown: 60s.");
-		mInfo.mDescriptions.add("When this skill is triggered, also gain 2 Absorption hearts for 8 seconds, 30% Speed, and Jump Boost III. If damage taken would kill you but could have been prevented by this skill it will instead do so.");
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mIgnoreCooldown = true;
+		mInfo.mDescriptions.add(
+			String.format("When taking damage from a mob leaves you below %s hearts, throw a paralyzing grenade that stuns all enemies within %s blocks for %s seconds. Cooldown: %ss.",
+				(int)TRIGGER_THRESHOLD_HEALTH / 2,
+				RANGE,
+				STUN_DURATION / 20,
+				COOLDOWN / 20));
+		mInfo.mDescriptions.add(
+			String.format("When this skill is triggered, also gain %s Absorption hearts for %s seconds, %s%% Speed, and Jump Boost %s. If damage taken would kill you but could have been prevented by this skill it will instead do so.",
+				ABSORPTION_HEALTH / 2,
+				BUFF_DURATION / 20,
+				(int)(SPEED_PERCENT * 100),
+				StringUtils.toRoman(JUMP_BOOST_AMPLIFIER + 1)));
+		mInfo.mDescriptions.add(
+			String.format("When this skill is triggered, gain a regenerating effect that heals you for %s%% hp every second for %ss. The effect is canceled if you take damage from an enemy.",
+				(int)(ENHANCEMENT_HEAL_PERCENT * 100),
+				ENHANCEMENT_DURATION / 20));
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
 	}
 
@@ -53,24 +80,39 @@ public class EscapeDeath extends Ability {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (!event.isBlocked() && mPlayer != null) {
+		if (mPlugin.mEffectManager.hasEffect(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN)
+			&& !event.isBlocked()
+			&& event.getSource() != null
+			&& EntityUtils.isHostileMob(event.getSource())) {
+			mPlugin.mEffectManager.clearEffects(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN);
+		}
+
+		double absorptionHealth = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, ABSORPTION_HEALTH);
+		if (!event.isBlocked() && !isTimerActive()) {
 			double newHealth = mPlayer.getHealth() - event.getFinalDamage(true);
-			boolean dealDamageLater = newHealth < 0 && newHealth > -ABSORPTION_HEALTH && getAbilityScore() > 1;
+			boolean dealDamageLater = newHealth < 0 && newHealth > -absorptionHealth && isLevelTwo();
 			if (newHealth <= TRIGGER_THRESHOLD_HEALTH && (newHealth > 0 || dealDamageLater)) {
 				if (dealDamageLater) {
 					event.setCancelled(true);
 				}
 				putOnCooldown();
 
+				int stunDuration = STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN_DURATION);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RANGE, mPlayer)) {
-					EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
+					EntityUtils.applyStun(mPlugin, stunDuration, mob);
 				}
 
-				if (getAbilityScore() > 1) {
-					AbsorptionUtils.addAbsorption(mPlayer, ABSORPTION_HEALTH, ABSORPTION_HEALTH, BUFF_DURATION);
-					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(BUFF_DURATION, SPEED_PERCENT, PERCENT_SPEED_EFFECT_NAME));
+				if (isLevelTwo()) {
+					AbsorptionUtils.addAbsorption(mPlayer, absorptionHealth, absorptionHealth, BUFF_DURATION);
+					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(BUFF_DURATION, SPEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), PERCENT_SPEED_EFFECT_NAME));
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-							new PotionEffect(PotionEffectType.JUMP, BUFF_DURATION, JUMP_BOOST_AMPLIFIER, true, true));
+						new PotionEffect(PotionEffectType.JUMP, BUFF_DURATION, JUMP_BOOST_AMPLIFIER + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP), true, true));
+				}
+
+				if (isEnhanced()) {
+					// This check ensures that no "dupe" regeneration runnables occurs.
+					// If escape death somehow "double procs", simply reset the ticks variable.
+					mPlugin.mEffectManager.addEffect(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN, new CustomRegeneration(ENHANCEMENT_DURATION, ENHANCEMENT_HEAL_PERCENT * EntityUtils.getMaxHealth(mPlayer), mPlugin));
 				}
 
 				Location loc = mPlayer.getLocation();

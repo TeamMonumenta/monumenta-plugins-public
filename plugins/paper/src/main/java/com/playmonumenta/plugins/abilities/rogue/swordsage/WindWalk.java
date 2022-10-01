@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -38,6 +39,10 @@ public class WindWalk extends MultipleChargeAbility {
 	private static final double WIND_WALK_VELOCITY_BONUS = 1.5;
 	private static final int WIND_WALK_CDR = 20 * 2;
 
+	public static final String CHARM_COOLDOWN = "Wind Walk Cooldown";
+	public static final String CHARM_CHARGE = "Wind Walk Charge";
+	public static final String CHARM_COOLDOWN_REDUCTION = "Wind Walk Cooldown Reduction";
+
 	private final int mDuration;
 
 	private int mLastCastTicks = 0;
@@ -47,14 +52,21 @@ public class WindWalk extends MultipleChargeAbility {
 		mInfo.mLinkedSpell = ClassAbility.WIND_WALK;
 		mInfo.mScoreboardId = "WindWalk";
 		mInfo.mShorthandName = "WW";
-		mInfo.mDescriptions.add("Press the swap key while holding two swords to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. Cooldown: 25s. Charges: 2.");
-		mInfo.mDescriptions.add("Casting this ability reduces the cooldown of all other abilities by 2 seconds.");
-		mInfo.mCooldown = WIND_WALK_COOLDOWN;
+		mInfo.mDescriptions.add(
+			String.format("Press the swap key while holding two swords to dash in the target direction, stunning and levitating enemies for %s seconds. Elites are not levitated. Cooldown: %ss. Charges: %s.",
+				WIND_WALK_DURATION / 20,
+				WIND_WALK_COOLDOWN / 20,
+				WIND_WALK_MAX_CHARGES
+				));
+		mInfo.mDescriptions.add(
+			String.format("Casting this ability reduces the cooldown of all other abilities by %s seconds.",
+				WIND_WALK_CDR / 20));
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, WIND_WALK_COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.QUARTZ, 1);
 		mDuration = WIND_WALK_DURATION;
-		mMaxCharges = WIND_WALK_MAX_CHARGES;
+		mMaxCharges = WIND_WALK_MAX_CHARGES + (int) CharmManager.getLevel(player, CHARM_CHARGE);
 		mCharges = getTrackedCharges();
 	}
 
@@ -77,8 +89,8 @@ public class WindWalk extends MultipleChargeAbility {
 		putOnCooldown();
 		walk();
 
-		if (getAbilityScore() > 1) {
-			mPlugin.mTimers.updateCooldownsExcept(mPlayer, mInfo.mLinkedSpell, WIND_WALK_CDR);
+		if (isLevelTwo()) {
+			mPlugin.mTimers.updateCooldownsExcept(mPlayer, mInfo.mLinkedSpell, WIND_WALK_CDR + CharmManager.getExtraDuration(mPlayer, CHARM_COOLDOWN_REDUCTION));
 		}
 	}
 

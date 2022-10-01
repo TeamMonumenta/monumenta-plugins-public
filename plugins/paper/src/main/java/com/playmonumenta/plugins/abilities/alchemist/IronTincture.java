@@ -2,15 +2,18 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,6 +25,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
@@ -39,7 +43,16 @@ public class IronTincture extends Ability {
 	private static final int IRON_TINCTURE_TICK_PERIOD = 2;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
 
+	private static final double IRON_TINCTURE_ENHANCEMENT_RESISTANCE = 0.05;
+
+	public static final String CHARM_COOLDOWN = "Iron Tincture Cooldown";
+	public static final String CHARM_ABSORPTION = "Iron Tincture Absorption Health";
+	public static final String CHARM_DURATION = "Iron Tincture Duration";
+	public static final String CHARM_VELOCITY = "Iron Tincture Velocity";
+	public static final String CHARM_RESISTANCE = "Iron Tincture Resistance";
+
 	private @Nullable AlchemistPotions mAlchemistPotions;
+	private final double mAbsorption;
 
 	public IronTincture(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Iron Tincture");
@@ -48,12 +61,15 @@ public class IronTincture extends Ability {
 		mInfo.mShorthandName = "IT";
 		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain 8 absorption health for 50 seconds, up to 8 absorption health. If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. When another player grabs the tincture, you gain 2 Alchemist's Potions. When you grab the tincture, you gain 1 Alchemist's Potion. Cooldown: 50s.");
 		mInfo.mDescriptions.add("Effect and effect cap increased to 12 absorption health.");
-		mInfo.mCooldown = IRON_TINCTURE_USE_COOLDOWN; // Full duration cooldown
+		mInfo.mDescriptions.add("The tincture now additionally cleanses all potion debuffs and grants 5% damage resistance when absorption is present for the duration of the absorption.");
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, IRON_TINCTURE_USE_COOLDOWN); // Full duration cooldown
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
 
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+		mAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, isLevelOne() ? IRON_TINCTURE_1_ABSORPTION : IRON_TINCTURE_2_ABSORPTION);
+
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 		});
 	}
 
@@ -86,12 +102,12 @@ public class IronTincture extends Ability {
 		tincture.setPickupDelay(Integer.MAX_VALUE);
 
 		Vector vel = mPlayer.getEyeLocation().getDirection().normalize();
-		vel.multiply(IRON_TINCTURE_VELOCITY);
+		vel.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, IRON_TINCTURE_VELOCITY));
 
 		tincture.setVelocity(vel);
 		tincture.setGlowing(true);
 
-		mInfo.mCooldown = IRON_TINCTURE_USE_COOLDOWN;
+		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, IRON_TINCTURE_USE_COOLDOWN);
 		// Full duration cooldown - is shortened if not picked up
 		putOnCooldown();
 
@@ -133,7 +149,7 @@ public class IronTincture extends Ability {
 				}
 
 				mTinctureDecay += IRON_TINCTURE_TICK_PERIOD;
-				if (mTinctureDecay >= IRON_TINCTURE_THROW_COOLDOWN || !tincture.isValid() || tincture.isDead()) {
+				if (mTinctureDecay >= CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, IRON_TINCTURE_THROW_COOLDOWN) || !tincture.isValid() || tincture.isDead()) {
 					tincture.remove();
 					this.cancel();
 
@@ -146,9 +162,24 @@ public class IronTincture extends Ability {
 	}
 
 	private void execute(Player player) {
-		int absorption = getAbilityScore() == 1 ? IRON_TINCTURE_1_ABSORPTION : IRON_TINCTURE_2_ABSORPTION;
+		int duration = IRON_TINCTURE_ABSORPTION_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+		AbsorptionUtils.addAbsorption(player, mAbsorption, mAbsorption, duration);
 
-		AbsorptionUtils.addAbsorption(player, absorption, absorption, IRON_TINCTURE_ABSORPTION_DURATION);
+		if (isEnhanced()) {
+			PotionUtils.clearNegatives(mPlugin, player);
+
+			double resistance = IRON_TINCTURE_ENHANCEMENT_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
+			mPlugin.mEffectManager.addEffect(player, "IronTinctureEnhancementResistanceEffect", new PercentDamageReceived(duration, -resistance) {
+				@Override
+				public void onHurt(LivingEntity entity, DamageEvent event) {
+					if (entity instanceof Player player) {
+						if (AbsorptionUtils.getAbsorption(player) > 0) {
+							event.setDamage(event.getDamage() * (1 - resistance));
+						}
+					}
+				}
+			});
+		}
 
 		World world = player.getWorld();
 		world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);

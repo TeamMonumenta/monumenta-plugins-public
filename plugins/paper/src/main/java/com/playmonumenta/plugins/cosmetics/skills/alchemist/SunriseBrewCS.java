@@ -30,6 +30,7 @@ public class SunriseBrewCS extends BezoarCS {
 		new Particle.DustOptions(Color.fromRGB(252, 255, 196), 1.25f);
 	private static final Particle.DustOptions SUNDROP_RING_COLOR =
 		new Particle.DustOptions(Color.fromRGB(252, 255, 196), 0.65f);
+
 	@Override
 	public Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),

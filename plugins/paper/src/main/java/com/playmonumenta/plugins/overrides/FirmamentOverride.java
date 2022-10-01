@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.protocollib.FirmamentLagFix;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -22,7 +21,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.data.BlockData;
@@ -35,7 +33,7 @@ import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class FirmamentOverride extends BaseOverride {
+public class FirmamentOverride {
 	private static final String CAN_PLACE_SHULKER_PERM = "monumenta.canplaceshulker";
 
 	private static final Component PRISMARINE_ENABLED = Component.text("Prismarine ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
@@ -53,32 +51,7 @@ public class FirmamentOverride extends BaseOverride {
 	private static final String ITEM_NAME = "Firmament";
 	private static final String DELVE_SKIN_NAME = "Doorway from Eternity";
 
-	@Override
-	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
-		return placeBlock(player, item, event);
-	}
-
-	@Override
-	public boolean swapHandsInteraction(Plugin plugin, Player player, ItemStack item) {
-		return changeMode(item, player);
-	}
-
-	@Override
-	public boolean blockDispenseInteraction(Plugin plugin, Block block, ItemStack dispensed) {
-		if (isFirmamentItem(dispensed)) {
-			block.getWorld().playSound(block.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			return false;
-		}
-
-		Player nearbyPlayer = EntityUtils.getNearestPlayer(block.getLocation(), 10);
-		if (nearbyPlayer != null) {
-			// Check permission to enable placing shulkers, just so this can be turned off via perms if needed
-			return nearbyPlayer.hasPermission(CAN_PLACE_SHULKER_PERM);
-		}
-		return false; // Don't allow shulkers to be placed by dispensers if no player is nearby
-	}
-
-	private boolean placeBlock(Player player, ItemStack item, BlockPlaceEvent event) {
+	public static boolean placeBlock(Player player, ItemStack item, BlockPlaceEvent event) {
 		if (!isFirmamentItem(item)) {
 			// Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe - hopefully other shulkers with lore won't get placed
 			// Check permission to enable placing shulkers, just so this can be turned off via perms if needed
@@ -92,16 +65,16 @@ public class FirmamentOverride extends BaseOverride {
 			return false;
 		}
 
-		BlockStateMeta shulkerMeta = (BlockStateMeta)item.getItemMeta();
-		ShulkerBox shulkerBox = (ShulkerBox)shulkerMeta.getBlockState();
+		BlockStateMeta shulkerMeta = (BlockStateMeta) item.getItemMeta();
+		ShulkerBox shulkerBox = (ShulkerBox) shulkerMeta.getBlockState();
 		Inventory shulkerInventory = shulkerBox.getInventory();
 		for (int i = 0; i < 27; i++) {
 			ItemStack currentItem = shulkerInventory.getItem(i);
 			if (currentItem == null
-					|| currentItem.getType().isAir()
-					|| ItemUtils.notAllowedTreeReplace.contains(currentItem.getType())
-					|| (!currentItem.getType().isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(currentItem.getType()))
-					|| currentItem.getItemMeta().hasLore()) {
+				|| currentItem.getType().isAir()
+				|| ItemUtils.notAllowedTreeReplace.contains(currentItem.getType())
+				|| (!currentItem.getType().isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(currentItem.getType()))
+				|| currentItem.getItemMeta().hasLore()) {
 				// Air breaks it, skip over it. Also the banned items break it, skip over those.
 				continue;
 			}
@@ -120,8 +93,8 @@ public class FirmamentOverride extends BaseOverride {
 				BlockData blockData;
 				boolean removeItem = true;
 				if (FastUtils.RANDOM.nextBoolean()
-					    && item.getItemMeta().hasLore()
-					    && (InventoryUtils.testForItemWithLore(item, PLAIN_PRISMARINE_ENABLED) || InventoryUtils.testForItemWithLore(item, PLAIN_BLACKSTONE_ENABLED))) {
+					&& item.getItemMeta().hasLore()
+					&& (InventoryUtils.testForItemWithLore(item, PLAIN_PRISMARINE_ENABLED) || InventoryUtils.testForItemWithLore(item, PLAIN_BLACKSTONE_ENABLED))) {
 					removeItem = false;
 					// Place a prismarine/blackstone block instead of the block from the shulker
 					if (InventoryUtils.testForItemWithName(item, ITEM_NAME)) {
@@ -175,7 +148,7 @@ public class FirmamentOverride extends BaseOverride {
 		return false;
 	}
 
-	private boolean changeMode(ItemStack item, Player player) {
+	public static boolean changeMode(ItemStack item, Player player) {
 		if (!isFirmamentItem(item)) {
 			//Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe
 			return false;
@@ -243,10 +216,10 @@ public class FirmamentOverride extends BaseOverride {
 
 	public static boolean isFirmamentItem(ItemStack item) {
 		return item != null &&
-		       item.getType() != null &&
-		       (InventoryUtils.testForItemWithName(item, ITEM_NAME) || InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME)) &&
-		       (InventoryUtils.testForItemWithLore(item, "City of Shifting Waters") || InventoryUtils.testForItemWithLore(item, "Mythic Reliquary")) &&
-		       ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
-		       ItemUtils.isShulkerBox(item.getType());
+			item.getType() != null &&
+			(InventoryUtils.testForItemWithName(item, ITEM_NAME) || InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME)) &&
+			(InventoryUtils.testForItemWithLore(item, "City of Shifting Waters") || InventoryUtils.testForItemWithLore(item, "Mythic Reliquary")) &&
+			ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
+			ItemUtils.isShulkerBox(item.getType());
 	}
 }

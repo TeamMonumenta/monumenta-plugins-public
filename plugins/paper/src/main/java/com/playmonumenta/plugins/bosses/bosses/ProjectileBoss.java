@@ -19,6 +19,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -57,6 +58,9 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public double DAMAGE_PERCENTAGE = 0.0;
 
+		@BossParam(help = "Boolean on if the projectile can damage entities or not")
+		public boolean DAMAGE_PLAYER_ONLY = false;
+
 		@BossParam(help = "Track target when launching if true.")
 		public boolean LAUNCH_TRACKING = true;
 
@@ -68,6 +72,12 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		@BossParam(help = "not written")
 		public boolean COLLIDES_WITH_BLOCKS = true;
+
+		@BossParam(help = "Percentage Speed of projectile when moving in liquids")
+		public double SPEED_LIQUID = 0.5;
+
+		@BossParam(help = "Percentage Speed of projectile when moving in blocks")
+		public double SPEED_BLOCKS = 0.125;
 
 		@BossParam(help = "Delay on each single cast between sound_start and the actual cast of the projectile")
 		public int SPELL_DELAY = Integer.MAX_VALUE;
@@ -167,30 +177,31 @@ public class ProjectileBoss extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL, p.COOLDOWN, p.SPELL_DELAY,
 				p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH, p.SPLIT, p.SPLIT_ANGLE,
-				p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
+				p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS, p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
 				//spell targets
-					() -> {
-						return p.TARGETS.getTargetsList(mBoss);
-					},
-					// Initiate Aesthetic
-					(World world, Location loc, int ticks) -> {
-						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.SPELL_DELAY, 0));
-						p.SOUND_START.play(loc);
-					},
-					// Launch Aesthetic
-					(World world, Location loc, int ticks) -> {
-						p.PARTICLE_LAUNCH.spawn(boss, loc);
-						p.SOUND_LAUNCH.play(loc);
-					},
-					// Projectile Aesthetic
-					(World world, Location loc, int ticks) -> {
-						p.PARTICLE_PROJECTILE.spawn(boss, loc, 0.1, 0.1, 0.1, 0.1);
-						if (ticks % 40 == 0) {
-							p.SOUND_PROJECTILE.play(loc);
-						}
-					},
-					// Hit Action
-					(World world, LivingEntity target, Location loc) -> {
+				() -> {
+					return p.TARGETS.getTargetsList(mBoss);
+				},
+				// Initiate Aesthetic
+				(World world, Location loc, int ticks) -> {
+					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.SPELL_DELAY, 0));
+					p.SOUND_START.play(loc);
+				},
+				// Launch Aesthetic
+				(World world, Location loc, int ticks) -> {
+					p.PARTICLE_LAUNCH.spawn(boss, loc);
+					p.SOUND_LAUNCH.play(loc);
+				},
+				// Projectile Aesthetic
+				(World world, Location loc, int ticks) -> {
+					p.PARTICLE_PROJECTILE.spawn(boss, loc, 0.1, 0.1, 0.1, 0.1);
+					if (ticks % 40 == 0) {
+						p.SOUND_PROJECTILE.play(loc);
+					}
+				},
+				// Hit Action
+				(World world, LivingEntity target, Location loc) -> {
+					if (!p.DAMAGE_PLAYER_ONLY || target instanceof Player) {
 						p.SOUND_HIT.play(loc, 0.5f, 0.5f);
 						p.PARTICLE_HIT.spawn(boss, loc, 0d, 0d, 0d, 0.25d);
 
@@ -204,8 +215,8 @@ public class ProjectileBoss extends BossAbilityGroup {
 							}
 							p.EFFECTS.apply(target, boss);
 						}
-
-					})
+					}
+				})
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), (int) (p.TARGETS.getRange() * 2), null, p.DELAY);

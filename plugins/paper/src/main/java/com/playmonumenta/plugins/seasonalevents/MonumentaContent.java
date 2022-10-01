@@ -34,8 +34,18 @@ public enum MonumentaContent {
 	ELDRASK("eldrask", ContentType.BOSS, 2),
 	HEKAWT("hekawt", ContentType.BOSS, 2),
 	RUSH("rush", ContentType.OTHER, 2),
+	BLUE("blue", ContentType.DUNGEON, 3),
+	BROWN("brown", ContentType.DUNGEON, 3),
+	GREEN("green", ContentType.DUNGEON, 3),
+	RED("red", ContentType.DUNGEON, 3),
+	BLACK("black", ContentType.DUNGEON, 3),
+	SKT("skt", ContentType.DUNGEON, 3),
+	RUIN("ruin", ContentType.STRIKE, 3),
+	PORTAL("portal", ContentType.STRIKE, 3),
+	GALLERY("gallery", ContentType.OTHER, 3),
 	KINGS_BOUNTY("r1daily", ContentType.OTHER, 0),
 	CELSIAN_BOUNTY("r2daily", ContentType.OTHER, 0),
+	RING_BOUNTY("r3daily", ContentType.OTHER, 0),
 	DELVE_BOUNTY("delvebounty", ContentType.OTHER, 0);
 
 	private final int mRegion;

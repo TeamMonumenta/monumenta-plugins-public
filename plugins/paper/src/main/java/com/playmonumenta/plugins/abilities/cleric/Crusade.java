@@ -14,11 +14,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 
-
 public class Crusade extends Ability {
 	public static final String NAME = "Crusade";
 
 	public static final double DAMAGE_MULTIPLIER = 1d / 3;
+	public static final double ENHANCEMENT_RADIUS = 8;
+	public static final int ENHANCEMENT_MAX_MOBS = 6;
+	public static final double ENHANCEMENT_BONUS_DAMAGE = 0.05;
 
 	private final boolean mCountsHumanlikes;
 
@@ -39,15 +41,28 @@ public class Crusade extends Ability {
 		mInfo.mDescriptions.add(
 			"Your abilities that work against undead enemies now also work against human-like enemies - illagers, vexes, witches, piglins, piglin brutes, golems and giants."
 		); // List of human-likes hardcoded
+		mInfo.mDescriptions.add(
+			String.format("Gain %s%% ability damage for every mob affected by this ability within %s blocks, capping at %s mobs.",
+				(int) (ENHANCEMENT_BONUS_DAMAGE * 100), ENHANCEMENT_RADIUS, ENHANCEMENT_MAX_MOBS)
+		);
 		mDisplayItem = new ItemStack(Material.ZOMBIE_HEAD, 1);
 
-		mCountsHumanlikes = getAbilityScore() == 2;
+		mCountsHumanlikes = isLevelTwo();
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getAbility() == null || mPlayer == null) {
 			return false;
+		}
+
+		if (isEnhanced()) {
+			long numMobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), ENHANCEMENT_RADIUS).stream()
+				.filter(this::enemyTriggersAbilities)
+				.filter(mob -> mob.getLocation().distanceSquared(mPlayer.getLocation()) <= ENHANCEMENT_RADIUS * ENHANCEMENT_RADIUS)
+				.limit(ENHANCEMENT_MAX_MOBS)
+				.count();
+			event.setDamage(event.getDamage() * (1 + ENHANCEMENT_BONUS_DAMAGE * numMobs));
 		}
 
 		if (enemyTriggersAbilities(enemy)) {

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.function.ToIntFunction;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
@@ -53,6 +54,12 @@ public class PlayerPotionInfo {
 	protected void updatePotionStatus(Player player, int ticks) {
 		for (Entry<PotionEffectType, PotionMap> potionEntry : mPotionInfo.entrySet()) {
 			potionEntry.getValue().updatePotionStatus(player, ticks);
+		}
+	}
+
+	public void modifyPotionDuration(Player player, ToIntFunction<PotionInfo> function) {
+		for (PotionMap potionMap : mPotionInfo.values()) {
+			potionMap.modifyPotionDuration(player, function);
 		}
 	}
 

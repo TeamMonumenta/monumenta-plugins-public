@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 public class SanguineMark extends Effect {
+	public static final String effectID = "SanguineMark";
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(179, 0, 0), 1.0f);
 	private double mHealPercent;
@@ -20,7 +21,7 @@ public class SanguineMark extends Effect {
 	private Plugin mPlugin;
 
 	public SanguineMark(double healPercent, int duration, Player player, Plugin plugin) {
-		super(duration);
+		super(duration, effectID);
 		mHealPercent = healPercent;
 		mPlayer = player;
 		mPlugin = plugin;
@@ -39,10 +40,10 @@ public class SanguineMark extends Effect {
 	@Override
 	public void onDeath(EntityDeathEvent event) {
 		if (event.getEntity().getKiller() != null) {
-			 Player player = event.getEntity().getKiller();
-			 double maxHealth = EntityUtils.getMaxHealth(player);
-			 PlayerUtils.healPlayer(mPlugin, player, mHealPercent * maxHealth, mPlayer);
-			 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH_SMALL, 1.0f, 0.8f);
+			Player player = event.getEntity().getKiller();
+			double maxHealth = EntityUtils.getMaxHealth(player);
+			PlayerUtils.healPlayer(mPlugin, player, mHealPercent * maxHealth, mPlayer);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH_SMALL, 1.0f, 0.8f);
 		}
 	}
 

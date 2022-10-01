@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.cosmetics.skills.mage;
 
-import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
@@ -8,7 +7,13 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import org.apache.commons.math3.util.FastMath;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -46,7 +51,7 @@ public class TwistedLanceCS extends ManaLanceCS {
 	}
 
 	@Override
-	public void lanceParticle(Player mPlayer, Location loc, Location endLoc, int iterations) {
+	public void lanceParticle(Player mPlayer, Location loc, Location endLoc, int iterations, double range) {
 
 		Location l = loc.clone();
 		Vector dir = loc.getDirection().multiply(0.3333);
@@ -56,7 +61,7 @@ public class TwistedLanceCS extends ManaLanceCS {
 			l.add(dir);
 			new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.175, 0.2, 0.2, 0.05).spawnAsPlayerActive(mPlayer);
 			rotation += 6;
-			radius -= 0.75D / (ManaLance.RANGE * 3);
+			radius -= 0.75D / (range * 3);
 			for (int j = 0; j < 3; j++) {
 				double radian = FastMath.toRadians(rotation + (j * 120));
 				Vector vec = new Vector(FastUtils.cos(radian) * radius, 0,

@@ -72,6 +72,7 @@ public class SpellBullet extends Spell {
 	private final int mCooldown;
 	private final int mBulletDuration;
 	private final Pattern mPattern;
+	private final Vector mOffset;
 	// Junko Specific
 	private int mAccelStart;
 	private int mAccelEnd;
@@ -79,7 +80,7 @@ public class SpellBullet extends Spell {
 	private boolean mPassThrough;
 	private double mRotationSpeed;
 
-	public SpellBullet(Plugin plugin, LivingEntity caster, int duration, int delay, int emissionSpeed, double velocity, double detectRange, double hitboxRadius, int cooldown, int bulletDuration, String pattern,
+	public SpellBullet(Plugin plugin, LivingEntity caster, Vector offset, int duration, int delay, int emissionSpeed, double velocity, double detectRange, double hitboxRadius, int cooldown, int bulletDuration, String pattern,
 						   double accel, int accelStart, int accelEnd, boolean passThrough, double rotationSpeed, TickAction tickAction, CastAction castAction, Material bulletMaterial, IntersectAction intersectAction) {
 		mPlugin = plugin;
 		mEmissionSpeed = emissionSpeed;
@@ -101,6 +102,7 @@ public class SpellBullet extends Spell {
 		mAccelEnd = accelEnd;
 		mPassThrough = passThrough;
 		mRotationSpeed = rotationSpeed;
+		mOffset = offset;
 	}
 
 	@Override
@@ -111,7 +113,7 @@ public class SpellBullet extends Spell {
 			double mRotation = 0;
 			int mJunkoOffset = (int)(Math.random() * 2);
 			double mRandomAngle = Math.random() * 3.14;
-			Location mSanaeLoc = mCaster.getLocation().clone().add(new Vector(7.75, 0, 0).rotateAroundY(mRandomAngle));
+			Location mSanaeLoc = mCaster.getLocation().clone().add(new Vector(7.75, 0, 0).add(mOffset).rotateAroundY(mRandomAngle));
 			double mSanaeAngle = 162 / 180.0 * 3.14 + mRandomAngle;
 
 			@Override
@@ -155,10 +157,10 @@ public class SpellBullet extends Spell {
 								List<Player> players = EntityUtils.getNearestPlayers(mCaster.getLocation(), mDetectRange);
 								for (Player player : players) {
 									double distance = player.getLocation().toVector().setY(0).distance(mCaster.getLocation().toVector().setY(0));
-									launchAcceleratingBullet(mCaster.getLocation().add(new Vector(1, 0, 0).rotateAroundY(rotation).multiply(distance)), mBulletDuration, new Vector(), 0, 0, 0);
-									launchAcceleratingBullet(mCaster.getLocation().add(new Vector(-1, 0, 0).rotateAroundY(rotation).multiply(distance)), mBulletDuration, new Vector(), 0, 0, 0);
-									launchAcceleratingBullet(mCaster.getLocation().add(new Vector(0, 0, 1).rotateAroundY(rotation).multiply(distance)), mBulletDuration, new Vector(), 0, 0, 0);
-									launchAcceleratingBullet(mCaster.getLocation().add(new Vector(0, 0, -1).rotateAroundY(rotation).multiply(distance)), mBulletDuration, new Vector(), 0, 0, 0);
+									launchAcceleratingBullet(mCaster.getLocation().add(new Vector(1, 0, 0).add(mOffset).rotateAroundY(rotation).multiply(distance)), mBulletDuration, new Vector(), 0, 0, 0);
+									launchAcceleratingBullet(mCaster.getLocation().add(new Vector(-1, 0, 0).add(mOffset).rotateAroundY(rotation).multiply(distance)), mBulletDuration, new Vector(), 0, 0, 0);
+									launchAcceleratingBullet(mCaster.getLocation().add(new Vector(0, 0, 1).add(mOffset).rotateAroundY(rotation).multiply(distance)), mBulletDuration, new Vector(), 0, 0, 0);
+									launchAcceleratingBullet(mCaster.getLocation().add(new Vector(0, 0, -1).add(mOffset).rotateAroundY(rotation).multiply(distance)), mBulletDuration, new Vector(), 0, 0, 0);
 								}
 							}
 						}
@@ -176,7 +178,7 @@ public class SpellBullet extends Spell {
 	}
 
 	private void launchAcceleratingBullet(Vector dir, double accel, int accelStart, int accelEnd) {
-		launchAcceleratingBullet(mCaster.getLocation(), mBulletDuration, dir, accel, accelStart, accelEnd);
+		launchAcceleratingBullet(mCaster.getLocation().clone().add(mOffset), mBulletDuration, dir, accel, accelStart, accelEnd);
 	}
 
 	private void launchAcceleratingBullet(Location detLoc, int bulletDuration, Vector dir, double accel, int accelStart, int accelEnd) {

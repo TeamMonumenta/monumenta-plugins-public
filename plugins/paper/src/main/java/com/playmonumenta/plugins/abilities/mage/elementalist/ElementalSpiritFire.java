@@ -3,12 +3,12 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -36,7 +36,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-
 public class ElementalSpiritFire extends Ability {
 	public static final String NAME = "Elemental Spirits";
 
@@ -47,7 +46,11 @@ public class ElementalSpiritFire extends Ability {
 	public static final double HITBOX = 1.5;
 	public static final int COOLDOWN_TICKS = 10 * Constants.TICKS_PER_SECOND;
 
-	private final int mLevelDamage;
+	public static final String CHARM_DAMAGE = "Elemental Spirits Damage";
+	public static final String CHARM_COOLDOWN = "Elemental Spirits Cooldown";
+	public static final String CHARM_SIZE = "Elemental Spirits Size";
+
+	private final float mLevelDamage;
 	private final double mLevelBowMultiplier;
 	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
 
@@ -63,7 +66,7 @@ public class ElementalSpiritFire extends Ability {
 		mInfo.mShorthandName = "ES";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, the fire spirit instantly dashes from you towards the farthest enemy that spell hit, dealing %s magic damage to all enemies in a %s-block cube around it along its path. The next moment after you deal ice damage, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, dealing %s magic damage to all enemies in a %s-block cube around it every second for %ss. If the spell was %s, the fire spirit does an additional %s%% of the bow's original damage, and for the ice spirit, an additional %s%%. The spirits' damage ignores iframes. Independent cooldown: %ss.",
+				"Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, the fire spirit instantly dashes from you towards the farthest enemy that spell hit, dealing %s fire magic damage to all enemies in a %s-block cube around it along its path. The next moment after you deal ice damage, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, dealing %s ice magic damage to all enemies in a %s-block cube around it every second for %ss. If the spell was %s, the fire spirit does an additional %s%% of the projectile weapon's original damage, and for the ice spirit, an additional %s%%. The spirits' damage ignores iframes. Independent cooldown: %ss.",
 				DAMAGE_1,
 				HITBOX,
 				ElementalSpiritIce.DAMAGE_1,
@@ -89,19 +92,16 @@ public class ElementalSpiritFire extends Ability {
 				StringUtils.multiplierToPercentage(ElementalSpiritIce.BOW_MULTIPLIER_2)
 			)
 		);
-		mInfo.mCooldown = COOLDOWN_TICKS;
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN_TICKS);
 		mDisplayItem = new ItemStack(Material.SUNFLOWER, 1);
 
-		boolean isUpgraded = getAbilityScore() == 2;
-		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
-		mLevelBowMultiplier = isUpgraded ? BOW_MULTIPLIER_2 : BOW_MULTIPLIER_1;
+		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mLevelBowMultiplier = isLevelOne() ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
 
 		// Task runs on the next server tick. Need to wait for entire AbilityCollection to be initialised to properly getPlayerAbility()
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mElementalArrows = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mElementalArrows = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
+		});
 	}
 
 	@Override
@@ -138,14 +138,15 @@ public class ElementalSpiritFire extends Ability {
 							Location endLocation = LocationUtils.getHalfHeightLocation(farthestEnemy);
 
 							World world = mPlayer.getWorld();
-							BoundingBox movingSpiritBox = BoundingBox.of(mPlayer.getEyeLocation(), HITBOX, HITBOX, HITBOX);
+							double size = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, HITBOX);
+							BoundingBox movingSpiritBox = BoundingBox.of(mPlayer.getEyeLocation(), size, size, size);
 							double maxDistanceSquared = startLocation.distanceSquared(endLocation);
 							double maxDistance = Math.sqrt(maxDistanceSquared);
 							Vector vector = endLocation.clone().subtract(startLocation).toVector();
 							double increment = 0.2;
 
-							List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + HITBOX);
-							float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+							List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + size);
+							float spellDamage = ClassAbility.ELEMENTAL_ARROWS_FIRE == ability ? mLevelDamage : SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 							Vector vectorIncrement = vector.normalize().multiply(increment);
 
 							// Fire spirit sound
@@ -161,7 +162,7 @@ public class ElementalSpiritFire extends Ability {
 										double finalDamage = spellDamage;
 										if (
 											ClassAbility.ELEMENTAL_ARROWS_FIRE.equals(ability)
-											&& mElementalArrows != null
+												&& mElementalArrows != null
 										) {
 											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
 										}
@@ -213,9 +214,9 @@ public class ElementalSpiritFire extends Ability {
 				@Override
 				public void run() {
 					if (isTimerActive()
-						    || mPlayer == null
-							|| !mPlayer.isValid() // Ensure player is not dead, is still online?
-						    || PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
+						|| mPlayer == null
+						|| !mPlayer.isValid() // Ensure player is not dead, is still online?
+						|| PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
 						this.cancel();
 						mPlayerParticlesGenerator = null;
 					}
@@ -226,12 +227,12 @@ public class ElementalSpiritFire extends Ability {
 					mRotationAngle %= 360;
 
 					mParticle.location(
-						LocationUtils
-							.getHalfHeightLocation(mPlayer)
-							.add(
-								FastUtils.cos(Math.toRadians(mRotationAngle)),
-								FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.5,
-								FastUtils.sin(Math.toRadians(mRotationAngle))
+							LocationUtils
+								.getHalfHeightLocation(mPlayer)
+								.add(
+									FastUtils.cos(Math.toRadians(mRotationAngle)),
+									FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.5,
+									FastUtils.sin(Math.toRadians(mRotationAngle))
 								))
 						.spawnAsPlayerPassive(mPlayer);
 				}

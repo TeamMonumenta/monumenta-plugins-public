@@ -23,9 +23,9 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -48,18 +48,17 @@ public class PiercingCold extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (mPlayer.isSneaking()) {
-			arrow.remove();
-			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
+	public boolean playerShotProjectileEvent(Projectile projectile) {
+		if (mPlayer != null && mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			projectile.remove();
+			mPlugin.mProjectileEffectTimers.removeEntity(projectile);
 			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
 
 			BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1.5, 1.5, 1.5);
 
 			World world = mPlayer.getWorld();
-			Player player = mPlayer;
-			Location loc = player.getEyeLocation();
+			Location loc = mPlayer.getEyeLocation();
 			Vector dir = loc.getDirection().normalize();
 
 			world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 1.4f);
@@ -145,7 +144,7 @@ public class PiercingCold extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting an arrow or trident while sneaking instead shoots an enchanted beam of frost that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and leaves a trail of ice below it that lasts for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Shooting a projectile while sneaking instead shoots an enchanted beam of frost that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and leaves a trail of ice below it that lasts for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

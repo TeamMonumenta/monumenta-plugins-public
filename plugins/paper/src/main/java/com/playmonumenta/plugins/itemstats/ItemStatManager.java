@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
+import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -53,6 +54,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -66,6 +68,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -90,6 +93,14 @@ public class ItemStatManager implements Listener {
 							mMap.put(stat, old + value);
 						}
 					}
+				}
+			}
+
+			public void set(ItemStat stat, double value) {
+				if (value != 0) {
+					mMap.put(stat, value);
+				} else {
+					mMap.remove(stat);
 				}
 			}
 
@@ -119,12 +130,14 @@ public class ItemStatManager implements Listener {
 		}
 
 		public PlayerItemStats(Player player) {
-			mRegion = ServerProperties.getClassSpecializationsEnabled() ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY;
+			mRegion = ServerProperties.getAbilityEnhancementsEnabled() ? ItemStatUtils.Region.RING : (ServerProperties.getClassSpecializationsEnabled() ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY);
 			updateStats(player, true);
 		}
 
 		public PlayerItemStats(PlayerItemStats playerItemStats) {
-			mStats = playerItemStats.getItemStats();
+			for (Entry<ItemStat, Double> entry : playerItemStats.getItemStats()) {
+				mStats.add(entry.getKey(), entry.getValue());
+			}
 			mRegion = playerItemStats.mRegion;
 		}
 
@@ -184,14 +197,19 @@ public class ItemStatManager implements Listener {
 					NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
 					boolean scaleRegion = mRegion.compareTo(ItemStatUtils.getRegion(item)) < 0;
+					boolean scaleRegionLarge = mRegion.equals(ItemStatUtils.Region.VALLEY) &&
+						ItemStatUtils.getRegion(item).equals(ItemStatUtils.Region.RING);
+					if (scaleRegionLarge) {
+						scaleRegion = false;
+					}
 
 					for (ItemStat stat : ITEM_STATS) {
 						if (stat instanceof Attribute attribute) {
-							double multiplier = attribute.getAttributeType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+							double multiplier = attribute.getAttributeType().isRegionScaled() && scaleRegion ? 0.5 : attribute.getAttributeType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 							newArmorAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, slot) * multiplier);
 							newArmorMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, slot) * multiplier);
 						} else if (stat instanceof Enchantment enchantment) {
-							double multiplier = enchantment.getEnchantmentType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+							double multiplier = enchantment.getEnchantmentType().isRegionScaled() && scaleRegion ? 0.5 : enchantment.getEnchantmentType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 							if (enchantment.getEnchantmentType() == EnchantmentType.MAINHAND_OFFHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
 								break;
 							}
@@ -202,7 +220,7 @@ public class ItemStatManager implements Listener {
 								newArmorAddStats.add(stat, 1);
 							}
 						} else if (stat instanceof Infusion infusion) {
-							double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+							double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : infusion.getInfusionType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 							multiplier = infusion.getInfusionType().isRegionScaled() && Shattered.isShattered(item) ? 0 : multiplier;
 							newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
 						}
@@ -220,14 +238,19 @@ public class ItemStatManager implements Listener {
 				NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
 				boolean scaleRegion = mRegion.compareTo(ItemStatUtils.getRegion(mainhand)) < 0;
+				boolean scaleRegionLarge = mRegion.equals(ItemStatUtils.Region.VALLEY) &&
+					ItemStatUtils.getRegion(mainhand).equals(ItemStatUtils.Region.RING);
+				if (scaleRegionLarge) {
+					scaleRegion = false;
+				}
 
 				for (ItemStat stat : ITEM_STATS) {
 					if (stat instanceof Attribute attribute) {
-						double multiplier = attribute.getAttributeType().isMainhandRegionScaled() && scaleRegion ? 0.5 : 1.0;
+						double multiplier = attribute.getAttributeType().isMainhandRegionScaled() && scaleRegion ? 0.5 : attribute.getAttributeType().isMainhandRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 						newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND) * multiplier);
 						newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND) * multiplier);
 					} else if (stat instanceof Enchantment enchantment) {
-						double multiplier = enchantment.getEnchantmentType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+						double multiplier = enchantment.getEnchantmentType().isRegionScaled() && scaleRegion ? 0.5 : enchantment.getEnchantmentType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 						if (enchantment.getEnchantmentType() == EnchantmentType.OFFHAND_MAINHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
 							break;
 						}
@@ -235,7 +258,7 @@ public class ItemStatManager implements Listener {
 							newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 						}
 					} else if (stat instanceof Infusion infusion) {
-						double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : 1.0;
+						double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : infusion.getInfusionType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 						newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
 					}
 				}
@@ -518,10 +541,26 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
+	public void onLoadCrossbow(Plugin plugin, Player player, EntityLoadCrossbowEvent event) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onLoadCrossbow(plugin, player, entry.getValue(), event);
+			}
+		}
+	}
+
 	public void onLaunchProjectile(Plugin plugin, Player player, ProjectileLaunchEvent event, Projectile projectile) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onLaunchProjectile(plugin, player, entry.getValue(), event, projectile);
+			}
+		}
+	}
+
+	public void onProjectileHit(Plugin plugin, Player player, ProjectileHitEvent event, Projectile projectile) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onProjectileHit(plugin, player, entry.getValue(), event, projectile);
 			}
 		}
 	}
@@ -558,7 +597,7 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public void onRegain(Plugin plugin, Player player, EntityRegainHealthEvent event) {
+	public void playerRegainHealthEvent(Plugin plugin, Player player, EntityRegainHealthEvent event) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onRegain(plugin, player, entry.getValue(), event);
@@ -594,6 +633,14 @@ public class ItemStatManager implements Listener {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onDeath(plugin, player, entry.getValue(), event);
+			}
+		}
+	}
+
+	public void onRiptide(Plugin plugin, Player player, PlayerRiptideEvent event) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onRiptide(plugin, player, entry.getValue(), event);
 			}
 		}
 	}

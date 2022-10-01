@@ -5,9 +5,13 @@ import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.structures.StructuresPlugin;
+import com.playmonumenta.structures.managers.RespawningStructure;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
@@ -23,11 +27,14 @@ public class StatMultiplier {
 	private static final double SPEED_MULTIPLIER_INCREMENT = 0.004;
 
 	private static final Map<String, Double> STAT_COMPENSATION_MAPPINGS = new HashMap<>();
+	private static final Map<String, Double> STAT_COMPENSATION_MAPPINGS_RING_POI = new HashMap<>();
 
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.4;
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
+	public static final double DELVE_MOB_STAT_MULTIPLIER_R3 = 1.6;
 
 	static {
+		//r1 shards
 		STAT_COMPENSATION_MAPPINGS.put("white", 1.7);
 		STAT_COMPENSATION_MAPPINGS.put("orange", 1.5);
 		STAT_COMPENSATION_MAPPINGS.put("magenta", 1.4);
@@ -35,6 +42,9 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS.put("yellow", 1.1);
 		STAT_COMPENSATION_MAPPINGS.put("willows", 1.2);
 		STAT_COMPENSATION_MAPPINGS.put("reverie", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("corridors", 1.0);
+
+		//r2 shards
 		STAT_COMPENSATION_MAPPINGS.put("lime", 1.6);
 		STAT_COMPENSATION_MAPPINGS.put("pink", 1.4);
 		STAT_COMPENSATION_MAPPINGS.put("gray", 1.4);
@@ -45,14 +55,56 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS.put("forum", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("shiftingcity", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("depths", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("corridors", 1.0);
+
+		//r3 shards
+		STAT_COMPENSATION_MAPPINGS.put("blue", 1.2);
+		STAT_COMPENSATION_MAPPINGS.put("ruin", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("portal", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("skt", 1.0);
+
+		//dev shards
 		STAT_COMPENSATION_MAPPINGS.put("dev1", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev2", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("mobs", 1.0);
+
+		// Wolfswood
+		final double FOREST = 1.2;
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("coven_fortress", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("locum_vernantia", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("shadowcast_bastille", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("aminita_colony", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("chanterelle_village", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("bewitched_dominion", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("vibrant_hollow", FOREST);
+
+		// Pelias' Keep
+		final double KEEP = 1.2;
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("quelled_convent", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("silvic_quarry", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("doomed_encampment", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("forsaken_manor", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("arx_spirensis", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("submerged_citadel", KEEP);
 	}
 
 	public static double getStatCompensation(String dungeon) {
 		return STAT_COMPENSATION_MAPPINGS.getOrDefault(dungeon, 1.0);
+	}
+
+	public static double getStatCompensation(String shard, Location loc) {
+		if (shard.equals("ring")) {
+			List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(loc.toVector(), false);
+			for (RespawningStructure rs : structures) {
+				String name = (String) rs.getConfig().get("name");
+				Double value = STAT_COMPENSATION_MAPPINGS_RING_POI.get(name);
+				if (value != null) {
+					return value;
+				}
+			}
+			//no match -> return default value from shard mapping
+		}
+
+		return STAT_COMPENSATION_MAPPINGS.getOrDefault(shard, 1.0);
 	}
 
 	public static double getDamageMultiplier(int depthPoints) {
@@ -77,10 +129,6 @@ public class StatMultiplier {
 		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * SPEED_MULTIPLIER_INCREMENT;
 	}
 
-	public static double getDelveMobStatMultiplier(int point) {
-		return STAT_COMPENSATION_MAPPINGS.get(ServerProperties.getShardName()) == null ? 1 : STAT_COMPENSATION_MAPPINGS.get(ServerProperties.getShardName());
-	}
-
 	public static boolean isDepthsShard() {
 		return ServerProperties.getShardName().startsWith("depths")
 			|| ServerProperties.getShardName().equals("mobs")
@@ -92,10 +140,13 @@ public class StatMultiplier {
 			//somehow we run a delve with 0 score delvescore
 			return;
 		}
+
+		double statCompensation = getStatCompensation(ServerProperties.getShardName(), mob.getLocation());
+
 		//stat
 		double healthMulti = DelvesUtils.isDelveMob(mob) ?
-			                    getHealthMultiplier(level) * (ServerProperties.getClassSpecializationsEnabled() ? DELVE_MOB_STAT_MULTIPLIER_R2 : DELVE_MOB_STAT_MULTIPLIER_R1) :
-			                    getHealthMultiplier(level) * STAT_COMPENSATION_MAPPINGS.getOrDefault(ServerProperties.getShardName(), 1.0);
+			                    getHealthMultiplier(level) * (ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? DELVE_MOB_STAT_MULTIPLIER_R3 : DELVE_MOB_STAT_MULTIPLIER_R2) : DELVE_MOB_STAT_MULTIPLIER_R1) :
+			                    getHealthMultiplier(level) * statCompensation;
 
 		EntityUtils.scaleMaxHealth(mob, healthMulti - 1, HEALTH_MODIFIER_NAME);
 
@@ -106,7 +157,7 @@ public class StatMultiplier {
 		}
 
 		mob.addScoreboardTag(StatMultiplierBoss.identityTag);
-		mob.addScoreboardTag(StatMultiplierBoss.identityTag + "[damagestatmult=" + getDelveMobStatMultiplier(level) + ",damagemult=" + getDamageMultiplier(level) + "]");
+		mob.addScoreboardTag(StatMultiplierBoss.identityTag + "[damagestatmult=" + statCompensation + ",damagemult=" + getDamageMultiplier(level) + "]");
 	}
 
 }

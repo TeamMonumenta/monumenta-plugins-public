@@ -3,12 +3,12 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -30,8 +30,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-
-
 public class ElementalSpiritIce extends Ability {
 	public static final int DAMAGE_1 = 4;
 	public static final int DAMAGE_2 = 6;
@@ -42,7 +40,7 @@ public class ElementalSpiritIce extends Ability {
 	public static final int PULSES = 3;
 	public static final int COOLDOWN_TICKS = ElementalSpiritFire.COOLDOWN_TICKS;
 
-	private final int mLevelDamage;
+	private final float mLevelDamage;
 	private final double mLevelBowMultiplier;
 	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
 
@@ -60,17 +58,14 @@ public class ElementalSpiritIce extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.ELEMENTAL_SPIRIT_ICE;
 
 		mInfo.mScoreboardId = "ElementalSpirit";
-		mInfo.mCooldown = COOLDOWN_TICKS;
+		mInfo.mCooldown = CharmManager.getCooldown(player, ElementalSpiritFire.CHARM_COOLDOWN, COOLDOWN_TICKS);
 
-		boolean isUpgraded = getAbilityScore() == 2;
-		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
-		mLevelBowMultiplier = isUpgraded ? BOW_MULTIPLIER_2 : BOW_MULTIPLIER_1;
+		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, ElementalSpiritFire.CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mLevelBowMultiplier = isLevelOne() ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mElementalArrows = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mElementalArrows = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
+		});
 	}
 
 	@Override
@@ -103,7 +98,7 @@ public class ElementalSpiritIce extends Ability {
 							putOnCooldown();
 
 							Location centre = LocationUtils.getHalfHeightLocation(closestEnemy);
-							float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+							float spellDamage = ClassAbility.ELEMENTAL_ARROWS_ICE == ability ? mLevelDamage : SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 							World world = mPlayer.getWorld();
 
 							mSpiritPulser = new BukkitRunnable() {
@@ -112,7 +107,7 @@ public class ElementalSpiritIce extends Ability {
 								@Override
 								public void run() {
 									// Damage actions
-									for (LivingEntity mob : EntityUtils.getNearbyMobs(centre, SIZE)) {
+									for (LivingEntity mob : EntityUtils.getNearbyMobs(centre, CharmManager.calculateFlatAndPercentValue(mPlayer, ElementalSpiritFire.CHARM_SIZE, SIZE))) {
 										double finalDamage = spellDamage;
 										if (
 											ClassAbility.ELEMENTAL_ARROWS_ICE.equals(ability)
@@ -128,7 +123,7 @@ public class ElementalSpiritIce extends Ability {
 									// Ice spirit effects
 									PartialParticle partialParticle = new PartialParticle(Particle.SNOWBALL, centre)
 										.count(150)
-										.delta(PartialParticle.getWidthDelta(SIZE))
+										.delta(PartialParticle.getWidthDelta(CharmManager.calculateFlatAndPercentValue(mPlayer, ElementalSpiritFire.CHARM_SIZE, SIZE)))
 										.extra(0.1)
 										.spawnAsPlayerActive(mPlayer);
 									//TODO falling dust

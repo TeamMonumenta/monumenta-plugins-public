@@ -61,6 +61,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 	private final int mLifetimeTicks;
 	private final double mHitboxLength;
 	private final boolean mCollidesWithBlocks;
+	private final double mSpeedLiquid;
+	private final double mSpeedBlocks;
 	private final boolean mLingers;
 	private final AestheticAction mInitiateAesthetic;
 	private final AestheticAction mLaunchAesthetic;
@@ -112,6 +114,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 		mLifetimeTicks = lifetimeTicks;
 		mHitboxLength = hitboxLength;
 		mCollidesWithBlocks = collidesWithBlocks;
+		mSpeedLiquid = 0.5;
+		mSpeedBlocks = 0.125;
 		mLingers = lingers;
 		mInitiateAesthetic = initiateAesthetic;
 		mLaunchAesthetic = launchAesthetic;
@@ -133,7 +137,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 									  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		this(plugin, boss, launchTracking, 1, 40, cooldown, delay,
 			0, 0, 0, 0, 200.0, 100.0, 1, 30, speed, turnRadius,
-			lifetimeTicks, hitboxLength, lingers, collidesWithBlocks, collidesWithOthers, collisionCheckDelay,
+			lifetimeTicks, hitboxLength, lingers, collidesWithBlocks, 0.5, 0.125, collidesWithOthers, collisionCheckDelay,
 			targets, initiateAesthetic, launchAesthetic, projectileAesthetic, hitAction);
 	}
 
@@ -166,7 +170,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	 */
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, boolean launchTracking, int charge, int chargeInterval, int cooldown, int delay,
 									  double offsetX, double offsetY, double offsetZ, int mirror, double fixYaw, double fixPitch, int split, double splitAngle, double speed, double turnRadius,
-									  int lifetimeTicks, double hitboxLength, boolean lingers, boolean collidesWithBlocks, boolean collidesWithOthers, int collisionCheckDelay,
+									  int lifetimeTicks, double hitboxLength, boolean lingers, boolean collidesWithBlocks, double speedLiquid, double speedBlocks, boolean collidesWithOthers, int collisionCheckDelay,
 									  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -190,6 +194,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 		mLifetimeTicks = lifetimeTicks;
 		mHitboxLength = hitboxLength;
 		mCollidesWithBlocks = collidesWithBlocks;
+		mSpeedLiquid = speedLiquid;
+		mSpeedBlocks = speedBlocks;
 		mLingers = lingers;
 		mInitiateAesthetic = initiateAesthetic;
 		mLaunchAesthetic = launchAesthetic;
@@ -435,11 +441,11 @@ public class SpellBaseSeekingProjectile extends Spell {
 				} else {
 					if (mHitbox.overlaps(block.getBoundingBox())) {
 						if (block.isLiquid()) {
-							shift.multiply(0.5);
+							shift.multiply(mSpeedLiquid);
 						} else {
 							// If going through blocks, increase the effects
 							mProjectileAesthetic.run(mWorld, mLocation, mTicks);
-							shift.multiply(0.125);
+							shift.multiply(mSpeedBlocks);
 						}
 					}
 				}

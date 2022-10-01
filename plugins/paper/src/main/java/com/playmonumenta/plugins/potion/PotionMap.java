@@ -12,6 +12,7 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -89,6 +90,22 @@ public class PotionMap {
 		mPotionMap.remove(id);
 
 		applyBestPotionEffect(player);
+	}
+
+	public void modifyPotionDuration(Player player, ToIntFunction<PotionInfo> function) {
+		boolean changed = false;
+		for (TreeMap<Integer, PotionInfo> treeMap : mPotionMap.values()) {
+			for (PotionInfo potionInfo : treeMap.values()) {
+				int newDuration = function.applyAsInt(potionInfo);
+				if (newDuration != potionInfo.mDuration) {
+					changed = true;
+					potionInfo.mDuration = newDuration;
+				}
+			}
+		}
+		if (changed) {
+			applyBestPotionEffect(player);
+		}
 	}
 
 	protected void removePotion(Player player, PotionID id, int amplifier) {
@@ -170,9 +187,9 @@ public class PotionMap {
 		PotionEffect currentVanillaEffect = player.getPotionEffect(mType);
 		if (currentVanillaEffect != null) {
 			if (bestEffect == null
-			    || currentVanillaEffect.getDuration() > (bestEffect.mDuration + 20)
-			    || currentVanillaEffect.getDuration() < (bestEffect.mDuration - 20)
-			    || bestEffect.mAmplifier != currentVanillaEffect.getAmplifier()) {
+				    || currentVanillaEffect.getDuration() > (bestEffect.mDuration + 20)
+				    || currentVanillaEffect.getDuration() < (bestEffect.mDuration - 20)
+				    || bestEffect.mAmplifier != currentVanillaEffect.getAmplifier()) {
 
 				// The current effect must be removed because the "best" effect is either less than it
 				// OR the same strength but less duration
