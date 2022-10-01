@@ -21,6 +21,7 @@ public class EliteFinishers {
 			.put(SplishSplashFinisher.NAME, new SplishSplashFinisher())
 			.put(MegalovaniaFinisher.NAME, new MegalovaniaFinisher())
 			.put(FrozenSolidFinisher.NAME, new FrozenSolidFinisher())
+			.put(CornucopiaFinisher.NAME, new CornucopiaFinisher())
 			.build();
 
 	// Delegate based on elite finisher name
