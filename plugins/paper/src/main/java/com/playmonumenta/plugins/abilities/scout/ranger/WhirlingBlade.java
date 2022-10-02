@@ -85,7 +85,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (ItemUtils.isShootableItem(inMainHand) || ItemUtils.isSomePotion(inMainHand) || inMainHand.getType().isBlock()
+		if (ItemUtils.isShootableItem(inMainHand, false) || ItemUtils.isSomePotion(inMainHand) || inMainHand.getType().isBlock()
 			|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.TRIDENT || inMainHand.getType() == Material.COMPASS || inMainHand.getType() == Material.SHIELD) {
 			return;
 		}

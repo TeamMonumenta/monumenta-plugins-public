@@ -601,13 +601,17 @@ public class ItemUtils {
 		ItemUtils.setPlainName(potion);
 	}
 
-	public static boolean isShootableItem(ItemStack item) {
+	public static boolean isShootableItem(ItemStack item, boolean excludeRiptide) {
 		Material mat = item.getType();
 		if (mat == Material.TRIDENT) {
-			return !item.containsEnchantment(Enchantment.RIPTIDE);
+			return !(excludeRiptide && item.containsEnchantment(Enchantment.RIPTIDE));
 		} else {
 			return SHOOTABLES.contains(mat);
 		}
+	}
+
+	public static boolean isShootableItem(ItemStack item) {
+		return isShootableItem(item, true);
 	}
 
 	public static boolean isAllowedTreeReplace(@Nullable Material mat) {
