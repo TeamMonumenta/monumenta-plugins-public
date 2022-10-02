@@ -42,7 +42,7 @@ public class LaserBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public int COOLDOWN = 12 * 20;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "When false, laser attack can go through blocks.")
 		public boolean CAN_BLOCK = true;
 
 		@BossParam(help = "not written")
