@@ -40,9 +40,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	private static final int MAX_LORE_LENGHT = 30;
 	private static final Material JUNK_ITEM = Material.GRAY_STAINED_GLASS_PANE;
 
-	private static final Map<DelveInfusionSelection, List<ItemStack>> mDelveInfusionPannelsMap = new HashMap<>();
+	private static final Map<DelveInfusionSelection, List<ItemStack>> mDelveInfusionPanelsMap = new HashMap<>();
 	private static final Map<DelveInfusionSelection, String> mDelveMatsMap = new HashMap<>();
-	private static final List<ItemStack> mDelvePannelList = new ArrayList<>();
+	private static final HashMap<DelveInfusionSelection, ItemStack> mDelvePanelList = new HashMap<>();
 
 	private static final List<ItemStack> mInvalidItems = new ArrayList<>();
 	private static final ItemStack mRefundItem = new ItemStack(Material.GRINDSTONE);
@@ -83,8 +83,8 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		mDelveMatsMap.put(DelveInfusionSelection.QUENCH, "Fenian Flowers");
 		mDelveMatsMap.put(DelveInfusionSelection.GRACE, "Iridium Catalysts");
 
-		//Load all the pannels for delves
-		//mDelvePannelList
+		//Load all the panels for delves
+		//mDelvePanelList
 
 		//R1
 		//White
@@ -96,7 +96,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		whiteLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.PENNATE), TextColor.fromHexString("#555555")));
 		whiteMeta.lore(whiteLore);
 		whiteItem.setItemMeta(whiteMeta);
-		mDelvePannelList.add(whiteItem);
+		mDelvePanelList.put(DelveInfusionSelection.PENNATE, whiteItem);
 
 		//Orange
 		ItemStack orangeItem = new ItemStack(Material.ORANGE_WOOL);
@@ -107,7 +107,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		orangeLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.CARAPACE), TextColor.fromHexString("#555555")));
 		orangeMeta.lore(orangeLore);
 		orangeItem.setItemMeta(orangeMeta);
-		mDelvePannelList.add(orangeItem);
+		mDelvePanelList.put(DelveInfusionSelection.CARAPACE, orangeItem);
 
 		//Magenta
 		ItemStack magentaItem = new ItemStack(Material.MAGENTA_WOOL);
@@ -118,7 +118,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		magentaLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.AURA), TextColor.fromHexString("#555555")));
 		magentaMeta.lore(magentaLore);
 		magentaItem.setItemMeta(magentaMeta);
-		mDelvePannelList.add(magentaItem);
+		mDelvePanelList.put(DelveInfusionSelection.AURA, magentaItem);
 
 		//Light Blue
 		ItemStack lbItem = new ItemStack(Material.LIGHT_BLUE_WOOL);
@@ -129,7 +129,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		lbLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.EXPEDITE), TextColor.fromHexString("#555555")));
 		lbMeta.lore(lbLore);
 		lbItem.setItemMeta(lbMeta);
-		mDelvePannelList.add(lbItem);
+		mDelvePanelList.put(DelveInfusionSelection.EXPEDITE, lbItem);
 
 		//Yellow
 		ItemStack yellowItem = new ItemStack(Material.YELLOW_WOOL);
@@ -140,7 +140,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		yellowLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.CHOLER), TextColor.fromHexString("#555555")));
 		yellowMeta.lore(yellowLore);
 		yellowItem.setItemMeta(yellowMeta);
-		mDelvePannelList.add(yellowItem);
+		mDelvePanelList.put(DelveInfusionSelection.CHOLER, yellowItem);
 
 		//Bonus
 		ItemStack bonusItem = new ItemStack(Material.MOSSY_COBBLESTONE);
@@ -151,7 +151,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		bonusLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.UNYIELDING), TextColor.fromHexString("#555555")));
 		bonusMeta.lore(bonusLore);
 		bonusItem.setItemMeta(bonusMeta);
-		mDelvePannelList.add(bonusItem);
+		mDelvePanelList.put(DelveInfusionSelection.UNYIELDING, bonusItem);
 
 		//Reverie
 		ItemStack reverieItem = new ItemStack(Material.NETHER_WART_BLOCK);
@@ -162,7 +162,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		reverieLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.USURPER), TextColor.fromHexString("#555555")));
 		reverieMeta.lore(reverieLore);
 		reverieItem.setItemMeta(reverieMeta);
-		mDelvePannelList.add(reverieItem);
+		mDelvePanelList.put(DelveInfusionSelection.USURPER, reverieItem);
 
 		//Ephemeral Corridors
 		ItemStack corridorsItem = new ItemStack(Material.MAGMA_BLOCK);
@@ -173,7 +173,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		corridorsLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.VENGEFUL), TextColor.fromHexString("#555555")));
 		corridorsMeta.lore(corridorsLore);
 		corridorsItem.setItemMeta(corridorsMeta);
-		mDelvePannelList.add(corridorsItem);
+		mDelvePanelList.put(DelveInfusionSelection.VENGEFUL, corridorsItem);
 
 		//R2
 		//Lime
@@ -185,7 +185,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		limeLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.EMPOWERED), TextColor.fromHexString("#555555")));
 		limeMeta.lore(limeLore);
 		limeItem.setItemMeta(limeMeta);
-		mDelvePannelList.add(limeItem);
+		mDelvePanelList.put(DelveInfusionSelection.EMPOWERED, limeItem);
 
 		//Pink
 		ItemStack pinkItem = new ItemStack(Material.PINK_WOOL);
@@ -196,7 +196,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		pinkLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.NUTRIMENT), TextColor.fromHexString("#555555")));
 		pinkMeta.lore(pinkLore);
 		pinkItem.setItemMeta(pinkMeta);
-		mDelvePannelList.add(pinkItem);
+		mDelvePanelList.put(DelveInfusionSelection.NUTRIMENT, pinkItem);
 
 		//Gray
 		ItemStack greyItem = new ItemStack(Material.GRAY_WOOL);
@@ -207,7 +207,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		greyLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.EXECUTION), TextColor.fromHexString("#555555")));
 		greyMeta.lore(greyLore);
 		greyItem.setItemMeta(greyMeta);
-		mDelvePannelList.add(greyItem);
+		mDelvePanelList.put(DelveInfusionSelection.EXECUTION, greyItem);
 
 		//Light Grey
 		ItemStack lgItem = new ItemStack(Material.LIGHT_GRAY_WOOL);
@@ -218,7 +218,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		lgLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.REFLECTION), TextColor.fromHexString("#555555")));
 		lgMeta.lore(lgLore);
 		lgItem.setItemMeta(lgMeta);
-		mDelvePannelList.add(lgItem);
+		mDelvePanelList.put(DelveInfusionSelection.REFLECTION, lgItem);
 
 		//Cyan
 		ItemStack cyanItem = new ItemStack(Material.CYAN_WOOL);
@@ -229,7 +229,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		cyanLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.MITOSIS), TextColor.fromHexString("#555555")));
 		cyanMeta.lore(cyanLore);
 		cyanItem.setItemMeta(cyanMeta);
-		mDelvePannelList.add(cyanItem);
+		mDelvePanelList.put(DelveInfusionSelection.MITOSIS, cyanItem);
 
 		//Purple
 		ItemStack purpleItem = new ItemStack(Material.PURPLE_WOOL);
@@ -240,7 +240,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		purpleLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.ARDOR), TextColor.fromHexString("#555555")));
 		purpleMeta.lore(purpleLore);
 		purpleItem.setItemMeta(purpleMeta);
-		mDelvePannelList.add(purpleItem);
+		mDelvePanelList.put(DelveInfusionSelection.ARDOR, purpleItem);
 
 		//Teal
 		ItemStack tealItem = new ItemStack(Material.CYAN_CONCRETE_POWDER);
@@ -251,7 +251,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		tealLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.EPOCH), TextColor.fromHexString("#555555")));
 		tealMeta.lore(tealLore);
 		tealItem.setItemMeta(tealMeta);
-		mDelvePannelList.add(tealItem);
+		mDelvePanelList.put(DelveInfusionSelection.EPOCH, tealItem);
 
 		//shifting
 		ItemStack shiftingItem = new ItemStack(Material.BLUE_CONCRETE);
@@ -262,7 +262,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		shiftingLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.NATANT), TextColor.fromHexString("#555555")));
 		shiftingMeta.lore(shiftingLore);
 		shiftingItem.setItemMeta(shiftingMeta);
-		mDelvePannelList.add(shiftingItem);
+		mDelvePanelList.put(DelveInfusionSelection.NATANT, shiftingItem);
 
 		//Fallen Forum
 		ItemStack fallenItem = new ItemStack(Material.BOOKSHELF);
@@ -273,7 +273,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		fallenLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.UNDERSTANDING), TextColor.fromHexString("#555555")));
 		fallenMeta.lore(fallenLore);
 		fallenItem.setItemMeta(fallenMeta);
-		mDelvePannelList.add(fallenItem);
+		mDelvePanelList.put(DelveInfusionSelection.UNDERSTANDING, fallenItem);
 
 		// Silver Knight's Tomb
 		ItemStack sktItem = new ItemStack(Material.POLISHED_DEEPSLATE);
@@ -281,7 +281,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		sktMeta.displayName(Component.text("Refresh", TextColor.fromCSSHexString("#C0C0C0")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(sktMeta, "Reduces the cooldown of infinite consumable foods by 2% per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		sktItem.setItemMeta(sktMeta);
-		mDelvePannelList.add(sktItem);
+		mDelvePanelList.put(DelveInfusionSelection.REFRESH, sktItem);
 
 		// Blue
 		ItemStack blueItem = new ItemStack(Material.BLUE_WOOL);
@@ -289,7 +289,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		blueMeta.displayName(Component.text("Soothing", TextColor.fromCSSHexString("#0C2CA2")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(blueMeta, "Regenerate 0.0825 health per level each second.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		blueItem.setItemMeta(blueMeta);
-		mDelvePannelList.add(blueItem);
+		mDelvePanelList.put(DelveInfusionSelection.SOOTHING, blueItem);
 
 		// Wolfswood
 		ItemStack woodItem = new ItemStack(Material.DARK_OAK_WOOD);
@@ -297,7 +297,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		woodMeta.displayName(Component.text("Quench", TextColor.fromCSSHexString("#4C8F4D")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(woodMeta, "Gain 1% damage per level when you have a non-infinite vanilla potion effect active.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		woodItem.setItemMeta(woodMeta);
-		mDelvePannelList.add(woodItem);
+		mDelvePanelList.put(DelveInfusionSelection.QUENCH, woodItem);
 
 		// Keep
 		ItemStack keepItem = new ItemStack(Material.CRACKED_STONE_BRICKS);
@@ -305,10 +305,10 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		keepMeta.displayName(Component.text("Grace", TextColor.fromCSSHexString("#C4BBA5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(keepMeta, "Gain 1.5% attack speed per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		keepItem.setItemMeta(keepMeta);
-		mDelvePannelList.add(keepItem);
+		mDelvePanelList.put(DelveInfusionSelection.GRACE, keepItem);
 
 
-		//LOADING mDelveInfusionPannelsMap
+		//LOADING mDelveInfusionPanelsMap
 		//-----------------------------------------------------
 		//   items showed for each delve infusion on item
 		//-----------------------------------------------------
@@ -318,267 +318,267 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		List<ItemStack> whiteItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.WHITE_WOOL, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.WHITE_WOOL, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Pennate level " + (i + 1), TextColor.fromCSSHexString("#FFFFFF")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Fall damage is reduced by " + 5 * (i + 1) + "%.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			whiteItems.add(pannel);
+			panel.setItemMeta(meta);
+			whiteItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.PENNATE, whiteItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.PENNATE, whiteItems);
 
 		//orange
 		List<ItemStack> orangeItems = new ArrayList<>();
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.ORANGE_WOOL, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.ORANGE_WOOL, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Carapace level " + (i + 1), TextColor.fromCSSHexString("#FFAA00")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "After being hit, you gain " + 1.25 * (i + 1) + "% damage reduction for 5s. Being hit again while active refreshes the duration.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			orangeItems.add(pannel);
+			panel.setItemMeta(meta);
+			orangeItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.CARAPACE, orangeItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.CARAPACE, orangeItems);
 
 		//magenta
 		List<ItemStack> magentaItems = new ArrayList<>();
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.MAGENTA_WOOL, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.MAGENTA_WOOL, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Aura level " + (i + 1), TextColor.fromCSSHexString("#FF55FF")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Mobs in a 3 block radius from you are slowed by " + 2 * (i + 1) + "% for 0.5 seconds. This is refreshed as long as they are in range.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			magentaItems.add(pannel);
+			panel.setItemMeta(meta);
+			magentaItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.AURA, magentaItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.AURA, magentaItems);
 
 		//light blue
 		List<ItemStack> lbItems = new ArrayList<>();
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.LIGHT_BLUE_WOOL, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.LIGHT_BLUE_WOOL, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Expedite level " + (i + 1), TextColor.fromCSSHexString("#4AC2E5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Damaging an enemy with an ability increases your movement speed by " + 1 * (i + 1) + "% for 5 seconds, stacking up to 3 times.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			lbItems.add(pannel);
+			panel.setItemMeta(meta);
+			lbItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.EXPEDITE, lbItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.EXPEDITE, lbItems);
 
 		//yellow
 		List<ItemStack> yellowItems = new ArrayList<>();
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.YELLOW_WOOL, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.YELLOW_WOOL, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Choler level " + (i + 1), TextColor.fromCSSHexString("#FFFF55")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Deal " + 1 * (i + 1) + "% additional damage to any mob that is on fire, slowed, or stunned.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			yellowItems.add(pannel);
+			panel.setItemMeta(meta);
+			yellowItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.CHOLER, yellowItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.CHOLER, yellowItems);
 
 		//bonus
 		List<ItemStack> bonusItems = new ArrayList<>();
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.MOSSY_COBBLESTONE, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.MOSSY_COBBLESTONE, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Unyielding level " + (i + 1), TextColor.fromCSSHexString("#006400")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Gain " + String.format("%,.1f", (0.4 * (i + 1))) + " Knockback Resistance", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			bonusItems.add(pannel);
+			panel.setItemMeta(meta);
+			bonusItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.UNYIELDING, bonusItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.UNYIELDING, bonusItems);
 
 		//reverie
 		List<ItemStack> reverieItems = new ArrayList<>();
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.NETHER_WART_BLOCK, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.NETHER_WART_BLOCK, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Usurper level " + (i + 1), TextColor.fromCSSHexString("#790E47")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Heal " + 2.5 * (1 + i) + "% of your max health whenever you slay an elite or boss enemy.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			reverieItems.add(pannel);
+			panel.setItemMeta(meta);
+			reverieItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.USURPER, reverieItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.USURPER, reverieItems);
 
 		//corridors
 		List<ItemStack> corridorsItems = new ArrayList<>();
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.MAGMA_BLOCK, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.MAGMA_BLOCK, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Vengeful level " + (i + 1), TextColor.fromCSSHexString("#8B0000")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Gain " + 2 * (1 + i) + "% damage against the last enemy that damaged you.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			corridorsItems.add(pannel);
+			panel.setItemMeta(meta);
+			corridorsItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.VENGEFUL, corridorsItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.VENGEFUL, corridorsItems);
 
 		//lime
 		List<ItemStack> limeItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.LIME_WOOL, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.LIME_WOOL, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Empowered level " + (i + 1), TextColor.fromCSSHexString("#55FF55")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "When you gain XP, you have a " + String.format("%,.1f", (0.25 * (i + 1))) + "% chance per XP point to repair all currently equipped items by 1% of their max durability.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			limeItems.add(pannel);
+			panel.setItemMeta(meta);
+			limeItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.EMPOWERED, limeItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.EMPOWERED, limeItems);
 
 		//pink
 		List<ItemStack> pinkItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.PINK_WOOL, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.PINK_WOOL, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Nutriment level " + (i + 1), TextColor.fromCSSHexString("#FF69B4")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Gain " + 1.5 * (i + 1) + "% extra healing.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			pinkItems.add(pannel);
+			panel.setItemMeta(meta);
+			pinkItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.NUTRIMENT, pinkItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.NUTRIMENT, pinkItems);
 
 		//gray
 		List<ItemStack> grayItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.GRAY_WOOL, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.GRAY_WOOL, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Execution level " + (i + 1), TextColor.fromCSSHexString("#555555")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "After killing an enemy, you deal " + 1.5 * (i + 1) + "% extra damage for 4 seconds.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			grayItems.add(pannel);
+			panel.setItemMeta(meta);
+			grayItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.EXECUTION, grayItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.EXECUTION, grayItems);
 
 		//light gray
 		List<ItemStack> lgItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.LIGHT_GRAY_WOOL, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.LIGHT_GRAY_WOOL, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Reflection level " + (i + 1), TextColor.fromCSSHexString("#AAAAAA")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "1 second after taking ability damage, deal " + 6 * (1 + i) + "% of the spell's damage to all mobs in a 4 block radius.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			lgItems.add(pannel);
+			panel.setItemMeta(meta);
+			lgItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.REFLECTION, lgItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.REFLECTION, lgItems);
 
 		//cyan
 		List<ItemStack> cyanItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.CYAN_WOOL, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.CYAN_WOOL, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Mitosis level " + (i + 1), TextColor.fromCSSHexString("#00AAAA")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Mining a spawner debuffs all mobs in a 5 block radius with " + 3.75 * (i + 1) + "% Weakness for 3 seconds.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			cyanItems.add(pannel);
+			panel.setItemMeta(meta);
+			cyanItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.MITOSIS, cyanItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.MITOSIS, cyanItems);
 
 		//purple
 		List<ItemStack> purpleItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.PURPLE_WOOL, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.PURPLE_WOOL, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Ardor level " + (i + 1), TextColor.fromCSSHexString("#AA00AA")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Mining a spawner outside of water grants you " + 3.75 * (i + 1) + "% speed for 4s. Mining a spawner underwater refreshes 0.5 breath per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			purpleItems.add(pannel);
+			panel.setItemMeta(meta);
+			purpleItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.ARDOR, purpleItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.ARDOR, purpleItems);
 
 		//teal
 		List<ItemStack> tealItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.CYAN_CONCRETE_POWDER, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.CYAN_CONCRETE_POWDER, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Epoch level " + (i + 1), TextColor.fromCSSHexString("#47B6B5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Class abilities cooldowns are reduced by " + (i + 1) + "%.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			tealItems.add(pannel);
+			panel.setItemMeta(meta);
+			tealItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.EPOCH, tealItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.EPOCH, tealItems);
 
 		//shifting
 		List<ItemStack> shiftingItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.BLUE_CONCRETE, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.BLUE_CONCRETE, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Natant level " + (i + 1), TextColor.fromCSSHexString("#7FFFD4")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "You move " + 4 * (i + 1) + "% faster when in water.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			shiftingItems.add(pannel);
+			panel.setItemMeta(meta);
+			shiftingItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.NATANT, shiftingItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.NATANT, shiftingItems);
 
 		//forum
 		List<ItemStack> forumItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.BOOKSHELF, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.BOOKSHELF, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Understanding level " + (i + 1), TextColor.fromCSSHexString("#808000")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "All other Delve Infusions you are currently benefiting from gain " + .25 * (i + 1) + " levels.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			forumItems.add(pannel);
+			panel.setItemMeta(meta);
+			forumItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.UNDERSTANDING, forumItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.UNDERSTANDING, forumItems);
 
 		// SKT
 		List<ItemStack> sktItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.POLISHED_DEEPSLATE, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.POLISHED_DEEPSLATE, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Refresh level " + (i + 1), TextColor.fromCSSHexString("#C0C0C0")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Reduces the cooldown of infinite consumable foods by " + (i + 1) * 2 + "%.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			sktItems.add(pannel);
+			panel.setItemMeta(meta);
+			sktItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.REFRESH, sktItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.REFRESH, sktItems);
 
 		// Blue
 		List<ItemStack> blueItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.BLUE_WOOL, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.BLUE_WOOL, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Soothing level " + (i + 1), TextColor.fromCSSHexString("#0C2CA2")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Regenerate " + 0.0825 * (i + 1) + " health each second.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			blueItems.add(pannel);
+			panel.setItemMeta(meta);
+			blueItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.SOOTHING, blueItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.SOOTHING, blueItems);
 
 		// Wolfswood
 		List<ItemStack> forestItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.DARK_OAK_WOOD, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.DARK_OAK_WOOD, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Quench level " + (i + 1), TextColor.fromCSSHexString("#4C8F4D")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Gain " + (i + 1) + "% damage when you have a non-infinite vanilla potion effect active.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			forestItems.add(pannel);
+			panel.setItemMeta(meta);
+			forestItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.QUENCH, forestItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.QUENCH, forestItems);
 
 		// Keep
 		List<ItemStack> keepItems = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			ItemStack pannel = new ItemStack(Material.CRACKED_STONE_BRICKS, 1);
-			ItemMeta meta = pannel.getItemMeta();
+			ItemStack panel = new ItemStack(Material.CRACKED_STONE_BRICKS, 1);
+			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Grace level " + (i + 1), TextColor.fromCSSHexString("#C4BBA5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 			splitLoreLine(meta, "Gain " + 1.5 * (i + 1) + "% attack speed.", MAX_LORE_LENGHT, ChatColor.GRAY);
-			pannel.setItemMeta(meta);
-			keepItems.add(pannel);
+			panel.setItemMeta(meta);
+			keepItems.add(panel);
 		}
-		mDelveInfusionPannelsMap.put(DelveInfusionSelection.GRACE, keepItems);
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.GRACE, keepItems);
 
 		//INVALIDS ITEM.
 		//placeholder when an item can't be infused.
@@ -679,14 +679,14 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		if (mRowSelected == 99) {
 			loadDelveInfusionPage(items);
 		} else {
-			loadDelveInfusionSelection(items.get(mRowSelected));
+			loadDelveInfusionSelection(items.get(mRowSelected), player);
 		}
 
 		fillWithJunk();
 	}
 
 
-	private void loadDelveInfusionSelection(ItemStack infusedItem) {
+	private void loadDelveInfusionSelection(ItemStack infusedItem, Player player) {
 		//we need to delay this loading to make the item skin applied
 		new BukkitRunnable() {
 			@Override
@@ -706,35 +706,41 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			}
 		}.runTaskLater(Plugin.getInstance(), 2);
 
-		//R1
-		mInventory.setItem(9, mDelvePannelList.get(0));
-		mInventory.setItem(10, mDelvePannelList.get(1));
-		mInventory.setItem(11, mDelvePannelList.get(2));
-		mInventory.setItem(12, mDelvePannelList.get(3));
-		mInventory.setItem(14, mDelvePannelList.get(4));
-		mInventory.setItem(15, mDelvePannelList.get(5));
-		mInventory.setItem(16, mDelvePannelList.get(6));
-		mInventory.setItem(17, mDelvePannelList.get(7));
+		HashMap<DelveInfusionSelection, Integer> itemPlacements = new HashMap<>();
 
-		//R2
-		mInventory.setItem(18, mDelvePannelList.get(8));
-		mInventory.setItem(19, mDelvePannelList.get(9));
-		mInventory.setItem(20, mDelvePannelList.get(10));
-		mInventory.setItem(21, mDelvePannelList.get(11));
-		mInventory.setItem(22, mDelvePannelList.get(12));
-		mInventory.setItem(23, mDelvePannelList.get(13));
-		mInventory.setItem(24, mDelvePannelList.get(14));
-		mInventory.setItem(25, mDelvePannelList.get(15));
-		mInventory.setItem(26, mDelvePannelList.get(16));
+		itemPlacements.put(DelveInfusionSelection.PENNATE, 9);
+		itemPlacements.put(DelveInfusionSelection.CARAPACE, 10);
+		itemPlacements.put(DelveInfusionSelection.AURA, 11);
+		itemPlacements.put(DelveInfusionSelection.EXPEDITE, 12);
+		itemPlacements.put(DelveInfusionSelection.CHOLER, 14);
+		itemPlacements.put(DelveInfusionSelection.UNYIELDING, 15);
+		itemPlacements.put(DelveInfusionSelection.USURPER, 16);
+		itemPlacements.put(DelveInfusionSelection.VENGEFUL, 17);
 
-		//R3 Dungeon
-		mInventory.setItem(30, mDelvePannelList.get(17));
-		mInventory.setItem(32, mDelvePannelList.get(18));
+		itemPlacements.put(DelveInfusionSelection.EMPOWERED, 18);
+		itemPlacements.put(DelveInfusionSelection.NUTRIMENT, 19);
+		itemPlacements.put(DelveInfusionSelection.EXECUTION, 20);
+		itemPlacements.put(DelveInfusionSelection.REFLECTION, 21);
+		itemPlacements.put(DelveInfusionSelection.MITOSIS, 22);
+		itemPlacements.put(DelveInfusionSelection.ARDOR, 23);
+		itemPlacements.put(DelveInfusionSelection.EPOCH, 24);
+		itemPlacements.put(DelveInfusionSelection.NATANT, 25);
+		itemPlacements.put(DelveInfusionSelection.UNDERSTANDING, 26);
 
-		//R3 Other
-		mInventory.setItem(39, mDelvePannelList.get(19));
-		mInventory.setItem(41, mDelvePannelList.get(20));
+		itemPlacements.put(DelveInfusionSelection.REFRESH, 30);
+		itemPlacements.put(DelveInfusionSelection.SOOTHING, 32);
 
+		itemPlacements.put(DelveInfusionSelection.QUENCH, 39);
+		itemPlacements.put(DelveInfusionSelection.GRACE, 41);
+
+		itemPlacements.forEach((infusion, place) -> {
+			if (infusion.isUnlocked(player)) {
+				mInventory.setItem(place, mDelvePanelList.get(infusion));
+				mMapFunction.put(place, (p, inventory, slot) -> {
+					attemptInfusion(p, infusedItem, infusion);
+				});
+			}
+		});
 
 		ItemStack swapPage = new ItemStack(Material.PAPER);
 		ItemMeta meta = swapPage.getItemMeta();
@@ -750,93 +756,6 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 
 		});
 
-
-		mMapFunction.put(9, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.PENNATE);
-		});
-
-		mMapFunction.put(10, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.CARAPACE);
-		});
-
-		mMapFunction.put(11, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.AURA);
-		});
-
-		mMapFunction.put(12, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.EXPEDITE);
-		});
-
-		mMapFunction.put(14, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.CHOLER);
-		});
-
-		mMapFunction.put(15, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.UNYIELDING);
-		});
-
-		mMapFunction.put(16, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.USURPER);
-		});
-
-		mMapFunction.put(17, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.VENGEFUL);
-		});
-
-		//R2
-		mMapFunction.put(18, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.EMPOWERED);
-		});
-
-		mMapFunction.put(19, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.NUTRIMENT);
-		});
-
-		mMapFunction.put(20, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.EXECUTION);
-		});
-
-		mMapFunction.put(21, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.REFLECTION);
-		});
-
-		mMapFunction.put(22, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.MITOSIS);
-		});
-
-		mMapFunction.put(23, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.ARDOR);
-		});
-
-		mMapFunction.put(24, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.EPOCH);
-		});
-
-		mMapFunction.put(25, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.NATANT);
-		});
-
-		mMapFunction.put(26, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.UNDERSTANDING);
-		});
-
-		//R3 Dungeon
-		mMapFunction.put(30, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.REFRESH);
-		});
-
-		mMapFunction.put(32, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.SOOTHING);
-		});
-
-		//R3 Other
-		mMapFunction.put(39, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.QUENCH);
-		});
-
-		mMapFunction.put(41, (p, inventory, slot) -> {
-			attemptInfusion(p, infusedItem, DelveInfusionSelection.GRACE);
-		});
 	}
 
 	private void attemptInfusion(Player p, ItemStack item, DelveInfusionSelection infusion) {
@@ -863,7 +782,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	}
 
 	private void loadDelveInfusionPage(List<ItemStack> items) {
-		//load pannels for each item with the corresponding infusions.
+		//load panels for each item with the corresponding infusions.
 		int row = 0;
 		for (ItemStack item : items) {
 			if (item != null) {
@@ -897,11 +816,11 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 
 						//load the infusion.
 						int level = DelveInfusionUtils.getInfusionLevel(item, infusion);
-						List<ItemStack> pannelsList = mDelveInfusionPannelsMap.get(infusion);
-						if (pannelsList != null) {
+						List<ItemStack> panelsList = mDelveInfusionPanelsMap.get(infusion);
+						if (panelsList != null) {
 							for (int i = 0; i < level; i++) {
-								if (pannelsList.get(i) != null) {
-									mInventory.setItem((row * 9) + 2 + i, pannelsList.get(i));
+								if (panelsList.get(i) != null) {
+									mInventory.setItem((row * 9) + 2 + i, panelsList.get(i));
 								}
 							}
 						}

@@ -33,40 +33,42 @@ public class DelveInfusionUtils {
 	public static final NamespacedKey DEPTHS_MAT_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode");
 
 	public enum DelveInfusionSelection {
-		PENNATE("pennate", "Pennate", NamespacedKeyUtils.fromString("epic:r1/delves/white/auxiliary/delve_material")),
-		CARAPACE("carapace", "Carapace", NamespacedKeyUtils.fromString("epic:r1/delves/orange/auxiliary/delve_material")),
-		AURA("aura", "Aura", NamespacedKeyUtils.fromString("epic:r1/delves/magenta/auxiliary/delve_material")),
-		EXPEDITE("expedite", "Expedite", NamespacedKeyUtils.fromString("epic:r1/delves/lightblue/auxiliary/delve_material")),
-		CHOLER("choler", "Choler", NamespacedKeyUtils.fromString("epic:r1/delves/yellow/auxiliary/delve_material")),
-		UNYIELDING("unyielding", "Unyielding", NamespacedKeyUtils.fromString("epic:r1/delves/willows/auxiliary/echoes_of_the_veil")),
-		USURPER("usurper", "Usurper", NamespacedKeyUtils.fromString("epic:r1/delves/reverie/auxiliary/delve_material")),
-		VENGEFUL("vengeful", "Vengeful", NamespacedKeyUtils.fromString("epic:r1/delves/rogue/persistent_parchment")),
+		PENNATE("pennate", "Pennate", NamespacedKeyUtils.fromString("epic:r1/delves/white/auxiliary/delve_material"), "White"),
+		CARAPACE("carapace", "Carapace", NamespacedKeyUtils.fromString("epic:r1/delves/orange/auxiliary/delve_material"), "Orange"),
+		AURA("aura", "Aura", NamespacedKeyUtils.fromString("epic:r1/delves/magenta/auxiliary/delve_material"), "Magenta"),
+		EXPEDITE("expedite", "Expedite", NamespacedKeyUtils.fromString("epic:r1/delves/lightblue/auxiliary/delve_material"), "LightBlue"),
+		CHOLER("choler", "Choler", NamespacedKeyUtils.fromString("epic:r1/delves/yellow/auxiliary/delve_material"), "Yellow"),
+		UNYIELDING("unyielding", "Unyielding", NamespacedKeyUtils.fromString("epic:r1/delves/willows/auxiliary/echoes_of_the_veil"), "R1Bonus"),
+		USURPER("usurper", "Usurper", NamespacedKeyUtils.fromString("epic:r1/delves/reverie/auxiliary/delve_material"), "Corrupted"),
+		VENGEFUL("vengeful", "Vengeful", NamespacedKeyUtils.fromString("epic:r1/delves/rogue/persistent_parchment"), "RogFinishedN"),
 
-		EMPOWERED("empowered", "Empowered", NamespacedKeyUtils.fromString("epic:r2/delves/lime/auxiliary/delve_material")),
-		NUTRIMENT("nutriment", "Nutriment", NamespacedKeyUtils.fromString("epic:r2/delves/pink/auxiliary/delve_material")),
-		EXECUTION("execution", "Execution", NamespacedKeyUtils.fromString("epic:r2/delves/gray/auxiliary/delve_material")),
-		REFLECTION("reflection", "Reflection", NamespacedKeyUtils.fromString("epic:r2/delves/lightgray/auxiliary/delve_material")),
-		MITOSIS("mitosis", "Mitosis", NamespacedKeyUtils.fromString("epic:r2/delves/cyan/auxiliary/delve_material")),
-		ARDOR("ardor", "Ardor", NamespacedKeyUtils.fromString("epic:r2/delves/purple/auxiliary/delve_material")),
-		EPOCH("epoch", "Epoch", NamespacedKeyUtils.fromString("epic:r2/delves/teal/auxiliary/delve_material")),
-		NATANT("natant", "Natant", NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material")),
-		UNDERSTANDING("understanding", "Understanding", NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material")),
+		EMPOWERED("empowered", "Empowered", NamespacedKeyUtils.fromString("epic:r2/delves/lime/auxiliary/delve_material"), "Lime"),
+		NUTRIMENT("nutriment", "Nutriment", NamespacedKeyUtils.fromString("epic:r2/delves/pink/auxiliary/delve_material"), "Pink"),
+		EXECUTION("execution", "Execution", NamespacedKeyUtils.fromString("epic:r2/delves/gray/auxiliary/delve_material"), "Gray"),
+		REFLECTION("reflection", "Reflection", NamespacedKeyUtils.fromString("epic:r2/delves/lightgray/auxiliary/delve_material"), "LightGray"),
+		MITOSIS("mitosis", "Mitosis", NamespacedKeyUtils.fromString("epic:r2/delves/cyan/auxiliary/delve_material"), "Cyan"),
+		ARDOR("ardor", "Ardor", NamespacedKeyUtils.fromString("epic:r2/delves/purple/auxiliary/delve_material"), "Purple"),
+		EPOCH("epoch", "Epoch", NamespacedKeyUtils.fromString("epic:r2/delves/teal/auxiliary/delve_material"), "Teal"),
+		NATANT("natant", "Natant", NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material"), "Fred"),
+		UNDERSTANDING("understanding", "Understanding", NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material"), "Forum"),
 
-		REFRESH("refresh", "Refresh", NamespacedKeyUtils.fromString("epic:r3/items/currency/silver_remnant")),
-		SOOTHING("soothing", "Soothing", NamespacedKeyUtils.fromString("epic:r3/items/currency/sorceress_stave")),
-		QUENCH("quench", "Quench", NamespacedKeyUtils.fromString("epic:r3/items/currency/fenian_flower")),
-		GRACE("grace", "Grace", NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst")),
+		REFRESH("refresh", "Refresh", NamespacedKeyUtils.fromString("epic:r3/items/currency/silver_remnant"), "SKT"),
+		SOOTHING("soothing", "Soothing", NamespacedKeyUtils.fromString("epic:r3/items/currency/sorceress_stave"), "Blue"),
+		QUENCH("quench", "Quench", NamespacedKeyUtils.fromString("epic:r3/items/currency/fenian_flower"), "AccessEnhance"),
+		GRACE("grace", "Grace", NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst"), "AccessEnhance"),
 
-		REFUND("refund", "refund", null);
+		REFUND("refund", "refund", null, null);
 
 		private final String mLabel;
 		private final String mEnchantName;
 		private final @Nullable NamespacedKey mLootTable;
+		private final @Nullable String mScoreboard;
 
-		DelveInfusionSelection(String label, String enchantName, @Nullable NamespacedKey lootTable) {
+		DelveInfusionSelection(String label, String enchantName, @Nullable NamespacedKey lootTable, @Nullable String scoreboard) {
 			mLabel = label;
 			mEnchantName = enchantName;
 			mLootTable = lootTable;
+			mScoreboard = scoreboard;
 		}
 
 		public static @Nullable DelveInfusionSelection getInfusionSelection(@Nullable String label) {
@@ -91,6 +93,10 @@ public class DelveInfusionUtils {
 
 		public @Nullable NamespacedKey getLootTable() {
 			return mLootTable;
+		}
+
+		public boolean isUnlocked(Player player) {
+			return mScoreboard == null || ScoreboardUtils.getScoreOrDefault(player, mScoreboard, 0) >= 1;
 		}
 	}
 
