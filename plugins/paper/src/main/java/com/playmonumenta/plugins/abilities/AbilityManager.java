@@ -537,9 +537,12 @@ public class AbilityManager {
 		mAbilities.put(player.getUniqueId(), collection);
 
 		// Set up new class potion abilities
-		for (Ability abil : getPlayerAbilities(player).getAbilitiesIgnoringSilence()) {
-			abil.setupClassPotionEffects();
-		}
+		// Needs to run at the end of the tick, or it can inconsistently not apply the effects
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			for (Ability abil : getPlayerAbilities(player).getAbilitiesIgnoringSilence()) {
+				abil.setupClassPotionEffects();
+			}
+		});
 
 		MonumentaNetworkChatIntegration.refreshPlayer(player);
 		ClientModHandler.updateAbilities(player);
