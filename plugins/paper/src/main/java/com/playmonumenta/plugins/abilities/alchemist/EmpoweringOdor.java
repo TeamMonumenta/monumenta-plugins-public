@@ -28,7 +28,7 @@ public class EmpoweringOdor extends PotionAbility {
 
 	public static final String CHARM_DURATION = "Empowering Odor Duration";
 	public static final String CHARM_SPEED = "Empowering Odor Speed Modifier";
-	public static final String CHARM_DAMAGE = "Empoewring Odor Damage Bonus";
+	public static final String CHARM_DAMAGE = "Empowering Odor Damage Bonus";
 	public static final String CHARM_SINGLE_HIT_DAMAGE = "Empowering Odor Single Hit Damage";
 
 	private final double mDamageAmplifier;

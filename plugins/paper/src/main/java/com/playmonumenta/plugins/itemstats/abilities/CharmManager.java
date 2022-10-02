@@ -51,6 +51,7 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
 import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
+import com.playmonumenta.plugins.abilities.rogue.Dodging;
 import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
 import com.playmonumenta.plugins.abilities.rogue.Skirmisher;
 import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
@@ -372,6 +373,8 @@ public class CharmManager {
 			DaggerThrow.CHARM_RANGE,
 			DaggerThrow.CHARM_VULN,
 			DaggerThrow.CHARM_DAGGERS,
+			Dodging.CHARM_COOLDOWN,
+			Dodging.CHARM_SPEED,
 			EscapeDeath.CHARM_ABSORPTION,
 			EscapeDeath.CHARM_COOLDOWN,
 			EscapeDeath.CHARM_SPEED,
