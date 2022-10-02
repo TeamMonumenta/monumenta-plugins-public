@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.itemstats.abilities;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -104,9 +102,6 @@ import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.itemstats.enchantments.Abyssal;
 import com.playmonumenta.plugins.itemstats.enchantments.Adrenaline;
 import com.playmonumenta.plugins.itemstats.enchantments.ArcaneThrust;
@@ -164,7 +159,6 @@ public class CharmManager {
 	public static final String KEY_CHARMS = "charms";
 	public static final String KEY_ITEM = "item";
 	public static final int MAX_CHARM_COUNT = 7;
-	private static final String CHARM_EFFECT_NAME = "CHARM EFFECT";
 
 	public static CharmManager mInstance;
 
@@ -176,12 +170,9 @@ public class CharmManager {
 
 	public Map<UUID, Map<String, Double>> mPlayerCharmEffectMap;
 
-	public Map<UUID, Multimap<ClassAbility, Effect>> mPlayerAbilityEffectMap;
-
 	private CharmManager() {
 		mPlayerCharms = new HashMap<>();
 		mPlayerCharmEffectMap = new HashMap<UUID, Map<String, Double>>();
-		mPlayerAbilityEffectMap = new HashMap<>();
 		loadCharmEffects();
 		loadFlippedColorEffects();
 	}
@@ -951,58 +942,6 @@ public class CharmManager {
 		//Store to local map
 		mPlayerCharmEffectMap.put(p.getUniqueId(), allEffects);
 
-		//Loop through charms for onhit effects
-		Multimap<ClassAbility, Effect> abilityEffects = ArrayListMultimap.create();
-		for (ItemStack item : equippedCharms) {
-			List<String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(item));
-			for (String plainLore : plainLoreLines) {
-				if (plainLore.contains("Hit :")) {
-					ClassAbility classAbility = null;
-					//Step one- get the class ability
-					String abilityName = plainLore.split("Hit :")[0]; //Trim back half of line with effect off
-					abilityName = abilityName.split("n", 2)[1]; //Get rid of the initial "On"
-					abilityName = abilityName.trim();
-					for (ClassAbility ca : ClassAbility.values()) {
-						if (ca.getName().toLowerCase().equals(abilityName.toLowerCase())) {
-							classAbility = ca;
-						}
-					}
-					if (classAbility == null) {
-						continue;
-					}
-					//Step two- get the class effect
-					String effectName = plainLore.split(":")[1]; //Trim front half of line with ability off
-					Scanner s = new Scanner(effectName);
-					//First word of the string will be the effect
-					effectName = s.next().toLowerCase();
-					double amplifier = -1;
-					int duration = -1;
-					Scanner s2 = new Scanner(plainLore.split(":")[1]).useDelimiter("\\D+");
-					if (plainLore.contains("%")) {
-						//Parse the amplifier first, if it exists (indicated by %)
-						if (s2.hasNextInt()) {
-							amplifier = s2.nextInt() / 100.0;
-						}
-					}
-					if (s2.hasNextInt()) {
-						//Parse the final duration now
-						duration = s2.nextInt() * 20;
-					}
-					//Now, create the effect by name and add it
-					Effect parsedEffect = null;
-					//TODO add more effects to this
-					if (effectName.equals("slowness")) {
-						parsedEffect = new PercentSpeed(duration, amplifier * -1, CHARM_EFFECT_NAME);
-					}
-					if (parsedEffect != null) {
-						//Add to the player's effect list
-						abilityEffects.put(classAbility, parsedEffect);
-					}
-				}
-			}
-		}
-		//Store to local map
-		mPlayerAbilityEffectMap.put(p.getUniqueId(), abilityEffects);
 		//Refresh class of player
 		AbilityManager.getManager().updatePlayerAbilities(p, false);
 	}
@@ -1011,7 +950,7 @@ public class CharmManager {
 	private CharmParsedInfo getPlayerItemLevel(ItemStack itemStack, String effect) {
 		List<String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(itemStack));
 		for (String plainLore : plainLoreLines) {
-			if (plainLore.contains(effect)) {
+			if (plainLore.endsWith(effect)) {
 				double value = parseValue(plainLore);
 				if (plainLore.contains("%")) {
 					return new CharmParsedInfo(value, true);
@@ -1211,7 +1150,6 @@ public class CharmManager {
 				if (!p.isOnline()) {
 					mPlayerCharms.remove(p.getUniqueId());
 					mPlayerCharmEffectMap.remove(p.getUniqueId());
-					mPlayerAbilityEffectMap.remove(p.getUniqueId());
 				}
 			}
 
