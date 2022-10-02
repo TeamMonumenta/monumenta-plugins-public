@@ -61,7 +61,7 @@ public class IronTincture extends Ability {
 		mInfo.mShorthandName = "IT";
 		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain 8 absorption health for 50 seconds, up to 8 absorption health. If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. When another player grabs the tincture, you gain 2 Alchemist's Potions. When you grab the tincture, you gain 1 Alchemist's Potion. Cooldown: 50s.");
 		mInfo.mDescriptions.add("Effect and effect cap increased to 12 absorption health.");
-		mInfo.mDescriptions.add("The tincture now additionally cleanses all potion debuffs and grants 5% damage resistance when absorption is present for the duration of the absorption.");
+		mInfo.mDescriptions.add("The tincture now additionally cleanses all potion debuffs, extinguishes fire, and grants 5% damage resistance when absorption is present for the duration of the absorption.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, IRON_TINCTURE_USE_COOLDOWN); // Full duration cooldown
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
@@ -167,6 +167,9 @@ public class IronTincture extends Ability {
 
 		if (isEnhanced()) {
 			PotionUtils.clearNegatives(mPlugin, player);
+			if (player.getFireTicks() > 1) {
+				player.setFireTicks(1);
+			}
 
 			double resistance = IRON_TINCTURE_ENHANCEMENT_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
 			mPlugin.mEffectManager.addEffect(player, "IronTinctureEnhancementResistanceEffect", new PercentDamageReceived(duration, -resistance) {
