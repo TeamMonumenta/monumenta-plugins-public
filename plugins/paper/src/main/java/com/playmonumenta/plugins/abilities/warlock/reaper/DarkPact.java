@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.warlock.reaper;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Effect;
@@ -12,6 +11,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.EnumSet;
@@ -67,11 +67,9 @@ public class DarkPact extends Ability {
 		mDisplayItem = new ItemStack(Material.SOUL_SAND, 1);
 		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? PERCENT_DAMAGE_DEALT_1 : PERCENT_DAMAGE_DEALT_2);
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mJudgementChain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, JudgementChain.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mJudgementChain = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, JudgementChain.class);
+		});
 	}
 
 	@Override
@@ -111,11 +109,11 @@ public class DarkPact extends Ability {
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (mPlayer == null) {
+		if (mPlayer == null || event.getEntity().getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			return;
 		}
-		int duration = DURATION_INCREASE_ON_KILL + CharmManager.getExtraDuration(mPlayer, CHARM_REFRESH);
 
+		int duration = DURATION_INCREASE_ON_KILL + CharmManager.getExtraDuration(mPlayer, CHARM_REFRESH);
 
 		NavigableSet<Effect> aestheticsEffects = mPlugin.mEffectManager.getEffects(mPlayer, AESTHETICS_EFFECT_NAME);
 		if (aestheticsEffects != null) {

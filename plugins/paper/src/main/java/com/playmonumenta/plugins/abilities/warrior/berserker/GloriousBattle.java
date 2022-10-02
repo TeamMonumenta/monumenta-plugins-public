@@ -154,7 +154,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (AFFECTED_ABILITIES.contains(event.getAbility()) && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "GloriousBattleStackIncrease")) {
+		if (AFFECTED_ABILITIES.contains(event.getAbility()) && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "GloriousBattleStackIncrease") && !enemy.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			int previousStacks = mStacks;
 			if (mStacks < mStackLimit) {
 				mStacks++;
