@@ -30,7 +30,7 @@ public final class NovaBoss extends BossAbilityGroup {
 		public int DELAY = 100;
 		@BossParam(help = "not written")
 		public int DURATION = 70;
-		@BossParam(help = "not written", deprecated = true)
+		@BossParam(help = "not written")
 		public int DETECTION = 40;
 		@BossParam(help = "not written")
 		public int COOLDOWN = 8 * 20;
@@ -133,6 +133,6 @@ public final class NovaBoss extends BossAbilityGroup {
 				}
 			}));
 
-		super.constructBoss(activeSpells, Collections.emptyList(), (int) (p.TARGETS.getRange() * 2), null, p.DELAY);
+		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}
 }

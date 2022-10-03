@@ -30,7 +30,7 @@ public class LaserBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public int DAMAGE = 0;
 
-		@BossParam(help = "not written", deprecated = true)
+		@BossParam(help = "not written")
 		public int DETECTION = 30;
 
 		@BossParam(help = "not written")
@@ -145,7 +145,7 @@ public class LaserBoss extends BossAbilityGroup {
 					})
 		));
 
-		super.constructBoss(activeSpells, Collections.emptyList(), (int) (p.TARGETS.getRange() * 2), null, p.DELAY);
+		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}
 }
 
