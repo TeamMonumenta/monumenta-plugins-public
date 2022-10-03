@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.commands.BossTagCommand.TypeAndDesc;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import dev.jorel.commandapi.Tooltip;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -38,7 +40,8 @@ public abstract class BossParameters {
 				// Parse as many parameters as possible... but ignore the result, and just return the populated parameters
 				ParseResult<T> res = parseParameters(reader, parameters);
 				if (res.getResult() == null) {
-					Plugin.getInstance().getLogger().warning("[BossParameters] problems during parsing tag for entity: " + boss.getName() + " on tag: " + tag);
+					Location mobLoc = boss.getLocation();
+					MMLog.warning("[BossParameters] problems during parsing tag for entity: " + boss.getName() + " | at x: " + mobLoc.getBlockX() + " y: " + mobLoc.getBlockY() + " z: " + mobLoc.getBlockZ() + " | on tag: " + tag);
 				}
 			}
 		}
