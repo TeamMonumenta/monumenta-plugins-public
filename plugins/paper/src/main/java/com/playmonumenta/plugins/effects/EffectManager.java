@@ -125,11 +125,23 @@ public final class EffectManager implements Listener {
 			return effectSet;
 		}
 
+		// Gets ONLY active effects, effects with the largest magnitude.
 		public List<Effect> getEffects() {
 			List<Effect> effects = new ArrayList<>();
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
 				for (NavigableSet<Effect> eff : priorityEffects.values()) {
 					effects.add(eff.last());
+				}
+			}
+			return effects;
+		}
+
+		// Gets ALL effects, including non-active, hidden ones.
+		public List<Effect> getAllEffects() {
+			List<Effect> effects = new ArrayList<>();
+			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
+				for (NavigableSet<Effect> eff : priorityEffects.values()) {
+					effects.addAll(eff);
 				}
 			}
 			return effects;
@@ -480,9 +492,24 @@ public final class EffectManager implements Listener {
 		return Collections.emptyNavigableSet();
 	}
 
-	public List<Effect> getEffects(Entity entity) {
+	public @Nullable List<Effect> getEffects(Entity entity) {
 		Effects effects = mEntities.get(entity);
-		return effects.getEffects();
+		if (effects != null) {
+			return effects.getEffects();
+		} else {
+			return null;
+		}
+	}
+
+	// Gets ALL Effects of entity, including hidden non-active ones.
+	// I.E. The effects with lesser magnitude.
+	public @Nullable List<Effect> getAllEffects(Entity entity) {
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			return effects.getAllEffects();
+		} else {
+			return null;
+		}
 	}
 
 	public @Nullable Effect getActiveEffect(Entity entity, String source) {
@@ -588,7 +615,7 @@ public final class EffectManager implements Listener {
 		return new JsonObject();
 	}
 
-	public @Nullable Effect getEffectFromJson(JsonObject object, Plugin plugin) throws Exception {
+	public static @Nullable Effect getEffectFromJson(JsonObject object, Plugin plugin) throws Exception {
 		String effectID = object.get("effectID").getAsString();
 		return mEffectDeserializer.get(effectID).deserialize(object, plugin);
 	}

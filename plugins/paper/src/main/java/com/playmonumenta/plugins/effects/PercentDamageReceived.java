@@ -38,12 +38,12 @@ public class PercentDamageReceived extends Effect {
 
 	@Override
 	public boolean isDebuff() {
-		return mAmount < 0;
+		return mAmount > 0;
 	}
 
 	@Override
 	public boolean isBuff() {
-		return mAmount > 0;
+		return mAmount < 0;
 	}
 
 	public EnumSet<DamageType> getAffectedDamageTypes() {
