@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.seasonalevents;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
@@ -173,25 +174,42 @@ public class SeasonalPass {
 				}
 				if (toParse.get("delvemodifier") != null) {
 					// This compares using integers - in json need to list the number of the modifier, not the name!
-					if (toParse.get("delvemodifier") instanceof JsonArray) {
-						JsonArray mods = toParse.get("delvemodifier").getAsJsonArray();
+					if (toParse.get("delvemodifier") instanceof JsonArray mods) {
 						List<DelvesModifier> modList = new ArrayList<>();
 						for (JsonElement mod : mods) {
-							int delveModifier = mod.getAsInt();
-							for (DelvesModifier selection : DelvesModifier.values()) {
-								if (selection.getColumn() == delveModifier) {
-									modList.add(selection);
+							JsonPrimitive modPrimitive = mod.getAsJsonPrimitive();
+							if (modPrimitive.isString()) {
+								DelvesModifier modifier = DelvesModifier.fromName(modPrimitive.getAsString());
+								if (modifier != null) {
+									modList.add(modifier);
+								}
+							} else {
+								int delveModifier = mod.getAsInt();
+								for (DelvesModifier selection : DelvesModifier.values()) {
+									if (selection.getColumn() == delveModifier) {
+										modList.add(selection);
+									}
 								}
 							}
 						}
 						mission.mDelveModifiers = modList;
 					} else {
-						int delveModifier = toParse.get("delvemodifier").getAsInt();
-						List<DelvesModifier> modList = new ArrayList<>();
-						for (DelvesModifier selection : DelvesModifier.values()) {
-							if (selection.getColumn() == delveModifier) {
-								modList.add(selection);
+						JsonPrimitive modPrimitive = toParse.get("delvemodifier").getAsJsonPrimitive();
+						if (modPrimitive.isString()) {
+							DelvesModifier modifier = DelvesModifier.fromName(modPrimitive.getAsString());
+							if (modifier != null) {
+								List<DelvesModifier> modList = new ArrayList<>();
+								modList.add(modifier);
 								mission.mDelveModifiers = modList;
+							}
+						} else {
+							int delveModifier = modPrimitive.getAsInt();
+							List<DelvesModifier> modList = new ArrayList<>();
+							for (DelvesModifier selection : DelvesModifier.values()) {
+								if (selection.getColumn() == delveModifier) {
+									modList.add(selection);
+									mission.mDelveModifiers = modList;
+								}
 							}
 						}
 					}
