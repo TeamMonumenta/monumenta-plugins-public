@@ -115,7 +115,7 @@ public class EsotericEnhancements extends PotionAbility {
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ABERRATION_DAMAGE_RADIUS);
 			alchemicalAberrationBoss.spawn(mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * mDamageMultiplier), radius, ABERRATION_BLEED_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
 
-			aberration.setMaxFuseTicks(aberration.getFuseTicks() + CharmManager.getExtraDuration(mPlayer, CHARM_FUSE));
+			aberration.setMaxFuseTicks(aberration.getMaxFuseTicks() + CharmManager.getExtraDuration(mPlayer, CHARM_FUSE));
 			aberration.setExplosionRadius((int) radius);
 			EntityUtils.setAttributeBase(aberration, Attribute.GENERIC_MOVEMENT_SPEED, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SPEED, EntityUtils.getAttributeBaseOrDefault(aberration, Attribute.GENERIC_MOVEMENT_SPEED, 0)));
 			if (isLevelTwo()) {
