@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.structures.StructuresPlugin;
+import com.playmonumenta.structures.managers.RespawningStructure;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -532,7 +534,6 @@ public class LocationUtils {
 		return block1.getLocation().distanceSquared(block2.getLocation()) <= radius * radius;
 	}
 
-
 	// TODO use Consumer?
 	@FunctionalInterface
 	public interface TravelAction {
@@ -598,4 +599,15 @@ public class LocationUtils {
 			return fallToGround(clone, minHeight);
 		}
 	}
+
+	public static String getPoiNameFromLocation(Location location) {
+		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(location.toVector(), false);
+
+		for (RespawningStructure structure : structures) {
+			return (String) structure.getConfig().get("name");
+		}
+
+		return null;
+	}
+
 }

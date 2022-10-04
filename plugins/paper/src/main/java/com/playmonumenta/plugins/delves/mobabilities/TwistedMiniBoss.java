@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.delves.abilities.Twisted;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +21,19 @@ public class TwistedMiniBoss extends BossAbilityGroup {
 
 	private final Map<UUID, Integer> mCounterMap = new HashMap<>();
 
+	private final String mR3PoiName;
+	private final boolean mIsR3Overworld;
+
 	public TwistedMiniBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		boss.addScoreboardTag(Twisted.TWISTED_MINIBOSS_TAG);
+
+		mIsR3Overworld = ServerProperties.getShardName().contains("ring");
+		if (mIsR3Overworld) {
+			mR3PoiName = LocationUtils.getPoiNameFromLocation(boss.getLocation());
+		} else {
+			mR3PoiName = null;
+		}
 
 		Spell spell = new Spell() {
 			int mTimer = 0;
@@ -29,7 +41,13 @@ public class TwistedMiniBoss extends BossAbilityGroup {
 				mTimer += 5;
 
 				if (mTimer >= 20 * 120 && mBoss.isValid() && !mBoss.isDead()) {
-					Twisted.despawnTwistedMiniBoss(mBoss);
+					if (mIsR3Overworld) {
+						if (mR3PoiName != null) {
+							Twisted.despawnR3TwistedMiniBoss(mR3PoiName);
+						}
+					} else {
+						Twisted.despawnTwistedMiniBoss(mBoss);
+					}
 					mBoss.remove();
 				}
 			}
@@ -66,7 +84,13 @@ public class TwistedMiniBoss extends BossAbilityGroup {
 		int oldValue = mCounterMap.getOrDefault(player.getUniqueId(), 0);
 		mCounterMap.put(player.getUniqueId(), oldValue + 1);
 		if (oldValue + 1 >= 5) {
-			Twisted.despawnTwistedMiniBoss(mBoss);
+			if (mIsR3Overworld) {
+				if (mR3PoiName != null) {
+					Twisted.despawnR3TwistedMiniBoss(mR3PoiName);
+				}
+			} else {
+				Twisted.despawnTwistedMiniBoss(mBoss);
+			}
 			mBoss.remove();
 		}
 	}

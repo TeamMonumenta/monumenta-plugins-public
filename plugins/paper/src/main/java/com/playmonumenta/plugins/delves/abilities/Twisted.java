@@ -5,9 +5,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -28,6 +30,8 @@ import org.bukkit.util.Vector;
 public class Twisted {
 
 	public static final Map<UUID, Integer> MAP_WORLD_SPAWN_COUNT = new HashMap<>();
+
+	public static final Map<String, Integer> MAP_R3_POI_SPAWN_COUNT = new HashMap<>();
 
 	public static final String TWISTED_MINIBOSS_TAG = "TwistedMiniBoss";
 
@@ -56,7 +60,17 @@ public class Twisted {
 
 	public static void applyModifiers(LivingEntity mob, int level) {
 		if (DelvesUtils.isValidTwistedMob(mob)) {
-			int spawnSinceLast = MAP_WORLD_SPAWN_COUNT.getOrDefault(mob.getWorld().getUID(), 1);
+			int spawnSinceLast = 1;
+
+			if (ServerProperties.getShardName().contains("ring")) {
+				String poiName = LocationUtils.getPoiNameFromLocation(mob.getLocation());
+				if (poiName != null) {
+					spawnSinceLast = MAP_R3_POI_SPAWN_COUNT.getOrDefault(poiName, 1);
+				}
+			} else {
+				spawnSinceLast = MAP_WORLD_SPAWN_COUNT.getOrDefault(mob.getWorld().getUID(), 1);
+			}
+
 			if (shouldSpawn(level, spawnSinceLast)) {
 				//spawn a twisted mob
 				spawnTwisted(mob, spawnSinceLast < 1000);
@@ -72,7 +86,6 @@ public class Twisted {
 	}
 
 	public static boolean shouldSpawn(int level, int spawns) {
-		// todo for the future me - we need another map of each POI for R3
 		BigDecimal randomChance = BigDecimal.valueOf(FastUtils.RANDOM.nextDouble());
 		BigDecimal chance = getSpawnChance(level, spawns).multiply(BigDecimal.valueOf(2));
 		return !(randomChance.subtract(chance).doubleValue() > 0);
@@ -179,9 +192,13 @@ public class Twisted {
 	}
 
 	public static void despawnTwistedMiniBoss(LivingEntity mob) {
-		//TODO - R3 POI STUFF
 		int spawnSinceLast = MAP_WORLD_SPAWN_COUNT.getOrDefault(mob.getWorld().getUID(), 1);
 		MAP_WORLD_SPAWN_COUNT.put(mob.getWorld().getUID(), spawnSinceLast + 1000);
+	}
+
+	public static void despawnR3TwistedMiniBoss(String poiName) {
+		int spawnSinceLast = MAP_R3_POI_SPAWN_COUNT.getOrDefault(poiName, 1);
+		MAP_R3_POI_SPAWN_COUNT.put(poiName, spawnSinceLast + 1000);
 	}
 
 
