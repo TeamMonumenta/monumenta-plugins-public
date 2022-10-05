@@ -1068,13 +1068,27 @@ public class ItemStatUtils {
 		}
 		NBTItem nbt = new NBTItem(item);
 		NBTList<String> lore = nbt.addCompound(MONUMENTA_KEY).getStringList(LORE_KEY);
-		if (lore.size() > 0 && index < lore.size()) {
-			lore.remove(index);
-		} else if (lore.size() > 0) {
-			lore.remove(lore.size() - 1);
+		if (!lore.isEmpty()) {
+			if (index < lore.size()) {
+				lore.remove(index);
+			} else {
+				lore.remove(lore.size() - 1);
+			}
+		}
+
+		if (lore.isEmpty()) {
+			clearLore(nbt);
 		}
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
+	public static void clearLore(final ItemStack item) {
+		clearLore(new NBTItem(item));
+	}
+
+	public static void clearLore(NBTItem nbt) {
+		nbt.addCompound(MONUMENTA_KEY).removeKey(LORE_KEY);
 	}
 
 	public static List<Component> getLore(final ItemStack item) {
@@ -2892,6 +2906,8 @@ public class ItemStatUtils {
 			}
 
 			editItemInfo(item, Region.NONE, Tier.NONE, Masterwork.NONE, Location.NONE);
+
+			clearLore(item);
 
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
