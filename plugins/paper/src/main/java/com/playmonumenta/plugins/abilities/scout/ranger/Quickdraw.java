@@ -144,7 +144,7 @@ public class Quickdraw extends Ability {
 			}
 		}
 
-		return !eventLaunch.isCancelled();
+		return !eventLaunch.isCancelled() || proj instanceof Trident;
 	}
 
 	@Override
