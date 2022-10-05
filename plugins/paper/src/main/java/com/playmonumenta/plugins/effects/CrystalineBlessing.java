@@ -13,6 +13,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class CrystalineBlessing extends ZeroArgumentEffect {
 	public static final String GENERIC_NAME = "CrystalineBlessing";
@@ -46,6 +47,11 @@ public class CrystalineBlessing extends ZeroArgumentEffect {
 	@Override
 	public boolean isBuff() {
 		return true;
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return "Crystalline Blessing";
 	}
 
 	@Override

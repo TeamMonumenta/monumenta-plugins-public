@@ -20,6 +20,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class DeepGodsEndowment extends ZeroArgumentEffect {
 	public static final String GENERIC_NAME = "DeepGodsEndowment";
@@ -142,6 +143,11 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 	@Override
 	public boolean isBuff() {
 		return true;
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return "Deep God's Endowment";
 	}
 
 	@Override

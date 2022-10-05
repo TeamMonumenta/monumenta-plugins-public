@@ -56,19 +56,22 @@ public enum EffectType {
 	VANILLA_HASTE("Haste", "Haste", true, true, false, true),
 	VANILLA_FATIGUE("MiningFatigue", "Mining Fatigue", false, true, false, true),
 	VANILLA_JUMP("JumpBoost", "Jump Boost", true, true, false, true),
-	VANILLA_FIRE_RESISTANCE("VanillaFireRes", "Fire Immunity", true, true, false, true),
-	VANILLA_WATER_BREATH("WaterBreath", "Water Breathing", true, true, false, true),
-	VANILLA_BLINDNESS("Blindness", "Blindness", false, true, false, true),
-	VANILLA_NIGHT_VISION("NightVision", "Night Vision", true, true, false, true),
+	VANILLA_FIRE_RESISTANCE("VanillaFireRes", "Fire Immunity", true, true, true, true),
+	VANILLA_WATER_BREATH("WaterBreath", "Water Breathing", true, true, true, true),
+	VANILLA_BLINDNESS("Blindness", "Blindness", false, true, true, true),
+	VANILLA_NIGHT_VISION("NightVision", "Night Vision", true, true, true, true),
 	VANILLA_POISON("Poison", "Poison", false, true, false, true),
 	VANILLA_WITHER("Wither", "Wither", false, true, false, true),
 	VANILLA_REGEN("Regeneration", "Regeneration", true, true, false, true),
 	VANILLA_HEAL("InstantHealth", "Instant Health", true, false, false, true),
 	VANILLA_DAMAGE("InstantDamage", "Instant Damage", false, false, false, true),
 	VANILLA_SATURATION("Saturation", "Saturation", true, true, false, true),
-	VANILLA_GLOW("Glowing", "Glowing", true, true, false, true),
+	VANILLA_GLOW("Glowing", "Glowing", true, true, true, true),
 	VANILLA_SLOWFALL("SlowFalling", "Slow Falling", true, true, false, true),
-	VANILLA_CONDUIT("ConduitPower", "ConduitPower", true, true, false, true),
+	VANILLA_CONDUIT("ConduitPower", "Conduit Power", true, true, true, true),
+	VANILLA_HUNGER("Hunger", "Hunger", false, true, false, true),
+	VANILLA_NAUSEA("Nausea", "Nausea", false, true, true, true),
+	VANILLA_BADLUCK("BadLuck", "Bad Luck", false, true, false, true),
 
 	SPEED("Speed", "Speed", true, false, false, false),
 	SLOW("Slow", "Speed", false, false, false, false),
@@ -80,7 +83,7 @@ public enum EffectType {
 	NEGATIVE_KNOCKBACK_RESIST("NegativeKnockbackResist", "Knockback Resistance", false, false, false, false),
 
 	MAX_HEALTH_INCREASE("MaxHealthIncrease", "Max Health", true, false, false, false),
-	MAX_HEALTH_DECREASE("MaxHealthDecrase", "Max Health", false, false, false, false),
+	MAX_HEALTH_DECREASE("MaxHealthDecrease", "Max Health", false, false, false, false),
 
 	ABSORPTION("Absorption", "Absorption Health", true, false, false, false),
 	SATURATION("Saturation", "Saturation", true, true, false, false),
@@ -140,8 +143,8 @@ public enum EffectType {
 	EXP_BONUS("ExpBonus", "Experience", true, false, false, false),
 	EXP_LOSS("ExpLoss", "Experience", false, false, false, false),
 
-	COOLDOWN_DECREASE("AbilityCooldownDecrease", "Cooldown Reduction", true, false, false, false),
-	COOLDOWN_INCREASE("AbilityCooldownIncrease", "Cooldown Reduction", false, false, false, false),
+	COOLDOWN_DECREASE("AbilityCooldownDecrease", "Ability Cooldowns", true, false, false, false),
+	COOLDOWN_INCREASE("AbilityCooldownIncrease", "Ability Cooldowns", false, false, false, false),
 
 	BLEED("Bleed", "Bleed", false, false, false, false),
 
@@ -242,6 +245,10 @@ public enum EffectType {
 		if (effectType.isVanilla()) {
 			if (effectType.getType().contains("Instant")) {
 				return Component.text(effectType.mName + " " + ItemStatUtils.toRomanNumerals((int) strength), TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false);
+			} else if (effectType.isConstant()) {
+				return Component.text(effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
+					Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
+				);
 			}
 			return Component.text(effectType.mName + " " + ItemStatUtils.toRomanNumerals((int) strength) + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
 				Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
@@ -290,6 +297,9 @@ public enum EffectType {
 			case VANILLA_GLOW -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.GLOWING, duration, (int) (strength - 1), true));
 			case VANILLA_SLOWFALL -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW_FALLING, duration, (int) (strength - 1), true));
 			case VANILLA_CONDUIT -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.CONDUIT_POWER, duration, (int) (strength - 1), true));
+			case VANILLA_HUNGER -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.HUNGER, duration, (int) (strength - 1), true));
+			case VANILLA_NAUSEA -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.CONFUSION, duration, (int) (strength - 1), true));
+			case VANILLA_BADLUCK -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.UNLUCK, duration, (int) (strength - 1), true));
 
 			case SPEED -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentSpeed(duration, strength, sourceString));
 			case SLOW -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentSpeed(duration, -strength, sourceString));

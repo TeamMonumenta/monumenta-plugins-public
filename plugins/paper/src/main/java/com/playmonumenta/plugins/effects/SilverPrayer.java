@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class SilverPrayer extends ZeroArgumentEffect {
 	public static final String GENERIC_NAME = "SilverPrayer";
@@ -37,6 +38,11 @@ public class SilverPrayer extends ZeroArgumentEffect {
 		int duration = object.get("duration").getAsInt();
 
 		return new SilverPrayer(duration);
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return "Boon of Silver Prayer";
 	}
 
 	@Override

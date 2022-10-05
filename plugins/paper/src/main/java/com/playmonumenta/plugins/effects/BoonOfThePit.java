@@ -7,6 +7,7 @@ import java.util.HashSet;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BoonOfThePit extends ZeroArgumentEffect {
 	public static final String GENERIC_NAME = "BoonOfThePit";
@@ -45,6 +46,11 @@ public class BoonOfThePit extends ZeroArgumentEffect {
 	@Override
 	public boolean isBuff() {
 		return true;
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return "Boon of the Pit";
 	}
 
 	@Override

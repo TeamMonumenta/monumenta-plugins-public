@@ -9,8 +9,10 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
@@ -19,6 +21,7 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
@@ -31,8 +34,8 @@ import org.bukkit.potion.PotionEffectType;
 
 public final class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 
-	private static final double HEAVENLY_BOON_1_CHANCE = 0.08;
-	private static final double HEAVENLY_BOON_2_CHANCE = 0.16;
+	private static final double HEAVENLY_BOON_1_CHANCE = 0.1;
+	private static final double HEAVENLY_BOON_2_CHANCE = 0.2;
 	private static final double HEAVENLY_BOON_RADIUS = 12;
 	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0.05;
 	private static final int HEAVENLY_BOON_1_DURATION = 20 * 20;
@@ -56,8 +59,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		super(plugin, player, "Heavenly Boon");
 		mInfo.mScoreboardId = "HeavenlyBoon";
 		mInfo.mShorthandName = "HB";
-		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob or deal damage to a boss (R1 100/R2 200), you have a 8% chance to be splashed with an Instant Health I potion, as well as either a Speed I, Regen I, or Absorption I potion with 20 second duration.");
-		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 16%, the effect potions can now also be Strength and Resistance, and the durations of each are increased to 50 seconds.");
+		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob or deal damage to a boss (R1 100/R2 200), you have a 10% chance to be splashed with an Instant Health I potion, with an additional effect of either Regen I, +10% Attack Damage, +10 Damage Resistance, +20% Speed, or +20% Absorption with 20 second duration.");
+		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 20%, the effect potions now give Instant Health 2 and the durations of each are increased to 50 seconds.");
 		mInfo.mDescriptions.add(
 			String.format(
 				"When a potion is created by this skill, also increase all current positive potion durations by %s%%" +
@@ -113,11 +116,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 					continue;
 				}
 
-				/* Apply full-strength effects to players within range */
-				for (PotionEffect effect : PotionUtils.getEffects(potion.getItem())) {
-					PotionUtils.applyPotion(mPlugin, p, effect);
-				}
-
 				// Apply custom effects from potion
 				ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem());
 
@@ -151,43 +149,37 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				&& FastUtils.RANDOM.nextDouble() < mChance
 		) {
 			ItemStack potions;
+			NamespacedKey lootTable;
 
+			int rand = FastUtils.RANDOM.nextInt(5);
 			if (isLevelOne()) {
-				// TODO: CHANGE ALL OF THESE POTIONS TO NEW CUSTOM POTIONS ONCE THEY ARE MADE
-				int rand = FastUtils.RANDOM.nextInt(4);
-				if (rand == 0 || rand == 1) {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, mDuration, 0,
-						"Splash Potion of Regeneration");
+				if (rand == 0) {
+					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/regeneration_boon");
+				} else if (rand == 1) {
+					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/absorption_boon");
 				} else if (rand == 2) {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, mDuration, 0,
-						"Splash Potion of Absorption");
+					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/speed_boon");
+				} else if (rand == 3) {
+					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/resistance_boon");
 				} else {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, mDuration, 0,
-						"Splash Potion of Speed");
+					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/strength_boon");
 				}
 			} else {
-				int rand = FastUtils.RANDOM.nextInt(5);
 				if (rand == 0) {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, mDuration, 0,
-						"Splash Potion of Regeneration");
+					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/regeneration_boon_2");
 				} else if (rand == 1) {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, mDuration, 0,
-						"Splash Potion of Absorption");
+					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/absorption_boon_2");
 				} else if (rand == 2) {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, mDuration, 0,
-						"Splash Potion of Speed");
+					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/speed_boon_2");
 				} else if (rand == 3) {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.INCREASE_DAMAGE, 1, mDuration, 0,
-						"Splash Potion of Strength");
+					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/resistance_boon_2");
 				} else {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.DAMAGE_RESISTANCE, 1, mDuration, 0,
-						"Splash Potion of Resistance");
+					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/strength_boon_2");
 				}
 			}
 
-			ItemUtils.addPotionEffect(potions, PotionInfo.HEALING);
-
 			Location pos = mPlayer.getLocation().add(0, 1, 0);
+			potions = InventoryUtils.getItemFromLootTable(mPlayer, lootTable).clone();
 			EntityUtils.spawnCustomSplashPotion(mPlayer, potions, pos);
 
 			if (isEnhanced()) {

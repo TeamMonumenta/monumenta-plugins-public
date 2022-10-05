@@ -45,20 +45,7 @@ public class InstantDrink implements Enchantment {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || (event.getAction() == Action.RIGHT_CLICK_BLOCK && block != null && !ItemUtils.interactableBlocks.contains(block.getBlockData().getMaterial()))) {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item.getType() == Material.POTION && item.getItemMeta() instanceof PotionMeta meta) {
-				if (meta.hasCustomEffects()) {
-					for (PotionEffect effect : meta.getCustomEffects()) {
-						if (effect.getType().equals(PotionEffectType.HEAL) || effect.getType().equals(PotionEffectType.HARM)) {
-							PotionUtils.apply(player, new PotionInfo(effect.getType(), effect.getDuration() + 1, effect.getAmplifier(), false, false, false));
-						} else {
-							plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
-						}
-					}
-				} else {
-					PotionInfo info = PotionUtils.getPotionInfo(meta.getBasePotionData(), 1);
-					if (info != null) {
-						PotionUtils.apply(player, info);
-					}
-				}
+				ItemStatUtils.applyCustomEffects(plugin, player, item);
 
 				//Apply Starvation if applicable
 				int starvation = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.STARVATION);

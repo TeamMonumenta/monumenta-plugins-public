@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BoonOfKnightlyPrayer extends ZeroArgumentEffect {
 	public static final String GENERIC_NAME = "BoonOfKnightlyPrayer";
@@ -42,6 +43,11 @@ public class BoonOfKnightlyPrayer extends ZeroArgumentEffect {
 	@Override
 	public boolean isBuff() {
 		return true;
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return "Boon of Knightly Prayer";
 	}
 
 	@Override

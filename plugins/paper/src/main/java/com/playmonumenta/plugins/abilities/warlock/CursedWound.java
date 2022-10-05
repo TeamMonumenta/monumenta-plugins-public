@@ -96,9 +96,6 @@ public class CursedWound extends Ability {
 					new PartialParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 25,
 						radius / 2, radius / 3, radius / 2, fallingDustData)
 						.spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SPELL_MOB, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 35,
-						radius / 2, radius / 2, radius / 2, 0, new Particle.DustOptions(DARK_COLOR, 1.4f))
-						.spawnAsPlayerActive(mPlayer);
 				}
 			}
 
@@ -106,9 +103,6 @@ public class CursedWound extends Ability {
 			if (EntityUtils.isHostileMob(enemy)) {
 				new PartialParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 3,
 					(enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, fallingDustData)
-					.spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.SPELL_MOB, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 6,
-					(enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, 0, new Particle.DustOptions(DARK_COLOR, 1.4f))
 					.spawnAsPlayerActive(mPlayer);
 
 				int cooldowns = 0;
@@ -126,9 +120,6 @@ public class CursedWound extends Ability {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CURSED_WOUND_RADIUS, mPlayer)) {
 					new PartialParticle(Particle.FALLING_DUST, mob.getLocation().add(0, mob.getHeight() / 2, 0), 3,
 						(mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, fallingDustData)
-						.spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 6,
-						(mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, 0, new Particle.DustOptions(DARK_COLOR, 1.4f))
 						.spawnAsPlayerActive(mPlayer);
 					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME, new CustomDamageOverTime(CURSED_WOUND_DURATION, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT, CURSED_WOUND_DOT_DAMAGE), CURSED_WOUND_DOT_PERIOD, mPlayer, null));
 					if (isLevelTwo()) {

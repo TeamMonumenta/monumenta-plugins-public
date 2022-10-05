@@ -37,8 +37,8 @@ public class IronTincture extends Ability {
 
 	private static final int IRON_TINCTURE_THROW_COOLDOWN = 10 * 20;
 	private static final int IRON_TINCTURE_USE_COOLDOWN = 50 * 20;
-	private static final int IRON_TINCTURE_1_ABSORPTION = 8;
-	private static final int IRON_TINCTURE_2_ABSORPTION = 12;
+	private static final int IRON_TINCTURE_1_ABSORPTION = 6;
+	private static final int IRON_TINCTURE_2_ABSORPTION = 10;
 	private static final int IRON_TINCTURE_ABSORPTION_DURATION = 20 * 50;
 	private static final int IRON_TINCTURE_TICK_PERIOD = 2;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
@@ -59,8 +59,8 @@ public class IronTincture extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.IRON_TINCTURE;
 		mInfo.mScoreboardId = "IronTincture";
 		mInfo.mShorthandName = "IT";
-		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain 8 absorption health for 50 seconds, up to 8 absorption health. If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. When another player grabs the tincture, you gain 2 Alchemist's Potions. When you grab the tincture, you gain 1 Alchemist's Potion. Cooldown: 50s.");
-		mInfo.mDescriptions.add("Effect and effect cap increased to 12 absorption health.");
+		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain 6 absorption health for 50 seconds, up to 8 absorption health. If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. When another player grabs the tincture, you gain 2 Alchemist's Potions. When you grab the tincture, you gain 1 Alchemist's Potion. Cooldown: 50s.");
+		mInfo.mDescriptions.add("Effect and effect cap increased to 10 absorption health.");
 		mInfo.mDescriptions.add("The tincture now additionally cleanses all potion debuffs, extinguishes fire, and grants 5% damage resistance when absorption is present for the duration of the absorption.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, IRON_TINCTURE_USE_COOLDOWN); // Full duration cooldown
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

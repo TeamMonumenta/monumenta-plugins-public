@@ -8,6 +8,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PercentHeal extends SingleArgumentEffect {
 	public static final String effectID = "PercentHeal";
+	public static final String GENERIC_NAME = "PercentHeal";
 
 	public PercentHeal(int duration, double amount) {
 		super(duration, amount, effectID);

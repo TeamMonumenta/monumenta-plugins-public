@@ -50,8 +50,8 @@ public class UnstableAmalgam extends Ability {
 
 	private static final int UNSTABLE_AMALGAM_1_COOLDOWN = 20 * 20;
 	private static final int UNSTABLE_AMALGAM_2_COOLDOWN = 16 * 20;
-	private static final int UNSTABLE_AMALGAM_1_DAMAGE = 12;
-	private static final int UNSTABLE_AMALGAM_2_DAMAGE = 20;
+	private static final int UNSTABLE_AMALGAM_1_DAMAGE = 10;
+	private static final int UNSTABLE_AMALGAM_2_DAMAGE = 15;
 	private static final int UNSTABLE_AMALGAM_CAST_RANGE = 7;
 	private static final int UNSTABLE_AMALGAM_DURATION = 3 * 20;
 	private static final int UNSTABLE_AMALGAM_RADIUS = 4;
@@ -79,8 +79,8 @@ public class UnstableAmalgam extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.UNSTABLE_AMALGAM;
 		mInfo.mScoreboardId = "UnstableAmalgam";
 		mInfo.mShorthandName = "UA";
-		mInfo.mDescriptions.add("Shift left click while holding an Alchemist's Bag to consume a potion to place an Amalgam with 1 health at the location you are looking, up to 7 blocks away. Shift left click again to detonate it, dealing your Alchemist Potion's damage + 12 magic damage to mobs in a 4 block radius and applying potion effects from all abilities. The Amalgam also explodes when killed, or 3 seconds after being placed. Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion. Cooldown: 20s.");
-		mInfo.mDescriptions.add("The damage is increased to 20 and the cooldown is reduced to 16s.");
+		mInfo.mDescriptions.add("Shift left click while holding an Alchemist's Bag to consume a potion to place an Amalgam with 1 health at the location you are looking, up to 7 blocks away. Shift left click again to detonate it, dealing your Alchemist Potion's damage + 10 magic damage to mobs in a 4 block radius and applying potion effects from all abilities. The Amalgam also explodes when killed, or 3 seconds after being placed. Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion. Cooldown: 20s.");
+		mInfo.mDescriptions.add("The damage is increased to 15 and the cooldown is reduced to 16s.");
 		mInfo.mDescriptions.add("Enemies hit by the Amalgam's explosion become unstable. When an unstable mob is killed, a potion that deals 40% of your potion damage is dropped at its location. These potions apply both Brutal and Gruesome effects.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? UNSTABLE_AMALGAM_1_COOLDOWN : UNSTABLE_AMALGAM_2_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;

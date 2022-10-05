@@ -31,7 +31,7 @@ public class CosmicMoonblade extends Ability {
 
 	public static final String NAME = "Cosmic Moonblade";
 	private static final double DAMAGE_1 = 5;
-	private static final double DAMAGE_2 = 8;
+	private static final double DAMAGE_2 = 7;
 	private static final int SWINGS = 2;
 	private static final int RADIUS = 5;
 	private static final int COOLDOWN = 20 * 8;

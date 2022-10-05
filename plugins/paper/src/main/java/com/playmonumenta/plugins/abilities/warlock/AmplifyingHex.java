@@ -46,6 +46,7 @@ public class AmplifyingHex extends Ability {
 	private static final int AMPLIFIER_CAP_2 = 3;
 	private static final float R1_CAP = 3.5f;
 	private static final float R2_CAP = 5f;
+	private static final float R3_CAP = 7f;
 	private static final int RADIUS_1 = 8;
 	private static final int RADIUS_2 = 10;
 	private static final double DOT_ANGLE = 0.33;
@@ -88,7 +89,7 @@ public class AmplifyingHex extends Ability {
 				int skillPoints = Stream.of(AmplifyingHex.class, CholericFlames.class, GraspingClaws.class, SoulRend.class,
 						SanguineHarvest.class, MelancholicLament.class, CursedWound.class, PhlegmaticResolve.class)
 					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c))
-					.mapToInt(a -> a == null ? 0 : Math.min(a.getAbilityScore(), 2))
+					.mapToInt(a -> a == null ? 0 : Math.min(a.getAbilityScore(), 3))
 					.sum();
 				mDamage = DAMAGE_PER_SKILL_POINT * skillPoints;
 			});
@@ -101,7 +102,7 @@ public class AmplifyingHex extends Ability {
 			return;
 		}
 		World world = mPlayer.getWorld();
-		mRegionCap = ServerProperties.getClassSpecializationsEnabled() ? R2_CAP : R1_CAP;
+		mRegionCap = ServerProperties.getAbilityEnhancementsEnabled() ? R3_CAP : ServerProperties.getClassSpecializationsEnabled() ? R2_CAP : R1_CAP;
 
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getLocation();

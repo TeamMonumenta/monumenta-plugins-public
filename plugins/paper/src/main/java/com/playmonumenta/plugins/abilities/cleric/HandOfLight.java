@@ -80,8 +80,8 @@ public class HandOfLight extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.HAND_OF_LIGHT;
 		mInfo.mScoreboardId = "Healing";
 		mInfo.mShorthandName = "HoL";
-		mInfo.mDescriptions.add("Right click while holding a weapon or tool to heal all other players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. If holding a shield, the trigger is changed to crouch + right click. Additionally, swap hands while looking up and not sneaking to change to damage mode. In damage mode, instead of healing players, damage all mobs in a 6 block radius in front of you magic damage equal to 2 times the number of undead mobs in the range, up to 8 damage. Cooldown: 14s.");
-		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health. In damage mode, deal 3 damage per undead mob, up to 9 damage. Cooldown: 10s.");
+		mInfo.mDescriptions.add("Right click while holding a weapon or tool to heal all other players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. Additionally, damage all mobs in a 6 block radius in front of you with magic damage equal to 2 times the number of undead mobs in the range, up to 8 damage. If holding a shield, the trigger is changed to crouch + right click. Cooldown: 14s.");
+		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health. Damage increases to 3 damage per undead mob, up to 9. Cooldown: 10s.");
 		mInfo.mDescriptions.add(
 			String.format("The cone is changed to a sphere of equal range, centered on the Cleric." +
 				              " The cooldown is reduced by %s%% for each 4 health healed, capped at %s%% cooldown." +
@@ -151,70 +151,66 @@ public class HandOfLight extends Ability {
 		World world = mPlayer.getWorld();
 		Location userLoc = mPlayer.getLocation();
 
-		if (!mDamageMode) {
-			List<Player> nearbyPlayers = PlayerUtils.otherPlayersInRange(mPlayer, mHealingRange, true);
-			if (!isEnhanced()) {
-				nearbyPlayers.removeIf(p -> playerDir.dot(p.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && p.getLocation().distance(userLoc) > 2);
+		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(userLoc, mDamageRange);
+		if (!isEnhanced()) {
+			nearbyMobs.removeIf(mob -> playerDir.dot(mob.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && mob.getLocation().distance(userLoc) > 2);
+		}
+		nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+
+		List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
+		List<Player> nearbyPlayers = PlayerUtils.otherPlayersInRange(mPlayer, mHealingRange, true);
+		nearbyPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class"));
+		undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob, mCrusade));
+		double damage = Math.min(undeadMobs.size() * mDamagePer, mDamageMax);
+		damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
+		double cooldown = getModifiedCooldown();
+
+		if (damage > 0) {
+			for (LivingEntity mob : nearbyMobs) {
+				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, true);
+
+				Location loc = mob.getLocation();
+				mCosmetic.lightDamageEffect(mPlayer, loc, mob);
 			}
-			nearbyPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class"));
-			if (nearbyPlayers.size() > 0) {
-				double healthHealed = 0;
-				for (Player p : nearbyPlayers) {
-					double maxHealth = EntityUtils.getMaxHealth(p);
-					double healthBeforeHeal = p.getHealth();
-					PlayerUtils.healPlayer(mPlugin, p, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, mFlat + mPercent * maxHealth), mPlayer);
-					healthHealed += p.getHealth() - healthBeforeHeal;
 
-					Location loc = p.getLocation();
-					mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, 20 * 4, 1, true, true));
-					mCosmetic.lightHealEffect(mPlayer, loc, p);
-				}
+			mCosmetic.lightDamageCastEffect(world, userLoc, mPlugin, mPlayer, (float) mDamageRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1);
+		} else if (nearbyPlayers.size() == 0) {
+			mCosmetic.lightHealCastEffect(world, userLoc, mPlugin, mPlayer, (float) mDamageRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1);
+		}
 
-				doEnhancementEffect(userLoc);
+		if (!isEnhanced()) {
+			nearbyPlayers.removeIf(p -> playerDir.dot(p.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && p.getLocation().distance(userLoc) > 2);
+		}
 
-				mCosmetic.lightHealCastEffect(world, userLoc, mPlugin, mPlayer, (float) mHealingRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1);
+		if (!nearbyPlayers.isEmpty()) {
+			double healthHealed = 0;
+			for (Player p : nearbyPlayers) {
+				double maxHealth = EntityUtils.getMaxHealth(p);
+				double healthBeforeHeal = p.getHealth();
+				PlayerUtils.healPlayer(mPlugin, p, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, mFlat + mPercent * maxHealth), mPlayer);
+				healthHealed += p.getHealth() - healthBeforeHeal;
 
-				double cooldown = getModifiedCooldown();
-				if (isEnhanced()) {
-					cooldown *= 1 - Math.min((healthHealed / 4) * ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED, ENHANCEMENT_COOLDOWN_REDUCTION_MAX);
-				}
-				putOnCooldown((int) cooldown);
+				Location loc = p.getLocation();
+				mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, 20 * 4, 1, true, true));
+				mCosmetic.lightHealEffect(mPlayer, loc, p);
 			}
-		} else {
-			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(userLoc, mDamageRange);
-			if (!isEnhanced()) {
-				nearbyMobs.removeIf(mob -> playerDir.dot(mob.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && mob.getLocation().distance(userLoc) > 2);
-			}
-			nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
-			List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
-			undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob, mCrusade));
-			double damage = Math.min(undeadMobs.size() * mDamagePer, mDamageMax);
-			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
+			mCosmetic.lightHealCastEffect(world, userLoc, mPlugin, mPlayer, (float) mHealingRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1);
 
-			if (damage > 0) {
-				for (LivingEntity mob : nearbyMobs) {
-					DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, true);
-
-					Location loc = mob.getLocation();
-					mCosmetic.lightDamageEffect(mPlayer, loc, mob);
-				}
-
-				doEnhancementEffect(userLoc);
-
-				mCosmetic.lightDamageCastEffect(world, userLoc, mPlugin, mPlayer, (float) mDamageRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1);
-
-				putOnCooldown();
+			if (isEnhanced()) {
+				cooldown *= 1 - Math.min((healthHealed / 4) * ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED, ENHANCEMENT_COOLDOWN_REDUCTION_MAX);
 			}
 		}
-	}
 
-	private void doEnhancementEffect(Location userLoc) {
-		if (isEnhanced()) {
-			EntityUtils.getNearbyMobs(userLoc, mHealingRange).stream()
-				.filter(mob -> mob.getLocation().distanceSquared(userLoc) <= mHealingRange * mHealingRange)
-				.filter(mob -> Crusade.enemyTriggersAbilities(mob, mCrusade))
-				.forEach(mob -> EntityUtils.applyStun(mPlugin, ENHANCEMENT_UNDEAD_STUN_DURATION, mob));
+		if (damage > 0 || !nearbyPlayers.isEmpty()) {
+			if (isEnhanced()) {
+				EntityUtils.getNearbyMobs(userLoc, mHealingRange).stream()
+					.filter(mob -> mob.getLocation().distanceSquared(userLoc) <= mHealingRange * mHealingRange)
+					.filter(mob -> Crusade.enemyTriggersAbilities(mob, mCrusade))
+					.forEach(mob -> EntityUtils.applyStun(mPlugin, ENHANCEMENT_UNDEAD_STUN_DURATION, mob));
+			}
+
+			putOnCooldown((int) cooldown);
 		}
 	}
 

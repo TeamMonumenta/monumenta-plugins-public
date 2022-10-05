@@ -31,8 +31,7 @@ public class PrismaticShield extends Ability {
 	private static final int ABSORPTION_HEALTH_1 = 4;
 	private static final int ABSORPTION_HEALTH_2 = 8;
 	private static final int DURATION = 12 * 20;
-	private static final int COOLDOWN_1 = 90 * 20;
-	private static final int COOLDOWN_2 = 70 * 20;
+	private static final int COOLDOWN = 90 * 20;
 	private static final float KNOCKBACK_SPEED = 0.7f;
 	private static final int STUN_DURATION = 20;
 	private static final int HEAL_DURATION = 3 * 20;
@@ -63,20 +62,19 @@ public class PrismaticShield extends Ability {
 				ABSORPTION_HEALTH_1 / 2,
 				DURATION / 20,
 				(int)RADIUS,
-				COOLDOWN_1 / 20
+				COOLDOWN / 20
 				));
 		mInfo.mDescriptions.add(
-			String.format("The shield is improved to %s Absorption hearts. Enemies within %s blocks are knocked back and stunned for %s s. Cooldown: %ss.",
+			String.format("The shield is improved to %s Absorption hearts. Enemies within %s blocks are knocked back and stunned for %s s.",
 				ABSORPTION_HEALTH_2 / 2,
 				(int)RADIUS,
-				STUN_DURATION / 20,
-				COOLDOWN_2 / 20));
+				STUN_DURATION / 20));
 		mInfo.mDescriptions.add(
 			String.format("After Prismatic Shield is activated, in the next %ss, every spell that deals damage to at least one enemy will heal you for %s%% of your max health.",
 				HEAL_DURATION / 20,
 				HEAL_PERCENT)
 		);
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
+		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mAbsorptionHealth = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);

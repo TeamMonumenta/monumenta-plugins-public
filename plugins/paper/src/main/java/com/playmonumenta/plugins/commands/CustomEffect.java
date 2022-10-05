@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentExperience;
+import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SilverPrayer;
@@ -63,11 +64,13 @@ public class CustomEffect {
 		singleArgumentEffects.put("durabilitysaving", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, DurabilitySaving.GENERIC_NAME), new DurabilitySaving(duration, amount)));
 		singleArgumentEffects.put("soul", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, BonusSoulThreads.GENERIC_NAME), new BonusSoulThreads(duration, amount)));
 		singleArgumentEffects.put("cdr", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, AbilityCooldownDecrease.GENERIC_NAME), new AbilityCooldownDecrease(duration, amount)));
+		singleArgumentEffects.put("heal", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, PercentHeal.GENERIC_NAME), new PercentHeal(duration, amount)));
+		singleArgumentEffects.put("antiheal", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, PercentHeal.GENERIC_NAME), new PercentHeal(duration, -amount)));
 
 		// R3 Shrine Effects
 		singleArgumentEffects.put("boonofthepit", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, BoonOfThePit.GENERIC_NAME), new BoonOfThePit(duration)));
 		singleArgumentEffects.put("boonofknightlyprayer", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, BoonOfKnightlyPrayer.GENERIC_NAME), new BoonOfKnightlyPrayer(duration)));
-		singleArgumentEffects.put("crystalineblessing", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, CrystalineBlessing.GENERIC_NAME), new CrystalineBlessing(duration)));
+		singleArgumentEffects.put("crystallineblessing", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, CrystalineBlessing.GENERIC_NAME), new CrystalineBlessing(duration)));
 		singleArgumentEffects.put("deepgodsendowment", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, DeepGodsEndowment.GENERIC_NAME), new DeepGodsEndowment(duration)));
 		singleArgumentEffects.put("silverprayer", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, SilverPrayer.GENERIC_NAME), new SilverPrayer(duration)));
 		singleArgumentEffects.put("starcommunion", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, StarCommunion.GENERIC_NAME), new StarCommunion(duration)));
@@ -86,6 +89,8 @@ public class CustomEffect {
 		translations.put("durabilitysaving", DurabilitySaving.GENERIC_NAME);
 		translations.put("soul", BonusSoulThreads.GENERIC_NAME);
 		translations.put("cdr", AbilityCooldownDecrease.GENERIC_NAME);
+		translations.put("heal", PercentHeal.GENERIC_NAME);
+		translations.put("antiheal", PercentHeal.GENERIC_NAME);
 		translations.put("boonofthepit", BoonOfThePit.GENERIC_NAME);
 		translations.put("boonofknightlyprayer", BoonOfKnightlyPrayer.GENERIC_NAME);
 		translations.put("crystalineblessing", CrystalineBlessing.GENERIC_NAME);

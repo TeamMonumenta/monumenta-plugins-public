@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class TuathanBlessing extends ZeroArgumentEffect {
 	public static final String GENERIC_NAME = "TuathanBlessing";
@@ -38,6 +39,11 @@ public class TuathanBlessing extends ZeroArgumentEffect {
 		int duration = object.get("duration").getAsInt();
 
 		return new TuathanBlessing(duration);
+	}
+
+	@Override
+	public @Nullable String getSpecificDisplay() {
+		return "Tuathan Blessing";
 	}
 
 	@Override

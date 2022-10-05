@@ -64,8 +64,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	private static final int IFRAME_BETWEEN_POT = 10;
 	private static final double DAMAGE_PER_SKILL_POINT = 0.5;
-	private static final double DAMAGE_PER_SPEC_POINT = 2.5;
-	private static final double DAMAGE_PER_ENHANCEMENT = 2.5;
+	private static final double DAMAGE_PER_SPEC_POINT = 2;
+	private static final double DAMAGE_PER_ENHANCEMENT = 2;
 	private static final String POTION_SCOREBOARD = "StoredPotions";
 	private static final double RADIUS = 4;
 

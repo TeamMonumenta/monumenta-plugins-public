@@ -33,7 +33,6 @@ public class ChoirBells extends Ability {
 	private static final double SLOWNESS_AMPLIFIER_2 = 0.2;
 	private static final int COOLDOWN = 16 * 20;
 	private static final int CHOIR_BELLS_RANGE = 10;
-	private static final double CHOIR_BELLS_CONICAL_THRESHOLD = 1d / 3;
 	private static final int DAMAGE = 4;
 
 	private static final float[] CHOIR_BELLS_PITCHES = {0.6f, 0.8f, 0.6f, 0.8f, 1f};
@@ -56,7 +55,7 @@ public class ChoirBells extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.CHOIR_BELLS;
 		mInfo.mScoreboardId = "ChoirBells";
 		mInfo.mShorthandName = "CB";
-		mInfo.mDescriptions.add("While not sneaking, pressing the swap key afflicts all enemies in front of you within a 10-block cube around you with 10% slowness for 8s. Undead enemies also switch targets over to you, are dealt " + DAMAGE + " magic damage, and are afflicted with 20% vulnerability and 20% weakness for 8s. Cooldown: 16s.");
+		mInfo.mDescriptions.add("While not sneaking, pressing the swap key afflicts all enemies in a 10-block radius with 10% slowness for 8s. Undead enemies also switch targets over to you, are dealt " + DAMAGE + " magic damage, and are afflicted with 20% vulnerability and 20% weakness for 8s. Cooldown: 16s.");
 		mInfo.mDescriptions.add("Slowness is increased from 10% to 20%. Vulnerability and weakness are increased from 20% to 35%.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
@@ -90,19 +89,15 @@ public class ChoirBells extends Ability {
 				}.runTaskLater(mPlugin, i);
 			}
 
-			Vector playerDirection = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RANGE, CHOIR_BELLS_RANGE))) {
-				Vector toMobDirection = mob.getLocation().subtract(mPlayer.getLocation()).toVector().setY(0).normalize();
-				if (playerDirection.dot(toMobDirection) > CHOIR_BELLS_CONICAL_THRESHOLD) {
-					EntityUtils.applySlow(mPlugin, DURATION, mSlownessAmount, mob);
+				EntityUtils.applySlow(mPlugin, DURATION, mSlownessAmount, mob);
 
-					if (Crusade.enemyTriggersAbilities(mob, mCrusade)) {
-						// Infusion
-						EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
-						DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE), mInfo.mLinkedSpell, true, true);
-						EntityUtils.applyVulnerability(mPlugin, DURATION, mVulnerabilityEffect, mob);
-						EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
-					}
+				if (Crusade.enemyTriggersAbilities(mob, mCrusade)) {
+					// Infusion
+					EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
+					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE), mInfo.mLinkedSpell, true, true);
+					EntityUtils.applyVulnerability(mPlugin, DURATION, mVulnerabilityEffect, mob);
+					EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
 				}
 			}
 			putOnCooldown();

@@ -178,7 +178,7 @@ public class PotionConsumeListener implements Listener {
 		//If instant drink enchantment, instantly apply potion, otherwise imitate potion drinking
 		if (instantDrinkLevel != 0) {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1.0f, 1.0f);
-			PotionUtils.applyPotion(mPlugin, player, meta);
+			ItemStatUtils.applyCustomEffects(mPlugin, player, item);
 
 			//Apply Starvation if applicable
 			int starvation = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.STARVATION);
@@ -195,7 +195,7 @@ public class PotionConsumeListener implements Listener {
 				public void run() {
 					//If time to drink is finished, add effects. Otherwise, play sound of slurping every 0.5 seconds for 3.5 seconds total
 					if (mTicks >= DRINK_DURATION) {
-						PotionUtils.applyPotion(mPlugin, player, meta);
+						ItemStatUtils.applyCustomEffects(mPlugin, player, item);
 
 						//Apply Starvation if applicable
 						int starvation = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.STARVATION);
