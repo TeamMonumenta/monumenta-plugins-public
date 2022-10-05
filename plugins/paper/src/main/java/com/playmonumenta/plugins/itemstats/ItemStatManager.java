@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
+import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
@@ -219,6 +220,9 @@ public class ItemStatManager implements Listener {
 							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN && (ItemStatUtils.getRegion(item) == ItemStatUtils.Region.ISLES || ItemStatUtils.getRegion(item) == ItemStatUtils.Region.RING)) {
 								newArmorAddStats.add(stat, 1);
 							}
+							if (enchantment.getEnchantmentType() == EnchantmentType.SKT_DAMAGE_TAKEN) {
+								newArmorAddStats.add(stat, 1);
+							}
 						} else if (stat instanceof Infusion infusion) {
 							double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : infusion.getInfusionType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 							multiplier = infusion.getInfusionType().isRegionScaled() && Shattered.isShattered(item) ? 0 : multiplier;
@@ -271,7 +275,8 @@ public class ItemStatManager implements Listener {
 					newStats.add(stat, (newArmorAddStats.get(stat) + newMainhandAddStats.get(stat)) * (1 + newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat)));
 				}
 				if (stat instanceof CritScaling || stat instanceof AntiCritScaling ||
-					stat instanceof StrengthApply || stat instanceof StrengthCancel) {
+					stat instanceof StrengthApply || stat instanceof StrengthCancel ||
+					stat instanceof SKTQuestDamageDealt) {
 					newStats.add(stat, 1);
 				}
 				if (stat instanceof RegionScalingDamageDealt && (ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.ISLES || ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.RING)) {

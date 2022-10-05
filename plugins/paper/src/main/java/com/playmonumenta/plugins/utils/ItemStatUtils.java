@@ -385,6 +385,8 @@ public class ItemStatUtils {
 		MAINHAND_OFFHAND_DISABLE(new MainhandOffhandDisable(), false, false, false, false),
 		REGION_SCALING_DAMAGE_DEALT(new RegionScalingDamageDealt(), false, false, false, false),
 		REGION_SCALING_DAMAGE_TAKEN(new RegionScalingDamageTaken(), false, false, false, false),
+		SKT_DAMAGE_DEALT(new SKTQuestDamageDealt(), false, false, false, false),
+		SKT_DAMAGE_TAKEN(new SKTQuestDamageTaken(), false, false, false, false),
 		// Vanilla
 		SWEEPING_EDGE(Enchantment.SWEEPING_EDGE, "Sweeping Edge", true, false, false, false),
 		KNOCKBACK(Enchantment.KNOCKBACK, "Knockback", true, false, false, false),
