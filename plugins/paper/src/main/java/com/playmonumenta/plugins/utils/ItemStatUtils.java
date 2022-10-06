@@ -71,6 +71,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemStatUtils {
@@ -960,7 +963,25 @@ public class ItemStatUtils {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
 		}
+
 		NBTCompoundList effects = getEffects(new NBTItem(item));
+
+		// Ensure other effects don't apply
+		if (item.getItemMeta() instanceof PotionMeta potionMeta) {
+			if (ItemStatUtils.hasConsumeEffect(item)) {
+				// If it's a custom potion, remove all effects
+				potionMeta.clearCustomEffects();
+				potionMeta.setBasePotionData(new PotionData(PotionType.AWKWARD));
+			} else {
+				// If it's a vanilla potion, remove positive effects (Ensure legacies stay unusable)
+				PotionUtils.removePositiveEffects(potionMeta);
+				if (PotionUtils.hasPositiveEffects(potionMeta.getBasePotionData().getType().getEffectType())) {
+					// If base potion is vanilla positive potion, set to AWKWARD, otherwise keep (ensures negative effects remain)
+					potionMeta.setBasePotionData(new PotionData(PotionType.AWKWARD));
+				}
+			}
+			item.setItemMeta(potionMeta);
+		}
 
 		if (effects == null || effects.isEmpty()) {
 			return;
@@ -977,7 +998,98 @@ public class ItemStatUtils {
 				EffectType.applyEffect(effectType, player, duration, strength, source);
 			}
 		}
+	}
 
+	public static void changeEffectsDuration(Player player, ItemStack item, int durationChange) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+
+		NBTCompoundList effects = getEffects(new NBTItem(item));
+
+		if (effects == null || effects.isEmpty()) {
+			return;
+		}
+
+		for (NBTListCompound effect : effects) {
+			String type = effect.getString(EFFECT_TYPE_KEY);
+			int duration = effect.getInteger(EFFECT_DURATION_KEY);
+			double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
+			String source = effect.getString(EFFECT_SOURCE_KEY);
+			EffectType effectType = EffectType.fromType(type);
+			if (effectType != null) {
+				EffectType.applyEffect(effectType, player, duration + durationChange, strength, source);
+			}
+		}
+	}
+
+	public static void changeEffectsDurationSplash(Player player, ItemStack item, double scale) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+
+		NBTCompoundList effects = getEffects(new NBTItem(item));
+
+		if (effects == null || effects.isEmpty()) {
+			return;
+		}
+
+		for (NBTListCompound effect : effects) {
+			String type = effect.getString(EFFECT_TYPE_KEY);
+			int duration = effect.getInteger(EFFECT_DURATION_KEY);
+			double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
+			String source = effect.getString(EFFECT_SOURCE_KEY);
+			EffectType effectType = EffectType.fromType(type);
+			if (effectType != null) {
+				EffectType.applyEffect(effectType, player, (int) (duration * scale), strength, source);
+			}
+		}
+	}
+
+	public static boolean hasConsumeEffect(ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return false;
+		}
+
+		NBTCompoundList effects = getEffects(new NBTItem(item));
+
+		if (effects == null || effects.isEmpty()) {
+			return false;
+		}
+
+		for (NBTListCompound effect : effects) {
+			String type = effect.getString(EFFECT_TYPE_KEY);
+
+			EffectType effectType = EffectType.fromType(type);
+			if (effectType != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean hasNegativeEffect(ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return false;
+		}
+
+		NBTCompoundList effects = getEffects(new NBTItem(item));
+
+		if (effects == null || effects.isEmpty()) {
+			return false;
+		}
+
+		for (NBTListCompound effect : effects) {
+			String type = effect.getString(EFFECT_TYPE_KEY);
+
+			EffectType effectType = EffectType.fromType(type);
+			if (effectType != null) {
+				if (!effectType.isPositive()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	static final DecimalFormat NUMBER_FORMATTER = new DecimalFormat("0.###");
@@ -2207,7 +2319,14 @@ public class ItemStatUtils {
 			meta.addEnchant(placeholder, 1, true);
 		}
 
-		item.setItemMeta(meta);
+		if (meta instanceof PotionMeta potionMeta) {
+			potionMeta.clearCustomEffects();
+			potionMeta.setBasePotionData(new PotionData(PotionType.AWKWARD));
+			item.setItemMeta(potionMeta);
+		} else {
+			item.setItemMeta(meta);
+		}
+
 		ItemUtils.setPlainLore(item);
 	}
 

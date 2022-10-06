@@ -123,8 +123,10 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -732,15 +734,23 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
 		Player player = event.getPlayer();
+		ItemStack item = event.getItem();
 
-		if (event.getItem().getItemMeta() instanceof PotionMeta) {
-			if (PotionUtils.isLuckPotion((PotionMeta) event.getItem().getItemMeta())) {
-				Location loc = player.getLocation();
-				loc.getWorld().playSound(loc, Sound.ENTITY_HORSE_DEATH, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				player.sendMessage(Component.text("Luck potions can no longer be consumed", NamedTextColor.RED, TextDecoration.BOLD));
-				event.setCancelled(true);
-				return;
+		if (item.getItemMeta() instanceof PotionMeta potionMeta) {
+			if (ItemStatUtils.hasConsumeEffect(item)) {
+				// If it's a custom potion, remove all effects
+				potionMeta.clearCustomEffects();
+				potionMeta.setBasePotionData(new PotionData(PotionType.AWKWARD));
+			} else {
+				// If it's a vanilla potion, remove positive effects (Ensure legacies stay unusable)
+				PotionUtils.removePositiveEffects(potionMeta);
+				if (PotionUtils.hasPositiveEffects(potionMeta.getBasePotionData().getType().getEffectType())) {
+					// If base potion is vanilla positive potion, set to AWKWARD, otherwise keep (ensures negative effects remain)
+					potionMeta.setBasePotionData(new PotionData(PotionType.AWKWARD));
+				}
 			}
+			item.setItemMeta(potionMeta);
+			event.setItem(item);
 		}
 
 		if (!mPlugin.mItemOverrides.playerItemConsume(mPlugin, player, event)) {
@@ -750,17 +760,17 @@ public class PlayerListener implements Listener {
 
 		mPlugin.mAbilityManager.playerItemConsumeEvent(player, event);
 
-		if (event.getItem().containsEnchantment(Enchantment.ARROW_INFINITE)) {
-			event.setReplacement(event.getItem());
+		if (item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+			event.setReplacement(item);
 			//Stat tracker for consuming infinity items
-			StatTrackManager.incrementStat(event.getItem(), player, InfusionType.STAT_TRACK_CONSUMED, 1);
+			StatTrackManager.incrementStat(item, player, InfusionType.STAT_TRACK_CONSUMED, 1);
 		}
 
-		ItemStatUtils.applyCustomEffects(mPlugin, player, event.getItem());
+		ItemStatUtils.applyCustomEffects(mPlugin, player, item);
 
 		mPlugin.mItemStatManager.onConsume(mPlugin, player, event);
 
-		for (PotionEffect effect : PotionUtils.getEffects(event.getItem())) {
+		for (PotionEffect effect : PotionUtils.getEffects(item)) {
 			// Kill the player if they drink a potion with instant damage 10+
 			if (effect.getType() != null
 			    && effect.getType().equals(PotionEffectType.HARM)

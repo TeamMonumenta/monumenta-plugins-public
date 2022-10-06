@@ -108,6 +108,7 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -604,6 +605,7 @@ public class EntityListener implements Listener {
 					event.setCancelled(true);
 					potion = potionClone;
 				}
+
 				if (potionItem.getType() == Material.SPLASH_POTION) {
 					if (!mAbilities.playerThrewSplashPotionEvent(player, potion)) {
 						event.setCancelled(true);
@@ -622,6 +624,7 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void potionSplashEvent(PotionSplashEvent event) {
 		ThrownPotion potion = event.getPotion();
+		ItemStack item = potion.getItem();
 		ProjectileSource source = potion.getShooter();
 
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
@@ -634,8 +637,20 @@ public class EntityListener implements Listener {
 		affectedEntities.removeIf(Entity::isInvulnerable);
 
 		/* If a potion has negative effects, don't apply them to any players except the thrower (if applicable) */
-		if (source instanceof Player && PotionUtils.hasNegativeEffects(potion.getItem())) {
+		if (source instanceof Player && (PotionUtils.hasNegativeEffects(potion.getItem()) || ItemStatUtils.hasNegativeEffect(potion.getItem()))) {
 			affectedEntities.removeIf(entity -> (entity instanceof Player && entity != source));
+		}
+
+		if (source instanceof Player && item.getItemMeta() instanceof PotionMeta potionMeta) {
+			// Will never have negative effects at this point, just do basic clear of positive effects
+			potionMeta.clearCustomEffects();
+			potionMeta.setBasePotionData(new PotionData(PotionType.AWKWARD));
+			item.setItemMeta(potionMeta);
+			for (LivingEntity entity : affectedEntities) {
+				if (entity instanceof Player player) {
+					event.setIntensity(player, 0);
+				}
+			}
 		}
 
 		/* If a player threw this potion, trigger applicable abilities (potentially cancelling or modifying the event!) */
@@ -648,10 +663,8 @@ public class EntityListener implements Listener {
 
 		/*
 		 * If a player was hit by this potion, trigger applicable abilities (potentially cancelling or modifying the event!)
-		 *
-		 * Since the ability might modify the affectedEntities list while iterating, need to make a copy of it
 		 */
-		for (LivingEntity entity : new ArrayList<>(affectedEntities)) {
+		for (LivingEntity entity : affectedEntities) {
 			if (entity instanceof Player player) {
 				affectedPlayers.add(player);
 				if (!mAbilities.playerSplashedByPotionEvent(player, affectedEntities, potion, event)) {
@@ -661,18 +674,20 @@ public class EntityListener implements Listener {
 			}
 		}
 
+		// Run each custom effect on each afflicted entity
+		for (LivingEntity entity : affectedEntities) {
+			if (entity instanceof Player player) {
+				double distance = Math.min(player.getLocation().distance(event.getEntity().getLocation()), player.getEyeLocation().distance(event.getEntity().getLocation()));
+				distance = Math.min(Math.max(-0.1 * distance + 1, 0), 1);
+				ItemStatUtils.changeEffectsDurationSplash(player, item, distance);
+			}
+		}
+
 		// Track all player potion effects with the potion manager
 		for (LivingEntity entity : affectedEntities) {
 			if (entity instanceof Player player) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, PotionUtils.getEffects(potion.getItem()),
 					event.getIntensity(entity));
-			}
-		}
-
-		// Run each custom effect on each afflicted entity
-		for (LivingEntity entity : affectedEntities) {
-			if (entity instanceof Player player) {
-				ItemStatUtils.applyCustomEffects(mPlugin, player, potion.getItem());
 			}
 		}
 

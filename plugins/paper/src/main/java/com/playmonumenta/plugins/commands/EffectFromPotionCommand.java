@@ -131,11 +131,6 @@ public class EffectFromPotionCommand {
 	 * @return updatedPotion = ItemStack
 	 */
 	private static ItemStack consumePotion(Plugin plugin, Player player, ItemStack potion) {
-		// Potion Meta to apply effects!
-		if (potion.getItemMeta() instanceof PotionMeta potionMeta) {
-			PotionUtils.applyPotion(plugin, player, potionMeta);
-		}
-
 		if (ItemStatUtils.isConsumable(potion)) {
 			ItemStatUtils.applyCustomEffects(plugin, player, potion);
 		}

@@ -37,9 +37,9 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private static final double HEAVENLY_BOON_1_CHANCE = 0.1;
 	private static final double HEAVENLY_BOON_2_CHANCE = 0.2;
 	private static final double HEAVENLY_BOON_RADIUS = 12;
-	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0.05;
-	private static final int HEAVENLY_BOON_1_DURATION = 20 * 20;
-	private static final int HEAVENLY_BOON_2_DURATION = 50 * 20;
+	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0;
+//  private static final int HEAVENLY_BOON_1_DURATION = 20 * 20;
+//  private static final int HEAVENLY_BOON_2_DURATION = 50 * 20;
 	private static final double ENHANCEMENT_POTION_EFFECT_BONUS = 0.2;
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_BOOST = 24 * 20;
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_DURATION = 3 * 60 * 20;
@@ -50,7 +50,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
-	private final int mDuration;
+	// private final int mDuration;
 	private final double mRadius;
 
 	private @Nullable Crusade mCrusade;
@@ -73,7 +73,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		mTracker = new KillTriggeredAbilityTracker(this);
 
 		mChance = CharmManager.getLevelPercentDecimal(player, CHARM_CHANCE) + (isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE);
-		mDuration = CharmManager.getExtraDuration(player, CHARM_DURATION) + (isLevelOne() ? HEAVENLY_BOON_1_DURATION : HEAVENLY_BOON_2_DURATION);
+		// mDuration = CharmManager.getExtraDuration(player, CHARM_DURATION) + (isLevelOne() ? HEAVENLY_BOON_1_DURATION : HEAVENLY_BOON_2_DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, HEAVENLY_BOON_RADIUS);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -98,7 +98,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		}
 
 		boolean hasPositiveEffects = PotionUtils.hasPositiveEffects(PotionUtils.getEffects(potion.getItem()));
-		if (PotionUtils.hasNegativeEffects(potion.getItem()) && !hasPositiveEffects) {
+		if ((PotionUtils.hasNegativeEffects(potion.getItem()) || ItemStatUtils.hasNegativeEffect(potion.getItem())) && (!hasPositiveEffects)) {
 			return true;
 		}
 

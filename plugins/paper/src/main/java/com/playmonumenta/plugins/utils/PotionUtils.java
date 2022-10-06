@@ -400,6 +400,12 @@ public class PotionUtils {
 		return types;
 	}
 
+	public static void removePositiveEffects(PotionMeta potionMeta) {
+		for (PotionEffectType type : POSITIVE_EFFECTS) {
+			potionMeta.removeCustomEffect(type);
+		}
+	}
+
 	public static @Nullable PotionEffectType getOppositeEffect(PotionEffectType type) {
 		return OPPOSITE_EFFECTS.get(type);
 	}
