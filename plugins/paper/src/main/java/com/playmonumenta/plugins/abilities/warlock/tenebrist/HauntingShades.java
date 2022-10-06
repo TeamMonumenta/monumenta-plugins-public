@@ -146,6 +146,9 @@ public class HauntingShades extends Ability {
 		stand.setGravity(false);
 		stand.setCanMove(false);
 		stand.setSilent(true);
+		stand.setBasePlate(false);
+		stand.setMarker(true);
+		stand.setVisible(true);
 		stand.setCustomName("Haunting Shade");
 		stand.setCustomNameVisible(false);
 
