@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentExperience;
 import com.playmonumenta.plugins.effects.PercentHeal;
+import com.playmonumenta.plugins.effects.PercentHealthBoost;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SilverPrayer;
@@ -66,6 +67,7 @@ public class CustomEffect {
 		singleArgumentEffects.put("cdr", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, AbilityCooldownDecrease.GENERIC_NAME), new AbilityCooldownDecrease(duration, amount)));
 		singleArgumentEffects.put("heal", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, PercentHeal.GENERIC_NAME), new PercentHeal(duration, amount)));
 		singleArgumentEffects.put("antiheal", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, PercentHeal.GENERIC_NAME), new PercentHeal(duration, -amount)));
+		singleArgumentEffects.put("healthboost", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, PercentHealthBoost.GENERIC_NAME), new PercentHealthBoost(duration, amount, PercentHealthBoost.GENERIC_NAME)));
 
 		// R3 Shrine Effects
 		singleArgumentEffects.put("boonofthepit", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, BoonOfThePit.GENERIC_NAME), new BoonOfThePit(duration)));
@@ -91,6 +93,7 @@ public class CustomEffect {
 		translations.put("cdr", AbilityCooldownDecrease.GENERIC_NAME);
 		translations.put("heal", PercentHeal.GENERIC_NAME);
 		translations.put("antiheal", PercentHeal.GENERIC_NAME);
+		translations.put("healthboost", PercentHealthBoost.GENERIC_NAME);
 		translations.put("boonofthepit", BoonOfThePit.GENERIC_NAME);
 		translations.put("boonofknightlyprayer", BoonOfKnightlyPrayer.GENERIC_NAME);
 		translations.put("crystalineblessing", CrystalineBlessing.GENERIC_NAME);
