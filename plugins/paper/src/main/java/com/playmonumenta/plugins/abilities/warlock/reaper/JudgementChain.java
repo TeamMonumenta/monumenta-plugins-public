@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.warlock.reaper;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
@@ -16,6 +17,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -24,6 +26,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.EnumSet;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -85,6 +88,7 @@ public class JudgementChain extends Ability {
 
 	private @Nullable LivingEntity mTarget = null;
 	private boolean mChainActive = false;
+	private boolean mHasPact;
 
 	public JudgementChain(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Judgement Chain");
@@ -97,6 +101,12 @@ public class JudgementChain extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.CHAIN, 1);
 		mAmplifier = BUFF_AMOUNT;
+		mHasPact = false;
+		if (ServerProperties.getClassSpecializationsEnabled()) {
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+				mHasPact = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, DarkPact.class) != null;
+			});
+		}
 	}
 
 	@Override
@@ -107,7 +117,7 @@ public class JudgementChain extends Ability {
 		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
 		if (ItemUtils.isHoe(mainHandItem)) {
 			event.setCancelled(true);
-			if (!mPlayer.isSneaking() && mPlayer.isOnGround()) {
+			if (!mPlayer.isSneaking() && (mPlayer.isOnGround() || !mHasPact)) {
 				if (mChainActive) {
 					breakChain(true, true);
 					mTarget = null;
