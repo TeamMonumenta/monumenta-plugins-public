@@ -29,7 +29,7 @@ public class StasisListener implements Listener {
 	public static boolean isInStasis(@Nullable Entity entity) {
 		// Only players can stasis, at least for now
 		// No need to do a bunch of iteration to check on other entities
-		if (entity == null || !(entity instanceof Player)) {
+		if (!(entity instanceof Player)) {
 			return false;
 		}
 		return Plugin.getInstance().mEffectManager.hasEffect(entity, Stasis.GENERIC_NAME);
@@ -48,6 +48,9 @@ public class StasisListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void damageEvent(DamageEvent event) {
+		if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+			return;
+		}
 		if (isInStasis(event.getDamager()) || isInStasis(event.getDamagee())) {
 			event.setCancelled(true);
 		}
@@ -55,6 +58,9 @@ public class StasisListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
+		if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+			return;
+		}
 		if (isInStasis(event.getEntity())) {
 			event.setCancelled(true);
 		}
