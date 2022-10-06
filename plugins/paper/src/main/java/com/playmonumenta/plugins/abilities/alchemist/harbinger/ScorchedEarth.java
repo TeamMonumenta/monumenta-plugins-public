@@ -82,6 +82,9 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		manageChargeCooldowns();
+		if (mAlchemistPotions == null) {
+			return;
+		}
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * SCORCHED_EARTH_DAMAGE_FRACTION);
         // Copy list to avoid ConcurrentModificationException
 		for (Location loc : new ArrayList<>(mCenters.keySet())) {
