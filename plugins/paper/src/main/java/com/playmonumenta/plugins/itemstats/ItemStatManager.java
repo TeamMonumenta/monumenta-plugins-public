@@ -132,7 +132,7 @@ public class ItemStatManager implements Listener {
 
 		public PlayerItemStats(Player player) {
 			mRegion = ServerProperties.getAbilityEnhancementsEnabled() ? ItemStatUtils.Region.RING : (ServerProperties.getClassSpecializationsEnabled() ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY);
-			updateStats(player, true);
+			updateStats(player, true, player.getMaxHealth());
 		}
 
 		public PlayerItemStats(PlayerItemStats playerItemStats) {
@@ -154,13 +154,17 @@ public class ItemStatManager implements Listener {
 			mRegion = region;
 		}
 
-		public void updateStats(Player player, boolean updateAll) {
+		public void updateStats(Player player, boolean updateAll, double priorHealth) {
 			PlayerInventory inventory = player.getInventory();
 			updateStats(inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(), updateAll);
 			// Tell the ItemStats that there has been an update
 			Plugin plugin = Plugin.getInstance();
 			for (ItemStat stat : ITEM_STATS) {
 				stat.onEquipmentUpdate(plugin, player);
+			}
+			if (priorHealth != player.getMaxHealth()) {
+				Plugin.getInstance().mEffectManager.clearEffects(player, EffectType.ABSORPTION.getName());
+				Plugin.getInstance().mEffectManager.clearEffects(player, EffectType.MAX_HEALTH_INCREASE.getName());
 			}
 		}
 
@@ -370,7 +374,7 @@ public class ItemStatManager implements Listener {
 			@Override
 			public void run() {
 				if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-					mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(player, true);
+					mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth());
 				}
 			}
 		}.runTaskLater(mPlugin, 0);
@@ -382,7 +386,7 @@ public class ItemStatManager implements Listener {
 		PlayerItemStats playerItemStats = new PlayerItemStats(player);
 		mPlayerItemStatsMappings.put(player.getUniqueId(), playerItemStats);
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			playerItemStats.updateStats(player, true);
+			playerItemStats.updateStats(player, true, player.getMaxHealth());
 		});
 	}
 
@@ -711,7 +715,7 @@ public class ItemStatManager implements Listener {
 	public void updateStats(Player player) {
 		PlayerItemStats stats = getPlayerItemStats(player);
 		if (stats != null) {
-			stats.updateStats(player, true);
+			stats.updateStats(player, true, player.getMaxHealth());
 		}
 	}
 }

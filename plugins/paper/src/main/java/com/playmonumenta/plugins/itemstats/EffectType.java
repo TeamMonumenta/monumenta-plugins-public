@@ -183,6 +183,10 @@ public enum EffectType {
 		return mType;
 	}
 
+	public String getName() {
+		return mName;
+	}
+
 	public Boolean isPositive() {
 		return mIsPositive;
 	}

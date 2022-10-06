@@ -83,7 +83,7 @@ public class Resurrection implements Enchantment {
 
 			ItemStatManager.PlayerItemStats playerItemStats = plugin.mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true);
+				playerItemStats.updateStats(player, true, player.getMaxHealth());
 			}
 		}
 

@@ -2411,7 +2411,7 @@ public class ItemStatUtils {
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true);
+				playerItemStats.updateStats(player, true, player.getMaxHealth());
 			}
 		}).register();
 	}
@@ -2930,7 +2930,7 @@ public class ItemStatUtils {
 		generateItemStats(item);
 		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 		if (playerItemStats != null) {
-			playerItemStats.updateStats(player, true);
+			playerItemStats.updateStats(player, true, player.getMaxHealth());
 		}
 	}
 
@@ -2987,7 +2987,7 @@ public class ItemStatUtils {
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true);
+				playerItemStats.updateStats(player, true, player.getMaxHealth());
 			}
 		}).register();
 	}
@@ -3033,7 +3033,7 @@ public class ItemStatUtils {
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true);
+				playerItemStats.updateStats(player, true, player.getMaxHealth());
 			}
 		}).register();
 	}
