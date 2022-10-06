@@ -267,6 +267,8 @@ public class CharmManager {
 			ElementalArrows.CHARM_DAMAGE,
 			ElementalArrows.CHARM_AREA_DAMAGE,
 			ElementalArrows.CHARM_DURATION,
+			ElementalArrows.CHARM_STUN_DURATION,
+			ElementalArrows.CHARM_SLOWNESS,
 			ElementalArrows.CHARM_RANGE,
 			ElementalArrows.CHARM_THUNDER_COOLDOWN,
 			Spellshock.CHARM_SPEED,

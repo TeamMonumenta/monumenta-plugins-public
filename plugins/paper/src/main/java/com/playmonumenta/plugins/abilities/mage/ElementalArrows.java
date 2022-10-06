@@ -11,10 +11,12 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Blaze;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -41,6 +43,8 @@ public class ElementalArrows extends Ability {
 	public static final String CHARM_DAMAGE = "Elemental Arrows Damage";
 	public static final String CHARM_AREA_DAMAGE = "Elemental Arrows Area Damage";
 	public static final String CHARM_DURATION = "Elemental Arrows Duration";
+	public static final String CHARM_STUN_DURATION = "Elemental Arrows Stun Duration";
+	public static final String CHARM_SLOWNESS = "Elemental Arrows Slowness Amplifier";
 	public static final String CHARM_RANGE = "Elemental Arrows Range";
 	public static final String CHARM_THUNDER_COOLDOWN = "Elemental Arrows Thunder Arrow Cooldown";
 
@@ -83,58 +87,49 @@ public class ElementalArrows extends Ability {
 		}
 		ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(proj);
 
-		double damage = event.getDamage();
-		double targetDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-		double areaDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_AREA_DAMAGE, damage * AOE_DAMAGE_MULTIPLIER);
-
-		double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, ELEMENTAL_ARROWS_RADIUS);
 		int duration = ELEMENTAL_ARROWS_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 
 		if (proj.hasMetadata("ElementalArrowsFireArrow")) {
-			if (isLevelTwo()) {
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius, enemy)) {
-					EntityUtils.applyFire(mPlugin, duration, mob, mPlayer, playerItemStats);
-					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, ABILITY_FIRE, playerItemStats), areaDamage, true, true, false);
-				}
-			}
-			if (enemy instanceof Stray) {
-				targetDamage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
-			}
-
-			EntityUtils.applyFire(mPlugin, duration, enemy, mPlayer, playerItemStats);
-			event.setDamage(0);
-			DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.MAGIC, ABILITY_FIRE, playerItemStats), targetDamage, true, true, false);
-			mLastDamage = event.getDamage();
+			applyArrowEffects(event, enemy, 1, ABILITY_FIRE, playerItemStats, Stray.class, (entity) -> {
+				EntityUtils.applyFire(mPlugin, duration, entity, mPlayer, playerItemStats);
+			});
 		} else if (proj.hasMetadata("ElementalArrowsIceArrow")) {
-			if (isLevelTwo()) {
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius, enemy)) {
-					EntityUtils.applySlow(mPlugin, duration, SLOW_AMPLIFIER, mob);
-					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, ABILITY_ICE, playerItemStats), areaDamage, true, true, false);
-				}
-			}
-			if (enemy instanceof Blaze) {
-				targetDamage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
-			}
-
-			EntityUtils.applySlow(mPlugin, duration, SLOW_AMPLIFIER, enemy);
-			event.setDamage(0);
-			DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.MAGIC, ABILITY_ICE, playerItemStats), targetDamage, true, true, false);
-			mLastDamage = event.getDamage();
+			double slowAmplifier = SLOW_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
+			applyArrowEffects(event, enemy, 1, ABILITY_ICE, playerItemStats, Blaze.class, (entity) -> {
+				EntityUtils.applySlow(mPlugin, duration, slowAmplifier, entity);
+			});
 		} else if (proj.hasMetadata("ElementalArrowsThunderArrow")) {
 			putOnCooldown();
-			targetDamage *= 1 + ENHANCED_DAMAGE_MULTIPLIER;
-			areaDamage *= 1 + ENHANCED_DAMAGE_MULTIPLIER;
-			if (isLevelTwo()) {
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius, enemy)) {
-					EntityUtils.applyStun(mPlugin, ENHANCED_ARROW_STUN_DURATION, mob);
-					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, ABILITY, playerItemStats), areaDamage, true, true, false);
-				}
-			}
-			EntityUtils.applyStun(mPlugin, ENHANCED_ARROW_STUN_DURATION, enemy);
-			event.setDamage(0);
-			DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.MAGIC, ABILITY, playerItemStats), targetDamage, true, true, false);
+			int stunDuration = ENHANCED_ARROW_STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN_DURATION);
+			applyArrowEffects(event, enemy, 1 + ENHANCED_DAMAGE_MULTIPLIER, ABILITY, playerItemStats, null, (entity) -> {
+				EntityUtils.applyStun(mPlugin, stunDuration, entity);
+			});
 		}
 		return true; // creates new damage instances
+	}
+
+	private void applyArrowEffects(DamageEvent event, LivingEntity enemy, double multiplier, ClassAbility ability, ItemStatManager.PlayerItemStats playerItemStats, @Nullable Class<? extends Entity> bonusEntity, Consumer<LivingEntity> effectAction) {
+		double damage = event.getDamage();
+		mLastDamage = damage;
+
+		double targetDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage) * multiplier;
+		double areaDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_AREA_DAMAGE, damage * AOE_DAMAGE_MULTIPLIER) * multiplier;
+		double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, ELEMENTAL_ARROWS_RADIUS);
+
+		if (isLevelTwo()) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius, enemy)) {
+				effectAction.accept(enemy);
+				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, ability, playerItemStats), areaDamage, true, true, false);
+			}
+		}
+
+		if (enemy.getClass() == bonusEntity) {
+			targetDamage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
+		}
+
+		effectAction.accept(enemy);
+		event.setDamage(0);
+		DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.MAGIC, ability, playerItemStats), targetDamage, true, true, false);
 	}
 
 	public double getLastDamage() {
@@ -149,7 +144,6 @@ public class ElementalArrows extends Ability {
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
 			if (isEnhanced() && !isTimerActive()) {
 				projectile.setMetadata("ElementalArrowsThunderArrow", new FixedMetadataValue(mPlugin, 0));
-				projectile.setFireTicks(0);
 				mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.END_ROD);
 			} else if (mPlayer.isSneaking()) {
 				projectile.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));

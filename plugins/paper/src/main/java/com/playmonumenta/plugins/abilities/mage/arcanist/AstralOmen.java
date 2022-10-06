@@ -18,7 +18,7 @@ import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
 import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -59,6 +60,8 @@ public class AstralOmen extends Ability {
 	public static final String CHARM_RANGE = "Astral Omen Range";
 
 	private final double mLevelBonusMultiplier;
+
+	private @Nullable ElementalArrows mElementalArrows;
 
 	private static final Map<ClassAbility, Type> mElementClassification;
 
@@ -120,11 +123,15 @@ public class AstralOmen extends Ability {
 		);
 		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
 		mLevelBonusMultiplier = (isLevelTwo() ? BONUS_MULTIPLIER : 0) + CharmManager.getLevelPercentDecimal(player, CHARM_MODIFIER);
+
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mElementalArrows = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
+		});
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getAbility() == null || event.getAbility() == mInfo.mLinkedSpell || event.getAbility() == ClassAbility.SPELLSHOCK) {
+		if (mPlayer == null || event.getAbility() == null || event.getAbility() == mInfo.mLinkedSpell || event.getAbility() == ClassAbility.SPELLSHOCK) {
 			return false;
 		}
 
@@ -157,7 +164,13 @@ public class AstralOmen extends Ability {
 			float baseDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
 			float spellDamage;
 			if (ability == ClassAbility.ELEMENTAL_ARROWS || ability == ClassAbility.ELEMENTAL_ARROWS_FIRE || ability == ClassAbility.ELEMENTAL_ARROWS_ICE) {
-				spellDamage = baseDamage + (float) (mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD) * BOW_MULTIPLIER);
+				if (mElementalArrows == null) {
+					// how?
+					MMLog.warning("Dealt Elemental Arrows damage with Astral Omen despite not finding Elemental Arrows (player: " + mPlayer.getName() + ")");
+					spellDamage = baseDamage;
+				} else {
+					spellDamage = baseDamage + (float) (mElementalArrows.getLastDamage() * BOW_MULTIPLIER);
+				}
 			} else {
 				spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, baseDamage);
 			}
