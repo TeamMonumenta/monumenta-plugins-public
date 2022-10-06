@@ -375,6 +375,9 @@ public final class ItemOverrides {
 
 		BaseOverride boneMealOverride = new BoneMealOverride();
 		mItems.put(Material.BONE_MEAL, boneMealOverride);
+
+		BaseOverride glassBottleOverride = new GlassBottleOverride();
+		mItems.put(Material.GLASS_BOTTLE, glassBottleOverride);
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, @Nullable Block block, PlayerInteractEvent event) {
