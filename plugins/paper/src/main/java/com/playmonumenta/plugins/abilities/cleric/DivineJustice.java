@@ -203,6 +203,7 @@ public class DivineJustice extends Ability {
 		}
 
 		if (mPlayer != null
+			    && isEnhanced()
 			    && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
 			    && FastUtils.RANDOM.nextDouble() <= ENHANCEMENT_ASH_CHANCE) {
 			spawnAsh(entityDeathEvent.getEntity().getLocation());
