@@ -90,7 +90,7 @@ public class WhispersBoss extends BossAbilityGroup {
 				mCleanse.get(i).cancel();
 				double amtHeal = (mParam.PERCENT_DAMAGE / 100.0) / (1 - mParam.PERCENT_DAMAGE / 100.0) * stolenPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 				EntityUtils.removeAttribute(stolenPlayer, Attribute.GENERIC_MAX_HEALTH, "Whispers" + mBoss.getUniqueId());
-				PlayerUtils.healPlayer(com.playmonumenta.plugins.Plugin.getInstance(), stolenPlayer, amtHeal);
+				stolenPlayer.setHealth(Math.min(amtHeal + stolenPlayer.getHealth(), stolenPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
 			}
 		}
 	}
