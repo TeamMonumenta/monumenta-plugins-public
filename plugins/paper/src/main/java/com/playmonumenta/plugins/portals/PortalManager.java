@@ -325,10 +325,14 @@ public class PortalManager implements Listener {
 		mPlayerPortal2.put(player, portal2);
 
 		Map<Long, Set<Portal>> worldPortalsByChunk = mPortalsByChunk.computeIfAbsent(world.getUID(), k -> new HashMap<>());
-		long chunkKey1 = location1.getChunk().getChunkKey();
-		long chunkKey2 = location2.getChunk().getChunkKey();
-		worldPortalsByChunk.computeIfAbsent(chunkKey1, k -> new HashSet<>()).add(portal1);
-		worldPortalsByChunk.computeIfAbsent(chunkKey2, k -> new HashSet<>()).add(portal2);
+		if (portal1 != null) {
+			long chunkKey1 = location1.getChunk().getChunkKey();
+			worldPortalsByChunk.computeIfAbsent(chunkKey1, k -> new HashSet<>()).add(portal1);
+		}
+		if (portal2 != null) {
+			long chunkKey2 = location2.getChunk().getChunkKey();
+			worldPortalsByChunk.computeIfAbsent(chunkKey2, k -> new HashSet<>()).add(portal2);
+		}
 
 		//Activate teleport logic
 		if (portal1 != null && portal2 != null) {
