@@ -112,14 +112,10 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 		int ticks = mPlayer.getTicksLived();
 		// Prevent double casting on accident
-		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
+		if (ticks - mLastCastTicks <= 4 || !consumeCharge()) {
 			return;
 		}
 		mLastCastTicks = ticks;
-
-		if (!consumeCharge()) {
-			return;
-		}
 
 		mTeleporting = true;
 
