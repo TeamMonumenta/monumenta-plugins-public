@@ -65,6 +65,10 @@ public class AbilityInfo {
 		Component component = Component.text("");
 		component = component.append(getFormattedDescription(1));
 		for (int skillLevel = 2; skillLevel <= mDescriptions.size(); skillLevel++) {
+			if (skillLevel == 3) {
+				break;
+			}
+
 			component = component.append(Component.newline())
 				.append(getFormattedDescription(skillLevel));
 		}
