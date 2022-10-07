@@ -28,7 +28,7 @@ public class Versatile extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		// Hunting Companion uses both melee and projectile scaling already
 		if (event.getAbility() == ClassAbility.HUNTING_COMPANION) {
-			return true;
+			return false;
 		}
 
 		if (event.getType() == DamageEvent.DamageType.MELEE || event.getType() == DamageEvent.DamageType.MELEE_SKILL || event.getType() == DamageEvent.DamageType.MELEE_ENCH) {
@@ -44,7 +44,7 @@ public class Versatile extends Ability {
 				event.setDamage(currentdamage * (1 + (percentatk - 1) * DAMAGE_MULTIPLY_PROJ));
 			}
 		}
-		return true;
+		return false; // no recursion possible as we only change the damage amount
 
 	}
 }
