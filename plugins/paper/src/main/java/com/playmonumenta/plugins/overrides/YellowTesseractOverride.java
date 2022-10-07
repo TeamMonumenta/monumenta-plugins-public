@@ -197,6 +197,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
 		new PartialParticle(Particle.SNOWBALL, pLoc, 10, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
 		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, 1, 2.5f);
+		player.sendMessage(Component.text("The Tesseract of the Elements has stored your skills!", NamedTextColor.YELLOW));
 
 		ItemStatUtils.generateItemStats(item);
 		ItemUtils.setPlainTag(item);
@@ -367,7 +368,6 @@ public class YellowTesseractOverride extends BaseOverride {
 		} else if (totalSkillsAdded < totalLevel || totalSpecAdded < totalSpec || totalEnhancementsAdded < totalEnhancement) {
 			player.sendMessage(Component.text("You have additional skill points to spend!", NamedTextColor.YELLOW));
 		}
-		player.sendMessage(Component.text(ItemUtils.getPlainName(item) + " has stored your skills!", NamedTextColor.YELLOW));
 
 		AbilityManager.getManager().updatePlayerAbilities(player, true);
 
