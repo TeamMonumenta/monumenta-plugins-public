@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -15,11 +16,15 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import de.tr7zw.nbtapi.NBTCompoundList;
+import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBTListCompound;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -139,8 +144,9 @@ public class PotionConsumeListener implements Listener {
 
 		PotionMeta meta = (PotionMeta) item.getItemMeta();
 		List<PotionEffect> effects = PotionUtils.getEffects(meta);
+		NBTCompoundList customEffects = ItemStatUtils.getEffects(new NBTItem(item));
 
-		if (checkPotionCooldown(player) && event.getClickedInventory().getType() != InventoryType.CHEST && isCooldownApplicable(effects)) {
+		if (checkPotionCooldown(player) && event.getClickedInventory().getType() != InventoryType.CHEST && isCooldownApplicable(customEffects)) {
 			player.sendMessage(ChatColor.RED + "Quick drink is still on cooldown!");
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
@@ -148,10 +154,10 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		if (ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.INFINITY) > 0 && !(effects.size() == 1 && effects.get(0).getType().equals(PotionEffectType.GLOWING))) {
+		if (ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.INFINITY) > 0 && !(customEffects != null && customEffects.size() == 1 && EffectType.fromType(customEffects.get(0).getString(ItemStatUtils.EFFECT_TYPE_KEY)) == EffectType.VANILLA_GLOW)) {
 			player.sendMessage(ChatColor.RED + "Infinite potions can not be quick drinked!");
 
-			float pitch = ((float)FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
+			float pitch = ((float) FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
 			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1.0f, 1.0f + pitch);
 
 			event.setCancelled(true);
@@ -170,7 +176,7 @@ public class PotionConsumeListener implements Listener {
 
 		InventoryType invType = event.getClickedInventory().getType();
 		if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX || invType == InventoryType.CRAFTING) {
-			if (isCooldownApplicable(effects)) {
+			if (isCooldownApplicable(customEffects)) {
 				setPotionCooldown(player);
 			}
 		}
@@ -195,17 +201,17 @@ public class PotionConsumeListener implements Listener {
 				public void run() {
 					//If time to drink is finished, add effects. Otherwise, play sound of slurping every 0.5 seconds for 3.5 seconds total
 					if (mTicks >= DRINK_DURATION) {
-						ItemStatUtils.applyCustomEffects(mPlugin, player, item);
+						ItemStack potion = mPotionsConsumed.remove(player.getUniqueId());
+						ItemStatUtils.applyCustomEffects(mPlugin, player, potion);
 
 						//Apply Starvation if applicable
-						int starvation = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.STARVATION);
+						int starvation = ItemStatUtils.getEnchantmentLevel(potion, EnchantmentType.STARVATION);
 						if (starvation > 0) {
 							Starvation.apply(player, starvation);
 						}
 
 						//If Sacred Provisions check passes, do not consume, but do not enable cancel quick drink function
 						//Do not run addition on infinity potions
-						ItemStack potion = mPotionsConsumed.remove(player.getUniqueId());
 						if (potion != null && ItemStatUtils.getEnchantmentLevel(potion, EnchantmentType.INFINITY) == 0 &&
 							NonClericProvisionsPassive.testRandomChance(player)) {
 							NonClericProvisionsPassive.sacredProvisionsSound(player);
@@ -291,8 +297,9 @@ public class PotionConsumeListener implements Listener {
 
 		PotionMeta meta = (PotionMeta) item.getItemMeta();
 		List<PotionEffect> effects = PotionUtils.getEffects(meta);
+		NBTCompoundList customEffects = ItemStatUtils.getEffects(new NBTItem(item));
 
-		if (checkPotionCooldown(player) && event.getClickedInventory().getType() != InventoryType.CHEST && isCooldownApplicable(effects)) {
+		if (checkPotionCooldown(player) && event.getClickedInventory().getType() != InventoryType.CHEST && isCooldownApplicable(customEffects)) {
 			player.sendMessage(ChatColor.RED + "Quick drink is still on cooldown!");
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
@@ -316,7 +323,7 @@ public class PotionConsumeListener implements Listener {
 
 		InventoryType invType = event.getClickedInventory().getType();
 		if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX || invType == InventoryType.CRAFTING) {
-			if (isCooldownApplicable(effects)) {
+			if (isCooldownApplicable(customEffects)) {
 				setPotionCooldown(player);
 			}
 		}
@@ -380,11 +387,27 @@ public class PotionConsumeListener implements Listener {
 		return mCooldowns.containsKey(player.getUniqueId());
 	}
 
-	private boolean isCooldownApplicable(List<PotionEffect> effects) {
-		for (PotionEffect effect : effects) {
-			PotionEffectType type = effect.getType();
-			int amp = effect.getAmplifier();
-			if (type.equals(PotionEffectType.HEAL) || (type.equals(PotionEffectType.REGENERATION) && amp >= 2) || (type.equals(PotionEffectType.DAMAGE_RESISTANCE) && amp >= 2) || type.equals(PotionEffectType.ABSORPTION) || type.equals(PotionEffectType.SATURATION)) {
+	private boolean isCooldownApplicable(@Nullable NBTCompoundList effects) {
+		if (effects == null) {
+			return false;
+		}
+
+		for (NBTListCompound effect : effects) {
+			EffectType type = null;
+			if (effect.hasKey(ItemStatUtils.EFFECT_TYPE_KEY)) {
+				type = EffectType.fromType(effect.getString(ItemStatUtils.EFFECT_TYPE_KEY));
+			}
+			double strength = 0;
+			if (effect.hasKey(ItemStatUtils.EFFECT_STRENGTH_KEY)) {
+				strength = effect.getDouble(ItemStatUtils.EFFECT_STRENGTH_KEY);
+			}
+
+			if (type != null
+				&& (type.equals(EffectType.VANILLA_HEAL)
+				|| (type.equals(EffectType.VANILLA_REGEN) && strength >= 2)
+				|| (type.equals(EffectType.RESISTANCE) && strength >= 0.2)
+				|| type.equals(EffectType.ABSORPTION)
+				|| type.equals(EffectType.SATURATION))) {
 				return true;
 			}
 		}

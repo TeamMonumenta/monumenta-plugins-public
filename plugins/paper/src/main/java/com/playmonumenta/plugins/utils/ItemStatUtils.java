@@ -89,9 +89,9 @@ public class ItemStatUtils {
 	static final String CHARM_KEY = "CharmText";
 	static final String CHARM_POWER_KEY = "CharmPower";
 	static final String AMOUNT_KEY = "Amount";
-	static final String EFFECT_TYPE_KEY = "EffectType";
+	public static final String EFFECT_TYPE_KEY = "EffectType";
 	static final String EFFECT_DURATION_KEY = "EffectDuration";
-	static final String EFFECT_STRENGTH_KEY = "EffectStrength";
+	public static final String EFFECT_STRENGTH_KEY = "EffectStrength";
 	static final String EFFECT_SOURCE_KEY = "EffectSource";
 	static final String DIRTY_KEY = "Dirty";
 	static final String SHULKER_SLOTS_KEY = "ShulkerSlots";
