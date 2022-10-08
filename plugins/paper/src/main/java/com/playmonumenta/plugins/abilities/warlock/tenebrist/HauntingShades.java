@@ -5,11 +5,11 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -30,21 +30,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class HauntingShades extends Ability {
 
-	private static final String ATTR_NAME = "HauntingShadesHealing";
+	private static final String HEAL_NAME = "HauntingShadesHealing";
+	private static final String STR_NAME = "HauntingShadesStrength";
 
 	private static final int COOLDOWN = 10 * 20;
 	private static final int SHADES_DURATION = 7 * 20;
 	private static final double VULN = 0.1;
 	private static final double HEAL_PERCENT = 0.025;
-	private static final int EFFECT_LEVEL = 0;
+	private static final double EFFECT_LEVEL = 0.1;
 	private static final int EFFECT_DURATION = 20 * 1;
 	private static final int RANGE = 10;
 	private static final int AOE_RANGE = 6;
@@ -63,7 +62,7 @@ public class HauntingShades extends Ability {
 		mInfo.mScoreboardId = "HauntingShades";
 		mInfo.mShorthandName = "HS";
 		mInfo.mDescriptions.add("Press the swap key while not sneaking with a scythe to conjure a Shade at the target block or mob location. Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability. A Shade fades back into darkness after 7 seconds. Cooldown: 10s.");
-		mInfo.mDescriptions.add("Players within 6 blocks of the shade are given strength 1 and gain a custom healing effect that regenerates 2.5% of max health every second for 1 second. Effects do not stack with other Tenebrists.");
+		mInfo.mDescriptions.add("Players within 6 blocks of the shade are given 10% damage dealt and gain a custom healing effect that regenerates 2.5% of max health every second for 1 second. Effects do not stack with other Tenebrists.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.ALL;
 		mInfo.mIgnoreCooldown = true;
@@ -164,9 +163,8 @@ public class HauntingShades extends Ability {
 					if (isLevelTwo()) {
 						for (Player p : affectedPlayers) {
 							double maxHealth = EntityUtils.getMaxHealth(p);
-							mPlugin.mEffectManager.addEffect(p, ATTR_NAME, new CustomRegeneration(EFFECT_DURATION, maxHealth * CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT), mPlayer, mPlugin));
-
-							mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, EFFECT_DURATION, EFFECT_LEVEL, true, false));
+							mPlugin.mEffectManager.addEffect(p, HEAL_NAME, new CustomRegeneration(EFFECT_DURATION, maxHealth * CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT), mPlayer, mPlugin));
+							mPlugin.mEffectManager.addEffect(p, STR_NAME, new PercentDamageDealt(EFFECT_DURATION, EFFECT_LEVEL, STR_NAME));
 						}
 					}
 
