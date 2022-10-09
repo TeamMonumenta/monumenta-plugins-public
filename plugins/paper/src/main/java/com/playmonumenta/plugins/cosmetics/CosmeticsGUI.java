@@ -4,7 +4,6 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
@@ -765,7 +764,7 @@ public class CosmeticsGUI extends CustomInventory {
 					ProtocolLibrary.getProtocolManager().updateEntity(player, ProtocolLibrary.getProtocolManager().getEntityTrackers(player));
 				}
 				if (mCosmeticSkillChanged) {
-					AbilityManager.getManager().updatePlayerAbilities(player, false);
+					mPlugin.mAbilityManager.updatePlayerAbilities(player, false);
 				}
 				if (mPreviousOtherVanityEnabled != mPlugin.mVanityManager.getData(player).mOtherVanityEnabled) {
 					for (Player otherPlayer : ProtocolLibrary.getProtocolManager().getEntityTrackers(player)) {

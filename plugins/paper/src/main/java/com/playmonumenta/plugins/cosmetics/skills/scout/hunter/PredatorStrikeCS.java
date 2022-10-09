@@ -29,6 +29,11 @@ public class PredatorStrikeCS implements CosmeticSkill {
 		return Material.SPECTRAL_ARROW;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public void strikeTick(Player mPlayer, int tick) {
 		new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation().add(0, 0.75, 0), 1, 0.25, 0, 0.25, 0).spawnAsPlayerActive(mPlayer);
 	}

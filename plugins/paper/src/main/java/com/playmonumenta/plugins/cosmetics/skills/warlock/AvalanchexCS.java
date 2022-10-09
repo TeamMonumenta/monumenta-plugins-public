@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics.skills.warlock;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
+import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -15,7 +16,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-public class AvalanchexCS extends AmplifyingHexCS {
+public class AvalanchexCS extends AmplifyingHexCS implements DepthsCS {
 	//Icy amplifying hex. Depth set: frost
 
 	public static final String NAME = "Avalanchex";
@@ -37,6 +38,16 @@ public class AvalanchexCS extends AmplifyingHexCS {
 	@Override
 	public Material getDisplayItem() {
 		return Material.POWDER_SNOW_BUCKET;
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
+	public String getToken() {
+		return TALISMAN_FROST;
 	}
 
 	@Override

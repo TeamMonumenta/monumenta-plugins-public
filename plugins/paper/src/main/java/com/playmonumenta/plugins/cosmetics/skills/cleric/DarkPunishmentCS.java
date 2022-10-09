@@ -4,20 +4,27 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
+import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.List;
 import org.apache.commons.math3.util.FastMath;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 
-public class DarkPunishmentCS extends DivineJusticeCS {
+public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 	//Darker divine justice. Depth set: shadow
 	//Dark CLERIC!
 
@@ -52,6 +59,16 @@ public class DarkPunishmentCS extends DivineJusticeCS {
 	@Override
 	public Material getDisplayItem() {
 		return Material.NETHERITE_SWORD;
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
+	public String getToken() {
+		return TALISMAN_SHADOW;
 	}
 
 	@Override

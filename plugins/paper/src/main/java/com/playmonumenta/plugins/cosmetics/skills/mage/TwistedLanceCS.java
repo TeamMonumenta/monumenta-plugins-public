@@ -43,6 +43,11 @@ public class TwistedLanceCS extends ManaLanceCS {
 	}
 
 	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
 	public void lanceHitBlock(Player mPlayer, Location bLoc, World world) {
 		new PartialParticle(Particle.SMOKE_LARGE, bLoc, 25, 0, 0, 0, 0.1)
 			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);

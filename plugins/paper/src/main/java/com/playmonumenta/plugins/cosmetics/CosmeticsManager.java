@@ -260,7 +260,6 @@ public class CosmeticsManager implements Listener {
 	}
 
 	//Load plugin data into local cosmetic data
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player p = event.getPlayer();
 		JsonObject cosmeticData = MonumentaRedisSyncAPI.getPlayerPluginData(p.getUniqueId(), KEY_PLUGIN_DATA);
@@ -287,6 +286,7 @@ public class CosmeticsManager implements Listener {
 		}
 		// call the "event listener" of the vanity manager after the cosmetics manager loaded cosmetics
 		Plugin.getInstance().mVanityManager.playerJoinEvent(event);
+		//reloadSkillCosmetics(p);
 	}
 
 	// Elite Finisher handler

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
+import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -14,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class BrambleShellCS extends CounterStrikeCS {
+public class BrambleShellCS extends CounterStrikeCS implements DepthsCS {
 	//Earthy counter strike. Depth set: earth
 
 	public static final String NAME = "Bramble Shell";
@@ -37,6 +38,16 @@ public class BrambleShellCS extends CounterStrikeCS {
 	@Override
 	public Material getDisplayItem() {
 		return Material.SWEET_BERRIES;
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
+	public String getToken() {
+		return TALISMAN_EARTH;
 	}
 
 	@Override

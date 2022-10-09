@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics.skills.rogue;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
+import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -12,7 +13,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-public class WindStepCS extends AdvancingShadowsCS {
+public class WindStepCS extends AdvancingShadowsCS implements DepthsCS {
 	// Windy advancing shadow. Depth set: wind
 
 	public static final String NAME = "Wind Step";
@@ -33,6 +34,16 @@ public class WindStepCS extends AdvancingShadowsCS {
 	@Override
 	public Material getDisplayItem() {
 		return Material.FEATHER;
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
+	public String getToken() {
+		return TALISMAN_WIND;
 	}
 
 	@Override

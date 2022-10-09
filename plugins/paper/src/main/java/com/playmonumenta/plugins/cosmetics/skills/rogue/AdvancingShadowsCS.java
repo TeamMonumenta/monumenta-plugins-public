@@ -29,6 +29,11 @@ public class AdvancingShadowsCS implements CosmeticSkill {
 		return Material.ENDER_EYE;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public void tpStart(Player mPlayer) {
 
 	}

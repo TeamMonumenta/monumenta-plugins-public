@@ -34,6 +34,11 @@ public class ManaLanceCS implements CosmeticSkill {
 		return Material.TRIDENT;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public void lanceHitBlock(Player mPlayer, Location bLoc, World world) {
 		new PartialParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);

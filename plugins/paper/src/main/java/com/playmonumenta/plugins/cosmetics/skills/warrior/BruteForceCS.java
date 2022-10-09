@@ -33,6 +33,11 @@ public class BruteForceCS implements CosmeticSkill {
 		return Material.STONE_AXE;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public void bruteOnDamage(Player mPlayer, Location loc, int combo) {
 		loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.6f, 0.6f);
 		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);

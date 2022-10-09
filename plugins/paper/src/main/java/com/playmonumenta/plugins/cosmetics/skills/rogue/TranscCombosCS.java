@@ -44,6 +44,11 @@ public class TranscCombosCS extends ViciousCombosCS {
 	}
 
 	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
 	public void comboOnKill(World world, Location loc, Player mPlayer, double range, LivingEntity target) {
 		loc = mPlayer.getLocation().add(0, 1, 0);
 		Location eLoc = LocationUtils.getHalfHeightLocation(target);

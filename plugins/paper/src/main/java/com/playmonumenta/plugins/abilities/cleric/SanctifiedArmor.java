@@ -3,11 +3,12 @@ package com.playmonumenta.plugins.abilities.cleric;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.SanctifiedArmorCS;
 import com.playmonumenta.plugins.effects.SanctifiedArmorHeal;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -18,8 +19,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -47,6 +46,7 @@ public class SanctifiedArmor extends Ability {
 	private double mLastDamage;
 
 	private @Nullable Crusade mCrusade;
+	private final SanctifiedArmorCS mCosmetic;
 
 	public SanctifiedArmor(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Sanctified Armor");
@@ -58,6 +58,7 @@ public class SanctifiedArmor extends Ability {
 		mInfo.mDescriptions.add("If the most recently affected mob is killed by any means other than Sanctified Armor or Thorns damage, regain half the health lost from the last damage taken.");
 		mPercentDamageReturned = isLevelOne() ? PERCENT_DAMAGE_RETURNED_1 : PERCENT_DAMAGE_RETURNED_2;
 		mDisplayItem = new ItemStack(Material.IRON_CHESTPLATE, 1);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SanctifiedArmorCS(), SanctifiedArmorCS.SKIN_LIST);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
@@ -79,12 +80,12 @@ public class SanctifiedArmor extends Ability {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
 
-			new PartialParticle(Particle.FIREWORKS_SPARK, loc.add(0, source.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125).spawnAsPlayerPassive(mPlayer);
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
-
 			MovementUtils.knockAway(mPlayer, source, KNOCKBACK_SPEED, KNOCKBACK_SPEED, true);
 			if (isLevelTwo()) {
 				EntityUtils.applySlow(mPlugin, SLOWNESS_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), SLOWNESS_AMPLIFIER_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), source);
+				mCosmetic.sanctOnTrigger2(world, mPlayer, loc, source);
+			} else {
+				mCosmetic.sanctOnTrigger1(world, mPlayer, loc, source);
 			}
 
 			if (!event.isBlocked()) {
@@ -114,7 +115,7 @@ public class SanctifiedArmor extends Ability {
 			    && entity.getLastDamageCause() != null
 			    && entity.getLastDamageCause().getCause() != EntityDamageEvent.DamageCause.THORNS) {
 			PlayerUtils.healPlayer(mPlugin, mPlayer, mLastDamage / 2.0);
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.65f, 1.25f);
+			mCosmetic.sanctOnHeal(mPlayer, entity);
 		}
 	}
 }

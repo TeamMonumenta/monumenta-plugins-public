@@ -43,6 +43,11 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 	}
 
 	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
 	public void lightHealEffect(Player mPlayer, Location loc, Player mTarget) {
 		Location l = loc.clone().add(0, 1, 0);
 		new PartialParticle(Particle.HEART, l, 7, 0.7, 0.7, 0.7, 0)

@@ -12,4 +12,5 @@ public interface CosmeticSkill {
 
 	Material getDisplayItem();
 
+	String getName();
 }

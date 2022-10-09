@@ -39,6 +39,11 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 	}
 
 	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
 	public void effectsOnSwap(Player mPlayer, boolean isGruesomeBeforeSwap) {
 		if (!isGruesomeBeforeSwap) { // brutal -> gruesome, dark red
 			spawnRing(mPlayer.getLocation(), mPlayer, ECHO_COLOR);

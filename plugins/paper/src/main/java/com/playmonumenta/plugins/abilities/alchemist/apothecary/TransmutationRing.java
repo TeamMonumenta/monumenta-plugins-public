@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.TransmRingCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
@@ -15,11 +17,8 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -31,7 +30,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class TransmutationRing extends PotionAbility {
-	private static final Particle.DustOptions GOLD_COLOR = new Particle.DustOptions(Color.fromRGB(255, 200, 0), 1.2f);
 	private static final int TRANSMUTATION_RING_1_COOLDOWN = 25 * 20;
 	private static final int TRANSMUTATION_RING_2_COOLDOWN = 20 * 20;
 	private static final int TRANSMUTATION_RING_RADIUS = 5;
@@ -58,6 +56,8 @@ public class TransmutationRing extends PotionAbility {
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private int mKills = 0;
 
+	private final TransmRingCS mCosmetic;
+
 	public TransmutationRing(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Transmutation Ring", 0, 0);
 		mInfo.mLinkedSpell = ClassAbility.TRANSMUTATION_RING;
@@ -74,6 +74,8 @@ public class TransmutationRing extends PotionAbility {
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 		});
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TransmRingCS(), TransmRingCS.SKIN_LIST);
 	}
 
 	@Override
@@ -92,16 +94,14 @@ public class TransmutationRing extends PotionAbility {
 			mCenter = potion.getLocation();
 			World world = mPlayer.getWorld();
 
-			world.playSound(mCenter, Sound.ENTITY_PHANTOM_FLAP, 3f, 0.35f);
+			mCosmetic.ringSoundStart(world, mCenter);
 
 			int duration = TRANSMUTATION_RING_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 			double amplifier = DAMAGE_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
 			double perKillAmplifier = DAMAGE_PER_DEATH_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_PER_KILL_AMPLIFIER);
 			int maxKills = MAX_KILLS + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_KILLS);
 
-			PPCircle particles = new PPCircle(Particle.REDSTONE, mCenter, mRadius)
-				.data(GOLD_COLOR)
-				.ringMode(true);
+			PPCircle particles = mCosmetic.ringPPCircle(mCenter, mRadius);
 
 			new BukkitRunnable() {
 				int mTicks = 0;
@@ -127,10 +127,7 @@ public class TransmutationRing extends PotionAbility {
 						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost));
 					}
 
-					particles.count((int) Math.floor(120 * mRadius / TRANSMUTATION_RING_RADIUS)).location(mCenter).spawnAsPlayerActive(mPlayer);
-					particles.count((int) Math.floor(30 * mRadius / TRANSMUTATION_RING_RADIUS)).location(mCenter.clone().add(0, 0.5, 0)).spawnAsPlayerActive(mPlayer);
-					particles.count((int) Math.floor(15 * mRadius / TRANSMUTATION_RING_RADIUS)).location(mCenter.clone().add(0, 1, 0)).spawnAsPlayerActive(mPlayer);
-					particles.count((int) Math.floor(7 * mRadius / TRANSMUTATION_RING_RADIUS)).location(mCenter.clone().add(0, 1.75, 0)).spawnAsPlayerActive(mPlayer);
+					mCosmetic.ringEffect(mPlayer, mCenter, particles, mRadius, TRANSMUTATION_RING_RADIUS, mTicks);
 
 					mTicks += 5;
 				}
@@ -153,7 +150,7 @@ public class TransmutationRing extends PotionAbility {
 	@Override
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		mKills++;
-		mPlayer.getWorld().playSound(event.getEntity().getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, 2);
+		mCosmetic.ringEffectOnKill(mPlayer, event.getEntity().getLocation());
 	}
 
 }

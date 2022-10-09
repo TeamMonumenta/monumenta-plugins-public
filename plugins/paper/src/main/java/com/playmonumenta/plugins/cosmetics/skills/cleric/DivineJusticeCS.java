@@ -39,6 +39,11 @@ public class DivineJusticeCS implements CosmeticSkill {
 		return Material.IRON_SWORD;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public float getHealPitchSelf() {
 		return HEAL_PITCH_SELF;
 	}

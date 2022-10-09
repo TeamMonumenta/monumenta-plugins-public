@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
+import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -15,7 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class VolcanicBurstCS extends MagmaShieldCS {
+public class VolcanicBurstCS extends MagmaShieldCS implements DepthsCS {
 	// Meteor like magma shield. Depth set: flame
 	// It used to be Heavenly Blast. I deeply loved it and a song with the same name.
 
@@ -23,7 +24,7 @@ public class VolcanicBurstCS extends MagmaShieldCS {
 
 	@Override
 	public Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, VolcanicBurstCS.NAME, false, this.getAbilityName(),
+		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"Unleash forth volcanic havoc,",
 			"an unstoppable blast from the heavens.");
 	}
@@ -38,6 +39,15 @@ public class VolcanicBurstCS extends MagmaShieldCS {
 		return Material.MAGMA_BLOCK;
 	}
 
+	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
+	public String getToken() {
+		return TALISMAN_FLAME;
+	}
 
 	@Override
 	public void magmaParticle(Player mPlayer, Location l) {

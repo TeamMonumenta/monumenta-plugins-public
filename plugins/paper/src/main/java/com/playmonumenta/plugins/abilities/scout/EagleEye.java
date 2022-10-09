@@ -4,22 +4,19 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.EagleEyeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -50,6 +47,7 @@ public class EagleEye extends Ability {
 	private final double mVulnLevel;
 	private Team mEagleEyeTeam = null;
 	private List<LivingEntity> mEntitiesAffected = new ArrayList<>(); // Used for tracking Entities on a first hit.
+	private final EagleEyeCS mCosmetic;
 
 	public EagleEye(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Eagle Eye");
@@ -66,7 +64,9 @@ public class EagleEye extends Ability {
 		mInfo.mIgnoreCooldown = true;
 
 		mVulnLevel = (isLevelOne() ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
-		mEagleEyeTeam = ScoreboardUtils.getExistingTeamOrCreate("eagleEyeColor", NamedTextColor.YELLOW);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EagleEyeCS(), EagleEyeCS.SKIN_LIST);
+		mEagleEyeTeam = mCosmetic.createTeams();
+
 	}
 
 
@@ -78,8 +78,7 @@ public class EagleEye extends Ability {
 		}
 
 		World world = player.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1.5f, 1.25f);
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.25f);
+		mCosmetic.eyeStart(world, mPlayer);
 
 		mEntitiesAffected = EntityUtils.getNearbyMobs(player.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, EAGLE_EYE_RADIUS), mPlayer);
 
@@ -122,8 +121,7 @@ public class EagleEye extends Ability {
 				}
 
 			}.runTaskTimer(mPlugin, 0, 1);
-			world.playSound(mob.getLocation(), Sound.ENTITY_PARROT_IMITATE_SHULKER, 0.4f, 0.7f);
-			new PartialParticle(Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
+			mCosmetic.eyeOnTarget(world, mPlayer, mob);
 		}
 
 		putOnCooldown();
@@ -138,6 +136,7 @@ public class EagleEye extends Ability {
 		if (isEnhanced() && mEntitiesAffected.contains(enemy)) {
 			event.setDamage(event.getDamage() * (1 + ENHANCEMENT_DAMAGE_PERCENT));
 			mEntitiesAffected.remove(enemy);
+			mCosmetic.eyeFirstStrike(enemy.getWorld(), mPlayer, enemy);
 
 			// Revert glowing color to normal white
 			if (mEagleEyeTeam.hasEntry(enemy.getUniqueId().toString())) {
@@ -156,4 +155,5 @@ public class EagleEye extends Ability {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		return !ItemUtils.isPickaxe(inMainHand) && inMainHand.getType() != Material.HEART_OF_THE_SEA;
 	}
+
 }

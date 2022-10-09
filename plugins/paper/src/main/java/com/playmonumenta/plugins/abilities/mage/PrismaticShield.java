@@ -3,9 +3,10 @@ package com.playmonumenta.plugins.abilities.mage;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.mage.PrismaticShieldCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -16,8 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -51,6 +50,8 @@ public class PrismaticShield extends Ability {
 	private final Set<ClassAbility> mHealedFromAbilitiesThisTick = new HashSet<>();
 	private boolean mHealedFromBlizzard = false;
 
+	private final PrismaticShieldCS mCosmetic;
+
 	public PrismaticShield(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Prismatic Shield");
 		mInfo.mLinkedSpell = ClassAbility.PRISMATIC_SHIELD;
@@ -78,6 +79,7 @@ public class PrismaticShield extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mAbsorptionHealth = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PrismaticShieldCS(), PrismaticShieldCS.SKIN_LIST);
 	}
 
 	@Override
@@ -115,14 +117,13 @@ public class PrismaticShield extends Ability {
 				MovementUtils.knockAway(mPlayer, mob, knockback, true);
 				if (isLevelTwo()) {
 					EntityUtils.applyStun(mPlugin, STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), mob);
+					mCosmetic.prismaOnStun(mob, STUN_DURATION, mPlayer);
 				}
 			}
 
 			AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION));
 			World world = mPlayer.getWorld();
-			new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1).spawnAsPlayerActive(mPlayer);
-			world.playSound(mPlayer.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
+			mCosmetic.prismaEffect(world, mPlayer, RADIUS);
 			MessagingUtils.sendActionBarMessage(mPlayer, "Prismatic Shield has been activated");
 
 			if (dealDamageLater) {
@@ -162,6 +163,7 @@ public class PrismaticShield extends Ability {
 				mHealedFromBlizzard = true;
 			}
 			PlayerUtils.healPlayer(mPlugin, mPlayer, HEAL_PERCENT / 100.0 * EntityUtils.getMaxHealth(mPlayer));
+			mCosmetic.prismaOnHeal(mPlayer);
 		}
 		return false; // there may be multiple spells cast in the same tick, need to check them all. No recursion possible as this doesn't deal damage.
 	}

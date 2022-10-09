@@ -44,6 +44,11 @@ public class ColossalBruteCS extends BruteForceCS {
 	}
 
 	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
 	public void bruteOnDamage(Player mPlayer, Location loc, int combo) {
 		mPlayer.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.75f);
 		mPlayer.getWorld().playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.75f, PITCHES[combo]);

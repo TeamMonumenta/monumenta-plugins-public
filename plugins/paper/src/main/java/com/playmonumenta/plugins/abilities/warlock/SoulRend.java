@@ -4,12 +4,13 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.SoulRendCS;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -19,8 +20,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -49,6 +48,8 @@ public class SoulRend extends Ability {
 
 	private @Nullable DarkPact mDarkPact;
 
+	private final SoulRendCS mCosmetic;
+
 	public SoulRend(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Soul Rend");
 		mInfo.mScoreboardId = "SoulRend";
@@ -60,6 +61,7 @@ public class SoulRend extends Ability {
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mDisplayItem = new ItemStack(Material.POTION, 1);
 		mHeal = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, isLevelOne() ? HEAL_1 : HEAL_2);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SoulRendCS(), SoulRendCS.SKIN_LIST);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mDarkPact = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, DarkPact.class);
@@ -74,26 +76,20 @@ public class SoulRend extends Ability {
 
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
-			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, 0.4f, 1.5f);
-			world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 0.4f, 1.15f);
+			mCosmetic.rendHitSound(world, loc);
 
 			if (isLevelOne()) {
-				new PartialParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 10, 0.75, 0.5, 0.75, 0.0).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.SPELL_MOB, loc.clone().add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.0).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 7, 0.75, 0.5, 0.75, 0.0).spawnAsPlayerActive(mPlayer);
+				mCosmetic.rendHitParticle1(mPlayer, loc);
 			} else {
-				new PartialParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 75, 3.5, 1.5, 3.5, 0.0).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.SPELL_MOB, loc.clone().add(0, 1, 0), 95, 3.5, 1.5, 3.5, 0.0).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 45, 3.5, 1.5, 3.5, 0.0).spawnAsPlayerActive(mPlayer);
+				mCosmetic.rendHitParticle2(mPlayer, loc, RADIUS);
 			}
 
-			new PartialParticle(Particle.DAMAGE_INDICATOR, mPlayer.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0).spawnAsPlayerActive(mPlayer);
 			NavigableSet<Effect> darkPactEffects = mPlugin.mEffectManager.getEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
 			if (darkPactEffects != null) {
 				if (mDarkPact != null && mDarkPact.isLevelTwo()) {
 					int currPactDuration = darkPactEffects.last().getDuration();
 					mPlugin.mEffectManager.clearEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
-					new PartialParticle(Particle.DAMAGE_INDICATOR, mPlayer.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0).spawnAsPlayerActive(mPlayer);
+					mCosmetic.rendHealEffect(mPlayer, mPlayer, enemy);
 					double remainingHealth = EntityUtils.getMaxHealth(mPlayer) - mPlayer.getHealth();
 					PlayerUtils.healPlayer(mPlugin, mPlayer, mHeal);
 					mPlugin.mEffectManager.addEffect(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME, new PercentHeal(currPactDuration, -1));
@@ -102,14 +98,16 @@ public class SoulRend extends Ability {
 						double absorption = heal - Math.min(mHeal, remainingHealth);
 						absorption = Math.min(ABSORPTION_CAP, absorption);
 						AbsorptionUtils.addAbsorption(mPlayer, absorption, absorption, ABSORPTION_DURATION);
+						mCosmetic.rendAbsorptionEffect(mPlayer, mPlayer, enemy);
 					}
 				} else if (isEnhanced()) {
 					double absorption = heal;
 					absorption = Math.min(ABSORPTION_CAP, absorption);
 					AbsorptionUtils.addAbsorption(mPlayer, absorption, absorption, ABSORPTION_DURATION);
+					mCosmetic.rendAbsorptionEffect(mPlayer, mPlayer, enemy);
 				}
 			} else {
-				new PartialParticle(Particle.DAMAGE_INDICATOR, mPlayer.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0).spawnAsPlayerActive(mPlayer);
+				mCosmetic.rendHealEffect(mPlayer, mPlayer, enemy);
 				if (isEnhanced()) {
 					double remainingHealth = EntityUtils.getMaxHealth(mPlayer) - mPlayer.getHealth();
 					if (heal > remainingHealth) {
@@ -117,6 +115,7 @@ public class SoulRend extends Ability {
 						heal = remainingHealth;
 						absorption = Math.min(ABSORPTION_CAP, absorption);
 						AbsorptionUtils.addAbsorption(mPlayer, absorption, absorption, ABSORPTION_DURATION);
+						mCosmetic.rendAbsorptionEffect(mPlayer, mPlayer, enemy);
 					}
 				}
 				PlayerUtils.healPlayer(mPlugin, mPlayer, heal);
@@ -124,7 +123,7 @@ public class SoulRend extends Ability {
 
 			if (isLevelTwo()) {
 				for (Player p : PlayerUtils.otherPlayersInRange(mPlayer, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), true)) {
-					new PartialParticle(Particle.DAMAGE_INDICATOR, p.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0).spawnAsPlayerActive(mPlayer);
+					mCosmetic.rendHealEffect(mPlayer, p, enemy);
 					if (isEnhanced()) {
 						double remainingHealth = EntityUtils.getMaxHealth(p) - p.getHealth();
 						if (heal > remainingHealth) {
@@ -132,6 +131,7 @@ public class SoulRend extends Ability {
 							heal = remainingHealth;
 							absorption = Math.min(ABSORPTION_CAP, absorption);
 							AbsorptionUtils.addAbsorption(p, absorption, absorption, ABSORPTION_DURATION);
+							mCosmetic.rendAbsorptionEffect(mPlayer, p, enemy);
 						}
 					}
 					PlayerUtils.healPlayer(mPlugin, p, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, heal), mPlayer);

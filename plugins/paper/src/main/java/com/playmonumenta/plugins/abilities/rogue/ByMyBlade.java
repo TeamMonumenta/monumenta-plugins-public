@@ -3,10 +3,11 @@ package com.playmonumenta.plugins.abilities.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.ByMyBladeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -15,8 +16,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -45,6 +44,7 @@ public class ByMyBlade extends Ability {
 
 	private final double mDamageBonus;
 	private final int mHasteAmplifier;
+	private final ByMyBladeCS mCosmetic;
 
 	public ByMyBlade(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "By My Blade");
@@ -71,6 +71,8 @@ public class ByMyBlade extends Ability {
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 		mDamageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE);
 		mHasteAmplifier = (isLevelOne() ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER) + (int) CharmManager.getLevel(mPlayer, CHARM_HASTE_AMPLIFIER);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ByMyBladeCS(), ByMyBladeCS.SKIN_LIST);
 	}
 
 	@Override
@@ -84,10 +86,10 @@ public class ByMyBlade extends Ability {
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
 			loc.add(0, 1, 0);
-			int count = 15;
+			int level = 1;
 			if (isLevelTwo()) {
-				new PartialParticle(Particle.SPELL_WITCH, loc, 45, 0.2, 0.65, 0.2, 1.0).spawnAsPlayerActive(mPlayer);
-				count = 30;
+				mCosmetic.bmbDamageLv2(mPlayer, enemy);
+				level = 2;
 			}
 			if (isEnhanced()) {
 				// This might be a bit scuffed... but hopefully it feels better this way.
@@ -103,14 +105,12 @@ public class ByMyBlade extends Ability {
 							} else {
 								PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * ENHANCEMENT_HEAL_PERCENT);
 							}
-							new PartialParticle(Particle.HEART, mPlayer.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
+							mCosmetic.bmbHeal(mPlayer, loc);
 						}
 					}
 				}.runTaskLater(mPlugin, 1);
 			}
-			new PartialParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
+			mCosmetic.bmbDamage(world, mPlayer, enemy, level);
 			putOnCooldown();
 		}
 		return false;

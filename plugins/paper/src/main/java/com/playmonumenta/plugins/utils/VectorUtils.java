@@ -66,10 +66,10 @@ public class VectorUtils {
 	// convert direction vector to [yaw, pitch] in degrees
 	public static double[] vectorToRotation(Vector dir) {
 		double[] ret = new double[2];
-		dir = dir.normalize();
+		Vector nor = dir.clone().normalize();
 		//For Minecraft coords are different with math coords, we need to flip X and Y.
-		ret[1] = Math.toDegrees(Math.asin(Math.max(-1, Math.min(1, -dir.getY()))));
-		ret[0] = Math.toDegrees(Math.atan2(-dir.getX(), dir.getZ()));
+		ret[1] = Math.toDegrees(Math.asin(Math.max(-1, Math.min(1, -nor.getY()))));
+		ret[0] = Math.toDegrees(Math.atan2(-nor.getX(), nor.getZ()));
 		return ret;
 	}
 
@@ -88,7 +88,7 @@ public class VectorUtils {
 		} else {
 			double[] targetAngle = VectorUtils.vectorToRotation(targetDir);
 			// Start with the assumption the target is at due South (yaw 0.0, pitch 0.0, no offset)
-			Vector dir = new Vector(0.0, 0.0, 1.0);
+			Vector dir = new Vector(0.0, 0.0, targetDir.length());
 			// Apply pitch/yaw offset to get start pattern
 			dir = VectorUtils.rotateXAxis(dir, pitch);
 			dir = VectorUtils.rotateYAxis(dir, yaw);

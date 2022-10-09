@@ -40,6 +40,11 @@ public class HuntingCompanionCS implements CosmeticSkill {
 		return Material.SWEET_BERRIES;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public String getFoxName() {
 		return FOX_NAME;
 	}

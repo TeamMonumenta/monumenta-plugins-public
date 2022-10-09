@@ -4,13 +4,14 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.GloriousBattleCS;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -23,9 +24,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -66,8 +64,10 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 
 	private int mStacks;
 	private final int mStackLimit;
+	private final int mSpellDelay = 10;
 	private final double mDamage;
 	private @Nullable BukkitRunnable mRunnable;
+	private final GloriousBattleCS mCosmetic;
 
 	public GloriousBattle(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Glorious Battle");
@@ -82,6 +82,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mStacks = 0;
 		mStackLimit = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GloriousBattleCS(), GloriousBattleCS.SKIN_LIST);
 	}
 
 	@Override
@@ -101,9 +102,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		ClientModHandler.updateAbility(mPlayer, this);
 		Location location = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
-		world.playSound(location, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 2f, 0.5f);
-		new PartialParticle(Particle.CRIMSON_SPORE, location, 25, 1, 0, 1, 0).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIT, location, 15, 1, 0, 1, 0).spawnAsPlayerActive(mPlayer);
+		mCosmetic.gloryStart(world, mPlayer, location, mSpellDelay);
 
 		if (mRunnable != null) {
 			mRunnable.cancel();
@@ -114,12 +113,13 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			@Override
 			public void run() {
 				mT++;
+				mCosmetic.gloryTick(mPlayer, mT);
 				if (mPlayer.isOnGround()) {
 					mPlugin.mEffectManager.clearEffects(mPlayer, KBR_EFFECT);
-
 					double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 					Location location = mPlayer.getLocation();
 					World world = mPlayer.getWorld();
+					mCosmetic.gloryOnLand(world, mPlayer, location, radius);
 					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(location, radius);
 					mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
@@ -131,15 +131,12 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 
 					EntityUtils.applyBleed(mPlugin, BLEED_TIME + CharmManager.getExtraDuration(mPlayer, CHARM_BLEED_DURATION), BLEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER), nearest);
 					DamageUtils.damage(mPlayer, nearest, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage), ClassAbility.GLORIOUS_BATTLE, true);
+					mCosmetic.gloryOnDamage(world, mPlayer, nearest);
 
 					float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED);
 					for (LivingEntity mob : mobs) {
 						MovementUtils.knockAway(mPlayer, mob, knockback, true);
 					}
-
-					world.playSound(location, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.PLAYERS, 0.8f, 0.65f);
-					new PartialParticle(Particle.SWEEP_ATTACK, location, 20, 1, 0, 1, 0).spawnAsPlayerActive(mPlayer);
-
 					this.cancel();
 				}
 
@@ -149,7 +146,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 				}
 			}
 		};
-		mRunnable.runTaskTimer(mPlugin, 10, 1);
+		mRunnable.runTaskTimer(mPlugin, mSpellDelay, 1);
 	}
 
 	@Override

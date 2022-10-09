@@ -32,9 +32,15 @@ public class DarkLanceCS extends ManaLanceCS {
 	}
 
 	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
 	public void lanceHitBlock(Player mPlayer, Location bLoc, World world) {
 		new PartialParticle(Particle.SOUL_FIRE_FLAME, bLoc, 40, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
 		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
+
 	}
 
 	@Override

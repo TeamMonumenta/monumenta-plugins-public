@@ -29,6 +29,11 @@ public class MagmaShieldCS implements CosmeticSkill {
 		return Material.MAGMA_CREAM;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public void magmaParticle(Player mPlayer, Location l) {
 		new PartialParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);

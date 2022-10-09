@@ -166,13 +166,13 @@ public class AmplifyingHex extends Ability {
 					PotionEffect effect = mob.getPotionEffect(effectType);
 					if (effect != null) {
 						debuffCount++;
-						amplifierCount += Math.min(mAmplifierCap, effect.getAmplifier());
+						amplifierCount += (int) Math.min(mAmplifierCap, effect.getAmplifier());
 					}
 				}
 
 				if (mob.getFireTicks() > 0) {
 					debuffCount++;
-					amplifierCount += Math.min(mAmplifierCap, Inferno.getInfernoLevel(mPlugin, mob));
+					amplifierCount += (int) Math.min(mAmplifierCap, Inferno.getInfernoLevel(mPlugin, mob));
 					// mPlayer.sendMessage("On Fire");
 				}
 
@@ -193,7 +193,7 @@ public class AmplifyingHex extends Ability {
 
 				if (EntityUtils.isBleeding(mPlugin, mob)) {
 					debuffCount++;
-					amplifierCount += Math.min(mAmplifierCap, EntityUtils.getBleedLevel(mPlugin, mob) - 1);
+					amplifierCount += (int) Math.min(mAmplifierCap, EntityUtils.getBleedLevel(mPlugin, mob) - 1);
 				}
 
 				//Custom slow effect interaction
@@ -216,7 +216,7 @@ public class AmplifyingHex extends Ability {
 				if (EntityUtils.isVulnerable(mPlugin, mob)) {
 					debuffCount++;
 					double vulnAmp = EntityUtils.getVulnAmount(mPlugin, mob);
-					amplifierCount += Math.min(mAmplifierCap, Math.max((int) Math.floor(vulnAmp * 10) - 1, 0));
+					amplifierCount += (int) Math.min(mAmplifierCap, Math.max((int) Math.floor(vulnAmp * 10) - 1, 0));
 				}
 
 				//Custom DoT interaction

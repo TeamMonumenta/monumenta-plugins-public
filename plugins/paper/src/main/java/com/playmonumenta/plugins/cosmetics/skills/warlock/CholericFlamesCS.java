@@ -30,6 +30,11 @@ public class CholericFlamesCS implements CosmeticSkill {
 		return Material.FIRE_CHARGE;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public void flameParticle(Player mPlayer, Location mLoc, double mRadius) {
 		new PPCircle(Particle.FLAME, mLoc, mRadius).ringMode(true).count(40).extra(0.125).spawnAsPlayerActive(mPlayer);
 		new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).ringMode(true).count(40).extra(0.125).spawnAsPlayerActive(mPlayer);

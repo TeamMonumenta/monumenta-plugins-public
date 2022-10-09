@@ -30,6 +30,11 @@ public class ViciousCombosCS implements CosmeticSkill {
 		return Material.ZOMBIE_HEAD;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public void comboOnKill(World world, Location loc, Player mPlayer, double range, LivingEntity target) {
 		final double VICIOUS_COMBOS_RANGE = range;
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.5f);

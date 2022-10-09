@@ -31,6 +31,11 @@ public class HallowedLanceCS extends ManaLanceCS {
 	}
 
 	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
 	public void lanceHitBlock(Player mPlayer, Location bLoc, World world) {
 		new PartialParticle(Particle.CLOUD, bLoc, 20, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
 		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);

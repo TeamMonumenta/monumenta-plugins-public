@@ -37,6 +37,11 @@ public class BezoarCS implements CosmeticSkill {
 		return Material.LIME_CONCRETE;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public ItemStack bezoarItem() {
 		ItemStack itemBezoar = new ItemStack(Material.LIME_CONCRETE);
 		ItemMeta bezoarMeta = itemBezoar.getItemMeta();

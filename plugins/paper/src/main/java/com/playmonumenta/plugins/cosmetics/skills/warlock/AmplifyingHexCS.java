@@ -29,6 +29,11 @@ public class AmplifyingHexCS implements CosmeticSkill {
 		return Material.DRAGON_BREATH;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public void amplifyingParticle(Player mPlayer, Location l) {
 		new PartialParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);

@@ -32,6 +32,11 @@ public class GruesomeAlchemyCS implements CosmeticSkill {
 		return Material.DRAGON_BREATH;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public void effectsOnSwap(Player mPlayer, boolean isGruesomeBeforeSwap) {
 		if (isGruesomeBeforeSwap) {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 1.25f);

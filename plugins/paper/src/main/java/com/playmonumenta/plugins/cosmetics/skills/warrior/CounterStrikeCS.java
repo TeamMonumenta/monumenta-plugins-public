@@ -33,6 +33,11 @@ public class CounterStrikeCS implements CosmeticSkill {
 		return Material.CACTUS;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public void counterOnHurt(Player mPlayer, Location loc, LivingEntity source) {
 		new PartialParticle(Particle.SWEEP_ATTACK, loc, 6, 0.75, 0.5, 0.75, 0.001).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 8, 0.75, 0.5, 0.75, 0.1).spawnAsPlayerActive(mPlayer);

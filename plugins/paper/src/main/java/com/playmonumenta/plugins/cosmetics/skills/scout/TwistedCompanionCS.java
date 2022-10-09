@@ -52,6 +52,11 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 	}
 
 	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
 	public String getFoxName() {
 		return FOX_NAME;
 	}

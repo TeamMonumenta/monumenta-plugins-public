@@ -159,6 +159,7 @@ public class PlayerListener implements Listener {
 		player.removeScoreboardTag("MidTransfer");
 
 		mPlugin.mTrackingManager.addEntity(player);
+		mPlugin.mCosmeticsManager.playerJoinEvent(event);
 		mPlugin.mAbilityManager.playerJoinEvent(player, event);
 
 		DailyReset.handle(mPlugin, player);

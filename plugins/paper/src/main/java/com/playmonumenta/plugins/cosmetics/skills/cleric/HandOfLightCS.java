@@ -32,6 +32,11 @@ public class HandOfLightCS implements CosmeticSkill {
 		return Material.PINK_DYE;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public void lightHealEffect(Player mPlayer, Location loc, Player mTarget) {
 		new PartialParticle(Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);

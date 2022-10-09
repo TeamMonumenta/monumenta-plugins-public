@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
+import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -23,7 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class FireworkStrikeCS extends PredatorStrikeCS {
+public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 	//Steely predator stirke. Depth set: steel
 
 	public static final String NAME = "Firework Strike";
@@ -48,6 +49,16 @@ public class FireworkStrikeCS extends PredatorStrikeCS {
 	@Override
 	public Material getDisplayItem() {
 		return Material.FIREWORK_ROCKET;
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	@Override
+	public String getToken() {
+		return TALISMAN_STEEL;
 	}
 
 	@Override
