@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.AbstractArrow;
@@ -56,20 +58,23 @@ public final class EffectManager implements Listener {
 		 * are tracked and ticked down by the over-arching runnable, meaning that after a stronger Effect wears off,
 		 * longer lasting weaker Effects are still active and will be applied.
 		 */
-		public final Map<EffectPriority, HashMap<String, NavigableSet<Effect>>> mPriorityMap = new EnumMap<>(EffectPriority.class);
+		public final Map<EffectPriority, Map<String, NavigableSet<Effect>>> mPriorityMap = new EnumMap<>(EffectPriority.class);
 		public final Entity mEntity;
 
 		public Effects(Entity entity) {
 			mEntity = entity;
-			mPriorityMap.put(EffectPriority.EARLY, new HashMap<>());
-			mPriorityMap.put(EffectPriority.NORMAL, new HashMap<>());
-			mPriorityMap.put(EffectPriority.LATE, new HashMap<>());
+			// NB: concurrent maps and sets are used as the tab list reads effects from a different thread
+			// mPriorityMap is not concurrent, as it is never updated after this constructor
+			// (and we rely on its iteration order being the order of enum constants)
+			mPriorityMap.put(EffectPriority.EARLY, new ConcurrentHashMap<>());
+			mPriorityMap.put(EffectPriority.NORMAL, new ConcurrentHashMap<>());
+			mPriorityMap.put(EffectPriority.LATE, new ConcurrentHashMap<>());
 		}
 
 		public void addEffect(String source, Effect effect) {
 			Map<String, NavigableSet<Effect>> priorityEffects = mPriorityMap.get(effect.getPriority());
 
-			NavigableSet<Effect> effectGroup = priorityEffects.computeIfAbsent(source, k -> new TreeSet<>());
+			NavigableSet<Effect> effectGroup = priorityEffects.computeIfAbsent(source, k -> new ConcurrentSkipListSet<>());
 
 			if (!effectGroup.isEmpty()) {
 				Effect currentEffect = effectGroup.last();
@@ -196,7 +201,7 @@ public final class EffectManager implements Listener {
 
 		public @Nullable String getSource(Effect effect) {
 			for (EffectPriority priority : mPriorityMap.keySet()) {
-				HashMap<String, NavigableSet<Effect>> sourceMap = mPriorityMap.get(priority);
+				Map<String, NavigableSet<Effect>> sourceMap = mPriorityMap.get(priority);
 				for (String source : sourceMap.keySet()) {
 					if (sourceMap.get(source).contains(effect)) {
 						return source;
@@ -211,7 +216,7 @@ public final class EffectManager implements Listener {
 		 */
 		public JsonObject getAsJsonObject() {
 			JsonObject ret = new JsonObject();
-			for (Map.Entry<EffectPriority, HashMap<String, NavigableSet<Effect>>> priorityEntries : mPriorityMap.entrySet()) {
+			for (Map.Entry<EffectPriority, Map<String, NavigableSet<Effect>>> priorityEntries : mPriorityMap.entrySet()) {
 				JsonObject mid = new JsonObject();
 				JsonArray source = new JsonArray();
 				for (Map.Entry<String, NavigableSet<Effect>> effects : priorityEntries.getValue().entrySet()) {
@@ -328,9 +333,9 @@ public final class EffectManager implements Listener {
 				// Periodic trigger for Effects in case they need stuff like particles
 				try {
 					for (Map.Entry<Entity, Effects> entry : ((HashMap<Entity, Effects>) mEntities.clone()).entrySet()) {
-						for (HashMap<String, NavigableSet<Effect>> priorityEffects : entry.getValue().mPriorityMap.values()) {
-							// Have to make a copy of the map to prevent concurrent modification exceptions in case ticking changes the effects :(
-							for (NavigableSet<Effect> effectGroup : ((HashMap<String, NavigableSet<Effect>>) priorityEffects.clone()).values()) {
+						for (Map<String, NavigableSet<Effect>> priorityEffects : entry.getValue().mPriorityMap.values()) {
+							// Have to make a copy of the effects to prevent concurrent modification exceptions in case ticking changes the effects :(
+							for (NavigableSet<Effect> effectGroup : new ArrayList<>(priorityEffects.values())) {
 								try {
 									effectGroup.last().entityTickEffect(entry.getKey(), fourHertz, twoHertz, oneHertz);
 								} catch (Exception ex) {
@@ -353,9 +358,8 @@ public final class EffectManager implements Listener {
 							}
 						}
 
-						Iterator<HashMap<String, NavigableSet<Effect>>> effectsIter = effects.mPriorityMap.values().iterator();
-						while (effectsIter.hasNext()) {
-							Iterator<NavigableSet<Effect>> priorityEffectsIter = effectsIter.next().values().iterator();
+						for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+							Iterator<NavigableSet<Effect>> priorityEffectsIter = priorityEffects.values().iterator();
 							while (priorityEffectsIter.hasNext()) {
 								NavigableSet<Effect> effectGroup = priorityEffectsIter.next();
 								if (effectGroup.isEmpty()) {
