@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.ItemStat;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
@@ -960,6 +962,10 @@ public class ItemStatUtils {
 	}
 
 	public static void applyCustomEffects(Plugin plugin, Player player, ItemStack item) {
+		applyCustomEffects(plugin, player, item, true);
+	}
+
+	public static void applyCustomEffects(Plugin plugin, Player player, ItemStack item, boolean applySickness) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
 		}
@@ -999,7 +1005,25 @@ public class ItemStatUtils {
 
 			EffectType effectType = EffectType.fromType(type);
 			if (effectType != null) {
-				EffectType.applyEffect(effectType, player, duration, strength, source);
+				if (effectType == EffectType.ABSORPTION) {
+					double sicknessPenalty = 0;
+					NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "AbsorptionSickness");
+					if (sicks != null) {
+						Effect sick = sicks.last();
+						sicknessPenalty = sick.getMagnitude();
+					}
+					EffectType.applyEffect(effectType, player, duration, strength * (1 - sicknessPenalty), source, applySickness);
+				} else if (effectType == EffectType.INSTANT_HEALTH || effectType == EffectType.VANILLA_HEAL) {
+					double sicknessPenalty = 0;
+					NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "HealingSickness");
+					if (sicks != null) {
+						Effect sick = sicks.last();
+						sicknessPenalty = sick.getMagnitude();
+					}
+					EffectType.applyEffect(effectType, player, duration, strength * (1 - sicknessPenalty), source, applySickness);
+				} else {
+					EffectType.applyEffect(effectType, player, duration, strength, source, applySickness);
+				}
 			}
 		}
 	}
@@ -1022,7 +1046,7 @@ public class ItemStatUtils {
 			String source = effect.getString(EFFECT_SOURCE_KEY);
 			EffectType effectType = EffectType.fromType(type);
 			if (effectType != null) {
-				EffectType.applyEffect(effectType, player, duration + durationChange, strength, source);
+				EffectType.applyEffect(effectType, player, duration + durationChange, strength, source, false);
 			}
 		}
 	}
@@ -1045,7 +1069,7 @@ public class ItemStatUtils {
 			String source = effect.getString(EFFECT_SOURCE_KEY);
 			EffectType effectType = EffectType.fromType(type);
 			if (effectType != null) {
-				EffectType.applyEffect(effectType, player, (int) (duration * scale), strength, source);
+				EffectType.applyEffect(effectType, player, (int) (duration * scale), strength, source, false);
 			}
 		}
 	}
@@ -2415,7 +2439,7 @@ public class ItemStatUtils {
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true, player.getMaxHealth());
+				playerItemStats.updateStats(player, true, player.getMaxHealth(), true);
 			}
 		}).register();
 	}
@@ -2934,7 +2958,7 @@ public class ItemStatUtils {
 		generateItemStats(item);
 		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 		if (playerItemStats != null) {
-			playerItemStats.updateStats(player, true, player.getMaxHealth());
+			playerItemStats.updateStats(player, true, player.getMaxHealth(), true);
 		}
 	}
 
@@ -2991,7 +3015,7 @@ public class ItemStatUtils {
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true, player.getMaxHealth());
+				playerItemStats.updateStats(player, true, player.getMaxHealth(), true);
 			}
 		}).register();
 	}
@@ -3037,7 +3061,7 @@ public class ItemStatUtils {
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true, player.getMaxHealth());
+				playerItemStats.updateStats(player, true, player.getMaxHealth(), true);
 			}
 		}).register();
 	}

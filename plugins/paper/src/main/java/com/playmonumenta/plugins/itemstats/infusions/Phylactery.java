@@ -24,7 +24,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 public class Phylactery implements Infusion {
 
 	public static final double XP_KEPT = 0.1;
-	public static final double DURATION_KEPT = 0.1;
+	public static final double DURATION_KEPT = 0.05;
+	public static final int BASE_POTION_KEEP_LEVEL = 10;
 	public static final String GRAVE_XP_SCOREBOARD = "PhylacteryXP";
 
 	private static final HashMap<UUID, HashMap<PotionManager.PotionID, List<PotionUtils.PotionInfo>>> POTION_EFFECTS_MAP = new HashMap<>();
@@ -42,6 +43,7 @@ public class Phylactery implements Infusion {
 
 	@Override
 	public void onDeath(Plugin plugin, Player player, double value, PlayerDeathEvent event) {
+		value -= BASE_POTION_KEEP_LEVEL;
 		if (!event.getKeepLevel()) {
 			int playerXp = ExperienceUtils.getTotalExperience(player);
 			int newTotalXp = ExperienceUtils.getTotalExperience(event.getNewLevel()) + event.getNewExp();
@@ -63,6 +65,8 @@ public class Phylactery implements Infusion {
 			}
 		}
 
+		value += BASE_POTION_KEEP_LEVEL;
+
 		HashMap<PotionManager.PotionID, List<PotionUtils.PotionInfo>> infoMap = new HashMap<>(plugin.mPotionManager.getAllPotionInfos(player));
 		infoMap.remove(PotionManager.PotionID.SAFE_ZONE);
 		infoMap.remove(PotionManager.PotionID.ABILITY_SELF);
@@ -83,6 +87,7 @@ public class Phylactery implements Infusion {
 
 		// Store Effects into CUSTOM_EFFECTS_MAP
 		List<Effect> effects = plugin.mEffectManager.getAllEffects(player);
+
 		if (effects != null) {
 			List<EffectPair> resultEffects = new ArrayList<>();
 			for (Effect effect : effects) {
@@ -101,6 +106,7 @@ public class Phylactery implements Infusion {
 					}
 				}
 			}
+			plugin.mEffectManager.clearEffects(player);
 			CUSTOM_EFFECTS_MAP.put(player.getUniqueId(), resultEffects);
 		}
 	}

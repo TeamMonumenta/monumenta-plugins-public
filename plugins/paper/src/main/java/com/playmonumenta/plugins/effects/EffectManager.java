@@ -83,6 +83,8 @@ public final class EffectManager implements Listener {
 				boolean foundEffect = false;
 				for (Effect effectIter : effectGroup) {
 					if (effectIter.compareTo(effect) == 0 && effectIter.getDuration() < effect.getDuration()) {
+						effectIter.entityLoseEffect(mEntity);
+						effectIter.entityGainEffect(mEntity);
 						effectIter.setDuration(effect.getDuration());
 						foundEffect = true;
 						break;
@@ -246,6 +248,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(AbilityCooldownDecrease.effectID, AbilityCooldownDecrease::deserialize);
 		mEffectDeserializer.put(AbilityCooldownIncrease.effectID, AbilityCooldownIncrease::deserialize);
 		mEffectDeserializer.put(AbilitySilence.effectID, AbilitySilence::deserialize);
+		mEffectDeserializer.put(AbsorptionSickness.effectID, AbsorptionSickness::deserialize);
 		mEffectDeserializer.put(Aesthetics.effectID, Aesthetics::deserialize);
 		mEffectDeserializer.put(ArrowSaving.effectID, ArrowSaving::deserialize);
 		mEffectDeserializer.put(AstralOmenBonusDamage.effectID, AstralOmenBonusDamage::deserialize);
@@ -267,6 +270,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(EnchantedPrayerAoE.effectID, EnchantedPrayerAoE::deserialize);
 		mEffectDeserializer.put(FirstStrikeCooldown.effectID, FirstStrikeCooldown::deserialize);
 		mEffectDeserializer.put(FlatDamageDealt.effectID, FlatDamageDealt::deserialize);
+		mEffectDeserializer.put(HealingSickness.effectID, HealingSickness::deserialize);
 		mEffectDeserializer.put(HealPlayerOnDeath.effectID, HealPlayerOnDeath::deserialize);
 		mEffectDeserializer.put(InfernoDamage.effectID, InfernoDamage::deserialize);
 		mEffectDeserializer.put(ItemCooldown.effectID, ItemCooldown::deserialize);

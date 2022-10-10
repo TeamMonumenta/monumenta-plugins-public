@@ -98,7 +98,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		}
 
 		boolean hasPositiveEffects = PotionUtils.hasPositiveEffects(PotionUtils.getEffects(potion.getItem()));
-		if ((PotionUtils.hasNegativeEffects(potion.getItem()) || ItemStatUtils.hasNegativeEffect(potion.getItem())) && (!hasPositiveEffects)) {
+		if ((PotionUtils.hasNegativeEffects(potion.getItem()) || ItemStatUtils.hasNegativeEffect(potion.getItem())) && !hasPositiveEffects) {
 			return true;
 		}
 
@@ -117,7 +117,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				}
 
 				// Apply custom effects from potion
-				ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem());
+				ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem(), false);
 
 				/* Remove this player from the "usual" application of potion effects */
 				affectedEntities.remove(p);

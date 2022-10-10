@@ -175,7 +175,7 @@ public class ShulkerEquipmentListener implements Listener {
 					event.setCancelled(true);
 					Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = mPlugin.mItemStatManager.getPlayerItemStatsMappings();
 					if (itemStatsMap.containsKey(player.getUniqueId())) {
-						itemStatsMap.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth());
+						itemStatsMap.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth(), true);
 					}
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
 				} else if (sbox.isLocked() && sbox.getLock().equals(CHARM_STRING)) {
@@ -240,7 +240,7 @@ public class ShulkerEquipmentListener implements Listener {
 					event.setCancelled(true);
 					Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = mPlugin.mItemStatManager.getPlayerItemStatsMappings();
 					if (itemStatsMap.containsKey(player.getUniqueId())) {
-						itemStatsMap.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth());
+						itemStatsMap.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth(), true);
 					}
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
 

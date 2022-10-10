@@ -180,11 +180,8 @@ public class PotionManager {
 	}
 
 	public void loadFromJsonObject(Player player, JsonObject object) throws Exception {
-		clearAllPotions(player);
-
 		PlayerPotionInfo info = new PlayerPotionInfo();
 		info.loadFromJsonObject(object);
-
 		mPlayerPotions.put(player.getUniqueId(), info);
 	}
 }

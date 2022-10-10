@@ -794,8 +794,6 @@ public class PlayerListener implements Listener {
 					}
 				}, 1);
 			}
-
-			mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
 		}
 	}
 

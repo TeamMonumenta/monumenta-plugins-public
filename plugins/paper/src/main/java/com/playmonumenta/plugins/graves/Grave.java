@@ -396,7 +396,7 @@ public final class Grave {
 
 			Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = Plugin.getInstance().mItemStatManager.getPlayerItemStatsMappings();
 			if (itemStatsMap.containsKey(player.getUniqueId())) {
-				itemStatsMap.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth());
+				itemStatsMap.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth(), false);
 			}
 
 			if (collected > 0) {

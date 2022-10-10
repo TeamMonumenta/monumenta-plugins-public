@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt
 import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
+import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -132,7 +133,7 @@ public class ItemStatManager implements Listener {
 
 		public PlayerItemStats(Player player) {
 			mRegion = ServerProperties.getAbilityEnhancementsEnabled() ? ItemStatUtils.Region.RING : (ServerProperties.getClassSpecializationsEnabled() ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY);
-			updateStats(player, true, player.getMaxHealth());
+			updateStats(player, true, player.getMaxHealth(), false);
 		}
 
 		public PlayerItemStats(PlayerItemStats playerItemStats) {
@@ -154,7 +155,7 @@ public class ItemStatManager implements Listener {
 			mRegion = region;
 		}
 
-		public void updateStats(Player player, boolean updateAll, double priorHealth) {
+		public void updateStats(Player player, boolean updateAll, double priorHealth, boolean checkHealth) {
 			PlayerInventory inventory = player.getInventory();
 			updateStats(inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(), updateAll);
 			// Tell the ItemStats that there has been an update
@@ -162,10 +163,20 @@ public class ItemStatManager implements Listener {
 			for (ItemStat stat : ITEM_STATS) {
 				stat.onEquipmentUpdate(plugin, player);
 			}
-			if (priorHealth != player.getMaxHealth()) {
-				Plugin.getInstance().mEffectManager.clearEffects(player, EffectType.ABSORPTION.getName());
-				Plugin.getInstance().mEffectManager.clearEffects(player, EffectType.MAX_HEALTH_INCREASE.getName());
+
+			// If health changed, wipe Absorption + Max Health
+			if (checkHealth) {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						if (priorHealth != player.getMaxHealth()) {
+							Plugin.getInstance().mEffectManager.clearEffects(player, EffectType.ABSORPTION.getName());
+							Plugin.getInstance().mEffectManager.clearEffects(player, EffectType.MAX_HEALTH_INCREASE.getName());
+						}
+					}
+				}.runTaskLater(plugin, 1);
 			}
+
 		}
 
 		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet, boolean updateAll) {
@@ -275,6 +286,8 @@ public class ItemStatManager implements Listener {
 			for (ItemStat stat : ITEM_STATS) {
 				if (newArmorAddStats.get(stat) + newMainhandAddStats.get(stat) == 0 && newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat) != 0 && stat instanceof Attribute) {
 					newStats.add(stat, 1 + newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat));
+				} else if (stat instanceof Phylactery) {
+					newStats.add(stat, (newArmorAddStats.get(stat) + newMainhandAddStats.get(stat) * (1 + newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat))) + Phylactery.BASE_POTION_KEEP_LEVEL);
 				} else {
 					newStats.add(stat, (newArmorAddStats.get(stat) + newMainhandAddStats.get(stat)) * (1 + newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat)));
 				}
@@ -286,6 +299,7 @@ public class ItemStatManager implements Listener {
 				if (stat instanceof RegionScalingDamageDealt && (ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.ISLES || ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.RING)) {
 					newStats.add(stat, 1);
 				}
+
 			}
 
 			mArmorAddStats = newArmorAddStats;
@@ -374,7 +388,7 @@ public class ItemStatManager implements Listener {
 			@Override
 			public void run() {
 				if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-					mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth());
+					mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth(), true);
 				}
 			}
 		}.runTaskLater(mPlugin, 0);
@@ -386,7 +400,7 @@ public class ItemStatManager implements Listener {
 		PlayerItemStats playerItemStats = new PlayerItemStats(player);
 		mPlayerItemStatsMappings.put(player.getUniqueId(), playerItemStats);
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			playerItemStats.updateStats(player, true, player.getMaxHealth());
+			playerItemStats.updateStats(player, true, player.getMaxHealth(), false);
 		});
 	}
 
@@ -715,7 +729,7 @@ public class ItemStatManager implements Listener {
 	public void updateStats(Player player) {
 		PlayerItemStats stats = getPlayerItemStats(player);
 		if (stats != null) {
-			stats.updateStats(player, true, player.getMaxHealth());
+			stats.updateStats(player, true, player.getMaxHealth(), true);
 		}
 	}
 }

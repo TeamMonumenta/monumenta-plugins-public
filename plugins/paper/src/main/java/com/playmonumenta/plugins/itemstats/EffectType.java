@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.CustomLogger;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.AbilityCooldownDecrease;
 import com.playmonumenta.plugins.effects.AbilityCooldownIncrease;
+import com.playmonumenta.plugins.effects.AbsorptionSickness;
 import com.playmonumenta.plugins.effects.ArrowSaving;
 import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.effects.BonusSoulThreads;
@@ -13,6 +14,8 @@ import com.playmonumenta.plugins.effects.CrystalineBlessing;
 import com.playmonumenta.plugins.effects.CustomAbsorption;
 import com.playmonumenta.plugins.effects.DeepGodsEndowment;
 import com.playmonumenta.plugins.effects.DurabilitySaving;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.HealingSickness;
 import com.playmonumenta.plugins.effects.NegateDamage;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -28,12 +31,15 @@ import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.effects.TuathanBlessing;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
+import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.EnumSet;
+import java.util.NavigableSet;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -129,8 +135,11 @@ public enum EffectType {
 	MELEE_WEAKNESS("MeleeWeakness", "Melee Damage", false, false, false, false),
 	PROJECTILE_WEAKNESS("ProjectileWeakness", "Projectile Damage", false, false, false, false),
 
-	HEAL("Heal", "Healing", true, false, false, false),
-	ANTI_HEAL("AntiHeal", "Healing", false, false, false, false),
+	INSTANT_HEALTH("InstantHealthPercent", "Instant Health", true, false, false, false),
+	INSTANT_DAMAGE("InstantDamagePercent", "Instant Health", false, false, false, false),
+
+	HEAL("Heal", "Healing Rate", true, false, false, false),
+	ANTI_HEAL("AntiHeal", "Healing Rate", false, false, false, false),
 
 	ARROW_SAVING("ArrowSaving", "Arrow Save Chance", true, false, false, false),
 	ARROW_LOSS("ArrowSaving", "Arrow Save Chance", false, false, false, false),
@@ -274,7 +283,7 @@ public enum EffectType {
 		);
 	}
 
-	public static void applyEffect(@Nullable EffectType effectType, Entity entity, int duration, double strength, @Nullable String source) {
+	public static void applyEffect(@Nullable EffectType effectType, Entity entity, int duration, double strength, @Nullable String source, boolean applySickness) {
 		if (effectType == null) {
 			return;
 		}
@@ -284,27 +293,87 @@ public enum EffectType {
 		Plugin plugin = Plugin.getInstance();
 
 		switch (effectType) {
-			case VANILLA_SPEED -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SPEED, duration, (int) (strength - 1), true));
-			case VANILLA_SLOW -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW, duration, (int) (strength - 1), true));
-			case VANILLA_HASTE -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.FAST_DIGGING, duration, (int) (strength - 1), true));
-			case VANILLA_FATIGUE -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW_DIGGING, duration, (int) (strength - 1), true));
-			case VANILLA_JUMP -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.JUMP, duration, (int) (strength - 1), true));
-			case VANILLA_FIRE_RESISTANCE -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, duration, (int) (strength - 1), true));
-			case VANILLA_WATER_BREATH -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.WATER_BREATHING, duration, (int) (strength - 1), true));
-			case VANILLA_BLINDNESS -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.BLINDNESS, duration, (int) (strength - 1), true));
-			case VANILLA_NIGHT_VISION -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.NIGHT_VISION, duration, (int) (strength - 1), true));
-			case VANILLA_POISON -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.POISON, duration, (int) (strength - 1), true));
-			case VANILLA_WITHER -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.WITHER, duration, (int) (strength - 1), true));
-			case VANILLA_REGEN -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.REGENERATION, duration, (int) (strength - 1), true));
-			case VANILLA_HEAL -> PlayerUtils.healPlayer(plugin, player, EntityUtils.getMaxHealth(player) * 0.2 * strength);
-			case VANILLA_DAMAGE -> DamageUtils.damage(null, player, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(player) * 0.2 * strength);
-			case VANILLA_SATURATION -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SATURATION, duration, (int) (strength - 1), true));
-			case VANILLA_GLOW -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.GLOWING, duration, (int) (strength - 1), true));
-			case VANILLA_SLOWFALL -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW_FALLING, duration, (int) (strength - 1), true));
-			case VANILLA_CONDUIT -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.CONDUIT_POWER, duration, (int) (strength - 1), true));
-			case VANILLA_HUNGER -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.HUNGER, duration, (int) (strength - 1), true));
-			case VANILLA_NAUSEA -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.CONFUSION, duration, (int) (strength - 1), true));
-			case VANILLA_BADLUCK -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.UNLUCK, duration, (int) (strength - 1), true));
+			case VANILLA_SPEED -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SPEED, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.SPEED, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_SLOW -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.SLOW, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_HASTE -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.FAST_DIGGING, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.FAST_DIGGING, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_FATIGUE -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW_DIGGING, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.SLOW_DIGGING, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_JUMP -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.JUMP, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.JUMP, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_FIRE_RESISTANCE -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_WATER_BREATH -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.WATER_BREATHING, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.WATER_BREATHING, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_BLINDNESS -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.BLINDNESS, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.BLINDNESS, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_NIGHT_VISION -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.NIGHT_VISION, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.NIGHT_VISION, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_POISON -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.POISON, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.POISON, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_WITHER -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.WITHER, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.WITHER, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_REGEN -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.REGENERATION, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.REGENERATION, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_HEAL -> {
+				PlayerUtils.healPlayer(plugin, player, player.getMaxHealth() * 0.2 * strength);
+				applyHealingSickness(entity, applySickness, player, plugin);
+			}
+			case VANILLA_DAMAGE -> DamageUtils.damage(null, player, DamageEvent.DamageType.AILMENT, player.getMaxHealth() * 0.2 * strength);
+			case VANILLA_SATURATION -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SATURATION, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.SATURATION, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_GLOW -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.GLOWING, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.GLOWING, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_SLOWFALL -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW_FALLING, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.SLOW_FALLING, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_CONDUIT -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.CONDUIT_POWER, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.CONDUIT_POWER, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_HUNGER -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.HUNGER, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.HUNGER, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_NAUSEA -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.CONFUSION, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.CONFUSION, duration, (int) (strength - 1), true));
+			}
+			case VANILLA_BADLUCK -> {
+				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.UNLUCK, duration, (int) (strength - 1), true));
+				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.UNLUCK, duration, (int) (strength - 1), true));
+			}
 
 			case SPEED -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentSpeed(duration, strength, sourceString));
 			case SLOW -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentSpeed(duration, -strength, sourceString));
@@ -318,7 +387,18 @@ public enum EffectType {
 			case MAX_HEALTH_INCREASE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHealthBoost(duration, strength, sourceString));
 			case MAX_HEALTH_DECREASE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHealthBoost(duration, -strength, sourceString));
 
-			case ABSORPTION -> plugin.mEffectManager.addEffect(entity, sourceString, new CustomAbsorption(duration, strength, sourceString));
+			case ABSORPTION -> {
+				plugin.mEffectManager.addEffect(entity, sourceString, new CustomAbsorption(duration, strength, sourceString));
+				if (applySickness) {
+					double sicknessPenalty = 0;
+					NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "AbsorptionSickness");
+					if (sicks != null) {
+						Effect sick = sicks.last();
+						sicknessPenalty = sick.getMagnitude();
+					}
+					plugin.mEffectManager.addEffect(entity, "AbsorptionSickness", new AbsorptionSickness(20 * 15, Math.min(sicknessPenalty + 0.2, 0.8), "AbsorptionSickness"));
+				}
+			}
 			case STARVATION -> Starvation.apply(player, (int) strength);
 
 			case RESISTANCE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, -strength));
@@ -358,6 +438,12 @@ public enum EffectType {
 			case HEAL -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHeal(duration, strength));
 			case ANTI_HEAL -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHeal(duration, -strength));
 
+			case INSTANT_HEALTH -> {
+				PlayerUtils.healPlayer(plugin, player, player.getMaxHealth() * strength);
+				applyHealingSickness(entity, applySickness, player, plugin);
+			}
+			case INSTANT_DAMAGE -> DamageUtils.damage(null, player, DamageEvent.DamageType.AILMENT, player.getMaxHealth() * strength);
+
 			case ARROW_SAVING -> plugin.mEffectManager.addEffect(entity, sourceString, new ArrowSaving(duration, strength));
 			case ARROW_LOSS -> plugin.mEffectManager.addEffect(entity, sourceString, new ArrowSaving(duration, -strength));
 
@@ -390,6 +476,18 @@ public enum EffectType {
 
 			default -> CustomLogger.getInstance().warning("No EffectType implemented in applyEffect(..) for: " + effectType.mType);
 
+		}
+	}
+
+	private static void applyHealingSickness(Entity entity, boolean applySickness, Player player, Plugin plugin) {
+		if (applySickness) {
+			double sicknessPenalty = 0;
+			NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "HealingSickness");
+			if (sicks != null) {
+				Effect sick = sicks.last();
+				sicknessPenalty = sick.getMagnitude();
+			}
+			plugin.mEffectManager.addEffect(entity, "HealingSickness", new HealingSickness(20 * 15, Math.min(sicknessPenalty + 0.2, 0.8), "HealingSickness"));
 		}
 	}
 }

@@ -143,7 +143,6 @@ public class PotionConsumeListener implements Listener {
 		}
 
 		PotionMeta meta = (PotionMeta) item.getItemMeta();
-		List<PotionEffect> effects = PotionUtils.getEffects(meta);
 		NBTCompoundList customEffects = ItemStatUtils.getEffects(new NBTItem(item));
 
 		if (checkPotionCooldown(player) && event.getClickedInventory().getType() != InventoryType.CHEST && isCooldownApplicable(customEffects)) {
@@ -295,8 +294,6 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		PotionMeta meta = (PotionMeta) item.getItemMeta();
-		List<PotionEffect> effects = PotionUtils.getEffects(meta);
 		NBTCompoundList customEffects = ItemStatUtils.getEffects(new NBTItem(item));
 
 		if (checkPotionCooldown(player) && event.getClickedInventory().getType() != InventoryType.CHEST && isCooldownApplicable(customEffects)) {
