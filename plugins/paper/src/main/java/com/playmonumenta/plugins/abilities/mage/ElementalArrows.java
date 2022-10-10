@@ -118,7 +118,7 @@ public class ElementalArrows extends Ability {
 
 		if (isLevelTwo()) {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius, enemy)) {
-				effectAction.accept(enemy);
+				effectAction.accept(mob);
 				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, ability, playerItemStats), areaDamage, true, true, false);
 			}
 		}
