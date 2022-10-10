@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
 import javax.annotation.Nullable;
@@ -72,11 +71,6 @@ public class EnchantedPrayer extends Ability {
 				return;
 			}
 		} else {
-			return;
-		}
-
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (ItemUtils.isProjectileWeapon(mainHand)) {
 			return;
 		}
 

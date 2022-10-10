@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.HandOfLightCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -17,10 +16,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,7 +25,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -53,7 +49,6 @@ public class HandOfLight extends Ability {
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED = 0.025;
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_MAX = 0.5;
 	private static final int ENHANCEMENT_UNDEAD_STUN_DURATION = 10;
-	private static final String DAMAGE_MODE_TAG = "ClericHOLDamageMode";
 
 	public static final String CHARM_DAMAGE = "Hand of Light Damage";
 	public static final String CHARM_COOLDOWN = "Hand of Light Cooldown";
@@ -65,7 +60,6 @@ public class HandOfLight extends Ability {
 	private final double mPercent;
 	private final double mDamagePer;
 	private final double mDamageMax;
-	private boolean mDamageMode;
 
 	private @Nullable Crusade mCrusade;
 	private boolean mHasCleansingRain;
@@ -98,8 +92,6 @@ public class HandOfLight extends Ability {
 		mPercent = isLevelOne() ? PERCENT_1 : PERCENT_2;
 		mDamagePer = isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2;
 		mDamageMax = isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
-
-		mDamageMode = player != null && player.getScoreboardTags().contains(DAMAGE_MODE_TAG);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HandOfLightCS(), HandOfLightCS.SKIN_LIST);
 
@@ -206,25 +198,6 @@ public class HandOfLight extends Ability {
 	}
 
 	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		event.setCancelled(true);
-
-		if (mPlayer == null || mPlayer.isSneaking() || mPlayer.getLocation().getPitch() > -45) {
-			return;
-		}
-
-		mDamageMode = ScoreboardUtils.toggleTag(mPlayer, DAMAGE_MODE_TAG);
-		String mode;
-		if (mDamageMode) {
-			mode = "damage";
-		} else {
-			mode = "healing";
-		}
-		mPlayer.sendActionBar(ChatColor.YELLOW + "Hand of Light has been set to " + mode + " mode!");
-		ClientModHandler.updateAbility(mPlayer, this);
-	}
-
-	@Override
 	public boolean runCheck() {
 		if (mPlayer == null) {
 			return false;
@@ -239,10 +212,5 @@ public class HandOfLight extends Ability {
 		}
 
 		return true;
-	}
-
-	@Override
-	public @Nullable String getMode() {
-		return mDamageMode ? "damage" : null;
 	}
 }
