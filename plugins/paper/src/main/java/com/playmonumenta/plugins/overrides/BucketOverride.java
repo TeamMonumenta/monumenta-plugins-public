@@ -34,7 +34,7 @@ public class BucketOverride extends BaseOverride {
 			return true;
 		} else if (clickedEntity instanceof Cow || clickedEntity instanceof Goat) {
 			return false;
-		} else if ((clickedEntity instanceof Fish || clickedEntity instanceof Axolotl) && !ZoneUtils.isInPlot(clickedEntity)) {
+		} else if ((clickedEntity instanceof Fish || clickedEntity instanceof Axolotl) && (clickedEntity.isInvulnerable() || !ZoneUtils.isInPlot(clickedEntity))) {
 			return false;
 		}
 
