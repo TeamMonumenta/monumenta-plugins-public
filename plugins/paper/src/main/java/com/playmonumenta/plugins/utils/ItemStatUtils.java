@@ -964,6 +964,10 @@ public class ItemStatUtils {
 			return;
 		}
 
+		if (player.isDead() || !player.isValid()) {
+			return;
+		}
+
 		NBTCompoundList effects = getEffects(new NBTItem(item));
 
 		// Ensure other effects don't apply

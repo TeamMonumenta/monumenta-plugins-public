@@ -29,6 +29,7 @@ import com.playmonumenta.plugins.effects.TuathanBlessing;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -295,8 +296,8 @@ public enum EffectType {
 			case VANILLA_POISON -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.POISON, duration, (int) (strength - 1), true));
 			case VANILLA_WITHER -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.WITHER, duration, (int) (strength - 1), true));
 			case VANILLA_REGEN -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.REGENERATION, duration, (int) (strength - 1), true));
-			case VANILLA_HEAL -> PlayerUtils.healPlayer(plugin, player, player.getMaxHealth() * 0.2 * strength);
-			case VANILLA_DAMAGE -> DamageUtils.damage(null, player, DamageEvent.DamageType.AILMENT, player.getMaxHealth() * 0.2 * strength);
+			case VANILLA_HEAL -> PlayerUtils.healPlayer(plugin, player, EntityUtils.getMaxHealth(player) * 0.2 * strength);
+			case VANILLA_DAMAGE -> DamageUtils.damage(null, player, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(player) * 0.2 * strength);
 			case VANILLA_SATURATION -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SATURATION, duration, (int) (strength - 1), true));
 			case VANILLA_GLOW -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.GLOWING, duration, (int) (strength - 1), true));
 			case VANILLA_SLOWFALL -> PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW_FALLING, duration, (int) (strength - 1), true));
