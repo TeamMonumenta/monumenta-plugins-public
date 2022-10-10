@@ -49,10 +49,11 @@ public class FirstStrike implements Enchantment {
 			&& ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand()))
 			|| type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
 			if (plugin.mEffectManager.getEffects(player, SOURCE) == null) {
-				double damage = event.getDamage() * (1 + (DAMAGE_PER_LEVEL * level));
+				double bonus = DAMAGE_PER_LEVEL * level;
 				if (type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
-					damage *= PROJ_REDUCTION;
+					bonus *= PROJ_REDUCTION;
 				}
+				double damage = event.getDamage() * (1 + bonus);
 				event.setDamage(damage);
 
 				double widthDelta = PartialParticle.getWidthDelta(enemy);
