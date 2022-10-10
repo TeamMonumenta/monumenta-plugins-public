@@ -263,6 +263,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(MobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> new MobRisingBoss(p, e));
 		mStatelessBosses.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> new GrenadeLauncherBoss(p, e));
 		mStatelessBosses.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> new SizeChangerBoss(p, e));
+		mStatelessBosses.put(DelveScalingBoss.identityTag, (Plugin p, LivingEntity e) -> new DelveScalingBoss(p, e));
 		mStatelessBosses.put(DeathSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new DeathSummonBoss(p, e));
 		mStatelessBosses.put(SummonOnExplosionBoss.identityTag, (Plugin p, LivingEntity e) -> new SummonOnExplosionBoss(p, e));
 		mStatelessBosses.put(HostileBoss.identityTag, (Plugin p, LivingEntity e) -> new HostileBoss(p, e));
@@ -513,6 +514,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(MobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> MobRisingBoss.deserialize(p, e));
 		mBossDeserializers.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> GrenadeLauncherBoss.deserialize(p, e));
 		mBossDeserializers.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> SizeChangerBoss.deserialize(p, e));
+		mBossDeserializers.put(DelveScalingBoss.identityTag, (Plugin p, LivingEntity e) -> DelveScalingBoss.deserialize(p, e));
 		mBossDeserializers.put(DeathSummonBoss.identityTag, (Plugin p, LivingEntity e) -> DeathSummonBoss.deserialize(p, e));
 		mBossDeserializers.put(StarfallBoss.identityTag, (Plugin p, LivingEntity e) -> StarfallBoss.deserialize(p, e));
 		mBossDeserializers.put(SpectralSummonBoss.identityTag, (Plugin p, LivingEntity e) -> SpectralSummonBoss.deserialize(p, e));
@@ -609,6 +611,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(SizeChangerBoss.identityTag, new SizeChangerBoss.Parameters());
 		mBossParameters.put(WrathBoss.identityTag, new WrathBoss.Parameters());
 		mBossParameters.put(ThrowSummonBoss.identityTag, new ThrowSummonBoss.Parameters());
+		mBossParameters.put(DelveScalingBoss.identityTag, new DelveScalingBoss.Parameters());
 		mBossParameters.put(DeathSummonBoss.identityTag, new DeathSummonBoss.Parameters());
 		mBossParameters.put(SummonOnExplosionBoss.identityTag, new SummonOnExplosionBoss.Parameters());
 		mBossParameters.put(ScoutVolleyBoss.identityTag, new ScoutVolleyBoss.Parameters());
