@@ -77,8 +77,7 @@ public class DelveLootTableGroup {
 		new DelveLootTableGroup("r2/delves/shiftingcity/base_final", "r2/delves/shiftingcity/dmat_final", "r2/delves/shiftingcity/cmat_final", "r2/dungeons/fred/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
 		// Blue Delves
-
-		// SKT Delves
+		new DelveLootTableGroup("r3/dungeons/delves/blue/base_chest", "r3/dungeons/delves/blue/dmat_chest", "r3/dungeons/delves/blue/cmat_chest", "r3/dungeons/blue/chestloot").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
 		// R3 Overworld Delves
 		// amanita
