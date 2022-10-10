@@ -60,6 +60,7 @@ public class Dodging extends Ability {
 	private static final String ATTR_NAME = "DodgingExtraSpeed";
 	private static final int DODGING_COOLDOWN_1 = 12 * 20;
 	private static final int DODGING_COOLDOWN_2 = 10 * 20;
+	private static final double ENHANCMENT_DAMAGE = 2.0;
 
 	public static final String CHARM_COOLDOWN = "Dodging Cooldown";
 	public static final String CHARM_SPEED = "Dodging Speed Amplifier";
@@ -79,7 +80,7 @@ public class Dodging extends Ability {
 				DODGING_COOLDOWN_2 / 20,
 				(int)(PERCENT_SPEED * 100),
 				DODGING_SPEED_EFFECT_DURATION / 20));
-		mInfo.mDescriptions.add("The projectile you dodged is now reflected back to the enemy.");
+		mInfo.mDescriptions.add("The projectile you dodged is now reflected back to the enemy at 2x damage.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2);
 		// NOTE: This skill will get events even when it is on cooldown!
 		mInfo.mIgnoreCooldown = true;
@@ -110,7 +111,7 @@ public class Dodging extends Ability {
 				if (source != null) {
 					deflectParticles(source);
 
-					DamageUtils.damage(mPlayer, source, DamageType.PROJECTILE_SKILL, event.getOriginalDamage(), mInfo.mLinkedSpell, true);
+					DamageUtils.damage(mPlayer, source, DamageType.PROJECTILE_SKILL, event.getOriginalDamage() * ENHANCMENT_DAMAGE, mInfo.mLinkedSpell, true);
 					// mPlayer.sendMessage(source.getName() + " HP: " + source.getHealth() + " / " + source.getMaxHealth() + " (-" + event.getOriginalDamage() + ")");
 
 					// If applicable (either arrow or trident), apply knockback
@@ -194,12 +195,10 @@ public class Dodging extends Ability {
 			// (I am pretty sure the only potion throwers are in fact, witches)
 			// (But for a more general case, I will default use the enemy's attack damage stat, like how witches do.)
 			double damage = EntityUtils.getAttributeOrDefault(enemy, Attribute.GENERIC_ATTACK_DAMAGE, 1);
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true);
-			// mPlayer.sendMessage(enemy.getName() + " HP: " + enemy.getHealth() + " / " + enemy.getMaxHealth() + " (-" + damage + ")");
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage * ENHANCMENT_DAMAGE, mInfo.mLinkedSpell, true);
 
 			for (PotionEffect potionEffect : potion.getEffects()) {
 				PotionUtils.applyPotion(mPlayer, enemy, potionEffect);
-				// mPlayer.sendMessage("Applied " + potionEffect);
 			}
 
 			deflectParticles(enemy);

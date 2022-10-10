@@ -49,7 +49,7 @@ public class AstralOmen extends Ability {
 	public static final int DAMAGE = 8;
 	public static final int SIZE = 3;
 	public static final double BONUS_MULTIPLIER = 0.2;
-	public static final double BOW_MULTIPLIER = 0.2;
+	public static final double BOW_MULTIPLIER = 0.4;
 	public static final int STACK_TICKS = 10 * Constants.TICKS_PER_SECOND;
 	public static final int BONUS_TICKS = 8 * Constants.TICKS_PER_SECOND;
 	public static final float PULL_SPEED = 0.25f;
@@ -105,7 +105,7 @@ public class AstralOmen extends Ability {
 		mInfo.mShorthandName = "AO";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Dealing spell damage to an enemy marks its fate, giving it an omen based on the spell type (Arcane, Fire, Ice, Thunder). If an enemy hits %s omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, dealing %s magic damage to it and all enemies in a %s-block cube around it. If the spell was %s, the implosion does an additional %s%% of the bow's original damage. An enemy loses all its omens after %ss of it not gaining another omen. That implosion's damage ignores iframes and itself cannot apply omens.",
+				"Dealing spell damage to an enemy marks its fate, giving it an omen based on the spell type (Arcane, Fire, Ice, Thunder). If an enemy hits %s omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, dealing %s magic damage to it and all enemies in a %s-block cube around it. If the spell was %s, the implosion instead does %s%% of the bow's original damage. An enemy loses all its omens after %ss of it not gaining another omen. That implosion's damage ignores iframes and itself cannot apply omens.",
 				STACK_THRESHOLD,
 				DAMAGE,
 				SIZE,
@@ -169,7 +169,7 @@ public class AstralOmen extends Ability {
 					MMLog.warning("Dealt Elemental Arrows damage with Astral Omen despite not finding Elemental Arrows (player: " + mPlayer.getName() + ")");
 					spellDamage = baseDamage;
 				} else {
-					spellDamage = baseDamage + (float) (mElementalArrows.getLastDamage() * BOW_MULTIPLIER);
+					spellDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mElementalArrows.getLastDamage() * BOW_MULTIPLIER);
 				}
 			} else {
 				spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, baseDamage);
