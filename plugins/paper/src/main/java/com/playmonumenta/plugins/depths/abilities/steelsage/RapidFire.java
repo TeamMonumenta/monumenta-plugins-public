@@ -26,8 +26,6 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
-import org.bukkit.entity.Trident;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
@@ -77,37 +75,22 @@ public class RapidFire extends DepthsAbility {
 				if (ItemUtils.isProjectileWeapon(inMainHand)) {
 					Location eyeLoc = mPlayer.getEyeLocation();
 					Vector direction = mPlayer.getLocation().getDirection();
-					Projectile proj;
-					switch (inMainHand.getType()) {
-						case BOW, CROSSBOW -> proj = world.spawnArrow(eyeLoc, direction, 3.0f, 0, Arrow.class);
-						case TRIDENT -> proj = world.spawnArrow(eyeLoc, direction, 3.0f, 0, Trident.class);
-						case SNOWBALL -> {
-							proj = world.spawn(eyeLoc, Snowball.class);
-							proj.setVelocity(direction.normalize().multiply(3.0f));
-						}
-						default -> {
-							// How did we get here?
-							return;
-						}
-					}
+					AbstractArrow arrow = world.spawnArrow(eyeLoc, direction, 3.0f, 0, Arrow.class);
+					arrow.setCritical(true);
+					arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 
-					if (proj instanceof AbstractArrow arrow) {
-						arrow.setCritical(true);
-						arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-					}
+					arrow.setShooter(mPlayer);
 
-					proj.setShooter(mPlayer);
+					mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 
-					mPlayerItemStatsMap.put(proj, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
-
-					mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.ASH);
+					mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.ASH);
 					Location loc = mPlayer.getLocation().add(0, 1, 0);
 					loc.getWorld().playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, 1, 0.65f);
 					loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.45f);
-					ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(proj);
+					ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
 					Bukkit.getPluginManager().callEvent(eventLaunch);
-					if (proj.hasMetadata(Skyhook.SKYHOOK_ARROW_METADATA)) {
-						proj.removeMetadata(Skyhook.SKYHOOK_ARROW_METADATA, mPlugin);
+					if (arrow.hasMetadata(Skyhook.SKYHOOK_ARROW_METADATA)) {
+						arrow.removeMetadata(Skyhook.SKYHOOK_ARROW_METADATA, mPlugin);
 					}
 					mCount++;
 				} else {
