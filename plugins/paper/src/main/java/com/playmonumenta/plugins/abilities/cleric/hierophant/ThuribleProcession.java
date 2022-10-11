@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -36,6 +38,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	private static final double EFFECT_PERCENT_1 = 0.10;
 	private static final double EFFECT_PERCENT_2 = 0.15;
 	private static final int MAX_BUFFS = 4;
+	private static final double DAMAGE_BREAK_PERCENT = 0.6;
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE, DamageType.PROJECTILE);
 	private static final String PERCENT_ATTACK_SPEED_EFFECT_NAME = "ThuribleProcessionPercentAttackSpeedEffect";
 	private static final String PERCENT_SPEED_EFFECT_NAME = "ThuribleProcessionPercentSpeedEffect";
@@ -59,22 +62,19 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 		super(plugin, player, "Thurible Procession");
 		mInfo.mScoreboardId = "Thurible";
 		mInfo.mShorthandName = "TP";
-		mInfo.mDescriptions.add("The Hierophant passively builds up buffs when other players are within 30 blocks, which are applied to all players in the radius. Buffs end and the buildup resets upon a melee attack on a hostile mob, unless the full set of buffs have been obtained. Then all players (including the Hierophant) get 8 seconds of all built-up buffs. After these 8 seconds the timer resets and the Procession begins anew. Progression - +10% Attack Speed (after 4s of no melee), +10% Speed (after 8s of no melee), +10% Attack and Projectile Damage (after 12s of no melee), Cleric's passive heal is doubled, to 10% of max health every 5s (after 16s of no melee)");
-		mInfo.mDescriptions.add("Progression - +15% Attack Speed (after 4s of no melee), +15% Speed (after 8s of no melee), +15% Attack and Projectile Damage (after 12s of no melee), Cleric's passive heal is tripled, to 15% of max health every 5s (after 16s of no melee)");
+		mInfo.mDescriptions.add("The Hierophant passively builds up buffs when other players are within 30 blocks, which are applied to all players in the radius. Buffs end and the buildup resets upon taking damage that causes you to drop below 60% of your max health, unless the full set of buffs have been obtained. Then all players (including the Hierophant) get 8 seconds of all built-up buffs. After these 8 seconds the timer resets and the Procession begins anew. Progression - +10% Attack Speed (after 4s of no health threshold reached), +10% Speed (after 8s of no health threshold reached), +10% Attack and Projectile Damage (after 12s of no health threshold reached), Cleric's passive heal is doubled, to 10% of max health every 5s (after 16s of no health threshold reached)");
+		mInfo.mDescriptions.add("Progression - +15% Attack Speed (after 4s of no health threshold reached), +15% Speed (after 8s of no health threshold reached), +15% Attack and Projectile Damage (after 12s of no health threshold reached), Cleric's passive heal is tripled, to 15% of max health every 5s (after 16s of no health threshold reached)");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, THURIBLE_COOLDOWN);
 		mInfo.mLinkedSpell = ClassAbility.THURIBLE_PROCESSION;
 		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
 	}
 
 	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		//If on cooldown, do not cast
-		if (mPlayer == null || !canCast()) {
-			return false;
+	public void onHurt(DamageEvent event, Entity damager, LivingEntity source) {
+		if (mPlayer == null) {
+			return;
 		}
-
-		if (mBuffs > 0 && event.getType() == DamageType.MELEE) {
-
+		if (mBuffs > 0 && mPlayer.getHealth() - event.getFinalDamage(true) <= EntityUtils.getMaxHealth(mPlayer) * DAMAGE_BREAK_PERCENT) {
 			updateBuffs();
 
 			//Give everyone buffs from the array
@@ -90,7 +90,6 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 			mSeconds = 0;
 			putOnCooldown();
 		}
-		return false;
 	}
 
 	@Override

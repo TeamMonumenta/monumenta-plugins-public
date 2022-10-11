@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
@@ -11,12 +12,11 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import java.util.Collection;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -28,8 +28,6 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 
 public final class HeavenlyBoon extends Ability implements KillTriggeredAbility {
@@ -38,8 +36,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private static final double HEAVENLY_BOON_2_CHANCE = 0.2;
 	private static final double HEAVENLY_BOON_RADIUS = 12;
 	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0;
-//  private static final int HEAVENLY_BOON_1_DURATION = 20 * 20;
-//  private static final int HEAVENLY_BOON_2_DURATION = 50 * 20;
 	private static final double ENHANCEMENT_POTION_EFFECT_BONUS = 0.2;
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_BOOST = 24 * 20;
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_DURATION = 3 * 60 * 20;
@@ -48,9 +44,11 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	public static final String CHARM_DURATION = "Heavenly Boon Potion Duration";
 	public static final String CHARM_RADIUS = "Heavenly Boon Radius";
 
+	private static final Set<String> BOON_DROPS = ImmutableSet.of("Regeneration Boon", "Speed Boon", "Strength Boon", "Absorption Boon", "Resistance Boon", "Regeneration Boon 2", "Speed Boon 2", "Strength Boon 2", "Absorption Boon 2", "Resistance Boon 2");
+
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
-	// private final int mDuration;
+	private final int mDurationChange;
 	private final double mRadius;
 
 	private @Nullable Crusade mCrusade;
@@ -73,7 +71,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		mTracker = new KillTriggeredAbilityTracker(this);
 
 		mChance = CharmManager.getLevelPercentDecimal(player, CHARM_CHANCE) + (isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE);
-		// mDuration = CharmManager.getExtraDuration(player, CHARM_DURATION) + (isLevelOne() ? HEAVENLY_BOON_1_DURATION : HEAVENLY_BOON_2_DURATION);
+		mDurationChange = CharmManager.getExtraDuration(player, CHARM_DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, HEAVENLY_BOON_RADIUS);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -117,7 +115,12 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				}
 
 				// Apply custom effects from potion
-				ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem(), false);
+				if (BOON_DROPS.contains(potion.getItem().getItemMeta().getDisplayName())) {
+					ItemStatUtils.changeEffectsDuration(p, potion.getItem(), mDurationChange);
+				} else {
+					ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem(), false);
+				}
+
 
 				/* Remove this player from the "usual" application of potion effects */
 				affectedEntities.remove(p);
