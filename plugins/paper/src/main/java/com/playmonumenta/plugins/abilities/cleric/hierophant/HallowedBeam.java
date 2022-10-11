@@ -35,6 +35,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -102,6 +103,15 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 	@Override
 	public void cast(Action action) {
+		beam(true);
+	}
+
+	@Override
+	public void playerAnimationEvent(PlayerAnimationEvent event) {
+		beam(false);
+	}
+
+	private void beam(boolean allowMobs) {
 		if (mPlayer == null) {
 			return;
 		}
@@ -129,7 +139,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			return;
 		}
 		LivingEntity e = (LivingEntity) raytrace.getHitEntity();
-		if (e instanceof Player || EntityUtils.isHostileMob(e)) {
+		if (e instanceof Player || (allowMobs && EntityUtils.isHostileMob(e))) {
 
 			PlayerInventory inventory = mPlayer.getInventory();
 			ItemStack inMainHand = inventory.getItemInMainHand();
