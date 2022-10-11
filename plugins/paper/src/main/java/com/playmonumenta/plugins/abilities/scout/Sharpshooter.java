@@ -68,7 +68,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 			}
 			event.setDamage(event.getDamage() * multiplier);
 
-			if (isLevelTwo() && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage()) && (type != DamageType.PROJECTILE || (event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, false)))) {
+			if (isLevelTwo() && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage()) && (type != DamageType.PROJECTILE || (event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)))) {
 				mTicksToStackDecay = mDecayTime;
 
 				if (mStacks < mMaxStacks) {
