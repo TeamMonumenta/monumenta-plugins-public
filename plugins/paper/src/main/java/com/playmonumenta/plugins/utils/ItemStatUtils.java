@@ -2327,7 +2327,10 @@ public class ItemStatUtils {
 		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		meta.addItemFlags(ItemFlag.HIDE_DYE);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+		String name = item.getType().name();
+		if (name.contains("POTION") || name.contains("PATTERN") || name.contains("SHIELD")) {
+			meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+		}
 
 		boolean hasDummyArmorToughnessAttribute = false;
 		if (meta.hasAttributeModifiers()) {
