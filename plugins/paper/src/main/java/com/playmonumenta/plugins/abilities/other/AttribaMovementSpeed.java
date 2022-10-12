@@ -18,7 +18,7 @@ public class AttribaMovementSpeed extends Ability {
 	}
 
 	public AttribaMovementSpeed(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "AttribaMovementSpeed");
+		super(plugin, player, null);
 
 		if (player != null) {
 			EntityUtils.addAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED,

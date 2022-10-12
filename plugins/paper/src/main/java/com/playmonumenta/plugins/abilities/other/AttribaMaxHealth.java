@@ -18,7 +18,7 @@ public class AttribaMaxHealth extends Ability {
 	}
 
 	public AttribaMaxHealth(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "AttribaMaxHealth");
+		super(plugin, player, null);
 
 		if (player != null) {
 			EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH,

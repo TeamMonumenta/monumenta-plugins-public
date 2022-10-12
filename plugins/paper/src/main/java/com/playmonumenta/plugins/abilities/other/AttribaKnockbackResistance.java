@@ -18,7 +18,7 @@ public class AttribaKnockbackResistance extends Ability {
 	}
 
 	public AttribaKnockbackResistance(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "AttribaKnockbackResistance");
+		super(plugin, player, null);
 
 		if (player != null) {
 			EntityUtils.addAttribute(player, Attribute.GENERIC_KNOCKBACK_RESISTANCE,

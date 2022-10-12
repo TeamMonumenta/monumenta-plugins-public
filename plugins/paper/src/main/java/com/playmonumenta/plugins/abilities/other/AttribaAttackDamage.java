@@ -18,7 +18,7 @@ public class AttribaAttackDamage extends Ability {
 	}
 
 	public AttribaAttackDamage(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "AttribaAttackDamage");
+		super(plugin, player, null);
 
 		if (player != null) {
 			EntityUtils.addAttribute(player, Attribute.GENERIC_ATTACK_DAMAGE,

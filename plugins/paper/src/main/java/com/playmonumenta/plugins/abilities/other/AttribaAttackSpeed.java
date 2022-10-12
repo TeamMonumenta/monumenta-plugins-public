@@ -18,7 +18,7 @@ public class AttribaAttackSpeed extends Ability {
 	}
 
 	public AttribaAttackSpeed(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "AttribaAttackSpeed");
+		super(plugin, player, null);
 
 		if (player != null) {
 			EntityUtils.addAttribute(player, Attribute.GENERIC_ATTACK_SPEED,
