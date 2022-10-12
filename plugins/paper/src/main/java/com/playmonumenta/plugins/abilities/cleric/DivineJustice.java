@@ -186,7 +186,7 @@ public class DivineJustice extends Ability {
 				PlayerUtils.healPlayer(
 					mPlugin,
 					otherPlayer,
-					CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, EntityUtils.getMaxHealth(mPlayer) * HEALING_MULTIPLIER_OTHER),
+					CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, EntityUtils.getMaxHealth(otherPlayer) * HEALING_MULTIPLIER_OTHER),
 					mPlayer
 				);
 			}
