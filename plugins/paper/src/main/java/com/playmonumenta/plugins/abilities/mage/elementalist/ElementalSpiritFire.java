@@ -66,7 +66,13 @@ public class ElementalSpiritFire extends Ability {
 		mInfo.mShorthandName = "ES";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, the fire spirit instantly dashes from you towards the farthest enemy that spell hit, dealing %s fire magic damage to all enemies in a %s-block cube around it along its path. The next moment after you deal ice damage, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, dealing %s ice magic damage to all enemies in a %s-block cube around it every second for %ss. If the spell was %s, the fire spirit does an additional %s%% of the projectile weapon's original damage, and for the ice spirit, an additional %s%%. The spirits' damage ignores iframes. Independent cooldown: %ss.",
+				"Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, " +
+					"the fire spirit instantly dashes from you towards the farthest enemy that spell hit, " +
+					"dealing %s fire magic damage to all enemies in a %s-block cube around it along its path. " +
+					"The next moment after you deal ice damage, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, " +
+					"dealing %s ice magic damage to all enemies in a %s-block cube around it every second for %ss. " +
+					"If the spell was %s, the fire spirit does an additional %s%% of the projectile weapon's original damage, " +
+					"and for the ice spirit, an additional %s%%. The spirits' damage ignores iframes. Independent cooldown: %ss.",
 				DAMAGE_1,
 				HITBOX,
 				ElementalSpiritIce.DAMAGE_1,
@@ -80,7 +86,8 @@ public class ElementalSpiritFire extends Ability {
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"Fire spirit damage is increased from %s to %s. Ice spirit damage is increased from %s to %s. Bonus %s damage is increased from %s%% to %s%% for the fire spirit, and from %s%% to %s%% for the ice spirit.",
+				"Fire spirit damage is increased from %s to %s. Ice spirit damage is increased from %s to %s. " +
+					"Bonus %s damage is increased from %s%% to %s%% for the fire spirit, and from %s%% to %s%% for the ice spirit.",
 				DAMAGE_1,
 				DAMAGE_2,
 				ElementalSpiritIce.DAMAGE_1,

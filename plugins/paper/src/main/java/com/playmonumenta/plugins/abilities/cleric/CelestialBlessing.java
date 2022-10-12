@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -48,7 +49,7 @@ public class CelestialBlessing extends Ability {
 			DamageType.PROJECTILE_SKILL
 	);
 	private static final EnumSet<DamageType> ENHANCED_AFFECTED_DAMAGE_TYPES = EnumSet.of(
-			DamageType.MAGIC
+		DamageType.MAGIC
 	);
 
 	public static final String DAMAGE_EFFECT_NAME = "CelestialBlessingExtraDamage";
@@ -58,17 +59,24 @@ public class CelestialBlessing extends Ability {
 	public static final String CHARM_SPEED = "Celestial Blessing Speed Amplifier";
 	public static final String CHARM_DURATION = "Celestial Blessing Duration";
 
-	private int mDuration;
-	private double mExtraDamage;
+	private final int mDuration;
+	private final double mExtraDamage;
 
 	public CelestialBlessing(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Celestial Blessing");
 		mInfo.mLinkedSpell = ClassAbility.CELESTIAL_BLESSING;
 		mInfo.mScoreboardId = "Celestial";
 		mInfo.mShorthandName = "CB";
-		mInfo.mDescriptions.add("When you strike while sneaking, you and all other players in a 12 block radius gain +20% melee and projectile damage and +20% speed for 10 s. Cooldown: 40s.");
-		mInfo.mDescriptions.add("Increases the buff to +35% damage for 12 s.");
-		mInfo.mDescriptions.add("Ability damage is now also increased by 25%. Cooldown: 30s.");
+		mInfo.mDescriptions.add("When you strike while sneaking, you and all other players in a %s radius gain +%s%% melee and projectile damage and +%s%% speed for %ss. Cooldown: %ss."
+			                        .formatted(CELESTIAL_RADIUS,
+				                        StringUtils.multiplierToPercentage(CELESTIAL_1_EXTRA_DAMAGE),
+				                        StringUtils.multiplierToPercentage(CELESTIAL_EXTRA_SPEED),
+				                        CELESTIAL_1_DURATION,
+				                        StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN)));
+		mInfo.mDescriptions.add("Increases the buff to +%s%% damage for %ss."
+			                        .formatted(StringUtils.multiplierToPercentage(CELESTIAL_2_EXTRA_DAMAGE), StringUtils.ticksToSeconds(CELESTIAL_2_DURATION)));
+		mInfo.mDescriptions.add("Ability damage is now also increased by %s%%. Cooldown: %ss."
+			                        .formatted(StringUtils.multiplierToPercentage(CELESTIAL_ENHANCED_DAMAGE), StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN_ENHANCED)));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isEnhanced() ? CELESTIAL_COOLDOWN_ENHANCED : CELESTIAL_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.SUGAR, 1);

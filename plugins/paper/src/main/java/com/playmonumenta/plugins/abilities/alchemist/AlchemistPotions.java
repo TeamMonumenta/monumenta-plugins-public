@@ -20,7 +20,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -58,14 +58,15 @@ import org.jetbrains.annotations.Nullable;
  */
 public class AlchemistPotions extends Ability implements AbilityWithChargesOrStacks {
 
-	private static final int MAX_CHARGES = 8;
-	private static final int POTIONS_TIMER_BASE = 2 * 20;
+	public static final int MAX_CHARGES = 8;
+	public static final int POTIONS_TIMER_BASE = 2 * 20;
 	private static final int POTIONS_TIMER_TOWN = 1 * 20;
 
 	private static final int IFRAME_BETWEEN_POT = 10;
-	private static final double DAMAGE_PER_SKILL_POINT = 0.5;
-	private static final double DAMAGE_PER_SPEC_POINT = 2;
-	private static final double DAMAGE_PER_ENHANCEMENT = 2;
+	public static final double DAMAGE_PER_SKILL_POINT = 0.5;
+	public static final double DAMAGE_PER_SPEC_POINT = 2;
+	// Alchemist.java assumes that these two constants are equal - update the description there if you change these values to be different.
+	private static final double DAMAGE_PER_ENHANCEMENT = DAMAGE_PER_SPEC_POINT;
 	private static final String POTION_SCOREBOARD = "StoredPotions";
 	private static final double RADIUS = 4;
 
@@ -73,7 +74,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	public static final String CHARM_DAMAGE = "Alchemist Potion Damage";
 	public static final String CHARM_RADIUS = "Alchemist Potion Radius";
 
-	private List<PotionAbility> mPotionAbilities = new ArrayList<>();
+	private final List<PotionAbility> mPotionAbilities = new ArrayList<>();
 	private double mDamage = 0;
 	private double mRadius = 0;
 	private int mTimer = 0;
@@ -263,10 +264,9 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			boolean isGruesome = isGruesome(potion);
 
 			double radius = getPotionRadius();
-			for (LivingEntity entity : EntityUtils.getNearbyMobs(loc, radius)) {
-				if (EntityUtils.isHostileMob(entity)) {
-					apply(entity, potion, isGruesome, playerItemStats);
-				}
+			Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
+			for (LivingEntity entity : hitbox.getHitMobs()) {
+				apply(entity, potion, isGruesome, playerItemStats);
 			}
 
 			mCosmetic.particlesOnSplash(mPlayer, potion, isGruesome);

@@ -84,9 +84,14 @@ public class GraspingClaws extends Ability {
 		super(plugin, player, "Grasping Claws");
 		mInfo.mScoreboardId = "GraspingClaws";
 		mInfo.mShorthandName = "GC";
-		mInfo.mDescriptions.add("Left-clicking while shifted while holding a projectile weapon fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given 20% Slowness for 8 seconds and take 3 magic damage. Cooldown: 16s.");
+		mInfo.mDescriptions.add("Left-clicking while shifted while holding a projectile weapon fires an arrow " +
+			                        "that pulls nearby enemies towards your arrow once it makes contact with a mob or block. " +
+			                        "Mobs caught in the arrow's 8 block radius are given 20% Slowness for 8 seconds and take 3 magic damage. Cooldown: 16s.");
 		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, and their Slowness is increased to 30%.");
-		mInfo.mDescriptions.add("At the location that the arrow lands, summon an impenetrable cage. Non-boss mobs within a 6 block radius of the location cannot enter or exit the cage, and players within the cage are granted +10% damage and 5% max health healing every 2 seconds. The cage disappears after 6 seconds. Mobs that are immune to crowd control cannot be trapped.");
+		mInfo.mDescriptions.add("At the location that the arrow lands, summon an impenetrable cage. " +
+			                        "Non-boss mobs within a 6 block radius of the location cannot enter or exit the cage, " +
+			                        "and players within the cage are granted +10% damage and 5% max health healing every 2 seconds. " +
+			                        "The cage disappears after 6 seconds. Mobs that are immune to crowd control cannot be trapped.");
 		mInfo.mLinkedSpell = ClassAbility.GRASPING_CLAWS;
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;

@@ -10,8 +10,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
@@ -55,7 +56,8 @@ public class DefensiveLine extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.DEFENSIVE_LINE;
 		mInfo.mScoreboardId = "DefensiveLine";
 		mInfo.mShorthandName = "DL";
-		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain 20% Resistance for 10 seconds. Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 30s.");
+		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain 20% Resistance for 10 seconds. " +
+			                        "Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The effect is increased to 30% Resistance.");
 		mInfo.mDescriptions.add("Additionally, all affected players negate the next melee attack dealt to them within the duration.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
@@ -91,7 +93,7 @@ public class DefensiveLine extends Ability {
 							mPlugin.mEffectManager.addEffect(player, NEGATE_DAMAGE_EFFECT_NAME, new NegateDamage(duration, (int) (1 + CharmManager.getLevel(mPlayer, CHARM_NEGATIONS)), EnumSet.of(DamageEvent.DamageType.MELEE), new PartialParticle(Particle.FIREWORKS_SPARK, loc, 5, 0, 0, 0, 0.25f)));
 						}
 
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, KNOCK_AWAY_RADIUS), mPlayer)) {
+						for (LivingEntity mob : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(player), CharmManager.getRadius(mPlayer, CHARM_RANGE, KNOCK_AWAY_RADIUS)).getHitMobs()) {
 							MovementUtils.knockAway(player, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED), true);
 						}
 					}

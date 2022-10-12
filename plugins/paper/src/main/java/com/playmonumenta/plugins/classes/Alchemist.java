@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.classes;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.Bezoar;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.EmpoweringOdor;
@@ -15,6 +16,7 @@ import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
+import com.playmonumenta.plugins.utils.StringUtils;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
@@ -40,8 +42,10 @@ public class Alchemist extends PlayerClass {
 		mChatColor = ChatColor.GREEN;
 		mDisplayItem = new ItemStack(Material.POTION, 1);
 		mClassDescription = "Alchemists employ magic potions to weaken and destroy their enemies.";
-		mClassPassiveDescription = "You gain 1 potion every 2 seconds, up to a maximum of 8. Each skill point" +
-				" increases your potion damage by 0.5. Each spec point and enhancement point increases potion damage by 2.5.";
+		mClassPassiveDescription = ("You gain 1 potion every %s seconds, up to a maximum of %s. Each skill point" +
+			                            " increases your potion damage by %s. Each spec point and enhancement point increases potion damage by %s.")
+			                           .formatted(StringUtils.ticksToSeconds(AlchemistPotions.POTIONS_TIMER_BASE), AlchemistPotions.MAX_CHARGES,
+				                           AlchemistPotions.DAMAGE_PER_SKILL_POINT, AlchemistPotions.DAMAGE_PER_SPEC_POINT);
 		mClassPassiveName = "Alchemist Potions";
 
 		mSpecOne.mAbilities.add(new Taboo(plugin, player));

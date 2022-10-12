@@ -2,7 +2,8 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.List;
 import org.bukkit.Location;
@@ -36,7 +37,7 @@ public class SpreadEffectOnDeath extends Effect {
 			try {
 				JsonObject serializedEffect = effect.serialize();
 				Location loc = entity.getLocation();
-				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius, entity);
+				List<LivingEntity> mobs = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(entity), mRadius).getHitMobs(entity);
 				for (LivingEntity mob : mobs) {
 					Effect deserializedEffect = manager.getEffectFromJson(serializedEffect, plugin);
 					if (deserializedEffect != null) {

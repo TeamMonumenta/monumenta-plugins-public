@@ -12,8 +12,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -28,7 +27,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
@@ -63,13 +61,15 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		mInfo.mScoreboardId = "DeadlyRonde";
 		mInfo.mShorthandName = "DR";
 		mInfo.mDescriptions.add(
-			String.format("After casting a skill, gain a stack of Deadly Ronde for %s seconds, stacking up to %s times. While Deadly Ronde is active, you gain %s%% Speed, and your next melee attack consumes a stack to fire a flurry of blades, that fire in a thin cone with a radius of %s blocks and deal %s melee damage to all enemies they hit.",
+			String.format("After casting a skill, gain a stack of Deadly Ronde for %s seconds, stacking up to %s times. " +
+				              "While Deadly Ronde is active, you gain %s%% Speed, and your next melee attack consumes a stack to fire a flurry of blades, " +
+				              "that fire in a thin cone with a radius of %s blocks and deal %s melee damage to all enemies they hit.",
 				RONDE_DECAY_TIMER / 20,
 				RONDE_1_MAX_STACKS,
-				(int)(RONDE_SPEED_BONUS * 100),
+				(int) (RONDE_SPEED_BONUS * 100),
 				RONDE_RADIUS,
 				RONDE_1_DAMAGE
-				));
+			));
 		mInfo.mDescriptions.add(
 			String.format("Damage increased to %s, and you can now store up to %s stacks.",
 				RONDE_2_DAMAGE,
@@ -131,15 +131,12 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		if (mActiveRunnable != null
 			    && event.getType() == DamageType.MELEE
 			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
-			Vector playerDirVector = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
-			double cos = FastUtils.cosDeg(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, RONDE_ANGLE));
+			double angle = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, RONDE_ANGLE);
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RONDE_RADIUS);
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius)) {
-				Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
-				if (playerDirVector.dot(toMobVector) > cos) {
-					DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell, true);
-					MovementUtils.knockAway(mPlayer, mob, mKnockback, true);
-				}
+			Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), radius, Math.toRadians(angle));
+			for (LivingEntity mob : hitbox.getHitMobs()) {
+				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell, true);
+				MovementUtils.knockAway(mPlayer, mob, mKnockback, true);
 			}
 
 			Location particleLoc = mPlayer.getEyeLocation().add(mPlayer.getEyeLocation().getDirection().multiply(3));

@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -83,7 +84,7 @@ public class ThunderStep extends Ability {
 		mInfo.mDescriptions.add(
 			String.format(
 				"While holding a wand while sneaking, pressing the swap key materializes a flash of thunder," +
-					" dealing %s thunder magic damage to all enemies in a %s-block cube around you and knocking them away." +
+					" dealing %s thunder magic damage to all enemies in a %s block radius around you and knocking them away." +
 					" The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block," +
 					" and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
 				DAMAGE_1,
@@ -94,7 +95,8 @@ public class ThunderStep extends Ability {
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"Damage is increased from %s to %s. Teleport range is increased from %s to %s blocks.",
+				"Damage is increased from %s to %s." +
+					" Teleport range is increased from %s to %s blocks.",
 				DAMAGE_1,
 				DAMAGE_2,
 				DISTANCE_1,
@@ -209,7 +211,9 @@ public class ThunderStep extends Ability {
 		new PartialParticle(Particle.REDSTONE, location, (int) (100 * ratio * ratio), 2.5 * ratio, 2.5 * ratio, 2.5 * ratio, 3, COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.REDSTONE, location, (int) (100 * ratio * ratio), 2.5 * ratio, 2.5 * ratio, 2.5 * ratio, 3, COLOR_AQUA).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10).spawnAsPlayerActive(mPlayer);
-		List<LivingEntity> enemies = EntityUtils.getNearbyMobs(location, radius);
+		Hitbox hitbox = new Hitbox.SphereHitbox(location.clone().add(0, 0.9, 0), radius);
+		List<LivingEntity> enemies = hitbox.getHitMobs();
+
 		// The more enemies, the fewer particles for each one
 		int mobParticles = Math.max(
 			1,

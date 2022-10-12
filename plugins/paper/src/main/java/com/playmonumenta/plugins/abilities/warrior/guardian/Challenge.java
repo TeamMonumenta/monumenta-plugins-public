@@ -11,6 +11,8 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -41,7 +43,7 @@ public class Challenge extends Ability {
 	private static final int ABSORPTION_PER_MOB_2 = 2;
 	private static final int MAX_ABSORPTION_1 = 4;
 	private static final int MAX_ABSORPTION_2 = 8;
-	private static final int CHALLENGE_RANGE = 12;
+	private static final int CHALLENGE_RANGE = 14;
 	private static final int COOLDOWN = 20 * 20;
 
 	public static final String CHARM_DURATION = "Challenge Duration";
@@ -59,8 +61,13 @@ public class Challenge extends Ability {
 		super(plugin, player, "Challenge");
 		mInfo.mScoreboardId = "Challenge";
 		mInfo.mShorthandName = "Ch";
-		mInfo.mDescriptions.add("Left-clicking while sneaking makes all enemies within 12 blocks target you. You gain 1 Absorption per affected mob (up to 4 Absorption) for 10 seconds and +15% melee damage for 10 seconds. Cooldown: 20s.");
-		mInfo.mDescriptions.add("You gain 2 Absorption per affected mob (up to 8 Absorption) and +30% melee damage instead.");
+		mInfo.mDescriptions.add(("Left-clicking while sneaking makes all enemies within %s blocks target you. " +
+			                         "You gain %s Absorption per affected mob (up to %s Absorption) for %s seconds and +%s%% melee damage for %s seconds. Cooldown: %ss.")
+			                        .formatted(CHALLENGE_RANGE, ABSORPTION_PER_MOB_1, MAX_ABSORPTION_1, StringUtils.ticksToSeconds(DURATION),
+				                        StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_EFFECT_1),
+				                        StringUtils.ticksToSeconds(DURATION), StringUtils.ticksToSeconds(COOLDOWN)));
+		mInfo.mDescriptions.add("You gain %s Absorption per affected mob (up to %s Absorption) and +%s%% melee damage instead."
+			                        .formatted(ABSORPTION_PER_MOB_2, MAX_ABSORPTION_2, StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_EFFECT_2)));
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.CHALLENGE;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -77,7 +84,7 @@ public class Challenge extends Ability {
 		}
 
 		Location loc = mPlayer.getLocation();
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, CHALLENGE_RANGE), mPlayer);
+		List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, CHALLENGE_RANGE)).getHitMobs();
 		if (!mobs.isEmpty()) {
 			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 			AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionPerMob * mobs.size(), mMaxAbsorption, duration);

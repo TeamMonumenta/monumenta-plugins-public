@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -65,9 +66,12 @@ public class CursedWound extends Ability {
 		super(plugin, player, "Cursed Wound");
 		mInfo.mScoreboardId = "CursedWound";
 		mInfo.mShorthandName = "CW";
-		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3-block cube around it with 1 damage every second for 6s. Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.");
+		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3 block radius around it with 1 damage every second for 6s. " +
+			                        "Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.");
 		mInfo.mDescriptions.add("Critical attacks now also extend all enemies' debuffs (except Stun, Silence, and Paralysis) by 2s. Damage cap is increased from 15% to 30%.");
-		mInfo.mDescriptions.add("When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, as well as 2 magic damage per effect.");
+		mInfo.mDescriptions.add("When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. " +
+			                        "Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, " +
+			                        "as well as 2 magic damage per effect.");
 		mInfo.mLinkedSpell = ClassAbility.CURSED_WOUND;
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
 		mCursedWoundCap = CharmManager.getLevelPercentDecimal(player, CHARM_CAP) + (isLevelOne() ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP);
@@ -117,7 +121,7 @@ public class CursedWound extends Ability {
 
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
 				world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 0.75f);
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CURSED_WOUND_RADIUS, mPlayer)) {
+				for (LivingEntity mob : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CURSED_WOUND_RADIUS).getHitMobs()) {
 					new PartialParticle(Particle.FALLING_DUST, mob.getLocation().add(0, mob.getHeight() / 2, 0), 3,
 						(mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, fallingDustData)
 						.spawnAsPlayerActive(mPlayer);

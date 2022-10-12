@@ -12,12 +12,11 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -151,7 +150,6 @@ public class UnstableAmalgam extends Ability {
 
 		int duration = UNSTABLE_AMALGAM_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 
-		loc.setY(loc.getBlockY() + 1);
 		World world = loc.getWorld();
 		Entity e = LibraryOfSoulsIntegration.summon(loc, "UnstableAmalgam");
 		if (e instanceof Slime amalgam) {
@@ -199,7 +197,8 @@ public class UnstableAmalgam extends Ability {
 		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, UNSTABLE_AMALGAM_KNOCKBACK_SPEED);
 		float playerVertical = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, 2);
 
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius, mAmalgam);
+		Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
+		List<LivingEntity> mobs = hitbox.getHitMobs(mAmalgam);
 		mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage + mAlchemistPotions.getDamage());
@@ -222,12 +221,12 @@ public class UnstableAmalgam extends Ability {
 		}
 
 		if (!ZoneUtils.hasZoneProperty(loc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			for (Player player : PlayerUtils.playersInRange(loc, radius, true)) {
+			for (Player player : hitbox.getHitPlayers(true)) {
 				if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 					if (!player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(0) == 100) {
 						MovementUtils.knockAwayRealistic(loc, player, knockback, playerVertical, false);
 					} else if (player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(1) > 0) {
-						//by default any Alch can use Rocket Jump with his UA
+						// by default any Alch can use Rocket Jump with their UA
 						MovementUtils.knockAwayRealistic(loc, player, knockback, playerVertical, false);
 					}
 				}
@@ -288,7 +287,7 @@ public class UnstableAmalgam extends Ability {
 			Location loc = potion.getLocation();
 
 			double damage = mAlchemistPotions.getDamage() * (UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_POTION_DAMAGE));
-			for (LivingEntity entity : EntityUtils.getNearbyMobs(loc, mAlchemistPotions.getPotionRadius())) {
+			for (LivingEntity entity : new Hitbox.SphereHitbox(loc, mAlchemistPotions.getPotionRadius()).getHitMobs()) {
 				DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, stats), damage, true, true, false);
 				mAlchemistPotions.applyEffects(entity, true);
 				mAlchemistPotions.applyEffects(entity, false);

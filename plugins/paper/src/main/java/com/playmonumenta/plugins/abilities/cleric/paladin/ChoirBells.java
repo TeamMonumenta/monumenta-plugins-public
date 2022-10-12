@@ -8,6 +8,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
@@ -19,7 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 
 public class ChoirBells extends Ability {
@@ -55,7 +56,9 @@ public class ChoirBells extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.CHOIR_BELLS;
 		mInfo.mScoreboardId = "ChoirBells";
 		mInfo.mShorthandName = "CB";
-		mInfo.mDescriptions.add("While not sneaking, pressing the swap key afflicts all enemies in a 10-block radius with 10% slowness for 8s. Undead enemies also switch targets over to you, are dealt " + DAMAGE + " magic damage, and are afflicted with 20% vulnerability and 20% weakness for 8s. Cooldown: 16s.");
+		mInfo.mDescriptions.add("While not sneaking, pressing the swap key afflicts all enemies in a 10-block radius with 10% slowness for 8s. " +
+			                        "Undead enemies also switch targets over to you, are dealt " + DAMAGE + " magic damage, " +
+			                        "and are afflicted with 20% vulnerability and 20% weakness for 8s. Cooldown: 16s.");
 		mInfo.mDescriptions.add("Slowness is increased from 10% to 20%. Vulnerability and weakness are increased from 20% to 35%.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
@@ -89,7 +92,8 @@ public class ChoirBells extends Ability {
 				}.runTaskLater(mPlugin, i);
 			}
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RANGE, CHOIR_BELLS_RANGE))) {
+			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), CharmManager.getRadius(mPlayer, CHARM_RANGE, CHOIR_BELLS_RANGE));
+			for (LivingEntity mob : hitbox.getHitMobs()) {
 				EntityUtils.applySlow(mPlugin, DURATION, mSlownessAmount, mob);
 
 				if (Crusade.enemyTriggersAbilities(mob, mCrusade)) {

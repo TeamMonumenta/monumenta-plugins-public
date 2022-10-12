@@ -3,13 +3,16 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.ChatColor;
@@ -25,7 +28,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
 
 /*
  * Volcanic Demise:
@@ -41,12 +43,14 @@ public class SpellVolcanicDemise extends Spell {
 	private static final int DAMAGE = 42;
 	private static final int METEOR_COUNT = 25;
 	private static final int METEOR_RATE = 10;
+	private static final double DEATH_RADIUS = 2;
+	private static final double HIT_RADIUS = 5;
 
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
-	private double mRange;
-	private Location mCenter;
-	private ChargeUpManager mChargeUp;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final double mRange;
+	private final Location mCenter;
+	private final ChargeUpManager mChargeUp;
 
 	public SpellVolcanicDemise(Plugin plugin, LivingEntity boss, double range, Location center) {
 		mPlugin = plugin;
@@ -154,8 +158,8 @@ public class SpellVolcanicDemise extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			double mY = spawnY;
-			Location mLoc = locInput.clone();
-			World mWorld = locInput.getWorld();
+			final Location mLoc = locInput.clone();
+			final World mWorld = locInput.getWorld();
 
 			@Override
 			public void run() {
@@ -164,12 +168,19 @@ public class SpellVolcanicDemise extends Spell {
 				mY -= 1;
 				if (mY % 2 == 0) {
 					for (Player player : players) {
-						// Player gets more particles the closer they are to the landing area
 						double dist = player.getLocation().distance(mLoc);
-						double step = dist < 10 ? 0.5 : (dist < 15 ? 1 : 3);
-						for (double deg = 0; deg < 360; deg += (step * 30)) {
-							player.spawnParticle(Particle.FLAME, mLoc.clone().add(FastUtils.cos(deg), 0, FastUtils.sin(deg)), 1, 0.15, 0.15, 0.15, 0);
-						}
+						double size = (spawnY - mY) / spawnY;
+						int count = dist < 10 ? 24 : (dist < 15 ? 12 : 4); // Player gets more particles the closer they are to the landing area
+						new PPCircle(Particle.FLAME, mLoc, size * HIT_RADIUS)
+							.ringMode(true)
+							.count(count)
+							.delta(0.15)
+							.spawnAsBoss();
+						new PPCircle(Particle.LANDING_LAVA, mLoc, size * DEATH_RADIUS)
+							.ringMode(false)
+							.count(count)
+							.delta(0.15)
+							.spawnAsBoss();
 					}
 				}
 				Location particle = mLoc.clone().add(0, mY, 0);
@@ -184,18 +195,18 @@ public class SpellVolcanicDemise extends Spell {
 					mWorld.spawnParticle(Particle.FLAME, mLoc, 50, 0, 0, 0, 0.175, null, true);
 					mWorld.spawnParticle(Particle.SMOKE_LARGE, mLoc, 10, 0, 0, 0, 0.25, null, true);
 					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
-					BoundingBox death = BoundingBox.of(mLoc, 1.5, 5, 1.5);
-					BoundingBox box = BoundingBox.of(mLoc, 4, 10, 4);
-					for (Player player : PlayerUtils.playersInRange(mLoc, 10, true)) {
-						BoundingBox pBox = player.getBoundingBox();
-						if (pBox.overlaps(death)) {
-							DamageUtils.damage(mBoss, player, DamageType.BLAST, 1000, null, false, true, "Volcanic Demise");
+					Hitbox deathBox = new Hitbox.UprightCylinderHitbox(mLoc, 7, DEATH_RADIUS);
+					Hitbox hitBox = new Hitbox.UprightCylinderHitbox(mLoc, 15, HIT_RADIUS);
+					List<Player> hitPlayers = new ArrayList<>(hitBox.getHitPlayers(true));
+					for (Player player : deathBox.getHitPlayers(true)) {
+						DamageUtils.damage(mBoss, player, DamageType.BLAST, 1000, null, false, true, "Volcanic Demise");
+						MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
+						hitPlayers.remove(player);
+					}
+					for (Player player : hitPlayers) {
+						BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, DAMAGE, "Volcanic Demise", mLoc);
+						if (!BossUtils.bossDamageBlocked(player, mLoc)) {
 							MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
-						} else if (pBox.overlaps(box)) {
-							BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, DAMAGE, "Volcanic Demise", mLoc);
-							if (!BossUtils.bossDamageBlocked(player, mLoc)) {
-								MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
-							}
 						}
 					}
 					for (Block block : LocationUtils.getNearbyBlocks(mLoc.getBlock(), 4)) {

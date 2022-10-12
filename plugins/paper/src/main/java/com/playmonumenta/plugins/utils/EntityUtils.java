@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
-import javax.annotation.Nullable;
+import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -56,6 +56,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 
 public class EntityUtils {
@@ -499,44 +500,24 @@ public class EntityUtils {
 
 	/**
 	 * Returns a List of LivingEntity objects in the bounding box with the specified dimensions.
-	 * <p>
-	 * The List will only include objects with EntityType contained in types. If types is null, only hostile mobs will be included.
 	 *
-	 * @param loc   Location representing center of the bounding box
-	 * @param rx    distance from center to faces perpendicular to x-axis
-	 * @param ry    distance from center to faces perpendicular to y-axis
-	 * @param rz    distance from center to faces perpendicular to z-axis
-	 * @param types List of EntityTypes to be returned, defaults to hostile mobs if null
-	 * @return List of LivingEntity objects of the specified type within the bounding box
+	 * @param loc       Location representing center of the bounding box
+	 * @param rx        distance from center to faces perpendicular to x-axis
+	 * @param ry        distance from center to faces perpendicular to y-axis
+	 * @param rz        distance from center to faces perpendicular to z-axis
+	 * @param predicate predicate to filter returned mobs, e.g. {@link #isHostileMob(Entity) isHostileMob} to only return hostile mobs
+	 * @return List of LivingEntity objects within the given bounding box matching the given predicate
 	 */
-	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz, EnumSet<EntityType> types) {
-		Collection<LivingEntity> entities = loc.getWorld().getNearbyEntitiesByType(LivingEntity.class, loc, rx, ry, rz);
-
-		List<LivingEntity> mobs = new ArrayList<>(entities.size());
-		for (LivingEntity entity : entities) {
-			if (entity.isDead() || !entity.isValid()) {
-				continue;
-			}
-
-			if (types == null) { // If no types specified
-				if (!isHostileMob(entity)) { // Only add hostiles. Not hostile = skip
-					continue;
-				}
-			} else if (!types.contains(entity.getType())) { // If types specified, only add those. Not match = skip
-				continue;
-			}
-
-			mobs.add(entity);
-		}
-
-		return mobs;
+	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz, Predicate<LivingEntity> predicate) {
+		return new ArrayList<>(loc.getWorld().getNearbyLivingEntities(loc, rx, ry, rz,
+			entity -> !entity.isDead() && entity.isValid() && predicate.test(entity)));
 	}
 
 	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz) {
-		return getNearbyMobs(loc, rx, ry, rz, null);
+		return getNearbyMobs(loc, rx, ry, rz, EntityUtils::isHostileMob);
 	}
 
-	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, LivingEntity getter) {
+	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, @Nullable LivingEntity getter) {
 		List<LivingEntity> list = getNearbyMobs(loc, radius, radius, radius);
 		list.remove(getter);
 		return list;
@@ -545,7 +526,7 @@ public class EntityUtils {
 	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, LivingEntity getter, boolean ignoreStack) {
 		List<LivingEntity> list = getNearbyMobs(loc, radius, radius, radius);
 		if (ignoreStack) {
-			List<LivingEntity> mobs = new ArrayList<LivingEntity>();
+			List<LivingEntity> mobs = new ArrayList<>();
 			if (getter.getVehicle() != null) {
 				getStackedMobsBelow(getter, mobs);
 			}
@@ -565,7 +546,23 @@ public class EntityUtils {
 	}
 
 	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, EnumSet<EntityType> types) {
-		return getNearbyMobs(loc, radius, radius, radius, types);
+		return getNearbyMobs(loc, radius, radius, radius, e -> types.contains(e.getType()));
+	}
+
+	public static List<LivingEntity> getNearbyMobsInSphere(Location loc, double radius, @Nullable LivingEntity getter) {
+		double radiusSquared = radius * radius;
+		List<LivingEntity> list = getNearbyMobs(loc, radius, radius, radius,
+			e -> isHostileMob(e) && e.getLocation().distanceSquared(loc) <= radiusSquared);
+		list.remove(getter);
+		return list;
+	}
+
+	public static List<LivingEntity> getNearbyMobsInCylinder(Location loc, double radius, double halfHeight, @Nullable LivingEntity getter) {
+		double radiusSquared = radius * radius;
+		List<LivingEntity> list = getNearbyMobs(loc, radius, halfHeight, radius,
+			e -> isHostileMob(e) && e.getLocation().toVector().setY(0).distanceSquared(loc.toVector().setY(0)) <= radiusSquared);
+		list.remove(getter);
+		return list;
 	}
 
 	public static void getStackedMobsAbove(Entity base, List<LivingEntity> prior) {

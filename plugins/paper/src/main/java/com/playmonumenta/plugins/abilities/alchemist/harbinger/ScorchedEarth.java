@@ -9,12 +9,12 @@ import com.playmonumenta.plugins.effects.ScorchedEarthDamage;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
@@ -64,7 +64,8 @@ public class ScorchedEarth extends MultipleChargeAbility {
 		mInfo.mLinkedSpell = ClassAbility.SCORCHED_EARTH;
 		mInfo.mScoreboardId = "ScorchedEarth";
 		mInfo.mShorthandName = "SE";
-		mInfo.mDescriptions.add("Shift right click while holding an Alchemist's Bag to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. Mobs in this zone are dealt 25% of your potion's damage extra whenever taking damage of types other than ailment or fire. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Shift right click while holding an Alchemist's Bag to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. " +
+			                        "Mobs in this zone are dealt 25% of your potion's damage extra whenever taking damage of types other than ailment or fire. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Cooldown reduced to 25s, and two charges of this ability can be stored at once.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? SCORCHED_EARTH_1_COOLDOWN : SCORCHED_EARTH_2_COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
@@ -81,22 +82,20 @@ public class ScorchedEarth extends MultipleChargeAbility {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		manageChargeCooldowns();
 		if (mAlchemistPotions == null) {
+			mCenters.clear();
 			return;
 		}
+		manageChargeCooldowns();
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * SCORCHED_EARTH_DAMAGE_FRACTION);
-        // Copy list to avoid ConcurrentModificationException
-		for (Location loc : new ArrayList<>(mCenters.keySet())) {
-			Integer time = mCenters.get(loc);
-			if (time == null) {
-				continue;
-			}
-			int timeRemaining = time;
+		for (Iterator<Map.Entry<Location, Integer>> iterator = mCenters.entrySet().iterator(); iterator.hasNext(); ) {
+			Map.Entry<Location, Integer> center = iterator.next();
+			Location loc = center.getKey();
+			int timeRemaining = center.getValue();
 			if (timeRemaining <= 0) {
-				mCenters.remove(loc);
+				iterator.remove();
 			} else {
-				mCenters.replace(loc, timeRemaining - 5);
+				center.setValue(timeRemaining - 5);
 
 				World world = loc.getWorld();
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 3, 2.1, 0.3, 2.1, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
@@ -112,7 +111,8 @@ public class ScorchedEarth extends MultipleChargeAbility {
 				}
 
 				PlayerItemStats stats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mRadius)) {
+				Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
+				for (LivingEntity mob : hitbox.getHitMobs()) {
 					EffectManager.getInstance().addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage, mPlayer, stats));
 				}
 			}

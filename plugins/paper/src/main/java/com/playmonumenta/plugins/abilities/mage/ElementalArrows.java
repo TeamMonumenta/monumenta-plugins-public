@@ -11,6 +11,8 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.bukkit.Material;
@@ -57,14 +59,18 @@ public class ElementalArrows extends Ability {
 		mInfo.mScoreboardId = "Elemental";
 		mInfo.mShorthandName = "EA";
 		mInfo.mDescriptions.add(
-			String.format("Your fully drawn projectiles are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with %s%% Slowness for %s seconds. Projectiles shot this way deal magical damage instead of projectile damage. Ice arrows deal %s extra damage to Blazes. Fire arrows deal %s extra damage to strays. This skill can not apply Spellshock.",
+			String.format("Your fully drawn projectiles are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with %s%% Slowness for %s seconds. " +
+				              "Projectiles shot this way deal magical damage instead of projectile damage. Ice arrows deal %s extra damage to Blazes. " +
+				              "Fire arrows deal %s extra damage to strays. This skill can not apply Spellshock.",
 				(int) (SLOW_AMPLIFIER * 100),
 				ELEMENTAL_ARROWS_DURATION / 20,
 				ELEMENTAL_ARROWS_BONUS_DAMAGE,
 				ELEMENTAL_ARROWS_BONUS_DAMAGE
 			));
 		mInfo.mDescriptions.add(
-			String.format("Your fire arrows also set nearby enemies within a radius of %s blocks on fire when they hit a target. Your ice arrows also slow nearby enemies within a radius of %s blocks when they hit a target. Both area of effect effects do %s%% bow damage to all targets affected.",
+			String.format("Your fire arrows also set nearby enemies within a radius of %s blocks on fire when they hit a target. " +
+				              "Your ice arrows also slow nearby enemies within a radius of %s blocks when they hit a target. " +
+				              "Both area of effect effects do %s%% bow damage to all targets affected.",
 				(int) ELEMENTAL_ARROWS_RADIUS,
 				(int) ELEMENTAL_ARROWS_RADIUS,
 				(int) (AOE_DAMAGE_MULTIPLIER * 100)
@@ -117,7 +123,8 @@ public class ElementalArrows extends Ability {
 		double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, ELEMENTAL_ARROWS_RADIUS);
 
 		if (isLevelTwo()) {
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius, enemy)) {
+			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), radius);
+			for (LivingEntity mob : hitbox.getHitMobs(enemy)) {
 				effectAction.accept(mob);
 				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, ability, playerItemStats), areaDamage, true, true, false);
 			}

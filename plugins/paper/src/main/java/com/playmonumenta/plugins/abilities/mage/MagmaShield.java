@@ -16,22 +16,18 @@ import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.EnumSet;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 
 public class MagmaShield extends Ability {
@@ -41,13 +37,14 @@ public class MagmaShield extends Ability {
 
 	public static final int DAMAGE_1 = 6;
 	public static final int DAMAGE_2 = 12;
-	public static final int SIZE = 6;
+	private static final int HEIGHT = 6;
+	private static final int RADIUS = 7;
 	public static final int FIRE_SECONDS = 6;
 	public static final int FIRE_TICKS = FIRE_SECONDS * 20;
 	public static final float KNOCKBACK = 0.5f;
 	// 70° on each side of look direction for XZ-plane (flattened Y),
 	// so 140° angle of effect
-	public static final int ANGLE = 70;
+	private static final int ANGLE = 70;
 	public static final int COOLDOWN_SECONDS = 12;
 	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
 	public static final float ENHANCEMENT_FIRE_DAMAGE_BONUS = 0.5f;
@@ -77,9 +74,10 @@ public class MagmaShield extends Ability {
 		mInfo.mShorthandName = "MS";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While sneaking, right-clicking with a wand summons a torrent of flames, dealing %s fire magic damage to all enemies in front of you within a %s-block cube around you, setting them on fire for %ss, and knocking them away. The damage ignores iframes. Cooldown: %ss.",
+				"While sneaking, right-clicking with a wand summons a torrent of flames, dealing %s fire magic damage to all enemies in front of you within %s blocks," +
+					" setting them on fire for %ss, and knocking them away. The damage ignores iframes. Cooldown: %ss.",
 				DAMAGE_1,
-				SIZE,
+				RADIUS,
 				FIRE_SECONDS,
 				COOLDOWN_SECONDS
 			)
@@ -123,60 +121,25 @@ public class MagmaShield extends Ability {
 		putOnCooldown();
 
 		float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-		Vector flattenedLookDirection = mPlayer.getEyeLocation().getDirection().setY(0);
-		for (LivingEntity potentialTarget : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE), mPlayer)) {
-			Vector flattenedTargetVector = potentialTarget.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0);
-			if (
-				VectorUtils.isAngleWithin(
-					flattenedLookDirection,
-					flattenedTargetVector,
-					CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, ANGLE)
-				)
-			) {
-				EntityUtils.applyFire(mPlugin, FIRE_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), potentialTarget, mPlayer);
-				DamageUtils.damage(mPlayer, potentialTarget, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
-				MovementUtils.knockAway(mPlayer, potentialTarget, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK), true);
-				if (isEnhanced()) {
-					mPlugin.mEffectManager.addEffect(potentialTarget, ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME,
-						new PercentDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_DAMAGE_BONUS, EnumSet.of(DamageType.FIRE)));
-					mPlugin.mEffectManager.addEffect(potentialTarget, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME,
-						new PercentAbilityDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS,
-							EnumSet.of(ClassAbility.MAGMA_SHIELD, ClassAbility.ELEMENTAL_ARROWS_FIRE, ClassAbility.ELEMENTAL_SPIRIT_FIRE,
-								ClassAbility.STARFALL, ClassAbility.CHOLERIC_FLAMES)));
-				}
+		double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS);
+		double angle = Math.min(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, ANGLE), 180);
+		Hitbox hitbox = Hitbox.approximateCylinderSegment(
+			LocationUtils.getHalfHeightLocation(mPlayer).add(0, -HEIGHT, 0), 2 * HEIGHT, radius, Math.toRadians(angle));
+		for (LivingEntity target : hitbox.getHitMobs()) {
+			EntityUtils.applyFire(mPlugin, FIRE_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), target, mPlayer);
+			DamageUtils.damage(mPlayer, target, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
+			MovementUtils.knockAway(mPlayer, target, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK), true);
+			if (isEnhanced()) {
+				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME,
+					new PercentDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_DAMAGE_BONUS, EnumSet.of(DamageType.FIRE)));
+				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME,
+					new PercentAbilityDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS,
+						EnumSet.of(ClassAbility.MAGMA_SHIELD, ClassAbility.ELEMENTAL_ARROWS_FIRE, ClassAbility.ELEMENTAL_SPIRIT_FIRE,
+							ClassAbility.STARFALL, ClassAbility.CHOLERIC_FLAMES)));
 			}
 		}
 
-		World world = mPlayer.getWorld();
-		new BukkitRunnable() {
-			final Location mLoc = mPlayer.getLocation();
-			double mRadius = 0;
-
-			@Override
-			public void run() {
-				if (mRadius == 0) {
-					mLoc.setDirection(mPlayer.getLocation().getDirection().setY(0).normalize());
-				}
-				Vector vec;
-				mRadius += 1.25;
-				for (double degree = 30; degree <= 150; degree += 10) {
-					double radian1 = Math.toRadians(degree);
-					vec = new Vector(FastUtils.cos(radian1) * mRadius, 0.125, FastUtils.sin(radian1) * mRadius);
-					vec = VectorUtils.rotateXAxis(vec, mLoc.getPitch());
-					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
-
-					Location l = mLoc.clone().add(0, 0.1, 0).add(vec);
-					mCosmetic.magmaParticle(mPlayer, l);
-				}
-
-				if (mRadius >= CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE + 1)) {
-					this.cancel();
-				}
-			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
-
-		mCosmetic.magmaEffects(world, mPlayer);
+		mCosmetic.magmaEffects(mPlayer.getWorld(), mPlayer, radius, angle);
 	}
 
 	@Override

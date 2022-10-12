@@ -17,7 +17,8 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -47,7 +48,7 @@ public class AstralOmen extends Ability {
 	public static final String DAMAGED_THIS_TICK_METAKEY = "AstralOmenDamagedThisTick";
 
 	public static final int DAMAGE = 8;
-	public static final int SIZE = 3;
+	public static final int RADIUS = 3;
 	public static final double BONUS_MULTIPLIER = 0.2;
 	public static final double BOW_MULTIPLIER = 0.4;
 	public static final int STACK_TICKS = 10 * Constants.TICKS_PER_SECOND;
@@ -105,10 +106,15 @@ public class AstralOmen extends Ability {
 		mInfo.mShorthandName = "AO";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Dealing spell damage to an enemy marks its fate, giving it an omen based on the spell type (Arcane, Fire, Ice, Thunder). If an enemy hits %s omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, dealing %s magic damage to it and all enemies in a %s-block cube around it. If the spell was %s, the implosion instead does %s%% of the bow's original damage. An enemy loses all its omens after %ss of it not gaining another omen. That implosion's damage ignores iframes and itself cannot apply omens.",
+				"Dealing spell damage to an enemy marks its fate, giving it an omen based on the spell type (Arcane, Fire, Ice, Thunder). " +
+					"If an enemy hits %s omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, " +
+					"dealing %s magic damage to it and all enemies within %s blocks. " +
+					"If the spell was %s, the implosion instead does %s%% of the bow's original damage. " +
+					"An enemy loses all its omens after %ss of it not gaining another omen. " +
+					"That implosion's damage ignores iframes and itself cannot apply omens.",
 				STACK_THRESHOLD,
 				DAMAGE,
-				SIZE,
+				RADIUS,
 				ElementalArrows.NAME,
 				StringUtils.multiplierToPercentage(BOW_MULTIPLIER),
 				StringUtils.ticksToSeconds(STACK_TICKS)
@@ -174,7 +180,8 @@ public class AstralOmen extends Ability {
 			} else {
 				spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, baseDamage);
 			}
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE))) {
+			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS));
+			for (LivingEntity mob : hitbox.getHitMobs()) {
 				if (MetadataUtils.checkOnceThisTick(mPlugin, mob, DAMAGED_THIS_TICK_METAKEY)) {
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, spellDamage, mInfo.mLinkedSpell, true);
 					if (isLevelOne()) {

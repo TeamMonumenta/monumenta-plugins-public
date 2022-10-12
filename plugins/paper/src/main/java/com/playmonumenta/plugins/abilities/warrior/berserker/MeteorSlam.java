@@ -10,7 +10,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -81,21 +81,27 @@ public final class MeteorSlam extends Ability {
 		mInfo.mShorthandName = "MS";
 		mInfo.mDescriptions.add(
 				String.format(
-						"Pressing the swap key grants you Jump Boost %s for %ss instead of doing its vanilla function. Cooldown: %ss. Falling more than %s blocks passively generates a slam when you land, dealing %s melee damage to all enemies in a %s-block cube around you per block fallen for the first %s blocks, and %s damage per block thereafter. Falling more than %s blocks and attacking an enemy also passively generates a slam at that enemy, and resets your blocks fallen. If any enemies are damaged by a slam, you take no fall damage from that fall.",
-						JUMP_LEVEL_1,
-						DURATION_SECONDS,
-						COOLDOWN_SECONDS_1,
-						AUTOMATIC_THRESHOLD,
-						DAMAGE_1,
-						SIZE_1,
-						REDUCED_THRESHOLD,
-						REDUCED_DAMAGE_1,
-						MANUAL_THRESHOLD
+					"Pressing the swap key grants you Jump Boost %s for %ss instead of doing its vanilla function. Cooldown: %ss. " +
+						"Falling more than %s blocks passively generates a slam when you land, " +
+						"dealing %s melee damage to all enemies in a %s block radius around you per block fallen for the first %s blocks, " +
+						"and %s damage per block thereafter. Falling more than %s blocks and attacking an enemy also passively generates a slam at that enemy, " +
+						"and resets your blocks fallen. If any enemies are damaged by a slam, you take no fall damage from that fall.",
+					JUMP_LEVEL_1,
+					DURATION_SECONDS,
+					COOLDOWN_SECONDS_1,
+					AUTOMATIC_THRESHOLD,
+					DAMAGE_1,
+					SIZE_1,
+					REDUCED_THRESHOLD,
+					REDUCED_DAMAGE_1,
+					MANUAL_THRESHOLD
 				)
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"Jump Boost level is increased from %s to %s. Cooldown is reduced from %ss to %ss. Damage is increased from %s to %s per block fallen for the first %s blocks, and from %s to %s per block thereafter. Damage size is increased from %s to %s blocks.",
+				"Jump Boost level is increased from %s to %s. Cooldown is reduced from %ss to %ss. " +
+					"Damage is increased from %s to %s per block fallen for the first %s blocks, and from %s to %s per block thereafter. " +
+					"Damage size is increased from %s to %s blocks.",
 				JUMP_LEVEL_1,
 				JUMP_LEVEL_2,
 				COOLDOWN_SECONDS_1,
@@ -240,7 +246,7 @@ public final class MeteorSlam extends Ability {
 		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * mLevelDamage + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * mLevelReducedDamage;
 		slamDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, slamDamage);
 
-		for (LivingEntity enemy : EntityUtils.getNearbyMobs(location, mLevelSize)) {
+		for (LivingEntity enemy : new Hitbox.SphereHitbox(location, mLevelSize).getHitMobs()) {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.mLinkedSpell, true);
 		}
 
@@ -256,7 +262,7 @@ public final class MeteorSlam extends Ability {
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		// If there is a mob in range, cancel the fall damage
-		if (event.getType() == DamageType.FALL && !EntityUtils.getNearbyMobs(mPlayer.getLocation(), mLevelSize).isEmpty()) {
+		if (event.getType() == DamageType.FALL && !new Hitbox.SphereHitbox(mPlayer.getLocation(), mLevelSize).getHitMobs().isEmpty()) {
 			event.setCancelled(true);
 		}
 	}

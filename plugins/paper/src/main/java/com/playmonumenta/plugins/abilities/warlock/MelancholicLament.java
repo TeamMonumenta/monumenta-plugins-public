@@ -10,9 +10,11 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
@@ -38,13 +40,14 @@ public class MelancholicLament extends Ability {
 	private static final double WEAKEN_EFFECT_1 = 0.2;
 	private static final double WEAKEN_EFFECT_2 = 0.3;
 	private static final int COOLDOWN = 20 * 16;
-	private static final int RADIUS = 7;
+	private static final int RADIUS = 8;
 	private static final int CLEANSE_REDUCTION = 20 * 10;
 	private static final int ENHANCE_RADIUS = 16;
 	private static final double ENHANCE_DAMAGE = .025;
 	private static final String ENHANCE_EFFECT_NAME = "LamentDamage";
 	private static final String ENHANCE_EFFECT_PARTICLE_NAME = "LamentParticle";
 	private static final int ENHANCE_EFFECT_DURATION = 20;
+	private static final int ENHANCE_MAX_MOBS = 6;
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageEvent.DamageType.MELEE);
 	public static final String CHARM_RADIUS = "Melancholic Lament Radius";
 	public static final String CHARM_COOLDOWN = "Melancholic Lament Cooldown";
@@ -63,9 +66,13 @@ public class MelancholicLament extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.MELANCHOLIC_LAMENT;
 		mInfo.mScoreboardId = "Melancholic";
 		mInfo.mShorthandName = "MLa";
-		mInfo.mDescriptions.add("Press the swap key while sneaking and holding a scythe to recite a haunting song, causing all mobs within 7 blocks to target the user and afflicting them with 20% Weaken for 8 seconds. Cooldown: 16s.");
-		mInfo.mDescriptions.add("Increase the Weaken to 30% and decrease the duration of all negative potion effects on players in the radius by 10s.");
-		mInfo.mDescriptions.add("For 8s after casting this ability, you and your allies in a 16 block radius gain +2.5% melee damage for each mob targeting you (max 6 stacks).");
+		mInfo.mDescriptions.add(("Press the swap key while sneaking and holding a scythe to recite a haunting song, " +
+			                         "causing all mobs within %s blocks to target the user and afflicting them with %s%% Weaken for %s seconds. Cooldown: %ss.")
+			                        .formatted(RADIUS, StringUtils.multiplierToPercentage(WEAKEN_EFFECT_1), StringUtils.ticksToSeconds(DURATION), StringUtils.ticksToSeconds(COOLDOWN)));
+		mInfo.mDescriptions.add("Increase the Weaken to %s%% and decrease the duration of all negative potion effects on players in the radius by %ss."
+			                        .formatted(StringUtils.multiplierToPercentage(WEAKEN_EFFECT_2), StringUtils.ticksToSeconds(CLEANSE_REDUCTION)));
+		mInfo.mDescriptions.add("For %ss after casting this ability, you and your allies in a %s block radius gain +%s%% melee damage for each mob in that same radius targeting you (capped at %s mobs)."
+			                        .formatted(StringUtils.ticksToSeconds(DURATION), ENHANCE_RADIUS, StringUtils.multiplierToPercentage(ENHANCE_DAMAGE), ENHANCE_MAX_MOBS));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
@@ -101,7 +108,9 @@ public class MelancholicLament extends Ability {
 			new PartialParticle(Particle.REDSTONE, loc, 300, 8, 8, 8, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 300, 8, 8, 8, 0.125).spawnAsPlayerActive(mPlayer);
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
+			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), radius);
+			for (LivingEntity mob : hitbox.getHitMobs()) {
 				EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
 				EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
 			}
@@ -118,21 +127,20 @@ public class MelancholicLament extends Ability {
 							return;
 						}
 
-						int numTargetting = 0;
-						for (LivingEntity entity : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ENHANCE_RADIUS, mPlayer)) {
-							Mob mob = (Mob) entity;
-							if (mob.getTarget() != null && mob.getTarget().equals(mPlayer)) {
-								numTargetting++;
-							}
-						}
-						numTargetting = Math.min(numTargetting, 6);
-						for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), ENHANCE_RADIUS, true)) {
-							mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME, new PercentDamageDealt(ENHANCE_EFFECT_DURATION, ENHANCE_DAMAGE * numTargetting, AFFECTED_DAMAGE_TYPES));
+						Hitbox enhanceHitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), ENHANCE_RADIUS);
+						int numTargeting = (int) enhanceHitbox
+							                         .getHitMobs().stream()
+							                         .filter(entity -> entity instanceof Mob mob && mob.getTarget() != null && mob.getTarget().equals(mPlayer))
+							                         .limit(ENHANCE_MAX_MOBS)
+							                         .count();
+						for (Player player : enhanceHitbox.getHitPlayers(true)) {
+							mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME, new PercentDamageDealt(ENHANCE_EFFECT_DURATION, ENHANCE_DAMAGE * numTargeting, AFFECTED_DAMAGE_TYPES));
 							mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_PARTICLE_NAME, new Aesthetics(ENHANCE_EFFECT_DURATION,
-								(entity, fourHertz, twoHertz, oneHertz) -> {
-									Location loc = player.getLocation().add(0, 1, 0);
-									new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 20, 0.5, 0, 0.5, 0.125).spawnAsPlayerActive(mPlayer);
-								}, (entity) -> { })
+									(entity, fourHertz, twoHertz, oneHertz) -> {
+										Location loc = player.getLocation().add(0, 1, 0);
+										new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 20, 0.5, 0, 0.5, 0.125).spawnAsPlayerActive(mPlayer);
+									}, (entity) -> {
+								})
 							);
 						}
 
@@ -147,7 +155,7 @@ public class MelancholicLament extends Ability {
 
 			if (isLevelTwo()) {
 				int reductionTime = CLEANSE_REDUCTION + CharmManager.getExtraDuration(mPlayer, CHARM_RECOVERY);
-				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), true)) {
+				for (Player player : hitbox.getHitPlayers(true)) {
 					new PartialParticle(Particle.REDSTONE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.ENCHANTMENT_TABLE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
 					for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, player)) {

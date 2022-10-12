@@ -9,9 +9,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.HashMap;
-import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -69,8 +69,8 @@ public class CounterStrike extends Ability {
 			mCosmetic.counterOnHurt(mPlayer, loc, source);
 
 			double eventDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, event.getOriginalDamage() * mReflect);
-			List<LivingEntity> entityList = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, COUNTER_STRIKE_RADIUS));
-			for (LivingEntity mob : entityList) {
+			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), CharmManager.getRadius(mPlayer, CHARM_RADIUS, COUNTER_STRIKE_RADIUS));
+			for (LivingEntity mob : hitbox.getHitMobs()) {
 				// Use different ClassAbility for non-target for Glorious Battle
 				ClassAbility ca = ClassAbility.COUNTER_STRIKE_AOE;
 				if (mob == source) {

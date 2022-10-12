@@ -10,8 +10,10 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -71,9 +73,18 @@ public class SanguineHarvest extends Ability {
 		super(plugin, player, "Sanguine Harvest");
 		mInfo.mScoreboardId = "SanguineHarvest";
 		mInfo.mShorthandName = "SH";
-		mInfo.mDescriptions.add("Enemies you damage with an ability are afflicted with Bleed I for 10 seconds. Bleed gives mobs 10% Slowness and 10% Weaken per level if the mob is below 50% Max Health. Additionally, right click while holding a scythe and not sneaking to fire a burst of darkness. This projectile travels up to 8 blocks and upon contact with a surface or an enemy, it explodes, knocking back and marking all mobs within 3 blocks of the explosion for a harvest. Any player that kills a marked mob is healed for 5% of max health. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Increase passive Bleed level to II, and increase the radius to 4 blocks. Players killing a marked mob are healed by 10%.");
-		mInfo.mDescriptions.add("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. Mobs standing on these Blighted blocks take 3% extra damage per debuff. The Blight disappears after 6s and is not counted as a debuff.");
+		mInfo.mDescriptions.add(("Enemies you damage with an ability are afflicted with Bleed I for %s seconds. " +
+			                         "Bleed gives mobs 10%% Slowness and 10%% Weaken per level if the mob is below 50%% Max Health. " +
+			                         "Additionally, right click while holding a scythe and not sneaking to fire a burst of darkness. " +
+			                         "This projectile travels up to %s blocks and upon contact with a surface or an enemy, it explodes, " +
+			                         "knocking back and marking all mobs within %s blocks of the explosion for a harvest. " +
+			                         "Any player that kills a marked mob is healed for %s%% of max health. Cooldown: %ss.")
+			                        .formatted(StringUtils.ticksToSeconds(BLEED_DURATION), RANGE, RADIUS_1, StringUtils.multiplierToPercentage(HEAL_PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN)));
+		mInfo.mDescriptions.add("Increase passive Bleed level to II, and increase the radius to %s blocks. Players killing a marked mob are healed by %s%%."
+			                        .formatted(RADIUS_2, StringUtils.multiplierToPercentage(HEAL_PERCENT_2)));
+		mInfo.mDescriptions.add(("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. " +
+			                         "Mobs standing on these Blighted blocks take %s%% extra damage per debuff. The Blight disappears after %ss and is not counted as a debuff.")
+			                        .formatted(StringUtils.multiplierToPercentage(ENHANCEMENT_DMG_INCREASE), StringUtils.ticksToSeconds(ENHANCEMENT_BLIGHT_DURATION)));
 		mInfo.mLinkedSpell = ClassAbility.SANGUINE_HARVEST;
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -183,8 +194,8 @@ public class SanguineHarvest extends Ability {
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.3f);
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
 
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius, mPlayer);
-		for (LivingEntity mob : mobs) {
+		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
+		for (LivingEntity mob : hitbox.getHitMobs()) {
 			MovementUtils.knockAway(loc, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, 0.2f), 0.2f, true);
 			mPlugin.mEffectManager.addEffect(mob, SANGUINE_NAME, new SanguineMark(mHealPercent, 20 * 30, mPlayer, mPlugin));
 		}

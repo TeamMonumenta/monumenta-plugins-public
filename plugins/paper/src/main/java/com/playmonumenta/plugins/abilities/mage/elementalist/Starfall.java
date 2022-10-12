@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import javax.annotation.Nullable;
@@ -32,7 +33,7 @@ public class Starfall extends Ability {
 
 	public static final int DAMAGE_1 = 13;
 	public static final int DAMAGE_2 = 23;
-	public static final int SIZE = 5;
+	public static final int SIZE = 6;
 	public static final int DISTANCE = 25;
 	public static final int FIRE_SECONDS = 5;
 	public static final int FIRE_TICKS = FIRE_SECONDS * 20;
@@ -54,7 +55,9 @@ public class Starfall extends Ability {
 		mInfo.mShorthandName = "SF";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While holding a wand, pressing the swap key marks where you're looking, up to %s blocks away. You summon a falling meteor above the mark that lands strongly, dealing %s fire magic damage to all enemies in a %s-block cube around it, setting them on fire for %ss, and knocking them away. Cooldown: %ss.",
+				"While holding a wand, pressing the swap key marks where you're looking, up to %s blocks away." +
+					" You summon a falling meteor above the mark that lands strongly, dealing %s fire magic damage to all enemies in a %s block radius around it," +
+					" setting them on fire for %ss, and knocking them away. Cooldown: %ss.",
 				DISTANCE,
 				DAMAGE_1,
 				SIZE,
@@ -106,7 +109,7 @@ public class Starfall extends Ability {
 
 					new PartialParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
 					int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
-					if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
+					if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid() || i >= DISTANCE - 1 || size > 0) {
 						launchMeteor(loc, playerItemStats, damage);
 						break;
 					}
@@ -136,7 +139,8 @@ public class Starfall extends Ability {
 							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2F).spawnAsPlayerActive(mPlayer);
 							this.cancel();
 
-							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE), mPlayer)) {
+							Hitbox hitbox = new Hitbox.SphereHitbox(loc, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE));
+							for (LivingEntity e : hitbox.getHitMobs()) {
 								EntityUtils.applyFire(mPlugin, FIRE_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_FIRE), e, mPlayer, playerItemStats);
 								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, false);
 								MovementUtils.knockAway(loc, e, KNOCKBACK, true);

@@ -10,10 +10,11 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,7 +36,7 @@ public class CosmicMoonblade extends Ability {
 	private static final int SWINGS = 2;
 	private static final int RADIUS = 5;
 	private static final int COOLDOWN = 20 * 8;
-	private static final double DOT_ANGLE = 0.6;
+	private static final double ANGLE = 55;
 	public static final double REDUCTION_MULTIPLIER_1 = 0.05;
 	public static final double REDUCTION_MULTIPLIER_2 = 0.1;
 	public static final int CAP_TICKS_1 = (int) (0.5 * Constants.TICKS_PER_SECOND);
@@ -59,7 +60,8 @@ public class CosmicMoonblade extends Ability {
 		mInfo.mScoreboardId = "CosmicMoonblade";
 		mInfo.mShorthandName = "CM";
 		mInfo.mDescriptions.add(
-			String.format("Swap while holding a wand to cause a wave of arcane blades to hit every enemy within a %s block cone %s times (%s arcane magic damage per hit) in rapid succession that if each land, reduce all your other skill cooldowns by %s%% (Max %ss). Cooldown: %ss.",
+			String.format("Swap while holding a wand to cause a wave of arcane blades to hit every enemy within a %s block cone %s times (%s arcane magic damage per hit)" +
+				              " in rapid succession that if each land, reduce all your other skill cooldowns by %s%% (Max %ss). Cooldown: %ss.",
 				RADIUS,
 				SWINGS,
 				(int) DAMAGE_1,
@@ -101,16 +103,11 @@ public class CosmicMoonblade extends Ability {
 					public void run() {
 						mTimes++;
 						mSwings++;
-						Vector playerDir = mPlayer.getEyeLocation().getDirection().normalize();
-						Location origin = mPlayer.getLocation();
-						boolean cdr = true;
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(origin, range)) {
-							if (cdr) {
-								cdr = false;
-								updateCooldowns(mLevelReduction);
-							}
-							Vector toMobVector = mob.getLocation().toVector().subtract(origin.toVector()).normalize();
-							if (playerDir.dot(toMobVector) > DOT_ANGLE) {
+						Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), range, Math.toRadians(ANGLE));
+						List<LivingEntity> hitMobs = hitbox.getHitMobs();
+						if (!hitMobs.isEmpty()) {
+							updateCooldowns(mLevelReduction);
+							for (LivingEntity mob : hitMobs) {
 								DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, false, false);
 							}
 						}
@@ -119,6 +116,7 @@ public class CosmicMoonblade extends Ability {
 							mPitch = 1.45f;
 						}
 						World world = mPlayer.getWorld();
+						Location origin = mPlayer.getLocation();
 						world.playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.8f);
 						world.playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.75f, mPitch);
 

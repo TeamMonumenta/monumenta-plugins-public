@@ -132,7 +132,7 @@ public class ItemStatManager implements Listener {
 		}
 
 		public PlayerItemStats(Player player) {
-			mRegion = ServerProperties.getAbilityEnhancementsEnabled() ? ItemStatUtils.Region.RING : (ServerProperties.getClassSpecializationsEnabled() ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY);
+			mRegion = ServerProperties.getRegion();
 			updateStats(player, true, player.getMaxHealth(), false);
 		}
 

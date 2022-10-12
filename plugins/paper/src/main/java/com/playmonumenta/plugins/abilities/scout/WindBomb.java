@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -54,7 +55,7 @@ public class WindBomb extends Ability {
 
 	private static final int PULL_INTERVAL = 10;
 	private static final double PULL_VELOCITY = 0.35;
-	private static final double PULL_RADIUS = 8;
+	private static final double PULL_RADIUS = 10;
 	private static final int PULL_DURATION = 3 * 20;
 	private static final double PULL_RATIO = 0.12;
 
@@ -78,9 +79,13 @@ public class WindBomb extends Ability {
 		mInfo.mScoreboardId = "WindBomb";
 		mInfo.mShorthandName = "WB";
 		mInfo.mLinkedSpell = ClassAbility.WIND_BOMB;
-		mInfo.mDescriptions.add(String.format("Press the swap key while sneaking and holding a projectile weapon to throw a projectile that, upon contact with the ground or an enemy, deals %s%% of your projectile damage to mobs in a %d block radius and launches them into the air, giving them Slow Falling and %d%% Weaken for %ds. Cooldown: %ds.",
+		mInfo.mDescriptions.add(String.format("Press the swap key while sneaking and holding a projectile weapon to throw a projectile that, " +
+			                                      "upon contact with the ground or an enemy, deals %s%% of your projectile damage to mobs in a %d block radius and launches them into the air, " +
+			                                      "giving them Slow Falling and %d%% Weaken for %ds. Cooldown: %ds.",
 			(int) (DAMAGE_FRACTION_1 * 100), RADIUS, (int) (WEAKEN_EFFECT * 100), DURATION / 20, COOLDOWN_1 / 20));
-		mInfo.mDescriptions.add(String.format("The damage is increased to %s%% of your projectile damage and the cooldown is reduced to %ds. Additionally, you deal %d%% more damage to enemies made airborne by this skill, until they hit the ground.", (int) (DAMAGE_FRACTION_2 * 100), COOLDOWN_2 / 20, (int) (MIDAIR_DAMAGE_BONUS * 100)));
+		mInfo.mDescriptions.add(String.format("The damage is increased to %s%% of your projectile damage and the cooldown is reduced to %ds. " +
+			                                      "Additionally, you deal %d%% more damage to enemies made airborne by this skill, until they hit the ground.",
+			(int) (DAMAGE_FRACTION_2 * 100), COOLDOWN_2 / 20, (int) (MIDAIR_DAMAGE_BONUS * 100)));
 		mInfo.mDescriptions.add(String.format("On impact, generate a vortex that pulls mobs within %s blocks toward the center for %d seconds.", (int) PULL_RADIUS, PULL_DURATION / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mIgnoreCooldown = true;
@@ -169,7 +174,8 @@ public class WindBomb extends Ability {
 			// Velocity scales with the square root of the maximum height
 			double velocityMultSquared = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEIGHT, 1);
 			float velocity = (float) (LAUNCH_VELOCITY * Math.sqrt(velocityMultSquared));
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius, mPlayer)) {
+			Hitbox damageHitbox = new Hitbox.SphereHitbox(loc, radius);
+			for (LivingEntity mob : damageHitbox.getHitMobs()) {
 				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, playerItemStats), damage, true, false, false);
 				if (!EntityUtils.isBoss(mob)) {
 					mob.setVelocity(new Vector(0.f, velocity, 0.f));
@@ -191,6 +197,7 @@ public class WindBomb extends Ability {
 				double pullVelocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_VELOCITY);
 				double pullRadius = CharmManager.getRadius(mPlayer, CHARM_VORTEX_RADIUS, PULL_RADIUS);
 				int pullDuration = PULL_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_VORTEX_DURATION);
+				Hitbox pullHitbox = new Hitbox.SphereHitbox(loc, pullRadius);
 
 				new BukkitRunnable() {
 					int mTicks = 0;
@@ -199,7 +206,7 @@ public class WindBomb extends Ability {
 					public void run() {
 						mTicks++;
 						if (mTicks % PULL_INTERVAL == 0) {
-							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, pullRadius)) {
+							for (LivingEntity mob : pullHitbox.getHitMobs()) {
 								if (!(EntityUtils.isBoss(mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag) || ZoneUtils.hasZoneProperty(mob.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES))) {
 									Vector vector = mob.getLocation().toVector().subtract(loc.toVector());
 									double ratio = PULL_RATIO + vector.length() / pullRadius;

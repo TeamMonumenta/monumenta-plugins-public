@@ -11,6 +11,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -29,8 +31,9 @@ public class Flamestrike extends DepthsAbility {
 	public static final String ABILITY_NAME = "Flamestrike";
 	public static final int COOLDOWN = 10 * 20;
 	public static final double[] DAMAGE = {14, 17.5, 21, 24.5, 28, 35};
-	public static final int SIZE = 6;
-	public static final double DOT_ANGLE = 1d / 3;
+	public static final int HEIGHT = 6;
+	public static final int RADIUS = 7;
+	public static final int ANGLE = 70;
 	public static final int FIRE_TICKS = 4 * 20;
 	public static final float KNOCKBACK = 0.5f;
 
@@ -50,14 +53,12 @@ public class Flamestrike extends DepthsAbility {
 		}
 		putOnCooldown();
 
-		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
-			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
-			if (playerDir.dot(toMobVector) > DOT_ANGLE) {
-				EntityUtils.applyFire(mPlugin, FIRE_TICKS, mob, mPlayer);
-				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true, true);
-				MovementUtils.knockAway(mPlayer, mob, KNOCKBACK, true);
-			}
+		Hitbox hitbox = Hitbox.approximateCylinderSegment(
+			LocationUtils.getHalfHeightLocation(mPlayer).add(0, -HEIGHT, 0), 2 * HEIGHT, RADIUS, Math.toRadians(ANGLE));
+		for (LivingEntity mob : hitbox.getHitMobs()) {
+			EntityUtils.applyFire(mPlugin, FIRE_TICKS, mob, mPlayer);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true, true);
+			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK, true);
 		}
 
 		World world = mPlayer.getWorld();
@@ -84,7 +85,7 @@ public class Flamestrike extends DepthsAbility {
 					world.spawnParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1);
 				}
 
-				if (mRadius >= SIZE + 1) {
+				if (mRadius >= RADIUS + 1) {
 					this.cancel();
 				}
 			}
@@ -104,7 +105,7 @@ public class Flamestrike extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while sneaking to create a torrent of flames, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to all enemies in front of you within a " + SIZE + " block cube around you, setting them on fire for " + FIRE_TICKS / 20 + " seconds and knocking them away. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while sneaking to create a torrent of flames, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to all enemies in front of you within " + RADIUS + " blocks, setting them on fire for " + FIRE_TICKS / 20 + " seconds and knocking them away. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

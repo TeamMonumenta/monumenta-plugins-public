@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.GloriousBattleCS;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -15,9 +14,12 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.EnumSet;
 import java.util.List;
@@ -44,7 +46,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	private static final String KBR_EFFECT = "GloriousBattleKnockbackResistanceEffect";
 	private static final double DAMAGE_PER = 0.05;
 	private static final int MAX_TARGETING = 4;
-	private static final double TARGET_RANGE = 8;
+	private static final double TARGET_RANGE = 10;
 
 	private static final EnumSet<ClassAbility> AFFECTED_ABILITIES = EnumSet.of(
 		ClassAbility.BRUTE_FORCE,
@@ -75,9 +77,13 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		mInfo.mCooldown = 0;
 		mInfo.mScoreboardId = "GloriousBattle";
 		mInfo.mShorthandName = "GB";
-		mInfo.mDescriptions.add("Dealing indirect damage with an ability grants you a Glorious Battle stack. Shift and swap hands to consume a stack and charge forwards, gaining full knockback resistance until landing. When you land, deal " + DAMAGE_1 + " damage to the nearest mob within 3 blocks and " +
-				"apply " + (int) DepthsUtils.roundPercent(BLEED_PERCENT) + "% bleed for " + (BLEED_TIME / 20) + " seconds. Additionally, knock back all mobs within 3 blocks.");
-		mInfo.mDescriptions.add("Damage increased to 25. Additionally, you now passively gain 5% melee damage for each mob targeting you within 8 blocks, up to 4 mobs.");
+		mInfo.mDescriptions.add(("Dealing indirect damage with an ability grants you a Glorious Battle stack. " +
+			                         "Shift and swap hands to consume a stack and charge forwards, gaining full knockback resistance until landing. " +
+			                         "When you land, deal %s damage to the nearest mob within %s blocks and apply %s%% bleed for %s seconds. " +
+			                         "Additionally, knock back all mobs within %s blocks.")
+			                        .formatted(DAMAGE_1, RADIUS, StringUtils.multiplierToPercentage(BLEED_PERCENT), StringUtils.ticksToSeconds(BLEED_TIME), RADIUS));
+		mInfo.mDescriptions.add("Damage increased to %s. Additionally, you now passively gain %s%% melee damage for each mob targeting you within %s blocks, up to %s mobs."
+			                        .formatted(DAMAGE_2, StringUtils.multiplierToPercentage(DAMAGE_PER), TARGET_RANGE, MAX_TARGETING));
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mStacks = 0;
@@ -110,6 +116,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 
 		mRunnable = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;
@@ -120,7 +127,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 					Location location = mPlayer.getLocation();
 					World world = mPlayer.getWorld();
 					mCosmetic.gloryOnLand(world, mPlayer, location, radius);
-					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(location, radius);
+					List<LivingEntity> mobs = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), radius).getHitMobs();
 					mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
 					LivingEntity nearest = EntityUtils.getNearestMob(location, mobs);
@@ -169,7 +176,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		DamageEvent.DamageType type = event.getType();
 		if (isLevelTwo() && (type == DamageType.MELEE || type == DamageType.MELEE_SKILL || type == DamageType.MELEE_ENCH)) {
 			int count = 0;
-			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), TARGET_RANGE)) {
+			for (LivingEntity le : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), TARGET_RANGE).getHitMobs()) {
 				if (le instanceof Mob mob && mob.getTarget() == mPlayer) {
 					count++;
 				}

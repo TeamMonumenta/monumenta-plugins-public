@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -110,7 +111,7 @@ public class Riposte extends Ability {
 				if (isEnhanced()) {
 					double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ENHANCEMENT_DAMAGE);
 					int duration = ENHANCEMENT_ROOT_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_ROOT_DURATION);
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(playerLoc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_RADIUS))) {
+					for (LivingEntity mob : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_RADIUS)).getHitMobs()) {
 						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, ClassAbility.RIPOSTE, true, true);
 						EntityUtils.applySlow(mPlugin, duration, 1.0f, mob);
 					}

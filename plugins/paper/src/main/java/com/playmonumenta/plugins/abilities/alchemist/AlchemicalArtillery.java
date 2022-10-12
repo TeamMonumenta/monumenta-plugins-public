@@ -10,12 +10,14 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
@@ -159,8 +161,8 @@ public class AlchemicalArtillery extends PotionAbility {
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.6f, 1.2f);
 				world.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 0.6f, 0.8f);
 
-				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius);
-				double damage = (mAlchemistPotions.getDamage() + potion.getMetadata(AlchemicalArtillery.ARTILLERY_POTION_TAG).get(0).asDouble()) * (ENHANCEMENT_EXPLOSION_POT_PERCENT_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_EXPLOSION_MULTIPLIER));
+				List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, radius).getHitMobs();
+				double damage = (mAlchemistPotions.getDamage() + MetadataUtils.getMetadata(potion, AlchemicalArtillery.ARTILLERY_POTION_TAG, 0.0)) * (ENHANCEMENT_EXPLOSION_POT_PERCENT_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_EXPLOSION_MULTIPLIER));
 				float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, ENHANCEMENT_EXPLOSION_KNOCK_UP);
 				for (LivingEntity mob : mobs) {
 					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, false, false);

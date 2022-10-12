@@ -14,7 +14,9 @@ import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -35,8 +37,8 @@ public class Blizzard extends Ability {
 
 	public static final int DAMAGE_1 = 3;
 	public static final int DAMAGE_2 = 5;
-	public static final int SIZE_1 = 6;
-	public static final int SIZE_2 = 8;
+	public static final int SIZE_1 = 7;
+	public static final int SIZE_2 = 10;
 	public static final double SLOW_MULTIPLIER_1 = 0.25;
 	public static final double SLOW_MULTIPLIER_2 = 0.3;
 	public static final int DAMAGE_INTERVAL = 1 * Constants.TICKS_PER_SECOND;
@@ -104,7 +106,8 @@ public class Blizzard extends Ability {
 				@Override
 				public void run() {
 					Location loc = mPlayer.getLocation();
-					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mLevelSize, mPlayer);
+					Hitbox hitbox = new Hitbox.UprightCylinderHitbox(LocationUtils.getHalfHeightLocation(mPlayer), mLevelSize, mLevelSize);
+					List<LivingEntity> mobs = hitbox.getHitMobs();
 					mTicks++;
 					if (mTicks % SLOW_INTERVAL == 0) {
 						for (Player p : PlayerUtils.playersInRange(loc, mLevelSize, true)) {

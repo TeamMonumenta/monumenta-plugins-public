@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
@@ -50,7 +51,8 @@ public class BruteForce extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.BRUTE_FORCE;
 		mInfo.mScoreboardId = "BruteForce";
 		mInfo.mShorthandName = "BF";
-		mInfo.mDescriptions.add("Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2-block cube around it, and knocks all non-boss enemies away from you.");
+		mInfo.mDescriptions.add("Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2 block radus around it, " +
+			                        "and knocks all non-boss enemies away from you.");
 		mInfo.mDescriptions.add("Damage is increased to 10 percent of the attack's damage plus 2.");
 		mInfo.mDescriptions.add("Half a second after triggering this ability, it triggers another wave centered on the same mob, with 50% of the damage and all of the knockback.");
 		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
@@ -110,10 +112,12 @@ public class BruteForce extends Ability {
 
 	private void wave(LivingEntity target, Location playerLoc, double damageBonus, boolean damageTarget) {
 		Location loc = target.getLocation().add(0, 0.75, 0);
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, BRUTE_FORCE_RADIUS));
-		if (!mobs.isEmpty()) {
-			mCosmetic.bruteOnDamage(mPlayer, loc, mComboNumber);
+		List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, BRUTE_FORCE_RADIUS)).getHitMobs();
+		if (mobs.isEmpty()) {
+			return;
 		}
+
+		mCosmetic.bruteOnDamage(mPlayer, loc, mComboNumber);
 
 		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, BRUTE_FORCE_KNOCKBACK_SPEED);
 

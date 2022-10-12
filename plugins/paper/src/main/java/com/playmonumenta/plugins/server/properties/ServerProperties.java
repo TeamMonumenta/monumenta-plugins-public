@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.server.properties;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.scriptedquests.utils.QuestUtils;
@@ -263,4 +264,9 @@ public class ServerProperties {
 			}
 		}
 	}
+
+	public static ItemStatUtils.Region getRegion() {
+		return ServerProperties.getAbilityEnhancementsEnabled() ? ItemStatUtils.Region.RING : ServerProperties.getClassSpecializationsEnabled() ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY;
+	}
+
 }

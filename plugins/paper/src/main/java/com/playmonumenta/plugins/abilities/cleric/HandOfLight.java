@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -28,14 +29,14 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 
 public class HandOfLight extends Ability {
 
 	public static final int RANGE = 12;
-	private static final double HEALING_DOT_ANGLE = 0.33;
+	private static final double HEALING_ANGLE = 70; // (half) angle of the healing cone
+	private static final double HEALING_DOT_ANGLE = Math.cos(Math.toRadians(HEALING_ANGLE));
 	private static final int HEALING_1_COOLDOWN = 14 * 20;
 	private static final int HEALING_2_COOLDOWN = 10 * 20;
 	private static final int FLAT_1 = 2;
@@ -72,7 +73,10 @@ public class HandOfLight extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.HAND_OF_LIGHT;
 		mInfo.mScoreboardId = "Healing";
 		mInfo.mShorthandName = "HoL";
-		mInfo.mDescriptions.add("Right click while holding a weapon or tool to heal all other players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. Additionally, damage all mobs in the area with magic damage equal to 2 times the number of undead mobs in the range, up to 8 damage. If holding a shield, the trigger is changed to sneak + right click. Cooldown: 14s.");
+		mInfo.mDescriptions.add("Right click while holding a weapon or tool to heal all other players in a 12 block cone in front of you or within 2 blocks of you " +
+			                        "for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. " +
+			                        "Additionally, damage all mobs in the area with magic damage equal to 2 times the number of undead mobs in the range, up to 8 damage. " +
+			                        "If holding a shield, the trigger is changed to sneak + right click. Cooldown: 14s.");
 		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health. Damage increases to 3 damage per undead mob, up to 9. Cooldown: 10s.");
 		mInfo.mDescriptions.add(
 			String.format("The cone is changed to a sphere of equal range, centered on the Cleric." +
@@ -85,7 +89,6 @@ public class HandOfLight extends Ability {
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.PINK_DYE, 1);
-		mInfo.mIgnoreCooldown = true;
 
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 		mFlat = isLevelOne() ? FLAT_1 : FLAT_2;
@@ -106,10 +109,6 @@ public class HandOfLight extends Ability {
 	@Override
 	public void cast(Action action) {
 		if (mPlayer == null) {
-			return;
-		}
-
-		if (isTimerActive()) {
 			return;
 		}
 
@@ -135,14 +134,17 @@ public class HandOfLight extends Ability {
 			return;
 		}
 
-		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		World world = mPlayer.getWorld();
 		Location userLoc = mPlayer.getLocation();
 
-		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(userLoc, mRange);
+		Hitbox hitbox;
 		if (!isEnhanced()) {
-			nearbyMobs.removeIf(mob -> playerDir.dot(mob.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && mob.getLocation().distance(userLoc) > 2);
+			hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), mRange, Math.toRadians(HEALING_ANGLE))
+				         .union(new Hitbox.SphereHitbox(mPlayer.getLocation(), 2));
+		} else {
+			hitbox = new Hitbox.SphereHitbox(mPlayer.getEyeLocation(), mRange);
 		}
+		List<LivingEntity> nearbyMobs = hitbox.getHitMobs();
 		nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
 		List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
@@ -165,12 +167,8 @@ public class HandOfLight extends Ability {
 			mCosmetic.lightDamageCastEffect(world, userLoc, mPlugin, mPlayer, (float) mRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1);
 		}
 
-		List<Player> nearbyPlayers = PlayerUtils.otherPlayersInRange(mPlayer, mRange, true);
+		List<Player> nearbyPlayers = hitbox.getHitPlayers(mPlayer, true);
 		nearbyPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class"));
-
-		if (!isEnhanced()) {
-			nearbyPlayers.removeIf(p -> playerDir.dot(p.getLocation().toVector().subtract(userLoc.toVector()).setY(0).normalize()) < HEALING_DOT_ANGLE && p.getLocation().distance(userLoc) > 2);
-		}
 
 		if (!nearbyPlayers.isEmpty()) {
 			double healthHealed = 0;
@@ -213,4 +211,5 @@ public class HandOfLight extends Ability {
 
 		return true;
 	}
+
 }

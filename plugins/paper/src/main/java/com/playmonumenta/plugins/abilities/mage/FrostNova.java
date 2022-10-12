@@ -13,7 +13,9 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import javax.annotation.Nullable;
@@ -35,10 +37,10 @@ public class FrostNova extends Ability {
 
 	public static final int DAMAGE_1 = 5;
 	public static final int DAMAGE_2 = 10;
-	public static final int SIZE = 6;
+	public static final int SIZE = 7;
 	public static final double SLOW_MULTIPLIER_1 = 0.2;
 	public static final double SLOW_MULTIPLIER_2 = 0.4;
-	public static final double REDUCTION_MULTIPLIER = 0.1;
+	public static final double ELITE_SLOW_MULTIPLIER_REDUCTION = 0.1;
 	public static final double ENHANCED_DAMAGE_MODIFIER = 1.15;
 	public static final int DURATION_TICKS = 4 * Constants.TICKS_PER_SECOND;
 	public static final int ENHANCED_FROZEN_DURATION = 1 * Constants.TICKS_PER_SECOND;
@@ -63,12 +65,16 @@ public class FrostNova extends Ability {
 		mInfo.mShorthandName = "FN";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While sneaking, left-clicking with a wand unleashes a frost nova, dealing %s ice magic damage to all enemies in a %s-block cube around you, afflicting them with %s%% slowness for %ss, and extinguishing them if they're on fire. Slowness is reduced by %s%% on elites and bosses, and all players in the nova are also extinguished. The damage ignores iframes. Cooldown: %ss.",
+				"While sneaking, left-clicking with a wand unleashes a frost nova," +
+					" dealing %s ice magic damage to all enemies in a %s-block sphere around you," +
+					" afflicting them with %s%% slowness for %ss, and extinguishing them if they're on fire." +
+					" Slowness is reduced by %s%% on elites and bosses, and all players in the nova are also extinguished." +
+					" The damage ignores iframes. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
 				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_1),
 				StringUtils.ticksToSeconds(DURATION_TICKS),
-				StringUtils.multiplierToPercentage(REDUCTION_MULTIPLIER),
+				StringUtils.multiplierToPercentage(ELITE_SLOW_MULTIPLIER_REDUCTION),
 				StringUtils.ticksToSeconds(COOLDOWN_TICKS)
 			)
 		);
@@ -108,9 +114,10 @@ public class FrostNova extends Ability {
 		int duration = CharmManager.getExtraDuration(mPlayer, CHARM_DURATION) + DURATION_TICKS;
 		int frozenDuration = CharmManager.getExtraDuration(mPlayer, CHARM_FROZEN) + ENHANCED_FROZEN_DURATION;
 		double size = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), size, mPlayer)) {
+		Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), size);
+		for (LivingEntity mob : hitbox.getHitMobs()) {
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
-				EntityUtils.applySlow(mPlugin, duration, mLevelSlowMultiplier - REDUCTION_MULTIPLIER, mob);
+				EntityUtils.applySlow(mPlugin, duration, mLevelSlowMultiplier - ELITE_SLOW_MULTIPLIER_REDUCTION, mob);
 			} else {
 				EntityUtils.applySlow(mPlugin, duration, mLevelSlowMultiplier, mob);
 				if (isEnhanced()) {

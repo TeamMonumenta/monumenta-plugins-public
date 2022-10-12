@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class EagleEye extends Ability {
 	private static final int EAGLE_EYE_REFRESH = 2 * 20;
 	private static final double EAGLE_EYE_1_VULN_LEVEL = 0.2;
 	private static final double EAGLE_EYE_2_VULN_LEVEL = 0.35;
-	private static final int EAGLE_EYE_RADIUS = 20;
+	private static final int EAGLE_EYE_RADIUS = 24;
 	private static final double ENHANCEMENT_DAMAGE_PERCENT = 0.15;
 
 	public static final String CHARM_DURATION = "Eagle Eye Duration";
@@ -54,10 +55,13 @@ public class EagleEye extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.EAGLE_EYE;
 		mInfo.mScoreboardId = "Tinkering"; // lmao
 		mInfo.mShorthandName = "EE";
-		mInfo.mDescriptions.add(String.format("When you left-click while sneaking you reveal all enemies in a %d block radius, giving them the glowing effect for %d seconds. Affected enemies have %d%% Vulnerability. If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by %d seconds. This skill can not be activated if you have a pickaxe in your mainhand. Cooldown: %ds.",
-			EAGLE_EYE_RADIUS, EAGLE_EYE_DURATION / 20, (int)(EAGLE_EYE_1_VULN_LEVEL * 100), EAGLE_EYE_REFRESH / 20, EAGLE_EYE_COOLDOWN / 20));
-		mInfo.mDescriptions.add(String.format("The effect is increased to %d%% Vulnerability.", (int)(EAGLE_EYE_2_VULN_LEVEL * 100)));
-		mInfo.mDescriptions.add("Your first attack against every enemy affected by this ability will deal " + (int)(ENHANCEMENT_DAMAGE_PERCENT * 100) + "% extra damage.");
+		mInfo.mDescriptions.add(String.format("When you left-click while sneaking you reveal all enemies in a %d block radius, " +
+			                                      "giving them the glowing effect for %d seconds. Affected enemies have %d%% Vulnerability. " +
+			                                      "If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by %d seconds. " +
+			                                      "This skill can not be activated if you have a pickaxe in your mainhand. Cooldown: %ds.",
+			EAGLE_EYE_RADIUS, EAGLE_EYE_DURATION / 20, (int) (EAGLE_EYE_1_VULN_LEVEL * 100), EAGLE_EYE_REFRESH / 20, EAGLE_EYE_COOLDOWN / 20));
+		mInfo.mDescriptions.add(String.format("The effect is increased to %d%% Vulnerability.", (int) (EAGLE_EYE_2_VULN_LEVEL * 100)));
+		mInfo.mDescriptions.add("Your first attack against every enemy affected by this ability will deal " + (int) (ENHANCEMENT_DAMAGE_PERCENT * 100) + "% extra damage.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, EAGLE_EYE_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
@@ -80,7 +84,7 @@ public class EagleEye extends Ability {
 		World world = player.getWorld();
 		mCosmetic.eyeStart(world, mPlayer);
 
-		mEntitiesAffected = EntityUtils.getNearbyMobs(player.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, EAGLE_EYE_RADIUS), mPlayer);
+		mEntitiesAffected = new Hitbox.SphereHitbox(player.getEyeLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, EAGLE_EYE_RADIUS)).getHitMobs();
 
 		for (LivingEntity mob : mEntitiesAffected) {
 			// Don't apply vulnerability to arena mobs

@@ -73,7 +73,10 @@ public class Spellshock extends Ability {
 		mInfo.mScoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";
 		mInfo.mDescriptions.add(
-			String.format("Hitting an enemy with a spell inflicts static for %s seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals %s%% of the triggering spell's damage to all mobs in a %s block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick. If a static mob is struck by a melee attack, it takes %s%% more damage on the hit and is slowed by %s%% for %s seconds, clearing the static.",
+			String.format("Hitting an enemy with a spell inflicts static for %s seconds." +
+			                        " If an enemy with static is hit by another spell, a spellshock centered on the enemy deals %s%% of the triggering spell's damage to all mobs in a %s block radius." +
+			                        " Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick." +
+			                        " If a static mob is struck by a melee attack, it takes %s%% more damage on the hit and is slowed by %s%% for %s seconds, clearing the static.",
 				DURATION_TICKS / 20,
 				(int)(DAMAGE_1 * 100),
 				SIZE,
@@ -132,8 +135,8 @@ public class Spellshock extends Ability {
 					world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 1.5f);
 
 					// Grab all realistically possible nearby mobs for simplicity, use Set for fast removal
-					Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(enemy.getLocation(), 32));
-					List<LivingEntity> triggeredMobs = new ArrayList<LivingEntity>();
+					Set<LivingEntity> nearbyMobs = new HashSet<>(EntityUtils.getNearbyMobs(enemy.getLocation(), 32));
+					List<LivingEntity> triggeredMobs = new ArrayList<>();
 					triggeredMobs.add(enemy);
 
 					// spellshock triggering other spellshocks propagates the damage at 100%

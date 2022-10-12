@@ -56,7 +56,9 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		super(plugin, player, "Whirling Blade");
 		mInfo.mScoreboardId = "WhirlingBlade";
 		mInfo.mShorthandName = "WB";
-		mInfo.mDescriptions.add("Use the swap key while holding a weapon and not looking up to throw a whirling blade that circles around you, knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits. Cooldown: " + BLADE_COOLDOWN / 20 + "s. Charges: " + BLADE_MAX_CHARGES + ".");
+		mInfo.mDescriptions.add("Use the swap key while holding a weapon and not looking up to throw a whirling blade that circles around you, " +
+			                        "knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits. " +
+			                        "Cooldown: " + BLADE_COOLDOWN / 20 + "s. Charges: " + BLADE_MAX_CHARGES + ".");
 		mInfo.mDescriptions.add("The damage is increased to " + BLADE_2_DAMAGE + " and the knockback is greatly increased.");
 		mInfo.mLinkedSpell = ClassAbility.WHIRLING_BLADE;
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? BLADE_1_DAMAGE : BLADE_2_DAMAGE);
@@ -106,9 +108,9 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		double throwRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, THROW_RADIUS);
 		double bladeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BLADE_RADIUS);
 		new BukkitRunnable() {
-			World mWorld = mPlayer.getWorld();
-			Location mLoc = mPlayer.getEyeLocation().add(0, -0.5, 0);
-			Vector mEyeDir = mLoc.getDirection();
+			final World mWorld = mPlayer.getWorld();
+			final Location mLoc = mPlayer.getEyeLocation().add(0, -0.5, 0);
+			final Vector mEyeDir = mLoc.getDirection();
 
 			// Convoluted range parameter makes sure we grab all possible entities to be hit without recalculating manually
 			List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(mLoc, 4 * throwRadius, mPlayer);

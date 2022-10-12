@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -48,9 +49,13 @@ public class CleansingRain extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.CLEANSING_RAIN;
 		mInfo.mScoreboardId = "Cleansing";
 		mInfo.mShorthandName = "CR";
-		mInfo.mDescriptions.add("Right click while sneaking and looking upwards to summon a \"cleansing rain\" that follows you, removing negative effects from players within 4 blocks, including yourself, and lasts for 15 seconds. (Cooldown: 45 seconds)");
-		mInfo.mDescriptions.add("Additionally grants 20% Damage Reduction to all players in the radius. Cooldown: 30s.");
-		mInfo.mDescriptions.add("The radius increases to 6 blocks, and each player touched by the rain keeps its effect for the cast duration.");
+		mInfo.mDescriptions.add("Right click while sneaking and looking upwards to summon a \"cleansing rain\" that follows you, " +
+			                        "removing negative effects from players within %s blocks, including yourself, and lasts for %s seconds. Cooldown: %ss."
+				                        .formatted(CLEANSING_RADIUS, StringUtils.ticksToSeconds(CLEANSING_DURATION), StringUtils.ticksToSeconds(CLEANSING_1_COOLDOWN)));
+		mInfo.mDescriptions.add("Additionally grants %s%% Damage Reduction to all players in the radius. Cooldown: %ss."
+			                        .formatted(StringUtils.multiplierToPercentage(Math.abs(PERCENT_DAMAGE_RESIST)), StringUtils.ticksToSeconds(CLEANSING_2_COOLDOWN)));
+		mInfo.mDescriptions.add("The radius increases to %s blocks, and each player touched by the rain keeps its effect for the cast duration."
+			                        .formatted(CLEANSING_RADIUS_ENHANCED));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mRadius = CharmManager.getRadius(player, CHARM_RANGE, isEnhanced() ? CLEANSING_RADIUS_ENHANCED : CLEANSING_RADIUS);
@@ -69,7 +74,7 @@ public class CleansingRain extends Ability {
 		// Run cleansing rain here until it finishes
 		new BukkitRunnable() {
 			int mTicks = 0;
-			List<Player> mCleansedPlayers = new ArrayList<>();
+			final List<Player> mCleansedPlayers = new ArrayList<>();
 
 			@Override
 			public void run() {

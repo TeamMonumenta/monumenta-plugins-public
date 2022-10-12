@@ -12,11 +12,11 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -61,9 +61,13 @@ public class PredatorStrike extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.PREDATOR_STRIKE;
 		mInfo.mScoreboardId = "PredatorStrike";
 		mInfo.mShorthandName = "PrS";
-		mInfo.mDescriptions.add(String.format("Left-clicking with a projectile weapon while not sneaking will prime a Predator Strike that unprimes after 5s. When you fire a critical projectile, it will instantaneously travel in a straight line for up to %d blocks or until it hits an enemy or block and damages enemies in a %s block radius. This ability deals 100%% of your projectile base damage increased by %d%% for every block of distance from you and the target (up to %d blocks, or %d%% total). Cooldown: %ds.",
-			MAX_RANGE, EXPLODE_RADIUS, (int)(DISTANCE_SCALE_1 * 100), MAX_DAMAGE_RANGE, MAX_DAMAGE_RANGE * (int)(DISTANCE_SCALE_1 * 100) + 100, COOLDOWN_1 / 20));
-		mInfo.mDescriptions.add(String.format("Damage now increases %d%% for each block of distance (up to %d%%). Cooldown: %ds.", (int)(DISTANCE_SCALE_2 * 100), MAX_DAMAGE_RANGE * (int)(DISTANCE_SCALE_2 * 100) + 100, COOLDOWN_2 / 20));
+		mInfo.mDescriptions.add(String.format("Left-clicking with a projectile weapon while not sneaking will prime a Predator Strike that unprimes after 5s. " +
+			                                      "When you fire a critical projectile, it will instantaneously travel in a straight line " +
+			                                      "for up to %d blocks or until it hits an enemy or block and damages enemies in a %s block radius. " +
+			                                      "This ability deals 100%% of your projectile base damage increased by %d%% for every block of distance from you and the target " +
+			                                      "(up to %d blocks, or %d%% total). Cooldown: %ds.",
+			MAX_RANGE, EXPLODE_RADIUS, (int) (DISTANCE_SCALE_1 * 100), MAX_DAMAGE_RANGE, MAX_DAMAGE_RANGE * (int) (DISTANCE_SCALE_1 * 100) + 100, COOLDOWN_1 / 20));
+		mInfo.mDescriptions.add(String.format("Damage now increases %d%% for each block of distance (up to %d%%). Cooldown: %ds.", (int) (DISTANCE_SCALE_2 * 100), MAX_DAMAGE_RANGE * (int) (DISTANCE_SCALE_2 * 100) + 100, COOLDOWN_2 / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
@@ -130,11 +134,8 @@ public class PredatorStrike extends Ability {
 
 				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 					bLoc.subtract(direction.multiply(0.5));
-					// Snapshot the mobs that would be hit if it were instananeous.
-					// This is very important for the Firework Strike Cosmetic
-					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(bLoc, mExplodeRadius, mPlayer);
 					mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, mExplodeRadius), bLoc, mPlayer);
-					explode(bLoc, mobs);
+					explode(bLoc);
 					hit = true;
 					break;
 				}
@@ -142,11 +143,8 @@ public class PredatorStrike extends Ability {
 				for (LivingEntity mob : nearbyMobs) {
 					if (mob.getBoundingBox().overlaps(box)) {
 						if (EntityUtils.isHostileMob(mob)) {
-							// Snapshot the mobs that would be hit if it were instananeous.
-							// This is very important for the Firework Strike Cosmetic
-							List<LivingEntity> mobs = EntityUtils.getNearbyMobs(bLoc, mExplodeRadius, mPlayer);
 							mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, mExplodeRadius), bLoc, mPlayer);
-							explode(bLoc, mobs);
+							explode(bLoc);
 							hit = true;
 							break;
 						}
@@ -168,7 +166,7 @@ public class PredatorStrike extends Ability {
 		return true;
 	}
 
-	private void explode(Location loc, List<LivingEntity> mobs) {
+	private void explode(Location loc) {
 		if (mPlayer == null) {
 			return;
 		}
@@ -178,7 +176,8 @@ public class PredatorStrike extends Ability {
 
 		mCosmetic.strikeExplode(world, mPlayer, loc, mExplodeRadius);
 
-		for (LivingEntity mob : mobs) {
+		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mExplodeRadius);
+		for (LivingEntity mob : hitbox.getHitMobs()) {
 			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
 			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, damage, mInfo.mLinkedSpell, true);
 		}

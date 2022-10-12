@@ -50,7 +50,8 @@ public class EnchantedPrayer extends Ability {
 		super(plugin, player, "Enchanted Prayer");
 		mInfo.mScoreboardId = "EPrayer";
 		mInfo.mShorthandName = "EP";
-		mInfo.mDescriptions.add("Swapping while shifted enchants the weapons of all players in a 15 block radius with holy magic. Their next melee or projectile attack deals an additional 7 damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 15s.");
+		mInfo.mDescriptions.add("Swapping while shifted enchants the weapons of all players in a 15 block radius with holy magic. " +
+			                        "Their next melee or projectile attack deals an additional 7 damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 15s.");
 		mInfo.mDescriptions.add("Damage is increased to 12. Healing is increased to 20% of max health.");
 		mInfo.mLinkedSpell = ClassAbility.ENCHANTED_PRAYER;
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, ENCHANTED_PRAYER_COOLDOWN);

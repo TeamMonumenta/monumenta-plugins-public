@@ -14,10 +14,13 @@ import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,7 +37,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class CholericFlames extends Ability {
 
-	public static final int RADIUS = 8;
+	public static final int RADIUS = 9;
 	private static final int DAMAGE_1 = 3;
 	private static final int DAMAGE_2 = 5;
 	private static final int DURATION = 7 * 20;
@@ -63,9 +66,14 @@ public class CholericFlames extends Ability {
 		super(plugin, player, "Choleric Flames");
 		mInfo.mScoreboardId = "CholericFlames";
 		mInfo.mShorthandName = "CF";
-		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 3 magic damage. Cooldown: 10s.");
-		mInfo.mDescriptions.add("The damage is increased to 5, and also afflict mobs with Hunger I.");
-		mInfo.mDescriptions.add("Mobs ignited by this ability are inflicted with an additional level of Inferno for each debuff they have prior to this ability, up to 3. Additionally, when these mobs die, they explode, applying all Inferno they have at the time of death to all mobs within a 3 block radius for 5s.");
+		mInfo.mDescriptions.add(("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within %s blocks of you for %ss, " +
+			                         "additionally dealing %s magic damage. Cooldown: %ss.")
+			                        .formatted(RADIUS, StringUtils.ticksToSeconds(DURATION), DAMAGE_1, StringUtils.ticksToSeconds(COOLDOWN)));
+		mInfo.mDescriptions.add("The damage is increased to %s, and also afflict mobs with Hunger I."
+			                        .formatted(DAMAGE_2));
+		mInfo.mDescriptions.add(("Mobs ignited by this ability are inflicted with an additional level of Inferno for each debuff they have prior to this ability, up to %s. " +
+			                         "Additionally, when these mobs die, they explode, applying all Inferno they have at the time of death to all mobs within a %s block radius for %ss.")
+			                        .formatted(MAX_DEBUFFS, SPREAD_EFFECT_RADIUS, StringUtils.ticksToSeconds(SPREAD_EFFECT_DURATION_APPLIED)));
 		mInfo.mLinkedSpell = ClassAbility.CHOLERIC_FLAMES;
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -103,7 +111,8 @@ public class CholericFlames extends Ability {
 
 		int maxDebuffs = (int) (MAX_DEBUFFS + CharmManager.getLevel(mPlayer, CHARM_INFERNO_CAP));
 		double spreadRadius = CharmManager.getRadius(mPlayer, CHARM_ENHANCEMENT_RADIUS, SPREAD_EFFECT_RADIUS);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
+		Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), RADIUS);
+		for (LivingEntity mob : hitbox.getHitMobs()) {
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.mLinkedSpell, true);
 			MovementUtils.knockAway(mPlayer, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK));
 

@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
 import org.bukkit.Location;
@@ -57,7 +59,7 @@ public class EnchantedPrayerAoE extends Effect {
 			world.playSound(enemy.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
 			new PartialParticle(Particle.SPELL_INSTANT, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.FIREWORKS_SPARK, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 75, 0, 0, 0, 0.3).spawnAsPlayerActive(mPlayer);
-			for (LivingEntity le : EntityUtils.getNearbyMobs(enemy.getLocation(), mEffectSize)) {
+			for (LivingEntity le : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), mEffectSize).getHitMobs()) {
 				DamageUtils.damage(mPlayer, le, DamageType.MAGIC, mDamageAmount, ClassAbility.ENCHANTED_PRAYER, true, true);
 			}
 			double maxHealth = EntityUtils.getMaxHealth(mPlayer);

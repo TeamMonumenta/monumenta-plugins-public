@@ -10,7 +10,9 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
@@ -34,7 +36,7 @@ public class BladeDance extends Ability {
 	private static final double SLOWNESS_AMPLIFIER = 1;
 	private static final int SLOW_DURATION_1 = 2 * 20;
 	private static final int SLOW_DURATION_2 = (int) (2.5 * 20);
-	private static final int DANCE_RADIUS = 4;
+	private static final int DANCE_RADIUS = 5;
 	private static final float DANCE_KNOCKBACK_SPEED = 0.2f;
 	private static final int COOLDOWN_1 = 18 * 20;
 	private static final int COOLDOWN_2 = 16 * 20;
@@ -55,12 +57,15 @@ public class BladeDance extends Ability {
 		mInfo.mScoreboardId = "BladeDance";
 		mInfo.mShorthandName = "BD";
 		mInfo.mDescriptions.add(
-			String.format("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals %s melee damage to enemies in a %s block radius. Damaged enemies are rooted for %s seconds. Cooldown: %ss.",
+			String.format("When holding two swords, right-click while looking down to enter a defensive stance, " +
+				              "parrying all attacks and becoming invulnerable for 0.75 seconds. " +
+				              "Afterwards, unleash a powerful attack that deals %s melee damage to enemies in a %s block radius. " +
+				              "Damaged enemies are rooted for %s seconds. Cooldown: %ss.",
 				DANCE_1_DAMAGE,
 				DANCE_RADIUS,
 				SLOW_DURATION_1 / 20,
 				COOLDOWN_1 / 20
-				));
+			));
 		mInfo.mDescriptions.add(
 			String.format("The area attack now deals %s damage and roots for %ss. Cooldown: %ss.",
 				DANCE_2_DAMAGE,
@@ -113,7 +118,8 @@ public class BladeDance extends Ability {
 
 					new PartialParticle(Particle.VILLAGER_ANGRY, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0).spawnAsPlayerActive(mPlayer);
 
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, DANCE_RADIUS))) {
+					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), CharmManager.getRadius(mPlayer, CHARM_RADIUS, DANCE_RADIUS));
+					for (LivingEntity mob : hitbox.getHitMobs()) {
 						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell, true);
 						MovementUtils.knockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED, true);
 

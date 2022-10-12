@@ -12,7 +12,9 @@ import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
@@ -90,7 +92,8 @@ public class ShieldBash extends Ability {
 
 									bash(mob, mInfo.mLinkedSpell);
 									if (isLevelTwo()) {
-										for (LivingEntity le : EntityUtils.getNearbyMobs(mob.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, SHIELD_BASH_2_RADIUS), mob)) {
+										Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mob), CharmManager.getRadius(mPlayer, CHARM_RADIUS, SHIELD_BASH_2_RADIUS));
+										for (LivingEntity le : hitbox.getHitMobs(mob)) {
 											bash(le, ClassAbility.SHIELD_BASH_AOE);
 										}
 									}

@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -58,13 +60,15 @@ public class PrismaticShield extends Ability {
 		mInfo.mScoreboardId = "Prismatic";
 		mInfo.mShorthandName = "PS";
 		mInfo.mDescriptions.add(
-			String.format("When your health drops below %s hearts (including if the attack would've killed you), you receive %s Absorption hearts which lasts up to %s s. In addition enemies within %s blocks are knocked back. Cooldown: %ss.",
+			String.format("When your health drops below %s hearts (including if the attack would've killed you)," +
+				              " you receive %s Absorption hearts which lasts up to %ss." +
+				              " In addition enemies within %s blocks are knocked back. Cooldown: %ss.",
 				TRIGGER_HEALTH / 2,
 				ABSORPTION_HEALTH_1 / 2,
 				DURATION / 20,
-				(int)RADIUS,
+				(int) RADIUS,
 				COOLDOWN / 20
-				));
+			));
 		mInfo.mDescriptions.add(
 			String.format("The shield is improved to %s Absorption hearts. Enemies within %s blocks are knocked back and stunned for %s s.",
 				ABSORPTION_HEALTH_2 / 2,
@@ -112,7 +116,8 @@ public class PrismaticShield extends Ability {
 			mHealedFromBlizzard = false;
 
 			// Conditions match - prismatic shield
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
+			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), RADIUS);
+			for (LivingEntity mob : hitbox.getHitMobs()) {
 				float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK_SPEED);
 				MovementUtils.knockAway(mPlayer, mob, knockback, true);
 				if (isLevelTwo()) {

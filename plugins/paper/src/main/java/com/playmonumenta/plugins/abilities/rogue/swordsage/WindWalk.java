@@ -53,11 +53,12 @@ public class WindWalk extends MultipleChargeAbility {
 		mInfo.mScoreboardId = "WindWalk";
 		mInfo.mShorthandName = "WW";
 		mInfo.mDescriptions.add(
-			String.format("Press the swap key while holding two swords to dash in the target direction, stunning and levitating enemies for %s seconds. Elites are not levitated. Cooldown: %ss. Charges: %s.",
+			String.format("Press the swap key while holding two swords to dash in the target direction, stunning and levitating enemies for %s seconds. " +
+				              "Elites are not levitated. Cooldown: %ss. Charges: %s.",
 				WIND_WALK_DURATION / 20,
 				WIND_WALK_COOLDOWN / 20,
 				WIND_WALK_MAX_CHARGES
-				));
+			));
 		mInfo.mDescriptions.add(
 			String.format("Casting this ability reduces the cooldown of all other abilities by %s seconds.",
 				WIND_WALK_CDR / 20));

@@ -139,7 +139,7 @@ public class PortalTeleportCheck extends BukkitRunnable {
 			return;
 		}
 		UUID entityUuid = entity.getUniqueId();
-		// Don't let players go through the portal if its not theirs, unless theyre in r3
+		// Don't let players go through the portal if it's not theirs, unless they're in r3
 		if (entity instanceof Player && !entityUuid.equals(mPlayer.getUniqueId()) && !ServerProperties.getAbilityEnhancementsEnabled()) {
 			return;
 		}

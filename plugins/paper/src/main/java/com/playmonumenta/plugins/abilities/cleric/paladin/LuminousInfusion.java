@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -61,8 +62,13 @@ public class LuminousInfusion extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.LUMINOUS_INFUSION;
 		mInfo.mScoreboardId = "LuminousInfusion";
 		mInfo.mShorthandName = "LI";
-		mInfo.mDescriptions.add("While sneaking, pressing the swap key charges your hands with holy light. The next time you damage an undead enemy, your attack is infused with explosive power, dealing 20 magic damage to it and all enemies in a 4-block cube around it, or 10 against non-undead, and knocking other enemies away from it. Cooldown: 14s.");
-		mInfo.mDescriptions.add("Your melee attacks now passively deal 15% magic damage to undead enemies, and Divine Justice now passively deals 15% more total damage. Damaging an undead enemy now passively sets it on fire for 3s.");
+		mInfo.mDescriptions.add("While sneaking, pressing the swap key charges your hands with holy light. " +
+			                        "The next time you damage an undead enemy, your attack is infused with explosive power, " +
+			                        "dealing 20 magic damage to it and all enemies in a 4 block radius around it, or 10 against non-undead, " +
+			                        "and knocking other enemies away from it. Cooldown: 14s.");
+		mInfo.mDescriptions.add("Your melee attacks now passively deal 15% magic damage to undead enemies, " +
+			                        "and Divine Justice now passively deals 15% more total damage. " +
+			                        "Damaging an undead enemy now passively sets it on fire for 3s.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -160,7 +166,7 @@ public class LuminousInfusion extends Ability {
 		world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.8f, 1.1f);
 
 		// Exclude the damagee so that the knockaway is valid
-		List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), damagee);
+		List<LivingEntity> affected = new Hitbox.SphereHitbox(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS)).getHitMobs(damagee);
 		for (LivingEntity e : affected) {
 			// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
 			double volume = 0.6 / Math.sqrt(affected.size());
