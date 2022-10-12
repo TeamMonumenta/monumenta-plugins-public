@@ -88,7 +88,6 @@ public class DelveCustomInventory extends CustomInventory {
 		DUNGEON_FUNCTION_MAPPINGS.put("forum", "function monumenta:lobbies/dff/new");
 		DUNGEON_FUNCTION_MAPPINGS.put("shiftingcity", "function monumenta:lobbies/drl2/new");
 		DUNGEON_FUNCTION_MAPPINGS.put("ruin", "function monumenta:lobbies/dmas/new");
-		DUNGEON_FUNCTION_MAPPINGS.put("skt", "function monumenta:lobbies/dskt/new");
 		DUNGEON_FUNCTION_MAPPINGS.put("portal", "function monumenta:lobbies/dps/new");
 		DUNGEON_FUNCTION_MAPPINGS.put("blue", "function monumenta:lobbies/d12/new");
 	}
@@ -120,8 +119,7 @@ public class DelveCustomInventory extends CustomInventory {
 	private int mPage = 0;
 	private int mTotalPoint = 0;
 	private int mIgnoreOldEntropyPoint;
-	@Nullable
-	private DelvePreset mPreset;
+	@Nullable private DelvePreset mPreset;
 
 	private final Map<DelvesModifier, Integer> mPointSelected = new HashMap<>();
 
@@ -276,55 +274,52 @@ public class DelveCustomInventory extends CustomInventory {
 
 		lore.add(Component.text(""));
 
+		if (!(mDungeonName.equals("depths") || mDungeonName.equals("corridors"))) {
+			double baseAmount = DelveLootTableGroup.getDelveMaterialTableChance(DelvesUtils.MINIMUM_DEPTH_POINTS, 9001);
+			if (!(mDungeonName.equals("portal") || mDungeonName.equals("ruin"))) {
+				List<Double> multipliers = new ArrayList<>();
+				for (int i = 1; i <= 4; i++) {
+					multipliers.add(DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, i) / baseAmount);
+				}
 
-		double baseAmount = DelveLootTableGroup.getDelveMaterialTableChance(DelvesUtils.MINIMUM_DEPTH_POINTS, 9001);
-		double delveMaterialMultiplierSolo = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 1) / baseAmount;
-		double delveMaterialMultiplierDuo = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 2) / baseAmount;
-		double delveMaterialMultiplierTrio = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 3) / baseAmount;
-		double delveMaterialMultiplier = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 9001) / baseAmount;
+				lore.add(Component.text("Delve Material Multipliers (Not Counting Loot Scaling):", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 
-		if (delveMaterialMultiplier > 0
-			&& !ServerProperties.getShardName().startsWith("depths")
-			&& !ServerProperties.getShardName().equals("corridors")) {
-			lore.add(Component.text("Delve Material Multipliers (Not Counting Loot Scaling):", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
-			if (delveMaterialMultiplierSolo == DelveLootTableGroup.getDelveMaterialTableChance(9001, 1) / baseAmount) {
-				lore.add(Component.text(String.format("- 1 Player: x%.2f (Capped)", delveMaterialMultiplierSolo), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+				for (int i = 1; i <= 4; i++) {
+					double multiplier = multipliers.get(i - 1);
+					String s = i == 1 ? "" : "s";
+					String plus = i == 4 ? "+" : "";
+					// i Player(s): xX.XX
+					String text = String.format("- %d%s Player%s: x%.2f", i, plus, s, multiplier);
+					NamedTextColor color = NamedTextColor.GRAY;
+					if (multiplier <= 0) {
+						text = "  " + text;
+						color = NamedTextColor.DARK_GRAY;
+					} else if (multiplier == DelveLootTableGroup.getDelveMaterialTableChance(9001, i) / baseAmount) {
+						text += " (Capped)";
+						color = NamedTextColor.YELLOW;
+					}
+					lore.add(Component.text(text, color).decoration(TextDecoration.ITALIC, false));
+				}
 			} else {
-				lore.add(Component.text(String.format("- 1 Player: x%.2f", delveMaterialMultiplierSolo), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+				double multiplier = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 9001) / baseAmount;
+				String text = String.format("x%.2f", multiplier);
+				NamedTextColor color = NamedTextColor.GRAY;
+				if (multiplier <= 0) {
+					color = NamedTextColor.DARK_GRAY;
+				} else if (multiplier == DelveLootTableGroup.getDelveMaterialTableChance(9001, 9001) / baseAmount) {
+					text += " (Capped)";
+					color = NamedTextColor.YELLOW;
+				}
+				lore.add(Component.text("Delve Material Multiplier: ", NamedTextColor.WHITE).append(Component.text(text, color)).decoration(TextDecoration.ITALIC, false));
 			}
-
-			if (delveMaterialMultiplierDuo == DelveLootTableGroup.getDelveMaterialTableChance(9001, 2) / baseAmount) {
-				lore.add(Component.text(String.format("- 2 Players: x%.2f (Capped)", delveMaterialMultiplierDuo), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-			} else {
-				lore.add(Component.text(String.format("- 2 Players: x%.2f", delveMaterialMultiplierDuo), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-			}
-
-			if (delveMaterialMultiplierTrio == DelveLootTableGroup.getDelveMaterialTableChance(9001, 3) / baseAmount) {
-				lore.add(Component.text(String.format("- 3 Players: x%.2f (Capped)", delveMaterialMultiplierTrio), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-			} else {
-				lore.add(Component.text(String.format("- 3 Players: x%.2f", delveMaterialMultiplierTrio), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-			}
-
-			if (delveMaterialMultiplier == DelveLootTableGroup.getDelveMaterialTableChance(9001, 9001) / baseAmount) {
-				lore.add(Component.text(String.format("- 4+ Players: x%.2f (Capped)", delveMaterialMultiplier), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-			} else {
-				lore.add(Component.text(String.format("- 4+ Players: x%.2f", delveMaterialMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-			}
-		} else if (!ServerProperties.getShardName().startsWith("depths")
-			&& !ServerProperties.getShardName().equals("corridors")) {
-			lore.add(Component.text("Delve Material Multipliers (Not Counting Loot Scaling):", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text(String.format("  - 1 Player: x%.2f", delveMaterialMultiplierSolo), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text(String.format("  - 2 Players: x%.2f", delveMaterialMultiplierDuo), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text(String.format("  - 3 Players: x%.2f", delveMaterialMultiplierTrio), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text(String.format("  - 4+ Players: x%.2f", delveMaterialMultiplier), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 		}
 
 		lore.add(Component.text(""));
 
 		if (depthPoints >= DelvesUtils.MAX_DEPTH_POINTS) {
-			lore.add(Component.text("- All DelvesModifiers Advancement Granted upon Completion", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("- All Delves Modifiers Advancement Granted upon Completion", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 		} else {
-			lore.add(Component.text("- All DelvesModifiers Advancement Granted upon Completion", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("- All Delves Modifiers Advancement Granted upon Completion", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 		}
 
 		meta.lore(lore);
