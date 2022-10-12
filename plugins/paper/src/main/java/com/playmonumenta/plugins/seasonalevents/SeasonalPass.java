@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.redissync.utils.ScoreboardUtils;
 import java.time.LocalDateTime;
@@ -138,6 +139,7 @@ public class SeasonalPass {
 	 */
 	private void loadMissions(JsonObject data) throws Exception {
 		int numberOfWeeks = 0;
+		String startDateStr = data.get("start_date").getAsString();
 		mName = data.get("pass_name").getAsString();
 		JsonArray missionParse = data.get("missions").getAsJsonArray();
 		for (JsonElement missionElement : missionParse) {
@@ -179,38 +181,32 @@ public class SeasonalPass {
 						for (JsonElement mod : mods) {
 							JsonPrimitive modPrimitive = mod.getAsJsonPrimitive();
 							if (modPrimitive.isString()) {
-								DelvesModifier modifier = DelvesModifier.fromName(modPrimitive.getAsString());
+								String modName = modPrimitive.getAsString();
+								DelvesModifier modifier = DelvesModifier.fromName(modName);
 								if (modifier != null) {
 									modList.add(modifier);
+								} else {
+									MMLog.warning("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": No such modifier " + modName);
 								}
 							} else {
-								int delveModifier = mod.getAsInt();
-								for (DelvesModifier selection : DelvesModifier.values()) {
-									if (selection.getColumn() == delveModifier) {
-										modList.add(selection);
-									}
-								}
+								MMLog.warning("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": Modifier ID is not string " + mod);
 							}
 						}
 						mission.mDelveModifiers = modList;
 					} else {
 						JsonPrimitive modPrimitive = toParse.get("delvemodifier").getAsJsonPrimitive();
 						if (modPrimitive.isString()) {
-							DelvesModifier modifier = DelvesModifier.fromName(modPrimitive.getAsString());
+							String modName = modPrimitive.getAsString();
+							DelvesModifier modifier = DelvesModifier.fromName(modName);
 							if (modifier != null) {
 								List<DelvesModifier> modList = new ArrayList<>();
 								modList.add(modifier);
 								mission.mDelveModifiers = modList;
+							} else {
+								MMLog.warning("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": No such modifier " + modName);
 							}
 						} else {
-							int delveModifier = modPrimitive.getAsInt();
-							List<DelvesModifier> modList = new ArrayList<>();
-							for (DelvesModifier selection : DelvesModifier.values()) {
-								if (selection.getColumn() == delveModifier) {
-									modList.add(selection);
-									mission.mDelveModifiers = modList;
-								}
-							}
+							MMLog.warning("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": Modifier ID is not string " + modPrimitive);
 						}
 					}
 				}
