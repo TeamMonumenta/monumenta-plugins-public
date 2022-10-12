@@ -50,9 +50,9 @@ public final class MasterworkCustomInventory extends CustomInventory {
 	private static final Material C_FILLER = Material.YELLOW_STAINED_GLASS_PANE;
 
 	private static final List<ItemStack> mInvalidItems = new ArrayList<>();
-	private static final ItemStack mUpgradeItem = new ItemStack(Material.IRON_INGOT); //TODO: Replace with raw iron
-	private static final ItemStack mUpgradeItemSeven = new ItemStack(Material.GOLD_INGOT); //TODO: Replace with raw gold
-	private static final ItemStack mNoPossibleUpgradeItem = new ItemStack(Material.NETHERITE_INGOT); //TODO: Replace with something cool
+	private static final ItemStack mUpgradeItem = new ItemStack(Material.RAW_IRON);
+	private static final ItemStack mUpgradeItemSeven = new ItemStack(Material.RAW_GOLD);
+	private static final ItemStack mNoPossibleUpgradeItem = new ItemStack(Material.NETHERITE_INGOT);
 	private static final ItemStack mFullUpgradeA = new ItemStack(Material.RED_DYE);
 	private static final ItemStack mFullUpgradeB = new ItemStack(Material.LIGHT_BLUE_DYE);
 	private static final ItemStack mFullUpgradeC = new ItemStack(Material.YELLOW_DYE);
@@ -299,7 +299,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 				NamespacedKeyUtils.fromString(MasterworkUtils.getNextItemPath(item))));
 			mInventory.setItem(40, newItem);
 			// Fill in mid material + cost
-			ItemStack upgradeIcon = new ItemStack(Material.IRON_INGOT); //TODO: Replace with raw iron
+			ItemStack upgradeIcon = new ItemStack(Material.RAW_IRON);
 			ItemMeta standardMeta = upgradeIcon.getItemMeta();
 			standardMeta.displayName(Component.text("Enhance Item", TextColor.fromHexString("#FFAA00"))
 				.decoration(TextDecoration.BOLD, true)
