@@ -136,7 +136,7 @@ public enum EffectType {
 	PROJECTILE_WEAKNESS("ProjectileWeakness", "Projectile Damage", false, false, false, false),
 
 	INSTANT_HEALTH("InstantHealthPercent", "Instant Health", true, false, false, false),
-	INSTANT_DAMAGE("InstantDamagePercent", "Instant Health", false, false, false, false),
+	INSTANT_DAMAGE("InstantDamagePercent", "Instant Damage", false, false, false, false),
 
 	HEAL("Heal", "Healing Rate", true, false, false, false),
 	ANTI_HEAL("AntiHeal", "Healing Rate", false, false, false, false),
@@ -267,20 +267,24 @@ public enum EffectType {
 			return Component.text(effectType.mName + " " + ItemStatUtils.toRomanNumerals((int) strength) + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
 				Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
 			);
-		}
-		if (effectType.isConstant()) {
-			return Component.text(effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
+		} else {
+			if (effectType.getType().contains("Instant")) {
+				return Component.text((int) (strength * 100) + "% " + effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false);
+			}
+			if (effectType.isConstant()) {
+				return Component.text(effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
+					Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
+				);
+			}
+			if (effectType.isFlat()) {
+				return Component.text(add + ((int) strength) + " " + effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
+					Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
+				);
+			}
+			return Component.text(add + (int) (strength * 100) + "% " + effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
 				Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
 			);
 		}
-		if (effectType.isFlat()) {
-			return Component.text(add + ((int) strength) + " " + effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
-				Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
-			);
-		}
-		return Component.text(add + (int) (strength * 100) + "% " + effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
-			Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
-		);
 	}
 
 	public static void applyEffect(@Nullable EffectType effectType, Entity entity, int duration, double strength, @Nullable String source, boolean applySickness) {
