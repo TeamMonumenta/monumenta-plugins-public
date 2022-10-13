@@ -9,21 +9,29 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.itemstats.attributes.Armor;
 import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
 import com.playmonumenta.plugins.itemstats.enchantments.BlastProtection;
+import com.playmonumenta.plugins.itemstats.enchantments.Cloaked;
+import com.playmonumenta.plugins.itemstats.enchantments.Ethereal;
+import com.playmonumenta.plugins.itemstats.enchantments.Evasion;
 import com.playmonumenta.plugins.itemstats.enchantments.FeatherFalling;
 import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
+import com.playmonumenta.plugins.itemstats.enchantments.Guard;
 import com.playmonumenta.plugins.itemstats.enchantments.Ineptitude;
 import com.playmonumenta.plugins.itemstats.enchantments.LifeDrain;
 import com.playmonumenta.plugins.itemstats.enchantments.MagicProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.MeleeProtection;
+import com.playmonumenta.plugins.itemstats.enchantments.Poise;
 import com.playmonumenta.plugins.itemstats.enchantments.ProjectileProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Protection;
 import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheDepths;
+import com.playmonumenta.plugins.itemstats.enchantments.Reflexes;
 import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
+import com.playmonumenta.plugins.itemstats.enchantments.Steadfast;
 import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
+import com.playmonumenta.plugins.itemstats.enchantments.Tempo;
 import com.playmonumenta.plugins.itemstats.infusions.Ardor;
 import com.playmonumenta.plugins.itemstats.infusions.Carapace;
 import com.playmonumenta.plugins.itemstats.infusions.Choler;
@@ -51,6 +59,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -548,46 +557,50 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	private enum SecondaryStat {
 		SHIELDING(0, Material.NAUTILUS_SHELL, EnchantmentType.SHIELDING, true, """
-			Gain (Level*20%) effective Armor
-			when taking damage from an enemy within 2.5 blocks.
+			Gain (Level*20%%) effective Armor
+			when taking damage from an enemy within %s blocks.
 			Taking damage that would stun a shield
-			halves Shielding reduction for 5 seconds."""),
+			halves Shielding reduction for %s seconds.""".formatted(Shielding.DISTANCE, StringUtils.ticksToSeconds(Shielding.DISABLE_DURATION))),
 		POISE(1, Material.LILY_OF_THE_VALLEY, EnchantmentType.POISE, true, """
-			Gain (Level*20%) effective Armor
-			when above 90% Max Health."""),
+			Gain (Level*20%%) effective Armor
+			when above %s%% Max Health.""".formatted(StringUtils.multiplierToPercentage(Poise.MIN_HEALTH_PERCENT))),
 		INURE(2, Material.NETHERITE_SCRAP, EnchantmentType.INURE, true, """
 			Gain (Level*20%) effective Armor
 			when taking the same type of mob damage consecutively
 			(Melee, Projectile, Blast, or Magic)."""),
 		STEADFAST(3, Material.LEAD, EnchantmentType.STEADFAST, true, """
 			Scaling with percent health missing,
-			gain up to (Level*20%) effective Armor
-			(0.25% armor per 1% health lost, up to 20% armor).
-			Also calculates bonus from Second Wind when enabled."""),
+			gain up to (Level*20%%) effective Armor
+			(%s%% armor per 1%% health lost, up to 20%% armor).
+			Also calculates bonus from Second Wind when enabled.""".formatted(Steadfast.BONUS_SCALING_RATE)),
 		GUARD(9, Material.SHULKER_SHELL, EnchantmentType.GUARD, true, """
-			Gain (Level*20%) effective Armor
+			Gain (Level*20%%) effective Armor
 			after blocking an attack with a shield.
-			The duration lasts for 2.5s if blocked
-			from offhand, and 5s from mainhand."""),
+			The duration lasts for %ss if blocked
+			from offhand, and %ss from mainhand.""".formatted(
+			StringUtils.ticksToSeconds(Guard.PAST_HIT_DURATION_TIME_OFFHAND), StringUtils.ticksToSeconds(Guard.PAST_HIT_DURATION_TIME_MAINHAND))),
 		ETHEREAL(5, Material.PHANTOM_MEMBRANE, EnchantmentType.ETHEREAL, false, """
-			Gain (Level*20%) effective Agility
-			on hits taken within 2 seconds of any previous hit."""),
+			Gain (Level*20%%) effective Agility
+			on hits taken within %s seconds of any previous hit.""".formatted(StringUtils.ticksToSeconds(Ethereal.PAST_HIT_DURATION_TIME))),
 		REFLEXES(6, Material.ENDER_EYE, EnchantmentType.REFLEXES, false, """
-			Gain (Level*20%) effective Agility
-			when there are 4 or more enemies within 8 blocks."""),
+			Gain (Level*20%%) effective Agility
+			when there are %s or more enemies within %s blocks.""".formatted(Reflexes.MOB_CAP, Reflexes.RADIUS)),
 		EVASION(7, Material.ELYTRA, EnchantmentType.EVASION, false, """
-			Gain (Level*20%) effective Agility
+			Gain (Level*20%%) effective Agility
 			when taking damage from a source further
-			than 5 blocks from the player."""),
+			than %s blocks from the player.""".formatted(Evasion.DISTANCE)),
 		TEMPO(8, Material.CLOCK, EnchantmentType.TEMPO, false, """
-			Gain (Level*20%) effective Agility
+			Gain (Level*20%%) effective Agility
 			on the first hit taken after
-			4 seconds of taking no damage.
+			%s seconds of taking no damage.
 			Half of the bonus is granted after
-			2 seconds of taking no damage."""),
+			%s seconds of taking no damage.""".formatted(
+			StringUtils.ticksToSeconds(Tempo.PAST_HIT_DURATION_TIME),
+			StringUtils.ticksToSeconds(Tempo.PAST_HIT_DURATION_TIME_HALF)
+		)),
 		CLOAKED(17, Material.BLACK_DYE, EnchantmentType.CLOAKED, false, """
-			Gain (Level*20%) effective Agility
-			when there are 2 or less enemies within 5 blocks.""");
+			Gain (Level*20%%) effective Agility
+			when there are %s or less enemies within %s blocks.""".formatted(Cloaked.MOB_CAP, Cloaked.RADIUS));
 
 		private final int mSlot;
 		private final Material mIcon;
@@ -688,6 +701,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private final Stats mLeftStats = new Stats(null, mSettings);
 	private final Stats mRightStats = new Stats(mLeftStats, mSettings);
 
+	private final boolean mShowVanity;
+
 	private boolean mSelectedRightEquipmentSet;
 	private @Nullable Equipment mSelectedEquipmentsSlot = null;
 
@@ -697,6 +712,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	public PlayerItemStatsGUI(Player player, @Nullable Player otherPlayer) {
 		super(player, 54, Component.text("Player Stats Calculator", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+
+		mShowVanity = Plugin.getInstance().mVanityManager.getData(player).mGuiVanityEnabled;
+
 		setEquipmentFromPlayer(false, player);
 		if (otherPlayer != null) {
 			setEquipmentFromPlayer(true, otherPlayer);
@@ -730,9 +748,13 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		stats.mDisplayedEquipment.put(slot, getPlayerItemWithVanity(player, slot.mEquipmentSlot));
 	}
 
-	public static @Nullable ItemStack getPlayerItemWithVanity(Player player, EquipmentSlot slot) {
+	private @Nullable ItemStack getPlayerItemWithVanity(Player player, EquipmentSlot slot) {
+		return getPlayerItemWithVanity(player, slot, mShowVanity);
+	}
+
+	public static @Nullable ItemStack getPlayerItemWithVanity(Player player, EquipmentSlot slot, boolean withVanity) {
 		ItemStack item = player.getInventory().getItem(slot);
-		if (item != null && item.getType() != Material.AIR) {
+		if (item != null && item.getType() != Material.AIR && withVanity) {
 			VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(player);
 			if (vanityData.getEquipped(slot) != null) {
 				ItemStack vanityItem = ItemUtils.clone(item);
@@ -1026,7 +1048,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				}
 				boolean selected = setting == selectedSetting;
 				lore.add(Component.text((selected ? "+ " : "- ") + line, selected ? NamedTextColor.GREEN : NamedTextColor.GRAY)
-					.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, selected));
+					         .decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, selected));
 			}
 			meta.lore(lore);
 			item.setItemMeta(meta);
@@ -1035,24 +1057,26 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		mInventory.setItem(INFUSION_SETTINGS_LEFT_SLOT, makeInfusionSettingsItem.apply(true, mLeftStats.mInfusionSetting));
 		mInventory.setItem(INFUSION_SETTINGS_RIGHT_SLOT, makeInfusionSettingsItem.apply(false, mRightStats.mInfusionSetting));
 
-		for (Equipment equipment : Equipment.values()) {
-			ItemStack leftItem = mLeftStats.mDisplayedEquipment.get(equipment);
-			mInventory.setItem(equipment.mLeftSlot, leftItem != null && leftItem.getType() != Material.AIR ? leftItem
-				: makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && !mSelectedRightEquipmentSet));
-
-			ItemStack rightItem = mRightStats.mDisplayedEquipment.get(equipment);
-			mInventory.setItem(equipment.mRightSlot, rightItem != null && rightItem.getType() != Material.AIR ? rightItem
-				: makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && mSelectedRightEquipmentSet));
-		}
-
 		mInventory.setItem(28, getWarningIcon(mLeftStats));
 		mInventory.setItem(34, getWarningIcon(mRightStats));
 
+		// Set plain name/lore tags. This must be before equipment items are added to not break vanity.
 		for (ItemStack item : mInventory) {
 			if (item != null) {
 				ItemUtils.setPlainTag(item);
 			}
 		}
+
+		for (Equipment equipment : Equipment.values()) {
+			ItemStack leftItem = mLeftStats.mDisplayedEquipment.get(equipment);
+			mInventory.setItem(equipment.mLeftSlot, leftItem != null && leftItem.getType() != Material.AIR ? leftItem
+				                                        : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && !mSelectedRightEquipmentSet));
+
+			ItemStack rightItem = mRightStats.mDisplayedEquipment.get(equipment);
+			mInventory.setItem(equipment.mRightSlot, rightItem != null && rightItem.getType() != Material.AIR ? rightItem
+				                                         : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && mSelectedRightEquipmentSet));
+		}
+
 		GUIUtils.fillWithFiller(mInventory, Material.BLACK_STAINED_GLASS_PANE);
 
 	}

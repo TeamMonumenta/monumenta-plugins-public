@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.delves;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.custominventories.BountyCustomInventory;
+import com.playmonumenta.plugins.custominventories.BountyGui;
 import com.playmonumenta.plugins.delves.abilities.Entropy;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -68,7 +68,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 		meta = BOUNTY_SELECTION_ITEM.getItemMeta();
 		meta.displayName(Component.text("Back to bounty selection!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-		REMOVE_ALL_MOD_ITEM.setItemMeta(meta);
+		BOUNTY_SELECTION_ITEM.setItemMeta(meta);
 
 
 		DUNGEON_FUNCTION_MAPPINGS.put("white", "function monumenta:lobbies/d1/new");
@@ -133,9 +133,7 @@ public class DelveCustomInventory extends CustomInventory {
 				mPointSelected.put(mod, DelvesUtils.getDelveModLevel(owner, dungeon, mod));
 			}
 		} else {
-			for (Map.Entry<DelvesModifier, Integer> entry : preset.mModifiers.entrySet()) {
-				mPointSelected.put(entry.getKey(), entry.getValue());
-			}
+			mPointSelected.putAll(preset.mModifiers);
 		}
 		mIgnoreOldEntropyPoint = mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0);
 		mPreset = preset;
@@ -202,13 +200,13 @@ public class DelveCustomInventory extends CustomInventory {
 			mInventory.setItem(PAGE_LEFT_SLOT, getPreviousPage());
 		} else if (mEditableDelvePoint) {
 			mInventory.setItem(PAGE_LEFT_SLOT, REMOVE_ALL_MOD_ITEM);
-			if (mDungeonName.equals("ring") && mEditableDelvePoint && ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0) > 0) {
+			if (mDungeonName.equals("ring") && ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0) > 0) {
 				DelvePreset delvePreset = DelvePreset.getDelvePreset(ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0));
 				ItemStack presetItem = new ItemStack(delvePreset.mDisplayItem, 1);
 				ItemMeta meta = presetItem.getItemMeta();
 				meta.displayName(Component.text("Use Bounty Preset", NamedTextColor.WHITE)
-					.decoration(TextDecoration.ITALIC, false)
-					.decoration(TextDecoration.BOLD, true));
+					                 .decoration(TextDecoration.ITALIC, false)
+					                 .decoration(TextDecoration.BOLD, true));
 				GUIUtils.splitLoreLine(meta, delvePreset.mName, 30, ChatColor.AQUA, true);
 				meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 				meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
@@ -453,7 +451,7 @@ public class DelveCustomInventory extends CustomInventory {
 			} else if (mPreset != null) {
 				this.close();
 				try {
-					new BountyCustomInventory(playerWhoClicked, 3, 0).openInventory(playerWhoClicked, getPlugin());
+					new BountyGui(playerWhoClicked, 3, 0).open();
 				} catch (Exception e) {
 					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), e);
 				}

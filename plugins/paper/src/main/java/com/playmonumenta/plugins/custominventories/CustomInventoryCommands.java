@@ -214,7 +214,7 @@ public class CustomInventoryCommands {
 					int level = (int) args[2];
 					if (ScoreboardUtils.getScoreboardValue(player, questScore.get(region - 1)).orElse(0) == 0 &&
 						ScoreboardUtils.getScoreboardValue(player, rewardScore.get(region - 1)).orElse(0) == 0) {
-						new BountyCustomInventory(player, region, level).openInventory(player, plugin);
+						new BountyGui(player, region, level).open();
 					}
 				} catch (Exception e) {
 					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), e);

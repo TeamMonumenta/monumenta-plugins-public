@@ -15,8 +15,8 @@ import org.bukkit.entity.Player;
 
 public class Guard implements Enchantment {
 	private static final double ARMOR_BONUS_PER_LEVEL = 0.2;
-	private static final int PAST_HIT_DURATION_TIME_MAINHAND = 5 * 20;
-	private static final int PAST_HIT_DURATION_TIME_OFFHAND = (int) (2.5 * 20);
+	public static final int PAST_HIT_DURATION_TIME_MAINHAND = 5 * 20;
+	public static final int PAST_HIT_DURATION_TIME_OFFHAND = (int) (2.5 * 20);
 	private static final String GUARD_EFFECT_NAME = "GuardEffect";
 
 	@Override

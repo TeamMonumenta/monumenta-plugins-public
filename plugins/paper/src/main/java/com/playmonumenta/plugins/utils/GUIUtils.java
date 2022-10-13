@@ -16,23 +16,24 @@ public class GUIUtils {
 		if (lore.isEmpty()) {
 			return;
 		}
-		String[] splitLine = lore.split(" ");
-		StringBuilder currentString = new StringBuilder(defaultColor + "");
+		String[] splitLine = lore.split(" |(?<=\n)");
+		StringBuilder currentLine = new StringBuilder(defaultColor + "");
 		List<String> finalLines = (clean || meta.getLore() == null) ? new ArrayList<>() : meta.getLore();
 
-		int currentLength = 0;
 		for (String word : splitLine) {
-			if (currentLength + word.length() > maxLength) {
-				finalLines.add(currentString.toString());
-				currentString.setLength(0);
-				currentString.append(defaultColor + "");
-				currentLength = 0;
+			boolean newline = currentLine.length() > 0 && currentLine.charAt(currentLine.length() - 1) == '\n';
+			if (newline || currentLine.length() + word.length() > maxLength) {
+				if (newline) {
+					currentLine.setLength(currentLine.length() - 1);
+				}
+				finalLines.add(currentLine.toString());
+				currentLine.setLength(0);
+				currentLine.append(defaultColor + "");
 			}
-			currentString.append(word).append(" ");
-			currentLength += word.length() + 1;
+			currentLine.append(word).append(" ");
 		}
-		if (!currentString.toString().equals(defaultColor + "")) {
-			finalLines.add(currentString.toString());
+		if (!currentLine.toString().equals(defaultColor + "")) {
+			finalLines.add(currentLine.toString());
 		}
 		meta.setLore(finalLines);
 	}

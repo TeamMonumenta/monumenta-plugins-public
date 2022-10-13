@@ -160,8 +160,8 @@ public final class ParrotCustomInventory extends CustomInventory {
 	//0 if the player can't have 2 parrot at the same time, otherwise the time of when he bought it
 
 
-	private final ArrayList<GuiItem> GUI_ITEMS = new ArrayList<>();
-	private final Map<Integer, GuiItem> mInvMapping = new HashMap<>();
+	private final ArrayList<ParrotGuiItem> GUI_ITEMS = new ArrayList<>();
+	private final Map<Integer, ParrotGuiItem> mInvMapping = new HashMap<>();
 	private ParrotAction mSelectedAction = ParrotAction.NONE;
 	private ParrotGUIPage mCurrentPage = ParrotGUIPage.R1;
 
@@ -192,7 +192,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		//                                 DONT modify these items
 		//==================================================================================================
 		ItemStack shoulderLeft = buildItem(Material.COOKIE, "Shoulder Left", List.of());
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 6, shoulderLeft,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 6, shoulderLeft,
 			(player, inv) -> mSelectedAction != ParrotAction.SET_LEFT_SHOULDER,
 			(player, inv) -> {
 				mSelectedAction = ParrotAction.SET_LEFT_SHOULDER;
@@ -200,7 +200,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		ItemStack shoulderRight = buildItem(Material.COOKIE, "Shoulder Right", List.of());
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 4, shoulderRight,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 4, shoulderRight,
 			(player, inv) -> mSelectedAction != ParrotAction.SET_RIGHT_SHOULDER,
 			(player, inv) -> {
 				mSelectedAction = ParrotAction.SET_RIGHT_SHOULDER;
@@ -208,7 +208,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		ItemStack leftShoulder = buildItem(Material.BRICK, "Left Shoulder Selected", List.of());
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 6, leftShoulder,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 6, leftShoulder,
 			(player, inv) -> mSelectedAction == ParrotAction.SET_LEFT_SHOULDER,
 			(player, inv) -> {
 				mSelectedAction = ParrotAction.NONE;
@@ -216,7 +216,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		ItemStack rightShoulder = buildItem(Material.BRICK, "Right Shoulder Selected", List.of());
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 4, rightShoulder,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 4, rightShoulder,
 			(player, inv) -> mSelectedAction == ParrotAction.SET_RIGHT_SHOULDER,
 			(player, inv) -> {
 				mSelectedAction = ParrotAction.NONE;
@@ -224,7 +224,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		ItemStack removeParrots = buildItem(Material.FEATHER, "Remove Parrots", List.of());
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 8, removeParrots,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 8, removeParrots,
 			(player, inv) -> ParrotManager.hasParrotOnShoulders(player),
 			(player, inv) -> {
 				ParrotManager.clearParrots(player);
@@ -232,7 +232,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		ItemStack visibleParrots = buildItem(Material.SADDLE, "Set parrots visible", List.of());
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 2, visibleParrots,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 2, visibleParrots,
 			(player, inv) -> ParrotManager.hasParrotOnShoulders(player) && !ParrotManager.areParrotsVisible(player),
 			(player, inv) -> {
 				ParrotManager.setParrotVisible(player, true);
@@ -240,7 +240,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		ItemStack invisibleParrots = buildItem(Material.SADDLE, "Set parrots invisible", List.of());
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 2, invisibleParrots,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 2, invisibleParrots,
 			(player, inv) -> ParrotManager.hasParrotOnShoulders(player) && ParrotManager.areParrotsVisible(player),
 			(player, inv) -> {
 				ParrotManager.setParrotVisible(player, false);
@@ -248,7 +248,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		ItemStack spawnParrot = buildItem(Material.ARMOR_STAND, "Place Parrots", List.of());
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 3, spawnParrot,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 3, spawnParrot,
 			(player, inv) -> ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.PLOT)
 				                 && ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.CURRENT_PLOT).orElse(-1).equals(ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(-2)),
 			(player, inv) -> {
@@ -257,7 +257,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		ItemStack spawningParrot = buildItem(Material.ARMOR_STAND, "Placing Parrots", List.of());
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 3, spawningParrot,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 3, spawningParrot,
 			(player, inv) -> mSelectedAction == ParrotAction.PLACE,
 			(player, inv) -> {
 				mSelectedAction = ParrotAction.NONE;
@@ -265,7 +265,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		ItemStack bothShoulders = buildItem(Material.INK_SAC, "Buy Both Shoulders", List.of("Click to buy!", "64HCS"));
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 5, bothShoulders, ImmutableMap.of(hcs, 64),
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 5, bothShoulders, ImmutableMap.of(hcs, 64),
 			(player, inv) -> !ParrotManager.hasDoubleShoulders(player),
 			(player, inv) -> {
 				ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_BOUGHT_SHOULDERS, (int) Instant.now().getEpochSecond());
@@ -274,12 +274,12 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		ItemStack boughtShoulders = buildItem(Material.INK_SAC, "Both Shoulders",
 			List.of("Owned", new Date((long) ScoreboardUtils.getScoreboardValue(playerLoad, SCOREBOARD_BOUGHT_SHOULDERS).orElse(0) * 1000).toString()));
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 5, boughtShoulders,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 5, boughtShoulders,
 			(player, inv) -> ParrotManager.hasDoubleShoulders(player)));
 
 
 		ItemStack turnRight = buildItem(Material.ARROW, "Turn Page ->", List.of());
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 1, turnRight,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 1, turnRight,
 			(player, inv) -> mCurrentPage != ParrotGUIPage.SPECIAL,
 			(player, inv) -> {
 				if (mCurrentPage == ParrotGUIPage.R1) {
@@ -291,7 +291,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		ItemStack turnLeft = buildItem(Material.ARROW, "<- Turn Page", List.of());
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 9, turnLeft,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 9, turnLeft,
 			(player, inv) -> mCurrentPage != ParrotGUIPage.R1,
 			(player, inv) -> {
 				if (mCurrentPage == ParrotGUIPage.R2) {
@@ -430,13 +430,13 @@ public final class ParrotCustomInventory extends CustomInventory {
 		// Parteon parrot
 		// This one cannot be bought in-game. This also means it has no purchase date.
 		ItemStack buyPatreon = buildItem(Material.ORANGE_WOOL, "Patreon Parakeet", List.of("Become a Tier 2 patreon to unlock"));
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.SPECIAL.mNum, 10, buyPatreon,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.SPECIAL.mNum, 10, buyPatreon,
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "Patreon").orElse(0) < 5 && mSelectedAction == ParrotAction.NONE));
 
 		ItemStack boughtPatreon = buildItem(Material.ORANGE_WOOL, "Patreon Parakeet", List.of("Owned"));
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.SPECIAL.mNum, 10, boughtPatreon,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.SPECIAL.mNum, 10, boughtPatreon,
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "Patreon").orElse(0) >= 5 && mSelectedAction == ParrotAction.NONE));
-		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.SPECIAL.mNum, 10, boughtPatreon,
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.SPECIAL.mNum, 10, boughtPatreon,
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "Patreon").orElse(0) >= 5 && mSelectedAction != ParrotAction.NONE,
 			(player, inv) -> {
 				selectParrot(player, ParrotVariant.PATREON);
@@ -504,7 +504,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		} else {
 			ItemStack stack = buildItem(Material.BEDROCK, ChatColor.MAGIC + "Twisted?????", List.of());
 			ItemUtils.setPlainName(stack, ParrotVariant.TWISTED.getName());
-			GUI_ITEMS.add(new GuiItem(ParrotGUIPage.SPECIAL.mNum, 12, stack, null, null, null));
+			GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.SPECIAL.mNum, 12, stack, null, null, null));
 		}
 
 		//==================================================================================================
@@ -531,7 +531,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		// "hidden" parrot (cannot be bought and unlock condition is hidden)
 		if (hiddenUnlockLore != null && showUnlockRequirements != null) {
 			ItemStack hiddenDisplayItem = buildItem(itemMaterial, variant.getName(), hiddenUnlockLore);
-			GUI_ITEMS.add(new GuiItem(page.mNum, slot, hiddenDisplayItem,
+			GUI_ITEMS.add(new ParrotGuiItem(page.mNum, slot, hiddenDisplayItem,
 				(player, inv) -> mSelectedAction == ParrotAction.NONE
 					                 && ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) == 0
 					                 && !showUnlockRequirements.test(player, inv)));
@@ -540,7 +540,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		// locked parrot (cannot be bought yet)
 		if (requirementsLore != null && requirements != null) {
 			ItemStack lockedDisplayItem = buildItem(itemMaterial, variant.getName(), requirementsLore);
-			GUI_ITEMS.add(new GuiItem(page.mNum, slot, lockedDisplayItem,
+			GUI_ITEMS.add(new ParrotGuiItem(page.mNum, slot, lockedDisplayItem,
 				(player, inv) -> mSelectedAction == ParrotAction.NONE
 					                 && ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) == 0
 					                 && !requirements.test(player, inv)
@@ -554,7 +554,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			costLore.add(entry.getValue() + " " + ItemUtils.getPlainName(entry.getKey(), false));
 		}
 		ItemStack buyDisplayItem = buildItem(itemMaterial, "Buy " + variant.getName(), costLore);
-		GUI_ITEMS.add(new GuiItem(page.mNum, slot, buyDisplayItem, cost,
+		GUI_ITEMS.add(new ParrotGuiItem(page.mNum, slot, buyDisplayItem, cost,
 			(player, inv) -> mSelectedAction == ParrotAction.NONE
 				                 && ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) == 0
 				                 && (requirements == null || requirements.test(player, inv))
@@ -567,11 +567,11 @@ public final class ParrotCustomInventory extends CustomInventory {
 		// unclickable bought parrot
 		ItemStack boughtDisplayItem = buildItem(itemMaterial, variant.getName(),
 			List.of("Owned", new Date((long) ScoreboardUtils.getScoreboardValue(playerLoad, scoreboard).orElse(0) * 1000).toString()));
-		GUI_ITEMS.add(new GuiItem(page.mNum, slot, boughtDisplayItem,
+		GUI_ITEMS.add(new ParrotGuiItem(page.mNum, slot, boughtDisplayItem,
 			(player, inv) -> mSelectedAction == ParrotAction.NONE && ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) > 0));
 
 		// clickable bought parrot
-		GUI_ITEMS.add(new GuiItem(page.mNum, slot, boughtDisplayItem,
+		GUI_ITEMS.add(new ParrotGuiItem(page.mNum, slot, boughtDisplayItem,
 			(player, inv) -> mSelectedAction != ParrotAction.NONE && ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) > 0,
 			(player, inv) -> {
 				selectParrot(player, variant);
@@ -666,7 +666,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			mInventory.setItem(4, SIGN_MAP.get(mCurrentPage));
 		}
 
-		for (GuiItem gItem : GUI_ITEMS) {
+		for (ParrotGuiItem gItem : GUI_ITEMS) {
 			ParrotGUIPage itemPage = ParrotGUIPage.valueOfPage(gItem.getPage());
 			if (itemPage != null && (itemPage == mCurrentPage || itemPage == ParrotGUIPage.OTHERS) && gItem.isVisible(player, mInventory)) {
 				mInventory.setItem(gItem.getSlot(), gItem.getShowedItem());
@@ -722,7 +722,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		}
 
 		int slotClicked = event.getSlot();
-		GuiItem gItem = mInvMapping.get(slotClicked);
+		ParrotGuiItem gItem = mInvMapping.get(slotClicked);
 		Player whoClicked = (Player) event.getWhoClicked();
 		Inventory inventory = event.getClickedInventory();
 

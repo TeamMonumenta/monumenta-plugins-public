@@ -20,7 +20,6 @@ import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.gallery.GalleryCommands;
 import com.playmonumenta.plugins.gallery.GalleryManager;
-import com.playmonumenta.plugins.guis.SinglePageGUIManager;
 import com.playmonumenta.plugins.infinitytower.TowerCommands;
 import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
@@ -363,7 +362,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new AnvilFixInInventory(this), this);
 		manager.registerEvents(new LootChestsInInventory(), this);
 		manager.registerEvents(new ArrowListener(this), this);
-		manager.registerEvents(new SinglePageGUIManager(), this);
 		manager.registerEvents(new GraveListener(this), this);
 		manager.registerEvents(new BrewingListener(), this);
 		manager.registerEvents(new ItemUpdateManager(this), this);

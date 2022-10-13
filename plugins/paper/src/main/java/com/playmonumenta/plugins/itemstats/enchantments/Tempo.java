@@ -16,8 +16,8 @@ public class Tempo implements Enchantment {
 
 	private static final double AGIL_BONUS_PER_LEVEL_1 = 0.1;
 	private static final double AGIL_BONUS_PER_LEVEL_2 = 0.2;
-	private static final int PAST_HIT_DURATION_TIME = 20 * 4;
-	private static final int PAST_HIT_DURATION_TIME_HALF = 20 * 2;
+	public static final int PAST_HIT_DURATION_TIME = 20 * 4;
+	public static final int PAST_HIT_DURATION_TIME_HALF = 20 * 2;
 	private static final String TEMPO_EFFECT_NAME = "TempoEffect";
 
 	@Override

@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 public class Poise implements Enchantment {
 
 	private static final double ARMOR_BONUS_PER_LEVEL = 0.2;
-	private static final double MIN_HEALTH_PERCENT = 0.9;
+	public static final double MIN_HEALTH_PERCENT = 0.9;
 
 	@Override
 	public String getName() {

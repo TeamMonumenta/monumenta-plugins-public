@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.inventories;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.PlayerItemStatsGUI;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
@@ -116,12 +117,14 @@ public class PlayerInventoryView implements Listener {
 		Inventory openInv = Bukkit.createInventory(null, 18, Component.text(clickedPlayer.getName() + "'s Inventory"));
 		mInventories.add(openInv);
 
+		boolean showVanity = Plugin.getInstance().mVanityManager.getData(player).mGuiVanityEnabled;
+
 		//Set the fake inventory's top row to be the armor and offhand of the player
-		openInv.setItem(0, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.HEAD));
-		openInv.setItem(1, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.CHEST));
-		openInv.setItem(2, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.LEGS));
-		openInv.setItem(3, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.FEET));
-		openInv.setItem(4, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.OFF_HAND));
+		openInv.setItem(0, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.HEAD, showVanity));
+		openInv.setItem(1, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.CHEST, showVanity));
+		openInv.setItem(2, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.LEGS, showVanity));
+		openInv.setItem(3, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.FEET, showVanity));
+		openInv.setItem(4, PlayerItemStatsGUI.getPlayerItemWithVanity(clickedPlayer, EquipmentSlot.OFF_HAND, showVanity));
 
 		//Set the fake inventory's bottom row to be the players hotbar
 		openInv.setItem(9, playInv.getItem(0));

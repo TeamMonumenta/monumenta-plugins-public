@@ -13,8 +13,8 @@ import org.bukkit.entity.Player;
 public class Cloaked implements Enchantment {
 
 	private static final double AGIL_BONUS_PER_LEVEL = 0.2;
-	private static final int MOB_CAP = 2;
-	private static final int RADIUS = 5;
+	public static final int MOB_CAP = 2;
+	public static final int RADIUS = 5;
 
 	@Override
 	public String getName() {

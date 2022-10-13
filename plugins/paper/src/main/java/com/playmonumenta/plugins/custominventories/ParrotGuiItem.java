@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class GuiItem {
+public class ParrotGuiItem {
 	private final int mPage;
 	private final int mSlot;
 	private final ItemStack mShowedItem;
@@ -16,7 +16,7 @@ public class GuiItem {
 	private final @Nullable BiPredicate<Player, Inventory> mAfterClickFunction;
 	private final @Nullable BiPredicate<Player, Inventory> mCondition;
 
-	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable BiPredicate<Player, Inventory> cond, @Nullable BiPredicate<Player, Inventory> afterClick) {
+	public ParrotGuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable BiPredicate<Player, Inventory> cond, @Nullable BiPredicate<Player, Inventory> afterClick) {
 		this.mPage = page;
 		this.mSlot = slot;
 		this.mShowedItem = showedItem;
@@ -25,27 +25,27 @@ public class GuiItem {
 		this.mAfterClickFunction = afterClick;
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable BiPredicate<Player, Inventory> cond) {
+	public ParrotGuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable BiPredicate<Player, Inventory> cond) {
 		this(page, slot, showedItem, cost, cond, null);
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable BiPredicate<Player, Inventory> cond, @Nullable BiPredicate<Player, Inventory> afterClick) {
+	public ParrotGuiItem(int page, int slot, ItemStack showedItem, @Nullable BiPredicate<Player, Inventory> cond, @Nullable BiPredicate<Player, Inventory> afterClick) {
 		this(page, slot, showedItem, null, cond, afterClick);
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost) {
+	public ParrotGuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost) {
 		this(page, slot, showedItem, cost, null);
 	}
 
-	public GuiItem(int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost) {
+	public ParrotGuiItem(int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost) {
 		this(0, slot, showedItem, cost);
 	}
 
-	public GuiItem(int slot, ItemStack showedItemStack) {
+	public ParrotGuiItem(int slot, ItemStack showedItemStack) {
 		this(0, slot, showedItemStack, (Map<ItemStack, Integer>) null);
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItemStack, @Nullable BiPredicate<Player, Inventory> cond) {
+	public ParrotGuiItem(int page, int slot, ItemStack showedItemStack, @Nullable BiPredicate<Player, Inventory> cond) {
 		this(page, slot, showedItemStack, (Map<ItemStack, Integer>) null, cond);
 	}
 
@@ -130,8 +130,8 @@ public class GuiItem {
 		return mCost == null || mCost.isEmpty();
 	}
 
-	public GuiItem copy() {
-		return new GuiItem(mPage, mSlot, mShowedItem, mCost, mCondition, mAfterClickFunction);
+	public ParrotGuiItem copy() {
+		return new ParrotGuiItem(mPage, mSlot, mShowedItem, mCost, mCondition, mAfterClickFunction);
 	}
 
 }

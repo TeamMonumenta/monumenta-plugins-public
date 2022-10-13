@@ -153,10 +153,10 @@ public enum DelvePreset {
 		return null;
 	}
 
-	public static @Nullable List<DelvePreset> getRandomPresets(int level) {
+	public static List<DelvePreset> getRandomPresets(int level) {
 		List<DelvePreset> presets = new ArrayList<>();
 		if (level <= 0 || level > 3) {
-			return null;
+			return Collections.emptyList();
 		}
 		List<DelvePreset> allPresets = Arrays.asList(DelvePreset.values());
 		Collections.shuffle(allPresets);
@@ -168,7 +168,7 @@ public enum DelvePreset {
 				break;
 			}
 		}
-		return presets;
+		return Collections.unmodifiableList(presets);
 	}
 
 	public static boolean validatePresetModifiers(DelvesManager.DungeonDelveInfo delveMods, DelvePreset preset) {

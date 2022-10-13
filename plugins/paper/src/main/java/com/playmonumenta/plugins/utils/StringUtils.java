@@ -132,21 +132,21 @@ public class StringUtils {
 		}
 	}
 
-	// 0 to 0%
-	// 0.05 to 5%
-	// 0.1 to 10%
-	// 0.333333 to 33.33%
-	// 0.25789 to 25.79%
-	// 12.345678 to 1234.57%
+	// 0 to 0
+	// 0.05 to 5
+	// 0.1 to 10
+	// 0.333333 to 33.33
+	// 0.25789 to 25.79
+	// 12.345678 to 1234.57
 	public static String multiplierToPercentage(double multiplier) {
 		return to2DP(multiplier * 100);
 	}
 
-	// 0 to 0s
-	// 5 to 0.25s
-	// 10 to 0.5s
-	// 20 to 1s
-	// 1000 to 50s
+	// 0 to 0
+	// 5 to 0.25
+	// 10 to 0.5
+	// 20 to 1
+	// 1000 to 50
 	public static String ticksToSeconds(int ticks) {
 		return to2DP(ticks / 20d);
 	}

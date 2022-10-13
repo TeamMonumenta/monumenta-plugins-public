@@ -17,8 +17,8 @@ public class Shielding implements Enchantment {
 
 	public static final double ARMOR_BONUS_PER_LEVEL = 0.2;
 	public static final double ARMOR_BONUS_PER_LEVEL_DISABLED = 0.1;
-	private static final double DISTANCE = 2.5;
-	private static final int DISABLE_DURATION = 5 * 20;
+	public static final double DISTANCE = 2.5;
+	public static final int DISABLE_DURATION = 5 * 20;
 	private static final String DISABLE_METAKEY = "ShieldingDisabled";
 
 	@Override

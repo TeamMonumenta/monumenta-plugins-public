@@ -60,6 +60,7 @@ public class VanityManager implements Listener {
 		public boolean mSelfVanityEnabled = true;
 		public boolean mOtherVanityEnabled = true;
 		public boolean mLockboxSwapEnabled = true;
+		public boolean mGuiVanityEnabled = true;
 
 		public void equip(EquipmentSlot slot, @Nullable ItemStack item) {
 			if (item == null || item.getType() == Material.AIR) {
@@ -71,8 +72,19 @@ public class VanityManager implements Listener {
 			}
 		}
 
+		public void setEquipped(Map<EquipmentSlot, ItemStack> vanity) {
+			mEquipped.clear();
+			for (Map.Entry<EquipmentSlot, ItemStack> entry : vanity.entrySet()) {
+				equip(entry.getKey(), entry.getValue());
+			}
+		}
+
 		public @Nullable ItemStack getEquipped(EquipmentSlot slot) {
 			return mEquipped.get(slot);
+		}
+
+		public Map<EquipmentSlot, ItemStack> getEquipped() {
+			return new HashMap<>(mEquipped);
 		}
 	}
 
@@ -90,6 +102,11 @@ public class VanityManager implements Listener {
 	public void toggleOtherVanity(Player player) {
 		VanityData data = getData(player);
 		data.mOtherVanityEnabled = !data.mOtherVanityEnabled;
+	}
+
+	public void toggleGuiVanity(Player player) {
+		VanityData data = getData(player);
+		data.mGuiVanityEnabled = !data.mGuiVanityEnabled;
 	}
 
 	public void toggleLockboxSwap(Player player) {
@@ -120,6 +137,7 @@ public class VanityManager implements Listener {
 		}
 		vanityData.mSelfVanityEnabled = data.getAsJsonPrimitive("selfVanityEnabled").getAsBoolean();
 		vanityData.mOtherVanityEnabled = Optional.ofNullable(data.getAsJsonPrimitive("otherVanityEnabled")).map(JsonPrimitive::getAsBoolean).orElse(true);
+		vanityData.mGuiVanityEnabled = Optional.ofNullable(data.getAsJsonPrimitive("guiVanityEnabled")).map(JsonPrimitive::getAsBoolean).orElse(true);
 		vanityData.mLockboxSwapEnabled = data.getAsJsonPrimitive("lockboxSwapEnabled").getAsBoolean();
 		mData.put(player.getUniqueId(), vanityData);
 	}
@@ -138,6 +156,7 @@ public class VanityManager implements Listener {
 		data.add("equipped", equipped);
 		data.addProperty("selfVanityEnabled", vanityData.mSelfVanityEnabled);
 		data.addProperty("otherVanityEnabled", vanityData.mOtherVanityEnabled);
+		data.addProperty("guiVanityEnabled", vanityData.mGuiVanityEnabled);
 		data.addProperty("lockboxSwapEnabled", vanityData.mLockboxSwapEnabled);
 		event.setPluginData(KEY_PLUGIN_DATA, data);
 	}

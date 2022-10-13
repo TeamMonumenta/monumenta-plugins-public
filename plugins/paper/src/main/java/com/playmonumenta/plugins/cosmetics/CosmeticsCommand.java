@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.GenericCommand;
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
+import com.playmonumenta.plugins.cosmetics.gui.CosmeticsGUI;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.plots.PlotBorderCustomInventory;
 import dev.jorel.commandapi.CommandAPICommand;
