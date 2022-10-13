@@ -201,7 +201,7 @@ public class HuntingCompanion extends Ability {
 								LivingEntity nearestMob = findNearestNonTargetedMob(summon);
 								if (nearestMob != null) {
 									summon.setTarget(nearestMob);
-									mCosmetic.onAggroSounds(world, nearestMob.getLocation(), nearestMob);
+									mCosmetic.onAggroSounds(world, nearestMob.getLocation(), summon);
 								}
 							}
 						}
