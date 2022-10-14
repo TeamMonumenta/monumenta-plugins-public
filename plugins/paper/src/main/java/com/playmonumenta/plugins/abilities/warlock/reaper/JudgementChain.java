@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.warlock.reaper;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
@@ -17,15 +16,17 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -102,11 +103,9 @@ public class JudgementChain extends Ability {
 		mDisplayItem = new ItemStack(Material.CHAIN, 1);
 		mAmplifier = BUFF_AMOUNT;
 		mHasPact = false;
-		if (ServerProperties.getClassSpecializationsEnabled()) {
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-				mHasPact = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, DarkPact.class) != null;
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mHasPact = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, DarkPact.class) != null;
+		});
 	}
 
 	@Override
@@ -180,20 +179,19 @@ public class JudgementChain extends Ability {
 							particleReduce++;
 						}
 
-						applyEffects(mPlayer, false);
-						mPlugin.mEffectManager.addEffect(mPlayer, L2_RESIST_NAME, new PercentDamageReceived(20, L2_RESIST_AMOUNT));
+						List<LivingEntity> hostiles = new ArrayList<>();
+						List<Player> players = new ArrayList<>();
+						if (isLevelTwo()) {
+							mPlugin.mEffectManager.addEffect(mPlayer, L2_RESIST_NAME, new PercentDamageReceived(20, L2_RESIST_AMOUNT));
 
-						List<LivingEntity> mobs = EntityUtils.getMobsInLine(l, chainVector, l.distance(mLoc), HITBOX_LENGTH);
-						mobs.remove(mTarget);
-						List<Player> players = EntityUtils.getPlayersInLine(l, chainVector, l.distance(mLoc), HITBOX_LENGTH, mPlayer);
+							hostiles = EntityUtils.getMobsInLine(l, chainVector, l.distance(mLoc), HITBOX_LENGTH);
+							hostiles.remove(mTarget);
+							players = EntityUtils.getPlayersInLine(l, chainVector, l.distance(mLoc), HITBOX_LENGTH, mPlayer);
 
-						for (Player pl : players) {
-							applyEffects(pl, false);
 						}
+						players.add(mPlayer);
 
-						for (LivingEntity m : mobs) {
-							applyEffects(m, true);
-						}
+						applyEffects(hostiles, players);
 					}
 					if (mTarget == null || mPlayer.isDead() || (mTarget != null && (mTarget.isDead() || !mTarget.isValid()))) {
 						this.cancel();
@@ -222,7 +220,6 @@ public class JudgementChain extends Ability {
 	public void breakChain(boolean doDamage, boolean doPull) {
 		if (mTarget != null && mPlayer != null) {
 			mPlugin.mEffectManager.clearEffects(mTarget, EFFECT_NAME);
-			applyEffects(mPlayer, false);
 
 			Location loc = mPlayer.getEyeLocation();
 			Location mLoc = mTarget.getLocation();
@@ -237,14 +234,15 @@ public class JudgementChain extends Ability {
 			world.playSound(mLoc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.7f, 0.6f);
 			world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.6f, 0.6f);
 
+			List<LivingEntity> hostiles = new ArrayList<>();
+			List<Player> players = new ArrayList<>();
 			if (isLevelTwo()) {
-				for (LivingEntity m : EntityUtils.getNearbyMobs(loc, effectRadius, mTarget)) {
-					applyEffects(m, true);
-				}
-				for (Player p : PlayerUtils.playersInRange(loc, effectRadius, false)) {
-					applyEffects(p, false);
-				}
+				hostiles = EntityUtils.getNearbyMobs(loc, effectRadius, mTarget);
+				players = PlayerUtils.playersInRange(loc, effectRadius, false);
 			}
+			players.add(mPlayer);
+
+			applyEffects(hostiles, players);
 
 			if (doPull) {
 				MovementUtils.pullTowardsStop(mPlayer, mTarget);
@@ -262,82 +260,77 @@ public class JudgementChain extends Ability {
 		}
 	}
 
-	private void applyEffects(LivingEntity e, boolean isHostile) {
+	private void applyEffects(List<LivingEntity> hostiles, List<Player> players) {
+		if (mTarget == null) {
+			return;
+		}
+
 		int duration = BUFF_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 
+		List<BiConsumer<List<LivingEntity>, List<Player>>> effects = new ArrayList<>();
+
+		boolean isSlow = EntityUtils.isSlowed(mPlugin, mTarget);
+		boolean isWeak = EntityUtils.isWeakened(mPlugin, mTarget);
 		boolean isBleed = EntityUtils.isBleeding(mPlugin, mTarget);
-		if (EntityUtils.isSlowed(mPlugin, mTarget) || isBleed) {
-			if (isHostile) {
-				if (EntityUtils.isSlowed(mPlugin, mTarget)) {
-					EntityUtils.applySlow(mPlugin, duration, mAmplifier, e);
+
+		effects.add(effect(isSlow || isBleed,
+			mob -> {
+				if (isSlow) {
+					EntityUtils.applySlow(mPlugin, duration, mAmplifier, mob);
 				}
 				if (isBleed) {
-					EntityUtils.applyBleed(mPlugin, duration, mAmplifier, e);
+					EntityUtils.applyBleed(mPlugin, duration, mAmplifier, mob);
 				}
-			} else {
-				mPlugin.mEffectManager.addEffect(e, SPEED_NAME, new PercentSpeed(duration, mAmplifier, SPEED_NAME));
-			}
-		}
+			},
+			player -> mPlugin.mEffectManager.addEffect(player, SPEED_NAME, new PercentSpeed(duration, mAmplifier, SPEED_NAME))));
 
-		if (EntityUtils.isWeakened(mPlugin, mTarget) || isBleed) {
-			if (isHostile) {
-				if (EntityUtils.isWeakened(mPlugin, mTarget)) {
-					EntityUtils.applyWeaken(mPlugin, duration, mAmplifier, e);
+		effects.add(effect(isWeak || isBleed,
+			mob -> {
+				if (isWeak) {
+					EntityUtils.applySlow(mPlugin, duration, mAmplifier, mob);
 				}
-				if (isBleed) {
-					EntityUtils.applyBleed(mPlugin, duration, mAmplifier, e);
+				// We've already applied bleed
+			},
+			player -> mPlugin.mEffectManager.addEffect(player, STRENGTH_NAME, new PercentDamageDealt(duration, mAmplifier, AFFECTED_DAMAGE_TYPES))));
+
+		effects.add(effect(mTarget.getFireTicks() > 0,
+			mob -> EntityUtils.setFireTicksIfLower(duration, mob),
+			player -> PotionUtils.applyPotion(mPlayer, player, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, duration, 0, false, true))));
+
+		effects.add(effect(EntityUtils.isParalyzed(mPlugin, mTarget),
+			mob -> mPlugin.mEffectManager.addEffect(mob, PARA_NAME, new Paralyze(duration, mPlugin)),
+			player -> mPlugin.mEffectManager.addEffect(player, KBR_NAME, new PercentKnockbackResist(duration, mAmplifier, KBR_NAME))));
+
+		effects.add(effect(EntityUtils.isVulnerable(mPlugin, mTarget),
+			mob -> EntityUtils.applyVulnerability(mPlugin, duration, mAmplifier, mob),
+			player -> mPlugin.mEffectManager.addEffect(player, DEF_NAME, new PercentDamageReceived(duration, -mAmplifier))));
+
+		effects.add(effect(mTarget.hasPotionEffect(PotionEffectType.POISON) || mTarget.hasPotionEffect(PotionEffectType.WITHER) || EntityUtils.hasDamageOverTime(mPlugin, mTarget),
+			mob -> mPlugin.mEffectManager.addEffect(mob, DOT_NAME, new CustomDamageOverTime(duration, 1, 20, mPlayer, null)),
+			player -> {
+				if (player == mPlayer) {
+					// 1 / 60 = 1/60th HP every tick, 60 ticks in 3 second interval
+					// We do this because constant re-application doesn't actually do anything
+					PlayerUtils.healPlayer(mPlugin, player, 1.0d / 60.0d, player);
 				}
-			} else {
-				mPlugin.mEffectManager.addEffect(e, STRENGTH_NAME, new PercentDamageDealt(duration, mAmplifier, AFFECTED_DAMAGE_TYPES));
-			}
-		}
+				mPlugin.mEffectManager.addEffect(player, HEAL_NAME, new CustomRegeneration(duration, 0.333, mPlayer, mPlugin));
+			}));
 
-		if (mTarget.getFireTicks() > 0) {
-			if (isHostile) {
-				e.setFireTicks(Math.max(duration, e.getFireTicks()));
-			} else {
-				PotionUtils.applyPotion(mPlayer, e, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, duration, 0, false, true));
-			}
-		}
+		effects.add(effect(mTarget.hasPotionEffect(PotionEffectType.HUNGER),
+			mob -> PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true)),
+			player -> mPlugin.mEffectManager.addEffect(player, HEAL_RATE_NAME, new PercentHeal(duration, mAmplifier))));
 
-		if (EntityUtils.isParalyzed(mPlugin, mTarget)) {
-			if (isHostile) {
-				mPlugin.mEffectManager.addEffect(e, PARA_NAME, new Paralyze(duration, mPlugin));
-			} else {
-				mPlugin.mEffectManager.addEffect(e, KBR_NAME, new PercentKnockbackResist(duration, mAmplifier, KBR_NAME));
-			}
-		}
+		effects.forEach(effect -> effect.accept(hostiles, players));
+	}
 
-		if (EntityUtils.isVulnerable(mPlugin, mTarget)) {
-			if (isHostile) {
-				EntityUtils.applyVulnerability(mPlugin, duration, mAmplifier, e);
-			} else {
-				mPlugin.mEffectManager.addEffect(e, DEF_NAME, new PercentDamageReceived(duration, -mAmplifier));
-			}
+	private BiConsumer<List<LivingEntity>, List<Player>> effect(boolean test, Consumer<LivingEntity> hostileAction, Consumer<Player> playerAction) {
+		if (test) {
+			return (hostiles, players) -> {
+				hostiles.forEach(hostileAction);
+				players.forEach(playerAction);
+			};
 		}
-
-		if (mTarget.hasPotionEffect(PotionEffectType.POISON) || mTarget.hasPotionEffect(PotionEffectType.WITHER)
-				|| EntityUtils.hasDamageOverTime(mPlugin, mTarget)) {
-			if (isHostile) {
-				mPlugin.mEffectManager.addEffect(e, DOT_NAME, new CustomDamageOverTime(duration, 1, 20, mPlayer, null));
-			} else if (mPlayer != e) {
-				mPlugin.mEffectManager.addEffect(e, HEAL_NAME, new CustomRegeneration(duration, 0.333, mPlugin));
-			} else {
-				// 1 / 60 = 1/60th HP every tick, 60 ticks in 3 second interval
-				// We do this because constant re-application doesn't actually do anything
-				PlayerUtils.healPlayer(mPlugin, mPlayer, 1.0d / 60.0d, mPlayer);
-				// This technically only starts to tick down after cast ends
-				mPlugin.mEffectManager.addEffect(e, HEAL_NAME, new CustomRegeneration(duration, 0.333, mPlugin));
-			}
-		}
-
-		if (mTarget.hasPotionEffect(PotionEffectType.HUNGER)) {
-			if (isHostile) {
-				PotionUtils.applyPotion(mPlayer, e, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true));
-			} else {
-				mPlugin.mEffectManager.addEffect(e, HEAL_RATE_NAME, new PercentHeal(duration, mAmplifier));
-			}
-		}
+		return (hostiles, players) -> { };
 	}
 
 	@Override
