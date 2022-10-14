@@ -4,8 +4,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.potion.PotionManager;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.Collections;
+import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -34,15 +36,27 @@ public class RegionScalingDamageDealt implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (!ServerProperties.getClassSpecializationsEnabled()) {
-			event.setDamage(event.getDamage() * DAMAGE_DEALT_MULTIPLIER);
-		}
+		event.setDamage(event.getDamage() * DAMAGE_DEALT_MULTIPLIER);
 	}
 
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
-		if (!ServerProperties.getClassSpecializationsEnabled()) {
-			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 20, MINING_FATIGUE_AMPLIFIER, false, false));
+		plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 20, MINING_FATIGUE_AMPLIFIER, false, false));
+	}
+
+	@Override
+	public void onEquipmentUpdate(Plugin plugin, Player player) {
+		if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.REGION_SCALING_DAMAGE_DEALT) <= 0) {
+			List<PotionUtils.PotionInfo> potionInfos = plugin.mPotionManager.getAllPotionInfos(player).getOrDefault(PotionManager.PotionID.ITEM, Collections.emptyList());
+			for (PotionUtils.PotionInfo potionInfo : potionInfos) {
+				if (PotionEffectType.SLOW_DIGGING.equals(potionInfo.mType)
+					    && potionInfo.mAmplifier == MINING_FATIGUE_AMPLIFIER
+					    && potionInfo.mDuration <= 20) {
+					potionInfo.mDuration = 0;
+					plugin.mPotionManager.updatePotionStatus(player, 0);
+					return;
+				}
+			}
 		}
 	}
 }
