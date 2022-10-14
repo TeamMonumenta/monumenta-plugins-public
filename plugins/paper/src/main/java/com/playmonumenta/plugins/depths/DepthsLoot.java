@@ -25,6 +25,7 @@ public class DepthsLoot {
 	public static final NamespacedKey GEODE_KEY = NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode");
 	public static final NamespacedKey POME_KEY = NamespacedKeyUtils.fromString("epic:r2/delves/items/twisted_pome");
 	public static final NamespacedKey TROPHY_KEY = NamespacedKeyUtils.fromString("epic:r2/delves/trophies/depths");
+	public static final NamespacedKey HALLOWEEN_KEY = NamespacedKey.fromString("epic:event/halloween2019/creepers_delight");
 
 	public static final int RELIC_CHANCE = 250;
 
@@ -115,6 +116,24 @@ public class DepthsLoot {
 			if (roll < treasureScore) {
 				//Drop an extra geode
 				for (ItemStack item : loot) {
+					loc.getWorld().dropItem(loc, item);
+				}
+			}
+		}
+
+		//roll halloween loot
+		LootTable halloweenTable = Bukkit.getLootTable(HALLOWEEN_KEY);
+		Collection<ItemStack> lootAgain = halloweenTable.populateLoot(FastUtils.RANDOM, context);
+		if (!lootAgain.isEmpty()) {
+			for (int i = treasureScore; i >= 20; i -= 20) {
+				for (ItemStack item : lootAgain) {
+					loc.getWorld().dropItem(loc, item);
+				}
+			}
+			//Get num from 0-19
+			if (r.nextInt(20) == 0) {
+				//Drop an extra candy
+				for (ItemStack item : lootAgain) {
 					loc.getWorld().dropItem(loc, item);
 				}
 			}
