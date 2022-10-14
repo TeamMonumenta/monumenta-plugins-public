@@ -6,8 +6,6 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import java.util.HashSet;
-import java.util.UUID;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -18,8 +16,6 @@ public class RegionScalingDamageDealt implements Enchantment {
 	public static final double DAMAGE_DEALT_MULTIPLIER = 0.5;
 
 	public static final int MINING_FATIGUE_AMPLIFIER = 0;
-
-	private static HashSet<UUID> mFatiguePlayers = new HashSet<>();
 
 	@Override
 	public String getName() {
@@ -44,14 +40,9 @@ public class RegionScalingDamageDealt implements Enchantment {
 	}
 
 	@Override
-	public void onEquipmentUpdate(Plugin plugin, Player player) {
+	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		if (!ServerProperties.getClassSpecializationsEnabled()) {
-			if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.REGION_SCALING_DAMAGE_DEALT) > 0) {
-				mFatiguePlayers.add(player.getUniqueId());
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 10000000, MINING_FATIGUE_AMPLIFIER, false, false));
-			} else if (mFatiguePlayers.remove(player.getUniqueId())) {
-				plugin.mPotionManager.removePotion(player, PotionManager.PotionID.ITEM, PotionEffectType.SLOW_DIGGING, MINING_FATIGUE_AMPLIFIER);
-			}
+			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 20, MINING_FATIGUE_AMPLIFIER, false, false));
 		}
 	}
 }
