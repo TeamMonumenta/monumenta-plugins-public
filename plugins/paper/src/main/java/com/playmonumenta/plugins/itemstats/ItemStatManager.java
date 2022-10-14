@@ -292,11 +292,13 @@ public class ItemStatManager implements Listener {
 					newStats.add(stat, (newArmorAddStats.get(stat) + newMainhandAddStats.get(stat)) * (1 + newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat)));
 				}
 				if (stat instanceof CritScaling || stat instanceof AntiCritScaling ||
-					stat instanceof StrengthApply || stat instanceof StrengthCancel ||
-					stat instanceof SKTQuestDamageDealt) {
+					    stat instanceof StrengthApply || stat instanceof StrengthCancel ||
+					    stat instanceof SKTQuestDamageDealt) {
 					newStats.add(stat, 1);
 				}
-				if (stat instanceof RegionScalingDamageDealt && (ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.ISLES || ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.RING)) {
+				if (stat instanceof RegionScalingDamageDealt
+					    && !ServerProperties.getClassSpecializationsEnabled()
+					    && (ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.ISLES || ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.RING)) {
 					newStats.add(stat, 1);
 				}
 
