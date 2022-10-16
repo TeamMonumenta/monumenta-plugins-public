@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.effects;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.StringUtils;
+import org.bukkit.ChatColor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class AbsorptionSickness extends Effect {
@@ -54,7 +55,7 @@ public class AbsorptionSickness extends Effect {
 
 	@Override
 	public @Nullable String getSpecificDisplay() {
-		return StringUtils.to2DP(mAmount * 100) + "% Absorption Sickness";
+		return ChatColor.RED + StringUtils.to2DP(mAmount * 100) + "% Absorption Sickness";
 	}
 
 	@Override
