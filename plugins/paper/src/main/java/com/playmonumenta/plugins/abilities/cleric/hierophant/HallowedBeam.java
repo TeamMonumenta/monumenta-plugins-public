@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -17,7 +18,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -275,12 +275,11 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 	public void applyRecoil() {
 		ItemStack item = mPlayer.getInventory().getItemInMainHand();
-		if (ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RECOIL) > 0) {
+		double recoil = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RECOIL);
+		if (recoil > 0) {
 			if (!EntityUtils.isRecoilDisable(mPlugin, mPlayer, mMaxCharges)) {
 				if (!mPlayer.isSneaking() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
-					Vector velocity = NmsUtils.getVersionAdapter().getActualDirection(mPlayer).multiply(-0.5 * Math.sqrt(ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RECOIL)));
-					velocity.setY(Math.max(0.1, velocity.getY()));
-					mPlayer.setVelocity(velocity);
+					Recoil.applyRecoil(mPlayer, recoil);
 				}
 			}
 			EntityUtils.applyRecoilDisable(mPlugin, 9999, (int) EntityUtils.getRecoilDisableAmount(mPlugin, mPlayer) + 1, mPlayer);

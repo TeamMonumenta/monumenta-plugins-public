@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -20,6 +21,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
@@ -117,6 +119,19 @@ public class AlchemicalArtillery extends PotionAbility {
 
 			pot.setMetadata(ARTILLERY_POTION_TAG, new FixedMetadataValue(mPlugin, bownus));
 
+			ItemStack item = mPlayer.getInventory().getItemInMainHand();
+			double recoil = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RECOIL);
+			if (recoil > 0) {
+				if (mPlayer.isSneaking()) {
+					Material type = item.getType();
+					if (mPlayer.getCooldown(type) < 10) {
+						mPlayer.setCooldown(type, 10);
+					}
+				} else if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
+					Recoil.applyRecoil(mPlayer, recoil);
+				}
+			}
+
 			return false;
 		}
 
@@ -135,7 +150,7 @@ public class AlchemicalArtillery extends PotionAbility {
 			return;
 		}
 
-		if (ItemUtils.isBowOrTrident(mPlayer.getInventory().getItemInMainHand())) {
+		if (ItemUtils.isProjectileWeapon(mPlayer.getInventory().getItemInMainHand())) {
 			mActive = ScoreboardUtils.toggleTag(mPlayer, ACTIVE_TAG);
 			String active;
 			if (mActive) {

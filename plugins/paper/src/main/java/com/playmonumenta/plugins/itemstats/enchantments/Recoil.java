@@ -38,10 +38,13 @@ public class Recoil implements Enchantment {
 				player.setCooldown(type, 10);
 			}
 		} else if (!ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && !proj.getScoreboardTags().contains("NoRecoil")) {
-			Vector velocity = NmsUtils.getVersionAdapter().getActualDirection(player).multiply(-0.5 * Math.sqrt(level));
-			velocity.setY(Math.max(0.1, velocity.getY()));
-			player.setVelocity(velocity);
+			applyRecoil(player, level);
 		}
 	}
 
+	public static void applyRecoil(Player player, double level) {
+		Vector velocity = NmsUtils.getVersionAdapter().getActualDirection(player).multiply(-0.5 * Math.sqrt(level));
+		velocity.setY(Math.max(0.1, velocity.getY()));
+		player.setVelocity(velocity);
+	}
 }
