@@ -183,6 +183,7 @@ public class StringUtils {
 					case MELEE, MELEE_ENCH, MELEE_SKILL -> typeString = "Melee";
 					case PROJECTILE, PROJECTILE_SKILL -> typeString = "Projectile";
 					case MAGIC -> typeString = "Magic";
+					case FIRE -> typeString = "Fire";
 					// We don't care about other types for now
 					default -> typeString = null;
 				}
