@@ -23,6 +23,7 @@ public class CharmsCommand extends GenericCommand {
 	public static void register(Plugin plugin) {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.charm");
+		CommandPermission guiPerms = CommandPermission.fromString("monumenta.command.charm.gui");
 
 		//ADD COMMAND
 
@@ -128,12 +129,13 @@ public class CharmsCommand extends GenericCommand {
 		}).register();
 
 		//CHARM GUI COMMAND
+		//Usable by all players
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("gui"));
 
 		new CommandAPICommand("charm")
-			.withPermission(perms)
+			.withPermission(guiPerms)
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
 				new CharmsGUI(player).openInventory(player, plugin);
@@ -142,12 +144,41 @@ public class CharmsCommand extends GenericCommand {
 		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
 
 		new CommandAPICommand("charm")
-		.withPermission(perms)
+		.withPermission(guiPerms)
 		.withArguments(arguments)
 		.executes((sender, args) -> {
 			Player player = (Player) args[0];
-			new CharmsGUI(player).openInventory(player, plugin);
+			Player viewer = player;
+			if (sender instanceof Player s) {
+				viewer = s;
+			}
+			new CharmsGUI(viewer, player).openInventory(viewer, plugin);
 		}).register();
+
+		//These are identical, maybe just a bit easier to use
+
+		arguments.clear();
+
+		new CommandAPICommand("viewcharms")
+			.withAliases("vc")
+			.withPermission(guiPerms)
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				new CharmsGUI(player).openInventory(player, plugin);
+			}).register();
+
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+
+		new CommandAPICommand("viewcharms")
+			.withAliases("vc")
+			.withPermission(guiPerms)
+			.withArguments(arguments)
+			.executesPlayer((sender, args) -> {
+				Player player = (Player) args[0];
+				new CharmsGUI(sender, player).openInventory(sender, plugin);
+			}).register();
+
+		// CHARM SEARCH COMMAND
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("search"));

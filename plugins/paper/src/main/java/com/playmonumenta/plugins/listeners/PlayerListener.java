@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Constants.Colors;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
@@ -12,7 +13,6 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.portals.PortalManager;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.protocollib.VirtualItemsReplacer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
@@ -494,14 +494,16 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
+		ItemStack item = event.getCurrentItem();
+
 		// If item contains curse of ephemerality, prevent from putting in other inventories
 		// Checks for player inventory unless it's a shift click
 		if (
 			// Prevent shift-clicking an ephemeral item from your inventory to something else
 			(
 				(event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT)
-					&& event.getCurrentItem() != null
-					&& CurseOfEphemerality.isEphemeral(event.getCurrentItem())
+					&& item != null
+					&& CurseOfEphemerality.isEphemeral(item)
 					&& event.getClickedInventory() instanceof PlayerInventory
 			)
 				// Prevent clicking an ephemeral item from your cursor down into something else
@@ -530,6 +532,11 @@ public class PlayerListener implements Listener {
 
 		if (!mPlugin.mItemOverrides.inventoryClickInteraction(mPlugin, player, event)) {
 			event.setCancelled(true);
+		}
+
+		// If right clicking charm, open GUI
+		if (event.getClick() == ClickType.RIGHT && ItemStatUtils.isCharm(item)) {
+			new CharmsGUI(player).openInventory(player, mPlugin);
 		}
 	}
 

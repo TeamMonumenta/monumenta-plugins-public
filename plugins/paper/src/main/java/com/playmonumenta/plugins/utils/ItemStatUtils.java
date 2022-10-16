@@ -2154,7 +2154,7 @@ public class ItemStatUtils {
 					}
 				}
 
-				if (getTier(item) == Tier.CHARM || getTier(item) == Tier.RARE_CHARM || getTier(item) == Tier.EPIC_CHARM) {
+				if (isCharm(item)) {
 					int charmPower = getCharmPower(item);
 					if (charmPower > 0) {
 						String starString = "";
@@ -2303,7 +2303,7 @@ public class ItemStatUtils {
 		}
 
 		NBTList<String> charmLore = monumenta.getStringList(CHARM_KEY);
-		if (charmLore != null && (getTier(item) == Tier.CHARM || getTier(item) == Tier.RARE_CHARM || getTier(item) == Tier.EPIC_CHARM)) {
+		if (charmLore != null && isCharm(item)) {
 			lore.add(Component.empty());
 			lore.add(Component.text("When in Charm Slot:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 			for (String serializedLine : charmLore) {
@@ -3071,6 +3071,14 @@ public class ItemStatUtils {
 
 	public static boolean isMaterial(@Nullable ItemStack item) {
 		return item != null && getEnchantmentLevel(item, EnchantmentType.MATERIAL) > 0;
+	}
+
+	public static boolean isCharm(@Nullable ItemStack item) {
+		Tier tier = getTier(item);
+		if (tier == Tier.CHARM || tier == Tier.RARE_CHARM || tier == Tier.EPIC_CHARM) {
+			return true;
+		}
+		return false;
 	}
 
 	// Returns true if the item has mainhand attack damage OR doesn't have mainhand projectile damage (i.e. any ranged weapon that is not also a melee weapon)
