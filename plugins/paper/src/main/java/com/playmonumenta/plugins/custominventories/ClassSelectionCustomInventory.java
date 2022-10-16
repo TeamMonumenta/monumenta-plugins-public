@@ -48,7 +48,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	private static final String ABILITY_SKILLCOUNT = "Skill";
 	private static final String SPEC_SKILLCOUNT = "SkillSpec";
 
-	private static final String R3_UNLOCK_SCOREBOARD = "AccessEnhance";
+	public static final String R3_UNLOCK_SCOREBOARD = "R3Access";
 	private static final int R3_UNLOCK_SCORE = 1;
 	private static final String R3_ENHANCE_CURRENT = "Enhancements";
 
