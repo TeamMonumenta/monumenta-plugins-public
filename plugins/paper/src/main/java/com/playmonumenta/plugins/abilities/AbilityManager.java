@@ -706,16 +706,21 @@ public class AbilityManager {
 	}
 
 	public void entityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
-		conditionalCast(player, (ability) -> ability.entityDeathEvent(event, shouldGenDrops));
+		if (!event.getEntity().getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+			conditionalCast(player, (ability) -> ability.entityDeathEvent(event, shouldGenDrops));
+		}
 	}
 
 	public void entityDeathRadiusEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
-		conditionalCast(player, (ability) -> {
-			Location center = ability.entityDeathRadiusCenterLocation();
-			if (center != null && event.getEntity().getLocation().distance(center) <= ability.entityDeathRadius()) {
-				ability.entityDeathRadiusEvent(event, shouldGenDrops);
-			}
-		});
+		LivingEntity entity = event.getEntity();
+		if (!entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+			conditionalCast(player, (ability) -> {
+				Location center = ability.entityDeathRadiusCenterLocation();
+				if (center != null && entity.getLocation().distance(center) <= ability.entityDeathRadius()) {
+					ability.entityDeathRadiusEvent(event, shouldGenDrops);
+				}
+			});
+		}
 	}
 
 	public void projectileHitEvent(Player player, ProjectileHitEvent event, Projectile proj) {
