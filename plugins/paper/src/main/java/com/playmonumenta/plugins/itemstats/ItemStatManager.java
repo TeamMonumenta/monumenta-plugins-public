@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageDealt;
+import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
@@ -239,9 +240,6 @@ public class ItemStatManager implements Listener {
 							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN) {
 								newArmorAddStats.add(stat, scaleRegion ? 1 : scaleRegionLarge ? 2 : 0);
 							}
-							if (enchantment.getEnchantmentType() == EnchantmentType.SKT_DAMAGE_TAKEN) {
-								newArmorAddStats.add(stat, 1);
-							}
 						} else if (stat instanceof Infusion infusion) {
 							double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : infusion.getInfusionType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
 							multiplier = infusion.getInfusionType().isRegionScaled() && Shattered.isShattered(item) ? 0 : multiplier;
@@ -304,7 +302,7 @@ public class ItemStatManager implements Listener {
 				}
 				if (stat instanceof CritScaling || stat instanceof AntiCritScaling ||
 					    stat instanceof StrengthApply || stat instanceof StrengthCancel ||
-					    stat instanceof SKTQuestDamageDealt) {
+					    stat instanceof SKTQuestDamageDealt || stat instanceof SKTQuestDamageTaken) {
 					newStats.add(stat, 1);
 				}
 			}

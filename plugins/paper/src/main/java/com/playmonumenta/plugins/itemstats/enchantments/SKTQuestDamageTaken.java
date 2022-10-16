@@ -26,7 +26,7 @@ public class SKTQuestDamageTaken implements Enchantment {
 
 	@Override
 	public double getPriorityAmount() {
-		return 4999; // second to last damage taken modifier, just before second wind
+		return 0;
 	}
 
 	@Override
