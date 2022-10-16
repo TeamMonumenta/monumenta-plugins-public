@@ -109,6 +109,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.ArcaneThrust;
 import com.playmonumenta.plugins.itemstats.enchantments.Decay;
 import com.playmonumenta.plugins.itemstats.enchantments.Duelist;
 import com.playmonumenta.plugins.itemstats.enchantments.Eruption;
+import com.playmonumenta.plugins.itemstats.enchantments.Explosive;
 import com.playmonumenta.plugins.itemstats.enchantments.HexEater;
 import com.playmonumenta.plugins.itemstats.enchantments.IceAspect;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
@@ -232,6 +233,9 @@ public class CharmManager {
 			Abyssal.CHARM_DAMAGE,
 			Eruption.CHARM_DAMAGE,
 			Eruption.CHARM_RADIUS,
+			Explosive.CHARM_DAMAGE,
+			Explosive.CHARM_RADIUS,
+
 			// Classes
 			// Mage
 			ManaLance.CHARM_DAMAGE,

@@ -4,8 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -14,7 +14,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -35,18 +34,14 @@ public class WindAspect implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		DamageEvent.DamageType type = event.getType();
-		if (((type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageEvent.DamageType.PROJECTILE) && !EntityUtils.isBoss(enemy) && !enemy.getScoreboardTags().contains("boss_ccimmune")) {
-			PotionUtils.applyPotion(player, enemy, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
-			launch(plugin, enemy, level);
+		if (AbilityUtils.isAspectTriggeringEvent(event, player) && !EntityUtils.isBoss(enemy) && !enemy.getScoreboardTags().contains("boss_ccimmune")) {
+			launch(plugin, player, enemy, level * (event.getType() == DamageEvent.DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
 		}
 	}
 
-	public static void launch(Plugin plugin, Entity e, double level) {
-		double kbr = 0;
-		if (e instanceof LivingEntity le) {
-			kbr = EntityUtils.getAttributeOrDefault(le, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
-		}
+	public static void launch(Plugin plugin, Player player, LivingEntity e, double level) {
+		PotionUtils.applyPotion(player, e, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
+		double kbr = EntityUtils.getAttributeOrDefault(e, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
 
 		if (kbr >= 1) {
 			return;

@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
-import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
@@ -114,6 +113,14 @@ public class ItemStatManager implements Listener {
 			public double get(ItemStat stat, double defaultValue) {
 				Double value = mMap.get(stat);
 				return value == null ? defaultValue : value;
+			}
+
+			public double get(EnchantmentType type) {
+				ItemStat stat = type.getItemStat();
+				if (stat == null) {
+					return 0;
+				}
+				return get(stat);
 			}
 
 			@Override

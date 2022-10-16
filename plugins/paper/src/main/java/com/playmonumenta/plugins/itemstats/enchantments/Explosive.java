@@ -1,18 +1,18 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Color;
@@ -21,24 +21,23 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
-
-import static com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect.CHARM_STUN_CHANCE;
 
 public class Explosive implements Enchantment {
 	public static final int RADIUS = 4;
-	public static final int HITBOX_LENGTH = 2;
 	public static final double DAMAGE_PERCENTAGE_PER_LEVEL = 0.1;
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
+
+	public static final String CHARM_DAMAGE = "Explosive Damage";
+	public static final String CHARM_RADIUS = "Explosive Radius";
 
 	@Override
 	public String getName() {
@@ -67,50 +66,41 @@ public class Explosive implements Enchantment {
 			return;
 		}
 
+		ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(projectile);
+		if (playerItemStats == null) {
+			return;
+		}
+
+		ItemStatManager.PlayerItemStats.ItemStatsMap itemStatsMap = playerItemStats.getItemStats();
+
 		//Get enchant levels on weapon
-		int fire = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.FIRE_ASPECT);
-		int ice = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ICE_ASPECT);
-		int thunder = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.THUNDER_ASPECT);
-		int decay = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.DECAY);
-		int bleed = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.BLEEDING);
-		int earth = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.EARTH_ASPECT);
-		int wind = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT);
+		int fire = (int) itemStatsMap.get(EnchantmentType.FIRE_ASPECT);
+		int ice = (int) itemStatsMap.get(EnchantmentType.ICE_ASPECT);
+		int thunder = (int) itemStatsMap.get(EnchantmentType.THUNDER_ASPECT);
+		int decay = (int) itemStatsMap.get(EnchantmentType.DECAY);
+		int bleed = (int) itemStatsMap.get(EnchantmentType.BLEEDING);
+		//int earth = (int) itemStatsMap.get(EnchantmentType.EARTH_ASPECT);
+		//int wind = (int) itemStatsMap.get(EnchantmentType.WIND_ASPECT);
 
 		Location location = EntityUtils.getProjectileHitLocation(event);
 
-		particles(location, player);
+		double radius = CharmManager.getRadius(player, CHARM_RADIUS, RADIUS);
+		particles(location, player, radius);
 
 		// Using bounding box because otherwise it is a bit inconsistent.
-		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(location, RADIUS);
-		BoundingBox box = BoundingBox.of(location, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
+		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(location, radius);
+		BoundingBox box = BoundingBox.of(location, radius / 2, radius / 2, radius / 2);
 
+		Entity hitEntity = event.getHitEntity();
+		if (hitEntity instanceof LivingEntity le) {
+			nearbyMobs.remove(le);
+		}
+
+		double rawDamage = ItemStatUtils.getAttributeAmount(player.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
+		double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * DAMAGE_PERCENTAGE_PER_LEVEL * rawDamage);
 		for (LivingEntity mob : nearbyMobs) {
 			if (mob.getBoundingBox().overlaps(box)) {
-				double rawDamage = ItemStatUtils.getAttributeAmount(player.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
-				DamageUtils.damage(player, mob, DamageEvent.DamageType.PROJECTILE, level * DAMAGE_PERCENTAGE_PER_LEVEL * rawDamage, null, true);
-
-				if (fire > 0) {
-					EntityUtils.applyFire(plugin, 80 * fire, mob, player);
-				}
-				if (ice > 0) {
-					EntityUtils.applySlow(plugin, IceAspect.ICE_ASPECT_DURATION + CharmManager.getExtraDuration(player, IceAspect.CHARM_DURATION), (ice * 0.1) + CharmManager.getLevelPercent(player, IceAspect.CHARM_SLOW), mob);
-				}
-				if (thunder > 0 && FastUtils.RANDOM.nextDouble() < thunder * ThunderAspect.CHANCE + CharmManager.getLevelPercent(player, CHARM_STUN_CHANCE) && !EntityUtils.isElite(mob) && !(EntityUtils.isBoss(mob) && !mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
-					EntityUtils.applyStun(plugin, ThunderAspect.DURATION_PROJ, mob);
-				}
-				if (decay > 0) {
-					Decay.apply(plugin, mob, Decay.DURATION, decay, player);
-				}
-				if (bleed > 0) {
-					EntityUtils.applyBleed(plugin, Bleeding.DURATION, bleed * Bleeding.AMOUNT_PER_LEVEL, mob);
-				}
-				if (earth > 0) {
-					EarthAspect.apply(plugin, player, earth);
-				}
-				if (wind > 0) {
-					PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
-					WindAspect.launch(plugin, mob, wind);
-				}
+				DamageUtils.damage(player, mob, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, ClassAbility.EXPLOSIVE, playerItemStats), damage, true, true, false);
 			}
 		}
 
@@ -141,11 +131,14 @@ public class Explosive implements Enchantment {
 		projectile.remove();
 	}
 
-	public static void particles(Location loc, Player player) {
+	public static void particles(Location loc, Player player, double radius) {
 		World world = loc.getWorld();
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0.5, 0.5, 0.5, 0.25);
-		world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 10, 0.5, 0.5, 0.5, 0.25);
-		world.spawnParticle(Particle.FLAME, loc, 10, 0.5, 0.5, 0.5, 0.25);
+		double ratio = radius / RADIUS;
+		int count = (int) (10 * ratio * ratio);
+		double offset = 0.5 * ratio;
+		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, count, offset, offset, offset, 0.25);
+		world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, count, offset, offset, offset, 0.25);
+		world.spawnParticle(Particle.FLAME, loc, count, offset, offset, offset, 0.25);
 		player.playSound(player.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1.0f, 1.5f);
 	}
 }

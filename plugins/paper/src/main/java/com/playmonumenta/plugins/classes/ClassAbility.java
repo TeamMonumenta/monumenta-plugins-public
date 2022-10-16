@@ -24,6 +24,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public enum ClassAbility {
 	// [Mage]
 	ARCANE_STRIKE("Arcane Strike"),
+	ARCANE_STRIKE_ENHANCED("Arcane Strike"), // special case for aspect enchants
 	ELEMENTAL_ARROWS(ElementalArrows.NAME),
 	ELEMENTAL_ARROWS_FIRE("Fire Elemental Arrows"),
 	ELEMENTAL_ARROWS_ICE("Ice Elemental Arrows"),
@@ -118,7 +119,7 @@ public enum ClassAbility {
 	// [Warrior]
 	BRUTE_FORCE("Brute Force"),
 	COUNTER_STRIKE("Counter Strike"),
-	COUNTER_STRIKE_AOE("Counter Strike"),
+	COUNTER_STRIKE_AOE("Counter Strike"), // special case for glorious battle
 	DEFENSIVE_LINE("Defensive Line"),
 	RIPOSTE("Riposte"),
 	SHIELD_BASH("Shield Bash"),
@@ -206,7 +207,13 @@ public enum ClassAbility {
 	EARTHEN_WRATH("Earthen Wrath"),
 	EARTHQUAKE("Earthquake"),
 	STONE_SKIN("Stone Skin"),
-	TAUNT("Taunt");
+	TAUNT("Taunt"),
+
+	// Fake class abilities for some enchantments
+	// Used to trigger other events
+	ERUPTION("Eruption"),
+	QUAKE("Quake"),
+	EXPLOSIVE("Explosive");
 
 	private final String mName;
 

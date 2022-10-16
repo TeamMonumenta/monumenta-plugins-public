@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
@@ -8,11 +9,9 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Color;
@@ -23,8 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 
 public class Quake implements Enchantment {
@@ -82,33 +79,11 @@ public class Quake implements Enchantment {
 			int thunder = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.THUNDER_ASPECT);
 			int decay = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.DECAY);
 			int bleed = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.BLEEDING);
-			int wind = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT);
-			/*
-			 *Damage any mobs in the area
-			 *Need to cast it because the methods only take integers
-			 */
+			//int wind = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT);
+
+			double finalDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, damage * DAMAGE_MODIFIER_PER_LEVEL * level);
 			for (LivingEntity mob : mobs) {
-				double finalDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, damage * DAMAGE_MODIFIER_PER_LEVEL * level);
-				DamageUtils.damage(player, mob, DamageType.OTHER, finalDamage, null, false, true);
-				if (fire > 0) {
-					EntityUtils.applyFire(plugin, 80 * fire, mob, player);
-				}
-				if (ice > 0) {
-					EntityUtils.applySlow(plugin, IceAspect.ICE_ASPECT_DURATION + CharmManager.getExtraDuration(player, IceAspect.CHARM_DURATION), (ice * 0.1) + CharmManager.getLevelPercent(player, IceAspect.CHARM_SLOW), mob);
-				}
-				if (thunder > 0 && FastUtils.RANDOM.nextDouble() < thunder * ThunderAspect.CHANCE) {
-					EntityUtils.applyStun(plugin, ThunderAspect.DURATION_MELEE, mob);
-				}
-				if (decay > 0) {
-					Decay.apply(plugin, mob, Decay.DURATION, decay, player);
-				}
-				if (bleed > 0) {
-					EntityUtils.applyBleed(plugin, Bleeding.DURATION, bleed * Bleeding.AMOUNT_PER_LEVEL, mob);
-				}
-				if (wind > 0) {
-					PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
-					WindAspect.launch(plugin, mob, wind);
-				}
+				DamageUtils.damage(player, mob, DamageType.OTHER, finalDamage, ClassAbility.QUAKE, false, true);
 			}
 
 			if (fire + ice + thunder + decay + bleed == 0) {

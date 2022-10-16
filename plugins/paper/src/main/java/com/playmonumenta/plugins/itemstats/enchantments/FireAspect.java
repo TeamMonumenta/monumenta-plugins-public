@@ -6,8 +6,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import java.util.EnumSet;
@@ -45,7 +45,7 @@ public class FireAspect implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		DamageType type = event.getType();
-		if ((type == DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
+		if (AbilityUtils.isAspectTriggeringEvent(event, player)) {
 			int duration = (int) (FIRE_ASPECT_DURATION * level * (type == DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
 			ItemStatManager.PlayerItemStats playerItemStats;
 			if (event.getDamager() instanceof Projectile proj) {

@@ -64,6 +64,7 @@ public class AstralOmen extends Ability {
 		mElementClassification = new HashMap<>();
 		// Arcane Types
 		mElementClassification.put(ClassAbility.ARCANE_STRIKE, Type.ARCANE);
+		mElementClassification.put(ClassAbility.ARCANE_STRIKE_ENHANCED, Type.ARCANE);
 		mElementClassification.put(ClassAbility.MANA_LANCE, Type.ARCANE);
 		mElementClassification.put(ClassAbility.COSMIC_MOONBLADE, Type.ARCANE);
 		// Fire Types

@@ -3,16 +3,19 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -615,5 +618,23 @@ public class AbilityUtils {
 			"Skill", ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0),
 			"Spec", ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0),
 			"Enhance", ScoreboardUtils.getScoreboardValue(player, TOTAL_ENHANCE).orElse(0));
+	}
+
+	private static final EnumSet<ClassAbility> TRIGGERS_ASPECTS = EnumSet.of(
+		ClassAbility.ERUPTION,
+		ClassAbility.QUAKE,
+		ClassAbility.EXPLOSIVE,
+		ClassAbility.ARCANE_STRIKE_ENHANCED,
+		ClassAbility.PREDATOR_STRIKE
+	);
+
+	public static boolean isAspectTriggeringEvent(DamageEvent event, Player player) {
+		DamageEvent.DamageType type = event.getType();
+
+		// Is:
+		// Melee from a weapon that is not only a projectile weapon
+		// Projectile
+		// One of a few "class abilities" that trigger aspects (i.e. Eruption, Quake)
+		return (type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageEvent.DamageType.PROJECTILE || TRIGGERS_ASPECTS.contains(event.getAbility());
 	}
 }

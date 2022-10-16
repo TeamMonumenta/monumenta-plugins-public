@@ -6,8 +6,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -28,7 +28,6 @@ public class IceAspect implements Enchantment {
 	public static final double SLOW_PER_LEVEL = 0.1;
 	public static final float BONUS_DAMAGE = 1.0f;
 	private static final Particle.DustOptions COLOR_LIGHT_BLUE = new Particle.DustOptions(Color.fromRGB(85, 170, 255), 0.75f);
-	public static final String LEVEL_METAKEY = "IceAspectLevelMetakey";
 	public static final String CHARM_SLOW = "Ice Aspect Slow Amplifier";
 	public static final String CHARM_DURATION = "Ice Aspect Slow Duration";
 
@@ -55,7 +54,7 @@ public class IceAspect implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		DamageType type = event.getType();
-		if ((type == DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
+		if (AbilityUtils.isAspectTriggeringEvent(event, player)) {
 			int duration = (int) (ICE_ASPECT_DURATION * (type == DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
 			if (type == DamageType.PROJECTILE) {
 				double widthDelta = PartialParticle.getWidthDelta(enemy);
@@ -138,9 +137,5 @@ public class IceAspect implements Enchantment {
 		if (particles) {
 			player.getWorld().spawnParticle(Particle.SNOWBALL, enemy.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
 		}
-	}
-
-	public static float getBonusDamage(LivingEntity enemy) {
-		return enemy instanceof Blaze ? BONUS_DAMAGE : 0;
 	}
 }

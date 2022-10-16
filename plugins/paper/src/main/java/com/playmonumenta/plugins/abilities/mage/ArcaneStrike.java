@@ -8,22 +8,14 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.itemstats.enchantments.Bleeding;
-import com.playmonumenta.plugins.itemstats.enchantments.Decay;
-import com.playmonumenta.plugins.itemstats.enchantments.FireAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.IceAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.WindAspect;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
@@ -35,7 +27,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -105,42 +96,15 @@ public class ArcaneStrike extends Ability {
 
 				float dmg = SpellPower.getSpellDamage(mPlugin, mPlayer, preSpellPowerDamage);
 
-				if (isEnhanced() && mob != enemy) {
-					ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-					int fire = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.FIRE_ASPECT);
-					if (fire > 0) {
-						FireAspect.apply(mPlugin, mPlayer, fire * FireAspect.FIRE_ASPECT_DURATION, mob);
-					}
-					int ice = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.ICE_ASPECT);
-					if (ice > 0) {
-						IceAspect.apply(mPlugin, mPlayer, ice, IceAspect.ICE_ASPECT_DURATION, mob, true);
-						dmg += IceAspect.getBonusDamage(mob);
-					}
-					int thunder = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.THUNDER_ASPECT);
-					if (thunder > 0) {
-						ThunderAspect.apply(mPlugin, mPlayer, thunder, mob);
-						dmg += ThunderAspect.getBonusDamage(mob);
-					}
-					int decay = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.DECAY);
-					if (decay > 0) {
-						Decay.apply(mPlugin, mob, Decay.DURATION, decay, mPlayer);
-					}
-					int bleed = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.BLEEDING);
-					if (bleed > 0) {
-						Bleeding.apply(mPlugin, mPlayer, bleed, Bleeding.DURATION, mob);
-					}
-					int wind = ItemStatUtils.getEnchantmentLevel(mainHand, ItemStatUtils.EnchantmentType.WIND_ASPECT);
-					if (wind > 0) {
-						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
-						WindAspect.launch(mPlugin, mob, wind);
-					}
-				}
-
+				ClassAbility ability = ClassAbility.ARCANE_STRIKE;
 				if (isEnhanced()) {
 					dmg = (float) (dmg * ENHANCEMENT_DAMAGE_MULTIPLIER);
+					if (mob != enemy) {
+						ability = ClassAbility.ARCANE_STRIKE_ENHANCED;
+					}
 				}
 
-				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, dmg, mInfo.mLinkedSpell, true, true);
+				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, dmg, ability, true, true);
 
 			}
 

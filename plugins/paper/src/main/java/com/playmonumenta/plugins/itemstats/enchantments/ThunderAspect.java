@@ -2,14 +2,15 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -62,7 +63,7 @@ public class ThunderAspect implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		DamageType type = event.getType();
-		if ((type == DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageType.PROJECTILE) {
+		if (AbilityUtils.isAspectTriggeringEvent(event, player)) {
 			// If used with arrow, must be critical
 			if (event.getDamager() instanceof AbstractArrow arrow && !(arrow instanceof Trident) && !arrow.isCritical()) {
 				return;
@@ -72,12 +73,13 @@ public class ThunderAspect implements Enchantment {
 				event.setDamage(event.getDamage() + BONUS_DAMAGE);
 			}
 
-			if (type == DamageType.MELEE) {
-				apply(plugin, player, level, enemy);
+			if (event.getAbility() == ClassAbility.ERUPTION) {
+				//Special case for eruption - always stun
+				EntityUtils.applyStun(plugin, (int) (10 * level), enemy);
+			} else if (!(type == DamageType.PROJECTILE || event.getAbility() == ClassAbility.EXPLOSIVE || event.getAbility() == ClassAbility.PREDATOR_STRIKE)) {
+				apply(plugin, player, level, enemy, type == DamageType.MELEE);
 			} else {
-
-				double chance = (CHANCE * level) + CharmManager.getLevelPercentDecimal(player, CHARM_STUN_CHANCE);
-
+				double chance = (CHANCE + CharmManager.getLevelPercentDecimal(player, CHARM_STUN_CHANCE)) * level;
 				if (FastUtils.RANDOM.nextDouble() < chance) {
 					if (!EntityUtils.isElite(enemy) && !(EntityUtils.isBoss(enemy) && !enemy.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
 						EntityUtils.applyStun(plugin, DURATION_PROJ, enemy);
@@ -134,8 +136,8 @@ public class ThunderAspect implements Enchantment {
 		}
 	}
 
-	public static void apply(Plugin plugin, Player player, double level, LivingEntity enemy) {
-		double chance = ((CHANCE * level) + CharmManager.getLevelPercent(player, CHARM_STUN_CHANCE)) * player.getCooledAttackStrength(0);
+	public static void apply(Plugin plugin, Player player, double level, LivingEntity enemy, boolean particles) {
+		double chance = (CHANCE + CharmManager.getLevelPercent(player, CHARM_STUN_CHANCE)) * level * (particles ? player.getCooledAttackStrength(0) : 1);
 		if (FastUtils.RANDOM.nextDouble() < chance) {
 			if (EntityUtils.isElite(enemy)) {
 				EntityUtils.applyStun(plugin, DURATION_MELEE_ELITE, enemy);
@@ -143,7 +145,7 @@ public class ThunderAspect implements Enchantment {
 				EntityUtils.applyStun(plugin, DURATION_MELEE, enemy);
 			}
 
-			if (!(EntityUtils.isBoss(enemy) || enemy.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
+			if (particles && !(EntityUtils.isBoss(enemy) || enemy.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
 				Location loc = enemy.getLocation();
 				World world = enemy.getWorld();
 				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.65f, 1.5f);
@@ -153,10 +155,6 @@ public class ThunderAspect implements Enchantment {
 				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 15, 0, 0, 0, 0.15);
 			}
 		}
-	}
-
-	public static float getBonusDamage(LivingEntity enemy) {
-		return (enemy instanceof Guardian || enemy instanceof IronGolem) ? BONUS_DAMAGE : 0;
 	}
 }
 

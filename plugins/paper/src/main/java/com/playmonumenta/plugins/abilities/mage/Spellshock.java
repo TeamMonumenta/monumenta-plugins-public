@@ -113,7 +113,7 @@ public class Spellshock extends Ability {
 					e.clearEffect();
 				}
 			}
-		} else if (event.getAbility() != null && event.getAbility() != ClassAbility.BLIZZARD && event.getAbility() != ClassAbility.ARCANE_STRIKE && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
+		} else if (event.getAbility() != null && event.getAbility() != ClassAbility.BLIZZARD && event.getAbility() != ClassAbility.ARCANE_STRIKE && event.getAbility() != ClassAbility.ARCANE_STRIKE_ENHANCED && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
 			// Check if the mob has static, and trigger it if possible; otherwise, apply/refresh it
 			NavigableSet<Effect> effectGroupOriginal = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
 			if (effectGroupOriginal != null) {

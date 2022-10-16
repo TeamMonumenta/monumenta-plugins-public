@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
@@ -12,7 +13,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -22,8 +22,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 public class Eruption implements Enchantment {
 
@@ -61,31 +59,12 @@ public class Eruption implements Enchantment {
 			int bleed = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.BLEEDING);
 			int sapper = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SAPPER) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SAPPER) : 0;
 			int adrenaline = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.ADRENALINE) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADRENALINE) : 0;
-			int wind = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.WIND_ASPECT) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT) : 0;
+			//int wind = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.WIND_ASPECT) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT) : 0;
 
+			double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_PER_LEVEL * level);
 			//Damage any mobs in the area
 			for (LivingEntity mob : mobs) {
-				double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_PER_LEVEL * level);
-				DamageUtils.damage(player, mob, DamageType.OTHER, damage, null, false, true);
-				if (fire > 0) {
-					EntityUtils.applyFire(plugin, 80 * fire, mob, player);
-				}
-				if (ice > 0) {
-					EntityUtils.applySlow(plugin, IceAspect.ICE_ASPECT_DURATION + CharmManager.getExtraDuration(player, IceAspect.CHARM_DURATION), (ice * 0.1) + CharmManager.getLevelPercent(player, IceAspect.CHARM_SLOW), mob);
-				}
-				if (thunder > 0) {
-					EntityUtils.applyStun(plugin, 10 * thunder, mob);
-				}
-				if (decay > 0) {
-					Decay.apply(plugin, mob, Decay.DURATION, decay, player);
-				}
-				if (bleed > 0) {
-					EntityUtils.applyBleed(plugin, Bleeding.DURATION, bleed * Bleeding.AMOUNT_PER_LEVEL, mob);
-				}
-				if (wind > 0) {
-					PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
-					WindAspect.launch(plugin, mob, wind);
-				}
+				DamageUtils.damage(player, mob, DamageType.OTHER, damage, ClassAbility.ERUPTION, false, true);
 			}
 
 			//Sapper Interaction
