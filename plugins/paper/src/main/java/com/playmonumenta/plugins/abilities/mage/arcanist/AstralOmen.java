@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -74,10 +73,8 @@ public class AstralOmen extends Ability {
 		mElementClassification.put(ClassAbility.COSMIC_MOONBLADE, Type.ARCANE);
 		// Fire Types
 		mElementClassification.put(ClassAbility.MAGMA_SHIELD, Type.FIRE);
-		mElementClassification.put(ClassAbility.ELEMENTAL_ARROWS_FIRE, Type.FIRE);
 		// Ice Types
 		mElementClassification.put(ClassAbility.FROST_NOVA, Type.ICE);
-		mElementClassification.put(ClassAbility.ELEMENTAL_ARROWS_ICE, Type.ICE);
 		// Thunder Types
 		mElementClassification.put(ClassAbility.THUNDER_STEP, Type.THUNDER);
 		mElementClassification.put(ClassAbility.ELEMENTAL_ARROWS, Type.THUNDER);
@@ -109,13 +106,12 @@ public class AstralOmen extends Ability {
 				"Dealing spell damage to an enemy marks its fate, giving it an omen based on the spell type (Arcane, Fire, Ice, Thunder). " +
 					"If an enemy hits %s omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, " +
 					"dealing %s magic damage to it and all enemies within %s blocks. " +
-					"If the spell was %s, the implosion instead does %s%% of the bow's original damage. " +
 					"An enemy loses all its omens after %ss of it not gaining another omen. " +
-					"That implosion's damage ignores iframes and itself cannot apply omens.",
+					"That implosion's damage ignores iframes and itself cannot apply omens." +
+					"Omens cannot be applied or sealed by Elemental Arrows.",
 				STACK_THRESHOLD,
 				DAMAGE,
 				RADIUS,
-				ElementalArrows.NAME,
 				StringUtils.multiplierToPercentage(BOW_MULTIPLIER),
 				StringUtils.ticksToSeconds(STACK_TICKS)
 			)
@@ -168,18 +164,7 @@ public class AstralOmen extends Ability {
 		if (combo >= stacksThreshold) { // Adding 1 more stack would hit threshold, which removes all stacks anyway, so don't bother adding then removing
 			World world = enemy.getWorld();
 			float baseDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
-			float spellDamage;
-			if (ability == ClassAbility.ELEMENTAL_ARROWS || ability == ClassAbility.ELEMENTAL_ARROWS_FIRE || ability == ClassAbility.ELEMENTAL_ARROWS_ICE) {
-				if (mElementalArrows == null) {
-					// how?
-					MMLog.warning("Dealt Elemental Arrows damage with Astral Omen despite not finding Elemental Arrows (player: " + mPlayer.getName() + ")");
-					spellDamage = baseDamage;
-				} else {
-					spellDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mElementalArrows.getLastDamage() * BOW_MULTIPLIER);
-				}
-			} else {
-				spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, baseDamage);
-			}
+			float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, baseDamage);
 			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS));
 			for (LivingEntity mob : hitbox.getHitMobs()) {
 				if (MetadataUtils.checkOnceThisTick(mPlugin, mob, DAMAGED_THIS_TICK_METAKEY)) {

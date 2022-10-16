@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
@@ -60,7 +61,7 @@ public class ElementalArrows extends Ability {
 		mInfo.mShorthandName = "EA";
 		mInfo.mDescriptions.add(
 			String.format("Your fully drawn projectiles are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with %s%% Slowness for %s seconds. " +
-				              "Projectiles shot this way deal magical damage instead of projectile damage. Ice arrows deal %s extra damage to Blazes. " +
+				              "Projectiles shot this way are magically infused, scaling off of magic damage instead of projectile damage. Ice arrows deal %s extra damage to Blazes. " +
 				              "Fire arrows deal %s extra damage to strays. This skill can not apply Spellshock.",
 				(int) (SLOW_AMPLIFIER * 100),
 				ELEMENTAL_ARROWS_DURATION / 20,
@@ -115,7 +116,17 @@ public class ElementalArrows extends Ability {
 	}
 
 	private void applyArrowEffects(DamageEvent event, LivingEntity enemy, double multiplier, ClassAbility ability, ItemStatManager.PlayerItemStats playerItemStats, @Nullable Class<? extends Entity> bonusEntity, Consumer<LivingEntity> effectAction) {
-		double damage = event.getDamage();
+		Player p = (Player) event.getDamager();
+		if (p == null) {
+			return;
+		}
+
+		ItemStack item = p.getItemInHand();
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+
+		double damage = ItemStatUtils.getAttributeAmount(item, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
 		mLastDamage = damage;
 
 		double targetDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage) * multiplier;
