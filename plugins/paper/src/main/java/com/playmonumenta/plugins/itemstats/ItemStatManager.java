@@ -157,7 +157,7 @@ public class ItemStatManager implements Listener {
 
 		public void updateStats(Player player, boolean updateAll, double priorHealth, boolean checkHealth) {
 			PlayerInventory inventory = player.getInventory();
-			updateStats(inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(), updateAll);
+			updateStats(inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(), player, updateAll);
 			// Tell the ItemStats that there has been an update
 			Plugin plugin = Plugin.getInstance();
 			for (ItemStat stat : ITEM_STATS) {
@@ -179,7 +179,7 @@ public class ItemStatManager implements Listener {
 
 		}
 
-		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet, boolean updateAll) {
+		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet, Player player, boolean updateAll) {
 			ItemStatsMap newArmorAddStats;
 			ItemStatsMap newMainhandAddStats = new ItemStatsMap();
 			ItemStatsMap newArmorMultiplyStats;
@@ -218,6 +218,10 @@ public class ItemStatManager implements Listener {
 					if (scaleRegionLarge) {
 						scaleRegion = false;
 					}
+					// Comment this statement out AFTER we get rid of R2 in R3 penalty
+					if (mRegion.equals(ItemStatUtils.Region.RING) && ItemStatUtils.getRegion(item).equals(ItemStatUtils.Region.ISLES) && !(player.getScoreboardTags().contains("SKTQuest") && ServerProperties.getShardName().startsWith("skt"))) {
+						scaleRegion = true;
+					}
 
 					for (ItemStat stat : ITEM_STATS) {
 						if (stat instanceof Attribute attribute) {
@@ -232,8 +236,8 @@ public class ItemStatManager implements Listener {
 							if (enchantment.getSlots().contains(slot)) {
 								newArmorAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 							}
-							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN && (ItemStatUtils.getRegion(item) == ItemStatUtils.Region.ISLES || ItemStatUtils.getRegion(item) == ItemStatUtils.Region.RING)) {
-								newArmorAddStats.add(stat, 1);
+							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN) {
+								newArmorAddStats.add(stat, scaleRegion ? 1 : scaleRegionLarge ? 2 : 0);
 							}
 							if (enchantment.getEnchantmentType() == EnchantmentType.SKT_DAMAGE_TAKEN) {
 								newArmorAddStats.add(stat, 1);
@@ -262,6 +266,10 @@ public class ItemStatManager implements Listener {
 				if (scaleRegionLarge) {
 					scaleRegion = false;
 				}
+				// Comment this statement out AFTER we get rid of R2 in R3 penalty
+				if (mRegion.equals(ItemStatUtils.Region.RING) && ItemStatUtils.getRegion(mainhand).equals(ItemStatUtils.Region.ISLES) && !(player.getScoreboardTags().contains("SKTQuest") && ServerProperties.getShardName().startsWith("skt"))) {
+					scaleRegion = true;
+				}
 
 				for (ItemStat stat : ITEM_STATS) {
 					if (stat instanceof Attribute attribute) {
@@ -275,6 +283,9 @@ public class ItemStatManager implements Listener {
 						}
 						if (enchantment.getSlots().contains(Slot.MAINHAND)) {
 							newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
+						}
+						if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_DEALT) {
+							newMainhandAddStats.add(stat, scaleRegion ? 1 : scaleRegionLarge ? 2 : 0);
 						}
 					} else if (stat instanceof Infusion infusion) {
 						double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : infusion.getInfusionType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
@@ -296,12 +307,6 @@ public class ItemStatManager implements Listener {
 					    stat instanceof SKTQuestDamageDealt) {
 					newStats.add(stat, 1);
 				}
-				if (stat instanceof RegionScalingDamageDealt
-					    && !ServerProperties.getClassSpecializationsEnabled()
-					    && (ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.ISLES || ItemStatUtils.getRegion(mainhand) == ItemStatUtils.Region.RING)) {
-					newStats.add(stat, 1);
-				}
-
 			}
 
 			mArmorAddStats = newArmorAddStats;
@@ -435,7 +440,7 @@ public class ItemStatManager implements Listener {
 		ItemStack oldItem = inv.getItem(event.getPreviousSlot());
 		ItemStack newItem = inv.getItem(event.getNewSlot());
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-			mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(newItem, null, null, null, null, null, false);
+			mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(newItem, null, null, null, null, null, player, false);
 			for (ItemStat stat : ITEM_STATS) {
 				stat.onEquipmentUpdate(mPlugin, player);
 			}

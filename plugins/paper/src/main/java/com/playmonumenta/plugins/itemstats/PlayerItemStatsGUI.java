@@ -1002,7 +1002,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		for (Stats stats : new Stats[] {mLeftStats, mRightStats}) {
 			stats.mStatCache.clear();
 			stats.mPlayerItemStats.updateStats(stats.getItem(Equipment.MAINHAND), stats.getItem(Equipment.OFFHAND),
-				stats.getItem(Equipment.HEAD), stats.getItem(Equipment.CHEST), stats.getItem(Equipment.LEGS), stats.getItem(Equipment.FEET), true);
+				stats.getItem(Equipment.HEAD), stats.getItem(Equipment.CHEST), stats.getItem(Equipment.LEGS), stats.getItem(Equipment.FEET), (Player) mInventory.getHolder(), true);
 		}
 
 		ItemStack swapItem = new ItemStack(Material.ARMOR_STAND, 1);

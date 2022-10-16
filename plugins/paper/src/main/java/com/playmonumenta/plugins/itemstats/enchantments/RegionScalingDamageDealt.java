@@ -36,7 +36,9 @@ public class RegionScalingDamageDealt implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		event.setDamage(event.getDamage() * DAMAGE_DEALT_MULTIPLIER);
+		if (value > 0) {
+			event.setDamage(event.getDamage() * (DAMAGE_DEALT_MULTIPLIER / value));
+		}
 	}
 
 	@Override
