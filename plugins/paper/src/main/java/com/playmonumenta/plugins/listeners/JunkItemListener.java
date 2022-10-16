@@ -1,19 +1,19 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.graves.GraveManager;
-import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,6 +31,7 @@ public final class JunkItemListener implements Listener {
 	public static final String COMMAND = "pickup";
 	public static final String ALIAS = "pu";
 
+	private static final String TIERED_TAG = "OnlyTieredItemsPickup";
 	private static final String LORE_TAG = "OnlyLoredItemsPickup";
 	private static final String INTERESTING_TAG = "NoJunkItemsPickup";
 
@@ -38,6 +39,7 @@ public final class JunkItemListener implements Listener {
 	private static final int JUNK_ITEM_SIZE_THRESHOLD = 17;
 	private static final int MAX_POSSIBLE_STACK = 64;
 
+	private final Set<UUID> mTieredPlayers = new HashSet<>();
 	private final Set<UUID> mLorePlayers = new HashSet<>();
 	private final Set<UUID> mInterestingPlayers = new HashSet<>();
 
@@ -47,7 +49,7 @@ public final class JunkItemListener implements Listener {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withAliases(ALIAS)
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				playerToggle(sender);
 			})
 			.register();
@@ -55,8 +57,17 @@ public final class JunkItemListener implements Listener {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withAliases(ALIAS)
+			.withArguments(new LiteralArgument("tiered"))
+			.executesPlayer((sender, args) -> {
+				pickupTiered(sender);
+			})
+			.register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("lore"))
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				pickupLore(sender);
 			})
 			.register();
@@ -65,7 +76,7 @@ public final class JunkItemListener implements Listener {
 			.withPermission(perms)
 			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("interesting"))
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				pickupInteresting(sender);
 			})
 			.register();
@@ -74,7 +85,7 @@ public final class JunkItemListener implements Listener {
 			.withPermission(perms)
 			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("all"))
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				pickupAll(sender);
 			})
 			.register();
@@ -83,16 +94,14 @@ public final class JunkItemListener implements Listener {
 			.withPermission(perms)
 			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("threshold"), new IntegerArgument("count"))
-			.executes((sender, args) -> {
+			.executesPlayer((sender, args) -> {
 				playerSetMin(sender, (int) args[0]);
 			})
 			.register();
 
 	}
 
-	private void playerToggle(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
-
+	private void playerToggle(Player player) {
 		if (hasTag(player)) {
 			pickupAll(player);
 		} else {
@@ -100,9 +109,7 @@ public final class JunkItemListener implements Listener {
 		}
 	}
 
-	private void playerSetMin(CommandSender sender, int newMin) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
-
+	private void playerSetMin(Player player, int newMin) {
 		newMin = Math.max(1, Math.min(newMin, MAX_POSSIBLE_STACK + 1));
 		ScoreboardUtils.setScoreboardValue(player, PICKUP_MIN_OBJ_NAME, newMin);
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Threshold to pick up uninteresting items set to " + newMin + ".");
@@ -112,32 +119,36 @@ public final class JunkItemListener implements Listener {
 	public void join(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		Set<String> tags = player.getScoreboardTags();
-		if (tags != null) {
-			UUID uuid = player.getUniqueId();
-			if (tags.contains(LORE_TAG)) {
-				mLorePlayers.add(uuid);
-			} else if (tags.contains(INTERESTING_TAG)) {
-				mInterestingPlayers.add(uuid);
-			}
+		UUID uuid = player.getUniqueId();
+		if (tags.contains(TIERED_TAG)) {
+			mTieredPlayers.add(uuid);
+		} else if (tags.contains(LORE_TAG)) {
+			mLorePlayers.add(uuid);
+		} else if (tags.contains(INTERESTING_TAG)) {
+			mInterestingPlayers.add(uuid);
 		}
 	}
 
-	private void pickupAll(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
+	private void pickupAll(Player player) {
 		remove(player);
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will now pick up all items.");
 	}
 
-	private void pickupLore(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
+	private void pickupTiered(Player player) {
+		remove(player);
+		player.addScoreboardTag(TIERED_TAG);
+		mTieredPlayers.add(player.getUniqueId());
+		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will now only pick up items with a tier.");
+	}
+
+	private void pickupLore(Player player) {
 		remove(player);
 		player.addScoreboardTag(LORE_TAG);
 		mLorePlayers.add(player.getUniqueId());
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will now only pick up items with lore text.");
 	}
 
-	private void pickupInteresting(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = CommandUtils.getPlayerFromSender(sender);
+	private void pickupInteresting(Player player) {
 		remove(player);
 		player.addScoreboardTag(INTERESTING_TAG);
 		mInterestingPlayers.add(player.getUniqueId());
@@ -151,18 +162,17 @@ public final class JunkItemListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void pickupItem(EntityPickupItemEvent event) {
-		if (event.getEntity() instanceof Player) {
+		if (event.getEntity() instanceof Player player) {
 			Item entity = event.getItem();
 			ItemStack item = entity.getItemStack();
-			if (item == null || item.getType().isAir()) {
+			if (item.getType().isAir()) {
 				return;
 			}
-			Player player = (Player) event.getEntity();
 			UUID uuid = player.getUniqueId();
 			PlayerInventory inv = player.getInventory();
 
 			// If they're in none of the groups, quit immediately without doing a bunch of checks
-			if (!(mInterestingPlayers.contains(uuid) || mLorePlayers.contains(uuid))) {
+			if (!(mInterestingPlayers.contains(uuid) || mLorePlayers.contains(uuid) || mTieredPlayers.contains(uuid))) {
 				return;
 			}
 
@@ -176,7 +186,7 @@ public final class JunkItemListener implements Listener {
 			}
 
 			// Allow collection of valuable player-dropped items
-			if (GraveManager.isThrownItem(entity)) {
+			if (GraveManager.isThrownItem(entity) || uuid.equals(entity.getOwner())) {
 				return;
 			}
 
@@ -191,7 +201,19 @@ public final class JunkItemListener implements Listener {
 				return;
 			}
 
-			if (mLorePlayers.contains(uuid)) {
+			if (mTieredPlayers.contains(uuid)) {
+				if (ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE) {
+					List<Component> lore = item.lore();
+					if (lore != null) {
+						for (Component line : lore) {
+							if (line.toString().contains("Quest Item")) {
+								return;
+							}
+						}
+					}
+					event.setCancelled(true);
+				}
+			} else if (mLorePlayers.contains(uuid)) {
 				if (!ItemUtils.hasLore(item)) {
 					event.setCancelled(true);
 				}
@@ -205,10 +227,11 @@ public final class JunkItemListener implements Listener {
 
 	private boolean hasTag(Player player) {
 		Set<String> tags = player.getScoreboardTags();
-		return tags.contains(INTERESTING_TAG) || tags.contains(LORE_TAG);
+		return tags.contains(INTERESTING_TAG) || tags.contains(LORE_TAG) || tags.contains(TIERED_TAG);
 	}
 
 	private void remove(Player player) {
+		player.removeScoreboardTag(TIERED_TAG);
 		player.removeScoreboardTag(LORE_TAG);
 		player.removeScoreboardTag(INTERESTING_TAG);
 		removeFromSets(player);
@@ -216,6 +239,7 @@ public final class JunkItemListener implements Listener {
 
 	private void removeFromSets(Player player) {
 		UUID uuid = player.getUniqueId();
+		mTieredPlayers.remove(uuid);
 		mLorePlayers.remove(uuid);
 		mInterestingPlayers.remove(uuid);
 	}
