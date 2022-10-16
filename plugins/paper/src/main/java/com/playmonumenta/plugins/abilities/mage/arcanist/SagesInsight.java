@@ -43,10 +43,10 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	private final int mMaxStacks;
 	private final List<ClassAbility> mResets = new ArrayList<>();
 	private final double mSpeed;
-	public static String CHARM_STACKS = "Sage's Insight Stack Trigger Threshold";
-	public static String CHARM_DECAY = "Sage's Insight Decay Duration";
-	public static String CHARM_SPEED = "Sage's Insight Speed Amplifier";
-	public static String CHARM_ABILITY = "Sage's Insight Ability Count";
+	public static final String CHARM_STACKS = "Sage's Insight Stack Trigger Threshold";
+	public static final String CHARM_DECAY = "Sage's Insight Decay Duration";
+	public static final String CHARM_SPEED = "Sage's Insight Speed Amplifier";
+	public static final String CHARM_ABILITY = "Sage's Insight Ability Count";
 
 
 	private final HashMap<ClassAbility, Boolean> mStacksMap;

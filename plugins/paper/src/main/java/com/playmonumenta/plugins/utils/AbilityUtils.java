@@ -58,8 +58,6 @@ public class AbilityUtils {
 	public static final int MAX_SKILL_POINTS = 10;
 	public static final int MAX_SPEC_POINTS = 4;
 
-
-
 	private static final Map<Player, Integer> INVISIBLE_PLAYERS = new HashMap<Player, Integer>();
 	private static @Nullable BukkitRunnable invisTracker = null;
 

@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.utils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
@@ -267,7 +269,7 @@ public class ItemStatUtils {
 		CASINO1("casino1", Component.text("Rock's Little Casino", TextColor.fromHexString("#EDC863")).decoration(TextDecoration.ITALIC, false)),
 		CASINO2("casino2", Component.text("Monarch's Cozy Casino", TextColor.fromHexString("#1773B1")).decoration(TextDecoration.ITALIC, false)),
 		CASINO3("casino3", Component.text("Sticks and Stones Tavern", TextColor.fromHexString("#C6C2B6")).decoration(TextDecoration.ITALIC, false)),
-		QUEST("quest", Component.text("Quest Item", TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false)),
+		QUEST("quest", Component.text("Quest Reward", TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false)),
 		LABS("labs", Component.text("Alchemy Labs", TextColor.fromHexString("#B4ACC3")).decoration(TextDecoration.ITALIC, false)),
 		WHITE("white", Component.text("Halls of Wind and Blood", TextColor.fromHexString("#FFFFFF")).decoration(TextDecoration.ITALIC, false)),
 		ORANGE("orange", Component.text("Fallen Menagerie", TextColor.fromHexString("#FFAA00")).decoration(TextDecoration.ITALIC, false)),
@@ -1344,6 +1346,77 @@ public class ItemStatUtils {
 		return monumenta.getInteger(CHARM_POWER_KEY);
 	}
 
+	public static Component getCharmClass(NBTList<String> charmLore) {
+		MonumentaClasses classes = new MonumentaClasses(Plugin.getInstance(), null);
+
+		ArrayList<Ability> alchSkills = classes.getClassAtIndex(0).mAbilities;
+		alchSkills.addAll(classes.getClassAtIndex(0).mSpecOne.mAbilities);
+		alchSkills.addAll(classes.getClassAtIndex(0).mSpecTwo.mAbilities);
+
+		ArrayList<Ability> clericSkills = classes.getClassAtIndex(1).mAbilities;
+		clericSkills.addAll(classes.getClassAtIndex(1).mSpecOne.mAbilities);
+		clericSkills.addAll(classes.getClassAtIndex(1).mSpecTwo.mAbilities);
+
+		ArrayList<Ability> mageSkills = classes.getClassAtIndex(2).mAbilities;
+		mageSkills.addAll(classes.getClassAtIndex(2).mSpecOne.mAbilities);
+		mageSkills.addAll(classes.getClassAtIndex(2).mSpecTwo.mAbilities);
+
+		ArrayList<Ability> rogueSkills = classes.getClassAtIndex(3).mAbilities;
+		rogueSkills.addAll(classes.getClassAtIndex(3).mSpecOne.mAbilities);
+		rogueSkills.addAll(classes.getClassAtIndex(3).mSpecTwo.mAbilities);
+
+		ArrayList<Ability> scoutSkills = classes.getClassAtIndex(4).mAbilities;
+		scoutSkills.addAll(classes.getClassAtIndex(4).mSpecOne.mAbilities);
+		scoutSkills.addAll(classes.getClassAtIndex(4).mSpecTwo.mAbilities);
+
+		ArrayList<Ability> warlockSkills = classes.getClassAtIndex(5).mAbilities;
+		warlockSkills.addAll(classes.getClassAtIndex(5).mSpecOne.mAbilities);
+		warlockSkills.addAll(classes.getClassAtIndex(5).mSpecTwo.mAbilities);
+
+		ArrayList<Ability> warriorSkills = classes.getClassAtIndex(6).mAbilities;
+		warriorSkills.addAll(classes.getClassAtIndex(6).mSpecOne.mAbilities);
+		warriorSkills.addAll(classes.getClassAtIndex(6).mSpecTwo.mAbilities);
+
+		for (String line : charmLore) {
+			for (Ability skill : alchSkills) {
+				if (line.contains(skill.getDisplayName()) || line.contains("Alchemist Potion")) {
+					return Component.text("Alchemist", TextColor.fromHexString("#5FAA19")).decoration(TextDecoration.ITALIC, false);
+				}
+			}
+			for (Ability skill : clericSkills) {
+				if (line.contains(skill.getDisplayName()) || line.contains("Rejuvination")) {
+					return Component.text("Cleric", TextColor.fromHexString("#FFC644")).decoration(TextDecoration.ITALIC, false);
+				}
+			}
+			for (Ability skill : mageSkills) {
+				if (line.contains(skill.getDisplayName()) || line.contains("Channeling")) {
+					return Component.text("Mage", TextColor.fromHexString("#A31ECE")).decoration(TextDecoration.ITALIC, false);
+				}
+			}
+			for (Ability skill : rogueSkills) {
+				if (line.contains(skill.getDisplayName()) || line.contains("Dethroner")) {
+					return Component.text("Rogue", TextColor.fromHexString("#36393D")).decoration(TextDecoration.ITALIC, false);
+				}
+			}
+			for (Ability skill : scoutSkills) {
+				if (line.contains(skill.getDisplayName()) || line.contains("Versatile")) {
+					return Component.text("Scout", TextColor.fromHexString("#248AC8")).decoration(TextDecoration.ITALIC, false);
+				}
+			}
+			for (Ability skill : warlockSkills) {
+				if (line.contains(skill.getDisplayName()) || line.contains("Culling")) {
+					return Component.text("Warlock", TextColor.fromHexString("#C724B9")).decoration(TextDecoration.ITALIC, false);
+				}
+			}
+			for (Ability skill : warriorSkills) {
+				if (line.contains(skill.getDisplayName()) || line.contains("Formidable")) {
+					return Component.text("Warrior", TextColor.fromHexString("#DE2446")).decoration(TextDecoration.ITALIC, false);
+				}
+			}
+		}
+		return Component.text("Generalist", TextColor.fromHexString("#9F8F91")).decoration(TextDecoration.ITALIC, false);
+	}
+
 	public static void addConsumeEffect(final ItemStack item, final EffectType type, final double strength, final int duration, @Nullable String source) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
@@ -2161,7 +2234,8 @@ public class ItemStatUtils {
 						for (int i = 0; i < charmPower; i++) {
 							starString += "★";
 						}
-						lore.add(Component.text("Charm Power : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false)));
+						lore.add(Component.text("Charm Power : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false))
+							.append(Component.text(" - ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)).append(getCharmClass(monumenta.getStringList(CHARM_KEY))));
 					}
 				}
 
@@ -2655,20 +2729,7 @@ public class ItemStatUtils {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
 				return;
 			}
-			String hexColor = "#C8A2C8";
-			if (lore.charAt(0) == '+') {
-				if (lore.endsWith("Cooldown")) {
-					hexColor = "#D02E28";
-				} else {
-					hexColor = "#4AC2E5";
-				}
-			} else if (lore.charAt(0) == '-') {
-				if (lore.endsWith("Cooldown")) {
-					hexColor = "#4AC2E5";
-				} else {
-					hexColor = "#D02E28";
-				}
-			}
+			String hexColor = CharmManager.getCharmEffectColor(lore.charAt(0) == '+', lore.split(" ", 2)[1]);
 
 			Component text = Component.text(lore, TextColor.fromHexString(hexColor)).decoration(TextDecoration.ITALIC, false);
 			addCharmEffect(item, index, text);
@@ -2823,6 +2884,7 @@ public class ItemStatUtils {
 			ItemMeta itemMeta = item.getItemMeta();
 			itemMeta.displayName(Component.text(name, TextColor.fromHexString(location.getDisplay().color().asHexString())).decoration(TextDecoration.BOLD, bold).decoration(TextDecoration.UNDERLINED, underline).decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(itemMeta);
+			ItemUtils.setPlainName(item, name);
 
 		}).register();
 	}

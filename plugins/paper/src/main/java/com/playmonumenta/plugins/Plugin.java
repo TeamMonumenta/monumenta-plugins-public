@@ -199,6 +199,7 @@ public class Plugin extends JavaPlugin {
 		ItemStatUtils.registerCharmCommand();
 		ItemStatUtils.registerConsumeCommand();
 		ItemStatUtils.registerRemoveCommand();
+		UpdateChestItems.register();
 		PlayerItemStatsGUICommand.register(this);
 		AuditLogCommand.register();
 		PickLevelAfterAnvils.register();

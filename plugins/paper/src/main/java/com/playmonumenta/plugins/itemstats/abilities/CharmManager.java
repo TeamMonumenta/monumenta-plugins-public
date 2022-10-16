@@ -1270,13 +1270,13 @@ public class CharmManager {
 			for (String s : mInstance.mFlippedColorEffectSubstrings) {
 				if (charmEffectName.contains(s)) {
 					outColor = "#D02E28";
-					break;
+					return outColor;
 				}
 			}
 		} else {
 			for (String s : mInstance.mFlippedColorEffectSubstrings) {
 				if (charmEffectName.contains(s)) {
-					break;
+					return outColor;
 				}
 			}
 			outColor = "#D02E28";

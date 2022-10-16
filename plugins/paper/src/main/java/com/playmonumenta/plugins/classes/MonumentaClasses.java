@@ -27,4 +27,8 @@ public class MonumentaClasses extends ClassList {
 		obj.add("classes", classes);
 		return obj;
 	}
+
+	public PlayerClass getClassAtIndex(int index) {
+		return mClasses.get(index);
+	}
 }

@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
-import java.util.Set;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -44,7 +43,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	public static final String CHARM_DURATION = "Heavenly Boon Potion Duration";
 	public static final String CHARM_RADIUS = "Heavenly Boon Radius";
 
-	private static final Set<String> BOON_DROPS = ImmutableSet.of("Regeneration Boon", "Speed Boon", "Strength Boon", "Absorption Boon", "Resistance Boon", "Regeneration Boon 2", "Speed Boon 2", "Strength Boon 2", "Absorption Boon 2", "Resistance Boon 2");
+	private static final ImmutableSet<String> BOON_DROPS = ImmutableSet.of("Regeneration Boon", "Speed Boon", "Strength Boon", "Absorption Boon", "Resistance Boon", "Regeneration Boon 2", "Speed Boon 2", "Strength Boon 2", "Absorption Boon 2", "Resistance Boon 2");
 
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
