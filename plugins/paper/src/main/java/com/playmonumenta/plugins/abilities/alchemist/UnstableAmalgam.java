@@ -68,6 +68,7 @@ public class UnstableAmalgam extends Ability {
 	public static final String CHARM_POTION_DAMAGE = "Unstable Amalgam Dropped Potion Damage Modifier";
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
+	private boolean mHasGruesome;
 	private @Nullable Slime mAmalgam;
 	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 	private final double mDamage;
@@ -93,6 +94,7 @@ public class UnstableAmalgam extends Ability {
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+			mHasGruesome = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, GruesomeAlchemy.class) != null;
 		});
 	}
 
@@ -205,8 +207,7 @@ public class UnstableAmalgam extends Ability {
 		for (LivingEntity mob : mobs) {
 			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, mPlayerItemStats), damage, true, true, false);
 
-			mAlchemistPotions.applyEffects(mob, false);
-			mAlchemistPotions.applyEffects(mob, true);
+			applyEffects(mob);
 
 			MovementUtils.knockAwayRealistic(loc, mob, knockback, 2f, true);
 			mAlchemistPotions.incrementCharge();
@@ -240,7 +241,6 @@ public class UnstableAmalgam extends Ability {
 		new PartialParticle(Particle.SMOKE_LARGE, loc, 40, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(mPlayer);
 	}
-
 
 	private void unstableMobs(List<LivingEntity> mobs, int duration) {
 		if (mPlayer == null || mAlchemistPotions == null) {
@@ -276,7 +276,6 @@ public class UnstableAmalgam extends Ability {
 		mAlchemistPotions.setPotionAlchemistPotionAesthetic(potion);
 	}
 
-
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (mAlchemistPotions == null) {
@@ -289,8 +288,7 @@ public class UnstableAmalgam extends Ability {
 			double damage = mAlchemistPotions.getDamage() * (UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_POTION_DAMAGE));
 			for (LivingEntity entity : new Hitbox.SphereHitbox(loc, mAlchemistPotions.getPotionRadius()).getHitMobs()) {
 				DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, stats), damage, true, true, false);
-				mAlchemistPotions.applyEffects(entity, true);
-				mAlchemistPotions.applyEffects(entity, false);
+				applyEffects(entity);
 			}
 		}
 
@@ -304,5 +302,12 @@ public class UnstableAmalgam extends Ability {
 			cast(Action.LEFT_CLICK_AIR);
 		}
 		return false;
+	}
+
+	private void applyEffects(LivingEntity entity) {
+		if (mHasGruesome) {
+			mAlchemistPotions.applyEffects(entity, true);
+		}
+		mAlchemistPotions.applyEffects(entity, false);
 	}
 }
