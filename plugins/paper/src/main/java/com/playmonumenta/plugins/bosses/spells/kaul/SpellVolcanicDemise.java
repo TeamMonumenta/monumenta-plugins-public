@@ -167,21 +167,24 @@ public class SpellVolcanicDemise extends Spell {
 
 				mY -= 1;
 				if (mY % 2 == 0) {
+					double distMin = 100;
 					for (Player player : players) {
 						double dist = player.getLocation().distance(mLoc);
-						double size = (spawnY - mY) / spawnY;
-						int count = dist < 10 ? 24 : (dist < 15 ? 12 : 4); // Player gets more particles the closer they are to the landing area
-						new PPCircle(Particle.FLAME, mLoc, size * HIT_RADIUS)
-							.ringMode(true)
-							.count(count)
-							.delta(0.15)
-							.spawnAsBoss();
-						new PPCircle(Particle.LANDING_LAVA, mLoc, size * DEATH_RADIUS)
-							.ringMode(false)
-							.count(count)
-							.delta(0.15)
-							.spawnAsBoss();
+						distMin = dist < distMin ? dist : distMin;
 					}
+					// Closer the closet player is, more particles are shown.
+					int count = distMin < 10 ? 32 : (distMin < 15 ? 16 : 4);
+					double size = (spawnY - mY) / spawnY;
+					new PPCircle(Particle.FLAME, mLoc, size * HIT_RADIUS)
+						.ringMode(true)
+						.count(count * 2)
+						.delta(0.15)
+						.spawnAsBoss();
+					new PPCircle(Particle.LANDING_LAVA, mLoc, size * DEATH_RADIUS)
+						.ringMode(false)
+						.count(count)
+						.delta(0.15)
+						.spawnAsBoss();
 				}
 				Location particle = mLoc.clone().add(0, mY, 0);
 				mWorld.spawnParticle(Particle.FLAME, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true);
