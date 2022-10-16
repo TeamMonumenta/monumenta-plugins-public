@@ -62,7 +62,7 @@ public class Paralyze extends ZeroArgumentEffect {
 
 			new PartialParticle(Particle.FIREWORKS_SPARK, halfHeightLocation)
 				.count(8)
-				.directionalMode(true)
+				.directionalMode(false)
 				.delta(widerWidthDelta, PartialParticle.getHeightDelta(le), widerWidthDelta)
 				.deltaVariance(true, false, true)
 				.deltaVariance(false, false, true, false, false, false)

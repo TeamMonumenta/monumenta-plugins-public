@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.mage.arcanist;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.AstralOmenArcaneStacks;
 import com.playmonumenta.plugins.effects.AstralOmenBonusDamage;
@@ -26,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -49,7 +47,6 @@ public class AstralOmen extends Ability {
 	public static final int DAMAGE = 8;
 	public static final int RADIUS = 3;
 	public static final double BONUS_MULTIPLIER = 0.2;
-	public static final double BOW_MULTIPLIER = 0.4;
 	public static final int STACK_TICKS = 10 * Constants.TICKS_PER_SECOND;
 	public static final int BONUS_TICKS = 8 * Constants.TICKS_PER_SECOND;
 	public static final float PULL_SPEED = 0.25f;
@@ -60,8 +57,6 @@ public class AstralOmen extends Ability {
 	public static final String CHARM_RANGE = "Astral Omen Range";
 
 	private final double mLevelBonusMultiplier;
-
-	private @Nullable ElementalArrows mElementalArrows;
 
 	private static final Map<ClassAbility, Type> mElementClassification;
 
@@ -112,7 +107,6 @@ public class AstralOmen extends Ability {
 				STACK_THRESHOLD,
 				DAMAGE,
 				RADIUS,
-				StringUtils.multiplierToPercentage(BOW_MULTIPLIER),
 				StringUtils.ticksToSeconds(STACK_TICKS)
 			)
 		);
@@ -125,10 +119,6 @@ public class AstralOmen extends Ability {
 		);
 		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
 		mLevelBonusMultiplier = (isLevelTwo() ? BONUS_MULTIPLIER : 0) + CharmManager.getLevelPercentDecimal(player, CHARM_MODIFIER);
-
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mElementalArrows = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
-		});
 	}
 
 	@Override
