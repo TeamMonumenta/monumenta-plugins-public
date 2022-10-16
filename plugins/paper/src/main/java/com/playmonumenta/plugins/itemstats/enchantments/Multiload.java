@@ -8,8 +8,9 @@ import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -46,8 +47,7 @@ public class Multiload implements Enchantment {
 		ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
 
 		if (itemInMainHand.getType() == Material.CROSSBOW &&
-			ItemStatUtils.getEnchantmentLevel(itemInMainHand, ItemStatUtils.EnchantmentType.MULTILOAD) > 0 &&
-			projectile instanceof Arrow arrow) {
+			projectile instanceof AbstractArrow arrow) {
 			new BukkitRunnable() {
 				@Override public void run() {
 					updateItemStack(itemInMainHand, arrow);
@@ -61,38 +61,36 @@ public class Multiload implements Enchantment {
 	@Override
 	public void onLoadCrossbow(Plugin plugin, Player player, double level, EntityLoadCrossbowEvent event) {
 		// When loading the crossbow, set level as ammo count.
-		new BukkitRunnable() {
-			@Override public void run() {
-				ItemStack crossbow = event.getCrossbow();
-				CrossbowMeta meta = (CrossbowMeta) crossbow.getItemMeta();
-				ItemStack arrowItem = meta.getChargedProjectiles().get(0);
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			ItemStack crossbow = event.getCrossbow();
+			CrossbowMeta meta = (CrossbowMeta) crossbow.getItemMeta();
+			ItemStack arrowItem = meta.getChargedProjectiles().get(0);
 
-				int maxArrows = (int) level + 1;
-				int arrowsToAccount = maxArrows - 1;
-				for (ItemStack itemStack : player.getInventory()) {
-					// Loop through the player's inventory for the arrows that is the same.
-					if (itemStack != null && itemStack.isSimilar(arrowItem)) {
-						if (itemStack.getAmount() > arrowsToAccount) {
-							itemStack.setAmount(itemStack.getAmount() - arrowsToAccount);
-							arrowsToAccount = 0;
-						} else {
-							arrowsToAccount -= itemStack.getAmount();
-							itemStack.setAmount(0);
-						}
+			int maxArrows = (int) level + 1;
+			int arrowsToAccount = maxArrows - 1;
+			for (ItemStack itemStack : player.getInventory()) {
+				// Loop through the player's inventory for the arrows that is the same.
+				if (itemStack != null && itemStack.isSimilar(arrowItem)) {
+					if (itemStack.getAmount() > arrowsToAccount) {
+						itemStack.setAmount(itemStack.getAmount() - arrowsToAccount);
+						arrowsToAccount = 0;
+					} else {
+						arrowsToAccount -= itemStack.getAmount();
+						itemStack.setAmount(0);
+					}
 
-						if (arrowsToAccount <= 0) {
-							break;
-						}
+					if (arrowsToAccount <= 0) {
+						break;
 					}
 				}
-
-				player.sendActionBar(Component.text("Ammo: " + (maxArrows - arrowsToAccount) + " / " + maxArrows, NamedTextColor.YELLOW));
-				setAmmoCount(crossbow, maxArrows - arrowsToAccount);
 			}
-		}.runTaskLater(plugin, 1);
+
+			player.sendActionBar(Component.text("Ammo: " + (maxArrows - arrowsToAccount) + " / " + maxArrows, NamedTextColor.YELLOW));
+			setAmmoCount(crossbow, maxArrows - arrowsToAccount);
+		}, 1);
 	}
 
-	private void updateItemStack(ItemStack itemStack, Arrow arrow) {
+	private void updateItemStack(ItemStack itemStack, AbstractArrow arrow) {
 		if (itemStack.getType() != Material.CROSSBOW) {
 			return;
 		}
