@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -118,6 +119,52 @@ public class ArcaneStrike extends Ability {
 			Location loc = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
 			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.65f);
 			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
+
+			if (isEnhanced()) {
+				//Visual feedback
+				ItemStack item = mPlayer.getItemInHand();
+				if (item == null) {
+					return false;
+				}
+
+				//Get enchant levels on weapon
+				ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.FIRE_ASPECT);
+				int fire = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.FIRE_ASPECT);
+				int ice = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.ICE_ASPECT);
+				int thunder = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.THUNDER_ASPECT);
+				int decay = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.DECAY);
+				int bleed = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.BLEEDING);
+				int wind = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.WIND_ASPECT);
+
+				double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, RADIUS);
+
+				if (ice > 0) {
+					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.6f, 1.3f);
+					new PartialParticle(Particle.SNOW_SHOVEL, loc, 20, radius, radius, radius).spawnAsPlayerActive(mPlayer);
+				}
+				if (thunder > 0) {
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.6f, 0.8f);
+					new PartialParticle(Particle.REDSTONE, loc, 10, radius, radius, radius, new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f)).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, loc, 10, radius, radius, radius, new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f)).spawnAsPlayerActive(mPlayer);
+				}
+				if (decay > 0) {
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.4f, 0.7f);
+					new PartialParticle(Particle.SQUID_INK, loc, 20, radius, radius, radius).spawnAsPlayerActive(mPlayer);
+				}
+				if (bleed > 0) {
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SLIME_SQUISH, 0.7f, 0.7f);
+					new PartialParticle(Particle.REDSTONE, loc, 20, radius, radius, radius, new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f)).spawnAsPlayerActive(mPlayer);
+				}
+				if (wind > 0) {
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
+					mPlayer.getWorld().spawnParticle(Particle.CLOUD, loc, 20, radius, radius, radius);
+				}
+				if (fire > 0) {
+					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);
+					mPlayer.getWorld().spawnParticle(Particle.LAVA, loc, 20, radius, radius, radius);
+				}
+			}
+
 			new BukkitRunnable() {
 				double mD = 30;
 

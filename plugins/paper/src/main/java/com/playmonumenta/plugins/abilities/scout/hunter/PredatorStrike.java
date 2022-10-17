@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PredatorStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -18,8 +19,11 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.HashSet;
 import java.util.Set;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
@@ -56,8 +60,8 @@ public class PredatorStrike extends Ability {
 
 	private final PredatorStrikeCS mCosmetic;
 
-	public PredatorStrike(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Predator Strike");
+	public PredatorStrike(Plugin plugin, @Nullable Player mPlayer) {
+		super(plugin, mPlayer, "Predator Strike");
 		mInfo.mLinkedSpell = ClassAbility.PREDATOR_STRIKE;
 		mInfo.mScoreboardId = "PredatorStrike";
 		mInfo.mShorthandName = "PrS";
@@ -76,7 +80,7 @@ public class PredatorStrike extends Ability {
 		mDistanceScale = isLevelOne() ? DISTANCE_SCALE_1 : DISTANCE_SCALE_2;
 		mExplodeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EXPLODE_RADIUS);
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PredatorStrikeCS(), PredatorStrikeCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new PredatorStrikeCS(), PredatorStrikeCS.SKIN_LIST);
 	}
 
 	@Override
@@ -180,6 +184,53 @@ public class PredatorStrike extends Ability {
 		for (LivingEntity mob : hitbox.getHitMobs()) {
 			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
 			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, damage, mInfo.mLinkedSpell, true);
+		}
+
+		//Visual feedback
+		ItemStack item = mPlayer.getItemInHand();
+		if (item == null) {
+			return;
+		}
+
+		//Get enchant levels on weapon
+		ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.FIRE_ASPECT);
+		int fire = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.FIRE_ASPECT);
+		int ice = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.ICE_ASPECT);
+		int thunder = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.THUNDER_ASPECT);
+		int decay = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.DECAY);
+		int bleed = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.BLEEDING);
+		int earth = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.EARTH_ASPECT);
+		int wind = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.WIND_ASPECT);
+
+		if (ice > 0) {
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.6f, 1.3f);
+			new PartialParticle(Particle.SNOW_SHOVEL, loc, 25, mExplodeRadius, mExplodeRadius, mExplodeRadius).spawnAsPlayerActive(mPlayer);
+		}
+		if (thunder > 0) {
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.6f, 0.8f);
+			new PartialParticle(Particle.REDSTONE, loc, 12, mExplodeRadius, mExplodeRadius, mExplodeRadius, new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f)).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, loc, 12, mExplodeRadius, mExplodeRadius, mExplodeRadius, new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f)).spawnAsPlayerActive(mPlayer);
+		}
+		if (decay > 0) {
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.4f, 0.7f);
+			new PartialParticle(Particle.SQUID_INK, loc, 25, mExplodeRadius, mExplodeRadius, mExplodeRadius).spawnAsPlayerActive(mPlayer);
+		}
+		if (bleed > 0) {
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SLIME_SQUISH, 0.7f, 0.7f);
+			new PartialParticle(Particle.REDSTONE, loc, 25, mExplodeRadius, mExplodeRadius, mExplodeRadius, new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f)).spawnAsPlayerActive(mPlayer);
+		}
+		if (wind > 0) {
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
+			mPlayer.getWorld().spawnParticle(Particle.CLOUD, loc, 25, mExplodeRadius, mExplodeRadius, mExplodeRadius);
+		}
+		if (earth > 0) {
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_GRAVEL_BREAK, 1.0f, 1.0f);
+			mPlayer.getWorld().spawnParticle(Particle.FALLING_DUST, loc, 12, mExplodeRadius, mExplodeRadius, mExplodeRadius, Material.COARSE_DIRT.createBlockData());
+			mPlayer.getWorld().spawnParticle(Particle.REDSTONE, loc, 12, mExplodeRadius, mExplodeRadius, mExplodeRadius, new Particle.DustOptions(Color.fromRGB(120, 148, 82), 0.75f));
+		}
+		if (fire > 0) {
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);
+			mPlayer.getWorld().spawnParticle(Particle.LAVA, loc, 25, mExplodeRadius, mExplodeRadius, mExplodeRadius);
 		}
 	}
 

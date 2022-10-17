@@ -59,7 +59,7 @@ public class Eruption implements Enchantment {
 			int bleed = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.BLEEDING);
 			int sapper = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SAPPER) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SAPPER) : 0;
 			int adrenaline = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.ADRENALINE) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADRENALINE) : 0;
-			//int wind = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.WIND_ASPECT) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT) : 0;
+			int wind = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.WIND_ASPECT) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT) : 0;
 
 			double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_PER_LEVEL * level);
 			//Damage any mobs in the area
@@ -113,7 +113,11 @@ public class Eruption implements Enchantment {
 				player.playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH, 0.7f, 0.7f);
 				new PartialParticle(Particle.REDSTONE, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5, BLEED_COLOR).spawnAsPlayerActive(player);
 			}
-			if (fire > 0 || fire + ice + thunder + decay + bleed + adrenaline == 0) {
+			if (wind > 0) {
+				player.playSound(player.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
+				player.getWorld().spawnParticle(Particle.CLOUD, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5);
+			}
+			if (fire > 0 || fire + ice + thunder + decay + bleed + adrenaline + wind == 0) {
 				player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);
 				player.getWorld().spawnParticle(Particle.LAVA, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5);
 			}

@@ -17,6 +17,7 @@ import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -79,8 +80,8 @@ public class Explosive implements Enchantment {
 		int thunder = (int) itemStatsMap.get(EnchantmentType.THUNDER_ASPECT);
 		int decay = (int) itemStatsMap.get(EnchantmentType.DECAY);
 		int bleed = (int) itemStatsMap.get(EnchantmentType.BLEEDING);
-		//int earth = (int) itemStatsMap.get(EnchantmentType.EARTH_ASPECT);
-		//int wind = (int) itemStatsMap.get(EnchantmentType.WIND_ASPECT);
+		int earth = (int) itemStatsMap.get(EnchantmentType.EARTH_ASPECT);
+		int wind = (int) itemStatsMap.get(EnchantmentType.WIND_ASPECT);
 
 		Location location = EntityUtils.getProjectileHitLocation(event);
 
@@ -122,7 +123,16 @@ public class Explosive implements Enchantment {
 			player.playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH, 0.7f, 0.7f);
 			new PartialParticle(Particle.REDSTONE, location, 25, 1.5, 1.5, 1.5, BLEED_COLOR).spawnAsPlayerActive(player);
 		}
-		if (fire > 0 || fire + ice + thunder + decay + bleed == 0) {
+		if (wind > 0) {
+			player.playSound(player.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
+			player.getWorld().spawnParticle(Particle.CLOUD, location, 25, 1.5, 1.5, 1.5);
+		}
+		if (earth > 0) {
+			player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_BREAK, 1.0f, 1.0f);
+			player.getWorld().spawnParticle(Particle.FALLING_DUST, location, 12, 1.5, 1.5, 1.5, Material.COARSE_DIRT.createBlockData());
+			player.getWorld().spawnParticle(Particle.REDSTONE, location, 12, 1.5, 1.5, 1.5, new Particle.DustOptions(Color.fromRGB(120, 148, 82), 0.75f));
+		}
+		if (fire > 0 || fire + ice + thunder + decay + bleed + wind + earth == 0) {
 			player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);
 			player.getWorld().spawnParticle(Particle.LAVA, location, 25, 1.5, 1.5, 1.5);
 		}

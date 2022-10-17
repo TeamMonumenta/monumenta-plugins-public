@@ -79,14 +79,14 @@ public class Quake implements Enchantment {
 			int thunder = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.THUNDER_ASPECT);
 			int decay = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.DECAY);
 			int bleed = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.BLEEDING);
-			//int wind = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT);
+			int wind = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT);
 
 			double finalDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, damage * DAMAGE_MODIFIER_PER_LEVEL * level);
 			for (LivingEntity mob : mobs) {
 				DamageUtils.damage(player, mob, DamageType.OTHER, finalDamage, ClassAbility.QUAKE, false, true);
 			}
 
-			if (fire + ice + thunder + decay + bleed == 0) {
+			if (fire + ice + thunder + decay + bleed + wind == 0) {
 				player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.5f, 0.5f);
 			}
 			if (fire > 0) {
@@ -109,6 +109,10 @@ public class Quake implements Enchantment {
 			if (bleed > 0) {
 				player.playSound(player.getLocation(), Sound.BLOCK_SLIME_BLOCK_BREAK, 1f, 0.8f);
 				new PartialParticle(Particle.REDSTONE, target.getLocation(), 25, 1.5, 1.5, 1.5, BLEED_COLOR).spawnAsPlayerActive(player);
+			}
+			if (wind > 0) {
+				player.playSound(player.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
+				player.getWorld().spawnParticle(Particle.CLOUD, target.getLocation(), 25, 1.5, 1.5, 1.5);
 			}
 		}
 	}
