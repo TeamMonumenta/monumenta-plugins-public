@@ -38,6 +38,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -230,6 +231,10 @@ public class ItemStatManager implements Listener {
 					if (mRegion.equals(ItemStatUtils.Region.RING) && ItemStatUtils.getRegion(item).equals(ItemStatUtils.Region.ISLES) && !(player.getScoreboardTags().contains("SKTQuest") && ServerProperties.getShardName().startsWith("skt"))) {
 						scaleRegion = true;
 					}
+					if (ServerProperties.getShardName().startsWith("dev") || ServerProperties.getShardName().contains("plots") || ServerProperties.getShardName().equals("mobs") || player.getGameMode() == GameMode.CREATIVE) {
+						scaleRegion = false;
+						scaleRegionLarge = false;
+					}
 
 					for (ItemStat stat : ITEM_STATS) {
 						if (stat instanceof Attribute attribute) {
@@ -274,6 +279,10 @@ public class ItemStatManager implements Listener {
 				// Comment this statement out AFTER we get rid of R2 in R3 penalty
 				if (mRegion.equals(ItemStatUtils.Region.RING) && ItemStatUtils.getRegion(mainhand).equals(ItemStatUtils.Region.ISLES) && !(player.getScoreboardTags().contains("SKTQuest") && ServerProperties.getShardName().startsWith("skt"))) {
 					scaleRegion = true;
+				}
+				if (ServerProperties.getShardName().startsWith("dev") || ServerProperties.getShardName().contains("plots") || ServerProperties.getShardName().equals("mobs") || player.getGameMode() == GameMode.CREATIVE) {
+					scaleRegion = false;
+					scaleRegionLarge = false;
 				}
 
 				for (ItemStat stat : ITEM_STATS) {
