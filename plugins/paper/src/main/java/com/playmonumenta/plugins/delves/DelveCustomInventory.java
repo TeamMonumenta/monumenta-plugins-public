@@ -172,10 +172,14 @@ public class DelveCustomInventory extends CustomInventory {
 		}
 
 		mods = DelvesModifier.valuesList();
-		if (mOwner.getGameMode() != GameMode.CREATIVE) {
+		if (mDungeonName.equals("ring")) {
+			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
+			mods.remove(DelvesModifier.ENTROPY);
+		} else if (mOwner.getGameMode() != GameMode.CREATIVE) {
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
 			mods.addAll(DelvesUtils.getWeeklyRotatingModifier());
 		}
+
 		for (int i = 0; i < 7; i++) {
 			if (mPage * 7 + i >= mods.size()) {
 				break;
