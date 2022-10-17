@@ -61,6 +61,7 @@ public class VolcanicBurstCS extends MagmaShieldCS implements DepthsCS {
 			final Location mLoc = mPlayer.getLocation();
 			double mRadius = 0;
 			int mHeight = 0;
+			int mTimes = 0;
 
 			@Override
 			public void run() {
@@ -70,10 +71,13 @@ public class VolcanicBurstCS extends MagmaShieldCS implements DepthsCS {
 				Vector vec;
 				mRadius += 1.25;
 				mHeight++;
-				world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.7f);
-				world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 0f);
-				world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 0.85f);
-				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.PLAYERS, 1f, 0.75f);
+				mTimes++;
+				if (mTimes % 2 == 1) {
+					world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.75f, 0.75f);
+					world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.65f, 0.65f);
+					world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.85f, 0.85f);
+					world.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.8f, 0.75f);
+				}
 				int flameI = mHeight % 2;
 				double degree = 90 - angle;
 				// particles about every 30 degrees
@@ -108,7 +112,7 @@ public class VolcanicBurstCS extends MagmaShieldCS implements DepthsCS {
 				}
 			}
 
-		}.runTaskTimer(Plugin.getInstance(), 0, 4);
+		}.runTaskTimer(Plugin.getInstance(), 0, 3);
 	}
 
 }

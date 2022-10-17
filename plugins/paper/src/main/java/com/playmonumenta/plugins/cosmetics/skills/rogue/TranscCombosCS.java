@@ -55,19 +55,17 @@ public class TranscCombosCS extends ViciousCombosCS {
 		eLoc.setPitch(0);
 		eLoc.setYaw(mPlayer.getLocation().getYaw());
 
-		world.playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 1, 0.75f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 0.85f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1.25f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 0.75f);
+		world.playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 1.4f, 0.75f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.9f, 0.85f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.75f, 1.25f);
 
 		Location finalLoc = loc;
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			world.playSound(finalLoc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 1, 1.25f);
-			world.playSound(finalLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 1.25f);
-			world.playSound(finalLoc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 1, 1.25f);
-			world.playSound(finalLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1.25f);
-			world.playSound(finalLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1, 0.75f);
-			world.playSound(finalLoc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1f, 0.75f);
+			world.playSound(finalLoc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 1.2f, 1.25f);
+			world.playSound(finalLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.8f, 1.25f);
+			world.playSound(finalLoc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 0.65f, 1.25f);
+			world.playSound(finalLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.6f, 1.25f);
+			world.playSound(finalLoc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 0.5f, 0.75f);
 		}, 2);
 
 
