@@ -635,6 +635,7 @@ public class CharmManager {
 			SanguineHarvest.CHARM_HEAL,
 			SanguineHarvest.CHARM_KNOCKBACK,
 			SanguineHarvest.CHARM_RADIUS,
+			SanguineHarvest.CHARM_RANGE,
 			SanguineHarvest.CHARM_BLEED,
 			SoulRend.CHARM_HEAL,
 			SoulRend.CHARM_ALLY,

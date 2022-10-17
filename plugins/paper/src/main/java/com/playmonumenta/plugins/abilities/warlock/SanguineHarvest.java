@@ -58,6 +58,7 @@ public class SanguineHarvest extends Ability {
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(179, 0, 0), 1.0f);
 
 	public static final String CHARM_RADIUS = "Sanguine Harvest Radius";
+	public static final String CHARM_RANGE = "Sanguine Harvest Range";
 	public static final String CHARM_COOLDOWN = "Sanguine Harvest Cooldown";
 	public static final String CHARM_HEAL = "Sanguine Harvest Healing";
 	public static final String CHARM_KNOCKBACK = "Sanguine Harvest Knockback";
@@ -114,13 +115,15 @@ public class SanguineHarvest extends Ability {
 		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.9f);
 
-		Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(loc, RANGE));
+		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
+		Set<LivingEntity> nearbyMobs = new HashSet<>(EntityUtils.getNearbyMobs(loc, range));
 
 		if (isEnhanced()) {
+			mMarkedLocations.clear();
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 1);
 			Vector v;
 			for (double degree = -40; degree < 40; degree += 10) {
-				for (double r = 0; r <= RANGE; r += 0.55) {
+				for (double r = 0; r <= range; r += 0.55) {
 					double radian = Math.toRadians(degree);
 					v = new Vector(Math.cos(radian) * r, 0, Math.sin(radian) * r);
 					v = VectorUtils.rotateZAxis(v, mPlayer.getLocation().getPitch());
@@ -152,9 +155,13 @@ public class SanguineHarvest extends Ability {
 					}
 				}
 			}
+
+			if (!mMarkedLocations.isEmpty()) {
+				runMarkerRunnable();
+			}
 		}
 
-		for (double r = 0; r < RANGE; r += HITBOX_LENGTH) {
+		for (double r = 0; r < range; r += HITBOX_LENGTH) {
 			Location bLoc = box.getCenter().toLocation(world);
 
 			new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075).spawnAsPlayerActive(mPlayer);
@@ -163,7 +170,6 @@ public class SanguineHarvest extends Ability {
 			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 				bLoc.subtract(direction.multiply(0.5));
 				explode(bLoc);
-				runMarkerRunnable();
 				return;
 			}
 
@@ -173,7 +179,6 @@ public class SanguineHarvest extends Ability {
 				if (mob.getBoundingBox().overlaps(box)) {
 					if (EntityUtils.isHostileMob(mob)) {
 						explode(bLoc);
-						runMarkerRunnable();
 						return;
 					}
 				}
@@ -226,7 +231,7 @@ public class SanguineHarvest extends Ability {
 
 					for (Location location : mMarkedLocations) {
 						BoundingBox boundingBox = BoundingBox.of(location, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
-						new PartialParticle(Particle.REDSTONE, location, 5, 0.25, 0, 0.25, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, location, 3, 0.25, 0, 0.25, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
 
 						if (mTicks % 20 == 0) {
 							List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(location, 1);
