@@ -43,7 +43,9 @@ public class RegionScalingDamageDealt implements Enchantment {
 
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
-		plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 20, MINING_FATIGUE_AMPLIFIER, false, false));
+		if (value > 0) {
+			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 21, MINING_FATIGUE_AMPLIFIER, false, false));
+		}
 	}
 
 	@Override

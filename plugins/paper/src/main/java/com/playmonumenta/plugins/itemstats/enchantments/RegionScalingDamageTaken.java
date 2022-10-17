@@ -51,9 +51,9 @@ public class RegionScalingDamageTaken implements Enchantment {
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		if (value > 0) {
-			plugin.mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(20, SPEED_EFFECT, SPEED_EFFECT_NAME));
+			plugin.mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(21, SPEED_EFFECT, SPEED_EFFECT_NAME));
 			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM,
-				new PotionEffect(PotionEffectType.BAD_OMEN, 20, 0, false, false, false));
+				new PotionEffect(PotionEffectType.BAD_OMEN, 21, 0, false, false, false));
 		}
 	}
 }
