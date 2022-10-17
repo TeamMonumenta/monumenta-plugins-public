@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
 import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
 import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
+import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTCompound;
@@ -122,6 +123,17 @@ public class VirtualItemsReplacer extends PacketAdapter {
 					default -> EquipmentSlot.OFF_HAND;
 				};
 				VanityManager.applyVanity(itemStack, vanityData, equipmentSlot, true);
+			}
+		}
+
+		// Lootboxes: don't send stored items to prevent NBT banning
+		if (ChestUtils.isLootBox(itemStack)) {
+			NBTCompound monumenta = new NBTItem(itemStack, true).getCompound(ItemStatUtils.MONUMENTA_KEY);
+			if (monumenta != null) {
+				NBTCompound playerModified = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+				if (playerModified != null) {
+					playerModified.removeKey(ItemStatUtils.ITEMS_KEY);
+				}
 			}
 		}
 	}
