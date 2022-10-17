@@ -1047,20 +1047,6 @@ public class CharmManager {
 					}
 				}
 			}
-			//Finally, add the custom charm effects
-			List<ItemStack> playerCharms = CharmManager.getInstance().mPlayerCharms.get(p.getUniqueId());
-			List<String> effectsAlreadyAdded = new ArrayList<>();
-			if (playerCharms != null) {
-				for (ItemStack charm : playerCharms) {
-					List<String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(charm));
-					for (String plainLore : plainLoreLines) {
-						if (plainLore.contains("Hit :") && !effectsAlreadyAdded.contains(plainLore)) {
-							summary += plainLore + "\n";
-							effectsAlreadyAdded.add(plainLore);
-						}
-					}
-				}
-			}
 			return summary;
 		}
 		return null;
@@ -1102,21 +1088,6 @@ public class CharmManager {
 				}
 
 				components.add(Component.text(desc, TextColor.fromHexString(charmColor)).decoration(TextDecoration.ITALIC, false));
-			}
-		}
-		//Now add the custom charm effects
-		List<ItemStack> playerCharms = CharmManager.getInstance().mPlayerCharms.get(p.getUniqueId());
-		List<String> effectsAlreadyAdded = new ArrayList<>();
-
-		if (playerCharms != null) {
-			for (ItemStack charm : playerCharms) {
-				List<String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(charm));
-				for (String plainLore : plainLoreLines) {
-					if (plainLore.contains("Hit :") && !effectsAlreadyAdded.contains(plainLore)) {
-						components.add(Component.text(plainLore, TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false));
-						effectsAlreadyAdded.add(plainLore);
-					}
-				}
 			}
 		}
 		return components;
@@ -1277,14 +1248,14 @@ public class CharmManager {
 		String outColor = "#4AC2E5";
 		if (isPositive) {
 			for (String s : mInstance.mFlippedColorEffectSubstrings) {
-				if (charmEffectName.contains(s)) {
+				if (charmEffectName.endsWith(s)) {
 					outColor = "#D02E28";
 					return outColor;
 				}
 			}
 		} else {
 			for (String s : mInstance.mFlippedColorEffectSubstrings) {
-				if (charmEffectName.contains(s)) {
+				if (charmEffectName.endsWith(s)) {
 					return outColor;
 				}
 			}
