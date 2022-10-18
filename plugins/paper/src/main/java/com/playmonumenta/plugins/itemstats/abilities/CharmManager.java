@@ -1081,7 +1081,7 @@ public class CharmManager {
 					desc = desc.substring(0, desc.length() - 2);
 				}
 
-				String charmColor = getCharmEffectColor(allEffects.get(s) > 0, s);
+				String charmColor = getCharmEffectColor(allEffects.get(s) > 0, s.replace("%", ""));
 
 				if (s.contains("%")) {
 					desc += "%";
