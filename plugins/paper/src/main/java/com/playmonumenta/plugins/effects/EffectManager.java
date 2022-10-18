@@ -564,8 +564,11 @@ public final class EffectManager implements Listener {
 		HashMap<String, Effect> output = new HashMap<>();
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
-				for (String source : priorityEffects.keySet()) {
-					output.put(source, priorityEffects.get(source).last());
+				for (Map.Entry<String, NavigableSet<Effect>> entry : priorityEffects.entrySet()) {
+					Effect effect = entry.getValue().pollLast();
+					if (effect != null) {
+						output.put(entry.getKey(), effect);
+					}
 				}
 			}
 		}

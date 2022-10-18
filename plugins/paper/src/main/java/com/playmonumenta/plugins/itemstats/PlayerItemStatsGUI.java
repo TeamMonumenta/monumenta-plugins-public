@@ -129,6 +129,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	}
 
 	private static class Stats {
+		private final Player mPlayer;
 		private final PlayerItemStats mPlayerItemStats = new PlayerItemStats(ItemStatUtils.Region.VALLEY);
 		private final EnumMap<Equipment, ItemStack> mEquipment = new EnumMap<>(Equipment.class);
 		private final EnumMap<Equipment, ItemStack> mDisplayedEquipment = new EnumMap<>(Equipment.class);
@@ -139,7 +140,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		private final Settings mSettings;
 		private InfusionSetting mInfusionSetting = InfusionSetting.DISABLED;
 
-		private Stats(@Nullable Stats mainStats, Settings settings) {
+		private Stats(Player player, @Nullable Stats mainStats, Settings settings) {
+			mPlayer = player;
 			mMainStats = mainStats;
 			mSettings = settings;
 		}
@@ -222,15 +224,22 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		}
 
 		private ItemStatUtils.Region getMaximumRegion(boolean mainhand) {
-			return (mainhand ? Stream.of(Equipment.MAINHAND) : Arrays.stream(Equipment.values()).filter(slot -> slot != Equipment.MAINHAND))
-				.map(slot -> ItemStatUtils.getRegion(getItem(slot)))
-				.filter(region -> region == ItemStatUtils.Region.VALLEY || region == ItemStatUtils.Region.ISLES || region == ItemStatUtils.Region.RING)
-				.max(Comparator.naturalOrder())
-				.orElse(ItemStatUtils.Region.VALLEY);
+			return getMaximumRegion(mainhand, ItemStatUtils.Region.VALLEY);
 		}
 
-		private boolean hasLaterRegionEquipment(boolean mainhand) {
-			return getMaximumRegion(mainhand).compareTo(mPlayerItemStats.getRegion()) > 0;
+		private ItemStatUtils.Region getMaximumRegion(boolean mainhand, ItemStatUtils.Region defaultRegion) {
+			return (mainhand ? Stream.of(Equipment.MAINHAND) : Arrays.stream(Equipment.values()).filter(slot -> slot != Equipment.MAINHAND))
+				       .map(slot -> ItemStatUtils.getRegion(getItem(slot)))
+				       .filter(region -> region == ItemStatUtils.Region.VALLEY || region == ItemStatUtils.Region.ISLES || region == ItemStatUtils.Region.RING)
+				       .max(Comparator.naturalOrder())
+				       .orElse(defaultRegion);
+		}
+
+		private int getRegionScaling(Player player, boolean mainhand) {
+			return (mainhand ? Stream.of(Equipment.MAINHAND) : Arrays.stream(Equipment.values()).filter(slot -> slot != Equipment.MAINHAND))
+				       .mapToInt(slot -> (int) ItemStatManager.getRegionScaling(player, ItemStatUtils.getRegion(getItem(slot)), mPlayerItemStats.getRegion(), 0, 1, 2))
+				       .max()
+				       .orElse(0);
 		}
 
 		private boolean hasMaxShatteredItemEquipped() {
@@ -251,9 +260,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				result *= Shattered.getDamageDealtMultiplier(hasMaxShatteredItemEquipped());
 			}
 
-			if (hasLaterRegionEquipment(true)) {
-				result *= RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER;
-			}
+			result *= RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER[getRegionScaling(mPlayer, true)];
 
 			result *= Choler.getDamageDealtMultiplier(getInfusion(InfusionType.CHOLER));
 			result *= Execution.getDamageDealtMultiplier(getInfusion(InfusionType.EXECUTION));
@@ -297,9 +304,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			damageMultiplier *= ProtectionOfTheDepths.getDamageMultiplier(region2);
 		}
 
-		ItemStatUtils.Region maxRegion = stats.getMaximumRegion(false);
-		if (maxRegion.compareTo(stats.mPlayerItemStats.getRegion()) > 0 && (protection == null || protection.getEnchantmentType() != EnchantmentType.FEATHER_FALLING)) {
-			damageMultiplier *= RegionScalingDamageTaken.DAMAGE_TAKEN_MULTIPLIER;
+		if (protection == null || protection.getEnchantmentType() != EnchantmentType.FEATHER_FALLING) {
+			damageMultiplier *= RegionScalingDamageTaken.DAMAGE_TAKEN_MULTIPLIER[stats.getRegionScaling(stats.mPlayer, false)];
 		}
 
 		if (stats.getInfusion(InfusionType.SHATTERED) > 0) {
@@ -420,24 +426,24 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		SPELL_POWER("Spell Power", PERCENT, stats -> stats.get(AttributeType.SPELL_DAMAGE)),
 		MAGIC_DAMAGE_ADD("+flat Magic Damage", NUMBER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_ADD)),
 		MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", PERCENT_MODIFIER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_MULTIPLY, 1)
-			* stats.getTotalDamageDealtMultiplier()
-			* (1 + Perspicacity.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.PERSPICACITY))),
+			                                                                    * stats.getTotalDamageDealtMultiplier()
+			                                                                    * (1 + Perspicacity.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.PERSPICACITY))),
 		TOTAL_SPELL_DAMAGE("Total Spell Damage %", PERCENT, stats -> SPELL_POWER.get(stats) * MAGIC_DAMAGE_MULTIPLY.get(stats)),
 		COOLDOWN_MULTIPLIER("Cooldown Multiplier", PERCENT, stats -> (1 + Aptitude.getCooldownPercentage(stats.get(EnchantmentType.APTITUDE)))
-			* (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE)))
-			* (1 + Epoch.getCooldownPercentage(stats.getInfusion(InfusionType.EPOCH))), false),
+			                                                             * (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE)))
+			                                                             * (1 + Epoch.getCooldownPercentage(stats.getInfusion(InfusionType.EPOCH))), false),
 		// misc
 		ARMOR("Total Armor", NUMBER, stats -> stats.get(AttributeType.ARMOR)),
 		AGILITY("Total Agility", NUMBER, stats -> stats.get(AttributeType.AGILITY)),
 		MOVEMENT_SPEED("Movement Speed", PERCENT,
 			stats -> stats.getAttributeAmount(AttributeType.SPEED, 0.1,
-				(stats.hasLaterRegionEquipment(false) ? RegionScalingDamageTaken.SPEED_EFFECT : 0)
+				RegionScalingDamageTaken.SPEED_EFFECT[stats.getRegionScaling(stats.mPlayer, false)]
 					+ Ardor.getMovementSpeedBonus(stats.getInfusion(InfusionType.ARDOR))
 					+ Expedite.getMovementSpeedBonus(stats.getInfusion(InfusionType.EXPEDITE), Expedite.MAX_STACKS)) / 0.1),
 		KNOCKBACK_RESISTANCE("Knockback Resistance", PERCENT, stats -> Math.min(1, stats.getAttributeAmount(AttributeType.KNOCKBACK_RESISTANCE, 0)
-			+ Unyielding.getKnockbackResistance(stats.getInfusion(InfusionType.UNYIELDING)))),
+			                                                                           + Unyielding.getKnockbackResistance(stats.getInfusion(InfusionType.UNYIELDING)))),
 		THORNS_DAMAGE("Thorns Damage", NUMBER, stats -> stats.get(AttributeType.THORNS) * stats.getTotalDamageDealtMultiplier()),
-		MINING_SPEED("Mining Speed", NUMBER, stats -> ItemUtils.getMiningSpeed(stats.getItem(Equipment.MAINHAND)) * (stats.hasLaterRegionEquipment(true) ? 0.3 : 1)),
+		MINING_SPEED("Mining Speed", NUMBER, stats -> ItemUtils.getMiningSpeed(stats.getItem(Equipment.MAINHAND)) * (stats.getRegionScaling(stats.mPlayer, true) > 0 ? 0.3 : 1)),
 
 		;
 
@@ -690,7 +696,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private static final int REGION_SETTING_SLOT = 4;
 	private static final ImmutableMap<ItemStatUtils.Region, ItemStack> REGION_ICONS = ImmutableMap.of(
 		ItemStatUtils.Region.VALLEY, ItemUtils.parseItemStack("{id:\"minecraft:cyan_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"sc\",Color:3},{Pattern:\"mc\",Color:11},{Pattern:\"flo\",Color:15},{Pattern:\"bts\",Color:11},{Pattern:\"tts\",Color:11}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: King\\'s Valley\",\"italic\":false,\"bold\":true,\"color\":\"aqua\"}'}}}"),
-		ItemStatUtils.Region.ISLES, ItemUtils.parseItemStack("{id:\"minecraft:green_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"gru\",Color:5},{Pattern:\"bo\",Color:13},{Pattern:\"mr\",Color:13},{Pattern:\"mc\",Color:5}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: Celsian Isles\",\"italic\":false,\"bold\":true,\"color\":\"green\"}'}}}")
+		ItemStatUtils.Region.ISLES, ItemUtils.parseItemStack("{id:\"minecraft:green_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"gru\",Color:5},{Pattern:\"bo\",Color:13},{Pattern:\"mr\",Color:13},{Pattern:\"mc\",Color:5}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: Celsian Isles\",\"italic\":false,\"bold\":true,\"color\":\"green\"}'}}}"),
+		ItemStatUtils.Region.RING, ItemUtils.parseItemStack("{id:\"minecraft:white_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[]},display:{Name:'{\"bold\":true,\"italic\":false,\"underlined\":false,\"color\":\"white\",\"text\":\"Calculation Region: Architect\\\\u0027s Ring\"}'}}}")
 	);
 
 	private static final int SWAP_EQUIPMENT_SET_SLOT = 49;
@@ -698,8 +705,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private static final int INFUSION_SETTINGS_RIGHT_SLOT = 14;
 
 	private final Settings mSettings = new Settings();
-	private final Stats mLeftStats = new Stats(null, mSettings);
-	private final Stats mRightStats = new Stats(mLeftStats, mSettings);
+	private final Stats mLeftStats;
+	private final Stats mRightStats;
 
 	private final boolean mShowVanity;
 
@@ -712,16 +719,17 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	public PlayerItemStatsGUI(Player player, @Nullable Player otherPlayer) {
 		super(player, 54, Component.text("Player Stats Calculator", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-
 		mShowVanity = Plugin.getInstance().mVanityManager.getData(player).mGuiVanityEnabled;
+		mLeftStats = new Stats(player, null, mSettings);
+		mRightStats = new Stats(player, mLeftStats, mSettings);
 
 		setEquipmentFromPlayer(false, player);
 		if (otherPlayer != null) {
 			setEquipmentFromPlayer(true, otherPlayer);
 		}
-		ItemStatUtils.Region region = Stream.of(mLeftStats.getMaximumRegion(false), mRightStats.getMaximumRegion(false))
+		ItemStatUtils.Region region = Stream.of(mLeftStats.getMaximumRegion(false, ServerProperties.getRegion()), mRightStats.getMaximumRegion(false, ServerProperties.getRegion()))
 			                              .max(Comparator.naturalOrder())
-			                              .orElse(ServerProperties.getClassSpecializationsEnabled() ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY);
+			                              .orElse(ServerProperties.getRegion());
 		mLeftStats.mPlayerItemStats.setRegion(region);
 		mRightStats.mPlayerItemStats.setRegion(region);
 		generateInventory();
@@ -817,7 +825,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			}
 
 			if (slot == REGION_SETTING_SLOT) {
-				ItemStatUtils.Region region = mLeftStats.mPlayerItemStats.getRegion() == ItemStatUtils.Region.VALLEY ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY;
+				ItemStatUtils.Region region = mLeftStats.mPlayerItemStats.getRegion() == ItemStatUtils.Region.VALLEY ? ItemStatUtils.Region.ISLES
+					                              : mLeftStats.mPlayerItemStats.getRegion() == ItemStatUtils.Region.ISLES ? ItemStatUtils.Region.RING
+						                                : ItemStatUtils.Region.VALLEY;
 				mLeftStats.mPlayerItemStats.setRegion(region);
 				mRightStats.mPlayerItemStats.setRegion(region);
 				generateInventory();
@@ -971,10 +981,10 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	private static @Nullable ItemStack getWarningIcon(Stats stats) {
 		List<Component> warnings = new ArrayList<>();
-		if (stats.hasLaterRegionEquipment(false)) {
+		if (stats.getRegionScaling(stats.mPlayer, false) > 0) {
 			warnings.add(Component.text("Build has equipment of a later region.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		}
-		if (stats.hasLaterRegionEquipment(true)) {
+		if (stats.getRegionScaling(stats.mPlayer, true) > 0) {
 			warnings.add(Component.text("Build has mainhand of a later region.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		}
 		if (stats.get(EnchantmentType.CURSE_OF_CORRUPTION) > 1) {

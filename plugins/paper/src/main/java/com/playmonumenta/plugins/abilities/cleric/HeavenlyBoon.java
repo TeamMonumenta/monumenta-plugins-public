@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -16,6 +17,7 @@ import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -43,7 +45,23 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	public static final String CHARM_DURATION = "Heavenly Boon Potion Duration";
 	public static final String CHARM_RADIUS = "Heavenly Boon Radius";
 
-	private static final ImmutableSet<String> BOON_DROPS = ImmutableSet.of("Regeneration Boon", "Speed Boon", "Strength Boon", "Absorption Boon", "Resistance Boon", "Regeneration Boon 2", "Speed Boon 2", "Strength Boon 2", "Absorption Boon 2", "Resistance Boon 2");
+	private static final ImmutableSet<String> BOON_DROPS = ImmutableSet.of(
+		"Regeneration Boon", "Speed Boon", "Strength Boon", "Absorption Boon", "Resistance Boon",
+		"Regeneration Boon 2", "Speed Boon 2", "Strength Boon 2", "Absorption Boon 2", "Resistance Boon 2");
+	private static final ImmutableList<NamespacedKey> LEVEL_1_POTIONS = ImmutableList.of(
+		NamespacedKeyUtils.fromString("epic:items/potions/regeneration_boon"),
+		NamespacedKeyUtils.fromString("epic:items/potions/absorption_boon"),
+		NamespacedKeyUtils.fromString("epic:items/potions/speed_boon"),
+		NamespacedKeyUtils.fromString("epic:items/potions/resistance_boon"),
+		NamespacedKeyUtils.fromString("epic:items/potions/strength_boon")
+	);
+	private static final ImmutableList<NamespacedKey> LEVEL_2_POTIONS = ImmutableList.of(
+		NamespacedKeyUtils.fromString("epic:items/potions/regeneration_boon_2"),
+		NamespacedKeyUtils.fromString("epic:items/potions/absorption_boon_2"),
+		NamespacedKeyUtils.fromString("epic:items/potions/speed_boon_2"),
+		NamespacedKeyUtils.fromString("epic:items/potions/resistance_boon_2"),
+		NamespacedKeyUtils.fromString("epic:items/potions/strength_boon_2")
+	);
 
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
@@ -145,44 +163,14 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
-		if (
-			mPlayer != null
-				&& Crusade.enemyTriggersAbilities(mob, mCrusade)
-				&& FastUtils.RANDOM.nextDouble() < mChance
-		) {
-			ItemStack potions;
-			NamespacedKey lootTable;
-
-			int rand = FastUtils.RANDOM.nextInt(5);
-			if (isLevelOne()) {
-				if (rand == 0) {
-					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/regeneration_boon");
-				} else if (rand == 1) {
-					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/absorption_boon");
-				} else if (rand == 2) {
-					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/speed_boon");
-				} else if (rand == 3) {
-					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/resistance_boon");
-				} else {
-					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/strength_boon");
-				}
-			} else {
-				if (rand == 0) {
-					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/regeneration_boon_2");
-				} else if (rand == 1) {
-					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/absorption_boon_2");
-				} else if (rand == 2) {
-					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/speed_boon_2");
-				} else if (rand == 3) {
-					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/resistance_boon_2");
-				} else {
-					lootTable = NamespacedKeyUtils.fromString("epic:items/potions/strength_boon_2");
-				}
-			}
-
+		if (mPlayer != null
+			    && Crusade.enemyTriggersAbilities(mob, mCrusade)
+			    && FastUtils.RANDOM.nextDouble() < mChance) {
+			ImmutableList<NamespacedKey> lootTables = isLevelOne() ? LEVEL_1_POTIONS : LEVEL_2_POTIONS;
+			NamespacedKey lootTable = lootTables.get(FastUtils.RANDOM.nextInt(lootTables.size()));
+			ItemStack potion = InventoryUtils.getItemFromLootTable(mPlayer, lootTable);
 			Location pos = mPlayer.getLocation().add(0, 1, 0);
-			potions = InventoryUtils.getItemFromLootTable(mPlayer, lootTable).clone();
-			EntityUtils.spawnCustomSplashPotion(mPlayer, potions, pos);
+			EntityUtils.spawnCustomSplashPotion(mPlayer, potion, pos);
 
 			if (isEnhanced()) {
 				for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
@@ -195,9 +183,12 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 							}
 							return Math.min(potionInfo.mDuration + Math.min((int) (potionInfo.mDuration * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_BOOST), ENHANCEMENT_POTION_EFFECT_MAX_DURATION);
 						});
-					for (Effect e : mPlugin.mEffectManager.getEffects(p)) {
-						if (e.isBuff()) {
-							e.setDuration(Math.min(e.getDuration() + Math.min((int) (e.getDuration() * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_BOOST), ENHANCEMENT_POTION_EFFECT_MAX_DURATION));
+					List<Effect> effects = mPlugin.mEffectManager.getEffects(p);
+					if (effects != null) {
+						for (Effect e : effects) {
+							if (e.isBuff()) {
+								e.setDuration(Math.min(e.getDuration() + Math.min((int) (e.getDuration() * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_BOOST), ENHANCEMENT_POTION_EFFECT_MAX_DURATION));
+							}
 						}
 					}
 				}

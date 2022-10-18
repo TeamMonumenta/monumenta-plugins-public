@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.potion.PotionManager;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
@@ -17,8 +16,8 @@ import org.bukkit.potion.PotionEffectType;
 public class RegionScalingDamageTaken implements Enchantment {
 
 	private static final String SPEED_EFFECT_NAME = "RegionScalingPercentSpeedEffect";
-	public static final double SPEED_EFFECT = -0.1;
-	public static final double DAMAGE_TAKEN_MULTIPLIER = 3;
+	public static final double[] SPEED_EFFECT = {0, -0.1, -0.2};
+	public static final double[] DAMAGE_TAKEN_MULTIPLIER = {1, 3, 9};
 
 	@Override
 	public String getName() {
@@ -37,23 +36,19 @@ public class RegionScalingDamageTaken implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (value > 0) {
-			if (event.getType() == DamageEvent.DamageType.FALL) {
-				return;
-			}
-			event.setDamage(event.getDamage() * DAMAGE_TAKEN_MULTIPLIER * value);
-			if (event.getType() == DamageEvent.DamageType.POISON) {
-				event.setDamage(Math.min(event.getDamage(), Math.max(player.getHealth() - 1, 0)));
-			}
+		if (event.getType() == DamageEvent.DamageType.FALL) {
+			return;
+		}
+		event.setDamage(event.getDamage() * DAMAGE_TAKEN_MULTIPLIER[Math.max(0, Math.min((int) value, DAMAGE_TAKEN_MULTIPLIER.length - 1))]);
+		if (event.getType() == DamageEvent.DamageType.POISON) {
+			event.setDamage(Math.min(event.getDamage(), Math.max(player.getHealth() - 1, 0)));
 		}
 	}
 
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
-		if (value > 0) {
-			plugin.mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(21, SPEED_EFFECT, SPEED_EFFECT_NAME));
-			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM,
-				new PotionEffect(PotionEffectType.BAD_OMEN, 21, 0, false, false, false));
-		}
+		plugin.mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(21, SPEED_EFFECT[Math.max(0, Math.min((int) value, SPEED_EFFECT.length - 1))], SPEED_EFFECT_NAME));
+		plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM,
+			new PotionEffect(PotionEffectType.BAD_OMEN, 21, 0, false, false, false));
 	}
 }

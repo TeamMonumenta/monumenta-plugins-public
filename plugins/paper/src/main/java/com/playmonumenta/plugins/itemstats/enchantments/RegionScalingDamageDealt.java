@@ -15,7 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class RegionScalingDamageDealt implements Enchantment {
 
-	public static final double DAMAGE_DEALT_MULTIPLIER = 0.5;
+	public static final double[] DAMAGE_DEALT_MULTIPLIER = {1, 0.5, 0.25};
 
 	public static final int MINING_FATIGUE_AMPLIFIER = 0;
 
@@ -36,16 +36,12 @@ public class RegionScalingDamageDealt implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (value > 0) {
-			event.setDamage(event.getDamage() * (DAMAGE_DEALT_MULTIPLIER / value));
-		}
+		event.setDamage(event.getDamage() * DAMAGE_DEALT_MULTIPLIER[Math.max(0, Math.min((int) value, DAMAGE_DEALT_MULTIPLIER.length - 1))]);
 	}
 
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
-		if (value > 0) {
-			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 21, MINING_FATIGUE_AMPLIFIER, false, false));
-		}
+		plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 21, MINING_FATIGUE_AMPLIFIER, false, false));
 	}
 
 	@Override
@@ -55,7 +51,7 @@ public class RegionScalingDamageDealt implements Enchantment {
 			for (PotionUtils.PotionInfo potionInfo : potionInfos) {
 				if (PotionEffectType.SLOW_DIGGING.equals(potionInfo.mType)
 					    && potionInfo.mAmplifier == MINING_FATIGUE_AMPLIFIER
-					    && potionInfo.mDuration <= 20) {
+					    && potionInfo.mDuration <= 21) {
 					potionInfo.mDuration = 0;
 					plugin.mPotionManager.updatePotionStatus(player, 0);
 					return;

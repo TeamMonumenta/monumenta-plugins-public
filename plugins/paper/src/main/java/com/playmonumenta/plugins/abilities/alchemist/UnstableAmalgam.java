@@ -148,6 +148,8 @@ public class UnstableAmalgam extends Ability {
 			return;
 		}
 
+		loc.setY(loc.getY() - 0.26); // spawn location is the bottom of the mob, so lower loc by half the slime's size
+
 		mPlayerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 		int duration = UNSTABLE_AMALGAM_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);

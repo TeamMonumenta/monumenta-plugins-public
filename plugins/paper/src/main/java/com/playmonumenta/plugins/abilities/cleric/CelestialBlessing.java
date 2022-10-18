@@ -71,7 +71,7 @@ public class CelestialBlessing extends Ability {
 			                        .formatted(CELESTIAL_RADIUS,
 				                        StringUtils.multiplierToPercentage(CELESTIAL_1_EXTRA_DAMAGE),
 				                        StringUtils.multiplierToPercentage(CELESTIAL_EXTRA_SPEED),
-				                        CELESTIAL_1_DURATION,
+				                        StringUtils.ticksToSeconds(CELESTIAL_1_DURATION),
 				                        StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN)));
 		mInfo.mDescriptions.add("Increases the buff to +%s%% damage for %ss."
 			                        .formatted(StringUtils.multiplierToPercentage(CELESTIAL_2_EXTRA_DAMAGE), StringUtils.ticksToSeconds(CELESTIAL_2_DURATION)));

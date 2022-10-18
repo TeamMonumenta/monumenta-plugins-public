@@ -221,28 +221,15 @@ public class ItemStatManager implements Listener {
 					NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 					NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
-					boolean scaleRegion = mRegion.compareTo(ItemStatUtils.getRegion(item)) < 0;
-					boolean scaleRegionLarge = mRegion.equals(ItemStatUtils.Region.VALLEY) &&
-						ItemStatUtils.getRegion(item).equals(ItemStatUtils.Region.RING);
-					if (scaleRegionLarge) {
-						scaleRegion = false;
-					}
-					// Comment this statement out AFTER we get rid of R2 in R3 penalty
-					if (mRegion.equals(ItemStatUtils.Region.RING) && ItemStatUtils.getRegion(item).equals(ItemStatUtils.Region.ISLES) && !(player.getScoreboardTags().contains("SKTQuest") && ServerProperties.getShardName().startsWith("skt"))) {
-						scaleRegion = true;
-					}
-					if (ServerProperties.getShardName().startsWith("dev") || ServerProperties.getShardName().contains("plots") || ServerProperties.getShardName().equals("mobs") || player.getGameMode() == GameMode.CREATIVE) {
-						scaleRegion = false;
-						scaleRegionLarge = false;
-					}
+					double regionScaling = getRegionScaling(player, ItemStatUtils.getRegion(item), 1, 0.5, 0.25);
 
 					for (ItemStat stat : ITEM_STATS) {
 						if (stat instanceof Attribute attribute) {
-							double multiplier = attribute.getAttributeType().isRegionScaled() && scaleRegion ? 0.5 : attribute.getAttributeType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
+							double multiplier = attribute.getAttributeType().isRegionScaled() ? regionScaling : 1.0;
 							newArmorAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, slot) * multiplier);
 							newArmorMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, slot) * multiplier);
 						} else if (stat instanceof Enchantment enchantment) {
-							double multiplier = enchantment.getEnchantmentType().isRegionScaled() && scaleRegion ? 0.5 : enchantment.getEnchantmentType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
+							double multiplier = enchantment.getEnchantmentType().isRegionScaled() ? regionScaling : 1.0;
 							if (enchantment.getEnchantmentType() == EnchantmentType.MAINHAND_OFFHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
 								break;
 							}
@@ -250,10 +237,10 @@ public class ItemStatManager implements Listener {
 								newArmorAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 							}
 							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN) {
-								newArmorAddStats.add(stat, scaleRegion ? 1 : scaleRegionLarge ? 2 : 0);
+								newArmorAddStats.add(stat, Math.max(newArmorAddStats.get(enchantment, 0), getRegionScaling(player, ItemStatUtils.getRegion(item), 0, 1, 2)));
 							}
 						} else if (stat instanceof Infusion infusion) {
-							double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : infusion.getInfusionType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
+							double multiplier = infusion.getInfusionType().isRegionScaled() ? regionScaling : 1.0;
 							multiplier = infusion.getInfusionType().isRegionScaled() && Shattered.isShattered(item) ? 0 : multiplier;
 							newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
 						}
@@ -270,28 +257,15 @@ public class ItemStatManager implements Listener {
 				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 				NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
-				boolean scaleRegion = mRegion.compareTo(ItemStatUtils.getRegion(mainhand)) < 0;
-				boolean scaleRegionLarge = mRegion.equals(ItemStatUtils.Region.VALLEY) &&
-					ItemStatUtils.getRegion(mainhand).equals(ItemStatUtils.Region.RING);
-				if (scaleRegionLarge) {
-					scaleRegion = false;
-				}
-				// Comment this statement out AFTER we get rid of R2 in R3 penalty
-				if (mRegion.equals(ItemStatUtils.Region.RING) && ItemStatUtils.getRegion(mainhand).equals(ItemStatUtils.Region.ISLES) && !(player.getScoreboardTags().contains("SKTQuest") && ServerProperties.getShardName().startsWith("skt"))) {
-					scaleRegion = true;
-				}
-				if (ServerProperties.getShardName().startsWith("dev") || ServerProperties.getShardName().contains("plots") || ServerProperties.getShardName().equals("mobs") || player.getGameMode() == GameMode.CREATIVE) {
-					scaleRegion = false;
-					scaleRegionLarge = false;
-				}
+				double regionScaling = getRegionScaling(player, ItemStatUtils.getRegion(mainhand), 1, 0.5, 0.25);
 
 				for (ItemStat stat : ITEM_STATS) {
 					if (stat instanceof Attribute attribute) {
-						double multiplier = attribute.getAttributeType().isMainhandRegionScaled() && scaleRegion ? 0.5 : attribute.getAttributeType().isMainhandRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
+						double multiplier = attribute.getAttributeType().isMainhandRegionScaled() ? regionScaling : 1.0;
 						newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND) * multiplier);
 						newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND) * multiplier);
 					} else if (stat instanceof Enchantment enchantment) {
-						double multiplier = enchantment.getEnchantmentType().isRegionScaled() && scaleRegion ? 0.5 : enchantment.getEnchantmentType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
+						double multiplier = enchantment.getEnchantmentType().isRegionScaled() ? regionScaling : 1.0;
 						if (enchantment.getEnchantmentType() == EnchantmentType.OFFHAND_MAINHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
 							break;
 						}
@@ -299,10 +273,10 @@ public class ItemStatManager implements Listener {
 							newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 						}
 						if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_DEALT) {
-							newMainhandAddStats.add(stat, scaleRegion ? 1 : scaleRegionLarge ? 2 : 0);
+							newMainhandAddStats.add(stat, getRegionScaling(player, ItemStatUtils.getRegion(mainhand), 0, 1, 2));
 						}
 					} else if (stat instanceof Infusion infusion) {
-						double multiplier = infusion.getInfusionType().isRegionScaled() && scaleRegion ? 0.5 : infusion.getInfusionType().isRegionScaled() && scaleRegionLarge ? 0.25 : 1.0;
+						double multiplier = infusion.getInfusionType().isRegionScaled() ? regionScaling : 1.0;
 						newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
 					}
 				}
@@ -317,8 +291,11 @@ public class ItemStatManager implements Listener {
 					newStats.add(stat, (newArmorAddStats.get(stat) + newMainhandAddStats.get(stat)) * (1 + newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat)));
 				}
 				if (stat instanceof CritScaling || stat instanceof AntiCritScaling ||
-					    stat instanceof StrengthApply || stat instanceof StrengthCancel ||
-					    stat instanceof SKTQuestDamageDealt || stat instanceof SKTQuestDamageTaken) {
+					    stat instanceof StrengthApply || stat instanceof StrengthCancel) {
+					newStats.add(stat, 1);
+				}
+				if ((stat instanceof SKTQuestDamageDealt || stat instanceof SKTQuestDamageTaken)
+					    && ServerProperties.getShardName().startsWith("skt")) {
 					newStats.add(stat, 1);
 				}
 			}
@@ -753,4 +730,26 @@ public class ItemStatManager implements Listener {
 			stats.updateStats(player, true, player.getMaxHealth(), true);
 		}
 	}
+
+	public static double getRegionScaling(Player player, ItemStatUtils.Region itemRegion, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
+		return getRegionScaling(player, itemRegion, ServerProperties.getRegion(), baseScaling, oneRegionScaling, twoRegionScaling);
+	}
+
+	public static double getRegionScaling(Player player, ItemStatUtils.Region itemRegion, ItemStatUtils.Region serverRegion, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
+		if (itemRegion == ItemStatUtils.Region.RING) {
+			return serverRegion == ItemStatUtils.Region.VALLEY ? twoRegionScaling
+				       : serverRegion == ItemStatUtils.Region.ISLES ? oneRegionScaling
+					         : baseScaling;
+		} else if (itemRegion == ItemStatUtils.Region.ISLES) {
+			// TODO Remove this if-statement after we get rid of R2 in R3 penalty
+			if (serverRegion == ItemStatUtils.Region.RING
+				    && !(player.getScoreboardTags().contains("SKTQuest") && ServerProperties.getShardName().startsWith("skt"))
+				    && !(ServerProperties.getShardName().startsWith("dev") || ServerProperties.getShardName().contains("plots") || ServerProperties.getShardName().equals("mobs") || player.getGameMode() == GameMode.CREATIVE)) {
+				return oneRegionScaling;
+			}
+			return serverRegion == ItemStatUtils.Region.VALLEY ? oneRegionScaling : baseScaling;
+		}
+		return baseScaling;
+	}
+
 }
