@@ -199,13 +199,13 @@ public class GraveManager {
 				|| ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED) >= Shattered.MAX_LEVEL)) {
 			// Check Lich infusion
 			if (Plugin.getInstance().mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.PHYLACTERY) == 0
-				|| ScoreboardUtils.getScoreboardValue(player, Phylactery.GRAVE_XP_SCOREBOARD).get() == 0) {
+				    || ScoreboardUtils.getScoreboardValue(player, Phylactery.GRAVE_XP_SCOREBOARD).orElse(0) == 0) {
 				player.sendMessage(Component.text("You died but had nothing equipped that could shatter, so no grave was created nor were items shattered further. ", NamedTextColor.GRAY)
-					.append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
+					                   .append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
 			} else if (manager.mGraves.stream().noneMatch(grave -> grave.mGhostGrave && shard.equals(grave.mShardName))) {
 				manager.mGraves.add(new Grave(manager, player, equipment));
 				player.sendMessage(Component.text("You died but had nothing equipped that could shatter, nevertheless you left a grave to store your experience! ", NamedTextColor.GRAY)
-					.append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
+					                   .append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
 			}
 		} else if (manager.mGraves.stream().noneMatch(grave -> grave.mGhostGrave && shard.equals(grave.mShardName))) {
 			manager.mGraves.add(new Grave(manager, player, equipment));
