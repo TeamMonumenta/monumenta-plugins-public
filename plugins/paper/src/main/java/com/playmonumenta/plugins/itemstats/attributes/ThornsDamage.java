@@ -35,7 +35,7 @@ public class ThornsDamage implements Attribute {
 			    && source != null
 			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)
 			    && !event.isBlocked()) {
-			DamageUtils.damage(player, source, DamageType.THORNS, value);
+			DamageUtils.damage(player, source, DamageType.THORNS, value, null, false, true);
 		}
 	}
 }
