@@ -132,6 +132,7 @@ public class ItemStatManager implements Listener {
 
 		private ItemStatsMap mArmorAddStats = new ItemStatsMap();
 		private ItemStatsMap mArmorMultiplyStats = new ItemStatsMap();
+		private ItemStatsMap mMainhandAddStats = new ItemStatsMap();
 		private ItemStatsMap mStats = new ItemStatsMap();
 
 		private ItemStatUtils.Region mRegion;
@@ -154,6 +155,10 @@ public class ItemStatManager implements Listener {
 
 		public ItemStatsMap getItemStats() {
 			return mStats;
+		}
+
+		public ItemStatsMap getMainhandAddStats() {
+			return mMainhandAddStats;
 		}
 
 		public ItemStatUtils.Region getRegion() {
@@ -302,6 +307,7 @@ public class ItemStatManager implements Listener {
 
 			mArmorAddStats = newArmorAddStats;
 			mArmorMultiplyStats = newArmorMultiplyStats;
+			mMainhandAddStats = newMainhandAddStats;
 			mStats = newStats;
 
 		}

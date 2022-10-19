@@ -116,17 +116,7 @@ public class ElementalArrows extends Ability {
 	}
 
 	private void applyArrowEffects(DamageEvent event, LivingEntity enemy, double multiplier, ClassAbility ability, ItemStatManager.PlayerItemStats playerItemStats, @Nullable Class<? extends Entity> bonusEntity, Consumer<LivingEntity> effectAction) {
-		Player p = (Player) event.getDamager();
-		if (p == null) {
-			return;
-		}
-
-		ItemStack item = p.getItemInHand();
-		if (item == null || item.getType() == Material.AIR) {
-			return;
-		}
-
-		double damage = ItemStatUtils.getAttributeAmount(item, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
+		double damage = playerItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
 		mLastDamage = damage;
 
 		double targetDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage) * multiplier;
