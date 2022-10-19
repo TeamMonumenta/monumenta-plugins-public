@@ -41,7 +41,7 @@ public class Smokescreen extends Ability {
 	private final double mWeakenEffect;
 
 	public Smokescreen(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Smoke Screen");
+		super(plugin, player, "Smokescreen");
 		mInfo.mLinkedSpell = ClassAbility.SMOKESCREEN;
 		mInfo.mScoreboardId = "SmokeScreen";
 		mInfo.mShorthandName = "Smk";
