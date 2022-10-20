@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import org.bukkit.entity.Dolphin;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Golem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Ocelot;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.plugin.Plugin;
 
@@ -53,11 +55,13 @@ public class GenericTargetBoss extends BossAbilityGroup {
 				}
 
 				if (mLastTarget != null) {
-					if (!mLastTarget.isValid() || mLastTarget.isDead()) {
+					if (!mLastTarget.isValid() || mLastTarget.isDead() || (mLastTarget instanceof Player player && AbilityUtils.isStealthed(player))) {
 						mLastTarget = null;
 						mob.setTarget(null);
 					}
-				} else {
+				}
+
+				if (mLastTarget == null) {
 					List<? extends LivingEntity> targets = param.TARGETS.getTargetsList(mob);
 					if (targets.size() > 0) {
 						mob.setTarget(targets.get(0));

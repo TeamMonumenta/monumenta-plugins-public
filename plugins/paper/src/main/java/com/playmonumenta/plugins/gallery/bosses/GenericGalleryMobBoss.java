@@ -50,7 +50,7 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 					return;
 				}
 
-				if (mLastTarget != mob.getTarget() && mob.getTarget() != null) {
+				if (mLastTarget != mob.getTarget() && mob.getTarget() instanceof Player) {
 					mLastTarget = mob.getTarget();
 				}
 
@@ -59,8 +59,10 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 						mLastTarget = null;
 						mob.setTarget(null);
 					}
-				} else {
-					List<? extends LivingEntity> targets = TARGETS.getTargetsList(mob).stream().filter(GalleryUtils::isPlayerDeath).toList();
+				}
+
+				if (mLastTarget == null) {
+					List<? extends LivingEntity> targets = TARGETS.getTargetsList(mob).stream().filter((player) -> !GalleryUtils.isPlayerDeath(player)).toList();
 					if (targets.size() > 0) {
 						mob.setTarget(targets.get(0));
 						mLastTarget = targets.get(0);
