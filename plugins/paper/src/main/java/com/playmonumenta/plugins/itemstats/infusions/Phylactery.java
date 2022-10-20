@@ -139,7 +139,10 @@ public class Phylactery implements Infusion {
 					String source = pair.mSource;
 					Effect effect = pair.mEffect;
 
-					plugin.mEffectManager.addEffect(player, source, effect);
+					// Skip Patreon Effects
+					if (!source.startsWith("PatronShrine")) {
+						plugin.mEffectManager.addEffect(player, source, effect);
+					}
 				}
 			}, 1);
 		}

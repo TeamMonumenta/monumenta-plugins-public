@@ -234,6 +234,24 @@ public class CustomEffect {
 				new ObjectiveArgument("objective"),
 				new MultiLiteralArgument("minutes", "seconds", "ticks"),
 				new ScoreHolderArgument("scoreholder", ScoreHolderArgument.ScoreHolderType.SINGLE),
+				new DoubleArgument("amount"),
+				new GreedyStringArgument("source")
+			).executes((sender, args) -> {
+				int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue((String) args[4], (String) args[2]).orElse(0));
+				for (Entity entity : (Collection<Entity>) args[0]) {
+					if (duration > 0) {
+						singleArgumentEffects.get((String) args[1]).run(entity, duration, (double) args[5], (String) args[6]);
+					}
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
+			.withArguments(
+				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new MultiLiteralArgument(singleArgumentEffects.keySet().toArray(String[]::new)),
+				new ObjectiveArgument("objective"),
+				new MultiLiteralArgument("minutes", "seconds", "ticks"),
+				new ScoreHolderArgument("scoreholder", ScoreHolderArgument.ScoreHolderType.SINGLE),
 				new DoubleArgument("amount")
 			).executes((sender, args) -> {
 				int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue((String) args[4], (String) args[2]).orElse(0));

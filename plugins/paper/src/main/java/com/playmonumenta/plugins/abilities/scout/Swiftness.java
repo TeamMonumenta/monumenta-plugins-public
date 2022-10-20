@@ -70,13 +70,6 @@ public class Swiftness extends Ability {
 	}
 
 	@Override
-	public void setupClassPotionEffects() {
-		if (isLevelTwo()) {
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST), true, false));
-		}
-	}
-
-	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		boolean isInNoMobilityZone = ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES);
 
@@ -87,6 +80,10 @@ public class Swiftness extends Ability {
 		}
 
 		mWasInNoMobilityZone = isInNoMobilityZone;
+
+		if (oneSecond && isLevelTwo() && !mWasInNoMobilityZone && mJumpBoost) {
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 21, SWIFTNESS_EFFECT_JUMP_LVL + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST), true, false));
+		}
 	}
 
 	@Override
@@ -108,7 +105,7 @@ public class Swiftness extends Ability {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 2.0f, 1.6f);
 		} else {
 			mJumpBoost = true;
-			setupClassPotionEffects();
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 21, SWIFTNESS_EFFECT_JUMP_LVL + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST), true, false));
 			MessagingUtils.sendActionBarMessage(mPlayer, "Jump Boost has been turned on");
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 1.6f);
 		}

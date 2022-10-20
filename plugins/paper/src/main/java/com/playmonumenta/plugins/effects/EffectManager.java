@@ -645,11 +645,16 @@ public final class EffectManager implements Listener {
 			JsonArray sourceList = priorityEffect.get("source").getAsJsonArray();
 			for (JsonElement sourceElement : sourceList) {
 				String source = sourceElement.getAsString();
+
+				// Skip re-application if effect is from the Patron Shrine
+				if (source.startsWith("PatronShrine")) {
+					continue;
+				}
+
 				JsonArray innerArray = priorityEffect.get(source).getAsJsonArray();
 				for (JsonElement effectJson : innerArray) {
 					JsonObject effectObject = effectJson.getAsJsonObject();
 					Effect effect = getEffectFromJson(effectObject, plugin);
-
 					if (effect != null) {
 						addEffect(player, source, effect);
 					}

@@ -82,11 +82,11 @@ public class Agility extends Ability {
 	}
 
 	@Override
-	public void setupClassPotionEffects() {
-		if (mPlayer != null) {
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		if (oneSecond) {
 			int effectLevel = isLevelOne() ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL;
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-				new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLevel, true, false));
+				new PotionEffect(PotionEffectType.FAST_DIGGING, 21, effectLevel, true, false));
 		}
 	}
 }
