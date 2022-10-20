@@ -163,6 +163,7 @@ public class Plugin extends JavaPlugin {
 		DebugInfo.register(this);
 		BossDebug.register();
 		RefreshClass.register(this);
+		ResetClass.register(this);
 		Effect.register(this);
 		RemoveTags.register();
 		DeathMsg.register();
