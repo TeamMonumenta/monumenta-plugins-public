@@ -1103,19 +1103,11 @@ public class EntityUtils {
 	}
 
 	public static boolean isRecoilDisable(Plugin plugin, LivingEntity mob, int amount) {
-		if (getRecoilDisableAmount(plugin, mob) >= amount) {
-			return true;
-		}
-		return false;
+		return getRecoilDisableAmount(plugin, mob) >= amount;
 	}
 
 	public static boolean isRiptideDisable(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> disable = plugin.mEffectManager.getEffects(mob, NO_RECOIL_EFFECT_NAME);
-		if (disable != null) {
-			return true;
-		} else {
-			return false;
-		}
+		return plugin.mEffectManager.hasEffect(mob, NO_RECOIL_EFFECT_NAME);
 	}
 
 	private static final String ARROW_IFRAMES_EFFECT_NAME = "SplitArrrowIframesEffect";

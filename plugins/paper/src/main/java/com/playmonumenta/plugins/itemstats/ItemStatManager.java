@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -35,6 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
@@ -137,6 +139,11 @@ public class ItemStatManager implements Listener {
 
 		private ItemStatUtils.Region mRegion;
 
+		/**
+		 * The mainhand item held when these stats were last updated. Used to check for mainhand modifications by commands or similar.
+		 */
+		private @Nullable ItemStack mMainhand;
+
 		public PlayerItemStats(ItemStatUtils.Region region) {
 			mRegion = region;
 		}
@@ -194,6 +201,8 @@ public class ItemStatManager implements Listener {
 		}
 
 		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet, Player player, boolean updateAll) {
+			mMainhand = mainhand;
+
 			ItemStatsMap newArmorAddStats;
 			ItemStatsMap newMainhandAddStats = new ItemStatsMap();
 			ItemStatsMap newArmorMultiplyStats;
@@ -526,6 +535,9 @@ public class ItemStatManager implements Listener {
 	}
 
 	public void tick(Plugin plugin, Player player, PlayerItemStats stats, boolean twoHz, boolean oneHz) {
+		if (!Objects.equals(stats.mMainhand, player.getInventory().getItemInMainHand())) {
+			stats.updateStats(player, false, EntityUtils.getMaxHealth(player), true);
+		}
 		for (Entry<ItemStat, Double> entry : stats.getItemStats()) {
 			entry.getKey().tick(plugin, player, entry.getValue(), twoHz, oneHz);
 		}
