@@ -234,8 +234,9 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			List<Component> itemLoreA = new ArrayList<>();
 			itemLoreA.add(Component.text("To enhance the selected item, you will need", NamedTextColor.DARK_GRAY)
 				.decoration(TextDecoration.ITALIC, false));
-			itemLoreA.add(Component.text(MasterworkUtils.getCostString(MasterworkCost.getMasterworkCost(costStringA), p),
-				NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+			for (String str : MasterworkUtils.getCostStringList(MasterworkCost.getMasterworkCost(costStringA), p)) {
+				itemLoreA.add(Component.text(str, NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+			}
 			standardMetaA.lore(itemLoreA);
 			upgradeIconA.setItemMeta(standardMetaA);
 			mInventory.setItem(21, upgradeIconA);
@@ -251,8 +252,9 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			List<Component> itemLoreB = new ArrayList<>();
 			itemLoreB.add(Component.text("To enhance the selected item, you will need", NamedTextColor.DARK_GRAY)
 				.decoration(TextDecoration.ITALIC, false));
-			itemLoreB.add(Component.text(MasterworkUtils.getCostString(MasterworkCost.getMasterworkCost(costStringB), p),
-				NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+			for (String str : MasterworkUtils.getCostStringList(MasterworkCost.getMasterworkCost(costStringB), p)) {
+				itemLoreB.add(Component.text(str, NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+			}
 			standardMetaB.lore(itemLoreB);
 			upgradeIconB.setItemMeta(standardMetaB);
 			mInventory.setItem(22, upgradeIconB);
@@ -268,8 +270,9 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			List<Component> itemLoreC = new ArrayList<>();
 			itemLoreC.add(Component.text("To enhance the selected item, you will need", NamedTextColor.DARK_GRAY)
 				.decoration(TextDecoration.ITALIC, false));
-			itemLoreC.add(Component.text(MasterworkUtils.getCostString(MasterworkCost.getMasterworkCost(costStringC), p),
-				NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+			for (String str : MasterworkUtils.getCostStringList(MasterworkCost.getMasterworkCost(costStringC), p)) {
+				itemLoreC.add(Component.text(str, NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+			}
 			standardMetaC.lore(itemLoreC);
 			upgradeIconC.setItemMeta(standardMetaC);
 			mInventory.setItem(23, upgradeIconC);
@@ -307,8 +310,9 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			List<Component> itemLore = new ArrayList<>();
 			itemLore.add(Component.text("To enhance the selected item, you will need", NamedTextColor.DARK_GRAY)
 				.decoration(TextDecoration.ITALIC, false));
-			itemLore.add(Component.text(MasterworkUtils.getCostString(MasterworkCost.getMasterworkCost(costString), p),
-					NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+			for (String str : MasterworkUtils.getCostStringList(MasterworkCost.getMasterworkCost(costString), p)) {
+				itemLore.add(Component.text(str, NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+			}
 			standardMeta.lore(itemLore);
 			upgradeIcon.setItemMeta(standardMeta);
 			mInventory.setItem(22, upgradeIcon);

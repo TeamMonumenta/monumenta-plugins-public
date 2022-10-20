@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Masterwork;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
@@ -205,24 +206,34 @@ public class MasterworkUtils {
 		}
 	}
 
-	public static String getCostString(MasterworkCost m, Player p) {
-		String outString = "";
-		outString += m.getCostA();
-		outString += " ";
-		outString += ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p,
+	public static List<String> getCostStringList(MasterworkCost m, Player p) {
+		String itemName;
+		String strA = m.getCostA() + " ";
+		itemName = ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p,
 			NamespacedKeyUtils.fromString(m.getPathA())));
+		strA += itemName;
 		if (m.getCostA() > 1) {
-			outString += "s";
+			strA += itemNameSuffix(p, itemName);
 		}
-		outString += " and ";
-		outString += m.getCostB();
-		outString += " ";
-		outString += ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p,
+		strA += " and";
+
+		String strB = m.getCostB() + " ";
+		itemName = ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p,
 			NamespacedKeyUtils.fromString(m.getPathB())));
+		strB += itemName;
 		if (m.getCostB() > 1) {
-			outString += "s";
+			strB += itemNameSuffix(p, itemName);
 		}
-		return outString;
+		return List.of(strA, strB);
+	}
+
+	private static String itemNameSuffix(Player p, String itemName) {
+		if (itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p,
+			NamespacedKeyUtils.fromString(GALLEY_MAT))))) {
+			//Torn Canvas, do nothing
+			return "";
+		}
+		return "s";
 	}
 
 	public static boolean canPayCost(MasterworkCost m, Player p, boolean isRefund) {
