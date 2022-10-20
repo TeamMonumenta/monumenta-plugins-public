@@ -159,7 +159,8 @@ public class BountyGui extends Gui {
 				bountyTag += preset.mId;
 			}
 			for (Player target : playersInRange) {
-				if (getBountyChoice(target, mRegion, i) == 0) {
+				if (getBountyChoice(target, mRegion, i) == 0
+					    && ScoreboardUtils.getScoreboardValue(target, BOUNTY_SCOREBOARDS.get(mRegion - 1)).orElse(0) == 0) {
 					ScoreboardUtils.setScoreboardValue(target, getBountyChoiceObjective(mRegion, i), bountyTag);
 					if (target != player && i == 0) {
 						target.sendMessage("Your bounty options for today have been rolled by " + player.getName() + "!");
