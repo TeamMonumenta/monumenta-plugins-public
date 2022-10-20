@@ -85,6 +85,7 @@ import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -498,21 +499,26 @@ public class PlayerListener implements Listener {
 
 		// If item contains curse of ephemerality, prevent from putting in other inventories
 		// Checks for player inventory unless it's a shift click
-		if (
-			// Prevent shift-clicking an ephemeral item from your inventory to something else
+		if (!event.getWhoClicked().getGameMode().equals(GameMode.CREATIVE) &&
 			(
-				(event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT)
-					&& item != null
-					&& CurseOfEphemerality.isEphemeral(item)
-					&& event.getClickedInventory() instanceof PlayerInventory
-			)
+				// Prevent shift-clicking an ephemeral item from your inventory to something else
+				(
+					(event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT)
+						&& item != null
+						&& CurseOfEphemerality.isEphemeral(item)
+						&& event.getView().getTopInventory().getType() != InventoryType.CRAFTING // Allow shift-click between inventory and hotbar
+						&& event.getClickedInventory() instanceof PlayerInventory
+				)
 				// Prevent clicking an ephemeral item from your cursor down into something else
 				|| (
-				event.getClick() != ClickType.SHIFT_LEFT
-					&& event.getClick() != ClickType.SHIFT_RIGHT
-					&& event.getCursor() != null
-					&& CurseOfEphemerality.isEphemeral(event.getCursor())
-			)) {
+					event.getClick() != ClickType.SHIFT_LEFT
+						&& event.getClick() != ClickType.SHIFT_RIGHT
+						&& event.getCursor() != null
+						&& CurseOfEphemerality.isEphemeral(event.getCursor())
+						&& !(event.getClickedInventory() instanceof PlayerInventory)
+				)
+			)
+		) {
 			event.setCancelled(true);
 			return;
 		}
@@ -543,18 +549,20 @@ public class PlayerListener implements Listener {
 	// If an item is being dragged in an inventory
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void inventoryDragEvent(InventoryDragEvent event) {
-		if (event.getWhoClicked() instanceof Player) {
-			Player player = (Player) event.getWhoClicked();
+		if (event.getWhoClicked() instanceof Player player) {
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
-		}
-		//If item contains curse of ephemerality, prevent from putting in other inventories
-		if (event.getWhoClicked() instanceof Player && event.getCursor() != null && CurseOfEphemerality.isEphemeral(event.getCursor())) {
-			event.setCancelled(true);
-		} else if (event.getNewItems() != null) {
-			for (Map.Entry<Integer, ItemStack> iter : event.getNewItems().entrySet()) {
-				if (CurseOfEphemerality.isEphemeral(iter.getValue())) {
+
+			//If item contains curse of ephemerality, prevent from putting in other inventories
+			if (player.getGameMode() != GameMode.CREATIVE && !(event.getInventory() instanceof PlayerInventory)) {
+				if (event.getCursor() != null && CurseOfEphemerality.isEphemeral(event.getCursor())) {
 					event.setCancelled(true);
-					return;
+				} else {
+					for (Map.Entry<Integer, ItemStack> iter : event.getNewItems().entrySet()) {
+						if (CurseOfEphemerality.isEphemeral(iter.getValue())) {
+							event.setCancelled(true);
+							return;
+						}
+					}
 				}
 			}
 		}
@@ -667,7 +675,9 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		//Cleanse mobs around player in dungeon if running solo
+		InventoryUtils.removeSpecialItems(player, true);
+
+		//Cleanse mobs around player in d6ungeon if running solo
 		if (Plugin.IS_PLAY_SERVER && ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
 			if (PlayerUtils.otherPlayersInRange(event.getEntity(), 48, true).size() == 0) {
 				List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(event.getEntity().getLocation(), 20);
