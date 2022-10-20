@@ -75,7 +75,7 @@ public class ManaLance extends MultipleChargeAbility {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer == null) {
+		if (mPlayer == null || mPlayer.isSneaking() || ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
 			return;
 		}
 
@@ -129,15 +129,6 @@ public class ManaLance extends MultipleChargeAbility {
 
 		mCosmetic.lanceParticle(mPlayer, loc, endLoc, i, range);
 		mCosmetic.lanceSound(world, mPlayer);
-	}
-
-	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return !mPlayer.isSneaking() && ItemUtils.isWand(mainHand);
 	}
 
 	@Override
