@@ -176,8 +176,12 @@ public class DelveCustomInventory extends CustomInventory {
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
 			mods.remove(DelvesModifier.ENTROPY);
 		} else if (mOwner.getGameMode() != GameMode.CREATIVE) {
-			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
-			mods.addAll(DelvesUtils.getWeeklyRotatingModifier());
+			List<DelvesModifier> weeklyMods = DelvesUtils.getWeeklyRotatingModifier();
+			for (DelvesModifier rotating : DelvesModifier.rotatingDelveModifiers()) {
+				if (mPointSelected.get(rotating) == 0 && !weeklyMods.contains(rotating)) {
+					mods.remove(rotating);
+				}
+			}
 		}
 
 		for (int i = 0; i < 7; i++) {
@@ -404,8 +408,12 @@ public class DelveCustomInventory extends CustomInventory {
 				if (i == column) {
 					List<DelvesModifier> mods = DelvesModifier.valuesList();
 					if (mOwner.getGameMode() != GameMode.CREATIVE) {
-						mods.removeAll(DelvesModifier.rotatingDelveModifiers());
-						mods.addAll(DelvesUtils.getWeeklyRotatingModifier());
+						List<DelvesModifier> weeklyMods = DelvesUtils.getWeeklyRotatingModifier();
+						for (DelvesModifier rotating : DelvesModifier.rotatingDelveModifiers()) {
+							if (mPointSelected.get(rotating) == 0 && !weeklyMods.contains(rotating)) {
+								mods.remove(rotating);
+							}
+						}
 					}
 					DelvesModifier mod = mods.get(column - 1 + (mPage * 7));
 					if (row == 5) {
