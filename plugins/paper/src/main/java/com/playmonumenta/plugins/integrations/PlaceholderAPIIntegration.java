@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -23,11 +24,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 	Plugin mPlugin;
+	boolean mIsPlay;
 
 	public PlaceholderAPIIntegration(Plugin plugin) {
 		super();
 		plugin.getLogger().info("Enabling PlaceholderAPI integration");
 		mPlugin = plugin;
+		mIsPlay = Plugin.IS_PLAY_SERVER;
 	}
 
 	@Override
@@ -105,12 +108,17 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 		}
 
 		if (identifier.equalsIgnoreCase("shard")) {
-			String toCut = player.getWorld().getName();
-			String mask = "Project_Epic-";
-			if (toCut.length() > mask.length()) {
-				String finalString = toCut.substring(mask.length(), toCut.length());
-				return finalString;
+			String shard = ServerProperties.getShardName();
+
+			// TODO begin temp
+			if (shard.contains("plots")) {
+				return shard;
+			} else if (mIsPlay && ServerProperties.getAbilityEnhancementsEnabled()) {
+				return "ring";
 			}
+			// TODO end temp
+
+			return shard;
 		}
 
 		//Player equipped title
