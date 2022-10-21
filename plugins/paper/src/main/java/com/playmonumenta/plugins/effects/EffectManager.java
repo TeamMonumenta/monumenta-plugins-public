@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
+import java.util.NoSuchElementException;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -565,9 +566,13 @@ public final class EffectManager implements Listener {
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (Map.Entry<String, NavigableSet<Effect>> entry : priorityEffects.entrySet()) {
-					Effect effect = entry.getValue().pollLast();
-					if (effect != null) {
-						output.put(entry.getKey(), effect);
+					try {
+						Effect effect = entry.getValue().last();
+						if (effect != null) {
+							output.put(entry.getKey(), effect);
+						}
+					} catch (NoSuchElementException e) {
+						// ignore - effect was probably removed in another thread (and this method can be called by the tab list from arbitrary threads)
 					}
 				}
 			}
