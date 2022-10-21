@@ -137,6 +137,10 @@ public class SpellBaseLeapAttack extends Spell {
 			return;
 		}
 
+		launch(locTarget, loc, targetPlayer, true);
+	}
+
+	public void launch(Location locTarget, Location loc, Player targetPlayer, boolean checkPassable) {
 		mInitiateAesthetic.run(mWorld, mBoss.getEyeLocation());
 
 		Vector offset = locTarget.clone().subtract(loc).toVector().normalize().multiply(mRunDistance);
@@ -150,7 +154,7 @@ public class SpellBaseLeapAttack extends Spell {
 			}
 		}
 
-		if (i == 3) {
+		if (i == 3 && checkPassable) {
 			// Failed to find a good path
 			return;
 		}

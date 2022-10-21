@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,51 +31,41 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class SandsOfTime extends Spell {
+	private static final int BELL_TIME = 30;
 	private static final double RADIUS = 21;
 	private static final double HEIGHT = 4;
-	private static final double RED_DAMAGE = 180;
-	private static final double RED_DIST = 25;
-	private static final int RED_SPREAD = 4;
-	private static final double RED_RADIUS = 2.5;
-	private static final double BLUE_DAMAGE = 180;
+	private static final double DAMAGE = 180;
 	private static final int BLUE_ROOT = 4 * 20;
+	private static final double DIST = 25;
+	private static final int SPREAD = 4;
+	private static final int BLUE_DELAY = 3 * 20;
 	private static final String ROOT_EFFECT = "SandsOfTimePercentSpeedEffect";
-	private static final int BLUE_DELAY = 2 * 20;
-	private static final double BLUE_MIN_DIST = 5;
-	private static final double BLUE_MAX_DIST = 20;
-	private static final double BLUE_ANGLE = 30;
-	private static final double BLUE_RADIUS = 7;
 	private static final String RED_TEAM = "SandsOfTimeRed";
 	private static final String BLUE_TEAM = "SandsOfTimeBlue";
 
 	private final LivingEntity mBoss;
 	private final Location mCenter;
 	private final int mCooldownTicks;
-	private final TealSpirit mTealSpirit;
 	private final ChargeUpManager mChargeUp;
 
 	private final Team mNormalTeam;
 	private final Team mRedTeam;
 	private final Team mBlueTeam;
 
-	public SandsOfTime(LivingEntity boss, Location center, Team team, int cooldownTicks, TealSpirit tealSpirit) {
+	public SandsOfTime(LivingEntity boss, Location center, Team team, int cooldownTicks) {
 		mBoss = boss;
 		mCenter = center;
 		mCooldownTicks = cooldownTicks;
-		mTealSpirit = tealSpirit;
 
 		mNormalTeam = team;
 		mRedTeam = ScoreboardUtils.getExistingTeamOrCreate(RED_TEAM, NamedTextColor.DARK_RED);
 		mBlueTeam = ScoreboardUtils.getExistingTeamOrCreate(BLUE_TEAM, NamedTextColor.BLUE);
 
-		mChargeUp = new ChargeUpManager(mCenter, mBoss, 4 * 20, ChatColor.BLUE + "Channeling Sands of Time...", BarColor.BLUE, BarStyle.SOLID, TealSpirit.detectionRange);
+		mChargeUp = new ChargeUpManager(mCenter, mBoss, 4 * BELL_TIME, ChatColor.BLUE + "Channeling Sands of Time...", BarColor.BLUE, BarStyle.SOLID, TealSpirit.detectionRange);
 	}
 
 	@Override
 	public void run() {
-		mTealSpirit.setInterspellCooldown(5 * 20);
-
-		World world = mCenter.getWorld();
 		Plugin plugin = Plugin.getInstance();
 		mBoss.setInvulnerable(true);
 		mBoss.setAI(false);
@@ -104,8 +93,8 @@ public class SandsOfTime extends Spell {
 			@Override
 			public void run() {
 				int time = mChargeUp.getTime();
-				if (time % 20 == 0 && time < 80) {
-					int i = time / 20;
+				if (time % BELL_TIME == 0 && time < 4 * BELL_TIME) {
+					int i = time / BELL_TIME;
 					Location loc = locs.get(i);
 					mBoss.teleport(loc);
 					float pitch;
@@ -123,7 +112,7 @@ public class SandsOfTime extends Spell {
 
 					for (Player player : PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true)) {
 						Location playerLoc = player.getLocation();
-						Location soundLoc = playerLoc.clone().add(LocationUtils.getDirectionTo(loc, playerLoc).multiply(3));
+						Location soundLoc = playerLoc.clone().add(LocationUtils.getDirectionTo(loc, playerLoc).normalize().multiply(3));
 						player.playSound(soundLoc, Sound.BLOCK_BELL_USE, 1, pitch);
 						player.playSound(soundLoc, Sound.BLOCK_BELL_USE, 0.75f, pitch * 0.334f);
 					}
@@ -137,59 +126,19 @@ public class SandsOfTime extends Spell {
 					for (int i = 0; i < locs.size(); i++) {
 						Location loc = locs.get(i);
 						if (bools.get(i)) {
-							activateRed(plugin, loc);
+							activate(plugin, loc, Color.RED, false, tallCenter);
 						} else {
 							Bukkit.getScheduler().runTaskLater(plugin, () -> {
-								activateBlue(plugin, loc);
+								activate(plugin, loc, Color.BLUE, true, tallCenter);
 							}, BLUE_DELAY);
 						}
 					}
-
-					Bukkit.getScheduler().runTaskLater(plugin, () -> {
-						List<Location> soundLocs = getRandomLocationsNear(tallCenter, 3);
-						for (Location loc : soundLocs) {
-							world.playSound(loc, Sound.ITEM_CROSSBOW_LOADING_START, 2.0f, 0.75f);
-						}
-					}, 2);
-
-					Bukkit.getScheduler().runTaskLater(plugin, () -> {
-						List<Location> soundLocs = getRandomLocationsNear(tallCenter, 5);
-						for (Location loc : soundLocs) {
-							world.playSound(loc, Sound.ITEM_TRIDENT_THROW, 1.5f, 1.25f);
-						}
-					}, 5);
-
-					Bukkit.getScheduler().runTaskLater(plugin, () -> {
-						for (int i = 0; i < locs.size(); i++) {
-							Location loc = locs.get(i);
-							if (bools.get(i)) {
-								List<Location> soundLocs = getRandomLocationsNear(loc, 3);
-								for (Location soundLoc : soundLocs) {
-									world.playSound(soundLoc, Sound.ITEM_TRIDENT_HIT_GROUND, 1.2f, 1.25f);
-								}
-								soundLocs = getRandomLocationsNear(loc, 3);
-								for (Location soundLoc : soundLocs) {
-									world.playSound(soundLoc, Sound.ENTITY_ARROW_HIT, 1.2f, 0.8f);
-								}
-							}
-						}
-					}, 10);
 
 					Bukkit.getScheduler().runTaskLater(plugin, () -> {
 						mBoss.setInvulnerable(false);
 						mBoss.setAI(true);
 						mBoss.setGravity(true);
 					}, BLUE_DELAY);
-
-					Bukkit.getScheduler().runTaskLater(plugin, () -> {
-						for (int i = 0; i < locs.size(); i++) {
-							Location loc = locs.get(i);
-							if (!bools.get(i)) {
-								world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 0.5f);
-								world.playSound(loc, Sound.BLOCK_SHROOMLIGHT_BREAK, 1.0f, 0.5f);
-							}
-						}
-					}, BLUE_DELAY + 10);
 
 					mChargeUp.reset();
 					this.cancel();
@@ -198,15 +147,15 @@ public class SandsOfTime extends Spell {
 		}.runTaskTimer(plugin, 0, 1);
 	}
 
-	private void activateRed(Plugin plugin, Location loc) {
+	private void activate(Plugin plugin, Location loc, Color color, boolean doRoot, Location tallCenter) {
 		World world = loc.getWorld();
 		Vector dir = LocationUtils.getDirectionTo(loc, mCenter);
 		Vector horizontal = new Vector(-dir.getZ(), 0, dir.getX()).normalize();
-		for (int i = 0; i < RED_DIST; i += RED_SPREAD) {
-			for (int j = -i; j <= i; j += RED_SPREAD) {
+		for (int i = 0; i < DIST; i += SPREAD) {
+			for (int j = -i; j <= i; j += SPREAD) {
 				Vector offset = dir.clone().multiply(i).add(horizontal.clone().multiply(j));
 				Location target = mCenter.clone().add(offset);
-				if (target.distance(mCenter) > RED_DIST) {
+				if (target.distance(mCenter) > DIST) {
 					continue;
 				}
 				target.add(FastUtils.randomDoubleInRange(-0.75, 0.75), 0, FastUtils.randomDoubleInRange(-0.75, 0.75));
@@ -231,14 +180,11 @@ public class SandsOfTime extends Spell {
 
 						double length = move.length();
 						for (double r = 0; r <= length; r += 0.3 + 0.2 * length) {
-							world.spawnParticle(Particle.REDSTONE, current.clone().add(move.clone().normalize().multiply(r)), 1, new Particle.DustOptions(Color.fromRGB(255, 0, 0), 2));
+							world.spawnParticle(Particle.REDSTONE, current.clone().add(move.clone().normalize().multiply(r)), 1, new Particle.DustOptions(color, 2.5f));
 						}
 						current.add(move);
 
 						if (mT >= 10) {
-							for (Player player : PlayerUtils.playersInRange(current, RED_RADIUS, true)) {
-								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, RED_DAMAGE, null, false, false, "Sands of Time");
-							}
 							this.cancel();
 							return;
 						}
@@ -250,56 +196,43 @@ public class SandsOfTime extends Spell {
 				runnable.runTaskTimer(plugin, 0, 1);
 			}
 		}
-	}
 
-	private void activateBlue(Plugin plugin, Location loc) {
-		World world = loc.getWorld();
-		Vector dir = LocationUtils.getDirectionTo(loc, mCenter);
-		double dist = FastUtils.randomDoubleInRange(BLUE_MIN_DIST, BLUE_MAX_DIST);
-		double deg = FastUtils.randomDoubleInRange(-BLUE_ANGLE, BLUE_ANGLE);
-		Vector dirR = VectorUtils.rotateYAxis(dir, deg);
-		Location target = mCenter.clone().add(dirR.clone().multiply(dist));
-		Location current = mCenter.clone().add(0, 6, 0);
-		Vector path = LocationUtils.getDirectionTo(target, current).multiply(current.distance(target) / 5);
-
-		List<Vector> points = new ArrayList<>();
-		for (int phi = 0; phi < 360; phi += 15) {
-			double y = (BLUE_RADIUS - 1) * FastUtils.cosDeg(phi);
-			double sin = (BLUE_RADIUS - 1) * FastUtils.sinDeg(phi);
-			for (int theta = 0; theta < 360; theta += 15) {
-				double x = sin * FastUtils.cosDeg(theta);
-				double z = sin * FastUtils.sinDeg(theta);
-				points.add(new Vector(x, y, z));
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			List<Location> soundLocs = getRandomLocationsNear(tallCenter, 2);
+			for (Location soundLoc : soundLocs) {
+				world.playSound(soundLoc, Sound.ITEM_CROSSBOW_LOADING_START, 2.0f, 0.75f);
 			}
-		}
+		}, 2);
 
-		BukkitRunnable runnable = new BukkitRunnable() {
-			int mT = 0;
-			@Override
-			public void run() {
-				current.add(path);
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			List<Location> soundLocs = getRandomLocationsNear(tallCenter, 3);
+			for (Location soundLoc : soundLocs) {
+				world.playSound(soundLoc, Sound.ITEM_TRIDENT_THROW, 1.5f, 1.25f);
+			}
+		}, 5);
 
-				for (Vector point : points) {
-					world.spawnParticle(Particle.REDSTONE, current.clone().add(point), 1, 0.05, 0.05, 0.05, 0, new Particle.DustOptions(Color.fromRGB(20, 70, 150), 2));
-				}
-				double halfRadius = BLUE_RADIUS / 2;
-				world.spawnParticle(Particle.SOUL_FIRE_FLAME, current, 20, halfRadius, halfRadius, halfRadius, 0);
-				world.spawnParticle(Particle.END_ROD, current, 30, halfRadius, halfRadius, halfRadius, 0);
-
-				if (mT >= 10) {
-					for (Player player : PlayerUtils.playersInRange(current, BLUE_RADIUS, true)) {
-						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, BLUE_DAMAGE, null, false, false, "Sands of Time");
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			for (Player player : PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true)) {
+				Location playerLoc = player.getLocation();
+				// Within 2 blocks or 45 degrees in either direction
+				// 0.7071 = sqrt(2) / 2
+				if (playerLoc.distanceSquared(mCenter) < 2 * 2 || dir.clone().setY(0).normalize().dot(LocationUtils.getDirectionTo(playerLoc, mCenter).setY(0).normalize()) >= 0.7071) {
+					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false, "Sands of Time");
+					if (doRoot) {
 						plugin.mEffectManager.addEffect(player, ROOT_EFFECT, new PercentSpeed(BLUE_ROOT, -1, ROOT_EFFECT));
 					}
-					this.cancel();
-					return;
 				}
-
-				mT += 2;
 			}
-		};
-		mActiveRunnables.add(runnable);
-		runnable.runTaskTimer(plugin, 0, 2);
+
+			List<Location> soundLocs = getRandomLocationsNear(loc, 3);
+			for (Location soundLoc : soundLocs) {
+				world.playSound(soundLoc, Sound.ITEM_TRIDENT_HIT_GROUND, 1.2f, 1.25f);
+			}
+			soundLocs = getRandomLocationsNear(loc, 3);
+			for (Location soundLoc : soundLocs) {
+				world.playSound(soundLoc, Sound.ENTITY_ARROW_HIT, 1.2f, 0.8f);
+			}
+		}, 10);
 	}
 
 	private List<Location> getRandomLocationsNear(Location center, int num) {
@@ -313,10 +246,5 @@ public class SandsOfTime extends Spell {
 	@Override
 	public int cooldownTicks() {
 		return mCooldownTicks;
-	}
-
-	@Override
-	public boolean canRun() {
-		return !mTealSpirit.isInterspellCooldown();
 	}
 }

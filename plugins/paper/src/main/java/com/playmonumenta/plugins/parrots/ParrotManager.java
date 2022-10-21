@@ -145,24 +145,28 @@ public class ParrotManager implements Listener {
 		// Updates only a few players at a time to spread out server load, as this causes noticeable lag when done for many players at once.
 		// TODO temporarily disabled because Optifine is no longer displaying shoulder parrot textures even with this hack
 		// Since it worked with 1.18 client and 1.16 server, somehow it must still be possible, so this is left in as a base to work off of.
-//		new BukkitRunnable() {
-//			Iterator<? extends Player> mPlayers = Collections.emptyIterator();
-//
-//			@Override
-//			public void run() {
-//				if (!mPlayers.hasNext()) {
-//					mPlayers = ImmutableList.copyOf(Bukkit.getOnlinePlayers()).iterator();
-//				}
-//				for (int i = 0; i < 10 && mPlayers.hasNext(); i++) {
-//					Player player = mPlayers.next();
-//					// Flying players lose parrots almost instantly, causing flickering, so don't update parrots for them. They'll get their parrots back once they land.
-//					if (player.isValid() && !player.isFlying() && !PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
-//						respawnParrots(player);
-//					}
-//				}
-//			}
-//		}.runTaskTimer(plugin, 10 * 20L, 10 * 20L); // low priority task, so can start after a long delay
+		/*
+				new BukkitRunnable() {
+					Iterator<? extends Player> mPlayers = Collections.emptyIterator();
+
+					@Override
+		*/
 	}
+	/*
+				public void run() {
+					if (!mPlayers.hasNext()) {
+						mPlayers = ImmutableList.copyOf(Bukkit.getOnlinePlayers()).iterator();
+					}
+					for (int i = 0; i < 10 && mPlayers.hasNext(); i++) {
+						Player player = mPlayers.next();
+						// Flying players lose parrots almost instantly, causing flickering, so don't update parrots for them. They'll get their parrots back once they land.
+						if (player.isValid() && !player.isFlying() && !PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
+							respawnParrots(player);
+						}
+					}
+				}
+			}.runTaskTimer(plugin, 10 * 20L, 10 * 20L); // low priority task, so can start after a long delay
+	 */
 
 	private static void respawnParrots(Player player) {
 		Location spawnLocation = player.getLocation().add(0, -256, 0);

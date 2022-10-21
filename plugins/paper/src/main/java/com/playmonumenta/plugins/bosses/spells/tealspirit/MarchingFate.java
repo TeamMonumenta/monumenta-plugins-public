@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -32,12 +33,11 @@ import org.bukkit.util.Vector;
 public class MarchingFate extends Spell {
 	private static final double DISTANCE = 21;
 	private static final double HEIGHT = 2;
-	private static final double STEP = 0.03;
 	private static final double PROXIMITY = 4;
 	private static final String LOS = "MarchingFate";
-
 	private final LivingEntity mBoss;
 	private final Location mCenter;
+	private final TealSpirit mTealSpirit;
 	private final List<Entity> mMarchers = new ArrayList<>();
 
 	private final ChargeUpManager mBossBar;
@@ -47,6 +47,7 @@ public class MarchingFate extends Spell {
 	public MarchingFate(LivingEntity boss, TealSpirit tealSpirit) {
 		mBoss = boss;
 		mCenter = tealSpirit.mSpawnLoc;
+		mTealSpirit = tealSpirit;
 
 		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(DISTANCE, HEIGHT, 0), LOS));
 		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(-DISTANCE, HEIGHT, 0), LOS));
@@ -61,15 +62,29 @@ public class MarchingFate extends Spell {
 	public void run() {
 		World world = mCenter.getWorld();
 
+		double stepLength = 0;
+		double currentBossHP = mBoss.getHealth();
+		double bossMaxHP = EntityUtils.getMaxHealth(mBoss);
+		double percentHP = currentBossHP / bossMaxHP;
+		if (percentHP <= 0.3) {
+			stepLength = 0.05;
+		} else if (percentHP <= 0.6) {
+			stepLength = 0.03;
+		} else if (percentHP <= 0.9) {
+			stepLength = 0.02;
+		} else if (percentHP <= 1) {
+			stepLength = 0.01;
+		}
+
 		List<Double> distances = new ArrayList<>();
 		int obfuscation = 0;
 		// Move marchers towards the center and kill party if they reach the center
 		for (Entity marcher : mMarchers) {
 			Location loc = marcher.getLocation();
-			Vector step = mCenter.toVector().subtract(loc.toVector()).setY(0).normalize().multiply(STEP);
+			Vector step = mCenter.toVector().subtract(loc.toVector()).setY(0).normalize().multiply(stepLength);
 			Location newLoc = loc.clone().add(step).setDirection(step);
 			double distance = newLoc.distance(mCenter);
-			if (distance < STEP) {
+			if (distance <= 0.6) {
 				marcher.teleport(mCenter);
 
 				world.spawnParticle(Particle.EXPLOSION_HUGE, mCenter.clone().add(0, 3, 0), 25, 11, 3, 11);
@@ -88,8 +103,11 @@ public class MarchingFate extends Spell {
 						player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 					}
 					player.setInvulnerable(false);
+					player.setHealth(0);
 					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.TRUE, 10000, null, true, false, "Marching Fates");
 				}
+
+				mTealSpirit.killMarchers();
 
 				mBossBar.reset();
 				return;

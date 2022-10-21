@@ -28,7 +28,7 @@ import org.bukkit.util.Vector;
 
 public class TemporalRift extends Spell {
 	private static final int CHARGE_TIME = 4 * 20;
-	private static final int DURATION = 9 * 20;
+	private static final int DURATION = 5 * 20;
 	private static final double DAMAGE_OUTER = 30;
 	private static final double DAMAGE_INNER = 60;
 	private static final double RADIUS = 6;
@@ -40,7 +40,6 @@ public class TemporalRift extends Spell {
 	private final LivingEntity mBoss;
 	private final Location mCenter;
 	private final int mCooldownTicks;
-	private final TealSpirit mTealSpirit;
 
 	private double mRad = 10;
 	private double mRotation = 0;
@@ -51,11 +50,10 @@ public class TemporalRift extends Spell {
 	private final PartialParticle mSmokeL;
 	private final PartialParticle mBreath;
 
-	public TemporalRift(LivingEntity boss, Location center, int cooldownTicks, TealSpirit tealSpirit) {
+	public TemporalRift(LivingEntity boss, Location center, int cooldownTicks) {
 		mBoss = boss;
 		mCenter = center;
 		mCooldownTicks = cooldownTicks;
-		mTealSpirit = tealSpirit;
 
 		mChargeUp = new ChargeUpManager(mBoss, CHARGE_TIME, ChatColor.YELLOW + "Channeling Temporal Rift...", BarColor.YELLOW, BarStyle.SOLID, 70);
 		mPortal2 = new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 2, 0.15, 0.15, 0.15, 0.1);
@@ -67,7 +65,6 @@ public class TemporalRift extends Spell {
 
 	@Override
 	public void run() {
-		mTealSpirit.setInterspellCooldown(CHARGE_TIME + DURATION + 2 * 20);
 
 		Plugin plugin = Plugin.getInstance();
 		World world = mBoss.getWorld();
@@ -182,11 +179,6 @@ public class TemporalRift extends Spell {
 		};
 		runA.runTaskTimer(plugin, 0, 1);
 		mActiveRunnables.add(runA);
-	}
-
-	@Override
-	public boolean canRun() {
-		return !mTealSpirit.isInterspellCooldown();
 	}
 
 	@Override

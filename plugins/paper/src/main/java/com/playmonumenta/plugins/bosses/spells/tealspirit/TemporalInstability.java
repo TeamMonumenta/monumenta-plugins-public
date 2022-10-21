@@ -60,7 +60,8 @@ public class TemporalInstability extends Spell {
 
 			if (event.getSource() instanceof Player player && event.getType() != DamageEvent.DamageType.AILMENT) {
 				Location loc = mBoss.getLocation();
-				player.playSound(loc, Sound.PARTICLE_SOUL_ESCAPE, 0.5f, 0.5f);
+				player.playSound(loc, Sound.PARTICLE_SOUL_ESCAPE, 1.0f, 0.5f);
+				player.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 1.0f, 0.5f);
 				loc.getWorld().spawnParticle(Particle.SOUL, loc.clone().add(0, 1.5, 0), 5, 0.5, 2, 0.5, 0);
 				loc.getWorld().spawnParticle(Particle.END_ROD, loc.clone().add(0, 1.5, 0), 5, 0.5, 2, 0.5, 0);
 			}

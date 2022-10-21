@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class SKTQuestDamageTaken implements Enchantment {
 
-	public static final double DAMAGE_TAKEN_MULTIPLIER = 0.7;
+	public static final double DAMAGE_TAKEN_MULTIPLIER = 0.5;
 
 	@Override
 	public String getName() {

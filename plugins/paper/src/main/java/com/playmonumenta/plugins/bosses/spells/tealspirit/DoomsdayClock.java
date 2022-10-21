@@ -27,32 +27,28 @@ import org.bukkit.util.Vector;
 public class DoomsdayClock extends Spell {
 	private static final double RADIUS = 11;
 	private static final double WALL_HEIGHT = 10;
-	private static final double BLACK_DAMAGE = 180;
-	private static final double RED_DAMAGE = 100;
+	private static final double BLACK_DAMAGE = 150;
+	private static final double RED_DAMAGE = 80;
 	private static final double BLACK_DEGREE = 2.25;
 	private static final double RED_DEGREE = -3;
 	private static final Color BLACK_COLOR = Color.fromRGB(0, 0, 0);
 	private static final Color RED_COLOR = Color.fromRGB(255, 0, 0);
 	private static final int PERIOD = 2;
-	private static final int GROWTH_TIME = 5 * 20;
-	private static final int MAX_TIME = 15 * 20;
+	public static final int GROWTH_TIME = 5 * 20;
+	public static final int MAX_TIME = 15 * 20;
 
 	private final LivingEntity mBoss;
 	private final Location mCenter;
 	private final int mCooldownTicks;
-	private final TealSpirit mTealSpirit;
 
-	public DoomsdayClock(LivingEntity boss, Location center, int cooldownTicks, TealSpirit tealSpirit) {
+	public DoomsdayClock(LivingEntity boss, Location center, int cooldownTicks) {
 		mBoss = boss;
 		mCenter = center;
 		mCooldownTicks = cooldownTicks;
-		mTealSpirit = tealSpirit;
 	}
 
 	@Override
 	public void run() {
-		mTealSpirit.setInterspellCooldown(GROWTH_TIME + MAX_TIME + 3 * 20);
-
 		World world = mBoss.getWorld();
 
 		PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "let your doom be made manifest!"));
@@ -113,7 +109,7 @@ public class DoomsdayClock extends Spell {
 						}
 
 						if (LocationUtils.xzDistance(player.getLocation(), mCenter) > RADIUS) {
-							BossUtils.bossDamagePercent(mBoss, player, mT > 5 * 20 ? 0.15 : 0.05, null, true, "Doomsday Clock");
+							BossUtils.bossDamagePercent(mBoss, player, mT > 5 * 20 ? 0.2 : 0.1, null, true, "Doomsday Clock");
 						}
 
 						player.playSound(player.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, 2f, 0.4f);
@@ -137,13 +133,13 @@ public class DoomsdayClock extends Spell {
 	}
 
 	@Override
-	public boolean canRun() {
-		return !mTealSpirit.isInterspellCooldown();
+	public int cooldownTicks() {
+		return mCooldownTicks;
 	}
 
 	@Override
-	public int cooldownTicks() {
-		return mCooldownTicks;
+	public boolean onlyForceCasted() {
+		return true;
 	}
 
 	private List<BoundingBox> createHand(double deg, double length, Color color) {

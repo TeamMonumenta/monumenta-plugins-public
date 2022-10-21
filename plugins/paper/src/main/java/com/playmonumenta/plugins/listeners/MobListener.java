@@ -277,7 +277,9 @@ public class MobListener implements Listener {
 
 		// Disable the randomness of Iron Golems' attacks
 		if (event.getDamager() instanceof IronGolem golem) {
-			event.setDamage(EntityUtils.getAttributeOrDefault(golem, Attribute.GENERIC_ATTACK_DAMAGE, 0));
+			if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
+				event.setDamage(EntityUtils.getAttributeOrDefault(golem, Attribute.GENERIC_ATTACK_DAMAGE, 0));
+			}
 		}
 
 		if (event.getEntity() instanceof Player) {

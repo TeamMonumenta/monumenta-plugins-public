@@ -4,24 +4,23 @@ import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.DelayedAssassination;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.ClockworkAssassination;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.DoomsdayClock;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.MarchingFate;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.PairedUnnaturalForce;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.Rewind;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.SandsOfTime;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.SundialSlash;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.TealAntiCheat;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.TealSpiritSummon;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.TemporalInstability;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.TemporalRift;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.TrabemTemporis;
+import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.TemporalFlux;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import com.playmonumenta.plugins.utils.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,12 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -52,19 +46,17 @@ public class TealSpirit extends BossAbilityGroup {
 	public static final String identityTag = "boss_tealspirit";
 	public static final int detectionRange = 70;
 
-	private static final int HEALTH = 10000;
-
-	private static final double RADIUS = 26;
-	private static final double HEIGHT_UP = 6;
-	private static final double HEIGHT_DOWN = 3;
+	private int mHealth = 20000;
 
 	public final Location mSpawnLoc;
 	private final Location mEndLoc;
 
 	private int mInterspellCooldown = 0;
-	private final BukkitRunnable mRunnable;
 
 	private List<Entity> mMarchers;
+	private List<Entity> mExchangers = new ArrayList<>();
+	private List<Entity> mShielders = new ArrayList<>();
+	private String mEncounterType;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -86,124 +78,239 @@ public class TealSpirit extends BossAbilityGroup {
 		Team team = ScoreboardUtils.getExistingTeamOrCreate("TealSpiritVulnerable", NamedTextColor.AQUA);
 		team.addEntity(mBoss);
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new DelayedAssassination(plugin, mBoss, 8 * 20),
-			new SandsOfTime(mBoss, mSpawnLoc, team, 12 * 20, this),
-			new DoomsdayClock(mBoss, mSpawnLoc, 11 * 20, this),
-			new TemporalRift(mBoss, mSpawnLoc, 15 * 20, this),
-			new TrabemTemporis(mBoss, mSpawnLoc, 20 * 20, this),
-			new SundialSlash(mBoss, 7 * 20)
-		));
 
-		List<Spell> passiveSpells = Arrays.asList(
-			new MarchingFate(mBoss, this),
-			new Rewind(mBoss, mSpawnLoc, 60 * 20, this),
-			new TemporalInstability(mBoss, mSpawnLoc, team),
-			new TealSpiritSummon(mSpawnLoc, 30 * 20),
-			new SpellBlockBreak(mBoss),
-			new SpellShieldStun(10 * 20)
-		);
-
-		PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "the full wrath of time itself will be upon you!"));
-
-		Map<Integer, BossBarManager.BossHealthAction> events = new HashMap<>();
-
-		events.put(75, mBoss -> {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (!isInterspellCooldown()) {
-						forceCastSpell(TrabemTemporis.class);
-						this.cancel();
-					}
+		for (Player p : PlayerUtils.playersInRange(mSpawnLoc, 75, true)) {
+			if (p.getGameMode() != GameMode.SPECTATOR) {
+				// Boss phases for Story Mode
+				if (p.getScoreboardTags().contains("SKTQuest")) {
+					mEncounterType = "Story";
+					break;
 				}
-			}.runTaskTimer(plugin, 0, 5);
-		});
-
-		events.put(50, mBoss -> {
-			List<Location> locs = new ArrayList<>();
-			double radius = 21;
-			double height = 2;
-			locs.add(mSpawnLoc.clone().add(0, height, radius));
-			locs.add(mSpawnLoc.clone().add(0, height, -radius));
-			for (Location loc : locs) {
-				LibraryOfSoulsIntegration.summon(loc, "EchoesOfOblivion");
-				world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 1.2f);
-				world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
-				world.spawnParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1);
-				world.spawnParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1);
-			}
-
-			PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "i call forth the echoes radiating from the edges of oblivion itself. rise, emperor!"));
-		});
-
-		events.put(25, mBoss -> {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (!isInterspellCooldown()) {
-						forceCastSpell(DoomsdayClock.class);
-						this.cancel();
-					}
+				// Boss phases for Normal Mode
+				else if (p.getScoreboardTags().contains("SKTNormal")) {
+					mEncounterType = "Normal";
+					break;
 				}
-			}.runTaskTimer(plugin, 0, 5);
-		});
-
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
-		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 20 * 10);
-
-		mRunnable = new BukkitRunnable() {
-			int mT = 0;
-
-			@Override
-			public void run() {
-				if (mInterspellCooldown > 0) {
-					mInterspellCooldown -= 5;
-				}
-
-				mT += 5;
-				if (mT > 100 && mT % 10 == 0) {
-					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-						Location loc = player.getLocation();
-						double height = loc.getY() - mSpawnLoc.getY();
-						if (LocationUtils.xzDistance(mSpawnLoc, loc) > RADIUS || (height > HEIGHT_UP && player.isOnGround()) || height < -HEIGHT_DOWN) {
-							BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location) null);
-							if (mT % 40 == 0) {
-								player.sendMessage(ChatColor.RED + "You are too far from the fight!");
-							}
-						}
-					}
+				// Boss phases for Hard Mode
+				else {
+					mEncounterType = "Hard";
+					break;
 				}
 			}
-		};
-		mRunnable.runTaskTimer(plugin, 0, 5);
+		}
+
+		if (mEncounterType.equals("Story")) {
+			mHealth = 9000;
+
+			SpellManager activeSpells = new SpellManager(Arrays.asList(
+				new ClockworkAssassination(plugin, boss),
+				//new SandsOfTime(mBoss, mSpawnLoc, team, 12 * 20),
+				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
+				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
+				new SundialSlash(mBoss, 7 * 20)
+			));
+
+			SpellManager activeDoomsdayPhase = new SpellManager(Arrays.asList(
+				new DoomsdayClock(mBoss, mSpawnLoc, 11 * 20)
+			));
+
+			List<Spell> passiveSpells = Arrays.asList(
+				//new Rewind(mBoss, mSpawnLoc),
+				new TealSpiritSummon(mSpawnLoc, 40 * 20),
+				new SpellBlockBreak(mBoss),
+				new SpellShieldStun(10 * 20),
+				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 40),
+				new TealAntiCheat(boss, 20, spawnLoc)
+			);
+
+			PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "the full wrath of time itself will be upon you!"));
+
+			Map<Integer, BossBarManager.BossHealthAction> events = new HashMap<>();
+
+			events.put(25, mBoss -> {
+				changePhase(activeDoomsdayPhase, passiveSpells, null);
+				forceCastSpell(MarchingFate.class);
+				changePhase(activeSpells, passiveSpells, null);
+			});
+
+			events.put(50, mBoss -> {
+				List<Location> locs = new ArrayList<>();
+				double height = 2;
+				locs.add(mSpawnLoc.clone().add(0, height, 0));
+				for (Location loc : locs) {
+					LibraryOfSoulsIntegration.summon(loc, "EchoOfOblivion");
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 1.2f);
+					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
+					world.spawnParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1);
+					world.spawnParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1);
+				}
+				PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "i call forth the echoes radiating from the edges of oblivion itself. rise, emperor!"));
+			});
+
+			events.put(75, mBoss -> {
+				changePhase(activeDoomsdayPhase, passiveSpells, null);
+				forceCastSpell(MarchingFate.class);
+				changePhase(activeSpells, passiveSpells, null);
+			});
+
+			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+			constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 20 * 10);
+		} else if (mEncounterType.equals("Hard")) {
+			mHealth = 20000;
+			SpellManager activeSpells = new SpellManager(Arrays.asList(
+				new ClockworkAssassination(plugin, boss),
+				new SandsOfTime(mBoss, mSpawnLoc, team, 12 * 20),
+				new Rewind(mBoss, mSpawnLoc),
+				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
+				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
+				new SundialSlash(mBoss, 7 * 20)
+			));
+
+			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
+				new Rewind(mBoss, mSpawnLoc)
+			));
+
+			List<Spell> passiveSpells = Arrays.asList(
+				new MarchingFate(mBoss, this),
+				//new Rewind(mBoss, mSpawnLoc),
+				new TealSpiritSummon(mSpawnLoc, 30 * 20),
+				new SpellBlockBreak(mBoss),
+				new SpellShieldStun(10 * 20),
+				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 40),
+				new TealAntiCheat(boss, 20, spawnLoc)
+			);
+
+			PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "the full wrath of time itself will be upon you!"));
+
+			Map<Integer, BossBarManager.BossHealthAction> events = new HashMap<>();
+
+			events.put(90, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(80, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(70, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(60, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(50, mBoss -> {
+				List<Location> locs = new ArrayList<>();
+				double height = 2;
+				locs.add(mSpawnLoc.clone().add(0, height, 0));
+				for (Location loc : locs) {
+					LibraryOfSoulsIntegration.summon(loc, "EchoOfOblivion");
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 1.2f);
+					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
+					world.spawnParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1);
+					world.spawnParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1);
+				}
+				PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "i call forth the echoes radiating from the edges of oblivion itself. rise, emperor!"));
+			});
+
+			events.put(40, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(45, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(30, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(20, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(10, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+			constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 20 * 10);
+		}
 	}
 
 	@Override
 	public void init() {
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, HEALTH);
-		mBoss.setHealth(HEALTH);
+
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, mHealth);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
+		mBoss.setHealth(mHealth);
+
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Orasomn\",\"color\":\"gold\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"The Hand of Fate\",\"color\":\"red\",\"yellow\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 
 		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
 		Collections.shuffle(players);
 		if (!players.isEmpty() && mBoss instanceof Mob mob) {
 			mob.setTarget(players.get(0));
 		}
+		mBoss.setAI(true);
 	}
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		killMarchers();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mSpawnLoc, detectionRange)) {
 			mob.remove();
 		}
-
-		mRunnable.cancel();
-
 		PlayerUtils.playersInRange(mSpawnLoc, TealSpirit.detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "no, this cannot be! time... betrays me? why do the hands of time not turn? i... will... be... forever!"));
-
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 
@@ -222,6 +329,101 @@ public class TealSpirit extends BossAbilityGroup {
 	public void killMarchers() {
 		for (Entity marcher : mMarchers) {
 			marcher.remove();
+		}
+	}
+
+	public void giveParadox() {
+		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, 50, true);
+		EffectManager manager = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager;
+		Collections.shuffle(players);
+		if (players.size() > 2) {
+			for (int i = 0; i < 1; i++) {
+				manager.addEffect(players.get(i), TemporalFlux.GENERIC_NAME, new TemporalFlux(20*30));
+			}
+		} else if (players.size() <= 2) {
+			for (Player p : players) {
+				manager.addEffect(p, TemporalFlux.GENERIC_NAME, new TemporalFlux(20*30));
+			}
+		}
+	}
+
+	public void clearParadox() {
+		EffectManager manager = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager;
+		for (Player p : PlayerUtils.playersInRange(mSpawnLoc, 50, true)) {
+			manager.clearEffects(p, "Paradox");
+		}
+	}
+
+	public void spawnExchangers() {
+		World world = mBoss.getWorld();
+		List<Location> locs = new ArrayList<>();
+		double radius = 21;
+		double height = 2;
+		locs.add(mSpawnLoc.clone().add(0, height, 0 - radius));
+		locs.add(mSpawnLoc.clone().add(0, height, radius));
+		for (Location loc : locs) {
+			mExchangers.add(LibraryOfSoulsIntegration.summon(loc, "TemporalExchanger"));
+			world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
+			world.spawnParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1);
+			world.spawnParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1);
+		}
+	}
+
+	public void killExchangers() {
+		for (Entity exchanger : mExchangers) {
+			exchanger.remove();
+		}
+	}
+
+	public void spawnShields() {
+		World world = mBoss.getWorld();
+		List<Location> locs = new ArrayList<>();
+		double radius = 21;
+		double height = 2;
+		locs.add(mSpawnLoc.clone().add(radius, height, 0));
+		locs.add(mSpawnLoc.clone().add(-radius, height, 0));
+		for (Location loc : locs) {
+			mShielders.add(LibraryOfSoulsIntegration.summon(loc, "TemporalAnchor"));
+			world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
+			world.spawnParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1);
+			world.spawnParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1);
+		}
+	}
+
+	public void killShields() {
+		for (Entity shield : mShielders) {
+			shield.remove();
+		}
+	}
+
+	public void castRewind(SpellManager activeRewindPhase, SpellManager activeSpells, List<Spell> passiveSpells) {
+		changePhase(activeRewindPhase, passiveSpells, null);
+		forceCastSpell(Rewind.class);
+
+		BukkitRunnable runnable = new BukkitRunnable() {
+			int mT = 0;
+			@Override
+			public void run() {
+				if (mT > Rewind.CHARGE_TIME + Rewind.REWIND_TIME) {
+					changePhase(activeSpells, passiveSpells, null);
+					this.cancel();
+				}
+				mT += 1;
+			}
+		};
+		runnable.runTaskTimer(mPlugin, 0, 1);
+	}
+
+	@Override
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
+		if (damager instanceof Player) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange, mBoss)) {
+				if (mob.getScoreboardTags().contains("boss_temporalshield")) {
+					event.setCancelled(true);
+					damager.sendMessage(ChatColor.GRAY + "The nearby Temporal Anchors prevent you from harming Orasomn!");
+					return;
+				}
+			}
 		}
 	}
 

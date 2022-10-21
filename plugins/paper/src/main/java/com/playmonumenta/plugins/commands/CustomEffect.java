@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SilverPrayer;
 import com.playmonumenta.plugins.effects.StarCommunion;
 import com.playmonumenta.plugins.effects.Stasis;
+import com.playmonumenta.plugins.effects.TemporalFlux;
 import com.playmonumenta.plugins.effects.TuathanBlessing;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -53,6 +54,7 @@ public class CustomEffect {
 		HashMap<String, ZeroArgument> zeroArgumentEffects = new HashMap<>();
 		zeroArgumentEffects.put("stasis", (Entity entity, int duration) -> Plugin.getInstance().mEffectManager.addEffect(entity, Stasis.GENERIC_NAME, new Stasis(duration)));
 		zeroArgumentEffects.put("silence", (Entity entity, int duration) -> Plugin.getInstance().mEffectManager.addEffect(entity, AbilitySilence.GENERIC_NAME, new AbilitySilence(duration)));
+		zeroArgumentEffects.put("paradox", (Entity entity, int duration) -> Plugin.getInstance().mEffectManager.addEffect(entity, TemporalFlux.GENERIC_NAME, new TemporalFlux(duration)));
 
 		HashMap<String, SingleArgument> singleArgumentEffects = new HashMap<>();
 		singleArgumentEffects.put("speed", (Entity entity, int duration, double amount, String source) -> Plugin.getInstance().mEffectManager.addEffect(entity, getSource(source, PercentSpeed.GENERIC_NAME), new PercentSpeed(duration, amount, getSource(source, PercentSpeed.GENERIC_NAME))));
@@ -90,6 +92,7 @@ public class CustomEffect {
 		translations.put("arrowsaving", ArrowSaving.GENERIC_NAME);
 		translations.put("durabilitysaving", DurabilitySaving.GENERIC_NAME);
 		translations.put("soul", BonusSoulThreads.GENERIC_NAME);
+		translations.put("paradox", TemporalFlux.GENERIC_NAME);
 		translations.put("cdr", AbilityCooldownDecrease.GENERIC_NAME);
 		translations.put("heal", PercentHeal.GENERIC_NAME);
 		translations.put("antiheal", PercentHeal.GENERIC_NAME);

@@ -18,7 +18,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class TealSpiritSummon extends Spell {
 	private static final double RADIUS = 25;
-	private static final int COUNT = 5;
+	private static final int COUNT = 3;
 	private static final LoSPool NORMAL_POOL = new LoSPool("~TealNormalMobs");
 	private static final LoSPool ELITE_POOL = new LoSPool("~TealEliteMobs");
 	private static final double ELITE_CHANCE = 0.05;
