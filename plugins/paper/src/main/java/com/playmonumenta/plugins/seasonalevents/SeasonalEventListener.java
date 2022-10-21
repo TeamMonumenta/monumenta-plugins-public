@@ -94,7 +94,7 @@ public class SeasonalEventListener implements Listener {
 					// Boss matches up - award points
 					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
 				} else if ((mission.mType == WeeklyMissionType.DELVE_MODIFIER || mission.mType == WeeklyMissionType.DELVE_POINTS) && DelvesUtils.SHARD_SCOREBOARD_PREFIX_MAPPINGS.containsKey(content.getLabel())) {
-					// Content is eligible for delves- get scores and check for modifier
+					// Content is eligible for delves - get scores and check for modifier
 					if (mission.mType == WeeklyMissionType.DELVE_POINTS && DelvesUtils.getPlayerTotalDelvePoint(null, p, content.getLabel()) >= mission.mDelvePoints) {
 						if (mission.mContent == null || mission.mContent.contains(content)) {
 							SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
@@ -106,7 +106,13 @@ public class SeasonalEventListener implements Listener {
 								modsActive = false;
 							}
 						}
-
+						if (mission.mRotatingModifiersAmount > 0) {
+							int rotatingPoints = 0;
+							for (DelvesModifier rotating : DelvesModifier.rotatingDelveModifiers()) {
+								rotatingPoints += DelvesUtils.getDelveModLevel(p, content.getLabel(), rotating);
+							}
+							modsActive = modsActive && (rotatingPoints >= mission.mRotatingModifiersAmount);
+						}
 						if ((mission.mContent == null || mission.mContent.contains(content)) && modsActive) {
 							SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
 						}

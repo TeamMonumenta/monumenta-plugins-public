@@ -24,6 +24,7 @@ public class WeeklyMission {
 	public List<String> mEligibleMobs;
 	//Delve mission fields
 	public List<DelvesModifier> mDelveModifiers;
+	public int mRotatingModifiersAmount;
 	public int mModifierRank;
 	public int mDelvePoints;
 	//Region of content to clear (includes dungeon, strike, boss)

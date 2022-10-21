@@ -174,6 +174,9 @@ public class SeasonalPass {
 				if (toParse.get("modifierrank") != null) {
 					mission.mModifierRank = toParse.get("modifierrank").getAsInt();
 				}
+				if (toParse.get("rotatingamount") != null) {
+					mission.mRotatingModifiersAmount = toParse.get("rotatingamount").getAsInt();
+				}
 				if (toParse.get("delvemodifier") != null) {
 					// This compares using integers - in json need to list the number of the modifier, not the name!
 					if (toParse.get("delvemodifier") instanceof JsonArray mods) {
