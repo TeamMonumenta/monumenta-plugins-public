@@ -102,9 +102,9 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			int charmPower = ScoreboardUtils.getScoreboardValue(player, "CharmPower").orElse(0);
 			charmPower = (charmPower > 0) ? charmPower / 3 + 1 : 0;
 			return Integer.toString(ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0) +
-				ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0) +
-				ScoreboardUtils.getScoreboardValue(player, "Enhancements").orElse(0) +
-				charmPower);
+				                        ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0) +
+				                        ScoreboardUtils.getScoreboardValue(player, "TotalEnhance").orElse(0) +
+				                        charmPower);
 		}
 
 		if (identifier.equalsIgnoreCase("shard")) {
@@ -118,6 +118,11 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			}
 			// TODO end temp
 
+			String worldName = player.getWorld().getName();
+			String mask = "Project_Epic-";
+			if (worldName.startsWith(mask)) {
+				return worldName.substring(mask.length());
+			}
 			return shard;
 		}
 
