@@ -103,7 +103,11 @@ public class DelvesUtils {
 			}
 		}
 		Collections.shuffle(nWeekRotation, new XoRoShiRo128PlusRandom(DateUtils.getWeeklyVersion() / nWeekRotation.size()));
-		return nWeekRotation.get((int)(DateUtils.getWeeklyVersion() % nWeekRotation.size()));
+		List<DelvesModifier> available = nWeekRotation.get((int)(DateUtils.getWeeklyVersion() % nWeekRotation.size()));
+		if (!available.contains(DelvesModifier.HAUNTED)) {
+			available.add(DelvesModifier.HAUNTED);
+		}
+		return available;
 	}
 
 	public static ItemStack getRankItem(DelvesModifier mod, int rank, int level) {
