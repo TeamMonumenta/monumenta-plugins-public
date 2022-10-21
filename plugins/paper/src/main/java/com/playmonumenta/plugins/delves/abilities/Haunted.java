@@ -59,7 +59,7 @@ public class Haunted {
 					return;
 				}
 
-				if (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR || mPLoc.distance(p.getLocation()) < 0.005) {
+				if (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR) {
 					return;
 				}
 
@@ -129,6 +129,10 @@ public class Haunted {
 					}
 				}
 				mBeatCD--;
+
+				if (mPLoc.distance(p.getLocation()) < 0.005) {
+					return;
+				}
 
 				mSLoc.add(direction.multiply(mSpeed));
 				mPLoc = p.getLocation();
