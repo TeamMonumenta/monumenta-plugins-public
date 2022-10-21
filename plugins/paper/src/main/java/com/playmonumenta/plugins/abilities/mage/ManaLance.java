@@ -75,7 +75,7 @@ public class ManaLance extends MultipleChargeAbility {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer == null || mPlayer.isSneaking() || ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer == null || mPlayer.isSneaking() || !ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
 			return;
 		}
 
