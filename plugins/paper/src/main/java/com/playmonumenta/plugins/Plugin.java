@@ -228,6 +228,7 @@ public class Plugin extends JavaPlugin {
 		ToggleTrail.register();
 		MonumentaTrigger.register();
 		BlueStrikeDaggerCraftingBoss.register();
+		ScanChests.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

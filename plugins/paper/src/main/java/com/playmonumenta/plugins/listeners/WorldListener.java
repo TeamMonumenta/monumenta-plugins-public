@@ -322,6 +322,9 @@ public class WorldListener implements Listener {
 	}
 
 	public void playerBrokeSpawner(Player player, Block spawner) {
+		if (!Plugin.IS_PLAY_SERVER) {
+			return;
+		}
 		ActivityManager.getManager().addActivity(player);
 		List<Chunk> chunkList = LocationUtils.getSurroundingChunks(spawner, SPAWNER_BREAK_CHEST_CHECK_RADIUS);
 		int chests = 0;
