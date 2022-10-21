@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.delves.abilities.Dreadful;
 import com.playmonumenta.plugins.delves.abilities.Echoes;
 import com.playmonumenta.plugins.delves.abilities.Entropy;
 import com.playmonumenta.plugins.delves.abilities.Fragile;
+import com.playmonumenta.plugins.delves.abilities.Haunted;
 import com.playmonumenta.plugins.delves.abilities.Infernal;
 import com.playmonumenta.plugins.delves.abilities.Legionary;
 import com.playmonumenta.plugins.delves.abilities.Pernicious;
@@ -56,11 +57,12 @@ public enum DelvesModifier {
 	ASTRAL(18, null, createIcon(Material.SPYGLASS, Component.text("Astral", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Astral.DESCRIPTION), Astral.RANK_DESCRIPTIONS, 22, 5),
 	UNYIELDING(19, Unyielding::applyModifiers, createIcon(Material.NETHERITE_CHESTPLATE, Component.text("Unyielding", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Unyielding.DESCRIPTION), Unyielding.RANK_DESCRIPTIONS, 23, 5),
 	CHRONOLOGY(20, null, createIcon(Material.CLOCK, Component.text("Chronology", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Chronology.DESCRIPTION), Chronology.RANK_DESCRIPTIONS, 24, 5),
-	RIFTBORN(21, null, createIcon(Material.END_PORTAL_FRAME, Component.text("Riftborn", NamedTextColor.DARK_BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Riftborn.DESCRIPTION), Riftborn.RANK_DESCRIPTIONS, 25, 5)
+	RIFTBORN(21, null, createIcon(Material.END_PORTAL_FRAME, Component.text("Riftborn", NamedTextColor.DARK_BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Riftborn.DESCRIPTION), Riftborn.RANK_DESCRIPTIONS, 25, 5),
+	HAUNTED(22, null, createIcon(Material.CARVED_PUMPKIN, Component.text("Haunted", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Haunted.DESCRIPTION), Haunted.RANK_DESCRIPTIONS, 26, 5)
 	;
 
 	private static final List<DelvesModifier> DEATH_TRIGGER_MODIFIERS = List.of(SPECTRAL, DREADFUL);
-	private static final List<DelvesModifier> ROTATING_DELVE_MODIFIERS = List.of(ASSASSINS, ASTRAL, UNYIELDING, CHRONOLOGY, RIFTBORN);
+	private static final List<DelvesModifier> ROTATING_DELVE_MODIFIERS = List.of(ASSASSINS, ASTRAL, UNYIELDING, CHRONOLOGY, RIFTBORN, HAUNTED);
 	private static final List<DelvesModifier> SPAWN_TRIGGER_MODIFIERS = List.of(ARCANIC, INFERNAL, TRANSCENDENT, CHIVALROUS, BLOODTHIRSTY, PERNICIOUS, LEGIONARY, CARAPACE, TWISTED, ECHOES, ASSASSINS, VENGEANCE, UNYIELDING);
 
 	private final int mIndex;

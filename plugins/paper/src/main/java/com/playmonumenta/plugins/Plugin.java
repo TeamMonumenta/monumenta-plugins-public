@@ -72,7 +72,9 @@ import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -534,6 +536,16 @@ public class Plugin extends JavaPlugin {
 
 		if (ServerProperties.getShardName().contains("gallery")) {
 			GalleryManager.close(); //TODO - test this
+		}
+
+		for (World world : Bukkit.getWorlds()) {
+			for (Entity entity : world.getEntities()) {
+				for (String tag : entity.getScoreboardTags()) {
+					if (tag.contains(DelvesManager.PHANTOM_NAME)) {
+						entity.remove();
+					}
+				}
+			}
 		}
 
 		TowerManager.unload();

@@ -61,6 +61,7 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.ASTRAL, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.CHRONOLOGY, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.RIFTBORN, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.HAUNTED, 1);
 
 		// Depths endless changes- use dev2 for testing
 		if (ServerProperties.getShardName().startsWith("depths")

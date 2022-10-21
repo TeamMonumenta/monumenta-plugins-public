@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Chronology;
 import com.playmonumenta.plugins.delves.abilities.Colossal;
 import com.playmonumenta.plugins.delves.abilities.Fragile;
+import com.playmonumenta.plugins.delves.abilities.Haunted;
 import com.playmonumenta.plugins.delves.abilities.Infernal;
 import com.playmonumenta.plugins.delves.abilities.Riftborn;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
@@ -31,17 +32,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -56,10 +63,15 @@ import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.util.Vector;
+
 
 public class DelvesManager implements Listener {
 	public static final String KEY_DELVES_PLUGIN_DATA = "MonumentaDelves";
@@ -72,7 +84,10 @@ public class DelvesManager implements Listener {
 	 * <PlayerID, <DungeonID, <ModifierID, points>>>
 	 */
 	public static final Map<UUID, Map<String, DungeonDelveInfo>> PLAYER_DELVE_DUNGEON_MOD_MAP = new HashMap<>();
-
+	public static final String PHANTOM_NAME = "LoomingConsequence";
+	static final String SPAWNER_BREAKS_SCORE_NAME = "SpawnerBreaks";
+	static final String SPAWNER_TOTAL_SCORE_NAME = "SpawnersTotal";
+	static final int CHUNK_SCAN_RADIUS = 32;
 	public static final Set<String> DUNGEONS = new HashSet<>();
 
 	//List of all the shard where we can use delves
@@ -356,6 +371,9 @@ public class DelvesManager implements Listener {
 		Player player = event.getPlayer();
 		//load the delves
 		loadPlayerData(player);
+		if (getRank(player, DelvesModifier.HAUNTED) > 0 && !player.isDead()) {
+			Haunted.applyModifiers(player);
+		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -455,8 +473,84 @@ public class DelvesManager implements Listener {
 			maxColossal = Math.max(maxColossal, getRank(player, DelvesModifier.COLOSSAL));
 		}
 
-		Colossal.applyModifiers(loc, maxColossal);
+		//region Spawner Breaks Handling
+		ScoreboardManager manager = Bukkit.getScoreboardManager();
+		final Scoreboard board = manager.getNewScoreboard();
+		if (board.getObjective(SPAWNER_TOTAL_SCORE_NAME) != null) {
+			board.registerNewObjective(SPAWNER_TOTAL_SCORE_NAME, "dummy");
+		}
+		if (board.getObjective(SPAWNER_BREAKS_SCORE_NAME) != null) {
+			board.registerNewObjective(SPAWNER_BREAKS_SCORE_NAME, "dummy");
+		}
 
+		Location armorStandLoc = event.getPlayer().getWorld().getSpawnLocation(); // get the spawn location
+		boolean foundStand = false;
+		ArmorStand armorStand = null;
+		for (Entity entity : armorStandLoc.getNearbyEntities(2, 2, 2)) { // get the entities at the spawn location
+			if (entity.getType().equals(EntityType.ARMOR_STAND) && entity.getCustomName() != null && entity.getCustomName().equals("SpawnerBreaksArmorStand")) { //if it's our marker armorstand
+				foundStand = true;
+				armorStand = (ArmorStand) entity;
+			}
+		}
+		if (!foundStand) { // create new armor stand
+			armorStand = (ArmorStand) event.getPlayer().getWorld().spawnEntity(armorStandLoc, EntityType.ARMOR_STAND);
+			armorStand.setVisible(false);
+			armorStand.setGravity(false);
+			armorStand.setMarker(true);
+			armorStand.setCustomName("SpawnerBreaksArmorStand");
+		}
+		// add one to breaks
+		int breaks = ScoreboardUtils.getScoreboardValue(armorStand, SPAWNER_BREAKS_SCORE_NAME).orElse(0) + 1;
+		ScoreboardUtils.setScoreboardValue(armorStand, SPAWNER_BREAKS_SCORE_NAME, breaks);
+		// if we haven't initialized spawners
+		int numSpawnersTotal = ScoreboardUtils.getScoreboardValue(armorStand, SPAWNER_TOTAL_SCORE_NAME).orElse(-2);
+		if (numSpawnersTotal < -1) {
+			// Haven't been initialized yet - load all the chunks and count the spawners
+
+			// Set the score to -1 to start so that this doesn't get called more than once before it finishes
+			ScoreboardUtils.setScoreboardValue(armorStand, SPAWNER_TOTAL_SCORE_NAME, -1);
+
+			// Get starting coords (divide by 16, basically)
+			int spawnChunkX = armorStandLoc.getBlockX() >> 4;
+			int spawnChunkZ = armorStandLoc.getBlockZ() >> 4;
+
+			World world = armorStandLoc.getWorld();
+			AtomicInteger numSpawners = new AtomicInteger(0);
+			AtomicInteger numChunksToLoad = new AtomicInteger(64 * 64);
+
+			ArmorStand finalArmorStand = armorStand;
+			// Load each chunk async, when they load the callback will be called
+			for (int cx = spawnChunkX - CHUNK_SCAN_RADIUS; cx <= spawnChunkX + CHUNK_SCAN_RADIUS; cx++) {
+				for (int cz = spawnChunkZ - CHUNK_SCAN_RADIUS; cz <= spawnChunkZ + CHUNK_SCAN_RADIUS; cz++) {
+					world.getChunkAtAsync(cx, cz, false /* don't create new chunks */, (Consumer<Chunk>) (chunk) -> {
+						if (chunk != null && chunk.isLoaded()) {
+							// This gets called once per chunk
+							for (BlockState tile : chunk.getTileEntities()) {
+								if (tile.getType().equals(Material.SPAWNER)) {
+									// Found another spawner
+									if (tile.getLocation().subtract(new Vector(0, 1, 0)).getBlock().getType().equals(Material.BEDROCK)) {
+										continue;
+									}
+									numSpawners.incrementAndGet();
+								}
+							}
+
+						}
+						// Decrement the number of chunks left until we get to 0
+						int numLeft = numChunksToLoad.decrementAndGet();
+						if (numLeft == 0) {
+							// This is the last chunk - so we can now store the value to the armor stand
+							// Need to run this on the main thread, since this function is labeled async
+
+							ScoreboardUtils.setScoreboardValue(finalArmorStand, SPAWNER_TOTAL_SCORE_NAME, numSpawners.intValue());
+						}
+					});
+				}
+			}
+		}
+		//endregion
+
+		Colossal.applyModifiers(loc, maxColossal);
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -470,8 +564,23 @@ public class DelvesManager implements Listener {
 	}
 
 	@EventHandler(ignoreCancelled = true)
+	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		Player player = event.getPlayer();
+		if (getRank(player, DelvesModifier.HAUNTED) > 0) {
+			Haunted.applyModifiers(player);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
+		if (getRank(player, DelvesModifier.HAUNTED) > 0) {
+			for (Entity entity : player.getNearbyEntities(100, 100, 100)) {
+				if (entity instanceof ArmorStand && entity.getScoreboardTags().contains(PHANTOM_NAME + player.getUniqueId())) {
+					entity.remove();
+				}
+			}
+		}
 		EntityUtils.removeAttributesContaining(player, Attribute.GENERIC_MAX_HEALTH, "Whispers");
 		Fragile.applyModifiers(player, getRank(player, DelvesModifier.FRAGILE));
 		for (LivingEntity mob : player.getLocation().getNearbyLivingEntities(25)) {
@@ -482,8 +591,6 @@ public class DelvesManager implements Listener {
 		}
 
 	}
-
-
 
 	//utility class to store date and modifier lvl on each player
 	public static class DungeonDelveInfo {
@@ -522,4 +629,5 @@ public class DelvesManager implements Listener {
 			mTotalPoint = Math.min(mTotalPoint, DelvesUtils.MAX_DEPTH_POINTS);
 		}
 	}
+
 }
