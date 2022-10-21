@@ -126,6 +126,11 @@ public class ItemStatManager implements Listener {
 				return get(stat);
 			}
 
+			public void setTo(ItemStatsMap other) {
+				mMap.clear();
+				mMap.putAll(other.mMap);
+			}
+
 			@Override
 			public Iterator<Entry<ItemStat, Double>> iterator() {
 				return mMap.entrySet().iterator();
@@ -154,9 +159,8 @@ public class ItemStatManager implements Listener {
 		}
 
 		public PlayerItemStats(PlayerItemStats playerItemStats) {
-			for (Entry<ItemStat, Double> entry : playerItemStats.getItemStats()) {
-				mStats.add(entry.getKey(), entry.getValue());
-			}
+			mStats.setTo(playerItemStats.mStats);
+			mMainhandAddStats.setTo(playerItemStats.mMainhandAddStats);
 			mRegion = playerItemStats.mRegion;
 		}
 
