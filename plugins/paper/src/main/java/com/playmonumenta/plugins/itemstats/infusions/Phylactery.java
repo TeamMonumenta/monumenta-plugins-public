@@ -71,12 +71,11 @@ public class Phylactery implements Infusion {
 		infoMap.remove(PotionManager.PotionID.SAFE_ZONE);
 		infoMap.remove(PotionManager.PotionID.ABILITY_SELF);
 
-		Iterator<List<PotionUtils.PotionInfo>> iter = infoMap.values().iterator();
-		while (iter.hasNext()) {
-			List<PotionUtils.PotionInfo> infoList = iter.next();
-			for (PotionUtils.PotionInfo info : infoList) {
+		for (List<PotionUtils.PotionInfo> infoList : infoMap.values()) {
+			for (Iterator<PotionUtils.PotionInfo> iterator = infoList.iterator(); iterator.hasNext(); ) {
+				PotionUtils.PotionInfo info = iterator.next();
 				if (info.mType != null && PotionUtils.hasNegativeEffects(info.mType)) {
-					iter.remove();
+					iterator.remove();
 				} else {
 					info.mDuration = (int) (info.mDuration * value * DURATION_KEPT);
 				}
