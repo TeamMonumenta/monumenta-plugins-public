@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -121,17 +122,19 @@ public class FrostNova extends Ability {
 			} else {
 				EntityUtils.applySlow(mPlugin, duration, mLevelSlowMultiplier, mob);
 				if (isEnhanced()) {
-					mob.setAI(false);
-					mob.setGravity(false);
-					new BukkitRunnable() {
-
-						@Override
-						public void run() {
+					if (mob.hasAI()) {
+						mob.setAI(false);
+						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 							mob.setAI(true);
-							mob.setGravity(true);
-						}
+						}, frozenDuration);
+					}
 
-					}.runTaskLater(mPlugin, frozenDuration);
+					if (mob.hasGravity()) {
+						mob.setGravity(false);
+						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+							mob.setGravity(true);
+						}, frozenDuration);
+					}
 				}
 			}
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
