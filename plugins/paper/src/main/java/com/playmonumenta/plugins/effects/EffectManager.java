@@ -531,6 +531,15 @@ public final class EffectManager implements Listener {
 		return null;
 	}
 
+	public <T extends Effect> T getActiveEffect(Entity entity, Class<T> cls) {
+		NavigableSet<T> effects = getEffects(entity, cls);
+		if (effects != null && effects.size() > 0) {
+			return effects.last();
+		}
+
+		return null;
+	}
+
 	/**
 	 * Returns if an entity has an effect source or not.
 	 *
