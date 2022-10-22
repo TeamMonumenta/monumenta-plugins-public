@@ -19,6 +19,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class TrainingDummyBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_training_dummy";
@@ -39,7 +40,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	private double mDPSDisp = -1;
 	private double mDPSDisp10s = -1;
 	private double mMaxDPS = -1;
-	private ArmorStand mHologram = null;
+	private @Nullable ArmorStand mHologram = null;
 
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -131,18 +132,20 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 			if (mDPSCounter10s == -1) {
 				mDPSCounter10s = 0;
 
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					mDPSDisp10s = mDPSCounter10s / 10;
-					mHologram.customName(Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-						.append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
-						.append(Component.text(" (", NamedTextColor.YELLOW))
-						.append(Component.text(damageToString(mDPSDisp10s, true), NamedTextColor.GREEN))
-						.append(Component.text("/", NamedTextColor.YELLOW))
-						.append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
-						.append(Component.text(")", NamedTextColor.YELLOW)));
+				if (mHologram != null) {
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+						mDPSDisp10s = mDPSCounter10s / 10;
+						mHologram.customName(Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
+							.append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
+							.append(Component.text(" (", NamedTextColor.YELLOW))
+							.append(Component.text(damageToString(mDPSDisp10s, true), NamedTextColor.GREEN))
+							.append(Component.text("/", NamedTextColor.YELLOW))
+							.append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
+							.append(Component.text(")", NamedTextColor.YELLOW)));
 
-					mDPSCounter10s = -1;
-				}, 200);
+						mDPSCounter10s = -1;
+					}, 200);
+				}
 			}
 
 			mDPSCounter += damage;

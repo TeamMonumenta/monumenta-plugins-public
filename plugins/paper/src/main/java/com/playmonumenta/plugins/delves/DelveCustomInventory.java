@@ -413,7 +413,14 @@ public class DelveCustomInventory extends CustomInventory {
 							}
 						}
 					}
-					DelvesModifier mod = mods.get(column - 1 + (mPage * 7));
+
+					int index = column - 1 + (mPage * 7);
+					if (index >= mods.size()) {
+						//Clicked past all the modifiers
+						break;
+					}
+					DelvesModifier mod = mods.get(index);
+
 					if (row == 5) {
 						//last row -> clearing this delve mod point
 						mPointSelected.put(mod, 0);
@@ -429,6 +436,7 @@ public class DelveCustomInventory extends CustomInventory {
 						}
 					}
 
+					break;
 				}
 			}
 

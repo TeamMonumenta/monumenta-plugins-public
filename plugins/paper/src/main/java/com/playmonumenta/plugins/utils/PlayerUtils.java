@@ -65,27 +65,6 @@ public class PlayerUtils {
 		player.teleport(player.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.UNKNOWN);
 	}
 
-	public static List<Player> playersInLootScalingRange(Location location) {
-		// In dungeons, all players in the same world (i.e. the entire dungeon) are in range
-
-		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
-		if (isDungeon) {
-			return location.getWorld().getPlayers().stream()
-				.filter(p -> ActivityManager.getManager().isActive(p) && p.getGameMode() != GameMode.SPECTATOR && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER))
-				.toList();
-		}
-
-		// In a POI, all players within the same POI are in range
-		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(location.toVector(), true);
-		if (!structures.isEmpty()) {
-			return location.getWorld().getPlayers().stream()
-				       .filter(p -> p.getGameMode() != GameMode.SPECTATOR && (p.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER) && structures.stream().anyMatch(structure -> structure.isNearby(p)))
-				       .toList();
-		}
-		// Otherwise, perform no loot scaling
-		return Collections.emptyList();
-	}
-
 	public static boolean playerCountsForLootScaling(Player player) {
 		return player.getGameMode() != GameMode.SPECTATOR
 			       && (player.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER)
@@ -93,27 +72,34 @@ public class PlayerUtils {
 			       && !Shattered.hasMaxShatteredItemEquipped(player);
 	}
 
-	public static List<Player> otherPlayersInLootScalingRange(Player player) {
+	public static List<Player> playersInLootScalingRange(Location loc) {
 		// In dungeons, all players in the same world (i.e. the entire dungeon) are in range
 		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
 		if (isDungeon) {
-			return player.getWorld().getPlayers().stream()
-				       .filter(p -> !p.equals(player) && playerCountsForLootScaling(p))
-				       .toList();
+			return loc.getWorld().getPlayers().stream()
+				.filter(p -> playerCountsForLootScaling(p))
+				.toList();
 		}
 
 		// In a POI, all players within the same POI are in range
-		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(player.getLocation().toVector(), true);
+		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(loc.toVector(), true);
 		if (!structures.isEmpty()) {
-			return player.getWorld().getPlayers().stream()
-				       .filter(p -> !p.equals(player)
-					                    && playerCountsForLootScaling(p)
-					                    && structures.stream().anyMatch(structure -> structure.isNearby(p)))
-				       .toList();
+			return loc.getWorld().getPlayers().stream()
+				.filter(p -> playerCountsForLootScaling(p)
+					             && structures.stream().anyMatch(structure -> structure.isWithin(p)))
+				.toList();
 		}
 
 		// Otherwise, perform no loot scaling
 		return Collections.emptyList();
+	}
+
+	public static List<Player> playersInLootScalingRange(Player player, boolean excludeTarget) {
+		List<Player> players = playersInLootScalingRange(player.getLocation());
+		if (excludeTarget) {
+			players.remove(player);
+		}
+		return players;
 	}
 
 	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable, boolean includeDead) {

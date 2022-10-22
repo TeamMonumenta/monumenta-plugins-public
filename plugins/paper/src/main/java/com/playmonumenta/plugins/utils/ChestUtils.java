@@ -91,7 +91,7 @@ public class ChestUtils {
 					MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey().toString() + "' which was scaled & distributed");
 
 					// Get all other players in range, excluding the source player
-					otherPlayers = PlayerUtils.otherPlayersInLootScalingRange(player);
+					otherPlayers = PlayerUtils.playersInLootScalingRange(player, true);
 
 					int otherPlayersMultiplier = otherPlayers.size() + 1;
 
