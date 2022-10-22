@@ -402,16 +402,20 @@ public class PortalManager implements Listener {
 			long chunkKey2 = loc2.getChunk().getChunkKey();
 
 			Set<Portal> chunkPortals = worldPortalsByChunk.get(chunkKey1);
-			chunkPortals.remove(portal);
-			if (chunkPortals.isEmpty()) {
-				worldPortalsByChunk.remove(chunkKey1);
+			if (chunkPortals != null) {
+				chunkPortals.remove(portal);
+				if (chunkPortals.isEmpty()) {
+					worldPortalsByChunk.remove(chunkKey1);
+				}
 			}
 
 			if (chunkKey1 != chunkKey2) {
 				chunkPortals = worldPortalsByChunk.get(chunkKey2);
-				chunkPortals.remove(portal);
-				if (chunkPortals.isEmpty()) {
-					worldPortalsByChunk.remove(chunkKey2);
+				if (chunkPortals != null) {
+					chunkPortals.remove(portal);
+					if (chunkPortals.isEmpty()) {
+						worldPortalsByChunk.remove(chunkKey2);
+					}
 				}
 			}
 
