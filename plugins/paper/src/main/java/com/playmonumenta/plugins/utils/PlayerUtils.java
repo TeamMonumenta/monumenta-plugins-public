@@ -95,7 +95,7 @@ public class PlayerUtils {
 	}
 
 	public static List<Player> playersInLootScalingRange(Player player, boolean excludeTarget) {
-		List<Player> players = playersInLootScalingRange(player.getLocation());
+		List<Player> players = new ArrayList<>(playersInLootScalingRange(player.getLocation()));
 		if (excludeTarget) {
 			players.remove(player);
 		}
