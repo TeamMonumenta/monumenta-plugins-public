@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -633,7 +634,12 @@ public final class EffectManager implements Listener {
 
 	public static @Nullable Effect getEffectFromJson(JsonObject object, Plugin plugin) throws Exception {
 		String effectID = object.get("effectID").getAsString();
-		return mEffectDeserializer.get(effectID).deserialize(object, plugin);
+		EffectDeserializer deserializer = mEffectDeserializer.get(effectID);
+		if (deserializer == null) {
+			MMLog.severe("Cannot deserialize effect with ID '" + effectID + "'");
+			return null;
+		}
+		return deserializer.deserialize(object, plugin);
 	}
 
 	public void loadFromJsonObject(Player player, JsonObject object, Plugin plugin) throws Exception {

@@ -61,24 +61,28 @@ public class MonumentaRedisSyncIntegration implements Listener {
 
 		JsonObject data = MonumentaRedisSyncAPI.getPlayerPluginData(player.getUniqueId(), IDENTIFIER);
 		if (data != null) {
-			try {
-				mPlugin.mPotionManager.loadFromJsonObject(player, data.get("potions").getAsJsonObject());
+			if (data.has("potions")) {
+				try {
+					mPlugin.mPotionManager.loadFromJsonObject(player, data.get("potions").getAsJsonObject());
 
-				/* TODO LEVEL */
-				mLogger.info("Loaded potion data for player " + player.getName());
-			} catch (Exception ex) {
-				mLogger.severe("Failed to load potion data for player " + player.getName() + ":" + ex.getMessage());
-				ex.printStackTrace();
+					/* TODO LEVEL */
+					mLogger.info("Loaded potion data for player " + player.getName());
+				} catch (Exception ex) {
+					mLogger.severe("Failed to load potion data for player " + player.getName() + ":" + ex.getMessage());
+					ex.printStackTrace();
+				}
 			}
 
-			try {
-				mPlugin.mEffectManager.loadFromJsonObject(player, data.get("effects").getAsJsonObject(), mPlugin);
+			if (data.has("effects")) {
+				try {
+					mPlugin.mEffectManager.loadFromJsonObject(player, data.get("effects").getAsJsonObject(), mPlugin);
 
-				/* TODO LEVEL */
-				mLogger.info("Loaded effects data for player " + player.getName());
-			} catch (Exception ex) {
-				mLogger.severe("Failed to load effects data for player " + player.getName() + ":" + ex.getMessage());
-				ex.printStackTrace();
+					/* TODO LEVEL */
+					mLogger.info("Loaded effects data for player " + player.getName());
+				} catch (Exception ex) {
+					mLogger.severe("Failed to load effects data for player " + player.getName() + ":" + ex.getMessage());
+					ex.printStackTrace();
+				}
 			}
 		}
 	}
