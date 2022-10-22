@@ -16,21 +16,27 @@ public class GUIUtils {
 		if (lore.isEmpty()) {
 			return;
 		}
-		String[] splitLine = lore.split(" |(?<=\n)");
+		String[] splitLine = lore.split(" |(?=\n)"); // split on spaces, and on the empty string just before a line break
 		StringBuilder currentLine = new StringBuilder(defaultColor + "");
 		List<String> finalLines = (clean || meta.getLore() == null) ? new ArrayList<>() : meta.getLore();
 
 		for (String word : splitLine) {
-			boolean newline = currentLine.length() > 0 && currentLine.charAt(currentLine.length() - 1) == '\n';
+			boolean newline = word.length() > 0 && word.charAt(0) == '\n';
 			if (newline || currentLine.length() + word.length() > maxLength) {
-				if (newline) {
+				if (currentLine.length() > 0 && currentLine.charAt(currentLine.length() - 1) == ' ') {
 					currentLine.setLength(currentLine.length() - 1);
 				}
 				finalLines.add(currentLine.toString());
 				currentLine.setLength(0);
 				currentLine.append(defaultColor + "");
 			}
-			currentLine.append(word).append(" ");
+			if (newline) {
+				if (word.length() > 1) {
+					currentLine.append(word.substring(1)).append(" ");
+				}
+			} else {
+				currentLine.append(word).append(" ");
+			}
 		}
 		if (!currentLine.toString().equals(defaultColor + "")) {
 			finalLines.add(currentLine.toString());
