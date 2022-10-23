@@ -259,6 +259,10 @@ public class Samwell extends BossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, finalHp);
 		mBoss.setHealth(finalHp);
 
+		Team team = ScoreboardUtils.getExistingTeamOrCreate("Blue", NamedTextColor.BLUE);
+		team.addEntity(mBoss);
+		mBoss.setGlowing(true);
+
 		mShardsReq = (int) (5 + Math.floor(PlayerUtils.playersInRange(mSpawnLoc, 100, true).size() / 2.0));
 
 		// Need to Delay this a bit, as BlueStrikeDaggerCraftingBoss will search for a nearby WitherSkeleton.

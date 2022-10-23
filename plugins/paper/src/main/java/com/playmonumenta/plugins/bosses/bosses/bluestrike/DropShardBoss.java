@@ -57,6 +57,9 @@ public class DropShardBoss extends BossAbilityGroup {
 			ItemStack item = mTable.populateLoot(mRand, cont).stream().toList().get(0);
 			mBoss.getWorld().dropItem(mBoss.getLocation(), item);
 		}
+
+		event.setDroppedExp(0);
+		event.getDrops().clear();
 	}
 
 	@Override
