@@ -21,7 +21,7 @@ public class SpellPortalSummons extends Spell {
 	private static final String SUMMON_NAME_1 = "ChemicalSpill";
 	private static final String SUMMON_NAME_2 = "HostileCube";
 	private static final String SUMMON_NAME_3 = "ProjectileRepeaterMK07";
-	private static final int SPAWN_COUNT = 8; // Summon count 8-16 depending on players alive
+	private static final int SPAWN_COUNT = 4; // Summon count 8-16 depending on players alive
 	private static final int RANGE = 25;
 	private static final int MAX_MOBS = 15;
 

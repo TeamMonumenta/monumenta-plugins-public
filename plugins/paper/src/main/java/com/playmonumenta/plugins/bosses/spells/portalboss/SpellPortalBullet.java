@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.PortalBoss;
 import com.playmonumenta.plugins.bosses.spells.SpellBullet;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -27,7 +28,10 @@ public class SpellPortalBullet extends SpellBullet {
 				}
 			},
 			(Entity entity) -> {
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.3f, 0);
+				if (FastUtils.RANDOM.nextDouble() < 0.25) {
+					//Space out thunder sounds of cast semi randomly
+					boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.3f, 0);
+				}
 			},
 			Material.GOLD_BLOCK,
 			(Player player, Location loc, boolean blocked) -> {
