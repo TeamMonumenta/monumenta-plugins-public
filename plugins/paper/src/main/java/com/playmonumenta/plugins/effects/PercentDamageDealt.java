@@ -44,7 +44,7 @@ public class PercentDamageDealt extends Effect {
 	}
 
 	// Only call this in PercentDamageDealtSingle
-	public PercentDamageDealt(int duration, double amount, String effectIdentifier) {
+	protected PercentDamageDealt(int duration, double amount, String effectIdentifier) {
 		this(duration, amount, null, 0, null, effectIdentifier);
 	}
 
