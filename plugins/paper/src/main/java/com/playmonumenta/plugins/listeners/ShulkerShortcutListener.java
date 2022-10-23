@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.inventories.ShulkerInventory;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
@@ -358,8 +359,12 @@ public class ShulkerShortcutListener implements Listener {
 
 						chest = (Chest) block.getState();
 						chest.getInventory().setContents(contents);
+
+						// Log CoreProtect data for chest placement
+						CoreProtectIntegration.logPlacement(player, chest.getLocation(), chest.getBlockData().getMaterial(), chest.getBlockData());
 					}
 				});
+
 				item.subtract();
 			} else if (ChestUtils.isLootBox(event.getItemInHand())) {
 				event.setCancelled(true);
