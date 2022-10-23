@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.portals;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -398,8 +399,8 @@ public class PortalManager implements Listener {
 
 		Map<Long, Set<Portal>> worldPortalsByChunk = mPortalsByChunk.get(worldId);
 		if (worldPortalsByChunk != null) {
-			long chunkKey1 = loc1.getChunk().getChunkKey();
-			long chunkKey2 = loc2.getChunk().getChunkKey();
+			long chunkKey1 = Chunk.getChunkKey(loc1);
+			long chunkKey2 = Chunk.getChunkKey(loc2);
 
 			Set<Portal> chunkPortals = worldPortalsByChunk.get(chunkKey1);
 			if (chunkPortals != null) {
@@ -424,14 +425,16 @@ public class PortalManager implements Listener {
 			}
 		}
 
-		deletePortalMap(portal.mUuid1);
-		deletePortalMap(portal.mUuid2);
+		deletePortalMap(portal.mUuid1, loc1);
+		deletePortalMap(portal.mUuid2, loc2);
 	}
 
-	private static void deletePortalMap(UUID uuid) {
+	private static void deletePortalMap(UUID uuid, Location loc) {
 		Entity itemFrame = Bukkit.getEntity(uuid);
 		if (itemFrame != null) {
 			itemFrame.remove();
+		} else {
+			MMLog.warning("Failed to delete portal map; uuid=" + uuid + ", location=" + loc);
 		}
 	}
 
