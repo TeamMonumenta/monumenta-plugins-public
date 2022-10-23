@@ -116,7 +116,7 @@ public class OrinCustomInventory extends CustomInventory {
 		ORIN_ITEMS.add(new TeleportEntry(4, 45, "Build Server", "Click to teleport!", Material.STONE_PICKAXE, null, 0, "transferserver build"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_valley", "instancebot valley"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_isles", "instancebot isles"));
-		ORIN_ITEMS.add(new TeleportEntry(4, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_ring", "instancebot ring"));
+		ORIN_ITEMS.add(new TeleportEntry(4, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_ring", "instancebot ring"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 42, "Dungeon Instances", "Click to view all open dungeon instances.", Material.SPAWNER, null, 0, "page 21"));
 
 

@@ -68,6 +68,7 @@ public class SpellSummonBlueStrike extends Spell {
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.0f, 1.0f);
 			PartialParticle particles = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 50, 1, 1, 1);
 			particles.spawnAsEnemy();
+			BossManager bossManager = com.playmonumenta.plugins.Plugin.getInstance().mBossManager;
 
 			// Run summon after a second of playing the sound.
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
@@ -87,7 +88,7 @@ public class SpellSummonBlueStrike extends Spell {
 					LivingEntity e = (LivingEntity) mWeights.get(keys.get(iteration)).spawn(mCenter.clone().add(mLocationOffsets.get(FastUtils.RANDOM.nextInt(mLocationOffsets.size()))));
 
 					if (e != null) {
-						BossManager.getInstance().manuallyRegisterBoss(e, new DropShardBoss(mPlugin, e));
+						bossManager.manuallyRegisterBoss(e, new DropShardBoss(mPlugin, e));
 					}
 				}
 			}, 20);

@@ -161,7 +161,7 @@ public class DelveLootTableGroup {
 		BlockState blockState = block.getState();
 		if (blockState instanceof Chest) {
 			setDelveLootTable(DelvesUtils.getPlayerTotalDelvePoint(null, player, ServerProperties.getShardName()),
-					PlayerUtils.otherPlayersInLootScalingRange(player).size() + 1,
+					PlayerUtils.playersInLootScalingRange(player, true).size() + 1,
 					(Chest) blockState);
 		}
 	}

@@ -94,28 +94,33 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 
 								p.SOUND_SHOOT.play(mBoss.getLocation());
 								Location eyeLoc = mBoss.getEyeLocation();
-								Location targetEyeLoc = p.TARGETS.getTargetsList(mBoss).get(0).getEyeLocation();
-								Vector dir = targetEyeLoc.toVector().subtract(eyeLoc.toVector()).normalize();
-								for (int i = 0; i < p.PROJECTILE_NUMBER; i++) {
-									double yaw = spacing * (i - (p.PROJECTILE_NUMBER - 1) / 2f);
-									AbstractArrow arrow = spawnArrow(mBoss, dir, yaw, p.SPEED);
-									arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
-									arrow.setPierceLevel(p.PIERCING);
-									arrow.setDamage(p.DAMAGE);
-									mVolleyArrowSet.add(arrow);
-									if (!p.PARTICLE_PROJECTILE.isEmpty()) {
-										new BukkitRunnable() {
+								List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
+								if (!targets.isEmpty()) {
+									Location targetEyeLoc = targets.get(0).getEyeLocation();
+									Vector dir = targetEyeLoc.toVector().subtract(eyeLoc.toVector()).normalize();
+									for (int i = 0; i < p.PROJECTILE_NUMBER; i++) {
+										double yaw = spacing * (i - (p.PROJECTILE_NUMBER - 1) / 2f);
+										AbstractArrow arrow = spawnArrow(mBoss, dir, yaw, p.SPEED);
+										arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
+										arrow.setPierceLevel(p.PIERCING);
+										arrow.setDamage(p.DAMAGE);
+										mVolleyArrowSet.add(arrow);
+										if (!p.PARTICLE_PROJECTILE.isEmpty()) {
+											new BukkitRunnable() {
 
-											@Override public void run() {
-												p.PARTICLE_PROJECTILE.spawn(boss, arrow.getLocation());
+												@Override
+												public void run() {
+													p.PARTICLE_PROJECTILE.spawn(boss, arrow.getLocation());
 
-												if (arrow.isInBlock() || !arrow.isValid()) {
-													this.cancel();
+													if (arrow.isInBlock() || !arrow.isValid()) {
+														this.cancel();
+													}
 												}
-											}
-										}.runTaskTimer(mPlugin, 0, 1);
+											}.runTaskTimer(mPlugin, 0, 1);
+										}
 									}
 								}
+
 								cancel();
 							}
 
@@ -130,7 +135,8 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 					return p.COOLDOWN;
 				}
 
-				@Override public boolean canRun() {
+				@Override
+				public boolean canRun() {
 					return !p.TARGETS.getTargetsList(mBoss).isEmpty();
 				}
 			}

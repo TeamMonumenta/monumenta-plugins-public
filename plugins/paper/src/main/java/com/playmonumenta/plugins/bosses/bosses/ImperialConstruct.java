@@ -6,7 +6,19 @@ import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.imperialconstruct.*;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.MinionSpawn;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SilverBolts;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellConstructAggro;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellCrash;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellEchoCharge;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellFinalStandPassive;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellFloor;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellLingeringParadox;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellRecover;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellRush;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellSlice;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellSteelboreSpread;
+import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellStonemason;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -17,7 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -27,6 +45,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ImperialConstruct extends BossAbilityGroup {
 
@@ -45,9 +64,9 @@ public class ImperialConstruct extends BossAbilityGroup {
 	//private int mPhase = 1;
 	private Location mPhase2Loc;
 	private Location mPhase3Loc;
-	public SpellLingeringParadox mParadox;
-	public SpellLingeringParadox mParadox2;
-	public SpellLingeringParadox mParadox3;
+	public @Nullable SpellLingeringParadox mParadox;
+	public @Nullable SpellLingeringParadox mParadox2;
+	public @Nullable SpellLingeringParadox mParadox3;
 	private SpellCrash mCrash;
 	private SpellRush mRush;
 	private SpellRush mRush2;
@@ -669,7 +688,9 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 
 		mSpawner.removeMobs();
-		mParadox.deleteExchangers();
+		if (mParadox != null) {
+			mParadox.deleteExchangers();
+		}
 
 	}
 

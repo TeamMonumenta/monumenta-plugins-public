@@ -10,6 +10,7 @@ import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.commands.GlowingCommand;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collection;
 import java.util.List;
@@ -67,7 +68,16 @@ public class GlowingReplacer extends PacketAdapter {
 
 		// Finally, unset the glowing bits
 		// We need to clone the packet to not affect other players, and get the data watchers again from the new packet
-		packet = packet.deepClone();
+		try {
+			packet = packet.deepClone();
+		} catch (RuntimeException e) {
+			// sometimes, cloning just fails for some reason?
+			if (e.getMessage() != null && e.getMessage().startsWith("Unable to clone")) {
+				MMLog.warning("Failed to clone packet of type " + packet.getType());
+				return;
+			}
+			throw e;
+		}
 		wrappedWatchableObjects = packet.getWatchableCollectionModifier().getValues().stream()
 			.flatMap(Collection::stream)
 			.filter(wwo -> wwo.getIndex() == 0 && wwo.getRawValue() instanceof Byte b && (b & GLOWING_BIT) != 0)

@@ -164,7 +164,7 @@ public class HauntingShades extends Ability {
 						for (Player p : affectedPlayers) {
 							double maxHealth = EntityUtils.getMaxHealth(p);
 							mPlugin.mEffectManager.addEffect(p, HEAL_NAME, new CustomRegeneration(EFFECT_DURATION, maxHealth * CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT), mPlayer, mPlugin));
-							mPlugin.mEffectManager.addEffect(p, STR_NAME, new PercentDamageDealt(EFFECT_DURATION, EFFECT_LEVEL, STR_NAME));
+							mPlugin.mEffectManager.addEffect(p, STR_NAME, new PercentDamageDealt(EFFECT_DURATION, EFFECT_LEVEL));
 						}
 					}
 

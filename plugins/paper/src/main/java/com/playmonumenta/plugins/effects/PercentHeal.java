@@ -30,6 +30,10 @@ public class PercentHeal extends SingleArgumentEffect {
 		return mAmount > -1;
 	}
 
+	public double getValue() {
+		return mAmount;
+	}
+
 	public static PercentHeal deserialize(JsonObject object, Plugin plugin) {
 		int duration = object.get("duration").getAsInt();
 		double amount = object.get("amount").getAsDouble();

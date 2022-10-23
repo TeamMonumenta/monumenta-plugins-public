@@ -16,7 +16,7 @@ public class ScoreboardUtils {
 		Optional<Integer> scoreValue = Optional.empty();
 		Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(objectiveName);
 		// Fast track applies
-		if (ServerProperties.getAbilityEnhancementsEnabled()) {
+		if (ServerProperties.getAbilityEnhancementsEnabled() && !ServerProperties.getShardName().contains("plots")) {
 			if (objectiveName.equals(AbilityUtils.TOTAL_LEVEL)) {
 				return Optional.of(AbilityUtils.MAX_SKILL_POINTS);
 			} else if (objectiveName.equals(AbilityUtils.TOTAL_SPEC)) {

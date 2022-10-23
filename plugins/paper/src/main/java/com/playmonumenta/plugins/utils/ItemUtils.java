@@ -642,7 +642,7 @@ public class ItemUtils {
 
 	public static void damageItem(ItemStack item, int damage, boolean canBreak) {
 		ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
-		if (meta instanceof Damageable dMeta) {
+		if (meta instanceof Damageable dMeta && !meta.isUnbreakable()) {
 			// This item can be damaged - remove some durability from it
 			short maxDurability = item.getType().getMaxDurability();
 			int currentDamage = dMeta.getDamage();
@@ -658,7 +658,7 @@ public class ItemUtils {
 
 	public static void damageItemPercent(ItemStack item, double damagePercent, boolean canBreak) {
 		ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
-		if (meta instanceof Damageable dMeta) {
+		if (meta instanceof Damageable dMeta && !meta.isUnbreakable()) {
 			// This item can be damaged - remove some durability from it
 			short maxDurability = item.getType().getMaxDurability();
 			int currentDamage = dMeta.getDamage();

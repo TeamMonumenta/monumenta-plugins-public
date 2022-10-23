@@ -32,8 +32,6 @@ public class ServerProperties {
 	private boolean mIsSleepingEnabled = true;
 	private boolean mKeepLowTierInventory = false;
 	private boolean mClassSpecializationsEnabled = false;
-	//TODO change this to false once r3 launches!
-	private boolean mCharmsEnabled = true;
 	private boolean mAbilityEnhancementsEnabled = false;
 	private boolean mAuditMessagesEnabled = true;
 	private boolean mRepairExplosions = false;
@@ -75,10 +73,6 @@ public class ServerProperties {
 
 	public static boolean getClassSpecializationsEnabled() {
 		return INSTANCE.mClassSpecializationsEnabled;
-	}
-
-	public static boolean getCharmsEnabled() {
-		return INSTANCE.mCharmsEnabled;
 	}
 
 	public static boolean getAbilityEnhancementsEnabled() {
@@ -183,7 +177,6 @@ public class ServerProperties {
 		out.add("isSleepingEnabled = " + mIsSleepingEnabled);
 		out.add("keepLowTierInventory = " + mKeepLowTierInventory);
 		out.add("classSpecializationsEnabled = " + mClassSpecializationsEnabled);
-		out.add("charmsEnabled = " + mCharmsEnabled);
 		out.add("abilityEnhancementsEnabled = " + mAbilityEnhancementsEnabled);
 		out.add("auditMessagesEnabled = " + mAuditMessagesEnabled);
 		out.add("repairExplosions = " + mRepairExplosions);

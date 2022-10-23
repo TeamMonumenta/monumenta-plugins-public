@@ -17,7 +17,7 @@ public class ActivityManager {
 	public final Map<UUID, Integer> mActivity = new HashMap<>();
 	public static final int THRESHOLD_R1 = 100;
 	public static final int THRESHOLD_R2 = 200;
-	// public static final int THRESHOLD_R3 = 300;
+	public static final int THRESHOLD_R3 = 300;
 	private final Plugin mPlugin;
 
 	public ActivityManager(Plugin plugin) {
@@ -44,12 +44,12 @@ public class ActivityManager {
 		UUID playerId = player.getUniqueId();
 		double updatedDamage = mDamageDealt.getOrDefault(playerId, 0.0) + damage;
 		mDamageDealt.put(playerId, updatedDamage);
-		/** if (ServerProperties.getCharmsEnabled()) {
+		if (ServerProperties.getAbilityEnhancementsEnabled()) {
 			if (updatedDamage > THRESHOLD_R3) {
 				mDamageDealt.put(playerId, updatedDamage - THRESHOLD_R3);
 				addActivity(player);
 			}
-		} else **/
+		} else
 		if (ServerProperties.getClassSpecializationsEnabled()) {
 			if (updatedDamage > THRESHOLD_R2) {
 				mDamageDealt.put(playerId, updatedDamage - THRESHOLD_R2);
@@ -66,13 +66,13 @@ public class ActivityManager {
 		double updatedHealing = mHealingDealt.getOrDefault(playerId, 0.0) + healing;
 		double damageDealt = mDamageDealt.getOrDefault(playerId, 0.0);
 		mHealingDealt.put(playerId, updatedHealing);
-		/** if (ServerProperties.getCharmsEnabled()) {
+		if (ServerProperties.getAbilityEnhancementsEnabled()) {
 			if (updatedHealing > THRESHOLD_R3 / 4 && damageDealt > 1) {
 				mHealingDealt.put(playerId, updatedHealing - THRESHOLD_R3 / 4);
 				mDamageDealt.put(playerId, 0.0);
 				addActivity(player);
 			}
-		} else **/
+		} else
 		if (ServerProperties.getClassSpecializationsEnabled()) {
 			if (updatedHealing > THRESHOLD_R2 / 4 && damageDealt > 1) {
 				mHealingDealt.put(playerId, updatedHealing - THRESHOLD_R2 / 4);

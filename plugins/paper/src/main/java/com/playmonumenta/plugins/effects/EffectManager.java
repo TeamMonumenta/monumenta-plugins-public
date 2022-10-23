@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
+import java.util.NoSuchElementException;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -529,6 +531,15 @@ public final class EffectManager implements Listener {
 		return null;
 	}
 
+	public <T extends Effect> T getActiveEffect(Entity entity, Class<T> cls) {
+		NavigableSet<T> effects = getEffects(entity, cls);
+		if (effects != null && effects.size() > 0) {
+			return effects.last();
+		}
+
+		return null;
+	}
+
 	/**
 	 * Returns if an entity has an effect source or not.
 	 *
@@ -565,9 +576,13 @@ public final class EffectManager implements Listener {
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (Map.Entry<String, NavigableSet<Effect>> entry : priorityEffects.entrySet()) {
-					Effect effect = entry.getValue().pollLast();
-					if (effect != null) {
-						output.put(entry.getKey(), effect);
+					try {
+						Effect effect = entry.getValue().last();
+						if (effect != null) {
+							output.put(entry.getKey(), effect);
+						}
+					} catch (NoSuchElementException e) {
+						// ignore - effect was probably removed in another thread (and this method can be called by the tab list from arbitrary threads)
 					}
 				}
 			}
@@ -628,7 +643,12 @@ public final class EffectManager implements Listener {
 
 	public static @Nullable Effect getEffectFromJson(JsonObject object, Plugin plugin) throws Exception {
 		String effectID = object.get("effectID").getAsString();
-		return mEffectDeserializer.get(effectID).deserialize(object, plugin);
+		EffectDeserializer deserializer = mEffectDeserializer.get(effectID);
+		if (deserializer == null) {
+			MMLog.severe("Cannot deserialize effect with ID '" + effectID + "'");
+			return null;
+		}
+		return deserializer.deserialize(object, plugin);
 	}
 
 	public void loadFromJsonObject(Player player, JsonObject object, Plugin plugin) throws Exception {

@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -137,9 +139,15 @@ public class BountyGui extends Gui {
 				});
 			for (int i = 1; i < PRESET_L1_LOCATIONS.size(); i++) {
 				final int level = i;
+				Supplier<IntStream> presetPoints = () -> Arrays.stream(DelvePreset.values())
+					                                         .filter(preset -> preset.mLevel == level)
+					                                         .mapToInt(preset -> preset.mModifiers.entrySet().stream().mapToInt(e -> e.getKey().getPointsPerLevel() * e.getValue()).sum());
+				int minPoints = presetPoints.get().min().orElse(0);
+				int maxPoints = presetPoints.get().max().orElse(0);
 				setItem(PRESET_L1_LOCATIONS.get(i), createBasicItem(
 					Material.SOUL_LANTERN, i, "Level " + i, NamedTextColor.AQUA,
-					false, "Delve presets will be rolled from level " + i + ".", ChatColor.WHITE))
+					false, "Delve presets will be rolled from level " + i + ".\n" +
+						       "Presets of this level will assign " + (minPoints == maxPoints ? minPoints : minPoints + " to " + maxPoints) + " delve points.", ChatColor.WHITE))
 					.onLeftClick(() -> {
 						mPresetLevel = level;
 						update();
@@ -240,7 +248,7 @@ public class BountyGui extends Gui {
 		for (Player target : nearbyPlayers) {
 			if (preset != null) {
 				ScoreboardUtils.setScoreboardValue(target, DelvePreset.PRESET_SCOREBOARD, preset.mId);
-				DelvesManager.savePlayerData(mPlayer, "ring", preset.mModifiers);
+				DelvesManager.savePlayerData(target, "ring", preset.mModifiers);
 			}
 			ScoreboardUtils.setScoreboardValue(target, BOUNTY_SCOREBOARDS.get(mRegion - 1), bounty.mID);
 			ScoreboardUtils.setScoreboardValue(target, LORE_SCOREBOARDS.get(mRegion - 1), 1);

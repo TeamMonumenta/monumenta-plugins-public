@@ -12,12 +12,17 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import java.lang.reflect.InvocationTargetException;
@@ -295,11 +300,21 @@ public class PlayerTitleManager {
 			result.add(Component.text(title.mName, NamedTextColor.GRAY));
 		}
 
+		// Track if player cannot heal
+		boolean hasAntiHeal = false;
+		ItemStatManager.PlayerItemStats.ItemStatsMap playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStatsCopy(player).getItemStats();
+		double antiHealFromEnchants = Sustenance.getHealingMultiplier(playerItemStats.get(ItemStatUtils.EnchantmentType.SUSTENANCE), playerItemStats.get(ItemStatUtils.EnchantmentType.CURSE_OF_ANEMIA));
+
+		PercentHeal antiHeal = Plugin.getInstance().mEffectManager.getActiveEffect(player, PercentHeal.class);
+		if ((antiHeal != null && antiHeal.getValue() <= -1) || antiHealFromEnchants <= 0) {
+			hasAntiHeal = true;
+		}
+
 		// middle: health
 		int health = (int) Math.round(player.getHealth());
 		int maxHealth = (int) Math.round(EntityUtils.getMaxHealth(player));
 		float redFactor = Math.max(0, Math.min(1, 1.25f * health / maxHealth - 0.25f)); // 100% red at 20% HP or below, white at full HP
-		Component healthLine = Component.text(health + "/" + maxHealth + " \u2665", TextColor.color(1f, redFactor, redFactor));
+		Component healthLine = Component.text(health + "/" + maxHealth + " \u2665", hasAntiHeal ? TextColor.fromHexString("#5D2D87") : TextColor.color(1f, redFactor, redFactor)); // if you have anitheal, set color to purple
 		int absorption = (int) Math.round(AbsorptionUtils.getAbsorption(player));
 		if (absorption > 0) {
 			healthLine = healthLine.append(Component.text(" +" + absorption, NamedTextColor.YELLOW));

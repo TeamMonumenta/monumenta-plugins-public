@@ -1023,7 +1023,7 @@ public class CharmManager {
 	 */
 	public double getValueOfAttribute(Player p, String charmAttribute) {
 		//Check if charms are enabled (r3 shard), if not, return zero as the net effect
-		if (!ServerProperties.getCharmsEnabled() || p == null) {
+		if (!ServerProperties.getAbilityEnhancementsEnabled() || p == null) {
 			return 0;
 		}
 
