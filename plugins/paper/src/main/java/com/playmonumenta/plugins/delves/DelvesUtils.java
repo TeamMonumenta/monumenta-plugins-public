@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import it.unimi.dsi.util.XoRoShiRo128PlusRandom;
 import java.util.ArrayList;
@@ -420,5 +421,17 @@ public class DelvesUtils {
 			return spawnCount <= MobListener.SPAWNER_DROP_THRESHOLD;
 		}
 		return true;
+	}
+
+	protected static List<Player> playerInRangeForDelves(Location loc) {
+		// In dungeons, all players in the same world (i.e. the entire dungeon) are in range
+		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
+		if (isDungeon) {
+			return loc.getWorld().getPlayers().stream()
+				.filter(PlayerUtils::playerCountsForLootScaling)
+				.toList();
+		}
+
+		return PlayerUtils.playersInRange(loc, DelvesManager.DELVES_MAX_PARTY_DISTANCE, true);
 	}
 }

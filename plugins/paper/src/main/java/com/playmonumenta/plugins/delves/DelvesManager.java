@@ -75,6 +75,7 @@ import org.bukkit.util.Vector;
 
 public class DelvesManager implements Listener {
 	public static final String KEY_DELVES_PLUGIN_DATA = "MonumentaDelves";
+	protected static final double DELVES_MAX_PARTY_DISTANCE = 32.0;
 
 
 	/**
@@ -140,13 +141,13 @@ public class DelvesManager implements Listener {
 		return 0;
 	}
 
-	//return all players running this dungeon/poi
+	//return all players running this dungeon or in MAX_PARTY_DISTANCE radius
 	protected static List<Player> getParty(Location loc) {
-		List<Player> players = new ArrayList<>(PlayerUtils.playersInLootScalingRange(loc));
+		List<Player> players = DelvesUtils.playerInRangeForDelves(loc);
 
 		if (players.isEmpty()) {
-			//somehow a mobs delve mobs spawned with a distance longer then MAX_PARTY_DISTANCE from any player - probably a bug.
-			//make a log and add the nearest player to party
+			//somehow a mobs delve mobs spawned with a distance longer then MAX_PARTY_DISTANCE from the party
+			//if this happens in R3 we need to increase MAX_PARTY_DISTANCE - make a log
 			List<Player> playerInWorld = new ArrayList<>(loc.getWorld().getPlayers());
 			playerInWorld.sort((player1, player2) -> (int) (loc.distance(player1.getLocation()) - loc.distance(player2.getLocation())));
 			Player player = playerInWorld.get(0);
