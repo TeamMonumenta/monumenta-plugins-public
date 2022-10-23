@@ -25,12 +25,12 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class DoomsdayClock extends Spell {
-	private static final double RADIUS = 11;
+	private static final double RADIUS = 25;
 	private static final double WALL_HEIGHT = 10;
 	private static final double BLACK_DAMAGE = 150;
 	private static final double RED_DAMAGE = 80;
-	private static final double BLACK_DEGREE = 2.25;
-	private static final double RED_DEGREE = -3;
+	private static final double BLACK_DEGREE = 0.15;
+	private static final double RED_DEGREE = 0.15;
 	private static final Color BLACK_COLOR = Color.fromRGB(0, 0, 0);
 	private static final Color RED_COLOR = Color.fromRGB(255, 0, 0);
 	private static final int PERIOD = 2;
@@ -40,28 +40,26 @@ public class DoomsdayClock extends Spell {
 	private final LivingEntity mBoss;
 	private final Location mCenter;
 	private final int mCooldownTicks;
+	private boolean mIsActive;
 
 	public DoomsdayClock(LivingEntity boss, Location center, int cooldownTicks) {
 		mBoss = boss;
 		mCenter = center;
 		mCooldownTicks = cooldownTicks;
+		mIsActive = true;
 	}
 
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-
 		PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "let your doom be made manifest!"));
-
-		double blackStartDeg = (int) FastUtils.randomDoubleInRange(0, 360);
-		double redStartDeg = (int) FastUtils.randomDoubleInRange(0, 360);
-
 		Plugin plugin = Plugin.getInstance();
+		mIsActive = true;
+
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = -GROWTH_TIME;
-			double mBlackDeg = blackStartDeg;
-			double mRedDeg = redStartDeg;
-
+			double mBlackDeg = 0;
+			double mRedDeg = 180;
 			@Override
 			public void run() {
 				double length;
@@ -81,7 +79,7 @@ public class DoomsdayClock extends Spell {
 				}
 
 				List<BoundingBox> blackBoxes = createHand(mBlackDeg, length, BLACK_COLOR);
-				List<BoundingBox> redBoxes = createHand(mRedDeg, length, RED_COLOR);
+				//List<BoundingBox> redBoxes = createHand(mRedDeg, length, RED_COLOR);
 
 				for (int deg = 0; deg < 360; deg += 15) {
 					Location base = mCenter.clone().add(FastUtils.cosDeg(deg) * RADIUS, 0.5, FastUtils.sinDeg(deg) * RADIUS);
@@ -101,26 +99,26 @@ public class DoomsdayClock extends Spell {
 								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, BLACK_DAMAGE, null, false, false, "Doomsday Clock");
 							}
 						}
-
+						/*
 						for (BoundingBox box : redBoxes) {
 							if (box.overlaps(player.getBoundingBox()) && player.isOnGround()) {
 								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, RED_DAMAGE, null, false, false, "Doomsday Clock");
 							}
 						}
-
-						if (LocationUtils.xzDistance(player.getLocation(), mCenter) > RADIUS) {
-							BossUtils.bossDamagePercent(mBoss, player, mT > 5 * 20 ? 0.2 : 0.1, null, true, "Doomsday Clock");
-						}
-
-						player.playSound(player.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, 2f, 0.4f);
-					}
+						 */
+				/*
+				if (LocationUtils.xzDistance(player.getLocation(), mCenter) > RADIUS) {
+					BossUtils.bossDamagePercent(mBoss, player, mT > 5 * 20 ? 0.2 : 0.1, null, true, "Doomsday Clock");
 				}
 
-				if (mT >= MAX_TIME) {
+				 */
+						player.playSound(player.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, 0.1f, 0.4f);
+					}
+				}
+				if (!mIsActive) {
 					this.cancel();
 					return;
 				}
-
 				if (mT > 0) {
 					mBlackDeg += BLACK_DEGREE;
 					mRedDeg += RED_DEGREE;
@@ -128,8 +126,8 @@ public class DoomsdayClock extends Spell {
 				mT += PERIOD;
 			}
 		};
-		mActiveRunnables.add(runnable);
 		runnable.runTaskTimer(plugin, 0, PERIOD);
+		mActiveRunnables.add(runnable);
 	}
 
 	@Override
@@ -168,5 +166,9 @@ public class DoomsdayClock extends Spell {
 		}
 
 		return boxes;
+	}
+
+	public void disableClock() {
+		mIsActive = false;
 	}
 }

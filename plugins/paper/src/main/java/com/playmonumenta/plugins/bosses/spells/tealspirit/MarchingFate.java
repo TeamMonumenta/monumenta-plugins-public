@@ -184,6 +184,12 @@ public class MarchingFate extends Spell {
 		return result.toString();
 	}
 
+	public void removeMarchers() {
+		for (Entity e : mMarchers) {
+			e.remove();
+		}
+	}
+
 	@Override
 	public int cooldownTicks() {
 		return 0;

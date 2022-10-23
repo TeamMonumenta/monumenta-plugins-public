@@ -67,7 +67,6 @@ public class SandsOfTime extends Spell {
 	@Override
 	public void run() {
 		Plugin plugin = Plugin.getInstance();
-		mBoss.setInvulnerable(true);
 		mBoss.setAI(false);
 		mBoss.setGravity(false);
 
@@ -135,7 +134,6 @@ public class SandsOfTime extends Spell {
 					}
 
 					Bukkit.getScheduler().runTaskLater(plugin, () -> {
-						mBoss.setInvulnerable(false);
 						mBoss.setAI(true);
 						mBoss.setGravity(true);
 					}, BLUE_DELAY);

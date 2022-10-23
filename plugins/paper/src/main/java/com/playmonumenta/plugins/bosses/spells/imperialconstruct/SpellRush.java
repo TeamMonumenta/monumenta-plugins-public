@@ -114,7 +114,7 @@ public class SpellRush extends Spell {
 					runBlockRespawn(blocksToRegen);
 
 					for (Player p : PlayerUtils.playersInRange(loc, 5, true)) {
-						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, 90, null, false, true, "Void Rift");
+						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, 90, null, false, true, "Metallic Rush");
 						MovementUtils.knockAway(loc, p, 1f, 0.25f, false);
 					}
 

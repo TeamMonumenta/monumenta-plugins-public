@@ -6,16 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.ClockworkAssassination;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.DoomsdayClock;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.MarchingFate;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.PairedUnnaturalForce;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.Rewind;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.SandsOfTime;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.SundialSlash;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.TealAntiCheat;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.TealSpiritSummon;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.TemporalRift;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.*;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.TemporalFlux;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -57,7 +48,7 @@ public class TealSpirit extends BossAbilityGroup {
 	private List<Entity> mExchangers = new ArrayList<>();
 	private List<Entity> mShielders = new ArrayList<>();
 	private String mEncounterType;
-
+	private DoomsdayClock mDoomsdayClock = null;
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
 			return new TealSpirit(plugin, boss, spawnLoc, endLoc);
@@ -81,26 +72,23 @@ public class TealSpirit extends BossAbilityGroup {
 
 		for (Player p : PlayerUtils.playersInRange(mSpawnLoc, 75, true)) {
 			if (p.getGameMode() != GameMode.SPECTATOR) {
-				// Boss phases for Story Mode
 				if (p.getScoreboardTags().contains("SKTQuest")) {
 					mEncounterType = "Story";
 					break;
 				}
-				// Boss phases for Normal Mode
-				else if (p.getScoreboardTags().contains("SKTNormal")) {
-					mEncounterType = "Normal";
+				else if (p.getScoreboardTags().contains("SKTHard")) {
+					mEncounterType = "Hard";
 					break;
 				}
-				// Boss phases for Hard Mode
 				else {
-					mEncounterType = "Hard";
+					mEncounterType = "Normal";
 					break;
 				}
 			}
 		}
 
 		if (mEncounterType.equals("Story")) {
-			mHealth = 9000;
+			mHealth = 6000;
 
 			SpellManager activeSpells = new SpellManager(Arrays.asList(
 				new ClockworkAssassination(plugin, boss),
@@ -111,7 +99,7 @@ public class TealSpirit extends BossAbilityGroup {
 			));
 
 			SpellManager activeDoomsdayPhase = new SpellManager(Arrays.asList(
-				new DoomsdayClock(mBoss, mSpawnLoc, 11 * 20)
+				//new DoomsdayClock(mBoss, mSpawnLoc, 11 * 20)
 			));
 
 			List<Spell> passiveSpells = Arrays.asList(
@@ -156,23 +144,60 @@ public class TealSpirit extends BossAbilityGroup {
 			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 			constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 20 * 10);
 		} else if (mEncounterType.equals("Hard")) {
-			mHealth = 20000;
+			mHealth = 22500;
+
+			RewriteHistory rewriteHistory = new RewriteHistory(mPlugin, mBoss, 20 * 5, 30, mSpawnLoc);
+			MidnightToll midnightToll = new MidnightToll(mPlugin, mBoss, 20 * 5, 40, 40, mSpawnLoc);
+			MidnightToll finalMidnightToll = new MidnightToll(mPlugin, mBoss, 20 * 15, 99999999, 40, mSpawnLoc);
+			mDoomsdayClock = new DoomsdayClock(mBoss, mSpawnLoc, 20 * 25);
+			MarchingFate mMarchingFates = new MarchingFate(mBoss, this);
+
 			SpellManager activeSpells = new SpellManager(Arrays.asList(
-				new ClockworkAssassination(plugin, boss),
+				//new ClockworkAssassination(plugin, boss),
 				new SandsOfTime(mBoss, mSpawnLoc, team, 12 * 20),
-				new Rewind(mBoss, mSpawnLoc),
+				//new Rewind(mBoss, mSpawnLoc),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
-				new SundialSlash(mBoss, 7 * 20)
+				new SundialSlash(mBoss, 7 * 20),
+				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 50,
+					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
 			));
 
 			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
 				new Rewind(mBoss, mSpawnLoc)
 			));
 
+			SpellManager activeRewriteHistoryPhase = new SpellManager(Arrays.asList(
+				rewriteHistory
+			));
+
+			SpellManager activeMidnightTollPhase = new SpellManager(Arrays.asList(
+				midnightToll
+			));
+
+			SpellManager activeFinalMidnightTollPhase = new SpellManager(Arrays.asList(
+				finalMidnightToll
+			));
+
+			SpellManager finalStandActives = new SpellManager(Arrays.asList(
+				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
+				new SundialSlash(mBoss, 7 * 20),
+				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
+				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 50,
+					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
+			));
+
 			List<Spell> passiveSpells = Arrays.asList(
-				new MarchingFate(mBoss, this),
+				mMarchingFates,
 				//new Rewind(mBoss, mSpawnLoc),
+				new TealSpiritSummon(mSpawnLoc, 30 * 20),
+				new SpellBlockBreak(mBoss),
+				new SpellShieldStun(10 * 20),
+				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 40),
+				new TealAntiCheat(boss, 20, spawnLoc)
+			);
+
+			List<Spell> finalStandPassive = Arrays.asList(
 				new TealSpiritSummon(mSpawnLoc, 30 * 20),
 				new SpellBlockBreak(mBoss),
 				new SpellShieldStun(10 * 20),
@@ -202,6 +227,10 @@ public class TealSpirit extends BossAbilityGroup {
 				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
+			events.put(75, mBoss -> {
+				mDoomsdayClock.run();
+			});
+
 			events.put(70, mBoss -> {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
@@ -218,6 +247,10 @@ public class TealSpirit extends BossAbilityGroup {
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 					changePhase(activeSpells, passiveSpells, null);
 				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(55, mBoss -> {
+				mDoomsdayClock.disableClock();
 			});
 
 			events.put(50, mBoss -> {
@@ -257,26 +290,31 @@ public class TealSpirit extends BossAbilityGroup {
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
+					changePhase(finalStandActives, finalStandPassive, null);
 				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+
+				mDoomsdayClock.run();
+			});
+
+			events.put(25, mBoss -> {
+				mMarchingFates.removeMarchers();
+				rewriteHistory.run();
 			});
 
 			events.put(20, mBoss -> {
-				// Cast Rewind without interruptions
-				changePhase(activeRewindPhase, passiveSpells, null);
-				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+				midnightToll.run();
+			});
+
+			events.put(15, mBoss -> {
+				rewriteHistory.run();
 			});
 
 			events.put(10, mBoss -> {
-				// Cast Rewind without interruptions
-				changePhase(activeRewindPhase, passiveSpells, null);
-				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+				finalMidnightToll.run();
+			});
+
+			events.put(1, mBoss -> {
+				mDoomsdayClock.disableClock();
 			});
 
 			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
@@ -310,8 +348,15 @@ public class TealSpirit extends BossAbilityGroup {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mSpawnLoc, detectionRange)) {
 			mob.remove();
 		}
-		PlayerUtils.playersInRange(mSpawnLoc, TealSpirit.detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "no, this cannot be! time... betrays me? why do the hands of time not turn? i... will... be... forever!"));
+		PlayerUtils.playersInRange(mSpawnLoc, TealSpirit.detectionRange, true).forEach(player -> {
+			player.sendMessage(ChatColor.DARK_AQUA + "no, this cannot be! time... betrays me? why do the hands of time not turn? i... will... be... forever!");
+			EntityUtils.removeAttribute(player, Attribute.GENERIC_MAX_HEALTH, "TealSpirit-" + mBoss.getUniqueId());
+		});
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+		if (mDoomsdayClock != null) {
+			mDoomsdayClock.disableClock();
+		}
+
 	}
 
 	public boolean isInterspellCooldown() {

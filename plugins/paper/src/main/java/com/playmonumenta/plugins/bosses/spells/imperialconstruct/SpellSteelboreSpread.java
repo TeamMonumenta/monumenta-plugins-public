@@ -25,13 +25,15 @@ public class SpellSteelboreSpread extends Spell {
 	private ChargeUpManager mChargeUp;
 	private Location mStartLoc;
 	private int mRange;
+	private double mDamage;
 
-	public SpellSteelboreSpread(Plugin plugin, LivingEntity boss, int radius, Location startLoc, int range) {
+	public SpellSteelboreSpread(Plugin plugin, LivingEntity boss, int radius, Location startLoc, int range, double damage) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRadius = radius;
 		mStartLoc = startLoc;
 		mRange = range;
+		mDamage = damage;
 		mChargeUp = new ChargeUpManager(mBoss, CAST_TIME, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + ABILITY_NAME,
 			BarColor.YELLOW, BarStyle.SOLID, mRange);
 	}
@@ -74,10 +76,8 @@ public class SpellSteelboreSpread extends Spell {
 								@Override
 								public void run() {
 									if (mT >= ANIM_TIME) {
-										if (p.equals(n)) {
-											BossUtils.bossDamagePercent(mBoss, n, 0.1, ABILITY_NAME);
-										} else {
-											BossUtils.bossDamagePercent(mBoss, n, 0.90, ABILITY_NAME);
+										if (!p.equals(n)) {
+											BossUtils.bossDamagePercent(mBoss, n, mDamage, ABILITY_NAME);
 										}
 										n.playSound(n.getLocation(), Sound.BLOCK_ANVIL_LAND, SoundCategory.HOSTILE, 1, 0);
 										this.cancel();
@@ -120,7 +120,7 @@ public class SpellSteelboreSpread extends Spell {
 							new PPCircle(Particle.REDSTONE, p.getLocation().add(0, 0.25, 0), mRadius).ringMode(true).count(30).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(225, 55, 55), 1.65f)).spawnAsBoss();
 							new PPCircle(Particle.FLAME, p.getLocation().add(0, 0.25, 0), mRadius).ringMode(true).count(10).delta(0.1, 0.05, 0.1).spawnAsBoss();
 						} else {
-							new PPCircle(Particle.REDSTONE, p.getLocation().add(0, 0.25, 0), mRadius).ringMode(true).count(30).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(81, 79, 79), 1.65f)).spawnAsBoss();
+							new PPCircle(Particle.REDSTONE, p.getLocation().add(0, 0.25, 0), mRadius).ringMode(true).count(30).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(252, 3, 3), 1.65f)).spawnAsBoss();
 							new PPCircle(Particle.ELECTRIC_SPARK, p.getLocation().add(0, 0.25, 0), mRadius).ringMode(true).count(10).delta(0.1, 0.05, 0.1).spawnAsBoss();
 						}
 					}
