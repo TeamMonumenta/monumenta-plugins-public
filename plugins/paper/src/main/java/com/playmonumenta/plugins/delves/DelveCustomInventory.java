@@ -171,18 +171,7 @@ public class DelveCustomInventory extends CustomInventory {
 			}
 		}
 
-		mods = DelvesModifier.valuesList();
-		if (mDungeonName.equals("ring")) {
-			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
-			mods.remove(DelvesModifier.ENTROPY);
-		} else if (mOwner.getGameMode() != GameMode.CREATIVE) {
-			List<DelvesModifier> weeklyMods = DelvesUtils.getWeeklyRotatingModifier();
-			for (DelvesModifier rotating : DelvesModifier.rotatingDelveModifiers()) {
-				if (mPointSelected.get(rotating) == 0 && !weeklyMods.contains(rotating)) {
-					mods.remove(rotating);
-				}
-			}
-		}
+		mods = getAvailableModifiers();
 
 		for (int i = 0; i < 7; i++) {
 			if (mPage * 7 + i >= mods.size()) {
@@ -236,6 +225,22 @@ public class DelveCustomInventory extends CustomInventory {
 				mInventory.setItem(i, WHITE_ITEM);
 			}
 		}
+	}
+
+	private List<DelvesModifier> getAvailableModifiers() {
+		List<DelvesModifier> mods = DelvesModifier.valuesList();
+		if (mDungeonName.startsWith("ring")) {
+			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
+			mods.remove(DelvesModifier.ENTROPY);
+		} else if (mOwner.getGameMode() != GameMode.CREATIVE) {
+			List<DelvesModifier> weeklyMods = DelvesUtils.getWeeklyRotatingModifier();
+			for (DelvesModifier rotating : DelvesModifier.rotatingDelveModifiers()) {
+				if (mPointSelected.get(rotating) == 0 && !weeklyMods.contains(rotating)) {
+					mods.remove(rotating);
+				}
+			}
+		}
+		return mods;
 	}
 
 	public ItemStack getSummary() {
@@ -404,15 +409,7 @@ public class DelveCustomInventory extends CustomInventory {
 		if (mEditableDelvePoint) {
 			for (int i : COLUMN_INDEX_SLOT) {
 				if (i == column) {
-					List<DelvesModifier> mods = DelvesModifier.valuesList();
-					if (mOwner.getGameMode() != GameMode.CREATIVE) {
-						List<DelvesModifier> weeklyMods = DelvesUtils.getWeeklyRotatingModifier();
-						for (DelvesModifier rotating : DelvesModifier.rotatingDelveModifiers()) {
-							if (mPointSelected.get(rotating) == 0 && !weeklyMods.contains(rotating)) {
-								mods.remove(rotating);
-							}
-						}
-					}
+					List<DelvesModifier> mods = getAvailableModifiers();
 
 					int index = column - 1 + (mPage * 7);
 					if (index >= mods.size()) {
