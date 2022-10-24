@@ -21,7 +21,7 @@ public class SpellPortalBullet extends SpellBullet {
 
 	public SpellPortalBullet(Plugin plugin, LivingEntity boss, int cooldownTicks, PortalBoss portalBoss) {
 
-		super(plugin, boss, new Vector(0, -3.0, 0), 150, 20, 3, 0.3, 30, 0.5, cooldownTicks, 120, "BORDER", 0, 0, 0, false, 0, (Entity entity, int tick) -> {
+		super(plugin, boss, new Vector(0, -3.0, 0), 150, 40, 3, 0.3, 30, 0.4, cooldownTicks, 120, "BORDER", 0, 0, 0, false, 0, (Entity entity, int tick) -> {
 				float t = tick/10;
 				if (tick % 5 == 0) {
 					boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 2, t);

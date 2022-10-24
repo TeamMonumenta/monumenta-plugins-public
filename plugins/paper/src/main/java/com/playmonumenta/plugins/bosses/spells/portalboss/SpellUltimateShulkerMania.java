@@ -116,8 +116,12 @@ public class SpellUltimateShulkerMania extends Spell {
 			if (p == null) {
 				return;
 			}
-			DamageUtils.damage(mBoss, p, DamageType.MAGIC, DAMAGE, null, false, true, "Byte Barrage");
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "PortalShulkerSlow" + UUID.randomUUID(), new PercentSpeed(2 * 20, -.40, "PortalShulkerSlow" + UUID.randomUUID()));
+			if (com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.hasEffect(p, "PortalShulkerSlow")) {
+				DamageUtils.damage(mBoss, p, DamageType.MAGIC, DAMAGE * 0.5, null, false, true, "Byte Barrage");
+			} else {
+				DamageUtils.damage(mBoss, p, DamageType.MAGIC, DAMAGE, null, false, true, "Byte Barrage");
+			}
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "PortalShulkerSlow", new PercentSpeed(2 * 20, -.40, "PortalShulkerSlow"));
 			//Set all nearby mobs to target them
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mBoss.getLocation(), 10.0)) {
 				if (le instanceof Mob mob) {

@@ -244,6 +244,12 @@ public final class PortalBoss extends BossAbilityGroup {
 
 		mBoss.setPersistent(true);
 
+		//Clear portals
+		for (Player p : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+			PortalManager.clearPortal(p, 1);
+			PortalManager.clearPortal(p, 2);
+		}
+
 		new BukkitRunnable() {
 
 			int mTicks = 0;
@@ -251,7 +257,7 @@ public final class PortalBoss extends BossAbilityGroup {
 			@Override
 			public void run() {
 				mTicks += 5;
-				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 20.0f, 0.5f + (mTicks / 25));
+				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 20.0f, 0.5f + (mTicks / 25));
 
 				//launch event related spawn commands
 				if (mTicks >= 6 * 20) {
