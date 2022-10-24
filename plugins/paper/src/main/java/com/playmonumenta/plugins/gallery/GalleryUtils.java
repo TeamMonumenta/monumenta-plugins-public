@@ -15,6 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class GalleryUtils {
 
@@ -114,6 +115,10 @@ public class GalleryUtils {
 		return mob.getScoreboardTags().contains(GalleryManager.TAG_MOB_ELITE);
 	}
 
+	public static boolean ignoreScaling(@NotNull LivingEntity mob) {
+		return mob.getScoreboardTags().contains(GalleryManager.TAG_MOB_IGNORE_SCALING);
+	}
+
 	public static boolean isPlayerDeath(LivingEntity player) {
 		GalleryGame game = GalleryManager.GAMES.get(player.getWorld().getUID());
 		if (game != null) {
@@ -124,5 +129,9 @@ public class GalleryUtils {
 		}
 		return false;
 
+	}
+
+	public static @Nullable GalleryGame getGame(@NotNull Location location) {
+		return GalleryManager.GAMES.get(location.getWorld().getUID());
 	}
 }

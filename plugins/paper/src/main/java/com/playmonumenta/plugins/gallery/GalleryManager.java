@@ -29,6 +29,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class GalleryManager implements Listener {
 
 	public static final String TAG_MOB_ELITE = "GalleryElite";
+	public static final String TAG_MOB_IGNORE_SCALING = "GalleryIgnoreScaling";
 	public static final String MOB_TAG_FROM_SPAWNER = "GalleryMobFromSpawner";
 	public static final String TAG_UTIL_LOCATION = "GalleryUtilLocation";
 	public static final String TAG_SPAWNING_LOC = "GalleryUtilSpawn";

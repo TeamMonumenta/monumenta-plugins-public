@@ -257,8 +257,10 @@ public class GalleryGame {
 				for (int i = 0; i < spawningMobs; i++) {
 					LivingEntity mob = mSpawningSpawnersList.get(0).spawn(mMap.getLosPool(), spawnerSpeed, true);
 					if (mob != null) {
-						GalleryUtils.scaleMobPerPlayerCount(mob, mPlayersMap.size());
-						GalleryUtils.scaleMobPerLevel(mob, mCurrentRound);
+						if (!GalleryUtils.ignoreScaling(mob)) {
+							GalleryUtils.scaleMobPerPlayerCount(mob, mPlayersMap.size());
+							GalleryUtils.scaleMobPerLevel(mob, mCurrentRound);
+						}
 						mMobsSpawnedThisRound++;
 						Collections.shuffle(mSpawningSpawnersList);
 					}
@@ -269,7 +271,7 @@ public class GalleryGame {
 				Collections.shuffle(mSpawningSpawnersList);
 				float spawnerSpeed = Math.min(SPAWNER_STARTING_SPEED + SPAWNER_SPEED_PER_ROUND * (mCurrentRound - 1), SPAWNER_MAX_SPEED);
 				LivingEntity elite1 = mSpawningSpawnersList.get(0).spawn(mMap.getElitePool(), spawnerSpeed, false);
-				if (elite1 != null) {
+				if (elite1 != null && !GalleryUtils.ignoreScaling(elite1)) {
 					GalleryUtils.scaleMobPerPlayerCount(elite1, mPlayersMap.size());
 					GalleryUtils.scaleMobPerLevel(elite1, mCurrentRound);
 				}
@@ -278,7 +280,7 @@ public class GalleryGame {
 					if (extraEliteChange >= FastUtils.RANDOM.nextDouble()) {
 						Collections.shuffle(mSpawningSpawnersList);
 						LivingEntity mob = mSpawningSpawnersList.get(0).spawn(mMap.getElitePool(), spawnerSpeed, false);
-						if (mob != null) {
+						if (mob != null && !GalleryUtils.ignoreScaling(mob)) {
 							GalleryUtils.scaleMobPerPlayerCount(mob, mPlayersMap.size());
 							GalleryUtils.scaleMobPerLevel(mob, mCurrentRound);
 						}
@@ -308,8 +310,10 @@ public class GalleryGame {
 			for (int i = 0; i < SPECTERS_MOBS_COUNT; i++) {
 				LivingEntity mob = mSpawningSpawnersList.get(0).spawn(mMap.getSpectersPool(), spawnerSpeed, false);
 				if (mob != null) {
-					GalleryUtils.scaleMobPerPlayerCount(mob, mPlayersMap.size());
-					GalleryUtils.scaleMobPerLevel(mob, mCurrentRound);
+					if (!GalleryUtils.ignoreScaling(mob)) {
+						GalleryUtils.scaleMobPerPlayerCount(mob, mPlayersMap.size());
+						GalleryUtils.scaleMobPerLevel(mob, mCurrentRound);
+					}
 					Collections.shuffle(mSpawningSpawnersList);
 				}
 			}
@@ -473,6 +477,12 @@ public class GalleryGame {
 
 		mob.remove();
 	}
+
+	public void scaleMob(LivingEntity livingEntity) {
+		GalleryUtils.scaleMobPerLevel(livingEntity, mCurrentRound);
+		GalleryUtils.scaleMobPerPlayerCount(livingEntity, mPlayersMap.size());
+	}
+
 
 	public void removeInteractable(String name) {
 		BaseInteractable interactable = mInteractableMap.get(name);
@@ -818,7 +828,7 @@ public class GalleryGame {
 	}
 
 	public void onPlayerHurtEvent(DamageEvent event, Player player, Entity damager, LivingEntity source) {
-		if (mCurrentRound > GalleryUtils.STARTING_ROUND_FOR_SCALING) {
+		if (mCurrentRound > GalleryUtils.STARTING_ROUND_FOR_SCALING && !GalleryUtils.ignoreScaling(source)) {
 			int dif = mCurrentRound - GalleryUtils.STARTING_ROUND_FOR_SCALING;
 			double multiply = Math.min(1 + dif * 0.1, 5.0);
 			event.setDamage(event.getDamage() * multiply);
