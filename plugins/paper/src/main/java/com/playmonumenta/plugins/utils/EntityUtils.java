@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1367,6 +1368,14 @@ public class EntityUtils {
 			}
 		} else if (proj instanceof Snowball && DamageListener.getProjectileItemStats(proj) != null) {
 			return true;
+		}
+		return false;
+	}
+
+	public static boolean isShopShulker(@Nullable Entity entity) {
+		if (entity instanceof Shulker shulker && ServerProperties.getShardName().equals("plots")) {
+			Set<String> tags = shulker.getScoreboardTags();
+			return tags.contains("player_shop") || tags.contains("guild_shop");
 		}
 		return false;
 	}
