@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,73 +23,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.Lootable;
 
 public class SpellBlockBreak extends Spell {
-	private static final EnumSet<Material> IGNORED_MATS = EnumSet.of(
-		Material.AIR,
-		Material.CAVE_AIR,
-		Material.VOID_AIR,
-		Material.STRUCTURE_VOID,
-		Material.STRUCTURE_BLOCK,
-		Material.JIGSAW,
-		Material.COMMAND_BLOCK,
-		Material.CHAIN_COMMAND_BLOCK,
-		Material.REPEATING_COMMAND_BLOCK,
-		Material.BEDROCK,
-		Material.BARRIER,
-		Material.SPAWNER,
-		Material.LIGHT
-	);
-
-	private static final EnumSet<Material> VALUABLES = EnumSet.of(
-		Material.SHULKER_BOX,
-		Material.BLACK_SHULKER_BOX,
-		Material.BLUE_SHULKER_BOX,
-		Material.BROWN_SHULKER_BOX,
-		Material.CYAN_SHULKER_BOX,
-		Material.GREEN_SHULKER_BOX,
-		Material.LIME_SHULKER_BOX,
-		Material.LIGHT_BLUE_SHULKER_BOX,
-		Material.LIGHT_GRAY_SHULKER_BOX,
-		Material.MAGENTA_SHULKER_BOX,
-		Material.ORANGE_SHULKER_BOX,
-		Material.PINK_SHULKER_BOX,
-		Material.PURPLE_SHULKER_BOX,
-		Material.RED_SHULKER_BOX,
-		Material.WHITE_SHULKER_BOX,
-		Material.YELLOW_SHULKER_BOX,
-		Material.GRAY_SHULKER_BOX,
-		Material.CHEST,
-		Material.TRAPPED_CHEST,
-		Material.IRON_ORE,
-		Material.IRON_BLOCK,
-		Material.DEEPSLATE_IRON_ORE,
-		Material.RAW_IRON,
-		Material.RAW_IRON_BLOCK,
-		Material.COPPER_ORE,
-		Material.DEEPSLATE_COPPER_ORE,
-		Material.RAW_COPPER,
-		Material.RAW_COPPER_BLOCK,
-		Material.COPPER_BLOCK,
-		Material.GOLD_ORE,
-		Material.DEEPSLATE_GOLD_ORE,
-		Material.RAW_GOLD,
-		Material.RAW_GOLD_BLOCK,
-		Material.GOLD_BLOCK,
-		Material.NETHER_GOLD_ORE,
-		Material.GILDED_BLACKSTONE,
-		Material.LAPIS_ORE,
-		Material.DEEPSLATE_LAPIS_ORE,
-		Material.EMERALD_ORE,
-		Material.DEEPSLATE_EMERALD_ORE,
-		Material.LAPIS_BLOCK,
-		Material.DIAMOND_ORE,
-		Material.DEEPSLATE_DIAMOND_ORE,
-		Material.EMERALD_ORE,
-		Material.DEEPSLATE_EMERALD_ORE,
-		Material.ANVIL,
-		Material.CHIPPED_ANVIL,
-		Material.DAMAGED_ANVIL
-	);
-
 	private Entity mLauncher;
 	private List<Material> mNoBreak;
 
@@ -167,11 +100,11 @@ public class SpellBlockBreak extends Spell {
 							}
 						}
 					} else if ((y > 0 || (mFootLevelBreak && y >= 0)) &&
-					           !IGNORED_MATS.contains(material) && !mNoBreak.contains(material) &&
-					           (material.isSolid() || ItemUtils.carpet.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD)) &&
-					           (!(block.getState() instanceof Lootable)
-								|| (!((Lootable)block.getState()).hasLootTable()
-								    && !block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {
+						!BlockUtils.isMechanicalBlock(material) && !mNoBreak.contains(material) &&
+						(material.isSolid() || ItemUtils.carpet.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD)) &&
+						(!(block.getState() instanceof Lootable)
+							|| (!((Lootable) block.getState()).hasLootTable()
+							&& !block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {
 						badBlockList.add(block);
 					}
 				}
@@ -190,7 +123,7 @@ public class SpellBlockBreak extends Spell {
 			if (badBlockList.size() > 0) {
 				/* Remove any remaining blocks, which might have been modified by the event */
 				for (Block block : badBlockList) {
-					if (VALUABLES.contains(block.getType())) {
+					if (BlockUtils.isValuableBlock(block.getType())) {
 						block.breakNaturally(new ItemStack(Material.IRON_PICKAXE));
 					} else {
 						block.setType(Material.AIR);

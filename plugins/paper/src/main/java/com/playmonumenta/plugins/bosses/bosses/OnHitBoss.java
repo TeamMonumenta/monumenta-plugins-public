@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -31,6 +32,11 @@ public class OnHitBoss extends BossAbilityGroup {
 		@BossParam(help = "Sound played when the player got hit by the boss")
 		public SoundsList SOUND = SoundsList.fromString("[(BLOCK_PORTAL_TRIGGER,0.25,2)]");
 
+		@BossParam(help = "Executes a Command as the CONSOLE when player gets hit.")
+		public String COMMAND_AS_BOSS = "";
+
+		@BossParam(help = "Executes a Command as the Player")
+		public String COMMAND_AS_PLAYER = "";
 	}
 
 	private Parameters mParams;
@@ -51,9 +57,22 @@ public class OnHitBoss extends BossAbilityGroup {
 
 		Location loc = damagee.getLocation().add(0, 1, 0);
 
-
-
 		mParams.EFFECTS.apply(damagee, mBoss);
+		if (!mParams.COMMAND_AS_BOSS.equals("")) {
+			try {
+				CommandUtils.runCommandViaConsole("execute as " + mBoss.getUniqueId() + " at @s run " + mParams.COMMAND_AS_BOSS);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (!mParams.COMMAND_AS_PLAYER.equals("")) {
+			try {
+				CommandUtils.runCommandViaConsole("execute as " + damagee.getUniqueId() + " at @s run " + mParams.COMMAND_AS_PLAYER);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
 		//Particle & Sound
 		mParams.SOUND.play(loc);
