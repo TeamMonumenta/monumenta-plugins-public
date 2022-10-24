@@ -12,7 +12,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
@@ -81,17 +81,11 @@ public class Starfall extends Ability {
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (
-			ItemUtils.isWand(
-				mPlayer.getInventory().getItemInMainHand()
-			)
-		) {
+		if (mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0) {
 			event.setCancelled(true);
 
-			if (
-				!isTimerActive()
-					&& !mPlayer.isSneaking()
-			) {
+			if (!isTimerActive()
+				    && !mPlayer.isSneaking()) {
 				putOnCooldown();
 
 				Location loc = mPlayer.getEyeLocation();

@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -80,7 +79,10 @@ public class ArcaneStrike extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && mPlayer != null && mPlayer.getCooledAttackStrength(0) == 1) {
+		if (event.getType() == DamageType.MELEE
+			    && mPlayer != null
+			    && mPlayer.getCooledAttackStrength(0) == 1
+			    && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0) {
 			putOnCooldown();
 
 			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, RADIUS));
@@ -196,9 +198,4 @@ public class ArcaneStrike extends Ability {
 		return false;
 	}
 
-	@Override
-	public boolean runCheck() {
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return ItemUtils.isWand(mainHand);
-	}
 }

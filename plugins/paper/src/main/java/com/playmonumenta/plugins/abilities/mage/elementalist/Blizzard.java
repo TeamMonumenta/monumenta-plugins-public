@@ -15,7 +15,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
@@ -91,7 +91,10 @@ public class Blizzard extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer != null) {
+		if (mPlayer != null
+			    && mPlayer.isSneaking()
+			    && mPlayer.getLocation().getPitch() < ANGLE
+			    && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0) {
 			putOnCooldown();
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
@@ -142,11 +145,4 @@ public class Blizzard extends Ability {
 		}
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null
-			&& ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())
-			&& mPlayer.isSneaking()
-			&& mPlayer.getLocation().getPitch() < ANGLE;
-	}
 }

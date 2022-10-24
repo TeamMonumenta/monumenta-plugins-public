@@ -10,7 +10,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -131,18 +131,18 @@ public class ThunderStep extends Ability {
 	 */
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer != null && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer != null && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0) {
 			event.setCancelled(true);
 
 			if (mPlayer.isSneaking()
-				&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+				    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 
 				// if enhanced, can teleport back within a short time frame (regardless of if on cooldown or not)
 				if (isEnhanced()
-					&& mPlayer.getTicksLived() <= mLastCastTick + BACK_TELEPORT_MAX_DELAY
-					&& mLastCastLocation != null
-					&& mLastCastLocation.getWorld() == mPlayer.getWorld()
-					&& mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
+					    && mPlayer.getTicksLived() <= mLastCastTick + BACK_TELEPORT_MAX_DELAY
+					    && mLastCastLocation != null
+					    && mLastCastLocation.getWorld() == mPlayer.getWorld()
+					    && mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
 
 					doDamage(mPlayer.getLocation(), 0, false);
 					mLastCastLocation.setDirection(mPlayer.getLocation().getDirection());

@@ -74,24 +74,25 @@ public class IronTincture extends Ability {
 	}
 
 	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSneaking() && !ItemUtils.isSomeBow(mainHand) && !ItemUtils.isAlchemistItem(mainHand) && mainHand.getType() != Material.SPLASH_POTION && mainHand.getType() != Material.LINGERING_POTION && !mainHand.getType().isBlock();
-	}
-
-	@Override
 	public void cast(Action action) {
 		if (mPlayer == null) {
 			return;
 		}
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+		if (!mPlayer.isSneaking()
+			    || ItemUtils.isSomeBow(mainHand)
+			    || ItemUtils.isAlchemistItem(mainHand)
+			    || mainHand.getType() == Material.SPLASH_POTION
+			    || mainHand.getType() == Material.LINGERING_POTION
+			    || mainHand.getType().isBlock()) {
+			return;
+		}
+
 		Location loc = mPlayer.getEyeLocation();
 		ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);
 		ItemMeta tinctMeta = itemTincture.getItemMeta();
 		tinctMeta.displayName(Component.text("Iron Tincture", NamedTextColor.WHITE)
-				.decoration(TextDecoration.ITALIC, false));
+			                      .decoration(TextDecoration.ITALIC, false));
 		itemTincture.setItemMeta(tinctMeta);
 		// Add infinity enchantment so that potion injector cannot use it
 		ItemStatUtils.addEnchantment(itemTincture, ItemStatUtils.EnchantmentType.INFINITY, 1);

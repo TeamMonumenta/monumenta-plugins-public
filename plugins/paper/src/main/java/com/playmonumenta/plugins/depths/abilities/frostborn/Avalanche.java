@@ -46,7 +46,7 @@ public class Avalanche extends DepthsAbility {
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
-		if (mPlayer != null && !isTimerActive()) {
+		if (mPlayer != null && !isTimerActive() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
 
@@ -95,11 +95,6 @@ public class Avalanche extends DepthsAbility {
 				world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, aboveLoc, 2, 0.5, 0.25, 0.5);
 			}
 		}
-	}
-
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

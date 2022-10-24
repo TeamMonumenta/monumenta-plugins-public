@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -100,7 +100,8 @@ public class Spellshock extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer == null) {
+		if (mPlayer == null
+			    || mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) <= 0) {
 			return false;
 		}
 
@@ -201,10 +202,5 @@ public class Spellshock extends Ability {
 			}
 		}
 		return false; // Needs to apply to all damaged mobs. Uses an internal check to prevent recursion on dealing damage.
-	}
-
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand());
 	}
 }

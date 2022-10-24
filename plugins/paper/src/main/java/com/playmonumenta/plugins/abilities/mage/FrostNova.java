@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -107,7 +107,9 @@ public class FrostNova extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer == null) {
+		if (!(mPlayer != null
+			      && mPlayer.isSneaking()
+			      && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0)) {
 			return;
 		}
 		putOnCooldown();
@@ -186,10 +188,4 @@ public class FrostNova extends Ability {
 		return false;
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null
-			&& ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())
-			&& mPlayer.isSneaking();
-	}
 }

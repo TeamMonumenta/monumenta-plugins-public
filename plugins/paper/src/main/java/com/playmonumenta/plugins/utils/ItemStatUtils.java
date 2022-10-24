@@ -517,7 +517,7 @@ public class ItemStatUtils {
 		OINKING(new Oinking(), false, false, true, false),
 		MATERIAL(new MaterialEnch(), false, false, false, false),
 		// Item Tags
-		MAGIC_WAND(null, "Magic Wand", false, false, false, false),
+		MAGIC_WAND(new MagicWandEnch(), false, false, false, false),
 		ALCHEMICAL_ALEMBIC(null, "Alchemical Utensil", false, false, false, false),
 		//Random Stuff
 		PESTILENCE_TESSERACT(new PestilenceTesseract(), false, false, true, false),

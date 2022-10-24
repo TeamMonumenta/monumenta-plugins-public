@@ -17,7 +17,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.EnumSet;
@@ -115,7 +115,10 @@ public class MagmaShield extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer == null) {
+		if (!(mPlayer != null
+			      && mPlayer.isSneaking()
+			      && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0
+			      && !(mHasBlizzard && mPlayer.getLocation().getPitch() < Blizzard.ANGLE))) {
 			return;
 		}
 		putOnCooldown();
@@ -142,8 +145,4 @@ public class MagmaShield extends Ability {
 		mCosmetic.magmaEffects(mPlayer.getWorld(), mPlayer, radius, angle);
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && mPlayer.isSneaking() && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand()) && !(mHasBlizzard && mPlayer.getLocation().getPitch() < Blizzard.ANGLE);
-	}
 }

@@ -11,7 +11,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.Iterator;
 import java.util.List;
@@ -75,7 +75,9 @@ public class ManaLance extends MultipleChargeAbility {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer == null || mPlayer.isSneaking() || !ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer == null
+			    || mPlayer.isSneaking()
+			    || mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) <= 0) {
 			return;
 		}
 

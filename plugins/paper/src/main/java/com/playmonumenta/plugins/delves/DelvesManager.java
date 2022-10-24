@@ -474,77 +474,79 @@ public class DelvesManager implements Listener {
 		}
 
 		//region Spawner Breaks Handling
-		ScoreboardManager manager = Bukkit.getScoreboardManager();
-		final Scoreboard board = manager.getNewScoreboard();
-		if (board.getObjective(SPAWNER_TOTAL_SCORE_NAME) != null) {
-			board.registerNewObjective(SPAWNER_TOTAL_SCORE_NAME, "dummy");
-		}
-		if (board.getObjective(SPAWNER_BREAKS_SCORE_NAME) != null) {
-			board.registerNewObjective(SPAWNER_BREAKS_SCORE_NAME, "dummy");
-		}
-
-		Location armorStandLoc = event.getPlayer().getWorld().getSpawnLocation(); // get the spawn location
-		boolean foundStand = false;
-		ArmorStand armorStand = null;
-		for (Entity entity : armorStandLoc.getNearbyEntities(2, 2, 2)) { // get the entities at the spawn location
-			if (entity.getType().equals(EntityType.ARMOR_STAND) && entity.getCustomName() != null && entity.getCustomName().equals("SpawnerBreaksArmorStand")) { //if it's our marker armorstand
-				foundStand = true;
-				armorStand = (ArmorStand) entity;
+		if (false) { // this is causing massive lag and is not currently used
+			ScoreboardManager manager = Bukkit.getScoreboardManager();
+			final Scoreboard board = manager.getNewScoreboard();
+			if (board.getObjective(SPAWNER_TOTAL_SCORE_NAME) != null) {
+				board.registerNewObjective(SPAWNER_TOTAL_SCORE_NAME, "dummy");
 			}
-		}
-		if (!foundStand) { // create new armor stand
-			armorStand = (ArmorStand) event.getPlayer().getWorld().spawnEntity(armorStandLoc, EntityType.ARMOR_STAND);
-			armorStand.setVisible(false);
-			armorStand.setGravity(false);
-			armorStand.setMarker(true);
-			armorStand.setCustomName("SpawnerBreaksArmorStand");
-		}
-		// add one to breaks
-		int breaks = ScoreboardUtils.getScoreboardValue(armorStand, SPAWNER_BREAKS_SCORE_NAME).orElse(0) + 1;
-		ScoreboardUtils.setScoreboardValue(armorStand, SPAWNER_BREAKS_SCORE_NAME, breaks);
-		// if we haven't initialized spawners
-		int numSpawnersTotal = ScoreboardUtils.getScoreboardValue(armorStand, SPAWNER_TOTAL_SCORE_NAME).orElse(-2);
-		if (numSpawnersTotal < -1) {
-			// Haven't been initialized yet - load all the chunks and count the spawners
+			if (board.getObjective(SPAWNER_BREAKS_SCORE_NAME) != null) {
+				board.registerNewObjective(SPAWNER_BREAKS_SCORE_NAME, "dummy");
+			}
 
-			// Set the score to -1 to start so that this doesn't get called more than once before it finishes
-			ScoreboardUtils.setScoreboardValue(armorStand, SPAWNER_TOTAL_SCORE_NAME, -1);
+			Location armorStandLoc = event.getPlayer().getWorld().getSpawnLocation(); // get the spawn location
+			boolean foundStand = false;
+			ArmorStand armorStand = null;
+			for (Entity entity : armorStandLoc.getNearbyEntities(2, 2, 2)) { // get the entities at the spawn location
+				if (entity.getType().equals(EntityType.ARMOR_STAND) && entity.getCustomName() != null && entity.getCustomName().equals("SpawnerBreaksArmorStand")) { //if it's our marker armorstand
+					foundStand = true;
+					armorStand = (ArmorStand) entity;
+				}
+			}
+			if (!foundStand) { // create new armor stand
+				armorStand = (ArmorStand) event.getPlayer().getWorld().spawnEntity(armorStandLoc, EntityType.ARMOR_STAND);
+				armorStand.setVisible(false);
+				armorStand.setGravity(false);
+				armorStand.setMarker(true);
+				armorStand.setCustomName("SpawnerBreaksArmorStand");
+			}
+			// add one to breaks
+			int breaks = ScoreboardUtils.getScoreboardValue(armorStand, SPAWNER_BREAKS_SCORE_NAME).orElse(0) + 1;
+			ScoreboardUtils.setScoreboardValue(armorStand, SPAWNER_BREAKS_SCORE_NAME, breaks);
+			// if we haven't initialized spawners
+			int numSpawnersTotal = ScoreboardUtils.getScoreboardValue(armorStand, SPAWNER_TOTAL_SCORE_NAME).orElse(-2);
+			if (numSpawnersTotal < -1) {
+				// Haven't been initialized yet - load all the chunks and count the spawners
 
-			// Get starting coords (divide by 16, basically)
-			int spawnChunkX = armorStandLoc.getBlockX() >> 4;
-			int spawnChunkZ = armorStandLoc.getBlockZ() >> 4;
+				// Set the score to -1 to start so that this doesn't get called more than once before it finishes
+				ScoreboardUtils.setScoreboardValue(armorStand, SPAWNER_TOTAL_SCORE_NAME, -1);
 
-			World world = armorStandLoc.getWorld();
-			AtomicInteger numSpawners = new AtomicInteger(0);
-			AtomicInteger numChunksToLoad = new AtomicInteger(64 * 64);
+				// Get starting coords (divide by 16, basically)
+				int spawnChunkX = armorStandLoc.getBlockX() >> 4;
+				int spawnChunkZ = armorStandLoc.getBlockZ() >> 4;
 
-			ArmorStand finalArmorStand = armorStand;
-			// Load each chunk async, when they load the callback will be called
-			for (int cx = spawnChunkX - CHUNK_SCAN_RADIUS; cx <= spawnChunkX + CHUNK_SCAN_RADIUS; cx++) {
-				for (int cz = spawnChunkZ - CHUNK_SCAN_RADIUS; cz <= spawnChunkZ + CHUNK_SCAN_RADIUS; cz++) {
-					world.getChunkAtAsync(cx, cz, false /* don't create new chunks */, (Consumer<Chunk>) (chunk) -> {
-						if (chunk != null && chunk.isLoaded()) {
-							// This gets called once per chunk
-							for (BlockState tile : chunk.getTileEntities()) {
-								if (tile.getType().equals(Material.SPAWNER)) {
-									// Found another spawner
-									if (tile.getLocation().subtract(new Vector(0, 1, 0)).getBlock().getType().equals(Material.BEDROCK)) {
-										continue;
+				World world = armorStandLoc.getWorld();
+				AtomicInteger numSpawners = new AtomicInteger(0);
+				AtomicInteger numChunksToLoad = new AtomicInteger(64 * 64);
+
+				ArmorStand finalArmorStand = armorStand;
+				// Load each chunk async, when they load the callback will be called
+				for (int cx = spawnChunkX - CHUNK_SCAN_RADIUS; cx <= spawnChunkX + CHUNK_SCAN_RADIUS; cx++) {
+					for (int cz = spawnChunkZ - CHUNK_SCAN_RADIUS; cz <= spawnChunkZ + CHUNK_SCAN_RADIUS; cz++) {
+						world.getChunkAtAsync(cx, cz, false /* don't create new chunks */, (Consumer<Chunk>) (chunk) -> {
+							if (chunk != null && chunk.isLoaded()) {
+								// This gets called once per chunk
+								for (BlockState tile : chunk.getTileEntities()) {
+									if (tile.getType().equals(Material.SPAWNER)) {
+										// Found another spawner
+										if (tile.getLocation().subtract(new Vector(0, 1, 0)).getBlock().getType().equals(Material.BEDROCK)) {
+											continue;
+										}
+										numSpawners.incrementAndGet();
 									}
-									numSpawners.incrementAndGet();
 								}
+
 							}
+							// Decrement the number of chunks left until we get to 0
+							int numLeft = numChunksToLoad.decrementAndGet();
+							if (numLeft == 0) {
+								// This is the last chunk - so we can now store the value to the armor stand
+								// Need to run this on the main thread, since this function is labeled async
 
-						}
-						// Decrement the number of chunks left until we get to 0
-						int numLeft = numChunksToLoad.decrementAndGet();
-						if (numLeft == 0) {
-							// This is the last chunk - so we can now store the value to the armor stand
-							// Need to run this on the main thread, since this function is labeled async
-
-							ScoreboardUtils.setScoreboardValue(finalArmorStand, SPAWNER_TOTAL_SCORE_NAME, numSpawners.intValue());
-						}
-					});
+								ScoreboardUtils.setScoreboardValue(finalArmorStand, SPAWNER_TOTAL_SCORE_NAME, numSpawners.intValue());
+							}
+						});
+					}
 				}
 			}
 		}
