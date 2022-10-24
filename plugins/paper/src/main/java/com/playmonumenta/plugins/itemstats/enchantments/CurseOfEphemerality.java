@@ -21,7 +21,9 @@ public class CurseOfEphemerality implements Enchantment {
 
 	@Override
 	public void onSpawn(Plugin plugin, Item item, double level) {
-		item.remove();
+		if (item.getThrower() != null) {
+			item.remove();
+		}
 	}
 
 	public static boolean isEphemeral(ItemStack item) {
