@@ -3,6 +3,14 @@ package com.playmonumenta.plugins.portals;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MMLog;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +35,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.EntitiesLoadEvent;
+import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.util.BoundingBox;
@@ -52,6 +61,8 @@ public class PortalManager implements Listener {
 		Material.VINE,
 		Material.LIGHT
 	);
+	public static final long LOG_SIZE_LIMIT = 1_000_000;
+	public static final String MAP_TAG = "PortalMap";
 
 	private static @Nullable PortalManager INSTANCE = null;
 	public static Map<Player, Portal> mPlayerPortal1 = null;
@@ -59,6 +70,7 @@ public class PortalManager implements Listener {
 	public static Map<Player, PortalTeleportCheck> mPortalTeleportChecks = null;
 	public static Map<Player, PortalAFKCheck> mPortalAFKChecks = null;
 	public static Map<UUID, Map<Long, Set<Portal>>> mPortalsByChunk = null;
+	public static Set<UUID> mPortalUuids = null;
 	public static String mCurrentShard = ServerProperties.getShardName();
 
 	//Timer for portals to despawn after placing
@@ -76,6 +88,7 @@ public class PortalManager implements Listener {
 	}
 
 	public static void spawnPortal(Player player, int portalNum, int gunId) {
+		portalLog("enter spawnPortal(" + player.getName() + ", " + portalNum + ", " + gunId + ");");
 		//Setup map
 		if (mPortalTeleportChecks == null || mPlayerPortal1 == null || mPlayerPortal2 == null) {
 			mPlayerPortal1 = new HashMap<>();
@@ -83,6 +96,7 @@ public class PortalManager implements Listener {
 			mPortalTeleportChecks = new HashMap<>();
 			mPortalAFKChecks = new HashMap<>();
 			mPortalsByChunk = new HashMap<>();
+			mPortalUuids = new HashSet<>();
 		}
 
 		//Raycast player eye to block face
@@ -93,9 +107,6 @@ public class PortalManager implements Listener {
 		box.shift(dir);
 		World world = player.getWorld();
 		String worldName = world.getName();
-		if (worldName.startsWith("Project_Epic")) {
-			worldName = "overworld";
-		}
 
 		Block blockHit = null;
 		if (portalNum == 1) {
@@ -106,16 +117,16 @@ public class PortalManager implements Listener {
 
 		BlockFace targetFace = player.getTargetBlockFace(50);
 
-		boolean valid = true;
-
 		if (blockHit == null) {
+			portalLog("exit spawnPortal: X - no block hit");
 			return;
 		}
 		//Check invalid block
+		boolean failed = false;
 		if (blockHit.getType() != Material.SMOOTH_STONE) {
-			valid = false;
+			failed = true;
 		} else if (!blockHit.getType().isSolid()) {
-			valid = false;
+			failed = true;
 		}
 
 		for (int i = 0; i < 50; i++) {
@@ -133,6 +144,10 @@ public class PortalManager implements Listener {
 				break;
 			}
 		}
+		if (failed) {
+			portalLog("exit spawnPortal: X - hit block is not valid");
+			return;
+		}
 		//Calculate player primary direction
 		BlockFace playerFacing;
 		if (Math.abs(dir.getX()) >= Math.abs(dir.getZ())) {
@@ -147,10 +162,6 @@ public class PortalManager implements Listener {
 			} else {
 				playerFacing = BlockFace.NORTH;
 			}
-		}
-
-		if (!valid) {
-			return;
 		}
 
 		//Check adjacent block
@@ -183,13 +194,15 @@ public class PortalManager implements Listener {
 
 		//Check invalid block
 		if (adjacent.getType() != Material.SMOOTH_STONE) {
+			portalLog("exit spawnPortal: X - adjacent block is not valid");
 			return;
 		} else if (!adjacent.getType().isSolid()) {
+			portalLog("exit spawnPortal: X - adjacent block is not valid");
 			return;
 		}
 		//Get the open blocks to place the portal on
-		Block portalBlock1 = null;
-		Block portalBlock2 = null;
+		Block portalBlock1;
+		Block portalBlock2;
 
 		if (targetFace == BlockFace.UP) {
 			portalBlock1 = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 1, 0)));
@@ -209,9 +222,13 @@ public class PortalManager implements Listener {
 		} else if (targetFace == BlockFace.SOUTH) {
 			portalBlock1 = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, 1)));
 			portalBlock2 = world.getBlockAt(adjacent.getLocation().clone().add(new Vector(0, 0, 1)));
+		} else {
+			portalLog("exit spawnPortal: X - unknown direction");
+			return;
 		}
 
-		if (portalBlock1 == null || portalBlock1.getType() != Material.AIR || portalBlock2 == null || portalBlock2.getType() != Material.AIR) {
+		if (portalBlock1.getType() != Material.AIR || portalBlock2.getType() != Material.AIR) {
+			portalLog("exit spawnPortal: X - a portal block is not air");
 			return;
 		}
 		//Check if the desired spots are occupied by other portal
@@ -235,6 +252,7 @@ public class PortalManager implements Listener {
 
 		//Check to see if there is already a portal at desired location
 		if (occupiedLocations.contains(portalBlock1.getLocation()) || occupiedLocations.contains(portalBlock2.getLocation())) {
+			portalLog("exit spawnPortal: X - a portal is already present");
 			return;
 		}
 
@@ -269,9 +287,9 @@ public class PortalManager implements Listener {
 		Portal portal2 = mPlayerPortal2.get(player);
 
 		if (portal1 != null && portalNum == 1) {
-			deletePortal(portal1);
+			clearPortal(player, 1);
 		} else if (portal2 != null && portalNum == 2) {
-			deletePortal(portal2);
+			clearPortal(player, 2);
 		}
 
 
@@ -294,6 +312,7 @@ public class PortalManager implements Listener {
 			itemFrame.setItem(mapItem.clone(), false);
 			itemFrame.setVisible(false);
 			itemFrame.setFixed(true);
+			itemFrame.addScoreboardTag(MAP_TAG);
 		});
 		Entity map2 = world.spawn(location2, GlowItemFrame.class, itemFrame -> {
 			itemFrame.setFacingDirection(targetFace);
@@ -301,6 +320,7 @@ public class PortalManager implements Listener {
 			itemFrame.setItem(mapItem, false);
 			itemFrame.setVisible(false);
 			itemFrame.setFixed(true);
+			itemFrame.addScoreboardTag(MAP_TAG);
 		});
 		UUID uuid1 = map1.getUniqueId();
 		UUID uuid2 = map2.getUniqueId();
@@ -313,6 +333,8 @@ public class PortalManager implements Listener {
 			if (portal2 != null) {
 				portal2.mPair = portal1;
 			}
+			mPortalUuids.add(uuid1);
+			mPortalUuids.add(uuid2);
 		} else {
 			portal2 = new Portal(portalNum, uuid1, uuid2, location1, location2, targetFace, blockHit.getLocation(), adjacent.getLocation());
 			portal2.mOwner = player;
@@ -320,6 +342,8 @@ public class PortalManager implements Listener {
 			if (portal1 != null) {
 				portal1.mPair = portal2;
 			}
+			mPortalUuids.add(uuid1);
+			mPortalUuids.add(uuid2);
 		}
 
 		mPlayerPortal1.put(player, portal1);
@@ -353,6 +377,7 @@ public class PortalManager implements Listener {
 		PortalAFKCheck check = new PortalAFKCheck(player);
 		check.runTaskLater(Plugin.getInstance(), PORTAL_AFK_TIMER);
 		mPortalAFKChecks.put(player, check);
+		portalLog("exit spawnPortal: + spawned portal");
 	}
 
 	public static void clearPortal(Player player, int portalNum) {
@@ -360,6 +385,7 @@ public class PortalManager implements Listener {
 		if (mPlayerPortal1 == null || mPlayerPortal2 == null) {
 			return;
 		}
+		portalLog("enter clearPortal(" + player.getName() + ", " + portalNum + ");");
 
 		if (portalNum == 1) {
 			Portal portal = mPlayerPortal1.get(player);
@@ -372,22 +398,37 @@ public class PortalManager implements Listener {
 				deletePortal(portal);
 			}
 		}
+		portalLog("exit clearPortal: cleared portal object (but did we clear the map(s)?)");
 	}
 
 	protected static void deletePortal(Portal portal) {
+		if (portal.mOwner != null) {
+			portalLog("enter deletePortal(<" + portal.mOwner.getName() + ", " + portal.mPortalNum + ">);");
+		} else {
+			portalLog("enter deletePortal(<NULL PLAYER, " + portal.mPortalNum + ">);");
+		}
 		PortalTeleportCheck teleportCheck = mPortalTeleportChecks.get(portal.mOwner);
 		if (teleportCheck != null) {
 			teleportCheck.cancel();
 			mPortalTeleportChecks.remove(portal.mOwner);
+		} else {
+			portalLog("   - deletePortal: no PortalTeleportCheck object found!");
 		}
 
 		if (portal.mPortalNum == 1) {
-			mPlayerPortal1.remove(portal.mOwner);
+			if (mPlayerPortal1.remove(portal.mOwner) == null) {
+				portalLog("   - deletePortal: Player did not have portal 1!");
+			}
 		} else {
-			mPlayerPortal2.remove(portal.mOwner);
+			if (mPlayerPortal2.remove(portal.mOwner) == null) {
+				portalLog("   - deletePortal: Player did not have portal 2!");
+			}
 		}
 
 		if (portal.mPair != null) {
+			if (portal.mPair.mPair == null) {
+				portalLog("   - deletePortal: pair's pair was null!");
+			}
 			portal.mPair.mPair = null;
 		}
 
@@ -398,22 +439,33 @@ public class PortalManager implements Listener {
 		UUID worldId = world.getUID();
 
 		Map<Long, Set<Portal>> worldPortalsByChunk = mPortalsByChunk.get(worldId);
-		if (worldPortalsByChunk != null) {
+		if (worldPortalsByChunk == null) {
+			portalLog("   - deletePortal: no worldPortalsByChunk!");
+		} else {
 			long chunkKey1 = Chunk.getChunkKey(loc1);
 			long chunkKey2 = Chunk.getChunkKey(loc2);
 
 			Set<Portal> chunkPortals = worldPortalsByChunk.get(chunkKey1);
-			if (chunkPortals != null) {
-				chunkPortals.remove(portal);
+			if (chunkPortals == null) {
+				portalLog("   - deletePortal: no chunkPortals for " + loc1 + "!");
+			} else {
+				if (!chunkPortals.remove(portal)) {
+					portalLog("   - deletePortal: portal " + loc1 + " not in chunkPortals!");
+				}
 				if (chunkPortals.isEmpty()) {
 					worldPortalsByChunk.remove(chunkKey1);
 				}
 			}
 
 			if (chunkKey1 != chunkKey2) {
+				portalLog("   - deletePortal: Note: " + loc1 + " and " + loc2 + " are in different chunks");
 				chunkPortals = worldPortalsByChunk.get(chunkKey2);
-				if (chunkPortals != null) {
-					chunkPortals.remove(portal);
+				if (chunkPortals == null) {
+					portalLog("   - deletePortal: no chunkPortals for " + loc2 + "!");
+				} else {
+					if (!chunkPortals.remove(portal)) {
+						portalLog("   - deletePortal: portal " + loc2 + " not in chunkPortals!");
+					}
 					if (chunkPortals.isEmpty()) {
 						worldPortalsByChunk.remove(chunkKey2);
 					}
@@ -427,15 +479,20 @@ public class PortalManager implements Listener {
 
 		deletePortalMap(portal.mUuid1, loc1);
 		deletePortalMap(portal.mUuid2, loc2);
+		portalLog("exit deletePortal: removed references to portal");
 	}
 
 	private static void deletePortalMap(UUID uuid, Location loc) {
+		portalLog("enter deletePortalMap(" + uuid + ");");
+		mPortalUuids.remove(uuid);
 		Entity itemFrame = Bukkit.getEntity(uuid);
 		if (itemFrame != null) {
+			portalLog("- deletePortalMap: Found at " + itemFrame.getLocation());
 			itemFrame.remove();
 		} else {
-			MMLog.warning("Failed to delete portal map; uuid=" + uuid + ", location=" + loc);
+			portalLog("Failed to delete portal map; uuid=" + uuid + ", location=" + loc);
 		}
+		portalLog("exit deletePortalMap");
 	}
 
 	public static int getMapNum(String shard) {
@@ -451,43 +508,143 @@ public class PortalManager implements Listener {
 	}
 
 	private static Particle.DustOptions getDustOptions(int portalNum) {
-		switch (portalNum) {
-			case 1:
-				return new Particle.DustOptions(Color.fromRGB(253, 255, 54), 1.0f);
-			case 2:
-				return new Particle.DustOptions(Color.fromRGB(0, 222, 60), 1.0f);
-			case 3:
-				return new Particle.DustOptions(Color.fromRGB(255, 1, 0), 1.0f);
-			case 4:
-				return new Particle.DustOptions(Color.fromRGB(209, 85, 0), 1.0f);
-			case 5:
-				return new Particle.DustOptions(Color.fromRGB(176, 75, 213), 1.0f);
-			case 6:
-				return new Particle.DustOptions(Color.fromRGB(61, 175, 227), 1.0f);
-			case 7:
-				return new Particle.DustOptions(Color.fromRGB(237, 125, 163), 1.0f);
-			case 8:
-				return new Particle.DustOptions(Color.fromRGB(122, 85, 50), 1.0f);
-			default:
-				return new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
-		}
+		return switch (portalNum) {
+			case 1 -> new Particle.DustOptions(Color.fromRGB(253, 255, 54), 1.0f);
+			case 2 -> new Particle.DustOptions(Color.fromRGB(0, 222, 60), 1.0f);
+			case 3 -> new Particle.DustOptions(Color.fromRGB(255, 1, 0), 1.0f);
+			case 4 -> new Particle.DustOptions(Color.fromRGB(209, 85, 0), 1.0f);
+			case 5 -> new Particle.DustOptions(Color.fromRGB(176, 75, 213), 1.0f);
+			case 6 -> new Particle.DustOptions(Color.fromRGB(61, 175, 227), 1.0f);
+			case 7 -> new Particle.DustOptions(Color.fromRGB(237, 125, 163), 1.0f);
+			case 8 -> new Particle.DustOptions(Color.fromRGB(122, 85, 50), 1.0f);
+			default -> new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
+		};
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void chunkUnloadEvent(ChunkUnloadEvent event) {
+	public void entitiesUnloadEvent(EntitiesUnloadEvent event) {
+		// Delete portals in unloading chunks
 		if (mPortalsByChunk != null) {
 			Chunk chunk = event.getChunk();
 			UUID worldId = chunk.getWorld().getUID();
 			Map<Long, Set<Portal>> worldPortalsByChunk = mPortalsByChunk.get(worldId);
 			if (worldPortalsByChunk != null) {
 				Set<Portal> liveChunkPortals = worldPortalsByChunk.get(chunk.getChunkKey());
-				if (liveChunkPortals != null) {
+				if (liveChunkPortals != null && !liveChunkPortals.isEmpty()) {
+					portalLog("enter entitiesUnloadEvent(<" + chunk.getX() + ", " + chunk.getZ() + ">);");
 					Set<Portal> chunkPortals = new HashSet<>(liveChunkPortals);
 					for (Portal portal : chunkPortals) {
-						deletePortal(portal);
+						Player owner = portal.mOwner;
+						if (owner == null) {
+							deletePortal(portal);
+						} else {
+							clearPortal(owner, portal.mPortalNum);
+						}
 					}
+					portalLog("exit entitiesUnloadEvent");
 				}
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entitiesLoadEvent(EntitiesLoadEvent event) {
+		// Remove assumed-unloaded portal maps
+		if (mPortalUuids != null && !mPortalUuids.isEmpty()) {
+			Chunk chunk = event.getChunk();
+			boolean foundEntity = false;
+			for (Entity entity : chunk.getEntities()) {
+				if (!entity.getScoreboardTags().contains(MAP_TAG)) {
+					continue;
+				}
+				if (!mPortalUuids.contains(entity.getUniqueId())) {
+					if (!foundEntity) {
+						portalLog("enter entitiesLoadEvent(<" + chunk.getX() + ", " + chunk.getZ() + ">);");
+					}
+					foundEntity = true;
+					portalLog("- entitiesLoadEvent: removed escapee portal map " + entity.getLocation());
+					entity.remove();
+				}
+			}
+			if (foundEntity) {
+				portalLog("exit entitiesLoadEvent");
+			}
+		}
+	}
+
+	private static void portalLog(String message) {
+		Plugin plugin = Plugin.getInstance();
+		if (plugin == null) {
+			return;
+		}
+		File logFile = new File(plugin.getDataFolder(), "portals.log");
+		boolean failed = false;
+		try {
+			if (!logFile.exists()) {
+				try {
+					if (!logFile.createNewFile()) {
+						failed = true;
+					}
+				} catch (IOException e) {
+					failed = true;
+				}
+			}
+			if (failed) {
+				MMLog.severe("Could not create portals.log");
+				return;
+			}
+			if (logFile.length() > LOG_SIZE_LIMIT) {
+				File rotatedLogFile = new File(plugin.getDataFolder(), "portals.log.1");
+				if (rotatedLogFile.exists()) {
+					if (!rotatedLogFile.delete()) {
+						MMLog.severe("Could not delete portals.log.1 for log rotation");
+						return;
+					}
+				}
+				if (!logFile.renameTo(rotatedLogFile)) {
+					MMLog.severe("Could not rotate portals.log to portals.log.1");
+					return;
+				}
+				try {
+					if (!logFile.createNewFile()) {
+						failed = true;
+					}
+				} catch (IOException e) {
+					failed = true;
+				}
+				if (failed) {
+					MMLog.severe("Could not create portals.log after rotation");
+					return;
+				}
+			}
+
+			OutputStreamWriter writer;
+			try {
+				writer = new OutputStreamWriter(new FileOutputStream(logFile, true), StandardCharsets.UTF_8);
+			} catch (FileNotFoundException e) {
+				MMLog.severe("Could not create writer for portals.log");
+				return;
+			}
+
+			LocalDateTime dateTime = LocalDateTime.now(ZoneId.systemDefault());
+			String timestamp = dateTime.toString();
+
+			String fullClassName = Thread.currentThread().getStackTrace()[2].getClassName();
+			String className = fullClassName.substring(fullClassName.lastIndexOf(".") + 1);
+			String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
+			int lineNumber = Thread.currentThread().getStackTrace()[2].getLineNumber();
+			String lineInfo = className + "." + methodName + "():" + lineNumber;
+
+			String logLine = "[" + timestamp + "] " + lineInfo + ": " + message + "\n";
+
+			try {
+				writer.write(logLine);
+				writer.close();
+			} catch (IOException e) {
+				MMLog.severe("Could not write to portals.log");
+			}
+		} catch (SecurityException ex) {
+			MMLog.severe("A security exception occurred with portals.log - how?");
 		}
 	}
 }
