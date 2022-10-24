@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelveLootTableGroup;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -156,8 +157,14 @@ public class ChestOverride extends BaseOverride {
 	}
 
 	protected static boolean breakable(Block block) {
+		if (ServerProperties.getIsTownWorld()) {
+			return true;
+		}
 		Block blockUnder = block.getLocation().add(0, -1, 0).getBlock();
-		if (blockUnder != null && blockUnder.getType() == Material.BARRIER) {
+		Material type = blockUnder.getType();
+		if (type == Material.BARRIER) {
+			return false;
+		} else if (type == Material.BEDROCK && ((Chest) blockUnder.getBlockData()).hasLootTable()) {
 			return false;
 		}
 		return true;
