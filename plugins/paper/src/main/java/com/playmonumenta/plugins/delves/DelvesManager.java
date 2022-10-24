@@ -152,7 +152,7 @@ public class DelvesManager implements Listener {
 			playerInWorld.sort((player1, player2) -> (int) (loc.distance(player1.getLocation()) - loc.distance(player2.getLocation())));
 			Player player = playerInWorld.get(0);
 			MMLog.warning("[DelveManager] Party Empty when spawned a delveMob - Real Distance: " + loc.distance(player.getLocation()));
-			players.add(player);
+			return List.of(player);
 		}
 
 		return players;
