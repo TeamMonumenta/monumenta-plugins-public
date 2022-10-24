@@ -49,28 +49,29 @@ public class AbilityInfo {
 		}
 
 		String skillHeader;
-		skillHeader = "[" + mDisplayName.toUpperCase() + " Level " + skillLevel + "] : ";
+		if (skillLevel <= 2) {
+			skillHeader = "[" + mDisplayName.toUpperCase() + " Level " + skillLevel + "] : ";
+		} else {
+			skillHeader = "[" + mDisplayName.toUpperCase() + " Enhancement] : ";
+		}
 
 		return Component.text("")
 			.append(Component.text(skillHeader, NamedTextColor.GREEN, TextDecoration.BOLD))
 			.append(Component.text(strDescription, NamedTextColor.YELLOW));
 	}
 
-	public Component getFormattedDescriptions() {
+	public Component getFormattedDescriptions(int level, boolean isEnhanced) {
 		if (mDescriptions.size() == 0) {
 			return Component.text("No descriptions found for " + mDisplayName + "!", NamedTextColor.RED);
 		}
 
-		//TODO edit to include enhancements
 		Component component = Component.text("");
 		component = component.append(getFormattedDescription(1));
-		for (int skillLevel = 2; skillLevel <= mDescriptions.size(); skillLevel++) {
-			if (skillLevel == 3) {
-				break;
-			}
-
-			component = component.append(Component.newline())
-				.append(getFormattedDescription(skillLevel));
+		if (level > 1) {
+			component = component.append(Component.newline()).append(getFormattedDescription(1));
+		}
+		if (isEnhanced) {
+			component = component.append(Component.newline()).append(getFormattedDescription(3));
 		}
 		return component;
 	}
@@ -79,24 +80,34 @@ public class AbilityInfo {
 	 * Returns null if a hover message could not be created
 	 */
 	public @Nullable Component getLevelHover(int skillLevel, boolean useShorthand) {
+		int level = skillLevel;
+		boolean isEnhanced = false;
+		if (skillLevel > 2) {
+			level -= 2;
+			isEnhanced = true;
+		}
+
 		String hoverableString;
 		if (useShorthand) {
 			if (mShorthandName == null) {
 				return null;
 			}
-			hoverableString = mShorthandName + skillLevel;
+			hoverableString = mShorthandName + level;
 		} else {
 			if (mDisplayName == null) {
 				return null;
 			}
-			hoverableString = mDisplayName.toUpperCase() + " Level " + skillLevel;
+			hoverableString = mDisplayName.toUpperCase() + " Level " + level;
+		}
+		if (isEnhanced) {
+			hoverableString += "*";
 		}
 		return Component.text(hoverableString, NamedTextColor.YELLOW)
-			.hoverEvent(getFormattedDescriptions());
+			.hoverEvent(getFormattedDescriptions(level, isEnhanced));
 	}
 
 	public void sendDescriptions(CommandSender sender) {
-		sender.sendMessage(getFormattedDescriptions());
+		sender.sendMessage(getFormattedDescriptions(2, false));
 	}
 
 	public JsonObject toJson() {
