@@ -110,6 +110,7 @@ import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -1404,6 +1405,13 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void playerVelocityEvent(PlayerVelocityEvent event) {
 		if (mIgnoreKnockbackThisTick.remove(event.getPlayer().getUniqueId())) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void playerTakeLecternBookEvent(PlayerTakeLecternBookEvent event) {
+		if (event.getPlayer().getGameMode() == GameMode.ADVENTURE) {
 			event.setCancelled(true);
 		}
 	}
