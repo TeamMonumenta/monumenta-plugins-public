@@ -124,7 +124,7 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 			}
 			ItemStack item = conversionResults.get(0).getItem();
 			ItemMeta meta = item.getItemMeta();
-			String conversionNames = conversions.stream().map(Conversion::getName).collect(Collectors.joining("/"));
+			String conversionNames = conversions.get(0).getCombinedName() != null ? conversions.get(0).getCombinedName() : conversions.stream().map(Conversion::getName).collect(Collectors.joining("/"));
 			meta.setDisplayName(WHITE + "Convert to " + GOLD + conversionNames);
 			meta.setLore(List.of(GRAY + "Will convert applicable items to",
 			                     GRAY + conversionNames));
@@ -136,12 +136,14 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 		{
 			// selected conversion marker
 			List<Conversion> conversions = mSelectedConversion >= 0 ? mConversions.get(mSelectedConversion) : null;
-			String conversionNames = conversions != null ? conversions.stream().map(Conversion::getName).collect(Collectors.joining("/")) : "the configured conversion";
+			String conversionNames = conversions != null
+				                         ? (conversions.get(0).getCombinedName() != null ? conversions.get(0).getCombinedName() : conversions.stream().map(Conversion::getName).collect(Collectors.joining("/")))
+				                         : "the configured conversion";
 			ItemStack marker = new ItemStack(Material.GOLD_NUGGET);
 			ItemMeta meta = marker.getItemMeta();
 			meta.setDisplayName(GOLD + "Selected Conversion");
 			meta.setLore(List.of(GRAY + "Will convert applicable items to",
-			                     GRAY + conversionNames));
+				GRAY + conversionNames));
 			marker.setItemMeta(meta);
 			mInventory.setItem(conversionStartIndex + 9 + mSelectedConversion + 1, marker);
 		}

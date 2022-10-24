@@ -74,9 +74,16 @@
 							"description": "Display name of this conversion.",
 							"type": "string"
 						},
+						"combined_name": {
+							"required": false,
+							"propertyOrder": 2,
+							"title": "Combined Conversion Name",
+							"description": "Display name of this conversion in the 'Selective Conversion' menu. If multiple conversions share the same Settings ID, this single name wil be used for all of them instead of using a combination of all names.",
+							"type": "string"
+						},
 						"settings_id": {
 							"required": true,
-							"propertyOrder": 2,
+							"propertyOrder": 3,
 							"title": "Settings ID",
 							"description": "Digit used to store this setting in the scoreboard. Multiple conversions can have the same ID if they apply to different regions.",
 							"type": "integer",
@@ -85,7 +92,7 @@
 						},
 						"rates": {
 							"required": true,
-							"propertyOrder": 3,
+							"propertyOrder": 4,
 							"title": "Conversion Rates: map of item region -> conversion name -> item tier -> rate",
 							"description": "",
 							"type": "object",
@@ -111,7 +118,7 @@
 						},
 						"results": {
 							"required": true,
-							"propertyOrder": 4,
+							"propertyOrder": 5,
 							"title": "Conversion Results",
 							"description": "Map of region to list of conversion results",
 							"type": "object",
@@ -162,21 +169,21 @@
 						},
 						"compress_existing_results": {
 							"required": false,
-							"propertyOrder": 5,
+							"propertyOrder": 6,
 							"title": "Compress Existing Results",
 							"description": "When giving compressed result items, will also compress existing uncompressed result items in the player's inventory.",
 							"type": "boolean"
 						},
 						"prerequisites": {
 							"required": false,
-							"propertyOrder": 6,
+							"propertyOrder": 7,
 							"title": "Prerequisites",
 							"description": "Prerequisites to be able to use this conversion.",
 							"$ref": "prerequisites.json"
 						},
 						"region_prerequisites": {
 							"required": false,
-							"propertyOrder": 7,
+							"propertyOrder": 8,
 							"title": "Region Prerequisites",
 							"description": "A map from item region to prerequisites to be able to convert items from that region.",
 							"type": "object",
@@ -189,7 +196,7 @@
 						},
 						"tier_prerequisites": {
 							"required": false,
-							"propertyOrder": 8,
+							"propertyOrder": 9,
 							"title": "Tier Prerequisites",
 							"description": "A map from item tier to prerequisites to be able to convert items of that tier.",
 							"type": "object",

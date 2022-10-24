@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.scriptedquests.Plugin;
 import com.playmonumenta.scriptedquests.quests.QuestContext;
 import com.playmonumenta.scriptedquests.quests.components.QuestPrerequisites;
+import com.playmonumenta.scriptedquests.utils.JsonUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -228,6 +229,7 @@ public final class ExperiencinatorConfig {
 	public static class Conversion {
 
 		private final String mName;
+		private final @Nullable String mCombinedName;
 		private final int mSettingsId;
 		private final Map<Region, ConversionRates> mRates = new EnumMap<>(Region.class);
 		private final Map<Region, List<ConversionResult>> mResults = new EnumMap<>(Region.class);
@@ -245,6 +247,8 @@ public final class ExperiencinatorConfig {
 			} else {
 				throw new Exception("conversion missing name value!");
 			}
+
+			mCombinedName = JsonUtils.getString(object, "combined_name", null);
 
 			JsonElement settingsIdElement = object.get("settings_id");
 			if (settingsIdElement != null) {
@@ -319,6 +323,10 @@ public final class ExperiencinatorConfig {
 
 		public String getName() {
 			return mName;
+		}
+
+		public String getCombinedName() {
+			return mCombinedName;
 		}
 
 		public int getSettingsId() {
