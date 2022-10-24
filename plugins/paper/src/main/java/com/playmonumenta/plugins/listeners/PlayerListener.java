@@ -517,6 +517,18 @@ public class PlayerListener implements Listener {
 						&& CurseOfEphemerality.isEphemeral(event.getCursor())
 						&& !(event.getClickedInventory() instanceof PlayerInventory)
 				)
+				// Prevent moving ephemeral item using number keys
+				|| (
+					event.getClick() == ClickType.NUMBER_KEY
+						&& CurseOfEphemerality.isEphemeral(player.getInventory().getItem(event.getHotbarButton()))
+						&& !(event.getClickedInventory() instanceof PlayerInventory)
+				)
+				// Prevent moving ephemeral item using swap offhand keys
+				|| (
+					event.getClick() == ClickType.SWAP_OFFHAND
+						&& CurseOfEphemerality.isEphemeral(player.getInventory().getItemInOffHand())
+						&& !(event.getClickedInventory() instanceof PlayerInventory)
+				)
 			)
 		) {
 			event.setCancelled(true);
