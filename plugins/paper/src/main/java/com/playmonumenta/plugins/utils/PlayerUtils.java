@@ -85,8 +85,7 @@ public class PlayerUtils {
 		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(loc.toVector(), true);
 		if (!structures.isEmpty()) {
 			return loc.getWorld().getPlayers().stream()
-				.filter(p -> playerCountsForLootScaling(p)
-					             && structures.stream().anyMatch(structure -> structure.isWithin(p)))
+				.filter(p -> playerCountsForLootScaling(p) && playerIsInPOI(structures, p))
 				.toList();
 		}
 
@@ -100,6 +99,18 @@ public class PlayerUtils {
 			players.remove(player);
 		}
 		return players;
+	}
+
+	public static boolean playerIsInPOI(List<RespawningStructure> structures, Player player) {
+		return structures.stream().anyMatch(structure -> structure.isWithin(player));
+	}
+
+	public static boolean playerIsInPOI(Location loc, Player player) {
+		return playerIsInPOI(StructuresPlugin.getInstance().mRespawnManager.getStructures(loc.toVector(), true), player);
+	}
+
+	public static boolean playerIsInPOI(Player player) {
+		return playerIsInPOI(player.getLocation(), player);
 	}
 
 	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable, boolean includeDead) {

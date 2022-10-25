@@ -432,6 +432,8 @@ public class DelvesUtils {
 				.toList();
 		}
 
-		return PlayerUtils.playersInRange(loc, DelvesManager.DELVES_MAX_PARTY_DISTANCE, true);
+		List<Player> players = PlayerUtils.playersInRange(loc, DelvesManager.DELVES_MAX_PARTY_DISTANCE, true);
+		players.removeIf(player -> !PlayerUtils.playerIsInPOI(loc, player));
+		return players;
 	}
 }
