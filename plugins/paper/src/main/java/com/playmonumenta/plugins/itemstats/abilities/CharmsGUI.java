@@ -85,7 +85,7 @@ public class CharmsGUI extends CustomInventory {
 				mTargetPlayer.closeInventory();
 			}
 			// It's in the charms gui, check clicked charms to remove them
-			if (event.getCurrentItem().getType() != Material.RED_STAINED_GLASS && event.getSlot() >= START_OF_CHARMS && event.getSlot() < 52) {
+			if (event.getSlot() >= START_OF_CHARMS && event.getSlot() < 52) {
 
 				ItemStack item = mInventory.getItem(event.getSlot());
 				if (item == null || item.getType() == Material.AIR) {
