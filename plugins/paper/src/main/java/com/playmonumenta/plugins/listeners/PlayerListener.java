@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
-import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.portals.PortalManager;
@@ -106,7 +105,6 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -153,8 +151,8 @@ public class PlayerListener implements Listener {
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 
-		if (ServerProperties.getJoinMessagesEnabled() == false) {
-			event.setJoinMessage("");
+		if (!ServerProperties.getJoinMessagesEnabled()) {
+			event.joinMessage(null);
 		}
 
 		/* This needs to stick around basically forever to remove this no-longer-needed tag */
@@ -165,7 +163,7 @@ public class PlayerListener implements Listener {
 		mPlugin.mAbilityManager.playerJoinEvent(player, event);
 
 		DailyReset.handle(mPlugin, player);
-		//This checks to make sure that when you login you aren't stuck in blocks, just in case the lag that causes you to fall also kicks you. You don't want to be stuck in dirt forever, right?
+		// This checks to make sure that when you log in you aren't stuck in blocks, just in case the lag that causes you to fall also kicks you. You don't want to be stuck in dirt forever, right?
 		Location loc = player.getLocation();
 		runTeleportRunnable(player, loc);
 
@@ -193,13 +191,6 @@ public class PlayerListener implements Listener {
 		//TODO: Remove this when custom effects logout handling is better dealt with
 		EntityUtils.applyRecoilDisable(mPlugin, 9999, 99, player);
 
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void playerChannelEvent(PlayerRegisterChannelEvent event) {
-		if (ClientModHandler.CHANNEL_ID.equals(event.getChannel())) {
-			ClientModHandler.updateAbilities(event.getPlayer());
-		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
