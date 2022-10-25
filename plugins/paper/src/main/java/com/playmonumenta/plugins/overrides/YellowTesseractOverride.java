@@ -80,7 +80,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			return true;
 		}
 
-		if (!InventoryUtils.testForItemWithName(item, TESSERACT_NAME.content())) {
+		if (!InventoryUtils.testForItemWithName(item, TESSERACT_NAME.content()) || InventoryUtils.testForItemWithName(item, "(u)")) {
 			return true;
 		}
 
