@@ -379,10 +379,9 @@ public class DelvesManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void playerWalk(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		if (getRank(player, DelvesModifier.ASTRAL) == 0) {
-			return;
-		}
-		if (player.getGameMode() == GameMode.SPECTATOR) {
+		if (getRank(player, DelvesModifier.ASTRAL) == 0
+			|| player.getGameMode() == GameMode.SPECTATOR
+			|| player.getGameMode() == GameMode.CREATIVE) {
 			return;
 		}
 		PotionEffect resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
