@@ -765,7 +765,7 @@ public class GalleryGame {
 						List<BaseInteractable> list = new ArrayList<>(mInteractableMap.values().stream().filter(bInteract -> bInteract instanceof MysteryBoxInteractable mmBox && mmBox != mysteryBoxInteractable).toList());
 						if (!list.isEmpty()) {
 							mysteryBoxInteractable.runCommandRemove();
-							MysteryBoxInteractable mmBoxInteractable = (MysteryBoxInteractable) list.get(0);
+							MysteryBoxInteractable mmBoxInteractable = (MysteryBoxInteractable) list.get(FastUtils.RANDOM.nextInt(list.size()));
 							mmBoxInteractable.runCommandPlace();
 							mmBoxInteractable.setValidBox(true);
 						}
