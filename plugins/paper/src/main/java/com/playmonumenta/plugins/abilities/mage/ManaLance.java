@@ -102,9 +102,9 @@ public class ManaLance extends MultipleChargeAbility {
 		Location endLoc = loc;
 		int i = 0;
 		boolean hit = false;
-		int range = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RANGE);
+		double range = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RANGE);
 		while (i < range) {
-			box.shift(dir);
+			box.shift((range - i >= 1 ? dir : dir.clone().multiply(range - i)));
 			Location bLoc = box.getCenter().toLocation(world);
 			endLoc = bLoc;
 
