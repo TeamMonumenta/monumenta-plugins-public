@@ -81,7 +81,7 @@ public class VoodooBondsReaper extends Effect {
 
 	@Override
 	public void entityLoseEffect(Entity entity) {
-		if (mPlayer != null && !mDone) {
+		if (mPlayer != null && !mDone && mPlayer.isValid() && !mPlayer.isDead() && mPlayer.getHealth() > 0) {
 			double absorbHealth = AbsorptionUtils.getAbsorption(mPlayer);
 			double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 			if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.RESIST_5)) {
