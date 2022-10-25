@@ -23,7 +23,7 @@ public class FirstStrike implements Enchantment {
 
 	private static final double DAMAGE_PER_LEVEL = 0.1;
 	private static final double PROJ_REDUCTION = 0.75;
-	private static final int DURATION = 3 * 20;
+	private static final int DURATION = 10000 * 20;
 	private static final String SOURCE = "FirstStrikeDisable";
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(244, 141, 123), 0.75f);
 
@@ -48,7 +48,7 @@ public class FirstStrike implements Enchantment {
 		if (((type == DamageType.MELEE || type == DamageType.MELEE_ENCH || type == DamageType.MELEE_SKILL)
 			&& ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand()))
 			|| type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
-			if (plugin.mEffectManager.getEffects(player, SOURCE) == null) {
+			if (plugin.mEffectManager.getEffects(enemy, SOURCE + player.getName()) == null) {
 				double bonus = DAMAGE_PER_LEVEL * level;
 				if (type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
 					bonus *= PROJ_REDUCTION;
@@ -90,8 +90,8 @@ public class FirstStrike implements Enchantment {
 					0.8f,
 					0.45f
 				);
+				plugin.mEffectManager.addEffect(enemy, SOURCE + player.getName(), new FirstStrikeCooldown(DURATION));
 			}
-			plugin.mEffectManager.addEffect(player, SOURCE, new FirstStrikeCooldown(DURATION));
 		}
 	}
 }
