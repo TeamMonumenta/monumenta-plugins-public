@@ -263,7 +263,7 @@ public class Samwell extends BossAbilityGroup {
 		team.addEntity(mBoss);
 		mBoss.setGlowing(true);
 
-		mShardsReq = (int) (5 + Math.floor(PlayerUtils.playersInRange(mSpawnLoc, 100, true).size() / 2.0));
+		mShardsReq = (int) (3 + Math.floor(PlayerUtils.playersInRange(mSpawnLoc, 100, true).size() / 2.0));
 
 		// Need to Delay this a bit, as BlueStrikeDaggerCraftingBoss will search for a nearby WitherSkeleton.
 		// (IK it is quite scuffed)
