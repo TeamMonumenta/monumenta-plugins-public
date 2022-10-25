@@ -52,7 +52,7 @@ public class DropShardBoss extends BossAbilityGroup {
 	@Override
 	public void death(EntityDeathEvent event) {
 		double rand = FastUtils.randomDoubleInRange(0, 1.0);
-		if (EntityUtils.isElite(mBoss) || rand > 0.75) {
+		if (EntityUtils.isElite(mBoss) || rand > 0.5) {
 			LootContext cont = new LootContext.Builder(mBoss.getLocation()).build();
 			ItemStack item = mTable.populateLoot(mRand, cont).stream().toList().get(0);
 			mBoss.getWorld().dropItem(mBoss.getLocation(), item);

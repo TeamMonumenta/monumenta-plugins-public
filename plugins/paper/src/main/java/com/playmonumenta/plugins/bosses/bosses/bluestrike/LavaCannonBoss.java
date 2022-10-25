@@ -88,7 +88,7 @@ public class LavaCannonBoss extends BossAbilityGroup {
 			Vector mVector;
 
 			@Override public void run() {
-				if (mT <= 60) {
+				if (mT <= chargeTime(mPhase) * 0.6) {
 					mVector = LocationUtils.getDirectionTo(mTarget.getLocation(), mBoss.getLocation());
 					Location loc = mBoss.getLocation();
 					loc.setYaw((float) (Math.atan2(mVector.getZ(), mVector.getX()) * 180.0 / Math.PI));

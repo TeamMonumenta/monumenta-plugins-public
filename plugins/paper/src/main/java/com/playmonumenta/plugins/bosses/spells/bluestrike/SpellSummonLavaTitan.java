@@ -55,7 +55,7 @@ public class SpellSummonLavaTitan extends Spell {
 				mCooldown = false;
 			}
 
-		}.runTaskLater(mPlugin, cooldownTicks() + 20);
+		}.runTaskLater(mPlugin, cooldownTicks() + 6 * 20);
 
 		new BukkitRunnable() {
 			int mT = 0;
