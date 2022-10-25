@@ -96,13 +96,13 @@ public class ManaLance extends MultipleChargeAbility {
 		BoundingBox box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
 		Vector dir = loc.getDirection();
 		box.shift(dir);
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 10, mPlayer);
+		double range = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RANGE);
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), range + 2, mPlayer);
 		World world = mPlayer.getWorld();
 
 		Location endLoc = loc;
 		int i = 0;
 		boolean hit = false;
-		double range = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RANGE);
 		while (i < range) {
 			box.shift((range - i >= 1 ? dir : dir.clone().multiply(range - i)));
 			Location bLoc = box.getCenter().toLocation(world);
