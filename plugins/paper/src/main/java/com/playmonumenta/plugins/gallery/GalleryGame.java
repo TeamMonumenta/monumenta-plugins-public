@@ -828,7 +828,7 @@ public class GalleryGame {
 	}
 
 	public void onPlayerHurtEvent(DamageEvent event, Player player, Entity damager, LivingEntity source) {
-		if (mCurrentRound > GalleryUtils.STARTING_ROUND_FOR_SCALING && !GalleryUtils.ignoreScaling(source)) {
+		if (mCurrentRound > GalleryUtils.STARTING_ROUND_FOR_SCALING && (source == null || !GalleryUtils.ignoreScaling(source))) {
 			int dif = mCurrentRound - GalleryUtils.STARTING_ROUND_FOR_SCALING;
 			double multiply = Math.min(1 + dif * 0.1, 5.0);
 			event.setDamage(event.getDamage() * multiply);

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffect;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffectType;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -142,39 +143,39 @@ public class GalleryPlayer {
 
 	public void otherPlayerDeathEvent(EntityDeathEvent event, LivingEntity otherPlayer, int ticks) {
 		if (isOnline()) {
-			for (GalleryEffect effect : mEffects.values()) {
+			for (GalleryEffect effect : new ArrayList<>(mEffects.values())) {
 				effect.onOtherPlayerDeathEvent(this, event, otherPlayer, ticks);
 			}
 		}
 	}
 
 	public void playerDeathEvent(EntityDeathEvent event, LivingEntity self, int ticks) {
-		for (GalleryEffect effect : mEffects.values()) {
+		for (GalleryEffect effect : new ArrayList<>(mEffects.values())) {
 			effect.onPlayerDeathEvent(this, event, ticks);
 		}
 	}
 
 	public void onPlayerDamageEvent(DamageEvent event, LivingEntity damagee) {
-		for (GalleryEffect effect : mEffects.values()) {
+		for (GalleryEffect effect : new ArrayList<>(mEffects.values())) {
 			effect.onPlayerDamage(this, event, damagee);
 		}
 	}
 
 
 	public void onPlayerHurtEvent(DamageEvent event, LivingEntity source) {
-		for (GalleryEffect effect : mEffects.values()) {
+		for (GalleryEffect effect : new ArrayList<>(mEffects.values())) {
 			effect.onPlayerHurt(this, event, source);
 		}
 	}
 
 	public void onPlayerFatalHurtEvent(DamageEvent event, LivingEntity source) {
-		for (GalleryEffect effect : mEffects.values()) {
+		for (GalleryEffect effect : new ArrayList<>(mEffects.values())) {
 			effect.onPlayerFatalHurt(this, event, source);
 		}
 	}
 
 	public void onRoundStart(GalleryGame game) {
-		for (GalleryEffect effect : mEffects.values()) {
+		for (GalleryEffect effect : new ArrayList<>(mEffects.values())) {
 			effect.onRoundStart(this, game);
 		}
 	}
