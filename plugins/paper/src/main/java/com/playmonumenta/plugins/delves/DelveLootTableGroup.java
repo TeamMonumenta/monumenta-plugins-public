@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.loot.LootTable;
 
 public class DelveLootTableGroup {
@@ -159,10 +160,15 @@ public class DelveLootTableGroup {
 
 	public static void setDelveLootTable(Player player, Block block) {
 		BlockState blockState = block.getState();
-		if (blockState instanceof Chest) {
-			setDelveLootTable(DelvesUtils.getPlayerTotalDelvePoint(null, player, ServerProperties.getShardName()),
-					PlayerUtils.playersInLootScalingRange(player, true).size() + 1,
-					(Chest) blockState);
+		if (blockState instanceof Chest chest) {
+			int playerTotalDelvePoint = DelvesUtils.getPlayerTotalDelvePoint(null, player, ServerProperties.getShardName());
+			int playerCount = PlayerUtils.playersInLootScalingRange(player, true).size() + 1;
+			if (chest.getInventory() instanceof DoubleChestInventory doubleChestInventory) {
+				setDelveLootTable(playerTotalDelvePoint, playerCount, (Chest) doubleChestInventory.getLeftSide().getHolder());
+				setDelveLootTable(playerTotalDelvePoint, playerCount, (Chest) doubleChestInventory.getRightSide().getHolder());
+			} else {
+				setDelveLootTable(playerTotalDelvePoint, playerCount, chest);
+			}
 		}
 	}
 
