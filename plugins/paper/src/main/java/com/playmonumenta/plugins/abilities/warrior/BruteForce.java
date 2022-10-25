@@ -78,7 +78,9 @@ public class BruteForce extends Ability {
 				for (int i = 1; i <= waves; i++) {
 					double damage = damageBonus * Math.pow(damageRatio, i);
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						wave(enemy, playerLoc, damage, true);
+						if (!enemy.isDead()) {
+							wave(enemy, playerLoc, damage, true);
+						}
 					}, (long) ENHANCEMENT_DELAY * i);
 				}
 			}
