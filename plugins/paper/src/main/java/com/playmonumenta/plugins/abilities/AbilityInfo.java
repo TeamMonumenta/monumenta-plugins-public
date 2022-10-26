@@ -68,7 +68,7 @@ public class AbilityInfo {
 		Component component = Component.text("");
 		component = component.append(getFormattedDescription(1));
 		if (level > 1) {
-			component = component.append(Component.newline()).append(getFormattedDescription(1));
+			component = component.append(Component.newline()).append(getFormattedDescription(2));
 		}
 		if (isEnhanced) {
 			component = component.append(Component.newline()).append(getFormattedDescription(3));
