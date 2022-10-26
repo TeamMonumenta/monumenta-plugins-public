@@ -51,8 +51,8 @@ public final class PortalBoss extends BossAbilityGroup {
 	public static final String ELITE_LOS = "FlameConstruct";
 	public static final String CUBE_FUNCTION = "function monumenta:quests/r2/quest149/cube/spawning/force_clear_boss";
 
-	public static final String MUSIC_TITLE = "epic:music.horseman";
-	private static final int MUSIC_DURATION = 190; //seconds
+	public static final String MUSIC_TITLE = "epic:music.misanthropic_circuitry";
+	private static final int MUSIC_DURATION = 233; //seconds
 
 	public final Location mSpawnLoc;
 	public final Location mEndLoc;

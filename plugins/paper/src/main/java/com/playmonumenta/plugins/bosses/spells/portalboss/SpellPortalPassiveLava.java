@@ -51,7 +51,7 @@ public class SpellPortalPassiveLava extends Spell {
 		//Anticheese
 		for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), Hedera.detectionRange, true)) {
 			if (p.getLocation().getY() < mStartLoc.getY() - 4 && p.isInLava()) {
-				BossUtils.bossDamagePercent(mBoss, p, .3, "Iota's Domain");
+				BossUtils.bossDamagePercent(mBoss, p, .35, "Iota's Domain");
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "PortalLava", new PercentHeal(6 * 20, -0.50));
 				p.sendActionBar(ChatColor.RED + "You have 50% reduced healing for 6s");
 				PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));

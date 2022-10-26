@@ -18,7 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellRisingCircles extends Spell {
 
-	public static final int DAMAGE = 45;
+	public static final double DAMAGE = 0.6;
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
@@ -101,7 +101,7 @@ public class SpellRisingCircles extends Spell {
 
 					for (Player p : PlayerUtils.playersInRange(mStartLoc, outerRadius, true)) {
 						if (!PlayerUtils.playersInRange(mStartLoc, innerRadius, true).contains(p)) {
-							BossUtils.bossDamagePercent(mBoss, p, 0.5, mStartLoc, "Sector Expunge");
+							BossUtils.bossDamagePercent(mBoss, p, DAMAGE, mStartLoc, "Sector Expunge");
 							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "Sector Expunge", new PercentSpeed(2 * 20, -.99, "Rising Circles"));
 							MovementUtils.knockAway(mStartLoc, p, 0, .75f, false);
 						}
