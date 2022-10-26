@@ -636,6 +636,7 @@ public class EntityListener implements Listener {
 
 		/* If a player threw this potion, trigger applicable abilities (potentially cancelling or modifying the event!) */
 		if (source instanceof Player player) {
+			mPlugin.mItemStatManager.onPlayerPotionSplashEvent(mPlugin, player, event);
 			if (!mAbilities.playerSplashPotionEvent(player, affectedEntities, potion, event)) {
 				event.setCancelled(true);
 				return;

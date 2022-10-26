@@ -35,6 +35,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Tempo;
 import com.playmonumenta.plugins.itemstats.infusions.Ardor;
 import com.playmonumenta.plugins.itemstats.infusions.Carapace;
 import com.playmonumenta.plugins.itemstats.infusions.Choler;
+import com.playmonumenta.plugins.itemstats.infusions.Decapitation;
 import com.playmonumenta.plugins.itemstats.infusions.Epoch;
 import com.playmonumenta.plugins.itemstats.infusions.Execution;
 import com.playmonumenta.plugins.itemstats.infusions.Expedite;
@@ -265,6 +266,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			result *= Choler.getDamageDealtMultiplier(getInfusion(InfusionType.CHOLER));
 			result *= Execution.getDamageDealtMultiplier(getInfusion(InfusionType.EXECUTION));
 			result *= Vengeful.getDamageDealtMultiplier(getInfusion(InfusionType.VENGEFUL));
+			result *= Decapitation.getDamageDealtMultiplier(getInfusion(InfusionType.DECAPITATION));
 
 			return result;
 		}

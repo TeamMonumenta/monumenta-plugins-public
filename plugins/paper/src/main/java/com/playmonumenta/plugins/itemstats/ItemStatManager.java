@@ -59,6 +59,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -636,6 +637,14 @@ public class ItemStatManager implements Listener {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onConsume(plugin, player, entry.getValue(), event);
+			}
+		}
+	}
+
+	public void onPlayerPotionSplashEvent(Plugin plugin, Player player, PotionSplashEvent event) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onPlayerPotionSplash(plugin, player, entry.getValue(), event);
 			}
 		}
 	}

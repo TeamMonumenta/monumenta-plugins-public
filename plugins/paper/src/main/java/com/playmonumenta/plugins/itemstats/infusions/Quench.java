@@ -1,17 +1,15 @@
 package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
+import org.bukkit.event.entity.PotionSplashEvent;
 
 public class Quench implements Infusion {
 
-	private static final double DMG_BONUS = 0.01;
+	private static final double DURATION_BONUS_PER_LVL = 0.02;
 
 	@Override
 	public String getName() {
@@ -24,20 +22,14 @@ public class Quench implements Infusion {
 	}
 
 	@Override
-	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (hasNonInfPotionEff(player)) {
-			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-			event.setDamage(event.getDamage() * (1 + (modifiedLevel * DMG_BONUS)));
-		}
+	public void onPlayerPotionSplash(Plugin plugin, Player player, double value, PotionSplashEvent event) {
+		double distance = Math.min(player.getLocation().distance(event.getEntity().getLocation()), player.getEyeLocation().distance(event.getEntity().getLocation()));
+		distance = Math.min(Math.max(-0.1 * distance + 1, 0), 1);
+		ItemStatUtils.changeEffectsDurationSplash(player, event.getPotion().getItem(), distance * getDurationScaling(plugin, player));
 	}
 
-	public boolean hasNonInfPotionEff(Player player) {
-		for (PotionEffect effect : player.getActivePotionEffects()) {
-			if (effect.getDuration() < 80000) {
-				return true;
-			}
-		}
-		return false;
+	public static double getDurationScaling(Plugin plugin, Player player) {
+		int level = plugin.mItemStatManager.getInfusionLevel(player, InfusionType.QUENCH);
+		return 1 + DURATION_BONUS_PER_LVL * level;
 	}
-
 }

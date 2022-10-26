@@ -82,6 +82,8 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		mDelveMatsMap.put(DelveInfusionSelection.SOOTHING, "Sorceress' Staves");
 		mDelveMatsMap.put(DelveInfusionSelection.QUENCH, "Fenian Flowers");
 		mDelveMatsMap.put(DelveInfusionSelection.GRACE, "Iridium Catalysts");
+		mDelveMatsMap.put(DelveInfusionSelection.GALVANIC, "Corrupted Circuit");
+		mDelveMatsMap.put(DelveInfusionSelection.DECAPITATION, "Shattered Mask");
 
 		//Load all the panels for delves
 		//mDelvePanelList
@@ -295,7 +297,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack woodItem = new ItemStack(Material.DARK_OAK_WOOD);
 		ItemMeta woodMeta = woodItem.getItemMeta();
 		woodMeta.displayName(Component.text("Quench", TextColor.fromCSSHexString("#4C8F4D")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(woodMeta, "Gain 1% damage per level when you have a non-infinite vanilla potion effect active.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(woodMeta, "Increase duration of consumables by 2.5% per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		woodItem.setItemMeta(woodMeta);
 		mDelvePanelList.put(DelveInfusionSelection.QUENCH, woodItem);
 
@@ -306,6 +308,22 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		splitLoreLine(keepMeta, "Gain 1.5% attack speed per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		keepItem.setItemMeta(keepMeta);
 		mDelvePanelList.put(DelveInfusionSelection.GRACE, keepItem);
+
+		// Portal
+		ItemStack portalItem = new ItemStack(Material.IRON_BLOCK);
+		ItemMeta portalMeta = portalItem.getItemMeta();
+		portalMeta.displayName(Component.text("Galvanic", TextColor.fromCSSHexString("#DBDBD7")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		splitLoreLine(portalMeta, "Gain a 1% chance per level to stun a mob for 2 seconds (0.5 seconds for elites) when dealing non-ability melee or projectile damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		portalItem.setItemMeta(portalMeta);
+		mDelvePanelList.put(DelveInfusionSelection.GALVANIC, portalItem);
+
+		// Ruin
+		ItemStack ruinItem = new ItemStack(Material.WITHER_SKELETON_SKULL);
+		ItemMeta ruinMeta = ruinItem.getItemMeta();
+		ruinMeta.displayName(Component.text("Decapitation", TextColor.fromCSSHexString("#86A5C4")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		splitLoreLine(ruinMeta, "Deal 1.25% additional damage per level on a critical melee strike.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		ruinItem.setItemMeta(ruinMeta);
+		mDelvePanelList.put(DelveInfusionSelection.DECAPITATION, ruinItem);
 
 
 		//LOADING mDelveInfusionPanelsMap
@@ -561,7 +579,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.DARK_OAK_WOOD, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Quench level " + (i + 1), TextColor.fromCSSHexString("#4C8F4D")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Gain " + (i + 1) + "% damage when you have a non-infinite vanilla potion effect active.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Increase duration of consumables by " + 2.5 * (i + 1) + "%.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			panel.setItemMeta(meta);
 			forestItems.add(panel);
 		}
@@ -580,14 +598,40 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		}
 		mDelveInfusionPanelsMap.put(DelveInfusionSelection.GRACE, keepItems);
 
+		// Portal
+		List<ItemStack> portalItems = new ArrayList<>();
+
+		for (int i = 0; i < 4; i++) {
+			ItemStack panel = new ItemStack(Material.IRON_BLOCK, 1);
+			ItemMeta meta = panel.getItemMeta();
+			meta.displayName(Component.text("Galvanic level " + (i + 1), TextColor.fromCSSHexString("#DBDBD7")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+			splitLoreLine(meta, "Gain a " + (i + 1) + "% chance per level to stun a mob for 2 seconds (0.5 seconds for elites) when dealing non-ability melee or projectile damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			panel.setItemMeta(meta);
+			portalItems.add(panel);
+		}
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.GALVANIC, portalItems);
+
+		// Keep
+		List<ItemStack> ruinItems = new ArrayList<>();
+
+		for (int i = 0; i < 4; i++) {
+			ItemStack panel = new ItemStack(Material.CRACKED_STONE_BRICKS, 1);
+			ItemMeta meta = panel.getItemMeta();
+			meta.displayName(Component.text("Decapitation level " + (i + 1), TextColor.fromCSSHexString("#86A5C4")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+			splitLoreLine(meta, "Deal " + 1.25 * (i + 1) + "% additional damage per level on a critical melee strike.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			panel.setItemMeta(meta);
+			ruinItems.add(panel);
+		}
+		mDelveInfusionPanelsMap.put(DelveInfusionSelection.DECAPITATION, ruinItems);
+
 		//INVALIDS ITEM.
 		//placeholder when an item can't be infused.
 
 		ItemStack invalidItem = new ItemStack(Material.ARMOR_STAND, 1);
 		ItemMeta meta = invalidItem.getItemMeta();
 		meta.displayName(Component.text("Invalid item", NamedTextColor.GRAY)
-				.decoration(TextDecoration.ITALIC, false)
-				.decoration(TextDecoration.BOLD, true));
+			.decoration(TextDecoration.ITALIC, false)
+			.decoration(TextDecoration.BOLD, true));
 
 		List<Component> itemLore = new ArrayList<Component>();
 		itemLore.add(Component.text("Your helmet can't be infused.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
@@ -727,11 +771,13 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		itemPlacements.put(DelveInfusionSelection.NATANT, 25);
 		itemPlacements.put(DelveInfusionSelection.UNDERSTANDING, 26);
 
-		itemPlacements.put(DelveInfusionSelection.REFRESH, 30);
-		itemPlacements.put(DelveInfusionSelection.SOOTHING, 32);
+		itemPlacements.put(DelveInfusionSelection.REFRESH, 29);
+		itemPlacements.put(DelveInfusionSelection.SOOTHING, 30);
+		itemPlacements.put(DelveInfusionSelection.QUENCH, 32);
+		itemPlacements.put(DelveInfusionSelection.GRACE, 33);
 
-		itemPlacements.put(DelveInfusionSelection.QUENCH, 39);
-		itemPlacements.put(DelveInfusionSelection.GRACE, 41);
+		itemPlacements.put(DelveInfusionSelection.GALVANIC, 39);
+		itemPlacements.put(DelveInfusionSelection.DECAPITATION, 41);
 
 		itemPlacements.forEach((infusion, place) -> {
 			if (infusion.isUnlocked(player)) {

@@ -623,12 +623,14 @@ public class ItemStatUtils {
 		AURA(new Aura(), "", true, false, false, true),
 		CARAPACE(new Carapace(), "", true, false, false, true),
 		CHOLER(new Choler(), "", true, false, false, true),
+		DECAPITATION(new Decapitation(), "", true, false, false, true),
 		EMPOWERED(new Empowered(), "", true, false, false, true),
 		ENERGIZE(new Energize(), "", true, false, false, true),
 		EPOCH(new Epoch(), "", true, false, false, true),
 		EXECUTION(new Execution(), "", true, false, false, true),
 		EXPEDITE(new Expedite(), "", true, false, false, true),
 		FOCUS(new Focus(), "", true, false, false, true),
+		GALVANIC(new Galvanic(), "", true, false, false, true),
 		GRACE(new Grace(), "", true, false, false, true),
 		MITOSIS(new Mitosis(), "", true, false, false, true),
 		NATANT(new Natant(), "", true, false, false, true),
@@ -999,11 +1001,15 @@ public class ItemStatUtils {
 			return;
 		}
 
+		double quenchScale = Quench.getDurationScaling(plugin, player);
+
 		for (NBTListCompound effect : effects) {
 			String type = effect.getString(EFFECT_TYPE_KEY);
 			int duration = effect.getInteger(EFFECT_DURATION_KEY);
 			double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
 			String source = effect.getString(EFFECT_SOURCE_KEY);
+
+			int modifiedDuration = (int) (duration * quenchScale);
 
 			EffectType effectType = EffectType.fromType(type);
 			if (effectType != null) {
@@ -1014,7 +1020,7 @@ public class ItemStatUtils {
 						Effect sick = sicks.last();
 						sicknessPenalty = sick.getMagnitude();
 					}
-					EffectType.applyEffect(effectType, player, duration, strength * (1 - sicknessPenalty), source, applySickness);
+					EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), source, applySickness);
 				} else if (effectType == EffectType.INSTANT_HEALTH || effectType == EffectType.VANILLA_HEAL) {
 					double sicknessPenalty = 0;
 					NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "HealingSickness");
@@ -1022,9 +1028,9 @@ public class ItemStatUtils {
 						Effect sick = sicks.last();
 						sicknessPenalty = sick.getMagnitude();
 					}
-					EffectType.applyEffect(effectType, player, duration, strength * (1 - sicknessPenalty), source, applySickness);
+					EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), source, applySickness);
 				} else {
-					EffectType.applyEffect(effectType, player, duration, strength, source, applySickness);
+					EffectType.applyEffect(effectType, player, modifiedDuration, strength, source, applySickness);
 				}
 			}
 		}

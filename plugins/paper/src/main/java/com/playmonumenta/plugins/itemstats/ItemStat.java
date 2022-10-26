@@ -14,6 +14,7 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
@@ -280,12 +281,25 @@ public interface ItemStat {
 
 	/**
 	 * Called when a player riptides (hopefully???)
+	 *
 	 * @param plugin monumenta plugin
 	 * @param player the Player riptiding
 	 * @param value  the value of ItemStat possessed by the Player
 	 * @param event  the associated PlayerRiptdieEvent
 	 */
 	default void onRiptide(Plugin plugin, Player player, double value, PlayerRiptideEvent event) {
+
+	}
+
+	/**
+	 * Called when a player is splashed by a potion
+	 *
+	 * @param plugin monumenta plugin
+	 * @param player the Player being splashed
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated PotionSplashEvent
+	 */
+	default void onPlayerPotionSplash(Plugin plugin, Player player, double value, PotionSplashEvent event) {
 
 	}
 }

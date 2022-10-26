@@ -57,6 +57,8 @@ public class DelveInfusionUtils {
 		SOOTHING("soothing", "Soothing", NamespacedKeyUtils.fromString("epic:r3/items/currency/sorceress_stave"), "Blue"),
 		QUENCH("quench", "Quench", NamespacedKeyUtils.fromString("epic:r3/items/currency/fenian_flower"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
 		GRACE("grace", "Grace", NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
+		GALVANIC("galvanic", "Galvanic", NamespacedKeyUtils.fromString("epic:r3/items/currency/corrupted_circuit"), "Portal"),
+		DECAPITATION("decapitation", "Decapitation", NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
 
 		REFUND("refund", "refund", null, null);
 
