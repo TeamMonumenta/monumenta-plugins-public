@@ -31,6 +31,10 @@ public class PumpkinPieOverride extends BaseOverride {
 			return true;
 		}
 
+		if (!player.hasPermission("monumenta.command.summontrickycreeper")) {
+			return true;
+		}
+
 		// TODO: Clean this up once the boss plugin and main plugin are merged
 		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "bossfight " + clickedEntity.getUniqueId().toString() + " boss_halloween_creeper");
 
