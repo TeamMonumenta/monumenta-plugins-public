@@ -31,6 +31,10 @@ public class MidnightToll extends Spell {
 		this.mRange = range;
 		this.mSpawnLoc = spawnLoc;
 		this.mDamageCastTime = damageCastTime;
+		if (mDamage >= 2000) {
+			this.mChargeDamage = new ChargeUpManager(mBoss, mDamageCastTime, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + ABILITY_NAME + "(Enrage)",
+				BarColor.YELLOW, BarStyle.SOLID, mRange);
+		}
 		this.mChargeDamage = new ChargeUpManager(mBoss, mDamageCastTime, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + ABILITY_NAME,
 			BarColor.YELLOW, BarStyle.SOLID, mRange);
 	}
@@ -42,6 +46,11 @@ public class MidnightToll extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
+				if (mChargeDamage.getTime() % 5 == 0) {
+					PlayerUtils.playersInRange(mSpawnLoc, mRange, true).forEach(p -> {
+						p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 5f, 2.0f);
+					});
+				}
 				if (mChargeDamage.nextTick()) {
 					new PPExplosion(Particle.SOUL_FIRE_FLAME, mBoss.getLocation())
 						.speed(1)
@@ -50,7 +59,8 @@ public class MidnightToll extends Spell {
 						.spawnAsBoss();
 					PlayerUtils.playersInRange(mSpawnLoc, mRange, true).forEach(p -> {
 						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, mDamage, null, false, true, ABILITY_NAME);
-						p.playSound(p.getLocation(), Sound.BLOCK_BELL_USE, 2f, 0.0f);
+						p.playSound(p.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 2f, 0.0f);
+						p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2f, 2f);
 					});
 					this.cancel();
 				}

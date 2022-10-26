@@ -31,14 +31,14 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class SandsOfTime extends Spell {
-	private static final int BELL_TIME = 30;
+	private static final int BELL_TIME = 60;
 	private static final double RADIUS = 21;
 	private static final double HEIGHT = 4;
-	private static final double DAMAGE = 180;
+	private double mDamage = 180;
 	private static final int BLUE_ROOT = 4 * 20;
 	private static final double DIST = 25;
 	private static final int SPREAD = 4;
-	private static final int BLUE_DELAY = 3 * 20;
+	private static final int BLUE_DELAY = 4 * 20;
 	private static final String ROOT_EFFECT = "SandsOfTimePercentSpeedEffect";
 	private static final String RED_TEAM = "SandsOfTimeRed";
 	private static final String BLUE_TEAM = "SandsOfTimeBlue";
@@ -52,11 +52,11 @@ public class SandsOfTime extends Spell {
 	private final Team mRedTeam;
 	private final Team mBlueTeam;
 
-	public SandsOfTime(LivingEntity boss, Location center, Team team, int cooldownTicks) {
+	public SandsOfTime(LivingEntity boss, Location center, Team team, int cooldownTicks, int damage) {
 		mBoss = boss;
 		mCenter = center;
 		mCooldownTicks = cooldownTicks;
-
+		mDamage = damage;
 		mNormalTeam = team;
 		mRedTeam = ScoreboardUtils.getExistingTeamOrCreate(RED_TEAM, NamedTextColor.DARK_RED);
 		mBlueTeam = ScoreboardUtils.getExistingTeamOrCreate(BLUE_TEAM, NamedTextColor.BLUE);
@@ -215,7 +215,7 @@ public class SandsOfTime extends Spell {
 				// Within 2 blocks or 45 degrees in either direction
 				// 0.7071 = sqrt(2) / 2
 				if (playerLoc.distanceSquared(mCenter) < 2 * 2 || dir.clone().setY(0).normalize().dot(LocationUtils.getDirectionTo(playerLoc, mCenter).setY(0).normalize()) >= 0.7071) {
-					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false, "Sands of Time");
+					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, mDamage, null, false, false, "Sands of Time");
 					if (doRoot) {
 						plugin.mEffectManager.addEffect(player, ROOT_EFFECT, new PercentSpeed(BLUE_ROOT, -1, ROOT_EFFECT));
 					}

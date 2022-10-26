@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -42,6 +43,7 @@ public class MarchingFate extends Spell {
 
 	private final ChargeUpManager mBossBar;
 	private boolean mSentMessage = false;
+	private HashMap<Entity, Location> mSpawnIndex = new HashMap<>();
 	private int mT = 0;
 
 	public MarchingFate(LivingEntity boss, TealSpirit tealSpirit) {
@@ -53,6 +55,11 @@ public class MarchingFate extends Spell {
 		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(-DISTANCE, HEIGHT, 0), LOS));
 		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(0, HEIGHT, DISTANCE), LOS));
 		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(0, HEIGHT, -DISTANCE), LOS));
+
+		for (Entity e : mMarchers) {
+			mSpawnIndex.put(e, e.getLocation());
+		}
+
 		tealSpirit.setMarchers(mMarchers);
 
 		mBossBar = new ChargeUpManager(mCenter, mBoss, 10000, ChatColor.DARK_AQUA + "Marching Fates", BarColor.PURPLE, BarStyle.SOLID, TealSpirit.detectionRange);
@@ -84,9 +91,12 @@ public class MarchingFate extends Spell {
 			Vector step = mCenter.toVector().subtract(loc.toVector()).setY(0).normalize().multiply(stepLength);
 			Location newLoc = loc.clone().add(step).setDirection(step);
 			double distance = newLoc.distance(mCenter);
+			if (marcher.getLocation().distance(mCenter) >= 25) {
+				Location temp = mSpawnIndex.get(marcher);
+				marcher.teleport(temp);
+			}
 			if (distance <= 0.6) {
 				marcher.teleport(mCenter);
-
 				world.spawnParticle(Particle.EXPLOSION_HUGE, mCenter.clone().add(0, 3, 0), 25, 11, 3, 11);
 				world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mCenter, 40, 17, 1, 17);
 				world.spawnParticle(Particle.SOUL_FIRE_FLAME, mCenter.clone().add(0, 3, 0), 40, 17, 3, 17);
@@ -135,7 +145,7 @@ public class MarchingFate extends Spell {
 					if (distance < PROXIMITY) {
 						List<Player> players = PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true);
 						for (Player player : players) {
-							BossUtils.bossDamagePercent(mBoss, player, 0.1, null, "Marching Fates");
+							BossUtils.bossDamagePercent(mBoss, player, 0.5, null, "Crossed Fates");
 						}
 
 						if (!mSentMessage) {

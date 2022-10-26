@@ -31,7 +31,7 @@ public class DoomsdayClock extends Spell {
 	private static final double RED_DAMAGE = 80;
 	private static final double BLACK_DEGREE = 0.15;
 	private static final double RED_DEGREE = 0.15;
-	private static final Color BLACK_COLOR = Color.fromRGB(0, 0, 0);
+	private static final Color BLACK_COLOR = Color.fromRGB(255, 0, 0);
 	private static final Color RED_COLOR = Color.fromRGB(255, 0, 0);
 	private static final int PERIOD = 2;
 	public static final int GROWTH_TIME = 5 * 20;
@@ -62,6 +62,10 @@ public class DoomsdayClock extends Spell {
 			double mRedDeg = 180;
 			@Override
 			public void run() {
+				if (!mBoss.isValid() || mBoss == null || mBoss.isDead()) {
+					mIsActive = false;
+				}
+
 				double length;
 				double wallHeight;
 				List<Player> players = PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true);
@@ -81,12 +85,14 @@ public class DoomsdayClock extends Spell {
 				List<BoundingBox> blackBoxes = createHand(mBlackDeg, length, BLACK_COLOR);
 				//List<BoundingBox> redBoxes = createHand(mRedDeg, length, RED_COLOR);
 
+				/*
 				for (int deg = 0; deg < 360; deg += 15) {
 					Location base = mCenter.clone().add(FastUtils.cosDeg(deg) * RADIUS, 0.5, FastUtils.sinDeg(deg) * RADIUS);
 					for (int y = 0; y < wallHeight; y++) {
 						world.spawnParticle(Particle.CRIT, base.clone().add(0, y, 0), 1, 0.1, 0.1, 0.1, 0);
 					}
 				}
+				 */
 
 				if (mT == 0) {
 					world.playSound(mCenter, Sound.BLOCK_ANVIL_PLACE, 1.5f, 1.4f);

@@ -33,7 +33,7 @@ import org.bukkit.util.Vector;
 
 public class Rewind extends Spell {
 	private static final double RADIUS = 5;
-	public static final int CHARGE_TIME = 12 * 20;
+	public static final int CHARGE_TIME = 10 * 20;
 	public static final int REWIND_TIME = 8 * 20;
 	public static final int COOLDOWN_TIME = 2 * 20;
 	private static final int DAMAGE = 100;

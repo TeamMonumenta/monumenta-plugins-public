@@ -144,9 +144,9 @@ public class ImperialConstruct extends BossAbilityGroup {
 			mSpawner = new MinionSpawn(boss, mCurrentLoc, 20 * 8, 2);
 			mFloor = new SpellFloor(plugin, boss, 5, mCurrentLoc);
 			mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
-			mSpread = new SpellSteelboreSpread(plugin, boss, 11, mSpawnLoc, 35, 0.75);
-			mSpread2 = new SpellSteelboreSpread(plugin, boss, 11, mPhase2Loc, 35, 0.75);
-			mSpreadSmall = new SpellSteelboreSpread(plugin, boss, 6, mPhase3Loc, 35, 0.75);
+			mSpread = new SpellSteelboreSpread(plugin, boss, 11, mSpawnLoc, 40, 0.90);
+			mSpread2 = new SpellSteelboreSpread(plugin, boss, 11, mPhase2Loc, 40, 0.90);
+			mSpreadSmall = new SpellSteelboreSpread(plugin, boss, 6, mPhase3Loc, 40, 0.90);
 
 			SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
 				// Active Spell List
@@ -309,7 +309,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 			super.constructBoss(activeSpellsPhase1, passiveSpells, detectionRange, bossBar);
 		} else if (mEncounterType.equals("Normal")) {
-			mHealth = 22500;
+			mHealth = 19000;
 			// Normal Mode Abilities
 			mParadox = new SpellLingeringParadox(boss, mSpawnLoc, 30);
 			mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc, 30);
@@ -321,9 +321,9 @@ public class ImperialConstruct extends BossAbilityGroup {
 			mSpawner = new MinionSpawn(boss, mCurrentLoc, 20 * 8, 2);
 			mFloor = new SpellFloor(plugin, boss, 5, mCurrentLoc);
 			mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
-			mSpread = new SpellSteelboreSpread(plugin, boss, 8, mSpawnLoc, 35, 0.5);
-			mSpread2 = new SpellSteelboreSpread(plugin, boss, 8, mPhase2Loc, 35, 0.5);
-			mSpreadSmall = new SpellSteelboreSpread(plugin, boss, 4, mPhase3Loc, 35, 0.5);
+			mSpread = new SpellSteelboreSpread(plugin, boss, 6, mSpawnLoc, 40, 0.6);
+			mSpread2 = new SpellSteelboreSpread(plugin, boss, 6, mPhase2Loc, 40, 0.6);
+			mSpreadSmall = new SpellSteelboreSpread(plugin, boss, 3, mPhase3Loc, 40, 0.6);
 
 			SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
 				// Active Spell List
@@ -427,7 +427,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 			});
 
 			events.put(50, (mob) -> {
-				mParadox2.run();
 				mSpread2.run();
 			});
 
@@ -475,12 +474,10 @@ public class ImperialConstruct extends BossAbilityGroup {
 			events.put(10, (mob) -> {
 				mSlice.run();
 				mSpreadSmall.run();
-				mParadox3.run();
 				changePhase(finalStandActiveSpells, passiveSpellsPhase3Part3, null);
 			});
 
 			events.put(5, (mob) -> {
-				mParadox3.run();
 				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct] " + ChatColor.WHITE + "TOMB DEFENSES COMPROMISED: FORGE DEFENSES ACTIVATED\",\"color\":\"purple\"}]");
 			});
 			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);

@@ -49,7 +49,7 @@ public class SpellCrash extends Spell {
 							for (int y = -6; y <= 10; y++) {
 								tempLoc.set(mCurrentLoc.getX() + x, mCurrentLoc.getY() + y, mCurrentLoc.getZ() + z);
 								Material mat = tempLoc.getBlock().getType();
-								if (mat == Material.COBBLESTONE || mat == Material.BLACKSTONE || mat == Material.POLISHED_BLACKSTONE_BRICKS || mat == Material.CRYING_OBSIDIAN || mat == Material.TUFF) {
+								if (mat == Material.COBBLESTONE || mat == Material.BLACKSTONE || mat == Material.POLISHED_BLACKSTONE_BRICKS || mat == Material.CRYING_OBSIDIAN || mat == Material.TUFF || mat == Material.BEDROCK) {
 									tempLoc.getBlock().setType(Material.AIR);
 								}
 							}

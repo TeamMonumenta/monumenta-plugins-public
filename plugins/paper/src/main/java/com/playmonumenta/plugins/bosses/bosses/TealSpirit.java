@@ -154,7 +154,7 @@ public class TealSpirit extends BossAbilityGroup {
 
 			SpellManager activeSpells = new SpellManager(Arrays.asList(
 				//new ClockworkAssassination(plugin, boss),
-				new SandsOfTime(mBoss, mSpawnLoc, team, 12 * 20),
+				new SandsOfTime(mBoss, mSpawnLoc, team, 12 * 20, 180),
 				//new Rewind(mBoss, mSpawnLoc),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
@@ -165,18 +165,6 @@ public class TealSpirit extends BossAbilityGroup {
 
 			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
 				new Rewind(mBoss, mSpawnLoc)
-			));
-
-			SpellManager activeRewriteHistoryPhase = new SpellManager(Arrays.asList(
-				rewriteHistory
-			));
-
-			SpellManager activeMidnightTollPhase = new SpellManager(Arrays.asList(
-				midnightToll
-			));
-
-			SpellManager activeFinalMidnightTollPhase = new SpellManager(Arrays.asList(
-				finalMidnightToll
 			));
 
 			SpellManager finalStandActives = new SpellManager(Arrays.asList(
@@ -258,7 +246,7 @@ public class TealSpirit extends BossAbilityGroup {
 				double height = 2;
 				locs.add(mSpawnLoc.clone().add(0, height, 0));
 				for (Location loc : locs) {
-					LibraryOfSoulsIntegration.summon(loc, "EchoOfOblivion");
+					LibraryOfSoulsIntegration.summon(loc, "EchoesOfOblivion");
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 1.2f);
 					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
 					world.spawnParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1);
@@ -292,16 +280,15 @@ public class TealSpirit extends BossAbilityGroup {
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 					changePhase(finalStandActives, finalStandPassive, null);
 				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
-
 				mDoomsdayClock.run();
 			});
 
 			events.put(25, mBoss -> {
-				mMarchingFates.removeMarchers();
 				rewriteHistory.run();
 			});
 
 			events.put(20, mBoss -> {
+				mMarchingFates.removeMarchers();
 				midnightToll.run();
 			});
 
@@ -311,6 +298,149 @@ public class TealSpirit extends BossAbilityGroup {
 
 			events.put(10, mBoss -> {
 				finalMidnightToll.run();
+			});
+
+			events.put(1, mBoss -> {
+				mDoomsdayClock.disableClock();
+			});
+
+			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+			constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 20 * 10);
+		} else if (mEncounterType.equals("Normal")) {
+			mHealth = 18000;
+
+			mDoomsdayClock = new DoomsdayClock(mBoss, mSpawnLoc, 20 * 25);
+			MarchingFate mMarchingFates = new MarchingFate(mBoss, this);
+
+			SpellManager activeSpells = new SpellManager(Arrays.asList(
+				//new ClockworkAssassination(plugin, boss),
+				new SandsOfTime(mBoss, mSpawnLoc, team, 12 * 20, 80),
+				//new Rewind(mBoss, mSpawnLoc),
+				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
+				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
+				new SundialSlash(mBoss, 7 * 20),
+				new SuspendedBallistae(mBoss, mPlugin, 25, 4, 50,
+					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
+			));
+
+			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
+				new Rewind(mBoss, mSpawnLoc)
+			));
+
+			SpellManager finalStandActives = new SpellManager(Arrays.asList(
+				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
+				new SundialSlash(mBoss, 7 * 20),
+				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
+				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 50,
+					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
+			));
+
+			List<Spell> passiveSpells = Arrays.asList(
+				mMarchingFates,
+				//new Rewind(mBoss, mSpawnLoc),
+				new TealSpiritSummon(mSpawnLoc, 30 * 20),
+				new SpellBlockBreak(mBoss),
+				new SpellShieldStun(10 * 20),
+				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 40),
+				new TealAntiCheat(boss, 20, spawnLoc)
+			);
+
+			List<Spell> finalStandPassive = Arrays.asList(
+				new TealSpiritSummon(mSpawnLoc, 30 * 20),
+				new SpellBlockBreak(mBoss),
+				new SpellShieldStun(10 * 20),
+				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 40),
+				new TealAntiCheat(boss, 20, spawnLoc)
+			);
+
+			PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "the full wrath of time itself will be upon you!"));
+
+			Map<Integer, BossBarManager.BossHealthAction> events = new HashMap<>();
+
+			events.put(90, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(80, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(75, mBoss -> {
+				mDoomsdayClock.run();
+			});
+
+			events.put(70, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(60, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(55, mBoss -> {
+				mDoomsdayClock.disableClock();
+			});
+
+			events.put(50, mBoss -> {
+				List<Location> locs = new ArrayList<>();
+				double height = 2;
+				locs.add(mSpawnLoc.clone().add(0, height, 0));
+				for (Location loc : locs) {
+					LibraryOfSoulsIntegration.summon(loc, "EchoesOfOblivion");
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 1.2f);
+					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
+					world.spawnParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1);
+					world.spawnParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1);
+				}
+				PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "i call forth the echoes radiating from the edges of oblivion itself. rise, emperor!"));
+			});
+
+			events.put(40, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(45, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(activeSpells, passiveSpells, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+			});
+
+			events.put(30, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					changePhase(finalStandActives, finalStandPassive, null);
+				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
+				mDoomsdayClock.run();
 			});
 
 			events.put(1, mBoss -> {
@@ -356,7 +486,6 @@ public class TealSpirit extends BossAbilityGroup {
 		if (mDoomsdayClock != null) {
 			mDoomsdayClock.disableClock();
 		}
-
 	}
 
 	public boolean isInterspellCooldown() {
