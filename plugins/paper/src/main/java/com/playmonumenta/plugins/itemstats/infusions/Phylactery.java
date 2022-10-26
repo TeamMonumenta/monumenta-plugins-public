@@ -29,7 +29,7 @@ public class Phylactery implements Infusion {
 	public static final String GRAVE_XP_SCOREBOARD = "PhylacteryXP";
 
 	private static final HashMap<UUID, HashMap<PotionManager.PotionID, List<PotionUtils.PotionInfo>>> POTION_EFFECTS_MAP = new HashMap<>();
-	private static final HashMap<UUID, List<EffectPair>> CUSTOM_EFFECTS_MAP = new HashMap<>();
+	private static final HashMap<UUID, List<EffectManager.EffectPair>> CUSTOM_EFFECTS_MAP = new HashMap<>();
 
 	@Override
 	public String getName() {
@@ -85,19 +85,19 @@ public class Phylactery implements Infusion {
 		POTION_EFFECTS_MAP.put(player.getUniqueId(), infoMap);
 
 		// Store Effects into CUSTOM_EFFECTS_MAP
-		List<Effect> effects = plugin.mEffectManager.getAllEffects(player);
+		List<EffectManager.EffectPair> effectPairs = plugin.mEffectManager.getAllEffectPairs(player);
 
-		if (effects != null) {
-			List<EffectPair> resultEffects = new ArrayList<>();
-			for (Effect effect : effects) {
+		if (effectPairs != null) {
+			List<EffectManager.EffectPair> resultEffects = new ArrayList<>();
+			for (EffectManager.EffectPair pair : effectPairs) {
+				Effect effect = pair.mEffect;
 				if (effect.isBuff()) {
 					try {
-						String source = plugin.mEffectManager.getSource(player, effect);
 						JsonObject effectObject = effect.serialize();
 						Effect newEffect = EffectManager.getEffectFromJson(effectObject, plugin);
 						if (newEffect != null) {
 							newEffect.setDuration((int) (effect.getDuration() * value * DURATION_KEPT));
-							resultEffects.add(new EffectPair(source, newEffect));
+							resultEffects.add(new EffectManager.EffectPair(pair.mSource, newEffect));
 						}
 					} catch (Exception e) {
 						// cry
@@ -131,10 +131,10 @@ public class Phylactery implements Infusion {
 			}, 1);
 		}
 
-		List<EffectPair> customEffects = CUSTOM_EFFECTS_MAP.remove(player.getUniqueId());
+		List<EffectManager.EffectPair> customEffects = CUSTOM_EFFECTS_MAP.remove(player.getUniqueId());
 		if (customEffects != null) {
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
-				for (EffectPair pair : customEffects) {
+				for (EffectManager.EffectPair pair : customEffects) {
 					String source = pair.mSource;
 					Effect effect = pair.mEffect;
 
@@ -144,16 +144,6 @@ public class Phylactery implements Infusion {
 					}
 				}
 			}, 1);
-		}
-	}
-
-	public static class EffectPair {
-		public final String mSource;
-		public final Effect mEffect;
-
-		public EffectPair(String source, Effect effect) {
-			mSource = source;
-			mEffect = effect;
 		}
 	}
 }

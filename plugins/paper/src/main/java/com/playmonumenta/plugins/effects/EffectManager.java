@@ -146,11 +146,12 @@ public final class EffectManager implements Listener {
 		}
 
 		// Gets ALL effects, including non-active, hidden ones.
-		public List<Effect> getAllEffects() {
-			List<Effect> effects = new ArrayList<>();
+		public List<EffectPair> getAllEffectPairs() {
+			List<EffectPair> effects = new ArrayList<>();
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
-				for (NavigableSet<Effect> eff : priorityEffects.values()) {
-					effects.addAll(eff);
+				for (Map.Entry<String, NavigableSet<Effect>> entry : priorityEffects.entrySet()) {
+					String source = entry.getKey();
+					entry.getValue().forEach(effect -> effects.add(new EffectPair(source, effect)));
 				}
 			}
 			return effects;
@@ -235,6 +236,17 @@ public final class EffectManager implements Listener {
 				ret.add(priorityEntries.getKey().name(), mid);
 			}
 			return ret;
+		}
+	}
+
+	// Used for phylactery
+	public static class EffectPair {
+		public final String mSource;
+		public final Effect mEffect;
+
+		public EffectPair(String source, Effect effect) {
+			mSource = source;
+			mEffect = effect;
 		}
 	}
 
@@ -513,10 +525,21 @@ public final class EffectManager implements Listener {
 
 	// Gets ALL Effects of entity, including hidden non-active ones.
 	// I.E. The effects with lesser magnitude.
-	public @Nullable List<Effect> getAllEffects(Entity entity) {
+	public @Nullable List<EffectPair> getAllEffectPairs(Entity entity) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
-			return effects.getAllEffects();
+			return effects.getAllEffectPairs();
+		} else {
+			return null;
+		}
+	}
+
+	public @Nullable List<Effect> getAllEffects(Entity entity) {
+		List<EffectPair> effectPairs = getAllEffectPairs(entity);
+		if (effectPairs != null) {
+			List<Effect> effects = new ArrayList<>();
+			effectPairs.forEach(pair -> effects.add(pair.mEffect));
+			return effects;
 		} else {
 			return null;
 		}
