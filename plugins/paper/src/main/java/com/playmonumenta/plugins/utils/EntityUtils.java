@@ -1055,7 +1055,7 @@ public class EntityUtils {
 	}
 
 	public static void applyStun(Plugin plugin, int ticks, LivingEntity mob) {
-		if (isBoss(mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag)) {
+		if (isBoss(mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag) || !mob.hasAI()) {
 			return;
 		}
 
