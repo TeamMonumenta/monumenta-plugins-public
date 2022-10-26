@@ -647,7 +647,7 @@ public class GalleryGame {
 
 		if (shouldCloseTheGame) {
 			mIsGameEnded = true;
-			for (GalleryPlayer player : mPlayersMap.values()) {
+			for (GalleryPlayer player : new ArrayList<>(mPlayersMap.values())) {
 				if (player.isOnline()) {
 					player.sendMessage(ChatColor.DARK_RED + "The Nightmare has taken you, a fresh canvas begging to be painted.");
 					GalleryUtils.runCommandAsEntity(player.getPlayer(), "function monumenta:dungeons/gallery/enter_lootroom");
