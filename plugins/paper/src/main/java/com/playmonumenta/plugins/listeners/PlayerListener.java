@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.portals.PortalManager;
@@ -105,6 +106,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -191,6 +193,17 @@ public class PlayerListener implements Listener {
 		//TODO: Remove this when custom effects logout handling is better dealt with
 		EntityUtils.applyRecoilDisable(mPlugin, 9999, 99, player);
 
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void playerChannelEvent(PlayerRegisterChannelEvent event) {
+		if (ClientModHandler.CHANNEL_ID.equals(event.getChannel())
+			    && event.getPlayer().isOnline()) {
+			// Check for isOnline() as this event sometimes gets called before the join event,
+			// and updating client mod state causes initialisation of player abilities, which must not happen before login or some abilities break.
+			// Also cannot just remove this, as sometimes the channel is registered after login, so abilities are already instantiated and not sent to the player.
+			Bukkit.getScheduler().runTask(mPlugin, () -> ClientModHandler.updateAbilities(event.getPlayer()));
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
