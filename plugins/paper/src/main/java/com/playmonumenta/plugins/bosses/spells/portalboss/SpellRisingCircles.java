@@ -37,7 +37,7 @@ public class SpellRisingCircles extends Spell {
 		if (FastUtils.RANDOM.nextBoolean()) {
 			cast(0, 10);
 		} else {
-			cast(19, 26);
+			cast(19, 27);
 		}
 	}
 
