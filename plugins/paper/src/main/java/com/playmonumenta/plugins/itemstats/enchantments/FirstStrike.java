@@ -45,12 +45,12 @@ public class FirstStrike implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		DamageType type = event.getType();
-		if (((type == DamageType.MELEE || type == DamageType.MELEE_ENCH || type == DamageType.MELEE_SKILL)
+		if ((type == DamageType.MELEE
 			&& ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand()))
-			|| type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
+			|| type == DamageType.PROJECTILE) {
 			if (plugin.mEffectManager.getEffects(enemy, SOURCE + player.getName()) == null) {
 				double bonus = DAMAGE_PER_LEVEL * level;
-				if (type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
+				if (type == DamageType.PROJECTILE) {
 					bonus *= PROJ_REDUCTION;
 				}
 				double damage = event.getDamage() * (1 + bonus);
