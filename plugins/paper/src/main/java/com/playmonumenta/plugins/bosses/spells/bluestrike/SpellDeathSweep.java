@@ -62,7 +62,6 @@ public class SpellDeathSweep extends Spell {
 
 		}.runTaskLater(mPlugin, cooldownTicks() + 20);
 
-		mBoss.setGlowing(true);
 		mBoss.setAI(false);
 
 		List<Player> targets = EntityUtils.getNearestPlayers(mBoss.getLocation(), 100);
@@ -114,9 +113,6 @@ public class SpellDeathSweep extends Spell {
 				}
 
 				if (mT > mDelay) {
-					if (mBoss.isGlowing()) {
-						mBoss.setGlowing(false);
-					}
 					mBoss.setAI(true);
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 5, 0.7f);
 
