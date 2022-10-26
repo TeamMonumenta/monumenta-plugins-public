@@ -25,7 +25,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class OrinCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
-	private static final int[] INSTANCE_LOCATIONS = {20, 22, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42, 47, 48, 49, 50, 51};
+	private static final int[] INSTANCE_UPTO3_LOCS = {20, 22, 24};
+	private static final int[] INSTANCE_UPTO9_LOCS = {20, 22, 24, 29, 31, 33, 38, 20, 42};
+	private static final int[] INSTANCE_UPTO20_LOCS = {20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42, 47, 48, 49, 50, 51};
+	private static final int[] INSTANCE_UPTO28_LOCS = {19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 46, 47, 48, 49, 50, 51, 52};
 
 	public static class TeleportEntry {
 		int mPage;
@@ -174,10 +177,12 @@ public class OrinCustomInventory extends CustomInventory {
 
 	private int mCurrentPage;
 	private final String mCurrentShard = ServerProperties.getShardName();
+	private final boolean mBackButtonEnabled;
 
 	public OrinCustomInventory(Player player, int page) {
 		super(player, 54, "Teleportation Choices");
 		if (page == -1) {
+			mBackButtonEnabled = true;
 			if (mCurrentShard.contains("valley")) {
 				mCurrentPage = 1;
 			} else if (mCurrentShard.contains("isles")) {
@@ -190,6 +195,7 @@ public class OrinCustomInventory extends CustomInventory {
 				mCurrentPage = 5;
 			}
 		} else {
+			mBackButtonEnabled = false;
 			mCurrentPage = page;
 		}
 
@@ -323,6 +329,9 @@ public class OrinCustomInventory extends CustomInventory {
 		int commonPage = (int) Math.floor(mCurrentPage / 10.0) * 10;
 		for (TeleportEntry item : ORIN_ITEMS) {
 			if (item.mPage == commonPage) {
+				if (item.mSlot == 0 && !mBackButtonEnabled) {
+					continue;
+				}
 				if (item.mScoreboard == null || ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired) {
 					mInventory.setItem(item.mSlot, createCustomItem(item));
 				}
@@ -372,12 +381,21 @@ public class OrinCustomInventory extends CustomInventory {
 			itemType = Material.DARK_OAK_SAPLING;
 			page = 13;
 		}
+		int[] instanceLocations;
+
+		switch (results.size()) {
+			case 0, 1, 2, 3 -> instanceLocations = INSTANCE_UPTO3_LOCS;
+			case 4, 5, 6, 7, 8, 9 -> instanceLocations = INSTANCE_UPTO9_LOCS;
+			case 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 -> instanceLocations = INSTANCE_UPTO20_LOCS;
+			default -> instanceLocations = INSTANCE_UPTO28_LOCS;
+		}
+
 		ArrayList<String> resultList = new ArrayList<>(results);
 		Collections.sort(resultList);
 		for (String shard : resultList) {
 			String shardName = shard.substring(0, 1).toUpperCase() + shard.substring(1);
-			if (index <= INSTANCE_LOCATIONS.length) {
-				INSTANCE_ITEMS.add(new TeleportEntry(page, INSTANCE_LOCATIONS[index++], shardName, "Click to teleport!", itemType, null, 0, "transferserver " + shard));
+			if (index <= instanceLocations.length) {
+				INSTANCE_ITEMS.add(new TeleportEntry(page, instanceLocations[index++], shardName, "Click to teleport!", itemType, null, 0, "transferserver " + shard));
 			}
 		}
 

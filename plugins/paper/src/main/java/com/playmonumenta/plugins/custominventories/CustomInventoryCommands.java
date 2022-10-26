@@ -48,6 +48,20 @@ public class CustomInventoryCommands {
 			})
 			.register();
 
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new IntegerArgument("region #"));
+		new CommandAPICommand("openinstancebot")
+			.withPermission("monumenta.command.openinstancebot")
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+
+				new OrinCustomInventory(player, (10 + (int) args[1])).openInventory(player, plugin);
+			})
+			.register();
+
+
 		new CommandAPICommand("openpeb")
 			.withPermission("monumenta.command.openpeb")
 			.executesPlayer((player, args) -> {
@@ -196,7 +210,7 @@ public class CustomInventoryCommands {
 			})
 			.register();
 
-		List<Argument> arguments = new ArrayList<>();
+		arguments = new ArrayList<>();
 		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
 		arguments.add(new IntegerArgument("region #"));
 		arguments.add(new IntegerArgument("level"));
