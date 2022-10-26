@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -59,8 +60,12 @@ public class SteelStallion extends DepthsAbility {
 		}
 
 		if (mHorse != null) {
-			mHorse.setHealth(Math.max(0, mHorse.getHealth() - event.getFinalDamage(false)));
-			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_HURT, 0.8f, 1.0f);
+			PercentDamageReceived effect = mPlugin.mEffectManager.getActiveEffect(mPlayer, PercentDamageReceived.class);
+			if (effect == null || effect.isDebuff() || (effect.isBuff() && effect.getMagnitude() < 1.0)) {
+				// Only hurt horse if the player doesn't have +100% resistance
+				mHorse.setHealth(Math.max(0, mHorse.getHealth() - event.getFinalDamage(false)));
+				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_HURT, 0.8f, 1.0f);
+			}
 			event.setDamage(0);
 			event.setCancelled(true);
 			return;
