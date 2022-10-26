@@ -17,7 +17,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -128,8 +127,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 					}
 				}
 			} else if (chosenSlot == SKILL_PAGE_RESET_SPEC_LOC) {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"execute as " + player.getUniqueId() + " run function monumenta:class_selection/reset_spec");
+				AbilityUtils.resetSpec(player, false);
 				for (PlayerClass oneClass : mClasses.mClasses) {
 					if (ScoreboardUtils.getScoreboardValue(player, "Class") == oneClass.mClass) {
 						makeSkillSelectPage(oneClass, player);
@@ -166,8 +164,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 					}
 				}
 			} else if (chosenSlot == SKILL_PAGE_RESET_SPEC_LOC) {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-					"execute as " + player.getUniqueId() + " run function monumenta:class_selection/reset_spec");
+				AbilityUtils.resetSpec(player, false);
 				for (PlayerClass oneClass : mClasses.mClasses) {
 					if (ScoreboardUtils.getScoreboardValue(player, "Class") == oneClass.mClass) {
 						makeSkillSelectPage(oneClass, player);
@@ -384,25 +381,29 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				Ability selectedAbility = oneClass.mAbilities.get(abilityIndex);
 				int currentLevel = ScoreboardUtils.getScoreboardValue(player, selectedAbility.mInfo.mScoreboardId);
 				skillOffset = currentLevel > 2 ? 2 : 0;
+				// actualCurrentLevel is 0, 1, or 2 - the actual level of the ability before any changes
+				int actualCurrentLevel = currentLevel - skillOffset;
 				if (level == 0) {
-					//clear ability data
+					// remove the ability
 					if (currentLevel > 2) {
+						// remove the enhancement
 						int currentEnhancement = ScoreboardUtils.getScoreboardValue(player, R3_ENHANCE_CURRENT);
 						ScoreboardUtils.setScoreboardValue(player, R3_ENHANCE_CURRENT, currentEnhancement + 1);
 					}
 					ScoreboardUtils.setScoreboardValue(player, selectedAbility.mInfo.mScoreboardId, 0);
 					int currentCount = ScoreboardUtils.getScoreboardValue(player, ABILITY_SKILLCOUNT);
-					ScoreboardUtils.setScoreboardValue(player, ABILITY_SKILLCOUNT, currentCount + (currentLevel - skillOffset - level));
-				} else if (level - currentLevel < 0) {
-					//level clicked is lower than level existing
+					ScoreboardUtils.setScoreboardValue(player, ABILITY_SKILLCOUNT, currentCount + (actualCurrentLevel - level));
+				} else if (level < actualCurrentLevel) {
+					//level clicked is lower than level existing - remove levels down to clicked level
 					ScoreboardUtils.setScoreboardValue(player, selectedAbility.mInfo.mScoreboardId, skillOffset + level);
 					int currentCount = ScoreboardUtils.getScoreboardValue(player, ABILITY_SKILLCOUNT);
-					ScoreboardUtils.setScoreboardValue(player, ABILITY_SKILLCOUNT, currentCount + (currentLevel - skillOffset - level));
-				} else if (level - currentLevel > 0) {
-					//level clicked is higher than level existing
+					ScoreboardUtils.setScoreboardValue(player, ABILITY_SKILLCOUNT, currentCount + (actualCurrentLevel - level));
+				} else if (level > actualCurrentLevel) {
+					//level clicked is higher than level existing - upgrade to clicked level if enough points
 					int currentCount = ScoreboardUtils.getScoreboardValue(player, ABILITY_SKILLCOUNT);
-					if (currentCount >= level - currentLevel) {
-						ScoreboardUtils.setScoreboardValue(player, ABILITY_SKILLCOUNT, currentCount - (level - currentLevel));
+					if (currentCount >= level - actualCurrentLevel) {
+						// can upgrade
+						ScoreboardUtils.setScoreboardValue(player, ABILITY_SKILLCOUNT, currentCount - (level - actualCurrentLevel));
 						ScoreboardUtils.setScoreboardValue(player, selectedAbility.mInfo.mScoreboardId, skillOffset + level);
 					} else {
 						player.sendMessage("You don't have enough skill points to select this skill!");
