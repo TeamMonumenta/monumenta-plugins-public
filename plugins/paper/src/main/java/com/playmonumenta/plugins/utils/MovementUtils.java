@@ -113,7 +113,8 @@ public class MovementUtils {
 	}
 
 	public static void pullTowardsByUnit(Entity towardsEntity, LivingEntity target, float speed) {
-		if (EntityUtils.isBoss(target)) {
+		if (EntityUtils.isBoss(target) || !target.getLocation().getWorld().equals(towardsEntity.getLocation().getWorld()) || target.getLocation().distance(towardsEntity.getLocation()) < 0.01) {
+			// Don't pull if target is a boss, in a different world, or if they're already on top of each other
 			return;
 		}
 		Vector dir = target.getLocation().subtract(towardsEntity.getLocation()).toVector().normalize().multiply(-speed);
