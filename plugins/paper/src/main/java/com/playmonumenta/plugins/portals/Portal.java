@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.portals;
 
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
@@ -230,6 +231,10 @@ public class Portal {
 
 	private Vector fromInterPortalDirection(Vector directionIn) {
 		return fromInterPortalComponents(directionIn);
+	}
+
+	public List<Location> occupiedLocations() {
+		return List.of(mLocation1.toBlockLocation(), mLocation2.toBlockLocation(), mBlock1.toBlockLocation(), mBlock2.toBlockLocation());
 	}
 
 	// Travel from this portal to the other portal

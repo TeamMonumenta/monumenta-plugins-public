@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.portals;
 
+import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -35,6 +36,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockFadeEvent;
+import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockGrowEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.inventory.ItemStack;
@@ -164,7 +175,7 @@ public class PortalManager implements Listener {
 		}
 
 		//Check adjacent block
-		Block adjacent = null;
+		Block adjacent;
 
 		if (targetFace != BlockFace.UP && targetFace != BlockFace.DOWN) {
 			adjacent = world.getBlockAt(blockHit.getLocation().add(new Vector(0, 1, 0)));
@@ -176,17 +187,17 @@ public class PortalManager implements Listener {
 				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, -1)));
 			} else if (playerFacing == BlockFace.EAST) {
 				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(1, 0, 0)));
-			} else if (playerFacing == BlockFace.WEST) {
+			} else {
 				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(-1, 0, 0)));
 			}
-		} else if (targetFace == BlockFace.DOWN) {
+		} else {
 			if (playerFacing == BlockFace.NORTH) {
 				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, 1)));
 			} else if (playerFacing == BlockFace.SOUTH) {
 				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(0, 0, -1)));
 			} else if (playerFacing == BlockFace.WEST) {
 				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(1, 0, 0)));
-			} else if (playerFacing == BlockFace.EAST) {
+			} else {
 				adjacent = world.getBlockAt(blockHit.getLocation().clone().add(new Vector(-1, 0, 0)));
 			}
 		}
@@ -325,6 +336,7 @@ public class PortalManager implements Listener {
 		UUID uuid2 = map2.getUniqueId();
 
 		//Store portals
+		Map<Long, Set<Portal>> worldPortalsByChunk = mPortalsByChunk.computeIfAbsent(world.getUID(), k -> new HashMap<>());
 		if (portalNum == 1) {
 			portal1 = new Portal(portalNum, uuid1, uuid2, location1, location2, targetFace, blockHit.getLocation(), adjacent.getLocation());
 			portal1.mOwner = player;
@@ -332,8 +344,10 @@ public class PortalManager implements Listener {
 			if (portal2 != null) {
 				portal2.mPair = portal1;
 			}
-			mPortalUuids.add(uuid1);
-			mPortalUuids.add(uuid2);
+			for (Location occupiedLoc : portal1.occupiedLocations()) {
+				long chunkKey = occupiedLoc.getChunk().getChunkKey();
+				worldPortalsByChunk.computeIfAbsent(chunkKey, k -> new HashSet<>()).add(portal1);
+			}
 		} else {
 			portal2 = new Portal(portalNum, uuid1, uuid2, location1, location2, targetFace, blockHit.getLocation(), adjacent.getLocation());
 			portal2.mOwner = player;
@@ -341,22 +355,16 @@ public class PortalManager implements Listener {
 			if (portal1 != null) {
 				portal1.mPair = portal2;
 			}
-			mPortalUuids.add(uuid1);
-			mPortalUuids.add(uuid2);
+			for (Location occupiedLoc : portal2.occupiedLocations()) {
+				long chunkKey = occupiedLoc.getChunk().getChunkKey();
+				worldPortalsByChunk.computeIfAbsent(chunkKey, k -> new HashSet<>()).add(portal2);
+			}
 		}
+		mPortalUuids.add(uuid1);
+		mPortalUuids.add(uuid2);
 
 		mPlayerPortal1.put(player, portal1);
 		mPlayerPortal2.put(player, portal2);
-
-		Map<Long, Set<Portal>> worldPortalsByChunk = mPortalsByChunk.computeIfAbsent(world.getUID(), k -> new HashMap<>());
-		if (portal1 != null) {
-			long chunkKey1 = location1.getChunk().getChunkKey();
-			worldPortalsByChunk.computeIfAbsent(chunkKey1, k -> new HashSet<>()).add(portal1);
-		}
-		if (portal2 != null) {
-			long chunkKey2 = location2.getChunk().getChunkKey();
-			worldPortalsByChunk.computeIfAbsent(chunkKey2, k -> new HashSet<>()).add(portal2);
-		}
 
 		//Activate teleport logic
 		if (portal1 != null && portal2 != null) {
@@ -441,32 +449,17 @@ public class PortalManager implements Listener {
 		if (worldPortalsByChunk == null) {
 			portalLog("   - deletePortal: no worldPortalsByChunk!");
 		} else {
-			long chunkKey1 = Chunk.getChunkKey(loc1);
-			long chunkKey2 = Chunk.getChunkKey(loc2);
-
-			Set<Portal> chunkPortals = worldPortalsByChunk.get(chunkKey1);
-			if (chunkPortals == null) {
-				portalLog("   - deletePortal: no chunkPortals for " + loc1 + "!");
-			} else {
-				if (!chunkPortals.remove(portal)) {
-					portalLog("   - deletePortal: portal " + loc1 + " not in chunkPortals!");
-				}
-				if (chunkPortals.isEmpty()) {
-					worldPortalsByChunk.remove(chunkKey1);
-				}
-			}
-
-			if (chunkKey1 != chunkKey2) {
-				portalLog("   - deletePortal: Note: " + loc1 + " and " + loc2 + " are in different chunks");
-				chunkPortals = worldPortalsByChunk.get(chunkKey2);
+			for (Location occupiedLoc : portal.occupiedLocations()) {
+				long chunkKey = Chunk.getChunkKey(occupiedLoc);
+				Set<Portal> chunkPortals = worldPortalsByChunk.get(chunkKey);
 				if (chunkPortals == null) {
-					portalLog("   - deletePortal: no chunkPortals for " + loc2 + "!");
+					portalLog("   - deletePortal: no chunkPortals for " + occupiedLoc + "!");
 				} else {
 					if (!chunkPortals.remove(portal)) {
-						portalLog("   - deletePortal: portal " + loc2 + " not in chunkPortals!");
+						portalLog("   - deletePortal: portal " + occupiedLoc + " not in chunkPortals!");
 					}
 					if (chunkPortals.isEmpty()) {
-						worldPortalsByChunk.remove(chunkKey2);
+						worldPortalsByChunk.remove(chunkKey);
 					}
 				}
 			}
@@ -549,7 +542,7 @@ public class PortalManager implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entitiesLoadEvent(EntitiesLoadEvent event) {
 		// Remove assumed-unloaded portal maps
-		if (mPortalUuids != null && !mPortalUuids.isEmpty()) {
+		if (mPortalUuids != null) {
 			Chunk chunk = event.getChunk();
 			boolean foundEntity = false;
 			for (Entity entity : chunk.getEntities()) {
@@ -567,6 +560,88 @@ public class PortalManager implements Listener {
 			}
 			if (foundEntity) {
 				portalLog("exit entitiesLoadEvent");
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockBreakEvent(BlockBreakEvent event) {
+		handleBlockEvent(event.getBlock());
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockDestroyEvent(BlockDestroyEvent event) {
+		handleBlockEvent(event.getBlock());
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockDispenseEvent(BlockDispenseEvent event) {
+		handleBlockEvent(event.getBlock());
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockExplodeEvent(BlockExplodeEvent event) {
+		handleBlockEvent(event.getBlock());
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockFadeEvent(BlockFadeEvent event) {
+		handleBlockEvent(event.getBlock());
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockFromToEvent(BlockFromToEvent event) {
+		handleBlockEvent(event.getBlock());
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockGrowEvent(BlockGrowEvent event) {
+		handleBlockEvent(event.getBlock());
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockIgniteEvent(BlockIgniteEvent event) {
+		handleBlockEvent(event.getBlock());
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockPistonExtendEvent(BlockPistonExtendEvent event) {
+		handleBlockEvent(event.getBlock());
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockPistonRetractEvent(BlockPistonRetractEvent event) {
+		handleBlockEvent(event.getBlock());
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockPlaceEvent(BlockPlaceEvent event) {
+		handleBlockEvent(event.getBlock());
+	}
+
+	public void handleBlockEvent(Block block) {
+		// Delete portals affected by block events
+		if (mPortalsByChunk != null) {
+			Location loc = block.getLocation();
+			Chunk chunk = loc.getChunk();
+			UUID worldId = chunk.getWorld().getUID();
+			Map<Long, Set<Portal>> worldPortalsByChunk = mPortalsByChunk.get(worldId);
+			if (worldPortalsByChunk != null) {
+				Set<Portal> liveChunkPortals = worldPortalsByChunk.get(chunk.getChunkKey());
+				if (liveChunkPortals != null && !liveChunkPortals.isEmpty()) {
+					portalLog("Chunk with block change contains portal!");
+					Set<Portal> chunkPortals = new HashSet<>(liveChunkPortals);
+					for (Portal portal : chunkPortals) {
+						if (portal.occupiedLocations().contains(loc)) {
+							Player owner = portal.mOwner;
+							if (owner == null) {
+								deletePortal(portal);
+							} else {
+								clearPortal(owner, portal.mPortalNum);
+							}
+						}
+					}
+				}
 			}
 		}
 	}
