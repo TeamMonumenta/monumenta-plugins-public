@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.ItemCooldown;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -228,6 +229,7 @@ public class WorldshaperOverride {
 				blockPlaced = true;
 				new PartialParticle(Particle.SMOKE_NORMAL, location, 10, 0.15, 0.15, 0.15).spawnAsPlayerActive(player);
 				player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_PLACE, 1f, 0.75f);
+				CoreProtectIntegration.logPlacement(player, location, blockData.getMaterial(), blockData);
 			} else {
 				player.sendMessage(ChatColor.RED + "There were not enough valid blocks to place in the shulker!");
 				break;

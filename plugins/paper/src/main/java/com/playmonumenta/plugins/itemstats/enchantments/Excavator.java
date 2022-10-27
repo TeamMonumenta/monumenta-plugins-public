@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -50,11 +51,7 @@ public class Excavator implements Enchantment {
 			case DOWN:
 				for (int x = -1; x <= 1; x++) {
 					for (int z = -1; z <= 1; z++) {
-						Block relative = block.getRelative(x, 0, z);
-						if (canBreakBlock(relative, player)) {
-							relative.breakNaturally(mainHand, true);
-							ItemUtils.damageItem(mainHand, 1, true);
-						}
+						breakBlock(player, mainHand, block, x, 0, z);
 					}
 				}
 				break;
@@ -62,11 +59,7 @@ public class Excavator implements Enchantment {
 			case EAST:
 				for (int z = -1; z <= 1; z++) {
 					for (int y = -1; y <= 1; y++) {
-						Block relative = block.getRelative(0, y, z);
-						if (canBreakBlock(relative, player)) {
-							relative.breakNaturally(mainHand, true);
-							ItemUtils.damageItem(mainHand, 1, true);
-						}
+						breakBlock(player, mainHand, block, 0, y, z);
 					}
 				}
 				break;
@@ -74,17 +67,22 @@ public class Excavator implements Enchantment {
 			case SOUTH:
 				for (int x = -1; x <= 1; x++) {
 					for (int y = -1; y <= 1; y++) {
-						Block relative = block.getRelative(x, y, 0);
-						if (canBreakBlock(relative, player)) {
-							relative.breakNaturally(mainHand, true);
-							ItemUtils.damageItem(mainHand, 1, true);
-						}
+						breakBlock(player, mainHand, block, x, y, 0);
 					}
 				}
 				break;
 			default:
 				player.sendMessage("Block face was Non-Cartesian.");
 				break;
+		}
+	}
+
+	private void breakBlock(Player player, ItemStack mainHand, Block block, int x, int y, int z) {
+		Block relative = block.getRelative(x, y, z);
+		if (canBreakBlock(relative, player)) {
+			CoreProtectIntegration.logRemoval(player, relative);
+			relative.breakNaturally(mainHand, true);
+			ItemUtils.damageItem(mainHand, 1, true);
 		}
 	}
 
