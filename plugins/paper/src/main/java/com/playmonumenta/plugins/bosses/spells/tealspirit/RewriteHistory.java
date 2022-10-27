@@ -21,7 +21,7 @@ public class RewriteHistory extends Spell {
 	private static final String ABILITY_NAME = "Rewrite History";
 	private int mHealthCastTime;
 	private Plugin mPlugin;
-	private static int mStack = 1;
+	private int mStack = 1;
 	private int mRange;
 	private Location mSpawnLoc;
 	private LivingEntity mBoss;
