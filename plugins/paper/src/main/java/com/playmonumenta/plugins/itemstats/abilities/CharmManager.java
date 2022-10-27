@@ -120,6 +120,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Quake;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
+import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
 import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
 import com.playmonumenta.plugins.itemstats.enchantments.Regicide;
 import com.playmonumenta.plugins.itemstats.enchantments.Retrieval;
@@ -215,6 +216,7 @@ public class CharmManager {
 			RageOfTheKeter.CHARM_COOLDOWN,
 			RageOfTheKeter.CHARM_DAMAGE,
 			RageOfTheKeter.CHARM_SPEED,
+			Recoil.CHARM_VELOCITY,
 			IntoxicatingWarmth.CHARM_COOLDOWN,
 			IntoxicatingWarmth.CHARM_DURATION,
 			IntoxicatingWarmth.CHARM_SATURATION,
