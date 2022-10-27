@@ -34,6 +34,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fox;
@@ -141,6 +142,15 @@ public class HuntingCompanion extends Ability {
 			boolean isInWater = LocationUtils.isLocationInWater(loc);
 			boolean isInLava = loc.getBlock().getType() == Material.LAVA;
 			int foxCount = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_FOXES);
+
+			// anti lag check
+			if (foxCount > 5) {
+				Class<? extends Entity> type = !isInLava ? (!isInWater ? Fox.class : Axolotl.class) : Strider.class;
+				if (loc.getWorld().getNearbyEntitiesByType(type, loc, 50).size() > 10) {
+					return;
+				}
+			}
+
 			String foxName = !isInLava ? (!isInWater ? mCosmetic.getFoxName() : mCosmetic.getAxolotlName()) : mCosmetic.getStriderName();
 			for (int i = 0; i < foxCount; i++) {
 				summon(foxName, damage, playerItemStats, false);
