@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;

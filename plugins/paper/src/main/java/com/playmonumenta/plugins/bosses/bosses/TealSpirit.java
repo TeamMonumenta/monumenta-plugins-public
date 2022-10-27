@@ -49,6 +49,7 @@ public class TealSpirit extends BossAbilityGroup {
 	private List<Entity> mShielders = new ArrayList<>();
 	private String mEncounterType;
 	private DoomsdayClock mDoomsdayClock = null;
+
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
 			return new TealSpirit(plugin, boss, spawnLoc, endLoc);
@@ -75,12 +76,10 @@ public class TealSpirit extends BossAbilityGroup {
 				if (p.getScoreboardTags().contains("SKTQuest")) {
 					mEncounterType = "Story";
 					break;
-				}
-				else if (p.getScoreboardTags().contains("SKTHard")) {
+				} else if (p.getScoreboardTags().contains("SKTHard")) {
 					mEncounterType = "Hard";
 					break;
-				}
-				else {
+				} else {
 					mEncounterType = "Normal";
 					break;
 				}
@@ -144,7 +143,7 @@ public class TealSpirit extends BossAbilityGroup {
 			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 			constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 20 * 10);
 		} else if (mEncounterType.equals("Hard")) {
-			mHealth = 22500;
+			mHealth = 24500;
 
 			RewriteHistory rewriteHistory = new RewriteHistory(mPlugin, mBoss, 20 * 5, 30, mSpawnLoc);
 			MidnightToll midnightToll = new MidnightToll(mPlugin, mBoss, 20 * 5, 40, 40, mSpawnLoc);
@@ -154,23 +153,11 @@ public class TealSpirit extends BossAbilityGroup {
 
 			SpellManager activeSpells = new SpellManager(Arrays.asList(
 				//new ClockworkAssassination(plugin, boss),
-				new SandsOfTime(mBoss, mSpawnLoc, team, 12 * 20, 180),
+				new SandsOfTime(mBoss, mSpawnLoc, team, 18 * 20, 180),
 				//new Rewind(mBoss, mSpawnLoc),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
 				new SundialSlash(mBoss, 7 * 20),
-				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 50,
-					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
-			));
-
-			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
-				new Rewind(mBoss, mSpawnLoc)
-			));
-
-			SpellManager finalStandActives = new SpellManager(Arrays.asList(
-				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
-				new SundialSlash(mBoss, 7 * 20),
-				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
 				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 50,
 					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
 			));
@@ -185,13 +172,10 @@ public class TealSpirit extends BossAbilityGroup {
 				new TealAntiCheat(boss, 20, spawnLoc)
 			);
 
-			List<Spell> finalStandPassive = Arrays.asList(
-				new TealSpiritSummon(mSpawnLoc, 30 * 20),
-				new SpellBlockBreak(mBoss),
-				new SpellShieldStun(10 * 20),
-				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 40),
-				new TealAntiCheat(boss, 20, spawnLoc)
-			);
+			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
+				new Rewind(mBoss, mSpawnLoc, this, activeSpells, passiveSpells)
+			));
+
 
 			PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "the full wrath of time itself will be upon you!"));
 
@@ -201,18 +185,12 @@ public class TealSpirit extends BossAbilityGroup {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
 			events.put(80, mBoss -> {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
 			events.put(75, mBoss -> {
@@ -223,18 +201,12 @@ public class TealSpirit extends BossAbilityGroup {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
 			events.put(60, mBoss -> {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
 			events.put(55, mBoss -> {
@@ -259,27 +231,18 @@ public class TealSpirit extends BossAbilityGroup {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
 			events.put(45, mBoss -> {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
 			events.put(30, mBoss -> {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(finalStandActives, finalStandPassive, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 				mDoomsdayClock.run();
 			});
 
@@ -314,24 +277,12 @@ public class TealSpirit extends BossAbilityGroup {
 
 			SpellManager activeSpells = new SpellManager(Arrays.asList(
 				//new ClockworkAssassination(plugin, boss),
-				new SandsOfTime(mBoss, mSpawnLoc, team, 12 * 20, 80),
+				new SandsOfTime(mBoss, mSpawnLoc, team, 18 * 20, 80),
 				//new Rewind(mBoss, mSpawnLoc),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
 				new SundialSlash(mBoss, 7 * 20),
 				new SuspendedBallistae(mBoss, mPlugin, 25, 4, 50,
-					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
-			));
-
-			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
-				new Rewind(mBoss, mSpawnLoc)
-			));
-
-			SpellManager finalStandActives = new SpellManager(Arrays.asList(
-				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
-				new SundialSlash(mBoss, 7 * 20),
-				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
-				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 50,
 					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
 			));
 
@@ -345,13 +296,9 @@ public class TealSpirit extends BossAbilityGroup {
 				new TealAntiCheat(boss, 20, spawnLoc)
 			);
 
-			List<Spell> finalStandPassive = Arrays.asList(
-				new TealSpiritSummon(mSpawnLoc, 30 * 20),
-				new SpellBlockBreak(mBoss),
-				new SpellShieldStun(10 * 20),
-				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 40),
-				new TealAntiCheat(boss, 20, spawnLoc)
-			);
+			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
+				new Rewind(mBoss, mSpawnLoc, this, activeSpells, passiveSpells)
+			));
 
 			PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "the full wrath of time itself will be upon you!"));
 
@@ -361,18 +308,12 @@ public class TealSpirit extends BossAbilityGroup {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
 			events.put(80, mBoss -> {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
 			events.put(75, mBoss -> {
@@ -383,18 +324,12 @@ public class TealSpirit extends BossAbilityGroup {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
 			events.put(60, mBoss -> {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
 			events.put(55, mBoss -> {
@@ -419,27 +354,18 @@ public class TealSpirit extends BossAbilityGroup {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
 			events.put(45, mBoss -> {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(activeSpells, passiveSpells, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 			});
 
 			events.put(30, mBoss -> {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					changePhase(finalStandActives, finalStandPassive, null);
-				}, Rewind.REWIND_TIME + Rewind.CHARGE_TIME + Rewind.COOLDOWN_TIME);
 				mDoomsdayClock.run();
 			});
 

@@ -48,7 +48,7 @@ public class TealSpiritSummon extends Spell {
 				}
 
 				world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 0.5f, 0.4f);
-				loc.subtract(0, 1, 0);
+				loc.subtract(0, 0.5, 0);
 
 				LoSPool pool = FastUtils.RANDOM.nextDouble() < ELITE_CHANCE ? ELITE_POOL : NORMAL_POOL;
 				Entity e = pool.spawn(loc);

@@ -45,6 +45,7 @@ public class MarchingFate extends Spell {
 	private boolean mSentMessage = false;
 	private HashMap<Entity, Location> mSpawnIndex = new HashMap<>();
 	private int mT = 0;
+	private boolean mHasRun = false;
 
 	public MarchingFate(LivingEntity boss, TealSpirit tealSpirit) {
 		mBoss = boss;
@@ -74,13 +75,13 @@ public class MarchingFate extends Spell {
 		double bossMaxHP = EntityUtils.getMaxHealth(mBoss);
 		double percentHP = currentBossHP / bossMaxHP;
 		if (percentHP <= 0.3) {
-			stepLength = 0.05;
+			stepLength = 0.1;
 		} else if (percentHP <= 0.6) {
-			stepLength = 0.03;
+			stepLength = 0.075;
 		} else if (percentHP <= 0.9) {
-			stepLength = 0.02;
+			stepLength = 0.05;
 		} else if (percentHP <= 1) {
-			stepLength = 0.01;
+			stepLength = 0.025;
 		}
 
 		List<Double> distances = new ArrayList<>();
@@ -95,7 +96,7 @@ public class MarchingFate extends Spell {
 				Location temp = mSpawnIndex.get(marcher);
 				marcher.teleport(temp);
 			}
-			if (distance <= 0.6) {
+			if (distance <= 0.6 && !mHasRun) {
 				marcher.teleport(mCenter);
 				world.spawnParticle(Particle.EXPLOSION_HUGE, mCenter.clone().add(0, 3, 0), 25, 11, 3, 11);
 				world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mCenter, 40, 17, 1, 17);
@@ -118,7 +119,7 @@ public class MarchingFate extends Spell {
 				}
 
 				mTealSpirit.killMarchers();
-
+				mHasRun = true;
 				mBossBar.reset();
 				return;
 			}

@@ -4,10 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.TealSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -26,16 +24,12 @@ import org.bukkit.util.Vector;
 
 public class DoomsdayClock extends Spell {
 	private static final double RADIUS = 25;
-	private static final double WALL_HEIGHT = 10;
 	private static final double BLACK_DAMAGE = 150;
-	private static final double RED_DAMAGE = 80;
 	private static final double BLACK_DEGREE = 0.15;
 	private static final double RED_DEGREE = 0.15;
 	private static final Color BLACK_COLOR = Color.fromRGB(255, 0, 0);
-	private static final Color RED_COLOR = Color.fromRGB(255, 0, 0);
 	private static final int PERIOD = 2;
 	public static final int GROWTH_TIME = 5 * 20;
-	public static final int MAX_TIME = 15 * 20;
 
 	private final LivingEntity mBoss;
 	private final Location mCenter;
@@ -67,19 +61,16 @@ public class DoomsdayClock extends Spell {
 				}
 
 				double length;
-				double wallHeight;
 				List<Player> players = PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true);
 				if (mT < 0) {
 					double ratio = (GROWTH_TIME + mT) / (double) GROWTH_TIME;
 					length = ratio * RADIUS;
-					wallHeight = ratio * WALL_HEIGHT;
 
 					if (mT % 4 == 0) {
 						players.forEach(player -> player.playSound(player.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, 2.0f, (float) (0.1 + ratio * 0.3)));
 					}
 				} else {
 					length = RADIUS;
-					wallHeight = WALL_HEIGHT;
 				}
 
 				List<BoundingBox> blackBoxes = createHand(mBlackDeg, length, BLACK_COLOR);

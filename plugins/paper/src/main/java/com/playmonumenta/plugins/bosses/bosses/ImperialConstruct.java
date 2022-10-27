@@ -321,8 +321,8 @@ public class ImperialConstruct extends BossAbilityGroup {
 			mSpawner = new MinionSpawn(boss, mCurrentLoc, 20 * 8, 2);
 			mFloor = new SpellFloor(plugin, boss, 5, mCurrentLoc);
 			mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
-			mSpread = new SpellSteelboreSpread(plugin, boss, 6, mSpawnLoc, 40, 0.6);
-			mSpread2 = new SpellSteelboreSpread(plugin, boss, 6, mPhase2Loc, 40, 0.6);
+			mSpread = new SpellSteelboreSpread(plugin, boss, 7, mSpawnLoc, 40, 0.6);
+			mSpread2 = new SpellSteelboreSpread(plugin, boss, 7, mPhase2Loc, 40, 0.6);
 			mSpreadSmall = new SpellSteelboreSpread(plugin, boss, 3, mPhase3Loc, 40, 0.6);
 
 			SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(

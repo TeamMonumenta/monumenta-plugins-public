@@ -26,35 +26,25 @@ public class TealFinalStand extends Spell {
 	private LivingEntity mBoss;
 	private int mRange;
 	private int mDamage;
-	private double mPercentHP;
 	private int mHealthReduceInterval;
 	private int mHealthCastTime;
 	private int mDamageInterval;
-	private int mDamageCastTime;
 	private Location mSpawnLoc;
 	private ChargeUpManager mChargeHealth;
-	private ChargeUpManager mChargeDamage;
-	private ChargeUpManager mChargeFinal;
 	private int mT = 0;
 	private int mStack = 1;
 
-	public TealFinalStand(Plugin mPlugin, LivingEntity mBoss, int mRange, int mDamage, double mPercentHP, int mHealthReduceInterval, int healthCastTime, int mDamageInterval, int damageCastTime, Location mSpawnLoc) {
+	public TealFinalStand(Plugin mPlugin, LivingEntity mBoss, int mRange, int mDamage, int mHealthReduceInterval, int healthCastTime, int mDamageInterval, Location mSpawnLoc) {
 		this.mPlugin = mPlugin;
 		this.mBoss = mBoss;
 		this.mRange = mRange;
 		this.mDamage = mDamage;
-		this.mPercentHP = mPercentHP;
 		this.mHealthReduceInterval = mHealthReduceInterval;
 		this.mHealthCastTime = healthCastTime;
 		this.mDamageInterval = mDamageInterval;
-		this.mDamageCastTime = damageCastTime;
 		this.mSpawnLoc = mSpawnLoc;
 
-		this.mChargeDamage = new ChargeUpManager(mBoss, mDamageCastTime, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + "Midnight Toll",
-			BarColor.YELLOW, BarStyle.SOLID, mRange);
 		this.mChargeHealth = new ChargeUpManager(mBoss, mHealthCastTime, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + "Rewrite History",
-			BarColor.YELLOW, BarStyle.SOLID, mRange);
-		this.mChargeFinal = new ChargeUpManager(mBoss, mHealthReduceInterval, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + "Destiny Undone",
 			BarColor.YELLOW, BarStyle.SOLID, mRange);
 	}
 
@@ -70,7 +60,7 @@ public class TealFinalStand extends Spell {
 					if (mChargeHealth.nextTick()) {
 						PlayerUtils.playersInRange(mSpawnLoc, mRange, true).forEach(p -> {
 							EntityUtils.removeAttribute(p, Attribute.GENERIC_MAX_HEALTH, "TealSpirit-" + mBoss.getUniqueId());
-							EntityUtils.addAttribute(p, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier( "TealSpirit-" + mBoss.getUniqueId(), (-10 * mStack) / 100.0, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+							EntityUtils.addAttribute(p, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier("TealSpirit-" + mBoss.getUniqueId(), (-10 * mStack) / 100.0, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 							new PPExplosion(Particle.PORTAL, p.getLocation())
 								.speed(1)
 								.count(120)

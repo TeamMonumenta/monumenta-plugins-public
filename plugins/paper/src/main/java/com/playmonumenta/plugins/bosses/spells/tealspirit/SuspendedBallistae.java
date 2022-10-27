@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 import org.bukkit.*;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -15,8 +16,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.List;
 
 public class SuspendedBallistae extends Spell {
 
@@ -83,7 +82,7 @@ public class SuspendedBallistae extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ARROW_SHOOT, 2.0f, 0.2f);
 		Location shotLoc = mBoss.getEyeLocation();
 		new PPLine(Particle.WAX_OFF, shotLoc, targetLoc)
-			.delta(0.4,0.4,0.4)
+			.delta(0.4, 0.4, 0.4)
 			.countPerMeter(5)
 			.spawnAsBoss();
 		BukkitRunnable runnable = new BukkitRunnable() {
@@ -94,14 +93,14 @@ public class SuspendedBallistae extends Spell {
 					world.playSound(shotLoc, Sound.ENTITY_CAT_HISS, 0.1f, 1.5f);
 				}
 				world.spawnParticle(Particle.WAX_OFF, shotLoc, 5, 0.2, 0.2, 0.2, 0.05);
-				new PPCircle(Particle.SMOKE_LARGE, targetLoc,mRadius)
+				new PPCircle(Particle.SMOKE_LARGE, targetLoc, mRadius)
 					.count(7)
 					.ringMode(true)
 					.spawnAsBoss();
 				if (mT >= mExecutionTime) {
 					world.playSound(targetLoc, Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 2.0f, 0.5f);
 					new PPLine(Particle.WAX_OFF, shotLoc, targetLoc)
-						.delta(0.4,0.4,0.4)
+						.delta(0.4, 0.4, 0.4)
 						.countPerMeter(5)
 						.spawnAsBoss();
 					new PPExplosion(Particle.FLAME, targetLoc)

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -51,6 +52,7 @@ public class TemporalFlux extends Effect {
 			mBossBar.setTitle(ChatColor.BLUE + "Paradox expires in " + (getDuration()/ 20) + " seconds!");
 			if (progress <= 0.01) {
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(entity, "Stasis");
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(entity, VoodooBonds.EFFECT_NAME);
 				PlayerUtils.executeCommandOnNearbyPlayers(entity.getLocation(), 30, "kill " + entity.getName());
 				DamageUtils.damage(null, (LivingEntity) entity, DamageEvent.DamageType.OTHER, 999999999, null, true, false, "Temporal Flux");
 				mBossBar.setVisible(false);

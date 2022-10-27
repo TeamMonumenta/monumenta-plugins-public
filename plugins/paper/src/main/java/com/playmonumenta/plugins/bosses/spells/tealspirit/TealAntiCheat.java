@@ -2,17 +2,15 @@ package com.playmonumenta.plugins.bosses.spells.tealspirit;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class TealAntiCheat extends Spell {
-	private static final double RADIUS = 25;
+	private static final double RADIUS = 26;
 	private static final double HEIGHT_UP = 6;
 	private static final double HEIGHT_DOWN = 3;
 	private static final int RANGE = 50;

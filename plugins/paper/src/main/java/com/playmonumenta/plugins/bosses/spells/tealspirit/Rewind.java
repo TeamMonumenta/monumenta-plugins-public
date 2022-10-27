@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.tealspirit;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.TealSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -33,8 +34,8 @@ import org.bukkit.util.Vector;
 
 public class Rewind extends Spell {
 	private static final double RADIUS = 5;
-	public static final int CHARGE_TIME = 10 * 20;
-	public static final int REWIND_TIME = 8 * 20;
+	public static final int CHARGE_TIME = 6 * 20;
+	public static final int REWIND_TIME = 6 * 20;
 	public static final int COOLDOWN_TIME = 2 * 20;
 	private static final int DAMAGE = 100;
 	private static int mToggle = 0;
@@ -43,10 +44,16 @@ public class Rewind extends Spell {
 	private final Location mCenter;
 	private final ChargeUpManager mWindUp;
 	private final ChargeUpManager mWindDown;
+	private TealSpirit mTeal;
+	private SpellManager mActiveSpells;
+	private List<Spell> mPassiveSpells;
 
-	public Rewind(LivingEntity boss, Location center) {
+	public Rewind(LivingEntity boss, Location center, TealSpirit tealSpirit, SpellManager activeSpells, List<Spell> passiveSpells) {
 		mBoss = boss;
 		mCenter = center;
+		mTeal = tealSpirit;
+		mActiveSpells = activeSpells;
+		mPassiveSpells = passiveSpells;
 		mWindUp = new ChargeUpManager(mBoss, CHARGE_TIME, ChatColor.AQUA + "Winding Up...", BarColor.RED, BarStyle.SOLID, TealSpirit.detectionRange);
 		mWindDown = new ChargeUpManager(mBoss, REWIND_TIME, ChatColor.AQUA + "Turning Back Time...", BarColor.RED, BarStyle.SOLID, TealSpirit.detectionRange);
 	}
@@ -171,6 +178,7 @@ public class Rewind extends Spell {
 									player.playSound(origin, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.8f, 1.5f);
 									world.spawnParticle(Particle.FALLING_OBSIDIAN_TEAR, origin.clone().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.1);
 								}
+								mTeal.changePhase(mActiveSpells, mPassiveSpells, null);
 								this.cancel();
 							}
 

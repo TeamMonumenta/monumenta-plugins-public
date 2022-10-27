@@ -224,10 +224,6 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			return (base + getAttributeAmount(type, Operation.ADD)) * (1 + getAttributeAmount(type, Operation.MULTIPLY) + additionalModifier);
 		}
 
-		private ItemStatUtils.Region getMaximumRegion(boolean mainhand) {
-			return getMaximumRegion(mainhand, ItemStatUtils.Region.VALLEY);
-		}
-
 		private ItemStatUtils.Region getMaximumRegion(boolean mainhand, ItemStatUtils.Region defaultRegion) {
 			return (mainhand ? Stream.of(Equipment.MAINHAND) : Arrays.stream(Equipment.values()).filter(slot -> slot != Equipment.MAINHAND))
 				       .map(slot -> ItemStatUtils.getRegion(getItem(slot)))

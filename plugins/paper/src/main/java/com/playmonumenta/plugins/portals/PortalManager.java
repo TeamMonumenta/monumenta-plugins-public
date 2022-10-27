@@ -106,7 +106,6 @@ public class PortalManager implements Listener {
 		dir = dir.multiply(.5);
 		box.shift(dir);
 		World world = player.getWorld();
-		String worldName = world.getName();
 
 		Block blockHit = null;
 		if (portalNum == 1) {

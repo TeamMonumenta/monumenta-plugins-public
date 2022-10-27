@@ -192,7 +192,7 @@ public class PairedUnnaturalForce extends Spell {
 								}
 								for (Player p : PlayerUtils.playersInRange(mSpawnLoc, mMaxRad2, true)) {
 									if (!PlayerUtils.playersInRange(mSpawnLoc, mMinRad2, true).contains(p)) {
-										DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, "Unnatrual Force");
+										DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, "Unnatural Force");
 										MovementUtils.knockAway(mSpawnLoc, p, 0, .75f, false);
 									}
 								}
