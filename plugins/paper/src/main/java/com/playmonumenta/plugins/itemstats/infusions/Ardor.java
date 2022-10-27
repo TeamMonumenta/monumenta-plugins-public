@@ -16,7 +16,7 @@ public class Ardor implements Infusion {
 
 	private static final int DURATION = 4 * 20;
 	private static final int AIR_INCREASE = 15; //Each breath bubble counts as 30
-	private static final double PERCENT_SPEED_PER_LEVEL = 0.0375;
+	private static final double PERCENT_SPEED_PER_LEVEL = 0.03;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "ArdorPercentSpeedEffect";
 
 	@Override

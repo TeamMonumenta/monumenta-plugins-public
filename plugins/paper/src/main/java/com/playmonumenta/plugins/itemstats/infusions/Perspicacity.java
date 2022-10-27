@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public class Perspicacity implements Infusion {
 
-	public static final double DAMAGE_MOD_PER_LEVEL = 0.01;
+	public static final double DAMAGE_MOD_PER_LEVEL = 0.0075;
 
 	@Override
 	public String getName() {

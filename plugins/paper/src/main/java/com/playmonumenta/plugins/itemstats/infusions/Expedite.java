@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 public class Expedite implements Infusion {
 
 	private static final int DURATION = 5 * 20;
-	private static final double PERCENT_SPEED_PER_LEVEL = 0.0125;
+	private static final double PERCENT_SPEED_PER_LEVEL = 0.01;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "ExpeditePercentSpeedEffect";
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "ExpediteTick";
 	public static final int MAX_STACKS = 3;

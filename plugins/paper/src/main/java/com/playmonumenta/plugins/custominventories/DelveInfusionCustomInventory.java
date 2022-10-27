@@ -148,7 +148,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack bonusItem = new ItemStack(Material.MOSSY_COBBLESTONE);
 		ItemMeta bonusMeta = bonusItem.getItemMeta();
 		bonusMeta.displayName(Component.text("Unyielding", TextColor.fromCSSHexString("#006400")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(bonusMeta, "Gain 0.4 Knockback Resistance per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(bonusMeta, "Gain 0.6 Knockback Resistance per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		List<Component> bonusLore = bonusMeta.lore();
 		bonusLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.UNYIELDING), TextColor.fromHexString("#555555")));
 		bonusMeta.lore(bonusLore);
@@ -237,7 +237,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack purpleItem = new ItemStack(Material.PURPLE_WOOL);
 		ItemMeta purpleMeta = purpleItem.getItemMeta();
 		purpleMeta.displayName(Component.text("Ardor", TextColor.fromCSSHexString("#AA00AA")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(purpleMeta, "Mining a spawner outside of water grants you 3.75% speed per level for 4s. Mining a spawner underwater refreshes 0.5 breath per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(purpleMeta, "Mining a spawner outside of water grants you 3% speed per level for 4s. Mining a spawner underwater refreshes 0.5 breath per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		List<Component> purpleLore = purpleMeta.lore();
 		purpleLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.ARDOR), TextColor.fromHexString("#555555")));
 		purpleMeta.lore(purpleLore);
@@ -399,7 +399,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.MOSSY_COBBLESTONE, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Unyielding level " + (i + 1), TextColor.fromCSSHexString("#006400")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Gain " + String.format("%,.1f", (0.4 * (i + 1))) + " Knockback Resistance", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Gain " + String.format("%,.1f", (0.6 * (i + 1))) + " Knockback Resistance", MAX_LORE_LENGHT, ChatColor.GRAY);
 			panel.setItemMeta(meta);
 			bonusItems.add(panel);
 		}
@@ -501,7 +501,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.PURPLE_WOOL, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Ardor level " + (i + 1), TextColor.fromCSSHexString("#AA00AA")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Mining a spawner outside of water grants you " + 3.75 * (i + 1) + "% speed for 4s. Mining a spawner underwater refreshes 0.5 breath per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Mining a spawner outside of water grants you " + 3 * (i + 1) + "% speed for 4s. Mining a spawner underwater refreshes 0.5 breath per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			panel.setItemMeta(meta);
 			purpleItems.add(panel);
 		}
