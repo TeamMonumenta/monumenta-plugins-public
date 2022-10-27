@@ -93,11 +93,16 @@ public class Phylactery implements Infusion {
 				Effect effect = pair.mEffect;
 				if (effect.isBuff()) {
 					try {
+						String source = pair.mSource;
 						JsonObject effectObject = effect.serialize();
 						Effect newEffect = EffectManager.getEffectFromJson(effectObject, plugin);
 						if (newEffect != null) {
-							newEffect.setDuration((int) (effect.getDuration() * value * DURATION_KEPT));
-							resultEffects.add(new EffectManager.EffectPair(pair.mSource, newEffect));
+							if (source.startsWith("DeathPersistent")) {
+								newEffect.setDuration(effect.getDuration());
+							} else {
+								newEffect.setDuration((int) (effect.getDuration() * value * DURATION_KEPT));
+							}
+							resultEffects.add(new EffectManager.EffectPair(source, newEffect));
 						}
 					} catch (Exception e) {
 						// cry
