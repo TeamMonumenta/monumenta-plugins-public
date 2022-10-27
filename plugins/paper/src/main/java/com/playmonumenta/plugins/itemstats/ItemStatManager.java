@@ -256,7 +256,7 @@ public class ItemStatManager implements Listener {
 								newArmorAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 							}
 							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN) {
-								newArmorAddStats.add(stat, Math.max(newArmorAddStats.get(enchantment, 0), getRegionScaling(player, ItemStatUtils.getRegion(item), mRegion, 0, 1, 2)));
+								newArmorAddStats.set(stat, Math.max(newArmorAddStats.get(enchantment, 0), getRegionScaling(player, ItemStatUtils.getRegion(item), mRegion, 0, 1, 2)));
 							}
 						} else if (stat instanceof Infusion infusion) {
 							double multiplier = infusion.getInfusionType().isRegionScaled() ? regionScaling : 1.0;
