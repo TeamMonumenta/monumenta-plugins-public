@@ -62,11 +62,18 @@ public class Twisted {
 		if (DelvesUtils.isValidTwistedMob(mob)) {
 			int spawnSinceLast = 1;
 
-			if (ServerProperties.getShardName().contains("ring")) {
-				String poiName = LocationUtils.getPoiNameFromLocation(mob.getLocation());
-				if (poiName != null) {
-					spawnSinceLast = MAP_R3_POI_SPAWN_COUNT.getOrDefault(poiName, 1);
+			boolean ring = ServerProperties.getShardName().contains("ring");
+			String poiName = null;
+			if (ring) {
+				poiName = LocationUtils.getPoiNameFromLocation(mob.getLocation());
+				if (poiName == null) {
+					// Somehow in an r3 delve but not in a poi
+					return;
 				}
+			}
+
+			if (poiName != null) {
+				spawnSinceLast = MAP_R3_POI_SPAWN_COUNT.getOrDefault(poiName, 1);
 			} else {
 				spawnSinceLast = MAP_WORLD_SPAWN_COUNT.getOrDefault(mob.getWorld().getUID(), 1);
 			}
@@ -77,10 +84,18 @@ public class Twisted {
 				//a twisted mob is spawned -> resetting the counter
 
 				spawnSinceLast = spawnSinceLast > 1000 ? spawnSinceLast - 1000 : 1;
-				MAP_WORLD_SPAWN_COUNT.put(mob.getWorld().getUID(), spawnSinceLast);
+				if (poiName != null) {
+					MAP_R3_POI_SPAWN_COUNT.put(poiName, spawnSinceLast);
+				} else {
+					MAP_WORLD_SPAWN_COUNT.put(mob.getWorld().getUID(), spawnSinceLast);
+				}
 			} else {
 				//twisted not spawned, increase the chance for the next event
-				MAP_WORLD_SPAWN_COUNT.put(mob.getWorld().getUID(), 1 + spawnSinceLast);
+				if (poiName != null) {
+					MAP_R3_POI_SPAWN_COUNT.put(poiName, 1 + spawnSinceLast);
+				} else {
+					MAP_WORLD_SPAWN_COUNT.put(mob.getWorld().getUID(), 1 + spawnSinceLast);
+				}
 			}
 		}
 	}
