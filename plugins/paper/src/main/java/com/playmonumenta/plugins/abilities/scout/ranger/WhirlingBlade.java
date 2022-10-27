@@ -32,7 +32,7 @@ import org.bukkit.util.Vector;
 public class WhirlingBlade extends MultipleChargeAbility {
 
 	private static final int BLADE_1_DAMAGE = 9;
-	private static final int BLADE_2_DAMAGE = 14;
+	private static final int BLADE_2_DAMAGE = 16;
 	private static final float BLADE_1_KNOCKBACK = 0.4f;
 	private static final float BLADE_2_KNOCKBACK = 1.2f;
 	private static final double THROW_RADIUS = 3;

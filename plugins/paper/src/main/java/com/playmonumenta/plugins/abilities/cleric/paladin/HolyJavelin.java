@@ -42,7 +42,7 @@ public class HolyJavelin extends Ability {
 	private static final int DAMAGE_1 = 9;
 	private static final int DAMAGE_2 = 12;
 	private static final int FIRE_DURATION = 5 * 20;
-	private static final int COOLDOWN = 12 * 20;
+	private static final int COOLDOWN = 10 * 20;
 
 	private final double mDamage;
 	private final double mUndeadDamage;
@@ -60,7 +60,7 @@ public class HolyJavelin extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.HOLY_JAVELIN;
 		mInfo.mScoreboardId = "HolyJavelin";
 		mInfo.mShorthandName = "HJ";
-		mInfo.mDescriptions.add("While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to 12 blocks or until it hits a solid block. It deals 18 magic damage to all enemies in a 0.75-block cube around it along its path, or 9 magic damage to non-undead, and sets them all on fire for 5s. Cooldown: 12s.");
+		mInfo.mDescriptions.add("While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to 12 blocks or until it hits a solid block. It deals 18 magic damage to all enemies in a 0.75-block cube around it along its path, or 9 magic damage to non-undead, and sets them all on fire for 5s. Cooldown: 10s.");
 		mInfo.mDescriptions.add("Attacking an undead enemy with that left-click now transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. Damage is increased from 18 to 32, and from 9 to 18 against non-undead.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;

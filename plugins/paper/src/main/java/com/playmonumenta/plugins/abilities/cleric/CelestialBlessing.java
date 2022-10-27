@@ -38,7 +38,6 @@ public class CelestialBlessing extends Ability {
 	private static final double CELESTIAL_RADIUS = 12;
 	private static final double CELESTIAL_1_EXTRA_DAMAGE = 0.20;
 	private static final double CELESTIAL_2_EXTRA_DAMAGE = 0.35;
-	private static final double CELESTIAL_ENHANCED_DAMAGE = 0.25;
 	private static final double CELESTIAL_EXTRA_SPEED = 0.20;
 	private static final String ATTR_NAME = "CelestialBlessingExtraSpeedAttr";
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
@@ -48,7 +47,12 @@ public class CelestialBlessing extends Ability {
 			DamageType.PROJECTILE,
 			DamageType.PROJECTILE_SKILL
 	);
-	private static final EnumSet<DamageType> ENHANCED_AFFECTED_DAMAGE_TYPES = EnumSet.of(
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES_ENHANCE = EnumSet.of(
+		DamageType.MELEE,
+		DamageType.MELEE_SKILL,
+		DamageType.MELEE_ENCH,
+		DamageType.PROJECTILE,
+		DamageType.PROJECTILE_SKILL,
 		DamageType.MAGIC
 	);
 
@@ -75,8 +79,8 @@ public class CelestialBlessing extends Ability {
 				                        StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN)));
 		mInfo.mDescriptions.add("Increases the buff to +%s%% damage for %ss."
 			                        .formatted(StringUtils.multiplierToPercentage(CELESTIAL_2_EXTRA_DAMAGE), StringUtils.ticksToSeconds(CELESTIAL_2_DURATION)));
-		mInfo.mDescriptions.add("Ability damage is now also increased by %s%%. Cooldown: %ss."
-			                        .formatted(StringUtils.multiplierToPercentage(CELESTIAL_ENHANCED_DAMAGE), StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN_ENHANCED)));
+		mInfo.mDescriptions.add("Magic damage is now increased as well. Cooldown: %ss."
+			                        .formatted(StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN_ENHANCED)));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isEnhanced() ? CELESTIAL_COOLDOWN_ENHANCED : CELESTIAL_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.SUGAR, 1);
@@ -100,10 +104,7 @@ public class CelestialBlessing extends Ability {
 
 		// Give these players the metadata tag that boosts their damage
 		for (Player p : affectedPlayers) {
-			if (isEnhanced()) {
-				mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME + "Magic", new PercentDamageDealt(mDuration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + CELESTIAL_ENHANCED_DAMAGE, ENHANCED_AFFECTED_DAMAGE_TYPES));
-			}
-			mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME, new PercentDamageDealt(mDuration, mExtraDamage, AFFECTED_DAMAGE_TYPES));
+			mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME, new PercentDamageDealt(mDuration, mExtraDamage, isEnhanced() ? AFFECTED_DAMAGE_TYPES_ENHANCE : AFFECTED_DAMAGE_TYPES));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraSpeed", new PercentSpeed(mDuration, CELESTIAL_EXTRA_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), ATTR_NAME));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingParticles", new Aesthetics(mDuration,
 				(entity, fourHertz, twoHertz, oneHertz) -> {

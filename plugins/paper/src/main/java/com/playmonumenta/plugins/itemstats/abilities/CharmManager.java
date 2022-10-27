@@ -458,7 +458,7 @@ public class CharmManager {
 			Toughness.CHARM_REDUCTION,
 			Toughness.CHARM_HEALING,
 			WeaponMastery.CHARM_REDUCTION,
-			WeaponMastery.CHARM_ATTACK_SPEED,
+			WeaponMastery.CHARM_SPEED,
 			WeaponMastery.CHARM_WEAKEN,
 			WeaponMastery.CHARM_DURATION,
 			GloriousBattle.CHARM_DAMAGE,

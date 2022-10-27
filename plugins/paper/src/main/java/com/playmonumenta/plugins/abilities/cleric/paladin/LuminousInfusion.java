@@ -46,7 +46,7 @@ public class LuminousInfusion extends Ability {
 	private static final String EXPIRATION_MESSAGE = "The light from your hands fades...";
 	private static final double RADIUS = 4;
 	private static final int FIRE_DURATION_2 = 20 * 3;
-	private static final int COOLDOWN = 20 * 14;
+	private static final int COOLDOWN = 20 * 12;
 	private static final float KNOCKBACK_SPEED = 0.7f;
 
 	public static final String CHARM_DAMAGE = "Luminous Infusion Damage";
@@ -65,7 +65,7 @@ public class LuminousInfusion extends Ability {
 		mInfo.mDescriptions.add("While sneaking, pressing the swap key charges your hands with holy light. " +
 			                        "The next time you damage an undead enemy, your attack is infused with explosive power, " +
 			                        "dealing 20 magic damage to it and all enemies in a 4 block radius around it, or 10 against non-undead, " +
-			                        "and knocking other enemies away from it. Cooldown: 14s.");
+			                        "and knocking other enemies away from it. Cooldown: 12s.");
 		mInfo.mDescriptions.add("Your melee attacks now passively deal 15% magic damage to undead enemies, " +
 			                        "and Divine Justice now passively deals 15% more total damage. " +
 			                        "Damaging an undead enemy now passively sets it on fire for 3s.");

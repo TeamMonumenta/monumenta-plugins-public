@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -47,8 +48,8 @@ public class AmplifyingHex extends Ability {
 	private static final int AMPLIFIER_CAP_1 = 2;
 	private static final int AMPLIFIER_CAP_2 = 3;
 	private static final float R1_CAP = 3.5f;
-	private static final float R2_CAP = 5f;
-	private static final float R3_CAP = 7f;
+	private static final float R2_CAP = 7f;
+	private static final float R3_CAP = 10.5f;
 	private static final int RADIUS_1 = 8;
 	private static final int RADIUS_2 = 10;
 	private static final double ANGLE = 70;
@@ -92,12 +93,13 @@ public class AmplifyingHex extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				int skillPoints = Stream.of(AmplifyingHex.class, CholericFlames.class, GraspingClaws.class, SoulRend.class,
-						SanguineHarvest.class, MelancholicLament.class, CursedWound.class, PhlegmaticResolve.class)
-					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c))
-					.mapToInt(a -> a == null ? 0 : Math.min(a.getAbilityScore(), 3))
-					.sum();
-				mDamage = DAMAGE_PER_SKILL_POINT * skillPoints;
+				int charmPower = ScoreboardUtils.getScoreboardValue(player, "CharmPower").orElse(0);
+				charmPower = (charmPower > 0) ? (charmPower / 3) - 2 : 0;
+				int totalLevel = ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0) +
+					ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0) +
+					ScoreboardUtils.getScoreboardValue(player, "TotalEnhance").orElse(0) +
+					charmPower;
+				mDamage = DAMAGE_PER_SKILL_POINT * totalLevel;
 			});
 		}
 	}

@@ -32,7 +32,7 @@ public class ChoirBells extends Ability {
 	private static final double SLOWNESS_AMPLIFIER_2 = 0.2;
 	private static final int COOLDOWN = 16 * 20;
 	private static final int CHOIR_BELLS_RANGE = 10;
-	private static final int DAMAGE = 4;
+	private static final int DAMAGE = 6;
 
 	public static final String CHARM_DAMAGE = "Choir Bells Damage";
 	public static final String CHARM_COOLDOWN = "Choir Bells Cooldown";

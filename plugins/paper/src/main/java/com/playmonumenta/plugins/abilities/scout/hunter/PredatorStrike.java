@@ -47,7 +47,7 @@ public class PredatorStrike extends Ability {
 	private static final double DISTANCE_SCALE_2 = 0.15;
 	private static final int MAX_RANGE = 30;
 	private static final int MAX_DAMAGE_RANGE = 12;
-	private static final double EXPLODE_RADIUS = 0.75;
+	private static final double EXPLODE_RADIUS = 1.25;
 	private static final double HITBOX_LENGTH = 0.5;
 
 	public static final String CHARM_COOLDOWN = "Predator Strike Cooldown";

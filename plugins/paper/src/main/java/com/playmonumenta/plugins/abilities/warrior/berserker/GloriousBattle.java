@@ -45,7 +45,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	private static final float KNOCK_AWAY_SPEED = 0.4f;
 	private static final String KBR_EFFECT = "GloriousBattleKnockbackResistanceEffect";
 	private static final double DAMAGE_PER = 0.05;
-	private static final int MAX_TARGETING = 4;
+	private static final int MAX_TARGETING = 6;
 	private static final double TARGET_RANGE = 10;
 
 	private static final EnumSet<ClassAbility> AFFECTED_ABILITIES = EnumSet.of(

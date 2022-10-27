@@ -31,8 +31,8 @@ public class ByMyBlade extends Ability {
 	private static final int BY_MY_BLADE_1_HASTE_AMPLIFIER = 1;
 	private static final int BY_MY_BLADE_2_HASTE_AMPLIFIER = 3;
 	private static final int BY_MY_BLADE_HASTE_DURATION = 4 * 20;
-	private static final int BY_MY_BLADE_1_DAMAGE = 10;
-	private static final int BY_MY_BLADE_2_DAMAGE = 20;
+	private static final int BY_MY_BLADE_1_DAMAGE = 12;
+	private static final int BY_MY_BLADE_2_DAMAGE = 24;
 	private static final int BY_MY_BLADE_COOLDOWN = 10 * 20;
 	private static final double ENHANCEMENT_HEAL_PERCENT = 0.05;
 	private static final double ENHANCEMENT_HEAL_PERCENT_ELITE = 0.15;

@@ -57,7 +57,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final int HALLOWED_DAMAGE_REDUCTION_DURATION = 20 * 5;
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "HallowedPercentDamageResistEffect";
 	private static final int HALLOWED_RADIUS = 4;
-	private static final int HALLOWED_UNDEAD_STUN = 10; // 20 * 0.5
+	private static final int HALLOWED_UNDEAD_STUN = 20; // 20 * 1
 	private static final int HALLOWED_LIVING_STUN = 20 * 2;
 	private static final int CAST_RANGE = 30;
 	private static final String MODE_SCOREBOARD = "HallowedBeamMode";
@@ -82,7 +82,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		super(plugin, player, "Hallowed Beam");
 		mInfo.mScoreboardId = "HallowedBeam";
 		mInfo.mShorthandName = "HB";
-		mInfo.mDescriptions.add("Left-click with a projectile weapon while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 30% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals projectile damage equal to the used weapon's projectile damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a projectile weapon will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). This skill can only apply Recoil twice before touching the ground. Cooldown: 16s each charge.");
+		mInfo.mDescriptions.add("Left-click with a projectile weapon while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 30% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals projectile damage equal to the used weapon's projectile damage to the target, and stuns them for one second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a projectile weapon will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). This skill can only apply Recoil twice before touching the ground. Cooldown: 16s each charge.");
 		mInfo.mDescriptions.add("Hallowed Beam gains a third charge (and can apply Recoil three times before touching the ground), the cooldown is reduced to 12 seconds, and players healed by it gain 10% damage resistance for 5 seconds.");
 		mInfo.mLinkedSpell = ClassAbility.HALLOWED_BEAM;
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? HALLOWED_1_COOLDOWN : HALLOWED_2_COOLDOWN);

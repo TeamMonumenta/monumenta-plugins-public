@@ -33,12 +33,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class ShieldBash extends Ability {
 
-	private static final int SHIELD_BASH_DAMAGE = 5;
+	private static final int SHIELD_BASH_DAMAGE = 8;
 	private static final int SHIELD_BASH_STUN = 20 * 1;
 	private static final int SHIELD_BASH_COOLDOWN = 20 * 8;
-	private static final int SHIELD_BASH_2_RADIUS = 2;
+	private static final int SHIELD_BASH_2_RADIUS = 3;
 	private static final int SHIELD_BASH_RANGE = 4;
-	private static final int ENHANCEMENT_BLOCKING_DURATION = 10;
+	private static final int ENHANCEMENT_BLOCKING_DURATION = 20;
 
 	public static final String CHARM_DAMAGE = "Shield Bash Damage";
 	public static final String CHARM_DURATION = "Shield Bash Duration";
@@ -53,9 +53,9 @@ public class ShieldBash extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.SHIELD_BASH;
 		mInfo.mScoreboardId = "ShieldBash";
 		mInfo.mShorthandName = "SB";
-		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to deal 5 melee damage, stun for 1 second, and taunt. Elites and bosses are rooted instead of stunned. Cooldown: 8s.");
-		mInfo.mDescriptions.add("Additionally, apply damage, stun, and taunt to all enemies in a 2 block radius from the enemy you are looking at.");
-		mInfo.mDescriptions.add("Blocking damage with a shield within 0.5s of beginning to block refreshes 50% of this skill's cooldown.");
+		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to deal 8 melee damage, stun for 1 second, and taunt the targeted enemy. Elites and bosses are rooted instead of stunned. Cooldown: 8s.");
+		mInfo.mDescriptions.add("Additionally, apply damage, stun, and taunt to all enemies in a 3 block radius from the enemy you are looking at.");
+		mInfo.mDescriptions.add("Blocking damage with a shield within 1s of beginning to block refreshes 50% of this skill's cooldown.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, SHIELD_BASH_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.IRON_DOOR, 1);
