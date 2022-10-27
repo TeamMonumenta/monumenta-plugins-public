@@ -27,6 +27,7 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NonTameRandomTargetGoal;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.CommandBlockEntity;
@@ -49,6 +50,7 @@ import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.AbstractSkeleton;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Drowned;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Evoker;
@@ -436,6 +438,10 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
 				                                      && net.minecraft.world.entity.monster.AbstractSkeleton.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
 			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NonTameRandomTargetGoal);
+		} else if (mob instanceof Enderman) {
+			// remove all special enderman goals (freeze when looked at, attack staring player, take/drop block)
+			availableGoals.removeIf(goal -> goal.getGoal().getClass().getDeclaringClass() == EnderMan.class);
+			availableTargetGoals.removeIf(goal -> goal.getGoal().getClass().getDeclaringClass() == EnderMan.class);
 		}
 		// prevent all mobs from attacking iron golems and turtles
 		availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
