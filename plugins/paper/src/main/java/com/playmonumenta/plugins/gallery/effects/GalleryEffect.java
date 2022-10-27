@@ -61,6 +61,10 @@ public abstract class GalleryEffect {
 
 	}
 
+	public void refresh(GalleryPlayer player) {
+
+	}
+
 	public void clear(GalleryPlayer player) {
 		player.removeEffect(this);
 	}

@@ -154,6 +154,13 @@ public abstract class Ability {
 			effectPercent += dec.getMagnitude(); // this is always negative
 		}
 
+		NavigableSet<Effect> effGallery = Plugin.getInstance().mEffectManager.getEffects(mPlayer, "GalleryEnlightenmentEffect");
+		if (effGallery != null) {
+			//it should be way faster to add this check on each shard instead of doing a shard check each time
+			Effect dec = effDec.last();
+			effectPercent += dec.getMagnitude(); // this is always positive
+		}
+
 		return (int) (baseCooldown * (1 + epochPercent) * (1 + aptitudePercent) * (1 + ineptitudePercent) * (1 + effectPercent));
 	}
 

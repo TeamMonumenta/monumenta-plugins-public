@@ -138,6 +138,9 @@ public class GalleryPlayer {
 					player.teleport(loc);
 				}
 			}
+			for (GalleryEffect effect : new ArrayList<>(mEffects.values())) {
+				effect.refresh(this);
+			}
 		}
 	}
 

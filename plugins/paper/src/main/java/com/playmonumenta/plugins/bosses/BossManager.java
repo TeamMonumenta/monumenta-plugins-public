@@ -45,6 +45,7 @@ import com.playmonumenta.plugins.depths.bosses.Nucleus;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.bosses.GalleryMobRisingBoss;
+import com.playmonumenta.plugins.gallery.bosses.GallerySummonMobBoss;
 import com.playmonumenta.plugins.parrots.RainbowParrot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -319,6 +320,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(ParadoxSwapBoss.identityTag, (Plugin p, LivingEntity e) -> new ParadoxSwapBoss(p, e));
 		mStatelessBosses.put(TemporalShieldBoss.identityTag, (Plugin p, LivingEntity e) -> new TemporalShieldBoss(p, e));
 		mStatelessBosses.put(GalleryMobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> new GalleryMobRisingBoss(p, e));
+		mStatelessBosses.put(GallerySummonMobBoss.identityTag, (Plugin p, LivingEntity e) -> new GallerySummonMobBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -578,6 +580,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(TealSpirit.identityTag, (Plugin p, LivingEntity e) -> TealSpirit.deserialize(p, e));
 		mBossDeserializers.put(TemporalShieldBoss.identityTag, (Plugin p, LivingEntity e) -> TemporalShieldBoss.deserialize(p, e));
 		mBossDeserializers.put(GalleryMobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> GalleryMobRisingBoss.deserialize(p, e));
+		mBossDeserializers.put(GallerySummonMobBoss.identityTag, (Plugin p, LivingEntity e) -> GallerySummonMobBoss.deserialize(p, e));
 
 
 		/***************************************************

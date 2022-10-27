@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.gallery.GalleryPlayer;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Player;
 
 public class GalleryHealthEffect extends GalleryStackableEffect {
 
@@ -27,5 +28,13 @@ public class GalleryHealthEffect extends GalleryStackableEffect {
 
 	@Override public int getMaxStacks() {
 		return HEALTH_EFFECT_MAX_STACK;
+	}
+
+	@Override public void refresh(GalleryPlayer galleryPlayer) {
+		Player player = galleryPlayer.getPlayer();
+		if (galleryPlayer.isOnline() && player != null) {
+			EntityUtils.removeAttribute(player, Attribute.GENERIC_MAX_HEALTH, "GalleryHealthEffect");
+			EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier("GalleryHealthEffect", mStacks * HEALTH_EFFECT_PER_STACK, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		}
 	}
 }

@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.gallery.effects;
 
-import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Player;
 
 public class GallerySpeedEffect extends GalleryStackableEffect {
 
@@ -25,12 +25,15 @@ public class GallerySpeedEffect extends GalleryStackableEffect {
 		EntityUtils.removeAttribute(player.getPlayer(), Attribute.GENERIC_MOVEMENT_SPEED, "GallerySpeedEffect");
 	}
 
-	@Override
-	public void clear(GalleryPlayer player) {
-		EffectManager.getInstance().clearEffects(player.getPlayer(), "GallerySpeedEffect");
-	}
-
 	@Override public int getMaxStacks() {
 		return SPEED_EFFECT_MAX_STACK;
+	}
+
+	@Override public void refresh(GalleryPlayer galleryPlayer) {
+		Player player = galleryPlayer.getPlayer();
+		if (galleryPlayer.isOnline() && player != null) {
+			EntityUtils.removeAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, "GallerySpeedEffect");
+			EntityUtils.addAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier("GallerySpeedEffect", SPEED_EFFECT_PER_STACK * mStacks, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		}
 	}
 }

@@ -4,7 +4,9 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.NotNull;
 
 public class SpellSpawnMobs extends Spell {
 	public static final int MOB_DETECTION_RADIUS = 10;
@@ -18,10 +20,6 @@ public class SpellSpawnMobs extends Spell {
 	private final int mMobCap;
 
 	private final LivingEntity mBoss;
-
-	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, int range) {
-		this(boss, spawns, losname, cooldown, range, 0, DEFAULT_MOB_CAP);
-	}
 
 	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, int range, int minrange, int mobcap) {
 		mBoss = boss;
@@ -45,8 +43,16 @@ public class SpellSpawnMobs extends Spell {
 			double z = r * Math.sin(theta);
 
 			Location sLoc = loc.clone().add(x, 0.25, z);
-			LibraryOfSoulsIntegration.summon(sLoc, mSummonName);
+			Entity entity = LibraryOfSoulsIntegration.summon(sLoc, mSummonName);
+			if (entity != null) {
+				summonPlugins(entity);
+			}
 		}
+	}
+
+	//overwrite this function to modify summon mobs with extra tags/stats
+	public void summonPlugins(@NotNull Entity summon) {
+
 	}
 
 	@Override
