@@ -4,7 +4,7 @@ import net.kyori.adventure.text.format.TextColor;
 
 public interface GalleryCS extends LockableCS {
 
-	String GALLERY_COMPLETE_SCB = "GallerySanguineHalls";
+	String GALLERY_COMPLETE_SCB = "GallerySanguineHallsEasterEgg";
 
 	enum GalleryMap {
 		SANGUINE("Sanguine Halls", TextColor.fromHexString("#AB0000"))
