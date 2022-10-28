@@ -34,7 +34,7 @@ public class FirstStrike implements Enchantment {
 
 	@Override
 	public double getPriorityAmount() {
-		return 1;
+		return 999;
 	}
 
 	@Override
