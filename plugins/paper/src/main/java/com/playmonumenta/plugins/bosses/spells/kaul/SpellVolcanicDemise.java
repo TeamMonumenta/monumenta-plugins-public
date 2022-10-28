@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -20,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
@@ -80,12 +82,12 @@ public class SpellVolcanicDemise extends Spell {
 				float ft = fTick / 25;
 				world.spawnParticle(Particle.LAVA, mBoss.getLocation(), 4, 0.35, 0, 0.35, 0.005);
 				world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 3, 0.3, 0, 0.3, 0.125);
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.5f + ft);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.5f + ft);
 				if (mChargeUp.nextTick(2)) {
 					this.cancel();
 					mActiveRunnables.remove(this);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.5f);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 0.7f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 0.5f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 1, 0.7f);
 
 					mChargeUp.setTitle(ChatColor.GREEN + "Unleashing " + ChatColor.DARK_RED + "" + ChatColor.BOLD + "Volcanic Demise...");
 					BukkitRunnable runnable = new BukkitRunnable() {
@@ -166,38 +168,36 @@ public class SpellVolcanicDemise extends Spell {
 				players.removeIf(p -> p.getLocation().distance(mCenter) > 50 || p.getLocation().getY() >= 61);
 
 				mY -= 1;
-				if (mY % 2 == 0) {
+				if ((int) mY % 5 == 0) {
 					double distMin = 100;
 					for (Player player : players) {
 						double dist = player.getLocation().distance(mLoc);
 						distMin = dist < distMin ? dist : distMin;
 					}
 					// Closer the closet player is, more particles are shown.
-					int count = distMin < 10 ? 32 : (distMin < 15 ? 16 : 4);
-					double size = (spawnY - mY) / spawnY;
+					int count = distMin < 10 ? 12 : (distMin < 15 ? 6 : 4);
+					double size = 0.5 + 0.5 * (spawnY - mY) / spawnY;
 					new PPCircle(Particle.FLAME, mLoc, size * HIT_RADIUS)
 						.ringMode(true)
 						.count(count * 2)
-						.delta(0.15)
 						.spawnAsBoss();
 					new PPCircle(Particle.LANDING_LAVA, mLoc, size * DEATH_RADIUS)
 						.ringMode(false)
 						.count(count)
-						.delta(0.15)
 						.spawnAsBoss();
 				}
 				Location particle = mLoc.clone().add(0, mY, 0);
-				mWorld.spawnParticle(Particle.FLAME, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true);
+				new PartialParticle(Particle.FLAME, particle, 2, 0.2f, 0.2f, 0.2f, 0.05).spawnAsBoss();
 				if (FastUtils.RANDOM.nextBoolean()) {
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true);
+					new PartialParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0).spawnAsBoss();
 				}
-				mWorld.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
+				mWorld.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 				if (mY <= 0) {
 					this.cancel();
 					mActiveRunnables.remove(this);
-					mWorld.spawnParticle(Particle.FLAME, mLoc, 50, 0, 0, 0, 0.175, null, true);
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, mLoc, 10, 0, 0, 0, 0.25, null, true);
-					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
+					new PartialParticle(Particle.FLAME, mLoc, 50, 0, 0, 0, 0.175).spawnAsBoss();
+					new PartialParticle(Particle.SMOKE_LARGE, mLoc, 10, 0, 0, 0, 0.25).spawnAsBoss();
+					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.9f);
 					Hitbox deathBox = new Hitbox.UprightCylinderHitbox(mLoc, 7, DEATH_RADIUS);
 					Hitbox hitBox = new Hitbox.UprightCylinderHitbox(mLoc, 15, HIT_RADIUS);
 					List<Player> hitPlayers = new ArrayList<>(hitBox.getHitPlayers(true));
