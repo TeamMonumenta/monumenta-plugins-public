@@ -43,8 +43,7 @@ public class SeasonalEventListener implements Listener {
 
 	private static boolean isPOIContent() {
 		String shard = ServerProperties.getShardName();
-		// Add region three here eventually
-		return (shard.contains("valley") || shard.contains("isles"));
+		return (shard.contains("valley") || shard.contains("isles") || shard.contains("ring"));
 	}
 
 	/**
