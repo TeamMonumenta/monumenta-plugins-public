@@ -387,6 +387,10 @@ public class ItemUtils {
 		return null;
 	}
 
+	public static boolean isQuestItem(@Nullable ItemStack item) {
+		return InventoryUtils.testForItemWithLore(item, "Quest Item");
+	}
+
 	public static boolean isNullOrAir(@Nullable ItemStack itemStack) {
 		return itemStack == null || itemStack.getType() == Material.AIR;
 	}
@@ -530,7 +534,7 @@ public class ItemUtils {
 	 */
 	public static float getItemDropChance(@Nullable ItemStack item) {
 		ItemStatUtils.Tier tier = ItemStatUtils.getTier(item);
-		if (item != null && (item.hasItemMeta() && item.getItemMeta().hasLore()) && !InventoryUtils.testForItemWithLore(item, "$$") && (InventoryUtils.testForItemWithLore(item, "Quest Item") || ItemStatUtils.isMaterial(item) || (tier != null && tier != ItemStatUtils.Tier.CURRENCY))) {
+		if (item != null && (item.hasItemMeta() && item.getItemMeta().hasLore()) && !InventoryUtils.testForItemWithLore(item, "$$") && (isQuestItem(item) || ItemStatUtils.isMaterial(item) || (tier != null && tier != ItemStatUtils.Tier.CURRENCY))) {
 			return 100.0f;
 		} else {
 			return -200.0f;

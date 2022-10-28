@@ -435,21 +435,16 @@ public class MobListener implements Listener {
 				if (item == null) {
 					continue;
 				}
-				List<String> lore = ItemUtils.getPlainLore(item);
-				if (lore != null && !lore.isEmpty()) {
-					for (String loreEntry : lore) {
-						if (loreEntry.contains("Quest Item")) {
-							//Scales based off player count in a 20 meter radius, drops at least one quest item
-							int count = PlayerUtils.playersInRange(livingEntity.getLocation(), 20, true).size();
-							if (count < 1) {
-								count = 1;
-							}
-							if (count > item.getAmount()) {
-								item.setAmount(count);
-							}
-							return;
-						}
+				if (ItemUtils.isQuestItem(item)) {
+					//Scales based off player count in a 20 meter radius, drops at least one quest item
+					int count = PlayerUtils.playersInRange(livingEntity.getLocation(), 20, true).size();
+					if (count < 1) {
+						count = 1;
 					}
+					if (count > item.getAmount()) {
+						item.setAmount(count);
+					}
+					return;
 				}
 			}
 		}

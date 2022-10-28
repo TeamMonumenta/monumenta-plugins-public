@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.graves.GraveManager;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -9,10 +10,8 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -202,15 +201,7 @@ public final class JunkItemListener implements Listener {
 			}
 
 			if (mTieredPlayers.contains(uuid)) {
-				if (ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE) {
-					List<Component> lore = item.lore();
-					if (lore != null) {
-						for (Component line : lore) {
-							if (line.toString().contains("Quest Item")) {
-								return;
-							}
-						}
-					}
+				if (ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE && !ItemUtils.isQuestItem(item) && !InventoryUtils.containsSpecialLore(item)) {
 					event.setCancelled(true);
 				}
 			} else if (mLorePlayers.contains(uuid)) {

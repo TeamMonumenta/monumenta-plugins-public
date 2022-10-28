@@ -242,7 +242,7 @@ public class InventoryUtils {
 		return dropped;
 	}
 
-	private static boolean containsSpecialLore(final ItemStack item) {
+	public static boolean containsSpecialLore(final ItemStack item) {
 		return testForItemWithLore(item, "Taking this item outside of the dungeon");
 	}
 
