@@ -172,8 +172,8 @@ public class InventoryUtils {
 					items[i] = null;
 				} else if (includeSubInventories) {
 					try {
-						if (item.hasItemMeta() && item.getItemMeta() instanceof final BlockStateMeta meta) {
-							if (meta.getBlockState() instanceof final ShulkerBox shulker) {
+						if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta meta) {
+							if (meta.getBlockState() instanceof ShulkerBox shulker) {
 								dropped += removeSpecialItemsFromInventory(shulker.getInventory(), loc, ephemeralOnly, true);
 
 								meta.setBlockState(shulker);
