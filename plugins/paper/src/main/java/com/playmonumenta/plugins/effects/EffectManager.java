@@ -665,7 +665,12 @@ public final class EffectManager implements Listener {
 	}
 
 	public static @Nullable Effect getEffectFromJson(JsonObject object, Plugin plugin) throws Exception {
-		String effectID = object.get("effectID").getAsString();
+		JsonElement effectIDElement = object.get("effectID");
+		if (effectIDElement == null) {
+			MMLog.warning("Found null effectID - how? Effect Json: " + object);
+			return null;
+		}
+		String effectID = effectIDElement.getAsString();
 		EffectDeserializer deserializer = mEffectDeserializer.get(effectID);
 		if (deserializer == null) {
 			MMLog.severe("Cannot deserialize effect with ID '" + effectID + "'");
