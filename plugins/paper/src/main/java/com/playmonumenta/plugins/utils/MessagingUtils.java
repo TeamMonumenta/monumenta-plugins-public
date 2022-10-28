@@ -14,6 +14,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.title.Title;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -128,7 +129,7 @@ public class MessagingUtils {
 
 	public static void sendTitle(Player player, @Nullable String title, @Nullable String subtitle) {
 		// Default values used by /title
-		player.sendTitle(title, subtitle, 10, 70, 20);
+		player.showTitle(Title.title(Component.text(title != null ? title : ""), Component.text(subtitle != null ? subtitle : ""), Title.DEFAULT_TIMES));
 	}
 
 	public static void sendBoldTitle(Player player, @Nullable String title, @Nullable String subtitle) {

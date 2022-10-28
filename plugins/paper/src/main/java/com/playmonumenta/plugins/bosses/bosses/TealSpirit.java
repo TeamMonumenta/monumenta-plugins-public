@@ -6,12 +6,28 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.*;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.ClockworkAssassination;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.DoomsdayClock;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.MarchingFate;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.MidnightToll;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.PairedUnnaturalForce;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.Rewind;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.RewriteHistory;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.SandsOfTime;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.SundialSlash;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.SuspendedBallistae;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.TealAntiCheat;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.TealSpiritSummon;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.TemporalRift;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.TemporalFlux;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,17 +35,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 
@@ -386,17 +409,14 @@ public class TealSpirit extends BossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(mHealth);
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Orasomn\",\"color\":\"gold\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"The Hand of Fate\",\"color\":\"red\",\"yellow\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
-
-		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-		Collections.shuffle(players);
-		if (!players.isEmpty() && mBoss instanceof Mob mob) {
-			mob.setTarget(players.get(0));
+		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+			MessagingUtils.sendBoldTitle(player, ChatColor.AQUA + "Orasomn", ChatColor.RED + "The Hand of Fate");
+			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
 		}
+
 		mBoss.setAI(true);
+		mBoss.setGlowing(true);
 	}
 
 	@Override
