@@ -219,7 +219,7 @@ public class PlayerListener implements Listener {
 		PortalManager.clearPortal(player, 2);
 
 		/* Remove ephemeral items on logout */
-		InventoryUtils.removeSpecialItems(player, true);
+		InventoryUtils.removeSpecialItems(player, true, true);
 
 		mPlugin.mAbilityManager.playerQuitEvent(player, event);
 
@@ -692,7 +692,7 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		InventoryUtils.removeSpecialItems(player, true);
+		InventoryUtils.removeSpecialItems(player, true, false);
 
 		//Cleanse mobs around player in d6ungeon if running solo
 		if (Plugin.IS_PLAY_SERVER && ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {

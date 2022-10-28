@@ -385,8 +385,6 @@ public class ItemStatUtils {
 	 */
 
 	public enum EnchantmentType {
-		// Void Tether - work in either hand regardless
-		VOID_TETHER(new VoidTether(), false, false, false, false),
 		// Region Scaling
 		OFFHAND_MAINHAND_DISABLE(new OffhandMainhandDisable(), false, false, false, false),
 		MAINHAND_OFFHAND_DISABLE(new MainhandOffhandDisable(), false, false, false, false),

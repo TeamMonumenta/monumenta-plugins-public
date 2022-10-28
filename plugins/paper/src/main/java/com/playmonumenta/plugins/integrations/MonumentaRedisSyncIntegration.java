@@ -44,14 +44,14 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		player.closeInventory();
 
 		if (ServerProperties.getPreventDungeonItemTransfer()) {
-			int dropped = InventoryUtils.removeSpecialItems(player, false);
+			int dropped = InventoryUtils.removeSpecialItems(player, false, true);
 			if (dropped == 1) {
 				player.sendMessage(ChatColor.RED + "The dungeon key you were carrying was dropped!");
 			} else if (dropped > 1) {
 				player.sendMessage(ChatColor.RED + "The dungeon keys you were carrying were dropped!");
 			}
 		} else {
-			InventoryUtils.removeSpecialItems(player, true);
+			InventoryUtils.removeSpecialItems(player, true, true);
 		}
 	}
 

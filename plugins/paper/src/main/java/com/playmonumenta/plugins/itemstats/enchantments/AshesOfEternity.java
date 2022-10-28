@@ -10,12 +10,11 @@ import java.util.EnumSet;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 public class AshesOfEternity implements Enchantment {
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Ashes of Eternity";
 	}
 
@@ -30,19 +29,13 @@ public class AshesOfEternity implements Enchantment {
 
 	@Override
 	public double getPriorityAmount() {
-		return 9980; // before Resurrection and Void Tether
-	}
-
-	@Override
-	public void tick(Plugin plugin, Player player, double level, boolean twoHz, boolean oneHz) {
-		VoidTether.tick(player);
+		return 9980; // before Resurrection
 	}
 
 	@Override
 	public void onHurtFatal(Plugin plugin, Player player, double value, DamageEvent event) {
 
-		if (VoidTether.execute(plugin, player, event, null)
-			    || Resurrection.execute(plugin, player, event, null)) {
+		if (Resurrection.execute(plugin, player, event, null)) {
 
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PHANTOM_DEATH, 2, 2);
 
