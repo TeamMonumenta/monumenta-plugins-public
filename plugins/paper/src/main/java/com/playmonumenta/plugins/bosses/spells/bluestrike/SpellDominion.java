@@ -47,7 +47,8 @@ public class SpellDominion extends Spell {
 					World world = player.getWorld();
 					Location l = player.getEyeLocation();
 					world.spawnParticle(Particle.SQUID_INK, l, 10, 0.1, 0.1, 0.1, 0.25);
-					BossUtils.bossDamagePercent(mBoss, player, 0.2, "Dominion");
+					BossUtils.bossDamagePercent(mBoss, player, 0.5, "Dominion");
+					player.teleport(mSpawnLoc);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 0));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 6 * 20, 1));
 					if (!mWarnedPlayers.contains(player)) {

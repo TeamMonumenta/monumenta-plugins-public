@@ -63,6 +63,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
@@ -108,6 +109,8 @@ public class Samwell extends BossAbilityGroup {
 	public boolean mHealedBefore = false;
 	public boolean mPhase4Damaged = false;
 	public boolean mDefeated = false;
+	private int mPlayerCount;
+	private double mDefenseScaling;
 
 	private final Location mBhrahaviLoc;
 	private final Location mIzzyLoc;
@@ -253,11 +256,11 @@ public class Samwell extends BossAbilityGroup {
 		// Going to be using Scoreboards for this, easier to track between functions (I hope)
 		resetScoreboard();
 
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		int hpDelta = 8000;
-		double finalHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.5, 0.4);
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, finalHp);
-		mBoss.setHealth(finalHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, hpDelta);
+		mBoss.setHealth(hpDelta);
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, 0.5, 0.4);
 
 		Team team = ScoreboardUtils.getExistingTeamOrCreate("Blue", NamedTextColor.BLUE);
 		team.addEntity(mBoss);
@@ -300,6 +303,22 @@ public class Samwell extends BossAbilityGroup {
 				}, 10);
 			}, 70);
 		}, 10);
+	}
+
+	@Override
+	public void onHurt(DamageEvent event) {
+		event.setDamage(event.getDamage() / mDefenseScaling);
+	}
+
+	@Override
+	public boolean hasNearbyPlayerDeathTrigger() {
+		return true;
+	}
+
+	@Override
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, 0.5, 0.4);
 	}
 
 	@Override
