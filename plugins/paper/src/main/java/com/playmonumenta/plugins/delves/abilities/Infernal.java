@@ -108,26 +108,28 @@ public class Infernal {
 		List<String> flameTrailBoss = new ArrayList<>();
 		flameTrailBoss.add(FlameTrailBoss.identityTag);
 		flameTrailBoss.add(FlameTrailBoss.identityTag + "[damage=9,spellname=\"" + FLAME_TRAIL_SPELL_NAME + "\"]");
-		ABILITY_POOL_R1.add(flameNovaBoss);
+		ABILITY_POOL_R1.add(flameTrailBoss);
 		flameTrailBoss = new ArrayList<>();
 		flameTrailBoss.add(FlameTrailBoss.identityTag);
+		flameTrailBoss.add(FlameTrailBoss.identityTag + "[damage=15,spellname=\"" + FLAME_TRAIL_SPELL_NAME + "\"]");
 		ABILITY_POOL_R2.add(flameTrailBoss);
 		flameTrailBoss = new ArrayList<>();
 		flameTrailBoss.add(FlameTrailBoss.identityTag);
 		flameTrailBoss.add(FlameTrailBoss.identityTag + "[damage=20,spellname=\"" + FLAME_TRAIL_SPELL_NAME + "\"]");
-		ABILITY_POOL_R3.add(flameNovaBoss);
+		ABILITY_POOL_R3.add(flameTrailBoss);
 
 		List<String> fireBombTossBoss = new ArrayList<>();
 		fireBombTossBoss.add(FireBombTossBoss.identityTag);
 		fireBombTossBoss.add(FireBombTossBoss.identityTag + "[damage=24,spellname=\"" + BOMB_TOSS_SPELL_NAME + "\"]");
-		ABILITY_POOL_R1.add(flameNovaBoss);
+		ABILITY_POOL_R1.add(fireBombTossBoss);
 		fireBombTossBoss = new ArrayList<>();
 		fireBombTossBoss.add(FireBombTossBoss.identityTag);
+		fireBombTossBoss.add(FireBombTossBoss.identityTag + "[damage=48,spellname=\"" + BOMB_TOSS_SPELL_NAME + "\"]");
 		ABILITY_POOL_R2.add(fireBombTossBoss);
 		fireBombTossBoss = new ArrayList<>();
 		fireBombTossBoss.add(FireBombTossBoss.identityTag);
 		fireBombTossBoss.add(FireBombTossBoss.identityTag + "[damage=72,spellname=\"" + BOMB_TOSS_SPELL_NAME + "\"]");
-		ABILITY_POOL_R3.add(flameNovaBoss);
+		ABILITY_POOL_R3.add(fireBombTossBoss);
 
 	}
 
