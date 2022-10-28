@@ -85,12 +85,14 @@ public class Rewind extends Spell {
 					for (int dir = minDir; dir <= maxDir; dir += 90) {
 						Vector vec;
 						for (double degree = 60; degree < 120; degree += 5) {
-							for (double r = 0; r < 30; r++) {
+							for (double r = 0; r < 25; r++) {
 								double radian1 = Math.toRadians(degree);
 								vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 								vec = VectorUtils.rotateYAxis(vec, mCenter.getYaw() + dir);
 								Location l = mCenter.clone().add(vec);
-								world.spawnParticle(Particle.END_ROD, l, 1, 0.05, 1.5, 0.05, 0.01);
+								if (r % 2 == 0) {
+									world.spawnParticle(Particle.END_ROD, l, 1, 0.05, 1.5, 0.05, 0.01);
+								}
 							}
 						}
 					}
@@ -116,9 +118,9 @@ public class Rewind extends Spell {
 					Vector vec;
 					List<BoundingBox> boxes = new ArrayList<>();
 
-					for (double r = 0; r < 30; r++) {
+					for (double r = 0; r < 25; r++) {
 						for (int dir = minDir; dir <= maxDir; dir += 90) {
-							for (double degree = 60; degree < 120; degree += 5) {
+							for (double degree = 70; degree < 110; degree += 5) {
 								double radian1 = Math.toRadians(degree);
 								vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 								vec = VectorUtils.rotateYAxis(vec, mCenter.getYaw() + dir);

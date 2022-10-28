@@ -47,15 +47,18 @@ public class MarchingFate extends Spell {
 	private int mT = 0;
 	private boolean mHasRun = false;
 
-	public MarchingFate(LivingEntity boss, TealSpirit tealSpirit) {
+	public MarchingFate(LivingEntity boss, TealSpirit tealSpirit, boolean isHard) {
 		mBoss = boss;
 		mCenter = tealSpirit.mSpawnLoc;
 		mTealSpirit = tealSpirit;
 
 		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(DISTANCE, HEIGHT, 0), LOS));
 		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(-DISTANCE, HEIGHT, 0), LOS));
-		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(0, HEIGHT, DISTANCE), LOS));
-		mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(0, HEIGHT, -DISTANCE), LOS));
+
+		if (isHard) {
+			mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(0, HEIGHT, DISTANCE), LOS));
+			mMarchers.add(LibraryOfSoulsIntegration.summon(mCenter.clone().add(0, HEIGHT, -DISTANCE), LOS));
+		}
 
 		for (Entity e : mMarchers) {
 			mSpawnIndex.put(e, e.getLocation());
@@ -88,6 +91,9 @@ public class MarchingFate extends Spell {
 		int obfuscation = 0;
 		// Move marchers towards the center and kill party if they reach the center
 		for (Entity marcher : mMarchers) {
+			if (marcher.isDead() || !marcher.isValid()) {
+				break;
+			}
 			Location loc = marcher.getLocation();
 			Vector step = mCenter.toVector().subtract(loc.toVector()).setY(0).normalize().multiply(stepLength);
 			Location newLoc = loc.clone().add(step).setDirection(step);
@@ -166,12 +172,19 @@ public class MarchingFate extends Spell {
 				}
 			}
 
-			double dist1 = distances.get(FastUtils.RANDOM.nextInt(mMarchers.size()));
-			double dist2 = distances.get(FastUtils.RANDOM.nextInt(mMarchers.size()));
-			obfuscation = Math.max(obfuscation, (int) (Math.abs(dist1 - dist2) / 4));
-			mBossBar.setTime((int) (10000 * Math.min(dist1 / DISTANCE, 1)));
-			mBossBar.setTitle(obfuscate("Marching Fates", obfuscation, ChatColor.DARK_AQUA));
-			mBossBar.update();
+			if (mMarchers.size() > 0) {
+				double minDistance = 25;
+				for (Entity e : mMarchers) {
+					if (e.getLocation().distance(mCenter) < minDistance) {
+						minDistance = e.getLocation().distance(mCenter);
+					}
+				}
+				mBossBar.setTime((int) (10000 * Math.min(minDistance / DISTANCE, 1)));
+				mBossBar.setTitle(obfuscate("Marching Fates", obfuscation, ChatColor.DARK_AQUA));
+				mBossBar.update();
+			} else {
+				mBossBar.remove();
+			}
 		}
 		mT += 5;
 	}

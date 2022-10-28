@@ -47,6 +47,10 @@ public class MidnightToll extends Spell {
 			@Override
 			public void run() {
 				if (mChargeDamage.getTime() % 5 == 0) {
+					if (mBoss.isDead() || !mBoss.isValid()) {
+						this.cancel();
+					}
+
 					PlayerUtils.playersInRange(mSpawnLoc, mRange, true).forEach(p -> {
 						p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 5f, 2.0f);
 					});

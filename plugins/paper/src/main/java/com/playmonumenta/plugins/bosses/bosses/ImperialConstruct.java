@@ -135,7 +135,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 		mCurrentLoc = mStart.getLocation();
 
 		if (mEncounterType.equals("Hard")) {
-			mHealth = 22500;
+			mHealth = 24750;
 			// Hard Mode Abilities
 			mParadox = new SpellLingeringParadox(boss, mSpawnLoc, 30);
 			mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc, 30);

@@ -2,10 +2,13 @@ package com.playmonumenta.plugins.bosses.spells.tealspirit;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -36,6 +39,12 @@ public class TealAntiCheat extends Spell {
 				if (LocationUtils.xzDistance(mSpawnLoc, loc) > RADIUS || (height > HEIGHT_UP && player.isOnGround()) || height < -HEIGHT_DOWN) {
 					BossUtils.bossDamagePercent(mBoss, player, 0.85, (Location) null);
 					player.sendMessage(ChatColor.RED + "You are too far from the fight!");
+				}
+			}
+
+			for (Entity e : EntityUtils.getNearbyMobs(mSpawnLoc, 100)) {
+				if (e.getType() == EntityType.WITHER_SKELETON && !EntityUtils.getNearbyMobs(mSpawnLoc, 25).contains(e)) {
+					e.teleport(mSpawnLoc);
 				}
 			}
 		}

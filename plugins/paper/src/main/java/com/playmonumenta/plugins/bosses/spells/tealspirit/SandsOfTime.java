@@ -35,7 +35,7 @@ public class SandsOfTime extends Spell {
 	private static final double RADIUS = 21;
 	private static final double HEIGHT = 4;
 	private double mDamage = 180;
-	private static final int BLUE_ROOT = 4 * 20;
+	private static final int BLUE_ROOT = 1 * 20;
 	private static final double DIST = 25;
 	private static final int SPREAD = 4;
 	private static final int BLUE_DELAY = 4 * 20;
@@ -88,7 +88,7 @@ public class SandsOfTime extends Spell {
 		bools.add(false);
 		Collections.shuffle(bools);
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
 				int time = mChargeUp.getTime();
@@ -142,7 +142,9 @@ public class SandsOfTime extends Spell {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(plugin, 0, 1);
+		};
+		runnable.runTaskTimer(plugin, 0, 1);
+		mActiveRunnables.add(runnable);
 	}
 
 	private void activate(Plugin plugin, Location loc, Color color, boolean doRoot, Location tallCenter) {

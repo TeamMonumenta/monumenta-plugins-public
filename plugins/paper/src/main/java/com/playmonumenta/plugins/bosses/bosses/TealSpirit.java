@@ -172,11 +172,11 @@ public class TealSpirit extends BossAbilityGroup {
 			MidnightToll midnightToll = new MidnightToll(mPlugin, mBoss, 20 * 5, 40, 40, mSpawnLoc);
 			MidnightToll finalMidnightToll = new MidnightToll(mPlugin, mBoss, 20 * 15, 99999999, 40, mSpawnLoc);
 			mDoomsdayClock = new DoomsdayClock(mBoss, mSpawnLoc, 20 * 25);
-			MarchingFate mMarchingFates = new MarchingFate(mBoss, this);
+			MarchingFate mMarchingFates = new MarchingFate(mBoss, this, true);
 
 			SpellManager activeSpells = new SpellManager(Arrays.asList(
 				//new ClockworkAssassination(plugin, boss),
-				new SandsOfTime(mBoss, mSpawnLoc, team, 18 * 20, 180),
+				new SandsOfTime(mBoss, mSpawnLoc, team, 24 * 20, 180),
 				//new Rewind(mBoss, mSpawnLoc),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
@@ -293,19 +293,19 @@ public class TealSpirit extends BossAbilityGroup {
 			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 			constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 20 * 10);
 		} else if (mEncounterType.equals("Normal")) {
-			mHealth = 18000;
+			mHealth = 14000;
 
 			mDoomsdayClock = new DoomsdayClock(mBoss, mSpawnLoc, 20 * 25);
-			MarchingFate mMarchingFates = new MarchingFate(mBoss, this);
+			MarchingFate mMarchingFates = new MarchingFate(mBoss, this, false);
 
 			SpellManager activeSpells = new SpellManager(Arrays.asList(
 				//new ClockworkAssassination(plugin, boss),
-				new SandsOfTime(mBoss, mSpawnLoc, team, 18 * 20, 80),
+				new SandsOfTime(mBoss, mSpawnLoc, team, 25 * 20, 80),
 				//new Rewind(mBoss, mSpawnLoc),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
 				new SundialSlash(mBoss, 7 * 20),
-				new SuspendedBallistae(mBoss, mPlugin, 25, 4, 50,
+				new SuspendedBallistae(mBoss, mPlugin, 25, 3, 50,
 					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
 			));
 
@@ -315,7 +315,9 @@ public class TealSpirit extends BossAbilityGroup {
 				new TealSpiritSummon(mSpawnLoc, 30 * 20),
 				new SpellBlockBreak(mBoss),
 				new SpellShieldStun(10 * 20),
-				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 40),
+				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> {
+					return mBoss.getLocation().distance(mSpawnLoc) > 30;
+				}),
 				new TealAntiCheat(boss, 20, spawnLoc)
 			);
 
@@ -339,10 +341,6 @@ public class TealSpirit extends BossAbilityGroup {
 				forceCastSpell(Rewind.class);
 			});
 
-			events.put(75, mBoss -> {
-				mDoomsdayClock.run();
-			});
-
 			events.put(70, mBoss -> {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
@@ -353,10 +351,6 @@ public class TealSpirit extends BossAbilityGroup {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-			});
-
-			events.put(55, mBoss -> {
-				mDoomsdayClock.disableClock();
 			});
 
 			events.put(50, mBoss -> {
@@ -390,6 +384,7 @@ public class TealSpirit extends BossAbilityGroup {
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
 				mDoomsdayClock.run();
+				mMarchingFates.removeMarchers();
 			});
 
 			events.put(1, mBoss -> {
@@ -407,6 +402,9 @@ public class TealSpirit extends BossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, mHealth);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
+		if (mEncounterType.equals("Normal")) {
+			EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, 30);
+		}
 		mBoss.setHealth(mHealth);
 
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
