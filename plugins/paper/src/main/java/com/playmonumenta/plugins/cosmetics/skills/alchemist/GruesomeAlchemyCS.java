@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 
@@ -39,9 +40,9 @@ public class GruesomeAlchemyCS implements CosmeticSkill {
 
 	public void effectsOnSwap(Player mPlayer, boolean isGruesomeBeforeSwap) {
 		if (isGruesomeBeforeSwap) {
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 1.25f);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHEST_CLOSE, SoundCategory.PLAYERS, 1, 1.25f);
 		} else {
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 0.75f);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHEST_CLOSE, SoundCategory.PLAYERS, 1, 0.75f);
 		}
 	}
 

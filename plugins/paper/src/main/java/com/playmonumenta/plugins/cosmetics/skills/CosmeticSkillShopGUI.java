@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.cosmetics.gui.CosmeticsGUI;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -36,13 +37,14 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private static final int TALISMAN_PER_DEPTH_SKIN = 1;
 	private static final int GEODE_PER_DEPTH_SKIN = 2 * 64;
 	private static final int STRAND_PER_DELVE_SKIN = 64;
-	private static final int CANVAS_PER_GALLERY_SKIN = 3 * 64;
+	private static final int CANVAS_PER_GALLERY_SKIN = 2 * 64;
 	private static final NamespacedKey PIGMENT_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r2/delves/items/twisted_pigment");
+	private static final String TALISMAN_LOOTTABLE_FOLDER = "epic:r2/depths/utility/";
 	private static final NamespacedKey GEODE_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode");
 	private static final NamespacedKey STRAND_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r2/delves/items/twisted_strand");
 	private static final NamespacedKey CANVAS_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r3/gallery/items/torn_canvas");
-	//Talisman item paths
-	private static final String TALISMAN_LOOTTABLE_FOLDER = "epic:r2/depths/utility/";
+	private static final NamespacedKey PRESTIGE_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r2/delves/items/reverial_roots");
+
 	//Theme constants
 	//Depths
 	private static final List<String> DEPTH_INTRO = List.of(
@@ -57,6 +59,13 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		"rewards for heroic adventurers."
 	);
 	private static final ImmutableList<String> DELVE_THEME = CosmeticSkills.getDelvesNames();
+	//Prestige
+	private static final List<String> PRESTIGE_INTRO = List.of(
+		"Every single step here is",
+		"a witness of your prestige and glory."
+	);
+	private static final ImmutableList<String> PRESTIGE_THEME = CosmeticSkills.getPrestigeNames();
+	private static final ImmutableList<PrestigeCS> PRESTIGE_CS = CosmeticSkills.getPrestigeSkins();
 	//Sanguine
 	private static final List<String> GALLERY_INTRO = List.of(
 		"The nightmare was never meant for life.",
@@ -81,12 +90,13 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private static final String R1MONUMENT_SCB = "R1Complete";
 	private static final String DEPTHS_SCB = "Depths";
 	private static final String GALLERY_SCB = "DGLobby";
+	private static final String PRESTIGE_SCB = ""; //TODO: scb for unlocking hall
 	private static final TextColor DEPTH_COLOR = TextColor.fromHexString("#5D2D87");
 	private static final TextColor DELVE_COLOR = TextColor.fromHexString("#B47028");
-	//private static final TextColor PRESTIGE_COLOR = TextColor.fromHexString("#FFFF00");;
+	private static final TextColor PRESTIGE_COLOR = TextColor.fromHexString("#FEDC10");
 	private static final TextColor GALLERY_COLOR = TextColor.fromHexString("#39B14E");
 	private static final int DEPTH_ENTRY_LOC = 20;
-	private static final int DELVE_ENTRY_LOC = 24; //TODO: Change to 21 when we release r3
+	private static final int DELVE_ENTRY_LOC = 21;
 	private static final int PRESTIGE_ENTRY_LOC = 22;
 	private static final int GALLERY_ENTRY_LOC = 23;
 
@@ -298,8 +308,68 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 					}
 				}
 				break;
-				case Prestige:
-					break;
+				case Prestige: {
+					int entry = slotToEntryNum(slot);
+
+					// Clicked on a cosmetic. Check for buying
+					if (entry >= 0 && entry < PRESTIGE_THEME.size()) {
+						String skin = PRESTIGE_THEME.get(entry);
+						if (!CosmeticsManager.getInstance().playerHasCosmetic(player, CosmeticType.COSMETIC_SKILL, skin)) {
+							// Try to buy
+							if (player.getGameMode() == GameMode.CREATIVE) {
+								CosmeticsManager.getInstance().addCosmetic(player, CosmeticType.COSMETIC_SKILL, skin);
+								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1.5f);
+								player.sendMessage(Component.text("Because you are in creative mode, this is free!", NamedTextColor.GREEN));
+								reloadPage(player);
+								return;
+							}
+
+							// Check costs
+							ItemStack mStar = InventoryUtils.getItemFromLootTable(player, PRESTIGE_LOOTTABLE);
+							int priceNum = PRESTIGE_CS.get(entry).getPrice();
+							int removed = InventoryUtils.removeSoulboundItemFromInventory(player.getInventory(), ItemUtils.getPlainName(mStar), priceNum, player);
+							if (removed == 0) {
+								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
+							} else if (removed == priceNum) {
+								// Successfully removed items
+								if (CosmeticsManager.getInstance().addCosmetic(player, CosmeticType.COSMETIC_SKILL, skin)) {
+									player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1.5f);
+									player.sendMessage(Component.text("You successfully bought " + skin + "! Go to Cosmetic Manager to equip it!", NamedTextColor.GREEN));
+									reloadPage(player);
+								} else {
+									// Shouldn't be here! But leave it as a handler to avoid typo in code.
+									player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 0.5f);
+									player.sendMessage(Component.text("EX[" + skin + "]2: An exception occurred when buying cosmetic skill. Contact a moder or dev with this message to report if you believe this is a bug.", NamedTextColor.DARK_RED));
+									close();
+								}
+							} else {
+								// Shouldn't be here! But leave it as a handler to avoid typo in code.
+								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 0.5f);
+								player.sendMessage(Component.text("EX[" + skin + "]3: An exception occurred when consuming Soulbound tokens. Contact a moder if you lose items.", NamedTextColor.DARK_RED));
+							}
+						} else {
+							// Already bought
+							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+							player.sendMessage(Component.text("You already have this cosmetic skill. Go to Cosmetic Manager to equip it!", NamedTextColor.RED));
+						}
+						return;
+					}
+
+					// Changing page
+					if (slot == PREV_PAGE_LOC) {
+						mPageNumber--;
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						loadDepthPage(player);
+						return;
+					} else if (slot == NEXT_PAGE_LOC) {
+						mPageNumber++;
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						loadDepthPage(player);
+						return;
+					}
+				}
+				break;
 				case Gallery: {
 					int entry = slotToEntryNum(slot);
 
@@ -411,9 +481,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 				loadDelvePage(player);
 				break;
 			case Prestige:
-				//loadPrestigePage(player);
-				close();
-				player.sendMessage(Component.text("Not implemented. Why you can see this?", NamedTextColor.DARK_RED));
+				loadPrestigePage(player);
 				break;
 			case Gallery:
 				loadGalleryPage(player);
@@ -424,7 +492,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 				mInventory.setItem(INTRO_LOC, introItem);
 
 				// Depth theme entry
-				if (ScoreboardUtils.getScoreOrDefault(player, DEPTHS_SCB, 0) > 0 || player.getGameMode() == GameMode.CREATIVE) {
+				if (ScoreboardUtils.getScoreboardValue(player, DEPTHS_SCB).orElse(0) > 0 || player.getGameMode() == GameMode.CREATIVE) {
 					ItemStack depthItem = createPageIcon(Material.BLACKSTONE, "Darkest Depths", DEPTH_COLOR, DEPTH_INTRO);
 					mInventory.setItem(DEPTH_ENTRY_LOC, depthItem);
 				} else {
@@ -435,7 +503,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 				}
 
 				// Delve theme entry
-				if (ScoreboardUtils.getScoreOrDefault(player, R1MONUMENT_SCB, 0) > 0 || player.getGameMode() == GameMode.CREATIVE) {
+				if (ScoreboardUtils.getScoreboardValue(player, R1MONUMENT_SCB).orElse(0) > 0 || player.getGameMode() == GameMode.CREATIVE) {
 					ItemStack delveItem = createPageIcon(Material.NETHERITE_BLOCK, "Dungeon Delves", DELVE_COLOR, DELVE_INTRO);
 					mInventory.setItem(DELVE_ENTRY_LOC, delveItem);
 				} else {
@@ -446,34 +514,31 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 				}
 
 				// Prestige theme entry
-				final boolean prestige_enable = false; //TODO: Remove this when launching prestige hall
+				final boolean prestige_enable = false; //TODO: Remove this awful restriction when launching prestige hall
 				if (prestige_enable) {
-					ItemStack prestigeItem = createPageIcon(Material.GOLD_BLOCK, "Prestigious Hall", NamedTextColor.GOLD, List.of("Witness of prestige."));
-					mInventory.setItem(PRESTIGE_ENTRY_LOC, prestigeItem);
-				}
-
-				// Gallery theme entry
-				final boolean gallery_enable = false; //TODO: Remove this when launching gallery
-				if (gallery_enable) { //Testing!
-					if (ScoreboardUtils.getScoreOrDefault(player, GALLERY_SCB, 0) > 0 || player.getGameMode() == GameMode.CREATIVE) {
-						ItemStack galleryItem = createPageIcon(Material.WAXED_OXIDIZED_COPPER, "Gallery of Fear", GALLERY_COLOR, GALLERY_INTRO); //TODO: Gallery intro
-						mInventory.setItem(GALLERY_ENTRY_LOC, galleryItem);
+					if (ScoreboardUtils.getScoreboardValue(player, PRESTIGE_SCB).orElse(0) > 0 || player.getGameMode() == GameMode.CREATIVE) { //Testing!
+						ItemStack prestigeItem = createPageIcon(Material.GOLD_BLOCK, "Prestige Hall", PRESTIGE_COLOR, PRESTIGE_INTRO);
+						mInventory.setItem(PRESTIGE_ENTRY_LOC, prestigeItem);
 					} else {
-						ItemStack galleryItem = createPageIcon(LOCKED, ChatColor.MAGIC + "MzkCaerulaArbor" + ChatColor.RESET, GALLERY_COLOR,
-							List.of("Reveal the secret b" + ChatColor.MAGIC + "eneth the ocean" + ChatColor.RESET + "s",
-								"to unlock this theme!"));
-						mInventory.setItem(GALLERY_ENTRY_LOC, galleryItem);
+						ItemStack prestigeItem = createPageIcon(LOCKED, "???", PRESTIGE_COLOR,
+							List.of("Coming Soon!")); //TODO: pre hall condition
+						mInventory.setItem(PRESTIGE_ENTRY_LOC, prestigeItem);
 					}
 				}
 
-			// Back item
-			{
-				ItemStack item = new ItemStack(Material.REDSTONE_BLOCK, 1);
-				ItemMeta meta = item.getItemMeta();
-				meta.displayName(Component.text("Back to Cosmetic Manager", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-				item.setItemMeta(meta);
-				mInventory.setItem(BACK_LOC, item);
-			}
+				// Gallery theme entry
+				if (ScoreboardUtils.getScoreboardValue(player, GALLERY_SCB).orElse(0) > 0 || player.getGameMode() == GameMode.CREATIVE) {
+					ItemStack galleryItem = createPageIcon(Material.WAXED_OXIDIZED_COPPER, "Gallery of Fear", GALLERY_COLOR, GALLERY_INTRO);
+					mInventory.setItem(GALLERY_ENTRY_LOC, galleryItem);
+				} else {
+					ItemStack galleryItem = createPageIcon(LOCKED, ChatColor.MAGIC + "MzkCaerulaArbor" + ChatColor.RESET, GALLERY_COLOR,
+						List.of("Reveal the secret b" + ChatColor.MAGIC + "eneth the ocean" + ChatColor.RESET + "s",
+							"to unlock this theme!"));
+					mInventory.setItem(GALLERY_ENTRY_LOC, galleryItem);
+				}
+
+				// Back item
+				setBackItem("Back to Cosmetic Manager");
 		}
 	}
 
@@ -492,10 +557,10 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			// Paging
 			for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < DEPTHS_CS.size(); ) {
 				String skin = DEPTH_THEME.get(i);
-				String tokenName = DEPTHS_CS.get(i).getToken().replace('_', ' ');
+				String tokenName = StringUtils.capitalizeWords(DEPTHS_CS.get(i).getToken().replace('_', ' '));
 				List<String> price = List.of(
 					PIGMENT_PER_SKIN + " Twisted Pigments,",
-					TALISMAN_PER_DEPTH_SKIN + " " + StringUtils.capitalizeWords(tokenName) + " and",
+					TALISMAN_PER_DEPTH_SKIN + " " + tokenName + " and",
 					GEODE_PER_DEPTH_SKIN + " Voidstained Geodes");
 				ItemStack item = createSkillIcon(skin, DEPTH_COLOR, player, price);
 				mInventory.setItem(currentSlot, item);
@@ -510,32 +575,11 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			}
 
 			// Prev and next page buttons
-			if (mPageNumber > 1) {
-				// Display prev page
-				ItemStack pageItem = new ItemStack(Material.ARROW, 1);
-				ItemMeta meta = pageItem.getItemMeta();
-				meta.displayName(Component.text("Previous Page", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-				pageItem.setItemMeta(meta);
-				mInventory.setItem(PREV_PAGE_LOC, pageItem);
-			}
-			if (mPageNumber < numPages) {
-				// Display next page
-				ItemStack pageItem = new ItemStack(Material.ARROW, 1);
-				ItemMeta meta = pageItem.getItemMeta();
-				meta.displayName(Component.text("Next Page", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-				pageItem.setItemMeta(meta);
-				mInventory.setItem(NEXT_PAGE_LOC, pageItem);
-			}
+			setPagingItems(numPages);
 		}
 
 		// Back item
-		{
-			ItemStack item = new ItemStack(Material.REDSTONE_BLOCK, 1);
-			ItemMeta meta = item.getItemMeta();
-			meta.displayName(Component.text("Back to Overview", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			item.setItemMeta(meta);
-			mInventory.setItem(BACK_LOC, item);
-		}
+		setBackItem("Back to Overview");
 	}
 
 	private void loadDelvePage(Player player) {
@@ -569,39 +613,49 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			}
 
 			// Prev and next page buttons
-			if (mPageNumber > 1) {
-				// Display prev page
-				ItemStack pageItem = new ItemStack(Material.ARROW, 1);
-				ItemMeta meta = pageItem.getItemMeta();
-				meta.displayName(Component.text("Previous Page", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-				pageItem.setItemMeta(meta);
-				mInventory.setItem(PREV_PAGE_LOC, pageItem);
-			}
-			if (mPageNumber < numPages) {
-				// Display next page
-				ItemStack pageItem = new ItemStack(Material.ARROW, 1);
-				ItemMeta meta = pageItem.getItemMeta();
-				meta.displayName(Component.text("Next Page", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-				pageItem.setItemMeta(meta);
-				mInventory.setItem(NEXT_PAGE_LOC, pageItem);
-			}
+			setPagingItems(numPages);
 		}
 
 		// Back item
-		{
-			ItemStack item = new ItemStack(Material.REDSTONE_BLOCK, 1);
-			ItemMeta meta = item.getItemMeta();
-			meta.displayName(Component.text("Back to Overview", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			item.setItemMeta(meta);
-			mInventory.setItem(BACK_LOC, item);
-		}
+		setBackItem("Back to Overview");
 	}
 
-	/*
 	private void loadPrestigePage(Player player) {
-		//Not implemented
+		// Intro item
+		{
+			ItemStack introItem = createPageIcon(Material.GOLD_BLOCK, "Prestige Hall", PRESTIGE_COLOR, PRESTIGE_INTRO);
+			mInventory.setItem(INTRO_LOC, introItem);
+		}
+
+		// Skin items
+		{
+			int numPages = (PRESTIGE_THEME.size() - 1) / ENTRY_PER_PAGE + 1;
+			mPageNumber = Math.min(numPages, Math.max(1, mPageNumber));
+			int currentSlot = ENTRY_START;
+			// Paging
+			for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < PRESTIGE_CS.size(); ) {
+				String skin = PRESTIGE_THEME.get(i);
+				int priceNum = PRESTIGE_CS.get(i).getPrice();
+				List<String> price = List.of(priceNum + " Reverial Roots");
+				ItemStack item = createSkillIcon(skin, PRESTIGE_COLOR, player, price);
+				mInventory.setItem(currentSlot, item);
+				if (slotToEntryNum(++currentSlot) < 0) {
+					// New line
+					currentSlot += (9 - ENTRY_PER_LINE);
+				}
+				if (++i % ENTRY_PER_PAGE == 0) {
+					// End of current page number
+					break;
+				}
+			}
+
+			// Prev and next page buttons
+			setPagingItems(numPages);
+		}
+
+		// Back item
+		setBackItem("Back to Overview");
 	}
-	*/
 
 	private void loadGalleryPage(Player player) {
 		// Intro item
@@ -634,32 +688,38 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			}
 
 			// Prev and next page buttons
-			if (mPageNumber > 1) {
-				// Display prev page
-				ItemStack pageItem = new ItemStack(Material.ARROW, 1);
-				ItemMeta meta = pageItem.getItemMeta();
-				meta.displayName(Component.text("Previous Page", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-				pageItem.setItemMeta(meta);
-				mInventory.setItem(PREV_PAGE_LOC, pageItem);
-			}
-			if (mPageNumber < numPages) {
-				// Display next page
-				ItemStack pageItem = new ItemStack(Material.ARROW, 1);
-				ItemMeta meta = pageItem.getItemMeta();
-				meta.displayName(Component.text("Next Page", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-				pageItem.setItemMeta(meta);
-				mInventory.setItem(NEXT_PAGE_LOC, pageItem);
-			}
+			setPagingItems(numPages);
 		}
 
 		// Back item
-		{
-			ItemStack item = new ItemStack(Material.REDSTONE_BLOCK, 1);
-			ItemMeta meta = item.getItemMeta();
-			meta.displayName(Component.text("Back to Overview", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			item.setItemMeta(meta);
-			mInventory.setItem(BACK_LOC, item);
+		setBackItem("Back to Overview");
+	}
+
+	private void setPagingItems(int numPages) {
+		if (mPageNumber > 1) {
+			// Display prev page
+			ItemStack pageItem = new ItemStack(Material.ARROW, 1);
+			ItemMeta meta = pageItem.getItemMeta();
+			meta.displayName(Component.text("Previous Page", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+			pageItem.setItemMeta(meta);
+			mInventory.setItem(PREV_PAGE_LOC, pageItem);
 		}
+		if (mPageNumber < numPages) {
+			// Display next page
+			ItemStack pageItem = new ItemStack(Material.ARROW, 1);
+			ItemMeta meta = pageItem.getItemMeta();
+			meta.displayName(Component.text("Next Page", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+			pageItem.setItemMeta(meta);
+			mInventory.setItem(NEXT_PAGE_LOC, pageItem);
+		}
+	}
+
+	private void setBackItem(String itemName) {
+		ItemStack item = new ItemStack(Material.REDSTONE_BLOCK, 1);
+		ItemMeta meta = item.getItemMeta();
+		meta.displayName(Component.text(itemName, NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+		item.setItemMeta(meta);
+		mInventory.setItem(BACK_LOC, item);
 	}
 
 	private ItemStack createPageIcon(Material icon, String name, TextColor color, List<String> desc) {

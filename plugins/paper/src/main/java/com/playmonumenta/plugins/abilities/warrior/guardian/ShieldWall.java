@@ -3,11 +3,12 @@ package com.playmonumenta.plugins.abilities.warrior.guardian;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.ShieldWallCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -19,8 +20,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -43,6 +42,7 @@ public class ShieldWall extends Ability {
 	private static final int SHIELD_WALL_2_COOLDOWN = 20 * 20;
 	private static final int SHIELD_WALL_ANGLE = 180;
 	private static final float SHIELD_WALL_2_KNOCKBACK = 0.3f;
+	private static final double SHIELD_WALL_RADIUS = 4.0;
 
 	public static final String CHARM_DURATION = "Shield Wall Duration";
 	public static final String CHARM_DAMAGE = "Shield Wall Damage";
@@ -51,6 +51,7 @@ public class ShieldWall extends Ability {
 	public static final String CHARM_KNOCKBACK = "Shield Wall Knockback";
 
 	private int mDuration;
+	private final ShieldWallCS mCosmetic;
 
 	public ShieldWall(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Shield Wall");
@@ -64,6 +65,7 @@ public class ShieldWall extends Ability {
 		mDisplayItem = new ItemStack(Material.STONE_BRICK_WALL, 1);
 
 		mDuration = (isLevelOne() ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION) + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldWallCS(), ShieldWallCS.SKIN_LIST);
 	}
 
 	@Override
@@ -78,15 +80,14 @@ public class ShieldWall extends Ability {
 			double angle = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, SHIELD_WALL_ANGLE);
 
 			World world = mPlayer.getWorld();
-			world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
-			new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f).spawnAsPlayerActive(mPlayer);
+			mCosmetic.shieldStartEffect(world, mPlayer, SHIELD_WALL_RADIUS);
 			putOnCooldown();
 
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 			new BukkitRunnable() {
 				int mT = 0;
+				final int mHeight = 5;
 				final Location mLoc = mPlayer.getLocation();
 				final List<BoundingBox> mBoxes = new ArrayList<>();
 				List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
@@ -97,15 +98,15 @@ public class ShieldWall extends Ability {
 				public void run() {
 					mT++;
 					Vector vec;
-					for (int y = 0; y < 5; y++) {
+					for (int y = 0; y < mHeight; y++) {
 						for (double degree = 0; degree < angle; degree += 10) {
-							double radian1 = Math.toRadians(degree);
-							vec = new Vector(FastUtils.cos(radian1) * 4, y, FastUtils.sin(radian1) * 4);
+							double radian1 = Math.toRadians(degree - 0.5 * angle);
+							vec = new Vector(-FastUtils.sin(radian1) * SHIELD_WALL_RADIUS, y, FastUtils.cos(radian1) * SHIELD_WALL_RADIUS);
 							vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 							Location l = mLoc.clone().add(vec);
 							if (mT % 4 == 0) {
-								new PartialParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+								mCosmetic.shieldWallDot(mPlayer, l, degree, angle, y, mHeight);
 							}
 							if (!mHitboxes) {
 								mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
@@ -121,8 +122,7 @@ public class ShieldWall extends Ability {
 							if (e instanceof Projectile proj) {
 								if (proj.getShooter() instanceof LivingEntity shooter && !(shooter instanceof Player)) {
 									proj.remove();
-									new PartialParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f).spawnAsPlayerActive(mPlayer);
-									world.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
+									mCosmetic.shieldOnBlock(world, eLoc, mPlayer);
 								}
 							} else if (e instanceof LivingEntity le && EntityUtils.isHostileMob(e)) {
 								// Stores mobs hit this tick
@@ -137,8 +137,7 @@ public class ShieldWall extends Ability {
 									//Bosses should not be affected by slowness or knockback.
 									if (knockback > 0 && !e.getScoreboardTags().contains("Boss")) {
 										MovementUtils.knockAway(mLoc, le, knockback, true);
-										new PartialParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f).spawnAsPlayerActive(mPlayer);
-										world.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
+										mCosmetic.shieldOnHit(world, eLoc, mPlayer);
 									} else {
 										le.setVelocity(v);
 									}

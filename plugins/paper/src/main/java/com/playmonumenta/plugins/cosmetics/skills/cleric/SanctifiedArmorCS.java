@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -40,8 +41,8 @@ public class SanctifiedArmorCS implements CosmeticSkill {
 	}
 
 	public void sanctOnTrigger1(World world, Player mPlayer, Location loc, LivingEntity source) {
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 0.7f, 1.2f);
 		new PartialParticle(Particle.FIREWORKS_SPARK, loc.add(0, source.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125).spawnAsPlayerPassive(mPlayer);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
 	}
 
 	public void sanctOnTrigger2(World world, Player mPlayer, Location loc, LivingEntity source) {
@@ -49,6 +50,6 @@ public class SanctifiedArmorCS implements CosmeticSkill {
 	}
 
 	public void sanctOnHeal(Player mPlayer, LivingEntity enemy) {
-		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.65f, 1.25f);
+		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.65f, 1.25f);
 	}
 }

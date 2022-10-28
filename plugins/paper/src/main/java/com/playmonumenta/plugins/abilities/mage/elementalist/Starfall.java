@@ -3,12 +3,13 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.mage.elementalist.StarfallCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -17,8 +18,6 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -46,6 +45,7 @@ public class Starfall extends Ability {
 	public static final String CHARM_FIRE = "Starfall Fire Duration";
 
 	private final float mLevelDamage;
+	private final StarfallCS mCosmetic;
 
 	public Starfall(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
@@ -77,6 +77,7 @@ public class Starfall extends Ability {
 		mDisplayItem = new ItemStack(Material.MAGMA_BLOCK, 1);
 
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new StarfallCS(), StarfallCS.SKIN_LIST);
 	}
 
 	@Override
@@ -93,15 +94,12 @@ public class Starfall extends Ability {
 
 				ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 				float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-
-				world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
-				new PartialParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
+				mCosmetic.starfallCastEffect(world, mPlayer);
 				Vector dir = loc.getDirection().normalize();
 				for (int i = 0; i < DISTANCE; i++) {
 					loc.add(dir);
 
-					new PartialParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
+					mCosmetic.starfallCastTrail(loc, mPlayer);
 					int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
 					if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid() || i >= DISTANCE - 1 || size > 0) {
 						launchMeteor(loc, playerItemStats, damage);
@@ -127,10 +125,7 @@ public class Starfall extends Ability {
 					loc.subtract(0, 0.25, 0);
 					if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
 						if (loc.getY() - ogLoc.getY() <= 2) {
-							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0);
-							new PartialParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.235F).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.2F).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2F).spawnAsPlayerActive(mPlayer);
+							mCosmetic.starfallLandEffect(world, mPlayer, loc);
 							this.cancel();
 
 							Hitbox hitbox = new Hitbox.SphereHitbox(loc, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE));
@@ -143,9 +138,7 @@ public class Starfall extends Ability {
 						}
 					}
 				}
-				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
-				new PartialParticle(Particle.FLAME, loc, 25, 0.25F, 0.25F, 0.25F, 0.1F).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.SMOKE_LARGE, loc, 5, 0.25F, 0.25F, 0.25F, 0.1F).spawnAsPlayerActive(mPlayer);
+				mCosmetic.starfallFallEffect(world, mPlayer, loc);
 
 				if (mT >= 50) {
 					this.cancel();

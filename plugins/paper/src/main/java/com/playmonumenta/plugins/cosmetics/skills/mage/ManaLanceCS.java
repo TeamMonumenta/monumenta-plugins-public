@@ -40,8 +40,8 @@ public class ManaLanceCS implements CosmeticSkill {
 	}
 
 	public void lanceHitBlock(Player mPlayer, Location bLoc, World world) {
+		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.65f);
 		new PartialParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
 	}
 
 	public void lanceParticle(Player mPlayer, Location loc, Location endLoc, int iterations, double range) {
@@ -50,7 +50,7 @@ public class ManaLanceCS implements CosmeticSkill {
 	}
 
 	public void lanceSound(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1, 1.75f);
 	}
 
 	public void lanceHit(Location loc, Player mPlayer) {

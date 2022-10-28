@@ -99,7 +99,7 @@ public class DelveInfusionUtils {
 		}
 
 		public boolean isUnlocked(Player player) {
-			return mScoreboard == null || ScoreboardUtils.getScoreOrDefault(player, mScoreboard, 0) >= 1;
+			return mScoreboard == null || ScoreboardUtils.getScoreboardValue(player, mScoreboard).orElse(0) >= 1;
 		}
 	}
 

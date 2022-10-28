@@ -5,13 +5,14 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.HallowedBeamCS;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -27,8 +28,6 @@ import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -77,6 +76,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 	private Mode mMode = Mode.DEFAULT;
 	private int mLastCastTicks = 0;
+	private final HallowedBeamCS mCosmetic;
 
 	public HallowedBeam(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Hallowed Beam");
@@ -91,6 +91,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		mDisplayItem = new ItemStack(Material.BOW, 1);
 		mMaxCharges = (int) CharmManager.getLevel(player, CHARM_CHARGE) + (isLevelOne() ? HALLOWED_1_MAX_CHARGES : HALLOWED_2_MAX_CHARGES);
 		mCharges = getTrackedCharges();
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HallowedBeamCS(), HallowedBeamCS.SKIN_LIST);
 		if (player != null) {
 			int modeIndex = ScoreboardUtils.getScoreboardValue(player, MODE_SCOREBOARD).orElse(0);
 			mMode = Mode.values()[Math.max(0, Math.min(modeIndex, Mode.values().length - 1))];
@@ -176,25 +177,11 @@ public class HallowedBeam extends MultipleChargeAbility {
 								this.cancel();
 								return;
 							}
-							world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
-							world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
-							for (int i = 0; i < CAST_RANGE; i++) {
-								loc.add(dir);
-								new PartialParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(mPlayer);
-								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f).spawnAsPlayerActive(mPlayer);
-								if (loc.distance(e.getEyeLocation()) < 1.25) {
-									loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.35f);
-									loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
-									break;
-								}
-							}
-							Location eLoc = pe.getLocation().add(0, pe.getHeight() / 2, 0);
-							new PartialParticle(Particle.SPELL_INSTANT, pe.getLocation(), 500, 2.5, 0.15f, 2.5, 1).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.VILLAGER_HAPPY, pe.getLocation(), 150, 2.55, 0.15f, 2.5, 1).spawnAsPlayerActive(mPlayer);
-							world.playSound(player.getEyeLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, 2, 1.5f);
 
+							mCosmetic.beamHealEffect(world, mPlayer, pe, dir, CAST_RANGE);
 							PlayerUtils.healPlayer(mPlugin, pe, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEAL, EntityUtils.getMaxHealth(pe) * HALLOWED_HEAL_PERCENT), mPlayer);
 
+							Location eLoc = pe.getLocation().add(0, pe.getHeight() / 2, 0);
 							if (isLevelTwo()) {
 								mPlugin.mEffectManager.addEffect(pe, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(HALLOWED_DAMAGE_REDUCTION_DURATION, HALLOWED_DAMAGE_REDUCTION_PERCENT));
 							}
@@ -210,26 +197,14 @@ public class HallowedBeam extends MultipleChargeAbility {
 								this.cancel();
 								return;
 							}
-							world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
-							world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
-							for (int i = 0; i < CAST_RANGE; i++) {
-								loc.add(dir);
-								new PartialParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(mPlayer);
-								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f).spawnAsPlayerActive(mPlayer);
-								if (loc.distance(e.getEyeLocation()) < 1.25) {
-									loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.35f);
-									loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
-									break;
-								}
-							}
+							mCosmetic.beamHarm(world, mPlayer, e, dir, CAST_RANGE);
 
 							double damage = ItemStatUtils.getAttributeAmount(player.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
 							damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 							DamageUtils.damage(mPlayer, applyE, DamageType.PROJECTILE_SKILL, damage, mInfo.mLinkedSpell, true, true);
 
 							Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
-							new PartialParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f).spawnAsPlayerActive(mPlayer);
+							mCosmetic.beamHarmCrusade(mPlayer, eLoc);
 
 							applyRecoil();
 						} else if (EntityUtils.isHostileMob(applyE)) {
@@ -238,18 +213,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 								this.cancel();
 								return;
 							}
-							world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
-							world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
-							for (int i = 0; i < CAST_RANGE; i++) {
-								loc.add(dir);
-								new PartialParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(mPlayer);
-								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f).spawnAsPlayerActive(mPlayer);
-								if (loc.distance(e.getEyeLocation()) < 1.25) {
-									loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.35f);
-									loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
-									break;
-								}
-							}
+							mCosmetic.beamHarm(world, mPlayer, e, dir, CAST_RANGE);
 
 							if (Crusade.enemyTriggersAbilities(applyE, mCrusade)) {
 								EntityUtils.applyStun(mPlugin, HALLOWED_UNDEAD_STUN + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), applyE);
@@ -261,8 +225,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 								EntityUtils.applyFire(mPlugin, 20 * 15, applyE, player);
 							}
 							Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
-							new PartialParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.CRIT_MAGIC, loc, 30, 1, 1, 1, 0.25).spawnAsPlayerActive(mPlayer);
+							mCosmetic.beamHarmOther(mPlayer, eLoc);
 
 							applyRecoil();
 						}

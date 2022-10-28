@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -239,6 +240,43 @@ public class InventoryUtils {
 
 		inventory.setContents(items);
 
+		return dropped;
+	}
+
+	public static int removeSoulboundItemFromInventory(final Inventory inventory, final String itemPlainName, final int amount, final Player player) {
+		if (amount <= 0) {
+			return 0;
+		}
+		@Nullable ItemStack[] items = inventory.getContents();
+		int dropped = 0;
+		int total = 0;
+		List<Integer> matched = new ArrayList<>();
+		for (int i = 0; i < items.length; i++) {
+			ItemStack slot = items[i];
+			if (ItemUtils.getPlainName(slot).equals(itemPlainName) &&
+				isSoulboundToPlayer(slot, player)) {
+				total += slot.getAmount();
+				matched.add(i);
+			}
+		}
+		if (total >= amount) {
+			for (int i : matched) {
+				ItemStack slot = items[i];
+				if (slot.getAmount() > amount - dropped) {
+					slot.setAmount(slot.getAmount() - (amount - dropped));
+					dropped = amount;
+					player.updateInventory();
+					break;
+				} else {
+					dropped += slot.getAmount();
+					slot.setAmount(0);
+					player.updateInventory();
+					if (dropped >= amount) {
+						break;
+					}
+				}
+			}
+		}
 		return dropped;
 	}
 

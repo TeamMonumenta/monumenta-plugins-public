@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -39,7 +40,7 @@ public class BruteForceCS implements CosmeticSkill {
 	}
 
 	public void bruteOnDamage(Player mPlayer, Location loc, int combo) {
-		loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.6f, 0.6f);
+		loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 0.6f, 0.6f);
 		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.135).spawnAsPlayerActive(mPlayer);
 	}

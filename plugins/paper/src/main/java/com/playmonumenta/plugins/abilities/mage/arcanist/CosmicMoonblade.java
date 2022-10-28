@@ -4,29 +4,24 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.CosmicMoonbladeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 public class CosmicMoonblade extends Ability {
 
@@ -41,8 +36,6 @@ public class CosmicMoonblade extends Ability {
 	public static final double REDUCTION_MULTIPLIER_2 = 0.1;
 	public static final int CAP_TICKS_1 = (int) (0.5 * Constants.TICKS_PER_SECOND);
 	public static final int CAP_TICKS_2 = 1 * Constants.TICKS_PER_SECOND;
-	private static final Particle.DustOptions FSWORD_COLOR1 = new Particle.DustOptions(Color.fromRGB(106, 203, 255), 1.0f);
-	private static final Particle.DustOptions FSWORD_COLOR2 = new Particle.DustOptions(Color.fromRGB(168, 226, 255), 1.0f);
 
 	public static final String CHARM_DAMAGE = "Cosmic Moonblade Damage";
 	public static final String CHARM_SPELL_COOLDOWN = "Cosmic Moonblade Cooldown Reduction";
@@ -54,6 +47,7 @@ public class CosmicMoonblade extends Ability {
 	private final double mDamage;
 	private final double mLevelReduction;
 	private final int mLevelCap;
+	private final CosmicMoonbladeCS mCosmetic;
 
 	public CosmicMoonblade(Plugin plugin, Player player) {
 		super(plugin, player, "Cosmic Moonblade");
@@ -80,6 +74,7 @@ public class CosmicMoonblade extends Ability {
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mLevelReduction = (isLevelOne() ? REDUCTION_MULTIPLIER_1 : REDUCTION_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SPELL_COOLDOWN);
 		mLevelCap = (isLevelOne() ? CAP_TICKS_1 : CAP_TICKS_2) + CharmManager.getExtraDuration(player, CHARM_CAP);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CosmicMoonbladeCS(), CosmicMoonbladeCS.SKIN_LIST);
 	}
 
 
@@ -95,13 +90,10 @@ public class CosmicMoonblade extends Ability {
 				ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 				new BukkitRunnable() {
-					int mTimes = 0;
-					float mPitch = 1.2f;
 					int mSwings = 0;
 
 					@Override
 					public void run() {
-						mTimes++;
 						mSwings++;
 						Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), range, Math.toRadians(ANGLE));
 						List<LivingEntity> hitMobs = hitbox.getHitMobs();
@@ -112,77 +104,11 @@ public class CosmicMoonblade extends Ability {
 							}
 						}
 
-						if (mTimes >= swings) {
-							mPitch = 1.45f;
-						}
 						World world = mPlayer.getWorld();
 						Location origin = mPlayer.getLocation();
-						world.playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.8f);
-						world.playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.75f, mPitch);
+						mCosmetic.moonbladeSwingEffect(world, mPlayer, origin, range, mSwings, swings);
 
-						new BukkitRunnable() {
-							final int mI = mSwings;
-							double mRoll;
-							double mD = 45;
-							boolean mInit = false;
-
-							@Override
-							public void run() {
-								if (!mInit) {
-									if (mI % 2 == 0) {
-										mRoll = -8;
-										mD = 45;
-									} else {
-										mRoll = 8;
-										mD = 135;
-									}
-									mInit = true;
-								}
-								PPPeriodic particle1 = new PPPeriodic(Particle.REDSTONE, mPlayer.getLocation()).count(1).delta(0.1, 0.1, 0.1).data(FSWORD_COLOR1);
-								PPPeriodic particle2 = new PPPeriodic(Particle.REDSTONE, mPlayer.getLocation()).count(1).delta(0.1, 0.1, 0.1).data(FSWORD_COLOR2);
-								if (mI % 2 == 0) {
-									Vector vec;
-									for (double r = 1; r < range; r += 0.5) {
-										for (double degree = mD; degree < mD + 30; degree += 5) {
-											double radian1 = Math.toRadians(degree);
-											vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
-											vec = VectorUtils.rotateZAxis(vec, mRoll);
-											vec = VectorUtils.rotateXAxis(vec, origin.getPitch());
-											vec = VectorUtils.rotateYAxis(vec, origin.getYaw());
-
-											Location l = origin.clone().add(0, 1.25, 0).add(vec);
-											particle1.location(l).spawnAsPlayerActive(mPlayer);
-											particle2.location(l).spawnAsPlayerActive(mPlayer);
-										}
-									}
-
-									mD += 30;
-								} else {
-									Vector vec;
-									for (double r = 1; r < 5; r += 0.5) {
-										for (double degree = mD; degree > mD - 30; degree -= 5) {
-											double radian1 = Math.toRadians(degree);
-											vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
-											vec = VectorUtils.rotateZAxis(vec, mRoll);
-											vec = VectorUtils.rotateXAxis(vec, origin.getPitch());
-											vec = VectorUtils.rotateYAxis(vec, origin.getYaw());
-
-											Location l = origin.clone().add(0, 1.25, 0).add(vec);
-											l.setPitch(-l.getPitch());
-											particle1.location(l).spawnAsPlayerActive(mPlayer);
-											particle2.location(l).spawnAsPlayerActive(mPlayer);
-										}
-									}
-									mD -= 30;
-								}
-
-								if ((mD >= 135 && mI % 2 == 0) || (mD <= 45 && mI % 2 > 0)) {
-									this.cancel();
-								}
-							}
-
-						}.runTaskTimer(mPlugin, 0, 1);
-						if (mTimes >= swings) {
+						if (mSwings >= swings) {
 							this.cancel();
 						}
 					}

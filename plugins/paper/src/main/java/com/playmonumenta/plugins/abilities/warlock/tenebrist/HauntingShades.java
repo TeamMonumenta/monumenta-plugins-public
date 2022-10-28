@@ -4,12 +4,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist.HauntingShadesCS;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPCircle;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -18,11 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
@@ -54,7 +51,7 @@ public class HauntingShades extends Ability {
 	public static final String CHARM_RADIUS = "Haunting Shades Radius";
 	public static final String CHARM_DURATION = "Haunting Shades Duration";
 
-	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
+	private final HauntingShadesCS mCosmetic;
 
 	public HauntingShades(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Haunting Shades");
@@ -67,6 +64,7 @@ public class HauntingShades extends Ability {
 		mInfo.mTrigger = AbilityTrigger.ALL;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HauntingShadesCS(), HauntingShadesCS.SKIN_LIST);
 	}
 
 	@Override
@@ -98,15 +96,14 @@ public class HauntingShades extends Ability {
 			box.shift(direction);
 
 			World world = mPlayer.getWorld();
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 0.65f);
+			mCosmetic.shadesStartSound(world, mPlayer);
 
 			Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(loc, RANGE));
 
 			for (double r = 0; r < RANGE; r += HITBOX_LENGTH) {
 				Location bLoc = box.getCenter().toLocation(world);
 
-				new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.REDSTONE, bLoc, 16, 0.2, 0.2, 0.2, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
+				mCosmetic.shadesTrailParticle(mPlayer, bLoc, direction, r);
 
 				Iterator<LivingEntity> iter = nearbyMobs.iterator();
 				while (iter.hasNext()) {
@@ -137,7 +134,7 @@ public class HauntingShades extends Ability {
 		}
 		World world = mPlayer.getWorld();
 		bLoc.setDirection(mPlayer.getLocation().toVector().subtract(bLoc.toVector()).normalize());
-		ArmorStand stand = (ArmorStand) LibraryOfSoulsIntegration.summon(bLoc, "HauntingShade");
+		ArmorStand stand = (ArmorStand) LibraryOfSoulsIntegration.summon(bLoc, mCosmetic.getAsName());
 		if (stand == null) {
 			return;
 		}
@@ -148,7 +145,6 @@ public class HauntingShades extends Ability {
 		stand.setBasePlate(false);
 		stand.setMarker(true);
 		stand.setVisible(true);
-		stand.setCustomName("Haunting Shade");
 		stand.setCustomNameVisible(false);
 
 		new BukkitRunnable() {
@@ -173,32 +169,11 @@ public class HauntingShades extends Ability {
 				    }
 				}
 
-				if (mT % 10 == 0) {
-					new BukkitRunnable() {
-						double mRadius = 0;
-						final Location mLoc = bLoc.clone().add(0, 0.15, 0);
-
-						@Override
-						public void run() {
-							mRadius += 1.25;
-							new PPCircle(Particle.REDSTONE, mLoc, mRadius).ringMode(true).count(36).delta(0.2).extra(0.1).data(COLOR).spawnAsPlayerActive(mPlayer);
-							new PPCircle(Particle.SMOKE_NORMAL, mLoc, mRadius).ringMode(true).count(12).extra(0.15).spawnAsPlayerActive(mPlayer);
-							if (mRadius >= mAoeRadius + 1) {
-								this.cancel();
-							}
-						}
-					}.runTaskTimer(mPlugin, 0, 1);
-				}
-
-				if (mT % 20 == 0) {
-					world.playSound(bLoc, Sound.ENTITY_BLAZE_HURT, 0.3f, 0.5f);
-				}
+				mCosmetic.shadesTickEffect(mPlugin, world, mPlayer, bLoc, mAoeRadius, mT);
 
 				if (mT >= SHADES_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION) || mPlayer.isDead() || !mPlayer.isValid()) {
 					stand.remove();
-					new PartialParticle(Particle.REDSTONE, bLoc, 45, 0.2, 1.1, 0.2, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 40, 0.3, 1.1, 0.3, 0.15).spawnAsPlayerActive(mPlayer);
-					world.playSound(bLoc, Sound.ENTITY_BLAZE_DEATH, 0.7f, 0.5f);
+					mCosmetic.shadesEndEffect(world, mPlayer, bLoc, mAoeRadius);
 					this.cancel();
 				}
 			}

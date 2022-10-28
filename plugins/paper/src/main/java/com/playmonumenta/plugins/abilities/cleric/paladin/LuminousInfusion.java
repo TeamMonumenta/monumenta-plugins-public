@@ -6,23 +6,20 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.LuminousInfusionCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -43,7 +40,6 @@ public class LuminousInfusion extends Ability {
 	public double mLastPassiveMeleeDamage = 0;
 	public double mLastPassiveDJDamage = 0;
 
-	private static final String EXPIRATION_MESSAGE = "The light from your hands fades...";
 	private static final double RADIUS = 4;
 	private static final int FIRE_DURATION_2 = 20 * 3;
 	private static final int COOLDOWN = 20 * 12;
@@ -54,6 +50,7 @@ public class LuminousInfusion extends Ability {
 	public static final String CHARM_RADIUS = "Luminous Infusion Radius";
 
 	private boolean mActive = false;
+	private final LuminousInfusionCS mCosmetic;
 
 	private @Nullable Crusade mCrusade;
 
@@ -75,6 +72,7 @@ public class LuminousInfusion extends Ability {
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 
 		mDoMultiplierAndFire = isLevelTwo();
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new LuminousInfusionCS(), LuminousInfusionCS.SKIN_LIST);
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -93,26 +91,21 @@ public class LuminousInfusion extends Ability {
 		) {
 			mActive = true;
 			putOnCooldown();
-			MessagingUtils.sendActionBarMessage(mPlayer, "Holy energy radiates from your hands...");
 
 			World world = mPlayer.getWorld();
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1);
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1.65f);
-			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.75f, 0.25f, 0.75f, 1).spawnAsPlayerActive(mPlayer);
+			mCosmetic.infusionStartEffect(world, mPlayer);
+
 			new BukkitRunnable() {
 				int mT = 0;
 
 				@Override
 				public void run() {
 					mT++;
-					Location rightHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), 0.45).subtract(0, .8, 0);
-					Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
-					new PartialParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					mCosmetic.infusionTickEffect(mPlayer, mT);
 					if (mT >= COOLDOWN || !mActive) {
 						mActive = false;
 						if (mT >= COOLDOWN) {
-							MessagingUtils.sendActionBarMessage(mPlayer, EXPIRATION_MESSAGE);
+							mCosmetic.infusionExpireMsg(mPlayer);
 							ClientModHandler.updateAbility(mPlayer, LuminousInfusion.this);
 						}
 						this.cancel();
@@ -161,18 +154,14 @@ public class LuminousInfusion extends Ability {
 
 		Location loc = damagee.getLocation();
 		World world = mPlayer.getWorld();
-		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.8f, 1.1f);
+		mCosmetic.infusionHitEffect(world, mPlayer, damagee);
 
 		// Exclude the damagee so that the knockaway is valid
 		List<LivingEntity> affected = new Hitbox.SphereHitbox(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS)).getHitMobs(damagee);
 		for (LivingEntity e : affected) {
 			// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
 			double volume = 0.6 / Math.sqrt(affected.size());
-			world.playSound(loc, Sound.ITEM_TOTEM_USE, (float) volume, 1.1f);
-			new PartialParticle(Particle.FIREWORKS_SPARK, loc, 10, 0.05f, 0.05f, 0.05f, 0.1).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.FLAME, loc, 7, 0.05f, 0.05f, 0.05f, 0.1).spawnAsPlayerActive(mPlayer);
+			mCosmetic.infusionSpreadEffect(world, mPlayer, damagee, e, (float) volume);
 
 			if (Crusade.enemyTriggersAbilities(e, mCrusade)) {
 				/*

@@ -500,4 +500,21 @@ public class ParticleUtils {
 		Vector up = VectorUtils.rotateTargetDirection(front.clone(), 0, -90);
 		drawCurve(center, paraMin, paraMax, front, right, up, f, r, u, pp);
 	}
+
+	/**
+	 * Draw a ring with particles
+	 * @param center Center location of the ring
+	 * @param units How many units consisting the ring
+	 * @param normal Normal vector of the plane where the ring is
+	 * @param radius Radius of the ring
+	 * @param pp Particle action at each unit
+	 */
+	public static void drawRing(Location center, int units, Vector normal, double radius, ParametricParticle pp) {
+		ParticleUtils.drawCurve(center, 1, units, normal.clone().normalize(),
+			t -> 0,
+			t -> FastUtils.cos(2 * 3.1416 * t / units) * radius,
+			t -> FastUtils.sin(2 * 3.1416 * t / units) * radius,
+			pp
+		);
+	}
 }

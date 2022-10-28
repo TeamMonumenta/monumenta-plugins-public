@@ -3,19 +3,17 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PinningShotCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -38,8 +36,8 @@ public class PinningShot extends Ability {
 
 	private final double mDamageMultiplier;
 	private final double mWeaken;
-
 	private final Map<LivingEntity, Boolean> mPinnedMobs = new HashMap<LivingEntity, Boolean>();
+	private final PinningShotCS mCosmetic;
 
 	public PinningShot(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Pinning Shot");
@@ -53,6 +51,7 @@ public class PinningShot extends Ability {
 
 		mDamageMultiplier = (isLevelOne() ? PINNING_SHOT_1_DAMAGE_MULTIPLIER : PINNING_SHOT_2_DAMAGE_MULTIPLIER) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mWeaken = (isLevelOne() ? PINNING_WEAKEN_1 : PINNING_WEAKEN_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PinningShotCS(), PinningShotCS.SKIN_LIST);
 	}
 
 	@Override
@@ -65,10 +64,7 @@ public class PinningShot extends Ability {
 		if (mPinnedMobs.containsKey(enemy)) { // pinned once already
 			if (mPinnedMobs.get(enemy)) { // currently pinned
 				mPinnedMobs.put(enemy, false);
-				Location loc = enemy.getEyeLocation();
-				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
-				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.SNOWBALL, loc, 30, 0, 0, 0, 0.25).spawnAsPlayerActive(mPlayer);
+				mCosmetic.pinEffect2(world, mPlayer, enemy);
 				EntityUtils.setSlowTicks(mPlugin, enemy, 1);
 				EntityUtils.setWeakenTicks(mPlugin, enemy, 1);
 				if (!EntityUtils.isBoss(enemy)) {
@@ -76,9 +72,7 @@ public class PinningShot extends Ability {
 				}
 			}
 		} else {
-			Location loc = enemy.getLocation();
-			world.playSound(loc, Sound.BLOCK_SLIME_BLOCK_PLACE, 1, 0.5f);
-			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 8, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
+			mCosmetic.pinEffect1(world, mPlayer, enemy);
 			if (EntityUtils.isBoss(enemy)) {
 				EntityUtils.applySlow(mPlugin, PINNING_SHOT_DURATION, PINNING_SLOW_BOSS, enemy);
 			} else {

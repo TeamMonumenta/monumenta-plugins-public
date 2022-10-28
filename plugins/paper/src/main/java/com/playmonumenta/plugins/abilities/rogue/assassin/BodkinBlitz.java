@@ -5,10 +5,11 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.assassin.BodkinBlitzCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -20,8 +21,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -62,6 +61,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 	private boolean mHasSmokescreen = false;
 	private int mLastCastTicks = 0;
+	private final BodkinBlitzCS mCosmetic;
 
 	public BodkinBlitz(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Bodkin Blitz");
@@ -91,6 +91,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 		mStealthDuration = (isLevelOne() ? STEALTH_DURATION_1 : STEALTH_DURATION_2) + CharmManager.getExtraDuration(player, CHARM_STEALTH);
 		mBonusDmg = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? BONUS_DMG_1 : BONUS_DMG_2);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BodkinBlitzCS(), BodkinBlitzCS.SKIN_LIST);
 
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
 			mHasSmokescreen = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Smokescreen.class) != null;
@@ -120,8 +121,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mTeleporting = true;
 
 		World world = mPlayer.getWorld();
-		world.playSound(loc, Sound.ENTITY_PLAYER_BREATH, 1f, 2f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 2f);
+		mCosmetic.blitzStartSound(world, loc);
 
 		new BukkitRunnable() {
 			final BoundingBox mPlayerBox = mPlayer.getBoundingBox();
@@ -137,12 +137,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 				BoundingBox travelBox = mPlayerBox.clone();
 				boolean isBlocked = LocationUtils.travelTillObstructed(world, travelBox,
 					mDistancePerTick, mDirection, 0.1, true,
-					loc -> {
-						new PartialParticle(Particle.FALLING_DUST, loc, 5, 0.15, 0.45, 0.1,
-							Bukkit.createBlockData("gray_concrete")).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.CRIT, loc, 4, 0.25, 0.5, 0.25, 0).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.SMOKE_NORMAL, loc, 5, 0.15, 0.45, 0.15, 0.01).spawnAsPlayerActive(mPlayer);
-					}, 1, 1);
+					loc -> mCosmetic.blitzTrailEffect(mPlayer, loc, mDirection), 1, 1);
 				Location tpLoc = travelBox.getCenter().toLocation(world).add(0, -travelBox.getHeight() / 2, 0);
 				if (isBlocked) {
 					// If no spot was found, then you've literally hit a wall. Stop iterating.
@@ -171,18 +166,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 					mTeleporting = false;
 
-					world.playSound(tpLoc, Sound.BLOCK_ENDER_CHEST_OPEN, 1f, 2f);
-					world.playSound(tpLoc, Sound.ITEM_TRIDENT_RETURN, 1f, 0.8f);
-					world.playSound(tpLoc, Sound.ITEM_TRIDENT_THROW, 1f, 0.5f);
-					world.playSound(tpLoc, Sound.ITEM_TRIDENT_HIT, 1f, 1f);
-					world.playSound(tpLoc, Sound.ENTITY_PHANTOM_HURT, 1f, 0.75f);
-					world.playSound(tpLoc, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f);
-
-					new PartialParticle(Particle.SMOKE_LARGE, tpLoc.clone().add(0, 1, 0), 30, 0.25, 0.5, 0.25, 0.18).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SMOKE_LARGE, tpLoc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.04).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SPELL_WITCH, tpLoc.clone().add(0, 1, 0), 15, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SMOKE_NORMAL, tpLoc.clone().add(0, 1, 0), 50, 0.75, 0.5, 0.75, 0.05).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.CRIT, tpLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.3).spawnAsPlayerActive(mPlayer);
+					mCosmetic.blitzEndEffect(world, mPlayer, tpLoc);
 
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 						new PotionEffect(PotionEffectType.FAST_DIGGING, 5, 19, true, false));
@@ -194,7 +178,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 						mRunnable = new BukkitRunnable() {
 							@Override
 							public void run() {
-								new PartialParticle(Particle.FALLING_DUST, mPlayer.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, Bukkit.createBlockData("gray_concrete")).spawnAsPlayerActive(mPlayer);
+								mCosmetic.blitzBuffEffect(mPlayer);
 								if (mTicks <= 0) {
 									mTicks = 0;
 									this.cancel();
@@ -223,10 +207,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 					Location entityLoc = m.getLocation().clone().add(0, 1, 0);
 
 					World world = entityLoc.getWorld();
-					world.playSound(entityLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 2f);
-					world.playSound(entityLoc, Sound.BLOCK_ANVIL_LAND, 0.8f, 2f);
-					new PartialParticle(Particle.FALLING_DUST, entityLoc, 35, 0.35, 0.5, 0.35, Bukkit.createBlockData("gray_concrete")).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.BLOCK_CRACK, entityLoc, 20, 0.25, 0.25, 0.25, 1, Bukkit.createBlockData("redstone_block")).spawnAsPlayerActive(mPlayer);
+					mCosmetic.blitzOnDamage(world, mPlayer, entityLoc);
 
 					DamageUtils.damage(mPlayer, m, DamageType.MELEE_SKILL, mBonusDmg, mInfo.mLinkedSpell, true);
 				}

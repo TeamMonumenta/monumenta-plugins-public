@@ -4,10 +4,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.MeteorSlamCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -18,9 +19,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -70,8 +68,8 @@ public final class MeteorSlam extends Ability {
 	private final int mLevelJumpAmplifier;
 	private final BukkitRunnable mSlamAttackRunner;
 	private boolean mHasGloriousBattle = false;
-
 	private double mFallFromY = -7050;
+	private final MeteorSlamCS mCosmetic;
 
 	public MeteorSlam(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
@@ -124,6 +122,8 @@ public final class MeteorSlam extends Ability {
 		mLevelReducedDamage = isLevelOne() ? REDUCED_DAMAGE_1 : REDUCED_DAMAGE_2;
 		mLevelSize = CharmManager.getRadius(mPlayer, CHARM_RADIUS, (isLevelOne() ? SIZE_1 : SIZE_2));
 		mLevelJumpAmplifier = (isLevelOne() ? JUMP_AMPLIFIER_1 : JUMP_AMPLIFIER_2) + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MeteorSlamCS(), MeteorSlamCS.SKIN_LIST);
 
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
 			mHasGloriousBattle = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, GloriousBattle.class) != null;
@@ -195,16 +195,7 @@ public final class MeteorSlam extends Ability {
 
 			World world = mPlayer.getWorld();
 			Location location = mPlayer.getLocation().add(0, 0.15, 0);
-			world.playSound(location, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
-			new PartialParticle(Particle.LAVA, location, 15, 1, 0f, 1, 0).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.FLAME, location)
-				.count(30)
-				.delta(3, 0, 3)
-				.deltaVariance(true, false, true)
-				.extra(0.2)
-				.extraVariance(0.1)
-				.directionalMode(true)
-				.spawnAsPlayerActive(mPlayer);
+			mCosmetic.slamCastEffect(world, location, mPlayer);
 		}
 	}
 
@@ -251,12 +242,7 @@ public final class MeteorSlam extends Ability {
 		}
 
 		World world = mPlayer.getWorld();
-		float volumeScale = (float) Math.min(0.1 + fallDistance / 16 * 0.9, 1);
-		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, volumeScale * 1.3f, 0);
-		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, volumeScale * 2, 1.25F);
-		new PartialParticle(Particle.FLAME, location, 60, 0F, 0F, 0F, 0.2F).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.EXPLOSION_NORMAL, location, 20, 0F, 0F, 0F, 0.3F).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.LAVA, location, (int) (3 * mLevelSize * mLevelSize), mLevelSize, 0.25f, mLevelSize, 0).spawnAsPlayerActive(mPlayer);
+		mCosmetic.slamAttackEffect(world, location, mPlayer, mLevelSize, fallDistance);
 	}
 
 	@Override

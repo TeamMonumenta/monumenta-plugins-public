@@ -123,10 +123,11 @@ public class ScoreboardUtils {
 		}
 	}
 
-	public static int getScoreOrDefault(Entity entity, String objectiveName, int defaultResult) {
+	public static boolean addScore(Entity entity, String objectiveName, int add) {
 		if (!getScoreboardValue(entity, objectiveName).isPresent()) {
-			return defaultResult;
+			return false;
 		}
-		return getScoreboardValue(entity, objectiveName).get();
+		setScoreboardValue(entity, objectiveName, getScoreboardValue(entity, objectiveName).get() + add);
+		return true;
 	}
 }

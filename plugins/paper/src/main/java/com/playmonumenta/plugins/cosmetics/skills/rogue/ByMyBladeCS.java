@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -41,9 +42,9 @@ public class ByMyBladeCS implements CosmeticSkill {
 
 	public void bmbDamage(World world, Player mPlayer, LivingEntity enemy, int level) {
 		Location loc = enemy.getLocation();
+		world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 2.0f, 0.5f);
 		new PartialParticle(Particle.SPELL_MOB, loc, level * 15, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 	}
 
 	public void bmbDamageLv2(Player mPlayer, LivingEntity enemy) {

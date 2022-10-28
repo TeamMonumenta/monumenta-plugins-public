@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.EsotericEnhancementsCS;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -28,7 +30,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class EsotericEnhancements extends PotionAbility {
-	private static final String ABERRATION_LOS = "Alchemicalaberration";
 	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 0.6;
 	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1;
 	private static final double ABERRATION_DAMAGE_RADIUS = 3;
@@ -55,6 +56,7 @@ public class EsotericEnhancements extends PotionAbility {
 	private double mDamageMultiplier;
 
 	private HashMap<LivingEntity, Integer> mAppliedMobs;
+	private final EsotericEnhancementsCS mCosmetic;
 
 	public EsotericEnhancements(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Esoteric Enhancements", 0, 0);
@@ -72,6 +74,8 @@ public class EsotericEnhancements extends PotionAbility {
 		mAppliedMobs = new HashMap<>();
 
 		mDamageMultiplier = isLevelOne() ? ABERRATION_POTION_DAMAGE_MULTIPLIER_1 : ABERRATION_POTION_DAMAGE_MULTIPLIER_2;
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EsotericEnhancementsCS(), EsotericEnhancementsCS.SKIN_LIST);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
@@ -92,6 +96,7 @@ public class EsotericEnhancements extends PotionAbility {
 				int num = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CREEPER);
 				for (int i = 0; i < num; i++) {
 					summonAbberation(mob.getLocation());
+					mCosmetic.esotericSummonEffect(mob.getWorld(), mPlayer, mob.getLocation());
 				}
 				putOnCooldown();
 			}
@@ -100,7 +105,7 @@ public class EsotericEnhancements extends PotionAbility {
 
 	private void summonAbberation(Location loc) {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			Creeper aberration = (Creeper) LibraryOfSoulsIntegration.summon(loc, ABERRATION_LOS);
+			Creeper aberration = (Creeper) LibraryOfSoulsIntegration.summon(loc, mCosmetic.getLos());
 			if (aberration == null) {
 				MMLog.warning("Failed to spawn Alchemical Aberration from Library of Souls");
 				return;

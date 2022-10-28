@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -77,37 +78,37 @@ public class HuntingCompanionCS implements CosmeticSkill {
 
 	public void foxOnSummon(World world, Location loc, Player player, LivingEntity summon) {
 		foxAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, 2.0f, 1.0f);
-		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 0.75f, 1.2f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, SoundCategory.NEUTRAL, 2.0f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, SoundCategory.NEUTRAL, 0.75f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 1.0f, 1.0f);
 	}
 
 	public void axolotlOnSummon(World world, Location loc, Player player, LivingEntity summon) {
 		axolotlAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_AXOLOTL_SPLASH, 2.0f, 1.0f);
-		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1.0f, 1.5f);
-		world.playSound(loc, Sound.ITEM_BUCKET_EMPTY_AXOLOTL, 1.0f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_SPLASH, SoundCategory.NEUTRAL, 2.0f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, SoundCategory.NEUTRAL, 1.0f, 1.5f);
+		world.playSound(loc, Sound.ITEM_BUCKET_EMPTY_AXOLOTL, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 1.0f, 1.5f);
 	}
 
 	public void striderOnSummon(World world, Location loc, Player player, LivingEntity summon) {
 		striderAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_STRIDER_STEP_LAVA, 1.0f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_STRIDER_STEP_LAVA, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 1.0f, 1.0f);
 	}
 
 	public void eagleOnSummon(World world, Location loc, Player player, LivingEntity summon) {
 		eagleAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_PARROT_FLY, 2.0f, 0.5f);
-		world.playSound(loc, Sound.BLOCK_SMALL_DRIPLEAF_FALL, 1.0f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.5f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_PARROT_FLY, SoundCategory.NEUTRAL, 2.0f, 0.5f);
+		world.playSound(loc, Sound.BLOCK_SMALL_DRIPLEAF_FALL, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 0.5f, 1.5f);
 	}
 
 	public void dolphinOnSummon(World world, Location loc, Player player, LivingEntity summon) {
 		dolphinAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_SPLASH, 2.0f, 1.0f);
-		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1.0f, 1.5f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_SPLASH, SoundCategory.NEUTRAL, 2.0f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, SoundCategory.NEUTRAL, 1.0f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 0.5f, 1.0f);
 	}
 
 	public void onDespawn(World world, Location loc, LivingEntity summon, Player player) {
@@ -122,33 +123,33 @@ public class HuntingCompanionCS implements CosmeticSkill {
 
 	public void foxOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
 		foxAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 20).spawnAsPlayerActive(player);
 	}
 
 	public void axolotlOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
 		foxAmbient(world, loc);
-		world.playSound(loc, Sound.ITEM_BUCKET_FILL_AXOLOTL, 1.5f, 1.0f);
-		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1.0f, 1.5f);
+		world.playSound(loc, Sound.ITEM_BUCKET_FILL_AXOLOTL, SoundCategory.NEUTRAL, 1.5f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, SoundCategory.NEUTRAL, 1.0f, 1.5f);
 		new PartialParticle(Particle.GLOW_SQUID_INK, loc, 5).spawnAsPlayerActive(player);
 	}
 
 	public void striderOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
 		striderAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_STRIDER_RETREAT, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_STRIDER_RETREAT, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 		new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, loc, 5).spawnAsPlayerActive(player);
 	}
 
 	public void eagleOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
 		eagleAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_PARROT_IMITATE_PHANTOM, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_PARROT_IMITATE_PHANTOM, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 		new PartialParticle(Particle.CLOUD, loc, 15).spawnAsPlayerActive(player);
 	}
 
 	public void dolphinOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
 		dolphinAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_JUMP, 1.5f, 1.0f);
-		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1.0f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_JUMP, SoundCategory.NEUTRAL, 1.5f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, SoundCategory.NEUTRAL, 1.0f, 1.5f);
 		new PartialParticle(Particle.WATER_BUBBLE, loc, 10).spawnAsPlayerActive(player);
 	}
 
@@ -172,24 +173,24 @@ public class HuntingCompanionCS implements CosmeticSkill {
 	}
 
 	public void foxOnAggro(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_FOX_AGGRO, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_FOX_AGGRO, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 	}
 
 	public void axolotlOnAggro(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_AXOLOTL_SWIM, 1.5f, 0.5f);
-		world.playSound(loc, Sound.ENTITY_VILLAGER_NO, 0.5f, 3.0f);
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_SWIM, SoundCategory.NEUTRAL, 1.5f, 0.5f);
+		world.playSound(loc, Sound.ENTITY_VILLAGER_NO, SoundCategory.NEUTRAL, 0.5f, 3.0f);
 	}
 
 	public void striderOnAggro(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_STRIDER_HURT, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_STRIDER_HURT, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 	}
 
 	public void eagleOnAggro(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, 1.0f, 2.0f);
+		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, SoundCategory.NEUTRAL, 1.0f, 2.0f);
 	}
 
 	public void dolphinOnAggro(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_HURT, 1.5f, 0.5f);
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_HURT, SoundCategory.NEUTRAL, 1.5f, 0.5f);
 	}
 
 	public void onAttack(World world, Location loc, LivingEntity summon) {
@@ -203,54 +204,54 @@ public class HuntingCompanionCS implements CosmeticSkill {
 	}
 
 	public void foxOnAttack(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_FOX_BITE, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_FOX_BITE, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 	}
 
 	public void axolotlOnAttack(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_AXOLOTL_ATTACK, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_ATTACK, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 	}
 
 	public void striderOnAttack(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_STRIDER_EAT, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_STRIDER_EAT, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 	}
 
 	public void eagleOnAttack(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, 1.0f, 2.0f);
+		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, SoundCategory.NEUTRAL, 1.0f, 2.0f);
 	}
 
 	public void dolphinOnAttack(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_ATTACK, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_ATTACK, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 	}
 
 	public void foxAmbient(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 1.2f);
 	}
 
 	public void axolotlAmbient(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_AXOLOTL_IDLE_WATER, 1.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_AXOLOTL_IDLE_WATER, 1.5f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_AXOLOTL_IDLE_WATER, 1.5f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_IDLE_WATER, SoundCategory.NEUTRAL, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_IDLE_WATER, SoundCategory.NEUTRAL, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_IDLE_WATER, SoundCategory.NEUTRAL, 1.5f, 1.2f);
 	}
 
 	public void striderAmbient(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_STRIDER_AMBIENT, 1.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_STRIDER_AMBIENT, 1.5f, 1.2f);
-		world.playSound(loc, Sound.ENTITY_STRIDER_HAPPY, 1.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_STRIDER_HAPPY, 1.5f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_STRIDER_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_STRIDER_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_STRIDER_HAPPY, SoundCategory.NEUTRAL, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_STRIDER_HAPPY, SoundCategory.NEUTRAL, 1.5f, 1.2f);
 	}
 
 	public void eagleAmbient(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, 1.5f, 0.6f);
-		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, 1.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 0.6f);
+		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 	}
 
 	public void dolphinAmbient(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, 1.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, 1.5f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, 1.5f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, SoundCategory.NEUTRAL, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, SoundCategory.NEUTRAL, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, SoundCategory.NEUTRAL, 1.5f, 1.2f);
 	}
 
 	public void tick(LivingEntity summon, Player player, LivingEntity target, int t) {

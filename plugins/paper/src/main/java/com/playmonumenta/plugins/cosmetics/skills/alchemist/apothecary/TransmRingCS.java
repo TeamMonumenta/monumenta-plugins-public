@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -55,10 +56,10 @@ public class TransmRingCS implements CosmeticSkill {
 	}
 
 	public void ringSoundStart(World world, Location mCenter) {
-		world.playSound(mCenter, Sound.ENTITY_PHANTOM_FLAP, 3f, 0.35f);
+		world.playSound(mCenter, Sound.ENTITY_PHANTOM_FLAP, SoundCategory.PLAYERS, 3f, 0.35f);
 	}
 
 	public void ringEffectOnKill(Player mPlayer, Location loc) {
-		mPlayer.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_BELL, 1, 2);
+		mPlayer.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.PLAYERS, 1, 2);
 	}
 }

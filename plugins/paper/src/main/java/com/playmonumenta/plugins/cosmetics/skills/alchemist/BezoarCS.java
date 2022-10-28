@@ -58,9 +58,9 @@ public class BezoarCS implements CosmeticSkill {
 
 	public void bezoarPickup(Player mPlayer, Location loc) {
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-		world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1f);
+		world.playSound(loc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
+		world.playSound(loc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1, 1f);
 		new PartialParticle(Particle.BLOCK_CRACK, loc, 30, 0.15, 0.15, 0.15, 0.75F,
 			Material.LIME_CONCRETE.createBlockData()).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.TOTEM, loc, 20, 0, 0, 0, 0.35F).spawnAsPlayerActive(mPlayer);

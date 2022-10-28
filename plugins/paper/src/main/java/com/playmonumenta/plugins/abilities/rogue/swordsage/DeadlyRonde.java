@@ -4,24 +4,21 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.DeadlyRondeCS;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import javax.annotation.Nullable;
-import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -46,14 +43,13 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	public static final String CHARM_KNOCKBACK = "Deadly Ronde Knockback";
 	public static final String CHARM_STACKS = "Deadly Ronde Max Stacks";
 
-	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
-
 	private @Nullable BukkitRunnable mActiveRunnable = null;
 	private int mRondeStacks = 0;
 
 	private final double mDamage;
 	private final float mKnockback;
 	private final int mMaxStacks;
+	private final DeadlyRondeCS mCosmetic;
 
 	public DeadlyRonde(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Deadly Ronde");
@@ -79,6 +75,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? RONDE_1_DAMAGE : RONDE_2_DAMAGE);
 		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, RONDE_KNOCKBACK_SPEED);
 		mMaxStacks = (int) ((isLevelOne() ? RONDE_1_MAX_STACKS : RONDE_2_MAX_STACKS) + CharmManager.getLevel(mPlayer, CHARM_STACKS));
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DeadlyRondeCS(), DeadlyRondeCS.SKIN_LIST);
 	}
 
 	@Override
@@ -91,10 +88,12 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			mActiveRunnable.cancel();
 		} else {
 			new BukkitRunnable() {
+				int mTicks = 0;
 
 				@Override
 				public void run() {
-					new PartialParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, SWORDSAGE_COLOR).spawnAsPlayerBuff(mPlayer);
+					mTicks++;
+					mCosmetic.rondeTickEffect(mPlayer, getCharges(), mTicks);
 					mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde", new PercentSpeed(5, RONDE_SPEED_BONUS, "DeadlyRondeMod"));
 					if (mActiveRunnable == null) {
 						this.cancel();
@@ -115,8 +114,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		mActiveRunnable.runTaskLater(mPlugin, RONDE_DECAY_TIMER);
 
 		if (mRondeStacks < mMaxStacks) {
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PUFFER_FISH_BLOW_OUT, 1, 1f);
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SNOW_GOLEM_DEATH, 0.7f, 1.5f);
+			mCosmetic.rondeGainStackEffect(mPlayer);
 			mRondeStacks++;
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
@@ -139,19 +137,8 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 				MovementUtils.knockAway(mPlayer, mob, mKnockback, true);
 			}
 
-			Location particleLoc = mPlayer.getEyeLocation().add(mPlayer.getEyeLocation().getDirection().multiply(3));
 			World world = mPlayer.getWorld();
-			double multiplier = radius / RONDE_RADIUS;
-			double delta = 1.5 * multiplier;
-			new PartialParticle(Particle.SWEEP_ATTACK, particleLoc, (int) (10 * multiplier), delta, 0.5, delta).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CRIT, particleLoc, (int) (50 * multiplier), delta, 0.5, delta, 0.2).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CLOUD, particleLoc, (int) (20 * multiplier), delta, 0.5, delta, 0.3).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.REDSTONE, particleLoc, (int) (45 * multiplier), delta, 0.5, delta, SWORDSAGE_COLOR).spawnAsPlayerActive(mPlayer);
-
-			world.playSound(particleLoc, Sound.ITEM_TRIDENT_THROW, 1, 1.25f);
-			world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.8f, 0.75f);
-			world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.75f);
-			world.playSound(particleLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
+			mCosmetic.rondeHitEffect(world, mPlayer, radius, RONDE_RADIUS, isLevelTwo());
 
 			mActiveRunnable.cancel();
 			mActiveRunnable = null;

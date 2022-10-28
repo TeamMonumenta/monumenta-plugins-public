@@ -182,7 +182,7 @@ public class PlayerUtils {
 	}
 
 	public static Location getRightSide(Location location, double distance) {
-		float angle = location.getYaw() / 60;
+		double angle = location.getYaw() / 57.296;
 		return location.clone().subtract(new Vector(FastUtils.cos(angle), 0, FastUtils.sin(angle)).normalize().multiply(distance));
 	}
 

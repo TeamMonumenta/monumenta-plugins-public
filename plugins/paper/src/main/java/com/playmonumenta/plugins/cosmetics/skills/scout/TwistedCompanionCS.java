@@ -63,14 +63,14 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 
 	@Override
 	public void foxOnSummon(World world, Location loc, Player player, LivingEntity summon) {
-		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.PLAYERS, 1.5f, 0.7f);
-		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.PLAYERS, 1.5f, 0.85f);
-		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.PLAYERS, 1.5f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, SoundCategory.PLAYERS, 2.0f, 0.9f);
-		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.5f, 0.85f);
-		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 1.5f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 0.7f);
+		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 0.85f);
+		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, SoundCategory.NEUTRAL, 2.0f, 0.9f);
+		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 1.5f, 0.85f);
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.NEUTRAL, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 1.5f);
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-1, 1), 1,
 			FastUtils.randomDoubleInRange(-1, 1)), player.getLocation().add(0, 1.35, 0), player, summon);
 
@@ -111,9 +111,9 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 
 	@Override
 	public void foxOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
-		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 1.5f, 1.5f);
-		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.5f, 0.7f);
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.NEUTRAL, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 1.5f);
+		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.NEUTRAL, 1.5f, 0.7f);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 35, 0.15, 0.15, 0.15, 0.125F).minimumMultiplier(false).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, loc, 30, 0, 0, 0, 0.6F).minimumMultiplier(false).spawnAsPlayerActive(player);
 
@@ -193,8 +193,8 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 						.spawnAsPlayerActive(mPlayer);
 
 					if (mT > 5 && mL.distance(to) < 0.35) {
-						world.playSound(mL, Sound.ENTITY_FOX_AGGRO, SoundCategory.PLAYERS, 1.25f, 0);
-						world.playSound(mL, Sound.ENTITY_FOX_BITE, SoundCategory.PLAYERS, 1.25f, 0.5f);
+						world.playSound(mL, Sound.ENTITY_FOX_AGGRO, SoundCategory.NEUTRAL, 1.25f, 0);
+						world.playSound(mL, Sound.ENTITY_FOX_BITE, SoundCategory.NEUTRAL, 1.25f, 0.5f);
 						new PartialParticle(Particle.CRIT, mL, 20, 0, 0, 0, 0.6F)
 							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.SMOKE_NORMAL, mL, 25, 0, 0, 0, 0.1F)

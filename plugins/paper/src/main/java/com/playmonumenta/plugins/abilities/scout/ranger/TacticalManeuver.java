@@ -4,9 +4,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.TacticalManeuverCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -16,8 +17,6 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -47,6 +46,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 	public static final String CHARM_VELOCITY = "Tactical Maneuver Velocity";
 
 	private int mLastCastTicks = 0;
+	private final TacticalManeuverCS mCosmetic;
 
 	public TacticalManeuver(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Tactical Maneuver");
@@ -62,6 +62,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		mDisplayItem = new ItemStack(Material.STRING, 1);
 		mMaxCharges = (isLevelOne() ? TACTICAL_MANEUVER_1_MAX_CHARGES : TACTICAL_MANEUVER_2_MAX_CHARGES) + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TacticalManeuverCS(), TacticalManeuverCS.SKIN_LIST);
 	}
 
 	@Override
@@ -90,11 +91,8 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 		World world = mPlayer.getWorld();
 		if (mPlayer.isSprinting()) {
-			new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1.7f);
 			Vector dir = mPlayer.getLocation().getDirection();
+			mCosmetic.maneuverStartEffect(world, mPlayer, dir);
 			mPlayer.setVelocity(dir.setY(dir.getY() * 0.5 + 0.4));
 
 			new BukkitRunnable() {
@@ -111,7 +109,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 						return;
 					}
 
-					new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
+					mCosmetic.maneuverTickEffect(mPlayer);
 
 					Location loc = mPlayer.getLocation();
 					Vector velocity = mPlayer.getVelocity();
@@ -127,10 +125,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 						for (LivingEntity e : EntityUtils.getNearbyMobs(le.getLocation(), radius)) {
 							EntityUtils.applyStun(mPlugin, duration, e);
 						}
-
-						new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
-						world.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
+						mCosmetic.maneuverHitEffect(world, mPlayer);
 
 						this.cancel();
 					}
@@ -143,11 +138,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 				MovementUtils.knockAway(mPlayer, le, TACTICAL_LEAP_KNOCKBACK_SPEED);
 			}
 
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 1.2f);
-			new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.1f, 0, 0.1f, 0.125f).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 10, 0.1f, 0, 0.1f, 0.15f).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 25, 0.1f, 0, 0.1f, 0.15f).spawnAsPlayerActive(mPlayer);
+			mCosmetic.maneuverBackEffect(world, mPlayer);
 			mPlayer.setVelocity(mPlayer.getLocation().getDirection().setY(0).normalize().multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, -1.65)).setY(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 0.65)));
 		}
 	}

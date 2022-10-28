@@ -4,11 +4,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.DaggerThrowCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -16,11 +16,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -43,7 +40,6 @@ public class DaggerThrow extends Ability {
 	private static final double DAGGER_THROW_2_VULN = 0.4;
 	private static final double DAGGER_THROW_VULN_ENHANCEMENT = 0.1;
 	private static final double DAGGER_THROW_SPREAD = Math.toRadians(25);
-	private static final Particle.DustOptions DAGGER_THROW_COLOR = new Particle.DustOptions(Color.fromRGB(64, 64, 64), 1);
 
 	public static final String CHARM_DAMAGE = "Dagger Throw Damage";
 	public static final String CHARM_COOLDOWN = "Dagger Throw Cooldown";
@@ -53,6 +49,7 @@ public class DaggerThrow extends Ability {
 
 	private final double mDamage;
 	private final double mVulnAmplifier;
+	private final DaggerThrowCS mCosmetic;
 
 	public DaggerThrow(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Dagger Throw");
@@ -78,6 +75,7 @@ public class DaggerThrow extends Ability {
 		mDisplayItem = new ItemStack(Material.WOODEN_SWORD, 1);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE);
 		mVulnAmplifier = (isLevelOne() ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN) + (isEnhanced() ? DAGGER_THROW_VULN_ENHANCEMENT : 0) + CharmManager.getLevelPercentDecimal(player, CHARM_VULN);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DaggerThrowCS(), DaggerThrowCS.SKIN_LIST);
 	}
 
 	@Override
@@ -89,9 +87,7 @@ public class DaggerThrow extends Ability {
 		Vector dir = loc.getDirection();
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, DAGGER_THROW_RANGE + 1, mPlayer);
 		World world = mPlayer.getWorld();
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.5f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.25f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.0f);
+		mCosmetic.daggerCastSound(world, loc);
 
 		int daggers = DAGGER_THROW_DAGGERS + (int) CharmManager.getLevel(mPlayer, CHARM_DAGGERS);
 
@@ -108,14 +104,13 @@ public class DaggerThrow extends Ability {
 			for (int i = 0; i <= CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, DAGGER_THROW_RANGE); i++) {
 				box.shift(newDir);
 				Location bLoc = box.getCenter().toLocation(world);
-				new PPLine(Particle.REDSTONE, bLoc, newDir, 0.9).countPerMeter(10).delta(0.1).data(DAGGER_THROW_COLOR).spawnAsPlayerActive(mPlayer);
+				mCosmetic.daggerLineEffect(bLoc, newDir, mPlayer);
 
 				for (LivingEntity mob : mobs) {
 					if (mob.getBoundingBox().overlaps(box)
 						&& MetadataUtils.checkOnceThisTick(mPlugin, mob, DAGGER_THROW_MOB_HIT_TICK)) {
 						bLoc.subtract(newDir.clone().multiply(0.5));
-						new PartialParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer);
-						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
+						mCosmetic.daggerHitEffect(world, loc, bLoc, mPlayer);
 
 						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell, true);
 						EntityUtils.applyVulnerability(mPlugin, DAGGER_THROW_DURATION, mVulnAmplifier, mob);
@@ -126,7 +121,7 @@ public class DaggerThrow extends Ability {
 
 					} else if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 						bLoc.subtract(newDir.clone().multiply(0.5));
-						new PartialParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer);
+						mCosmetic.daggerHitBlockEffect(bLoc, mPlayer);
 						break;
 					}
 				}

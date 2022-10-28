@@ -40,8 +40,8 @@ public class AmplifyingHexCS implements CosmeticSkill {
 	}
 
 	public void amplifyingEffects(Player mPlayer, World world, Location soundLoc) {
-		world.playSound(soundLoc, Sound.ENTITY_BLAZE_DEATH, 1.0f, 0.7f);
-		world.playSound(soundLoc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.65f);
+		world.playSound(soundLoc, Sound.ENTITY_BLAZE_DEATH, SoundCategory.PLAYERS, 1.0f, 0.7f);
+		world.playSound(soundLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.0f, 0.65f);
 	}
 
 	public double amplifyingAngle(double angle, double radius) {

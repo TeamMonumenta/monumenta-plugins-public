@@ -71,7 +71,7 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 
 	@Override
 	public boolean isUnlocked(Player mPlayer) {
-		return ScoreboardUtils.getScoreOrDefault(mPlayer, GALLERY_COMPLETE_SCB, 0) >= 1
+		return ScoreboardUtils.getScoreboardValue(mPlayer, GALLERY_COMPLETE_SCB).orElse(0) >= 1
 			|| mPlayer.getGameMode() == GameMode.CREATIVE;
 	}
 

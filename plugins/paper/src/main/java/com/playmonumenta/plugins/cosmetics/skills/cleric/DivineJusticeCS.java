@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -69,6 +70,7 @@ public class DivineJusticeCS implements CosmeticSkill {
 		mPlayer.getWorld().playSound(
 			enemy.getLocation(),
 			Sound.BLOCK_ANVIL_LAND,
+			SoundCategory.PLAYERS,
 			0.15f,
 			1.5f
 		);
@@ -83,6 +85,7 @@ public class DivineJusticeCS implements CosmeticSkill {
 			healedPlayer.playSound(
 				healedPlayer.getLocation(),
 				Sound.BLOCK_NOTE_BLOCK_CHIME,
+				SoundCategory.PLAYERS,
 				0.5f,
 				pitch
 			);
