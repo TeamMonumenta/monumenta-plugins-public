@@ -282,6 +282,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemMeta sktMeta = sktItem.getItemMeta();
 		sktMeta.displayName(Component.text("Refresh", TextColor.fromCSSHexString("#C0C0C0")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(sktMeta, "Reduces the cooldown of infinite consumable foods by 2% per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		List<Component> sktLore = sktMeta.lore();
+		sktLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.REFRESH), TextColor.fromHexString("#555555")));
+		sktMeta.lore(sktLore);
 		sktItem.setItemMeta(sktMeta);
 		mDelvePanelList.put(DelveInfusionSelection.REFRESH, sktItem);
 
@@ -290,6 +293,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemMeta blueMeta = blueItem.getItemMeta();
 		blueMeta.displayName(Component.text("Soothing", TextColor.fromCSSHexString("#0C2CA2")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(blueMeta, "Regenerate 0.0825 health per level each second.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		List<Component> blueLore = blueMeta.lore();
+		blueLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.SOOTHING), TextColor.fromHexString("#555555")));
+		blueMeta.lore(blueLore);
 		blueItem.setItemMeta(blueMeta);
 		mDelvePanelList.put(DelveInfusionSelection.SOOTHING, blueItem);
 
@@ -298,6 +304,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemMeta woodMeta = woodItem.getItemMeta();
 		woodMeta.displayName(Component.text("Quench", TextColor.fromCSSHexString("#4C8F4D")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(woodMeta, "Increase duration of consumables by 2.5% per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		List<Component> woodLore = woodMeta.lore();
+		woodLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.QUENCH), TextColor.fromHexString("#555555")));
+		woodMeta.lore(woodLore);
 		woodItem.setItemMeta(woodMeta);
 		mDelvePanelList.put(DelveInfusionSelection.QUENCH, woodItem);
 
@@ -306,6 +315,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemMeta keepMeta = keepItem.getItemMeta();
 		keepMeta.displayName(Component.text("Grace", TextColor.fromCSSHexString("#C4BBA5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(keepMeta, "Gain 1.5% attack speed per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		List<Component> keepLore = keepMeta.lore();
+		keepLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.GRACE), TextColor.fromHexString("#555555")));
+		keepMeta.lore(keepLore);
 		keepItem.setItemMeta(keepMeta);
 		mDelvePanelList.put(DelveInfusionSelection.GRACE, keepItem);
 
@@ -314,6 +326,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemMeta portalMeta = portalItem.getItemMeta();
 		portalMeta.displayName(Component.text("Galvanic", TextColor.fromCSSHexString("#DBDBD7")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(portalMeta, "Gain a 1% chance per level to stun a mob for 2 seconds (0.5 seconds for elites) when dealing non-ability melee or projectile damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		List<Component> portalLore = portalMeta.lore();
+		portalLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.GALVANIC), TextColor.fromHexString("#555555")));
+		portalMeta.lore(portalLore);
 		portalItem.setItemMeta(portalMeta);
 		mDelvePanelList.put(DelveInfusionSelection.GALVANIC, portalItem);
 
@@ -322,6 +337,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemMeta ruinMeta = ruinItem.getItemMeta();
 		ruinMeta.displayName(Component.text("Decapitation", TextColor.fromCSSHexString("#86A5C4")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(ruinMeta, "Deal 1.25% additional damage per level on a critical melee strike.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		List<Component> ruinLore = ruinMeta.lore();
+		ruinLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.DECAPITATION), TextColor.fromHexString("#555555")));
+		ruinMeta.lore(ruinLore);
 		ruinItem.setItemMeta(ruinMeta);
 		mDelvePanelList.put(DelveInfusionSelection.DECAPITATION, ruinItem);
 
