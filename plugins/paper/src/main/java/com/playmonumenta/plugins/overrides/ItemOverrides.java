@@ -325,6 +325,8 @@ public final class ItemOverrides {
 		mItems.put(Material.POTTED_JUNGLE_SAPLING, flowerOverride);
 		mItems.put(Material.POTTED_ACACIA_SAPLING, flowerOverride);
 		mItems.put(Material.POTTED_DARK_OAK_SAPLING, flowerOverride);
+		mItems.put(Material.POTTED_AZALEA_BUSH, flowerOverride);
+		mItems.put(Material.POTTED_FLOWERING_AZALEA_BUSH, flowerOverride);
 		mItems.put(Material.POTTED_RED_MUSHROOM, flowerOverride);
 		mItems.put(Material.POTTED_BROWN_MUSHROOM, flowerOverride);
 		mItems.put(Material.POTTED_FERN, flowerOverride);
