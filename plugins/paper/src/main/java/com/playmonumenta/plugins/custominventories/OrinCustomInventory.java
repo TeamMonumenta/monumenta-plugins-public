@@ -40,6 +40,7 @@ public class OrinCustomInventory extends CustomInventory {
 		Material mType;
 		String mLeftClick;
 		String mRightClick;
+		int mItemCount;
 
 		public TeleportEntry(int p, int s, String n, String l, Material t, @Nullable String sc, int sr, String left, String right) {
 			mPage = p;
@@ -51,6 +52,7 @@ public class OrinCustomInventory extends CustomInventory {
 			mScoreRequired = sr;
 			mLeftClick = left;
 			mRightClick = right;
+			mItemCount = 1;
 		}
 
 		public TeleportEntry(int p, int s, String n, String l, Material t, @Nullable String sc, int sr, String left) {
@@ -63,6 +65,20 @@ public class OrinCustomInventory extends CustomInventory {
 			mScoreRequired = sr;
 			mLeftClick = left;
 			mRightClick = "";
+			mItemCount = 1;
+		}
+
+		public TeleportEntry(int p, int s, String n, String l, Material t, @Nullable String sc, int sr, String left, String right, int count) {
+			mPage = p;
+			mSlot = s;
+			mName = n;
+			mLore = l;
+			mType = t;
+			mScoreboard = sc;
+			mScoreRequired = sr;
+			mLeftClick = left;
+			mRightClick = right;
+			mItemCount = count;
 		}
 	}
 	/* Page Info
@@ -312,10 +328,10 @@ public class OrinCustomInventory extends CustomInventory {
 	}
 
 	public ItemStack createCustomItem(TeleportEntry location) {
-		ItemStack newItem = new ItemStack(location.mType, 1);
+		ItemStack newItem = new ItemStack(location.mType, location.mItemCount);
 		ItemMeta meta = newItem.getItemMeta();
 		meta.displayName(Component.text(location.mName, NamedTextColor.GOLD)
-				.decoration(TextDecoration.ITALIC, false));
+			.decoration(TextDecoration.ITALIC, false));
 		if (!location.mLore.isEmpty()) {
 			GUIUtils.splitLoreLine(meta, location.mLore, 30, ChatColor.DARK_PURPLE, true);
 		}
@@ -368,15 +384,16 @@ public class OrinCustomInventory extends CustomInventory {
 			return;
 		}
 		results.removeIf(item -> !item.startsWith(searchTerm));
+
 		int page;
 		Material itemType;
 
 		if (searchTerm.startsWith("valley")) {
 			page = 11;
-			itemType = Material.GRASS;
+			itemType = Material.JUNGLE_SAPLING;
 		} else if (searchTerm.startsWith("isles")) {
 			page = 12;
-			itemType = Material.PUFFERFISH;
+			itemType = Material.KELP;
 		} else {
 			itemType = Material.DARK_OAK_SAPLING;
 			page = 13;
@@ -390,12 +407,25 @@ public class OrinCustomInventory extends CustomInventory {
 			default -> instanceLocations = INSTANCE_UPTO28_LOCS;
 		}
 
-		ArrayList<String> resultList = new ArrayList<>(results);
-		Collections.sort(resultList);
-		for (String shard : resultList) {
-			String shardName = shard.substring(0, 1).toUpperCase() + shard.substring(1);
+		ArrayList<Integer> resultSortedList = new ArrayList<>();
+		for (String shard : results) {
+			if (shard.equalsIgnoreCase(searchTerm)) {
+				resultSortedList.add(0);
+			} else {
+				resultSortedList.add(Integer.parseInt(shard.split("-")[1]));
+			}
+		}
+		Collections.sort(resultSortedList);
+
+		String shardName = "";
+		for (Integer shard : resultSortedList) {
+			if (shard == 0) {
+				shardName = searchTerm.substring(0, 1).toUpperCase() + searchTerm.substring(1);
+			} else {
+				shardName = searchTerm.substring(0, 1).toUpperCase() + searchTerm.substring(1) + "-" + shard;
+			}
 			if (index <= instanceLocations.length) {
-				INSTANCE_ITEMS.add(new TeleportEntry(page, instanceLocations[index++], shardName, "Click to teleport!", itemType, null, 0, "transferserver " + shard));
+				INSTANCE_ITEMS.add(new TeleportEntry(page, instanceLocations[index++], shardName, "Click to teleport!", itemType, null, 0, "transferserver " + shardName, "", shard < 1 ? 1 : shard));
 			}
 		}
 
