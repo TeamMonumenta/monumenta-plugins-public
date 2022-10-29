@@ -17,6 +17,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
@@ -160,11 +161,11 @@ public class ChestOverride extends BaseOverride {
 		if (ServerProperties.getIsTownWorld()) {
 			return true;
 		}
-		Block blockUnder = block.getLocation().add(0, -1, 0).getBlock();
+		Block blockUnder = block.getRelative(BlockFace.DOWN);
 		Material type = blockUnder.getType();
 		if (type == Material.BARRIER) {
 			return false;
-		} else if (type == Material.BEDROCK && ((Chest) blockUnder.getBlockData()).hasLootTable()) {
+		} else if (type == Material.BEDROCK && block.getState() instanceof Chest chest && chest.hasLootTable()) {
 			return false;
 		}
 		return true;
