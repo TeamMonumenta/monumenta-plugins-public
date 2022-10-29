@@ -103,7 +103,7 @@ public class AstralOmen extends Ability {
 					"If an enemy hits %s omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, " +
 					"dealing %s magic damage to it and all enemies within %s blocks. " +
 					"An enemy loses all its omens after %ss of it not gaining another omen. " +
-					"That implosion's damage ignores iframes and itself cannot apply omens." +
+					"That implosion's damage ignores iframes and itself cannot apply omens. " +
 					"Omens cannot be applied or sealed by Elemental Arrows.",
 				STACK_THRESHOLD,
 				DAMAGE,
