@@ -31,10 +31,9 @@ import org.bukkit.inventory.ItemStack;
 
 public class CelestialBlessing extends Ability {
 
-	private static final int CELESTIAL_COOLDOWN = 40 * 20;
+	private static final int CELESTIAL_COOLDOWN = 35 * 20;
 	private static final int CELESTIAL_COOLDOWN_ENHANCED = 30 * 20;
-	private static final int CELESTIAL_1_DURATION = 10 * 20;
-	private static final int CELESTIAL_2_DURATION = 12 * 20;
+	private static final int CELESTIAL_DURATION = 15 * 20;
 	private static final double CELESTIAL_RADIUS = 12;
 	private static final double CELESTIAL_1_EXTRA_DAMAGE = 0.20;
 	private static final double CELESTIAL_2_EXTRA_DAMAGE = 0.35;
@@ -75,17 +74,17 @@ public class CelestialBlessing extends Ability {
 			                        .formatted(CELESTIAL_RADIUS,
 				                        StringUtils.multiplierToPercentage(CELESTIAL_1_EXTRA_DAMAGE),
 				                        StringUtils.multiplierToPercentage(CELESTIAL_EXTRA_SPEED),
-				                        StringUtils.ticksToSeconds(CELESTIAL_1_DURATION),
+				                        StringUtils.ticksToSeconds(CELESTIAL_DURATION),
 				                        StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN)));
-		mInfo.mDescriptions.add("Increases the buff to +%s%% damage for %ss."
-			                        .formatted(StringUtils.multiplierToPercentage(CELESTIAL_2_EXTRA_DAMAGE), StringUtils.ticksToSeconds(CELESTIAL_2_DURATION)));
+		mInfo.mDescriptions.add("Increases the buff to +%s%% damage."
+			                        .formatted(StringUtils.multiplierToPercentage(CELESTIAL_2_EXTRA_DAMAGE)));
 		mInfo.mDescriptions.add("Magic damage is now increased as well. Cooldown: %ss."
 			                        .formatted(StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN_ENHANCED)));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isEnhanced() ? CELESTIAL_COOLDOWN_ENHANCED : CELESTIAL_COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.SUGAR, 1);
 
-		mDuration = CharmManager.getExtraDuration(player, CHARM_DURATION) + (isLevelOne() ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION);
+		mDuration = CharmManager.getExtraDuration(player, CHARM_DURATION) + CELESTIAL_DURATION;
 		mExtraDamage = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE);
 	}
 
