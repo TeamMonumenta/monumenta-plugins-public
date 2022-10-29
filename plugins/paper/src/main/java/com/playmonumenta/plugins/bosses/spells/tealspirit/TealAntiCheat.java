@@ -43,7 +43,7 @@ public class TealAntiCheat extends Spell {
 			}
 
 			for (Entity e : EntityUtils.getNearbyMobs(mSpawnLoc, 100)) {
-				if (e.getType() == EntityType.WITHER_SKELETON && !EntityUtils.getNearbyMobs(mSpawnLoc, 25).contains(e)) {
+				if (e.getScoreboardTags().contains("Boss") && !EntityUtils.getNearbyMobs(mSpawnLoc, 25).contains(e)) {
 					e.teleport(mSpawnLoc);
 				}
 			}

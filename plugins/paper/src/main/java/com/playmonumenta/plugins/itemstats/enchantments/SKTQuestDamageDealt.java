@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 public class SKTQuestDamageDealt implements Enchantment {
 
-	public static final double DAMAGE_DEALT_MULTIPLIER = 2.0;
+	public static final double DAMAGE_DEALT_MULTIPLIER = 2.7;
 
 	@Override
 	public String getName() {

@@ -113,7 +113,8 @@ public class TealSpirit extends BossAbilityGroup {
 			mHealth = 6000;
 
 			SpellManager activeSpells = new SpellManager(Arrays.asList(
-				new ClockworkAssassination(plugin, boss),
+				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 50,
+					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5),
 				//new SandsOfTime(mBoss, mSpawnLoc, team, 12 * 20),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
@@ -129,7 +130,7 @@ public class TealSpirit extends BossAbilityGroup {
 				new TealSpiritSummon(mSpawnLoc, 40 * 20),
 				new SpellBlockBreak(mBoss),
 				new SpellShieldStun(10 * 20),
-				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 40),
+				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 25),
 				new TealAntiCheat(boss, 20, spawnLoc)
 			);
 
@@ -176,7 +177,7 @@ public class TealSpirit extends BossAbilityGroup {
 
 			SpellManager activeSpells = new SpellManager(Arrays.asList(
 				//new ClockworkAssassination(plugin, boss),
-				new SandsOfTime(mBoss, mSpawnLoc, team, 24 * 20, 180),
+				new SandsOfTime(mBoss, mSpawnLoc, team, 24 * 20, 120),
 				//new Rewind(mBoss, mSpawnLoc),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
@@ -191,9 +192,17 @@ public class TealSpirit extends BossAbilityGroup {
 				new TealSpiritSummon(mSpawnLoc, 30 * 20),
 				new SpellBlockBreak(mBoss),
 				new SpellShieldStun(10 * 20),
-				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 40),
+				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> mBoss.getLocation().distance(mSpawnLoc) > 25),
 				new TealAntiCheat(boss, 20, spawnLoc)
 			);
+
+			SpellManager finalPhaseActiveSpells = new SpellManager(Arrays.asList(
+				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
+				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
+				new SundialSlash(mBoss, 7 * 20),
+				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 50,
+					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
+			));
 
 			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
 				new Rewind(mBoss, mSpawnLoc, this, activeSpells, passiveSpells)
@@ -276,6 +285,7 @@ public class TealSpirit extends BossAbilityGroup {
 			events.put(20, mBoss -> {
 				mMarchingFates.removeMarchers();
 				midnightToll.run();
+				changePhase(finalPhaseActiveSpells, passiveSpells, null);
 			});
 
 			events.put(15, mBoss -> {
@@ -316,7 +326,7 @@ public class TealSpirit extends BossAbilityGroup {
 				new SpellBlockBreak(mBoss),
 				new SpellShieldStun(10 * 20),
 				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> {
-					return mBoss.getLocation().distance(mSpawnLoc) > 30;
+					return mBoss.getLocation().distance(mSpawnLoc) > 25;
 				}),
 				new TealAntiCheat(boss, 20, spawnLoc)
 			);
