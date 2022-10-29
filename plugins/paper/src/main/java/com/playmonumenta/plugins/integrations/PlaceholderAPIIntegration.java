@@ -110,14 +110,6 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 		if (identifier.equalsIgnoreCase("shard")) {
 			String shard = ServerProperties.getShardName();
 
-			// TODO begin temp
-			if (shard.contains("plots")) {
-				return shard;
-			} else if (mIsPlay && ServerProperties.getAbilityEnhancementsEnabled()) {
-				return "ring";
-			}
-			// TODO end temp
-
 			String worldName = player.getWorld().getName();
 			String mask = "Project_Epic-";
 			if (worldName.startsWith(mask)) {

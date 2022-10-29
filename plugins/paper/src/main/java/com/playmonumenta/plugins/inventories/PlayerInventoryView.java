@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.itemstats.PlayerItemStatsGUI;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -63,17 +62,6 @@ public class PlayerInventoryView implements Listener {
 				//Below if check is almost certainly not necessary, but always be careful
 				if (data.getEntities().get(0) instanceof Player clickedPlayer) {
 					if (!clickedPlayer.equals(player)) {
-
-						//TODO begin temp
-						if (ScoreboardUtils.getScoreboardValue(clickedPlayer, "R3Access").orElse(0) > 0) {
-							if (ScoreboardUtils.getScoreboardValue(player, "R3Access").orElse(0) == 0) {
-								// non r3 player trying to look at r3 player's items
-								player.sendMessage(ChatColor.RED + "You cannot view this player's items at this time. Good try though.");
-								return;
-							}
-						}
-						//TODO end temp
-
 						inventoryView(event.getPlayer(), clickedPlayer);
 					}
 				}
