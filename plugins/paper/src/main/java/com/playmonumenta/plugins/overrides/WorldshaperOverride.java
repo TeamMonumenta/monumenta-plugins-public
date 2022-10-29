@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBTItem;
 import java.util.ArrayList;
@@ -68,6 +69,12 @@ public class WorldshaperOverride {
 		}
 
 		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+			return false;
+		}
+
+		if (ScoreboardUtils.getScoreboardValue(player, "SKTH").orElse(0) <= 0) {
+			// Requirements for using Worldshaper's Loom is SKT savage.
+			player.sendMessage(ChatColor.RED + "You need to have cleared Silver Knight's Tomb Savage in order to use this item!");
 			return false;
 		}
 
@@ -295,6 +302,12 @@ public class WorldshaperOverride {
 		}
 
 		if (!player.isSneaking()) {
+			return true;
+		}
+
+		if (ScoreboardUtils.getScoreboardValue(player, "SKTH").orElse(0) <= 0) {
+			// Requirements for using Worldshaper's Loom is SKT savage.
+			player.sendMessage(ChatColor.RED + "You need to have cleared Silver Knight's Tomb Savage in order to use this item!");
 			return true;
 		}
 
