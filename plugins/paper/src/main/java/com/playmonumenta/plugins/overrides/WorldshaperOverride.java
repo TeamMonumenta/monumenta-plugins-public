@@ -226,7 +226,7 @@ public class WorldshaperOverride {
 
 		boolean blockPlaced = false;
 		for (Location location : blockPlacePattern) {
-			if (location.getBlock().isSolid() || !ZoneUtils.playerCanInteractWithBlock(player, location)) {
+			if (location.getBlock().isSolid() || !ZoneUtils.playerCanInteractWithBlock(player, location, false)) {
 				continue;
 			}
 

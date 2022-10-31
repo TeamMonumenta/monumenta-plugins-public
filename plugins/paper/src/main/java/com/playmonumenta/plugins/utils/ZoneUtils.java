@@ -84,15 +84,15 @@ public class ZoneUtils {
 		return mat == Material.SPONGE;
 	}
 
-	public static boolean playerCanInteractWithBlock(Player player, Block block) {
-		return playerCanInteractWithBlock(player, block.getLocation());
+	public static boolean playerCanInteractWithBlock(Player player, Block block, boolean alwaysInPlots) {
+		return playerCanInteractWithBlock(player, block.getLocation(), alwaysInPlots);
 	}
 
 	// True when the player is allowed to break/place blocks in the location
 	// Must be in survival mode, attempting to interact in an adventure mode area that is not a survival mode plots area to be false
 	// Does not include "interactions" like trapdoors/chests/etc
-	public static boolean playerCanInteractWithBlock(Player player, Location loc) {
-		return player.getGameMode() != GameMode.SURVIVAL || !ZoneUtils.hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE) || ServerProperties.getIsTownWorld();
+	public static boolean playerCanInteractWithBlock(Player player, Location loc, boolean alwaysInPlots) {
+		return player.getGameMode() != GameMode.SURVIVAL || !ZoneUtils.hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE) || (alwaysInPlots && ServerProperties.getIsTownWorld());
 	}
 
 	// Check that the player can break/place blocks

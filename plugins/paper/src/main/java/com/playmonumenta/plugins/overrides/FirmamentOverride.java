@@ -61,7 +61,7 @@ public class FirmamentOverride {
 			player.sendMessage(ChatColor.RED + "You don't have permission to use this item. Please ask a moderator to fix this.");
 			return false;
 		}
-		if (!ZoneUtils.playerCanInteractWithBlock(player, event.getBlock())) {
+		if (!ZoneUtils.playerCanInteractWithBlock(player, event.getBlock(), true)) {
 			return false;
 		}
 
