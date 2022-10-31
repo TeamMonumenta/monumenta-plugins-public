@@ -23,7 +23,7 @@ public class GalleryUtils {
 	protected static final int GOLD_PER_MOB_AFTER_ROUND_1 = 60;
 	protected static final int STARTING_ROUND_FOR_SCALING = 20;
 	private static final double HEALTH_SCALE_PER_ROUND = 0.05;
-	private static final double MAX_HEALTH_SCALE = 4;
+	private static final double MAX_HEALTH_SCALE = 9999999; //todo - monarch wanted this hotfix but we need to move all of these inside their own GalleryMap info.
 	private static final double SPEED_SCALE_PER_ROUND = 0.01;
 	private static final double MAX_SPEED_SCALE = 0.15;
 	private static final double[] MOB_COUNT_MULTIPLIER_PER_PLAYER = {1, 1.33, 1.67, 2};

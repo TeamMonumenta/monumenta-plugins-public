@@ -157,7 +157,7 @@ public abstract class Ability {
 		NavigableSet<Effect> effGallery = Plugin.getInstance().mEffectManager.getEffects(mPlayer, "GalleryEnlightenmentEffect");
 		if (effGallery != null) {
 			//it should be way faster to add this check on each shard instead of doing a shard check each time
-			Effect dec = effDec.last();
+			Effect dec = effGallery.last();
 			effectPercent += dec.getMagnitude(); // this is always positive
 		}
 

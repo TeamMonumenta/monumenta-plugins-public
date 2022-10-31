@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.gallery;
 
 import com.playmonumenta.plugins.gallery.effects.GalleryEffectType;
 import com.playmonumenta.plugins.gallery.interactables.BaseInteractable;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -53,7 +55,16 @@ public class GalleryCommands {
 			.executes((sender, args) -> {
 				Player target = (Player) args[2];
 				GalleryGame game = GalleryManager.GAMES.get(target.getWorld().getUID());
-				game.printPlayerInfo(target);
+
+				if (!MetadataUtils.checkOnceThisTick(GalleryManager.mPlugin, target, "GalleryCommandOneTick")) {
+					return 1;
+				}
+
+				if (game != null) {
+					game.printPlayerInfo(target);
+				} else {
+					target.sendMessage(ChatColor.GRAY + "the game should start in a bit");
+				}
 				return 1;
 			}).register();
 
@@ -66,7 +77,9 @@ public class GalleryCommands {
 			.executes((sender, args) -> {
 				Player target = (Player) args[2];
 				GalleryGame game = GalleryManager.GAMES.get(target.getWorld().getUID());
-				game.playerLeave(target);
+				if (game != null) {
+					game.playerLeave(target);
+				}
 			}).register();
 
 		new CommandAPICommand(COMMAND)
