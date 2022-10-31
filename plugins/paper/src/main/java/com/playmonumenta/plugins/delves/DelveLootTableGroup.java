@@ -3,8 +3,10 @@ package com.playmonumenta.plugins.delves;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
@@ -161,8 +163,9 @@ public class DelveLootTableGroup {
 	public static void setDelveLootTable(Player player, Block block) {
 		BlockState blockState = block.getState();
 		if (blockState instanceof Chest chest) {
-			int playerTotalDelvePoint = DelvesUtils.getPlayerTotalDelvePoint(null, player, ServerProperties.getShardName());
-			int playerCount = PlayerUtils.playersInLootScalingRange(player, true).size() + 1;
+			List<Player> players = DelvesUtils.playerInRangeForDelves(player.getLocation());
+			int playerTotalDelvePoint = getGreatestDelvePoints(players);
+			int playerCount = players.size();
 			if (chest.getInventory() instanceof DoubleChestInventory doubleChestInventory) {
 				setDelveLootTable(playerTotalDelvePoint, playerCount, (Chest) doubleChestInventory.getLeftSide().getHolder());
 				setDelveLootTable(playerTotalDelvePoint, playerCount, (Chest) doubleChestInventory.getRightSide().getHolder());
@@ -170,6 +173,18 @@ public class DelveLootTableGroup {
 				setDelveLootTable(playerTotalDelvePoint, playerCount, chest);
 			}
 		}
+	}
+
+	public static int getGreatestDelvePoints(List<Player> players) {
+		if (players.isEmpty()) {
+			return 0;
+		}
+		List<Integer> points = new ArrayList<>();
+		String shard = ServerProperties.getShardName();
+		for (Player player : players) {
+			points.add(DelvesUtils.getPlayerTotalDelvePoint(null, player, shard));
+		}
+		return Collections.max(points);
 	}
 
 	public @Nullable String getDelveLootTable(int depthPoints, int playerCount) {
