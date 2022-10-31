@@ -1,6 +1,6 @@
 plugins {
     id("com.playmonumenta.plugins.java-conventions")
-    id("io.papermc.paperweight.userdev") version "1.3.7"
+    id("io.papermc.paperweight.userdev") version "1.3.8"
 }
 
 dependencies {
@@ -29,5 +29,13 @@ tasks {
     }
     processResources {
         filteringCharset = Charsets.UTF_8.name() // We want UTF-8 for everything
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        dependencySubstitution {
+            substitute(module("org.jetbrains:annotations:20.1.+")).using(module("org.jetbrains:annotations:20.1.0"))
+        }
     }
 }
