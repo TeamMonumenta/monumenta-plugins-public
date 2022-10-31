@@ -69,22 +69,22 @@ public class StatMultiplier {
 
 		// Wolfswood
 		final double FOREST = 1.2;
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("coven_fortress", FOREST);
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("locum_vernantia", FOREST);
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("shadowcast_bastille", FOREST);
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("aminita_colony", FOREST);
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("chanterelle_village", FOREST);
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("bewitched_dominion", FOREST);
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("vibrant_hollow", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Coven Fortress", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Locum Vernantia", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Shadowcast Bastille", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Aminita Colony", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Chanterelle Village", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Bewitched Dominion", FOREST);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Vibrant Hollow", FOREST);
 
 		// Pelias' Keep
 		final double KEEP = 1.2;
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("quelled_convent", KEEP);
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("silvic_quarry", KEEP);
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("doomed_encampment", KEEP);
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("forsaken_manor", KEEP);
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("arx_spirensis", KEEP);
-		STAT_COMPENSATION_MAPPINGS_RING_POI.put("submerged_citadel", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Quelled Convent", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Silvic Quarry", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Doomed Encampment", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Forsaken Manor", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Arx Spirensis", KEEP);
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Submerged Citadel", KEEP);
 	}
 
 	public static double getStatCompensation(String dungeon) {
@@ -92,7 +92,9 @@ public class StatMultiplier {
 	}
 
 	public static double getStatCompensation(String shard, Location loc) {
-		if (shard.equals("ring")) {
+		String shardType = shard.split("-")[0];
+
+		if (shardType.equals("ring")) {
 			List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(loc.toVector(), false);
 			for (RespawningStructure rs : structures) {
 				String name = (String) rs.getConfig().get("name");
@@ -104,7 +106,7 @@ public class StatMultiplier {
 			//no match -> return default value from shard mapping
 		}
 
-		return STAT_COMPENSATION_MAPPINGS.getOrDefault(shard, 1.0);
+		return STAT_COMPENSATION_MAPPINGS.getOrDefault(shardType, 1.0);
 	}
 
 	public static double getDamageMultiplier(int depthPoints) {
