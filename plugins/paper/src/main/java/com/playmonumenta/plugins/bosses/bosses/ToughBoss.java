@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
@@ -19,8 +20,7 @@ public class ToughBoss extends BossAbilityGroup {
 	}
 
 	final Parameters mParam;
-	private ArmorStand mBannerHolder;
-
+	private final ArmorStand mBannerHolder;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new ToughBoss(plugin, boss);
@@ -44,6 +44,12 @@ public class ToughBoss extends BossAbilityGroup {
 			e.printStackTrace();
 		}
 		mBoss.addPassenger(mBannerHolder);
+	}
+
+	@Override
+	public void unload() {
+		mBannerHolder.remove();
+		EntityUtils.removeAttribute(mBoss, Attribute.GENERIC_MAX_HEALTH, "vengeance_modifier");
 	}
 }
 
