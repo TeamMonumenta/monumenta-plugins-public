@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -43,7 +42,7 @@ public class TealAntiCheat extends Spell {
 			}
 
 			for (Entity e : EntityUtils.getNearbyMobs(mSpawnLoc, 100)) {
-				if (e.getScoreboardTags().contains("Boss") && !EntityUtils.getNearbyMobs(mSpawnLoc, 25).contains(e)) {
+				if (e.getScoreboardTags().contains("Boss") && !e.getName().contains("Marching Fate") && e.getLocation().distance(mSpawnLoc) > RADIUS) {
 					e.teleport(mSpawnLoc);
 				}
 			}
