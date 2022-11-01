@@ -314,34 +314,17 @@ public class DelvesManager implements Listener {
 			List<Player> playerParty = getParty(entity.getLocation());
 
 			if (!playerParty.isEmpty()) {
-				Map<DelvesModifier, Integer> delvesApplied = new HashMap<>();
-
-				for (Player delvePlayer : playerParty) {
-					for (DelvesModifier mod : DelvesModifier.values()) {
-						delvesApplied.put(mod, Math.max(delvesApplied.getOrDefault(mod, 0), getRank(delvePlayer, mod)));
-					}
-				}
+				Map<DelvesModifier, Integer> delvesApplied = DelvesUtils.getPartyDelvePointsMap(playerParty);
 				//check if this mob is summoned by command or by spawners
-				int totalLevel = 0;
 				if (event instanceof SpawnerSpawnEvent) {
 					//normal spawn - handle all the mods
-					List<DelvesModifier> mods = DelvesModifier.valuesList();
 					Riftborn.applyModifiers(((SpawnerSpawnEvent) event).getSpawner().getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
 					Chronology.applyModifiers(((SpawnerSpawnEvent) event).getSpawner(), delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
-					for (DelvesModifier mod : mods) {
-						mod.applyDelve(livingEntity, delvesApplied.getOrDefault(mod, 0));
-						totalLevel += delvesApplied.getOrDefault(mod, 0);
-					}
 
+					delvesApplied.forEach((mod, level) -> mod.applyDelve(livingEntity, level));
 				} else {
 					//this mob is spawned by something that is not a spawner (plugin - command - egg)
 					//give only death trigger abilities
-
-					//calculate total points to use for StatMultiplier
-					List<DelvesModifier> mods = DelvesModifier.valuesList();
-					for (DelvesModifier mod : mods) {
-						totalLevel += delvesApplied.getOrDefault(mod, 0);
-					}
 
 					for (DelvesModifier mod : DelvesModifier.deathTriggerDelvesModifier()) {
 						mod.applyDelve(livingEntity, delvesApplied.getOrDefault(mod, 0));
@@ -353,7 +336,7 @@ public class DelvesManager implements Listener {
 				livingEntity.addScoreboardTag(HAS_DELVE_MODIFIER_TAG);
 
 				//Mob stats should ALWAYS work on any mobs even if spawned by command plugin or spawners
-				StatMultiplier.applyModifiers(livingEntity, totalLevel);
+				StatMultiplier.applyModifiers(livingEntity, DelvesUtils.getTotalPoints(delvesApplied));
 			}
 		}
 	}
@@ -431,14 +414,8 @@ public class DelvesManager implements Listener {
 			return;
 		}
 
-		if (event.getDamagee() instanceof Player delvePlayer) {
-			int maxInfernal = 0;
-
-			for (Player player : getParty(delvePlayer.getLocation())) {
-				maxInfernal = Math.max(maxInfernal, getRank(player, DelvesModifier.INFERNAL));
-			}
-			Infernal.applyDamageModifiers(event, maxInfernal);
-
+		if (event.getDamagee() instanceof Player player) {
+			Infernal.applyDamageModifiers(event, DelvesUtils.getModifierLevel(player, DelvesModifier.INFERNAL));
 		}
 
 		//hard coded since magma cubes from Chivalrous should not do damage to player
@@ -465,12 +442,8 @@ public class DelvesManager implements Listener {
 			return;
 		}
 
-		int maxColossal = 0;
 		Location loc = event.getBlock().getLocation();
-
-		for (Player player : getParty(loc)) {
-			maxColossal = Math.max(maxColossal, getRank(player, DelvesModifier.COLOSSAL));
-		}
+		Colossal.applyModifiers(loc, DelvesUtils.getModifierLevel(loc, DelvesModifier.COLOSSAL));
 
 		//region Spawner Breaks Handling
 		if (false) { // this is causing massive lag and is not currently used
@@ -550,8 +523,6 @@ public class DelvesManager implements Listener {
 			}
 		}
 		//endregion
-
-		Colossal.applyModifiers(loc, maxColossal);
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -582,15 +553,17 @@ public class DelvesManager implements Listener {
 				}
 			}
 		}
+
 		EntityUtils.removeAttributesContaining(player, Attribute.GENERIC_MAX_HEALTH, "Whispers");
-		Fragile.applyModifiers(player, getRank(player, DelvesModifier.FRAGILE));
+
+		Fragile.applyModifiers(player, DelvesUtils.getModifierLevel(player, DelvesModifier.FRAGILE));
+
 		for (LivingEntity mob : player.getLocation().getNearbyLivingEntities(25)) {
 			TwistedMiniBoss boss = BossManager.getInstance().getBoss(mob, TwistedMiniBoss.class);
 			if (boss != null) {
 				boss.playerDeath(player);
 			}
 		}
-
 	}
 
 	//utility class to store date and modifier lvl on each player
@@ -611,6 +584,10 @@ public class DelvesManager implements Listener {
 			info.mModifierPoint.putAll(this.mModifierPoint);
 			info.mTotalPoint = this.mTotalPoint;
 			return info;
+		}
+
+		public HashMap<DelvesModifier, Integer> getMap() {
+			return new HashMap<>(mModifierPoint);
 		}
 
 		public void put(DelvesModifier mod, int level) {

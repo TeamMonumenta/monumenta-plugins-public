@@ -43,7 +43,7 @@ public class BountyGui extends Gui {
 	private static final List<String> LORE_SCOREBOARDS = new ArrayList<>(Arrays.asList("DailyLoreReq", "Daily2LoreReq", "Daily3LoreReq"));
 	private static final List<String> BOUNTY_NPCS = new ArrayList<>(Arrays.asList("King's Herald", "Seer", "The Seanchaidh"));
 
-	private static class BountyData {
+	public static class BountyData {
 		private final String mName;
 		private final int mID;
 		private final int mLevel;
@@ -68,9 +68,17 @@ public class BountyGui extends Gui {
 				mReqMin = 0;
 			}
 		}
+
+		public String getName() {
+			return mName;
+		}
+
+		public boolean hasBounty(Player player, int region) {
+			return ScoreboardUtils.getScoreboardValue(player, BOUNTY_SCOREBOARDS.get(region - 1)).orElse(0) == mID;
+		}
 	}
 
-	private final List<BountyData> mBounties = new ArrayList<>();
+	private final List<BountyData> mBounties;
 	private final List<BountyData> mBountyChoices = new ArrayList<>();
 	private final List<DelvePreset> mPresetChoices = new ArrayList<>();
 	private final int mLevel;
@@ -82,7 +90,7 @@ public class BountyGui extends Gui {
 		mLevel = level;
 		mRegion = region;
 
-		parseData();
+		mBounties = parseData(region);
 		setFiller(FILLER);
 	}
 
@@ -285,8 +293,9 @@ public class BountyGui extends Gui {
 		return item;
 	}
 
-	private void parseData() throws Exception {
-		String bountyContent = FileUtils.readFile(Plugin.getInstance().getDataFolder().getPath() + "/bounties/region" + mRegion + ".json");
+	public static List<BountyData> parseData(int region) throws Exception {
+		List<BountyData> bounties = new ArrayList<>();
+		String bountyContent = FileUtils.readFile(Plugin.getInstance().getDataFolder().getPath() + "/bounties/region" + region + ".json");
 		Gson gson = new Gson();
 		JsonObject data = gson.fromJson(bountyContent, JsonObject.class);
 		JsonArray bountyParse = data.get("pois").getAsJsonArray();
@@ -300,13 +309,14 @@ public class BountyGui extends Gui {
 				JsonObject reqs = toParse.get("requirement").getAsJsonObject();
 				String bountyBoard = reqs.get("scoreboard").getAsString();
 				int bountyReqMin = reqs.get("minimum").getAsInt();
-				mBounties.add(new BountyData(bountyName, bountyID,
+				bounties.add(new BountyData(bountyName, bountyID,
 					bountyLevel, bountyMat, bountyBoard, bountyReqMin));
 			} else {
-				mBounties.add(new BountyData(bountyName, bountyID,
+				bounties.add(new BountyData(bountyName, bountyID,
 					bountyLevel, bountyMat, null, 0));
 			}
 		}
+		return bounties;
 	}
 
 	public void createInfoItem() {

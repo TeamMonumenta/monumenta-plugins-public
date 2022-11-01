@@ -1,14 +1,18 @@
 package com.playmonumenta.plugins.delves;
 
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.custominventories.BountyGui;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Entropy;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.structures.StructuresPlugin;
+import com.playmonumenta.structures.managers.RespawningStructure;
 import it.unimi.dsi.util.XoRoShiRo128PlusRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -266,7 +270,7 @@ public class DelvesUtils {
 
 		List<DelvesModifier> mods = DelvesModifier.valuesList();
 
-		for (Player delvePlayer : DelvesManager.getParty(loc)) {
+		for (Player delvePlayer : playerInRangeForDelves(loc)) {
 			for (DelvesModifier mod : mods) {
 				delvesApplied.put(mod, Math.max(delvesApplied.getOrDefault(mod, 0), DelvesManager.getRank(delvePlayer, mod)));
 			}
@@ -435,5 +439,147 @@ public class DelvesUtils {
 		List<Player> players = PlayerUtils.playersInRange(loc, DelvesManager.DELVES_MAX_PARTY_DISTANCE, true);
 		players.removeIf(player -> !PlayerUtils.playerIsInPOI(loc, player));
 		return players;
+	}
+
+	private static HashMap<RespawningStructure, HashMap<DelvesModifier, Integer>> LAST_POI_DELVE_POINTS = new HashMap<>();
+
+
+
+	public static int getPartyDelvePoints(Player player) {
+		return getPartyDelvePoints(player.getLocation());
+	}
+
+	public static int getPartyDelvePoints(Location loc) {
+		return getPartyDelvePoints(playerInRangeForDelves(loc));
+	}
+
+	public static int getPartyDelvePoints(List<Player> party) {
+		return getTotalPoints(getPartyDelvePointsMap(party));
+	}
+
+	public static HashMap<DelvesModifier, Integer> getPartyDelvePointsMap(Player player) {
+		return getPartyDelvePointsMap(player.getLocation());
+	}
+
+	public static HashMap<DelvesModifier, Integer> getPartyDelvePointsMap(Location loc) {
+		return getPartyDelvePointsMap(playerInRangeForDelves(loc));
+	}
+
+	public static HashMap<DelvesModifier, Integer> getPartyDelvePointsMap(List<Player> party) {
+		if (party.isEmpty()) {
+			return new HashMap<>();
+		}
+
+		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
+		if (isDungeon) {
+			// All players in the party have the same modifiers
+			Player player = party.get(0);
+			return getPlayerDelvePoints(player);
+		} else {
+
+			// Find the structure(s) the party is in
+			List<RespawningStructure> structures = new ArrayList<>();
+			for (Player player : party) {
+				List<RespawningStructure> playerStructures = StructuresPlugin.getInstance().mRespawnManager.getStructures(player.getLocation().toVector(), false);
+				playerStructures.removeIf(structure -> structure.isWithin(player));
+				structures.addAll(playerStructures);
+			}
+
+			if (structures.isEmpty()) {
+				MMLog.fine("Delve party is not in any structures");
+				return new HashMap<>();
+			} else if (structures.size() > 1) {
+				StringBuilder msg = new StringBuilder("Delve party is in multiple structures at once: ");
+				for (int i = 0; i < structures.size(); i++) {
+					if (i > 0) {
+						msg.append(", ");
+					}
+					msg.append(getStructureName(structures.get(i)));
+				}
+				structures.forEach(structure -> msg.append(getStructureName(structure)));
+				MMLog.warning(String.valueOf(msg));
+			}
+
+			RespawningStructure structure = structures.get(0);
+			String name = getStructureName(structure);
+
+			// Find highest bounty delve score
+			List<BountyGui.BountyData> bountyData = new ArrayList<>();
+			try {
+				bountyData = BountyGui.parseData(3);
+			} catch (Exception e) {
+				MMLog.warning("Caught exception parsing r3 bounty data");
+				e.printStackTrace();
+			}
+
+			List<Player> bountyPlayers = new ArrayList<>();
+			for (BountyGui.BountyData bounty : bountyData) {
+				if (name.equals(bounty.getName())) {
+					for (Player player : party) {
+						if (bounty.hasBounty(player, 3)) {
+							bountyPlayers.add(player);
+						}
+					}
+				}
+			}
+
+			// There is someone with a bounty - return theirs and ignore what everyone else has
+			if (!bountyPlayers.isEmpty()) {
+				HashMap<DelvesModifier, Integer> highestMap = getHighestDelvePoints(bountyPlayers, null);
+				LAST_POI_DELVE_POINTS.put(structure, highestMap);
+				return highestMap;
+			}
+
+			HashMap<DelvesModifier, Integer> highestMap = getHighestDelvePoints(party, LAST_POI_DELVE_POINTS.get(structure));
+			LAST_POI_DELVE_POINTS.put(structure, highestMap);
+			return highestMap;
+		}
+	}
+
+	private static HashMap<DelvesModifier, Integer> getHighestDelvePoints(List<Player> players, @Nullable HashMap<DelvesModifier, Integer> base) {
+		HashMap<DelvesModifier, Integer> highestMap = base != null ? base : new HashMap<>();
+		int highestPoints = getTotalPoints(base);
+		for (Player player : players) {
+			HashMap<DelvesModifier, Integer> playerMap = getPlayerDelvePoints(player);
+			int playerPoints = getTotalPoints(playerMap);
+			if (playerPoints > highestPoints) {
+				highestMap = playerMap;
+				highestPoints = playerPoints;
+			}
+		}
+		return highestMap;
+	}
+
+	private static HashMap<DelvesModifier, Integer> getPlayerDelvePoints(Player player) {
+		Map<String, DelvesManager.DungeonDelveInfo> playerDDInfo = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(player.getUniqueId(), new HashMap<>());
+		DelvesManager.DungeonDelveInfo info = playerDDInfo.get(ServerProperties.getShardName());
+		if (info != null) {
+			return info.getMap();
+		}
+		return new HashMap<>();
+	}
+
+	public static int getTotalPoints(@Nullable Map<DelvesModifier, Integer> map) {
+		if (map == null) {
+			return 0;
+		}
+		int points = 0;
+		for (int x : map.values()) {
+			points += x;
+		}
+		return points;
+	}
+
+	public static int getModifierLevel(Player player, DelvesModifier mod) {
+		return getModifierLevel(player.getLocation(), mod);
+	}
+
+	public static int getModifierLevel(Location loc, DelvesModifier mod) {
+		HashMap<DelvesModifier, Integer> mods = getPartyDelvePointsMap(loc);
+		return mods.getOrDefault(mod, 0);
+	}
+
+	private static String getStructureName(RespawningStructure structure) {
+		return (String) structure.getConfig().get("name");
 	}
 }
