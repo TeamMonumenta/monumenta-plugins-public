@@ -16,6 +16,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -32,6 +33,7 @@ public class PhlegmaticResolve extends Ability {
 	private final double mPercentDamageResist;
 	private double[] mEnhancementDamageSpread = {0, 0, 0};
 	private double mLastMaxDamage = 0;
+	private int mLastPlayedSoundTick = 0;
 	private double mKBR;
 
 	public static final String CHARM_RESIST = "Phlegmatic Resolve Resistance";
@@ -60,6 +62,10 @@ public class PhlegmaticResolve extends Ability {
 		}
 
 		if (isEnhanced()) {
+			if (twoHertz) {
+				mLastMaxDamage = 0;
+			}
+
 			if (oneSecond) {
 				// mPlayer.sendMessage("Phlegmatic: " + mEnhancementDamageSpread[0] + ", " + mEnhancementDamageSpread[1] + ", " + mEnhancementDamageSpread[2]);
 
@@ -81,7 +87,7 @@ public class PhlegmaticResolve extends Ability {
 						}
 
 						mPlayer.setHealth(Math.min(mPlayer.getHealth() - mEnhancementDamageSpread[0], EntityUtils.getMaxHealth(mPlayer)));
-						mPlayer.damage(0);
+						mPlayer.damage(0.01);
 					}
 					Particle.DustOptions dustColor = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
 					mPlayer.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(new Vector(0, 0.5, 0)), 50, 0.5, 0.5, 0.5, dustColor);
@@ -128,33 +134,27 @@ public class PhlegmaticResolve extends Ability {
 			event.getType() != DamageEvent.DamageType.AILMENT &&
 			event.getType() != DamageEvent.DamageType.POISON &&
 			event.getType() != DamageEvent.DamageType.OTHER &&
+			event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK &&
 			!event.isBlocked() &&
 			mPlayer != null) {
 
-			double damageSplit;
 			// If player isn't under invincibility ticks. (This means we can have attacks that bypass Iframes hopefully)
-			if (mPlayer.getNoDamageTicks() == 0) {
-				damageSplit = event.getDamage() / 3.0;
+			if (event.getDamage() > mLastMaxDamage) {
+				double damageSplit = (event.getDamage() - mLastMaxDamage) / 3.0;
 				mLastMaxDamage = event.getDamage();
 
-				// We really only want to play this once per 0.5 seconds, or it will get annoying.
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, 1, 1);
-			} else { // Player is under invincibility ticks, we need to take difference between mLastMaxDamage and damage.
-				damageSplit = (event.getDamage() > mLastMaxDamage) ? (event.getDamage() - mLastMaxDamage) / 3.0 : 0;
-				mLastMaxDamage = event.getDamage();
+				// Only play sound to player once per second.
+				if ((mLastPlayedSoundTick - mPlayer.getTicksLived()) > 20) {
+					mLastPlayedSoundTick = mPlayer.getTicksLived();
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, 1, 1);
+				}
 
-				// Set the event to be cancelled also, so that it doesn't mess with invincibiility ticks.
-				event.setCancelled(true);
-			}
-
-			if (damageSplit > 0) {
 				mEnhancementDamageSpread[0] += damageSplit;
 				mEnhancementDamageSpread[1] += damageSplit;
 				mEnhancementDamageSpread[2] += damageSplit;
-
-				// Only set damage to 0 so that kb occurs.
-				event.setDamage(0);
 			}
+
+			event.setDamage(0.01);
 		}
 	}
 }
