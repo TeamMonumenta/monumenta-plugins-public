@@ -22,6 +22,7 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 
 	private static final String DREADLING_TERRAIN_SOUL_NAME = "Dreadling";
 	private static final String DREADLING_WATER_SOUL_NAME = "Hydraling";
+	private static final double DREADLING_SPAWN_THRESHOLD = 0.35;
 
 	private double mDamageCounter = 0;
 
@@ -44,8 +45,10 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 
 		mDamageCounter += event.getFinalDamage(false);
 
-		if (mDamageCounter >= 80) {
-			mDamageCounter -= 80;
+		double regionCap = mBoss.getMaxHealth() * DREADLING_SPAWN_THRESHOLD;
+
+		if (mDamageCounter >= regionCap) {
+			mDamageCounter -= regionCap;
 
 			if (loc.getBlock().getType() == Material.WATER) {
 				LibraryOfSoulsIntegration.summon(loc, DREADLING_WATER_SOUL_NAME);
