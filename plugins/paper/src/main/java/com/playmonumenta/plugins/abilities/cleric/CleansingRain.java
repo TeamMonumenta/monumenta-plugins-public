@@ -92,7 +92,7 @@ public class CleansingRain extends Ability {
 
 				List<Player> rainPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true);
 				for (Player player : rainPlayers) {
-					if (isEnhanced()) {
+					if (isEnhanced() && !mCleansedPlayers.contains(player)) {
 						mCleansedPlayers.add(player);
 						continue;
 					}
@@ -111,10 +111,10 @@ public class CleansingRain extends Ability {
 				//Loop through already affected players for enhanced cleansing rain
 				if (isEnhanced()) {
 					for (Player player : mCleansedPlayers) {
-						if (!rainPlayers.contains(player)) {
-							new PartialParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 4, 0), (int) (5 * smallRatio * smallRatio), 2.5 * smallRatio, 0.35, 2.5 * smallRatio, 0).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.WATER_DROP, mPlayer.getLocation().add(0, 2, 0), (int) (15 * smallRatio * smallRatio), 2.5 * smallRatio, 2, 2.5 * smallRatio, 0.001).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 2, 0), (int) (1 * smallRatio * smallRatio), 2 * smallRatio, 1.5, 2 * smallRatio, 0.001).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+						if (!rainPlayers.contains(player) && player != mPlayer) {
+							new PartialParticle(Particle.CLOUD, player.getLocation().add(0, 4, 0), (int) (5 * smallRatio * smallRatio), 2.5 * smallRatio, 0.35, 2.5 * smallRatio, 0).spawnAsPlayerActive(player);
+							new PartialParticle(Particle.WATER_DROP, player.getLocation().add(0, 2, 0), (int) (15 * smallRatio * smallRatio), 2.5 * smallRatio, 2, 2.5 * smallRatio, 0.001).spawnAsPlayerActive(player);
+							new PartialParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), (int) (1 * smallRatio * smallRatio), 2 * smallRatio, 1.5, 2 * smallRatio, 0.001).minimumMultiplier(false).spawnAsPlayerActive(player);
 						}
 
 						PotionUtils.clearNegatives(mPlugin, player);
