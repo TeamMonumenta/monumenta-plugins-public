@@ -8,9 +8,11 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -60,7 +62,8 @@ public class RitualRingCS extends TransmRingCS implements GalleryCS {
 
 	@Override
 	public boolean isUnlocked(Player mPlayer) {
-		return mPlayer != null;
+		return ScoreboardUtils.getScoreboardValue(mPlayer, GALLERY_COMPLETE_SCB).orElse(0) >= 1
+			       || mPlayer.getGameMode() == GameMode.CREATIVE;
 	}
 
 	@Override
