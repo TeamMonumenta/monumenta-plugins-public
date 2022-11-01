@@ -48,6 +48,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -1379,4 +1380,33 @@ public class EntityUtils {
 		}
 		return false;
 	}
+
+	public static List<BlockState> getTileEntitiesInRange(Location location, int radius, Predicate<Block> blockPredicate) {
+		double radiusSquared = 1.0 * radius * radius;
+		List<BlockState> result = new ArrayList<>();
+		for (int x = -radius; x <= radius; x += 16) {
+			for (int z = -radius; z <= radius; z += 16) {
+				Location offsetLocation = location.clone().add(x, 0, z);
+				if (offsetLocation.isChunkLoaded()) {
+					result.addAll(offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false));
+				}
+			}
+		}
+		return result;
+	}
+
+	public static boolean hasTileEntityInRange(Location location, int radius, Predicate<Block> blockPredicate) {
+		double radiusSquared = 1.0 * radius * radius;
+		for (int x = -radius; x <= radius; x += 16) {
+			for (int z = -radius; z <= radius; z += 16) {
+				Location offsetLocation = location.clone().add(x, 0, z);
+				if (offsetLocation.isChunkLoaded()
+					    && !offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false).isEmpty()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 }

@@ -384,6 +384,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mVanityManager, this);
 		manager.registerEvents(new BrokenEquipmentListener(), this);
 		manager.registerEvents(PortalManager.getInstance(), this);
+		manager.registerEvents(new LootingLimiter(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")

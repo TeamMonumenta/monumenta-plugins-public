@@ -47,6 +47,8 @@ public class ServerProperties {
 	private final EnumSet<Material> mNamedPickupMats = EnumSet.noneOf(Material.class);
 
 	private final List<NamespacedKey> mEggifySpawnEggs = new ArrayList<>();
+	private int mLootingLimiterMobKills = 0;
+	private int mLootingLimiterSpawners = 0;
 
 	public ServerProperties() {
 	}
@@ -123,6 +125,14 @@ public class ServerProperties {
 		return INSTANCE.mEggifySpawnEggs;
 	}
 
+	public static int getLootingLimiterMobKills() {
+		return INSTANCE.mLootingLimiterMobKills;
+	}
+
+	public static int getLootingLimiterSpawners() {
+		return INSTANCE.mLootingLimiterSpawners;
+	}
+
 	public static void load(Plugin plugin, @Nullable CommandSender sender) {
 		INSTANCE.loadInternal(plugin, sender);
 	}
@@ -151,6 +161,9 @@ public class ServerProperties {
 			getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender, mNamedPickupMats);
 
 			getPropertyValueCollection(plugin, object, "eggifySpawnEggs", sender, NamespacedKeyUtils::fromString, mEggifySpawnEggs);
+
+			mLootingLimiterMobKills = getPropertyValueInt(object, "lootingLimiterMobKills", mLootingLimiterMobKills);
+			mLootingLimiterSpawners = getPropertyValueInt(object, "lootingLimiterSpawners", mLootingLimiterSpawners);
 
 			return null;
 		});
@@ -192,6 +205,9 @@ public class ServerProperties {
 		out.add("namedPickupMaterials = [" + mNamedPickupMats.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
 
 		out.add("eggifySpawnEggs = [" + mEggifySpawnEggs.stream().map(NamespacedKey::toString).collect(Collectors.joining("  ")) + "]");
+
+		out.add("lootingLimiterMobKills = " + mLootingLimiterMobKills);
+		out.add("lootingLimiterSpawners = " + mLootingLimiterSpawners);
 
 		return out;
 	}
