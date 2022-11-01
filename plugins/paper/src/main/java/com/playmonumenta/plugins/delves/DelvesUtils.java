@@ -443,8 +443,6 @@ public class DelvesUtils {
 
 	private static HashMap<RespawningStructure, HashMap<DelvesModifier, Integer>> LAST_POI_DELVE_POINTS = new HashMap<>();
 
-
-
 	public static int getPartyDelvePoints(Player player) {
 		return getPartyDelvePoints(player.getLocation());
 	}
@@ -523,24 +521,39 @@ public class DelvesUtils {
 				}
 			}
 
-			// There is someone with a bounty - return theirs and ignore what everyone else has
+			List<Player> players = party;
 			if (!bountyPlayers.isEmpty()) {
-				HashMap<DelvesModifier, Integer> highestMap = getHighestDelvePoints(bountyPlayers, null);
-				LAST_POI_DELVE_POINTS.put(structure, highestMap);
-				return highestMap;
+				players = bountyPlayers;
 			}
 
-			HashMap<DelvesModifier, Integer> highestMap = getHighestDelvePoints(party, LAST_POI_DELVE_POINTS.get(structure));
+			HashMap<DelvesModifier, Integer> lastMap = LAST_POI_DELVE_POINTS.get(structure);
+			HashMap<DelvesModifier, Integer> highestMap = getHighestDelvePointsWithLast(players, lastMap);
 			LAST_POI_DELVE_POINTS.put(structure, highestMap);
 			return highestMap;
 		}
 	}
 
-	private static HashMap<DelvesModifier, Integer> getHighestDelvePoints(List<Player> players, @Nullable HashMap<DelvesModifier, Integer> base) {
-		HashMap<DelvesModifier, Integer> highestMap = base != null ? base : new HashMap<>();
-		int highestPoints = getTotalPoints(base);
+	private static HashMap<DelvesModifier, Integer> getHighestDelvePointsWithLast(List<Player> players, @Nullable HashMap<DelvesModifier, Integer> last) {
+		List<HashMap<DelvesModifier, Integer>> list = new ArrayList<>();
+		boolean foundLast = false;
 		for (Player player : players) {
 			HashMap<DelvesModifier, Integer> playerMap = getPlayerDelvePoints(player);
+			if (playerMap.equals(last)) {
+				foundLast = true;
+			}
+			list.add(playerMap);
+		}
+		HashMap<DelvesModifier, Integer> highest = getHighestDelvePoints(list);
+		if (foundLast && getTotalPoints(highest) == getTotalPoints(last)) {
+			return last;
+		}
+		return highest;
+	}
+
+	private static HashMap<DelvesModifier, Integer> getHighestDelvePoints(List<HashMap<DelvesModifier, Integer>> list) {
+		HashMap<DelvesModifier, Integer> highestMap = new HashMap<>();
+		int highestPoints = 0;
+		for (HashMap<DelvesModifier, Integer> playerMap : list) {
 			int playerPoints = getTotalPoints(playerMap);
 			if (playerPoints > highestPoints) {
 				highestMap = playerMap;
