@@ -253,7 +253,12 @@ public class YellowTesseractOverride extends BaseOverride {
 			if (reference.getDisplayName() != null && reference.getScoreboard() != null) {
 				int value = ScoreboardUtils.getScoreboardValue(player, reference.getScoreboard()).orElse(0);
 				if (value > 0) {
-					ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(PREFIX + reference.getDisplayName() + " : " + value,
+					boolean enhanced = false;
+					if (value > 2) {
+						enhanced = true;
+						value -= 2;
+					}
+					ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(PREFIX + reference.getDisplayName() + " : " + value + (enhanced ? "*" : ""),
 						NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 				}
 			}
@@ -290,8 +295,17 @@ public class YellowTesseractOverride extends BaseOverride {
 				specVal = AbilityUtils.getSpec(str.substring(SPEC_STR.length()));
 				ScoreboardUtils.setScoreboardValue(player, "Specialization", specVal);
 			} else if (str.startsWith(PREFIX)) {
+				boolean enhanced = false;
+				if (str.endsWith("*")) {
+					enhanced = true;
+					str = str.substring(0, str.length() - 1);
+				}
 				int level = Integer.parseInt(str.substring(str.length() - 1));
-				targetSkills.put(str.substring(PREFIX.length(), str.indexOf(" : ")), level);
+				if (enhanced) {
+					level += 2;
+				}
+				String name = str.substring(PREFIX.length(), str.indexOf(" : "));
+				targetSkills.put(name, level);
 			}
 		}
 
