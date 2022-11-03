@@ -46,10 +46,13 @@ public class WorldshaperOverride {
 		.append(Component.text("Floor", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 	private static final Component CAGE_MODE = Component.text("Selected Mode: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 		.append(Component.text("Cage", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+	private static final Component STAIRS_MODE = Component.text("Selected Mode: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+		.append(Component.text("Stairs", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false));
 	private static final String PLAIN_BRIDGE_MODE = MessagingUtils.plainText(BRIDGE_MODE);
 	private static final String PLAIN_WALL_MODE = MessagingUtils.plainText(WALL_MODE);
 	private static final String PLAIN_FLOOR_MODE = MessagingUtils.plainText(FLOOR_MODE);
 	private static final String PLAIN_CAGE_MODE = MessagingUtils.plainText(CAGE_MODE);
+	private static final String PLAIN_STAIRS_MODE = MessagingUtils.plainText(STAIRS_MODE);
 	private static final String ITEM_NAME = "Worldshaper's Loom";
 	// private static final String DELVE_SKIN_NAME = "Doorway from Eternity"; - Insert DELVE SKIN here
 
@@ -83,7 +86,7 @@ public class WorldshaperOverride {
 		int cooldown = 0;
 
 		if (getMode(item) == Mode.BRIDGE) {
-			cooldown = 4 * 20;
+			cooldown = 3 * 20;
 
 			Location origin;
 
@@ -119,7 +122,7 @@ public class WorldshaperOverride {
 				origin.add(xIterAdd, 0, zIterAdd);
 			}
 		} else if (getMode(item) == Mode.WALL) {
-			cooldown = 6 * 20;
+			cooldown = 5 * 20;
 
 			Location origin = player.getTargetBlock(3).getLocation();
 			origin.setY(player.getLocation().getY() + 1);
@@ -189,7 +192,7 @@ public class WorldshaperOverride {
 
 
 		} else if (getMode(item) == Mode.FLOOR) {
-			cooldown = 8 * 20;
+			cooldown = 7 * 20;
 
 			Location origin = player.getLocation();
 
@@ -203,7 +206,7 @@ public class WorldshaperOverride {
 			blockPlacePattern.add(origin.clone().add(0, -1, 1));
 			blockPlacePattern.add(origin.clone().add(1, -1, 1));
 		} else if (getMode(item) == Mode.CAGE) {
-			cooldown = 60 * 20;
+			cooldown = 10 * 20;
 
 			Location origin = player.getLocation();
 
@@ -222,6 +225,41 @@ public class WorldshaperOverride {
 			//Top & Bottom
 			blockPlacePattern.add(origin.clone().add(0, 2, 0));
 			blockPlacePattern.add(origin.clone().add(0, -1, 0));
+		} else if (getMode(item) == Mode.STAIRS) {
+			cooldown = 5 * 20;
+
+			Location origin;
+
+			origin = player.getLocation().clone().add(0, -1, 0);
+
+			if (!origin.getBlock().isSolid()) {
+				player.sendMessage(Component.text("Stairs Mode can only be used while on a solid block!", TextColor.fromHexString("#D02E28")));
+				return false;
+			}
+
+			// 337.5 to 360 or 0 to 22.5 is positive Z
+			// 22.5 to 67.5 is negative X and positive Z
+			// 67.5 to 112.5 is negative X... and so on.
+			float playerYaw = player.getLocation().getYaw();
+
+			// For whatever reason it gives a negative value... yaww.
+			if (playerYaw < 0) {
+				playerYaw += 360;
+			}
+
+			// So, 22.5 to 157.5 for negative X. 202.5 to 337.5 for positive X.
+			int xIterAdd = (playerYaw >= 22.5 && playerYaw <= 157.5) ? -1 : ((playerYaw >= 202.5 && playerYaw <= 337.5) ? 1 : 0);
+
+			// For Z, 67.5 to 112.5 or 247.5 to 292.5 for 0, 112.5 to 247.5 for -1, default 1.
+			int zIterAdd = ((playerYaw >= 67.5 && playerYaw <= 112.5) || (playerYaw >= 247.5 && playerYaw <= 292.5)) ? 0 : ((playerYaw >= 112.5 && playerYaw <= 247.5) ? -1 : 1);
+
+			// If there is a complaint about how readable that code was, the response is "yes".
+			origin.add(xIterAdd, 1, zIterAdd);
+
+			for (int i = 0; i < 6; i++) {
+				blockPlacePattern.add(origin.clone());
+				origin.add(xIterAdd, 1, zIterAdd);
+			}
 		}
 
 		boolean blockPlaced = false;
@@ -320,9 +358,16 @@ public class WorldshaperOverride {
 				String line = lore.get(i);
 				if (line.equals(PLAIN_BRIDGE_MODE) && !foundLine) {
 					ItemStatUtils.removeLore(item, i);
+					ItemStatUtils.addLore(item, i, STAIRS_MODE);
+					player.sendMessage(STAIRS_MODE);
+					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+					foundLine = true;
+					break;
+				} else if (line.equals(PLAIN_STAIRS_MODE) && !foundLine) {
+					ItemStatUtils.removeLore(item, i);
 					ItemStatUtils.addLore(item, i, WALL_MODE);
 					player.sendMessage(WALL_MODE);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, (float) 0.9);
 					foundLine = true;
 					break;
 				} else if (line.equals(PLAIN_WALL_MODE) && !foundLine) {
@@ -386,6 +431,8 @@ public class WorldshaperOverride {
 				return Mode.FLOOR;
 			} else if (line.equals(PLAIN_CAGE_MODE)) {
 				return Mode.CAGE;
+			} else if (line.equals(PLAIN_STAIRS_MODE)) {
+				return Mode.STAIRS;
 			}
 		}
 
@@ -396,6 +443,7 @@ public class WorldshaperOverride {
 		BRIDGE,
 		WALL,
 		FLOOR,
-		CAGE
+		CAGE,
+		STAIRS
 	}
 }
