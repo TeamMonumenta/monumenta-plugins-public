@@ -231,6 +231,7 @@ public class Plugin extends JavaPlugin {
 		MonumentaTrigger.register();
 		BlueStrikeDaggerCraftingBoss.register();
 		ScanChests.register();
+		AbsorptionCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

@@ -1,12 +1,16 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.DisplayableEffect;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.annotation.Nullable;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -118,6 +122,38 @@ public class AbsorptionUtils {
 				}
 			};
 			ABSORPTION_INFO_TRACKER.runTaskTimer(Plugin.getInstance(), 0, TRACKER_PERIOD);
+		}
+	}
+
+	public static List<AbsorptionDisplayable> getAbsorptionDisplayables(LivingEntity entity) {
+		List<AbsorptionDisplayable> displayables = new ArrayList<>();
+		AbsorptionInstances absorptionInstances = ABSORPTION_INFO_MAPPINGS.get(entity);
+		if (absorptionInstances != null) {
+			absorptionInstances.mAbsorptionInstances.forEach((amount, duration) -> displayables.add(new AbsorptionDisplayable(amount, duration)));
+		}
+
+		return displayables;
+	}
+
+	// this does not do any tracking, it is purely for display & sorting
+	public static class AbsorptionDisplayable implements DisplayableEffect {
+
+		private final double mAmount;
+		private final int mDuration;
+
+		public AbsorptionDisplayable(double amount, int duration) {
+			mAmount = amount;
+			mDuration = duration;
+		}
+
+		@Override
+		public int getDuration() {
+			return mDuration;
+		}
+
+		@Override
+		public String getDisplay() {
+			return ChatColor.YELLOW + "" + StringUtils.to2DP(mAmount) + " Absorption " + ChatColor.GRAY + "" + StringUtils.intToMinuteAndSeconds(mDuration / 20);
 		}
 	}
 

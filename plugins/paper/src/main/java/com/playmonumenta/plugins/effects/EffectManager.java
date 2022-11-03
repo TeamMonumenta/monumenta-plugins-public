@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -276,7 +275,6 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(BoonOfThePit.effectID, BoonOfThePit::deserialize);
 		mEffectDeserializer.put(CourageEffect.effectID, CourageEffect::deserialize);
 		mEffectDeserializer.put(CrystalineBlessing.effectID, CrystalineBlessing::deserialize);
-		mEffectDeserializer.put(CustomAbsorption.effectID, CustomAbsorption::deserialize);
 		mEffectDeserializer.put(CustomDamageOverTime.effectID, CustomDamageOverTime::deserialize);
 		mEffectDeserializer.put(CustomRegeneration.effectID, CustomRegeneration::deserialize);
 		mEffectDeserializer.put(DeepGodsEndowment.effectID, DeepGodsEndowment::deserialize);
@@ -441,13 +439,6 @@ public final class EffectManager implements Listener {
 		};
 
 		mTimer.runTaskTimer(plugin, 0, PERIOD);
-	}
-
-	public static class SortEffectsByDuration implements Comparator<Effect> {
-		@Override
-		public int compare(Effect effect1, Effect effect2) {
-			return effect2.getDuration() - effect1.getDuration();
-		}
 	}
 
 	public static EffectManager getInstance() {

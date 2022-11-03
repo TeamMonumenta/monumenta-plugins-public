@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.effects.BonusSoulThreads;
 import com.playmonumenta.plugins.effects.BoonOfKnightlyPrayer;
 import com.playmonumenta.plugins.effects.BoonOfThePit;
 import com.playmonumenta.plugins.effects.CrystalineBlessing;
-import com.playmonumenta.plugins.effects.CustomAbsorption;
 import com.playmonumenta.plugins.effects.DeepGodsEndowment;
 import com.playmonumenta.plugins.effects.DurabilitySaving;
 import com.playmonumenta.plugins.effects.Effect;
@@ -32,7 +31,9 @@ import com.playmonumenta.plugins.effects.TuathanBlessing;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
 import com.playmonumenta.plugins.potion.PotionManager;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -42,6 +43,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -390,15 +392,18 @@ public enum EffectType {
 			case MAX_HEALTH_DECREASE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHealthBoost(duration, -strength, sourceString));
 
 			case ABSORPTION -> {
-				plugin.mEffectManager.addEffect(entity, sourceString, new CustomAbsorption(duration, strength, sourceString));
-				if (applySickness) {
-					double sicknessPenalty = 0;
-					NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "AbsorptionSickness");
-					if (sicks != null) {
-						Effect sick = sicks.last();
-						sicknessPenalty = sick.getMagnitude();
+				if (entity instanceof LivingEntity livingEntity) {
+					double amount = strength * EntityUtils.getMaxHealth(livingEntity);
+					AbsorptionUtils.addAbsorption(livingEntity, amount, amount, duration);
+					if (applySickness) {
+						double sicknessPenalty = 0;
+						NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "AbsorptionSickness");
+						if (sicks != null) {
+							Effect sick = sicks.last();
+							sicknessPenalty = sick.getMagnitude();
+						}
+						plugin.mEffectManager.addEffect(entity, "AbsorptionSickness", new AbsorptionSickness(20 * 15, Math.min(sicknessPenalty + 0.2, 0.8), "AbsorptionSickness"));
 					}
-					plugin.mEffectManager.addEffect(entity, "AbsorptionSickness", new AbsorptionSickness(20 * 15, Math.min(sicknessPenalty + 0.2, 0.8), "AbsorptionSickness"));
 				}
 			}
 			case STARVATION -> Starvation.apply(player, (int) strength);

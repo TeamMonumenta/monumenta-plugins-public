@@ -20,7 +20,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Effects should not themselves modify other effects when any of the below methods are called
  * If you need to do this, you should use Bukkit.getScheduler().runTask(...) to update the effects after the current operation finishes processing
  */
-public abstract class Effect implements Comparable<Effect> {
+public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	protected int mDuration;
 	public String mEffectID;
@@ -34,6 +34,7 @@ public abstract class Effect implements Comparable<Effect> {
 		return EffectPriority.NORMAL;
 	}
 
+	@Override
 	public int getDuration() {
 		return mDuration;
 	}
@@ -163,6 +164,7 @@ public abstract class Effect implements Comparable<Effect> {
 		return null;
 	}
 
+	@Override
 	public @Nullable String getDisplay() {
 		String specificDisplay = getSpecificDisplay();
 		if (specificDisplay != null) {

@@ -4,15 +4,13 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.DisplayableEffect;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import java.util.ArrayList;
 import java.util.List;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -196,16 +194,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 		}
 
 		if (identifier.startsWith("effect_")) {
-			List<String> effectDisplays = new ArrayList<>();
-			List<Effect> effects = new ArrayList<>(mPlugin.mEffectManager.getPriorityEffects(player).values());
-			effects.sort(new EffectManager.SortEffectsByDuration());
-
-			for (Effect effect : effects) {
-				String display = effect.getDisplay();
-				if (display != null) {
-					effectDisplays.add(display);
-				}
-			}
+			List<String> effectDisplays = DisplayableEffect.getSortedEffectDisplays(mPlugin, player);
 
 			if (identifier.startsWith("effect_more")) {
 				int extra = effectDisplays.size() - 10;
