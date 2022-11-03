@@ -22,6 +22,8 @@ public class SpellBullet extends Spell {
 
 	public enum Pattern {
 		BORDER("border"),
+		BORDER_2("border_2"),
+		BORDER_1("border_1"),
 		JUNKO("junko"),
 		SANAE("sanae"),
 		POLYGRAPH("polygraph"),
@@ -126,11 +128,15 @@ public class SpellBullet extends Spell {
 					mTickAction.run(mCaster, mTicks);
 				} else if (mTicks < mDuration + mDelay && mTicks % mEmissionSpeed == 0) {
 					if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, false).size() > 0) {
-						if (mPattern == Pattern.BORDER) {
+						if (mPattern == Pattern.BORDER || mPattern == Pattern.BORDER_2 || mPattern == Pattern.BORDER_1) {
 							launchAcceleratingBullet(new Vector(1, 0, 0).rotateAroundY(mRotation), 0, 0, 0);
-							launchAcceleratingBullet(new Vector(-1, 0, 0).rotateAroundY(mRotation), 0, 0, 0);
-							launchAcceleratingBullet(new Vector(0, 0, -1).rotateAroundY(mRotation), 0, 0, 0);
-							launchAcceleratingBullet(new Vector(0, 0, 1).rotateAroundY(mRotation), 0, 0, 0);
+							if (mPattern == Pattern.BORDER || mPattern == Pattern.BORDER_2) {
+								launchAcceleratingBullet(new Vector(-1, 0, 0).rotateAroundY(mRotation), 0, 0, 0);
+								if (mPattern == Pattern.BORDER) {
+									launchAcceleratingBullet(new Vector(0, 0, -1).rotateAroundY(mRotation), 0, 0, 0);
+									launchAcceleratingBullet(new Vector(0, 0, 1).rotateAroundY(mRotation), 0, 0, 0);
+								}
+							}
 							mCasts++;
 							mRotation += Math.sin(mCasts / 30.0 * 3.14);
 						} else if (mPattern == Pattern.JUNKO) {

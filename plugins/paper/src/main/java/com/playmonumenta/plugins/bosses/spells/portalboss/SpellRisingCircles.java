@@ -18,7 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellRisingCircles extends Spell {
 
-	public static final double DAMAGE = 0.6;
+	public static final double DAMAGE = 0.7;
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;

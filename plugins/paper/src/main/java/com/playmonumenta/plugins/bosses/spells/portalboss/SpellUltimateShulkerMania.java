@@ -33,7 +33,7 @@ public class SpellUltimateShulkerMania extends Spell {
 	private int mCooldown;
 
 	public static final int ARENA_SIZE = 18;
-	public static final int DAMAGE = 40;
+	public static final int DAMAGE = 50;
 
 	public SpellUltimateShulkerMania(Plugin plugin, LivingEntity boss, Location loc, int cooldown) {
 		mPlugin = plugin;

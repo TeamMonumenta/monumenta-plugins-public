@@ -46,7 +46,7 @@ import org.bukkit.util.Vector;
 public final class PortalBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_portalfight";
 	public static final int detectionRange = 50;
-	public static final int BASE_HEALTH = 4000;
+	public static final int BASE_HEALTH = 5000;
 	public static final String CUBE_TAG = "boss_portal";
 	public static final String ELITE_LOS = "FlameConstruct";
 	public static final String CUBE_FUNCTION = "function monumenta:quests/r2/quest149/cube/spawning/force_clear_boss";

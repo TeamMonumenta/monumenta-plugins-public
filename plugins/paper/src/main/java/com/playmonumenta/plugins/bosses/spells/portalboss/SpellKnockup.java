@@ -69,7 +69,7 @@ public class SpellKnockup extends Spell {
 						world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5f, 1);
 
 						for (Player p : PlayerUtils.playersInRange(loc, mRadius, true)) {
-							DamageUtils.damage(mBoss, p, DamageType.MAGIC, 30, null, false, true, "Error Field");
+							DamageUtils.damage(mBoss, p, DamageType.MAGIC, 85, null, false, true, "Error Field");
 							MovementUtils.knockAway(loc, p, 0f, 1f, false);
 						}
 					}
