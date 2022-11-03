@@ -33,17 +33,19 @@ public class SpellEchoCharge extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private final int mCooldown = 20 * 10;
+	private int mDamage;
 	private ChargeUpManager mChargeUp;
 	private int mCastTime = (int) (20 * 7.5);
 	private int mExecutionTime = (int) (20 * 3.5);
 	private final Location[] mSpawnLocations = new Location[3];
 	private final Location[] mTargetLocations = new Location[3];
 
-	public SpellEchoCharge(Plugin plugin, LivingEntity boss, int castTime, int executionTime) {
+	public SpellEchoCharge(Plugin plugin, LivingEntity boss, int castTime, int executionTime, int damage) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mCastTime = castTime;
 		mExecutionTime = executionTime;
+		mDamage = damage;
 		mChargeUp = new ChargeUpManager(mBoss, mCastTime, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + ABILITY_NAME,
 			BarColor.YELLOW, BarStyle.SOLID, mRange);
 	}
@@ -166,7 +168,7 @@ public class SpellEchoCharge extends Spell {
 			chargeBox1.shift(baseVector1);
 			if (i % 4 == 0) {
 				world.spawnParticle(Particle.ELECTRIC_SPARK, chargeBox1.getCenter().toLocation(world), 6, 3.5, 0.1, 3.5, 0.01);
-				world.spawnParticle(Particle.WAX_ON, chargeBox1.getCenter().toLocation(world), 8, 3.5, 0.1, 3.5, 0.01);
+				world.spawnParticle(Particle.WAX_ON, chargeBox1.getCenter().toLocation(world), 2, 3.5, 0.1, 3.5, 0.01);
 			}
 		}
 
@@ -214,11 +216,6 @@ public class SpellEchoCharge extends Spell {
 		new PPLine(Particle.WAX_ON, telegraphLineEnd1.clone().add(0, 1.5, 0), telegraphLine1.clone().add(0, 1.5, 0)).shiftStart(0.75).countPerMeter(1).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsBoss();
 		new PPLine(Particle.ELECTRIC_SPARK, telegraphLineEnd2.clone().add(0, 1.5, 0), telegraphLine2.clone().add(0, 1.5, 0)).shiftStart(0.75).countPerMeter(1).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsBoss();
 		new PPLine(Particle.WAX_ON, telegraphLineEnd2.clone().add(0, 1.5, 0), telegraphLine2.clone().add(0, 1.5, 0)).shiftStart(0.75).countPerMeter(1).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsBoss();
-
-		new PPLine(Particle.ELECTRIC_SPARK, telegraphLine1.clone().add(0, 3, 0), telegraphLineEnd1.clone().add(0, 3, 0)).shiftStart(0.75).countPerMeter(1).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsBoss();
-		new PPLine(Particle.WAX_ON, telegraphLine1.clone().add(0, 3, 0), telegraphLineEnd1.clone().add(0, 3, 0)).shiftStart(0.75).countPerMeter(1).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsBoss();
-		new PPLine(Particle.ELECTRIC_SPARK, telegraphLine2.clone().add(0, 3, 0), telegraphLineEnd2.clone().add(0, 3, 0)).shiftStart(0.75).countPerMeter(1).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsBoss();
-		new PPLine(Particle.WAX_ON, telegraphLine2.clone().add(0, 3, 0), telegraphLineEnd2.clone().add(0, 3, 0)).shiftStart(0.75).countPerMeter(1).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsBoss();
 	}
 
 	private void rush(Location startLoc, Location endLoc) {
@@ -242,7 +239,7 @@ public class SpellEchoCharge extends Spell {
 						world.spawnParticle(Particle.ELECTRIC_SPARK, chargeBox.getCenter().toLocation(world), 2, 4, 3, 4, 0.05);
 						for (Player player: nearbyPlayers) {
 							if (chargeBox.contains(player.getLocation().toVector())) {
-								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MELEE, 110, null, false, true);
+								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MELEE, mDamage, null, false, true);
 							}
 						}
 					}

@@ -45,16 +45,17 @@ public class PairedUnnaturalForce extends Spell {
 	private final int mOuterRadius;
 	private final int mMidRadius;
 	private final int mMinRadius;
+	private int mDamage;
 
 
-	public PairedUnnaturalForce(Plugin plugin, LivingEntity boss, Location spawnLoc, int minRadius, int midRadius, int outerRadius) {
+	public PairedUnnaturalForce(Plugin plugin, LivingEntity boss, Location spawnLoc, int minRadius, int midRadius, int outerRadius, int damage) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mSpawnLoc = spawnLoc;
 		mMinRadius = minRadius;
 		mMidRadius = midRadius;
 		mOuterRadius = outerRadius;
-
+		mDamage = damage;
 		mChargeUp = new ChargeUpManager(mBoss, CAST_TIME, ChatColor.GOLD + "Channeling " + ChatColor.YELLOW + ABILITY_NAME,
 			BarColor.YELLOW, BarStyle.SOLID, RANGE);
 	}
@@ -139,7 +140,7 @@ public class PairedUnnaturalForce extends Spell {
 					}
 					for (Player p : PlayerUtils.playersInRange(mSpawnLoc, mMaxRad1, true)) {
 						if (!PlayerUtils.playersInRange(mSpawnLoc, mMinRad1, true).contains(p)) {
-							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, "Unnatural Force");
+							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, mDamage, null, false, true, "Unnatural Force");
 							MovementUtils.knockAway(mSpawnLoc, p, 0, .75f, false);
 						}
 					}

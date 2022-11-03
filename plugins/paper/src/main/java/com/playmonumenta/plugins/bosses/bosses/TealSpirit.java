@@ -117,7 +117,7 @@ public class TealSpirit extends BossAbilityGroup {
 					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5),
 				//new SandsOfTime(mBoss, mSpawnLoc, team, 12 * 20),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
-				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
+				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 90),
 				new SundialSlash(mBoss, 7 * 20)
 			));
 
@@ -170,7 +170,7 @@ public class TealSpirit extends BossAbilityGroup {
 			mHealth = 24500;
 
 			RewriteHistory rewriteHistory = new RewriteHistory(mPlugin, mBoss, 20 * 5, 30, mSpawnLoc);
-			MidnightToll midnightToll = new MidnightToll(mPlugin, mBoss, 20 * 5, 40, 40, mSpawnLoc);
+			MidnightToll midnightToll = new MidnightToll(mPlugin, mBoss, 20 * 5, 80, 40, mSpawnLoc);
 			MidnightToll finalMidnightToll = new MidnightToll(mPlugin, mBoss, 20 * 15, 99999999, 40, mSpawnLoc);
 			mDoomsdayClock = new DoomsdayClock(mBoss, mSpawnLoc, 20 * 25);
 			MarchingFate mMarchingFates = new MarchingFate(mBoss, this, true);
@@ -180,9 +180,9 @@ public class TealSpirit extends BossAbilityGroup {
 				new SandsOfTime(mBoss, mSpawnLoc, team, 24 * 20, 120),
 				//new Rewind(mBoss, mSpawnLoc),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
-				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
+				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 150),
 				new SundialSlash(mBoss, 7 * 20),
-				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 50,
+				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 80,
 					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
 			));
 
@@ -198,9 +198,9 @@ public class TealSpirit extends BossAbilityGroup {
 
 			SpellManager finalPhaseActiveSpells = new SpellManager(Arrays.asList(
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
-				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
+				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 150),
 				new SundialSlash(mBoss, 7 * 20),
-				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 50,
+				new SuspendedBallistae(mBoss, mPlugin, 25, 4, 80,
 					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
 			));
 
@@ -303,7 +303,7 @@ public class TealSpirit extends BossAbilityGroup {
 			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 			constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 20 * 10);
 		} else if (mEncounterType.equals("Normal")) {
-			mHealth = 14000;
+			mHealth = 19000;
 
 			mDoomsdayClock = new DoomsdayClock(mBoss, mSpawnLoc, 20 * 25);
 			MarchingFate mMarchingFates = new MarchingFate(mBoss, this, false);
@@ -313,7 +313,7 @@ public class TealSpirit extends BossAbilityGroup {
 				new SandsOfTime(mBoss, mSpawnLoc, team, 25 * 20, 80),
 				//new Rewind(mBoss, mSpawnLoc),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
-				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30),
+				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 80),
 				new SundialSlash(mBoss, 7 * 20),
 				new SuspendedBallistae(mBoss, mPlugin, 25, 3, 50,
 					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
@@ -394,7 +394,18 @@ public class TealSpirit extends BossAbilityGroup {
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
 				mDoomsdayClock.run();
-				mMarchingFates.removeMarchers();
+			});
+
+			events.put(20, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
+			});
+
+			events.put(10, mBoss -> {
+				// Cast Rewind without interruptions
+				changePhase(activeRewindPhase, passiveSpells, null);
+				forceCastSpell(Rewind.class);
 			});
 
 			events.put(1, mBoss -> {

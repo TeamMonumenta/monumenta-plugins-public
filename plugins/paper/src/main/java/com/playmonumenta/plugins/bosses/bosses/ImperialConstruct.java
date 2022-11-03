@@ -135,7 +135,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 		mCurrentLoc = mStart.getLocation();
 
 		if (mEncounterType.equals("Hard")) {
-			mHealth = 24750;
+			mHealth = 27225;
 			// Hard Mode Abilities
 			mParadox = new SpellLingeringParadox(boss, mSpawnLoc, 30);
 			mParadox2 = new SpellLingeringParadox(boss, mPhase2Loc, 30);
@@ -147,28 +147,28 @@ public class ImperialConstruct extends BossAbilityGroup {
 			mSpawner = new MinionSpawn(boss, mCurrentLoc, 20 * 8, 2);
 			mFloor = new SpellFloor(plugin, boss, 5, mCurrentLoc);
 			mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
-			mSpread = new SpellSteelboreSpread(plugin, boss, 11, mSpawnLoc, 40, 0.90);
-			mSpread2 = new SpellSteelboreSpread(plugin, boss, 11, mPhase2Loc, 40, 0.90);
-			mSpreadSmall = new SpellSteelboreSpread(plugin, boss, 6, mPhase3Loc, 40, 0.90);
+			mSpread = new SpellSteelboreSpread(plugin, boss, 11, mSpawnLoc, 40, 1);
+			mSpread2 = new SpellSteelboreSpread(plugin, boss, 11, mPhase2Loc, 40, 1);
+			mSpreadSmall = new SpellSteelboreSpread(plugin, boss, 6, mPhase3Loc, 40, 1);
 
 			SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
 				// Active Spell List
 				mRush,
-				new SpellStonemason(boss, plugin, mSpawnLoc, 30),
+				new SpellStonemason(boss, plugin, mSpawnLoc, 30, 110),
 				new SilverBolts(boss, plugin),
-				new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3))
+				new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3), 300)
 			));
 
 			SpellManager activeSpellsPhase2 = new SpellManager(Arrays.asList(
 				// Active Spell List
 				mRush2,
-				new SpellStonemason(boss, plugin, mPhase2Loc, 30),
+				new SpellStonemason(boss, plugin, mPhase2Loc, 30, 110),
 				new SilverBolts(boss, plugin),
-				new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3))
+				new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3), 300)
 			));
 
 			SpellManager finalStandActiveSpells = new SpellManager(Arrays.asList(
-				new SpellStonemason(boss, plugin, mPhase3Loc, 30),
+				new SpellStonemason(boss, plugin, mPhase3Loc, 30, 110),
 				new SilverBolts(boss, plugin)
 			));
 
@@ -331,21 +331,21 @@ public class ImperialConstruct extends BossAbilityGroup {
 			SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
 				// Active Spell List
 				mRush,
-				new SpellStonemason(boss, plugin, mSpawnLoc, 30),
+				new SpellStonemason(boss, plugin, mSpawnLoc, 30, 70),
 				new SilverBolts(boss, plugin),
-				new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3))
+				new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3), 110)
 			));
 
 			SpellManager activeSpellsPhase2 = new SpellManager(Arrays.asList(
 				// Active Spell List
 				mRush2,
-				new SpellStonemason(boss, plugin, mPhase2Loc, 30),
+				new SpellStonemason(boss, plugin, mPhase2Loc, 30, 70),
 				new SilverBolts(boss, plugin),
-				new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3))
+				new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3), 110)
 			));
 
 			SpellManager finalStandActiveSpells = new SpellManager(Arrays.asList(
-				new SpellStonemason(boss, plugin, mPhase3Loc, 30),
+				new SpellStonemason(boss, plugin, mPhase3Loc, 30, 70),
 				new SilverBolts(boss, plugin)
 			));
 
@@ -500,21 +500,21 @@ public class ImperialConstruct extends BossAbilityGroup {
 			SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
 				// Active Spell List
 				mRush,
-				new SpellStonemason(boss, plugin, mSpawnLoc, 30),
+				new SpellStonemason(boss, plugin, mSpawnLoc, 30, 70),
 				new SilverBolts(boss, plugin),
-				new SpellEchoCharge(plugin, boss, (int) (20 * 10), (int) (20 * 4.5))
+				new SpellEchoCharge(plugin, boss, (int) (20 * 10), (int) (20 * 4.5), 110)
 			));
 
 			SpellManager activeSpellsPhase2 = new SpellManager(Arrays.asList(
 				// Active Spell List
 				mRush2,
-				new SpellStonemason(boss, plugin, mPhase2Loc, 30),
+				new SpellStonemason(boss, plugin, mPhase2Loc, 30, 70),
 				new SilverBolts(boss, plugin),
-				new SpellEchoCharge(plugin, boss, (int) (20 * 10), (int) (20 * 4.5))
+				new SpellEchoCharge(plugin, boss, (int) (20 * 10), (int) (20 * 4.5), 110)
 			));
 
 			SpellManager finalStandActiveSpells = new SpellManager(Arrays.asList(
-				new SpellStonemason(boss, plugin, mPhase3Loc, 30),
+				new SpellStonemason(boss, plugin, mPhase3Loc, 30, 70),
 				new SilverBolts(boss, plugin)
 			));
 

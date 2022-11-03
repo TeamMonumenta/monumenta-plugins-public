@@ -31,7 +31,7 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class SandsOfTime extends Spell {
-	private static final int BELL_TIME = 40;
+	private static final int BELL_TIME = 20;
 	private static final double RADIUS = 21;
 	private static final double HEIGHT = 4;
 	private double mDamage = 180;

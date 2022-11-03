@@ -77,15 +77,7 @@ public class MarchingFate extends Spell {
 		double currentBossHP = mBoss.getHealth();
 		double bossMaxHP = EntityUtils.getMaxHealth(mBoss);
 		double percentHP = currentBossHP / bossMaxHP;
-		if (percentHP <= 0.3) {
-			stepLength = 0.1;
-		} else if (percentHP <= 0.6) {
-			stepLength = 0.075;
-		} else if (percentHP <= 0.9) {
-			stepLength = 0.05;
-		} else if (percentHP <= 1) {
-			stepLength = 0.025;
-		}
+		stepLength = 0.045;
 
 		List<Double> distances = new ArrayList<>();
 		int obfuscation = 0;

@@ -32,15 +32,17 @@ public class SpellStonemason extends Spell {
 	private LivingEntity mBoss;
 	private Plugin mPlugin;
 	private int mRadius = 6;
+	private int mDamage;
 	private ChargeUpManager mChargeUp;
 	private Location mStartLoc;
 	private int mRange;
 
-	public SpellStonemason(LivingEntity boss, Plugin plugin, Location startLoc, int range) {
+	public SpellStonemason(LivingEntity boss, Plugin plugin, Location startLoc, int range, int damage) {
 		mBoss = boss;
 		mPlugin = plugin;
 		mStartLoc = startLoc;
 		mRange = range;
+		mDamage = damage;
 		mChargeUp = new ChargeUpManager(mBoss, CAST_TIME, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + ABILITY_NAME,
 			BarColor.YELLOW, BarStyle.SOLID, mRange);
 	}
@@ -90,7 +92,7 @@ public class SpellStonemason extends Spell {
 						world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.HOSTILE, 1.5f, 0);
 
 						for (Player p : PlayerUtils.playersInRange(loc, mRadius, true)) {
-							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MELEE, 70, null, true, true, "Stonemason");
+							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MELEE, mDamage, null, true, true, "Stonemason");
 							MovementUtils.knockAway(loc, p, 0f, 1f, false);
 							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 1.5f, 1);
 						}
