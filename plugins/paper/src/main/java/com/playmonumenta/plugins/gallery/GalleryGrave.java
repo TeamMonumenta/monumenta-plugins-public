@@ -101,7 +101,6 @@ public class GalleryGrave {
 					mReanimationTimer = 0;
 				}
 
-				//TODO - make sure that the teams are on the shard
 				if (mTimer <= GRAVE_DURATION / 3) {
 					ScoreboardUtils.addEntityToTeam(mGrave, "Green");
 				} else if (mTimer <= GRAVE_DURATION * 2 / 3) {

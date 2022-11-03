@@ -769,7 +769,7 @@ public class GalleryGame {
 							mmBoxInteractable.runCommandPlace();
 							mmBoxInteractable.setValidBox(true);
 						}
-					}, 20 * 6);
+					}, 20 * 8);
 				}
 			}
 		}

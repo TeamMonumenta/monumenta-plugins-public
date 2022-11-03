@@ -1,9 +1,15 @@
 package com.playmonumenta.plugins.gallery.interactables;
 
 import com.playmonumenta.plugins.gallery.GalleryUtils;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Slime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,12 +47,16 @@ public class MysteryBoxInteractable extends BasePricedInteractable {
 		if (mCommandRemove != null) {
 			GalleryUtils.runCommandAsEntity(mArmorStand, mCommandRemove);
 		}
+
+		removeSlime();
 	}
 
 	public void runCommandPlace() {
 		if (mCommandPlace != null) {
 			GalleryUtils.runCommandAsEntity(mArmorStand, mCommandPlace);
 		}
+
+		summonSlime();
 	}
 
 	@Override public boolean isInteractable() {
@@ -74,6 +84,35 @@ public class MysteryBoxInteractable extends BasePricedInteractable {
 		mArmorStand.addScoreboardTag(BaseInteractable.TAG_STRING);
 		mArmorStand.addScoreboardTag(TAG_STRING);
 		mArmorStand.addScoreboardTag(TAG_STRING + "-" + mName + "-" + (mValidBox ? "Active" : "Deactivated") + "-" + mPrice + "-" + (mCommand != null ? mCommand : "") + "-" + (mCommandRemove != null ? mCommandRemove : "") + "-" + (mCommandPlace != null ? mCommandPlace : ""));
+	}
+
+	private void summonSlime() {
+		Location loc = mArmorStand.getLocation().clone().add(0, -0.5, 0);
+		Entity entity = loc.getWorld().spawnEntity(loc, EntityType.SLIME);
+		if (entity instanceof Slime slime) {
+			slime.setSize(2);
+			slime.setAI(false);
+			slime.setCollidable(false);
+			slime.setGlowing(true);
+			slime.setInvulnerable(true);
+			slime.setInvisible(true);
+			slime.setRemoveWhenFarAway(false);
+			slime.addScoreboardTag(AbilityUtils.IGNORE_TAG);
+			slime.addScoreboardTag("UNPUSHABLE");
+			slime.addScoreboardTag("MMBoxSlime");
+			ScoreboardUtils.addEntityToTeam(slime, "Aqua");
+		}
+	}
+
+	private void removeSlime() {
+		Location loc = mArmorStand.getLocation().clone().add(0, -0.5, 0);
+		Collection<Entity> entities = loc.getNearbyEntitiesByType(Slime.class, 1);
+		//just in case we are removing all slime with that tag in a block radius
+		for (Entity entity : entities) {
+			if (entity instanceof Slime slime && slime.getScoreboardTags().contains("MMBoxSlime")) {
+				slime.remove();
+			}
+		}
 	}
 
 	//MMBOX-name-A/D-0000-lootTable-func1 art-func2 remove-func3 place
