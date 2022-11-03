@@ -134,8 +134,8 @@ public class Samwell extends BossAbilityGroup {
 		mSpawnLoc = startLoc;
 		mEndLoc = endLoc;
 		HashMap<Double, LoSPool> weights = new HashMap<>();
-		weights.put(0.2, LoSPool.fromString("~BlueMaskedElite"));
-		weights.put(0.8, LoSPool.fromString("~BlueMaskedNormal"));
+		weights.put(0.15, LoSPool.fromString("~BlueMaskedElite"));
+		weights.put(0.85, LoSPool.fromString("~BlueMaskedNormal"));
 
 		mBhrahaviLoc = mSpawnLoc.clone().add(15, 1, 0);
 		mIzzyLoc = mSpawnLoc.clone().add(-8, 1, 12);
