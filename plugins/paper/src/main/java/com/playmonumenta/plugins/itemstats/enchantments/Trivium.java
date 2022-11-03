@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -53,6 +55,13 @@ public class Trivium implements Enchantment {
 								for (DamageEvent e : eventList) {
 									DamageUtils.damage(p, e.getDamagee(), DamageEvent.DamageType.OTHER, e.getDamage() * (DAMAGE_PER_LEVEL * value), null, true, false);
 								}
+								p.playSound(
+									p.getLocation(),
+									Sound.ENTITY_ILLUSIONER_CAST_SPELL,
+									SoundCategory.PLAYERS,
+									0.8f,
+									2f
+								);
 							}
 						});
 					});
