@@ -21,6 +21,7 @@ public class Crusade extends Ability {
 	public static final double ENHANCEMENT_RADIUS = 8;
 	public static final int ENHANCEMENT_MAX_MOBS = 6;
 	public static final double ENHANCEMENT_BONUS_DAMAGE = 0.05;
+	public static final int ENHANCEMENT_DURATION = 10 * 20;
 
 	private final boolean mCountsHumanlikes;
 
@@ -42,7 +43,7 @@ public class Crusade extends Ability {
 			"Your abilities that work against undead enemies now also work against human-like enemies - illagers, vexes, witches, piglins, piglin brutes, golems and giants."
 		); // List of human-likes hardcoded
 		mInfo.mDescriptions.add(
-			String.format("Gain %s%% ability damage for every mob affected by this ability within %s blocks, capping at %s mobs.",
+			String.format("Gain %s%% ability damage for every mob affected by this ability within %s blocks, capping at %s mobs. Additionally, after damaged or debuffed by an active Cleric ability, monster-like mobs (affected by Slayer) will count as undead for the next 10s.",
 				(int) (ENHANCEMENT_BONUS_DAMAGE * 100), ENHANCEMENT_RADIUS, ENHANCEMENT_MAX_MOBS)
 		);
 		mDisplayItem = new ItemStack(Material.ZOMBIE_HEAD, 1);
@@ -95,13 +96,20 @@ public class Crusade extends Ability {
 		LivingEntity enemy,
 		@Nullable Crusade crusade
 	) {
-		return (
-			EntityUtils.isUndead(enemy)
-			|| (
-				crusade != null
-				&& crusade.mCountsHumanlikes
-				&& EntityUtils.isHumanlike(enemy)
-			)
+		return (EntityUtils.isUndead(enemy) ||
+			(crusade != null && crusade.mCountsHumanlikes && EntityUtils.isHumanlike(enemy)) ||
+			Plugin.getInstance().mEffectManager.hasEffect(enemy, "CrusadeSlayerTag")
 		);
+	}
+
+	public static boolean applyCrusadeToSlayer(LivingEntity enemy, @Nullable Crusade crusade) {
+		if (crusade != null) {
+			return EntityUtils.isBeast(enemy) && crusade.isEnhanced();
+		}
+		return false;
+	}
+
+	public static int getEnhancementDuration() {
+		return ENHANCEMENT_DURATION;
 	}
 }

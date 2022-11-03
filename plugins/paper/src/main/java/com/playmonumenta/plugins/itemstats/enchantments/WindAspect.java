@@ -66,7 +66,7 @@ public class WindAspect implements Enchantment {
 		double mult = Math.sqrt(level * (1 - kbr));
 
 		// Run at the end of the tick to override knockback
-		Bukkit.getScheduler().runTask(plugin, () -> e.setVelocity(new Vector(0.f, 0.6 * mult, 0.f)));
+		Bukkit.getScheduler().runTask(plugin, () -> e.setVelocity(new Vector(0.f, 0.5 * mult, 0.f)));
 	}
 
 }

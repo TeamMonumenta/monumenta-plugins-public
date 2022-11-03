@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -60,6 +62,17 @@ public class SwiftCuts extends Ability {
 				event.setDamage(event.getDamage() * (1 + mConsecutivePercentDamage));
 
 				double sweepDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SWEEP_DAMAGE, event.getDamage() * mPercentAoEDamage);
+
+				if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageDealt.class)) {
+					for (Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {
+						if (priorityEffects instanceof PercentDamageDealt damageEffect) {
+							if (damageEffect.getAffectedDamageTypes().contains(DamageType.MELEE)) {
+								sweepDamage = sweepDamage * (1 + damageEffect.getMagnitude() * (damageEffect.isBuff() ? 1 : -1));
+							}
+						}
+					}
+				}
+
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, SWEEP_RADIUS), enemy)) {
 					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, sweepDamage, mInfo.mLinkedSpell, true, true);
 				}

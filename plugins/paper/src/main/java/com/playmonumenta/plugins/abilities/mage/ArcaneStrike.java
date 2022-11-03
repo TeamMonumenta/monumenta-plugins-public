@@ -42,7 +42,7 @@ public class ArcaneStrike extends Ability {
 	private static final int DAMAGE_2 = 7;
 	private static final int BONUS_DAMAGE_1 = 2;
 	private static final int BONUS_DAMAGE_2 = 3;
-	private static final double ENHANCEMENT_DAMAGE_MULTIPLIER = 1.2;
+	private static final double ENHANCEMENT_DAMAGE_MULTIPLIER = 1.3;
 	private static final int COOLDOWN = 5 * 20;
 
 	public static final String CHARM_DAMAGE = "Arcane Strike Damage";
@@ -70,7 +70,7 @@ public class ArcaneStrike extends Ability {
 			String.format("The damage is increased to %s. Mobs that are on fire or slowed take %s additional damage.",
 				DAMAGE_2,
 				BONUS_DAMAGE_2));
-		mInfo.mDescriptions.add("Your enchantment on-hit effects are now also applied to all other enemies hit in the radius. Also this skill's damage is increased by 20%.");
+		mInfo.mDescriptions.add("Your enchantment on-hit effects are now also applied to all other enemies hit in the radius. Also this skill's damage is increased by 30%.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
 		mDamageBonus = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);

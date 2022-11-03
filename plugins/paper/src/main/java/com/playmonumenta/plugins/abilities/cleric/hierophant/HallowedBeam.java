@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.HallowedBeamCS;
+import com.playmonumenta.plugins.effects.CrusadeEnhancementTag;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -219,6 +220,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 								EntityUtils.applyStun(mPlugin, HALLOWED_UNDEAD_STUN + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), applyE);
 							} else {
 								EntityUtils.applyStun(mPlugin, HALLOWED_LIVING_STUN + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), applyE);
+							}
+							if (Crusade.applyCrusadeToSlayer(applyE, mCrusade)) {
+								mPlugin.mEffectManager.addEffect(applyE, "CrusadeSlayerTag", new CrusadeEnhancementTag(mCrusade.getEnhancementDuration()));
 							}
 
 							if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {

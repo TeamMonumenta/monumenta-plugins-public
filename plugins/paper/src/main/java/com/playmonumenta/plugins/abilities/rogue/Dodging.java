@@ -60,7 +60,7 @@ public class Dodging extends Ability {
 	private static final String ATTR_NAME = "DodgingExtraSpeed";
 	private static final int DODGING_COOLDOWN_1 = 12 * 20;
 	private static final int DODGING_COOLDOWN_2 = 10 * 20;
-	private static final double ENHANCMENT_DAMAGE = 2.0;
+	private static final double ENHANCMENT_DAMAGE = 3.0;
 
 	public static final String CHARM_COOLDOWN = "Dodging Cooldown";
 	public static final String CHARM_SPEED = "Dodging Speed Amplifier";
@@ -80,7 +80,7 @@ public class Dodging extends Ability {
 				DODGING_COOLDOWN_2 / 20,
 				(int)(PERCENT_SPEED * 100),
 				DODGING_SPEED_EFFECT_DURATION / 20));
-		mInfo.mDescriptions.add("The projectile you dodged is now reflected back to the enemy at 2x damage.");
+		mInfo.mDescriptions.add("The projectile you dodged is now reflected back to the enemy at 3x damage.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2);
 		// NOTE: This skill will get events even when it is on cooldown!
 		mInfo.mIgnoreCooldown = true;

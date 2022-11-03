@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -66,7 +67,7 @@ public class CoupDeGrace extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) {
+		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH || event.getAbility() == ClassAbility.QUAKE) {
 			for (PotionEffect effect : enemy.getActivePotionEffects()) {
 				if (effect.getType().equals(PotionEffectType.DAMAGE_RESISTANCE) && effect.getAmplifier() >= 4) {
 					return false;
@@ -88,7 +89,7 @@ public class CoupDeGrace extends Ability {
 	}
 
 	private void execute(LivingEntity le) {
-		DamageUtils.damage(mPlayer, le, DamageType.OTHER, 9001, null, true, false);
+		DamageUtils.damage(mPlayer, le, DamageType.OTHER, 9001, ClassAbility.COUP_DE_GRACE, true, false);
 		World world = mPlayer.getWorld();
 		world.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);
 		world.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.5f);

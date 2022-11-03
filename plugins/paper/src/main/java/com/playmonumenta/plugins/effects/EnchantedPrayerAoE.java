@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -29,8 +30,9 @@ public class EnchantedPrayerAoE extends Effect {
 	private final Player mPlayer;
 	private final EnumSet<DamageType> mAffectedDamageTypes;
 	private final double mEffectSize;
+	private final @Nullable Crusade mCrusade;
 
-	public EnchantedPrayerAoE(Plugin plugin, int duration, double damageAmount, double healAmount, Player player, EnumSet<DamageType> affectedDamageTypes, double size) {
+	public EnchantedPrayerAoE(Plugin plugin, int duration, double damageAmount, double healAmount, Player player, EnumSet<DamageType> affectedDamageTypes, double size, @Nullable Crusade crusade) {
 		super(duration, effectID);
 		mPlugin = plugin;
 		mDamageAmount = damageAmount;
@@ -38,6 +40,7 @@ public class EnchantedPrayerAoE extends Effect {
 		mPlayer = player;
 		mAffectedDamageTypes = affectedDamageTypes;
 		mEffectSize = size;
+		mCrusade = crusade;
 	}
 
 	// This needs to trigger after any percent damage
@@ -61,6 +64,9 @@ public class EnchantedPrayerAoE extends Effect {
 			new PartialParticle(Particle.FIREWORKS_SPARK, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 75, 0, 0, 0, 0.3).spawnAsPlayerActive(mPlayer);
 			for (LivingEntity le : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), mEffectSize).getHitMobs()) {
 				DamageUtils.damage(mPlayer, le, DamageType.MAGIC, mDamageAmount, ClassAbility.ENCHANTED_PRAYER, true, true);
+				if (Crusade.applyCrusadeToSlayer(le, mCrusade)) {
+					mPlugin.mEffectManager.addEffect(le, "CrusadeSlayerTag", new CrusadeEnhancementTag(mCrusade.getEnhancementDuration()));
+				}
 			}
 			double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 			PlayerUtils.healPlayer(mPlugin, mPlayer, maxHealth * mHealAmount, mPlayer);

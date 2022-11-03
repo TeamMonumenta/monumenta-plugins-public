@@ -35,7 +35,7 @@ public class Swiftness extends Ability {
 	private static final String SWIFTNESS_SPEED_MODIFIER = "SwiftnessSpeedModifier";
 	private static final double SWIFTNESS_SPEED_BONUS = 0.2;
 	private static final int SWIFTNESS_EFFECT_JUMP_LVL = 2;
-	private static final double DODGE_CHANCE = 0.1;
+	private static final double DODGE_CHANCE = 0.15;
 
 	public static final String CHARM_SPEED = "Swiftness Speed Amplifier";
 	public static final String CHARM_JUMP_BOOST = "Swiftness Jump Boost Amplifier";

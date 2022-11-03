@@ -751,6 +751,20 @@ public final class EffectManager implements Listener {
 		LivingEntity damagee = event.getDamagee();
 		LivingEntity source = event.getSource();
 
+		if (source != null) {
+			Effects sourceEffects = mEntities.get(source);
+			if (sourceEffects != null) {
+				for (Map<String, NavigableSet<Effect>> priorityEffects : sourceEffects.mPriorityMap.values()) {
+					for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+						if (event.isCancelled()) {
+							return;
+						}
+						effectGroup.last().onDamage(source, event, damagee);
+					}
+				}
+			}
+		}
+
 		Effects effects = mEntities.get(damagee);
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
@@ -765,20 +779,6 @@ public final class EffectManager implements Listener {
 						if (source != null) {
 							effectGroup.last().onHurtByEntityWithSource(damagee, event, damager, source);
 						}
-					}
-				}
-			}
-		}
-
-		if (source != null) {
-			Effects sourceEffects = mEntities.get(source);
-			if (sourceEffects != null) {
-				for (Map<String, NavigableSet<Effect>> priorityEffects : sourceEffects.mPriorityMap.values()) {
-					for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
-						if (event.isCancelled()) {
-							return;
-						}
-						effectGroup.last().onDamage(source, event, damagee);
 					}
 				}
 			}

@@ -6,12 +6,14 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.JudgementChainMobEffect;
+import com.playmonumenta.plugins.effects.JudgementChainPlayerEffect;
 import com.playmonumenta.plugins.effects.Paralyze;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
@@ -24,6 +26,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -82,10 +85,12 @@ public class JudgementChain extends Ability {
 	public static final String CHARM_RANGE = "Judgement Chain Range";
 	public static final String CHARM_DURATION = "Judgement Chain Buff Duration";
 
-	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(217, 217, 217), 1.0f);
-	private static final Particle.DustOptions DARK_COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
+	public static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(217, 217, 217), 1.0f);
+	public static final Particle.DustOptions DARK_COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
 	private final double mAmplifier;
+	private HashMap<Player, HashMap<ClassAbility, List<DamageEvent>>> mDamageInTick = new HashMap<>();
+	private boolean mRunDamageNextTick = false;
 
 	private @Nullable LivingEntity mTarget = null;
 	private boolean mChainActive = false;
@@ -96,7 +101,7 @@ public class JudgementChain extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.JUDGEMENT_CHAIN;
 		mInfo.mScoreboardId = "JudgementChain";
 		mInfo.mShorthandName = "JC";
-		mInfo.mDescriptions.add("Press the swap key while not sneaking targeting a non-boss hostile mob to conjure an unbreakable chain, linking the Reaper and the mob. As long as another mob is within 8 blocks, the mob becomes immortal for 20 seconds, can only target or damage the Reaper, is slowed by 25%, and deals 50% less damage. All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at 10%. Pressing swap while a mob is already chained will pull it towards you, dealing 20 magic damage and breaking the chain. Walking 16+ blocks away will deal damage but not pull the mob. Cooldown: 25s.");
+		mInfo.mDescriptions.add("Press the swap key while not sneaking targeting a non-boss hostile mob to conjure an unbreakable chain, linking the Reaper and the mob. For the next 20s, long as another mob is within 8 blocks, the mob becomes immortal and can only target or damage the Reaper, is slowed by 25%, and deals 50% less damage. All damage taken by the chained mob is passed to the nearest mob in 8 blocks. All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at 10%. Pressing swap while a mob is already chained will pull it towards you, dealing 20 magic damage and breaking the chain. Walking 16+ blocks away will deal damage but not pull the mob. Cooldown: 25s.");
 		mInfo.mDescriptions.add("While a mob is chained, the reaper gains 10% damage resistance. When breaking the chain, apply all the positively inverted debuffs to other players and all debuffs (capped at 10%) to other mobs in an 8 block radius of the player for 10s. Additionally, deal 20 magic damage to all mobs in a 4 block radius of the player.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mIgnoreCooldown = true;
@@ -118,14 +123,66 @@ public class JudgementChain extends Ability {
 			event.setCancelled(true);
 			if (!mPlayer.isSneaking() && (mPlayer.isOnGround() || !mHasPact)) {
 				if (mChainActive) {
+					mChainActive = false;
 					breakChain(true, true);
 					mTarget = null;
-					mChainActive = false;
 					ClientModHandler.updateAbility(mPlayer, this);
 				} else {
 					summonChain();
 					mChainActive = true;
 				}
+			}
+		}
+	}
+
+	public void passDamage(DamageEvent event) {
+		if (mChainActive) {
+			List<LivingEntity> e = EntityUtils.getNearbyMobs(mTarget.getLocation(), 8, mTarget, true);
+			e.remove(mTarget);
+			LivingEntity selectedEnemy = EntityUtils.getNearestMob(mTarget.getLocation(), e);
+			double damage = event.getDamage();
+
+			if (selectedEnemy != null && event.getAbility() != ClassAbility.COUP_DE_GRACE) {
+				if (event.getAbility() != null && event.getSource() instanceof Player p) {
+					mDamageInTick.computeIfAbsent(p, key -> new HashMap<>()).computeIfAbsent(event.getAbility(), key -> new ArrayList<>()).add(event);
+					if (!mRunDamageNextTick) {
+						mRunDamageNextTick = true;
+						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+							mDamageInTick.forEach((player, map) -> {
+								map.forEach((ability, eventList) -> {
+									boolean damagedChainMob = false;
+									boolean damagedNearMob = false;
+									for (DamageEvent damageEvent : eventList) {
+										if (damageEvent.getDamagee() == mTarget) {
+											damagedChainMob = true;
+										}
+										if (damageEvent.getDamagee() == selectedEnemy) {
+											damagedNearMob = true;
+										}
+									}
+									if (damagedChainMob && !damagedNearMob && event.getDamagee() == mTarget) {
+										DamageUtils.damage(mPlayer, selectedEnemy, DamageEvent.DamageType.OTHER, damage, null, true);
+									}
+								});
+							});
+							mDamageInTick.clear();
+							mRunDamageNextTick = false;
+						});
+					}
+				} else {
+					if (!mRunDamageNextTick) {
+						mRunDamageNextTick = true;
+						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+							if (event.getDamagee() == mTarget) {
+								DamageUtils.damage(mPlayer, selectedEnemy, DamageEvent.DamageType.OTHER, damage, null, true);
+							}
+							mDamageInTick.clear();
+							mRunDamageNextTick = false;
+						});
+					}
+				}
+				new PartialParticle(Particle.REDSTONE, selectedEnemy.getLocation(), 15, 0.5, 0.5, 0.5, 0, JudgementChain.LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, selectedEnemy.getLocation(), 15, 0.5, 0.5, 0.5, 0, JudgementChain.LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
 			}
 		}
 	}
@@ -196,16 +253,16 @@ public class JudgementChain extends Ability {
 					if (mTarget == null || mPlayer.isDead() || (mTarget != null && (mTarget.isDead() || !mTarget.isValid()))) {
 						this.cancel();
 						if (mTarget != null) {
+							mChainActive = false;
 							breakChain(false, false);
 							mTarget = null;
-							mChainActive = false;
 							ClientModHandler.updateAbility(mPlayer, JudgementChain.this);
 						}
 					} else if (l.distance(mTarget.getLocation()) > range || mT >= mRunnableDuration) {
 						this.cancel();
+						mChainActive = false;
 						breakChain(true, false);
 						mTarget = null;
-						mChainActive = false;
 						ClientModHandler.updateAbility(mPlayer, JudgementChain.this);
 					}
 				}
@@ -336,5 +393,14 @@ public class JudgementChain extends Ability {
 	@Override
 	public @Nullable String getMode() {
 		return mTarget != null ? "active" : null;
+	}
+
+	@Override
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		if (mChainActive && mPlayer != null) {
+			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), 36, false)) {
+				mPlugin.mEffectManager.addEffect(p, "JudgementChainPlayerEffectBy" + mPlayer.getName(), new JudgementChainPlayerEffect(20, mPlayer));
+			}
+		}
 	}
 }

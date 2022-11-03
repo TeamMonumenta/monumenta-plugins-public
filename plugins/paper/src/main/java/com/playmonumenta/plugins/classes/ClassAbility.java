@@ -58,6 +58,7 @@ public enum ClassAbility {
 	// Assassin
 	BODKIN_BLITZ("Bodkin Blitz"),
 	CLOAK_AND_DAGGER("Cloak And Dagger"),
+	COUP_DE_GRACE("Coup de Grace"),
 
 	// Swordsage
 	BLADE_DANCE("Blade Dance"),

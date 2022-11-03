@@ -54,8 +54,8 @@ public class DivineJustice extends Ability {
 	public static final int ENHANCEMENT_ASH_DURATION = 10 * 20;
 	public static final double ENHANCEMENT_ASH_BONUS_DAMAGE = 0.025;
 	public static final double ENHANCEMENT_BONUS_DAMAGE_MAX = 0.15;
-	public static final int ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION = 30 * 20;
-	public static final int ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION = 5 * 60 * 20;
+	public static final int ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION = 20 * 20;
+	public static final int ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION = 4 * 60 * 20;
 	public static final String ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME = "DivineJusticeBonusDamageEffect";
 	public static final Material ASH_MATERIAL = Material.GUNPOWDER;
 	public static final String ASH_NAME = "Purified Ash";
@@ -75,6 +75,8 @@ public class DivineJustice extends Ability {
 
 	private int mComboNumber = 0;
 	private BukkitRunnable mComboRunnable = null;
+
+	private double mPriorAmount = 0;
 
 	public DivineJustice(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
@@ -207,6 +209,20 @@ public class DivineJustice extends Ability {
 			    && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
 			    && FastUtils.RANDOM.nextDouble() <= ENHANCEMENT_ASH_CHANCE) {
 			spawnAsh(entityDeathEvent.getEntity().getLocation());
+		}
+	}
+
+	@Override
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		// Keep track of prior tick's effect magnitude,
+		// if effect duration runs out (becomes null) decrement stacks rather than clear effect entirely.
+		Effect existingEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
+		if (existingEffect != null && existingEffect.getMagnitude() > 0) {
+			mPriorAmount = existingEffect.getMagnitude();
+		} else if (existingEffect == null && mPriorAmount - ENHANCEMENT_ASH_BONUS_DAMAGE > 0) {
+			mPlugin.mEffectManager.addEffect(mPlayer, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME,
+				new PercentDamageDealt(ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION, mPriorAmount - ENHANCEMENT_ASH_BONUS_DAMAGE, null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy, mCrusade)));
+			mPriorAmount -= ENHANCEMENT_ASH_BONUS_DAMAGE;
 		}
 	}
 

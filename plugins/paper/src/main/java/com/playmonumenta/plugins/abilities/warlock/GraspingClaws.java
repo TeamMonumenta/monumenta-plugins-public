@@ -54,18 +54,8 @@ public class GraspingClaws extends Ability {
 	private static final int CAGE_RADIUS = 6;
 	private static final int CAGE_DURATION = 6 * 20;
 	private static final double HEAL_AMOUNT = 0.05;
-	private static final double DMG_BONUS = 0.1;
 	private static final int CAGE_DELAY = 1 * 20;
 	private static final BlockData CHAIN_PARTICLE = Material.CHAIN.createBlockData();
-	private static final String DMG_EFF_NAME = "ClawsDmg";
-	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-		DamageType.MELEE,
-		DamageType.MELEE_ENCH,
-		DamageType.MELEE_SKILL,
-		DamageType.PROJECTILE,
-		DamageType.PROJECTILE_SKILL,
-		DamageType.MAGIC
-	);
 
 	public static final String CHARM_DAMAGE = "Grasping Claws Damage";
 	public static final String CHARM_COOLDOWN = "Grasping Claws Cooldown";
@@ -90,7 +80,7 @@ public class GraspingClaws extends Ability {
 		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, and their Slowness is increased to 30%.");
 		mInfo.mDescriptions.add("At the location that the arrow lands, summon an impenetrable cage. " +
 			                        "Non-boss mobs within a 6 block radius of the location cannot enter or exit the cage, " +
-			                        "and players within the cage are granted +10% damage and 5% max health healing every 2 seconds. " +
+			                        "and players within the cage are granted 5% max health healing every 2 seconds. " +
 			                        "The cage disappears after 6 seconds. Mobs that are immune to crowd control cannot be trapped.");
 		mInfo.mLinkedSpell = ClassAbility.GRASPING_CLAWS;
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
@@ -248,7 +238,6 @@ public class GraspingClaws extends Ability {
 				if (mT % 5 == 0) {
 					List<Player> affectedPlayers = PlayerUtils.playersInRange(loc, CAGE_RADIUS, true);
 					for (Player p : affectedPlayers) {
-						mPlugin.mEffectManager.addEffect(p, DMG_EFF_NAME, new PercentDamageDealt(20, DMG_BONUS, AFFECTED_DAMAGE_TYPES));
 						if (mT % 20 == 0) {
 							PlayerUtils.healPlayer(mPlugin, p, p.getMaxHealth() * HEAL_AMOUNT, mPlayer);
 						}

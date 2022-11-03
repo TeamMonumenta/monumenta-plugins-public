@@ -46,7 +46,7 @@ public class CounterStrike extends Ability {
 		super(plugin, player, "Counter Strike");
 		mInfo.mScoreboardId = "CounterStrike";
 		mInfo.mShorthandName = "CS";
-		mInfo.mDescriptions.add("When you take melee damage, deal melee damage equal to 20% of pre-mitigation damage taken to all mobs in a 3 block radius.");
+		mInfo.mDescriptions.add("When you take melee damage, deal damage equal to 20% of pre-mitigation damage taken to all mobs in a 3 block radius.");
 		mInfo.mDescriptions.add("The damage is increased to 40% of pre-mitigation damage.");
 		mInfo.mDescriptions.add("When this ability activates, gain 5% damage reduction against future melee damage from the mob that activated it for 10 seconds. This effect stacks up to 3 times (15% damage reduction).");
 		mInfo.mLinkedSpell = ClassAbility.COUNTER_STRIKE;
@@ -76,7 +76,7 @@ public class CounterStrike extends Ability {
 				if (mob == source) {
 					ca = mInfo.mLinkedSpell;
 				}
-				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, eventDamage, ca, true, true);
+				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, eventDamage, ca, true, true);
 			}
 
 			if (isEnhanced()) {

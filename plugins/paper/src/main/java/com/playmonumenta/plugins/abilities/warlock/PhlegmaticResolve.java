@@ -2,23 +2,26 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import javax.annotation.Nullable;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.Vibration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 public class PhlegmaticResolve extends Ability {
 
@@ -29,12 +32,16 @@ public class PhlegmaticResolve extends Ability {
 	private static final double PERCENT_KNOCKBACK_RESIST = 0.05;
 	private static final int RADIUS = 7;
 	private static final double ALLY_MODIFIER = 0.33;
+	private static final double ENHANCEMENT_DAMAGE = 0.05;
+	private static final int ENHANCE_RADIUS = 3;
 
 	private final double mPercentDamageResist;
 	private double[] mEnhancementDamageSpread = {0, 0, 0};
 	private double mLastMaxDamage = 0;
+	private double mLastPreMitigationDamage = 0;
 	private int mLastPlayedSoundTick = 0;
 	private double mKBR;
+	private boolean mDamagedLastWindow = false;
 
 	public static final String CHARM_RESIST = "Phlegmatic Resolve Resistance";
 	public static final String CHARM_KBR = "Phlegmatic Resolve Knockback Resistance";
@@ -47,7 +54,7 @@ public class PhlegmaticResolve extends Ability {
 		mInfo.mShorthandName = "PR";
 		mInfo.mDescriptions.add("For each spell on cooldown, gain +1.5% Damage Reduction and +0.5 Knockback Resistance.");
 		mInfo.mDescriptions.add("Increase to +2.5% Damage Reduction per spell on cooldown, and players within 7 blocks are given 33% of your bonuses. (Does not stack with multiple Warlocks.)");
-		mInfo.mDescriptions.add("All non-ailment damage taken is instead converted into a short Damage-over-Time effect. A third of the damage stored is dealt every second for 3s.");
+		mInfo.mDescriptions.add("All non-ailment damage taken is instead converted into a short Damage-over-Time effect. A third of the damage stored is dealt every second for 3s. Each time this stored damage is dealt, deal 5% of the initial damage to all mobs in a 3 block radius.");
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 		mPercentDamageResist = (isLevelOne() ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2) - CharmManager.getLevelPercentDecimal(player, CHARM_RESIST);
 		mKBR = (CharmManager.getLevelPercentDecimal(player, CHARM_KBR) + PERCENT_KNOCKBACK_RESIST);
@@ -62,13 +69,11 @@ public class PhlegmaticResolve extends Ability {
 		}
 
 		if (isEnhanced()) {
-			if (twoHertz) {
+			if (twoHertz && mDamagedLastWindow) {
 				mLastMaxDamage = 0;
 			}
 
 			if (oneSecond) {
-				// mPlayer.sendMessage("Phlegmatic: " + mEnhancementDamageSpread[0] + ", " + mEnhancementDamageSpread[1] + ", " + mEnhancementDamageSpread[2]);
-
 				// This follows how reckless swing does it.
 				if (mEnhancementDamageSpread[0] > 0.0) {
 					if (mPlayer.getHealth() + mPlayer.getAbsorptionAmount() <= mEnhancementDamageSpread[0]) {
@@ -87,15 +92,24 @@ public class PhlegmaticResolve extends Ability {
 						}
 
 						mPlayer.setHealth(Math.min(mPlayer.getHealth() - mEnhancementDamageSpread[0], EntityUtils.getMaxHealth(mPlayer)));
-						mPlayer.damage(0.01);
+						mPlayer.damage(0);
+						mDamagedLastWindow = true;
 					}
-					Particle.DustOptions dustColor = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
-					mPlayer.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(new Vector(0, 0.5, 0)), 50, 0.5, 0.5, 0.5, dustColor);
+
+					// AoE Effect
+					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), ENHANCE_RADIUS);
+					for (LivingEntity mob : hitbox.getHitMobs()) {
+						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.OTHER, mLastPreMitigationDamage * ENHANCEMENT_DAMAGE);
+						Vibration vibration = new Vibration(mPlayer.getLocation(), new Vibration.Destination.EntityDestination(mob), 3);
+						mPlayer.getWorld().spawnParticle(Particle.VIBRATION, mPlayer.getLocation(), 3, vibration);
+					}
 
 					// Shift the array forward
 					mEnhancementDamageSpread[0] = mEnhancementDamageSpread[1];
 					mEnhancementDamageSpread[1] = mEnhancementDamageSpread[2];
 					mEnhancementDamageSpread[2] = 0;
+				} else {
+					mDamagedLastWindow = false;
 				}
 
 				// If player has died, reset the array
@@ -134,14 +148,30 @@ public class PhlegmaticResolve extends Ability {
 			event.getType() != DamageEvent.DamageType.AILMENT &&
 			event.getType() != DamageEvent.DamageType.POISON &&
 			event.getType() != DamageEvent.DamageType.OTHER &&
+			event.getType() != DamageEvent.DamageType.FALL &&
 			event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK &&
 			!event.isBlocked() &&
 			mPlayer != null) {
+
+			// Need to apply Voodoo Bonds + Resistance effects here since the damage event will be cancelled before
+			// they can apply, this is easier than rewriting whole effect manager.
+			if (mPlugin.mEffectManager.hasEffect(mPlayer, "VoodooBondsEffect")) {
+				mPlugin.mEffectManager.getActiveEffect(mPlayer, "VoodooBondsEffect").onHurt(mPlayer, event);
+			}
+
+			if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageReceived.class)) {
+				for (Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {
+					if (priorityEffects.getEffectID().equals(PercentDamageReceived.effectID)) {
+						priorityEffects.onHurt(mPlayer, event);
+					}
+				}
+			}
 
 			// If player isn't under invincibility ticks. (This means we can have attacks that bypass Iframes hopefully)
 			if (event.getDamage() > mLastMaxDamage) {
 				double damageSplit = (event.getDamage() - mLastMaxDamage) / 3.0;
 				mLastMaxDamage = event.getDamage();
+				mLastPreMitigationDamage = event.getOriginalDamage();
 
 				// Only play sound to player once per second.
 				if ((mLastPlayedSoundTick - mPlayer.getTicksLived()) > 20) {
@@ -149,12 +179,15 @@ public class PhlegmaticResolve extends Ability {
 					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, 1, 1);
 				}
 
-				mEnhancementDamageSpread[0] += damageSplit;
-				mEnhancementDamageSpread[1] += damageSplit;
-				mEnhancementDamageSpread[2] += damageSplit;
-			}
+				if (damageSplit > 0) {
+					mEnhancementDamageSpread[0] += damageSplit;
+					mEnhancementDamageSpread[1] += damageSplit;
+					mEnhancementDamageSpread[2] += damageSplit;
 
-			event.setDamage(0.01);
+				}
+			}
+			// Only set damage to 0 so that kb occurs.
+			event.setDamage(0);
 		}
 	}
 }

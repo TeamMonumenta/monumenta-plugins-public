@@ -48,7 +48,7 @@ public class CursedWound extends Ability {
 	private static final double CURSED_WOUND_2_CAP = 0.3;
 	private static final int CURSED_WOUND_EXTENDED_DURATION = 2 * 20;
 	private static final String DOT_EFFECT_NAME = "CursedWoundDamageOverTimeEffect";
-	private static final double DAMAGE_PER_EFFECT = 2;
+	private static final double DAMAGE_PER_EFFECT_RATIO = 0.03;
 
 	private static final Color LIGHT_COLOR = Color.fromRGB(217, 217, 217);
 	private static final Color DARK_COLOR = Color.fromRGB(13, 13, 13);
@@ -71,7 +71,7 @@ public class CursedWound extends Ability {
 		mInfo.mDescriptions.add("Critical attacks now also extend all enemies' debuffs (except Stun, Silence, and Paralysis) by 2s. Damage cap is increased from 15% to 30%.");
 		mInfo.mDescriptions.add("When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. " +
 			                        "Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, " +
-			                        "as well as 2 magic damage per effect.");
+			                        "as well as 3% of your melee attack's damage as magic damage per effect.");
 		mInfo.mLinkedSpell = ClassAbility.CURSED_WOUND;
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
 		mCursedWoundCap = CharmManager.getLevelPercentDecimal(player, CHARM_CAP) + (isLevelOne() ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP);
@@ -84,7 +84,7 @@ public class CursedWound extends Ability {
 			BlockData fallingDustData = Material.ANVIL.createBlockData();
 
 			if (isEnhanced() && mStoredPotionEffects != null && mStoredCustomEffects != null) {
-				double damage = DAMAGE_PER_EFFECT * (mStoredPotionEffects.size() + mStoredCustomEffects.size());
+				double damage = event.getDamage() * DAMAGE_PER_EFFECT_RATIO * (mStoredPotionEffects.size() + mStoredCustomEffects.size());
 				double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, CURSED_WOUND_RADIUS);
 				if (damage > 0) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius)) {

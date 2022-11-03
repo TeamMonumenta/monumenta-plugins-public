@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.BruteForceCS;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -69,6 +71,16 @@ public class BruteForce extends Ability {
 			damageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damageBonus);
 
 			event.setDamage(event.getDamage() + damageBonus);
+
+			if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageDealt.class)) {
+				for (Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {
+					if (priorityEffects instanceof PercentDamageDealt damageEffect) {
+						if (damageEffect.getAffectedDamageTypes().contains(DamageType.MELEE)) {
+							damageBonus = damageBonus * (1 + damageEffect.getMagnitude() * (damageEffect.isBuff() ? 1 : -1));
+						}
+					}
+				}
+			}
 
 			Location playerLoc = mPlayer.getLocation();
 			wave(enemy, playerLoc, damageBonus, false);

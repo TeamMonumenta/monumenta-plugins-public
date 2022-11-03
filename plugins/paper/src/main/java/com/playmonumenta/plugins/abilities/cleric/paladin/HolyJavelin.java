@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.CrusadeEnhancementTag;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -151,6 +152,9 @@ public class HolyJavelin extends Ability {
 					}
 					EntityUtils.applyFire(mPlugin, FIRE_DURATION, enemy, mPlayer);
 					DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true);
+					if (Crusade.applyCrusadeToSlayer(enemy, mCrusade)) {
+						mPlugin.mEffectManager.addEffect(enemy, "CrusadeSlayerTag", new CrusadeEnhancementTag(mCrusade.getEnhancementDuration()));
+					}
 					iterator.remove();
 				}
 			}

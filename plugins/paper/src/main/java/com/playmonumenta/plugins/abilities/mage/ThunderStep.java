@@ -62,6 +62,7 @@ public class ThunderStep extends Ability {
 	public static final int BACK_TELEPORT_MAX_DELAY = 3 * 20;
 	public static final int ENHANCEMENT_BONUS_DAMAGE_TIMER = 30 * 20;
 	public static final int ENHANCEMENT_PARALYZE_DURATION = 5 * 20;
+	public static final float ENHANCEMENT_DAMAGE_RATIO = 0.2f;
 
 	public static final String CHARM_DAMAGE = "Thunder Step Damage";
 	public static final String CHARM_COOLDOWN = "Thunder Step Cooldown";
@@ -104,9 +105,10 @@ public class ThunderStep extends Ability {
 			)
 		);
 		mInfo.mDescriptions.add(
-			String.format("Within %ss of casting, use the same trigger to return to the original starting location." +
+			String.format("Within %ss of casting, use the same trigger to return to the original starting location, dealing %s%% of the skills damage." +
 					" If you do not do so, your next Thunder Step within %ss will paralyze enemies for %ss.",
 				BACK_TELEPORT_MAX_DELAY / 20,
+				(int)(ENHANCEMENT_DAMAGE_RATIO * 100),
 				ENHANCEMENT_BONUS_DAMAGE_TIMER / 20,
 				ENHANCEMENT_PARALYZE_DURATION / 20
 			)
@@ -137,6 +139,8 @@ public class ThunderStep extends Ability {
 			if (mPlayer.isSneaking()
 				    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 
+				float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+
 				// if enhanced, can teleport back within a short time frame (regardless of if on cooldown or not)
 				if (isEnhanced()
 					    && mPlayer.getTicksLived() <= mLastCastTick + BACK_TELEPORT_MAX_DELAY
@@ -144,10 +148,10 @@ public class ThunderStep extends Ability {
 					    && mLastCastLocation.getWorld() == mPlayer.getWorld()
 					    && mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
 
-					doDamage(mPlayer.getLocation(), 0, false);
+					doDamage(mPlayer.getLocation(), spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
 					mLastCastLocation.setDirection(mPlayer.getLocation().getDirection());
 					mPlayer.teleport(mLastCastLocation);
-					doDamage(mLastCastLocation, 0, false);
+					doDamage(mLastCastLocation, spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
 
 					// prevent further back teleports as well as paralyze of any further casts
 					mLastCastLocation = null;
@@ -167,8 +171,6 @@ public class ThunderStep extends Ability {
 				putOnCooldown();
 				mLastCastLocation = mPlayer.getLocation();
 				mLastCastTick = mPlayer.getTicksLived();
-
-				float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 
 				Location playerStartLocation = mPlayer.getLocation();
 				doDamage(playerStartLocation, spellDamage, doParalyze);

@@ -36,6 +36,7 @@ public class ByMyBlade extends Ability {
 	private static final int BY_MY_BLADE_COOLDOWN = 10 * 20;
 	private static final double ENHANCEMENT_HEAL_PERCENT = 0.05;
 	private static final double ENHANCEMENT_HEAL_PERCENT_ELITE = 0.15;
+	private static final double ENHANCEMENT_DAMAGE_MULT = 0.2;
 
 	public static final String CHARM_DAMAGE = "By My Blade Damage";
 	public static final String CHARM_COOLDOWN = "By My Blade Cooldown";
@@ -64,12 +65,13 @@ public class ByMyBlade extends Ability {
 				StringUtils.toRoman(BY_MY_BLADE_1_HASTE_AMPLIFIER + 1),
 				StringUtils.toRoman(BY_MY_BLADE_2_HASTE_AMPLIFIER + 1)));
 		mInfo.mDescriptions.add(
-			String.format("Killing an enemy with this ability heals you for %s%% of your max health, increased to %s%% if the target was an elite or boss.",
+			String.format("By My Blade does %s%% extra damage. Killing an enemy with this ability heals you for %s%% of your max health, increased to %s%% if the target was an elite or boss.",
+				(int)(ENHANCEMENT_DAMAGE_MULT * 100),
 				(int)(ENHANCEMENT_HEAL_PERCENT * 100),
 				(int)(ENHANCEMENT_HEAL_PERCENT_ELITE * 100)));
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, BY_MY_BLADE_COOLDOWN);
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
-		mDamageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE);
+		mDamageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, (isLevelOne() ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE) * (isEnhanced() ? 1 + ENHANCEMENT_DAMAGE_MULT : 1));
 		mHasteAmplifier = (isLevelOne() ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER) + (int) CharmManager.getLevel(mPlayer, CHARM_HASTE_AMPLIFIER);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ByMyBladeCS(), ByMyBladeCS.SKIN_LIST);

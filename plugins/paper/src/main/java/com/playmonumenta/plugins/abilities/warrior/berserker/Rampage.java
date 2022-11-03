@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -36,6 +37,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	private static final int RAMPAGE_STACK_DECAY_TIME = 20 * 5;
 	private static final int RAMPAGE_1_DAMAGE_PER_STACK = 50;
 	private static final int RAMPAGE_2_DAMAGE_PER_STACK = 35;
+	private static final double R3_DAMAGE_PER_STACK_MULTIPLIER = 1.5;
 	private static final int ACTIVE_MIN_STACKS = 10;
 	private static final int RAMPAGE_1_STACK_LIMIT = 15;
 	private static final int RAMPAGE_2_STACK_LIMIT = 20;
@@ -67,7 +69,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		mInfo.mScoreboardId = "Rampage";
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mShorthandName = "Rmp";
-		mInfo.mDescriptions.add(("Gain a stack of rage for each %s melee damage dealt. Stacks decay by 1 every %s seconds of not dealing melee damage and cap at %s. " +
+		mInfo.mDescriptions.add(("Gain a stack of rage for each %s melee damage dealt (50%% more in region 3). Stacks decay by 1 every %s seconds of not dealing melee damage and cap at %s. " +
 			                         "Passively gain %s%% damage resistance for each stack. " +
 			                         "When at %s or more stacks, right click while looking down to consume all stacks and damage mobs " +
 			                         "in a %s block radius by %s times the number of stacks consumed. For the next (stacks consumed / 2) seconds, " +
@@ -78,7 +80,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		mInfo.mDescriptions.add("Gain a stack of rage for each %s melee damage dealt, with stacks capping at %s."
 			                        .formatted(RAMPAGE_2_DAMAGE_PER_STACK, RAMPAGE_2_STACK_LIMIT));
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
-		mDamagePerStack = (isLevelOne() ? RAMPAGE_1_DAMAGE_PER_STACK : RAMPAGE_2_DAMAGE_PER_STACK) + CharmManager.getLevel(mPlayer, CHARM_THRESHOLD);
+		mDamagePerStack = ((isLevelOne() ? RAMPAGE_1_DAMAGE_PER_STACK : RAMPAGE_2_DAMAGE_PER_STACK) + CharmManager.getLevel(mPlayer, CHARM_THRESHOLD)) * (ServerProperties.getAbilityEnhancementsEnabled() ? R3_DAMAGE_PER_STACK_MULTIPLIER : 1);
 		mStackLimit = (isLevelOne() ? RAMPAGE_1_STACK_LIMIT : RAMPAGE_2_STACK_LIMIT) + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 	}
 

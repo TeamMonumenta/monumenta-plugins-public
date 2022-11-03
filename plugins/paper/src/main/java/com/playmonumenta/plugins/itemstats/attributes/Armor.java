@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemstats.attributes;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Attribute;
+import com.playmonumenta.plugins.itemstats.enchantments.Adaptability;
 import com.playmonumenta.plugins.itemstats.enchantments.Guard;
 import com.playmonumenta.plugins.itemstats.enchantments.Inure;
 import com.playmonumenta.plugins.itemstats.enchantments.Poise;
@@ -48,7 +49,7 @@ public class Armor implements Attribute {
 	 * @param armorMods     Total secondary armor enchantment modifier, see {@link #getSecondaryEnchantsMod(DamageEvent, Plugin, Player)}
 	 * @param agility       Total agility value
 	 * @param agilityMods   Total secondary agility enchantment modifier, see {@link Agility#getSecondaryEnchantsMod(DamageEvent, Plugin, Player)}
-	 * @param adaptability  Whether the {@link com.playmonumenta.plugins.itemstats.enchantments.Adaptability} enchantment is present
+	 * @param adaptability  Whether the {@link Adaptability} enchantment is present
 	 * @param epf           EPF from protection enchantments
 	 * @param environmental Whether the damage is environmental
 	 * @return Damage multiplier

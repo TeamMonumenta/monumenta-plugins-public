@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.HandOfLightCS;
+import com.playmonumenta.plugins.effects.CrusadeEnhancementTag;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.potion.PotionManager;
@@ -159,6 +160,9 @@ public class HandOfLight extends Ability {
 		if (damage > 0) {
 			for (LivingEntity mob : nearbyMobs) {
 				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, true);
+				if (Crusade.applyCrusadeToSlayer(mob, mCrusade)) {
+					mPlugin.mEffectManager.addEffect(mob, "CrusadeSlayerTag", new CrusadeEnhancementTag(mCrusade.getEnhancementDuration()));
+				}
 
 				Location loc = mob.getLocation();
 				mCosmetic.lightDamageEffect(mPlayer, loc, mob);

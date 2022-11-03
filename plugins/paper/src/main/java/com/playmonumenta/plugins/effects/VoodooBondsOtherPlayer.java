@@ -47,7 +47,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 		}
 
 		int duration = mTransferDuration;
-		double damage = event.getDamage();
+		double damage = event.getFinalDamage(true);
 		double maxHealth = EntityUtils.getMaxHealth(entity);
 		double percentDamage = damage / maxHealth;
 
