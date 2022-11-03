@@ -599,9 +599,9 @@ public class ChestUtils {
 		}
 	}
 
-	public static boolean isUnlootedChest(Block block) {
+	public static boolean isUnscaledChest(Block block) {
 		return block.getState() instanceof Chest chest && chest.getLootTable() != null &&
-			chest.getSeed() == 0 && isChestEmpty(chest);
+			       chest.getSeed() == 0 && isChestEmpty(chest);
 	}
 
 	public static boolean isChestEmpty(Chest chest) {
@@ -626,5 +626,12 @@ public class ChestUtils {
 		return true;
 	}
 
+	public static boolean isChestWithLootTable(Block block) {
+		Material type = block.getType();
+		return (type == Material.CHEST || type == Material.TRAPPED_CHEST)
+			       && block.getState() instanceof Chest chest
+			       && (chest.hasLootTable() || (chest.getInventory() instanceof DoubleChestInventory doubleChestInventory
+				                                    && (((Chest) doubleChestInventory.getLeftSide().getHolder()).hasLootTable() || ((Chest) doubleChestInventory.getRightSide().getHolder()).hasLootTable())));
+	}
 
 }

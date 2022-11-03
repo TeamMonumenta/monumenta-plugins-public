@@ -330,10 +330,10 @@ public class WorldListener implements Listener {
 		int chests = 0;
 		for (Chunk chunk : chunkList) {
 			for (BlockState interestingBlock: chunk.getTileEntities()) {
-				if (ChestUtils.isUnlootedChest(interestingBlock.getBlock()) && LocationUtils.blocksAreWithinRadius(spawner, interestingBlock.getBlock(), SPAWNER_BREAK_CHEST_CHECK_RADIUS)) {
+				if (ChestUtils.isUnscaledChest(interestingBlock.getBlock()) && LocationUtils.blocksAreWithinRadius(spawner, interestingBlock.getBlock(), SPAWNER_BREAK_CHEST_CHECK_RADIUS)) {
 					chests++;
 					List<Player> players = PlayerUtils.playersInLootScalingRange(spawner.getLocation());
-					((Lootable)interestingBlock).setSeed(players.size());
+					((Lootable) interestingBlock).setSeed(players.size());
 					interestingBlock.update();
 					MMLog.fine("SpawnerBreakLootScaling : Players in radius: " + players.size());
 				}

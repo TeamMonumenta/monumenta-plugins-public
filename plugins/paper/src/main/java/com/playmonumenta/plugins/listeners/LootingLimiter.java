@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -11,7 +12,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -32,8 +32,8 @@ public class LootingLimiter implements Listener {
 
 	private static final int MAX_BANKED_CHESTS = 4;
 
-	private static final int PLAYER_SEARCH_RADIUS = 32;
-	private static final int MOB_AND_SPAWNER_SEARCH_RADIUS = 16;
+	private static final int PLAYER_SEARCH_RADIUS = 20;
+	private static final int MOB_AND_SPAWNER_SEARCH_RADIUS = 12;
 
 	// spawner break checks
 
@@ -93,13 +93,7 @@ public class LootingLimiter implements Listener {
 
 	// chest break checks
 
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void entityExplodeEventEarly(EntityExplodeEvent event) {
-		if (ServerProperties.getLootingLimiterSpawners() <= 0 && ServerProperties.getLootingLimiterMobKills() <= 0) {
-			return;
-		}
-		event.blockList().removeIf(block -> !checkChest(block, null));
-	}
+	// explode events are handled by ChestOverride, as that code is called before this one would be
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockBreakEventEarly(BlockBreakEvent event) {
@@ -115,7 +109,7 @@ public class LootingLimiter implements Listener {
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		if (event.useInteractedBlock() == Event.Result.DENY
 			    || event.getAction() != Action.RIGHT_CLICK_BLOCK
-			    || ServerProperties.getLootingLimiterSpawners() <= 0 && ServerProperties.getLootingLimiterMobKills() <= 0) {
+			    || (ServerProperties.getLootingLimiterSpawners() <= 0 && ServerProperties.getLootingLimiterMobKills() <= 0)) {
 			return;
 		}
 		Block block = event.getClickedBlock();
@@ -124,15 +118,11 @@ public class LootingLimiter implements Listener {
 		}
 	}
 
-	private boolean checkChest(Block block, @Nullable Player player) {
+	public static boolean checkChest(Block block, @Nullable Player player) {
 		if (player != null && player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		}
-		Material type = block.getType();
-		if ((type == Material.CHEST || type == Material.TRAPPED_CHEST)
-			    && block.getState() instanceof Chest chest
-			    && chest.hasLootTable()) {
-
+		if (ChestUtils.isChestWithLootTable(block)) {
 			List<Player> players = PlayerUtils.playersInRange(block.getLocation(), PLAYER_SEARCH_RADIUS, true, true);
 			if (players.isEmpty()) {
 				return false;

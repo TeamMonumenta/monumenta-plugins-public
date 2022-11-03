@@ -373,7 +373,7 @@ public class DelvesManager implements Listener {
 			List<Chunk> chunkList = LocationUtils.getSurroundingChunks(event.getTo().getBlock(), 32);
 			for (Chunk chunk : chunkList) {
 				for (BlockState interestingBlock : chunk.getTileEntities()) {
-					if (ChestUtils.isUnlootedChest(interestingBlock.getBlock()) && LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), 32) && PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
+					if (ChestUtils.isUnscaledChest(interestingBlock.getBlock()) && LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), 32) && PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
 						Astral.applyModifiers(interestingBlock.getBlock(), getRank(player, DelvesModifier.ASTRAL));
 					}
 				}
