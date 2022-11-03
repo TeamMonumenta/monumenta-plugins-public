@@ -86,6 +86,7 @@ public class Samwell extends BossAbilityGroup {
 	public int mPhase = 1;
 	public boolean mCraftPhase = false;
 	public boolean mDaggerPhase = false;
+	public BossBar mGatheringBar;
 	public BossBar mCraftingBar;
 	private final List<Spell> mBasePassives;
 	List<Spell> mPhase1Passives;
@@ -267,6 +268,8 @@ public class Samwell extends BossAbilityGroup {
 		mBoss.setGlowing(true);
 
 		mShardsReq = (int) (3 + Math.floor(PlayerUtils.playersInRange(mSpawnLoc, 100, true).size() / 2.0));
+		mGatheringBar = Bukkit.getServer().createBossBar(ChatColor.YELLOW + "Shards Obtained: " + ChatColor.GREEN + getShards() + ChatColor.YELLOW + " / " + ChatColor.RED + mShardsReq, BarColor.GREEN, BarStyle.SEGMENTED_6);
+		mGatheringBar.setProgress(0);
 
 		// Need to Delay this a bit, as BlueStrikeDaggerCraftingBoss will search for a nearby WitherSkeleton.
 		// (IK it is quite scuffed)
@@ -514,6 +517,8 @@ public class Samwell extends BossAbilityGroup {
 
 		clearAllAdds();
 		clearDaggerAndShards();
+		mGatheringBar.setVisible(false);
+		mCraftingBar.setVisible(false);
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 		if (players.size() <= 0) {
@@ -692,6 +697,18 @@ public class Samwell extends BossAbilityGroup {
 		clearTargetMobs();
 		mCraftPhase = false;
 		mDaggerPhase = false;
+
+		if (mPhase < 4) {
+			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 75, true);
+			mGatheringBar.setVisible(true);
+			mGatheringBar.setProgress(0);
+			mGatheringBar.setTitle(ChatColor.YELLOW + "Shards Obtained: " + ChatColor.GREEN + "0" + ChatColor.YELLOW + " / " + ChatColor.RED + mShardsReq);
+
+			for (Player player : players) {
+				mGatheringBar.addPlayer(player);
+			}
+		}
+
 		switch (mPhase) {
 			case 1 -> changePhase(mPhase1Actives, mPhase1Passives, null);
 			case 2 -> changePhase(mPhase2Actives, mPhase2Passives, null);
@@ -703,6 +720,7 @@ public class Samwell extends BossAbilityGroup {
 	public void changePhaseCraft() {
 		mCraftPhase = true;
 		mDaggerPhase = false;
+		mGatheringBar.setVisible(false);
 		switch (mPhase) {
 			case 1 -> changePhase(mPhase1Actives, mCraft1Passives, null);
 			case 2 -> changePhase(mPhase2Actives, mCraft2Passives, null);
@@ -729,6 +747,8 @@ public class Samwell extends BossAbilityGroup {
 
 	public void addShards(int amount) {
 		ScoreboardUtils.setScoreboardValue(mBoss, Samwell.OBJECTIVE_SHARD_NAME, getShards() + amount);
+		mGatheringBar.setProgress((double) getShards() / mShardsReq);
+		mGatheringBar.setTitle(ChatColor.YELLOW + "Shards Obtained: " + ChatColor.GREEN + getShards() + ChatColor.YELLOW + " / " + ChatColor.RED + mShardsReq);
 	}
 
 	public int getFails() {
