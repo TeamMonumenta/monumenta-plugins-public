@@ -300,7 +300,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			mMobsIframeMap.values().removeIf(tick -> tick + IFRAME_BETWEEN_POT < mPlayer.getTicksLived());
 
 			if (mMobsIframeMap.containsKey(mob.getUniqueId())) {
-				applyEffects(mob, isGruesome);
+				applyEffects(mob, isGruesome, playerItemStats);
 				return;
 			}
 
@@ -308,7 +308,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			mMobsIframeMap.put(mob.getUniqueId(), mPlayer.getTicksLived());
 
 			// Intentionally apply effects after damage
-			applyEffects(mob, isGruesome);
+			applyEffects(mob, isGruesome, playerItemStats);
 		}
 	}
 
@@ -320,10 +320,10 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 	}
 
-	public void applyEffects(LivingEntity mob, boolean isGruesome) {
+	public void applyEffects(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {
 		//Apply potions effects but no damage
 		for (PotionAbility potionAbility : mPotionAbilities) {
-			potionAbility.apply(mob, isGruesome);
+			potionAbility.apply(mob, isGruesome, playerItemStats);
 		}
 	}
 

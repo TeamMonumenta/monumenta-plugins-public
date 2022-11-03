@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.GruesomeAlchemyCS;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -77,7 +78,7 @@ public class GruesomeAlchemy extends PotionAbility {
 	}
 
 	@Override
-	public void apply(LivingEntity mob, boolean isGruesome) {
+	public void apply(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {
 		if (isGruesome) {
 			int duration = GRUESOME_ALCHEMY_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 			EntityUtils.applySlow(mPlugin, duration, mSlownessAmount, mob);

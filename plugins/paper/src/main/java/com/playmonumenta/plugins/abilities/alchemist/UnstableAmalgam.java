@@ -308,8 +308,8 @@ public class UnstableAmalgam extends Ability {
 
 	private void applyEffects(LivingEntity entity) {
 		if (mHasGruesome) {
-			mAlchemistPotions.applyEffects(entity, true);
+			mAlchemistPotions.applyEffects(entity, true, mPlayerItemStats);
 		}
-		mAlchemistPotions.applyEffects(entity, false);
+		mAlchemistPotions.applyEffects(entity, false, mPlayerItemStats);
 	}
 }
