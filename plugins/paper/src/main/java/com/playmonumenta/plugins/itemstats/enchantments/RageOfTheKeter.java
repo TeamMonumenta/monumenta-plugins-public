@@ -47,6 +47,7 @@ public class RageOfTheKeter implements Enchantment {
 	public static final String CHARM_COOLDOWN = "Rage of the Keter Cooldown";
 	public static final String CHARM_DAMAGE = "Rage of the Keter Damage";
 	public static final String CHARM_SPEED = "Rage of the Keter Speed";
+	public static final String CHARM_DURATION = "Rage of the Keter Duration";
 
 	private static final Particle.DustOptions OLIVE_COLOR = new Particle.DustOptions(Color.fromRGB(128, 128, 0), 1.0f);
 	private static final Particle.DustOptions GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(64, 128, 0), 1.0f);
@@ -79,9 +80,10 @@ public class RageOfTheKeter implements Enchantment {
 
 			event.setCancelled(true);
 			World world = player.getWorld();
-			plugin.mEffectManager.addEffect(player, "KeterExtraDamage", new PercentDamageDealt(DURATION, DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE), AFFECTED_DAMAGE_TYPES));
-			plugin.mEffectManager.addEffect(player, "KeterExtraSpeed", new PercentSpeed(DURATION, SPEED_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_SPEED), ATTR_NAME));
-			plugin.mEffectManager.addEffect(player, "KeterParticles", new Aesthetics(DURATION,
+			int duration = DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION);
+			plugin.mEffectManager.addEffect(player, "KeterExtraDamage", new PercentDamageDealt(duration, DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE), AFFECTED_DAMAGE_TYPES));
+			plugin.mEffectManager.addEffect(player, "KeterExtraSpeed", new PercentSpeed(duration, SPEED_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_SPEED), ATTR_NAME));
+			plugin.mEffectManager.addEffect(player, "KeterParticles", new Aesthetics(duration,
 					(entity, fourHertz, twoHertz, oneHertz) -> {
 						// Tick effect
 						Location loc = player.getLocation().add(0, 1, 0);

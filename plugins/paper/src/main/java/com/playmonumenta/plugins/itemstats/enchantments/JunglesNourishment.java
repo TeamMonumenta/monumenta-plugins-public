@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.infusions.Refresh;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -23,14 +24,17 @@ import org.bukkit.inventory.ItemStack;
 
 public class JunglesNourishment implements Enchantment {
 
-	private static final int HEAL = 8;
+	private static final double HEAL_PERCENT = 0.4;
 	private static final int DURATION = 20 * 5;
 	private static final double PERCENT_DAMAGE_RECEIVED = -0.2;
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "JunglesNourishmentResistance";
 	private static final int COOLDOWN = 20 * 25;
+	public static final Material COOLDOWN_ITEM = Material.MELON_SEEDS;
+
 	public static final String CHARM_COOLDOWN = "Jungle's Nourishment Cooldown";
 	public static final String CHARM_HEALTH = "Jungle's Nourishment Health";
-	public static final Material COOLDOWN_ITEM = Material.MELON_SEEDS;
+	public static final String CHARM_RESISTANCE = "Jungle's Nourishment Resistance";
+	public static final String CHARM_DURATION = "Jungle's Nourishment Duration";
 
 	@Override
 	public String getName() {
@@ -57,9 +61,11 @@ public class JunglesNourishment implements Enchantment {
 				return;
 			}
 
-			double heal = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEALTH, HEAL);
-			PlayerUtils.healPlayer(plugin, player, heal, player);
-			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RECEIVED));
+			double healPercent = HEAL_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_HEALTH);
+			PlayerUtils.healPlayer(plugin, player, healPercent * EntityUtils.getMaxHealth(player), player);
+
+			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION), PERCENT_DAMAGE_RECEIVED - CharmManager.getLevelPercentDecimal(player, CHARM_RESISTANCE)));
+
 			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, Refresh.reduceCooldown(plugin, player, COOLDOWN));
 			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()), new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
 			player.setFoodLevel(24);
