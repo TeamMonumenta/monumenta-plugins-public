@@ -481,6 +481,7 @@ public class DelvesUtils {
 			for (Player player : party) {
 				List<RespawningStructure> playerStructures = StructuresPlugin.getInstance().mRespawnManager.getStructures(player.getLocation().toVector(), false);
 				playerStructures.removeIf(structure -> !structure.isWithin(player));
+				playerStructures.removeAll(structures);
 				structures.addAll(playerStructures);
 			}
 
