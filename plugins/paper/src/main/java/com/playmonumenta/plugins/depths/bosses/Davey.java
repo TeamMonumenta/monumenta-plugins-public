@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellMusic;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
@@ -156,7 +157,8 @@ public class Davey extends BossAbilityGroup {
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellDaveyAnticheese(mBoss, mSpawnLoc),
 			new SpellAbyssalSpawnPassive(mBoss, mVexes),
-			new SpellShieldStun(20 * 30)
+			new SpellShieldStun(20 * 30),
+			new SpellMusic(mBoss, MUSIC_TITLE, MUSIC_DURATION * 20, 20, 0, detectionRange, detectionRange, false, 0)
 		);
 
 		//Summon vexes
@@ -226,7 +228,6 @@ public class Davey extends BossAbilityGroup {
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
 		}
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\", \"color\":\"gold\"},{\"text\":\" Ahoy! Ye have the stink of the Veil upon ye. She won't be likin' this... Sink!\",\"color\":\"blue\"}]");
-		mMusicRunnable.runTaskTimer(mPlugin, 0, MUSIC_DURATION * 20 + 20);
 	}
 
 	@Override
@@ -269,14 +270,4 @@ public class Davey extends BossAbilityGroup {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
 		}
 	}
-
-	BukkitRunnable mMusicRunnable = new BukkitRunnable() {
-		@Override
-		public void run() {
-			if (mBoss.isDead()) {
-				this.cancel();
-			}
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound " + MUSIC_TITLE + " record @s ~ ~ ~ 2");
-		}
-	};
 }

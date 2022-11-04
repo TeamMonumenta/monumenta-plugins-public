@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellMusic;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -167,7 +168,8 @@ public class Hedera extends BossAbilityGroup {
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2, true, Material.AIR),
 			new SpellHederaAnticheese(mBoss, mSpawnLoc),
-			new SpellPassiveGarden(mBoss, mPlantSpawns, mPlants, mPlantTypes, mSpawnLoc)
+			new SpellPassiveGarden(mBoss, mPlantSpawns, mPlants, mPlantTypes, mSpawnLoc),
+			new SpellMusic(mBoss, MUSIC_TITLE, MUSIC_DURATION * 20, 20, 0, detectionRange, detectionRange, false, 0)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -188,7 +190,6 @@ public class Hedera extends BossAbilityGroup {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
 		}
-		mMusicRunnable.runTaskTimer(mPlugin, 0, MUSIC_DURATION * 20 + 20);
 	}
 
 	@Override
@@ -283,14 +284,4 @@ public class Hedera extends BossAbilityGroup {
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
 	}
-
-	BukkitRunnable mMusicRunnable = new BukkitRunnable() {
-		@Override
-		public void run() {
-			if (mBoss.isDead()) {
-				this.cancel();
-			}
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound " + MUSIC_TITLE + " record @s ~ ~ ~ 2");
-		}
-	};
 }

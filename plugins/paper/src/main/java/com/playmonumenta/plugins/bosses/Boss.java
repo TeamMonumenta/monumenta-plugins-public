@@ -298,6 +298,14 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.mDead = true;
 			ability.death(event);
+
+			for (Spell passive : ability.getPassives()) {
+				passive.onDeath(event);
+			}
+
+			for (Spell active : ability.getActiveSpells()) {
+				active.onDeath(event);
+			}
 		}
 	}
 

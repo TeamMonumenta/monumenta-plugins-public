@@ -9,6 +9,7 @@ import java.util.Set;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -94,6 +95,10 @@ public abstract class Spell implements Cloneable {
 	 * Boss was hurt by an entity with a source (source is usually the same as the entity)
 	 */
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+
+	}
+
+	public void onDeath(EntityDeathEvent event) {
 
 	}
 

@@ -581,6 +581,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(TemporalShieldBoss.identityTag, (Plugin p, LivingEntity e) -> TemporalShieldBoss.deserialize(p, e));
 		mBossDeserializers.put(GalleryMobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> GalleryMobRisingBoss.deserialize(p, e));
 		mBossDeserializers.put(GallerySummonMobBoss.identityTag, (Plugin p, LivingEntity e) -> GallerySummonMobBoss.deserialize(p, e));
+		mBossDeserializers.put(MusicBoss.identityTag, (Plugin p, LivingEntity e) -> MusicBoss.deserialize(p, e));
 
 
 		/***************************************************
@@ -648,6 +649,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(BrownMagnetSwapBoss.identityTag, new BrownMagnetSwapBoss.Parameters());
 		mBossParameters.put(BrownPositiveBoss.identityTag, new BrownPositiveBoss.Parameters());
 		mBossParameters.put(BrownNegativeBoss.identityTag, new BrownNegativeBoss.Parameters());
+		mBossParameters.put(MusicBoss.identityTag, new MusicBoss.Parameters());
 	}
 
 	/********************************************************************************

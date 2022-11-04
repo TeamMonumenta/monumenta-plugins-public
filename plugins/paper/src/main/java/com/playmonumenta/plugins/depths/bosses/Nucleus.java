@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellMusic;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -162,16 +163,19 @@ public final class Nucleus extends BossAbilityGroup {
 			}
 		}
 
+		SpellMusic music = new SpellMusic(mBoss, MUSIC_TITLE, MUSIC_DURATION * 20, 20, 0, detectionRange, detectionRange, false, 0);
+
 		//Spell setup
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 				new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
 				new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
 			));
 		List<Spell> phase1Passives = Arrays.asList(
-				new SpellBlockBreak(mBoss, 2, 3, 2),
-				new SpellPassiveEyes(mBoss, this, spawnLoc),
-				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this)
-			);
+			new SpellBlockBreak(mBoss, 2, 3, 2),
+			new SpellPassiveEyes(mBoss, this, spawnLoc),
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this),
+			music
+		);
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
 				new SpellTectonicDevastation(mPlugin, mBoss, mSpawnLoc, mCooldownTicks, this),
@@ -181,19 +185,21 @@ public final class Nucleus extends BossAbilityGroup {
 		List<Spell> phase2Passives = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
-			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this)
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this),
+			music
 		);
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
-			new SpellTectonicDevastation(mPlugin, mBoss, mSpawnLoc, mCooldownTicks, this),
-			new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
-			new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
-		));
+				new SpellTectonicDevastation(mPlugin, mBoss, mSpawnLoc, mCooldownTicks, this),
+				new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
+				new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
+			));
 		List<Spell> phase3Passives = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellVolcanicDeepmise(mBoss, mSpawnLoc),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
-			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this)
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this),
+			music
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -347,7 +353,6 @@ public final class Nucleus extends BossAbilityGroup {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
 					}
-					mMusicRunnable.runTaskTimer(mPlugin, 0, MUSIC_DURATION * 20 + 20);
 				}
 
 			}
@@ -384,14 +389,4 @@ public final class Nucleus extends BossAbilityGroup {
 
 		}.runTaskLater(mPlugin, 20);
 	}
-
-	BukkitRunnable mMusicRunnable = new BukkitRunnable() {
-		@Override
-		public void run() {
-			if (mBoss.isDead()) {
-				this.cancel();
-			}
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound " + MUSIC_TITLE + " record @s ~ ~ ~ 2");
-		}
-	};
 }
