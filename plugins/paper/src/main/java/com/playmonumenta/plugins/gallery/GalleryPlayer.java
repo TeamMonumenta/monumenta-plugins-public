@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffect;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffectType;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -84,6 +85,10 @@ public class GalleryPlayer {
 
 	public GalleryEffect getEffectOfType(GalleryEffectType type) {
 		return mEffects.get(type);
+	}
+
+	public Collection<GalleryEffect> getAllEffects() {
+		return mEffects.values();
 	}
 
 	public void clearEffects() {

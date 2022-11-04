@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.gallery.effects;
 
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.effects.DisplayableEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.GalleryGame;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
@@ -9,7 +10,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class GalleryEffect {
+public abstract class GalleryEffect implements DisplayableEffect {
 
 	protected final @NotNull GalleryEffectType mType;
 
@@ -84,6 +85,14 @@ public abstract class GalleryEffect {
 		return type.newEffect();
 	}
 
+	// This is not a real duration - gallery effects are infinite
+	// This only controls the order of display in the tab list
+	// These effects should always be first, and be in a consistent order based on the order in GalleryEffectType
+	@Override
+	public int getDuration() {
+		return 1000000000 + mType.ordinal();
+	}
+
 	public abstract boolean canBuy(GalleryPlayer player);
 
 
@@ -99,6 +108,5 @@ public abstract class GalleryEffect {
 		}
 		return null;
 	}
-
 
 }

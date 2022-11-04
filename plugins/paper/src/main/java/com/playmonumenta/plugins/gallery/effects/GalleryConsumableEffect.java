@@ -1,12 +1,9 @@
 package com.playmonumenta.plugins.gallery.effects;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.gallery.GalleryGame;
-import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
 import org.bukkit.ChatColor;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class GalleryConsumableEffect extends GalleryEffect {
@@ -20,16 +17,9 @@ public abstract class GalleryConsumableEffect extends GalleryEffect {
 		mRoundsLeft = getMaxRoundLeft();
 	}
 
-	@Override public void tick(GalleryPlayer player, boolean oneSecond, boolean twoHertz, int ticks) {
-		GalleryManager.mPlugin.mEffectManager.addEffect(player.getPlayer(), "Gallery" + mType.getRealName(), new Effect(20, "Gallery" + mType.getRealName()) {
-			@Override public String toString() {
-				return "Gallery" + mType.getRealName() + " round left " + mRoundsLeft;
-			}
-
-			@Override public @Nullable String getDisplay() {
-				return ChatColor.GOLD + mType.getRealName() + " " + mRoundsLeft + " remaining";
-			}
-		});
+	@Override
+	public String getDisplay() {
+		return ChatColor.GOLD + mType.getRealName() + " " + mRoundsLeft + " remaining";
 	}
 
 	@Override public void onRoundStart(GalleryPlayer player, GalleryGame game) {

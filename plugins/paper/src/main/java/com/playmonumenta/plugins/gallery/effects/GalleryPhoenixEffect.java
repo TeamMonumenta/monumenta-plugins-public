@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.gallery.effects;
 
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.GalleryGame;
 import com.playmonumenta.plugins.gallery.GalleryManager;
@@ -12,7 +11,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.EntityEffect;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GalleryPhoenixEffect extends GalleryEffect {
 	/**
@@ -40,16 +38,9 @@ public class GalleryPhoenixEffect extends GalleryEffect {
 		}
 	}
 
-	@Override public void tick(GalleryPlayer player, boolean oneSecond, boolean twoHertz, int ticks) {
-		GalleryManager.mPlugin.mEffectManager.addEffect(player.getPlayer(), "Gallery" + mType.getRealName(), new Effect(20, "Gallery" + mType.getRealName()) {
-			@Override public String toString() {
-				return "Gallery" + mType.getRealName();
-			}
-
-			@Override public @Nullable String getDisplay() {
-				return ChatColor.GOLD + mType.getRealName();
-			}
-		});
+	@Override
+	public String getDisplay() {
+		return ChatColor.GOLD + mType.getRealName();
 	}
 
 	@Override public boolean canBuy(GalleryPlayer player) {

@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface DisplayableEffect {
@@ -16,6 +18,9 @@ public interface DisplayableEffect {
 	static List<DisplayableEffect> getEffects(Plugin plugin, LivingEntity entity) {
 		List<DisplayableEffect> effects = new ArrayList<>(plugin.mEffectManager.getPriorityEffects(entity).values());
 		effects.addAll(AbsorptionUtils.getAbsorptionDisplayables(entity));
+		if (entity instanceof Player player) {
+			effects.addAll(GalleryManager.getGalleryEffects(player));
+		}
 		return effects;
 	}
 

@@ -1,12 +1,9 @@
 package com.playmonumenta.plugins.gallery.effects;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.ChatColor;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class GalleryStackableEffect extends GalleryEffect {
@@ -17,20 +14,9 @@ public abstract class GalleryStackableEffect extends GalleryEffect {
 		super(type);
 	}
 
-	@Override public void tick(GalleryPlayer player, boolean oneSecond, boolean twoHertz, int ticks) {
-		GalleryManager.mPlugin.mEffectManager.addEffect(player.getPlayer(), "Gallery" + mType.getRealName(), new Effect(20, "Gallery" + mType.getRealName()) {
-			@Override public double getMagnitude() {
-				return mStacks;
-			}
-
-			@Override public String toString() {
-				return "Gallery" + mType.getRealName() + " lvl. " + mStacks;
-			}
-
-			@Override public @Nullable String getDisplay() {
-				return ChatColor.GOLD + mType.getRealName() + " " + StringUtils.toRoman(mStacks);
-			}
-		});
+	@Override
+	public String getDisplay() {
+		return ChatColor.GOLD + mType.getRealName() + " " + StringUtils.toRoman(mStacks);
 	}
 
 	@Override public void playerGainEffect(GalleryPlayer player) {

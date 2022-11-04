@@ -5,10 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.gallery.effects.GalleryEffect;
 import com.playmonumenta.plugins.utils.FileUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.entity.Creeper;
@@ -25,6 +27,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GalleryManager implements Listener {
 
@@ -173,6 +176,27 @@ public class GalleryManager implements Listener {
 
 	public static void removeGame(GalleryGame game) {
 		GAMES.remove(game.mUUIDGame);
+	}
+
+	public static @Nullable GalleryGame getGame(Player player) {
+		return GAMES.get(player.getWorld().getUID());
+	}
+
+	public static @Nullable GalleryPlayer getGalleryPlayer(Player player) {
+		GalleryGame game = getGame(player);
+		if (game != null) {
+			return game.getGalleryPlayer(player.getUniqueId());
+		}
+		return null;
+	}
+
+	public static List<GalleryEffect> getGalleryEffects(Player player) {
+		List<GalleryEffect> effects = new ArrayList<>();
+		GalleryPlayer galleryPlayer = getGalleryPlayer(player);
+		if (galleryPlayer != null) {
+			effects.addAll(galleryPlayer.getAllEffects());
+		}
+		return effects;
 	}
 
 	public static void close() {
