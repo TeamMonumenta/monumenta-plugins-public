@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -487,15 +488,7 @@ public class DelvesUtils {
 				MMLog.fine("Delve party is not in any structures");
 				return new HashMap<>();
 			} else if (structures.size() > 1) {
-				StringBuilder msg = new StringBuilder("Delve party is in multiple structures at once: ");
-				for (int i = 0; i < structures.size(); i++) {
-					if (i > 0) {
-						msg.append(", ");
-					}
-					msg.append(getStructureName(structures.get(i)));
-				}
-				structures.forEach(structure -> msg.append(getStructureName(structure)));
-				MMLog.warning(String.valueOf(msg));
+				MMLog.warning("Delve party is in multiple structures at once: " + structures.stream().map(DelvesUtils::getStructureName).collect(Collectors.joining(", ")));
 			}
 
 			RespawningStructure structure = structures.get(0);
