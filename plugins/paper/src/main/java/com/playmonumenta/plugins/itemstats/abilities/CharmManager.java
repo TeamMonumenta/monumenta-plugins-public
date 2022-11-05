@@ -290,6 +290,7 @@ public class CharmManager {
 			AstralOmen.CHARM_RANGE,
 			AstralOmen.CHARM_MODIFIER,
 			AstralOmen.CHARM_STACK,
+			AstralOmen.CHARM_PULL,
 			CosmicMoonblade.CHARM_CAP,
 			CosmicMoonblade.CHARM_DAMAGE,
 			CosmicMoonblade.CHARM_RANGE,

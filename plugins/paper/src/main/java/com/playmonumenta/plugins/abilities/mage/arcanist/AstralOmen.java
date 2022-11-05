@@ -51,10 +51,12 @@ public class AstralOmen extends Ability {
 	public static final int BONUS_TICKS = 8 * Constants.TICKS_PER_SECOND;
 	public static final float PULL_SPEED = 0.25f;
 	public static final int STACK_THRESHOLD = 2;
+
 	public static final String CHARM_DAMAGE = "Astral Omen Damage";
 	public static final String CHARM_MODIFIER = "Astral Omen Damage Modifier";
 	public static final String CHARM_STACK = "Astral Omen Stack Threshold";
 	public static final String CHARM_RANGE = "Astral Omen Range";
+	public static final String CHARM_PULL = "Astral Omen Pull Speed";
 
 	private final double mLevelBonusMultiplier;
 
@@ -160,8 +162,8 @@ public class AstralOmen extends Ability {
 			for (LivingEntity mob : hitbox.getHitMobs()) {
 				if (MetadataUtils.checkOnceThisTick(mPlugin, mob, DAMAGED_THIS_TICK_METAKEY)) {
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, spellDamage, mInfo.mLinkedSpell, true);
-					if (isLevelOne()) {
-						MovementUtils.pullTowards(enemy, mob, PULL_SPEED);
+					if (isLevelTwo()) {
+						MovementUtils.pullTowards(enemy, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_SPEED));
 					}
 					for (Type type : levels.keySet()) {
 						if (levels.get(type) > 0) {
