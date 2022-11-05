@@ -50,6 +50,7 @@ public class ServerProperties {
 	private int mLootingLimiterMobKills = 0;
 	private int mLootingLimiterSpawners = 0;
 	private boolean mDepthsEnabled = false;
+	private boolean mTrickyCreepersEnabled = true;
 
 	public ServerProperties() {
 	}
@@ -138,6 +139,10 @@ public class ServerProperties {
 		return INSTANCE.mDepthsEnabled;
 	}
 
+	public static boolean getTrickyCreepersEnabled() {
+		return INSTANCE.mTrickyCreepersEnabled;
+	}
+
 	public static void load(Plugin plugin, @Nullable CommandSender sender) {
 		INSTANCE.loadInternal(plugin, sender);
 	}
@@ -171,6 +176,7 @@ public class ServerProperties {
 			mLootingLimiterSpawners = getPropertyValueInt(object, "lootingLimiterSpawners", mLootingLimiterSpawners);
 
 			mDepthsEnabled = getPropertyValueBool(object, "depthsEnabled", mDepthsEnabled);
+			mTrickyCreepersEnabled = getPropertyValueBool(object, "trickyCreepersEnabled", mTrickyCreepersEnabled);
 
 			return null;
 		});
@@ -217,6 +223,8 @@ public class ServerProperties {
 		out.add("lootingLimiterSpawners = " + mLootingLimiterSpawners);
 
 		out.add("depthsEnabled = " + mDepthsEnabled + " (NB: changing this requires a restart)");
+
+		out.add("trickyCreepersEnabled = " + mTrickyCreepersEnabled);
 
 		return out;
 	}

@@ -22,6 +22,7 @@ public class PumpkinPieOverride extends BaseOverride {
 	@Override
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity, ItemStack item) {
 		if (player == null
+				|| !ServerProperties.getTrickyCreepersEnabled()
 				|| !(clickedEntity instanceof Creeper)
 				|| !InventoryUtils.testForItemWithName(item, "Creeper's Delight")
 				|| "plots".equals(ServerProperties.getShardName())
