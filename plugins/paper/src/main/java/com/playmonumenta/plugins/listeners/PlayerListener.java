@@ -558,7 +558,7 @@ public class PlayerListener implements Listener {
 		}
 
 		// If right clicking charm, open GUI
-		if (event.getClick() == ClickType.RIGHT && ItemStatUtils.isCharm(item)) {
+		if (event.getClick() == ClickType.RIGHT && item.getAmount() == 1 && ItemStatUtils.isCharm(item)) {
 			new CharmsGUI(player).openInventory(player, mPlugin);
 		}
 	}

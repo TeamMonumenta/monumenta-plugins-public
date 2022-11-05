@@ -11,6 +11,7 @@ import java.util.Optional;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -137,6 +138,7 @@ public class CharmsGUI extends CustomInventory {
 
 
 		//Display active charms
+		List<ItemStack> indexedCharms = new ArrayList<>();
 		if (items != null) {
 			for (int i = 0; i < items.size(); i++) {
 				if (items.get(i) == null || items.get(i).getType() == Material.AIR) {
@@ -146,7 +148,6 @@ public class CharmsGUI extends CustomInventory {
 			}
 
 			//Fill out yellow stained glass for visual display of charm budget
-			List<ItemStack> indexedCharms = new ArrayList<>();
 			for (ItemStack item : items) {
 				if (item == null || item.getType() == Material.AIR) {
 					continue;
@@ -212,5 +213,16 @@ public class CharmsGUI extends CustomInventory {
 		item.setItemMeta(meta);
 		ItemUtils.setPlainTag(item);
 		mInventory.setItem(EXIT_BUTTON_LOC, item);
+
+		if (charmPower > totalBudget) {
+			for (ItemStack charm : items) {
+				if (CharmManager.getInstance().removeCharm(mTargetPlayer, charm)) {
+					InventoryUtils.giveItem(mTargetPlayer, charm);
+				}
+			}
+			mTargetPlayer.sendMessage(ChatColor.RED + "Your equipped charms cost more than your budget (likely because their cost was adjusted). Your charms have all be unequipped");
+			mTargetPlayer.playSound(mTargetPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
+			setCharms();
+		}
 	}
 }
