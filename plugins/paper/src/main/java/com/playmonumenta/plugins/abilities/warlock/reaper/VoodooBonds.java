@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.EnumSet;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -95,7 +96,8 @@ public class VoodooBonds extends Ability {
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageDealt.class)) {
 				for (Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {
 					if (priorityEffects instanceof PercentDamageDealt damageEffect) {
-						if (damageEffect.getAffectedDamageTypes().contains(DamageType.MELEE)) {
+						EnumSet<DamageType> types = damageEffect.getAffectedDamageTypes();
+						if (types == null || types.contains(DamageType.MELEE)) {
 							damage = damage * (1 + damageEffect.getMagnitude() * (damageEffect.isBuff() ? 1 : -1));
 						}
 					}

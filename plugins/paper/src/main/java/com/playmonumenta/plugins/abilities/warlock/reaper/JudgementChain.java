@@ -136,7 +136,7 @@ public class JudgementChain extends Ability {
 	}
 
 	public void passDamage(DamageEvent event) {
-		if (mChainActive) {
+		if (mChainActive && mTarget != null) {
 			List<LivingEntity> e = EntityUtils.getNearbyMobs(mTarget.getLocation(), 8, mTarget, true);
 			e.remove(mTarget);
 			LivingEntity selectedEnemy = EntityUtils.getNearestMob(mTarget.getLocation(), e);

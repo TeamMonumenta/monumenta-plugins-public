@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
@@ -75,7 +76,8 @@ public class BruteForce extends Ability {
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageDealt.class)) {
 				for (Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {
 					if (priorityEffects instanceof PercentDamageDealt damageEffect) {
-						if (damageEffect.getAffectedDamageTypes().contains(DamageType.MELEE)) {
+						EnumSet<DamageType> types = damageEffect.getAffectedDamageTypes();
+						if (types == null || types.contains(DamageType.MELEE)) {
 							damageBonus = damageBonus * (1 + damageEffect.getMagnitude() * (damageEffect.isBuff() ? 1 : -1));
 						}
 					}

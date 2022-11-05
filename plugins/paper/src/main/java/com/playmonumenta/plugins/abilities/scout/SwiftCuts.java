@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.EnumSet;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -66,7 +67,8 @@ public class SwiftCuts extends Ability {
 				if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageDealt.class)) {
 					for (Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {
 						if (priorityEffects instanceof PercentDamageDealt damageEffect) {
-							if (damageEffect.getAffectedDamageTypes().contains(DamageType.MELEE)) {
+							EnumSet<DamageType> types = damageEffect.getAffectedDamageTypes();
+							if (types == null || types.contains(DamageType.MELEE)) {
 								sweepDamage = sweepDamage * (1 + damageEffect.getMagnitude() * (damageEffect.isBuff() ? 1 : -1));
 							}
 						}
