@@ -139,6 +139,7 @@ public class JudgementChain extends Ability {
 		if (mChainActive && mTarget != null) {
 			List<LivingEntity> e = EntityUtils.getNearbyMobs(mTarget.getLocation(), 8, mTarget, true);
 			e.remove(mTarget);
+			e.removeIf(entity -> mPlugin.mEffectManager.hasEffect(entity, EFFECT_NAME));
 			LivingEntity selectedEnemy = EntityUtils.getNearestMob(mTarget.getLocation(), e);
 			double damage = event.getDamage();
 
