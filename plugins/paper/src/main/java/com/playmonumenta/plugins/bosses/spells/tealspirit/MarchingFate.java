@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -73,13 +72,8 @@ public class MarchingFate extends Spell {
 	public void run() {
 		World world = mCenter.getWorld();
 
-		double stepLength = 0;
-		double currentBossHP = mBoss.getHealth();
-		double bossMaxHP = EntityUtils.getMaxHealth(mBoss);
-		double percentHP = currentBossHP / bossMaxHP;
-		stepLength = 0.045;
+		double stepLength = 0.045;
 
-		List<Double> distances = new ArrayList<>();
 		int obfuscation = 0;
 		// Move marchers towards the center and kill party if they reach the center
 		for (Entity marcher : mMarchers) {
@@ -121,8 +115,6 @@ public class MarchingFate extends Spell {
 				mBossBar.reset();
 				return;
 			}
-
-			distances.add(distance);
 
 			newLoc = LocationUtils.fallToGround(newLoc, mCenter.getBlockY());
 			marcher.teleport(newLoc);

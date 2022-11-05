@@ -19,7 +19,6 @@ public class GalleryPhoenixEffect extends GalleryEffect {
 
 	public static final String SCOREBOARD_PHOENIX_BOUGHT_ROUND = "PhoenixBoughtRound";
 	public static final String SCOREBOARD_PHOENIX_BOUGHT_COUNT = "PhoenixBoughtCount";
-	private static final int MAX_PER_ROUND_BUYABLE = 1;
 	private static final int MAX_BOUGHT_COUNT = 1;
 
 	public GalleryPhoenixEffect() {

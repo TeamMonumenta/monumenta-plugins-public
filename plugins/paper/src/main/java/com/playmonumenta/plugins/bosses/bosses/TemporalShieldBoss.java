@@ -25,11 +25,8 @@ public class TemporalShieldBoss extends BossAbilityGroup {
 		return new TemporalShieldBoss(plugin, boss);
 	}
 
-	public LivingEntity mBoss;
-
 	public TemporalShieldBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		mBoss = boss;
 		EffectManager manager = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager;
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
