@@ -80,9 +80,9 @@ public class DelveLootTableGroup {
 		new DelveLootTableGroup("r3/delves/blue/base_earth", "r3/delves/blue/dmat_earth", "r3/delves/blue/cmat_earth", "r3/dungeons/blue/earth").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r3/delves/blue/base_fire", "r3/delves/blue/dmat_fire", "r3/delves/blue/cmat_fire", "r3/dungeons/blue/fire").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r3/delves/blue/base_water", "r3/delves/blue/dmat_water", "r3/delves/blue/cmat_water", "r3/dungeons/blue/water").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
-		new DelveLootTableGroup("r3/delves/blue/base_lootroom_normal", "r3/delves/blue/dmat_lootroom", "r3/delves/blue/cmat_lootroom", "r3/dungeons/blue/lootroom_normal").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
-		new DelveLootTableGroup("r3/delves/blue/base_lootroom_racewin", "r3/delves/blue/dmat_lootroom", "r3/delves/blue/cmat_lootroom", "r3/dungeons/blue/lootroom_racewin").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
-		new DelveLootTableGroup("r3/delves/blue/base_lootroom_rare", "r3/delves/blue/dmat_lootroom", "r3/delves/blue/cmat_lootroom", "r3/dungeons/blue/lootroom_rare").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/delves/blue/base_lootroom_normal", "r3/delves/blue/dmat_lootroom_normal", "r3/delves/blue/cmat_lootroom_normal", "r3/dungeons/blue/lootroom_normal").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/delves/blue/base_lootroom_racewin", "r3/delves/blue/dmat_lootroom_racewin", "r3/delves/blue/cmat_lootroom_racewin", "r3/dungeons/blue/lootroom_racewin").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/delves/blue/base_lootroom_rare", "r3/delves/blue/dmat_lootroom_rare", "r3/delves/blue/cmat_lootroom_rare", "r3/dungeons/blue/lootroom_rare").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
 		// R3 Overworld Delves
 		// amanita
