@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.tealspirit;
 
+import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -62,6 +63,8 @@ public class MidnightToll extends Spell {
 						.extraRange(4, 4)
 						.spawnAsBoss();
 					PlayerUtils.playersInRange(mSpawnLoc, mRange, true).forEach(p -> {
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.EFFECT_NAME);
 						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, mDamage, null, false, true, ABILITY_NAME);
 						p.playSound(p.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 2f, 0.0f);
 						p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2f, 2f);

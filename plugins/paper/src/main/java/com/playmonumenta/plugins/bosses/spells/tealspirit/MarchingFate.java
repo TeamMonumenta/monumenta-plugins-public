@@ -72,7 +72,7 @@ public class MarchingFate extends Spell {
 	public void run() {
 		World world = mCenter.getWorld();
 
-		double stepLength = 0.045;
+		double stepLength = 0.075;
 
 		int obfuscation = 0;
 		// Move marchers towards the center and kill party if they reach the center

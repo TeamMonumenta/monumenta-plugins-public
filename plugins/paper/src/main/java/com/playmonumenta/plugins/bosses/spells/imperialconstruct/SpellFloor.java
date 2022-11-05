@@ -53,6 +53,25 @@ public class SpellFloor extends Spell {
 				if (mDamaged.contains(p)) {
 					continue;
 				}
+				Location loc = p.getLocation();
+				double height = loc.getY();
+
+				if (height - mCurrentLoc.getY() > 5) {
+					BossUtils.bossDamagePercent(mBoss, p, 0.7, p.getLocation(), "Mechanical Void");
+					Vector dir = mCurrentLoc.toVector().clone().subtract(p.getLocation().toVector());
+					dir.normalize();
+					dir.multiply(1.5f);
+
+					p.setVelocity(dir);
+					mDamaged.add(p);
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							mDamaged.remove(p);
+						}
+					}.runTaskLater(mPlugin, 0);
+				}
+
 				if (p.getLocation().distance(mCurrentLoc) > 31) {
 					p.sendMessage(ChatColor.GRAY + "The mechanical void pushes you back in.");
 					p.playSound(p.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, 1, 0);

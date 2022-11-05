@@ -214,7 +214,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 			Map<Integer, BossHealthAction> events = new HashMap<>();
 			events.put(100, (mob) -> {
 				mCurrentLoc = mStart.getLocation();
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct (Hard)] " + ChatColor.WHITE + "UNAUTHORIZED ENTITY DETECTED: IMPLEMENTING REMOVAL PROCEDURE\",\"color\":\"purple\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Silver Construct] " + ChatColor.WHITE + "UNAUTHORIZED ENTITY DETECTED: IMPLEMENTING REMOVAL PROCEDURE\",\"color\":\"purple\"}]");
 			});
 
 			events.put(90, (mob) -> {
@@ -263,7 +263,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 			events.put(33, (mob) -> {
 				mCurrentLoc = mPhase3Loc;
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct] " + ChatColor.WHITE + "INTERNAL DAMAGE CRITICAL: REALIGNING CURRENT DIRECTIVE: DESTROY INTRUDERS\",\"color\":\"purple\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Silver Construct] " + ChatColor.WHITE + "INTERNAL DAMAGE CRITICAL: REALIGNING CURRENT DIRECTIVE: DESTROY INTRUDERS\",\"color\":\"purple\"}]");
 				mCrash.setLocation(mPhase2Loc);
 				mRush.setLocation(mPhase3Loc);
 				mRecover.setLocation(mPhase3Loc);
@@ -287,7 +287,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 				for (Player p : PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true)) {
 					Plugin.getInstance().mEffectManager.clearEffects(p, "Paradox");
 				}
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct] " + ChatColor.WHITE + "TEMPORAL ANOMALY DETECTED: INTRUDERS BEWARE\",\"color\":\"purple\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Silver Construct] " + ChatColor.WHITE + "TEMPORAL ANOMALY DETECTED: INTRUDERS BEWARE\",\"color\":\"purple\"}]");
 				mParadox3.run();
 			});
 
@@ -307,7 +307,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 			events.put(5, (mob) -> {
 				mParadox3.run();
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct] " + ChatColor.WHITE + "TOMB DEFENSES COMPROMISED: FORGE DEFENSES ACTIVATED\",\"color\":\"purple\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Silver Construct] " + ChatColor.WHITE + "TOMB DEFENSES COMPROMISED: FORGE DEFENSES ACTIVATED\",\"color\":\"purple\"}]");
 			});
 			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 			super.constructBoss(activeSpellsPhase1, passiveSpells, detectionRange, bossBar);
@@ -391,7 +391,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 			Map<Integer, BossHealthAction> events = new HashMap<>();
 			events.put(100, (mob) -> {
 				mCurrentLoc = mStart.getLocation();
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct (Hard)] " + ChatColor.WHITE + "UNAUTHORIZED ENTITY DETECTED: IMPLEMENTING REMOVAL PROCEDURE\",\"color\":\"purple\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Silver Construct] " + ChatColor.WHITE + "UNAUTHORIZED ENTITY DETECTED: IMPLEMENTING REMOVAL PROCEDURE\",\"color\":\"purple\"}]");
 			});
 
 			events.put(90, (mob) -> {
@@ -439,7 +439,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 			events.put(33, (mob) -> {
 				mCurrentLoc = mPhase3Loc;
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct] " + ChatColor.WHITE + "INTERNAL DAMAGE CRITICAL: REALIGNING CURRENT DIRECTIVE: DESTROY INTRUDERS\",\"color\":\"purple\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Silver Construct] " + ChatColor.WHITE + "INTERNAL DAMAGE CRITICAL: REALIGNING CURRENT DIRECTIVE: DESTROY INTRUDERS\",\"color\":\"purple\"}]");
 				mCrash.setLocation(mPhase2Loc);
 				mRush.setLocation(mPhase3Loc);
 				mRecover.setLocation(mPhase3Loc);
@@ -463,7 +463,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 				for (Player p : PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true)) {
 					Plugin.getInstance().mEffectManager.clearEffects(p, "Paradox");
 				}
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct] " + ChatColor.WHITE + "TEMPORAL ANOMALY DETECTED: INTRUDERS BEWARE\",\"color\":\"purple\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Silver Construct] " + ChatColor.WHITE + "TEMPORAL ANOMALY DETECTED: INTRUDERS BEWARE\",\"color\":\"purple\"}]");
 				mParadox3.run();
 			});
 
@@ -481,7 +481,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 			});
 
 			events.put(5, (mob) -> {
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct] " + ChatColor.WHITE + "TOMB DEFENSES COMPROMISED: FORGE DEFENSES ACTIVATED\",\"color\":\"purple\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Silver Construct] " + ChatColor.WHITE + "TOMB DEFENSES COMPROMISED: FORGE DEFENSES ACTIVATED\",\"color\":\"purple\"}]");
 			});
 			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 			super.constructBoss(activeSpellsPhase1, passiveSpells, detectionRange, bossBar);
@@ -560,7 +560,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 			Map<Integer, BossHealthAction> events = new HashMap<>();
 			events.put(100, (mob) -> {
 				mCurrentLoc = mStart.getLocation();
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct (Quest)] " + ChatColor.WHITE + "UNAUTHORIZED ENTITY DETECTED: IMPLEMENTING REMOVAL PROCEDURE \",\"color\":\"purple\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Silver Construct] " + ChatColor.WHITE + "UNAUTHORIZED ENTITY DETECTED: IMPLEMENTING REMOVAL PROCEDURE \",\"color\":\"purple\"}]");
 			});
 
 			events.put(70, (mob) -> {
@@ -584,7 +584,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 			events.put(33, (mob) -> {
 				mCurrentLoc = mPhase3Loc;
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct] " + ChatColor.WHITE + "INTERNAL DAMAGE CRITICAL: REALIGNING CURRENT DIRECTIVE: DESTROY INTRUDERS\",\"color\":\"purple\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Silver Construct] " + ChatColor.WHITE + "INTERNAL DAMAGE CRITICAL: REALIGNING CURRENT DIRECTIVE: DESTROY INTRUDERS\",\"color\":\"purple\"}]");
 				mCrash.setLocation(mPhase2Loc);
 				mRush.setLocation(mPhase3Loc);
 				mRecover.setLocation(mPhase3Loc);
@@ -606,7 +606,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 				for (Player p : PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true)) {
 					Plugin.getInstance().mEffectManager.clearEffects(p, "Paradox");
 				}
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct] " + ChatColor.WHITE + "TEMPORAL ANOMALY DETECTED: INTRUDERS BEWARE\",\"color\":\"purple\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Silver Construct] " + ChatColor.WHITE + "TEMPORAL ANOMALY DETECTED: INTRUDERS BEWARE\",\"color\":\"purple\"}]");
 			});
 
 			events.put(20, (mob) -> {
@@ -620,7 +620,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 			});
 
 			events.put(5, (mob) -> {
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Imperial Construct] " + ChatColor.WHITE + "TOMB DEFENSES COMPROMISED: FORGE DEFENSES ACTIVATED\",\"color\":\"purple\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Silver Construct] " + ChatColor.WHITE + "TOMB DEFENSES COMPROMISED: FORGE DEFENSES ACTIVATED\",\"color\":\"purple\"}]");
 			});
 
 			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
