@@ -34,10 +34,9 @@ import org.bukkit.util.Vector;
 public class BottledSunlight extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Bottled Sunlight";
-	private static final int COOLDOWN = 12 * 20;
+	private static final int COOLDOWN = 30 * 20;
 	private static final int[] ABSORPTION = {8, 10, 12, 14, 16, 20};
 	private static final int BOTTLE_THROW_COOLDOWN = 10 * 20;
-	private static final int BOTTLE_USE_COOLDOWN = 30 * 20;
 	private static final int BOTTLE_ABSORPTION_DURATION = 20 * 30;
 	private static final double BOTTLE_VELOCITY = 0.7;
 	private static final int BOTTLE_TICK_PERIOD = 2;
@@ -73,8 +72,6 @@ public class BottledSunlight extends DepthsAbility {
 		tincture.setVelocity(vel);
 		tincture.setGlowing(true);
 
-		mInfo.mCooldown = BOTTLE_USE_COOLDOWN;
-		// Full duration cooldown - is shortened if not picked up
 		putOnCooldown();
 
 		new BukkitRunnable() {
@@ -171,7 +168,7 @@ public class BottledSunlight extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while sneaking to throw a luminescent bottle. If you or an ally walk over it, you both gain " + DepthsUtils.getRarityColor(rarity) + ABSORPTION[rarity - 1] / 2 + ChatColor.WHITE + " absorption hearts for " + BOTTLE_ABSORPTION_DURATION / 20 + " seconds and the durations of negative potion effects get reduced by " + EFFECT_DURATION_REDUCTION / 20 + " seconds. If the bottle is destroyed or not grabbed, it quickly comes off cooldown. Cooldown: " + BOTTLE_USE_COOLDOWN / 20 + "s.";
+		return "Right click while sneaking to throw a luminescent bottle. If you or an ally walk over it, you both gain " + DepthsUtils.getRarityColor(rarity) + ABSORPTION[rarity - 1] / 2 + ChatColor.WHITE + " absorption hearts for " + BOTTLE_ABSORPTION_DURATION / 20 + " seconds and the durations of negative potion effects get reduced by " + EFFECT_DURATION_REDUCTION / 20 + " seconds. If the bottle is destroyed or not grabbed, it quickly comes off cooldown. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override
