@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.effects.OnHitTimerEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import java.util.NavigableSet;
 import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -32,10 +31,10 @@ public class Tempo implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (event.isBlocked()) {
-			return;
-		}
-		if (event.getType() == DamageEvent.DamageType.FIRE || event.getType() == DamageEvent.DamageType.FALL || event.getType() == DamageEvent.DamageType.AILMENT) {
+		if (event.isBlocked()
+			    || !event.getType().isDefendable()
+			    || event.getType() == DamageEvent.DamageType.FIRE
+			    || event.getType() == DamageEvent.DamageType.FALL) {
 			return;
 		}
 		plugin.mEffectManager.clearEffects(player, TEMPO_EFFECT_NAME);
@@ -43,16 +42,13 @@ public class Tempo implements Enchantment {
 	}
 
 	public static double applyTempo(DamageEvent event, Plugin plugin, Player player) {
-		NavigableSet<Effect> tempo = plugin.mEffectManager.getEffects(player, TEMPO_EFFECT_NAME);
+		Effect tempo = plugin.mEffectManager.getActiveEffect(player, TEMPO_EFFECT_NAME);
 		if (tempo == null) {
 			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TEMPO) * AGIL_BONUS_PER_LEVEL_2;
+		} else if (tempo.getDuration() <= PAST_HIT_DURATION_TIME_HALF) {
+			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TEMPO) * AGIL_BONUS_PER_LEVEL_1;
 		} else {
-			Effect temp = tempo.last();
-			if (temp.getDuration() <= PAST_HIT_DURATION_TIME_HALF) {
-				return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TEMPO) * AGIL_BONUS_PER_LEVEL_1;
-			} else {
-				return 0;
-			}
+			return 0;
 		}
 	}
 
