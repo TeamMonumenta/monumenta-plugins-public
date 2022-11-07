@@ -98,6 +98,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Poise;
 import com.playmonumenta.plugins.itemstats.enchantments.ProjectileFragility;
 import com.playmonumenta.plugins.itemstats.enchantments.ProjectileProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheDepths;
+import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheWorld;
 import com.playmonumenta.plugins.itemstats.enchantments.Quake;
 import com.playmonumenta.plugins.itemstats.enchantments.Radiant;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
@@ -574,6 +575,7 @@ public class ItemStatUtils {
 		REGENERATION(new Regeneration(), true, false, false, true),
 		POINT_BLANK(new PointBlank(), true, false, false, true),
 		PROTECTION_OF_THE_DEPTHS(new ProtectionOfTheDepths(), false, false, false, false),
+		PROTECTION_OF_THE_WORLD(new ProtectionOfTheWorld(), false, false, false, false),
 		QUAKE(new Quake(), true, false, false, true),
 		RAGE_OF_THE_KETER(new RageOfTheKeter(), false, false, false, false),
 		RECOIL(new Recoil(), true, false, false, false),
