@@ -567,6 +567,13 @@ public class TealSpirit extends BossAbilityGroup {
 	}
 
 	@Override
+	public void onHurt(DamageEvent event) {
+		if (hasRunningSpellOfType(Rewind.class)) {
+			event.setDamage(event.getDamage() * 0.4);
+		}
+	}
+
+	@Override
 	public boolean hasNearbyPlayerDeathTrigger() {
 		return true;
 	}
