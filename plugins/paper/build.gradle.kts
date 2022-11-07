@@ -43,7 +43,7 @@ dependencies {
     compileOnly("com.playmonumenta:scripted-quests:5.1")
     compileOnly("com.playmonumenta:redissync:3.6")
     compileOnly("com.playmonumenta:monumenta-network-relay:1.0")
-    compileOnly("com.playmonumenta:structures:7.2")
+    compileOnly("com.playmonumenta:structures:8.2")
     compileOnly("com.playmonumenta:worlds:1.6")
     compileOnly("com.playmonumenta:libraryofsouls:4.2")
     compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.18.2-v2")

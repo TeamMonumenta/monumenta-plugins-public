@@ -77,16 +77,17 @@ public class PlayerUtils {
 		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
 		if (isDungeon) {
 			return loc.getWorld().getPlayers().stream()
-				.filter(p -> playerCountsForLootScaling(p))
-				.toList();
+				       .filter(p -> playerCountsForLootScaling(p))
+				       .toList();
 		}
 
 		// In a POI, all players within the same POI are in range
-		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(loc.toVector(), true);
+		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(loc.toVector(), false)
+			                                       .stream().filter(structure -> structure.isWithin(loc)).toList();
 		if (!structures.isEmpty()) {
 			return loc.getWorld().getPlayers().stream()
-				.filter(p -> playerCountsForLootScaling(p) && playerIsInPOI(structures, p))
-				.toList();
+				       .filter(p -> playerCountsForLootScaling(p) && playerIsInPOI(structures, p))
+				       .toList();
 		}
 
 		// Otherwise, perform no loot scaling
