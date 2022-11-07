@@ -162,9 +162,14 @@ public class TemporalRift extends Spell {
 							}
 							if (mT >= DURATION) {
 								this.cancel();
-								mChargeUp.reset();
-								mChargeUp.setColor(BarColor.YELLOW);
 							}
+						}
+
+						@Override
+						public synchronized void cancel() {
+							super.cancel();
+							mChargeUp.reset();
+							mChargeUp.setColor(BarColor.YELLOW);
 						}
 
 					};
