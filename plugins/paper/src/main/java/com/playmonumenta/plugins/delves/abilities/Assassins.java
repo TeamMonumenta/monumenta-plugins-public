@@ -41,7 +41,9 @@ public class Assassins {
 			mob.addScoreboardTag(UnseenBoss.identityTag);
 			mob.addScoreboardTag(UnseenBoss.identityTag + "[damageincrease=1.5]");
 			if (FastUtils.RANDOM.nextDouble() < .3) {
-				List<String> ability = ABILITY_POOL.get(FastUtils.RANDOM.nextInt(ABILITY_POOL.size()));
+				List<List<String>> abilityPool = new ArrayList<>(ABILITY_POOL);
+				abilityPool.removeIf(ability -> mob.getScoreboardTags().contains(ability.get(0)));
+				List<String> ability = abilityPool.get(FastUtils.RANDOM.nextInt(abilityPool.size()));
 				for (String abilityTag : ability) {
 					mob.addScoreboardTag(abilityTag);
 				}

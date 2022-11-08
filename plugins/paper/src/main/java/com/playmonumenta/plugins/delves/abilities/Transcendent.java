@@ -121,19 +121,17 @@ public class Transcendent {
 			EntityEquipment equipment = mob.getEquipment();
 			ItemStack mainhand = equipment == null ? null : equipment.getItemInMainHand();
 			Material material = mainhand == null ? null : mainhand.getType();
+			List<List<String>> abilityPool;
 			if (material == Material.BOW || material == Material.CROSSBOW || material == Material.TRIDENT
 				    || mob instanceof Evoker) {
-				List<List<String>> abilityPool = ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? ABILITY_POOL_R3 : ABILITY_POOL_R2) : ABILITY_POOL_R1;
-				List<String> ability = abilityPool.get(FastUtils.RANDOM.nextInt(abilityPool.size()));
-				for (String abilityTag : ability) {
-					mob.addScoreboardTag(abilityTag);
-				}
+				abilityPool = new ArrayList<>(ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? ABILITY_POOL_R3 : ABILITY_POOL_R2) : ABILITY_POOL_R1);
 			} else {
-				List<List<String>> abilityPool = ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? ABILITY_POOL_MELEE_R3 : ABILITY_POOL_MELEE_R2) : ABILITY_POOL_MELEE_R1;
-				List<String> ability = abilityPool.get(FastUtils.RANDOM.nextInt(abilityPool.size()));
-				for (String abilityTag : ability) {
-					mob.addScoreboardTag(abilityTag);
-				}
+				abilityPool = new ArrayList<>(ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? ABILITY_POOL_MELEE_R3 : ABILITY_POOL_MELEE_R2) : ABILITY_POOL_MELEE_R1);
+			}
+			abilityPool.removeIf(ability -> mob.getScoreboardTags().contains(ability.get(0)));
+			List<String> ability = abilityPool.get(FastUtils.RANDOM.nextInt(abilityPool.size()));
+			for (String abilityTag : ability) {
+				mob.addScoreboardTag(abilityTag);
 			}
 		}
 	}
