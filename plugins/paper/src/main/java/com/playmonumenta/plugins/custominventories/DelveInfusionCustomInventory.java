@@ -325,7 +325,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack portalItem = new ItemStack(Material.IRON_BLOCK);
 		ItemMeta portalMeta = portalItem.getItemMeta();
 		portalMeta.displayName(Component.text("Galvanic", TextColor.fromCSSHexString("#DBDBD7")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(portalMeta, "Gain a 1% chance per level to stun a mob for 2 seconds (0.5 seconds for elites) when dealing non-ability melee or projectile damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(portalMeta, "Gain a 1% chance per level to stun a mob for 2 seconds (0.5 seconds for elites) when dealing or taking non-ability melee or projectile damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		List<Component> portalLore = portalMeta.lore();
 		portalLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.GALVANIC), TextColor.fromHexString("#555555")));
 		portalMeta.lore(portalLore);
@@ -623,7 +623,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.IRON_BLOCK, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Galvanic level " + (i + 1), TextColor.fromCSSHexString("#DBDBD7")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Gain a " + (i + 1) + "% chance per level to stun a mob for 2 seconds (0.5 seconds for elites) when dealing non-ability melee or projectile damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Gain a " + (i + 1) + "% chance per level to stun a mob for 2 seconds (0.5 seconds for elites) when dealing or taking non-ability melee or projectile damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			panel.setItemMeta(meta);
 			portalItems.add(panel);
 		}

@@ -15,9 +15,11 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
+import org.jetbrains.annotations.Nullable;
 
 public class Galvanic implements Infusion {
 
@@ -59,6 +61,20 @@ public class Galvanic implements Infusion {
 		}
 
 		apply(plugin, player, modifiedLevel, enemy, type == DamageType.MELEE);
+	}
+
+	@Override
+	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity enemy) {
+		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
+		DamageType type = event.getType();
+
+		if (!(type == DamageType.MELEE || type == DamageType.PROJECTILE) || event.isBlocked() || event.isCancelled()) {
+			return;
+		}
+
+		if (enemy != null) {
+			apply(plugin, player, modifiedLevel, enemy, false);
+		}
 	}
 
 	public static void apply(Plugin plugin, Player player, double level, LivingEntity enemy, boolean isMelee) {
