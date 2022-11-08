@@ -56,7 +56,7 @@ public class SpellFloor extends Spell {
 				Location loc = p.getLocation();
 				double height = loc.getY();
 
-				if (height - mCurrentLoc.getY() > 5) {
+				if (height - mCurrentLoc.getY() > 7 && p.isOnGround()) {
 					BossUtils.bossDamagePercent(mBoss, p, 0.7, p.getLocation(), "Mechanical Void");
 					Vector dir = mCurrentLoc.toVector().clone().subtract(p.getLocation().toVector());
 					dir.normalize();
