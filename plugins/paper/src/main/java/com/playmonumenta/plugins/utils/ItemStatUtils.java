@@ -575,7 +575,7 @@ public class ItemStatUtils {
 		REGENERATION(new Regeneration(), true, false, false, true),
 		POINT_BLANK(new PointBlank(), true, false, false, true),
 		PROTECTION_OF_THE_DEPTHS(new ProtectionOfTheDepths(), false, false, false, false),
-		PROTECTION_OF_THE_WORLD(new ProtectionOfTheWorld(), false, false, false, false),
+		PROTECTION_OF_THE_WORLD(new ProtectionOfTheWorld(), true, false, false, false),
 		QUAKE(new Quake(), true, false, false, true),
 		RAGE_OF_THE_KETER(new RageOfTheKeter(), false, false, false, false),
 		RECOIL(new Recoil(), true, false, false, false),
