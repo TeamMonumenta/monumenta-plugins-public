@@ -109,7 +109,7 @@ public class Blizzard extends Ability {
 				@Override
 				public void run() {
 					Location loc = mPlayer.getLocation();
-					Hitbox hitbox = new Hitbox.UprightCylinderHitbox(LocationUtils.getHalfHeightLocation(mPlayer), mLevelSize, mLevelSize);
+					Hitbox hitbox = new Hitbox.UprightCylinderHitbox(LocationUtils.getHalfHeightLocation(mPlayer).add(0, -mLevelSize, 0), 2 * mLevelSize, mLevelSize);
 					List<LivingEntity> mobs = hitbox.getHitMobs();
 					mTicks++;
 					if (mTicks % SLOW_INTERVAL == 0) {
