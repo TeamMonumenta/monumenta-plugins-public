@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -150,7 +151,7 @@ public class SpellEarthshake extends Spell {
 				}
 
 				Material material = b.getType();
-				if (!mIgnoredMats.contains(material) && !BlockUtils.containsWater(b) && !(b.getBlockData() instanceof Bed) && FastUtils.RANDOM.nextDouble() < mParameters.FLY_BLOCKS_CHANCE) {
+				if (!mIgnoredMats.contains(material) && !BlockUtils.containsWater(b) && !(b.getBlockData() instanceof Bed) && FastUtils.RANDOM.nextDouble() < mParameters.FLY_BLOCKS_CHANCE && !ZoneUtils.hasZoneProperty(b.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
 					if (mParameters.FLY_BLOCKS) {
 						double x = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 						double z = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
