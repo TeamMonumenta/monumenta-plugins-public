@@ -23,7 +23,7 @@ public class SilverPrayer extends ZeroArgumentEffect {
 		if (oneHertz) {
 			if (entity instanceof Player player) {
 				if (player.getHealth() / EntityUtils.getMaxHealth(player) <= 0.5) {
-					Plugin.getInstance().mEffectManager.addEffect(player, EFFECT_NAME, new PercentKnockbackResist(EFFECT_DURATION, 1, EFFECT_NAME));
+					Plugin.getInstance().mEffectManager.addEffect(player, EFFECT_NAME, new PercentKnockbackResist(EFFECT_DURATION, 1, EFFECT_NAME).displaysTime(false));
 				}
 			}
 		}

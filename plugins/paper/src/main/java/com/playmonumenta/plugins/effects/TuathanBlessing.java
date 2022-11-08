@@ -23,9 +23,9 @@ public class TuathanBlessing extends ZeroArgumentEffect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (oneHertz) {
-			Plugin.getInstance().mEffectManager.addEffect(entity, SPEED_EFFECT, new PercentSpeed(25, AMOUNT, SPEED_EFFECT));
+			Plugin.getInstance().mEffectManager.addEffect(entity, SPEED_EFFECT, new PercentSpeed(25, AMOUNT, SPEED_EFFECT).displaysTime(false));
 			for (Player player : PlayerUtils.playersInRange(entity.getLocation(), RADIUS, false)) {
-				Plugin.getInstance().mEffectManager.addEffect(player, DEFENSE_EFFECT, new PercentDamageReceived(25, -1 * AMOUNT));
+				Plugin.getInstance().mEffectManager.addEffect(player, DEFENSE_EFFECT, new PercentDamageReceived(25, -1 * AMOUNT).displaysTime(false));
 			}
 		}
 	}

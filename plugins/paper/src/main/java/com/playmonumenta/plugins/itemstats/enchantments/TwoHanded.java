@@ -48,7 +48,7 @@ public class TwoHanded implements Enchantment {
 			return;
 		}
 		if (checkForOffhand(plugin, player)) {
-			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(PERCENT_SPEED_DURATION, PERCENT_SPEED, PERCENT_SPEED_EFFECT_NAME));
+			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(PERCENT_SPEED_DURATION, PERCENT_SPEED, PERCENT_SPEED_EFFECT_NAME).displaysTime(false));
 		} else {
 			plugin.mEffectManager.clearEffects(player, PERCENT_SPEED_EFFECT_NAME);
 		}

@@ -24,6 +24,7 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	protected int mDuration;
 	public String mEffectID;
+	private boolean mDisplayTime = false;
 
 	public Effect(int duration, String effectID) {
 		mDuration = duration;
@@ -34,7 +35,6 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 		return EffectPriority.NORMAL;
 	}
 
-	@Override
 	public int getDuration() {
 		return mDuration;
 	}
@@ -168,9 +168,22 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 	public @Nullable String getDisplay() {
 		String specificDisplay = getSpecificDisplay();
 		if (specificDisplay != null) {
-			return ChatColor.GREEN + specificDisplay + " " + ChatColor.GRAY + StringUtils.intToMinuteAndSeconds(mDuration / 20);
+			return ChatColor.GREEN + specificDisplay + (mDisplayTime ? " " + ChatColor.GRAY + StringUtils.intToMinuteAndSeconds(mDuration / 20) : "");
 		}
 		return null;
+	}
+
+	@Override
+	public int getDisplayPriority() {
+		if (!mDisplayTime) {
+			return -1;
+		}
+		return mDuration;
+	}
+
+	public Effect displaysTime(boolean displayTime) {
+		mDisplayTime = displayTime;
+		return this;
 	}
 
 	/* Must implement this method to print info about what the effect does for debug */

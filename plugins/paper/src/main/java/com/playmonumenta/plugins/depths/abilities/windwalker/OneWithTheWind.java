@@ -35,8 +35,8 @@ public class OneWithTheWind extends DepthsAbility {
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		boolean wasActive = mActive;
 		if (mPlayer != null && PlayerUtils.otherPlayersInRange(mPlayer, RANGE, true).size() == 0) {
-			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(40, SPEED[mRarity - 1], ABILITY_NAME));
-			mPlugin.mEffectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME, new PercentDamageReceived(40, PERCENT_DAMAGE_RECEIVED[mRarity - 1]));
+			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(40, SPEED[mRarity - 1], ABILITY_NAME).displaysTime(false));
+			mPlugin.mEffectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME, new PercentDamageReceived(40, PERCENT_DAMAGE_RECEIVED[mRarity - 1]).displaysTime(false));
 			mActive = true;
 		} else {
 			mActive = mPlugin.mEffectManager.hasEffect(mPlayer, RESISTANCE_EFFECT_NAME);

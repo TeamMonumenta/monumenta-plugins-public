@@ -27,7 +27,7 @@ public class Grace implements Infusion {
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		if (twoHz) {
 			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-			plugin.mEffectManager.addEffect(player, EFFECT_NAME, new PercentAttackSpeed(DURATION, ATKS_BONUS * modifiedLevel, EFFECT_NAME));
+			plugin.mEffectManager.addEffect(player, EFFECT_NAME, new PercentAttackSpeed(DURATION, ATKS_BONUS * modifiedLevel, EFFECT_NAME).displaysTime(false));
 		}
 	}
 }

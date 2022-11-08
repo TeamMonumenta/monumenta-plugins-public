@@ -85,11 +85,9 @@ public abstract class GalleryEffect implements DisplayableEffect {
 		return type.newEffect();
 	}
 
-	// This is not a real duration - gallery effects are infinite
-	// This only controls the order of display in the tab list
 	// These effects should always be first, and be in a consistent order based on the order in GalleryEffectType
 	@Override
-	public int getDuration() {
+	public int getDisplayPriority() {
 		return 1000000000 + mType.ordinal();
 	}
 

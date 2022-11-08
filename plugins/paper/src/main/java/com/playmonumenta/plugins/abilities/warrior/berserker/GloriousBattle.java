@@ -104,7 +104,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1.05));
 		dir.setY(dir.getY() * 0.4 + 0.3);
 		mPlayer.setVelocity(dir);
-		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT, new PercentKnockbackResist(200, 1, KBR_EFFECT));
+		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT, new PercentKnockbackResist(200, 1, KBR_EFFECT).displaysTime(false));
 		ClientModHandler.updateAbility(mPlayer, this);
 		Location location = mPlayer.getLocation();
 		World world = mPlayer.getWorld();

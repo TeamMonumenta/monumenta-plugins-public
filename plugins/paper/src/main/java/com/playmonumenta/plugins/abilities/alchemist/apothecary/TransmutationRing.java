@@ -124,7 +124,7 @@ public class TransmutationRing extends PotionAbility {
 					List<Player> players = PlayerUtils.playersInRange(mCenter, mRadius, true);
 					players.remove(mPlayer);
 					for (Player player : players) {
-						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost));
+						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost).displaysTime(false));
 					}
 
 					mCosmetic.ringEffect(mPlayer, mCenter, particles, mRadius, TRANSMUTATION_RING_RADIUS, mTicks);

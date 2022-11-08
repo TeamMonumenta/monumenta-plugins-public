@@ -11,7 +11,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface DisplayableEffect {
 
-	int getDuration();
+	int getDisplayPriority();
 
 	@Nullable String getDisplay();
 
@@ -26,7 +26,7 @@ public interface DisplayableEffect {
 
 	static List<DisplayableEffect> getSortedEffects(Plugin plugin, LivingEntity entity) {
 		List<DisplayableEffect> effects = getEffects(plugin, entity);
-		effects.sort((effect1, effect2) -> effect2.getDuration() - effect1.getDuration());
+		effects.sort((effect1, effect2) -> effect2.getDisplayPriority() - effect1.getDisplayPriority());
 		return effects;
 	}
 

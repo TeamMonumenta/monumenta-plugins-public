@@ -75,7 +75,7 @@ public class WeaponMastery extends Ability {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (isEnhanced() && mPlayer != null && ItemUtils.isAxe(mPlayer.getInventory().getItemInMainHand())) {
-			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT, new PercentSpeed(6, AXE_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), SPEED_EFFECT));
+			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT, new PercentSpeed(6, AXE_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), SPEED_EFFECT).displaysTime(false));
 		}
 	}
 

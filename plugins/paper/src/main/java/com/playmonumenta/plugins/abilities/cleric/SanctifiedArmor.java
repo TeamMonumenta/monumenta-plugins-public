@@ -98,7 +98,7 @@ public class SanctifiedArmor extends Ability {
 					if (existingEffect.isPresent()) {
 						existingEffect.get().addPlayer(mPlayer);
 					} else {
-						mPlugin.mEffectManager.addEffect(source, ENHANCEMENT_EFFECT_NAME, new SanctifiedArmorHeal(mPlayer.getUniqueId()));
+						mPlugin.mEffectManager.addEffect(source, ENHANCEMENT_EFFECT_NAME, new SanctifiedArmorHeal(mPlayer.getUniqueId()).displaysTime(false));
 					}
 					mLastAffectedMob = source.getUniqueId();
 					mLastDamage = event.getFinalDamage(false);

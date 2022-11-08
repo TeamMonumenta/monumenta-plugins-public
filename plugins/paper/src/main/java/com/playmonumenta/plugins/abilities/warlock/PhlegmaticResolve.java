@@ -131,13 +131,13 @@ public class PhlegmaticResolve extends Ability {
 			return;
 		}
 
-		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns));
-		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME));
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns).displaysTime(false));
+		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
 
 		if (isLevelTwo()) {
 			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RANGE, RADIUS), false)) {
-				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY) + ALLY_MODIFIER)));
-				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY) + ALLY_MODIFIER), KNOCKBACK_RESIST_EFFECT_NAME));
+				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(20, mPercentDamageResist * cooldowns * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY) + ALLY_MODIFIER)).displaysTime(false));
+				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, mKBR * cooldowns * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY) + ALLY_MODIFIER), KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
 			}
 		}
 	}

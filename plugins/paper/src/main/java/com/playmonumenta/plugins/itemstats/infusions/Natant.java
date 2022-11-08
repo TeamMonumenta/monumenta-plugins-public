@@ -28,7 +28,7 @@ public class Natant implements Infusion {
 		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 		double percentSpeed = PERCENT_SPEED_PER_LEVEL * modifiedLevel;
 		if (player.isInWaterOrBubbleColumn()) {
-			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed, PERCENT_SPEED_EFFECT_NAME));
+			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed, PERCENT_SPEED_EFFECT_NAME).displaysTime(false));
 		}
 	}
 

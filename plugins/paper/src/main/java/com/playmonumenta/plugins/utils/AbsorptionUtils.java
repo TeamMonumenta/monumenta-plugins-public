@@ -147,7 +147,7 @@ public class AbsorptionUtils {
 		}
 
 		@Override
-		public int getDuration() {
+		public int getDisplayPriority() {
 			return mDuration;
 		}
 

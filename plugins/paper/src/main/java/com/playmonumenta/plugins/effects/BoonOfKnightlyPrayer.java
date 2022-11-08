@@ -33,7 +33,7 @@ public class BoonOfKnightlyPrayer extends ZeroArgumentEffect {
 				if (p.getHealth() / p.getMaxHealth() <= HEALTH_THRESHOLD) {
 					Location loc = entity.getLocation().add(0, 0.25, 0);
 					new PartialParticle(Particle.SPELL_INSTANT, loc, 3, 0.25, 0.5, 0.25, 0.02).spawnAsEnemy();
-					Plugin.getInstance().mEffectManager.addEffect(p, effectID, new PercentKnockbackResist(10, KNOCKBACK_RESIST_AMOUNT, effectID));
+					Plugin.getInstance().mEffectManager.addEffect(p, effectID, new PercentKnockbackResist(10, KNOCKBACK_RESIST_AMOUNT, effectID).displaysTime(false));
 				}
 			}
 
