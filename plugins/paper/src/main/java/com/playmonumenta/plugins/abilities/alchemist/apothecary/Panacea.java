@@ -45,13 +45,13 @@ public class Panacea extends Ability {
 	private static final int PANACEA_ABSORPTION_DURATION = 20 * 24;
 	// Calculate the range with MAX_DURATION * MOVE_SPEED
 	private static final int PANACEA_MAX_DURATION = 20 * 2;
-	private static final double PANACEA_MOVE_SPEED = 0.25;
+	private static final double PANACEA_MOVE_SPEED = 0.35;
 	private static final double PANACEA_RADIUS = 1.5;
 	private static final int PANACEA_1_SLOW_TICKS = (int) (1.5 * 20);
 	private static final int PANACEA_2_SLOW_TICKS = 2 * 20;
 	private static final Particle.DustOptions APOTHECARY_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
-	private static final int COOLDOWN = 24 * 20;
+	private static final int COOLDOWN = 20 * 20;
 
 	public static final String CHARM_DAMAGE = "Panacea Damage";
 	public static final String CHARM_ABSORPTION = "Panacea Absorption Health";
@@ -71,7 +71,7 @@ public class Panacea extends Ability {
 		super(plugin, player, "Panacea");
 		mInfo.mScoreboardId = "Panacea";
 		mInfo.mShorthandName = "Pn";
-		mInfo.mDescriptions.add("Shift left click with a projectile weapon to shoot a mixture that deals 60% of your potion damage and applies 100% Slow for 1.5s to every enemy touched and adds 2 absorption health to other players, lasting 24 seconds, maximum 16. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 24s.");
+		mInfo.mDescriptions.add("Shift left click with a projectile weapon to shoot a mixture that deals 60% of your potion damage and applies 100% Slow for 1.5s to every enemy touched and adds 2 absorption health to other players, lasting 24 seconds, maximum 16. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 20s.");
 		mInfo.mDescriptions.add("Absorption health added is increased to 4, and Slow duration is increased to 2s.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mLinkedSpell = ClassAbility.PANACEA;

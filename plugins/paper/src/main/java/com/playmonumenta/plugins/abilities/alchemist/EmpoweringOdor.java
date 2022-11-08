@@ -20,11 +20,11 @@ public class EmpoweringOdor extends PotionAbility {
 	private static final int EMPOWERING_ODOR_DURATION = 8 * 20;
 	private static final double EMPOWERING_ODOR_SPEED_AMPLIFIER = 0.1;
 	private static final double EMPOWERING_ODOR_1_DAMAGE_AMPLIFIER = 0.1;
-	private static final double EMPOWERING_ODOR_2_DAMAGE_AMPLIFIER = 0.15;
+	private static final double EMPOWERING_ODOR_2_DAMAGE_AMPLIFIER = 0.1;
 	private static final String EMPOWERING_ODOR_SPEED_EFFECT_NAME = "EmpoweringOdorSpeedEffect";
 	private static final String EMPOWERING_ODOR_DAMAGE_EFFECT_NAME = "EmpoweringOdorDamageEffect";
 	private static final String EMPOWERING_ODOR_ENHANCEMENT_EFFECT_NAME = "EmpoweringOdorEnhancementDamageEffect";
-	private static final double EMPOWERING_ODOR_ENHANCEMENT_DAMAGE_AMPLIFIER = 0.15;
+	private static final double EMPOWERING_ODOR_ENHANCEMENT_DAMAGE_AMPLIFIER = 0.1;
 
 	public static final String CHARM_DURATION = "Empowering Odor Duration";
 	public static final String CHARM_SPEED = "Empowering Odor Speed Modifier";
@@ -38,8 +38,8 @@ public class EmpoweringOdor extends PotionAbility {
 		mInfo.mScoreboardId = "EmpoweringOdor";
 		mInfo.mShorthandName = "EO";
 		mInfo.mDescriptions.add("Other players hit by your Alchemist's Potions are given 10% speed and 10% damage from all sources for 8 seconds.");
-		mInfo.mDescriptions.add("The damage is increased to 15%. Your potion recharge rate is decreased by 0.5s.");
-		mInfo.mDescriptions.add("The first hit a player would deal to an enemy after they gain this bonus is increased by 15%, refreshing on each application.");
+		mInfo.mDescriptions.add("Your potion recharge rate is decreased by 0.5s.");
+		mInfo.mDescriptions.add("The first hit a player would deal to an enemy after they gain this bonus is increased by 10%, refreshing on each application.");
 		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
 
 		mDamageAmplifier = (isLevelOne() ? EMPOWERING_ODOR_1_DAMAGE_AMPLIFIER : EMPOWERING_ODOR_2_DAMAGE_AMPLIFIER) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);

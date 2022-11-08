@@ -36,8 +36,8 @@ public class DarkPact extends Ability {
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "DarkPactPercentDamageDealtEffect";
 	private static final int DURATION = 20 * 7;
 	private static final int DURATION_INCREASE_ON_KILL = 20 * 1;
-	private static final double PERCENT_DAMAGE_DEALT_1 = 0.4;
-	private static final double PERCENT_DAMAGE_DEALT_2 = 0.7;
+	private static final double PERCENT_DAMAGE_DEALT_1 = 0.35;
+	private static final double PERCENT_DAMAGE_DEALT_2 = 0.55;
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE);
 	private static final int ABSORPTION_ON_KILL = 1;
 	private static final int MAX_ABSORPTION = 6;
@@ -59,8 +59,8 @@ public class DarkPact extends Ability {
 		super(plugin, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, your scythe attacks deal +40% melee damage. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
-		mInfo.mDescriptions.add("Attacks with a scythe deal +70% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
+		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, your scythe attacks deal +35% melee damage. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
+		mInfo.mDescriptions.add("Attacks with a scythe deal +55% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
 		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
 		mInfo.mIgnoreCooldown = true;

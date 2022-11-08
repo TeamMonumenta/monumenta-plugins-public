@@ -63,7 +63,7 @@ public class TransmutationRing extends PotionAbility {
 		mInfo.mLinkedSpell = ClassAbility.TRANSMUTATION_RING;
 		mInfo.mScoreboardId = "Transmutation";
 		mInfo.mShorthandName = "TR";
-		mInfo.mDescriptions.add("Right click while sneaking and holding an Alchemist's Bag to create a Transmutation Ring at the potion's landing location that lasts for 10 seconds. The ring has a radius of 5 blocks. Other players within this ring deal 15% extra damage on all attacks. Mobs that die within this ring increase the damage bonus by 1% per mob, up to 30% total extra damage. Cooldown: 25s.");
+		mInfo.mDescriptions.add("Right click while sneaking and holding an Alchemist's Bag to create a Transmutation Ring at the potion's landing location that lasts for 10 seconds. The ring has a radius of 5 blocks. Other players within this ring deal 10% extra damage on all attacks. Mobs that die within this ring increase the damage bonus by 1% per mob, up to 30% total extra damage. Cooldown: 25s.");
 		mInfo.mDescriptions.add("Mobs that die within this ring also increase the duration of the ring by 0.35 seconds per mob, up to 5 extra seconds. Cooldown: 20s.");
 		mDisplayItem = new ItemStack(Material.GOLD_NUGGET, 1);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
