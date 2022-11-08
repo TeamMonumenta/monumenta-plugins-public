@@ -45,7 +45,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		mInfo.mDescriptions.add(String.format("Your projectiles deal %d%% more damage.", (int)(PERCENT_BASE_DAMAGE * 100)));
 		mInfo.mDescriptions.add(String.format("Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to %d. Stacks decay after %d seconds of not gaining a stack. Each stack makes your projectiles deal an additional +%d%% damage. Additionally, passively gain a %d%% chance to not consume arrows when shot.",
 			MAX_STACKS, SHARPSHOOTER_DECAY_TIMER / 20, (int)(PERCENT_DAMAGE_PER_STACK * 100), (int)(ARROW_SAVE_CHANCE * 100)));
-		mInfo.mDescriptions.add(String.format("Your projectiles deal an extra %s%% per block of distance between you and the target, up to %s blocks.", DAMAGE_PER_BLOCK * 100, (int)MAX_DISTANCE));
+		mInfo.mDescriptions.add(String.format("Your projectiles deal an extra %s%% damage per block of distance between you and the target, up to %s blocks.", DAMAGE_PER_BLOCK * 100, (int)MAX_DISTANCE));
 		mDisplayItem = new ItemStack(Material.TARGET, 1);
 
 		mMaxStacks = MAX_STACKS + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
