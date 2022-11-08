@@ -92,6 +92,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		World world = mPlayer.getWorld();
 		if (mPlayer.isSprinting()) {
 			Vector dir = mPlayer.getLocation().getDirection();
+			dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1));
 			mCosmetic.maneuverStartEffect(world, mPlayer, dir);
 			mPlayer.setVelocity(dir.setY(dir.getY() * 0.5 + 0.4));
 
@@ -115,7 +116,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 					Vector velocity = mPlayer.getVelocity();
 					double length = velocity.length();
 					if (length > 0.001) {
-						loc.add(velocity.normalize().multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, length)));
+						loc.add(velocity.normalize());
 					}
 
 					LivingEntity le = EntityUtils.getNearestMob(mPlayer.getLocation(), 2);
@@ -139,7 +140,9 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			}
 
 			mCosmetic.maneuverBackEffect(world, mPlayer);
-			mPlayer.setVelocity(mPlayer.getLocation().getDirection().setY(0).normalize().multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, -1.65)).setY(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 0.65)));
+			Vector vel = mPlayer.getLocation().getDirection().setY(0).normalize().multiply(-1.65).setY(0.65);
+			vel.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1));
+			mPlayer.setVelocity(vel);
 		}
 	}
 }

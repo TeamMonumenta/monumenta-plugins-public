@@ -777,6 +777,7 @@ public class CharmManager {
 			AdvancingShadows.CHARM_COOLDOWN,
 			ByMyBlade.CHARM_COOLDOWN,
 			DaggerThrow.CHARM_COOLDOWN,
+			Dodging.CHARM_COOLDOWN,
 			EscapeDeath.CHARM_COOLDOWN,
 			Smokescreen.CHARM_COOLDOWN,
 			BladeDance.CHARM_COOLDOWN,
