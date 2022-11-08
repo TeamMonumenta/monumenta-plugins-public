@@ -164,6 +164,10 @@ public class PlayerUtils {
 	}
 
 	public static void healPlayer(Plugin plugin, Player player, double healAmount, @Nullable Player sourcePlayer) {
+		if (healAmount <= 0) {
+			return;
+		}
+
 		if ((sourcePlayer != null) && (player != sourcePlayer)) {
 			double healBonus = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TRIAGE) * 0.05;
 			healAmount *= 1 + healBonus;
