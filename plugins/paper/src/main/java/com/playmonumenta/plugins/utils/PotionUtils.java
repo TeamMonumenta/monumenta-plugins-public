@@ -425,4 +425,13 @@ public class PotionUtils {
 
 		return isLuckPotion;
 	}
+
+	// Duration is greater than about 10 hours
+	public static boolean isInfinite(PotionEffect effect) {
+		return isInfinite(effect.getDuration());
+	}
+
+	public static boolean isInfinite(int duration) {
+		return duration > 1000000;
+	}
 }

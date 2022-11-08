@@ -76,7 +76,7 @@ public class Phylactery implements Infusion {
 				PotionUtils.PotionInfo info = iterator.next();
 				if (info.mType != null && PotionUtils.hasNegativeEffects(info.mType)) {
 					iterator.remove();
-				} else {
+				} else if (!PotionUtils.isInfinite(info.mDuration)) {
 					info.mDuration = (int) (info.mDuration * value * DURATION_KEPT);
 				}
 			}
