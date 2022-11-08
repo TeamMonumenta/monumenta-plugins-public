@@ -29,7 +29,7 @@ public class TemporalBender implements Enchantment {
 	public static final String CHARM_COOLDOWN = "Temporal Bender Cooldown";
 	public static final String CHARM_COOLDOWN_REDUCTION = "Temporal Bender Cooldown Reduction";
 	private static final int COOLDOWN = 20 * 30;
-	private static final double COOLDOWN_REFRESH = 0.2;
+	private static final double COOLDOWN_REFRESH = 0.3;
 	public static final Material COOLDOWN_ITEM = Material.GLASS_BOTTLE;
 
 	private static final Particle.DustOptions BLUE1_COLOR = new Particle.DustOptions(Color.fromRGB(0, 203, 230), 1.0f);
@@ -66,7 +66,7 @@ public class TemporalBender implements Enchantment {
 			double cooldownRefresh = COOLDOWN_REFRESH + CharmManager.getLevelPercentDecimal(player, CHARM_COOLDOWN_REDUCTION);
 			for (Ability abil : AbilityManager.getManager().getPlayerAbilities(player).getAbilities()) {
 				int cooldownReduction = (int) (abil.getModifiedCooldown() * cooldownRefresh);
-				plugin.mTimers.updateCooldown(player, abil.mInfo.mLinkedSpell, cooldownReduction);
+				plugin.mTimers.updateCooldown(player, abil.mInfo.mLinkedSpell, Math.min(4 * 20, cooldownReduction));
 			}
 
 			player.setFoodLevel(Math.min(20, player.getFoodLevel() + 6));
