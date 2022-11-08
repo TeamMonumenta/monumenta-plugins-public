@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.UnstableAmalgamDisable;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -57,6 +58,7 @@ public class UnstableAmalgam extends Ability {
 	private static final float UNSTABLE_AMALGAM_KNOCKBACK_SPEED = 2.5f;
 	private static final int UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION = 20 * 8;
 	private static final double UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE = 0.4;
+	private static final String DISABLE_SOURCE = "UnstableAmalgamDisable";
 
 	public static final String CHARM_COOLDOWN = "Unstable Amalgam Cooldown";
 	public static final String CHARM_DAMAGE = "Unstable Amalgam Damage";
@@ -106,6 +108,9 @@ public class UnstableAmalgam extends Ability {
 		}
 		// prevent double casts in the same tick (while normal cast has this check, this ability is also cast on melee damage, which bypasses that check)
 		if (!MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "UnstableAmalgamCast")) {
+			return;
+		}
+		if (mPlugin.mEffectManager.hasEffect(mPlayer, DISABLE_SOURCE)) {
 			return;
 		}
 
@@ -228,9 +233,11 @@ public class UnstableAmalgam extends Ability {
 				if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 					if (!player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(0) == 100) {
 						MovementUtils.knockAwayRealistic(loc, player, knockback, playerVertical, false);
+						disable(player);
 					} else if (player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(1) > 0) {
 						// by default any Alch can use Rocket Jump with their UA
 						MovementUtils.knockAwayRealistic(loc, player, knockback, playerVertical, false);
+						disable(player);
 					}
 				}
 			}
@@ -242,6 +249,10 @@ public class UnstableAmalgam extends Ability {
 		new PartialParticle(Particle.FLAME, loc, 115, 0.02, 0.02, 0.02, 0.2).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SMOKE_LARGE, loc, 40, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(mPlayer);
+	}
+
+	private void disable(Player player) {
+		mPlugin.mEffectManager.addEffect(player, DISABLE_SOURCE, new UnstableAmalgamDisable(9999));
 	}
 
 	private void unstableMobs(List<LivingEntity> mobs, int duration) {

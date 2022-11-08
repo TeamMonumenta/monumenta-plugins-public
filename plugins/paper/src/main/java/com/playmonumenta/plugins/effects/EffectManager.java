@@ -315,6 +315,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(Stasis.effectID, Stasis::deserialize);
 		mEffectDeserializer.put(ThuribleBonusHealing.effectID, ThuribleBonusHealing::deserialize);
 		mEffectDeserializer.put(TuathanBlessing.effectID, TuathanBlessing::deserialize);
+		mEffectDeserializer.put(UnstableAmalgamDisable.effectID, UnstableAmalgamDisable::deserialize);
 		mEffectDeserializer.put(VengefulTag.effectID, VengefulTag::deserialize);
 		mEffectDeserializer.put(VoodooBondsOtherPlayer.effectID, VoodooBondsOtherPlayer::deserialize);
 		mEffectDeserializer.put(VoodooBondsReaper.effectID, VoodooBondsReaper::deserialize);
