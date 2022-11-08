@@ -79,7 +79,7 @@ public class GalleryManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onEntityDeathEvent(EntityDeathEvent event) {
 		LivingEntity entity = event.getEntity();
 		GalleryGame game = GAMES.get(entity.getWorld().getUID());
@@ -197,6 +197,13 @@ public class GalleryManager implements Listener {
 			effects.addAll(galleryPlayer.getAllEffects());
 		}
 		return effects;
+	}
+
+	public static void refreshEffects(Player player) {
+		GalleryPlayer galleryPlayer = getGalleryPlayer(player);
+		if (galleryPlayer != null) {
+			galleryPlayer.refreshEffects();
+		}
 	}
 
 	public static void close() {

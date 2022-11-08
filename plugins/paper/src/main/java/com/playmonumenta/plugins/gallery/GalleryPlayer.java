@@ -64,9 +64,12 @@ public class GalleryPlayer {
 		mIsDead = !alive;
 	}
 
-
 	public void setShouldTeleportWhenJoining(boolean bool) {
 		mShouldTeleportToSpawn = bool;
+	}
+
+	public boolean getShouldTeleportWhenJoining() {
+		return mShouldTeleportToSpawn;
 	}
 
 	public void giveEffect(@Nullable GalleryEffect effect) {
@@ -94,6 +97,12 @@ public class GalleryPlayer {
 	public void clearEffects() {
 		for (GalleryEffectType type : GalleryEffectType.values()) {
 			removeEffect(type.newEffect());
+		}
+	}
+
+	public void refreshEffects() {
+		for (GalleryEffect effect : new ArrayList<>(mEffects.values())) {
+			effect.refresh(this);
 		}
 	}
 
@@ -143,9 +152,7 @@ public class GalleryPlayer {
 					player.teleport(loc);
 				}
 			}
-			for (GalleryEffect effect : new ArrayList<>(mEffects.values())) {
-				effect.refresh(this);
-			}
+			refreshEffects();
 		}
 	}
 

@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.gallery.effects.GalleryEffect;
 import com.playmonumenta.plugins.gallery.interactables.BaseInteractable;
 import com.playmonumenta.plugins.gallery.interactables.BasePricedInteractable;
 import com.playmonumenta.plugins.gallery.interactables.EffectInteractable;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
@@ -40,6 +42,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 /**
@@ -769,7 +772,7 @@ public class GalleryGame {
 							mmBoxInteractable.runCommandPlace();
 							mmBoxInteractable.setValidBox(true);
 						}
-					}, 20 * 8);
+					}, 20 * 9);
 				}
 			}
 		}
@@ -824,6 +827,10 @@ public class GalleryGame {
 				}
 			}
 			GalleryGrave.createGrave(realPlayer, deadLoc, this);
+			return;
+		}
+		if (player instanceof Player player1) {
+			GalleryManager.refreshEffects(player1);
 		}
 	}
 
@@ -880,4 +887,28 @@ public class GalleryGame {
 		}
 	}
 
+	public void printModerationInfo(@NotNull Player moderator, @Nullable Player target) {
+		moderator.sendMessage(Component.text("Gallery Game ID: ", NamedTextColor.GRAY).append(Component.text(mUUIDGame.toString(), NamedTextColor.WHITE).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, mUUIDGame.toString())).hoverEvent(Component.text("Click to copy!").asHoverEvent())));
+		moderator.sendMessage(Component.text("Round: " + mCurrentRound, NamedTextColor.GRAY));
+		moderator.sendMessage(Component.text("Coins: " + mPlayersCoins, NamedTextColor.GRAY));
+		moderator.sendMessage(Component.text("Mobs this round: " + mMobsToSpawnThisRound, NamedTextColor.GRAY));
+		moderator.sendMessage(Component.text("Mobs spawned this round: " + mMobsSpawnedThisRound, NamedTextColor.GRAY));
+		moderator.sendMessage(Component.text("Mobs killed this round: " + mMobsKilledThisRound, NamedTextColor.GRAY));
+		moderator.sendMessage(Component.text("Players this game: " + mPlayersMap.size(), NamedTextColor.GRAY));
+		if (target != null) {
+			GalleryPlayer player = mPlayersMap.get(target.getUniqueId());
+			if (player != null) {
+				moderator.sendMessage(Component.text("-------------------------------", NamedTextColor.GRAY));
+				moderator.sendMessage(Component.text("Player Info for:  " + target.getName(), NamedTextColor.GRAY));
+				moderator.sendMessage(Component.text("Alive:  " + !player.isDead(), NamedTextColor.GRAY));
+				moderator.sendMessage(Component.text("Should teleport to spawn when joining:  " + player.getShouldTeleportWhenJoining(), NamedTextColor.GRAY));
+				moderator.sendMessage(Component.text("Effects:  ", NamedTextColor.GRAY));
+				for (GalleryEffect effect : player.getAllEffects()) {
+					moderator.sendMessage(Component.text(effect.getDisplay() != null ? effect.getDisplay() : "Null display ???? " + effect.getType().name(), NamedTextColor.GRAY));
+				}
+			}
+		}
+
+
+	}
 }

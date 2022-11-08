@@ -126,6 +126,7 @@ import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.itemstats.infusions.Vitality;
 import com.playmonumenta.plugins.network.ClientModHandler;
@@ -544,6 +545,7 @@ public class AbilityManager {
 			}
 		});
 
+		GalleryManager.refreshEffects(player);
 		MonumentaNetworkChatIntegration.refreshPlayer(player);
 		ClientModHandler.updateAbilities(player);
 

@@ -112,6 +112,38 @@ public class GalleryCommands {
 	private static void registerUtils() {
 		Argument util = new MultiLiteralArgument("utils");
 
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERMISSION)
+			.withArguments(
+				util,
+				new MultiLiteralArgument("moderation"),
+				new MultiLiteralArgument("get"),
+				new MultiLiteralArgument("info"))
+			.executesPlayer((moderator, args) -> {
+				GalleryGame game = getGameFromSender(moderator);
+				if (game != null) {
+					game.printModerationInfo(moderator, null);
+				}
+				return 1;
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERMISSION)
+			.withArguments(
+				util,
+				new MultiLiteralArgument("moderation"),
+				new MultiLiteralArgument("get"),
+				new MultiLiteralArgument("info"),
+				new EntitySelectorArgument("target", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
+			.executesPlayer((moderator, args) -> {
+				GalleryGame game = getGameFromSender(moderator);
+				if (game != null) {
+					game.printModerationInfo(moderator, (Player) args[4]);
+				}
+				return 1;
+			}).register();
+
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
 			.withArguments(

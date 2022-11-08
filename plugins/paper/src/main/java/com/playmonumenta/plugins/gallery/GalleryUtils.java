@@ -29,6 +29,7 @@ public class GalleryUtils {
 	private static final double[] MOB_COUNT_MULTIPLIER_PER_PLAYER = {1, 1.33, 1.67, 2};
 	private static final double[] MOB_HEALTH_MULTIPLIER_PER_PLAYER = {0, 0.25, 0.5, 0.75};
 
+	//https://www.desmos.com/calculator/9lvoxpwcnw graph of the mobs scaling
 	public static int getMobsCountForRound(int round, int players) {
 		int count = 0;
 
