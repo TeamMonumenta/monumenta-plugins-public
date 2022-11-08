@@ -239,6 +239,9 @@ public class DelveCustomInventory extends CustomInventory {
 					mods.remove(rotating);
 				}
 			}
+			if (mDungeonName.startsWith("portal") || mDungeonName.startsWith("ruin")) {
+				mods.remove(DelvesModifier.FRAGILE);
+			}
 		}
 		return mods;
 	}
