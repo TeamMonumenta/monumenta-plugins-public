@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -25,8 +24,7 @@ public class Stamina implements Enchantment {
 	private static final String STAMINA_EFFECT = "StaminaDamage";
 	private static final double DAMAGE_BONUS = 0.025;
 	private static final double DAMAGE_CAP = 0.1;
-	private static final double PROJ_REDUCTION = 0.75;
-	private static final int DURATION = 5 * 20;
+	private static final int DURATION = 6 * 20;
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(241, 190, 84), 0.75f);
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
 		DamageEvent.DamageType.MELEE,
@@ -47,18 +45,13 @@ public class Stamina implements Enchantment {
 	}
 
 	@Override
-	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if (AFFECTED_DAMAGE_TYPES.contains(event.getType())) {
-			applyStamina(plugin, player, level, event.getType());
+	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (source != null) {
+			applyStamina(plugin, player, value);
 		}
 	}
 
-	@Override
-	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		applyStamina(plugin, player, value, event.getType());
-	}
-
-	private void applyStamina(Plugin plugin, Player player, double level, DamageType type) {
+	private void applyStamina(Plugin plugin, Player player, double level) {
 		NavigableSet<Effect> s = plugin.mEffectManager.getEffects(player, STAMINA_EFFECT);
 		if (s != null && s.last().getDuration() > DURATION - 20) {
 			// attacked within 1s, do not run anything/refresh effect
@@ -69,9 +62,6 @@ public class Stamina implements Enchantment {
 			currStamina = s.last().getMagnitude();
 		}
 		double damage = Math.min(currStamina + (DAMAGE_BONUS * level), DAMAGE_CAP * level);
-		if (type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
-			damage *= PROJ_REDUCTION;
-		}
 		plugin.mEffectManager.addEffect(player, STAMINA_EFFECT, new PercentDamageDealt(DURATION, damage, AFFECTED_DAMAGE_TYPES));
 
 		player.getWorld().playSound(
