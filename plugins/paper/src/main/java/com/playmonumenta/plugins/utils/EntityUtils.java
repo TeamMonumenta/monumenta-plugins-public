@@ -88,6 +88,7 @@ public class EntityUtils {
 		EntityType.OCELOT,
 		EntityType.HOGLIN,
 		EntityType.RAVAGER,
+		EntityType.STRIDER,
 		EntityType.SLIME,
 		EntityType.MAGMA_CUBE,
 		EntityType.SHULKER,
