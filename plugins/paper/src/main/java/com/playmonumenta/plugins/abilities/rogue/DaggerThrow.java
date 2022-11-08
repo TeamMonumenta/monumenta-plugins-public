@@ -85,7 +85,8 @@ public class DaggerThrow extends Ability {
 		}
 		Location loc = mPlayer.getEyeLocation();
 		Vector dir = loc.getDirection();
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, DAGGER_THROW_RANGE + 1, mPlayer);
+		double adjustedRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, DAGGER_THROW_RANGE);
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, adjustedRange + 1, mPlayer);
 		World world = mPlayer.getWorld();
 		mCosmetic.daggerCastSound(world, loc);
 
@@ -101,7 +102,7 @@ public class DaggerThrow extends Ability {
 			// Since we want some hitbox allowance, we use bounding boxes instead of a raycast
 			BoundingBox box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
 
-			for (int i = 0; i <= CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, DAGGER_THROW_RANGE); i++) {
+			for (int i = 0; i <= adjustedRange; i++) {
 				box.shift(newDir);
 				Location bLoc = box.getCenter().toLocation(world);
 				mCosmetic.daggerLineEffect(bLoc, newDir, mPlayer);
