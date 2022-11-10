@@ -69,8 +69,9 @@ public class BaseOverride {
 
 	/**
 	 * Called when the player presses the swap key while this item is in the main hand
+	 * Return True to cancel the swap event.
 	 */
 	public boolean swapHandsInteraction(Plugin plugin, Player player, ItemStack item) {
-		return true;
+		return false;
 	}
 }

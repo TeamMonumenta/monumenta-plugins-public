@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
 import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
 import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
+import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -103,12 +104,20 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		// Virtual cooldown items for Infinity food
 		for (Map.Entry<ItemStatUtils.EnchantmentType, Material> entry : FOOD_COOLDOWN_ITEMS.entrySet()) {
 			if (ItemStatUtils.getEnchantmentLevel(itemStack, entry.getKey()) > 0
-				    && mPlugin.mEffectManager.hasEffect(player, ItemCooldown.toSource(entry.getKey()))) {
+				&& mPlugin.mEffectManager.hasEffect(player, ItemCooldown.toSource(entry.getKey()))) {
 				// Then we need to replace the item in the packet.
 				itemStack.setType(entry.getValue());
 				markVirtual(itemStack);
 				return;
 			}
+		}
+
+		if (WorldshaperOverride.isWorldshaperItem(itemStack)
+			&& mPlugin.mEffectManager.hasEffect(player, WorldshaperOverride.COOLDOWN_SOURCE)) {
+			// Then we need to replace the item in the packet.
+			itemStack.setType(WorldshaperOverride.COOLDOWN_ITEM);
+			markVirtual(itemStack);
+			return;
 		}
 
 		// Vanity

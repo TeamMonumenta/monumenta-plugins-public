@@ -42,7 +42,7 @@ public class ShulkerBoxOverride extends BaseOverride {
 		} else if (WorldshaperOverride.isWorldshaperItem(item)) {
 			return WorldshaperOverride.changeMode(item, player);
 		}
-		return true;
+		return false;
 	}
 
 	@Override

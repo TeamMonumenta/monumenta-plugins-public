@@ -441,13 +441,14 @@ public final class ItemOverrides {
 		return override == null || override.inventoryClickInteraction(plugin, player, item, event);
 	}
 
+	// Returns true is event swaphands is to be cancelled, this cancels player abilities too (like Shield Wall).
 	public boolean swapHandsInteraction(Plugin plugin, Player player) {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		if (item == null) {
 			return true;
 		}
 		BaseOverride override = mItems.get(item.getType());
-		return override == null || override.swapHandsInteraction(plugin, player, item);
+		return override != null && override.swapHandsInteraction(plugin, player, item);
 	}
 
 	// Returns eventCancelled = true if disallowed, otherwise false

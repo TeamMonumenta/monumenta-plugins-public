@@ -673,9 +673,10 @@ public class PlayerListener implements Listener {
 	// Player swapped hand items
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		mPlugin.mAbilityManager.playerSwapHandItemsEvent(event.getPlayer(), event);
 		if (mPlugin.mItemOverrides.swapHandsInteraction(mPlugin, event.getPlayer())) {
 			event.setCancelled(true);
+		} else {
+			mPlugin.mAbilityManager.playerSwapHandItemsEvent(event.getPlayer(), event);
 		}
 		if (event.getPlayer().getScoreboardTags().contains(ToggleSwap.SWAP_TAG)) {
 			event.setCancelled(true);

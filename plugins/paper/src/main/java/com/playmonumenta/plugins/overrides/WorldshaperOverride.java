@@ -20,6 +20,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -36,7 +37,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class WorldshaperOverride {
 	private static final String CAN_PLACE_SHULKER_PERM = "monumenta.canplaceshulker";
 	private static final String WORLDSHAPER_PERM = "monumenta.worldshaper";
-	private static final String COOLDOWN_SOURCE = "CDWorldshaperLoom";
+	public static final String COOLDOWN_SOURCE = "CDWorldshaperLoom";
+	public static final Material COOLDOWN_ITEM = Material.LOOM;
 
 	private static final Component BRIDGE_MODE = Component.text("Selected Mode: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 		.append(Component.text("Bridge", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
@@ -44,14 +46,11 @@ public class WorldshaperOverride {
 		.append(Component.text("Wall", NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false));
 	private static final Component FLOOR_MODE = Component.text("Selected Mode: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 		.append(Component.text("Floor", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
-	private static final Component CAGE_MODE = Component.text("Selected Mode: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-		.append(Component.text("Cage", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 	private static final Component STAIRS_MODE = Component.text("Selected Mode: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 		.append(Component.text("Stairs", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false));
 	private static final String PLAIN_BRIDGE_MODE = MessagingUtils.plainText(BRIDGE_MODE);
 	private static final String PLAIN_WALL_MODE = MessagingUtils.plainText(WALL_MODE);
 	private static final String PLAIN_FLOOR_MODE = MessagingUtils.plainText(FLOOR_MODE);
-	private static final String PLAIN_CAGE_MODE = MessagingUtils.plainText(CAGE_MODE);
 	private static final String PLAIN_STAIRS_MODE = MessagingUtils.plainText(STAIRS_MODE);
 	private static final String ITEM_NAME = "Worldshaper's Loom";
 	// private static final String DELVE_SKIN_NAME = "Doorway from Eternity"; - Insert DELVE SKIN here
@@ -86,7 +85,7 @@ public class WorldshaperOverride {
 		int cooldown = 0;
 
 		if (getMode(item) == Mode.BRIDGE) {
-			cooldown = 3 * 20;
+			cooldown = 2 * 20;
 
 			Location origin;
 
@@ -118,6 +117,10 @@ public class WorldshaperOverride {
 			origin.add(xIterAdd, 0, zIterAdd);
 
 			for (int i = 0; i < 6; i++) {
+				if (ItemUtils.noPassthrough.contains(origin.getBlock().getType())) {
+					break;
+				}
+
 				blockPlacePattern.add(origin.clone());
 				origin.add(xIterAdd, 0, zIterAdd);
 			}
@@ -192,7 +195,7 @@ public class WorldshaperOverride {
 
 
 		} else if (getMode(item) == Mode.FLOOR) {
-			cooldown = 7 * 20;
+			cooldown = 5 * 20;
 
 			Location origin = player.getLocation();
 
@@ -205,28 +208,8 @@ public class WorldshaperOverride {
 			blockPlacePattern.add(origin.clone().add(-1, -1, 1));
 			blockPlacePattern.add(origin.clone().add(0, -1, 1));
 			blockPlacePattern.add(origin.clone().add(1, -1, 1));
-		} else if (getMode(item) == Mode.CAGE) {
-			cooldown = 10 * 20;
-
-			Location origin = player.getLocation();
-
-			//First Layer
-			blockPlacePattern.add(origin.clone().add(1, 0, 0));
-			blockPlacePattern.add(origin.clone().add(-1, 0, 0));
-			blockPlacePattern.add(origin.clone().add(0, 0, 1));
-			blockPlacePattern.add(origin.clone().add(0, 0, -1));
-
-			//Second Layer
-			blockPlacePattern.add(origin.clone().add(1, 1, 0));
-			blockPlacePattern.add(origin.clone().add(-1, 1, 0));
-			blockPlacePattern.add(origin.clone().add(0, 1, 1));
-			blockPlacePattern.add(origin.clone().add(0, 1, -1));
-
-			//Top & Bottom
-			blockPlacePattern.add(origin.clone().add(0, 2, 0));
-			blockPlacePattern.add(origin.clone().add(0, -1, 0));
 		} else if (getMode(item) == Mode.STAIRS) {
-			cooldown = 5 * 20;
+			cooldown = 4 * 20;
 
 			Location origin;
 
@@ -257,6 +240,10 @@ public class WorldshaperOverride {
 			origin.add(xIterAdd, 1, zIterAdd);
 
 			for (int i = 0; i < 6; i++) {
+				if (ItemUtils.noPassthrough.contains(origin.getBlock().getType())) {
+					break;
+				}
+
 				blockPlacePattern.add(origin.clone());
 				origin.add(xIterAdd, 1, zIterAdd);
 			}
@@ -264,7 +251,7 @@ public class WorldshaperOverride {
 
 		boolean blockPlaced = false;
 		for (Location location : blockPlacePattern) {
-			if (location.getBlock().isSolid() || !ZoneUtils.playerCanInteractWithBlock(player, location, false)) {
+			if (location.getBlock().isSolid() || ItemUtils.interactableBlocks.contains(location.getBlock().getType()) || !ZoneUtils.playerCanInteractWithBlock(player, location, false)) {
 				continue;
 			}
 
@@ -283,7 +270,7 @@ public class WorldshaperOverride {
 
 		if (blockPlaced) {
 			// Ensure only put on cooldown if blocks are placed.
-			plugin.mEffectManager.addEffect(player, COOLDOWN_SOURCE, new ItemCooldown(cooldown, item, plugin));
+			plugin.mEffectManager.addEffect(player, COOLDOWN_SOURCE, new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
 		}
 		return false;
 	}
@@ -336,17 +323,18 @@ public class WorldshaperOverride {
 	public static boolean changeMode(ItemStack item, Player player) {
 		if (!isWorldshaperItem(item)) {
 			//Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe
-			return true;
+			return false;
 		}
 
-		if (!player.isSneaking()) {
-			return true;
+		boolean reverse = false;
+		if (player.isSneaking()) {
+			reverse = true;
 		}
 
 		if (ScoreboardUtils.getScoreboardValue(player, "SKTH").orElse(0) <= 0) {
 			// Requirements for using Worldshaper's Loom is SKT savage.
 			player.sendMessage(ChatColor.RED + "You need to have cleared Silver Knight's Tomb Savage in order to use this item!");
-			return true;
+			return false;
 		}
 
 		NBTItem nbt = new NBTItem(item);
@@ -356,47 +344,78 @@ public class WorldshaperOverride {
 		if (InventoryUtils.testForItemWithName(item, ITEM_NAME)) {
 			for (int i = 0; i < lore.size(); ++i) {
 				String line = lore.get(i);
-				if (line.equals(PLAIN_BRIDGE_MODE) && !foundLine) {
-					ItemStatUtils.removeLore(item, i);
-					ItemStatUtils.addLore(item, i, STAIRS_MODE);
-					player.sendMessage(STAIRS_MODE);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
-					foundLine = true;
-					break;
-				} else if (line.equals(PLAIN_STAIRS_MODE) && !foundLine) {
-					ItemStatUtils.removeLore(item, i);
-					ItemStatUtils.addLore(item, i, WALL_MODE);
-					player.sendMessage(WALL_MODE);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, (float) 0.9);
-					foundLine = true;
-					break;
-				} else if (line.equals(PLAIN_WALL_MODE) && !foundLine) {
-					ItemStatUtils.removeLore(item, i);
-					ItemStatUtils.addLore(item, i, FLOOR_MODE);
-					player.sendMessage(FLOOR_MODE);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, (float) 1.1);
-					foundLine = true;
-					break;
-				} else if (line.equals(PLAIN_FLOOR_MODE) && !foundLine) {
-					ItemStatUtils.removeLore(item, i);
-					ItemStatUtils.addLore(item, i, CAGE_MODE);
-					player.sendMessage(CAGE_MODE);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, (float) 1.2);
-					foundLine = true;
-					break;
-				} else if (line.equals(PLAIN_CAGE_MODE) && !foundLine) {
-					ItemStatUtils.removeLore(item, i);
-					ItemStatUtils.addLore(item, i, BRIDGE_MODE);
-					player.sendMessage(BRIDGE_MODE);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, (float) 0.9);
-					foundLine = true;
-					break;
+				if (!reverse) {
+					if (line.equals(PLAIN_BRIDGE_MODE) && !foundLine) {
+						ItemStatUtils.removeLore(item, i);
+						ItemStatUtils.addLore(item, i, STAIRS_MODE);
+						player.sendMessage(STAIRS_MODE);
+						player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+						foundLine = true;
+						break;
+					} else if (line.equals(PLAIN_STAIRS_MODE) && !foundLine) {
+						ItemStatUtils.removeLore(item, i);
+						ItemStatUtils.addLore(item, i, WALL_MODE);
+						player.sendMessage(WALL_MODE);
+						player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, (float) 0.9);
+						foundLine = true;
+						break;
+					} else if (line.equals(PLAIN_WALL_MODE) && !foundLine) {
+						ItemStatUtils.removeLore(item, i);
+						ItemStatUtils.addLore(item, i, FLOOR_MODE);
+						player.sendMessage(FLOOR_MODE);
+						player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, (float) 1.1);
+						foundLine = true;
+						break;
+					} else if (line.equals(PLAIN_FLOOR_MODE) && !foundLine) {
+						ItemStatUtils.removeLore(item, i);
+						ItemStatUtils.addLore(item, i, BRIDGE_MODE);
+						player.sendMessage(BRIDGE_MODE);
+						player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, (float) 1.2);
+						foundLine = true;
+						break;
+					}
+				} else {
+					if (line.equals(PLAIN_BRIDGE_MODE) && !foundLine) {
+						ItemStatUtils.removeLore(item, i);
+						ItemStatUtils.addLore(item, i, FLOOR_MODE);
+						player.sendMessage(FLOOR_MODE);
+						player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+						foundLine = true;
+						break;
+					} else if (line.equals(PLAIN_STAIRS_MODE) && !foundLine) {
+						ItemStatUtils.removeLore(item, i);
+						ItemStatUtils.addLore(item, i, BRIDGE_MODE);
+						player.sendMessage(BRIDGE_MODE);
+						player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, (float) 0.9);
+						foundLine = true;
+						break;
+					} else if (line.equals(PLAIN_WALL_MODE) && !foundLine) {
+						ItemStatUtils.removeLore(item, i);
+						ItemStatUtils.addLore(item, i, STAIRS_MODE);
+						player.sendMessage(STAIRS_MODE);
+						player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, (float) 1.1);
+						foundLine = true;
+						break;
+					} else if (line.equals(PLAIN_FLOOR_MODE) && !foundLine) {
+						ItemStatUtils.removeLore(item, i);
+						ItemStatUtils.addLore(item, i, WALL_MODE);
+						player.sendMessage(WALL_MODE);
+						player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, (float) 1.2);
+						foundLine = true;
+						break;
+					}
 				}
 			}
 			if (!foundLine) {
-				ItemStatUtils.addLore(item, lore.size(), WALL_MODE);
-				player.sendMessage(WALL_MODE);
-				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+				if (!reverse) {
+					ItemStatUtils.addLore(item, lore.size(), STAIRS_MODE);
+					player.sendMessage(STAIRS_MODE);
+					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+				} else {
+					ItemStatUtils.addLore(item, lore.size(), FLOOR_MODE);
+					player.sendMessage(FLOOR_MODE);
+					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+				}
 			}
 		}
 		ItemStatUtils.generateItemStats(item);
@@ -429,8 +448,6 @@ public class WorldshaperOverride {
 				return Mode.WALL;
 			} else if (line.equals(PLAIN_FLOOR_MODE)) {
 				return Mode.FLOOR;
-			} else if (line.equals(PLAIN_CAGE_MODE)) {
-				return Mode.CAGE;
 			} else if (line.equals(PLAIN_STAIRS_MODE)) {
 				return Mode.STAIRS;
 			}
@@ -443,7 +460,6 @@ public class WorldshaperOverride {
 		BRIDGE,
 		WALL,
 		FLOOR,
-		CAGE,
 		STAIRS
 	}
 }
