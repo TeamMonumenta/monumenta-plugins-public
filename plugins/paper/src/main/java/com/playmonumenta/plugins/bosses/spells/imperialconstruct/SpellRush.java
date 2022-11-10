@@ -75,9 +75,9 @@ public class SpellRush extends Spell {
 				c.setTarget(null);
 				pathfinder.stopPathfinding();
 
-				Location bossLocYCorrected = mBoss.getLocation();
-				bossLocYCorrected.setY(endLoc.getY());
-				if (mTicks >= 20 * 7 || endLoc.distance(bossLocYCorrected) < 3) {
+				endLoc.setY(mBoss.getLocation().getY() + 1);
+
+				if (mTicks >= 20 * 7 || endLoc.distance(mBoss.getLocation()) < 3) {
 					c.setTarget(EntityUtils.getNearestPlayer(c.getLocation(), 15));
 					mBlockBreak.mIsActive = false;
 					this.cancel();
