@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -15,10 +16,13 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
@@ -31,8 +35,9 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class LavaCannonBoss extends BossAbilityGroup {
-	private static final Particle.DustOptions ORANGE = new Particle.DustOptions(Color.fromRGB(255, 128, 0), 1.0f);
+	private static final Particle.DustOptions ORANGE = new Particle.DustOptions(Color.fromRGB(255, 128, 0), 0.5f);
 	public static final int BULLET_DURATION = 2 * 20;
+	private static final Material WARNING_BLOCK = Material.NETHER_WART_BLOCK;
 
 	public static final String identityTag = "boss_lavacannon";
 	private LivingEntity mSamwellMob;
@@ -44,6 +49,13 @@ public class LavaCannonBoss extends BossAbilityGroup {
 	private List<Player> mHitMap;
 
 	private PartialParticle mPWarning;
+	private PartialParticle mPWarningLava;
+	private PartialParticle mPWarning2;
+	private PartialParticle mPWarning3;
+	private PartialParticle mPWarning4;
+	private boolean mLockedTrajectory = false;
+	private boolean mForecastBlocks = false;
+	private Map<Location, Material> mOldBlocks = new HashMap<>();
 
 	private String SPELL_NAME = "Lava Cannon";
 
@@ -74,7 +86,11 @@ public class LavaCannonBoss extends BossAbilityGroup {
 
 		mPhase = mSamwell.mPhase;
 		mTarget = EntityUtils.getNearestPlayer(mBoss.getLocation(), 100);
-		mPWarning = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 50, 1, 1, 1, 0.1, ORANGE);
+		mPWarning = new PartialParticle(Particle.FLAME, mBoss.getLocation(), 2, 0, 0, 0, 0.01);
+		mPWarningLava = new PartialParticle(Particle.LAVA, mBoss.getLocation(), 1, 0, 0, 0, 0.01);
+		mPWarning2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), 2, 0, 0, 0, 0.01);
+		mPWarning3 = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 10, 0.25, 0.25, 0.25, 0, ORANGE);
+		mPWarning4 = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 5, 0.25, 0.25, 0.25, 0);
 		mHitMap = new ArrayList<>();
 
 		List<Spell> passives = Arrays.asList(
@@ -93,10 +109,12 @@ public class LavaCannonBoss extends BossAbilityGroup {
 					Location loc = mBoss.getLocation();
 					loc.setYaw((float) (Math.atan2(mVector.getZ(), mVector.getX()) * 180.0 / Math.PI));
 					mBoss.teleport(loc);
+				} else {
+					mLockedTrajectory = true;
 				}
 
 				if (mT % (chargeTime(mPhase) / 6) == 0) {
-					warningParticles(mBoss.getLocation(), mVector);
+					warningParticles(mBoss.getLocation(), mVector, mLockedTrajectory);
 				}
 
 				if (mT >= chargeTime(mPhase)) {
@@ -149,18 +167,108 @@ public class LavaCannonBoss extends BossAbilityGroup {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	private void warningParticles(Location origin, Vector dir) {
+	private void warningParticles(Location origin, Vector dir, boolean lockedTrajectory) {
 		Location particleLoc = origin.clone();
 		new BukkitRunnable() {
 			int mT = 0;
+			boolean mPlaceBlocks = false;
 
 			@Override public void run() {
+				if (!mForecastBlocks && lockedTrajectory) {
+					mPlaceBlocks = true;
+					mForecastBlocks = true;
+				}
+
 				mT += 1;
 				particleLoc.add(dir.clone().setY(0).normalize());
-				mPWarning.location(particleLoc).spawnAsBoss();
+				if (lockedTrajectory) {
+					mPWarning.location(particleLoc).spawnAsBoss();
+					mPWarningLava.location(particleLoc).spawnAsBoss();
+				} else {
+					mPWarning2.location(particleLoc).spawnAsBoss();
+				}
+				mPWarning3.location(particleLoc).spawnAsBoss();
+				mPWarning4.location(particleLoc).spawnAsBoss();
+
+				if (mPlaceBlocks) {
+					// Place 3 x 3 Square
+					for (int x = -1; x <= 1; x++) {
+						for (int z = -1; z <= 1; z++) {
+							// Climb down 5 blocks.
+							for (int y = 0; y >= -5; y--) {
+								Location bLoc = particleLoc.clone().add(x, y, z);
+
+								if (bLoc.getBlock().isSolid()
+									&& !BlockUtils.isMechanicalBlock(bLoc.getBlock().getType())
+									&& !BlockUtils.isValuableBlock(bLoc.getBlock().getType())
+									&& bLoc.getBlock().getType() != WARNING_BLOCK) {
+									mOldBlocks.put(bLoc, bLoc.getBlock().getType());
+									bLoc.getBlock().setType(WARNING_BLOCK);
+									break;
+								}
+							}
+						}
+					}
+				}
+
+				mT += 1;
+				particleLoc.add(dir.clone().setY(0).normalize());
+				if (lockedTrajectory) {
+					mPWarning.location(particleLoc).spawnAsBoss();
+					mPWarningLava.location(particleLoc).spawnAsBoss();
+				} else {
+					mPWarning2.location(particleLoc).spawnAsBoss();
+				}
+				mPWarning3.location(particleLoc).spawnAsBoss();
+				mPWarning4.location(particleLoc).spawnAsBoss();
+
+				if (mPlaceBlocks) {
+					mBoss.getWorld().playSound(particleLoc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 10f, 1.5f);
+					// Place 3 x 3 Square
+					for (int x = -1; x <= 1; x++) {
+						for (int z = -1; z <= 1; z++) {
+							// Climb down 5 blocks.
+							for (int y = 0; y >= -5; y--) {
+								Location bLoc = particleLoc.clone().add(x, y, z);
+
+								if (bLoc.getBlock().isSolid()
+									&& !BlockUtils.isMechanicalBlock(bLoc.getBlock().getType())
+									&& !BlockUtils.isValuableBlock(bLoc.getBlock().getType())
+									&& bLoc.getBlock().getType() != WARNING_BLOCK) {
+									mOldBlocks.put(bLoc, bLoc.getBlock().getType());
+									bLoc.getBlock().setType(WARNING_BLOCK);
+									break;
+								}
+							}
+						}
+					}
+				}
 
 				if (mT >= 300 || mShot || mPhase != mSamwell.mPhase) {
 					this.cancel();
+					if (mPlaceBlocks) {
+						new BukkitRunnable() {
+							int mTicks = 0;
+
+							@Override public void run() {
+								mTicks += 2;
+								if (mBoss.isDead() || !mBoss.isValid() || mPhase != mSamwell.mPhase || mTicks > (BULLET_DURATION + chargeTime(mPhase) + 20)) {
+									for (Map.Entry<Location, Material> e : mOldBlocks.entrySet()) {
+										if (e.getKey().getBlock().getType() != Material.AIR) {
+											e.getKey().getBlock().setType(e.getValue());
+										}
+										this.cancel();
+									}
+								} else {
+									for (Map.Entry<Location, Material> e : mOldBlocks.entrySet()) {
+										if (e.getKey().getBlock().getType() != WARNING_BLOCK && e.getKey().getBlock().getType() != Material.CRYING_OBSIDIAN) {
+											e.getKey().getBlock().setType(WARNING_BLOCK);
+										}
+									}
+								}
+							}
+						}.runTaskTimer(mPlugin, 0, 2);
+					}
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
