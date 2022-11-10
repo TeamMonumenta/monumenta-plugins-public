@@ -9,6 +9,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 
@@ -19,6 +20,7 @@ import org.bukkit.entity.Player;
  * - If mob does not have line of sight to player, tick down cooldown
  * - If cooldown elapsed, mob targets the closest player with line of sight
  * - If no players have line of sight, the mob continues to target the last seen player, even through walls
+ * - If mob has a new player target (potentially a taunt), set mLastTarget to that new target instead.
  */
 public class SpellTargetVisiblePlayer extends Spell {
 	private static final int PERIOD = 5;
@@ -69,18 +71,32 @@ public class SpellTargetVisiblePlayer extends Spell {
 		if (mLastTarget != null && LocationUtils.hasLineOfSight(mBoss, mLastTarget)) {
 			mTicksSinceLastSeen = 0;
 
-			// Make sure that player is still the target
+			// If target has changed and is a player, set mLastTarget to that new target (to allow taunts)
+			// Otherwise, if it is NOT a player, change it back to mLastTarget.
 			if (mBoss.getTarget() != mLastTarget) {
-				mBoss.setTarget(mLastTarget);
+				LivingEntity target = mBoss.getTarget();
+				if (target instanceof Player player) {
+					mLastTarget = player;
+				} else {
+					mBoss.setTarget(mLastTarget);
+				}
 			}
 
 			// Refresh the cooldown and end here
 			mCooldownRemaining = mCooldown;
 		} else {
+			// No line of sight.
 			if (mCooldownRemaining > 0) {
-				// Continue targeting last target even though they are not visible
+				// Continue targeting last target even though they are not visible.
+				// If target is a different player, set that new player as the new target.
+				// Otherwise, continue chasing mLastTarget.
 				if (mLastTarget != null && mBoss.getTarget() != mLastTarget) {
-					mBoss.setTarget(mLastTarget);
+					LivingEntity target = mBoss.getTarget();
+					if (target instanceof Player player) {
+						mLastTarget = player;
+					} else {
+						mBoss.setTarget(mLastTarget);
+					}
 				}
 			} else {
 				// Potentially find a new target
