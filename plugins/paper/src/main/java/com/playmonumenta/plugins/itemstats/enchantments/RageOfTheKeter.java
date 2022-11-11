@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.infusions.Quench;
 import com.playmonumenta.plugins.itemstats.infusions.Refresh;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -80,7 +81,7 @@ public class RageOfTheKeter implements Enchantment {
 
 			event.setCancelled(true);
 			World world = player.getWorld();
-			int duration = DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION);
+			int duration = (int)((DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION)) * Quench.getDurationScaling(plugin, player));
 			plugin.mEffectManager.addEffect(player, "KeterExtraDamage", new PercentDamageDealt(duration, DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE), AFFECTED_DAMAGE_TYPES));
 			plugin.mEffectManager.addEffect(player, "KeterExtraSpeed", new PercentSpeed(duration, SPEED_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_SPEED), ATTR_NAME));
 			plugin.mEffectManager.addEffect(player, "KeterParticles", new Aesthetics(duration,

@@ -36,7 +36,7 @@ public class SecondWind implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double level, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		double healthThreshold = HEALTH_LIMIT + (CharmManager.getLevelPercent(player, CHARM_THRESHOLD) / 100.0);
+		double healthThreshold = HEALTH_LIMIT + CharmManager.getLevelPercentDecimal(player, CHARM_THRESHOLD);
 		double currHealth = player.getHealth();
 		double maxHealth = EntityUtils.getMaxHealth(player);
 		double hpAfterHit = currHealth - event.getFinalDamage(true);

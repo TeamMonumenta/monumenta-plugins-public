@@ -32,7 +32,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	public static final String CHARM_STACK_DAMAGE = "Sharpshooter Stack Damage";
 	public static final String CHARM_STACKS = "Sharpshooter Max Stacks";
-	public static final String CHARM_RETRIEVAL = "Sharpshooter Retrieval Chance";
+	public static final String CHARM_RETRIEVAL = "Sharpshooter Arrow Save Chance";
 	public static final String CHARM_DECAY = "Sharpshooter Stack Decay Time";
 
 	private final int mMaxStacks;

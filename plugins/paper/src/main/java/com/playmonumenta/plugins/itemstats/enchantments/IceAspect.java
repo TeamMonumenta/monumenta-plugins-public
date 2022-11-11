@@ -133,7 +133,7 @@ public class IceAspect implements Enchantment {
 	}
 
 	public static void apply(Plugin plugin, Player player, double level, int duration, LivingEntity enemy, boolean particles) {
-		EntityUtils.applySlow(plugin, duration + CharmManager.getExtraDuration(player, CHARM_DURATION), (level * SLOW_PER_LEVEL) + CharmManager.getLevelPercent(player, CHARM_SLOW), enemy);
+		EntityUtils.applySlow(plugin, duration + CharmManager.getExtraDuration(player, CHARM_DURATION), (level * SLOW_PER_LEVEL) + CharmManager.getLevelPercentDecimal(player, CHARM_SLOW), enemy);
 		if (particles) {
 			player.getWorld().spawnParticle(Particle.SNOWBALL, enemy.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
 		}

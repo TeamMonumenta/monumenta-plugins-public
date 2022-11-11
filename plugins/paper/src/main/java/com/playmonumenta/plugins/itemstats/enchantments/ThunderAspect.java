@@ -137,7 +137,7 @@ public class ThunderAspect implements Enchantment {
 	}
 
 	public static void apply(Plugin plugin, Player player, double level, LivingEntity enemy, boolean particles) {
-		double chance = (CHANCE + CharmManager.getLevelPercent(player, CHARM_STUN_CHANCE)) * level * (particles ? player.getCooledAttackStrength(0) : 1);
+		double chance = (CHANCE + CharmManager.getLevelPercentDecimal(player, CHARM_STUN_CHANCE)) * level * (particles ? player.getCooledAttackStrength(0) : 1);
 		if (FastUtils.RANDOM.nextDouble() < chance) {
 			if (EntityUtils.isElite(enemy)) {
 				EntityUtils.applyStun(plugin, DURATION_MELEE_ELITE, enemy);

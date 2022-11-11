@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.effects.ItemCooldown;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.infusions.Quench;
 import com.playmonumenta.plugins.itemstats.infusions.Refresh;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -77,7 +78,7 @@ public class LiquidCourage implements Enchantment {
 
 			event.setCancelled(true);
 
-			int duration = DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION);
+			int duration = (int)((DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION)) * Quench.getDurationScaling(plugin, player));
 			plugin.mEffectManager.addEffect(player, COURAGE_EFFECT_SOURCE, new CourageEffect(duration, CharmManager.calculateFlatAndPercentValue(player, CHARM_RESISTANCE, AMOUNT), (int) (CHARGES + CharmManager.getLevel(player, CHARM_CHARGES)), AFFECTED_DAMAGE_TYPES));
 
 			player.setFoodLevel(Math.min(20, player.getFoodLevel() + 8));

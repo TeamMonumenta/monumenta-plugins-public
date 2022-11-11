@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.effects.ItemCooldown;
 import com.playmonumenta.plugins.effects.WarmthEffect;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.infusions.Quench;
 import com.playmonumenta.plugins.itemstats.infusions.Refresh;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -64,8 +65,8 @@ public class IntoxicatingWarmth implements Enchantment {
 				return;
 			}
 
-			int duration = DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION);
-			double amount = 1 + CharmManager.getLevelPercent(player, CHARM_SATURATION);
+			int duration = (int)((DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION)) * Quench.getDurationScaling(plugin, player));
+			double amount = CharmManager.calculateFlatAndPercentValue(player, CHARM_SATURATION, 1);
 
 			plugin.mEffectManager.addEffect(player, WARMTH_EFFECT_SOURCE, new WarmthEffect(duration, (float) amount));
 			event.setCancelled(true);
