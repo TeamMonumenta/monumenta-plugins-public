@@ -36,6 +36,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SignOverride extends BaseOverride {
 	public static final String COPIED_SIGN_HEADER = "Sign contents:";
+	public static final String SIGN_IS_GLOWING = "Sign is glowing";
 
 	@Override
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
@@ -96,7 +97,7 @@ public class SignOverride extends BaseOverride {
 		boolean output = item == null || !(item.hasItemMeta() && item.getItemMeta().hasLore() && ItemUtils.isDye(item.getType()));
 
 		// Compile all the lines of text together and make sure it is not a leaderboard that is being clicked
-		String display = "";
+		StringBuilder display = new StringBuilder();
 		for (Component component : sign.lines()) {
 			if (component.clickEvent() != null) {
 				return output;
@@ -110,11 +111,11 @@ public class SignOverride extends BaseOverride {
 			if (component.hasDecoration(TextDecoration.OBFUSCATED)) {
 				line = ChatColor.MAGIC + line + ChatColor.RESET;
 			}
-			display += line + " ";
+			display.append(line).append(" ");
 		}
 
-		if (!display.isEmpty()) {
-			player.sendMessage(Component.text(display));
+		if (display.length() > 0) {
+			player.sendMessage(Component.text(display.toString()));
 		}
 
 		if (player.isSneaking()) {
@@ -149,6 +150,11 @@ public class SignOverride extends BaseOverride {
 							signItem.line(lineNum, line);
 							Component loreLine = loreBase.append(line);
 							loreLines.add(loreLine);
+						}
+						boolean signGlowing = sign.isGlowingText();
+						signItem.setGlowingText(signGlowing);
+						if (signGlowing) {
+							loreLines.add(Component.text(SIGN_IS_GLOWING, NamedTextColor.WHITE));
 						}
 						blockStateMeta.setBlockState(blockState);
 						blockStateMeta.lore(loreLines);
