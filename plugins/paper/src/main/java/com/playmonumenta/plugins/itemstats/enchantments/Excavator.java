@@ -35,6 +35,10 @@ public class Excavator implements Enchantment {
 
 	@Override
 	public void onBlockBreak(Plugin plugin, Player player, double level, BlockBreakEvent event) {
+		if (player.isSneaking()) {
+			return;
+		}
+
 		Block block = event.getBlock();
 		if (mIgnoredMats.contains(block.getType())) {
 			return;
