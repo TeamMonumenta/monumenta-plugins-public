@@ -737,6 +737,7 @@ public class ItemStatUtils {
 		EPOCH(new Epoch(), "", true, false, false, true),
 		EXECUTION(new Execution(), "", true, false, false, true),
 		EXPEDITE(new Expedite(), "", true, false, false, true),
+		FUELED(new Fueled(), "", true, false, false, true),
 		FOCUS(new Focus(), "", true, false, false, true),
 		GALVANIC(new Galvanic(), "", true, false, false, true),
 		GRACE(new Grace(), "", true, false, false, true),
@@ -792,7 +793,8 @@ public class ItemStatUtils {
 
 		public static final ImmutableSet<InfusionType> DELVE_INFUSIONS = ImmutableSet.of(
 			ARDOR, AURA, CARAPACE, CHOLER, EMPOWERED, EPOCH, EXECUTION, EXPEDITE, MITOSIS, NATANT,
-			NUTRIMENT, PENNATE, REFLECTION, UNDERSTANDING, UNYIELDING, USURPER, VENGEFUL
+			NUTRIMENT, PENNATE, REFLECTION, UNDERSTANDING, UNYIELDING, USURPER, VENGEFUL,
+			REFRESH, SOOTHING, QUENCH, GRACE, GALVANIC, DECAPITATION, FUELED
 		);
 
 		static final String KEY = "Infusions";

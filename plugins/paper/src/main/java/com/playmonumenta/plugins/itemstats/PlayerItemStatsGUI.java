@@ -40,6 +40,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Epoch;
 import com.playmonumenta.plugins.itemstats.infusions.Execution;
 import com.playmonumenta.plugins.itemstats.infusions.Expedite;
 import com.playmonumenta.plugins.itemstats.infusions.Focus;
+import com.playmonumenta.plugins.itemstats.infusions.Fueled;
 import com.playmonumenta.plugins.itemstats.infusions.Nutriment;
 import com.playmonumenta.plugins.itemstats.infusions.Pennate;
 import com.playmonumenta.plugins.itemstats.infusions.Perspicacity;
@@ -114,8 +115,10 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			InfusionType.ARDOR,
 			InfusionType.CARAPACE,
 			InfusionType.CHOLER,
+			InfusionType.DECAPITATION,
 			InfusionType.EXECUTION,
 			InfusionType.EXPEDITE,
+			InfusionType.FUELED,
 			InfusionType.MITOSIS,
 			InfusionType.VENGEFUL
 		);
@@ -312,6 +315,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 		damageMultiplier *= Tenacity.getDamageTakenMultiplier(stats.getInfusion(InfusionType.TENACITY));
 		damageMultiplier *= Carapace.getDamageTakenMultiplier(stats.getInfusion(InfusionType.CARAPACE));
+		damageMultiplier *= Fueled.getDamageTakenMultiplier(stats.getInfusion(InfusionType.FUELED));
 
 		return damageMultiplier;
 	}

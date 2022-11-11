@@ -59,6 +59,7 @@ public class DelveInfusionUtils {
 		GRACE("grace", "Grace", NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
 		GALVANIC("galvanic", "Galvanic", NamespacedKeyUtils.fromString("epic:r3/items/currency/corrupted_circuit"), "Portal"),
 		DECAPITATION("decapitation", "Decapitation", NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
+		FUELED("fueled", "Fueled", NamespacedKeyUtils.fromString("epic:r3/items/currency/broken_god_gearframe"), "Brown"),
 
 		REFUND("refund", "refund", null, null);
 
