@@ -177,7 +177,7 @@ public class TealSpirit extends BossAbilityGroup {
 
 			SpellManager activeSpells = new SpellManager(Arrays.asList(
 				//new ClockworkAssassination(plugin, boss),
-				new SandsOfTime(mBoss, mSpawnLoc, team, 24 * 20, 120),
+				new SandsOfTime(mBoss, mSpawnLoc, team, 24 * 20, 120, 20),
 				//new Rewind(mBoss, mSpawnLoc),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 150),
@@ -310,7 +310,7 @@ public class TealSpirit extends BossAbilityGroup {
 
 			SpellManager activeSpells = new SpellManager(Arrays.asList(
 				//new ClockworkAssassination(plugin, boss),
-				new SandsOfTime(mBoss, mSpawnLoc, team, 25 * 20, 80),
+				new SandsOfTime(mBoss, mSpawnLoc, team, 25 * 20, 80, 40),
 				//new Rewind(mBoss, mSpawnLoc),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 80),

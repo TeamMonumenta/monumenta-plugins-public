@@ -97,6 +97,11 @@ public class SuspendedBallistae extends Spell {
 					.count(7)
 					.ringMode(true)
 					.spawnAsBoss();
+				new PPCircle(Particle.REDSTONE, targetLoc, mRadius - 0.02)
+					.count(7)
+					.ringMode(true)
+					.data(new Particle.DustOptions(Color.fromRGB(252, 3, 3), 1.65f))
+					.spawnAsBoss();
 				if (mT >= mExecutionTime) {
 					world.playSound(targetLoc, Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 2.0f, 0.5f);
 					new PPLine(Particle.WAX_OFF, shotLoc, targetLoc)

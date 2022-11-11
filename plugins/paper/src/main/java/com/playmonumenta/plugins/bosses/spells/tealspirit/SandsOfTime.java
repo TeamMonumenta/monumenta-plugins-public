@@ -31,10 +31,8 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class SandsOfTime extends Spell {
-	private static final int BELL_TIME = 20;
 	private static final double RADIUS = 21;
 	private static final double HEIGHT = 4;
-	private double mDamage = 180;
 	private static final int BLUE_ROOT = 1 * 20;
 	private static final double DIST = 25;
 	private static final int SPREAD = 4;
@@ -46,13 +44,15 @@ public class SandsOfTime extends Spell {
 	private final LivingEntity mBoss;
 	private final Location mCenter;
 	private final int mCooldownTicks;
+	private final double mDamage;
+	private final int mBellTime;
 	private final ChargeUpManager mChargeUp;
 
 	private final Team mNormalTeam;
 	private final Team mRedTeam;
 	private final Team mBlueTeam;
 
-	public SandsOfTime(LivingEntity boss, Location center, Team team, int cooldownTicks, int damage) {
+	public SandsOfTime(LivingEntity boss, Location center, Team team, int cooldownTicks, int damage, int bellTime) {
 		mBoss = boss;
 		mCenter = center;
 		mCooldownTicks = cooldownTicks;
@@ -60,8 +60,8 @@ public class SandsOfTime extends Spell {
 		mNormalTeam = team;
 		mRedTeam = ScoreboardUtils.getExistingTeamOrCreate(RED_TEAM, NamedTextColor.DARK_RED);
 		mBlueTeam = ScoreboardUtils.getExistingTeamOrCreate(BLUE_TEAM, NamedTextColor.BLUE);
-
-		mChargeUp = new ChargeUpManager(mCenter, mBoss, 4 * BELL_TIME, ChatColor.BLUE + "Channeling Sands of Time...", BarColor.BLUE, BarStyle.SOLID, TealSpirit.detectionRange);
+		mBellTime = bellTime;
+		mChargeUp = new ChargeUpManager(mCenter, mBoss, 4 * mBellTime, ChatColor.BLUE + "Channeling Sands of Time...", BarColor.BLUE, BarStyle.SOLID, TealSpirit.detectionRange);
 	}
 
 	@Override
@@ -92,8 +92,8 @@ public class SandsOfTime extends Spell {
 			@Override
 			public void run() {
 				int time = mChargeUp.getTime();
-				if (time % BELL_TIME == 0 && time < 4 * BELL_TIME) {
-					int i = time / BELL_TIME;
+				if (time % mBellTime == 0 && time < 4 * mBellTime) {
+					int i = time / mBellTime;
 					Location loc = locs.get(i);
 					mBoss.teleport(loc);
 					float pitch;
@@ -141,6 +141,13 @@ public class SandsOfTime extends Spell {
 					mChargeUp.reset();
 					this.cancel();
 				}
+			}
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				mBoss.setAI(true);
+				mBoss.setGravity(true);
 			}
 		};
 		runnable.runTaskTimer(plugin, 0, 1);
