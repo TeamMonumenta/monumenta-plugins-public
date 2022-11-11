@@ -33,7 +33,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -46,7 +45,6 @@ public class CursedWound extends Ability {
 	private static final double CURSED_WOUND_DAMAGE = 0.05;
 	private static final double CURSED_WOUND_1_CAP = 0.15;
 	private static final double CURSED_WOUND_2_CAP = 0.3;
-	private static final int CURSED_WOUND_EXTENDED_DURATION = 2 * 20;
 	private static final String DOT_EFFECT_NAME = "CursedWoundDamageOverTimeEffect";
 	private static final double DAMAGE_PER_EFFECT_RATIO = 0.03;
 
@@ -68,7 +66,7 @@ public class CursedWound extends Ability {
 		mInfo.mShorthandName = "CW";
 		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3 block radius around it with 1 damage every second for 6s. " +
 			                        "Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.");
-		mInfo.mDescriptions.add("Critical attacks now also extend all enemies' debuffs (except Stun, Silence, and Paralysis) by 2s. Damage cap is increased from 15% to 30%.");
+		mInfo.mDescriptions.add("Damage cap is increased from 15% to 30%.");
 		mInfo.mDescriptions.add("When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. " +
 			                        "Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, " +
 			                        "as well as 3% of your melee attack's damage as magic damage per effect.");
@@ -126,28 +124,6 @@ public class CursedWound extends Ability {
 						(mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, fallingDustData)
 						.spawnAsPlayerActive(mPlayer);
 					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME, new CustomDamageOverTime(CURSED_WOUND_DURATION, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT, CURSED_WOUND_DOT_DAMAGE), CURSED_WOUND_DOT_PERIOD, mPlayer, null));
-					if (isLevelTwo()) {
-						//Bleed interaction
-						if (EntityUtils.isBleeding(mPlugin, mob)) {
-							EntityUtils.setBleedTicks(mPlugin, mob, EntityUtils.getBleedTicks(mPlugin, mob) + CURSED_WOUND_EXTENDED_DURATION);
-						}
-						//Custom slow effect interaction
-						if (EntityUtils.isSlowed(mPlugin, mob)) {
-							EntityUtils.setSlowTicks(mPlugin, mob, EntityUtils.getSlowTicks(mPlugin, mob) + CURSED_WOUND_EXTENDED_DURATION);
-						}
-						//Custom weaken interaction
-						if (EntityUtils.isWeakened(mPlugin, mob)) {
-							EntityUtils.setWeakenTicks(mPlugin, mob, EntityUtils.getWeakenTicks(mPlugin, mob) + CURSED_WOUND_EXTENDED_DURATION);
-						}
-						for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, mob)) {
-							PotionEffect effect = mob.getPotionEffect(effectType);
-							if (effect != null) {
-								mob.removePotionEffect(effectType);
-								// No chance of overwriting and we don't want to trigger PotionApplyEvent for "upgrading" effects, so don't use PotionUtils here
-								mob.addPotionEffect(new PotionEffect(effectType, effect.getDuration() + CURSED_WOUND_EXTENDED_DURATION, effect.getAmplifier()));
-							}
-						}
-					}
 				}
 			}
 			return true;

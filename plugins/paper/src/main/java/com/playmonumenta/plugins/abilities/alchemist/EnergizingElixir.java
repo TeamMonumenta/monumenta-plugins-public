@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.EnergizingElixirStacks;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -37,6 +38,7 @@ public class EnergizingElixir extends Ability {
 	private static final double DAMAGE_AMPLIFIER_2 = 0.1;
 	private static final String PERCENT_DAMAGE_EFFECT_NAME = "EnergizingElixirPercentDamageEffect";
 
+	private static final String ENHANCED_STACKS_NAME = EnergizingElixirStacks.GENERIC_NAME;
 	private static final double ENHANCED_BONUS = 0.03;
 	private static final int ENHANCED_MAX_STACK = 4;
 
@@ -60,7 +62,7 @@ public class EnergizingElixir extends Ability {
 		mInfo.mShorthandName = "EE";
 		mInfo.mDescriptions.add("Left click while holding an Alchemist's Bag to consume a potion to apply 10% Speed and Jump Boost 2 to yourself for 6s. Cooldown: 2s.");
 		mInfo.mDescriptions.add("Speed is increased to 20%; additionally, gain a 10% damage buff from all sources for the same duration.");
-		mInfo.mDescriptions.add("Recasting this ability while the buff is still active refreshes the duration and increases the damage bonus and speed by 3%, up to 4 stacks.");
+		mInfo.mDescriptions.add("Recasting this ability while the buff is still active refreshes the duration and increases the damage bonus and speed by 3%, up to 4 stacks. Stacks decay every 6 seconds.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.RABBIT_FOOT, 1);
@@ -88,8 +90,7 @@ public class EnergizingElixir extends Ability {
 			if (isEnhanced()) {
 				if (mPlugin.mEffectManager.hasEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME)) {
 					mStacks = Math.min(ENHANCED_MAX_STACK + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS), mStacks + 1);
-				} else {
-					mStacks = 0;
+					mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME, new EnergizingElixirStacks(DURATION, mStacks));
 				}
 			}
 
@@ -116,5 +117,15 @@ public class EnergizingElixir extends Ability {
 			cast(Action.LEFT_CLICK_AIR);
 		}
 		return false;
+	}
+
+	@Override
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		if (oneSecond && !mPlugin.mEffectManager.hasEffect(mPlayer, EnergizingElixirStacks.class) && mStacks > 0) {
+			mStacks--;
+			if (mStacks > 0) {
+				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME, new EnergizingElixirStacks(DURATION, mStacks));
+			}
+		}
 	}
 }

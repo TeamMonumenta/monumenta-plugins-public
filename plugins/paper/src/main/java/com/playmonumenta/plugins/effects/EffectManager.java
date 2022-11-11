@@ -280,6 +280,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(DeepGodsEndowment.effectID, DeepGodsEndowment::deserialize);
 		mEffectDeserializer.put(DurabilitySaving.effectID, DurabilitySaving::deserialize);
 		mEffectDeserializer.put(EnchantedPrayerAoE.effectID, EnchantedPrayerAoE::deserialize);
+		mEffectDeserializer.put(EnergizingElixirStacks.effectID, EnergizingElixirStacks::deserialize);
 		mEffectDeserializer.put(FirstStrikeCooldown.effectID, FirstStrikeCooldown::deserialize);
 		mEffectDeserializer.put(FlatDamageDealt.effectID, FlatDamageDealt::deserialize);
 		mEffectDeserializer.put(HealingSickness.effectID, HealingSickness::deserialize);

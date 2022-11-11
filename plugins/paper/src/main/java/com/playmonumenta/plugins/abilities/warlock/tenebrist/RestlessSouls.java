@@ -2,10 +2,6 @@ package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
-import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
-import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -15,27 +11,28 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
+import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vex;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class RestlessSouls extends Ability {
 	private static final int DAMAGE_1 = 10;
@@ -47,9 +44,10 @@ public class RestlessSouls extends Ability {
 	private static final int VEX_CAP_2 = 5;
 	private static final int DEBUFF_DURATION = 4 * 20;
 	public static final String VEX_NAME = "RestlessSoul";
-	private static final int TICK_INTERVAL = 5;
+	private static final int TICK_INTERVAL = 1;
 	private static final int DETECTION_RANGE = 24;
 	private static final int RANGE = 8;
+	private static final double MOVESPEED = 2.5; //block(s) per second on 0.2 mob speed
 
 	public static final String CHARM_DAMAGE = "Restless Souls Damage";
 	public static final String CHARM_RADIUS = "Restless Souls Radius";
@@ -65,7 +63,6 @@ public class RestlessSouls extends Ability {
 	private List<Vex> mVexList = new ArrayList<Vex>();
 	private PartialParticle mParticle1;
 	private PartialParticle mParticle2;
-	private Ability[] mAbilities = {};
 
 	public RestlessSouls(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Restless Souls");
@@ -81,14 +78,6 @@ public class RestlessSouls extends Ability {
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne ? DAMAGE_1 : DAMAGE_2);
 		mSilenceTime = isLevelOne ? SILENCE_DURATION_1 : SILENCE_DURATION_2;
 		mVexCap = (int) CharmManager.getLevel(player, CHARM_CAP) + (isLevelOne ? VEX_CAP_1 : VEX_CAP_2);
-
-		if (player != null) {
-			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				mAbilities = Stream.of(CholericFlames.class, GraspingClaws.class,
-						MelancholicLament.class, HauntingShades.class, WitheringGaze.class)
-					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
-			});
-		}
 	}
 
 	@Override
@@ -142,9 +131,9 @@ public class RestlessSouls extends Ability {
 				int mTicksElapsed = 0;
 				@Nullable LivingEntity mTarget;
 				Vex mBoss = mVex;
+				double mRadian = 0;
 				@Override
 				public void run() {
-
 					Location loc = mBoss.getLocation().add(0, 0.25, 0);
 					mParticle1.location(loc).spawnAsPlayerActive(mPlayer);
 					mParticle2.location(loc).spawnAsPlayerActive(mPlayer);
@@ -157,9 +146,6 @@ public class RestlessSouls extends Ability {
 							world.playSound(vexLoc, Sound.ENTITY_VEX_DEATH, 1.5f, 1.0f);
 							new PartialParticle(Particle.SOUL, vexLoc, 20, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
 						}
-						if (mTarget != null) {
-							mTarget.removePotionEffect(PotionEffectType.GLOWING);
-						}
 						if (mBoss != null) {
 							mBoss.remove();
 						}
@@ -167,20 +153,16 @@ public class RestlessSouls extends Ability {
 						return;
 					}
 
-					if (mTarget != null && !mTarget.isDead() && mTarget.getHealth() > 0) {
-						mBoss.setTarget(mTarget);
-					}
-
-					LivingEntity target = mBoss.getTarget();
 					// re-aggro
-					if ((target == null || target.isDead() || target.getHealth() <= 0) && mTicksElapsed >= TICK_INTERVAL * 2) {
+					mTarget = mBoss.getTarget();
+					if (mTarget == null || mTarget.isDead() || mTarget.getHealth() <= 0) {
 						Location pLoc = mPlayer.getLocation();
 						List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(pLoc, DETECTION_RANGE, mBoss);
 						if (!nearbyMobs.isEmpty()) {
 							nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
-							Collections.shuffle(nearbyMobs);
 							// check mob count again after removal of vexes
 							if (nearbyMobs.size() > 0) {
+								Collections.shuffle(nearbyMobs);
 								LivingEntity randomMob = nearbyMobs.get(0);
 								if (randomMob != null) {
 									mBoss.setTarget(randomMob);
@@ -189,16 +171,26 @@ public class RestlessSouls extends Ability {
 							}
 						}
 					}
-					// forced attack after charge
-					if (mBoss.isCharging()) {
-						// charge attack in progress, increase mob "hitbox" by 4 blocks
-						ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-						LivingEntity damagee = mBoss.getTarget();
-						if (mBoss.getLocation().distance(damagee.getLocation().add(0, 1, 0)) <= 4) {
-							RestlessSoulsBoss.attack(mPlugin, mPlayer, playerItemStats, mBoss, damagee, mLevel, mDamage,
-								mSilenceTime, mAbilities, DEBUFF_DURATION);
+
+					// haunted move boss method
+					// movement
+					Location vexLoc = mBoss.getLocation();
+					if (mTarget != null && !mTarget.isDead()) {
+						mBoss.setCharging(true);
+						Vector direction = LocationUtils.getDirectionTo(mTarget.getLocation(), vexLoc);
+						vexLoc.setDirection(direction);
+						double scale = mTarget.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() / 0.2;
+						vexLoc.add(direction.multiply(MOVESPEED * TICK_INTERVAL / 20 * scale));
+						// attack
+						if (mBoss.getBoundingBox().overlaps(mTarget.getBoundingBox())) {
+							mBoss.attack(mTarget);
 						}
+					} else {
+						mBoss.setCharging(false);
 					}
+					// bobbing
+					mBoss.teleport(vexLoc.clone().add(0, FastMath.sin(mRadian) * 0.05, 0));
+					mRadian += Math.PI / 20D; // Finishes a sin bob in (20 * 2) ticks
 					mTicksElapsed += TICK_INTERVAL;
 				}
 			}.runTaskTimer(mPlugin, 0, TICK_INTERVAL);

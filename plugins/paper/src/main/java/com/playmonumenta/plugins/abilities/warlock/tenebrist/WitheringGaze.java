@@ -55,7 +55,7 @@ public class WitheringGaze extends Ability {
 		mInfo.mScoreboardId = "WitheringGaze";
 		mInfo.mShorthandName = "WG";
 		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. " +
-			                        "Enemies in its path are stunned for 3 seconds (elites and bosses are given 30% Slowness instead) " +
+			                        "Enemies in its path are stunned for 3 seconds (elites and bosses are given 100% Slowness instead) " +
 			                        "and dealt 1 damage every half second for 6 seconds. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Your damage over time lasts for 8 seconds. Cooldown: 20s.");
 		mInfo.mLinkedSpell = ClassAbility.WITHERING_GAZE;
@@ -100,7 +100,7 @@ public class WitheringGaze extends Ability {
 				Hitbox hitbox = Hitbox.approximateCylinderSegment(LocationUtils.getHalfHeightLocation(player).add(0, -mDamageRange, 0), 2 * mDamageRange, mDamageRange, Math.toRadians(ANGLE));
 				for (LivingEntity e : hitbox.getHitMobs()) {
 					if (EntityUtils.isElite(e) || EntityUtils.isBoss(e) || ((e instanceof Player p) && AbilityManager.getManager().isPvPEnabled(p))) {
-						EntityUtils.applySlow(mPlugin, WITHERING_GAZE_STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), 0.3, e);
+						EntityUtils.applySlow(mPlugin, WITHERING_GAZE_STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), 1.0, e);
 					} else {
 						EntityUtils.applyStun(mPlugin, WITHERING_GAZE_STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), e);
 					}
