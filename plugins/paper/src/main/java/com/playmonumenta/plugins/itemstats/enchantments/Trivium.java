@@ -62,6 +62,13 @@ public class Trivium implements Enchantment {
 									0.8f,
 									2f
 								);
+								p.playSound(
+									p.getLocation(),
+									Sound.ENTITY_BLAZE_SHOOT,
+									SoundCategory.PLAYERS,
+									0.8f,
+									2f
+								);
 							}
 						});
 					});
