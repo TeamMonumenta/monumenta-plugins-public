@@ -24,7 +24,7 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	protected int mDuration;
 	public String mEffectID;
-	private boolean mDisplayTime = false;
+	private boolean mDisplayTime = true;
 
 	public Effect(int duration, String effectID) {
 		mDuration = duration;
