@@ -27,14 +27,14 @@ public class Haunted {
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 		{
-			"A looming figure haunts you relentlessly",
-			"until the dungeon has been completed,",
+			"A looming figure haunts you relentlessly,",
 			"only moving when you do."
 		}
 	};
-	public static final double MAX_SPEED = 0.1;
+	public static final double MAX_SPEED = 0.5;
 	public static final double DAMAGE = 0.3; //percentage
 	public static final double RANGE = 50;
+	public static final double VERTICAL_SPEED_DEBUFF = 3;
 
 	private static void followPlayer(Player p, ArmorStand armorStand) {
 		new BukkitRunnable() {
@@ -46,6 +46,8 @@ public class Haunted {
 
 			int mHitTimer = 0;
 			int mBeatCD = 0;
+
+			int mRangeCD = 0;
 			@Override
 			public void run() {
 				if (!p.isOnline() || !armorStand.isValid()) {
@@ -71,10 +73,11 @@ public class Haunted {
 					summonBeast(p, p.getLocation().add(0, 10, 0));
 					return;
 				} else if (distance > RANGE / 2) {
-					mSpeed = MAX_SPEED;
+					mSpeed = MAX_SPEED * 2;
 				} else {
-					mSpeed = MAX_SPEED * 1.5;
+					mSpeed = MAX_SPEED;
 				}
+
 				// Change the direction of the stand and its head
 				Vector direction = LocationUtils.getDirectionTo(p.getLocation(), mSLoc);
 				mSLoc.setDirection(direction);
@@ -111,30 +114,21 @@ public class Haunted {
 				new PartialParticle(Particle.SOUL, armorStand.getLocation().add(0, 1, 0), 1, 0.3, 0.4, 0.3, 0.025)
 					.minimumMultiplier(false).spawnAsEntityActive(armorStand);
 
+				//Sounds
 				distance = mSLoc.distance(p.getLocation());
-				if (distance <= 16) {
-					int beatPeriod = Math.max(7, (int) (distance * 2));
-					if (mBeatCD <= 0) {
-						p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 2, 0);
-						int beatRate = 5;
-						if (distance <= 6) {
-							beatRate = 3;
-							if (distance <= 3) {
-								beatRate = 2;
-							}
-						}
-						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(),
-							() -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 2, 0), beatRate);
-						mBeatCD = beatPeriod;
-					}
+				if (distance <= 16 && mRangeCD <= 0) {
+					p.playSound(armorStand.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 1.75f, 0f);
+					mRangeCD = 70;
 				}
-				mBeatCD--;
+				mRangeCD--;
 
-				if (mPLoc.distance(p.getLocation()) < 0.005) {
+				double pMovedTick = mPLoc.distance(p.getLocation());
+
+				if (pMovedTick < 0.005) {
 					return;
 				}
 
-				mSLoc.add(direction.multiply(mSpeed));
+				mSLoc.add(direction.multiply(mSpeed*pMovedTick).divide(new Vector(1, VERTICAL_SPEED_DEBUFF, 1)));
 				mPLoc = p.getLocation();
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0L, 1L);
