@@ -126,6 +126,8 @@ public class Haunted {
 
 				if (pMovedTick < 0.005) {
 					return;
+				} else if (pMovedTick > 1) {
+					pMovedTick = 1;
 				}
 
 				mSLoc.add(direction.multiply(mSpeed*pMovedTick).divide(new Vector(1, VERTICAL_SPEED_DEBUFF, 1)));
