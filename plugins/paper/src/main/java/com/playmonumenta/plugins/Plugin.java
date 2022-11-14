@@ -386,6 +386,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new BrokenEquipmentListener(), this);
 		manager.registerEvents(PortalManager.getInstance(), this);
 		manager.registerEvents(new LootingLimiter(), this);
+		manager.registerEvents(new InventoryUpdateListener(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(this), this);

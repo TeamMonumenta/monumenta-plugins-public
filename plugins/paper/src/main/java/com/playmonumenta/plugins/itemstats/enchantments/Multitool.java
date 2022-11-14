@@ -72,6 +72,7 @@ public class Multitool implements Enchantment {
 						item.setType(mat);
 					}
 					player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 2F);
+					player.updateInventory();
 				}
 
 				if (eventMat == Material.GRASS_BLOCK || ItemUtils.isStrippable(eventMat)) {
