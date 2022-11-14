@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.SoothingCombos;
+import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenCombos;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -10,7 +12,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
-import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -27,10 +28,6 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 	public static final String effectID = "DeepGodsEndowment";
 
 	public static int HITS_NEEDED = 5;
-	Random RANDOM = new Random();
-
-	public static final String SOOTHING_SPEED_EFFECT_NAME = "SoothingCombosPercentSpeedEffect";
-	private static final String EARTH_PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "EarthenCombosPercentDamageReceivedEffect";
 
 	private int mCurrHits = 0;
 
@@ -40,19 +37,21 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
-		mCurrHits += 1;
+		if (entity instanceof Player player && event.getType() == DamageType.MELEE && player.getCooledAttackStrength(0) == 1) {
+			mCurrHits += 1;
 
-		if (mCurrHits >= HITS_NEEDED) {
-			mCurrHits = 0;
-			int randInt = RANDOM.ints(0, 5).findFirst().getAsInt();
+			if (mCurrHits >= HITS_NEEDED) {
+				mCurrHits = 0;
+				int randInt = FastUtils.RANDOM.nextInt(0, 5);
 
-			switch (randInt) {
-				case 0 -> soothingCombo(entity, enemy);
-				case 1 -> earthenCombo(entity, enemy);
-				case 2 -> volcanicCombo(entity, enemy);
-				case 3 -> frigidCombo(entity, enemy);
-				case 4 -> darkCombo(entity, enemy);
-				default -> {
+				switch (randInt) {
+					case 0 -> soothingCombo(entity, enemy);
+					case 1 -> earthenCombo(entity, enemy);
+					case 2 -> volcanicCombo(entity, enemy);
+					case 3 -> frigidCombo(entity, enemy);
+					case 4 -> darkCombo(entity, enemy);
+					default -> {
+					}
 				}
 			}
 		}
@@ -65,7 +64,7 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 
 		for (Player p : players) {
 			p.addPotionEffect(hasteEffect);
-			Plugin.getInstance().mEffectManager.addEffect(p, SOOTHING_SPEED_EFFECT_NAME, new PercentSpeed(20 * 2, 0.1, SOOTHING_SPEED_EFFECT_NAME));
+			Plugin.getInstance().mEffectManager.addEffect(p, SoothingCombos.SPEED_EFFECT_NAME, new PercentSpeed(20 * 2, 0.1, SoothingCombos.SPEED_EFFECT_NAME));
 			entity.getWorld().spawnParticle(Particle.END_ROD, p.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
 			entity.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, p.getLocation().add(0, 1, 0), 5, 0.7, 0.7, 0.7, 0.001);
 			entity.getWorld().playSound(p.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.6f);
@@ -77,7 +76,7 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 	}
 
 	public void earthenCombo(LivingEntity entity, LivingEntity enemy) {
-		Plugin.getInstance().mEffectManager.addEffect(entity, EARTH_PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(20 * 4, -.08));
+		Plugin.getInstance().mEffectManager.addEffect(entity, EarthenCombos.PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(20 * 4, -.08));
 		EntityUtils.applySlow(Plugin.getInstance(), 25, .99, enemy);
 
 		Location loc = entity.getLocation().add(0, 1, 0);

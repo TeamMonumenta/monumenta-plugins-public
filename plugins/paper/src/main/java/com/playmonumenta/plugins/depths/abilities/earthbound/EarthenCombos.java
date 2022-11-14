@@ -21,7 +21,7 @@ public class EarthenCombos extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Earthen Combos";
 	public static final int TIME = 20;
-	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "EarthenCombosPercentDamageReceivedEffect";
+	public static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "EarthenCombosPercentDamageReceivedEffect";
 	private static final double[] PERCENT_DAMAGE_RECEIVED = {-.08, -.10, -.12, -.14, -.16, -.20};
 	private static final int DURATION = 20 * 4;
 	private static final int ROOT_DURATION = 25;
