@@ -159,7 +159,7 @@ public class DelveLootTableGroup {
 
 	public static void setDelveLootTable(Player player, Block block) {
 		BlockState blockState = block.getState();
-		if (blockState instanceof Chest chest) {
+		if (blockState instanceof Chest chest && chest.hasLootTable()) {
 			List<Player> players = DelvesUtils.playerInRangeForDelves(player.getLocation());
 			int playerTotalDelvePoint = DelvesUtils.getPartyDelvePoints(players);
 			int playerCount = players.size();

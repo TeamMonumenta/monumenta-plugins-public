@@ -232,6 +232,7 @@ public class Plugin extends JavaPlugin {
 		BlueStrikeDaggerCraftingBoss.register();
 		ScanChests.register();
 		AbsorptionCommand.register();
+		SetActivity.register(this);
 
 		try {
 			mHttpManager = new HttpManager(this);

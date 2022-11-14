@@ -571,8 +571,8 @@ public class DelvesUtils {
 			return 0;
 		}
 		int points = 0;
-		for (int x : map.values()) {
-			points += x;
+		for (DelvesModifier mod : map.keySet()) {
+			points += map.get(mod) * mod.getPointsPerLevel();
 		}
 		return points;
 	}
