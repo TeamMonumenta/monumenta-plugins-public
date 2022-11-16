@@ -104,6 +104,10 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc.clone().add(0, 0.15, 0), 0, 1, 0, 0, 50, 0.3f,
 			true, 0, Particle.END_ROD);
+	}
+
+	@Override
+	public void bezoarTarget(Player mPlayer, Location loc) {
 		new BukkitRunnable() {
 
 			double mRadius = 0;
@@ -132,7 +136,7 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 
 		createDrip(new Vector(0, 1, 0), loc, mPlayer);
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 3; i++) {
 			createDrip(new Vector(FastUtils.randomDoubleInRange(-1, 1), 1,
 				FastUtils.randomDoubleInRange(-1, 1)), loc, mPlayer);
 		}
@@ -152,7 +156,7 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 
 				Location to = mPlayer.getLocation().add(0, 1, 0);
 
-				for (int i = 0; i < 2; i++) {
+				for (int i = 0; i < 3; i++) {
 					if (mT <= 5) {
 						mD = dir.clone();
 					} else {

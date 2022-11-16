@@ -121,8 +121,10 @@ public class Bezoar extends Ability {
 				for (Player p : PlayerUtils.playersInRange(itemLoc, 1, true)) {
 					if (p != mPlayer) {
 						applyEffects(p);
+						mCosmetic.bezoarTarget(p, itemLoc);
 					}
 					applyEffects(mPlayer);
+					mCosmetic.bezoarTarget(mPlayer, itemLoc);
 
 					if (mAlchemistPotions != null) {
 						mAlchemistPotions.incrementCharges(POTIONS + (int) CharmManager.getLevel(mPlayer, CHARM_POTIONS));
@@ -143,6 +145,7 @@ public class Bezoar extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
+
 
 	private void applyEffects(Player player) {
 		if (mPlayer == null) {

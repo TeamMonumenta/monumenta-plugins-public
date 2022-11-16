@@ -174,11 +174,8 @@ public class PredatorStrike extends Ability {
 		if (mPlayer == null) {
 			return;
 		}
-		World world = mPlayer.getWorld();
 
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE)));
-
-		mCosmetic.strikeExplode(world, mPlayer, loc, mExplodeRadius);
 
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mExplodeRadius);
 		for (LivingEntity mob : hitbox.getHitMobs()) {

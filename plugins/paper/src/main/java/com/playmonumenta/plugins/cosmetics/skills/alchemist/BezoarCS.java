@@ -56,6 +56,10 @@ public class BezoarCS implements CosmeticSkill {
 		new PartialParticle(Particle.FALLING_DUST, loc, 1, 0.2, 0.2, 0.2, FALLING_DUST_DATA).spawnAsPlayerActive(mPlayer);
 	}
 
+	public void bezoarTarget(Player player, Location loc) {
+
+	}
+
 	public void bezoarPickup(Player mPlayer, Location loc) {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
