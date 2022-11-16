@@ -84,6 +84,11 @@ public class DelveLootTableGroup {
 		new DelveLootTableGroup("r3/delves/blue/base_lootroom_racewin", "r3/delves/blue/dmat_lootroom_racewin", "r3/delves/blue/cmat_lootroom_racewin", "r3/dungeons/blue/lootroom_racewin").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r3/delves/blue/base_lootroom_rare", "r3/delves/blue/dmat_lootroom_rare", "r3/delves/blue/cmat_lootroom_rare", "r3/dungeons/blue/lootroom_rare").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
+		new DelveLootTableGroup("r3/delves/brown/base_cogs", "r3/delves/brown/dmat_cogs", "r3/delves/delves/brown/cmat_cogs", "r3/dungeons/brown/cogs").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/delves/brown/base_quartz", "r3/delves/brown/dmat_quartz", "r3/delves/delves/brown/cmat_quartz", "r3/dungeons/brown/quartz").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/delves/brown/base_lootroom_boss", "r3/delves/brown/dmat_lootroom_boss", "r3/delves/delves/brown/cmat_lootroom_boss", "r3/dungeons/brown/lootroom_boss").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/delves/brown/base_lootroom_rare", "r3/delves/brown/dmat_lootroom_rare", "r3/delves/delves/brown/cmat_lootroom_rare", "r3/dungeons/brown/lootroom_rare").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
 		// R3 Overworld Delves
 		// amanita
 		new DelveLootTableGroup("r3/world/poi/amanita_colony/delves/base_chest", "r3/world/poi/amanita_colony/delves/dmat_chest", "r3/world/poi/amanita_colony/delves/cmat_chest", "r3/world/poi/amanita_colony/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
