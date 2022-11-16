@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 public class Steadfast implements Enchantment {
 
 	private static final double ARMOR_BONUS_PER_LEVEL = 0.2;
-	public static final double BONUS_SCALING_RATE = 0.25;
+	public static final double BONUS_SCALING_RATE = 0.33;
 
 	@Override
 	public String getName() {
