@@ -16,7 +16,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.Vibration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -100,8 +99,7 @@ public class PhlegmaticResolve extends Ability {
 					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), ENHANCE_RADIUS);
 					for (LivingEntity mob : hitbox.getHitMobs()) {
 						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.OTHER, mLastPreMitigationDamage * ENHANCEMENT_DAMAGE);
-						Vibration vibration = new Vibration(mPlayer.getLocation(), new Vibration.Destination.EntityDestination(mob), 3);
-						mPlayer.getWorld().spawnParticle(Particle.VIBRATION, mPlayer.getLocation(), 3, vibration);
+						mPlayer.getWorld().spawnParticle(Particle.WAX_OFF, mob.getLocation(), 6, 0.5f, 0.5f, 0.5f);
 					}
 
 					// Shift the array forward
