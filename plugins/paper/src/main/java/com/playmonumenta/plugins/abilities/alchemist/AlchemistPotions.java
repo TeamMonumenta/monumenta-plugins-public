@@ -58,6 +58,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class AlchemistPotions extends Ability implements AbilityWithChargesOrStacks {
 
+	public static final String METADATA_KEY = "PlayerThrowAlchPotionEvent";
 	public static final int MAX_CHARGES = 8;
 	public static final int POTIONS_TIMER_BASE = 2 * 20;
 	private static final int POTIONS_TIMER_TOWN = 1 * 20;
@@ -197,6 +198,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		if (mPlayer != null && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && ItemUtils.isAlchemistItem(potion.getItem())) {
+			mPlayer.setMetadata(METADATA_KEY, new FixedMetadataValue(mPlugin, mPlayer.getTicksLived()));
 			if (decrementCharge()) {
 				setPotionToAlchemistPotion(potion);
 			} else {

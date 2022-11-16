@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -80,6 +81,12 @@ public class EnergizingElixir extends Ability {
 		if (mPlayer != null
 			&& ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())
 			&& !(mHasUnstableAmalgam && mPlayer.isSneaking())) {
+
+			if (MetadataUtils.happenedThisTick(mPlayer, AlchemistPotions.METADATA_KEY, -1)) {
+				//this may be strange but sometime for some player, when they throw an Alch pot, elixir is randomly cast
+				//Stopping elixir since was caused by potion
+				return;
+			}
 
 			int price = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_PRICE);
 			if (mAlchemistPotions == null || !mAlchemistPotions.decrementCharges(price)) {
