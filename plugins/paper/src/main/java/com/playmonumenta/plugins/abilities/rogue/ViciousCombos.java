@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.ViciousCombosCS;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -99,7 +100,7 @@ public class ViciousCombos extends Ability {
 						mCosmetic.comboOnElite(world, loc, mPlayer, VICIOUS_COMBOS_RANGE, killedEntity);
 
 					} else if (EntityUtils.isHostileMob(killedEntity)) {
-						int timeReduction = isLevelOne() ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
+						int timeReduction = isLevelOne() ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2 + (int) (CharmManager.getLevel(mPlayer, CHARM_CDR) * 20);
 						if (killedEntity instanceof Player) {
 							timeReduction *= 2;
 						}

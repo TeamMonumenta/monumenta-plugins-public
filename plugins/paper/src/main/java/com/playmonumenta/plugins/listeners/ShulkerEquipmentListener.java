@@ -88,6 +88,7 @@ public class ShulkerEquipmentListener implements Listener {
 	private final Plugin mPlugin;
 	private final Map<UUID, BukkitRunnable> mLockBoxCooldowns = new HashMap<>();
 	private final Map<UUID, BukkitRunnable> mCharmBoxCooldowns = new HashMap<>();
+	private final Map<UUID, BukkitRunnable> mOmniBoxCooldowns = new HashMap<>();
 
 	public ShulkerEquipmentListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -206,18 +207,9 @@ public class ShulkerEquipmentListener implements Listener {
 					}
 					event.setCancelled(true);
 				} else if (sbox.isLocked() && sbox.getLock().equals(PORTAL_EPIC_STRING)) {
-					// Shares with Yellow Tesseract Cooldown: Because I am lazy to setup a new cooldown timer thing.
-					boolean safeZone = ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5);
-					int cd = ScoreboardUtils.getScoreboardValue(player, "YellowCooldown").orElse(0);
-					// If the player is in a safezone and the Tesseract is on CD, remove CD and continue.
-					if (safeZone && cd > 0) {
-						ScoreboardUtils.setScoreboardValue(player, "YellowCooldown", 0);
-						cd = 0;
-					}
-
-					// If the CD hasn't hit 0, tell the player and exit.
-					if (cd != 0) {
-						player.sendMessage(Component.text("The Omni Lockbox is on cooldown!", NamedTextColor.RED));
+					//if on cooldown don't swap
+					if (checkOmniSwapCooldown(player)) {
+						player.sendMessage(ChatColor.RED + "Omni Box still on cooldown!");
 						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						event.setCancelled(true);
 						return;
@@ -230,7 +222,27 @@ public class ShulkerEquipmentListener implements Listener {
 					sMeta.setBlockState(sbox);
 					sboxItem.setItemMeta(sMeta);
 
-					swapSkills(player, sboxItem);
+					// Shares with Yellow Tesseract Cooldown: Because I am lazy to setup a new cooldown timer thing.
+					boolean safeZone = ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5);
+					int yellowCooldown = ScoreboardUtils.getScoreboardValue(player, "YellowCooldown").orElse(0);
+					// If the player is in a safezone and the Tesseract is on CD, remove CD and continue.
+					if (safeZone && yellowCooldown > 0) {
+						ScoreboardUtils.setScoreboardValue(player, "YellowCooldown", 0);
+						yellowCooldown = 0;
+					}
+
+					// If the CD hasn't hit 0, tell the player and exit.
+					if (yellowCooldown != 0) {
+						player.sendMessage(Component.text("Your items are swapped, but your class skills remain unchanged.", NamedTextColor.AQUA).append(Component.text(ChatColor.AQUA + " (Skill CD: " + ChatColor.YELLOW + "" + yellowCooldown + "" + ChatColor.AQUA + " mins)")));
+						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+					} else {
+						swapSkills(player, sboxItem);
+
+						if (!ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5)) {
+							ScoreboardUtils.setScoreboardValue(player, "YellowCooldown", 3);
+						}
+					}
+
 					swapVanity(player, sboxItem);
 
 					player.updateInventory();
@@ -238,15 +250,21 @@ public class ShulkerEquipmentListener implements Listener {
 						CharmManager.getInstance().updateCharms(player, CharmManager.getInstance().mPlayerCharms.get(player.getUniqueId()));
 					}
 					event.setCancelled(true);
+
+					//check if swapped in radius of boss
+					Location loc = player.getLocation();
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 24)) {
+						if (mob.getScoreboardTags().contains("Boss") && !mob.getScoreboardTags().contains(TrainingDummyBoss.identityTag)) {
+							player.sendMessage(ChatColor.RED + "Close to boss - Omni Box on 15s cooldown!");
+							setOmniBoxCooldowns(player);
+						}
+					}
+
 					Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = mPlugin.mItemStatManager.getPlayerItemStatsMappings();
 					if (itemStatsMap.containsKey(player.getUniqueId())) {
 						itemStatsMap.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth(), true);
 					}
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
-
-					if (!ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5)) {
-						ScoreboardUtils.setScoreboardValue(player, "YellowCooldown", 3);
-					}
 				}
 			}
 		}
@@ -442,6 +460,22 @@ public class ShulkerEquipmentListener implements Listener {
 		mCharmBoxCooldowns.put(player.getUniqueId(), runnable);
 	}
 
+	private void setOmniBoxCooldowns(Player player) {
+		BukkitRunnable runnable = mOmniBoxCooldowns.remove(player.getUniqueId());
+		if (runnable != null) {
+			runnable.cancel();
+		}
+		runnable = new BukkitRunnable() {
+			@Override
+			public void run() {
+				//Don't need to put anything here - method checks if BukkitRunnable is active
+				mOmniBoxCooldowns.remove(player.getUniqueId());
+			}
+		};
+		runnable.runTaskLater(mPlugin, 20 * 15); //15s cooldown
+		mOmniBoxCooldowns.put(player.getUniqueId(), runnable);
+	}
+
 	//Returns true if cooldown is up right now
 	//False if no cooldowns and the lockbox is activatable now
 	private boolean checkLockboxSwapCooldown(Player player) {
@@ -452,11 +486,15 @@ public class ShulkerEquipmentListener implements Listener {
 		return mCharmBoxCooldowns.containsKey(player.getUniqueId()) && !mCharmBoxCooldowns.get(player.getUniqueId()).isCancelled();
 	}
 
+	private boolean checkOmniSwapCooldown(Player player) {
+		return mOmniBoxCooldowns.containsKey(player.getUniqueId()) && !mOmniBoxCooldowns.get(player.getUniqueId()).isCancelled();
+	}
+
 	public static boolean isPotionInjectorItem(ItemStack item) {
 		return item != null &&
 			ItemUtils.isShulkerBox(item.getType()) &&
 			item.hasItemMeta() &&
 			item.getItemMeta().hasLore() &&
-			       (InventoryUtils.testForItemWithName(item, "Potion Injector") || (InventoryUtils.testForItemWithName(item, "Iridium Injector")));
+			(InventoryUtils.testForItemWithName(item, "Potion Injector") || (InventoryUtils.testForItemWithName(item, "Iridium Injector")));
 	}
 }

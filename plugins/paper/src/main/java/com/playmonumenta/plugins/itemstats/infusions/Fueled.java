@@ -38,7 +38,7 @@ public class Fueled implements Infusion {
 
 			int count = 0;
 			for (LivingEntity mob : mobs) {
-				if (mob.getFireTicks() > 0 || plugin.mEffectManager.hasEffect(mob, InfernoDamage.class)) {
+				if (EntityUtils.isStunned(mob) || EntityUtils.isSlowed(plugin, mob) || mob.getFireTicks() > 0 || plugin.mEffectManager.hasEffect(mob, InfernoDamage.class)) {
 					count++;
 				}
 				if (count >= MOB_CAP) {

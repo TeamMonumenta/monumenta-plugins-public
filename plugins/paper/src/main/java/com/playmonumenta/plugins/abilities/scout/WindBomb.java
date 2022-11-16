@@ -84,7 +84,7 @@ public class WindBomb extends Ability {
 			                                      "giving them Slow Falling and %d%% Weaken for %ds. Cooldown: %ds.",
 			(int) (DAMAGE_FRACTION_1 * 100), RADIUS, (int) (WEAKEN_EFFECT * 100), DURATION / 20, COOLDOWN_1 / 20));
 		mInfo.mDescriptions.add(String.format("The damage is increased to %s%% of your projectile damage and the cooldown is reduced to %ds. " +
-			                                      "Additionally, you deal %d%% more damage to enemies made airborne by this skill, until they hit the ground.",
+				"Additionally, you deal %d%% more damage to enemies affected by this skill for 4 seconds.",
 			(int) (DAMAGE_FRACTION_2 * 100), COOLDOWN_2 / 20, (int) (MIDAIR_DAMAGE_BONUS * 100)));
 		mInfo.mDescriptions.add(String.format("On impact, generate a vortex that pulls mobs within %s blocks toward the center for %d seconds.", (int) PULL_RADIUS, PULL_DURATION / 20));
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
@@ -183,7 +183,7 @@ public class WindBomb extends Ability {
 				}
 				EntityUtils.applyWeaken(mPlugin, duration, weaken, mob);
 				if (isLevelTwo()) {
-					mPlugin.mEffectManager.addEffect(mob, AIR_TAG, new WindBombAirTag(duration * 2, MIDAIR_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MODIFIER), mPlayer));
+					mPlugin.mEffectManager.addEffect(mob, AIR_TAG + mPlayer.getName(), new WindBombAirTag(duration, MIDAIR_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MODIFIER), mPlayer));
 				}
 			}
 

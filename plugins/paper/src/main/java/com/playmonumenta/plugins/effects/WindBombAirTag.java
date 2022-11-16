@@ -44,9 +44,6 @@ public class WindBombAirTag extends Effect {
 			Location loc = entity.getLocation();
 			new PartialParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.5, 0.25, 0.02).spawnAsEnemy();
 			new PartialParticle(Particle.CLOUD, loc, 1, 0.25, 0.5, 0.25, 0).spawnAsEnemy();
-			if (entity.isOnGround()) {
-				setDuration(0);
-			}
 		}
 	}
 

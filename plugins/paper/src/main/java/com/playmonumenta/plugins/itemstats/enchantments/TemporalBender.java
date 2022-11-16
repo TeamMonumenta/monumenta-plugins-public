@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.effects.ItemCooldown;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -29,7 +27,7 @@ public class TemporalBender implements Enchantment {
 	public static final String CHARM_COOLDOWN = "Temporal Bender Cooldown";
 	public static final String CHARM_COOLDOWN_REDUCTION = "Temporal Bender Cooldown Reduction";
 	private static final int COOLDOWN = 20 * 30;
-	private static final double COOLDOWN_REFRESH = 0.3;
+	private static final int COOLDOWN_REFRESH = 5 * 20;
 	public static final Material COOLDOWN_ITEM = Material.GLASS_BOTTLE;
 
 	private static final Particle.DustOptions BLUE1_COLOR = new Particle.DustOptions(Color.fromRGB(0, 203, 230), 1.0f);
@@ -63,11 +61,8 @@ public class TemporalBender implements Enchantment {
 
 			event.setCancelled(true);
 
-			double cooldownRefresh = COOLDOWN_REFRESH + CharmManager.getLevelPercentDecimal(player, CHARM_COOLDOWN_REDUCTION);
-			for (Ability abil : AbilityManager.getManager().getPlayerAbilities(player).getAbilities()) {
-				int cooldownReduction = (int) (abil.getModifiedCooldown() * cooldownRefresh);
-				plugin.mTimers.updateCooldown(player, abil.mInfo.mLinkedSpell, Math.min(4 * 20, cooldownReduction));
-			}
+			int cooldownRefresh = COOLDOWN_REFRESH + (int) (CharmManager.getLevel(player, CHARM_COOLDOWN_REDUCTION) * 20);
+			plugin.mTimers.updateCooldowns(cooldownRefresh);
 
 			player.setFoodLevel(Math.min(20, player.getFoodLevel() + 6));
 			player.setSaturation(Math.min(player.getFoodLevel(), Math.min(player.getSaturation() + 6, 20)));

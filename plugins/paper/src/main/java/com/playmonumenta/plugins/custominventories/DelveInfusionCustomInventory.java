@@ -348,7 +348,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack brownItem = new ItemStack(Material.BROWN_WOOL);
 		ItemMeta brownMeta = brownItem.getItemMeta();
 		brownMeta.displayName(Component.text("Fueled", TextColor.fromCSSHexString("#5C4800")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(brownMeta, "Gain 0.3% Damage Reduction per level for every enemy actively ignited (Vanilla / Inferno) within 8 blocks, capped at 4 mobs.", MAX_LORE_LENGTH, ChatColor.GRAY);
+		splitLoreLine(brownMeta, "Gain 0.3% Damage Reduction per level for every enemy actively ignited (Vanilla / Inferno), Slowed or Stunned within 8 blocks, capped at 4 mobs.", MAX_LORE_LENGTH, ChatColor.GRAY);
 		List<Component> brownLore = brownMeta.lore();
 		brownLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.FUELED), TextColor.fromHexString("#555555")));
 		brownMeta.lore(brownLore);
@@ -660,7 +660,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.BROWN_WOOL, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Fueled level " + (i + 1), TextColor.fromCSSHexString("#86A5C4")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Gain " + String.format("%.1f", 0.3 * (i + 1)) + "% Damage Reduction per level for every enemy actively ignited (Vanilla / Inferno) within 8 blocks, capped at 4 mobs.", MAX_LORE_LENGTH, ChatColor.GRAY);
+			splitLoreLine(meta, "Gain " + String.format("%.1f", 0.3 * (i + 1)) + "% Damage Reduction per level for every enemy actively ignited (Vanilla / Inferno), Slowed or Stunned within 8 blocks, capped at 4 mobs.", MAX_LORE_LENGTH, ChatColor.GRAY);
 			panel.setItemMeta(meta);
 			brownItems.add(panel);
 		}
