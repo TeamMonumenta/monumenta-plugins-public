@@ -235,5 +235,50 @@ public class CustomInventoryCommands {
 				}
 			})
 			.register();
+
+		new CommandAPICommand("emoji")
+			.withPermission("monumenta.command.emoji")
+			.executesPlayer((player, args) -> {
+				new EmojiCustomInventory(player).openInventory(player, plugin);
+			})
+			.register();
+		new CommandAPICommand("emoji")
+			.withPermission("monumenta.command.emoji.others")
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				new EmojiCustomInventory(player).openInventory(player, plugin);
+			})
+			.register();
+		new CommandAPICommand("emote")
+			.withPermission("monumenta.command.emote")
+			.executesPlayer((player, arg) -> {
+				emote(player);
+			})
+			.register();
+		new CommandAPICommand("emote")
+			.withPermission("monumenta.command.emote.others")
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				emote(player);
+			})
+			.register();
+	}
+
+	private static void emote(Player player) {
+		int defaultEmote = ScoreboardUtils.getScoreboardValue(player, EmojiCustomInventory.EMOJI_CHOICE_BOARD).orElse(0);
+		ArrayList<EmojiCustomInventory.Emoji> list = new ArrayList<>();
+		list.addAll(EmojiCustomInventory.EMOJI_LIST);
+		list.removeIf(item -> item.mDefaultID != defaultEmote);
+		if (list.isEmpty()) {
+			player.sendMessage("Select an emote in the emoji selection GUI as a default first!");
+			return;
+		}
+		if (list.get(0).mPatreon && !(ScoreboardUtils.getScoreboardValue(player, "Patreon").orElse(0) >= 10)) {
+			player.sendMessage("You must be a T2+ Patron to use this emote!");
+			return;
+		}
+		EmojiCustomInventory.completeCommand(player, list.get(0).mLeftClick);
 	}
 }
