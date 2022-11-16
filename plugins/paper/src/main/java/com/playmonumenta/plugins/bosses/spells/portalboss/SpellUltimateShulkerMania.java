@@ -60,7 +60,7 @@ public class SpellUltimateShulkerMania extends Spell {
 			public void run() {
 
 				mTicks += 10;
-				if (mTicks >= 200) {
+				if (mTicks >= 150) {
 					this.cancel();
 					return;
 				}
@@ -116,9 +116,9 @@ public class SpellUltimateShulkerMania extends Spell {
 				return;
 			}
 			if (com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.hasEffect(p, "PortalShulkerSlow")) {
-				DamageUtils.damage(mBoss, p, DamageType.MAGIC, DAMAGE * 0.5, null, false, true, "Byte Barrage");
+				DamageUtils.damage(mBoss, p, DamageType.PROJECTILE, DAMAGE * 0.5, null, false, true, "Byte Barrage");
 			} else {
-				DamageUtils.damage(mBoss, p, DamageType.MAGIC, DAMAGE, null, false, true, "Byte Barrage");
+				DamageUtils.damage(mBoss, p, DamageType.PROJECTILE, DAMAGE, null, false, true, "Byte Barrage");
 			}
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "PortalShulkerSlow", new PercentSpeed(2 * 20, -.40, "PortalShulkerSlow"));
 			//Set all nearby mobs to target them
@@ -136,6 +136,11 @@ public class SpellUltimateShulkerMania extends Spell {
 	@Override
 	public int cooldownTicks() {
 		return mCooldown;
+	}
+
+	@Override
+	public boolean canRun() {
+		return mBoss.getWorld().getEntitiesByClass(ShulkerBullet.class).size() < 5;
 	}
 
 }
