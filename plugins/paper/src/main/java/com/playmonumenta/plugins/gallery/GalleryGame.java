@@ -906,8 +906,15 @@ public class GalleryGame {
 				for (GalleryEffect effect : player.getAllEffects()) {
 					moderator.sendMessage(Component.text(effect.getDisplay() != null ? effect.getDisplay() : "Null display ???? " + effect.getType().name(), NamedTextColor.GRAY));
 				}
+				moderator.sendMessage(Component.text("-------------------------------", NamedTextColor.GRAY));
 			}
 		}
+
+		moderator.sendMessage(Component.text("Interactable loaded: " + mInteractableMap.size(), NamedTextColor.GRAY));
+		moderator.sendMessage(Component.text("Spawners loaded: " + mSpawnerMap.size(), NamedTextColor.GRAY));
+		moderator.sendMessage(Component.text("Spawners activated: " + mActivatedSpawnerSet.size(), NamedTextColor.GRAY));
+		moderator.sendMessage(Component.text("Spawners active that spawn: " + mSpawningSpawnersList.size(), NamedTextColor.GRAY));
+
 
 
 	}

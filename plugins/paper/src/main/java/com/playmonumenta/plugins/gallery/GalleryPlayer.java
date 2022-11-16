@@ -146,11 +146,19 @@ public class GalleryPlayer {
 	public void onPlayerJoinEvent() {
 		if (isOnline()) {
 			if (mShouldTeleportToSpawn) {
-				Location loc = getGame().getSpawnLocation();
-				Player player = getPlayer();
-				if (loc != null) {
-					player.teleport(loc);
-				}
+				Bukkit.getScheduler().runTaskLater(GalleryManager.mPlugin, () -> {
+					Location loc = getGame().getSpawnLocation();
+					Player player = getPlayer();
+					if (loc != null) {
+						if (player != null && player.isOnline() && player.isValid()) {
+							player.teleport(loc);
+						} else {
+							GalleryUtils.printDebugMessage("Somehow teleporting a player== null? or an invalid player!");
+						}
+					} else {
+						GalleryUtils.printDebugMessage("LOCATION NULL when teleporting player back to game! how this happen?");
+					}
+				}, 3L);
 			}
 			refreshEffects();
 		}
