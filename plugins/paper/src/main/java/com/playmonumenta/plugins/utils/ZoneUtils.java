@@ -42,7 +42,8 @@ public class ZoneUtils {
 		RESTRICTED("Restricted"),
 		BROOMSTICK_ENABLED("Broomstick Enabled"),
 		BLOCKBREAK_DISABLED("Blockbreak Disabled"),
-		BONE_MEAL_DISABLED("Bone Meal Disabled");
+		BONE_MEAL_DISABLED("Bone Meal Disabled"),
+		LAND_BOAT_POSSIBLE("Land Boat Possible");
 
 		private final String mPropertyName;
 

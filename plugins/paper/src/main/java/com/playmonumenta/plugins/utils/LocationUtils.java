@@ -106,6 +106,9 @@ public class LocationUtils {
 		 * If it's a liquid or ice, this is allowed, otherwise it's not.
 		 */
 		loc = loc.clone();
+		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.LAND_BOAT_POSSIBLE)) {
+			return true;
+		}
 		for (int i = 0; i < 50; i++) {
 			Block block = loc.getBlock();
 			if (block.isLiquid()
