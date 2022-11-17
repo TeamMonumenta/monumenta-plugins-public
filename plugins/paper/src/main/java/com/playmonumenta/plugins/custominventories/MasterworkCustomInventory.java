@@ -40,7 +40,9 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		void run(Player player, Inventory clickedInventory, int slot);
 	}
 
+	//TODO: Replace with next max level
 	private static final int MAX_MASTERWORK_LEVEL = 3;
+
 	private static final int MAX_LORE_LENGTH = 30;
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final Material ORANGE_FILLER = Material.ORANGE_STAINED_GLASS_PANE;
@@ -57,9 +59,15 @@ public final class MasterworkCustomInventory extends CustomInventory {
 	private static final ItemStack mFullUpgradeB = new ItemStack(Material.LIGHT_BLUE_DYE);
 	private static final ItemStack mFullUpgradeC = new ItemStack(Material.YELLOW_DYE);
 	private static final ItemStack mRefundItem = new ItemStack(Material.GRINDSTONE);
+	private static final ItemStack mBackItem = new ItemStack(Material.STRING);
+	private static final ItemStack mPreviewItem = new ItemStack(Material.CHORUS_FLOWER);
 
 	private final Map<Integer, ItemClicked> mMapFunction;
 	private int mRowSelected = 99;
+	private boolean mIsPreview = false;
+	private static HashMap<Integer, int[]> mPatternMap = new HashMap<>();
+	private int mMagicRow = Integer.MAX_VALUE;
+
 
 	static {
 		ItemStack invalidItem = new ItemStack(Material.ARMOR_STAND, 1);
@@ -156,6 +164,17 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		splitLoreLine(refund, "Click to refund Legendary upgrade to Epic level. This refunds 100% of the Location Materials and 75% of the Augments.\n", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
 		mRefundItem.setItemMeta(refund);
 
+		mPatternMap.put(0, new int[] {});
+		mPatternMap.put(1, new int[] {22});
+		mPatternMap.put(2, new int[] {22, 31});
+		mPatternMap.put(3, new int[] {30, 31, 32});
+		mPatternMap.put(4, new int[] {22, 30, 31, 32});
+
+		ItemMeta backMeta = mBackItem.getItemMeta();
+		backMeta.displayName(Component.text("Back", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
+			.decoration(TextDecoration.BOLD, true));
+		mBackItem.setItemMeta(backMeta);
+
 	}
 
 	private static void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
@@ -196,7 +215,9 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		items.add(pi.getItemInMainHand());
 		items.add(pi.getItemInOffHand());
 
-		if (mRowSelected == 99) {
+		if (mIsPreview) {
+			setUpPreview(items.get(mMagicRow < mRowSelected ? mMagicRow : mRowSelected), player);
+		} else if (mRowSelected == 99) {
 			loadMasterworkPage(items);
 		} else {
 			loadMasterworkPath(items.get(mRowSelected), player);
@@ -280,6 +301,21 @@ public final class MasterworkCustomInventory extends CustomInventory {
 				attemptUpgrade(p, item, newItemC, MasterworkCost.getMasterworkCost(costStringC));
 			});
 
+			ItemMeta previewMeta = mPreviewItem.getItemMeta();
+			previewMeta.displayName(Component.text("Preview Masterwork Levels", TextColor.fromHexString("#FFAA00"))
+				.decoration(TextDecoration.ITALIC, false)
+				.decoration(TextDecoration.BOLD, true));
+			mPreviewItem.setItemMeta(previewMeta);
+			mInventory.setItem(49, mPreviewItem);
+			mMapFunction.put(49, (player, inventory, slot) -> {
+				mIsPreview = true;
+			});
+
+			mInventory.setItem(0, mBackItem);
+			mMapFunction.put(0, (player, inventory, slot) -> {
+				mRowSelected = 99;
+			});
+
 			// Fill in aesthetics
 			fillWithColoredJunk(13, ORANGE_FILLER);
 			fillWithColoredJunk(30, A_FILLER);
@@ -320,6 +356,20 @@ public final class MasterworkCustomInventory extends CustomInventory {
 				attemptUpgrade(p, item, newItem, MasterworkCost.getMasterworkCost(costString));
 			});
 
+			ItemMeta previewMeta = mPreviewItem.getItemMeta();
+			previewMeta.displayName(Component.text("Preview Masterwork Levels", TextColor.fromHexString("#FFAA00"))
+				.decoration(TextDecoration.ITALIC, false)
+				.decoration(TextDecoration.BOLD, true));
+			mPreviewItem.setItemMeta(previewMeta);
+			mInventory.setItem(49, mPreviewItem);
+			mMapFunction.put(49, (player, inventory, slot) -> {
+				mIsPreview = true;
+			});
+
+			mInventory.setItem(0, mBackItem);
+			mMapFunction.put(0, (player, inventory, slot) -> {
+				mRowSelected = 99;
+			});
 			// Fill in aesthetics
 			fillWithColoredJunk(13, ORANGE_FILLER);
 			fillWithColoredJunk(31, ORANGE_FILLER);
@@ -329,6 +379,32 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			fillWithColoredJunk(16, ORANGE_FILLER);
 			fillWithColoredJunk(34, ORANGE_FILLER);
 			fillWithColoredJunk(43, ORANGE_FILLER);
+		}
+	}
+
+	private void setUpPreview(ItemStack item, Player p) {
+		mMapFunction.put(0, (player, inventory, slot) -> {
+			mIsPreview = false;
+			mMagicRow = Integer.MAX_VALUE;
+		});
+		List<ItemStack> allMasterworks = MasterworkUtils.getAllMasterworks(item, p);
+
+		int tiers = allMasterworks.size();
+
+		//Only true when it is an epic, by design (or only has tiers above the max)
+		if (tiers == 0) {
+			mMapFunction.get(0).run(p, mInventory, 0);
+			loadInv(p);
+			return;
+		}
+
+		fillWithJunk();
+		mInventory.setItem(0, mBackItem);
+
+		int j = 0;
+		for (int i : mPatternMap.get(tiers)) {
+			mInventory.setItem(i, allMasterworks.get(j));
+			j++;
 		}
 	}
 
@@ -405,6 +481,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 						mInventory.setItem((row * 9) + currMasterwork + 2, mNoPossibleUpgradeItem);
 						mMapFunction.put((row * 9) + currMasterwork + 2, (p, inventory, slot) -> {
 							p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_FALL, 1.f, 1.f);
+							mIsPreview = true;
+							mMagicRow = rowF;
 						});
 						for (int i = (row * 9) + 1; i < (row * 9) + currMasterwork + 2; i++) {
 							fillWithColoredJunk(i, PURPLE_FILLER);

@@ -5,8 +5,10 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Masterwork;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -304,6 +306,30 @@ public class MasterworkUtils {
 		}
 
 		return path;
+	}
+
+	public static List<ItemStack> getAllMasterworks(ItemStack item, Player p) {
+		String basePath = "epic:r3/masterwork/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/" + toCleanPathName(ItemUtils.getPlainName(item));
+		ArrayList<String> paths = new ArrayList<>();
+		Masterwork m = ItemStatUtils.getMasterwork(item);
+		//If nonexistent yet on this page, display nothing
+		if (m == Masterwork.ERROR || m == Masterwork.NONE || ItemStatUtils.getRegion(item) != Region.RING) {
+			return new ArrayList<>();
+		}
+
+		for (int i = 0; i < 7; i++) {
+			paths.add(basePath + "_m" + i);
+		}
+		String abc = "abc";
+		for (int i = 0; i < abc.length(); i++) {
+			paths.add(basePath + "m7" + abc.charAt(i));
+		}
+
+		//TODO: Replace with next max level
+		List<ItemStack> realItems = paths.stream().filter(s -> InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(s)) != null)
+			.filter(s -> s.substring(s.lastIndexOf('m') + 1).matches("[0123]"))
+			.map(s -> InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(s))).collect(Collectors.toList());
+		return realItems;
 	}
 
 	public static String getNextItemPath(ItemStack item) {
