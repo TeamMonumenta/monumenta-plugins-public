@@ -49,7 +49,7 @@ public class ColossalBruteCS extends BruteForceCS {
 	}
 
 	@Override
-	public void bruteOnDamage(Player mPlayer, Location loc, int combo) {
+	public void bruteOnDamage(Player mPlayer, Location loc, double radius, int combo) {
 		mPlayer.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.75f);
 		mPlayer.getWorld().playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.75f, PITCHES[combo]);
 		mPlayer.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.PLAYERS, 1f, 0.65f);
@@ -81,7 +81,7 @@ public class ColossalBruteCS extends BruteForceCS {
 
 			double mRadius = 0;
 			final Location mL = loc.clone().subtract(0, 0.6, 0);
-			final double RADIUS = 2.5;
+			final double RADIUS = radius * 1.25;
 			@Override
 			public void run() {
 

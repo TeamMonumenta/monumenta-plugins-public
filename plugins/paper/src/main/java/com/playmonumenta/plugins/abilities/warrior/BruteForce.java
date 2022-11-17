@@ -126,12 +126,13 @@ public class BruteForce extends Ability {
 
 	private void wave(LivingEntity target, Location playerLoc, double damageBonus, boolean damageTarget) {
 		Location loc = target.getLocation().add(0, 0.75, 0);
-		List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, BRUTE_FORCE_RADIUS)).getHitMobs();
+		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BRUTE_FORCE_RADIUS);
+		List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, radius).getHitMobs();
 		if (mobs.isEmpty()) {
 			return;
 		}
 
-		mCosmetic.bruteOnDamage(mPlayer, loc, mComboNumber);
+		mCosmetic.bruteOnDamage(mPlayer, loc, radius, mComboNumber);
 
 		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, BRUTE_FORCE_KNOCKBACK_SPEED);
 
