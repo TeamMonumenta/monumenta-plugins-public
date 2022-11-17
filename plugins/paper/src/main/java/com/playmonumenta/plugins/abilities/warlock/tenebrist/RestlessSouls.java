@@ -177,9 +177,23 @@ public class RestlessSouls extends Ability {
 					Location vexLoc = mBoss.getLocation();
 					if (mTarget != null && !mTarget.isDead()) {
 						mBoss.setCharging(true);
+						//choose vehicle mob for speed (bee mount mobs do not have speed, but bees do)
+						//sometimes rider have speed, choose fastest
+						LivingEntity mob = mTarget;
+						double speed = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue();
+						while (mob.isInsideVehicle()) {
+							mob = (LivingEntity) mob.getVehicle();
+							speed = Math.max(speed, mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue());
+						}
 						Vector direction = LocationUtils.getDirectionTo(mTarget.getLocation(), vexLoc);
+						//0.2x distance for vertical movement for flying mobs
+						double yDiff = (mTarget.getLocation().getY() - mBoss.getLocation().getY()) * 0.2;
+						if (yDiff > direction.getY()) {
+							direction.setY(yDiff);
+						}
 						vexLoc.setDirection(direction);
-						double scale = mTarget.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() / 0.2;
+						//do not set scaling speed if mob is slower than baseline for shulkers
+						double scale = Math.max(speed / 0.2, 1);
 						vexLoc.add(direction.multiply(MOVESPEED * TICK_INTERVAL / 20 * scale));
 						// attack
 						if (mBoss.getBoundingBox().overlaps(mTarget.getBoundingBox())) {
