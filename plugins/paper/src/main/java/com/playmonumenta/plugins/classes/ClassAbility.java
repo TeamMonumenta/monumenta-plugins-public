@@ -119,12 +119,13 @@ public enum ClassAbility {
 
 	// [Warrior]
 	BRUTE_FORCE("Brute Force"),
+	BRUTE_FORCE_AOE("Brute Force"), // special case for glorious battle
 	COUNTER_STRIKE("Counter Strike"),
 	COUNTER_STRIKE_AOE("Counter Strike"), // special case for glorious battle
 	DEFENSIVE_LINE("Defensive Line"),
 	RIPOSTE("Riposte"),
 	SHIELD_BASH("Shield Bash"),
-	SHIELD_BASH_AOE("Shield Bash"),
+	SHIELD_BASH_AOE("Shield Bash"), // special case for glorious battle
 
 	// Berserker
 	METEOR_SLAM(MeteorSlam.NAME),

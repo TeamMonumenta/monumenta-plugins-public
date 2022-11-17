@@ -49,7 +49,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	private static final double TARGET_RANGE = 10;
 
 	private static final EnumSet<ClassAbility> AFFECTED_ABILITIES = EnumSet.of(
-		ClassAbility.BRUTE_FORCE,
+		ClassAbility.BRUTE_FORCE_AOE,
 		ClassAbility.COUNTER_STRIKE_AOE,
 		ClassAbility.SHIELD_BASH_AOE,
 		ClassAbility.METEOR_SLAM,

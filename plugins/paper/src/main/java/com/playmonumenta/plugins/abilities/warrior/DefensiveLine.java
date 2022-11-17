@@ -37,7 +37,6 @@ public class DefensiveLine extends Ability {
 	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_1 = -0.20;
 	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_2 = -0.30;
 	private static final int DURATION = 20 * 10;
-	private static final int BLOCK_DURATION = 20 * 5;
 	private static final int COOLDOWN = 20 * 30;
 	private static final int RADIUS = 8;
 	private static final int KNOCK_AWAY_RADIUS = 3;
@@ -60,7 +59,7 @@ public class DefensiveLine extends Ability {
 		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain 20% Resistance for 10 seconds. " +
 			                        "Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The effect is increased to 30% Resistance.");
-		mInfo.mDescriptions.add("Additionally, all affected players negate the next melee attack dealt to them within 5 seconds.");
+		mInfo.mDescriptions.add("Additionally, all affected players negate the next melee attack dealt to them within the duration.");
 		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.CHAIN, 1);
@@ -81,7 +80,6 @@ public class DefensiveLine extends Ability {
 					new PartialParticle(Particle.FIREWORKS_SPARK, location, 35, 0.2, 0, 0.2, 0.25).spawnAsPlayerActive(mPlayer);
 
 					int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
-					int blockDuration = BLOCK_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 
 					List<Player> players = PlayerUtils.playersInRange(location, CharmManager.getRadius(mPlayer, CHARM_RANGE, RADIUS), true);
 					players.removeIf(player -> player.getScoreboardTags().contains("disable_class"));
@@ -92,7 +90,7 @@ public class DefensiveLine extends Ability {
 
 						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(duration, mPercentDamageReceived));
 						if (isEnhanced()) {
-							mPlugin.mEffectManager.addEffect(player, NEGATE_DAMAGE_EFFECT_NAME, new NegateDamage(blockDuration, (int) (1 + CharmManager.getLevel(mPlayer, CHARM_NEGATIONS)), EnumSet.of(DamageEvent.DamageType.MELEE), new PartialParticle(Particle.FIREWORKS_SPARK, loc, 5, 0, 0, 0, 0.25f)));
+							mPlugin.mEffectManager.addEffect(player, NEGATE_DAMAGE_EFFECT_NAME, new NegateDamage(duration, (int) (1 + CharmManager.getLevel(mPlayer, CHARM_NEGATIONS)), EnumSet.of(DamageEvent.DamageType.MELEE), new PartialParticle(Particle.FIREWORKS_SPARK, loc, 5, 0, 0, 0, 0.25f)));
 						}
 
 						for (LivingEntity mob : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(player), CharmManager.getRadius(mPlayer, CHARM_RANGE, KNOCK_AWAY_RADIUS)).getHitMobs()) {

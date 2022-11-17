@@ -33,7 +33,7 @@ public class BruteForce extends Ability {
 	private static final int BRUTE_FORCE_DAMAGE = 2;
 	private static final double BRUTE_FORCE_2_MODIFIER = 0.1;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
-	private static final double ENHANCEMENT_DAMAGE_RATIO = 0.5;
+	private static final double ENHANCEMENT_DAMAGE_RATIO = 0.75;
 	private static final int ENHANCEMENT_DELAY = 10;
 
 	public static final String CHARM_RADIUS = "Brute Force Radius";
@@ -57,7 +57,7 @@ public class BruteForce extends Ability {
 		mInfo.mDescriptions.add("Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2 block radus around it, " +
 			                        "and knocks all non-boss enemies away from you.");
 		mInfo.mDescriptions.add("Damage is increased to 10 percent of the attack's damage plus 2.");
-		mInfo.mDescriptions.add("Half a second after triggering this ability, it triggers another wave centered on the same mob, with 50% of the damage and all of the knockback.");
+		mInfo.mDescriptions.add("Half a second after triggering this ability, it triggers another wave centered on the same mob, with 75% of the damage and all of the knockback.");
 		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
 
 		mMultiplier = isLevelOne() ? 0 : BRUTE_FORCE_2_MODIFIER;
@@ -92,9 +92,7 @@ public class BruteForce extends Ability {
 				for (int i = 1; i <= waves; i++) {
 					double damage = damageBonus * Math.pow(damageRatio, i);
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						if (!enemy.isDead()) {
-							wave(enemy, playerLoc, damage, true);
-						}
+						wave(enemy, playerLoc, damage, true);
 					}, (long) ENHANCEMENT_DELAY * i);
 				}
 			}
@@ -139,7 +137,7 @@ public class BruteForce extends Ability {
 
 		for (LivingEntity mob : mobs) {
 			if (damageTarget || mob != target) {
-				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damageBonus, mInfo.mLinkedSpell, true);
+				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damageBonus, mob == target ? ClassAbility.BRUTE_FORCE : ClassAbility.BRUTE_FORCE_AOE, true);
 				mCosmetic.bruteOnSpread(mPlayer, mob);
 			}
 
