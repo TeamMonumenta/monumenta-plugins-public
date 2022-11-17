@@ -41,6 +41,10 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_BOOST = 24 * 20;
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_DURATION = 3 * 60 * 20;
 
+	private static final int BOSS_DAMAGE_THRESHOLD_R1 = 100;
+	private static final int BOSS_DAMAGE_THRESHOLD_R2 = 200;
+	private static final int BOSS_DAMAGE_THRESHOLD_R3 = 300;
+
 	public static final String CHARM_CHANCE = "Heavenly Boon Potion Chance";
 	public static final String CHARM_DURATION = "Heavenly Boon Potion Duration";
 	public static final String CHARM_RADIUS = "Heavenly Boon Radius";
@@ -74,7 +78,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		super(plugin, player, "Heavenly Boon");
 		mInfo.mScoreboardId = "HeavenlyBoon";
 		mInfo.mShorthandName = "HB";
-		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob or deal damage to a boss (R1 100/R2 200), you have a 10% chance to be splashed with an Instant Health I potion, with an additional effect of either Regen I, +10% Attack Damage, +10 Damage Resistance, +20% Speed, or +20% Absorption with 20 second duration.");
+		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob or deal damage to a boss (R1 100/R2 200/R3 300), you have a 10% chance to be splashed with an Instant Health I potion, with an additional effect of either Regen I, +10% Attack Damage, +10 Damage Resistance, +20% Speed, or +20% Absorption with 20 second duration.");
 		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 20%, the effect potions now give Instant Health 2 and the durations of each are increased to 50 seconds.");
 		mInfo.mDescriptions.add(
 			String.format(
@@ -85,7 +89,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				ENHANCEMENT_POTION_EFFECT_MAX_DURATION / (60 * 20)
 			));
 		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
-		mTracker = new KillTriggeredAbilityTracker(this);
+		mTracker = new KillTriggeredAbilityTracker(this, BOSS_DAMAGE_THRESHOLD_R1, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
 
 		mChance = CharmManager.getLevelPercentDecimal(player, CHARM_CHANCE) + (isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE);
 		mDurationChange = CharmManager.getExtraDuration(player, CHARM_DURATION);

@@ -38,7 +38,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	private static final int CLOAK_MIN_STACKS = 5;
 	private static final int CLOAK_STACKS_ON_ELITE_KILL = 5;
 	private static final int STEALTH_DURATION = (int)(2.5 * 20);
-	private static final int BOSS_DAMAGE_THRESHOLD = 300;
+	private static final int BOSS_DAMAGE_THRESHOLD_R2 = 300;
+	private static final int BOSS_DAMAGE_THRESHOLD_R3 = 450;
 
 	public static final String CHARM_DAMAGE = "Cloak and Dagger Damage";
 	public static final String CHARM_STACKS = "Cloak and Dagger Max Stacks";
@@ -57,9 +58,10 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		mInfo.mScoreboardId = "CloakAndDagger";
 		mInfo.mShorthandName = "CnD";
 		mInfo.mDescriptions.add(
-			String.format("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you %s stacks (every %s damage to them). Stacks are capped at %s. When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain %s seconds of Stealth and (%s * X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least %s stacks to activate this.",
+			String.format("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you %s stacks (every %s damage to them in R2; every %s damage to them in R3). Stacks are capped at %s. When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain %s seconds of Stealth and (%s * X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least %s stacks to activate this.",
 				CLOAK_STACKS_ON_ELITE_KILL,
-				BOSS_DAMAGE_THRESHOLD,
+				BOSS_DAMAGE_THRESHOLD_R2,
+				BOSS_DAMAGE_THRESHOLD_R3,
 				CLOAK_1_MAX_STACKS,
 				STEALTH_DURATION / 20.0,
 				(int)CLOAK_1_DAMAGE_MULTIPLIER,
@@ -74,7 +76,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 		mDamageMultiplier = (isLevelOne() ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER) + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE);
 		mMaxStacks = (isLevelOne() ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS) + (int) CharmManager.getLevel(player, CHARM_STACKS);
-		mTracker = new KillTriggeredAbilityTracker(this, BOSS_DAMAGE_THRESHOLD);
+		mTracker = new KillTriggeredAbilityTracker(this, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
 	}
 
 	@Override

@@ -11,21 +11,18 @@ public class KillTriggeredAbilityTracker {
 		void triggerOnKill(LivingEntity mob);
 	}
 
-	private static final int DAMAGE_DEALT_TO_R1_BOSSES_PER_KILL = 100;
-	private static final int DAMAGE_DEALT_TO_R2_BOSSES_PER_KILL = 200;
-
 	private final KillTriggeredAbility mLinkedAbility;
 	private final int mDamageDealtToBossesPerKill;
 
 	private double mDamageDealtToBosses = 0;
 
-	public KillTriggeredAbilityTracker(KillTriggeredAbility linkedAbility) {
-		this(linkedAbility, ServerProperties.getClassSpecializationsEnabled() ? DAMAGE_DEALT_TO_R2_BOSSES_PER_KILL : DAMAGE_DEALT_TO_R1_BOSSES_PER_KILL);
-	}
-
 	public KillTriggeredAbilityTracker(KillTriggeredAbility linkedAbility, int damage) {
 		mLinkedAbility = linkedAbility;
 		mDamageDealtToBossesPerKill = damage;
+	}
+
+	public KillTriggeredAbilityTracker(KillTriggeredAbility linkedAbility, int r1damage, int r2damage, int r3damage) {
+		this(linkedAbility, ServerProperties.getAbilityEnhancementsEnabled() ? r3damage : (ServerProperties.getClassSpecializationsEnabled() ? r2damage : r1damage));
 	}
 
 	public void updateDamageDealtToBosses(DamageEvent event) {
