@@ -944,13 +944,13 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 										if (DelveInfusionUtils.payInfusion(item, infusion, p)) {
 											DelveInfusionUtils.infuseItem(p, item, infusion);
 										} else {
-											p.sendMessage("If you see this message please contact a mod. Error paying.");
+											p.sendMessage(ChatColor.RED + "If you see this message please contact a mod. Error paying.");
 										}
 									} else {
-										p.sendMessage("You don't have enough experience and/or currency for this infusion.");
+										p.sendMessage(ChatColor.RED + "You don't have enough experience and/or currency for this infusion.");
 									}
 								} catch (Exception e) {
-									p.sendMessage("Error while infusing, please contact a mod: " + e);
+									p.sendMessage(ChatColor.RED + "Error while infusing, please contact a mod: " + e);
 								}
 
 							});
