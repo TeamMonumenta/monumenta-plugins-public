@@ -289,6 +289,16 @@ public class EntityUtils {
 		return FLYING_MOBS.contains(type);
 	}
 
+	public static boolean isFlyingMobOrRidingFlyingMob(LivingEntity mob) {
+		if (isFlyingMob(mob)) {
+			return true;
+		}
+		if (mob.getVehicle() instanceof LivingEntity vehicle) {
+			return isFlyingMobOrRidingFlyingMob(vehicle);
+		}
+		return false;
+	}
+
 	public static boolean isWaterMob(LivingEntity mob) {
 		return isWaterMob(mob.getType());
 	}

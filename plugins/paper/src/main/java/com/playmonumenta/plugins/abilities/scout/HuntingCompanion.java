@@ -390,14 +390,23 @@ public class HuntingCompanion extends Ability {
 
 		nearbyMobs.removeIf(Entity::isInvulnerable);
 		nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+
+		List<LivingEntity> unfilteredNearbyMobs = new ArrayList<>(nearbyMobs);
+
 		if (summon instanceof Fox || summon instanceof Strider) {
 			nearbyMobs.removeIf(mob -> Math.abs(mob.getLocation().getY() - summonLoc.getY()) > MAX_TARGET_Y);
+			nearbyMobs.removeIf(EntityUtils::isFlyingMob);
 		}
 		for (Mob otherSummon : mSummons.keySet()) {
 			LivingEntity otherTarget = otherSummon.getTarget();
 			if (otherTarget != null) {
 				nearbyMobs.remove(otherTarget);
 			}
+		}
+
+		// if there are no other mobs to target, we can double up
+		if (nearbyMobs.isEmpty()) {
+			return EntityUtils.getNearestMob(summon.getLocation(), unfilteredNearbyMobs);
 		}
 
 		return EntityUtils.getNearestMob(summon.getLocation(), nearbyMobs);
