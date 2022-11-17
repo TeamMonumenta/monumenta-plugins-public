@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
@@ -19,6 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellParadoxSwap extends Spell {
 
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_TYPES = EnumSet.of(DamageEvent.DamageType.MELEE, DamageEvent.DamageType.MELEE_SKILL, DamageEvent.DamageType.MELEE_ENCH, DamageEvent.DamageType.PROJECTILE, DamageEvent.DamageType.PROJECTILE_SKILL, DamageEvent.DamageType.MAGIC);
 	private static final int mCoolDown = 20 * 5;
 	private final int mRange;
 	private Plugin mPlugin;
@@ -39,7 +41,7 @@ public class SpellParadoxSwap extends Spell {
 
 	@Override
 	public void onHurtByEntity(DamageEvent event, Entity damager) {
-		if (!(damager instanceof Player player)) {
+		if (!(damager instanceof Player player) || !AFFECTED_TYPES.contains(event.getType())) {
 			return;
 		}
 
