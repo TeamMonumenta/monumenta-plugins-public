@@ -9,7 +9,13 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import org.apache.commons.math3.util.FastMath;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -48,49 +54,52 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 	}
 
 	@Override
-	public void lightHealEffect(Player mPlayer, Location loc, Player mTarget) {
+	public void lightHealEffect(Player player, Location loc, Player target) {
 		Location l = loc.clone().add(0, 1, 0);
 		new PartialParticle(Particle.HEART, l, 7, 0.7, 0.7, 0.7, 0)
-			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-		mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 2.0f, 1.2f);
+			.minimumMultiplier(false).spawnAsPlayerActive(player);
+		player.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 2.0f, 1.2f);
 
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-0.75, 0.75),
 			FastUtils.randomDoubleInRange(1, 1.5),
-			FastUtils.randomDoubleInRange(-0.75, 0.75)), mPlayer.getLocation().add(0, 1, 0), mPlayer, mTarget, null, false);
+			FastUtils.randomDoubleInRange(-0.75, 0.75)), player.getLocation().add(0, 1, 0), player, target, null, false);
 	}
 
 	@Override
-	public void lightHealCastEffect(World world, Location userLoc, Plugin mPlugin, Player mPlayer, float radius, double angle) {
-		final float HEALING_RADIUS = radius;
+	public void lightHealCastEffect(World world, Location userLoc, Plugin plugin, Player player, float radius, double angle) {
 		world.playSound(userLoc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.5f, 1.25f);
-		cone(mPlayer, HEALING_RADIUS, false);
+		cone(player, radius, angle, false);
 	}
 
 	@Override
-	public void lightDamageEffect(Player mPlayer, Location loc, LivingEntity target) {
+	public void lightDamageEffect(Player player, Location loc, LivingEntity target) {
 		loc = loc.clone().add(0, 1, 0);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125)
-			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-		mPlayer.getWorld().playSound(loc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.PLAYERS, 1.5f, 0f);
+			.minimumMultiplier(false).spawnAsPlayerActive(player);
+		player.getWorld().playSound(loc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.PLAYERS, 1.5f, 0f);
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-1, 1), FastUtils.randomDoubleInRange(-0.5, 0.5),
 			FastUtils.randomDoubleInRange(-1, 1)), LocationUtils.getHalfHeightLocation(target),
-			mPlayer, target, target.getLocation().add(
+			player, target, target.getLocation().add(
 				FastUtils.randomDoubleInRange(-2, 2), FastUtils.randomDoubleInRange(5, 7),
 				FastUtils.randomDoubleInRange(-2, 2)
 			), true);
 	}
 
 	@Override
-	public void lightDamageCastEffect(World world, Location userLoc, Plugin mPlugin, Player mPlayer, float radius, double angle) {
-		final float DAMAGE_RADIUS = radius;
+	public void lightDamageCastEffect(World world, Location userLoc, Plugin plugin, Player player, float radius, double angle) {
 		world.playSound(userLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.5f, 0.6f);
 		world.playSound(userLoc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.5f, 0.85f);
-		cone(mPlayer, DAMAGE_RADIUS, true);
+		cone(player, radius, angle, true);
 	}
 
-	private void cone(Player mPlayer, double range, boolean damage) {
-		final Location mLoc = mPlayer.getLocation();
-		mLoc.setDirection(mPlayer.getLocation().getDirection().setY(0).normalize());
+	private void cone(Player player, double range, double angle, boolean damage) {
+		final Location mLoc = player.getLocation();
+		mLoc.setDirection(player.getLocation().getDirection().setY(0).normalize());
+
+		double halfAngleDegrees = Math.toDegrees(Math.acos(angle));
+		double minAngle = 90 - halfAngleDegrees;
+		double maxAngle = 90 + halfAngleDegrees;
+
 		new BukkitRunnable() {
 
 			double mRadius = damage ? range : 0;
@@ -100,7 +109,7 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 				Vector vec;
 				for (int i = 0; i < 4; i++) {
 					mRadius += damage ? -0.5 : 0.5;
-					for (double degree = 30; degree <= 150; degree += 5) {
+					for (double degree = minAngle; degree <= maxAngle; degree += 5) {
 						double radian1 = FastMath.toRadians(degree);
 						double percent = FastMath.abs(degree - 90) / 60;
 						double y = 0.6 * FastUtils.sin(Math.PI * ((mRadius + 0.5) / range));
@@ -111,13 +120,13 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 						Location l = mLoc.clone().add(0, 0.1, 0).add(vec);
 						new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 							new Particle.DustOptions(damage ? ENTRO_COLOR : DRAIN_COLOR, 0.75f + (float) (percent * 0.5f)))
-							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							.minimumMultiplier(false).spawnAsPlayerActive(player);
 						if (damage) {
 							new PartialParticle(Particle.SMOKE_NORMAL, l, 1, 0.125f, 0.125f, 0.125f, 0.075)
-								.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+								.minimumMultiplier(false).spawnAsPlayerActive(player);
 						} else {
 							new PartialParticle(Particle.PORTAL, l, 2, 0, 0, 0, 0.15)
-								.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+								.minimumMultiplier(false).spawnAsPlayerActive(player);
 							Color c = FastUtils.RANDOM.nextBoolean() ? DRAIN_COLOR : DRAIN_COLOR_LIGHT;
 							double red = c.getRed() / 255D;
 							double green = c.getGreen() / 255D;
@@ -127,7 +136,7 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 									FastUtils.randomDoubleInRange(-0.1, 0.1),
 									FastUtils.randomDoubleInRange(-0.1, 0.1)),
 								1, red, green, blue, 1)
-								.directionalMode(true).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+								.directionalMode(true).minimumMultiplier(false).spawnAsPlayerActive(player);
 						}
 					}
 					if (mRadius <= 0 || mRadius >= range) {
