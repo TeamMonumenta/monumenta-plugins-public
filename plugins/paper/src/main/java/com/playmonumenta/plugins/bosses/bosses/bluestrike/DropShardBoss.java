@@ -55,7 +55,7 @@ public class DropShardBoss extends BossAbilityGroup {
 		if (EntityUtils.isElite(mBoss) || rand > 0.5) {
 			LootContext cont = new LootContext.Builder(mBoss.getLocation()).build();
 			ItemStack item = mTable.populateLoot(mRand, cont).stream().toList().get(0);
-			mBoss.getWorld().dropItem(mBoss.getLocation(), item);
+			mBoss.getWorld().dropItem(mBoss.getLocation(), item).setGlowing(true);
 		}
 
 		event.setDroppedExp(0);
