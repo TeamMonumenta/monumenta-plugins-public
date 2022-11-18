@@ -1496,6 +1496,8 @@ public final class Lich extends BossAbilityGroup {
 					public void run() {
 						//prevent players above the barrier ceiling from seeing title
 						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
+							Bukkit.dispatchCommand(p, "scoreboard players set @s MusicCooldown 10000");
+							Bukkit.dispatchCommand(p, "function monumenta:mechanisms/music/music_stop");
 							p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.MASTER, 100f, 0.8f);
 							p.sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "VICTORY",
 								ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Hekawt, The Eternal", 10, 80, 10);
@@ -1551,12 +1553,19 @@ public final class Lich extends BossAbilityGroup {
 		// haha surprise fuck you I'm not dead dialogues
 		new BukkitRunnable() {
 			int mT = 0;
-
 			@Override
 			public void run() {
 				if (mT < dio.length) {
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 						p.sendMessage(ChatColor.LIGHT_PURPLE + dio[mT].toUpperCase());
+						if (mT == 0) {
+							new BukkitRunnable() {
+
+								@Override public void run() {
+									Bukkit.dispatchCommand(p, "playsound epic:music.hekawtp4 record @s ~ ~ ~ 5 1");
+								}
+							}.runTaskLater(mPlugin, 15);
+						}
 					}
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3, 1);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 3, 1);
@@ -2060,6 +2069,7 @@ public final class Lich extends BossAbilityGroup {
 										}
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 											p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.MASTER, 100f, 0.8f);
+											Bukkit.dispatchCommand(p, "scoreboard players set @s MusicCooldown 0");
 											p.sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "VICTORY",
 												ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Hekawt, The Eternal", 10, 80, 10);
 										}
