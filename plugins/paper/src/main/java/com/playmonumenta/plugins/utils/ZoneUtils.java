@@ -43,7 +43,8 @@ public class ZoneUtils {
 		BROOMSTICK_ENABLED("Broomstick Enabled"),
 		BLOCKBREAK_DISABLED("Blockbreak Disabled"),
 		BONE_MEAL_DISABLED("Bone Meal Disabled"),
-		LAND_BOAT_POSSIBLE("Land Boat Possible");
+		LAND_BOAT_POSSIBLE("Land Boat Possible"),
+		NO_QUICK_BUILDING("NoQuickBuilding");
 
 		private final String mPropertyName;
 

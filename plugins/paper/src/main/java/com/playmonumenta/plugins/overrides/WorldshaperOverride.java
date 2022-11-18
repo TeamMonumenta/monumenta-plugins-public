@@ -70,7 +70,7 @@ public class WorldshaperOverride {
 			return false;
 		}
 
-		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.ADVENTURE_MODE) || ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.NO_QUICK_BUILDING)) {
 			return false;
 		}
 

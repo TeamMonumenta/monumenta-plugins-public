@@ -40,7 +40,7 @@ public class Excavator implements Enchantment {
 		}
 
 		Block block = event.getBlock();
-		if (mIgnoredMats.contains(block.getType())) {
+		if (mIgnoredMats.contains(block.getType()) || ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.NO_QUICK_BUILDING)) {
 			return;
 		}
 
