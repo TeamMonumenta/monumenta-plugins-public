@@ -61,6 +61,10 @@ public class EmojiCustomInventory extends CustomInventory {
 		EMOJI_LIST.add(new Emoji("Pray", "Living on a ______!", Material.GOLDEN_APPLE, true, "pray", 12));
 		EMOJI_LIST.add(new Emoji("Question", "What is the meaning of life?", Material.COD, true, "question", 13));
 		EMOJI_LIST.add(new Emoji("Skull", "Literally dead.", Material.SKELETON_SKULL, true, "skull", 14));
+		EMOJI_LIST.add(new Emoji("Parrot", "The iconic patron parrot.", Material.PARROT_SPAWN_EGG, true, "parrot", 15));
+		EMOJI_LIST.add(new Emoji("Pepega", "That's unfortunate", Material.FISHING_ROD, true, "pepega", 16));
+		EMOJI_LIST.add(new Emoji("Suffer", "Pain and suffering", Material.POINTED_DRIPSTONE, true, "suffer", 17));
+		EMOJI_LIST.add(new Emoji("NotLikeBusty", "The product of 100s of server ops issues.", Material.CHISELED_DEEPSLATE, true, "notlikebusty", 18));
 	}
 
 
@@ -105,9 +109,17 @@ public class EmojiCustomInventory extends CustomInventory {
 		long timeLeft = COOLDOWNS.getOrDefault(player.getUniqueId(), 0L) - Instant.now().getEpochSecond();
 
 		if (timeLeft > 0) {
-			player.sendMessage("Too fast! You can only emote once every 15s (" + timeLeft + "s remaining)");
+			if (ScoreboardUtils.getScoreboardValue(player, PATREON_BOARD) >= PATREON_MINIMUM) {
+				player.sendMessage("Too fast! You can only emote once every 15s (" + timeLeft + "s remaining)");
+			} else {
+				player.sendMessage("Too fast! You can only emote once every 60s (" + timeLeft + "s remaining)");
+			}
 		} else {
-			COOLDOWNS.put(player.getUniqueId(), Instant.now().getEpochSecond() + 15);
+			if (ScoreboardUtils.getScoreboardValue(player, PATREON_BOARD) >= PATREON_MINIMUM) {
+				COOLDOWNS.put(player.getUniqueId(), Instant.now().getEpochSecond() + 15);
+			} else {
+				COOLDOWNS.put(player.getUniqueId(), Instant.now().getEpochSecond() + 60);
+			}
 			String command = "execute as @S at @S run function monumenta:mechanisms/emojis/" + cmd + "_run";
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command.replace("@S", player.getName()));
 		}
