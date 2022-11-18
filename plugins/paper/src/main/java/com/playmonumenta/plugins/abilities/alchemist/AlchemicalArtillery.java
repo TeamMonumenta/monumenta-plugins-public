@@ -48,12 +48,12 @@ public class AlchemicalArtillery extends PotionAbility {
 	public static final String ARTILLERY_POTION_TAG = "ArtilleryPotion";
 	public static final String ACTIVE_TAG = "AlchArtActive";
 
-	private static final double BOW_DAMAGE_MULTIPLIER = 0.35;
+	private static final double BOW_DAMAGE_MULTIPLIER = 0.25;
 
 	private static final int ENHANCEMENT_EXPLOSION_DELAY = 20;
 	private static final int ENHANCEMENT_EXPLOSION_RADIUS = 3;
-	private static final float ENHANCEMENT_EXPLOSION_KNOCK_UP = 1.5f;
-	private static final double ENHANCEMENT_EXPLOSION_POT_PERCENT_DAMAGE = 0.15;
+	private static final float ENHANCEMENT_EXPLOSION_KNOCK_UP = 0.5f;
+	private static final double ENHANCEMENT_EXPLOSION_POT_PERCENT_DAMAGE = 0.1;
 
 	public static final String CHARM_MULTIPLIER = "Alchemical Artillery Projectile Damage Multiplier";
 	public static final String CHARM_DELAY = "Alchemical Artillery Delay";
@@ -70,8 +70,8 @@ public class AlchemicalArtillery extends PotionAbility {
 		mInfo.mScoreboardId = "Alchemical";
 		mInfo.mShorthandName = "AA";
 		mInfo.mDescriptions.add("Swap hands while holding a bow, crossbow, or trident to toggle shooting Alchemist's Potions instead of projectiles. Shooting a potion consumes the potion and applies the damage and any effects that potion would normally apply.");
-		mInfo.mDescriptions.add("Potions shot with this ability have 35% of your projectile damage added to their base damage.");
-		mInfo.mDescriptions.add("1 second after the Artillery lands, cause an explosion that deals 15% of the potion's damage to and knocking up enemies in a 3 block radius.");
+		mInfo.mDescriptions.add("Potions shot with this ability have 25% of your projectile damage added to their base damage.");
+		mInfo.mDescriptions.add("1 second after the Artillery lands, cause an explosion that deals 10% of the potion's damage to and knocking up enemies in a 3 block radius.");
 		mInfo.mLinkedSpell = ClassAbility.ALCHEMICAL_ARTILLERY;
 		mDisplayItem = new ItemStack(Material.CROSSBOW, 1);
 
