@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 public class Grace implements Infusion {
 
-	private static final double ATKS_BONUS = 0.015;
+	public static final double ATKS_BONUS = 0.015;
 	private static final int DURATION = 20;
 	private static final String EFFECT_NAME = "GraceAttackSpeedEffect";
 

@@ -8,18 +8,24 @@ import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.itemstats.attributes.Armor;
 import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
+import com.playmonumenta.plugins.itemstats.enchantments.BlastFragility;
 import com.playmonumenta.plugins.itemstats.enchantments.BlastProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Cloaked;
 import com.playmonumenta.plugins.itemstats.enchantments.Ethereal;
 import com.playmonumenta.plugins.itemstats.enchantments.Evasion;
+import com.playmonumenta.plugins.itemstats.enchantments.FallFragility;
 import com.playmonumenta.plugins.itemstats.enchantments.FeatherFalling;
+import com.playmonumenta.plugins.itemstats.enchantments.FireFragility;
 import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Guard;
 import com.playmonumenta.plugins.itemstats.enchantments.Ineptitude;
 import com.playmonumenta.plugins.itemstats.enchantments.LifeDrain;
+import com.playmonumenta.plugins.itemstats.enchantments.MagicFragility;
 import com.playmonumenta.plugins.itemstats.enchantments.MagicProtection;
+import com.playmonumenta.plugins.itemstats.enchantments.MeleeFragility;
 import com.playmonumenta.plugins.itemstats.enchantments.MeleeProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Poise;
+import com.playmonumenta.plugins.itemstats.enchantments.ProjectileFragility;
 import com.playmonumenta.plugins.itemstats.enchantments.ProjectileProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Protection;
 import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheDepths;
@@ -41,10 +47,12 @@ import com.playmonumenta.plugins.itemstats.infusions.Execution;
 import com.playmonumenta.plugins.itemstats.infusions.Expedite;
 import com.playmonumenta.plugins.itemstats.infusions.Focus;
 import com.playmonumenta.plugins.itemstats.infusions.Fueled;
+import com.playmonumenta.plugins.itemstats.infusions.Grace;
 import com.playmonumenta.plugins.itemstats.infusions.Nutriment;
 import com.playmonumenta.plugins.itemstats.infusions.Pennate;
 import com.playmonumenta.plugins.itemstats.infusions.Perspicacity;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
+import com.playmonumenta.plugins.itemstats.infusions.Soothing;
 import com.playmonumenta.plugins.itemstats.infusions.Tenacity;
 import com.playmonumenta.plugins.itemstats.infusions.Unyielding;
 import com.playmonumenta.plugins.itemstats.infusions.Vengeful;
@@ -271,11 +279,11 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		}
 	}
 
-	static double getDamageTakenMultiplier(Stats stats, @Nullable Protection protection) {
+	static double getDamageTakenMultiplier(Stats stats, @Nullable Protection protection, @Nullable Protection inverseProtection) {
 		boolean region2 = stats.mPlayerItemStats.getRegion().compareTo(ItemStatUtils.Region.ISLES) >= 0;
 
 		double damageMultiplier = 1;
-		if (protection != null) {
+		if (protection != null && inverseProtection != null) {
 			double armor = stats.get(AttributeType.ARMOR);
 			double agility = stats.get(AttributeType.AGILITY);
 
@@ -290,7 +298,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			}
 
 			boolean adaptability = stats.get(EnchantmentType.ADAPTABILITY) > 0;
-			double epf = protection.getEPF() * stats.get(protection.getEnchantmentType());
+			double epf = (protection.getEPF() * stats.get(protection.getEnchantmentType()))
+				+ (inverseProtection.getEPF() * stats.get(inverseProtection.getEnchantmentType()));
 
 			damageMultiplier = Armor.getDamageMultiplier(armor, armorBonus, agility, agilityBonus,
 				Armor.getSecondaryEnchantCap(region2), adaptability, epf, protection.getType().isEnvironmental());
@@ -340,20 +349,21 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		HEALING_RATE("Healing Rate", PERCENT, stats -> Sustenance.getHealingMultiplier(stats.get(EnchantmentType.SUSTENANCE), stats.get(EnchantmentType.CURSE_OF_ANEMIA))
 			* Nutriment.getHealingMultiplier(stats.getInfusion(InfusionType.NUTRIMENT))),
 		EFFECTIVE_HEALING_RATE("Effective Healing Rate", PERCENT, stats -> HEALING_RATE.get(stats) * 20.0 / HEALTH.get(stats)),
-		REGENERATION("Regeneration per second", NUMBER, stats -> 4 * Regeneration.healPer5Ticks(stats.get(EnchantmentType.REGENERATION)) * HEALING_RATE.get(stats)),
+		REGENERATION("Regeneration per second", NUMBER, stats -> ((4 * Regeneration.healPer5Ticks(stats.get(EnchantmentType.REGENERATION)))
+			+ (stats.getInfusion(InfusionType.SOOTHING) * Soothing.HEAL_PER_LEVEL)) * HEALING_RATE.get(stats)),
 		EFFECTIVE_REGENERATION("Regeneration in %HP/s", PERCENT, stats -> REGENERATION.get(stats) / HEALTH.get(stats)),
 		LIFE_DRAIN("Life Drain on crit", NUMBER, stats -> LifeDrain.LIFE_DRAIN_CRIT_HEAL * Math.sqrt(stats.get(EnchantmentType.LIFE_DRAIN)) * HEALING_RATE.get(stats)),
 		EFFECTIVE_LIFE_DRAIN("Life Drain on crit in %HP", PERCENT, stats -> LIFE_DRAIN.get(stats) / HEALTH.get(stats)),
 
 		// These stats are damage taken, but get displayed as damage reduction
-		MELEE_DAMAGE_TAKEN("Melee", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new MeleeProtection()), false, DR_CHANGE_FORMAT),
-		PROJECTILE_DAMAGE_TAKEN("Projectile", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new ProjectileProtection()), false, DR_CHANGE_FORMAT),
-		MAGIC_DAMAGE_TAKEN("Magic", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new MagicProtection()), false, DR_CHANGE_FORMAT),
-		BLAST_DAMAGE_TAKEN("Blast", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new BlastProtection()), false, DR_CHANGE_FORMAT),
-		FIRE_DAMAGE_TAKEN("Fire", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new FireProtection()), false, DR_CHANGE_FORMAT),
-		FALL_DAMAGE_TAKEN("Fall", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new FeatherFalling())
+		MELEE_DAMAGE_TAKEN("Melee", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new MeleeProtection(), new MeleeFragility()), false, DR_CHANGE_FORMAT),
+		PROJECTILE_DAMAGE_TAKEN("Projectile", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new ProjectileProtection(), new ProjectileFragility()), false, DR_CHANGE_FORMAT),
+		MAGIC_DAMAGE_TAKEN("Magic", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new MagicProtection(), new MagicFragility()), false, DR_CHANGE_FORMAT),
+		BLAST_DAMAGE_TAKEN("Blast", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new BlastProtection(), new BlastFragility()), false, DR_CHANGE_FORMAT),
+		FIRE_DAMAGE_TAKEN("Fire", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new FireProtection(), new FireFragility()), false, DR_CHANGE_FORMAT),
+		FALL_DAMAGE_TAKEN("Fall", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, new FeatherFalling(), new FallFragility())
 			* Pennate.getFallDamageResistance(stats.getInfusion(InfusionType.PENNATE)), false, DR_CHANGE_FORMAT),
-		AILMENT_DAMAGE_TAKEN("Ailment", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, null), false, DR_CHANGE_FORMAT),
+		AILMENT_DAMAGE_TAKEN("Ailment", ONE_MINUS_PERCENT, stats -> getDamageTakenMultiplier(stats, null, null), false, DR_CHANGE_FORMAT),
 
 		// These stats are effective damage taken, but get displayed as effective damage reduction
 		EFFECTIVE_MELEE_DAMAGE_TAKEN("Melee", ONE_MINUS_PERCENT, stats -> MELEE_DAMAGE_TAKEN.get(stats) * 20.0 / HEALTH.get(stats), false, DR_CHANGE_FORMAT),
@@ -390,7 +400,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			* stats.getTotalDamageDealtMultiplier()
 			* (1 + Vigor.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.VIGOR))),
 		TOTAL_ATTACK_DAMAGE("Total Attack Damage", NUMBER, stats -> (1 + stats.get(AttributeType.ATTACK_DAMAGE_ADD)) * ATTACK_DAMAGE_MULTIPLY.get(stats)),
-		ATTACK_SPEED("Attack Speed", NUMBER, stats -> stats.getAttributeAmount(AttributeType.ATTACK_SPEED, 4)),
+		ATTACK_SPEED("Attack Speed", NUMBER, stats -> stats.getAttributeAmount(AttributeType.ATTACK_SPEED, 4)
+			* (1 + (Grace.ATKS_BONUS * stats.getInfusion(InfusionType.GRACE)))),
 
 		// projectile
 		PROJECTILE_DAMAGE_ADD("+flat Projectile Damage", NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD)),
@@ -699,7 +710,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private static final ImmutableMap<ItemStatUtils.Region, ItemStack> REGION_ICONS = ImmutableMap.of(
 		ItemStatUtils.Region.VALLEY, ItemUtils.parseItemStack("{id:\"minecraft:cyan_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"sc\",Color:3},{Pattern:\"mc\",Color:11},{Pattern:\"flo\",Color:15},{Pattern:\"bts\",Color:11},{Pattern:\"tts\",Color:11}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: King\\'s Valley\",\"italic\":false,\"bold\":true,\"color\":\"aqua\"}'}}}"),
 		ItemStatUtils.Region.ISLES, ItemUtils.parseItemStack("{id:\"minecraft:green_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"gru\",Color:5},{Pattern:\"bo\",Color:13},{Pattern:\"mr\",Color:13},{Pattern:\"mc\",Color:5}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: Celsian Isles\",\"italic\":false,\"bold\":true,\"color\":\"green\"}'}}}"),
-		ItemStatUtils.Region.RING, ItemUtils.parseItemStack("{id:\"minecraft:white_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:ss,Color:12},{Pattern:bts,Color:13},{Pattern:tts,Color:13},{Pattern:gra,Color:8},{Pattern:ms,Color:13},{Pattern:gru,Color:7},{Pattern:flo,Color:15},{Pattern:mc,Color:0}]},HideFlags:63,display:{Name:'{\"bold\":true,\"italic\":false,\"underlined\":false,\"color\":\"white\",\"text\":\"Calculation Region: Architect\\\\u0027s Ring\"}'}}}")
+		ItemStatUtils.Region.RING, ItemUtils.parseItemStack("{id:\"minecraft:white_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"ss\",Color:12},{Pattern:\"bts\",Color:13},{Pattern:\"tts\",Color:13},{Pattern:\"gra\",Color:8},{Pattern:\"ms\",Color:13},{Pattern:\"gru\",Color:7},{Pattern:\"flo\",Color:15},{Pattern:\"mc\",Color:0}]},HideFlags:63,display:{Name:'{\"bold\":true,\"italic\":false,\"underlined\":false,\"color\":\"white\",\"text\":\"Calculation Region: Architect\\\\u0027s Ring\"}'}}}")
 	);
 
 	private static final int SWAP_EQUIPMENT_SET_SLOT = 49;
