@@ -321,6 +321,8 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(TemporalShieldBoss.identityTag, (Plugin p, LivingEntity e) -> new TemporalShieldBoss(p, e));
 		mStatelessBosses.put(GalleryMobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> new GalleryMobRisingBoss(p, e));
 		mStatelessBosses.put(GallerySummonMobBoss.identityTag, (Plugin p, LivingEntity e) -> new GallerySummonMobBoss(p, e));
+		mStatelessBosses.put(TagScalingBoss.identityTag, (Plugin p, LivingEntity e) -> new TagScalingBoss(p, e));
+
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -582,7 +584,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(GalleryMobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> GalleryMobRisingBoss.deserialize(p, e));
 		mBossDeserializers.put(GallerySummonMobBoss.identityTag, (Plugin p, LivingEntity e) -> GallerySummonMobBoss.deserialize(p, e));
 		mBossDeserializers.put(MusicBoss.identityTag, (Plugin p, LivingEntity e) -> MusicBoss.deserialize(p, e));
-
+		mBossDeserializers.put(TagScalingBoss.identityTag, (Plugin p, LivingEntity e) -> TagScalingBoss.deserialize(p, e));
 
 		/***************************************************
 		 * Boss Parameters
@@ -650,6 +652,8 @@ public class BossManager implements Listener {
 		mBossParameters.put(BrownPositiveBoss.identityTag, new BrownPositiveBoss.Parameters());
 		mBossParameters.put(BrownNegativeBoss.identityTag, new BrownNegativeBoss.Parameters());
 		mBossParameters.put(MusicBoss.identityTag, new MusicBoss.Parameters());
+		mBossParameters.put(TagScalingBoss.identityTag, new TagScalingBoss.Parameters());
+
 	}
 
 	/********************************************************************************

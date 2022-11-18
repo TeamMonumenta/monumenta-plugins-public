@@ -218,11 +218,11 @@ public class ImperialConstruct extends BossAbilityGroup {
 			});
 
 			events.put(90, (mob) -> {
-				mSpread.run();
+				new SpellSteelboreSpread(plugin, boss, 11, mSpawnLoc, 40, 1).run();
 			});
 
 			events.put(80, (mob) -> {
-				mSpread.run();
+				new SpellSteelboreSpread(plugin, boss, 11, mSpawnLoc, 40, 1).run();
 				mParadox.spawnExchanger(mCurrentLoc);
 			});
 
@@ -231,8 +231,8 @@ public class ImperialConstruct extends BossAbilityGroup {
 			});
 
 			events.put(70, (mob) -> {
+				new SpellSteelboreSpread(plugin, boss, 11, mSpawnLoc, 40, 1).run();
 				mSlice.run();
-				mSpread.run();
 			});
 
 			events.put(66, (mob) -> {
@@ -249,16 +249,16 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 			events.put(60, (mob) -> {
 				mSlice.run();
-				mSpread2.run();
+				new SpellSteelboreSpread(plugin, boss, 11, mPhase2Loc, 40, 1).run();
 			});
 
 			events.put(50, (mob) -> {
 				mParadox2.run();
-				mSpread2.run();
+				new SpellSteelboreSpread(plugin, boss, 11, mPhase2Loc, 40, 1).run();
 			});
 
 			events.put(40, (mob) -> {
-				mSpread2.run();
+				new SpellSteelboreSpread(plugin, boss, 11, mPhase2Loc, 40, 1).run();
 			});
 
 			events.put(33, (mob) -> {
@@ -279,7 +279,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 			events.put(30, (mob) -> {
 				mSlice.setRingMode(true);
 				mSlice.run();
-				mSpreadSmall.run();
+				new SpellSteelboreSpread(plugin, boss, 6, mPhase3Loc, 40, 1).run();
 				changePhase(finalStandActiveSpells, passiveSpellsPhase3, null);
 			});
 
@@ -293,14 +293,14 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 			events.put(20, (mob) -> {
 				mSlice.run();
-				mSpreadSmall.run();
+				new SpellSteelboreSpread(plugin, boss, 6, mPhase3Loc, 40, 1).run();
 				mParadox3.run();
 				changePhase(finalStandActiveSpells, passiveSpellsPhase3Part2, null);
 			});
 
 			events.put(10, (mob) -> {
 				mSlice.run();
-				mSpreadSmall.run();
+				new SpellSteelboreSpread(plugin, boss, 6, mPhase3Loc, 40, 1).run();
 				mParadox3.run();
 				changePhase(finalStandActiveSpells, passiveSpellsPhase3Part3, null);
 			});
@@ -395,11 +395,11 @@ public class ImperialConstruct extends BossAbilityGroup {
 			});
 
 			events.put(90, (mob) -> {
-				mSpread.run();
+				new SpellSteelboreSpread(plugin, boss, 7, mSpawnLoc, 40, 0.6).run();
 			});
 
 			events.put(80, (mob) -> {
-				mSpread.run();
+				new SpellSteelboreSpread(plugin, boss, 7, mSpawnLoc, 40, 0.6).run();
 				mParadox.spawnExchanger(mCurrentLoc);
 			});
 
@@ -409,7 +409,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 			events.put(70, (mob) -> {
 				mSlice.run();
-				mSpread.run();
+				new SpellSteelboreSpread(plugin, boss, 7, mSpawnLoc, 40, 0.6).run();
 			});
 
 			events.put(66, (mob) -> {
@@ -426,15 +426,15 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 			events.put(60, (mob) -> {
 				mSlice.run();
-				mSpread2.run();
+				new SpellSteelboreSpread(plugin, boss, 7, mPhase2Loc, 40, 0.6).run();
 			});
 
 			events.put(50, (mob) -> {
-				mSpread2.run();
+				new SpellSteelboreSpread(plugin, boss, 7, mPhase2Loc, 40, 0.6).run();
 			});
 
 			events.put(40, (mob) -> {
-				mSpread2.run();
+				new SpellSteelboreSpread(plugin, boss, 7, mPhase2Loc, 40, 0.6).run();
 			});
 
 			events.put(33, (mob) -> {
@@ -455,7 +455,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 			events.put(30, (mob) -> {
 				mSlice.setRingMode(true);
 				mSlice.run();
-				mSpreadSmall.run();
+				new SpellSteelboreSpread(plugin, boss, 3, mPhase3Loc, 40, 0.6).run();
 				changePhase(finalStandActiveSpells, passiveSpellsPhase3, null);
 			});
 
@@ -469,14 +469,14 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 			events.put(20, (mob) -> {
 				mSlice.run();
-				mSpreadSmall.run();
+				new SpellSteelboreSpread(plugin, boss, 3, mPhase3Loc, 40, 0.6).run();
 				mParadox3.run();
 				changePhase(finalStandActiveSpells, passiveSpellsPhase3Part2, null);
 			});
 
 			events.put(10, (mob) -> {
 				mSlice.run();
-				mSpreadSmall.run();
+				new SpellSteelboreSpread(plugin, boss, 3, mPhase3Loc, 40, 0.6).run();
 				changePhase(finalStandActiveSpells, passiveSpellsPhase3Part3, null);
 			});
 

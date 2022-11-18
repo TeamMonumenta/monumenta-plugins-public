@@ -569,8 +569,10 @@ public class TealSpirit extends BossAbilityGroup {
 	@Override
 	public void onHurt(DamageEvent event) {
 		if (hasRunningSpellOfType(Rewind.class)) {
-			event.setDamage(event.getDamage() * 0.4);
+			event.setDamage(event.getDamage() * 0.1);
 		}
+
+
 	}
 
 	@Override
@@ -581,5 +583,6 @@ public class TealSpirit extends BossAbilityGroup {
 	@Override
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
 		event.getPlayer().sendMessage(ChatColor.DARK_AQUA + "the endless march of time will decay even your bones. you will be forgotten.");
+
 	}
 }
