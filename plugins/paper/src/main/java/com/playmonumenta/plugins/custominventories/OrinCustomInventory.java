@@ -26,7 +26,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class OrinCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final int[] INSTANCE_UPTO3_LOCS = {20, 22, 24};
-	private static final int[] INSTANCE_UPTO9_LOCS = {20, 22, 24, 29, 31, 33, 38, 20, 42};
+	private static final int[] INSTANCE_UPTO9_LOCS = {20, 22, 24, 29, 31, 33, 38, 40, 42};
 	private static final int[] INSTANCE_UPTO20_LOCS = {20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42, 47, 48, 49, 50, 51};
 	private static final int[] INSTANCE_UPTO28_LOCS = {19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 46, 47, 48, 49, 50, 51, 52};
 
