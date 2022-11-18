@@ -1369,16 +1369,21 @@ public class PlayerListener implements Listener {
 	}
 
 	private static final Set<DamageCause> DISABLE_KNOCKBACK_DAMAGE_CAUSES = Set.of(
-			DamageCause.CONTACT,
-			DamageCause.FALL,
-			DamageCause.FIRE,
-			DamageCause.FIRE_TICK,
-			DamageCause.LAVA,
-			DamageCause.VOID,
-			DamageCause.STARVATION,
-			DamageCause.POISON,
-			DamageCause.WITHER,
-			DamageCause.HOT_FLOOR);
+		DamageCause.CONTACT,
+		DamageCause.FALL,
+		DamageCause.FIRE,
+		DamageCause.FIRE_TICK,
+		DamageCause.LAVA,
+		DamageCause.VOID,
+		DamageCause.STARVATION,
+		DamageCause.POISON,
+		DamageCause.WITHER,
+		DamageCause.HOT_FLOOR);
+
+	private static final Set<DamageCause> SCALABLE_REGION_DAMAGE_CAUSES = Set.of(
+		DamageCause.FIRE_TICK,
+		DamageCause.LAVA
+	);
 
 	private final Set<UUID> mIgnoreKnockbackThisTick = new HashSet<>();
 	private final Set<UUID> mIgnoreKnockbackNextTick = new HashSet<>();
@@ -1387,8 +1392,8 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
 		if (event.getEntity() instanceof Player player
-			    && player.getNoDamageTicks() <= player.getMaximumNoDamageTicks() / 2.0f // can only take knockback again after half the iframes are over
-			    && DISABLE_KNOCKBACK_DAMAGE_CAUSES.contains(event.getCause())) {
+			&& player.getNoDamageTicks() <= player.getMaximumNoDamageTicks() / 2.0f // can only take knockback again after half the iframes are over
+			&& DISABLE_KNOCKBACK_DAMAGE_CAUSES.contains(event.getCause())) {
 			mIgnoreKnockbackNextTick.add(player.getUniqueId());
 
 			// NB: The two sets are required because this task runs after the damage event, but before the velocity change event.
@@ -1402,6 +1407,18 @@ public class PlayerListener implements Listener {
 						mKnockbackTaskId = -1;
 					}
 				}, 0, 1);
+			}
+		}
+
+		// For Fire / Fall damage in R2 and R3, take more damage.
+		if (event.getEntity() instanceof Player
+			&& SCALABLE_REGION_DAMAGE_CAUSES.contains(event.getCause())) {
+			if (ServerProperties.getAbilityEnhancementsEnabled()) {
+				// R3, Take +40% more damage
+				event.setDamage(event.getDamage() * 1.4);
+			} else if (ServerProperties.getClassSpecializationsEnabled()) {
+				// R2, Take +20% more damage
+				event.setDamage(event.getDamage() * 1.2);
 			}
 		}
 	}

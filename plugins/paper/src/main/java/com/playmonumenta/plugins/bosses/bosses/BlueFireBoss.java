@@ -19,7 +19,7 @@ public class BlueFireBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_bluefire";
 	public static final int detectionRange = 20;
 
-	public static final double[] FIRE_DAMAGE_MULTIPLIERS = {0, 0.2, 0.3, 0.4};
+	public static final double[] FIRE_DAMAGE_MULTIPLIERS = {0, 0.1, 0.2, 0.3};
 	public static final String FIRE_VULN_EFFECT_NAME = "BossBlueFireVulnerabilityEffect";
 
 	private int mBlueTimeOfDay = 0;
