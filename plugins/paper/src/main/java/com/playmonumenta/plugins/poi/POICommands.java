@@ -26,12 +26,12 @@ public class POICommands {
 				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
 				new MultiLiteralArgument(pois))
 			.executes((sender, args) -> {
-				Player player = (Player) args[0];
+				/*Player player = (Player) args[0];
 				String poiName = (String) args[1];
 				boolean added = Plugin.getInstance().mPOIManager.completePOI(player, poiName);
 				if (added && player != null) {
 					player.sendMessage(Component.text("You've conquered " + POI.getPOI(poiName).getCleanName() + " for the first time this week, earning you bonus loot!", NamedTextColor.GOLD));
-				}
+				}*/
 			})
 			.register();
 
