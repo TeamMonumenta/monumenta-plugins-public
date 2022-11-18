@@ -87,7 +87,8 @@ public class OrinCustomInventory extends CustomInventory {
 	 * Page 2: Region 2
 	 * Page 3: Region 3
 	 * Page 4: Plots
-	 * Page 5: Default Page (Playerplots, dungeon shards, etc)
+	 * Page 5: Playerplots
+	 * Page 6: Default Page (dungeon shards, etc)
 	 * Page 10: Common for 11-19
 	 * Page 11: Region 1 Instance Bot
 	 * Page 12: Region 2 Instance Bot
@@ -104,7 +105,7 @@ public class OrinCustomInventory extends CustomInventory {
 		ORIN_ITEMS.add(new TeleportEntry(1, 9, "Plots", "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, null, 0, "execute as @S run function monumenta:mechanisms/teleporters/tp/sierhaven_to_plots"));
 		ORIN_ITEMS.add(new TeleportEntry(1, 27, "Player Plot", "Click to teleport!", Material.PLAYER_HEAD, "CurrentPlot", 1, "plot send @S", "plot gui @S"));
 		ORIN_ITEMS.add(new TeleportEntry(1, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "tp @S -765.5 106.0625 70.5 180 0", "instancebot valley"));
-		ORIN_ITEMS.add(new TeleportEntry(1, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "execute as @S run function monumenta:mechanisms/teleporters/tp/sierhaven_to_isles", "instancebot isles"));
+		ORIN_ITEMS.add(new TeleportEntry(1, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
 		ORIN_ITEMS.add(new TeleportEntry(1, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "execute as @S run function monumenta:mechanisms/teleporters/goto/ring", "instancebot ring"));
 		ORIN_ITEMS.add(new TeleportEntry(1, 42, "Dungeon Instances", "Click to view all open dungeon instances.", Material.SPAWNER, null, 0, "page 21"));
 		ORIN_ITEMS.add(new TeleportEntry(1, 45, "Build Server", "Click to teleport!", Material.STONE_PICKAXE, null, 0, "transferserver build"));
@@ -112,17 +113,17 @@ public class OrinCustomInventory extends CustomInventory {
 		//R2 Page
 		ORIN_ITEMS.add(new TeleportEntry(2, 9, "Plots", "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, null, 0, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_plots"));
 		ORIN_ITEMS.add(new TeleportEntry(2, 27, "Player Plot", "Click to teleport!", Material.PLAYER_HEAD, "CurrentPlot", 1, "plot send @S", "plot gui @S"));
-		ORIN_ITEMS.add(new TeleportEntry(2, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_valley", "instancebot valley"));
+		ORIN_ITEMS.add(new TeleportEntry(2, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
 		ORIN_ITEMS.add(new TeleportEntry(2, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "tp @S -762.5 70.1 1344.5 180 0", "instancebot isles"));
-		ORIN_ITEMS.add(new TeleportEntry(2, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_ring", "instancebot ring"));
+		ORIN_ITEMS.add(new TeleportEntry(2, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/ring", "instancebot ring"));
 		ORIN_ITEMS.add(new TeleportEntry(2, 42, "Dungeon Instances", "Click to view all open dungeon instances.", Material.SPAWNER, null, 0, "page 21"));
 		ORIN_ITEMS.add(new TeleportEntry(2, 45, "Build Server", "Click to teleport!", Material.STONE_PICKAXE, null, 0, "transferserver build"));
 
 		//R3 Page
 		ORIN_ITEMS.add(new TeleportEntry(3, 9, "Plots", "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, null, 0, "execute as @S run function monumenta:mechanisms/teleporters/tp/galengarde_to_plots"));
 		ORIN_ITEMS.add(new TeleportEntry(3, 27, "Player Plot", "Click to teleport!", Material.PLAYER_HEAD, "CurrentPlot", 1, "plot send @S", "plot gui @S"));
-		ORIN_ITEMS.add(new TeleportEntry(3, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "execute as @S run function monumenta:mechanisms/teleporters/tp/galengarde_to_valley", "instancebot valley"));
-		ORIN_ITEMS.add(new TeleportEntry(3, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "execute as @S run function monumenta:mechanisms/teleporters/tp/galengarde_to_isles", "instancebot isles"));
+		ORIN_ITEMS.add(new TeleportEntry(3, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
+		ORIN_ITEMS.add(new TeleportEntry(3, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
 		ORIN_ITEMS.add(new TeleportEntry(3, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "tp @S -303.5 83 -654.5 90 0", "instancebot ring"));
 		ORIN_ITEMS.add(new TeleportEntry(3, 42, "Dungeon Instances", "Click to view all open dungeon instances.", Material.SPAWNER, null, 0, "page 21"));
 		ORIN_ITEMS.add(new TeleportEntry(3, 45, "Build Server", "Click to teleport!", Material.STONE_PICKAXE, null, 0, "transferserver build"));
@@ -133,19 +134,27 @@ public class OrinCustomInventory extends CustomInventory {
 		ORIN_ITEMS.add(new TeleportEntry(4, 27, "Player Plot", "Click to teleport!", Material.GRASS_BLOCK, "CurrentPlot", 1, "plot send @S", "plot gui @S"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 36, "Guild Plot", "Click to teleport!", Material.YELLOW_BANNER, null, 0, "teleportguild @S"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 45, "Build Server", "Click to teleport!", Material.STONE_PICKAXE, null, 0, "transferserver build"));
-		ORIN_ITEMS.add(new TeleportEntry(4, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_valley", "instancebot valley"));
-		ORIN_ITEMS.add(new TeleportEntry(4, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_isles", "instancebot isles"));
-		ORIN_ITEMS.add(new TeleportEntry(4, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_ring", "instancebot ring"));
+		ORIN_ITEMS.add(new TeleportEntry(4, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
+		ORIN_ITEMS.add(new TeleportEntry(4, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
+		ORIN_ITEMS.add(new TeleportEntry(4, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/ring", "instancebot ring"));
 		ORIN_ITEMS.add(new TeleportEntry(4, 42, "Dungeon Instances", "Click to view all open dungeon instances.", Material.SPAWNER, null, 0, "page 21"));
 
-
+		//Playerplots Page
 		ORIN_ITEMS.add(new TeleportEntry(5, 9, "Plots", "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, null, 0, "transferserver plots"));
 		ORIN_ITEMS.add(new TeleportEntry(5, 27, "Player Plot", "Click to teleport!", Material.GRASS_BLOCK, "CurrentPlot", 1, "plot gui @S"));
-		ORIN_ITEMS.add(new TeleportEntry(5, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "transferserver valley", "instancebot valley"));
-		ORIN_ITEMS.add(new TeleportEntry(5, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "transferserver isles", "instancebot isles"));
-		ORIN_ITEMS.add(new TeleportEntry(5, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "transferserver ring", "instancebot ring"));
+		ORIN_ITEMS.add(new TeleportEntry(5, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
+		ORIN_ITEMS.add(new TeleportEntry(5, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
+		ORIN_ITEMS.add(new TeleportEntry(5, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/ring", "instancebot ring"));
 		ORIN_ITEMS.add(new TeleportEntry(5, 42, "Dungeon Instances", "Click to view all open dungeon instances.", Material.SPAWNER, null, 0, "page 21"));
 		ORIN_ITEMS.add(new TeleportEntry(5, 45, "Build Server", "Click to teleport!", Material.STONE_PICKAXE, null, 0, "transferserver build"));
+
+		ORIN_ITEMS.add(new TeleportEntry(6, 9, "Plots", "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, null, 0, "transferserver plots"));
+		ORIN_ITEMS.add(new TeleportEntry(6, 27, "Player Plot", "Click to teleport!", Material.GRASS_BLOCK, "CurrentPlot", 1, "plot send @S", "plot gui @S"));
+		ORIN_ITEMS.add(new TeleportEntry(6, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
+		ORIN_ITEMS.add(new TeleportEntry(6, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
+		ORIN_ITEMS.add(new TeleportEntry(6, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/ring", "instancebot ring"));
+		ORIN_ITEMS.add(new TeleportEntry(6, 42, "Dungeon Instances", "Click to view all open dungeon instances.", Material.SPAWNER, null, 0, "page 21"));
+		ORIN_ITEMS.add(new TeleportEntry(6, 45, "Build Server", "Click to teleport!", Material.STONE_PICKAXE, null, 0, "transferserver build"));
 
 		//Common 10-19: Instance Bot Choices
 		ORIN_ITEMS.add(new TeleportEntry(10, 0, "Back", "Return to the main page.", Material.ARROW, null, 0, "back"));
@@ -189,6 +198,7 @@ public class OrinCustomInventory extends CustomInventory {
 		//Group: R3 Dungeons
 		ORIN_ITEMS.add(new TeleportEntry(21, 24, "Silver Knight's Tomb", "Click to teleport!", Material.DEEPSLATE, "DSKTAccess", 1, "execute as @S run function monumenta:lobbies/send_one/dskt"));
 		ORIN_ITEMS.add(new TeleportEntry(21, 25, "Blue", "Click to teleport!", Material.BLUE_WOOL, "D12Access", 1, "execute as @S run function monumenta:lobbies/send_one/d12"));
+		ORIN_ITEMS.add(new TeleportEntry(21, 26, "Brown", "Click to teleport!", Material.BROWN_WOOL, "D13Access", 1, "execute as @S run function monumenta:lobbies/send_one/d13"));
 	}
 
 	private int mCurrentPage;
@@ -207,8 +217,10 @@ public class OrinCustomInventory extends CustomInventory {
 				mCurrentPage = 3;
 			} else if (mCurrentShard.equals("plots")) {
 				mCurrentPage = 4;
-			} else {
+			} else if (mCurrentShard.equals("playerplots")) {
 				mCurrentPage = 5;
+			} else {
+				mCurrentPage = 6;
 			}
 		} else {
 			mBackButtonEnabled = false;
@@ -294,8 +306,10 @@ public class OrinCustomInventory extends CustomInventory {
 				mCurrentPage = 3;
 			} else if (mCurrentShard.equals("plots")) {
 				mCurrentPage = 4;
-			} else {
+			} else if (mCurrentShard.equals("playerplots")) {
 				mCurrentPage = 5;
+			} else {
+				mCurrentPage = 6;
 			}
 			setLayout(player);
 		}
