@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -42,12 +41,15 @@ public class Taboo extends Ability {
 	public static final String CHARM_KNOCKBACK_RESISTANCE = "Taboo Knockback Resistance";
 	public static final String CHARM_DAMAGE = "Taboo Damage Modifier";
 	public static final String CHARM_HEALING = "Taboo Healing";
+	public static final String CHARM_RECHARGE = "Taboo Potion Recharge Rate";
 
-	private boolean mActive;
-	private double mMagicDamageIncrease;
+	private final double mMagicDamageIncrease;
+	private final int mRechargeRateDecrease;
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private @Nullable AlchemicalArtillery mAlchemicalArtillery;
+
+	private boolean mActive;
 
 	public Taboo(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Taboo");
@@ -60,11 +62,14 @@ public class Taboo extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.HONEY_BOTTLE, 1);
 
-		mActive = false;
 		mMagicDamageIncrease = (isLevelOne() ? MAGIC_DAMAGE_INCREASE_1 : MAGIC_DAMAGE_INCREASE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-			mAlchemicalArtillery = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
+		mRechargeRateDecrease = CHARGE_TIME_REDUCTION + CharmManager.getExtraDuration(mPlayer, CHARM_RECHARGE);
+
+		mActive = false;
+
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+			mAlchemicalArtillery = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
 		});
 	}
 
@@ -85,13 +90,13 @@ public class Taboo extends Ability {
 						new PartialParticle(Particle.HEART, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(mPlayer);
 					}
 				} else {
-					mAlchemistPotions.increaseChargeTime(CHARGE_TIME_REDUCTION);
+					mAlchemistPotions.increaseChargeTime(mRechargeRateDecrease);
 					mActive = false;
 					world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_BURP, 0.8f, 1.2f);
 					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			} else if (mAlchemistPotions.decrementCharge()) {
-				mAlchemistPotions.reduceChargeTime(CHARGE_TIME_REDUCTION);
+				mAlchemistPotions.reduceChargeTime(mRechargeRateDecrease);
 				mActive = true;
 				world.playSound(mPlayer.getLocation(), Sound.ENTITY_WANDERING_TRADER_DRINK_POTION, 1, 0.9f);
 				ClientModHandler.updateAbility(mPlayer, this);

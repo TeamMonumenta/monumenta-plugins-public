@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Objects;
@@ -32,6 +33,9 @@ public class Agility extends Ability {
 	private static final double SCALING_DAMAGE = 0.1;
 	private static final double ENHANCEMENT_COOLDOWN_REFRESH = 0.05;
 
+	public static final String CHARM_HASTE = "Agility Haste Amplifier";
+
+	private final int mHasteAmplifier;
 	private Ability[] mScoutAbilities = {};
 
 	public Agility(Plugin plugin, @Nullable Player player) {
@@ -44,6 +48,8 @@ public class Agility extends Ability {
 			String.format("Breaking a spawner refreshes the cooldown of all your skills by %s%%.",
 				StringUtils.multiplierToPercentage(ENHANCEMENT_COOLDOWN_REFRESH)));
 		mDisplayItem = new ItemStack(Material.GOLDEN_PICKAXE, 1);
+
+		mHasteAmplifier = (isLevelOne() ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL) + (int) CharmManager.getLevel(mPlayer, CHARM_HASTE);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			AbilityManager abilityManager = mPlugin.mAbilityManager;
@@ -84,9 +90,8 @@ public class Agility extends Ability {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (oneSecond) {
-			int effectLevel = isLevelOne() ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL;
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-				new PotionEffect(PotionEffectType.FAST_DIGGING, 21, effectLevel, true, false));
+				new PotionEffect(PotionEffectType.FAST_DIGGING, 21, mHasteAmplifier, true, false));
 		}
 	}
 }

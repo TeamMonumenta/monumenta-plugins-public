@@ -62,6 +62,7 @@ import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
+import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
@@ -399,6 +400,10 @@ public class CharmManager {
 			Smokescreen.CHARM_WEAKEN,
 			Smokescreen.CHARM_SLOW,
 			ViciousCombos.CHARM_CDR,
+			ViciousCombos.CHARM_RADIUS,
+			ViciousCombos.CHARM_VULN,
+			ViciousCombos.CHARM_WEAKEN,
+			ViciousCombos.CHARM_DURATION,
 			BladeDance.CHARM_COOLDOWN,
 			BladeDance.CHARM_DAMAGE,
 			BladeDance.CHARM_RADIUS,
@@ -602,6 +607,7 @@ public class CharmManager {
 			Taboo.CHARM_HEALING,
 			Taboo.CHARM_KNOCKBACK_RESISTANCE,
 			Taboo.CHARM_SELF_DAMAGE,
+			Taboo.CHARM_RECHARGE,
 
 			//Warlock
 			AmplifyingHex.CHARM_CONE,
@@ -679,6 +685,7 @@ public class CharmManager {
 			VoodooBonds.CHARM_TRANSFER_TIME,
 
 			//Scout
+			Agility.CHARM_HASTE,
 			EagleEye.CHARM_COOLDOWN,
 			EagleEye.CHARM_DURATION,
 			EagleEye.CHARM_RADIUS,

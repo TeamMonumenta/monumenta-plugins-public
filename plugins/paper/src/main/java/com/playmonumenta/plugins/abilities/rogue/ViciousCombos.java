@@ -37,6 +37,10 @@ public class ViciousCombos extends Ability {
 	private static final double ENHANCEMENT_DAMAGE_INCREASE = 0.1;
 
 	public static final String CHARM_CDR = "Vicious Combos Cooldown Reduction";
+	public static final String CHARM_RADIUS = "Vicious Combos Radius";
+	public static final String CHARM_VULN = "Vicious Combos Vulnerability Amplifier";
+	public static final String CHARM_WEAKEN = "Vicious Combos Weakness Amplifier";
+	public static final String CHARM_DURATION = "Vicious Combos Duration";
 
 	private ClassAbility mLastAbility = null;
 	private int mAbilityCastTime = 0;
@@ -86,27 +90,28 @@ public class ViciousCombos extends Ability {
 					loc = loc.add(0, 0.5, 0);
 					World world = mPlayer.getWorld();
 
+					double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, VICIOUS_COMBOS_RANGE);
 					if (EntityUtils.isElite(killedEntity) || EntityUtils.isBoss(killedEntity)) {
 						mPlugin.mTimers.removeAllCooldowns(mPlayer);
 						MessagingUtils.sendActionBarMessage(mPlayer, "All your cooldowns have been reset");
 
 						if (isLevelTwo()) {
-							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, VICIOUS_COMBOS_RANGE, mPlayer)) {
+							int duration = VICIOUS_COMBOS_CRIPPLE_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+							double vuln = VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
+							double weaken = VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
+							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius, mPlayer)) {
 								new PartialParticle(Particle.SPELL_MOB, mob.getLocation().clone().add(0, 1, 0), 10, 0.35, 0.5, 0.35, 0).spawnAsPlayerActive(mPlayer);
-								EntityUtils.applyVulnerability(mPlugin, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL, mob);
-								EntityUtils.applyWeaken(mPlugin, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL, mob);
+								EntityUtils.applyVulnerability(mPlugin, duration, vuln, mob);
+								EntityUtils.applyWeaken(mPlugin, duration, weaken, mob);
 							}
 						}
-						mCosmetic.comboOnElite(world, loc, mPlayer, VICIOUS_COMBOS_RANGE, killedEntity);
+						mCosmetic.comboOnElite(world, loc, mPlayer, radius, killedEntity);
 
 					} else if (EntityUtils.isHostileMob(killedEntity)) {
 						int timeReduction = isLevelOne() ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2 + (int) (CharmManager.getLevel(mPlayer, CHARM_CDR) * 20);
-						if (killedEntity instanceof Player) {
-							timeReduction *= 2;
-						}
 
 						mPlugin.mTimers.updateCooldowns(mPlayer, timeReduction);
-						mCosmetic.comboOnKill(world, loc, mPlayer, VICIOUS_COMBOS_RANGE, killedEntity);
+						mCosmetic.comboOnKill(world, loc, mPlayer, radius, killedEntity);
 					}
 
 				}
