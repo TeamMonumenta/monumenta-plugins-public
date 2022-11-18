@@ -62,7 +62,7 @@ public class TemporalBender implements Enchantment {
 			event.setCancelled(true);
 
 			int cooldownRefresh = COOLDOWN_REFRESH + (int) (CharmManager.getLevel(player, CHARM_COOLDOWN_REDUCTION) * 20);
-			plugin.mTimers.updateCooldowns(cooldownRefresh);
+			plugin.mTimers.updateCooldowns(player, cooldownRefresh);
 
 			player.setFoodLevel(Math.min(20, player.getFoodLevel() + 6));
 			player.setSaturation(Math.min(player.getFoodLevel(), Math.min(player.getSaturation() + 6, 20)));
