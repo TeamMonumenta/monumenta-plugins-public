@@ -122,24 +122,28 @@ public class DepthsLoot {
 		}
 
 		//roll halloween loot
-		LootTable halloweenTable = Bukkit.getLootTable(HALLOWEEN_KEY);
-		Collection<ItemStack> lootAgain = halloweenTable.populateLoot(FastUtils.RANDOM, context);
-		if (!lootAgain.isEmpty()) {
-			for (int i = treasureScore; i >= 20; i -= 20) {
-				for (ItemStack item : lootAgain) {
-					loc.getWorld().dropItem(loc, item);
-				}
-			}
-			//Get num from 0-19
-			if (r.nextInt(20) == 0) {
-				//Drop an extra candy
-				for (ItemStack item : lootAgain) {
-					loc.getWorld().dropItem(loc, item);
+		if (HALLOWEEN_KEY != null && p.hasPermission("monumenta.event.creeperween")) {
+			LootTable halloweenTable = Bukkit.getLootTable(HALLOWEEN_KEY);
+			if (halloweenTable != null) {
+				Collection<ItemStack> lootAgain = halloweenTable.populateLoot(FastUtils.RANDOM, context);
+				if (!lootAgain.isEmpty()) {
+					for (int i = treasureScore; i >= 20; i -= 20) {
+						for (ItemStack item : lootAgain) {
+							loc.getWorld().dropItem(loc, item);
+						}
+					}
+					//Get num from 0-19
+					if (r.nextInt(20) == 0) {
+						//Drop an extra candy
+						for (ItemStack item : lootAgain) {
+							loc.getWorld().dropItem(loc, item);
+						}
+					}
 				}
 			}
 		}
 
-		//Roll for endless mode loot- subtract 54 from treasure score to compensate for base score from 3 boss wins
+		//Roll for endless mode loot - subtract 54 from treasure score to compensate for base score from 3 boss wins
 
 		LootTable pomeTable = Bukkit.getLootTable(POME_KEY);
 		if (pomeTable != null) {
@@ -169,7 +173,7 @@ public class DepthsLoot {
 		}
 
 
-		//Roll for relics- treasure score / 250 chance (if above 250, guaranteed drop and subtract relic)
+		//Roll for relics - treasure score / 250 chance (if above 250, guaranteed drop and subtract relic)
 
 		LootTable relicTable = Bukkit.getLootTable(RELIC_KEY);
 
