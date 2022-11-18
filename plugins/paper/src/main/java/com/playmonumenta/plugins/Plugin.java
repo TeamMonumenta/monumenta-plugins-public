@@ -46,6 +46,8 @@ import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.plots.ShopManager;
+import com.playmonumenta.plugins.poi.POICommands;
+import com.playmonumenta.plugins.poi.POIManager;
 import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.protocollib.ProtocolLibIntegration;
@@ -129,6 +131,7 @@ public class Plugin extends JavaPlugin {
 	public CosmeticsManager mCosmeticsManager;
 	public SeasonalEventManager mSeasonalEventManager;
 	public VanityManager mVanityManager;
+	public POIManager mPOIManager;
 	private @Nullable CustomLogger mLogger = null;
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
@@ -219,6 +222,7 @@ public class Plugin extends JavaPlugin {
 		Eggify.register();
 		SeasonalEventCommand.register(this);
 		CosmeticsCommand.register(this);
+		POICommands.register(this);
 		NameMCVerify.register(this);
 		TellMiniMessage.register();
 		RunWithPlaceholdersCommand.register();
@@ -307,6 +311,7 @@ public class Plugin extends JavaPlugin {
 		mSeasonalEventManager = new SeasonalEventManager();
 		mActivityManager = new ActivityManager(this);
 		mVanityManager = new VanityManager();
+		mPOIManager = new POIManager();
 
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();
@@ -384,6 +389,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new QuiverListener(), this);
 		manager.registerEvents(new ToggleTrail(), this);
 		manager.registerEvents(mVanityManager, this);
+		manager.registerEvents(mPOIManager.getInstance(), this);
 		manager.registerEvents(new BrokenEquipmentListener(), this);
 		manager.registerEvents(PortalManager.getInstance(), this);
 		manager.registerEvents(new LootingLimiter(), this);

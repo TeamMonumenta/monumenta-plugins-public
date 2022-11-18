@@ -162,6 +162,7 @@ public class PlayerListener implements Listener {
 
 		mPlugin.mTrackingManager.addEntity(player);
 		mPlugin.mCosmeticsManager.playerJoinEvent(event);
+		mPlugin.mPOIManager.playerJoinEvent(event);
 		mPlugin.mAbilityManager.playerJoinEvent(player, event);
 
 		DailyReset.handle(mPlugin, player);
@@ -558,8 +559,10 @@ public class PlayerListener implements Listener {
 		}
 
 		// If right clicking charm, open GUI
-		if (event.getClick() == ClickType.RIGHT && item.getAmount() == 1 && ItemStatUtils.isCharm(item)) {
-			new CharmsGUI(player).openInventory(player, mPlugin);
+		if (event.getClick() == ClickType.RIGHT && ItemStatUtils.isCharm(item)) {
+			if (item.getAmount() == 1) {
+				new CharmsGUI(player).openInventory(player, mPlugin);
+			}
 		}
 	}
 

@@ -16,8 +16,11 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
@@ -632,6 +635,20 @@ public class ChestUtils {
 			       && block.getState() instanceof Chest chest
 			       && (chest.hasLootTable() || (chest.getInventory() instanceof DoubleChestInventory doubleChestInventory
 				                                    && (((Chest) doubleChestInventory.getLeftSide().getHolder()).hasLootTable() || ((Chest) doubleChestInventory.getRightSide().getHolder()).hasLootTable())));
+	}
+
+	public static ItemStack giveChestWithLootTable(String lootTable, String chestName, String chestNameColor, List<Component> lore) {
+		ItemStack chest = new ItemStack(Material.CHEST);
+		if (chest.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof Chest chestMeta) {
+			blockMeta.displayName(Component.text(chestName).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true).color(TextColor.fromHexString(chestNameColor)));
+			chestMeta.setLootTable(Bukkit.getLootTable(NamespacedKey.fromString(lootTable)));
+			blockMeta.setBlockState(chestMeta);
+			blockMeta.lore(lore);
+			chest.setItemMeta(blockMeta);
+		}
+		ItemUtils.setPlainTag(chest);
+
+		return chest;
 	}
 
 }

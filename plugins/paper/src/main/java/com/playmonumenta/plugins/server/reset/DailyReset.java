@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.server.reset;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.poi.POIManager;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -200,6 +201,7 @@ public class DailyReset {
 				plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), commandStr);
 
 				SeasonalEventManager.handlePlayerDailyChange(player);
+				POIManager.handlePlayerDailyChange(player);
 
 				ScoreboardUtils.setScoreboardValue(player, "DailyVersion", getDailyVersion());
 
