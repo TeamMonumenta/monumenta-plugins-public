@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -20,7 +21,9 @@ public interface DisplayableEffect {
 		effects.addAll(AbsorptionUtils.getAbsorptionDisplayables(entity));
 		if (entity instanceof Player player) {
 			effects.addAll(GalleryManager.getGalleryEffects(player));
+			effects.add(BrownPolarityDisplay.getPolarityDisplay(player));
 		}
+		effects.removeIf(Objects::isNull);
 		return effects;
 	}
 

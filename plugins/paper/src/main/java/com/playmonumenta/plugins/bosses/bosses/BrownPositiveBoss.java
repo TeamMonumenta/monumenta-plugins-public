@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.effects.BrownPolarityDisplay;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -13,7 +14,6 @@ import org.bukkit.plugin.Plugin;
 
 public class BrownPositiveBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_brown_positive";
-	public static final String playerTag = "brown-negative";
 
 	private final double mBossVuln;
 	private final double mPlayerResist;
@@ -38,14 +38,16 @@ public class BrownPositiveBoss extends BossAbilityGroup {
 		mLastDamageTick = mBoss.getTicksLived();
 	}
 
-	@Override public void onDamage(DamageEvent event, LivingEntity damagee) {
-		if (damagee instanceof Player player && ScoreboardUtils.checkTag(player, playerTag)) {
+	@Override
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		if (damagee instanceof Player player && ScoreboardUtils.checkTag(player, BrownPolarityDisplay.NEGATIVE_TAG)) {
 			event.setDamage(event.getDamage() * mPlayerResist);
 		}
 	}
 
-	@Override public void onHurtByEntity(DamageEvent event, Entity damager) {
-		if (damager instanceof Player player && ScoreboardUtils.checkTag(player, playerTag)) {
+	@Override
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+		if (source instanceof Player player && ScoreboardUtils.checkTag(player, BrownPolarityDisplay.NEGATIVE_TAG)) {
 			event.setDamage(event.getDamage() * mBossVuln);
 			playAesthetic();
 		}

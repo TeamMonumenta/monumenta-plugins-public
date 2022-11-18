@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.effects.BrownPolarityDisplay;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -49,9 +50,6 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 		Material.LEATHER_LEGGINGS,
 		Material.LEATHER_BOOTS
 	);
-
-	public static final String playerTagPositive = "brown-positive";
-	public static final String playerTagNegative = "brown-negative";
 
 	private boolean mIsPositive;
 	private int mTicks;
@@ -141,33 +139,44 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, passives, 100, bossBar);
 	}
 
-	@Override public void onDamage(DamageEvent event, LivingEntity damagee) {
+	@Override
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (damagee instanceof Player player) {
 			if (mIsPositive) {
 				// Positively charged, does less damage when player negative
-				if (ScoreboardUtils.checkTag(player, playerTagNegative)) {
+				if (ScoreboardUtils.checkTag(player, BrownPolarityDisplay.NEGATIVE_TAG)) {
 					event.setDamage(event.getDamage() * mPlayerResist);
 				}
 			} else {
 				// Negatively charged, does less damage when player positive
-				if (ScoreboardUtils.checkTag(player, playerTagPositive)) {
+				if (ScoreboardUtils.checkTag(player, BrownPolarityDisplay.POSITIVE_TAG)) {
 					event.setDamage(event.getDamage() * mPlayerResist);
 				}
 			}
 		}
 	}
 
-	@Override public void onHurtByEntity(DamageEvent event, Entity damager) {
-		if (damager instanceof Player player) {
+
+	@Override
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
+		Player player = null;
+
+		if (damager instanceof Player p) {
+			player = p;
+		} else if (event.getSource() instanceof Player p) {
+			player = p;
+		}
+
+		if (player != null) {
 			if (mIsPositive) {
 				// Positively charged, dealt more damage when player negative
-				if (ScoreboardUtils.checkTag(player, playerTagNegative)) {
+				if (ScoreboardUtils.checkTag(player, BrownPolarityDisplay.NEGATIVE_TAG)) {
 					event.setDamage(event.getDamage() * mBossVuln);
 					playAesthetic();
 				}
 			} else {
 				// Negatively charged, dealt more damage when player positive
-				if (ScoreboardUtils.checkTag(player, playerTagPositive)) {
+				if (ScoreboardUtils.checkTag(player, BrownPolarityDisplay.POSITIVE_TAG)) {
 					event.setDamage(event.getDamage() * mBossVuln);
 					playAesthetic();
 				}
