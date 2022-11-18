@@ -43,13 +43,10 @@ public class RepairExplosionsListener implements Listener {
 		Material.COAL_ORE,
 		Material.DEEPSLATE_COAL_ORE,
 		Material.IRON_ORE,
-		Material.RAW_IRON_BLOCK,
 		Material.DEEPSLATE_IRON_ORE,
 		Material.COPPER_ORE,
-		Material.RAW_COPPER_BLOCK,
 		Material.DEEPSLATE_COPPER_ORE,
 		Material.GOLD_ORE,
-		Material.RAW_GOLD_BLOCK,
 		Material.DEEPSLATE_GOLD_ORE,
 		Material.GILDED_BLACKSTONE,
 		Material.NETHER_GOLD_ORE,
@@ -136,6 +133,45 @@ public class RepairExplosionsListener implements Listener {
 		Material.HOPPER
 	);
 
+	private static final EnumSet<Material> REPLACEABLE_MATERIALS = EnumSet.of(
+		// Air-like
+		Material.AIR,
+		Material.CAVE_AIR,
+		Material.VOID_AIR,
+
+		// Fluids
+		Material.WATER,
+		Material.LAVA,
+
+		// Fire (ghast fireballs)
+		Material.FIRE,
+
+		// Gravity blocks (intentionally skipping valuables)
+		Material.SCAFFOLDING,
+		Material.POINTED_DRIPSTONE,
+		Material.GRAVEL,
+		Material.SAND,
+		Material.RED_SAND,
+
+		// Concrete powder
+		Material.WHITE_CONCRETE_POWDER,
+		Material.ORANGE_CONCRETE_POWDER,
+		Material.MAGENTA_CONCRETE_POWDER,
+		Material.LIGHT_BLUE_CONCRETE_POWDER,
+		Material.YELLOW_CONCRETE_POWDER,
+		Material.LIME_CONCRETE_POWDER,
+		Material.PINK_CONCRETE_POWDER,
+		Material.GRAY_CONCRETE_POWDER,
+		Material.LIGHT_GRAY_CONCRETE_POWDER,
+		Material.CYAN_CONCRETE_POWDER,
+		Material.PURPLE_CONCRETE_POWDER,
+		Material.BLUE_CONCRETE_POWDER,
+		Material.BROWN_CONCRETE_POWDER,
+		Material.GREEN_CONCRETE_POWDER,
+		Material.RED_CONCRETE_POWDER,
+		Material.BLACK_CONCRETE_POWDER
+	);
+
 	/* A hash table that stores the list of blocks to restore for each chunk */
 	private final LongHashMap<List<BlockState>> mBlocksToRepair = new LongHashMap<>();
 
@@ -151,8 +187,8 @@ public class RepairExplosionsListener implements Listener {
 	 * on chunk unload
 	 */
 	private void commonExplosionHandler(List<Block> blocks) {
-		/* Create a copy of the blocks list so we don't modify the original */
-		blocks = new ArrayList<Block>(blocks);
+		/* Create a copy of the blocks list, so we don't modify the original */
+		blocks = new ArrayList<>(blocks);
 
 		/* Remove all complex blocks */
 		blocks.removeIf((block) -> NO_REPAIR_MATS.contains(block.getType()) || block.getState() instanceof TileState);
@@ -177,7 +213,7 @@ public class RepairExplosionsListener implements Listener {
 		long currentChunkKey = currentChunk.getChunkKey();
 		List<BlockState> chunkBlocks = mBlocksToRepair.get(currentChunkKey);
 		if (chunkBlocks == null) {
-			chunkBlocks = new ArrayList<BlockState>(blocks.size());
+			chunkBlocks = new ArrayList<>(blocks.size());
 			mBlocksToRepair.put(currentChunkKey, chunkBlocks);
 		}
 
@@ -192,12 +228,12 @@ public class RepairExplosionsListener implements Listener {
 				currentChunkKey = currentChunk.getChunkKey();
 				chunkBlocks = mBlocksToRepair.get(currentChunkKey);
 				if (chunkBlocks == null) {
-					chunkBlocks = new ArrayList<BlockState>(blocks.size());
+					chunkBlocks = new ArrayList<>(blocks.size());
 					mBlocksToRepair.put(currentChunkKey, chunkBlocks);
 				}
 			}
 
-			mPlugin.getLogger().fine("Marking block " + state.getType().toString() + " at " + state.getLocation().toString() + " for repair");
+			mPlugin.getLogger().fine("Marking block " + state.getType() + " at " + state.getLocation() + " for repair");
 			chunkBlocks.add(state);
 		}
 	}
@@ -235,8 +271,8 @@ public class RepairExplosionsListener implements Listener {
 		if (chunkBlocks != null) {
 			for (BlockState state : chunkBlocks) {
 				Material currentType = state.getLocation().getBlock().getType();
-				if (currentType.isAir() || currentType == Material.WATER) {
-					mPlugin.getLogger().fine("Repairing block " + state.getType().toString() + " at " + state.getLocation().toString());
+				if (REPLACEABLE_MATERIALS.contains(currentType)) {
+					mPlugin.getLogger().fine("Repairing block " + state.getType() + " at " + state.getLocation());
 					needsSave = true;
 					state.update(true, false);
 
@@ -277,7 +313,7 @@ public class RepairExplosionsListener implements Listener {
 			while (iter.hasNext()) {
 				BlockState state = iter.next();
 				if (state.getLocation().distanceSquared(deathLoc) <= 144) {
-					mPlugin.getLogger().fine("Removing repair block " + state.getType().toString() + " at " + state.getLocation().toString() + " due to death");
+					mPlugin.getLogger().fine("Removing repair block " + state.getType() + " at " + state.getLocation() + " due to death");
 					iter.remove();
 				}
 			}
@@ -301,7 +337,7 @@ public class RepairExplosionsListener implements Listener {
 			 * Be lazy and just grab four chunks, re-iterating them isn't going to take that much time anyway
 			 */
 			Location deathLoc = event.getEntity().getLocation();
-			mPlugin.getLogger().fine("Player died at: " + deathLoc.toString());
+			mPlugin.getLogger().fine("Player died at: " + deathLoc);
 
 			removeRepairBlocksNear(deathLoc.clone().add(7, 0, -7).getChunk(), deathLoc);
 			removeRepairBlocksNear(deathLoc.clone().add(7, 0, 7).getChunk(), deathLoc);
