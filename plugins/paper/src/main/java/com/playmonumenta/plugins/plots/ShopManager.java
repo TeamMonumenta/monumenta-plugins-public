@@ -15,6 +15,7 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -89,7 +90,7 @@ public class ShopManager implements Listener {
 			com.playmonumenta.scriptedquests.Plugin sq = com.playmonumenta.scriptedquests.Plugin.getInstance();
 
 			String npcName = shop.isGuildShop() ? GUILD_NPC_NAME : NPC_NAME;
-			QuestNpc npc = sq.mNpcManager.getInteractNPC(npcName, EntityType.SHULKER);
+			List<QuestNpc> npc = sq.mNpcManager.getInteractNPC(npcName, EntityType.SHULKER);
 			if (npc != null) {
 				/*
 				 * This is definitely a quest NPC, even if the player might not be able to interact with it

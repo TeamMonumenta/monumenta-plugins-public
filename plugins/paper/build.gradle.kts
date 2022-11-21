@@ -40,7 +40,7 @@ dependencies {
     compileOnly("de.jeff_media:ChestSortAPI:12.0.0")
     compileOnly("net.luckperms:api:5.3")
     compileOnly("net.coreprotect:coreprotect:2.15.0")
-    compileOnly("com.playmonumenta:scripted-quests:5.1")
+    compileOnly("com.playmonumenta:scripted-quests:6.0")
     compileOnly("com.playmonumenta:redissync:3.6")
     compileOnly("com.playmonumenta:monumenta-network-relay:1.0")
     compileOnly("com.playmonumenta:structures:8.2")
