@@ -435,6 +435,11 @@ public class EntityListener implements Listener {
 	public void hangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
 		Entity damager = event.getRemover();
 
+		if (ZoneUtils.hasZoneProperty(event.getEntity().getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (damager instanceof Player player) {
 			// If hurt by a player in adventure mode we want to prevent the break;
 

@@ -3,7 +3,9 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Collections;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -11,6 +13,7 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
@@ -25,6 +28,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class HalloweenCreeperBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_halloween_creeper";
+
+	private static final NamespacedKey LOOT_TABLE = NamespacedKeyUtils.fromString("epic:event/halloween2019/tricked_creeper");
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new HalloweenCreeperBoss(plugin, boss);
@@ -58,13 +63,18 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 					switch (mTicks) {
 						case 12 -> {
 							Block block = world.getBlockAt(loc);
-							if (block.getType() == Material.AIR || block.isLiquid()) {
+							if ((block.getType() == Material.AIR || block.isLiquid())
+								    && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)
+								    && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.RESTRICTED)
+								    && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
 								block.setType(Material.CHEST);
 								if (block.getState() instanceof Chest chest) {
 									chest.setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + "Creeperween Chest");
-									chest.setLootTable(Bukkit.getLootTable(NamespacedKeyUtils.fromString("epic:event/halloween2019/tricked_creeper")));
+									chest.setLootTable(Bukkit.getLootTable(LOOT_TABLE));
 									chest.update();
 								}
+							} else {
+								InventoryUtils.getItemsFromLootTable(loc, LOOT_TABLE).forEach(item -> loc.getWorld().dropItemNaturally(loc, item));
 							}
 						}
 						case 2, 6 -> summonFirework(loc, true);
