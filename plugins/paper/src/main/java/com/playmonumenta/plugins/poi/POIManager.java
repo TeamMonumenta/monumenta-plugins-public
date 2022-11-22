@@ -66,7 +66,7 @@ public class POIManager implements Listener {
 				loreList.add(Component.text("Bonus treasure found within " + finalPOI.getCleanName() + ".", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 				ItemStack chest = ChestUtils.giveChestWithLootTable(finalPOI.getLootPath(), "Weekly Treasure - " + finalPOI.getCleanName(),
 					finalPOI.getDisplayColor(), loreList);
-				chest.setAmount(2);
+				chest.setAmount(1);
 				InventoryUtils.giveItem(player, chest);
 				return true;
 			}
