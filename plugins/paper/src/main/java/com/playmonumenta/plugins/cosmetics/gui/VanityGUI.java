@@ -96,7 +96,7 @@ public class VanityGUI extends Gui {
 				}
 				lore.add(Component.text("There is a one-time cost of " + STRAND_COST_PER_VANITY_UNLOCK + " Twisted Strands", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 				lore.add(Component.text("per item to unlock that item's skin for vanity use.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-				lore.add(Component.text("Tier 4+ patrons can use any vanity", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("Tier 3+ patrons can use any vanity", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 				lore.add(Component.text("item without paying this fee.", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 				meta.lore(lore);
 				meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DYE);
