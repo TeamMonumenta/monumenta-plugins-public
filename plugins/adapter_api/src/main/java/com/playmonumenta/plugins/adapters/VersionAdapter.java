@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.adapters;
 
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import net.kyori.adventure.text.Component;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
@@ -135,5 +136,7 @@ public interface VersionAdapter {
 	 * If any extra data is needed, delay the code by 1 tick.
 	 */
 	void mobAIChanges(Mob entity);
+
+	Object toVanillaChatComponent(Component component);
 
 }

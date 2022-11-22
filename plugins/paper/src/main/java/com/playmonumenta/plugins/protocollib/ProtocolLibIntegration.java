@@ -37,6 +37,7 @@ public class ProtocolLibIntegration {
 		syncManager.addPacketListener(new FirmamentLagFix(plugin));
 		syncManager.addPacketListener(new EntityEquipmentReplacer(plugin));
 		syncManager.addPacketListener(new WorldNameReplacer(plugin));
+		syncManager.addPacketListener(new EntityNameReplacer(plugin));
 
 		mPlayerTitleManager = new PlayerTitleManager(syncManager);
 

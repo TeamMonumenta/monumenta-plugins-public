@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -447,6 +448,11 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
 			                                      && (getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.IronGolem.class
 				                                          || getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.Turtle.class));
+	}
+
+	@Override
+	public Object toVanillaChatComponent(net.kyori.adventure.text.Component component) {
+		return Component.Serializer.fromJson(GsonComponentSerializer.gson().serialize(component));
 	}
 
 }
