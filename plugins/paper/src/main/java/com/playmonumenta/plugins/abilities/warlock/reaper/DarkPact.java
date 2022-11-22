@@ -2,6 +2,9 @@ package com.playmonumenta.plugins.abilities.warlock.reaper;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Effect;
@@ -16,7 +19,6 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.EnumSet;
 import java.util.NavigableSet;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -24,7 +26,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,65 +52,60 @@ public class DarkPact extends Ability {
 	public static final String CHARM_DURATION = "Dark Pact Buff Duration";
 	public static final String CHARM_ABSORPTION = "Dark Pact Absorption Health Per Kill";
 
+	public static final AbilityInfo<DarkPact> INFO =
+		new AbilityInfo<>(DarkPact.class, "Dark Pact", DarkPact::new)
+			.linkedSpell(ClassAbility.DARK_PACT)
+			.scoreboardId("DarkPact")
+			.shorthandName("DaP")
+			.descriptions(
+				"Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. " +
+					"For the next 7 seconds, your scythe attacks deal +35% melee damage. " +
+					"Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. " +
+					"However, the player cannot heal for 7 seconds. Cooldown: 14s.",
+				"Attacks with a scythe deal +55% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. " +
+					"Nearby players are still healed as normal.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DarkPact::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).onGround(false).sneaking(false),
+				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+			.displayItem(new ItemStack(Material.SOUL_SAND, 1))
+			.priorityAmount(950); // multiplicative damage before additive
+
 	private final double mPercentDamageDealt;
-	private @Nullable JudgementChain mJudgementChain;
 	private boolean mActive = false;
 
-	public DarkPact(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Dark Pact");
-		mInfo.mScoreboardId = "DarkPact";
-		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, your scythe attacks deal +35% melee damage. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
-		mInfo.mDescriptions.add("Attacks with a scythe deal +55% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.SOUL_SAND, 1);
+	public DarkPact(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? PERCENT_DAMAGE_DEALT_1 : PERCENT_DAMAGE_DEALT_2);
-
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mJudgementChain = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, JudgementChain.class);
-		});
 	}
 
-	@Override
-	public double getPriorityAmount() {
-		return 950; // multiplicative damage before additive
-	}
-
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer != null && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
-			event.setCancelled(true);
-			// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
-			if (mPlayer.isOnGround() || mPlayer.isSneaking() || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || (mPlayer.isSneaking() && mJudgementChain != null && mPlayer.getLocation().getPitch() < -50.0)) {
-				return;
-			}
-
-			World world = mPlayer.getWorld();
-			new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 50, 0.2, 0.1, 0.2, 1).spawnAsPlayerActive(mPlayer);
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.5f, 1.25f);
-			world.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1, 0.5f);
-			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
-
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(duration, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES, 0, (entity, enemy) -> entity instanceof Player player && ItemUtils.isHoe(player.getInventory().getItemInMainHand())));
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(duration, PERCENT_HEAL));
-			mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(duration,
-					(entity, fourHertz, twoHertz, oneHertz) -> {
-					new PartialParticle(Particle.SPELL_WITCH, entity.getLocation(), 3, 0.2, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
-					},
-					(entity) -> {
-						world.playSound(entity.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.3f, 0.75f);
-					}));
-
-			putOnCooldown();
-
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
 		}
+
+		World world = mPlayer.getWorld();
+		new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 50, 0.2, 0.1, 0.2, 1).spawnAsPlayerActive(mPlayer);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.5f, 1.25f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1, 0.5f);
+		int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(duration, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES, 0, (entity, enemy) -> entity instanceof Player player && ItemUtils.isHoe(player.getInventory().getItemInMainHand())));
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(duration, PERCENT_HEAL));
+		mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(duration,
+			(entity, fourHertz, twoHertz, oneHertz) -> {
+				new PartialParticle(Particle.SPELL_WITCH, entity.getLocation(), 3, 0.2, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
+			},
+			(entity) -> {
+				world.playSound(entity.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.3f, 0.75f);
+			}));
+
+		putOnCooldown();
+
 	}
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (mPlayer == null || event.getEntity().getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+		if (event.getEntity().getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			return;
 		}
 

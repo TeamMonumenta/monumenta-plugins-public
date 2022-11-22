@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -18,7 +20,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class Fireball extends DepthsAbility {
@@ -30,17 +32,23 @@ public class Fireball extends DepthsAbility {
 	private static final int RADIUS = 3;
 	private static final int FIRE_TICKS = 3 * 20;
 
+	public static final DepthsAbilityInfo<Fireball> INFO =
+		new DepthsAbilityInfo<>(Fireball.class, ABILITY_NAME, Fireball::new, DepthsTree.FLAMECALLER, DepthsTrigger.RIGHT_CLICK)
+			.linkedSpell(ClassAbility.FIREBALL)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Fireball::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.FIREWORK_STAR))
+			.descriptions(Fireball::getDescription, MAX_RARITY);
+
 	public Fireball(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.FIREBALL;
-		mDisplayMaterial = Material.FIREWORK_STAR;
-		mTree = DepthsTree.FLAMECALLER;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action trigger) {
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
+		}
 		putOnCooldown();
 
 		Location loc = mPlayer.getEyeLocation();
@@ -71,27 +79,11 @@ public class Fireball extends DepthsAbility {
 
 		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
 			EntityUtils.applyFire(mPlugin, FIRE_TICKS, e, mPlayer);
-			DamageUtils.damage(mPlayer, e, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
+			DamageUtils.damage(mPlayer, e, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
 		}
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && !mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
-
-	@Override
-	public String getDescription(int rarity) {
-		return "Right click to summon a " + RADIUS + " block radius fireball at the location you are looking, up to " + DISTANCE + " blocks away. The fireball deals " + DepthsUtils.getRarityColor(rarity) + (float)DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and sets enemies ablaze for " + FIRE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.RIGHT_CLICK;
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FLAMECALLER;
+	private static String getDescription(int rarity) {
+		return "Right click to summon a " + RADIUS + " block radius fireball at the location you are looking, up to " + DISTANCE + " blocks away. The fireball deals " + DepthsUtils.getRarityColor(rarity) + (float) DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and sets enemies ablaze for " + FIRE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 }

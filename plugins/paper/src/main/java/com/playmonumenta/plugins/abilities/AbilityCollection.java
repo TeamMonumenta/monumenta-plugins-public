@@ -1,20 +1,27 @@
 package com.playmonumenta.plugins.abilities;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.MonumentaClasses;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class AbilityCollection {
+
+	private static final MonumentaClasses MONUMENTA_CLASSES = new MonumentaClasses();
 
 	// This map contains all abilities, including delve modifiers
 	// LinkedHashMap to preserve ordering
 	private final Map<Class<? extends Ability>, Ability> mAbilities = new LinkedHashMap<>();
+
+	private final ImmutableList<Ability> mAbilitiesInTriggerOrder;
 
 	/*
 	 * This map just contains delve modifiers for when the player is silenced
@@ -28,15 +35,26 @@ public class AbilityCollection {
 	public AbilityCollection(List<Ability> abilities) {
 		for (Ability ability : abilities) {
 			mAbilities.put(ability.getClass(), ability);
-
 		}
+		mAbilitiesInTriggerOrder =
+			abilities.stream()
+				.filter(a -> !a.getInfo().getTriggers().isEmpty())
+				.sorted(Comparator.comparingDouble(ability -> MONUMENTA_CLASSES.mTriggerOrder.indexOf(ability.getInfo())))
+				.collect(ImmutableList.toImmutableList());
 	}
 
 	public Collection<Ability> getAbilities() {
 		if (!mIsSilenced) {
 			return mAbilities.values();
 		}
-		return Collections.EMPTY_SET;
+		return Collections.emptySet();
+	}
+
+	public ImmutableList<Ability> getAbilitiesInTriggerOrder() {
+		if (!mIsSilenced) {
+			return mAbilitiesInTriggerOrder;
+		}
+		return ImmutableList.of();
 	}
 
 	public Collection<Ability> getAbilitiesIgnoringSilence() {
@@ -49,7 +67,6 @@ public class AbilityCollection {
 			return (T) mAbilities.get(cls);
 		}
 		return null;
-
 	}
 
 	public @Nullable Ability getAbility(ClassAbility classAbility) {
@@ -57,13 +74,13 @@ public class AbilityCollection {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Ability> T getAbilityIgnoringSilence(Class<T> cls) {
+	public <T extends Ability> @Nullable T getAbilityIgnoringSilence(Class<T> cls) {
 		return (T) mAbilities.get(cls);
 	}
 
 	public @Nullable Ability getAbilityIgnoringSilence(ClassAbility classAbility) {
 		for (Ability ability : mAbilities.values()) {
-			if (ability.getInfo().mLinkedSpell == classAbility) {
+			if (ability.getInfo().getLinkedSpell() == classAbility) {
 				return ability;
 			}
 		}

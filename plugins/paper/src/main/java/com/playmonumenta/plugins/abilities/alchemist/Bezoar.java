@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.BezoarCS;
@@ -66,22 +67,29 @@ public class Bezoar extends Ability {
 	public static final String CHARM_PHILOSOPHER_STONE_POTIONS = "Bezoar Philosopher Stone Potions";
 	public static final String CHARM_RADIUS = "Bezoar Radius";
 
+	public static final AbilityInfo<Bezoar> INFO =
+		new AbilityInfo<>(Bezoar.class, "Bezoar", Bezoar::new)
+			.linkedSpell(ClassAbility.BEZOAR)
+			.scoreboardId("Bezoar")
+			.shorthandName("BZ")
+			.descriptions(
+				"Every 5th mob killed within 16 blocks of the Alchemist spawns a Bezoar that lingers for 10s. " +
+					"Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, " +
+					"and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates 5% of max health " +
+					"every second for 2 seconds and reduces the duration of all current potion debuffs by 10s.",
+				"The Bezoar now additionally grants +15% damage from all sources for 8s.",
+				"When a Bezoar would spawn, 10% of the time it will summon a Philosopher's Stone instead. " +
+					"When the Philosopher's Stone is picked up, the player and the Alchemist gain 4 absorption health for 8s and the Alchemist gains 3 potions.")
+			.displayItem(new ItemStack(Material.LIME_CONCRETE, 1));
+
 	private int mKills = 0;
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private final int mLingerTime;
 
 	private final BezoarCS mCosmetic;
 
-	public Bezoar(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Bezoar");
-		mInfo.mLinkedSpell = ClassAbility.BEZOAR;
-		mInfo.mScoreboardId = "Bezoar";
-		mInfo.mShorthandName = "BZ";
-		mInfo.mDescriptions.add("Every 5th mob killed within 16 blocks of the Alchemist spawns a Bezoar that lingers for 10s. Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates 5% of max health every second for 2 seconds and reduces the duration of all current potion debuffs by 10s.");
-		mInfo.mDescriptions.add("The Bezoar now additionally grants +15% damage from all sources for 8s.");
-		mInfo.mDescriptions.add("When a Bezoar would spawn, 10% of the time it will summon a Philosopher's Stone instead. When the Philosopher's Stone is picked up, the player and the Alchemist gain 4 absorption health for 8s and the Alchemist gains 3 potions.");
-		mDisplayItem = new ItemStack(Material.LIME_CONCRETE, 1);
-
+	public Bezoar(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mLingerTime = LINGER_TIME + CharmManager.getExtraDuration(mPlayer, CHARM_LINGER_TIME);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BezoarCS(), BezoarCS.SKIN_LIST);
@@ -112,9 +120,6 @@ public class Bezoar extends Ability {
 			int mT = 0;
 			@Override
 			public void run() {
-				if (mPlayer == null) {
-					return;
-				}
 				mT++;
 				Location itemLoc = item.getLocation();
 				mCosmetic.bezoarTick(mPlayer, itemLoc, mT);
@@ -148,10 +153,6 @@ public class Bezoar extends Ability {
 
 
 	private void applyEffects(Player player) {
-		if (mPlayer == null) {
-			return;
-		}
-
 		int debuffReduction = DEBUFF_REDUCTION + CharmManager.getExtraDuration(mPlayer, CHARM_DEBUFF_REDUCTION);
 		for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, player)) {
 			PotionEffect effect = player.getPotionEffect(effectType);
@@ -187,9 +188,6 @@ public class Bezoar extends Ability {
 			final BlockData mFallingDustData = Material.RED_CONCRETE.createBlockData();
 			@Override
 			public void run() {
-				if (mPlayer == null) {
-					return;
-				}
 				mT++;
 				Location itemLoc = item.getLocation();
 				new PartialParticle(Particle.FALLING_DUST, itemLoc, 1, 0.2, 0.2, 0.2, mFallingDustData).spawnAsPlayerActive(mPlayer);
@@ -225,10 +223,6 @@ public class Bezoar extends Ability {
 	}
 
 	private void applyPhilosopherEffects(Player player) {
-		if (mPlayer == null) {
-			return;
-		}
-
 		double absorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, PHILOSOPHER_STONE_ABSORPTION_HEALTH);
 		AbsorptionUtils.addAbsorption(player, absorption, absorption, PHILOSOPHER_STONE_ABSORPTION_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_ABSORPTION_DURATION));
 	}

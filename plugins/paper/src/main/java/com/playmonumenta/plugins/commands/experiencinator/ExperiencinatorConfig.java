@@ -40,6 +40,11 @@ public final class ExperiencinatorConfig {
 	private final GuiConfig mGuiConfig;
 	private final ScoreboardConfig mScoreboardConfig;
 
+	ExperiencinatorConfig() {
+		mGuiConfig = new GuiConfig();
+		mScoreboardConfig = new ScoreboardConfig();
+	}
+
 	public ExperiencinatorConfig(JsonElement element, Location lootTableLocation) throws Exception {
 		JsonObject object = element.getAsJsonObject();
 
@@ -497,6 +502,9 @@ public final class ExperiencinatorConfig {
 		private final List<Region> mRegionOrder = new ArrayList<>();
 		private final List<Tier> mTierOrder = new ArrayList<>();
 
+		private GuiConfig() {
+		}
+
 		public GuiConfig(JsonElement element) throws Exception {
 			JsonObject object = element.getAsJsonObject();
 
@@ -559,6 +567,9 @@ public final class ExperiencinatorConfig {
 	public static class ScoreboardConfig {
 		private final List<Tier> mTierOrder = new ArrayList<>();
 		private final Map<Region, String> mObjectives = new EnumMap<>(Region.class);
+
+		private ScoreboardConfig() {
+		}
 
 		public ScoreboardConfig(JsonElement element) throws Exception {
 			JsonObject object = element.getAsJsonObject();

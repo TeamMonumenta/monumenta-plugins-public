@@ -14,7 +14,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-
 /*
  * Multitool - Level one allows you to swap the tool
  * between an axe and shovel, level 2 adds a pickaxe
@@ -37,6 +36,8 @@ public class Multitool implements Enchantment {
 		return EnumSet.of(Slot.MAINHAND);
 	}
 
+	// NB: if this trigger is ever changed, adapt AbilityTrigger.KeyOptions.NO_USABLE_ITEMS accordingly
+	// (that code prevents using abilities with right clicks when holding a multitool)
 	@Override
 	public void onPlayerInteract(Plugin plugin, Player player, double level, PlayerInteractEvent event) {
 		//Material of the block clicked

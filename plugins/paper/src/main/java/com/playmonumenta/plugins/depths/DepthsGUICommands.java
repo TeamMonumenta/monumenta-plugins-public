@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.depths;
 
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -78,7 +79,7 @@ public class DepthsGUICommands {
 							return;
 						}
 
-						List<WeaponAspectDepthsAbility> weapons = DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mWeaponOfferings;
+						List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> weapons = DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mWeaponOfferings;
 
 						if (weapons == null || weapons.size() == 0) {
 							return;

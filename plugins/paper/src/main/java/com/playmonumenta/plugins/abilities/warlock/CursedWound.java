@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
@@ -56,28 +57,32 @@ public class CursedWound extends Ability {
 	public static final String CHARM_CAP = "Cursed Wound Damage Cap";
 	public static final String CHARM_DOT = "Cursed Wound DoT";
 
-	private double mCursedWoundCap;
+	public static final AbilityInfo<CursedWound> INFO =
+		new AbilityInfo<>(CursedWound.class, "Cursed Wound", CursedWound::new)
+			.linkedSpell(ClassAbility.CURSED_WOUND)
+			.scoreboardId("CursedWound")
+			.shorthandName("CW")
+			.descriptions(
+				"Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3 block radius around it with 1 damage every second for 6s. " +
+					"Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.",
+				"Critical attacks now also extend all enemies' debuffs (except Stun, Silence, and Paralysis) by 2s. Damage cap is increased from 15% to 30%.",
+				"When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. " +
+					"Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, " +
+					"as well as 3% of your melee attack's damage as magic damage per effect.")
+			.displayItem(new ItemStack(Material.GOLDEN_SWORD, 1));
+
+	private final double mCursedWoundCap;
 	private @Nullable Collection<PotionEffect> mStoredPotionEffects;
 	private @Nullable HashMap<String, Effect> mStoredCustomEffects;
 
-	public CursedWound(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Cursed Wound");
-		mInfo.mScoreboardId = "CursedWound";
-		mInfo.mShorthandName = "CW";
-		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3 block radius around it with 1 damage every second for 6s. " +
-			                        "Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.");
-		mInfo.mDescriptions.add("Damage cap is increased from 15% to 30%.");
-		mInfo.mDescriptions.add("When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. " +
-			                        "Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, " +
-			                        "as well as 3% of your melee attack's damage as magic damage per effect.");
-		mInfo.mLinkedSpell = ClassAbility.CURSED_WOUND;
-		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
+	public CursedWound(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mCursedWoundCap = CharmManager.getLevelPercentDecimal(player, CHARM_CAP) + (isLevelOne() ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
+		if (event.getType() == DamageType.MELEE && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 			World world = mPlayer.getWorld();
 			BlockData fallingDustData = Material.ANVIL.createBlockData();
 
@@ -86,9 +91,9 @@ public class CursedWound extends Ability {
 				double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, CURSED_WOUND_RADIUS);
 				if (damage > 0) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius)) {
-						 mStoredPotionEffects.forEach(mob::addPotionEffect);
-						 mStoredCustomEffects.forEach((source, effect) -> mPlugin.mEffectManager.addEffect(mob, source, effect));
-						 DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, true);
+						mStoredPotionEffects.forEach(mob::addPotionEffect);
+						mStoredCustomEffects.forEach((source, effect) -> mPlugin.mEffectManager.addEffect(mob, source, effect));
+						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
 					}
 
 					mStoredPotionEffects = null;
@@ -133,6 +138,9 @@ public class CursedWound extends Ability {
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		if (!ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
+			return;
+		}
 		World world = event.getEntity().getWorld();
 		Location loc = mPlayer.getLocation();
 		LivingEntity entity = event.getEntity();
@@ -225,8 +233,4 @@ public class CursedWound extends Ability {
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand());
-	}
 }

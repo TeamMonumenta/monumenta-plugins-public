@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -13,13 +15,11 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -35,36 +35,39 @@ public class CleansingRain extends Ability {
 	private static final int CLEANSING_RADIUS_ENHANCED = 6;
 	private static final int CLEANSING_1_COOLDOWN = 45 * 20;
 	private static final int CLEANSING_2_COOLDOWN = 30 * 20;
-	private static final int ANGLE = -45; // Looking straight up is -90. This is 45 degrees of pitch allowance
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "CleansingPercentDamageResistEffect";
 	public static final String CHARM_REDUCTION = "Cleansing Rain Damage Reduction";
 	public static final String CHARM_DURATION = "Cleansing Rain Duration";
 	public static final String CHARM_RANGE = "Cleansing Rain Range";
 	public static final String CHARM_COOLDOWN = "Cleansing Rain Cooldown";
 
+	public static final AbilityInfo<CleansingRain> INFO =
+		new AbilityInfo<>(CleansingRain.class, "Cleansing Rain", CleansingRain::new)
+			.linkedSpell(ClassAbility.CLEANSING_RAIN)
+			.scoreboardId("Cleansing")
+			.shorthandName("CR")
+			.descriptions(
+				"Right click while sneaking and looking upwards to summon a \"cleansing rain\" that follows you, " +
+					"removing negative effects from players within %s blocks, including yourself, and lasts for %s seconds. Cooldown: %ss."
+						.formatted(CLEANSING_RADIUS, StringUtils.ticksToSeconds(CLEANSING_DURATION), StringUtils.ticksToSeconds(CLEANSING_1_COOLDOWN)),
+				"Additionally grants %s%% Damage Reduction to all players in the radius. Cooldown: %ss."
+					.formatted(StringUtils.multiplierToPercentage(Math.abs(PERCENT_DAMAGE_RESIST)), StringUtils.ticksToSeconds(CLEANSING_2_COOLDOWN)),
+				"The radius increases to %s blocks, and each player touched by the rain keeps its effect for the cast duration."
+					.formatted(CLEANSING_RADIUS_ENHANCED))
+			.cooldown(CLEANSING_1_COOLDOWN, CLEANSING_2_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CleansingRain::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP),
+				AbilityTriggerInfo.NOT_HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.NETHER_STAR, 1));
+
 	private final double mRadius;
 
-	public CleansingRain(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Cleansing Rain");
-		mInfo.mLinkedSpell = ClassAbility.CLEANSING_RAIN;
-		mInfo.mScoreboardId = "Cleansing";
-		mInfo.mShorthandName = "CR";
-		mInfo.mDescriptions.add("Right click while sneaking and looking upwards to summon a \"cleansing rain\" that follows you, " +
-			                        "removing negative effects from players within %s blocks, including yourself, and lasts for %s seconds. Cooldown: %ss."
-				                        .formatted(CLEANSING_RADIUS, StringUtils.ticksToSeconds(CLEANSING_DURATION), StringUtils.ticksToSeconds(CLEANSING_1_COOLDOWN)));
-		mInfo.mDescriptions.add("Additionally grants %s%% Damage Reduction to all players in the radius. Cooldown: %ss."
-			                        .formatted(StringUtils.multiplierToPercentage(Math.abs(PERCENT_DAMAGE_RESIST)), StringUtils.ticksToSeconds(CLEANSING_2_COOLDOWN)));
-		mInfo.mDescriptions.add("The radius increases to %s blocks, and each player touched by the rain keeps its effect for the cast duration."
-			                        .formatted(CLEANSING_RADIUS_ENHANCED));
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+	public CleansingRain(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mRadius = CharmManager.getRadius(player, CHARM_RANGE, isEnhanced() ? CLEANSING_RADIUS_ENHANCED : CLEANSING_RADIUS);
-		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 		World world = mPlayer.getWorld();
@@ -79,7 +82,7 @@ public class CleansingRain extends Ability {
 			@Override
 			public void run() {
 
-				if (mPlayer == null || !mPlayer.isOnline() || mPlayer.isDead()) {
+				if (!mPlayer.isOnline() || mPlayer.isDead()) {
 					this.cancel();
 					return;
 				}
@@ -137,19 +140,6 @@ public class CleansingRain extends Ability {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, CLEANSING_APPLY_PERIOD);
-	}
-
-	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSneaking()
-			&& mPlayer.getLocation().getPitch() < ANGLE
-			&& mainHand.getType() != Material.BOW
-			&& offHand.getType() != Material.BOW;
 	}
 
 }

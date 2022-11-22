@@ -101,19 +101,19 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 			}
 			if (!levelOne) {
 				for (Ability ability : abilities) {
-					if (ability != null && plugin.mTimers.isAbilityOnCooldown(p.getUniqueId(), ability.getInfo().mLinkedSpell)) {
-						if (ability.getInfo().mLinkedSpell == ClassAbility.CHOLERIC_FLAMES) {
+					if (ability != null && plugin.mTimers.isAbilityOnCooldown(p.getUniqueId(), ability.getInfo().getLinkedSpell())) {
+						if (ability.getInfo().getLinkedSpell() == ClassAbility.CHOLERIC_FLAMES) {
 							EntityUtils.applyFire(plugin, duration, damagee, p, playerItemStats);
 							if (ability.isLevelTwo()) {
 								PotionUtils.applyPotion(p, damagee, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true));
 							}
-						} else if (ability.getInfo().mLinkedSpell == ClassAbility.GRASPING_CLAWS) {
+						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.GRASPING_CLAWS) {
 							EntityUtils.applySlow(plugin, duration, 0.1, damagee);
-						} else if (ability.getInfo().mLinkedSpell == ClassAbility.MELANCHOLIC_LAMENT) {
+						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.MELANCHOLIC_LAMENT) {
 							EntityUtils.applyWeaken(plugin, duration, 0.1, damagee);
-						} else if (ability.getInfo().mLinkedSpell == ClassAbility.HAUNTING_SHADES) {
+						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.HAUNTING_SHADES) {
 							EntityUtils.applyVulnerability(plugin, duration, 0.1, damagee);
-						} else if (ability.getInfo().mLinkedSpell == ClassAbility.WITHERING_GAZE) {
+						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.WITHERING_GAZE) {
 							plugin.mEffectManager.addEffect(damagee, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, null));
 						}
 					}

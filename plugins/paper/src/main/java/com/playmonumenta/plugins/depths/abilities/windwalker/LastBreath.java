@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -21,6 +22,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -37,22 +39,21 @@ public class LastBreath extends DepthsAbility {
 	public static final int RADIUS = 5;
 	public static final double KNOCKBACK_SPEED = 2;
 
-	public LastBreath(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.DRAGON_BREATH;
-		mTree = DepthsTree.WINDWALKER;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.LAST_BREATH;
-	}
+	public static final DepthsAbilityInfo<LastBreath> INFO =
+		new DepthsAbilityInfo<>(LastBreath.class, ABILITY_NAME, LastBreath::new, DepthsTree.WINDWALKER, DepthsTrigger.LIFELINE)
+			.linkedSpell(ClassAbility.LAST_BREATH)
+			.cooldown(COOLDOWN)
+			.displayItem(new ItemStack(Material.DRAGON_BREATH))
+			.descriptions(LastBreath::getDescription, MAX_RARITY)
+			.priorityAmount(10000);
 
-	@Override
-	public double getPriorityAmount() {
-		return 10000;
+	public LastBreath(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (event.isBlocked() || mPlayer == null) {
+		if (event.isBlocked()) {
 			return;
 		}
 
@@ -71,12 +72,12 @@ public class LastBreath extends DepthsAbility {
 			}
 			int totalCD = abil.getModifiedCooldown();
 			int reducedCD;
-			if (abil instanceof DepthsAbility da && da.mTree == DepthsTree.WINDWALKER) {
+			if (abil instanceof DepthsAbility da && da.getInfo().getDepthsTree() == DepthsTree.WINDWALKER) {
 				reducedCD = totalCD;
 			} else {
 				reducedCD = (int) (totalCD * COOLDOWN_REDUCTION[mRarity - 1]);
 			}
-			mPlugin.mTimers.updateCooldown(mPlayer, abil.getInfo().mLinkedSpell, reducedCD);
+			mPlugin.mTimers.updateCooldown(mPlayer, abil.getInfo().getLinkedSpell(), reducedCD);
 		}
 
 		Location loc = mPlayer.getLocation();
@@ -104,18 +105,9 @@ public class LastBreath extends DepthsAbility {
 
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, all your other Windwalker abilities' cooldowns are reset, and abilities from other trees have their cooldowns reduced by " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(COOLDOWN_REDUCTION[rarity - 1]) + "%" + ChatColor.WHITE + ". You gain " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED[rarity - 1]) + "%" + ChatColor.WHITE + " speed for " + SPEED_DURATION / 20 + " seconds, Resistance V for " + DepthsUtils.getRarityColor(rarity) + (RESISTANCE_TICKS[rarity - 1] / 20) + ChatColor.WHITE + " seconds, and mobs within " + RADIUS + " blocks are knocked away. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.WINDWALKER;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.LIFELINE;
-	}
 }

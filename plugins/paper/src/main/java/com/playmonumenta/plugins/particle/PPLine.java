@@ -39,6 +39,14 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 		return this;
 	}
 
+	/**
+	 * Shifts the entire line by the given amount in the direction of this particle line.
+	 */
+	public PPLine shift(double shift) {
+		mLocation.add(mDirection.clone().multiply(shift));
+		return this;
+	}
+
 	public PPLine countPerMeter(double countPerMeter) {
 		return super.count((int) Math.ceil(countPerMeter * mLength));
 	}

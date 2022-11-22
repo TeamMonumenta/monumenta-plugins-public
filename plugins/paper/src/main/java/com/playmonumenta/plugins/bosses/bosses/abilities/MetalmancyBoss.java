@@ -47,7 +47,7 @@ public class MetalmancyBoss extends BossAbilityGroup {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		if (mPlayer != null && mPlayerItemStats != null) {
+		if (mPlayerItemStats != null) {
 			event.setCancelled(true);
 
 			DamageUtils.damage(mPlayer, damagee, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, ClassAbility.METALMANCY, mPlayerItemStats), mDamage, true, true, false);

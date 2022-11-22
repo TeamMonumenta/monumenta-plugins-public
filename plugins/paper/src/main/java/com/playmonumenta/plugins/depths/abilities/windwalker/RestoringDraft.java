@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -20,6 +22,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public final class RestoringDraft extends DepthsAbility {
@@ -30,16 +33,16 @@ public final class RestoringDraft extends DepthsAbility {
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "RestoringDraftTickSlammed";
 	public static final int AUTOMATIC_THRESHOLD = 4;
 
+	public static final DepthsAbilityInfo<RestoringDraft> INFO =
+		new DepthsAbilityInfo<>(RestoringDraft.class, ABILITY_NAME, RestoringDraft::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
+			.displayItem(new ItemStack(Material.GOLDEN_BOOTS))
+			.descriptions(RestoringDraft::getDescription, MAX_RARITY);
+
 	private final BukkitRunnable mSlamAttackRunner;
 	private double mFallFromY = -7050;
 
 	public RestoringDraft(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.GOLDEN_BOOTS;
-		mTree = DepthsTree.WINDWALKER;
-
-		mInfo.mIgnoreCooldown = true;
-
+		super(plugin, player, INFO);
 		mSlamAttackRunner = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -101,9 +104,6 @@ public final class RestoringDraft extends DepthsAbility {
 	}
 
 	private void updateFallFrom() {
-		if (mPlayer == null) {
-			return;
-		}
 		if (mPlayer.getFallDistance() <= 0) {
 			mFallFromY = -10000;
 		} else {
@@ -112,18 +112,12 @@ public final class RestoringDraft extends DepthsAbility {
 	}
 
 	private double calculateFallDistance() {
-		if (mPlayer == null) {
-			return 0;
-		}
 		double currentY = mPlayer.getLocation().getY();
 		double fallDistance = mFallFromY - currentY;
 		return Math.max(fallDistance, 0);
 	}
 
 	private void heal() {
-		if (mPlayer == null) {
-			return;
-		}
 		double fallDistance = calculateFallDistance();
 		double healing = Math.min(HEIGHT_CAP, fallDistance) * HEALING[mRarity - 1];
 		PlayerUtils.healPlayer(mPlugin, mPlayer, healing);
@@ -143,14 +137,8 @@ public final class RestoringDraft extends DepthsAbility {
 	}
 
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Falling more than " + AUTOMATIC_THRESHOLD + " blocks heals you by " + DepthsUtils.getRarityColor(rarity) + HEALING[rarity - 1] + ChatColor.WHITE + " health per block fallen (up to " + HEIGHT_CAP + " blocks). All fall damage is canceled.";
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.WINDWALKER;
 	}
 }
 

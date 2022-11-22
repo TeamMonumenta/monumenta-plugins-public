@@ -2,12 +2,13 @@ package com.playmonumenta.plugins.depths.abilities.frostborn;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -24,7 +25,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class DepthsFrostNova extends DepthsAbility {
@@ -37,24 +38,30 @@ public class DepthsFrostNova extends DepthsAbility {
 	public static final int COOLDOWN_TICKS = 18 * 20;
 	public static final int ICE_TICKS = 6 * 20;
 
+	public static final DepthsAbilityInfo<DepthsFrostNova> INFO =
+		new DepthsAbilityInfo<>(DepthsFrostNova.class, ABILITY_NAME, DepthsFrostNova::new, DepthsTree.FROSTBORN, DepthsTrigger.SHIFT_LEFT_CLICK)
+			.linkedSpell(ClassAbility.FROST_NOVA)
+			.cooldown(COOLDOWN_TICKS)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsFrostNova::cast,
+				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.ICE))
+			.descriptions(DepthsFrostNova::getDescription, MAX_RARITY);
+
 	public DepthsFrostNova(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.ICE;
-		mTree = DepthsTree.FROSTBORN;
-		mInfo.mCooldown = COOLDOWN_TICKS;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mInfo.mLinkedSpell = ClassAbility.FROST_NOVA;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action action) {
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
+		}
 		putOnCooldown();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
 			EntityUtils.applySlow(mPlugin, DURATION_TICKS, SLOW_MULTIPLIER[mRarity - 1], mob);
 			if (mob.getFireTicks() > 1) {
 				mob.setFireTicks(1);
 			}
-			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true);
 		}
 
 		// Extinguish fire on all nearby players
@@ -127,32 +134,10 @@ public class DepthsFrostNova extends DepthsAbility {
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1f);
 	}
 
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
-			cast(Action.LEFT_CLICK_AIR);
-		}
-		return false;
-	}
-
-	@Override
-	public boolean runCheck() {
-		return mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Left click while sneaking and holding a weapon to unleash a frost nova, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to all enemies in a " + SIZE + " block cube around you and afflicting them with " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(SLOW_MULTIPLIER[rarity - 1]) + "%" + ChatColor.WHITE + " slowness for " + DURATION_TICKS / 20 + " seconds. All mobs and players within range are extinguished if they are on fire. Nearby blocks are replaced with ice for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FROSTBORN;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_LEFT_CLICK;
-	}
 }
 

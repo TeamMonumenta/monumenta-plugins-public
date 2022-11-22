@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -47,28 +48,31 @@ public class Riposte extends Ability {
 	public static final String CHARM_RADIUS = "Riposte Range";
 	public static final String CHARM_ROOT_DURATION = "Riposte Root Duration";
 
+	public static final AbilityInfo<Riposte> INFO =
+		new AbilityInfo<>(Riposte.class, "Riposte", Riposte::new)
+			.linkedSpell(ClassAbility.RIPOSTE)
+			.scoreboardId("Obliteration")
+			.shorthandName("Rip")
+			.descriptions(
+				"While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: 15s.",
+				"Cooldown lowered to 12s and if you block an attack with Riposte's effect while holding a sword, your next sword attack within 2s deals double damage. " +
+					"If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 3s.",
+				"When Riposte activates, deal 15 melee damage to all mobs in a 4 block radius and root them for 1.5s.")
+			.cooldown(RIPOSTE_1_COOLDOWN, RIPOSTE_2_COOLDOWN, CHARM_COOLDOWN)
+			.displayItem(new ItemStack(Material.SKELETON_SKULL, 1));
+
 	private @Nullable BukkitRunnable mSwordTimer = null;
 
-	public Riposte(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Riposte");
-		mInfo.mLinkedSpell = ClassAbility.RIPOSTE;
-		mInfo.mScoreboardId = "Obliteration";
-		mInfo.mShorthandName = "Rip";
-		mInfo.mDescriptions.add("While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: 15s.");
-		mInfo.mDescriptions.add("Cooldown lowered to 12s and if you block an attack with Riposte's effect while holding a sword, your next sword attack within 2s deals double damage. If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 3s.");
-		mInfo.mDescriptions.add("When Riposte activates, deal 15 melee damage to all mobs in a 4 block radius and root them for 1.5s.");
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? RIPOSTE_1_COOLDOWN : RIPOSTE_2_COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
+	public Riposte(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (!isTimerActive()
+		if (!isOnCooldown()
 			    && source != null
 			    && event.getType() == DamageType.MELEE
-			    && !event.isBlocked()
-			    && mPlayer != null) {
+			    && !event.isBlocked()) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isAxe(mainHand) || ItemUtils.isSword(mainHand)) {
 				MovementUtils.knockAway(mPlayer, source, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, RIPOSTE_KNOCKBACK_SPEED), true);
@@ -123,14 +127,13 @@ public class Riposte extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && mPlayer != null) {
-			if (ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
-				if (mSwordTimer != null && !mSwordTimer.isCancelled()) {
-					event.setDamage(event.getDamage() * (1 + RIPOSTE_SWORD_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BONUS_DAMAGE)));
-					mSwordTimer.cancel();
-					mSwordTimer = null;
-				}
-			}
+		if (event.getType() == DamageType.MELEE
+			    && ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())
+			    && mSwordTimer != null
+			    && !mSwordTimer.isCancelled()) {
+			event.setDamage(event.getDamage() * (1 + RIPOSTE_SWORD_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BONUS_DAMAGE)));
+			mSwordTimer.cancel();
+			mSwordTimer = null;
 		}
 		return false; // prevents multiple applications itself by clearing mSwordTimer
 	}

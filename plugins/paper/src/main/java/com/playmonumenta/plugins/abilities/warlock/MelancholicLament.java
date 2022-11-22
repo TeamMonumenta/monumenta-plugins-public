@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -11,13 +13,10 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
-import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,7 +27,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -56,123 +54,112 @@ public class MelancholicLament extends Ability {
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(235, 235, 224), 1.0f);
 
+	public static final AbilityInfo<MelancholicLament> INFO =
+		new AbilityInfo<>(MelancholicLament.class, "Melancholic Lament", MelancholicLament::new)
+			.linkedSpell(ClassAbility.MELANCHOLIC_LAMENT)
+			.scoreboardId("Melancholic")
+			.shorthandName("MLa")
+			.descriptions(
+				("Press the swap key while sneaking and holding a scythe to recite a haunting song, " +
+					 "causing all mobs within %s blocks to target the user and afflicting them with %s%% Weaken for %s seconds. Cooldown: %ss.")
+					.formatted(RADIUS, StringUtils.multiplierToPercentage(WEAKEN_EFFECT_1), StringUtils.ticksToSeconds(DURATION), StringUtils.ticksToSeconds(COOLDOWN)),
+				"Increase the Weaken to %s%% and decrease the duration of all negative potion effects on players in the radius by %ss."
+					.formatted(StringUtils.multiplierToPercentage(WEAKEN_EFFECT_2), StringUtils.ticksToSeconds(CLEANSE_REDUCTION)),
+				"For %ss after casting this ability, you and your allies in a %s block radius gain +%s%% melee damage for each mob in that same radius targeting you (capped at %s mobs)."
+					.formatted(StringUtils.ticksToSeconds(DURATION), ENHANCE_RADIUS, StringUtils.multiplierToPercentage(ENHANCE_DAMAGE), ENHANCE_MAX_MOBS))
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", MelancholicLament::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
+				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+			.displayItem(new ItemStack(Material.GHAST_TEAR, 1));
+
 	private final double mWeakenEffect;
-	private @Nullable JudgementChain mJudgementChain;
 
 	private int mEnhancementBonusDamage;
 
-	public MelancholicLament(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Melancholic Lament");
-		mInfo.mLinkedSpell = ClassAbility.MELANCHOLIC_LAMENT;
-		mInfo.mScoreboardId = "Melancholic";
-		mInfo.mShorthandName = "MLa";
-		mInfo.mDescriptions.add(("Press the swap key while sneaking and holding a scythe to recite a haunting song, " +
-			                         "causing all mobs within %s blocks to target the user and afflicting them with %s%% Weaken for %s seconds. Cooldown: %ss.")
-			                        .formatted(RADIUS, StringUtils.multiplierToPercentage(WEAKEN_EFFECT_1), StringUtils.ticksToSeconds(DURATION), StringUtils.ticksToSeconds(COOLDOWN)));
-		mInfo.mDescriptions.add("Increase the Weaken to %s%% and decrease the duration of all negative potion effects on players in the radius by %ss."
-			                        .formatted(StringUtils.multiplierToPercentage(WEAKEN_EFFECT_2), StringUtils.ticksToSeconds(CLEANSE_REDUCTION)));
-		mInfo.mDescriptions.add("For %ss after casting this ability, you and your allies in a %s block radius gain +%s%% melee damage for each mob in that same radius targeting you (capped at %s mobs)."
-			                        .formatted(StringUtils.ticksToSeconds(DURATION), ENHANCE_RADIUS, StringUtils.multiplierToPercentage(ENHANCE_DAMAGE), ENHANCE_MAX_MOBS));
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
+	public MelancholicLament(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mWeakenEffect = CharmManager.getLevelPercentDecimal(player, CHARM_WEAKNESS) + (isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2);
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mJudgementChain = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, JudgementChain.class);
-		});
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
-		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
-		if (ItemUtils.isHoe(mainHandItem)) {
-			event.setCancelled(true);
-			// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
-			if (!mPlayer.isSneaking() || (mPlayer.isSneaking() && mJudgementChain != null && mPlayer.getLocation().getPitch() < -50.0)) {
-				return;
-			}
-			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-				return;
-			}
 
-			Location loc = mPlayer.getLocation();
-			World world = mPlayer.getWorld();
+		Location loc = mPlayer.getLocation();
+		World world = mPlayer.getWorld();
 
-			world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.2f);
-			world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.4f);
-			world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.6f);
+		world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.2f);
+		world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.6f);
 
-			new PartialParticle(Particle.REDSTONE, loc, 300, 8, 8, 8, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 300, 8, 8, 8, 0.125).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, loc, 300, 8, 8, 8, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 300, 8, 8, 8, 0.125).spawnAsPlayerActive(mPlayer);
 
-			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
-			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), radius);
-			for (LivingEntity mob : hitbox.getHitMobs()) {
-				EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
-				EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
-			}
-
-			if (isEnhanced()) {
-				new BukkitRunnable() {
-					int mTicks = 0;
-
-					@Override
-					public void run() {
-
-						if (mPlayer == null || !mPlayer.isOnline() || mPlayer.isDead()) {
-							this.cancel();
-							return;
-						}
-
-						Hitbox enhanceHitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), ENHANCE_RADIUS);
-						int numTargeting = (int) enhanceHitbox
-							                         .getHitMobs().stream()
-							                         .filter(entity -> entity instanceof Mob mob && mob.getTarget() != null && mob.getTarget().equals(mPlayer))
-							                         .limit(ENHANCE_MAX_MOBS)
-							                         .count();
-						for (Player player : enhanceHitbox.getHitPlayers(true)) {
-							mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME, new PercentDamageDealt(ENHANCE_EFFECT_DURATION, ENHANCE_DAMAGE * numTargeting, AFFECTED_DAMAGE_TYPES));
-							mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_PARTICLE_NAME, new Aesthetics(ENHANCE_EFFECT_DURATION,
-									(entity, fourHertz, twoHertz, oneHertz) -> {
-										Location loc = player.getLocation().add(0, 1, 0);
-										new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 20, 0.5, 0, 0.5, 0.125).spawnAsPlayerActive(mPlayer);
-									}, (entity) -> {
-								})
-							);
-						}
-
-						mTicks += 1;
-						if (mTicks > DURATION) {
-							this.cancel();
-						}
-					}
-				}.runTaskTimer(mPlugin, 0, 1);
-
-			}
-
-			if (isLevelTwo()) {
-				int reductionTime = CLEANSE_REDUCTION + CharmManager.getExtraDuration(mPlayer, CHARM_RECOVERY);
-				for (Player player : hitbox.getHitPlayers(true)) {
-					new PartialParticle(Particle.REDSTONE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.ENCHANTMENT_TABLE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
-					for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, player)) {
-						PotionEffect effect = player.getPotionEffect(effectType);
-						if (effect != null) {
-							player.removePotionEffect(effectType);
-							if (effect.getDuration() - reductionTime > 0) {
-								player.addPotionEffect(new PotionEffect(effectType, effect.getDuration() - reductionTime, effect.getAmplifier()));
-							}
-						}
-					}
-					EntityUtils.setWeakenTicks(mPlugin, player, Math.max(0, EntityUtils.getWeakenTicks(mPlugin, player) - reductionTime));
-					EntityUtils.setSlowTicks(mPlugin, player, Math.max(0, EntityUtils.getSlowTicks(mPlugin, player) - reductionTime));
-				}
-			}
-			putOnCooldown();
+		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+		Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), radius);
+		for (LivingEntity mob : hitbox.getHitMobs()) {
+			EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
+			EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
 		}
+
+		if (isEnhanced()) {
+			new BukkitRunnable() {
+				int mTicks = 0;
+
+				@Override
+				public void run() {
+
+					if (!mPlayer.isOnline() || mPlayer.isDead()) {
+						this.cancel();
+						return;
+					}
+
+					Hitbox enhanceHitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), ENHANCE_RADIUS);
+					int numTargeting = (int) enhanceHitbox
+						                         .getHitMobs().stream()
+						                         .filter(entity -> entity instanceof Mob mob && mob.getTarget() != null && mob.getTarget().equals(mPlayer))
+						                         .limit(ENHANCE_MAX_MOBS)
+						                         .count();
+					for (Player player : enhanceHitbox.getHitPlayers(true)) {
+						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME, new PercentDamageDealt(ENHANCE_EFFECT_DURATION, ENHANCE_DAMAGE * numTargeting, AFFECTED_DAMAGE_TYPES));
+						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_PARTICLE_NAME, new Aesthetics(ENHANCE_EFFECT_DURATION,
+								(entity, fourHertz, twoHertz, oneHertz) -> {
+									Location loc = player.getLocation().add(0, 1, 0);
+									new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 20, 0.5, 0, 0.5, 0.125).spawnAsPlayerActive(mPlayer);
+								}, (entity) -> {
+							})
+						);
+					}
+
+					mTicks += 1;
+					if (mTicks > DURATION) {
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
+
+		}
+
+		if (isLevelTwo()) {
+			int reductionTime = CLEANSE_REDUCTION + CharmManager.getExtraDuration(mPlayer, CHARM_RECOVERY);
+			for (Player player : hitbox.getHitPlayers(true)) {
+				new PartialParticle(Particle.REDSTONE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.ENCHANTMENT_TABLE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
+				for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, player)) {
+					PotionEffect effect = player.getPotionEffect(effectType);
+					if (effect != null) {
+						player.removePotionEffect(effectType);
+						if (effect.getDuration() - reductionTime > 0) {
+							player.addPotionEffect(new PotionEffect(effectType, effect.getDuration() - reductionTime, effect.getAmplifier()));
+						}
+					}
+				}
+				EntityUtils.setWeakenTicks(mPlugin, player, Math.max(0, EntityUtils.getWeakenTicks(mPlugin, player) - reductionTime));
+				EntityUtils.setSlowTicks(mPlugin, player, Math.max(0, EntityUtils.getSlowTicks(mPlugin, player) - reductionTime));
+			}
+		}
+		putOnCooldown();
 	}
 
 	@Override

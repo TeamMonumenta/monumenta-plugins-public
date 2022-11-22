@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.CounterStrikeCS;
@@ -13,6 +14,7 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.HashMap;
 import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -36,22 +38,26 @@ public class CounterStrike extends Ability {
 	public static final String CHARM_DAMAGE_REDUCTION = "Counter Strike Damage Reduction";
 	public static final String CHARM_STACKS = "Counter Strike Stacks";
 
+	public static final AbilityInfo<CounterStrike> INFO =
+		new AbilityInfo<>(CounterStrike.class, "Counter Strike", CounterStrike::new)
+			.linkedSpell(ClassAbility.COUNTER_STRIKE)
+			.scoreboardId("CounterStrike")
+			.shorthandName("CS")
+			.descriptions(
+				"When you take melee damage, deal damage equal to 20% of pre-mitigation damage taken to all mobs in a 3 block radius.",
+				"The damage is increased to 40% of pre-mitigation damage.",
+				"When this ability activates, gain 5% damage reduction against future melee damage from the mob that activated it for 10 seconds. " +
+					"This effect stacks up to 3 times (15% damage reduction).")
+			.displayItem(new ItemStack(Material.CACTUS, 1));
+
 	private final double mReflect;
 	private final HashMap<LivingEntity, Integer> mLastDamageTime = new HashMap<>();
 	private final HashMap<LivingEntity, Integer> mStacks = new HashMap<>();
 
 	private final CounterStrikeCS mCosmetic;
 
-	public CounterStrike(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Counter Strike");
-		mInfo.mScoreboardId = "CounterStrike";
-		mInfo.mShorthandName = "CS";
-		mInfo.mDescriptions.add("When you take melee damage, deal damage equal to 20% of pre-mitigation damage taken to all mobs in a 3 block radius.");
-		mInfo.mDescriptions.add("The damage is increased to 40% of pre-mitigation damage.");
-		mInfo.mDescriptions.add("When this ability activates, gain 5% damage reduction against future melee damage from the mob that activated it for 10 seconds. This effect stacks up to 3 times (15% damage reduction).");
-		mInfo.mLinkedSpell = ClassAbility.COUNTER_STRIKE;
-		mDisplayItem = new ItemStack(Material.CACTUS, 1);
-
+	public CounterStrike(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mReflect = isLevelOne() ? COUNTER_STRIKE_1_REFLECT : COUNTER_STRIKE_2_REFLECT;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CounterStrikeCS(), CounterStrikeCS.SKIN_LIST);
@@ -62,7 +68,6 @@ public class CounterStrike extends Ability {
 		if (event.getType() == DamageType.MELEE
 			    && source != null
 			    && !event.isBlocked()
-			    && mPlayer != null
 			    && mPlayer.getNoDamageTicks() <= mPlayer.getMaximumNoDamageTicks() / 2f) {
 
 			Location loc = mPlayer.getLocation().add(0, 1, 0);
@@ -74,7 +79,7 @@ public class CounterStrike extends Ability {
 				// Use different ClassAbility for non-target for Glorious Battle
 				ClassAbility ca = ClassAbility.COUNTER_STRIKE_AOE;
 				if (mob == source) {
-					ca = mInfo.mLinkedSpell;
+					ca = mInfo.getLinkedSpell();
 				}
 				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, eventDamage, ca, true, true);
 			}
@@ -95,13 +100,13 @@ public class CounterStrike extends Ability {
 				} else {
 					mStacks.put(source, 1);
 				}
-				mLastDamageTime.put(source, mPlayer.getTicksLived());
+				mLastDamageTime.put(source, Bukkit.getServer().getCurrentTick());
 			}
 		}
 	}
 
 	private void clearIfExpired(LivingEntity mob, Integer time) {
-		if (time < mPlayer.getTicksLived() - (REDUCTION_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION))) {
+		if (time < Bukkit.getServer().getCurrentTick() - (REDUCTION_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION))) {
 			mLastDamageTime.remove(mob);
 			mStacks.remove(mob);
 		}

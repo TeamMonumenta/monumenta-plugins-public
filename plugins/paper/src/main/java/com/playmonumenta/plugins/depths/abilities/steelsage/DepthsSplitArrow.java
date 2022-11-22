@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -21,6 +23,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -33,10 +36,13 @@ public class DepthsSplitArrow extends DepthsAbility {
 	private static final PotionEffect SPECTRAL_ARROW_EFFECT = new PotionEffect(PotionEffectType.GLOWING, 200, 0);
 	private static final int IFRAMES = 10;
 
+	public static final DepthsAbilityInfo<DepthsSplitArrow> INFO =
+		new DepthsAbilityInfo<>(DepthsSplitArrow.class, ABILITY_NAME, DepthsSplitArrow::new, DepthsTree.METALLIC, DepthsTrigger.PASSIVE)
+			.displayItem(new ItemStack(Material.CHAIN))
+			.descriptions(DepthsSplitArrow::getDescription, MAX_RARITY);
+
 	public DepthsSplitArrow(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.CHAIN;
-		mTree = DepthsTree.METALLIC;
+		super(plugin, player, INFO);
 	}
 
 	@Override
@@ -66,7 +72,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 						nearestMob.addPotionEffect(SPECTRAL_ARROW_EFFECT);
 					}
 
-					DamageUtils.damage(mPlayer, nearestMob, DamageType.OTHER, event.getDamage() * DAMAGE_MOD[mRarity - 1], mInfo.mLinkedSpell, true);
+					DamageUtils.damage(mPlayer, nearestMob, DamageType.OTHER, event.getDamage() * DAMAGE_MOD[mRarity - 1], mInfo.getLinkedSpell(), true);
 					MovementUtils.knockAway(enemy, nearestMob, 0.125f, 0.35f, true);
 					EntityUtils.applyArrowIframes(mPlugin, IFRAMES, nearestMob);
 				}
@@ -75,14 +81,8 @@ public class DepthsSplitArrow extends DepthsAbility {
 		return false; // applies damage of type OTHER for damage of type PROJECTILE, which should not cause recursion with any other ability (or itself)
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "When you shoot an enemy with a projectile, the nearest enemy within " + SPLIT_ARROW_CHAIN_RANGE + " blocks takes " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE_MOD[rarity - 1]) + "%" + ChatColor.WHITE + " of the projectile's damage.";
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.METALLIC;
 	}
 }
 

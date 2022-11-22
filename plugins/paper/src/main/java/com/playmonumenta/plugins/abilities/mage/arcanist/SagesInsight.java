@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.mage.arcanist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,25 +48,27 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	public static final String CHARM_SPEED = "Sage's Insight Speed Amplifier";
 	public static final String CHARM_ABILITY = "Sage's Insight Ability Count";
 
+	public static final AbilityInfo<SagesInsight> INFO =
+		new AbilityInfo<>(SagesInsight.class, "Sage's Insight", SagesInsight::new)
+			.scoreboardId("SagesInsight")
+			.shorthandName("SgI")
+			.descriptions(
+				String.format("If an active spell hits an enemy, you gain an Arcane Insight. Insights stack up to %s, but decay every %ss of not gaining one. Once %s Insights are revealed, cooldowns of the previous %s spells cast are refreshed. This sets your Insights back to 0.",
+					MAX_STACKS,
+					DECAY_TIMER / 20,
+					MAX_STACKS,
+					ABILITIES_COUNT_1
+				),
+				String.format("Sage's Insight now refreshes the cooldowns of your previous %s spells upon activating.",
+					ABILITIES_COUNT_2
+				))
+			.displayItem(new ItemStack(Material.ENDER_EYE, 1));
+
 
 	private final HashMap<ClassAbility, Boolean> mStacksMap;
 
-	public SagesInsight(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Sage's Insight");
-		mInfo.mScoreboardId = "SagesInsight";
-		mInfo.mShorthandName = "SgI";
-		mInfo.mDescriptions.add(
-			String.format("If an active spell hits an enemy, you gain an Arcane Insight. Insights stack up to %s, but decay every %ss of not gaining one. Once %s Insights are revealed, cooldowns of the previous %s spells cast are refreshed. This sets your Insights back to 0.",
-				MAX_STACKS,
-				DECAY_TIMER / 20,
-				MAX_STACKS,
-				ABILITIES_COUNT_1
-			));
-		mInfo.mDescriptions.add(
-			String.format("Sage's Insight now refreshes the cooldowns of your previous %s spells upon activating.",
-				ABILITIES_COUNT_2
-			));
-		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
+	public SagesInsight(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mResetSize = (isLevelOne() ? ABILITIES_COUNT_1 : ABILITIES_COUNT_2) + (int) CharmManager.getLevel(player, CHARM_ABILITY);
 		mMaxStacks = (int) CharmManager.getLevel(player, CHARM_STACKS) + MAX_STACKS;
 		mSpeed = CharmManager.getLevelPercentDecimal(player, CHARM_SPEED);
@@ -79,7 +81,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mPlayer != null && mStacks > 0) {
+		if (mStacks > 0) {
 			mTicksToStackDecay -= 5;
 
 			if (mTicksToStackDecay <= 0) {
@@ -102,44 +104,42 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 		Location loc = mPlayer.getLocation();
 		Location locD = event.getDamagee().getLocation().add(0, 1, 0);
 
-		if (mStacks < mMaxStacks) {
-			Boolean bool = mStacksMap.get(ability);
-			if (bool != null && bool) {
-				mStacks++;
-				mStacksMap.put(ability, false);
-				if (mStacks == mMaxStacks) {
-					if (mSpeed > 0) {
-						mPlugin.mEffectManager.addEffect(mPlayer, "SagesExtraSpeed", new PercentSpeed(SPEED_DURATION, mSpeed, ATTR_NAME));
-					}
-					new PartialParticle(Particle.REDSTONE, loc, 20, 1.4, 1.4, 1.4, COLOR).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 2.1, 0), 20, 0.5, 0.1, 0.5, 0.1).spawnAsPlayerActive(mPlayer);
-					for (int i = 0; i < PITCHES.length; i++) {
-						float pitch = PITCHES[i];
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 1, pitch);
-							}
-						}.runTaskLater(mPlugin, i);
-					}
-
-					mStacks = 0;
-					for (ClassAbility s : mResets) {
-						if (ability == ClassAbility.MANA_LANCE) {
-							// Special Treatment for Mana Lance because of charged abilities.
-							Objects.requireNonNull(mPlugin.mAbilityManager.getPlayerAbility(mPlayer, ManaLance.class)).incrementCharge();
-						} else {
-							mPlugin.mTimers.removeCooldown(mPlayer, s);
-						}
-					}
-					mResets.clear();
-				} else {
-					new PartialParticle(Particle.REDSTONE, locD, 15, 0.4, 0.4, 0.4, COLOR).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.EXPLOSION_NORMAL, locD, 15, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
-					MessagingUtils.sendActionBarMessage(mPlayer, "Sage's Insight Stacks: " + mStacks);
+		Boolean bool = mStacksMap.get(ability);
+		if (bool != null && bool) {
+			mStacks++;
+			mStacksMap.put(ability, false);
+			if (mStacks >= mMaxStacks) {
+				if (mSpeed > 0) {
+					mPlugin.mEffectManager.addEffect(mPlayer, "SagesExtraSpeed", new PercentSpeed(SPEED_DURATION, mSpeed, ATTR_NAME));
 				}
-				ClientModHandler.updateAbility(mPlayer, this);
+				new PartialParticle(Particle.REDSTONE, loc, 20, 1.4, 1.4, 1.4, COLOR).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 2.1, 0), 20, 0.5, 0.1, 0.5, 0.1).spawnAsPlayerActive(mPlayer);
+				for (int i = 0; i < PITCHES.length; i++) {
+					float pitch = PITCHES[i];
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 1, pitch);
+						}
+					}.runTaskLater(mPlugin, i);
+				}
+
+				mStacks = 0;
+				for (ClassAbility s : mResets) {
+					if (ability == ClassAbility.MANA_LANCE) {
+						// Special Treatment for Mana Lance because of charged abilities.
+						Objects.requireNonNull(mPlugin.mAbilityManager.getPlayerAbility(mPlayer, ManaLance.class)).incrementCharge();
+					} else {
+						mPlugin.mTimers.removeCooldown(mPlayer, s);
+					}
+				}
+				mResets.clear();
+			} else {
+				new PartialParticle(Particle.REDSTONE, locD, 15, 0.4, 0.4, 0.4, COLOR).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, locD, 15, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
+				MessagingUtils.sendActionBarMessage(mPlayer, "Sage's Insight Stacks: " + mStacks);
 			}
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 		return false; // only used to check that an ability dealt damage, and does not cause more damage instances.
 	}
@@ -163,7 +163,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public int getMaxCharges() {
-		return mMaxStacks;
+		return mMaxStacks - 1; // -1 as "max stacks" is never reached - it immediately resets back to 0
 	}
 
 }

@@ -2,6 +2,9 @@ package com.playmonumenta.plugins.abilities.warrior.berserker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -30,7 +33,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -64,6 +66,22 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	public static final String CHARM_KNOCKBACK = "Glorious Battle Knockback";
 	public static final String CHARM_DAMAGE_MODIFIER = "Glorious Battle Damage Modifier";
 
+	public static final AbilityInfo<GloriousBattle> INFO =
+		new AbilityInfo<>(GloriousBattle.class, "Glorious Battle", GloriousBattle::new)
+			.linkedSpell(ClassAbility.GLORIOUS_BATTLE)
+			.scoreboardId("GloriousBattle")
+			.shorthandName("GB")
+			.descriptions(
+				("Dealing indirect damage with an ability grants you a Glorious Battle stack. " +
+					 "Shift and swap hands to consume a stack and charge forwards, gaining full knockback resistance until landing. " +
+					 "When you land, deal %s damage to the nearest mob within %s blocks and apply %s%% bleed for %s seconds. " +
+					 "Additionally, knock back all mobs within %s blocks.")
+					.formatted(DAMAGE_1, RADIUS, StringUtils.multiplierToPercentage(BLEED_PERCENT), StringUtils.ticksToSeconds(BLEED_TIME), RADIUS),
+				"Damage increased to %s. Additionally, you now passively gain %s%% melee damage for each mob targeting you within %s blocks, up to %s mobs."
+					.formatted(DAMAGE_2, StringUtils.multiplierToPercentage(DAMAGE_PER), TARGET_RANGE, MAX_TARGETING))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GloriousBattle::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
+			.displayItem(new ItemStack(Material.IRON_SWORD, 1));
+
 	private int mStacks;
 	private final int mStackLimit;
 	private final int mSpellDelay = 10;
@@ -71,31 +89,16 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	private @Nullable BukkitRunnable mRunnable;
 	private final GloriousBattleCS mCosmetic;
 
-	public GloriousBattle(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Glorious Battle");
-		mInfo.mLinkedSpell = ClassAbility.GLORIOUS_BATTLE;
-		mInfo.mCooldown = 0;
-		mInfo.mScoreboardId = "GloriousBattle";
-		mInfo.mShorthandName = "GB";
-		mInfo.mDescriptions.add(("Dealing indirect damage with an ability grants you a Glorious Battle stack. " +
-			                         "Shift and swap hands to consume a stack and charge forwards, gaining full knockback resistance until landing. " +
-			                         "When you land, deal %s damage to the nearest mob within %s blocks and apply %s%% bleed for %s seconds. " +
-			                         "Additionally, knock back all mobs within %s blocks.")
-			                        .formatted(DAMAGE_1, RADIUS, StringUtils.multiplierToPercentage(BLEED_PERCENT), StringUtils.ticksToSeconds(BLEED_TIME), RADIUS));
-		mInfo.mDescriptions.add("Damage increased to %s. Additionally, you now passively gain %s%% melee damage for each mob targeting you within %s blocks, up to %s mobs."
-			                        .formatted(DAMAGE_2, StringUtils.multiplierToPercentage(DAMAGE_PER), TARGET_RANGE, MAX_TARGETING));
-		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
+	public GloriousBattle(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mStacks = 0;
 		mStackLimit = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GloriousBattleCS(), GloriousBattleCS.SKIN_LIST);
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		event.setCancelled(true);
-
-		if (mPlayer == null || mStacks < 1 || !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
+	public void cast() {
+		if (mStacks < 1 || ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return;
 		}
 

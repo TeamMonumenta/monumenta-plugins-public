@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -37,10 +38,13 @@ public class Sundrops extends DepthsAbility {
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "SundropsPercentDamageReceivedEffect";
 	private static final double PERCENT_DAMAGE_RECEIVED = -0.2;
 
+	public static final DepthsAbilityInfo<Sundrops> INFO =
+		new DepthsAbilityInfo<>(Sundrops.class, ABILITY_NAME, Sundrops::new, DepthsTree.SUNLIGHT, DepthsTrigger.SPAWNER)
+			.displayItem(new ItemStack(Material.HONEYCOMB_BLOCK))
+			.descriptions(Sundrops::getDescription, MAX_RARITY);
+
 	public Sundrops(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.HONEYCOMB_BLOCK;
-		mTree = DepthsTree.SUNLIGHT;
+		super(plugin, player, INFO);
 	}
 
 	public static void summonSundrop(Location loc) {
@@ -57,7 +61,7 @@ public class Sundrops extends DepthsAbility {
 
 		new BukkitRunnable() {
 			int mT = 0;
-			BlockData mFallingDustData = Material.HONEYCOMB_BLOCK.createBlockData();
+			final BlockData mFallingDustData = Material.HONEYCOMB_BLOCK.createBlockData();
 			@Override
 			public void run() {
 				mT++;
@@ -90,20 +94,9 @@ public class Sundrops extends DepthsAbility {
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Whenever a player in your party breaks a spawner, there is a " + DepthsUtils.getRarityColor(rarity) + DROP_CHANCE[rarity - 1] + "%" + ChatColor.WHITE + " chance of spawning a sundrop. Picking up a sundrop gives " + (int) DepthsUtils.roundPercent(PERCENT_SPEED) + "% speed and " + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED) + "% resistance for " + DURATION / 20 + " seconds. Spawn chance stacks with other players in your party who have the skill, up to 100%.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.SUNLIGHT;
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SPAWNER;
-	}
 }
 

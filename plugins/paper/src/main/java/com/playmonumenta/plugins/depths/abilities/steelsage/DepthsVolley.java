@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -30,6 +31,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -40,36 +42,33 @@ public class DepthsVolley extends DepthsAbility {
 	private static final int COOLDOWN = 12 * 20;
 	public static final int[] ARROWS = {7, 10, 12, 15, 18, 24};
 	private static final double[] DAMAGE_MULTIPLIER = {1.4, 1.5, 1.6, 1.7, 1.8, 2.0};
+
+	public static final DepthsAbilityInfo<DepthsVolley> INFO =
+		new DepthsAbilityInfo<>(DepthsVolley.class, ABILITY_NAME, DepthsVolley::new, DepthsTree.METALLIC, DepthsTrigger.SHIFT_BOW)
+			.linkedSpell(ClassAbility.VOLLEY)
+			.cooldown(COOLDOWN)
+			.displayItem(new ItemStack(Material.ARROW))
+			.descriptions(DepthsVolley::getDescription, MAX_RARITY)
+			.priorityAmount(900); // cancels damage events of volley arrows, so needs to run before other abilities
 	public Set<Projectile> mDepthsVolley;
 	public Map<LivingEntity, Integer> mDepthsVolleyHitMap;
 
 	public DepthsVolley(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.VOLLEY;
-		mInfo.mIgnoreCooldown = true;
-		mDisplayMaterial = Material.ARROW;
-		mTree = DepthsTree.METALLIC;
+		super(plugin, player, INFO);
 		mDepthsVolley = new HashSet<>();
 		mDepthsVolleyHitMap = new HashMap<>();
 	}
 
 	@Override
-	public double getPriorityAmount() {
-		return 900; // cancels damage events of volley arrows, so needs to run before other abilities
-	}
-
-	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (!mPlayer.isSneaking()
-			|| mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+			    || isOnCooldown()) {
 			/* This ability is actually on cooldown - event proceeds as normal */
 			return true;
 		}
 
 		// Start the cooldown first so we don't cause an infinite loop of Volleys
-		mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
-		putOnCooldown();
+		putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.75f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1f);
@@ -156,19 +155,9 @@ public class DepthsVolley extends DepthsAbility {
 		return true;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Shooting a projectile while sneaking shoots a volley consisting of " + DepthsUtils.getRarityColor(rarity) + ARROWS[rarity - 1] + ChatColor.WHITE + " projectiles instead. Only one arrow is consumed, and each projectile's damage is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE_MULTIPLIER[rarity - 1] + ChatColor.WHITE + ". Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.METALLIC;
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_BOW;
-	}
 
 }

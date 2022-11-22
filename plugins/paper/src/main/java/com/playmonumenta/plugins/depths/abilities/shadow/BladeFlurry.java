@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.shadow;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -20,7 +22,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -32,17 +34,23 @@ public class BladeFlurry extends DepthsAbility {
 	public static final int RADIUS = 3;
 	public static final int[] SILENCE_DURATION = {20, 25, 30, 35, 40, 50};
 
+	public static final DepthsAbilityInfo<BladeFlurry> INFO =
+		new DepthsAbilityInfo<>(BladeFlurry.class, ABILITY_NAME, BladeFlurry::new, DepthsTree.SHADOWS, DepthsTrigger.SHIFT_RIGHT_CLICK)
+			.linkedSpell(ClassAbility.BLADE_FLURRY)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BladeFlurry::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.IRON_SWORD))
+			.descriptions(BladeFlurry::getDescription, MAX_RARITY);
+
 	public BladeFlurry(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.IRON_SWORD;
-		mTree = DepthsTree.SHADOWS;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.BLADE_FLURRY;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action trigger) {
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
+		}
 
 		putOnCooldown();
 
@@ -51,7 +59,7 @@ public class BladeFlurry extends DepthsAbility {
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, 3);
 		for (LivingEntity mob : mobs) {
 			EntityUtils.applySilence(mPlugin, SILENCE_DURATION[mRarity - 1], mob);
-			DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
+			DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
 			MovementUtils.knockAway(mPlayer, mob, 0.8f, true);
 		}
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.75f);
@@ -85,24 +93,10 @@ public class BladeFlurry extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	@Override
-	public boolean runCheck() {
-		return (mPlayer.isSneaking() && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
-	}
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Right click while sneaking and holding a weapon to deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage in a " + RADIUS + " block radius around you. Affected mobs are silenced for " + DepthsUtils.getRarityColor(rarity) + (SILENCE_DURATION[rarity - 1] / 20.0) + ChatColor.WHITE + " seconds and knocked away slightly. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.SHADOWS;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_RIGHT_CLICK;
-	}
 }
 

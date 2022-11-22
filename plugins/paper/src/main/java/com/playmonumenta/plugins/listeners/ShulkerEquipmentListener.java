@@ -492,9 +492,9 @@ public class ShulkerEquipmentListener implements Listener {
 
 	public static boolean isPotionInjectorItem(ItemStack item) {
 		return item != null &&
-			ItemUtils.isShulkerBox(item.getType()) &&
-			item.hasItemMeta() &&
-			item.getItemMeta().hasLore() &&
-			(InventoryUtils.testForItemWithName(item, "Potion Injector") || (InventoryUtils.testForItemWithName(item, "Iridium Injector")));
+			       ItemUtils.isShulkerBox(item.getType()) &&
+			       item.hasItemMeta() &&
+			       item.getItemMeta().hasLore() &&
+			(InventoryUtils.testForItemWithName(item, "Potion Injector") || InventoryUtils.testForItemWithName(item, "Iridium Injector"));
 	}
 }

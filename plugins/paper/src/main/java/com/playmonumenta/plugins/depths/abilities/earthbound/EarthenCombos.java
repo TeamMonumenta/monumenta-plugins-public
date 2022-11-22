@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -16,6 +17,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class EarthenCombos extends DepthsAbility {
 
@@ -26,12 +28,15 @@ public class EarthenCombos extends DepthsAbility {
 	private static final int DURATION = 20 * 4;
 	private static final int ROOT_DURATION = 25;
 
+	public static final DepthsAbilityInfo<EarthenCombos> INFO =
+		new DepthsAbilityInfo<>(EarthenCombos.class, ABILITY_NAME, EarthenCombos::new, DepthsTree.EARTHBOUND, DepthsTrigger.COMBO)
+			.displayItem(new ItemStack(Material.WOODEN_SWORD))
+			.descriptions(EarthenCombos::getDescription, MAX_RARITY);
+
 	private int mComboCount = 0;
 
 	public EarthenCombos(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.WOODEN_SWORD;
-		mTree = DepthsTree.EARTHBOUND;
+		super(plugin, player, INFO);
 	}
 
 	@Override
@@ -58,19 +63,10 @@ public class EarthenCombos extends DepthsAbility {
 		return false;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Every third melee attack gives you " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance for " + DURATION / 20 + " seconds and roots the enemy for " + ROOT_DURATION / 20.0 + " seconds.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.EARTHBOUND;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.COMBO;
-	}
 }
 

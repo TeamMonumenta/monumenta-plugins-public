@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.earthbound;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.point.Raycast;
@@ -21,7 +23,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
 public class CrushingEarth extends DepthsAbility {
@@ -32,18 +33,21 @@ public class CrushingEarth extends DepthsAbility {
 	private static final int CAST_RANGE = 4;
 	private static final int[] STUN_DURATION = {20, 25, 30, 35, 40, 50};
 
+	public static final DepthsAbilityInfo<CrushingEarth> INFO =
+		new DepthsAbilityInfo<>(CrushingEarth.class, ABILITY_NAME, CrushingEarth::new, DepthsTree.EARTHBOUND, DepthsTrigger.RIGHT_CLICK)
+			.linkedSpell(ClassAbility.CRUSHING_EARTH)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CrushingEarth::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.SHIELD))
+			.descriptions(CrushingEarth::getDescription, MAX_RARITY);
+
 	public CrushingEarth(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.SHIELD;
-		mTree = DepthsTree.EARTHBOUND;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.CRUSHING_EARTH;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 
@@ -67,7 +71,7 @@ public class CrushingEarth extends DepthsAbility {
 					world.playSound(eyeLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 1.0f);
 
 					EntityUtils.applyStun(mPlugin, STUN_DURATION[mRarity - 1], mob);
-					DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
+					DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
 
 					putOnCooldown();
 					break;
@@ -76,27 +80,10 @@ public class CrushingEarth extends DepthsAbility {
 		}
 	}
 
-	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
-		return !mPlayer.isSneaking() && !isOnCooldown() && DepthsUtils.isWeaponItem(mainhand);
-	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Right click while looking at an enemy within " + CAST_RANGE + " blocks to deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage and stun them for " + DepthsUtils.getRarityColor(rarity) + STUN_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.EARTHBOUND;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.RIGHT_CLICK;
-	}
 }

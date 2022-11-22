@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -50,6 +51,47 @@ public class ElementalSpiritFire extends Ability {
 	public static final String CHARM_COOLDOWN = "Elemental Spirits Cooldown";
 	public static final String CHARM_SIZE = "Elemental Spirits Size";
 
+	public static final AbilityInfo<ElementalSpiritFire> INFO =
+		new AbilityInfo<>(ElementalSpiritFire.class, NAME, ElementalSpiritFire::new)
+			.linkedSpell(ClassAbility.ELEMENTAL_SPIRIT_FIRE)
+			.scoreboardId("ElementalSpirit")
+			.shorthandName("ES")
+			.descriptions(
+				String.format(
+					"Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, " +
+						"the fire spirit instantly dashes from you towards the farthest enemy that spell hit, " +
+						"dealing %s fire magic damage to all enemies in a %s-block cube around it along its path. " +
+						"The next moment after you deal ice damage, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, " +
+						"dealing %s ice magic damage to all enemies in a %s-block cube around it every second for %ss. " +
+						"If the spell was %s, the fire spirit does an additional %s%% of the projectile weapon's original damage, " +
+						"and for the ice spirit, an additional %s%%. The spirits' damage ignores iframes. Independent cooldown: %ss.",
+					DAMAGE_1,
+					HITBOX,
+					ElementalSpiritIce.DAMAGE_1,
+					ElementalSpiritIce.SIZE,
+					ElementalSpiritIce.PULSES,
+					ElementalArrows.NAME,
+					StringUtils.multiplierToPercentage(BOW_MULTIPLIER_1),
+					StringUtils.multiplierToPercentage(ElementalSpiritIce.BOW_MULTIPLIER_1),
+					StringUtils.ticksToSeconds(COOLDOWN_TICKS)
+				), // Ice pulse interval of 20 ticks hardcoded to say "every second"
+				String.format(
+					"Fire spirit damage is increased from %s to %s. Ice spirit damage is increased from %s to %s. " +
+						"Bonus %s damage is increased from %s%% to %s%% for the fire spirit, and from %s%% to %s%% for the ice spirit.",
+					DAMAGE_1,
+					DAMAGE_2,
+					ElementalSpiritIce.DAMAGE_1,
+					ElementalSpiritIce.DAMAGE_2,
+					ElementalArrows.NAME,
+					StringUtils.multiplierToPercentage(BOW_MULTIPLIER_1),
+					StringUtils.multiplierToPercentage(BOW_MULTIPLIER_2),
+					StringUtils.multiplierToPercentage(ElementalSpiritIce.BOW_MULTIPLIER_1),
+					StringUtils.multiplierToPercentage(ElementalSpiritIce.BOW_MULTIPLIER_2)
+				)
+			)
+			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
+			.displayItem(new ItemStack(Material.SUNFLOWER, 1));
+
 	private final float mLevelDamage;
 	private final double mLevelBowMultiplier;
 	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
@@ -58,50 +100,8 @@ public class ElementalSpiritFire extends Ability {
 	private @Nullable BukkitTask mPlayerParticlesGenerator;
 	private @Nullable BukkitTask mEnemiesAffectedProcessor;
 
-	public ElementalSpiritFire(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = ClassAbility.ELEMENTAL_SPIRIT_FIRE;
-
-		mInfo.mScoreboardId = "ElementalSpirit";
-		mInfo.mShorthandName = "ES";
-		mInfo.mDescriptions.add(
-			String.format(
-				"Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, " +
-					"the fire spirit instantly dashes from you towards the farthest enemy that spell hit, " +
-					"dealing %s fire magic damage to all enemies in a %s-block cube around it along its path. " +
-					"The next moment after you deal ice damage, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, " +
-					"dealing %s ice magic damage to all enemies in a %s-block cube around it every second for %ss. " +
-					"If the spell was %s, the fire spirit does an additional %s%% of the projectile weapon's original damage, " +
-					"and for the ice spirit, an additional %s%%. The spirits' damage ignores iframes. Independent cooldown: %ss.",
-				DAMAGE_1,
-				HITBOX,
-				ElementalSpiritIce.DAMAGE_1,
-				ElementalSpiritIce.SIZE,
-				ElementalSpiritIce.PULSES,
-				ElementalArrows.NAME,
-				StringUtils.multiplierToPercentage(BOW_MULTIPLIER_1),
-				StringUtils.multiplierToPercentage(ElementalSpiritIce.BOW_MULTIPLIER_1),
-				StringUtils.ticksToSeconds(COOLDOWN_TICKS)
-			) // Ice pulse interval of 20 ticks hardcoded to say "every second"
-		);
-		mInfo.mDescriptions.add(
-			String.format(
-				"Fire spirit damage is increased from %s to %s. Ice spirit damage is increased from %s to %s. " +
-					"Bonus %s damage is increased from %s%% to %s%% for the fire spirit, and from %s%% to %s%% for the ice spirit.",
-				DAMAGE_1,
-				DAMAGE_2,
-				ElementalSpiritIce.DAMAGE_1,
-				ElementalSpiritIce.DAMAGE_2,
-				ElementalArrows.NAME,
-				StringUtils.multiplierToPercentage(BOW_MULTIPLIER_1),
-				StringUtils.multiplierToPercentage(BOW_MULTIPLIER_2),
-				StringUtils.multiplierToPercentage(ElementalSpiritIce.BOW_MULTIPLIER_1),
-				StringUtils.multiplierToPercentage(ElementalSpiritIce.BOW_MULTIPLIER_2)
-			)
-		);
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN_TICKS);
-		mDisplayItem = new ItemStack(Material.SUNFLOWER, 1);
-
+	public ElementalSpiritFire(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mLevelBowMultiplier = isLevelOne() ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
 
@@ -174,7 +174,7 @@ public class ElementalSpiritFire extends Ability {
 											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
 										}
 
-										DamageUtils.damage(mPlayer, potentialTarget, DamageType.MAGIC, finalDamage, mInfo.mLinkedSpell, true);
+										DamageUtils.damage(mPlayer, potentialTarget, DamageType.MAGIC, finalDamage, mInfo.getLinkedSpell(), true);
 										iterator.remove();
 									}
 								}
@@ -212,7 +212,7 @@ public class ElementalSpiritFire extends Ability {
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		// Periodic trigger starts running again when the skill is off cooldown,
 		// which restarts these passive particles
-		if (mPlayerParticlesGenerator == null && mPlayer != null) {
+		if (mPlayerParticlesGenerator == null) {
 			mPlayerParticlesGenerator = new BukkitRunnable() {
 				double mVerticalAngle = 0;
 				double mRotationAngle = 0;
@@ -220,10 +220,9 @@ public class ElementalSpiritFire extends Ability {
 
 				@Override
 				public void run() {
-					if (isTimerActive()
-						|| mPlayer == null
-						|| !mPlayer.isValid() // Ensure player is not dead, is still online?
-						|| PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
+					if (isOnCooldown()
+						    || !mPlayer.isValid() // Ensure player is not dead, is still online?
+						    || PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
 						this.cancel();
 						mPlayerParticlesGenerator = null;
 					}

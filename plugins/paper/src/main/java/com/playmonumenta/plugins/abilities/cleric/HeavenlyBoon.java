@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.effects.Effect;
@@ -49,6 +50,22 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	public static final String CHARM_DURATION = "Heavenly Boon Potion Duration";
 	public static final String CHARM_RADIUS = "Heavenly Boon Radius";
 
+	public static final AbilityInfo<HeavenlyBoon> INFO =
+		new AbilityInfo<>(HeavenlyBoon.class, "Heavenly Boon", HeavenlyBoon::new)
+			.scoreboardId("HeavenlyBoon")
+			.shorthandName("HB")
+			.descriptions(
+				"Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob or deal damage to a boss (R1 100/R2 200/R3 300), you have a 10% chance to be splashed with an Instant Health I potion, with an additional effect of either Regen I, +10% Attack Damage, +10 Damage Resistance, +20% Speed, or +20% Absorption with 20 second duration.",
+				"The chance to be splashed upon killing an Undead increases to 20%, the effect potions now give Instant Health 2 and the durations of each are increased to 50 seconds.",
+				String.format(
+					"When a potion is created by this skill, also increase all current positive potion durations by %s%%" +
+						" (capped at +%ss, and up to a maximum of %s minutes) on all players in the radius.",
+					(int) (ENHANCEMENT_POTION_EFFECT_BONUS * 100),
+					ENHANCEMENT_POTION_EFFECT_MAX_BOOST / 20,
+					ENHANCEMENT_POTION_EFFECT_MAX_DURATION / (60 * 20)
+				))
+			.displayItem(new ItemStack(Material.SPLASH_POTION, 1));
+
 	private static final ImmutableSet<String> BOON_DROPS = ImmutableSet.of(
 		"Regeneration Boon", "Speed Boon", "Strength Boon", "Absorption Boon", "Resistance Boon",
 		"Regeneration Boon 2", "Speed Boon 2", "Strength Boon 2", "Absorption Boon 2", "Resistance Boon 2");
@@ -74,21 +91,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	private @Nullable Crusade mCrusade;
 
-	public HeavenlyBoon(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Heavenly Boon");
-		mInfo.mScoreboardId = "HeavenlyBoon";
-		mInfo.mShorthandName = "HB";
-		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob or deal damage to a boss (R1 100/R2 200/R3 300), you have a 10% chance to be splashed with an Instant Health I potion, with an additional effect of either Regen I, +10% Attack Damage, +10 Damage Resistance, +20% Speed, or +20% Absorption with 20 second duration.");
-		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 20%, the effect potions now give Instant Health 2 and the durations of each are increased to 50 seconds.");
-		mInfo.mDescriptions.add(
-			String.format(
-				"When a potion is created by this skill, also increase all current positive potion durations by %s%%" +
-					" (capped at +%ss, and up to a maximum of %s minutes) on all players in the radius.",
-				(int) (ENHANCEMENT_POTION_EFFECT_BONUS * 100),
-				ENHANCEMENT_POTION_EFFECT_MAX_BOOST / 20,
-				ENHANCEMENT_POTION_EFFECT_MAX_DURATION / (60 * 20)
-			));
-		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
+	public HeavenlyBoon(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mTracker = new KillTriggeredAbilityTracker(this, BOSS_DAMAGE_THRESHOLD_R1, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
 
 		mChance = CharmManager.getLevelPercentDecimal(player, CHARM_CHANCE) + (isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE);
@@ -108,10 +112,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	@Override
 	public boolean playerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion,
 	                                           PotionSplashEvent event) {
-		if (mPlayer == null) {
-			return false;
-		}
-
 		if (!(potion.getShooter() instanceof Player)) {
 			return true;
 		}
@@ -167,8 +167,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
-		if (mPlayer != null
-			    && Crusade.enemyTriggersAbilities(mob, mCrusade)
+		if (Crusade.enemyTriggersAbilities(mob, mCrusade)
 			    && FastUtils.RANDOM.nextDouble() < mChance) {
 			ImmutableList<NamespacedKey> lootTables = isLevelOne() ? LEVEL_1_POTIONS : LEVEL_2_POTIONS;
 			NamespacedKey lootTable = lootTables.get(FastUtils.RANDOM.nextInt(lootTables.size()));

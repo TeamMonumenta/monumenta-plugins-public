@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -20,6 +22,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public final class ShadowSlam extends DepthsAbility {
@@ -30,18 +33,18 @@ public final class ShadowSlam extends DepthsAbility {
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickSlammed";
 	public static final int REDUCED_THRESHOLD = 128; //No reduced damage for depths
 	public static final double MANUAL_THRESHOLD = 1.5; // Minimum fall distance for attacks to trigger slam attack
-	public static final int AUTOMATIC_THRESHOLD = 3; // Minimum fall distance for landing to automatically trigger slam attack
+	public static final int AUTOMATIC_THRESHOLD = 3;
+
+	public static final DepthsAbilityInfo<ShadowSlam> INFO =
+		new DepthsAbilityInfo<>(ShadowSlam.class, ABILITY_NAME, ShadowSlam::new, DepthsTree.SHADOWS, DepthsTrigger.PASSIVE)
+			.displayItem(new ItemStack(Material.ANVIL))
+			.descriptions(ShadowSlam::getDescription, MAX_RARITY); // Minimum fall distance for landing to automatically trigger slam attack
 
 	private final BukkitRunnable mSlamAttackRunner;
 	private double mFallFromY = -7050;
 
 	public ShadowSlam(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.ANVIL;
-		mTree = DepthsTree.SHADOWS;
-
-		mInfo.mIgnoreCooldown = true;
-
+		super(plugin, player, INFO);
 		mSlamAttackRunner = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -51,7 +54,7 @@ public final class ShadowSlam extends DepthsAbility {
 				}
 				if (
 					DepthsManager.getInstance().getPlayerLevelInAbility(ABILITY_NAME, player) == 0
-					|| !player.isValid() // Ensure player is not dead, is still online?
+						|| !player.isValid() // Ensure player is not dead, is still online?
 				) {
 					// If reached this point but not silenced, then proceed with cancelling
 					// If silenced, only return to not run anything, but don't cancel runnable
@@ -94,9 +97,6 @@ public final class ShadowSlam extends DepthsAbility {
 	}
 
 	private void updateFallFrom() {
-		if (mPlayer == null) {
-			return;
-		}
 		if (mPlayer.getFallDistance() <= 0) {
 			mFallFromY = -10000;
 		} else {
@@ -105,23 +105,17 @@ public final class ShadowSlam extends DepthsAbility {
 	}
 
 	private double calculateFallDistance() {
-		if (mPlayer == null) {
-			return 0;
-		}
 		double currentY = mPlayer.getLocation().getY();
 		double fallDistance = mFallFromY - currentY;
 		return Math.max(fallDistance, 0);
 	}
 
 	private void doSlamAttack(Location location) {
-		if (mPlayer == null) {
-			return;
-		}
 		double fallDistance = calculateFallDistance();
 		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * DAMAGE[mRarity - 1] + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * 0.0;
 
 		for (LivingEntity enemy : EntityUtils.getNearbyMobs(location, SIZE)) {
-			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.mLinkedSpell);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.getLinkedSpell());
 		}
 
 		World world = mPlayer.getWorld();
@@ -135,7 +129,7 @@ public final class ShadowSlam extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer != null && event.getType() == DamageType.MELEE && calculateFallDistance() > MANUAL_THRESHOLD && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
+		if (event.getType() == DamageType.MELEE && calculateFallDistance() > MANUAL_THRESHOLD && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
 			doSlamAttack(enemy.getLocation().add(0, 0.15, 0));
 			mFallFromY = -7050;
 			// Also reset fall damage, mFallFromY can continue updating from there
@@ -146,15 +140,8 @@ public final class ShadowSlam extends DepthsAbility {
 	}
 
 
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "When you fall more than " + AUTOMATIC_THRESHOLD + " blocks, landing causes a slam, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage per block fallen in a " + SIZE + " block radius. Falling more than " + MANUAL_THRESHOLD + " blocks and damaging an enemy also generates a slam and cancels fall damage.";
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.SHADOWS;
 	}
 }
 

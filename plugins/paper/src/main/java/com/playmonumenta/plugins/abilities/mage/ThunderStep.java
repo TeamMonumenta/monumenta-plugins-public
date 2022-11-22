@@ -2,6 +2,9 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -10,11 +13,11 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,7 +27,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
@@ -69,6 +71,43 @@ public class ThunderStep extends Ability {
 	public static final String CHARM_RADIUS = "Thunder Step Radius";
 	public static final String CHARM_DISTANCE = "Thunder Step Distance";
 
+	public static final AbilityInfo<ThunderStep> INFO =
+		new AbilityInfo<>(ThunderStep.class, NAME, ThunderStep::new)
+			.linkedSpell(ABILITY)
+			.scoreboardId("ThunderStep")
+			.shorthandName("TS")
+			.descriptions(
+				String.format(
+					"While holding a wand while sneaking, pressing the swap key materializes a flash of thunder," +
+						" dealing %s thunder magic damage to all enemies in a %s block radius around you and knocking them away." +
+						" The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block," +
+						" and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
+					DAMAGE_1,
+					SIZE,
+					DISTANCE_1,
+					COOLDOWN_SECONDS
+				),
+				String.format(
+					"Damage is increased from %s to %s." +
+						" Teleport range is increased from %s to %s blocks.",
+					DAMAGE_1,
+					DAMAGE_2,
+					DISTANCE_1,
+					DISTANCE_2
+				),
+				String.format("Within %ss of casting, use the same trigger to return to the original starting location, dealing %s%% of the skills damage." +
+					              " If you do not do so, your next Thunder Step within %ss will paralyze enemies for %ss.",
+					BACK_TELEPORT_MAX_DELAY / 20,
+					(int) (ENHANCEMENT_DAMAGE_RATIO * 100),
+					ENHANCEMENT_BONUS_DAMAGE_TIMER / 20,
+					ENHANCEMENT_PARALYZE_DURATION / 20
+				)
+			)
+			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ThunderStep::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
+				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
+			.displayItem(new ItemStack(Material.HORN_CORAL, 1));
+
 	private final float mLevelDamage;
 	private final int mLevelDistance;
 
@@ -76,132 +115,78 @@ public class ThunderStep extends Ability {
 	private @Nullable Location mLastCastLocation = null;
 	private boolean mCanParalyze = false;
 
-	public ThunderStep(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = ABILITY;
-
-		mInfo.mScoreboardId = "ThunderStep";
-		mInfo.mShorthandName = "TS";
-		mInfo.mDescriptions.add(
-			String.format(
-				"While holding a wand while sneaking, pressing the swap key materializes a flash of thunder," +
-					" dealing %s thunder magic damage to all enemies in a %s block radius around you and knocking them away." +
-					" The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block," +
-					" and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
-				DAMAGE_1,
-				SIZE,
-				DISTANCE_1,
-				COOLDOWN_SECONDS
-			)
-		);
-		mInfo.mDescriptions.add(
-			String.format(
-				"Damage is increased from %s to %s." +
-					" Teleport range is increased from %s to %s blocks.",
-				DAMAGE_1,
-				DAMAGE_2,
-				DISTANCE_1,
-				DISTANCE_2
-			)
-		);
-		mInfo.mDescriptions.add(
-			String.format("Within %ss of casting, use the same trigger to return to the original starting location, dealing %s%% of the skills damage." +
-					" If you do not do so, your next Thunder Step within %ss will paralyze enemies for %ss.",
-				BACK_TELEPORT_MAX_DELAY / 20,
-				(int)(ENHANCEMENT_DAMAGE_RATIO * 100),
-				ENHANCEMENT_BONUS_DAMAGE_TIMER / 20,
-				ENHANCEMENT_PARALYZE_DURATION / 20
-			)
-		);
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN_TICKS);
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.HORN_CORAL, 1);
-
+	public ThunderStep(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mLevelDistance = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
 	}
 
-	/* NOTE
-	 * We want to cancel every swap key while holding wand,
-	 * if the player has a skill that uses swap key as its trigger
-	 * to avoid annoyingly unintentionally swapping hands if the skill is on cooldown, instead of casting.
-	 * This means we have to reach this method every time,
-	 * so runCheck() is not overridden and defaults to true,
-	 * and we also mIgnoreCooldown above.
-	 * We run the actual cast condition and cooldown checks within this method,
-	 * and can always decide whether to cancel the event
-	 */
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer != null && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0) {
-			event.setCancelled(true);
-
-			if (mPlayer.isSneaking()
-				    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-
-				float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-
-				// if enhanced, can teleport back within a short time frame (regardless of if on cooldown or not)
-				if (isEnhanced()
-					    && mPlayer.getTicksLived() <= mLastCastTick + BACK_TELEPORT_MAX_DELAY
-					    && mLastCastLocation != null
-					    && mLastCastLocation.getWorld() == mPlayer.getWorld()
-					    && mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
-
-					doDamage(mPlayer.getLocation(), spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
-					mLastCastLocation.setDirection(mPlayer.getLocation().getDirection());
-					mPlayer.teleport(mLastCastLocation);
-					doDamage(mLastCastLocation, spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
-
-					// prevent further back teleports as well as paralyze of any further casts
-					mLastCastLocation = null;
-					mLastCastTick = -1;
-					mCanParalyze = false;
-					return;
-				}
-
-				// on cooldown and didn't teleport back: stop here
-				if (isTimerActive()) {
-					return;
-				}
-
-				boolean doParalyze = isEnhanced() && mCanParalyze && mPlayer.getTicksLived() <= mLastCastTick + ENHANCEMENT_BONUS_DAMAGE_TIMER;
-				mCanParalyze = !doParalyze;
-
-				putOnCooldown();
-				mLastCastLocation = mPlayer.getLocation();
-				mLastCastTick = mPlayer.getTicksLived();
-
-				Location playerStartLocation = mPlayer.getLocation();
-				doDamage(playerStartLocation, spellDamage, doParalyze);
-
-				World world = mPlayer.getWorld();
-				BoundingBox movingPlayerBox = mPlayer.getBoundingBox();
-				Vector vector = playerStartLocation.getDirection();
-				LocationUtils.travelTillObstructed(
-					world,
-					movingPlayerBox,
-					mLevelDistance,
-					vector,
-					CHECK_INCREMENT,
-					true,
-					null, -1, -1
-				);
-				Location playerEndLocation = movingPlayerBox
-					.getCenter()
-					.setY(movingPlayerBox.getMinY())
-					.toLocation(world)
-					.setDirection(vector);
-
-				if (!playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)
-					|| ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-					return;
-				}
-
-				mPlayer.teleport(playerEndLocation);
-				doDamage(playerEndLocation, spellDamage, doParalyze);
-			}
+	public void cast() {
+		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			return;
 		}
+
+		float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+
+		// if enhanced, can teleport back within a short time frame (regardless of if on cooldown or not)
+		if (isEnhanced()
+			    && Bukkit.getServer().getCurrentTick() <= mLastCastTick + BACK_TELEPORT_MAX_DELAY
+			    && mLastCastLocation != null
+			    && mLastCastLocation.getWorld() == mPlayer.getWorld()
+			    && mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
+
+			doDamage(mPlayer.getLocation(), spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
+			mLastCastLocation.setDirection(mPlayer.getLocation().getDirection());
+			mPlayer.teleport(mLastCastLocation);
+			doDamage(mLastCastLocation, spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
+
+			// prevent further back teleports as well as paralyze of any further casts
+			mLastCastLocation = null;
+			mLastCastTick = -1;
+			mCanParalyze = false;
+			return;
+		}
+
+		// on cooldown and didn't teleport back: stop here
+		if (isOnCooldown()) {
+			return;
+		}
+
+		boolean doParalyze = isEnhanced() && mCanParalyze && Bukkit.getServer().getCurrentTick() <= mLastCastTick + ENHANCEMENT_BONUS_DAMAGE_TIMER;
+		mCanParalyze = !doParalyze;
+
+		putOnCooldown();
+		mLastCastLocation = mPlayer.getLocation();
+		mLastCastTick = Bukkit.getServer().getCurrentTick();
+
+		Location playerStartLocation = mPlayer.getLocation();
+		doDamage(playerStartLocation, spellDamage, doParalyze);
+
+		World world = mPlayer.getWorld();
+		BoundingBox movingPlayerBox = mPlayer.getBoundingBox();
+		Vector vector = playerStartLocation.getDirection();
+		LocationUtils.travelTillObstructed(
+			world,
+			movingPlayerBox,
+			mLevelDistance,
+			vector,
+			CHECK_INCREMENT,
+			true,
+			null, -1, -1
+		);
+		Location playerEndLocation = movingPlayerBox
+			                             .getCenter()
+			                             .setY(movingPlayerBox.getMinY())
+			                             .toLocation(world)
+			                             .setDirection(vector);
+
+		if (!playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)
+			    || ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			return;
+		}
+
+		mPlayer.teleport(playerEndLocation);
+		doDamage(playerEndLocation, spellDamage, doParalyze);
 	}
 
 	private void doDamage(Location location, float spellDamage, boolean enhancementParalyze) {

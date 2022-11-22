@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -40,6 +41,12 @@ public class ElementalSpiritIce extends Ability {
 	public static final int PULSES = 3;
 	public static final int COOLDOWN_TICKS = ElementalSpiritFire.COOLDOWN_TICKS;
 
+	public static final AbilityInfo<ElementalSpiritIce> INFO =
+		new AbilityInfo<>(ElementalSpiritIce.class, null, ElementalSpiritIce::new)
+			.linkedSpell(ClassAbility.ELEMENTAL_SPIRIT_ICE)
+			.scoreboardId("ElementalSpirit")
+			.cooldown(COOLDOWN_TICKS, ElementalSpiritFire.CHARM_COOLDOWN);
+
 	private final float mLevelDamage;
 	private final double mLevelBowMultiplier;
 	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
@@ -49,17 +56,12 @@ public class ElementalSpiritIce extends Ability {
 	private @Nullable BukkitTask mEnemiesAffectedProcessor;
 	private @Nullable BukkitTask mSpiritPulser;
 
-	public ElementalSpiritIce(Plugin plugin, @Nullable Player player) {
+	public ElementalSpiritIce(Plugin plugin, Player player) {
 		/* NOTE
 		 * Display name is null so this variant will be ignored by the tesseract.
 		 * This variant also does not have a description
 		 */
-		super(plugin, player, null);
-		mInfo.mLinkedSpell = ClassAbility.ELEMENTAL_SPIRIT_ICE;
-
-		mInfo.mScoreboardId = "ElementalSpirit";
-		mInfo.mCooldown = CharmManager.getCooldown(player, ElementalSpiritFire.CHARM_COOLDOWN, COOLDOWN_TICKS);
-
+		super(plugin, player, INFO);
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, ElementalSpiritFire.CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mLevelBowMultiplier = isLevelOne() ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
 
@@ -116,7 +118,7 @@ public class ElementalSpiritIce extends Ability {
 											finalDamage += Math.max(0, mElementalArrows.getLastDamage() * mLevelBowMultiplier);
 										}
 
-										DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.mLinkedSpell, true);
+										DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.getLinkedSpell(), true);
 										mob.setVelocity(new Vector()); // Wipe velocity, extreme local climate
 									}
 
@@ -150,7 +152,7 @@ public class ElementalSpiritIce extends Ability {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mPlayerParticlesGenerator == null && mPlayer != null) {
+		if (mPlayerParticlesGenerator == null) {
 			mPlayerParticlesGenerator = new BukkitRunnable() {
 				double mVerticalAngle = 0;
 				final PPPeriodic mParticle = new PPPeriodic(Particle.SNOWBALL, mPlayer.getLocation()).count(3);
@@ -158,9 +160,8 @@ public class ElementalSpiritIce extends Ability {
 
 				@Override
 				public void run() {
-					if (isTimerActive()
-						    || mPlayer == null
-							|| !mPlayer.isValid() // Ensure player is not dead, is still online?
+					if (isOnCooldown()
+						    || !mPlayer.isValid() // Ensure player is not dead, is still online?
 						    || PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
 						this.cancel();
 						mPlayerParticlesGenerator = null;

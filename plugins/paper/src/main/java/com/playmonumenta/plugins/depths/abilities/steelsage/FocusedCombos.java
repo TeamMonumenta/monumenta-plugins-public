@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -15,6 +16,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.inventory.ItemStack;
 
 public class FocusedCombos extends DepthsAbility {
 
@@ -23,12 +25,15 @@ public class FocusedCombos extends DepthsAbility {
 	public static final double BLEED_AMOUNT = 0.2;
 	public static final int BLEED_DURATION = 20 * 3;
 
+	public static final DepthsAbilityInfo<FocusedCombos> INFO =
+		new DepthsAbilityInfo<>(FocusedCombos.class, ABILITY_NAME, FocusedCombos::new, DepthsTree.METALLIC, DepthsTrigger.COMBO)
+			.displayItem(new ItemStack(Material.SPECTRAL_ARROW))
+			.descriptions(FocusedCombos::getDescription, MAX_RARITY);
+
 	private int mComboCount = 0;
 
 	public FocusedCombos(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.SPECTRAL_ARROW;
-		mTree = DepthsTree.METALLIC;
+		super(plugin, player, INFO);
 	}
 
 	@Override
@@ -50,18 +55,9 @@ public class FocusedCombos extends DepthsAbility {
 		return false;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Every third critical projectile shot deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " times damage and applies " + DepthsUtils.roundPercent(BLEED_AMOUNT) + "% Bleed for " + BLEED_DURATION / 20 + " seconds.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.METALLIC;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.COMBO;
-	}
 }

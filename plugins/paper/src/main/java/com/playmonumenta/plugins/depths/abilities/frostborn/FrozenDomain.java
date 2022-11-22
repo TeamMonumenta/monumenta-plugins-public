@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -14,6 +16,7 @@ import org.bukkit.Particle;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class FrozenDomain extends DepthsAbility {
@@ -24,21 +27,21 @@ public class FrozenDomain extends DepthsAbility {
 	private static final int DURATION_TICKS = 100;
 	private static final double PERCENT_HEAL = .05;
 	private static final String ATTR_NAME = "FrozenDomainExtraSpeedAttr";
+
+	public static final DepthsAbilityInfo<FrozenDomain> INFO =
+		new DepthsAbilityInfo<>(FrozenDomain.class, ABILITY_NAME, FrozenDomain::new, DepthsTree.FROSTBORN, DepthsTrigger.PASSIVE)
+			.displayItem(new ItemStack(Material.IRON_BOOTS))
+			.descriptions(FrozenDomain::getDescription, MAX_RARITY);
 	private boolean mWasOnIce = false;
 	private int mSecondWhenIce = 0;
 	private int mSeconds = 0;
 
 	public FrozenDomain(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.IRON_BOOTS;
-		mTree = DepthsTree.FROSTBORN;
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mPlayer == null) {
-			return;
-		}
 		if (twoHertz && isOnIce(mPlayer)) {
 			mPlayer.getLocation().getWorld().spawnParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation(), 8, 0, 0, 0, 0.65);
 		}
@@ -60,9 +63,6 @@ public class FrozenDomain extends DepthsAbility {
 	}
 
 	public void handleParticles() {
-		if (mPlayer == null) {
-			return;
-		}
 		mPlayer.getLocation().getWorld().spawnParticle(Particle.HEART, mPlayer.getLocation().add(0, 1, 0), 5, 0, 0, 0, 0.65);
 		new BukkitRunnable() {
 			int mCount = 0;
@@ -108,19 +108,13 @@ public class FrozenDomain extends DepthsAbility {
 		return false;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		String s = "s";
 		if (REGEN_TIME[rarity - 1] == 20) {
 			s = "";
 		}
 		return "When standing on ice, gain " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(EXTRA_SPEED_PCT[rarity - 1]) + "%" + ChatColor.WHITE + " speed and regain " + (int) DepthsUtils.roundPercent(PERCENT_HEAL) + "% of your max health every "
-				+ DepthsUtils.getRarityColor(rarity) + REGEN_TIME[rarity - 1] + ChatColor.WHITE + " second" + s + ". Effects last for " + DURATION_TICKS / 20 + " seconds after leaving ice.";
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FROSTBORN;
+			       + DepthsUtils.getRarityColor(rarity) + REGEN_TIME[rarity - 1] + ChatColor.WHITE + " second" + s + ". Effects last for " + DURATION_TICKS / 20 + " seconds after leaving ice.";
 	}
 }
 

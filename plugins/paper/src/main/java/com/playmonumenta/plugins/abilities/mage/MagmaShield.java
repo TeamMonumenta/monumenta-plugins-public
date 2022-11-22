@@ -2,9 +2,9 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.MagmaShieldCS;
@@ -13,27 +13,22 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.EnumSet;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
 
 public class MagmaShield extends Ability {
 
 	public static final String NAME = "Magma Shield";
-	public static final ClassAbility ABILITY = ClassAbility.MAGMA_SHIELD;
 
 	public static final int DAMAGE_1 = 6;
 	public static final int DAMAGE_2 = 12;
@@ -60,65 +55,50 @@ public class MagmaShield extends Ability {
 	public static final String CHARM_KNOCKBACK = "Magma Shield Knockback";
 	public static final String CHARM_CONE = "Magma Shield Cone";
 
-	private final float mLevelDamage;
+	public static final AbilityInfo<MagmaShield> INFO =
+		new AbilityInfo<>(MagmaShield.class, NAME, MagmaShield::new)
+			.linkedSpell(ClassAbility.MAGMA_SHIELD)
+			.scoreboardId("Magma")
+			.shorthandName("MS")
+			.descriptions(
+				String.format(
+					"While sneaking, right-clicking with a wand summons a torrent of flames, dealing %s fire magic damage to all enemies in front of you within %s blocks," +
+						" setting them on fire for %ss, and knocking them away. The damage ignores iframes. Cooldown: %ss.",
+					DAMAGE_1,
+					RADIUS,
+					FIRE_SECONDS,
+					COOLDOWN_SECONDS
+				),
+				String.format(
+					"Damage is increased from %s to %s.",
+					DAMAGE_1,
+					DAMAGE_2
+				),
+				String.format(
+					"Enemies hit by this ability take %s%% extra damage by fire and %s%% by fire based abilities for %ss.",
+					(int) (100 * ENHANCEMENT_FIRE_DAMAGE_BONUS),
+					(int) (100 * ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS),
+					ENHANCEMENT_BONUS_DURATION / 20
+				))
+			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", MagmaShield::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true),
+				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
+			.displayItem(new ItemStack(Material.MAGMA_CREAM, 1));
 
-	private boolean mHasBlizzard;
+	private final float mLevelDamage;
 
 	private final MagmaShieldCS mCosmetic;
 
 	public MagmaShield(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = ABILITY;
-
-		mInfo.mScoreboardId = "Magma";
-		mInfo.mShorthandName = "MS";
-		mInfo.mDescriptions.add(
-			String.format(
-				"While sneaking, right-clicking with a wand summons a torrent of flames, dealing %s fire magic damage to all enemies in front of you within %s blocks," +
-					" setting them on fire for %ss, and knocking them away. The damage ignores iframes. Cooldown: %ss.",
-				DAMAGE_1,
-				RADIUS,
-				FIRE_SECONDS,
-				COOLDOWN_SECONDS
-			)
-		);
-		mInfo.mDescriptions.add(
-			String.format(
-				"Damage is increased from %s to %s.",
-				DAMAGE_1,
-				DAMAGE_2
-			)
-		);
-		mInfo.mDescriptions.add(
-			String.format(
-				"Enemies hit by this ability take %s%% extra damage by fire and %s%% by fire based abilities for %ss.",
-				(int) (100 * ENHANCEMENT_FIRE_DAMAGE_BONUS),
-				(int) (100 * ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS),
-				ENHANCEMENT_BONUS_DURATION / 20
-			)
-		);
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN_TICKS);
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mDisplayItem = new ItemStack(Material.MAGMA_CREAM, 1);
+		super(plugin, player, INFO);
 
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MagmaShieldCS(), MagmaShieldCS.SKIN_LIST);
-
-		mHasBlizzard = false;
-		if (ServerProperties.getClassSpecializationsEnabled()) {
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-				mHasBlizzard = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Blizzard.class) != null;
-			});
-		}
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (!(mPlayer != null
-			      && mPlayer.isSneaking()
-			      && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0
-			      && !(mHasBlizzard && mPlayer.getLocation().getPitch() < Blizzard.ANGLE))) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 		putOnCooldown();
@@ -130,7 +110,7 @@ public class MagmaShield extends Ability {
 			LocationUtils.getHalfHeightLocation(mPlayer).add(0, -HEIGHT, 0), 2 * HEIGHT, radius, Math.toRadians(angle));
 		for (LivingEntity target : hitbox.getHitMobs()) {
 			EntityUtils.applyFire(mPlugin, FIRE_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), target, mPlayer);
-			DamageUtils.damage(mPlayer, target, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
+			DamageUtils.damage(mPlayer, target, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);
 			MovementUtils.knockAway(mPlayer, target, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK), true);
 			if (isEnhanced()) {
 				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME,

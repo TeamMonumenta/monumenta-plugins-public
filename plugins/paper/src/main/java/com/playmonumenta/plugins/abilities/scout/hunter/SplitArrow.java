@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -14,7 +15,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -41,17 +41,20 @@ public class SplitArrow extends Ability {
 	public static final String CHARM_BOUNCES = "Split Arrow Bounces";
 	public static final String CHARM_RANGE = "Split Arrow Range";
 
+	public static final AbilityInfo<SplitArrow> INFO =
+		new AbilityInfo<>(SplitArrow.class, "Split Arrow", SplitArrow::new)
+			.linkedSpell(ClassAbility.SPLIT_ARROW)
+			.scoreboardId("SplitArrow")
+			.shorthandName("SA")
+			.descriptions(
+				"When you hit an enemy with an arrow, the next nearest enemy within " + (int) SPLIT_ARROW_CHAIN_RANGE + " blocks takes " + (int) (100 * SPLIT_ARROW_1_DAMAGE_PERCENT) + "% of the original arrow damage (ignores invulnerability frames).",
+				"Damage to the second target is increased to " + (int) (100 * SPLIT_ARROW_2_DAMAGE_PERCENT) + "% of the original arrow damage.")
+			.displayItem(new ItemStack(Material.BLAZE_ROD, 1));
+
 	private final double mDamagePercent;
 
-	public SplitArrow(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Split Arrow");
-		mInfo.mLinkedSpell = ClassAbility.SPLIT_ARROW;
-		mInfo.mScoreboardId = "SplitArrow";
-		mInfo.mShorthandName = "SA";
-		mInfo.mDescriptions.add("When you hit an enemy with an arrow, the next nearest enemy within " + (int)SPLIT_ARROW_CHAIN_RANGE + " blocks takes " + (int) (100 * SPLIT_ARROW_1_DAMAGE_PERCENT) + "% of the original arrow damage (ignores invulnerability frames).");
-		mInfo.mDescriptions.add("Damage to the second target is increased to " + (int) (100 * SPLIT_ARROW_2_DAMAGE_PERCENT) + "% of the original arrow damage.");
-		mDisplayItem = new ItemStack(Material.BLAZE_ROD, 1);
-
+	public SplitArrow(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDamagePercent = isLevelOne() ? SPLIT_ARROW_1_DAMAGE_PERCENT : SPLIT_ARROW_2_DAMAGE_PERCENT;
 	}
 
@@ -89,7 +92,7 @@ public class SplitArrow extends Ability {
 					new PartialParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6).spawnAsPlayerActive(mPlayer);
 					world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 
-					DamageUtils.damage(mPlayer, nearestMob, DamageType.OTHER, damage, mInfo.mLinkedSpell, true, true);
+					DamageUtils.damage(mPlayer, nearestMob, DamageType.OTHER, damage, mInfo.getLinkedSpell(), true, true);
 					MovementUtils.knockAway(sourceEnemy, nearestMob, 0.125f, 0.35f, true);
 					EntityUtils.applyArrowIframes(mPlugin, IFRAMES, nearestMob);
 					if (event.getDamager() instanceof SpectralArrow) {

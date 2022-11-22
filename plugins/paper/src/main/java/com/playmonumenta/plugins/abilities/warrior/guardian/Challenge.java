@@ -2,10 +2,11 @@ package com.playmonumenta.plugins.abilities.warrior.guardian;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -15,7 +16,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -24,7 +24,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
 public class Challenge extends Ability {
@@ -53,36 +52,38 @@ public class Challenge extends Ability {
 	public static final String CHARM_RANGE = "Challenge Range";
 	public static final String CHARM_COOLDOWN = "Challenge Cooldown";
 
+	public static final AbilityInfo<Challenge> INFO =
+		new AbilityInfo<>(Challenge.class, "Challenge", Challenge::new)
+			.linkedSpell(ClassAbility.CHALLENGE)
+			.scoreboardId("Challenge")
+			.shorthandName("Ch")
+			.descriptions(
+				("Left-clicking while sneaking makes all enemies within %s blocks target you. " +
+					 "You gain %s Absorption per affected mob (up to %s Absorption) for %s seconds and +%s%% melee damage for %s seconds. Cooldown: %ss.")
+					.formatted(CHALLENGE_RANGE, ABSORPTION_PER_MOB_1, MAX_ABSORPTION_1, StringUtils.ticksToSeconds(DURATION),
+						StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_EFFECT_1),
+						StringUtils.ticksToSeconds(DURATION), StringUtils.ticksToSeconds(COOLDOWN)),
+				"You gain %s Absorption per affected mob (up to %s Absorption) and +%s%% melee damage instead."
+					.formatted(ABSORPTION_PER_MOB_2, MAX_ABSORPTION_2, StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_EFFECT_2)))
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Challenge::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true)))
+			.displayItem(new ItemStack(Material.IRON_AXE, 1));
+
 	private final double mPercentDamageDealtEffect;
 	private final double mAbsorptionPerMob;
 	private final double mMaxAbsorption;
 
-	public Challenge(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Challenge");
-		mInfo.mScoreboardId = "Challenge";
-		mInfo.mShorthandName = "Ch";
-		mInfo.mDescriptions.add(("Left-clicking while sneaking makes all enemies within %s blocks target you. " +
-			                         "You gain %s Absorption per affected mob (up to %s Absorption) for %s seconds and +%s%% melee damage for %s seconds. Cooldown: %ss.")
-			                        .formatted(CHALLENGE_RANGE, ABSORPTION_PER_MOB_1, MAX_ABSORPTION_1, StringUtils.ticksToSeconds(DURATION),
-				                        StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_EFFECT_1),
-				                        StringUtils.ticksToSeconds(DURATION), StringUtils.ticksToSeconds(COOLDOWN)));
-		mInfo.mDescriptions.add("You gain %s Absorption per affected mob (up to %s Absorption) and +%s%% melee damage instead."
-			                        .formatted(ABSORPTION_PER_MOB_2, MAX_ABSORPTION_2, StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_EFFECT_2)));
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.CHALLENGE;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDisplayItem = new ItemStack(Material.IRON_AXE, 1);
+	public Challenge(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mPercentDamageDealtEffect = (isLevelOne() ? PERCENT_DAMAGE_DEALT_EFFECT_1 : PERCENT_DAMAGE_DEALT_EFFECT_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mAbsorptionPerMob = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_PER, isLevelOne() ? ABSORPTION_PER_MOB_1 : ABSORPTION_PER_MOB_2);
 		mMaxAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_MAX, isLevelOne() ? MAX_ABSORPTION_1 : MAX_ABSORPTION_2);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
-
 		Location loc = mPlayer.getLocation();
 		List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, CHALLENGE_RANGE)).getHitMobs();
 		if (!mobs.isEmpty()) {
@@ -108,16 +109,4 @@ public class Challenge extends Ability {
 		}
 	}
 
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
-			cast(Action.LEFT_CLICK_AIR);
-		}
-		return false;
-	}
-
-	@Override
-	public boolean runCheck() {
-		return mPlayer.isSneaking();
-	}
 }

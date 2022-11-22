@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.depths;
 
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -74,14 +74,14 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 		Player player = (Player) event.getWhoClicked();
 		DepthsManager instance = DepthsManager.getInstance();
 
-		List<DepthsAbility> abilities = instance.getPlayerAbilities(player);
+		List<DepthsAbilityInfo<?>> abilities = instance.getPlayerAbilities(player);
 		if (abilities == null) {
 			return;
 		}
 
 		if (clickedItem.getType() == CONFIRM_MAT) {
-			for (DepthsAbility ability : abilities) {
-				if (ability.mInfo.mDisplayName != null && mAbilityName.contains(ability.mInfo.mDisplayName)) {
+			for (DepthsAbilityInfo<?> ability : abilities) {
+				if (ability.getDisplayName() != null && mAbilityName.contains(ability.getDisplayName())) {
 					DepthsPlayer depthsplayer = instance.mPlayers.get(player.getUniqueId());
 					if (depthsplayer != null && !depthsplayer.mUsedAbilityDeletion) {
 						depthsplayer.mUsedAbilityDeletion = true;
@@ -96,9 +96,9 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 		} else if (clickedItem.getType() == CANCEL_MAT) {
 			setAbilities(player);
 		} else {
-			for (DepthsAbility ability : abilities) {
-				if (ability.mInfo.mDisplayName != null
-					    && ItemUtils.getPlainName(clickedItem).contains(ability.mInfo.mDisplayName)) {
+			for (DepthsAbilityInfo<?> ability : abilities) {
+				if (ability.getDisplayName() != null
+					    && ItemUtils.getPlainName(clickedItem).contains(ability.getDisplayName())) {
 					setConfirmation(clickedItem);
 					return;
 				}

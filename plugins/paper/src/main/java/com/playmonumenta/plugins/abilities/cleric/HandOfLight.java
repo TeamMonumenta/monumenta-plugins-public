@@ -2,8 +2,9 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.HandOfLightCS;
@@ -15,8 +16,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -57,6 +55,30 @@ public class HandOfLight extends Ability {
 	public static final String CHARM_RANGE = "Hand of Light Range";
 	public static final String CHARM_HEALING = "Hand of Light Healing";
 
+	public static final AbilityInfo<HandOfLight> INFO =
+		new AbilityInfo<>(HandOfLight.class, "Hand of Light", HandOfLight::new)
+			.linkedSpell(ClassAbility.HAND_OF_LIGHT)
+			.scoreboardId("Healing")
+			.shorthandName("HoL")
+			.descriptions(
+				"Right click while holding a weapon or tool to heal all other players in a 12 block cone in front of you or within 2 blocks of you " +
+					"for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. " +
+					"Additionally, damage all mobs in the area with magic damage equal to 2 times the number of undead mobs in the range, up to 8 damage. " +
+					"If holding a shield, the trigger is changed to sneak + right click. Cooldown: 14s.",
+				"The healing is improved to 4 hearts + 20% of their max health. Damage increases to 3 damage per undead mob, up to 9. Cooldown: 10s.",
+
+				String.format("The cone is changed to a sphere of equal range, centered on the Cleric." +
+					              " The cooldown is reduced by %s%% for each 4 health healed, capped at %s%% cooldown." +
+					              " All Undead caught in the radius are stunned for %ss.",
+					(int) (ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED * 100),
+					(int) (ENHANCEMENT_COOLDOWN_REDUCTION_MAX * 100),
+					ENHANCEMENT_UNDEAD_STUN_DURATION / 20.0
+				))
+			.cooldown(HEALING_1_COOLDOWN, HEALING_2_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HandOfLight::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK)
+				                                                                        .keyOptions(AbilityTrigger.KeyOptions.SNEAK_WITH_SHIELD, AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+			.displayItem(new ItemStack(Material.PINK_DYE, 1));
+
 	private final double mRange;
 	private final int mFlat;
 	private final double mPercent;
@@ -64,33 +86,11 @@ public class HandOfLight extends Ability {
 	private final double mDamageMax;
 
 	private @Nullable Crusade mCrusade;
-	private boolean mHasCleansingRain;
-	private boolean mHasLuminousInfusion;
 
 	private final HandOfLightCS mCosmetic;
 
-	public HandOfLight(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Hand of Light");
-		mInfo.mLinkedSpell = ClassAbility.HAND_OF_LIGHT;
-		mInfo.mScoreboardId = "Healing";
-		mInfo.mShorthandName = "HoL";
-		mInfo.mDescriptions.add("Right click while holding a weapon or tool to heal all other players in a 12 block cone in front of you or within 2 blocks of you " +
-			                        "for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. " +
-			                        "Additionally, damage all mobs in the area with magic damage equal to 2 times the number of undead mobs in the range, up to 8 damage. " +
-			                        "If holding a shield, the trigger is changed to sneak + right click. Cooldown: 14s.");
-		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health. Damage increases to 3 damage per undead mob, up to 9. Cooldown: 10s.");
-		mInfo.mDescriptions.add(
-			String.format("The cone is changed to a sphere of equal range, centered on the Cleric." +
-				              " The cooldown is reduced by %s%% for each 4 health healed, capped at %s%% cooldown." +
-				              " All Undead caught in the radius are stunned for %ss.",
-				(int) (ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED * 100),
-				(int) (ENHANCEMENT_COOLDOWN_REDUCTION_MAX * 100),
-				ENHANCEMENT_UNDEAD_STUN_DURATION / 20.0
-			));
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mDisplayItem = new ItemStack(Material.PINK_DYE, 1);
-
+	public HandOfLight(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 		mFlat = isLevelOne() ? FLAT_1 : FLAT_2;
 		mPercent = isLevelOne() ? PERCENT_1 : PERCENT_2;
@@ -101,40 +101,13 @@ public class HandOfLight extends Ability {
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
-
-			mHasCleansingRain = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, CleansingRain.class) != null;
-			mHasLuminousInfusion = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, LuminousInfusion.class) != null;
 		});
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
-
-		// If holding a shield, must be sneaking to activate
-		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack offhand = mPlayer.getInventory().getItemInOffHand();
-		if (!mPlayer.isSneaking() && (offhand.getType() == Material.SHIELD || mainhand.getType() == Material.SHIELD)) {
-			return;
-		}
-
-		// Must not match conditions for cleansing rain
-		if (mHasCleansingRain && mPlayer.getLocation().getPitch() <= -50) {
-			return;
-		}
-
-		// Must not match conditions for luminous infusion
-		if (mHasLuminousInfusion && mPlayer.getLocation().getPitch() >= 50) {
-			return;
-		}
-
-		//Cannot be cast with multitool.
-		if (mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.MULTITOOL) > 0) {
-			return;
-		}
-
 		World world = mPlayer.getWorld();
 		Location userLoc = mPlayer.getLocation();
 
@@ -148,20 +121,25 @@ public class HandOfLight extends Ability {
 		List<LivingEntity> nearbyMobs = hitbox.getHitMobs();
 		nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
+		boolean doCooldown = false;
 		List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
 		undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob, mCrusade));
 		if (isEnhanced()) {
 			undeadMobs.forEach(mob -> EntityUtils.applyStun(mPlugin, ENHANCEMENT_UNDEAD_STUN_DURATION, mob));
+			if (!undeadMobs.isEmpty()) {
+				doCooldown = true;
+			}
 		}
 		double damage = Math.min(undeadMobs.size() * mDamagePer, mDamageMax);
 		damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 		double cooldown = getModifiedCooldown();
 
 		if (damage > 0) {
+			doCooldown = true;
 			for (LivingEntity mob : nearbyMobs) {
-				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, true);
+				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
 				if (Crusade.applyCrusadeToSlayer(mob, mCrusade)) {
-					mPlugin.mEffectManager.addEffect(mob, "CrusadeSlayerTag", new CrusadeEnhancementTag(mCrusade.getEnhancementDuration()));
+					mPlugin.mEffectManager.addEffect(mob, "CrusadeSlayerTag", new CrusadeEnhancementTag(Crusade.getEnhancementDuration()));
 				}
 
 				Location loc = mob.getLocation();
@@ -175,6 +153,7 @@ public class HandOfLight extends Ability {
 		nearbyPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class"));
 
 		if (!nearbyPlayers.isEmpty()) {
+			doCooldown = true;
 			double healthHealed = 0;
 			for (Player p : nearbyPlayers) {
 				double maxHealth = EntityUtils.getMaxHealth(p);
@@ -194,26 +173,9 @@ public class HandOfLight extends Ability {
 			}
 		}
 
-		if (damage > 0 || !nearbyPlayers.isEmpty()) {
+		if (doCooldown) {
 			putOnCooldown((int) cooldown);
 		}
-	}
-
-	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-
-		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
-
-		//Must be holding weapon, tool, or shield
-		if (ItemUtils.isShootableItem(mainhand, false) || ItemUtils.isSomePotion(mainhand) || mainhand.getType().isBlock()
-			    || mainhand.getType().isEdible() || mainhand.getType() == Material.COMPASS) {
-			return false;
-		}
-
-		return true;
 	}
 
 }

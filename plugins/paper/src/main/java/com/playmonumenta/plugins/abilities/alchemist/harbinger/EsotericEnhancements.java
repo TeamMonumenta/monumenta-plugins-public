@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
@@ -53,24 +54,27 @@ public class EsotericEnhancements extends PotionAbility {
 	public static final String CHARM_FUSE = "Esoteric Enhancements Fuse Time";
 	public static final String CHARM_SPEED = "Esoteric Enhancements Speed";
 
-	private @Nullable AlchemistPotions mAlchemistPotions;
-	private double mDamageMultiplier;
+	public static final AbilityInfo<EsotericEnhancements> INFO =
+		new AbilityInfo<>(EsotericEnhancements.class, "Esoteric Enhancements", EsotericEnhancements::new)
+			.linkedSpell(ClassAbility.ESOTERIC_ENHANCEMENTS)
+			.scoreboardId("Esoteric")
+			.shorthandName("Es")
+			.descriptions(
+				"When afflicting a mob with a Brutal potion within 1.5s of afflicting that mob with a Gruesome potion, summon an Alchemical Aberration. " +
+					"The Aberration targets the mob with the highest health within 8 blocks and explodes on that mob, " +
+					"dealing 60% of your potion damage and applying 20% Bleed for 4s to all mobs in a 3 block radius. Cooldown: 5s.",
+				"Damage is increased to 100% of your potion damage.")
+			.cooldown(ABERRATION_COOLDOWN, CHARM_COOLDOWN)
+			.displayItem(new ItemStack(Material.CREEPER_HEAD, 1));
 
-	private HashMap<LivingEntity, Integer> mAppliedMobs;
+	private @Nullable AlchemistPotions mAlchemistPotions;
+	private final double mDamageMultiplier;
+
+	private final HashMap<LivingEntity, Integer> mAppliedMobs;
 	private final EsotericEnhancementsCS mCosmetic;
 
-	public EsotericEnhancements(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Esoteric Enhancements", 0, 0);
-		mInfo.mLinkedSpell = ClassAbility.ESOTERIC_ENHANCEMENTS;
-		mInfo.mScoreboardId = "Esoteric";
-		mInfo.mShorthandName = "Es";
-		mInfo.mDescriptions.add("When afflicting a mob with a Brutal potion within 1.5s of afflicting that mob with a Gruesome potion, summon an Alchemical Aberration. The Aberration targets the mob with the highest health within 8 blocks and explodes on that mob, dealing 60% of your potion damage and applying 20% Bleed for 4s to all mobs in a 3 block radius. Cooldown: 5s.");
-		mInfo.mDescriptions.add("Damage is increased to 100% of your potion damage.");
-		mDisplayItem = new ItemStack(Material.CREEPER_HEAD, 1);
-
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, ABERRATION_COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
-		mInfo.mLinkedSpell = ClassAbility.ESOTERIC_ENHANCEMENTS;
+	public EsotericEnhancements(Plugin plugin, Player player) {
+		super(plugin, player, INFO, 0, 0);
 
 		mAppliedMobs = new HashMap<>();
 
@@ -87,7 +91,7 @@ public class EsotericEnhancements extends PotionAbility {
 	public void apply(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {
 		if (isGruesome) {
 			mAppliedMobs.put(mob, mob.getTicksLived());
-		} else if (!isTimerActive()) {
+		} else if (!isOnCooldown()) {
 			// Clear out list so it doesn't build up
 			int reactionTime = ABERRATION_SUMMON_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_REACTION_TIME);
 			mAppliedMobs.keySet().removeIf((entity) -> (entity.getTicksLived() - mAppliedMobs.get(entity) > reactionTime));
@@ -96,7 +100,7 @@ public class EsotericEnhancements extends PotionAbility {
 			if (mAppliedMobs.containsKey(mob)) {
 				int num = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CREEPER);
 				for (int i = 0; i < num; i++) {
-					summonAbberation(mob.getLocation());
+					summonAberration(mob.getLocation());
 					mCosmetic.esotericSummonEffect(mob.getWorld(), mPlayer, mob.getLocation());
 				}
 				putOnCooldown();
@@ -104,7 +108,7 @@ public class EsotericEnhancements extends PotionAbility {
 		}
 	}
 
-	private void summonAbberation(Location loc) {
+	private void summonAberration(Location loc) {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			Creeper aberration = (Creeper) LibraryOfSoulsIntegration.summon(loc, mCosmetic.getLos());
 			if (aberration == null) {

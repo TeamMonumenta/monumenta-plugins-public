@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
@@ -41,7 +42,7 @@ public class ClientModHandler {
 		this.mPlugin = plugin;
 		mGson = new GsonBuilder().create();
 		Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, CHANNEL_ID);
-		mClasses = new MonumentaClasses(plugin, null);
+		mClasses = new MonumentaClasses();
 		INSTANCE = this;
 	}
 
@@ -65,7 +66,7 @@ public class ClientModHandler {
 		if (INSTANCE == null || !playerHasClientMod(player) || !shouldHandleAbility(ability)) {
 			return;
 		}
-		ClassAbility classAbility = ability.getInfo().mLinkedSpell;
+		ClassAbility classAbility = ability.getInfo().getLinkedSpell();
 		int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
 		int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
 
@@ -87,26 +88,26 @@ public class ClientModHandler {
 			return;
 		}
 
-		ClassUpdatePacket.AbilityInfo[] abilities = INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence().stream()
-			.filter(ClientModHandler::shouldHandleAbility)
-			.map(ability -> {
-				ClassAbility classAbility = ability.getInfo().mLinkedSpell;
-				int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
-				int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
-				int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
+		ClassUpdatePacket.ClientModAbilityInfo[] abilities = INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence().stream()
+			                                                     .filter(ClientModHandler::shouldHandleAbility)
+			                                                     .map(ability -> {
+				                                                     ClassAbility classAbility = ability.getInfo().getLinkedSpell();
+				                                                     int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
+				                                                     int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
+				                                                     int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
 
-				ClassUpdatePacket.AbilityInfo info = new ClassUpdatePacket.AbilityInfo();
-				info.name = getAbilityName(ability);
-				info.className = getAbilityClassName(ability);
-				info.remainingCooldown = remainingCooldown;
-				info.initialCooldown = ability.getInfo().mCooldown;
-				info.remainingCharges = charges;
-				info.maxCharges = maxCharges;
-				info.mode = ability.getMode();
-				return info;
-			})
-			.sorted(Comparator.comparing(i -> i.name == null ? "" : i.name))
-			.toArray(ClassUpdatePacket.AbilityInfo[]::new);
+				                                                     ClassUpdatePacket.ClientModAbilityInfo info = new ClassUpdatePacket.ClientModAbilityInfo();
+				                                                     info.name = getAbilityName(ability);
+				                                                     info.className = getAbilityClassName(ability);
+				                                                     info.remainingCooldown = remainingCooldown;
+				                                                     info.initialCooldown = ability.getInfo().getModifiedCooldown(player, ability.getAbilityScore());
+				                                                     info.remainingCharges = charges;
+				                                                     info.maxCharges = maxCharges;
+				                                                     info.mode = ability.getMode();
+				                                                     return info;
+			                                                     })
+			                                                     .sorted(Comparator.comparing(i -> i.name == null ? "" : i.name))
+			                                                     .toArray(ClassUpdatePacket.ClientModAbilityInfo[]::new);
 
 		ClassUpdatePacket packet = new ClassUpdatePacket();
 		packet.abilities = abilities;
@@ -131,21 +132,21 @@ public class ClientModHandler {
 	 */
 	private static boolean shouldHandleAbility(Ability ability) {
 		return ability != null
-			       && (ability.getInfo().mCooldown > 0 || ability instanceof AbilityWithChargesOrStacks
+			       && (ability.getInfo().getBaseCooldown(ability.getAbilityScore()) > 0 || ability instanceof AbilityWithChargesOrStacks
 				           || ability instanceof AlchemicalArtillery || ability instanceof Swiftness || ability instanceof OneWithTheWind); // these are passives with modes
 	}
 
 	private static @Nullable String getAbilityName(Ability ability) {
 		// The ClassAbility name is preferable if it exists (e.g. for the two Elemental Spirits)
-		if (ability.getInfo().mLinkedSpell != null) {
-			return ability.getInfo().mLinkedSpell.getName();
+		if (ability.getInfo().getLinkedSpell() != null) {
+			return ability.getInfo().getLinkedSpell().getName();
 		}
-		return ability.getDisplayName();
+		return ability.getInfo().getDisplayName();
 	}
 
 	private static @Nullable String getAbilityClassName(Ability ability) {
 		if (ability instanceof DepthsAbility) {
-			DepthsTree depthsTree = ((DepthsAbility) ability).mTree;
+			DepthsTree depthsTree = ((DepthsAbility) ability).getInfo().getDepthsTree();
 			if (depthsTree != null) {
 				return depthsTree.getDisplayName();
 			}
@@ -157,7 +158,7 @@ public class ClientModHandler {
 			return "Mage";
 		}
 		for (PlayerClass playerClass : INSTANCE.mClasses.mClasses) {
-			Predicate<Ability> sameClass = abi -> abi.getClass() == ability.getClass();
+			Predicate<AbilityInfo<?>> sameClass = abi -> abi.getAbilityClass() == ability.getClass();
 			if (playerClass.mAbilities.stream().anyMatch(sameClass)
 				|| playerClass.mSpecOne.mAbilities.stream().anyMatch(sameClass)
 				|| playerClass.mSpecTwo.mAbilities.stream().anyMatch(sameClass)) {
@@ -183,9 +184,9 @@ public class ClientModHandler {
 
 		final String _type = "ClassUpdatePacket";
 
-		AbilityInfo[] abilities;
+		ClientModAbilityInfo[] abilities;
 
-		public static class AbilityInfo {
+		public static class ClientModAbilityInfo {
 
 			@Nullable String name;
 			@Nullable String className;

@@ -2,26 +2,24 @@ package com.playmonumenta.plugins.abilities.rogue;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.DaggerThrowCS;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -47,40 +45,41 @@ public class DaggerThrow extends Ability {
 	public static final String CHARM_VULN = "Dagger Throw Vulnerability Amplifier";
 	public static final String CHARM_DAGGERS = "Dagger Throw Daggers";
 
+	public static final AbilityInfo<DaggerThrow> INFO =
+		new AbilityInfo<>(DaggerThrow.class, "Dagger Throw", DaggerThrow::new)
+			.linkedSpell(ClassAbility.DAGGER_THROW)
+			.scoreboardId("DaggerThrow")
+			.shorthandName("DT")
+			.descriptions(
+				String.format("Sneak left click while holding two swords to throw three daggers which deal %s melee damage and gives each target %s%% Vulnerability for %s seconds. Cooldown: %ss.",
+					DAGGER_THROW_1_DAMAGE,
+					(int) (DAGGER_THROW_1_VULN * 100),
+					DAGGER_THROW_DURATION / 20,
+					DAGGER_THROW_COOLDOWN / 20),
+				String.format("The damage is increased to %s and the Vulnerability increased to %s%%.",
+					DAGGER_THROW_2_DAMAGE,
+					(int) (DAGGER_THROW_2_VULN * 100)),
+				String.format("Targets are additionally silenced for %ss. Vulnerability is increased by %s%%.",
+					DAGGER_THROW_SILENCE_DURATION / 20,
+					(int) (DAGGER_THROW_VULN_ENHANCEMENT * 100)))
+			.cooldown(DAGGER_THROW_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DaggerThrow::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
+				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
+			.displayItem(new ItemStack(Material.WOODEN_SWORD, 1));
+
 	private final double mDamage;
 	private final double mVulnAmplifier;
 	private final DaggerThrowCS mCosmetic;
 
-	public DaggerThrow(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Dagger Throw");
-		mInfo.mLinkedSpell = ClassAbility.DAGGER_THROW;
-		mInfo.mScoreboardId = "DaggerThrow";
-		mInfo.mShorthandName = "DT";
-		mInfo.mDescriptions.add(
-			String.format("Sneak left click while holding two swords to throw three daggers which deal %s melee damage and gives each target %s%% Vulnerability for %s seconds. Cooldown: %ss.",
-				DAGGER_THROW_1_DAMAGE,
-				(int)(DAGGER_THROW_1_VULN * 100),
-				DAGGER_THROW_DURATION / 20,
-				DAGGER_THROW_COOLDOWN / 20));
-		mInfo.mDescriptions.add(
-			String.format("The damage is increased to %s and the Vulnerability increased to %s%%.",
-				DAGGER_THROW_2_DAMAGE,
-				(int)(DAGGER_THROW_2_VULN * 100)));
-		mInfo.mDescriptions.add(
-			String.format("Targets are additionally silenced for %ss. Vulnerability is increased by %s%%.",
-				DAGGER_THROW_SILENCE_DURATION / 20,
-				(int)(DAGGER_THROW_VULN_ENHANCEMENT * 100)));
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, DAGGER_THROW_COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDisplayItem = new ItemStack(Material.WOODEN_SWORD, 1);
+	public DaggerThrow(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE);
 		mVulnAmplifier = (isLevelOne() ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN) + (isEnhanced() ? DAGGER_THROW_VULN_ENHANCEMENT : 0) + CharmManager.getLevelPercentDecimal(player, CHARM_VULN);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DaggerThrowCS(), DaggerThrowCS.SKIN_LIST);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 		Location loc = mPlayer.getEyeLocation();
@@ -113,7 +112,7 @@ public class DaggerThrow extends Ability {
 						bLoc.subtract(newDir.clone().multiply(0.5));
 						mCosmetic.daggerHitEffect(world, loc, bLoc, mPlayer);
 
-						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell, true);
+						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
 						EntityUtils.applyVulnerability(mPlugin, DAGGER_THROW_DURATION, mVulnAmplifier, mob);
 						if (isEnhanced()) {
 							EntityUtils.applySilence(mPlugin, DAGGER_THROW_SILENCE_DURATION, mob);
@@ -129,19 +128,6 @@ public class DaggerThrow extends Ability {
 			}
 		}
 		putOnCooldown();
-	}
-
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > - 50 && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer);
-	}
-
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
-			cast(Action.LEFT_CLICK_AIR);
-		}
-		return false;
 	}
 
 }

@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.dawnbringer;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -23,7 +25,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -42,24 +43,29 @@ public class BottledSunlight extends DepthsAbility {
 	private static final int BOTTLE_TICK_PERIOD = 2;
 	private static final int EFFECT_DURATION_REDUCTION = 10 * 20;
 
+	public static final DepthsAbilityInfo<BottledSunlight> INFO =
+		new DepthsAbilityInfo<>(BottledSunlight.class, ABILITY_NAME, BottledSunlight::new, DepthsTree.SUNLIGHT, DepthsTrigger.SHIFT_RIGHT_CLICK)
+			.linkedSpell(ClassAbility.BOTTLED_SUNLIGHT)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BottledSunlight::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.HONEY_BOTTLE))
+			.descriptions(BottledSunlight::getDescription, MAX_RARITY);
+
 	public BottledSunlight(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.HONEY_BOTTLE;
-		mTree = DepthsTree.SUNLIGHT;
-		mInfo.mLinkedSpell = ClassAbility.BOTTLED_SUNLIGHT;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action action) {
-
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
+		}
 		Location loc = mPlayer.getEyeLocation();
 		ItemStack itemTincture = new ItemStack(Material.HONEY_BOTTLE);
 		ItemUtils.setPlainName(itemTincture, "Bottled Sunlight");
 		ItemMeta tinctureMeta = itemTincture.getItemMeta();
 		tinctureMeta.displayName(Component.text("Bottled Sunlight", NamedTextColor.WHITE)
-				.decoration(TextDecoration.ITALIC, false));
+			                         .decoration(TextDecoration.ITALIC, false));
 		itemTincture.setItemMeta(tinctureMeta);
 		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);
@@ -97,7 +103,7 @@ public class BottledSunlight extends DepthsAbility {
 						execute(p);
 					}
 
-					mPlugin.mTimers.removeCooldown(mPlayer, mInfo.mLinkedSpell);
+					mPlugin.mTimers.removeCooldown(mPlayer, mInfo.getLinkedSpell());
 					putOnCooldown();
 
 					this.cancel();
@@ -110,7 +116,7 @@ public class BottledSunlight extends DepthsAbility {
 					this.cancel();
 
 					// Take the skill off cooldown (by setting to 0)
-					mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, 0);
+					mPlugin.mTimers.addCooldown(mPlayer, mInfo.getLinkedSpell(), 0);
 				}
 			}
 
@@ -160,25 +166,11 @@ public class BottledSunlight extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
 
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Right click while sneaking to throw a luminescent bottle. If you or an ally walk over it, you both gain " + DepthsUtils.getRarityColor(rarity) + ABSORPTION[rarity - 1] / 2 + ChatColor.WHITE + " absorption hearts for " + BOTTLE_ABSORPTION_DURATION / 20 + " seconds and the durations of negative potion effects get reduced by " + EFFECT_DURATION_REDUCTION / 20 + " seconds. If the bottle is destroyed or not grabbed, it quickly comes off cooldown. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.SUNLIGHT;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_RIGHT_CLICK;
-	}
 }
 

@@ -2,9 +2,10 @@ package com.playmonumenta.plugins.abilities.rogue;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.AdvancingShadowsCS;
@@ -15,19 +16,14 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.EnumSet;
-import java.util.List;
-import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -55,56 +51,65 @@ public class AdvancingShadows extends Ability {
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE, DamageType.MELEE_ENCH, DamageType.MELEE_SKILL);
 	private static final String ENHANCEMENT_EFFECT_NAME = "AdvancingShadowsEnhancementPercentDamageDealtEffect";
 
-	private @Nullable LivingEntity mTarget = null;
-	private boolean mHasBladeDance;
+	public static final AbilityInfo<AdvancingShadows> INFO =
+		new AbilityInfo<>(AdvancingShadows.class, "Advancing Shadows", AdvancingShadows::new)
+			.linkedSpell(ClassAbility.ADVANCING_SHADOWS)
+			.scoreboardId("AdvancingShadows")
+			.shorthandName("AS")
+			.descriptions(
+				String.format("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within %s blocks and gain +%s%% Melee Damage for %s seconds. Cooldown: %ss.",
+					ADVANCING_SHADOWS_RANGE_1 - 1,
+					(int) (DAMAGE_BONUS_1 * 100),
+					DURATION / 20,
+					ADVANCING_SHADOWS_COOLDOWN / 20),
+				String.format("Damage increased to +%s%% Melee Damage for %ss, teleport range is increased to %s blocks and all hostile non-target mobs within %s blocks are knocked away from the target.",
+					(int) (DAMAGE_BONUS_2 * 100),
+					DURATION / 20,
+					ADVANCING_SHADOWS_RANGE_2 - 1,
+					(int) ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE),
+				String.format("You deal %s%% extra damage for %ss to the target.",
+					(int) (ENHANCEMENT_BONUS_DAMAGE * 100),
+					ENHANCEMENT_BONUS_DAMAGE_DURATION / 20))
+			.cooldown(ADVANCING_SHADOWS_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AdvancingShadows::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
+				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
+			.displayItem(new ItemStack(Material.ENDER_EYE, 1));
 
 	private final double mPercentDamageDealt;
 	private final double mActivationRange;
 
 	private final AdvancingShadowsCS mCosmetic;
 
-	public AdvancingShadows(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Advancing Shadows");
-		mInfo.mLinkedSpell = ClassAbility.ADVANCING_SHADOWS;
-		mInfo.mScoreboardId = "AdvancingShadows";
-		mInfo.mShorthandName = "AS";
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, ADVANCING_SHADOWS_COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mIgnoreCooldown = true;
-		mInfo.mDescriptions.add(
-			String.format("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within %s blocks and gain +%s%% Melee Damage for %s seconds. Cooldown: %ss.",
-				ADVANCING_SHADOWS_RANGE_1 - 1,
-				(int)(DAMAGE_BONUS_1 * 100),
-				DURATION / 20,
-				ADVANCING_SHADOWS_COOLDOWN / 20));
-		mInfo.mDescriptions.add(
-			String.format("Damage increased to +%s%% Melee Damage for %ss, teleport range is increased to %s blocks and all hostile non-target mobs within %s blocks are knocked away from the target.",
-				(int)(DAMAGE_BONUS_2 * 100),
-				DURATION / 20,
-				ADVANCING_SHADOWS_RANGE_2 - 1,
-				(int)ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE));
-		mInfo.mDescriptions.add(
-			String.format("You deal %s%% extra damage for %ss to the target.",
-				(int)(ENHANCEMENT_BONUS_DAMAGE * 100),
-				ENHANCEMENT_BONUS_DAMAGE_DURATION / 20));
-		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
+	public AdvancingShadows(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2);
 		mActivationRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, (isLevelOne() ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2));
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AdvancingShadowsCS(), AdvancingShadowsCS.SKIN_LIST);
-
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mHasBladeDance = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, BladeDance.class) != null;
-		});
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null || mTarget == null || isTimerActive()) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 
-		LivingEntity entity = mTarget;
+		// Basically makes sure if the target is in LoS and if there is a path.
+		Location eyeLoc = mPlayer.getEyeLocation();
+		Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), (int) Math.ceil(mActivationRange));
+		ray.mThroughBlocks = false;
+		ray.mThroughNonOccluding = false;
+		ray.mTargetPlayers = AbilityManager.getManager().isPvPEnabled(mPlayer);
+
+		RaycastData data = ray.shootRaycast();
+
+		LivingEntity entity = data.getEntities().stream()
+			                      .filter(t -> t != mPlayer && t.isValid() && EntityUtils.isHostileMob(t))
+			                      .findFirst()
+			                      .orElse(null);
+		if (entity == null) {
+			return;
+		}
+
 		double maxRange = mActivationRange;
 		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
 		if (origDistance <= maxRange) {
@@ -194,43 +199,8 @@ public class AdvancingShadows extends Ability {
 			mCosmetic.tpParticle(mPlayer);
 			mCosmetic.tpSound(world, mPlayer);
 
-			mTarget = null;
 			putOnCooldown();
 		}
 	}
 
-	@Override
-	public boolean runCheck() {
-		if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
-			if (!mPlayer.isSneaking()) {
-				// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
-				if (mHasBladeDance && mPlayer.getLocation().getPitch() >= 50) {
-					return false;
-				}
-
-				// Basically makes sure if the target is in LoS and if there is
-				// a path.
-				Location eyeLoc = mPlayer.getEyeLocation();
-				Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), (int) Math.ceil(mActivationRange));
-				ray.mThroughBlocks = false;
-				ray.mThroughNonOccluding = false;
-				if (AbilityManager.getManager().isPvPEnabled(mPlayer)) {
-					ray.mTargetPlayers = true;
-				}
-
-				RaycastData data = ray.shootRaycast();
-
-				List<LivingEntity> rayEntities = data.getEntities();
-				if (rayEntities != null && !rayEntities.isEmpty()) {
-					for (LivingEntity t : rayEntities) {
-						if (!t.getUniqueId().equals(mPlayer.getUniqueId()) && t.isValid() && !t.isDead() && EntityUtils.isHostileMob(t)) {
-							mTarget = t;
-							return true;
-						}
-					}
-				}
-			}
-		}
-		return false;
-	}
 }

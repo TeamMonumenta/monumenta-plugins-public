@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -43,6 +44,26 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	public static final String CHARM_KNOCKBACK = "Deadly Ronde Knockback";
 	public static final String CHARM_STACKS = "Deadly Ronde Max Stacks";
 
+	public static final AbilityInfo<DeadlyRonde> INFO =
+		new AbilityInfo<>(DeadlyRonde.class, "Deadly Ronde", DeadlyRonde::new)
+			.linkedSpell(ClassAbility.DEADLY_RONDE)
+			.scoreboardId("DeadlyRonde")
+			.shorthandName("DR")
+			.descriptions(
+				String.format("After casting a skill, gain a stack of Deadly Ronde for %s seconds, stacking up to %s times. " +
+					              "While Deadly Ronde is active, you gain %s%% Speed, and your next melee attack consumes a stack to fire a flurry of blades, " +
+					              "that fire in a thin cone with a radius of %s blocks and deal %s melee damage to all enemies they hit.",
+					RONDE_DECAY_TIMER / 20,
+					RONDE_1_MAX_STACKS,
+					(int) (RONDE_SPEED_BONUS * 100),
+					RONDE_RADIUS,
+					RONDE_1_DAMAGE
+				),
+				String.format("Damage increased to %s, and you can now store up to %s stacks.",
+					RONDE_2_DAMAGE,
+					RONDE_2_MAX_STACKS))
+			.displayItem(new ItemStack(Material.BLAZE_ROD, 1));
+
 	private @Nullable BukkitRunnable mActiveRunnable = null;
 	private int mRondeStacks = 0;
 
@@ -51,27 +72,8 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	private final int mMaxStacks;
 	private final DeadlyRondeCS mCosmetic;
 
-	public DeadlyRonde(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Deadly Ronde");
-		mInfo.mLinkedSpell = ClassAbility.DEADLY_RONDE;
-		mInfo.mScoreboardId = "DeadlyRonde";
-		mInfo.mShorthandName = "DR";
-		mInfo.mDescriptions.add(
-			String.format("After casting a skill, gain a stack of Deadly Ronde for %s seconds, stacking up to %s times. " +
-				              "While Deadly Ronde is active, you gain %s%% Speed, and your next melee attack consumes a stack to fire a flurry of blades, " +
-				              "that fire in a thin cone with a radius of %s blocks and deal %s melee damage to all enemies they hit.",
-				RONDE_DECAY_TIMER / 20,
-				RONDE_1_MAX_STACKS,
-				(int) (RONDE_SPEED_BONUS * 100),
-				RONDE_RADIUS,
-				RONDE_1_DAMAGE
-			));
-		mInfo.mDescriptions.add(
-			String.format("Damage increased to %s, and you can now store up to %s stacks.",
-				RONDE_2_DAMAGE,
-				RONDE_2_MAX_STACKS));
-		mDisplayItem = new ItemStack(Material.BLAZE_ROD, 1);
-
+	public DeadlyRonde(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? RONDE_1_DAMAGE : RONDE_2_DAMAGE);
 		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, RONDE_KNOCKBACK_SPEED);
 		mMaxStacks = (int) ((isLevelOne() ? RONDE_1_MAX_STACKS : RONDE_2_MAX_STACKS) + CharmManager.getLevel(mPlayer, CHARM_STACKS));
@@ -80,9 +82,6 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
-		if (mPlayer == null) {
-			return true;
-		}
 		/* Re-up the duration every time an ability is cast */
 		if (mActiveRunnable != null) {
 			mActiveRunnable.cancel();
@@ -133,7 +132,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RONDE_RADIUS);
 			Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), radius, Math.toRadians(angle));
 			for (LivingEntity mob : hitbox.getHitMobs()) {
-				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell, true);
+				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
 				MovementUtils.knockAway(mPlayer, mob, mKnockback, true);
 			}
 

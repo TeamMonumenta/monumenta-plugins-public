@@ -53,10 +53,17 @@ public abstract class ExperiencinatorUtils {
 		} catch (Exception e) {
 			MMLog.severe("Could not (re)load Experiencinator config!", e);
 		}
+		if (mConfig == null) { // load blank config on failure if this is the first load, otherwise keep old config
+			mConfig = new ExperiencinatorConfig();
+		}
 	}
 
-	public static @Nullable ExperiencinatorConfig getConfig(@Nullable Location lootTableLocation) {
-		if (lootTableLocation != null) {
+	public static ExperiencinatorConfig getConfig(@Nullable Location lootTableLocation) {
+		return getConfig(lootTableLocation, true);
+	}
+
+	public static ExperiencinatorConfig getConfig(@Nullable Location lootTableLocation, boolean reload) {
+		if (lootTableLocation != null && (mConfig == null || reload)) {
 			reloadConfig(lootTableLocation);
 		}
 		return mConfig;

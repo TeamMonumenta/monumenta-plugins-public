@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -27,7 +29,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -51,20 +52,27 @@ public class IronTincture extends Ability {
 	public static final String CHARM_VELOCITY = "Iron Tincture Velocity";
 	public static final String CHARM_RESISTANCE = "Iron Tincture Resistance";
 
+	public static final AbilityInfo<IronTincture> INFO =
+		new AbilityInfo<>(IronTincture.class, "Iron Tincture", IronTincture::new)
+			.linkedSpell(ClassAbility.IRON_TINCTURE)
+			.scoreboardId("IronTincture")
+			.shorthandName("IT")
+			.descriptions(
+				"Crouch and right-click to throw a tincture. If you walk over the tincture, gain 6 absorption health for 50 seconds, up to 8 absorption health. " +
+					"If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. " +
+					"When another player grabs the tincture, you gain 2 Alchemist's Potions. When you grab the tincture, you gain 1 Alchemist's Potion. Cooldown: 50s.",
+				"Effect and effect cap increased to 10 absorption health.",
+				"The tincture now additionally cleanses all potion debuffs, extinguishes fire, and grants 5% damage resistance when absorption is present for the duration of the absorption.")
+			.cooldown(IRON_TINCTURE_USE_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", IronTincture::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
+				                                                                         .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+			.displayItem(new ItemStack(Material.SPLASH_POTION, 1));
+
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private final double mAbsorption;
 
-	public IronTincture(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Iron Tincture");
-		mInfo.mLinkedSpell = ClassAbility.IRON_TINCTURE;
-		mInfo.mScoreboardId = "IronTincture";
-		mInfo.mShorthandName = "IT";
-		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain 6 absorption health for 50 seconds, up to 8 absorption health. If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. When another player grabs the tincture, you gain 2 Alchemist's Potions. When you grab the tincture, you gain 1 Alchemist's Potion. Cooldown: 50s.");
-		mInfo.mDescriptions.add("Effect and effect cap increased to 10 absorption health.");
-		mInfo.mDescriptions.add("The tincture now additionally cleanses all potion debuffs, extinguishes fire, and grants 5% damage resistance when absorption is present for the duration of the absorption.");
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, IRON_TINCTURE_USE_COOLDOWN); // Full duration cooldown
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
+	public IronTincture(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 
 		mAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, isLevelOne() ? IRON_TINCTURE_1_ABSORPTION : IRON_TINCTURE_2_ABSORPTION);
 
@@ -73,18 +81,8 @@ public class IronTincture extends Ability {
 		});
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null) {
-			return;
-		}
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!mPlayer.isSneaking()
-			    || ItemUtils.isSomeBow(mainHand)
-			    || ItemUtils.isAlchemistItem(mainHand)
-			    || mainHand.getType() == Material.SPLASH_POTION
-			    || mainHand.getType() == Material.LINGERING_POTION
-			    || mainHand.getType().isBlock()) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 
@@ -108,7 +106,6 @@ public class IronTincture extends Ability {
 		tincture.setVelocity(vel);
 		tincture.setGlowing(true);
 
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, IRON_TINCTURE_USE_COOLDOWN);
 		// Full duration cooldown - is shortened if not picked up
 		putOnCooldown();
 
@@ -142,7 +139,7 @@ public class IronTincture extends Ability {
 						}
 					}
 
-					mPlugin.mTimers.removeCooldown(mPlayer, mInfo.mLinkedSpell);
+					mPlugin.mTimers.removeCooldown(mPlayer, mInfo.getLinkedSpell());
 					putOnCooldown();
 
 					this.cancel();
@@ -155,7 +152,7 @@ public class IronTincture extends Ability {
 					this.cancel();
 
 					// Take the skill off cooldown (by setting to 0)
-					mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, 0);
+					mPlugin.mTimers.addCooldown(mPlayer, mInfo.getLinkedSpell(), 0);
 				}
 			}
 

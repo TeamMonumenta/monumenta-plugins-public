@@ -58,8 +58,8 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 	}
 
 	@Override
-	public boolean isUnlocked(Player mPlayer) {
-		return mPlayer != null;
+	public boolean isUnlocked(Player player) {
+		return player != null;
 	}
 
 	@Override

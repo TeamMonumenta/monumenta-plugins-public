@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageDealtSingle;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -31,17 +31,20 @@ public class EmpoweringOdor extends PotionAbility {
 	public static final String CHARM_DAMAGE = "Empowering Odor Damage Bonus";
 	public static final String CHARM_SINGLE_HIT_DAMAGE = "Empowering Odor Single Hit Damage";
 
+	public static final AbilityInfo<EmpoweringOdor> INFO =
+		new AbilityInfo<>(EmpoweringOdor.class, "Empowering Odor", EmpoweringOdor::new)
+			.scoreboardId("EmpoweringOdor")
+			.shorthandName("EO")
+			.descriptions(
+				"Other players hit by your Alchemist's Potions are given 10% speed and 10% damage from all sources for 8 seconds.",
+				"Your potion recharge rate is decreased by 0.5s.",
+				"The first hit a player would deal to an enemy after they gain this bonus is increased by 10%, refreshing on each application.")
+			.displayItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
+
 	private final double mDamageAmplifier;
 
-	public EmpoweringOdor(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Empowering Odor", 0, 0);
-		mInfo.mScoreboardId = "EmpoweringOdor";
-		mInfo.mShorthandName = "EO";
-		mInfo.mDescriptions.add("Other players hit by your Alchemist's Potions are given 10% speed and 10% damage from all sources for 8 seconds.");
-		mInfo.mDescriptions.add("Your potion recharge rate is decreased by 0.5s.");
-		mInfo.mDescriptions.add("The first hit a player would deal to an enemy after they gain this bonus is increased by 10%, refreshing on each application.");
-		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
-
+	public EmpoweringOdor(Plugin plugin, Player player) {
+		super(plugin, player, INFO, 0, 0);
 		mDamageAmplifier = (isLevelOne() ? EMPOWERING_ODOR_1_DAMAGE_AMPLIFIER : EMPOWERING_ODOR_2_DAMAGE_AMPLIFIER) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 	}
 

@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -15,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 public class Icebreaker extends DepthsAbility {
@@ -23,10 +26,13 @@ public class Icebreaker extends DepthsAbility {
 	public static final double[] ICE_DAMAGE = {1.24, 1.28, 1.32, 1.36, 1.40, 1.48};
 	public static final double[] EFFECT_DAMAGE = {1.12, 1.14, 1.16, 1.18, 1.20, 1.24};
 
+	public static final DepthsAbilityInfo<Icebreaker> INFO =
+		new DepthsAbilityInfo<>(Icebreaker.class, ABILITY_NAME, Icebreaker::new, DepthsTree.FROSTBORN, DepthsTrigger.PASSIVE)
+			.displayItem(new ItemStack(Material.TUBE_CORAL_FAN))
+			.descriptions(Icebreaker::getDescription, MAX_RARITY);
+
 	public Icebreaker(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.TUBE_CORAL_FAN;
-		mTree = DepthsTree.FROSTBORN;
+		super(plugin, player, INFO);
 	}
 
 	@Override
@@ -52,14 +58,8 @@ public class Icebreaker extends DepthsAbility {
 		return 1;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Damage you deal to mobs that are on ice is multiplied by " + DepthsUtils.getRarityColor(rarity) + ICE_DAMAGE[rarity - 1] + ChatColor.WHITE + ". Damage you deal to mobs that are debuffed but not on ice is multiplied by " + DepthsUtils.getRarityColor(rarity) + EFFECT_DAMAGE[rarity - 1] + ChatColor.WHITE + ".";
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FROSTBORN;
 	}
 }
 

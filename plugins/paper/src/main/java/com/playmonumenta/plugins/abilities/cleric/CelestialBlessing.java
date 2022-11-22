@@ -2,31 +2,27 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-
 
 
 public class CelestialBlessing extends Ability {
@@ -40,11 +36,11 @@ public class CelestialBlessing extends Ability {
 	private static final double CELESTIAL_EXTRA_SPEED = 0.20;
 	private static final String ATTR_NAME = "CelestialBlessingExtraSpeedAttr";
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-			DamageType.MELEE,
-			DamageType.MELEE_SKILL,
-			DamageType.MELEE_ENCH,
-			DamageType.PROJECTILE,
-			DamageType.PROJECTILE_SKILL
+		DamageType.MELEE,
+		DamageType.MELEE_SKILL,
+		DamageType.MELEE_ENCH,
+		DamageType.PROJECTILE,
+		DamageType.PROJECTILE_SKILL
 	);
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES_ENHANCE = EnumSet.of(
 		DamageType.MELEE,
@@ -62,35 +58,38 @@ public class CelestialBlessing extends Ability {
 	public static final String CHARM_SPEED = "Celestial Blessing Speed Amplifier";
 	public static final String CHARM_DURATION = "Celestial Blessing Duration";
 
+	public static final AbilityInfo<CelestialBlessing> INFO =
+		new AbilityInfo<>(CelestialBlessing.class, "Celestial Blessing", CelestialBlessing::new)
+			.linkedSpell(ClassAbility.CELESTIAL_BLESSING)
+			.scoreboardId("Celestial")
+			.shorthandName("CB")
+			.descriptions(
+				"When you left-click while sneaking, you and all other players in a %s radius gain +%s%% melee and projectile damage and +%s%% speed for %ss. Cooldown: %ss."
+					.formatted(CELESTIAL_RADIUS,
+						StringUtils.multiplierToPercentage(CELESTIAL_1_EXTRA_DAMAGE),
+						StringUtils.multiplierToPercentage(CELESTIAL_EXTRA_SPEED),
+						StringUtils.ticksToSeconds(CELESTIAL_DURATION),
+						StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN)),
+				"Increases the buff to +%s%% damage."
+					.formatted(StringUtils.multiplierToPercentage(CELESTIAL_2_EXTRA_DAMAGE)),
+				"Magic damage is now increased as well. Cooldown: %ss."
+					.formatted(StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN_ENHANCED)))
+			.cooldown(CELESTIAL_COOLDOWN, CELESTIAL_COOLDOWN, CELESTIAL_COOLDOWN_ENHANCED, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CelestialBlessing::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true)
+				                                                                              .keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
+			.displayItem(new ItemStack(Material.SUGAR, 1));
+
 	private final int mDuration;
 	private final double mExtraDamage;
 
-	public CelestialBlessing(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Celestial Blessing");
-		mInfo.mLinkedSpell = ClassAbility.CELESTIAL_BLESSING;
-		mInfo.mScoreboardId = "Celestial";
-		mInfo.mShorthandName = "CB";
-		mInfo.mDescriptions.add("When you strike while sneaking, you and all other players in a %s radius gain +%s%% melee and projectile damage and +%s%% speed for %ss. Cooldown: %ss."
-			                        .formatted(CELESTIAL_RADIUS,
-				                        StringUtils.multiplierToPercentage(CELESTIAL_1_EXTRA_DAMAGE),
-				                        StringUtils.multiplierToPercentage(CELESTIAL_EXTRA_SPEED),
-				                        StringUtils.ticksToSeconds(CELESTIAL_DURATION),
-				                        StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN)));
-		mInfo.mDescriptions.add("Increases the buff to +%s%% damage."
-			                        .formatted(StringUtils.multiplierToPercentage(CELESTIAL_2_EXTRA_DAMAGE)));
-		mInfo.mDescriptions.add("Magic damage is now increased as well. Cooldown: %ss."
-			                        .formatted(StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN_ENHANCED)));
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isEnhanced() ? CELESTIAL_COOLDOWN_ENHANCED : CELESTIAL_COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDisplayItem = new ItemStack(Material.SUGAR, 1);
-
+	public CelestialBlessing(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDuration = CharmManager.getExtraDuration(player, CHARM_DURATION) + CELESTIAL_DURATION;
 		mExtraDamage = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 
@@ -113,14 +112,14 @@ public class CelestialBlessing extends Ability {
 					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).minimumMultiplier(false).spawnAsPlayerBuff(mPlayer);
 					new PartialParticle(Particle.VILLAGER_HAPPY, loc, 2, 0.5, 0.5, 0.5, 0.1).minimumMultiplier(false).spawnAsPlayerBuff(mPlayer);
 				},
-					(entity) -> {
-						// Lose effect
-						Location loc = p.getLocation();
-						world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1f, 0.65f);
-						new PartialParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.1).spawnAsPlayerBuff(mPlayer);
-						new PartialParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0).spawnAsPlayerBuff(mPlayer);
-						new PartialParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0.1).spawnAsPlayerBuff(mPlayer);
-					})
+				(entity) -> {
+					// Lose effect
+					Location loc = p.getLocation();
+					world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1f, 0.65f);
+					new PartialParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.1).spawnAsPlayerBuff(mPlayer);
+					new PartialParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0).spawnAsPlayerBuff(mPlayer);
+					new PartialParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0.1).spawnAsPlayerBuff(mPlayer);
+				})
 			);
 			// Start effect
 			Location loc = p.getLocation();
@@ -130,23 +129,6 @@ public class CelestialBlessing extends Ability {
 		}
 
 		putOnCooldown();
-	}
-
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
-			cast(Action.LEFT_CLICK_AIR);
-		}
-		return false;
-	}
-
-	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return (mPlayer.isSneaking() && !ItemUtils.isPickaxe(mainHand));
 	}
 
 }

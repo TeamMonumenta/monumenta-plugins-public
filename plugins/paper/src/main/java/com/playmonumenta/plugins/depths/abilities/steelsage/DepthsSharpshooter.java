@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
@@ -16,6 +18,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.inventory.ItemStack;
 
 public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChargesOrStacks {
 
@@ -25,14 +28,17 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 	private static final int TWISTED_SHARPSHOOTER_DECAY_TIMER = 20 * 6;
 	private static final int MAX_STACKS = 8;
 
+	public static final DepthsAbilityInfo<DepthsSharpshooter> INFO =
+		new DepthsAbilityInfo<>(DepthsSharpshooter.class, ABILITY_NAME, DepthsSharpshooter::new, DepthsTree.METALLIC, DepthsTrigger.PASSIVE)
+			.displayItem(new ItemStack(Material.TARGET))
+			.descriptions(DepthsSharpshooter::getDescription, MAX_RARITY);
+
 	private int mStacks = 0;
 	private int mTicksToStackDecay = 0;
 	private int mDecayTimerLength;
 
 	public DepthsSharpshooter(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.TARGET;
-		mTree = DepthsTree.METALLIC;
+		super(plugin, player, INFO);
 		mDecayTimerLength = mRarity >= 6 ? TWISTED_SHARPSHOOTER_DECAY_TIMER : SHARPSHOOTER_DECAY_TIMER;
 	}
 
@@ -59,9 +65,6 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mPlayer == null) {
-			return;
-		}
 		if (mStacks > 0) {
 			mTicksToStackDecay -= 5;
 
@@ -83,17 +86,11 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 		}
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		if (rarity == 6) {
 			return "Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to " + MAX_STACKS + ". Stacks decay after " + DepthsUtils.getRarityColor(rarity) + TWISTED_SHARPSHOOTER_DECAY_TIMER / 20 + ChatColor.WHITE + " seconds of not gaining a stack. Each stack increases your projectile damage by " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(DAMAGE_PER_STACK[rarity - 1]) + "%" + ChatColor.WHITE + ".";
 		}
 		return "Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to " + MAX_STACKS + ". Stacks decay after " + SHARPSHOOTER_DECAY_TIMER / 20 + " seconds of not gaining a stack. Each stack increases your projectile damage by " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(DAMAGE_PER_STACK[rarity - 1]) + "%" + ChatColor.WHITE + ".";
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.METALLIC;
 	}
 
 	@Override

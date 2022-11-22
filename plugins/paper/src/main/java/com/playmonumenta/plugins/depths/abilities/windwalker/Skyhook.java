@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
@@ -29,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -39,13 +41,15 @@ public class Skyhook extends DepthsAbility {
 	public static final int MAX_TICKS = 20 * 20;
 	public static final String SKYHOOK_ARROW_METADATA = "SkyhookArrow";
 
+	public static final DepthsAbilityInfo<Skyhook> INFO =
+		new DepthsAbilityInfo<>(Skyhook.class, ABILITY_NAME, Skyhook::new, DepthsTree.WINDWALKER, DepthsTrigger.SHIFT_BOW)
+			.linkedSpell(ClassAbility.SKYHOOK)
+			.cooldown(COOLDOWN)
+			.displayItem(new ItemStack(Material.FISHING_ROD))
+			.descriptions(Skyhook::getDescription, MAX_RARITY);
+
 	public Skyhook(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.FISHING_ROD;
-		mTree = DepthsTree.WINDWALKER;
-		mInfo.mLinkedSpell = ClassAbility.SKYHOOK;
-		mInfo.mCooldown = mRarity == 0 ? COOLDOWN[0] : COOLDOWN[mRarity - 1];
-		mInfo.mIgnoreCooldown = true;
+		super(plugin, player, INFO);
 	}
 
 	@Override
@@ -61,7 +65,7 @@ public class Skyhook extends DepthsAbility {
 	// Since Snowballs disappear after landing, we need an extra detection for when it hits the ground.
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (mPlayer != null && proj instanceof Snowball && proj.hasMetadata(SKYHOOK_ARROW_METADATA)) {
+		if (proj instanceof Snowball && proj.hasMetadata(SKYHOOK_ARROW_METADATA)) {
 			hook(proj);
 			proj.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
 		}
@@ -96,12 +100,12 @@ public class Skyhook extends DepthsAbility {
 
 			//Refund cooldowns
 			for (Ability abil : AbilityManager.getManager().getPlayerAbilities(mPlayer).getAbilities()) {
-				AbilityInfo info = abil.getInfo();
-				ClassAbility spell = info.mLinkedSpell;
-				if (spell == null || spell == mInfo.mLinkedSpell) {
+				AbilityInfo<?> info = abil.getInfo();
+				ClassAbility spell = info.getLinkedSpell();
+				if (spell == null || spell == mInfo.getLinkedSpell()) {
 					continue;
 				}
-				int totalCD = info.mCooldown;
+				int totalCD = abil.getModifiedCooldown();
 				int reducedCD = (int) (totalCD * (loc.distance(playerStartLoc) / 100.0));
 				mPlugin.mTimers.updateCooldown(mPlayer, spell, reducedCD);
 			}
@@ -113,13 +117,12 @@ public class Skyhook extends DepthsAbility {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || projectile.hasMetadata(RapidFire.META_DATA_TAG)) {
+		if (isOnCooldown() || projectile.hasMetadata(RapidFire.META_DATA_TAG)) {
 			return true;
 		}
 
 		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
-			mInfo.mCooldown = (int) (COOLDOWN[mRarity - 1] * BowAspect.getCooldownReduction(mPlayer));
-			putOnCooldown();
+			putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
 			world.playSound(loc, Sound.ITEM_CROSSBOW_QUICK_CHARGE_3, 1, 1.0f);
@@ -158,18 +161,9 @@ public class Skyhook extends DepthsAbility {
 		return true;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Shooting a projectile while sneaking shoots out a skyhook. When the skyhook lands, you dash to the location and reduce all other ability cooldowns by 1% per block traveled. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.WINDWALKER;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_BOW;
-	}
 }

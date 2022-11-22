@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -40,9 +40,9 @@ public class SkillDescription extends GenericCommand {
 			}
 		}
 
-		for (Ability ability : plugin.mAbilityManager.getReferenceAbilities()) {
+		for (AbilityInfo<?> ability : plugin.mAbilityManager.getReferenceAbilities()) {
 			if (scoreboardId.equals(ability.getScoreboard())) {
-				ability.getInfo().sendDescriptions(target);
+				ability.sendDescriptions(target);
 				return;
 			}
 		}

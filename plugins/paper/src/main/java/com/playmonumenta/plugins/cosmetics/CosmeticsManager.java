@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -148,17 +148,17 @@ public class CosmeticsManager implements Listener {
 	/**
 	 * Gets a list of unlocked cosmetic of certain type, sorted alphabetically by name
 	 */
-	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type, @Nullable Ability ability) {
+	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type, @Nullable AbilityInfo<?> ability) {
 		if (type != CosmeticType.COSMETIC_SKILL) {
 			return getCosmetics(player).stream()
-				.filter(c -> c.getType() == type)
-				.sorted(Comparator.comparing(Cosmetic::getName))
-				.toList();
+				       .filter(c -> c.getType() == type)
+				       .sorted(Comparator.comparing(Cosmetic::getName))
+				       .toList();
 		} else if (ability != null) {
 			return getCosmetics(player).stream()
-				.filter(c -> c.getType() == type)
-				.filter(c -> c.getAbility() == ability.mInfo.mLinkedSpell)
-				.sorted(Comparator.comparing(Cosmetic::getName))
+				       .filter(c -> c.getType() == type)
+				       .filter(c -> c.getAbility() == ability.getLinkedSpell())
+				       .sorted(Comparator.comparing(Cosmetic::getName))
 				.toList();
 		} else {
 			return getCosmetics(player).stream()

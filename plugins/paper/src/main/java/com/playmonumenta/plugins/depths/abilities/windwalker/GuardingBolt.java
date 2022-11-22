@@ -2,11 +2,13 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -25,7 +27,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -40,19 +42,21 @@ public class GuardingBolt extends DepthsAbility {
 	public static final Particle.DustOptions COLOR_YELLOW = new Particle.DustOptions(Color.YELLOW, 0.75f);
 	public static final Particle.DustOptions COLOR_AQUA = new Particle.DustOptions(Color.AQUA, 0.75f);
 
+	public static final DepthsAbilityInfo<GuardingBolt> INFO =
+		new DepthsAbilityInfo<>(GuardingBolt.class, ABILITY_NAME, GuardingBolt::new, DepthsTree.WINDWALKER, DepthsTrigger.SHIFT_LEFT_CLICK)
+			.linkedSpell(ClassAbility.GUARDING_BOLT)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GuardingBolt::cast,
+				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.HORN_CORAL))
+			.descriptions(GuardingBolt::getDescription, MAX_RARITY);
+
 	public GuardingBolt(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.HORN_CORAL;
-		mTree = DepthsTree.WINDWALKER;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.GUARDING_BOLT;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mInfo.mIgnoreCooldown = true;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action trigger) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 
@@ -138,7 +142,7 @@ public class GuardingBolt extends DepthsAbility {
 		);
 
 		for (LivingEntity enemy : enemies) {
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
 			if (!EntityUtils.isBoss(enemy)) {
 				EntityUtils.applyStun(mPlugin, STUN_DURATION[mRarity - 1], enemy);
 			}
@@ -149,23 +153,8 @@ public class GuardingBolt extends DepthsAbility {
 		}
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Left click the air while sneaking and looking directly at a player within " + RANGE + " blocks to dash to their location. Mobs in a " + RADIUS + " block radius of the destination are dealt " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage, knocked back, and stunned for " + DepthsUtils.getRarityColor(rarity) + STUN_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.WINDWALKER;
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_LEFT_CLICK;
-	}
 }

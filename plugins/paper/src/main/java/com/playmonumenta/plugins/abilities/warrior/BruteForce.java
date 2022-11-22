@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.BruteForceCS;
@@ -17,7 +18,6 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,6 +42,18 @@ public class BruteForce extends Ability {
 	public static final String CHARM_WAVE_DAMAGE_RATIO = "Brute Force Wave Damage Ratio";
 	public static final String CHARM_WAVES = "Brute Force Waves";
 
+	public static final AbilityInfo<BruteForce> INFO =
+		new AbilityInfo<>(BruteForce.class, "Brute Force", BruteForce::new)
+			.linkedSpell(ClassAbility.BRUTE_FORCE)
+			.scoreboardId("BruteForce")
+			.shorthandName("BF")
+			.descriptions(
+				"Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2 block radus around it, " +
+					"and knocks all non-boss enemies away from you.",
+				"Damage is increased to 10 percent of the attack's damage plus 2.",
+				"Half a second after triggering this ability, it triggers another wave centered on the same mob, with 75% of the damage and all of the knockback.")
+			.displayItem(new ItemStack(Material.STONE_AXE, 1));
+
 	private final double mMultiplier;
 
 	private final BruteForceCS mCosmetic;
@@ -49,17 +61,8 @@ public class BruteForce extends Ability {
 	private int mComboNumber = 0;
 	private BukkitRunnable mComboRunnable = null;
 
-	public BruteForce(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Brute Force");
-		mInfo.mLinkedSpell = ClassAbility.BRUTE_FORCE;
-		mInfo.mScoreboardId = "BruteForce";
-		mInfo.mShorthandName = "BF";
-		mInfo.mDescriptions.add("Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2 block radus around it, " +
-			                        "and knocks all non-boss enemies away from you.");
-		mInfo.mDescriptions.add("Damage is increased to 10 percent of the attack's damage plus 2.");
-		mInfo.mDescriptions.add("Half a second after triggering this ability, it triggers another wave centered on the same mob, with 75% of the damage and all of the knockback.");
-		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
-
+	public BruteForce(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mMultiplier = isLevelOne() ? 0 : BRUTE_FORCE_2_MODIFIER;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BruteForceCS(), BruteForceCS.SKIN_LIST);
@@ -67,7 +70,7 @@ public class BruteForce extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer != null && event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
+		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
 			double damageBonus = BRUTE_FORCE_DAMAGE + event.getDamage() * mMultiplier;
 			damageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damageBonus);
 

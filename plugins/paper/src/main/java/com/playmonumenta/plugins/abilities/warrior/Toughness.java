@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -32,16 +33,20 @@ public class Toughness extends Ability {
 	public static final String CHARM_REDUCTION = "Toughness Damage Reduction";
 	public static final String CHARM_HEALING = "Toughness Healing Increase";
 
+	public static final AbilityInfo<Toughness> INFO =
+		new AbilityInfo<>(Toughness.class, "Toughness", Toughness::new)
+			.scoreboardId("Toughness")
+			.shorthandName("Tgh")
+			.descriptions(
+				"Gain +10% max health and damage from Poison, Wither, and Drowning is reduced by 20%.",
+				"Gain +20% max health and damage from Poison, Wither, and Drowning is reduced by 40%.",
+				"Gain an additional +5% max health. Additionally, when below 50% health, gain 20% healing.")
+			.displayItem(new ItemStack(Material.IRON_HELMET, 1));
+
 	private final double mDoTDamageReduction;
 
-	public Toughness(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Toughness");
-		mInfo.mScoreboardId = "Toughness";
-		mInfo.mShorthandName = "Tgh";
-		mInfo.mDescriptions.add("Gain +10% max health and damage from Poison, Wither, and Drowning is reduced by 20%.");
-		mInfo.mDescriptions.add("Gain +20% max health and damage from Poison, Wither, and Drowning is reduced by 40%.");
-		mInfo.mDescriptions.add("Gain an additional +5% max health. Additionally, when below 50% health, gain 20% healing.");
-		mDisplayItem = new ItemStack(Material.IRON_HELMET, 1);
+	public Toughness(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDoTDamageReduction = (isLevelOne() ? DOT_DAMAGE_REDUCTION_1 : DOT_DAMAGE_REDUCTION_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
 
 		if (player != null) {
@@ -51,7 +56,7 @@ public class Toughness extends Ability {
 			}
 			healthBoost += CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALTH);
 			EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH,
-					new AttributeModifier(TOUGHNESS_MODIFIER_NAME, healthBoost, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+				new AttributeModifier(TOUGHNESS_MODIFIER_NAME, healthBoost, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 

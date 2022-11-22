@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -28,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Pyroblast extends DepthsAbility {
@@ -39,15 +41,17 @@ public class Pyroblast extends DepthsAbility {
 	private static final int RADIUS = 4;
 	private static final int DURATION = 4 * 20;
 
+	public static final DepthsAbilityInfo<Pyroblast> INFO =
+		new DepthsAbilityInfo<>(Pyroblast.class, ABILITY_NAME, Pyroblast::new, DepthsTree.FLAMECALLER, DepthsTrigger.SHIFT_BOW)
+			.linkedSpell(ClassAbility.PYROBLAST)
+			.cooldown(COOLDOWN)
+			.displayItem(new ItemStack(Material.TNT_MINECART))
+			.descriptions(Pyroblast::getDescription, MAX_RARITY);
+
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public Pyroblast(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.TNT_MINECART;
-		mTree = DepthsTree.FLAMECALLER;
-		mInfo.mLinkedSpell = ClassAbility.PYROBLAST;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mIgnoreCooldown = true;
+		super(plugin, player, INFO);
 		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
@@ -63,18 +67,18 @@ public class Pyroblast extends DepthsAbility {
 	// Since Snowballs disappear after landing, we need an extra detection for when it hits the ground.
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (mPlayer != null && proj instanceof Snowball && mPlayerItemStatsMap.containsKey(proj)) {
+		if (proj instanceof Snowball && mPlayerItemStatsMap.containsKey(proj)) {
 			explode(proj, proj.getLocation());
 		}
 	}
 
 	private void explode(Projectile proj, Location loc) {
 		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(proj);
-		if (mPlayer != null && playerItemStats != null) {
+		if (playerItemStats != null) {
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, RADIUS);
 			for (LivingEntity mob : mobs) {
 				EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
-				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false);
+				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], false, true, false);
 			}
 			World world = proj.getWorld();
 			world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);
@@ -87,13 +91,12 @@ public class Pyroblast extends DepthsAbility {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mPlayer == null || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (isOnCooldown()) {
 			return true;
 		}
 
 		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
-			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
-			putOnCooldown();
+			putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.4f);
 
@@ -132,19 +135,10 @@ public class Pyroblast extends DepthsAbility {
 		return true;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Shooting a projectile while sneaking fires an exploding projectile, which deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage within a " + RADIUS + " block radius of it and sets nearby mobs on fire for " + DURATION / 20 + " seconds upon impact. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FLAMECALLER;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_BOW;
-	}
 }
 

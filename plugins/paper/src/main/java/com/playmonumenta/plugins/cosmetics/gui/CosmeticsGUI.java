@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.gui;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
@@ -57,7 +57,7 @@ public class CosmeticsGUI extends CustomInventory {
 	// for cosmetic skill paging
 	private PlayerClass mCurrentClass = null;
 	private PlayerSpec mCurrentSpec = null;
-	private Ability mCurrentAbility = null;
+	private AbilityInfo<?> mCurrentAbility = null;
 
 	public CosmeticsGUI(Plugin plugin, Player player) {
 		super(player, 6 * 9, Component.text("Cosmetics Manager", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
@@ -114,7 +114,7 @@ public class CosmeticsGUI extends CustomInventory {
 					new CosmeticSkillShopGUI(mPlugin, player).openInventory(player, mPlugin);
 					return;
 				}
-				final MonumentaClasses mClasses = new MonumentaClasses(mPlugin, null);
+				final MonumentaClasses mClasses = new MonumentaClasses();
 				for (int i = 0; i < CosmeticSkillGUIConfig.CLASS_LOCS.length; i++) {
 					if (slot == CosmeticSkillGUIConfig.CLASS_LOCS[i]) {
 						mCurrentClass = mClasses.mClasses.get(i);
@@ -436,7 +436,7 @@ public class CosmeticsGUI extends CustomInventory {
 
 		// Display class items
 		{
-			final MonumentaClasses mClasses = new MonumentaClasses(mPlugin, null);
+			final MonumentaClasses mClasses = new MonumentaClasses();
 			for (int i = 0; i < CosmeticSkillGUIConfig.CLASS_LOCS.length; i++) {
 				ItemStack item = createClassItem(mClasses.mClasses.get(i));
 				mInventory.setItem(CosmeticSkillGUIConfig.CLASS_LOCS[i], item);
@@ -560,13 +560,13 @@ public class CosmeticsGUI extends CustomInventory {
 			true, "Click to choose cosmetics for " + classToItemize.mClassName + "!", ChatColor.GRAY);
 	}
 
-	private ItemStack createSkillItem(Ability abilityToItemize) {
-		return createBasicItem(abilityToItemize.mDisplayItem.getType(), abilityToItemize.getDisplayName(), mCurrentClass.mClassColor,
+	private ItemStack createSkillItem(AbilityInfo<?> abilityToItemize) {
+		return createBasicItem(abilityToItemize.getDisplayItem().getType(), abilityToItemize.getDisplayName(), mCurrentClass.mClassColor,
 			true, "View cosmetics of this skill!", ChatColor.GRAY);
 	}
 
-	private ItemStack createSkillItemForCosmetic(Ability abilityToItemize) {
-		return createBasicItem(abilityToItemize.mDisplayItem.getType(), abilityToItemize.getDisplayName(), mCurrentClass.mClassColor,
+	private ItemStack createSkillItemForCosmetic(AbilityInfo<?> abilityToItemize) {
+		return createBasicItem(abilityToItemize.getDisplayItem().getType(), abilityToItemize.getDisplayName(), mCurrentClass.mClassColor,
 			true, "Current skill", ChatColor.YELLOW);
 	}
 
@@ -575,8 +575,8 @@ public class CosmeticsGUI extends CustomInventory {
 		ItemStack item = new ItemStack(mat, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(Component.text(name, nameColor)
-			.decoration(TextDecoration.ITALIC, false)
-			.decoration(TextDecoration.BOLD, nameBold));
+			                 .decoration(TextDecoration.ITALIC, false)
+			                 .decoration(TextDecoration.BOLD, nameBold));
 		GUIUtils.splitLoreLine(meta, desc, 30, loreColor, true);
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);

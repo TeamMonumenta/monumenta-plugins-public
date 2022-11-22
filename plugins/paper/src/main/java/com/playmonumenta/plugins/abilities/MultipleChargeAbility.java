@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.entity.Player;
 
 public abstract class MultipleChargeAbility extends Ability implements AbilityWithChargesOrStacks {
@@ -15,20 +14,20 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 
 	protected boolean mWasOnCooldown;
 
-	public MultipleChargeAbility(Plugin plugin, @Nullable Player player, String displayName) {
-		super(plugin, player, displayName);
+	public MultipleChargeAbility(Plugin plugin, Player player, AbilityInfo info) {
+		super(plugin, player, info);
 	}
 
 	// Call this when the ability is cast; returns whether a charge was consumed or not
 	protected boolean consumeCharge() {
-		if (mPlayer != null && mCharges > 0) {
+		if (mCharges > 0) {
 			mCharges--;
-			PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.mLinkedSpell);
+			PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.getLinkedSpell());
 			if (mMaxCharges > 1) {
-				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.getLinkedSpell().getName() + " Charges: " + mCharges);
 			}
 			ClientModHandler.updateAbility(mPlayer, this);
-			AbilityManager.getManager().trackCharges(mPlayer, mInfo.mLinkedSpell, mCharges);
+			AbilityManager.getManager().trackCharges(mPlayer, mInfo.getLinkedSpell(), mCharges);
 
 			return true;
 		}
@@ -36,16 +35,16 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 		return false;
 	}
 
-	protected boolean incrementCharge() {
-		if (mPlayer != null && mCharges < mMaxCharges) {
+	public boolean incrementCharge() {
+		if (mCharges < mMaxCharges) {
 			mCharges++;
 			if (mMaxCharges > 1) {
-				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.getLinkedSpell().getName() + " Charges: " + mCharges);
 			} else {
-				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " is now off cooldown!");
+				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.getLinkedSpell().getName() + " is now off cooldown!");
 			}
 			ClientModHandler.updateAbility(mPlayer, this);
-			AbilityManager.getManager().trackCharges(mPlayer, mInfo.mLinkedSpell, mCharges);
+			AbilityManager.getManager().trackCharges(mPlayer, mInfo.getLinkedSpell(), mCharges);
 
 			return true;
 		}
@@ -55,14 +54,11 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 
 	// This must be manually called if PeriodicTrigger is overridden by the superclass
 	protected void manageChargeCooldowns() {
-		if (mPlayer == null) {
-			return;
-		}
-		boolean onCooldown = mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
+		boolean onCooldown = isOnCooldown();
 
 		// If the skill is somehow on cooldown when charges are full, take it off cooldown
 		if (mCharges == mMaxCharges && onCooldown) {
-			mPlugin.mTimers.removeCooldown(mPlayer, mInfo.mLinkedSpell);
+			mPlugin.mTimers.removeCooldown(mPlayer, mInfo.getLinkedSpell());
 		}
 
 		boolean needsClientModUpdate = false;
@@ -71,12 +67,12 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 		if (mCharges < mMaxCharges && mWasOnCooldown && !onCooldown) {
 			mCharges++;
 			if (mMaxCharges > 1) {
-				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.getLinkedSpell().getName() + " Charges: " + mCharges);
 			} else {
-				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " is now off cooldown!");
+				MessagingUtils.sendActionBarMessage(mPlayer, mInfo.getLinkedSpell().getName() + " is now off cooldown!");
 			}
 			needsClientModUpdate = true;
-			AbilityManager.getManager().trackCharges(mPlayer, mInfo.mLinkedSpell, mCharges);
+			AbilityManager.getManager().trackCharges(mPlayer, mInfo.getLinkedSpell(), mCharges);
 		}
 
 		// Put on cooldown if charges can still be gained
@@ -95,8 +91,8 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	// Remove the call to AbilityCastEvent, which is done instead on charge consumption
 	@Override
 	public void putOnCooldown() {
-		if (mPlayer != null && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, getModifiedCooldown());
+		if (!isOnCooldown()) {
+			mPlugin.mTimers.addCooldown(mPlayer, mInfo.getLinkedSpell(), getModifiedCooldown());
 		}
 	}
 
@@ -116,8 +112,8 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	}
 
 	public int getTrackedCharges() {
-		if (mPlayer != null && mInfo.mLinkedSpell != null) {
-			return Math.min(AbilityManager.getManager().getTrackedCharges(mPlayer, mInfo.mLinkedSpell), mMaxCharges);
+		if (mInfo.getLinkedSpell() != null) {
+			return Math.min(AbilityManager.getManager().getTrackedCharges(mPlayer, mInfo.getLinkedSpell()), mMaxCharges);
 		}
 		return 0;
 	}

@@ -2,11 +2,11 @@ package com.playmonumenta.plugins.abilities.rogue;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import javax.annotation.Nullable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -15,13 +15,12 @@ public class Dethroner extends Ability {
 	public static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 1.3;
 	public static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.15;
 
-	public Dethroner(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, null);
-	}
+	public static final AbilityInfo<Dethroner> INFO =
+		new AbilityInfo<>(Dethroner.class, null, Dethroner::new)
+			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 4);
 
-	@Override
-	public boolean canUse(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 4;
+	public Dethroner(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 	}
 
 	@Override

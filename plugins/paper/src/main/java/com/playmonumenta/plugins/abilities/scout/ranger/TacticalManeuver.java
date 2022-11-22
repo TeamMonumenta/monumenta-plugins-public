@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -10,17 +12,15 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -45,42 +45,42 @@ public class TacticalManeuver extends MultipleChargeAbility {
 	public static final String CHARM_DAMAGE = "Tactical Maneuver Damage";
 	public static final String CHARM_VELOCITY = "Tactical Maneuver Velocity";
 
+	public static final AbilityInfo<TacticalManeuver> INFO =
+		new AbilityInfo<>(TacticalManeuver.class, "Tactical Maneuver", TacticalManeuver::new)
+			.linkedSpell(ClassAbility.TACTICAL_MANEUVER)
+			.scoreboardId("TacticalManeuver")
+			.shorthandName("TM")
+			.descriptions(
+				String.format("Sprint right click to dash forward, dealing the first enemy hit %d damage, and stunning it and all enemies in a %d block radius for %d second. " +
+					              "Shift right click to leap backwards, dealing enemies in a %d block radius %d damage and knocking them away. " +
+					              "Only triggers with non-trident melee weapons. Cooldown: %ds. Charges: %d.",
+					TACTICAL_DASH_DAMAGE, TACTICAL_MANEUVER_RADIUS, TACTICAL_DASH_STUN_DURATION / 20, TACTICAL_MANEUVER_RADIUS, TACTICAL_LEAP_DAMAGE, TACTICAL_MANEUVER_1_COOLDOWN / 20, TACTICAL_MANEUVER_1_MAX_CHARGES),
+				String.format("Cooldown: %ds. Charges: %d.", TACTICAL_MANEUVER_2_COOLDOWN / 20, TACTICAL_MANEUVER_2_MAX_CHARGES))
+			.cooldown(TACTICAL_MANEUVER_1_COOLDOWN, TACTICAL_MANEUVER_2_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("castForward", "dash forwards", tm -> tm.cast(true), new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sprinting(true)
+				                                                                                          .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+			.addTrigger(new AbilityTriggerInfo<>("castBackwards", "leap backwards", tm -> tm.cast(false), new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
+				                                                                                              .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+			.displayItem(new ItemStack(Material.STRING, 1));
+
 	private int mLastCastTicks = 0;
 	private final TacticalManeuverCS mCosmetic;
 
-	public TacticalManeuver(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Tactical Maneuver");
-		mInfo.mLinkedSpell = ClassAbility.TACTICAL_MANEUVER;
-		mInfo.mScoreboardId = "TacticalManeuver";
-		mInfo.mShorthandName = "TM";
-		mInfo.mDescriptions.add(String.format("Sprint right click to dash forward, dealing the first enemy hit %d damage, and stunning it and all enemies in a %d block radius for %d second. Shift right click to leap backwards, dealing enemies in a %d block radius %d damage and knocking them away. Only triggers with non-trident melee weapons. Cooldown: %ds. Charges: %d.",
-			TACTICAL_DASH_DAMAGE, TACTICAL_MANEUVER_RADIUS, TACTICAL_DASH_STUN_DURATION / 20, TACTICAL_MANEUVER_RADIUS, TACTICAL_LEAP_DAMAGE, TACTICAL_MANEUVER_1_COOLDOWN / 20, TACTICAL_MANEUVER_1_MAX_CHARGES));
-		mInfo.mDescriptions.add(String.format("Cooldown: %ds. Charges: %d.", TACTICAL_MANEUVER_2_COOLDOWN / 20, TACTICAL_MANEUVER_2_MAX_CHARGES));
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? TACTICAL_MANEUVER_1_COOLDOWN : TACTICAL_MANEUVER_2_COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.STRING, 1);
+	public TacticalManeuver(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mMaxCharges = (isLevelOne() ? TACTICAL_MANEUVER_1_MAX_CHARGES : TACTICAL_MANEUVER_2_MAX_CHARGES) + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TacticalManeuverCS(), TacticalManeuverCS.SKIN_LIST);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null || (!mPlayer.isSprinting() && !mPlayer.isSneaking()) || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+	public void cast(boolean forwards) {
+		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return;
 		}
 
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (ItemUtils.isShootableItem(inMainHand, false) || ItemUtils.isSomePotion(inMainHand) || inMainHand.getType().isBlock()
-				|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.COMPASS || inMainHand.getType() == Material.SHIELD) {
-			return;
-		}
+		int ticks = Bukkit.getServer().getCurrentTick();
 
-		int ticks = mPlayer.getTicksLived();
-
-		// Prevent double casting on accident. Also, strange bug, this seems to trigger twice when right clicking, but not the
-		// case for stuff like Bodkin Blitz. This check also fixes that bug.
+		// Prevent double casting on accident
 		if (ticks - mLastCastTicks <= 10 || !consumeCharge()) {
 			return;
 		}
@@ -90,7 +90,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, TACTICAL_MANEUVER_RADIUS);
 
 		World world = mPlayer.getWorld();
-		if (mPlayer.isSprinting()) {
+		if (forwards) {
 			Vector dir = mPlayer.getLocation().getDirection();
 			dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1));
 			mCosmetic.maneuverStartEffect(world, mPlayer, dir);
@@ -121,7 +121,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 					LivingEntity le = EntityUtils.getNearestMob(mPlayer.getLocation(), 2);
 					if (le != null) {
-						DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, TACTICAL_DASH_DAMAGE), mInfo.mLinkedSpell, true);
+						DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, TACTICAL_DASH_DAMAGE), mInfo.getLinkedSpell(), true);
 						int duration = TACTICAL_DASH_STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
 						for (LivingEntity e : EntityUtils.getNearbyMobs(le.getLocation(), radius)) {
 							EntityUtils.applyStun(mPlugin, duration, e);
@@ -135,7 +135,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			// Needs the 5 tick delay since being close to the ground will cancel the runnable
 		} else {
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius, mPlayer)) {
-				DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, TACTICAL_LEAP_DAMAGE), mInfo.mLinkedSpell, true);
+				DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, TACTICAL_LEAP_DAMAGE), mInfo.getLinkedSpell(), true);
 				MovementUtils.knockAway(mPlayer, le, TACTICAL_LEAP_KNOCKBACK_SPEED);
 			}
 

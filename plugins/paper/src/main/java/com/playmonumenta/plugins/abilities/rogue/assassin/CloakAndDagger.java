@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
@@ -17,7 +19,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,7 +26,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,13 +37,36 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	private static final int CLOAK_2_MAX_STACKS = 12;
 	private static final int CLOAK_MIN_STACKS = 5;
 	private static final int CLOAK_STACKS_ON_ELITE_KILL = 5;
-	private static final int STEALTH_DURATION = (int)(2.5 * 20);
+	private static final int STEALTH_DURATION = (int) (2.5 * 20);
 	private static final int BOSS_DAMAGE_THRESHOLD_R2 = 300;
 	private static final int BOSS_DAMAGE_THRESHOLD_R3 = 450;
 
 	public static final String CHARM_DAMAGE = "Cloak and Dagger Damage";
 	public static final String CHARM_STACKS = "Cloak and Dagger Max Stacks";
 	public static final String CHARM_STEALTH = "Cloak and Dagger Stealth Duration";
+
+	public static final AbilityInfo<CloakAndDagger> INFO =
+		new AbilityInfo<>(CloakAndDagger.class, "Cloak and Dagger", CloakAndDagger::new)
+			.linkedSpell(ClassAbility.CLOAK_AND_DAGGER)
+			.scoreboardId("CloakAndDagger")
+			.shorthandName("CnD")
+			.descriptions(
+				String.format("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you %s stacks (every %s damage to themin R2; every %s damage to them in R3). Stacks are capped at %s. " +
+					              "When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain %s seconds of Stealth " +
+					              "and (%s * X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least %s stacks to activate this.",
+					CLOAK_STACKS_ON_ELITE_KILL,
+					BOSS_DAMAGE_THRESHOLD_R2,
+				BOSS_DAMAGE_THRESHOLD_R3,
+					CLOAK_1_MAX_STACKS,
+					STEALTH_DURATION / 20.0,
+					(int) CLOAK_1_DAMAGE_MULTIPLIER,
+					CLOAK_MIN_STACKS),
+				String.format("Cloak stacks are now capped at %s and bonus damage is increased to (%s * X) where X is the number of stacks you have upon activating this skill.",
+					CLOAK_2_MAX_STACKS,
+					(int) CLOAK_2_DAMAGE_MULTIPLIER))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CloakAndDagger::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP),
+				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
+			.displayItem(new ItemStack(Material.IRON_SWORD, 1));
 
 	private final KillTriggeredAbilityTracker mTracker;
 
@@ -53,38 +76,16 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	private int mCloakOnActivation = 0;
 	private boolean mActive = false;
 
-	public CloakAndDagger(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Cloak and Dagger");
-		mInfo.mScoreboardId = "CloakAndDagger";
-		mInfo.mShorthandName = "CnD";
-		mInfo.mDescriptions.add(
-			String.format("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you %s stacks (every %s damage to them in R2; every %s damage to them in R3). Stacks are capped at %s. When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain %s seconds of Stealth and (%s * X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least %s stacks to activate this.",
-				CLOAK_STACKS_ON_ELITE_KILL,
-				BOSS_DAMAGE_THRESHOLD_R2,
-				BOSS_DAMAGE_THRESHOLD_R3,
-				CLOAK_1_MAX_STACKS,
-				STEALTH_DURATION / 20.0,
-				(int)CLOAK_1_DAMAGE_MULTIPLIER,
-				CLOAK_MIN_STACKS));
-		mInfo.mDescriptions.add(
-			String.format("Cloak stacks are now capped at %s and bonus damage is increased to (%s * X) where X is the number of stacks you have upon activating this skill.",
-				CLOAK_2_MAX_STACKS,
-				(int)CLOAK_2_DAMAGE_MULTIPLIER));
-		mInfo.mLinkedSpell = ClassAbility.CLOAK_AND_DAGGER;
-		mInfo.mCooldown = 0;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
+	public CloakAndDagger(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDamageMultiplier = (isLevelOne() ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER) + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE);
 		mMaxStacks = (isLevelOne() ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS) + (int) CharmManager.getLevel(player, CHARM_STACKS);
 		mTracker = new KillTriggeredAbilityTracker(this, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer != null
-				&& !AbilityUtils.isStealthed(mPlayer) && mCloak >= CLOAK_MIN_STACKS
-				&& mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50
-				&& InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
+	public void cast() {
+		if (!AbilityUtils.isStealthed(mPlayer)
+			    && mCloak >= CLOAK_MIN_STACKS) {
 			mCloakOnActivation = mCloak;
 			mCloak = 0;
 			mActive = true;
@@ -104,7 +105,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		if (AbilityUtils.isStealthed(mPlayer) && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH) && mActive) {
 			AbilityUtils.removeStealth(mPlugin, mPlayer, false);
 			if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
-				DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, mCloakOnActivation * mDamageMultiplier, mInfo.mLinkedSpell, true);
+				DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, mCloakOnActivation * mDamageMultiplier, mInfo.getLinkedSpell(), true);
 
 				Location loc = enemy.getLocation();
 				World world = mPlayer.getWorld();
@@ -125,18 +126,14 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mPlayer != null && mActive) {
-			if (!AbilityUtils.isStealthed(mPlayer)) {
-				mActive = false;
-			}
+		if (mActive
+			    && !AbilityUtils.isStealthed(mPlayer)) {
+			mActive = false;
 		}
 	}
 
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
-		if (mPlayer == null) {
-			return;
-		}
 		if (mCloak < mMaxStacks) {
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
 				mCloak = Math.min(mMaxStacks, mCloak + CLOAK_STACKS_ON_ELITE_KILL);

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -18,6 +19,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class Brutalize extends DepthsAbility {
 
@@ -25,15 +27,18 @@ public class Brutalize extends DepthsAbility {
 	public static final double[] DAMAGE = {0.12, 0.15, 0.18, 0.21, 0.24, 0.30};
 	public static final int RADIUS = 2;
 
+	public static final DepthsAbilityInfo<Brutalize> INFO =
+		new DepthsAbilityInfo<>(Brutalize.class, ABILITY_NAME, Brutalize::new, DepthsTree.SHADOWS, DepthsTrigger.PASSIVE)
+			.displayItem(new ItemStack(Material.STONE_SWORD))
+			.descriptions(Brutalize::getDescription, MAX_RARITY);
+
 	public Brutalize(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.STONE_SWORD;
-		mTree = DepthsTree.SHADOWS;
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer != null && event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
+		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
 			double originalDamage = event.getDamage();
 			double brutalizeDamage = DAMAGE[mRarity - 1] * originalDamage;
 			event.setDamage(originalDamage + brutalizeDamage);
@@ -52,19 +57,10 @@ public class Brutalize extends DepthsAbility {
 		return false;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "When you critically strike you deal " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " of the damage to all enemies in a " + RADIUS + " block radius and knock other enemies away from the target.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.SHADOWS;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.PASSIVE;
-	}
 }
 

@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -17,7 +19,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -37,7 +38,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -61,31 +61,36 @@ public class AlchemicalArtillery extends PotionAbility {
 	public static final String CHARM_KNOCKBACK = "Alchemical Artillery Knockback";
 	public static final String CHARM_EXPLOSION_MULTIPLIER = "Alchemical Artillery Explosion Damage Multiplier";
 
+	public static final AbilityInfo<AlchemicalArtillery> INFO =
+		new AbilityInfo<>(AlchemicalArtillery.class, "Alchemical Artillery", AlchemicalArtillery::new)
+			.linkedSpell(ClassAbility.ALCHEMICAL_ARTILLERY)
+			.scoreboardId("Alchemical")
+			.shorthandName("AA")
+			.descriptions(
+				"Swap hands while holding a bow, crossbow, or trident to toggle shooting Alchemist's Potions instead of projectiles. Shooting a potion consumes the potion and applies the damage and any effects that potion would normally apply.",
+				"Potions shot with this ability have 25% of your projectile damage added to their base damage.",
+				"1 second after the Artillery lands, cause an explosion that deals 10% of the potion's damage to and knocking up enemies in a 3 block radius.")
+			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", AlchemicalArtillery::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP),
+				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.CROSSBOW, 1));
+
 	private boolean mActive;
 	private @Nullable AlchemistPotions mAlchemistPotions;
-	private boolean mHasTaboo;
 
-	public AlchemicalArtillery(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Alchemical Artillery", 0, 0);
-		mInfo.mScoreboardId = "Alchemical";
-		mInfo.mShorthandName = "AA";
-		mInfo.mDescriptions.add("Swap hands while holding a bow, crossbow, or trident to toggle shooting Alchemist's Potions instead of projectiles. Shooting a potion consumes the potion and applies the damage and any effects that potion would normally apply.");
-		mInfo.mDescriptions.add("Potions shot with this ability have 25% of your projectile damage added to their base damage.");
-		mInfo.mDescriptions.add("1 second after the Artillery lands, cause an explosion that deals 10% of the potion's damage to and knocking up enemies in a 3 block radius.");
-		mInfo.mLinkedSpell = ClassAbility.ALCHEMICAL_ARTILLERY;
-		mDisplayItem = new ItemStack(Material.CROSSBOW, 1);
-
+	public AlchemicalArtillery(Plugin plugin, Player player) {
+		super(plugin, player, INFO, 0, 0);
 		mActive = player != null && player.getScoreboardTags().contains(ACTIVE_TAG);
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-			mHasTaboo = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Taboo.class) != null;
 		});
 	}
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mPlayer != null && mAlchemistPotions != null
-			&& mActive && EntityUtils.isAbilityTriggeringProjectile(projectile, true) && mAlchemistPotions.decrementCharge()) {
+		if (mAlchemistPotions != null
+			    && mActive
+			    && EntityUtils.isAbilityTriggeringProjectile(projectile, true)
+			    && mAlchemistPotions.decrementCharge()) {
 			ThrownPotion pot = mPlayer.getWorld().spawn(projectile.getLocation(), ThrownPotion.class);
 			Vector velocity = projectile.getVelocity();
 			double speed = velocity.length();
@@ -138,32 +143,19 @@ public class AlchemicalArtillery extends PotionAbility {
 		return true;
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		event.setCancelled(true);
-
-		if (mPlayer == null) {
-			return;
+	public void toggle() {
+		mActive = ScoreboardUtils.toggleTag(mPlayer, ACTIVE_TAG);
+		String active;
+		if (mActive) {
+			active = "activated";
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, 1, 1.25f);
+		} else {
+			active = "deactivated";
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, 1, 0.75f);
 		}
-
-		if (mHasTaboo && mActive && mPlayer.isSneaking()) {
-			return;
-		}
-
-		if (ItemUtils.isProjectileWeapon(mPlayer.getInventory().getItemInMainHand())) {
-			mActive = ScoreboardUtils.toggleTag(mPlayer, ACTIVE_TAG);
-			String active;
-			if (mActive) {
-				active = "activated";
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, 1, 1.25f);
-			} else {
-				active = "deactivated";
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, 1, 0.75f);
-			}
-			mPlayer.sendActionBar(ChatColor.YELLOW + "Alchemical Artillery has been " + active + "!");
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 0.9f, 1.2f);
-			ClientModHandler.updateAbility(mPlayer, this);
-		}
+		mPlayer.sendActionBar(ChatColor.YELLOW + "Alchemical Artillery has been " + active + "!");
+		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 0.9f, 1.2f);
+		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	@Override
@@ -180,7 +172,7 @@ public class AlchemicalArtillery extends PotionAbility {
 				double damage = (mAlchemistPotions.getDamage() + MetadataUtils.getMetadata(potion, AlchemicalArtillery.ARTILLERY_POTION_TAG, 0.0)) * (ENHANCEMENT_EXPLOSION_POT_PERCENT_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_EXPLOSION_MULTIPLIER));
 				float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, ENHANCEMENT_EXPLOSION_KNOCK_UP);
 				for (LivingEntity mob : mobs) {
-					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, false, false);
+					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, false, false);
 					MovementUtils.knockAway(loc, mob, knockback);
 				}
 

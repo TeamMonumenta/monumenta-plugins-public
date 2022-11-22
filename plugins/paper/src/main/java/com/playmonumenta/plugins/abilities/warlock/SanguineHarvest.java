@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.SanguineHarvestBlight;
 import com.playmonumenta.plugins.effects.SanguineMark;
@@ -11,7 +13,6 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -20,7 +21,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,7 +30,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
@@ -64,44 +63,44 @@ public class SanguineHarvest extends Ability {
 	public static final String CHARM_KNOCKBACK = "Sanguine Harvest Knockback";
 	public static final String CHARM_BLEED = "Sanguine Harvest Bleed Amplifier";
 
+	public static final AbilityInfo<SanguineHarvest> INFO =
+		new AbilityInfo<>(SanguineHarvest.class, "Sanguine Harvest", SanguineHarvest::new)
+			.linkedSpell(ClassAbility.SANGUINE_HARVEST)
+			.scoreboardId("SanguineHarvest")
+			.shorthandName("SH")
+			.descriptions(
+				("Enemies you damage with an ability are afflicted with Bleed I for %s seconds. " +
+					 "Bleed gives mobs 10%% Slowness and 10%% Weaken per level if the mob is below 50%% Max Health. " +
+					 "Additionally, right click while holding a scythe and not sneaking to fire a burst of darkness. " +
+					 "This projectile travels up to %s blocks and upon contact with a surface or an enemy, it explodes, " +
+					 "knocking back and marking all mobs within %s blocks of the explosion for a harvest. " +
+					 "Any player that kills a marked mob is healed for %s%% of max health. Cooldown: %ss.")
+					.formatted(StringUtils.ticksToSeconds(BLEED_DURATION), RANGE, RADIUS_1, StringUtils.multiplierToPercentage(HEAL_PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN)),
+				"Increase passive Bleed level to II, and increase the radius to %s blocks. Players killing a marked mob are healed by %s%%."
+					.formatted(RADIUS_2, StringUtils.multiplierToPercentage(HEAL_PERCENT_2)),
+				("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. " +
+					 "Mobs standing on these Blighted blocks take %s%% extra damage per debuff. The Blight disappears after %ss and is not counted as a debuff.")
+					.formatted(StringUtils.multiplierToPercentage(ENHANCEMENT_DMG_INCREASE), StringUtils.ticksToSeconds(ENHANCEMENT_BLIGHT_DURATION)))
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", SanguineHarvest::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
+				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+			.displayItem(new ItemStack(Material.NETHER_STAR, 1));
+
 	private final double mRadius;
 	private final double mBleedLevel;
 	private final double mHealPercent;
 
 	private ArrayList<Location> mMarkedLocations = new ArrayList<>(); // To mark locations (Even if block is not replaced)
 
-	public SanguineHarvest(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Sanguine Harvest");
-		mInfo.mScoreboardId = "SanguineHarvest";
-		mInfo.mShorthandName = "SH";
-		mInfo.mDescriptions.add(("Enemies you damage with an ability are afflicted with Bleed I for %s seconds. " +
-			                         "Bleed gives mobs 10%% Slowness and 10%% Weaken per level if the mob is below 50%% Max Health. " +
-			                         "Additionally, right click while holding a scythe and not sneaking to fire a burst of darkness. " +
-			                         "This projectile travels up to %s blocks and upon contact with a surface or an enemy, it explodes, " +
-			                         "knocking back and marking all mobs within %s blocks of the explosion for a harvest. " +
-			                         "Any player that kills a marked mob is healed for %s%% of max health. Cooldown: %ss.")
-			                        .formatted(StringUtils.ticksToSeconds(BLEED_DURATION), RANGE, RADIUS_1, StringUtils.multiplierToPercentage(HEAL_PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN)));
-		mInfo.mDescriptions.add("Increase passive Bleed level to II, and increase the radius to %s blocks. Players killing a marked mob are healed by %s%%."
-			                        .formatted(RADIUS_2, StringUtils.multiplierToPercentage(HEAL_PERCENT_2)));
-		mInfo.mDescriptions.add(("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. " +
-			                         "Mobs standing on these Blighted blocks take %s%% extra damage per debuff. The Blight disappears after %ss and is not counted as a debuff.")
-			                        .formatted(StringUtils.multiplierToPercentage(ENHANCEMENT_DMG_INCREASE), StringUtils.ticksToSeconds(ENHANCEMENT_BLIGHT_DURATION)));
-		mInfo.mLinkedSpell = ClassAbility.SANGUINE_HARVEST;
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
+	public SanguineHarvest(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mRadius = CharmManager.getRadius(player, CHARM_RADIUS, isLevelOne() ? RADIUS_1 : RADIUS_2);
 		mHealPercent = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2);
 		mBleedLevel = CharmManager.getLevelPercentDecimal(player, CHARM_BLEED) + (isLevelOne() ? BLEED_LEVEL_1 : BLEED_LEVEL_2);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			return;
-		}
-		if (!ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()) || mPlayer.isSneaking()) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 		putOnCooldown();

@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.warrior.guardian;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPExplosion;
@@ -10,13 +12,11 @@ import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -24,9 +24,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -48,126 +46,100 @@ public class Bodyguard extends Ability {
 	public static final String CHARM_STUN_DURATION = "Bodyguard Stun Duration";
 	public static final String CHARM_KNOCKBACK = "Bodyguard Knockback";
 
+	public static final AbilityInfo<Bodyguard> INFO =
+		new AbilityInfo<>(Bodyguard.class, "Bodyguard", Bodyguard::new)
+			.linkedSpell(ClassAbility.BODYGUARD)
+			.scoreboardId("Bodyguard")
+			.shorthandName("Bg")
+			.descriptions(
+				"Left-click the air twice while looking directly at another player within 25 blocks to charge to them (cannot be used in safezones). " +
+					"Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain 4 Absorption hearts for 10 seconds. " +
+					"Left-click twice while looking down to cast on yourself. Cooldown: 30s.",
+				"Absorption increased to 6 hearts. Additionally, affected mobs are stunned for 3 seconds.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("castSelf", "cast on self or others", bg -> bg.cast(true),
+				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).doubleClick().lookDirections(AbilityTrigger.LookDirection.DOWN)
+					.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
+			.addTrigger(new AbilityTriggerInfo<>("castOthers", "cast on others only", bg -> bg.cast(false),
+				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).doubleClick()
+					.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
+			.displayItem(new ItemStack(Material.IRON_CHESTPLATE, 1));
+
 	private final double mAbsorptionHealth;
 
-	private int mLeftClicks = 0;
-
-	public Bodyguard(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Bodyguard");
-		mInfo.mScoreboardId = "Bodyguard";
-		mInfo.mShorthandName = "Bg";
-		mInfo.mDescriptions.add("Left-click the air twice while looking directly at another player within 25 blocks to charge to them (cannot be used in safezones). Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain 4 Absorption hearts for 10 seconds. Left-click twice while looking down to cast on yourself. Cooldown: 30s.");
-		mInfo.mDescriptions.add("Absorption increased to 6 hearts. Additionally, affected mobs are stunned for 3 seconds.");
-		mInfo.mLinkedSpell = ClassAbility.BODYGUARD;
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.IRON_CHESTPLATE, 1);
+	public Bodyguard(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mAbsorptionHealth = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
 	}
 
-	@Override
-	public void cast(Action action) {
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)
-				|| ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-				|| ItemUtils.isPickaxe(mainHand)) {
+	public void cast(boolean allowSelfCast) {
+		if (isOnCooldown()) {
 			return;
 		}
 
-		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
-		Location oLoc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
-		boolean lookingDown = oLoc.getPitch() > 50;
-		Vector dir = oLoc.getDirection();
-		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
-		List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, range, true);
-		for (int i = 0; i < range; i++) {
-			box.shift(dir);
-			Location bLoc = box.getCenter().toLocation(world);
-			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
-				if (lookingDown) {
-					mLeftClicks++;
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							if (mLeftClicks > 0) {
-								mLeftClicks--;
-							}
-							this.cancel();
-						}
-					}.runTaskLater(mPlugin, 5);
-				}
+		Location oLoc = mPlayer.getLocation();
 
-				break;
-			}
-
-			boolean hasTeleported = false;
-			for (Player player : players) {
-				//Prevents bodyguarding to multiple people
-				if (hasTeleported) {
+		if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
+			Vector dir = oLoc.getDirection();
+			double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
+			List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, range, true);
+			boolean foundPlayer = false;
+			for (int i = 0; i < range; i++) {
+				box.shift(dir);
+				Location bLoc = box.getCenter().toLocation(world);
+				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 					break;
 				}
 
-				// If looking at another player, or reached the end of range check and looking down
-				if (player.getBoundingBox().overlaps(box) && !ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-					// Double LClick detection
-					mLeftClicks++;
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							if (mLeftClicks > 0) {
-								mLeftClicks--;
-							}
-							this.cancel();
+				for (Player player : players) {
+					// If looking at another player
+					if (player.getBoundingBox().overlaps(box) && !ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+						new PPLine(Particle.FLAME, mPlayer.getEyeLocation(), bLoc)
+							.countPerMeter(12)
+							.delta(0.25, 0.25, 0.25)
+							.spawnAsPlayerActive(mPlayer);
+
+						// Flame
+						new PPExplosion(Particle.FLAME, player.getLocation().add(0, 0.15, 0))
+							.flat(true)
+							.speed(1)
+							.count(120)
+							.extraRange(0.1, 0.4)
+							.spawnAsPlayerActive(mPlayer);
+
+						// Explosion_Normal
+						new PPExplosion(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0))
+							.flat(true)
+							.speed(1)
+							.count(60)
+							.extraRange(0.15, 0.5)
+							.spawnAsPlayerActive(mPlayer);
+
+						Location userLoc = mPlayer.getLocation();
+						Location targetLoc = player.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
+
+						world.playSound(targetLoc, Sound.ENTITY_BLAZE_SHOOT, 0.75f, 0.75f);
+						world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.75f, 0.9f);
+
+						giveAbsorption(player);
+
+						if (userLoc.distance(player.getLocation()) > 1
+							    && !ZoneUtils.hasZoneProperty(targetLoc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+							mPlayer.teleport(targetLoc);
 						}
-					}.runTaskLater(mPlugin, 5);
-					if (mLeftClicks < 2) {
-						return;
+
+						foundPlayer = true;
+						break;
 					}
-					// Don't set mLeftClicks to 0, self cast below handles that
-
-					new PPLine(Particle.FLAME, mPlayer.getEyeLocation(), bLoc)
-						.countPerMeter(12)
-						.delta(0.25, 0.25, 0.25)
-						.spawnAsPlayerActive(mPlayer);
-
-					// Flame
-					new PPExplosion(Particle.FLAME, player.getLocation().add(0, 0.15, 0))
-						.flat(true)
-						.speed(1)
-						.count(120)
-						.extraRange(0.1, 0.4)
-						.spawnAsPlayerActive(mPlayer);
-
-					// Explosion_Normal
-					new PPExplosion(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0))
-						.flat(true)
-						.speed(1)
-						.count(60)
-						.extraRange(0.15, 0.5)
-						.spawnAsPlayerActive(mPlayer);
-
-					Location userLoc = mPlayer.getLocation();
-					Location targetLoc = player.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
-					if (userLoc.distance(player.getLocation()) > 1) {
-						mPlayer.teleport(targetLoc);
-						hasTeleported = true;
-					}
-
-					world.playSound(targetLoc, Sound.ENTITY_BLAZE_SHOOT, 0.75f, 0.75f);
-					world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.75f, 0.9f);
-
-					giveAbsorption(player);
 				}
+			}
+			if (!foundPlayer && !allowSelfCast) {
+				return;
 			}
 		}
 
-		// Self trigger
-		if (mLeftClicks < 2) {
-			return;
-		}
-		mLeftClicks = 0;
 		putOnCooldown();
 
 		world.playSound(oLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
@@ -183,6 +155,7 @@ public class Bodyguard extends Ability {
 				EntityUtils.applyStun(mPlugin, duration, mob);
 			}
 		}
+
 	}
 
 	private void giveAbsorption(Player player) {

@@ -2,6 +2,9 @@ package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.EnchantedPrayerAoE;
@@ -19,7 +22,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -48,17 +50,21 @@ public class EnchantedPrayer extends Ability {
 	public static final String CHARM_EFFECT_RANGE = "Enchanted Prayer Attack Range";
 	public static final String CHARM_COOLDOWN = "Enchanted Prayer Cooldown";
 
-	public EnchantedPrayer(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Enchanted Prayer");
-		mInfo.mScoreboardId = "EPrayer";
-		mInfo.mShorthandName = "EP";
-		mInfo.mDescriptions.add("Swapping while shifted enchants the weapons of all players in a 15 block radius with holy magic. " +
-			                        "Their next melee or projectile attack deals an additional 9 damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 15s.");
-		mInfo.mDescriptions.add("Damage is increased to 15. Healing is increased to 20% of max health.");
-		mInfo.mLinkedSpell = ClassAbility.ENCHANTED_PRAYER;
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, ENCHANTED_PRAYER_COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.CHORUS_FRUIT, 1);
+	public static final AbilityInfo<EnchantedPrayer> INFO =
+		new AbilityInfo<>(EnchantedPrayer.class, "Enchanted Prayer", EnchantedPrayer::new)
+			.linkedSpell(ClassAbility.ENCHANTED_PRAYER)
+			.scoreboardId("EPrayer")
+			.shorthandName("EP")
+			.descriptions(
+				"Swapping while shifted enchants the weapons of all players in a 15 block radius with holy magic. " +
+					"Their next melee or projectile attack deals an additional 9 damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 15s.",
+				"Damage is increased to 15. Healing is increased to 20% of max health.")
+			.cooldown(ENCHANTED_PRAYER_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EnchantedPrayer::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
+			.displayItem(new ItemStack(Material.CHORUS_FRUIT, 1));
+
+	public EnchantedPrayer(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? ENCHANTED_PRAYER_1_DAMAGE : ENCHANTED_PRAYER_2_DAMAGE);
 		mHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEAL, isLevelOne() ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL);
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -66,17 +72,8 @@ public class EnchantedPrayer extends Ability {
 		});
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer == null) {
-			return;
-		}
-		if (mPlayer.isSneaking()) {
-			event.setCancelled(true);
-			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-				return;
-			}
-		} else {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 

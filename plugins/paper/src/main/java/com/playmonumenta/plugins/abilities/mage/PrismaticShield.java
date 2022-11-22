@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.PrismaticShieldCS;
@@ -18,6 +19,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -46,6 +48,33 @@ public class PrismaticShield extends Ability {
 	public static final String CHARM_DURATION = "Prismatic Shield Absorption Duration";
 	public static final String CHARM_TRIGGER = "Prismatic Shield Trigger Health";
 
+	public static final AbilityInfo<PrismaticShield> INFO =
+		new AbilityInfo<>(PrismaticShield.class, "Prismatic Shield", PrismaticShield::new)
+			.linkedSpell(ClassAbility.PRISMATIC_SHIELD)
+			.scoreboardId("Prismatic")
+			.shorthandName("PS")
+			.descriptions(
+				String.format("When your health drops below %s hearts (including if the attack would've killed you)," +
+					              " you receive %s Absorption hearts which lasts up to %ss." +
+					              " In addition enemies within %s blocks are knocked back. Cooldown: %ss.",
+					TRIGGER_HEALTH / 2,
+					ABSORPTION_HEALTH_1 / 2,
+					DURATION / 20,
+					(int) RADIUS,
+					COOLDOWN / 20
+				),
+				String.format("The shield is improved to %s Absorption hearts. Enemies within %s blocks are knocked back and stunned for %s s.",
+					ABSORPTION_HEALTH_2 / 2,
+					(int) RADIUS,
+					STUN_DURATION / 20),
+				String.format("After Prismatic Shield is activated, in the next %ss, every spell that deals damage to at least one enemy will heal you for %s%% of your max health.",
+					HEAL_DURATION / 20,
+					HEAL_PERCENT)
+			)
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.displayItem(new ItemStack(Material.SHIELD, 1))
+			.priorityAmount(10000);
+
 	private final int mAbsorptionHealth;
 
 	private int mLastActivation = -1;
@@ -54,46 +83,15 @@ public class PrismaticShield extends Ability {
 
 	private final PrismaticShieldCS mCosmetic;
 
-	public PrismaticShield(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Prismatic Shield");
-		mInfo.mLinkedSpell = ClassAbility.PRISMATIC_SHIELD;
-		mInfo.mScoreboardId = "Prismatic";
-		mInfo.mShorthandName = "PS";
-		mInfo.mDescriptions.add(
-			String.format("When your health drops below %s hearts (including if the attack would've killed you)," +
-				              " you receive %s Absorption hearts which lasts up to %ss." +
-				              " In addition enemies within %s blocks are knocked back. Cooldown: %ss.",
-				TRIGGER_HEALTH / 2,
-				ABSORPTION_HEALTH_1 / 2,
-				DURATION / 20,
-				(int) RADIUS,
-				COOLDOWN / 20
-			));
-		mInfo.mDescriptions.add(
-			String.format("The shield is improved to %s Absorption hearts. Enemies within %s blocks are knocked back and stunned for %s s.",
-				ABSORPTION_HEALTH_2 / 2,
-				(int)RADIUS,
-				STUN_DURATION / 20));
-		mInfo.mDescriptions.add(
-			String.format("After Prismatic Shield is activated, in the next %ss, every spell that deals damage to at least one enemy will heal you for %s%% of your max health.",
-				HEAL_DURATION / 20,
-				HEAL_PERCENT)
-		);
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
+	public PrismaticShield(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mAbsorptionHealth = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
-		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PrismaticShieldCS(), PrismaticShieldCS.SKIN_LIST);
 	}
 
 	@Override
-	public double getPriorityAmount() {
-		return 10000;
-	}
-
-	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (!event.isBlocked() && mPlayer != null && !isTimerActive()) {
+		if (!event.isBlocked() && !isOnCooldown()) {
 			// Calculate whether this effect should not be run based on player health.
 			// It is intentional that Prismatic Shield saves you from death if you take a buttload of damage somehow.
 			double healthRemaining = mPlayer.getHealth() - event.getFinalDamage(true);
@@ -111,7 +109,7 @@ public class PrismaticShield extends Ability {
 
 			// Put on cooldown before processing results to prevent infinite recursion
 			putOnCooldown();
-			mLastActivation = mPlayer.getTicksLived();
+			mLastActivation = Bukkit.getServer().getCurrentTick();
 			mHealedFromAbilitiesThisTick.clear();
 			mHealedFromBlizzard = false;
 
@@ -146,8 +144,7 @@ public class PrismaticShield extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (isEnhanced()
-			    && mPlayer != null
-			    && mPlayer.getTicksLived() <= mLastActivation + HEAL_DURATION
+			    && Bukkit.getServer().getCurrentTick() <= mLastActivation + HEAL_DURATION
 			    && event.getAbility() != null
 			    && event.getAbility() != ClassAbility.SPELLSHOCK
 			    && event.getAbility() != ClassAbility.ASTRAL_OMEN) {

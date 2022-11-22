@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class DepthsPlayer {
 	//The depths ability trees the player is eligible to select from this run
 	public List<DepthsTree> mEligibleTrees;
 	//Weapon offering options for the player
-	public transient List<WeaponAspectDepthsAbility> mWeaponOfferings;
+	public transient List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> mWeaponOfferings;
 	//Whether or not they have selected a weapon aspect
 	public boolean mHasWeaponAspect;
 	//Whether or not they have used chaos room this floor already

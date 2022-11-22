@@ -3,6 +3,10 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.WardingRemedyCS;
@@ -10,14 +14,11 @@ import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -43,26 +44,28 @@ public class WardingRemedy extends Ability {
 	public static final String CHARM_RADIUS = "Warding Remedy Radius";
 	public static final String CHARM_HEALING = "Warding Remedy Healing Bonus";
 
+	public static final AbilityInfo<WardingRemedy> INFO =
+		new AbilityInfo<>(WardingRemedy.class, "Warding Remedy", WardingRemedy::new)
+			.linkedSpell(ClassAbility.WARDING_REMEDY)
+			.scoreboardId("WardingRemedy")
+			.shorthandName("WR")
+			.descriptions(
+				"Swap hands while sneaking and holding an Alchemist's Bag to give players (including yourself) within a 6 block radius 1 absorption health per 0.5 seconds for 4 seconds, lasting 30 seconds, up to 6 absorption health. Cooldown: 30s.",
+				"You and allies in a 12 block radius passively gain 10% increased healing while having absorption health, and cooldown decreased to 25s.")
+			.cooldown(WARDING_REMEDY_1_COOLDOWN, WARDING_REMEDY_2_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WardingRemedy::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
+				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
+			.displayItem(new ItemStack(Material.GOLDEN_CARROT, 1));
+
 	private final WardingRemedyCS mCosmetic;
 
-	public WardingRemedy(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Warding Remedy");
-		mInfo.mScoreboardId = "WardingRemedy";
-		mInfo.mLinkedSpell = ClassAbility.WARDING_REMEDY;
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? WARDING_REMEDY_1_COOLDOWN : WARDING_REMEDY_2_COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
-		mInfo.mShorthandName = "WR";
-		mInfo.mDescriptions.add("Swap hands while sneaking and holding an Alchemist's Bag to give players (including yourself) within a 6 block radius 1 absorption health per 0.5 seconds for 4 seconds, lasting 30 seconds, up to 6 absorption health. Cooldown: 30s.");
-		mInfo.mDescriptions.add("You and allies in a 12 block radius passively gain 10% increased healing while having absorption health, and cooldown decreased to 25s.");
-		mDisplayItem = new ItemStack(Material.GOLDEN_CARROT, 1);
+	public WardingRemedy(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WardingRemedyCS(), WardingRemedyCS.SKIN_LIST);
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		event.setCancelled(true);
-
-		if (mPlayer == null || !mPlayer.isSneaking() || isTimerActive() || !ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 
@@ -87,11 +90,6 @@ public class WardingRemedy extends Ability {
 
 			@Override
 			public void run() {
-				if (mPlayer == null) {
-					this.cancel();
-					return;
-				}
-
 				Location playerLoc = mPlayer.getLocation();
 
 				for (PPPeriodic ppp : mParticles) {
@@ -121,7 +119,7 @@ public class WardingRemedy extends Ability {
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		//Triggers four times a second
 
-		if (mPlayer == null || isLevelOne()) {
+		if (isLevelOne()) {
 			return;
 		}
 

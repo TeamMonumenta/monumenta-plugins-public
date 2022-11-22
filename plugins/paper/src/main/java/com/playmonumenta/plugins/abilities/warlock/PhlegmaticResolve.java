@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
@@ -13,6 +14,7 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -35,11 +37,11 @@ public class PhlegmaticResolve extends Ability {
 	private static final int ENHANCE_RADIUS = 3;
 
 	private final double mPercentDamageResist;
-	private double[] mEnhancementDamageSpread = {0, 0, 0};
+	private final double[] mEnhancementDamageSpread = {0, 0, 0};
 	private double mLastMaxDamage = 0;
 	private double mLastPreMitigationDamage = 0;
 	private int mLastPlayedSoundTick = 0;
-	private double mKBR;
+	private final double mKBR;
 	private boolean mDamagedLastWindow = false;
 
 	public static final String CHARM_RESIST = "Phlegmatic Resolve Resistance";
@@ -47,14 +49,19 @@ public class PhlegmaticResolve extends Ability {
 	public static final String CHARM_ALLY = "Phlegmatic Resolve Ally Modifier";
 	public static final String CHARM_RANGE = "Phlegmatic Resolve Radius";
 
-	public PhlegmaticResolve(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Phlegmatic Resolve");
-		mInfo.mScoreboardId = "Phlegmatic";
-		mInfo.mShorthandName = "PR";
-		mInfo.mDescriptions.add("For each spell on cooldown, gain +1.5% Damage Reduction and +0.5 Knockback Resistance.");
-		mInfo.mDescriptions.add("Increase to +2.5% Damage Reduction per spell on cooldown, and players within 7 blocks are given 33% of your bonuses. (Does not stack with multiple Warlocks.)");
-		mInfo.mDescriptions.add("All non-ailment damage taken is instead converted into a short Damage-over-Time effect. A third of the damage stored is dealt every second for 3s. Each time this stored damage is dealt, deal 5% of the initial damage to all mobs in a 3 block radius.");
-		mDisplayItem = new ItemStack(Material.SHIELD, 1);
+	public static final AbilityInfo<PhlegmaticResolve> INFO =
+		new AbilityInfo<>(PhlegmaticResolve.class, "Phlegmatic Resolve", PhlegmaticResolve::new)
+			.scoreboardId("Phlegmatic")
+			.shorthandName("PR")
+			.descriptions(
+				"For each spell on cooldown, gain +1.5% Damage Reduction and +0.5 Knockback Resistance.",
+				"Increase to +2.5% Damage Reduction per spell on cooldown, and players within 7 blocks are given 33% of your bonuses. (Does not stack with multiple Warlocks.)",
+				"All non-ailment damage taken is instead converted into a short Damage-over-Time effect. " +
+					"A third of the damage stored is dealt every second for 3s. Each time this stored damage is dealt, deal 5% of the initial damage to all mobs in a 3 block radius.")
+			.displayItem(new ItemStack(Material.SHIELD, 1));
+
+	public PhlegmaticResolve(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mPercentDamageResist = (isLevelOne() ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2) - CharmManager.getLevelPercentDecimal(player, CHARM_RESIST);
 		mKBR = (CharmManager.getLevelPercentDecimal(player, CHARM_KBR) + PERCENT_KNOCKBACK_RESIST);
 	}
@@ -62,10 +69,6 @@ public class PhlegmaticResolve extends Ability {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		//Triggers four times a second
-
-		if (mPlayer == null) {
-			return;
-		}
 
 		if (isEnhanced()) {
 			if (twoHertz && mDamagedLastWindow) {
@@ -143,13 +146,12 @@ public class PhlegmaticResolve extends Ability {
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (isEnhanced() &&
-			event.getType() != DamageEvent.DamageType.AILMENT &&
-			event.getType() != DamageEvent.DamageType.POISON &&
-			event.getType() != DamageEvent.DamageType.OTHER &&
-			event.getType() != DamageEvent.DamageType.FALL &&
-			event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK &&
-			!event.isBlocked() &&
-			mPlayer != null) {
+			    event.getType() != DamageEvent.DamageType.AILMENT &&
+			    event.getType() != DamageEvent.DamageType.POISON &&
+			    event.getType() != DamageEvent.DamageType.OTHER &&
+			    event.getType() != DamageEvent.DamageType.FALL &&
+			    event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK &&
+			    !event.isBlocked()) {
 
 			// Need to apply Voodoo Bonds + Resistance effects here since the damage event will be cancelled before
 			// they can apply, this is easier than rewriting whole effect manager.
@@ -172,8 +174,8 @@ public class PhlegmaticResolve extends Ability {
 				mLastPreMitigationDamage = event.getOriginalDamage();
 
 				// Only play sound to player once per second.
-				if ((mLastPlayedSoundTick - mPlayer.getTicksLived()) > 20) {
-					mLastPlayedSoundTick = mPlayer.getTicksLived();
+				if ((mLastPlayedSoundTick - Bukkit.getServer().getCurrentTick()) > 20) {
+					mLastPlayedSoundTick = Bukkit.getServer().getCurrentTick();
 					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, 1, 1);
 				}
 

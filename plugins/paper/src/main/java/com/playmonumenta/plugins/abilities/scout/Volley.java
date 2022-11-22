@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -12,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,21 +51,25 @@ public class Volley extends Ability {
 	public static final String CHARM_BLEED_DURATION = "Volley Bleed Duration";
 	public static final String CHARM_PIERCING = "Volley Piercing";
 
+	public static final AbilityInfo<Volley> INFO =
+		new AbilityInfo<>(Volley.class, "Volley", Volley::new)
+			.linkedSpell(ClassAbility.VOLLEY)
+			.scoreboardId("Volley")
+			.shorthandName("Vly")
+			.descriptions(
+				String.format("When you shoot a projectile while sneaking, you shoot a volley consisting of %d projectiles instead. " +
+					              "Only one arrow is consumed, and each projectile deals %d%% bonus damage. Cooldown: 15s.", VOLLEY_1_ARROW_COUNT, (int) ((VOLLEY_1_DAMAGE_MULTIPLIER - 1) * 100)),
+				String.format("Increases the number of projectiles to %d and enhances the bonus damage to %d%%.", VOLLEY_2_ARROW_COUNT, (int) ((VOLLEY_2_DAMAGE_MULTIPLIER - 1) * 100)),
+				String.format("Volley now fires in a 360 degree arc. The projectiles inflict %d%% Bleed for %ds.", (int) (ENHANCEMENT_BLEED_POTENCY * 100), ENHANCEMENT_BLEED_DURATION / 20))
+			.cooldown(VOLLEY_COOLDOWN, CHARM_COOLDOWN)
+			.displayItem(new ItemStack(Material.ARROW, 1))
+			.priorityAmount(900); // cancels damage events of volley arrows, so needs to run before other abilities
+
 	private final int mArrows;
 	private final double mMultiplier;
 
-	public Volley(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Volley");
-		mInfo.mLinkedSpell = ClassAbility.VOLLEY;
-		mInfo.mScoreboardId = "Volley";
-		mInfo.mShorthandName = "Vly";
-		mInfo.mDescriptions.add(String.format("When you shoot a projectile while sneaking, you shoot a volley consisting of %d projectiles instead. Only one arrow is consumed, and each projectile deals %d%% bonus damage. Cooldown: 15s.", VOLLEY_1_ARROW_COUNT, (int)((VOLLEY_1_DAMAGE_MULTIPLIER - 1) * 100)));
-		mInfo.mDescriptions.add(String.format("Increases the number of projectiles to %d and enhances the bonus damage to %d%%.", VOLLEY_2_ARROW_COUNT, (int)((VOLLEY_2_DAMAGE_MULTIPLIER - 1) * 100)));
-		mInfo.mDescriptions.add(String.format("Volley now fires in a 360 degree arc. The projectiles inflict %d%% Bleed for %ds.", (int)(ENHANCEMENT_BLEED_POTENCY * 100), ENHANCEMENT_BLEED_DURATION / 20));
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, VOLLEY_COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.ARROW, 1);
-
+	public Volley(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mArrows = (isLevelOne() ? VOLLEY_1_ARROW_COUNT : VOLLEY_2_ARROW_COUNT) + (int) CharmManager.getLevel(mPlayer, CHARM_ARROWS);
 		mMultiplier = isLevelOne() ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
 
@@ -74,16 +78,9 @@ public class Volley extends Ability {
 	}
 
 	@Override
-	public double getPriorityAmount() {
-		return 900; // cancels damage events of volley arrows, so needs to run before other abilities
-	}
-
-	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mPlayer == null
-			|| !mPlayer.isSneaking()
-			|| mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			/* This ability is actually on cooldown - event proceeds as normal */
+		if (!mPlayer.isSneaking()
+			    || isOnCooldown()) {
 			return true;
 		}
 

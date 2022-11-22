@@ -2,7 +2,10 @@ package com.playmonumenta.plugins.abilities.warrior.berserker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.MeteorSlamCS;
@@ -16,14 +19,12 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -62,22 +63,12 @@ public final class MeteorSlam extends Ability {
 	public static final String CHARM_THRESHOLD = "Meteor Slam Fall Requirement";
 	public static final String CHARM_COOLDOWN = "Meteor Slam Cooldown";
 
-	private final double mLevelDamage;
-	private final double mLevelReducedDamage;
-	private final double mLevelSize;
-	private final int mLevelJumpAmplifier;
-	private final BukkitRunnable mSlamAttackRunner;
-	private boolean mHasGloriousBattle = false;
-	private double mFallFromY = -7050;
-	private final MeteorSlamCS mCosmetic;
-
-	public MeteorSlam(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = ABILITY;
-
-		mInfo.mScoreboardId = "MeteorSlam";
-		mInfo.mShorthandName = "MS";
-		mInfo.mDescriptions.add(
+	public static final AbilityInfo<MeteorSlam> INFO =
+		new AbilityInfo<>(MeteorSlam.class, NAME, MeteorSlam::new)
+			.linkedSpell(ABILITY)
+			.scoreboardId("MeteorSlam")
+			.shorthandName("MS")
+			.descriptions(
 				String.format(
 					"Pressing the swap key grants you Jump Boost %s for %ss instead of doing its vanilla function. Cooldown: %ss. " +
 						"Falling more than %s blocks passively generates a slam when you land, " +
@@ -93,41 +84,44 @@ public final class MeteorSlam extends Ability {
 					REDUCED_THRESHOLD,
 					REDUCED_DAMAGE_1,
 					MANUAL_THRESHOLD
+				),
+				String.format(
+					"Jump Boost level is increased from %s to %s. Cooldown is reduced from %ss to %ss. " +
+						"Damage is increased from %s to %s per block fallen for the first %s blocks, and from %s to %s per block thereafter. " +
+						"Damage size is increased from %s to %s blocks.",
+					JUMP_LEVEL_1,
+					JUMP_LEVEL_2,
+					COOLDOWN_SECONDS_1,
+					COOLDOWN_SECONDS_2,
+					DAMAGE_1,
+					DAMAGE_2,
+					REDUCED_THRESHOLD,
+					REDUCED_DAMAGE_1,
+					REDUCED_DAMAGE_2,
+					SIZE_1,
+					SIZE_2
 				)
-		);
-		mInfo.mDescriptions.add(
-			String.format(
-				"Jump Boost level is increased from %s to %s. Cooldown is reduced from %ss to %ss. " +
-					"Damage is increased from %s to %s per block fallen for the first %s blocks, and from %s to %s per block thereafter. " +
-					"Damage size is increased from %s to %s blocks.",
-				JUMP_LEVEL_1,
-				JUMP_LEVEL_2,
-				COOLDOWN_SECONDS_1,
-				COOLDOWN_SECONDS_2,
-				DAMAGE_1,
-				DAMAGE_2,
-				REDUCED_THRESHOLD,
-				REDUCED_DAMAGE_1,
-				REDUCED_DAMAGE_2,
-				SIZE_1,
-				SIZE_2
 			)
-		);
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.FIRE_CHARGE, 1);
+			.cooldown(COOLDOWN_TICKS_1, COOLDOWN_TICKS_2, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", MeteorSlam::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP)))
+			.displayItem(new ItemStack(Material.FIRE_CHARGE, 1));
 
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_TICKS_1 : COOLDOWN_TICKS_2);
+	private final double mLevelDamage;
+	private final double mLevelReducedDamage;
+	private final double mLevelSize;
+	private final int mLevelJumpAmplifier;
+	private final BukkitRunnable mSlamAttackRunner;
+	private double mFallFromY = -7050;
+	private final MeteorSlamCS mCosmetic;
 
+	public MeteorSlam(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 		mLevelReducedDamage = isLevelOne() ? REDUCED_DAMAGE_1 : REDUCED_DAMAGE_2;
 		mLevelSize = CharmManager.getRadius(mPlayer, CHARM_RADIUS, (isLevelOne() ? SIZE_1 : SIZE_2));
 		mLevelJumpAmplifier = (isLevelOne() ? JUMP_AMPLIFIER_1 : JUMP_AMPLIFIER_2) + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MeteorSlamCS(), MeteorSlamCS.SKIN_LIST);
-
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			mHasGloriousBattle = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, GloriousBattle.class) != null;
-		});
 
 		mSlamAttackRunner = new BukkitRunnable() {
 			@Override
@@ -138,7 +132,7 @@ public final class MeteorSlam extends Ability {
 				}
 				if (
 					AbilityManager.getManager().getPlayerAbility(player, MeteorSlam.class) == null
-					|| !player.isValid() // Ensure player is not dead, is still online?
+						|| !player.isValid() // Ensure player is not dead, is still online?
 				) {
 					// If reached this point but not silenced, then proceed with cancelling
 					// If silenced, only return to not run anything, but don't cancel runnable
@@ -173,7 +167,7 @@ public final class MeteorSlam extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer != null && event.getType() == DamageType.MELEE && calculateFallDistance() > MANUAL_THRESHOLD && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
+		if (event.getType() == DamageType.MELEE && calculateFallDistance() > MANUAL_THRESHOLD && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
 			doSlamAttack(enemy.getLocation().add(0, 0.15, 0));
 			mFallFromY = -7050;
 			return true;
@@ -181,22 +175,18 @@ public final class MeteorSlam extends Ability {
 		return false;
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		event.setCancelled(true);
-
-		if (mPlayer != null
-			    && !isTimerActive()
-			    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-			    && (!mHasGloriousBattle || !mPlayer.isSneaking())) {
-			putOnCooldown();
-
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mLevelJumpAmplifier, true, false));
-
-			World world = mPlayer.getWorld();
-			Location location = mPlayer.getLocation().add(0, 0.15, 0);
-			mCosmetic.slamCastEffect(world, location, mPlayer);
+	public void cast() {
+		if (isOnCooldown()
+			    || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			return;
 		}
+		putOnCooldown();
+
+		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mLevelJumpAmplifier, true, false));
+
+		World world = mPlayer.getWorld();
+		Location location = mPlayer.getLocation().add(0, 0.15, 0);
+		mCosmetic.slamCastEffect(world, location, mPlayer);
 	}
 
 	@Override
@@ -207,9 +197,6 @@ public final class MeteorSlam extends Ability {
 	}
 
 	private void updateFallFrom() {
-		if (mPlayer == null) {
-			return;
-		}
 		// player.getFallDistance() is unreliable (e.g. does not get reset while in a bed, despite player.isOnGround() being true),
 		// thus we calculate the fall distance ourselves.
 		// We still check if fall distance is 0 to reset our fall distance calculation, as that checks for water, vines, etc.
@@ -221,24 +208,18 @@ public final class MeteorSlam extends Ability {
 	}
 
 	private double calculateFallDistance() {
-		if (mPlayer == null) {
-			return 0;
-		}
 		double currentY = mPlayer.getLocation().getY();
 		double fallDistance = mFallFromY - currentY;
 		return Math.max(fallDistance, 0);
 	}
 
 	private void doSlamAttack(Location location) {
-		if (mPlayer == null) {
-			return;
-		}
 		double fallDistance = calculateFallDistance();
 		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * mLevelDamage + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * mLevelReducedDamage;
 		slamDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, slamDamage);
 
 		for (LivingEntity enemy : new Hitbox.SphereHitbox(location, mLevelSize).getHitMobs()) {
-			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.mLinkedSpell, true);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.getLinkedSpell(), true);
 		}
 
 		World world = mPlayer.getWorld();

@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.shadow;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -25,7 +27,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -43,22 +44,23 @@ public class CloakOfShadows extends DepthsAbility {
 	private static final double VELOCITY = 0.7;
 	private static final int RADIUS = 5;
 
+	public static final DepthsAbilityInfo<CloakOfShadows> INFO =
+		new DepthsAbilityInfo<>(CloakOfShadows.class, ABILITY_NAME, CloakOfShadows::new, DepthsTree.SHADOWS, DepthsTrigger.SHIFT_LEFT_CLICK)
+			.linkedSpell(ClassAbility.CLOAK_OF_SHADOWS)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CloakOfShadows::cast,
+				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.BLACK_CONCRETE))
+			.descriptions(CloakOfShadows::getDescription, MAX_RARITY);
+
 	private boolean mBonusDamage = false;
 
 	public CloakOfShadows(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.BLACK_CONCRETE;
-		mTree = DepthsTree.SHADOWS;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.CLOAK_OF_SHADOWS;
-		mInfo.mIgnoreCooldown = true;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action trigger) {
-		if (mPlayer == null
-			|| !(mPlayer.isSneaking() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()))) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 
@@ -124,26 +126,15 @@ public class CloakOfShadows extends DepthsAbility {
 			if (mBonusDamage) {
 				event.setDamage(event.getDamage() + DAMAGE[mRarity - 1]);
 				mBonusDamage = false;
-			} else if (mPlayer.isSneaking() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
-				cast(Action.LEFT_CLICK_AIR);
 			}
 		}
 		return false; // only changes event damage
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Left click while sneaking and holding a weapon to throw a shadow bomb, which explodes on landing, applying " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(WEAKEN_AMPLIFIER[rarity - 1]) + "%" + ChatColor.WHITE + " weaken for " + WEAKEN_DURATION / 20 + " seconds in a " + RADIUS + " block radius. You enter stealth for " + DepthsUtils.getRarityColor(rarity) + STEALTH_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds upon casting and the next instance of melee damage you deal within " + DAMAGE_DURATION / 20 + " seconds deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " additional damage. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.SHADOWS;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_LEFT_CLICK;
-	}
 }
 

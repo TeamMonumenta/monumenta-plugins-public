@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -26,6 +27,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -39,21 +41,23 @@ public class PiercingCold extends DepthsAbility {
 	private static final Particle.DustOptions ENCHANTED_ARROW_FRINGE_COLOR = new Particle.DustOptions(Color.fromRGB(168, 255, 252), 2.0f);
 	private static final int MAX_DIST = 50;
 
+	public static final DepthsAbilityInfo<PiercingCold> INFO =
+		new DepthsAbilityInfo<>(PiercingCold.class, ABILITY_NAME, PiercingCold::new, DepthsTree.FROSTBORN, DepthsTrigger.SHIFT_BOW)
+			.linkedSpell(ClassAbility.PIERCING_COLD)
+			.cooldown(COOLDOWN)
+			.displayItem(new ItemStack(Material.PRISMARINE_SHARD))
+			.descriptions(PiercingCold::getDescription, MAX_RARITY);
+
 	public PiercingCold(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.PRISMARINE_SHARD;
-		mTree = DepthsTree.FROSTBORN;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.PIERCING_COLD;
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mPlayer != null && mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			projectile.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(projectile);
-			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
-			putOnCooldown();
+			putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
 
 			BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1.5, 1.5, 1.5);
 
@@ -99,7 +103,7 @@ public class PiercingCold extends DepthsAbility {
 						world.spawnParticle(Particle.CRIT_MAGIC, mob.getLocation().add(0, 1, 0), 15, 0.1, 0.2, 0.1, 0.15);
 						world.spawnParticle(Particle.SPELL_INSTANT, mob.getLocation().add(0, 1, 0), 20, 0.1, 0.2, 0.1, 0.15);
 						world.spawnParticle(Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0), 10, 0.1, 0.2, 0.1, 0.1);
-						DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true);
+						DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true);
 						/* Prevent mob from being hit twice in one shot */
 						iterator.remove();
 					}
@@ -142,20 +146,10 @@ public class PiercingCold extends DepthsAbility {
 		return true;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Shooting a projectile while sneaking instead shoots an enchanted beam of frost that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and leaves a trail of ice below it that lasts for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FROSTBORN;
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_BOW;
-	}
 
 }
 

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.depths;
 
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -92,7 +93,7 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 		int[] unpaidLocations = {10, 13, 16};
 		int[] chosenArray;
 
-		List<WeaponAspectDepthsAbility> weapons = DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mWeaponOfferings;
+		List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> weapons = DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mWeaponOfferings;
 		List<DepthsAbilityItem> items = new ArrayList<>();
 
 		if (weapons == null || weapons.size() == 0) {
@@ -100,7 +101,7 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 			return;
 		}
 
-		for (WeaponAspectDepthsAbility weapon : weapons) {
+		for (DepthsAbilityInfo<? extends WeaponAspectDepthsAbility> weapon : weapons) {
 			items.add(weapon.getAbilityItem(1));
 		}
 

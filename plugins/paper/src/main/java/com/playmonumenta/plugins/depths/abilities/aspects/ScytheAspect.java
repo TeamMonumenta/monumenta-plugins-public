@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.depths.abilities.aspects;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -23,14 +25,18 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 	public static final String ABILITY_NAME = "Aspect of the Scythe";
 	public static final double DAMAGE_MODIFIER = 0.95;
 
+	public static final DepthsAbilityInfo<ScytheAspect> INFO =
+		new DepthsAbilityInfo<>(ScytheAspect.class, ABILITY_NAME, ScytheAspect::new, null, DepthsTrigger.WEAPON_ASPECT)
+			.displayItem(new ItemStack(Material.IRON_HOE))
+			.description("While holding a scythe, you gain an independent level of life drain and 5% damage reduction.");
+
 	public ScytheAspect(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.IRON_HOE;
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer == null || !event.getType().equals(DamageEvent.DamageType.MELEE)) {
+		if (!event.getType().equals(DamageEvent.DamageType.MELEE)) {
 			return false;
 		}
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
@@ -65,14 +71,10 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (mPlayer != null && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
+		if (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(event.getDamage() * DAMAGE_MODIFIER);
 		}
 	}
 
-	@Override
-	public String getDescription(int rarity) {
-		return "While holding a scythe, you gain an independent level of life drain and 5% damage reduction.";
-	}
 }
 

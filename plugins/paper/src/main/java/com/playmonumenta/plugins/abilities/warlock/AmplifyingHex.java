@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.AmplifyingHexCS;
@@ -17,19 +19,15 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -61,28 +59,33 @@ public class AmplifyingHex extends Ability {
 	public static final String CHARM_CONE = "Amplifying Hex Cone";
 	public static final String CHARM_EFFECT = "Amplifying Hex Damage per Effect Potency";
 
+	public static final AbilityInfo<AmplifyingHex> INFO =
+		new AbilityInfo<>(AmplifyingHex.class, "Amplifying Hex", AmplifyingHex::new)
+			.linkedSpell(ClassAbility.AMPLIFYING)
+			.scoreboardId("AmplifyingHex")
+			.shorthandName("AH")
+			.descriptions(
+				"Left-click while sneaking with a scythe to fire a magic cone up to 8 blocks in front of you, " +
+					"dealing 2 + (0.5 * number of Skill Points, capped at the maximum available Skill Points for each Region) magic damage " +
+					"to each enemy per debuff (potion effects like Weakness or Wither, as well as Fire and custom effects like Bleed) they have, " +
+					"and an extra +1 damage per extra level of debuff, capped at 2 extra levels. 10% Slowness, Weaken, etc. count as one level. Cooldown: 10s.",
+				"The range is increased to 10 blocks, extra damage increased to +2 per extra level, and the extra level cap is increased to 3 extra levels.",
+				"For every 1% health you have above 80% of your max health, Amplifying Hex will deal 1.25% more damage to enemies and deal 1% max health damage to yourself.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AmplifyingHex::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
+				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+			.displayItem(new ItemStack(Material.DRAGON_BREATH, 1));
+
 	private final float mAmplifierDamage;
 	private final int mAmplifierCap;
 	private final float mRadius;
-	private float mRegionCap;
+	private final float mRegionCap;
 	private float mDamage = 0f;
 
 	private final AmplifyingHexCS mCosmetic;
 
-	public AmplifyingHex(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Amplifying Hex");
-		mInfo.mScoreboardId = "AmplifyingHex";
-		mInfo.mShorthandName = "AH";
-		mInfo.mDescriptions.add("Left-click while sneaking with a scythe to fire a magic cone up to 8 blocks in front of you, " +
-			                        "dealing 2 + (0.5 * number of Skill Points, capped at the maximum available Skill Points for each Region) magic damage " +
-			                        "to each enemy per debuff (potion effects like Weakness or Wither, as well as Fire and custom effects like Bleed) they have, " +
-			                        "and an extra +1 damage per extra level of debuff, capped at 2 extra levels. 10% Slowness, Weaken, etc. count as one level. Cooldown: 10s.");
-		mInfo.mDescriptions.add("The range is increased to 10 blocks, extra damage increased to +2 per extra level, and the extra level cap is increased to 3 extra levels.");
-		mInfo.mDescriptions.add("For every 1% health you have above 80% of your max health, Amplifying Hex will deal 1.25% more damage to enemies and deal 1% max health damage to yourself.");
-		mInfo.mLinkedSpell = ClassAbility.AMPLIFYING;
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
+	public AmplifyingHex(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mAmplifierDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2);
 		mAmplifierCap = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2);
 		mRadius = (float) CharmManager.getRadius(player, CHARM_RANGE, isLevelOne() ? RADIUS_1 : RADIUS_2);
@@ -95,20 +98,18 @@ public class AmplifyingHex extends Ability {
 				int charmPower = ScoreboardUtils.getScoreboardValue(player, "CharmPower").orElse(0);
 				charmPower = (charmPower > 0) ? (charmPower / 3) - 2 : 0;
 				int totalLevel = ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0) +
-					ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0) +
-					ScoreboardUtils.getScoreboardValue(player, "TotalEnhance").orElse(0) +
-					charmPower;
+					                 ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0) +
+					                 ScoreboardUtils.getScoreboardValue(player, "TotalEnhance").orElse(0) +
+					                 charmPower;
 				mDamage = DAMAGE_PER_SKILL_POINT * totalLevel;
 			});
 		}
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
-		World world = mPlayer.getWorld();
 
 		double angle = Math.min(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, ANGLE), 180);
 
@@ -148,7 +149,7 @@ public class AmplifyingHex extends Ability {
 
 
 		final Location soundLoc = mPlayer.getLocation();
-		mCosmetic.amplifyingEffects(mPlayer, world, soundLoc);
+		mCosmetic.amplifyingEffects(mPlayer, mPlayer.getWorld(), soundLoc);
 
 		double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 		double percentBoost = 0;
@@ -237,28 +238,11 @@ public class AmplifyingHex extends Ability {
 			if (debuffCount > 0) {
 				double finalDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage);
 				finalDamage *= (1 + percentBoost);
-				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.mLinkedSpell, true);
+				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.getLinkedSpell(), true);
 				MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
 			}
 		}
 		putOnCooldown();
 	}
 
-	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		double pitch = mPlayer.getLocation().getPitch();
-		return (mPlayer.isSneaking() && pitch < 50 && pitch > -50
-			&& ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()));
-	}
-
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
-			cast(Action.LEFT_CLICK_AIR);
-		}
-		return false;
-	}
 }

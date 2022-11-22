@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -50,7 +50,20 @@ public class TransmutationRing extends PotionAbility {
 	public static final String CHARM_PER_KILL_AMPLIFIER = "Transmutation Ring Per Death Amplifier";
 	public static final String CHARM_MAX_KILLS = "Transmutation Ring Max Kills";
 
-	private double mRadius;
+	public static final AbilityInfo<TransmutationRing> INFO =
+		new AbilityInfo<>(TransmutationRing.class, "Transmutation Ring", TransmutationRing::new)
+			.linkedSpell(ClassAbility.TRANSMUTATION_RING)
+			.scoreboardId("Transmutation")
+			.shorthandName("TR")
+			.descriptions(
+				"Sneak while throwing an Alchemist's Potion to create a Transmutation Ring at the potion's landing location that lasts for 10 seconds. " +
+					"The ring has a radius of 5 blocks. Other players within this ring deal 10% extra damage on all attacks. " +
+					"Mobs that die within this ring increase the damage bonus by 1% per mob, up to 30% total extra damage. Cooldown: 25s.",
+				"Mobs that die within this ring also increase the duration of the ring by 0.35 seconds per mob, up to 5 extra seconds. Cooldown: 20s.")
+			.cooldown(TRANSMUTATION_RING_1_COOLDOWN, TRANSMUTATION_RING_2_COOLDOWN, CHARM_COOLDOWN)
+			.displayItem(new ItemStack(Material.GOLD_NUGGET, 1));
+
+	private final double mRadius;
 
 	private @Nullable Location mCenter;
 	private @Nullable AlchemistPotions mAlchemistPotions;
@@ -58,17 +71,8 @@ public class TransmutationRing extends PotionAbility {
 
 	private final TransmRingCS mCosmetic;
 
-	public TransmutationRing(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Transmutation Ring", 0, 0);
-		mInfo.mLinkedSpell = ClassAbility.TRANSMUTATION_RING;
-		mInfo.mScoreboardId = "Transmutation";
-		mInfo.mShorthandName = "TR";
-		mInfo.mDescriptions.add("Right click while sneaking and holding an Alchemist's Bag to create a Transmutation Ring at the potion's landing location that lasts for 10 seconds. The ring has a radius of 5 blocks. Other players within this ring deal 10% extra damage on all attacks. Mobs that die within this ring increase the damage bonus by 1% per mob, up to 30% total extra damage. Cooldown: 25s.");
-		mInfo.mDescriptions.add("Mobs that die within this ring also increase the duration of the ring by 0.35 seconds per mob, up to 5 extra seconds. Cooldown: 20s.");
-		mDisplayItem = new ItemStack(Material.GOLD_NUGGET, 1);
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? TRANSMUTATION_RING_1_COOLDOWN : TRANSMUTATION_RING_2_COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
+	public TransmutationRing(Plugin plugin, Player player) {
+		super(plugin, player, INFO, 0, 0);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, TRANSMUTATION_RING_RADIUS);
 
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
@@ -80,8 +84,10 @@ public class TransmutationRing extends PotionAbility {
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (mPlayer != null && mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && !isTimerActive()
-			&& mAlchemistPotions.isAlchemistPotion(potion)) {
+		if (!isOnCooldown()
+			    && mPlayer.isSneaking()
+			    && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())
+			    && mAlchemistPotions.isAlchemistPotion(potion)) {
 			putOnCooldown();
 			potion.setMetadata(TRANSMUTATION_POTION_METAKEY, new FixedMetadataValue(mPlugin, null));
 		}
@@ -90,7 +96,7 @@ public class TransmutationRing extends PotionAbility {
 
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
-		if (mPlayer != null && potion.hasMetadata(TRANSMUTATION_POTION_METAKEY)) {
+		if (potion.hasMetadata(TRANSMUTATION_POTION_METAKEY)) {
 			mCenter = potion.getLocation();
 			World world = mPlayer.getWorld();
 

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -17,6 +18,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class Entrench extends DepthsAbility {
 
@@ -26,10 +28,13 @@ public class Entrench extends DepthsAbility {
 	public static final int RADIUS = 6;
 	public static final double SLOW_MODIFIER = 0.99;
 
+	public static final DepthsAbilityInfo<Entrench> INFO =
+		new DepthsAbilityInfo<>(Entrench.class, ABILITY_NAME, Entrench::new, DepthsTree.EARTHBOUND, DepthsTrigger.SPAWNER)
+			.displayItem(new ItemStack(Material.SOUL_SAND))
+			.descriptions(Entrench::getDescription, MAX_RARITY);
+
 	public Entrench(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.SOUL_SAND;
-		mTree = DepthsTree.EARTHBOUND;
+		super(plugin, player, INFO);
 	}
 
 	@Override
@@ -49,18 +54,9 @@ public class Entrench extends DepthsAbility {
 		return true;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Breaking a spawner roots mobs within " + RADIUS + " blocks for " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.EARTHBOUND;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SPAWNER;
-	}
 }

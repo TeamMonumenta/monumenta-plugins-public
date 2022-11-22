@@ -52,8 +52,8 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 	}
 
 	@Override
-	public boolean isUnlocked(Player mPlayer) {
-		return mPlayer != null;
+	public boolean isUnlocked(Player player) {
+		return player != null;
 	}
 
 	@Override

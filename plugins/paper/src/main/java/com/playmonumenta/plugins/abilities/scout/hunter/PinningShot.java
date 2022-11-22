@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PinningShotCS;
@@ -12,7 +13,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -34,21 +34,24 @@ public class PinningShot extends Ability {
 	public static final String CHARM_DAMAGE = "Pinning Shot Max Health Damage";
 	public static final String CHARM_WEAKEN = "Pinning Shot Weakness Amplifier";
 
+	public static final AbilityInfo<PinningShot> INFO =
+		new AbilityInfo<>(PinningShot.class, "Pinning Shot", PinningShot::new)
+			.linkedSpell(ClassAbility.PINNING_SHOT)
+			.scoreboardId("PinningShot")
+			.shorthandName("PSh")
+			.descriptions(
+				String.format("The first time you shoot a non-boss enemy, pin it for %ss. Pinned enemies are afflicted with %d%% Slowness and %d%% Weaken (Bosses receive %d%% Slowness and no Weaken). Shooting a pinned non-boss enemy deals %d%% of its max health on top of regular damage and removes the pin. A mob cannot be pinned more than once.",
+					PINNING_SHOT_DURATION / 20.0, (int) (PINNING_SLOW * 100), (int) (PINNING_WEAKEN_1 * 100), (int) (PINNING_SLOW_BOSS * 100), (int) (PINNING_SHOT_1_DAMAGE_MULTIPLIER * 100)),
+				String.format("Weaken increased to %d%% and bonus damage increased to %d%% max health.", (int) (PINNING_WEAKEN_2 * 100), (int) (PINNING_SHOT_2_DAMAGE_MULTIPLIER * 100)))
+			.displayItem(new ItemStack(Material.CROSSBOW, 1));
+
 	private final double mDamageMultiplier;
 	private final double mWeaken;
 	private final Map<LivingEntity, Boolean> mPinnedMobs = new HashMap<LivingEntity, Boolean>();
 	private final PinningShotCS mCosmetic;
 
-	public PinningShot(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Pinning Shot");
-		mInfo.mScoreboardId = "PinningShot";
-		mInfo.mShorthandName = "PSh";
-		mInfo.mLinkedSpell = ClassAbility.PINNING_SHOT;
-		mInfo.mDescriptions.add(String.format("The first time you shoot a non-boss enemy, pin it for %ss. Pinned enemies are afflicted with %d%% Slowness and %d%% Weaken (Bosses receive %d%% Slowness and no Weaken). Shooting a pinned non-boss enemy deals %d%% of its max health on top of regular damage and removes the pin. A mob cannot be pinned more than once.",
-			PINNING_SHOT_DURATION / 20.0, (int)(PINNING_SLOW * 100), (int)(PINNING_WEAKEN_1 * 100), (int)(PINNING_SLOW_BOSS * 100), (int)(PINNING_SHOT_1_DAMAGE_MULTIPLIER * 100)));
-		mInfo.mDescriptions.add(String.format("Weaken increased to %d%% and bonus damage increased to %d%% max health.", (int)(PINNING_WEAKEN_2 * 100), (int)(PINNING_SHOT_2_DAMAGE_MULTIPLIER * 100)));
-		mDisplayItem = new ItemStack(Material.CROSSBOW, 1);
-
+	public PinningShot(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDamageMultiplier = (isLevelOne() ? PINNING_SHOT_1_DAMAGE_MULTIPLIER : PINNING_SHOT_2_DAMAGE_MULTIPLIER) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mWeaken = (isLevelOne() ? PINNING_WEAKEN_1 : PINNING_WEAKEN_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PinningShotCS(), PinningShotCS.SKIN_LIST);
@@ -68,7 +71,7 @@ public class PinningShot extends Ability {
 				EntityUtils.setSlowTicks(mPlugin, enemy, 1);
 				EntityUtils.setWeakenTicks(mPlugin, enemy, 1);
 				if (!EntityUtils.isBoss(enemy)) {
-					DamageUtils.damage(mPlayer, enemy, DamageType.OTHER, EntityUtils.getMaxHealth(enemy) * mDamageMultiplier, mInfo.mLinkedSpell, true, false);
+					DamageUtils.damage(mPlayer, enemy, DamageType.OTHER, EntityUtils.getMaxHealth(enemy) * mDamageMultiplier, mInfo.getLinkedSpell(), true, false);
 				}
 			}
 		} else {

@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.warlock;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
@@ -51,17 +50,7 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 	}
 
 	@Override
-	public void flameParticle(Player mPlayer, Location mLoc, double mRadius) {
-
-	}
-
-	@Override
-	public void flameEffects(Player mPlayer, World world, Location loc) {
-		erupt(loc, mPlayer);
-	}
-
-	private void erupt(Location loc, Player mPlayer) {
-		World world = loc.getWorld();
+	public void flameEffects(Player player, World world, Location loc, double range) {
 		world.playSound(loc, Sound.ENTITY_PHANTOM_DEATH, SoundCategory.PLAYERS, 1.5f, 0);
 		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 1.5f, 0.65f);
 		world.playSound(loc, Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.PLAYERS, 1.5f, 0.85f);
@@ -70,6 +59,7 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 		new BukkitRunnable() {
 
 			double mRadius = 0;
+
 			@Override
 			public void run() {
 
@@ -82,21 +72,21 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 						Location l = loc.clone().add(vec);
 
 						if (mRadius >= 2 && FastUtils.RANDOM.nextInt(30) == 0) {
-							spawnTendril(l, mPlayer);
+							spawnTendril(l, player);
 						}
 
-						vec = new Vector(FastUtils.cos(degree) * mRadius, 2 * FastMath.pow(mRadius / (CholericFlames.RADIUS + 1), 3), FastUtils.sin(degree) * mRadius);
+						vec = new Vector(FastUtils.cos(degree) * mRadius, 2 * FastMath.pow(mRadius / (range + 1), 3), FastUtils.sin(degree) * mRadius);
 						l = loc.clone().add(vec);
 						new PartialParticle(Particle.SOUL_FIRE_FLAME, l, 1, 0.1, 0.1, 0.1, 0.04)
-							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							.minimumMultiplier(false).spawnAsPlayerActive(player);
 						new PartialParticle(Particle.SOUL, l, 1, 0.15, 0.15, 0.15, 0.01)
-							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							.minimumMultiplier(false).spawnAsPlayerActive(player);
 						new PartialParticle(Particle.SMOKE_NORMAL, l, 5, 0.1, 0.1, 0.1, 0.075)
-							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							.minimumMultiplier(false).spawnAsPlayerActive(player);
 					}
 				}
 
-				if (mRadius >= CholericFlames.RADIUS + 1) {
+				if (mRadius >= range + 1) {
 					this.cancel();
 				}
 

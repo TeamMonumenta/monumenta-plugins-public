@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -17,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 
@@ -29,17 +31,17 @@ public class Whirlwind extends DepthsAbility {
 	private static final int SPEED_DURATION = 6 * 20;
 	private static final String SPEED_EFFECT_NAME = "WhirlwindSpeedEffect";
 
+	public static final DepthsAbilityInfo<Whirlwind> INFO =
+		new DepthsAbilityInfo<>(Whirlwind.class, ABILITY_NAME, Whirlwind::new, DepthsTree.WINDWALKER, DepthsTrigger.SPAWNER)
+			.displayItem(new ItemStack(Material.IRON_PICKAXE))
+			.descriptions(Whirlwind::getDescription, MAX_RARITY);
+
 	public Whirlwind(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.IRON_PICKAXE;
-		mTree = DepthsTree.WINDWALKER;
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public boolean blockBreakEvent(BlockBreakEvent event) {
-		if (mPlayer == null) {
-			return true;
-		}
 		//If we break a spawner with a pickaxe
 		if (ItemUtils.isPickaxe(event.getPlayer().getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
 			World world = event.getPlayer().getWorld();
@@ -57,19 +59,10 @@ public class Whirlwind extends DepthsAbility {
 		return true;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Breaking a spawner knocks back all mobs within " + RADIUS + " blocks with a speed of " + DepthsUtils.getRarityColor(rarity) + KNOCKBACK_SPEED[rarity - 1] + ChatColor.WHITE + ". Additionally, you receive " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED[rarity - 1]) + "%" + ChatColor.WHITE + " speed for " + SPEED_DURATION / 20 + " seconds.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.WINDWALKER;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SPAWNER;
-	}
 }
 

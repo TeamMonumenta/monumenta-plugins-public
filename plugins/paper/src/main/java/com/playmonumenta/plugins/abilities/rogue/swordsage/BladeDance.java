@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -11,10 +13,8 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,7 +23,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -48,43 +47,44 @@ public class BladeDance extends Ability {
 	public static final String CHARM_COOLDOWN = "Blade Dance Cooldown";
 	public static final String CHARM_RADIUS = "Blade Dance Radius";
 
+	public static final AbilityInfo<BladeDance> INFO =
+		new AbilityInfo<>(BladeDance.class, "Blade Dance", BladeDance::new)
+			.linkedSpell(ClassAbility.BLADE_DANCE)
+			.scoreboardId("BladeDance")
+			.shorthandName("BD")
+			.descriptions(
+				String.format("When holding two swords, right-click while looking down to enter a defensive stance, " +
+					              "parrying all attacks and becoming invulnerable for 0.75 seconds. " +
+					              "Afterwards, unleash a powerful attack that deals %s melee damage to enemies in a %s block radius. " +
+					              "Damaged enemies are rooted for %s seconds. Cooldown: %ss.",
+					DANCE_1_DAMAGE,
+					DANCE_RADIUS,
+					SLOW_DURATION_1 / 20,
+					COOLDOWN_1 / 20
+				),
+				String.format("The area attack now deals %s damage and roots for %ss. Cooldown: %ss.",
+					DANCE_2_DAMAGE,
+					SLOW_DURATION_2 / 20.0,
+					COOLDOWN_2 / 20))
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BladeDance::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).lookDirections(AbilityTrigger.LookDirection.DOWN).sneaking(false),
+				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
+			.displayItem(new ItemStack(Material.STRING, 1));
+
 
 	private final double mDamage;
 	private final int mSlowDuration;
 
-	public BladeDance(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Blade Dance");
-		mInfo.mScoreboardId = "BladeDance";
-		mInfo.mShorthandName = "BD";
-		mInfo.mDescriptions.add(
-			String.format("When holding two swords, right-click while looking down to enter a defensive stance, " +
-				              "parrying all attacks and becoming invulnerable for 0.75 seconds. " +
-				              "Afterwards, unleash a powerful attack that deals %s melee damage to enemies in a %s block radius. " +
-				              "Damaged enemies are rooted for %s seconds. Cooldown: %ss.",
-				DANCE_1_DAMAGE,
-				DANCE_RADIUS,
-				SLOW_DURATION_1 / 20,
-				COOLDOWN_1 / 20
-			));
-		mInfo.mDescriptions.add(
-			String.format("The area attack now deals %s damage and roots for %ss. Cooldown: %ss.",
-				DANCE_2_DAMAGE,
-				SLOW_DURATION_2 / 20.0,
-				COOLDOWN_2 / 20));
-		mInfo.mLinkedSpell = ClassAbility.BLADE_DANCE;
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mDisplayItem = new ItemStack(Material.STRING, 1);
+	public BladeDance(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DANCE_1_DAMAGE : DANCE_2_DAMAGE);
 		mSlowDuration = (isLevelOne() ? SLOW_DURATION_1 : SLOW_DURATION_2) + CharmManager.getExtraDuration(player, CHARM_ROOT);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
-
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RETURN, 1f, 0.75f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
@@ -120,7 +120,7 @@ public class BladeDance extends Ability {
 
 					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), CharmManager.getRadius(mPlayer, CHARM_RADIUS, DANCE_RADIUS));
 					for (LivingEntity mob : hitbox.getHitMobs()) {
-						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell, true);
+						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
 						MovementUtils.knockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED, true);
 
 						if (!EntityUtils.isBoss(mob)) {
@@ -164,8 +164,4 @@ public class BladeDance extends Ability {
 		putOnCooldown();
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && !mPlayer.isSneaking() && mPlayer.getLocation().getPitch() >= 50 && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer);
-	}
 }

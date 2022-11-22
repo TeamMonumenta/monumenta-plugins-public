@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -17,6 +18,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class FrigidCombos extends DepthsAbility {
 
@@ -26,12 +28,15 @@ public class FrigidCombos extends DepthsAbility {
 	public static final int[] DAMAGE = {2, 3, 4, 5, 6, 8};
 	public static final int RADIUS = 4;
 
+	public static final DepthsAbilityInfo<FrigidCombos> INFO =
+		new DepthsAbilityInfo<>(FrigidCombos.class, ABILITY_NAME, FrigidCombos::new, DepthsTree.FROSTBORN, DepthsTrigger.COMBO)
+			.displayItem(new ItemStack(Material.BLUE_DYE))
+			.descriptions(FrigidCombos::getDescription, MAX_RARITY);
+
 	private int mComboCount = 0;
 
 	public FrigidCombos(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.BLUE_DYE;
-		mTree = DepthsTree.FROSTBORN;
+		super(plugin, player, INFO);
 	}
 
 	@Override
@@ -46,7 +51,7 @@ public class FrigidCombos extends DepthsAbility {
 					if (!(mob.getHealth() <= 0 || mob == null)) {
 						world.spawnParticle(Particle.CRIT_MAGIC, mob.getLocation(), 25, .5, .2, .5, 0.65);
 						EntityUtils.applySlow(mPlugin, TIME, SLOW_AMPLIFIER[mRarity - 1], mob);
-						DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true);
+						DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true);
 					}
 				}
 
@@ -63,19 +68,10 @@ public class FrigidCombos extends DepthsAbility {
 		return false;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Every third melee attack deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to all mobs within " + RADIUS + " blocks and applies " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SLOW_AMPLIFIER[rarity - 1]) + "%" + ChatColor.WHITE + " slowness for " + TIME / 20.0 + " seconds to affected mobs.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FROSTBORN;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.COMBO;
-	}
 }
 

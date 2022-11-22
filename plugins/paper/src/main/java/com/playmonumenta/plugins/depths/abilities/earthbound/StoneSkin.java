@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.earthbound;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
@@ -16,7 +18,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class StoneSkin extends DepthsAbility {
@@ -29,25 +31,27 @@ public class StoneSkin extends DepthsAbility {
 	private static final int DURATION = 20 * 5;
 	private static final int COOLDOWN = 20 * 12;
 
-	public StoneSkin(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.POLISHED_ANDESITE;
-		mTree = DepthsTree.EARTHBOUND;
+	public static final DepthsAbilityInfo<StoneSkin> INFO =
+		new DepthsAbilityInfo<>(StoneSkin.class, ABILITY_NAME, StoneSkin::new, DepthsTree.EARTHBOUND, DepthsTrigger.SHIFT_RIGHT_CLICK)
+			.linkedSpell(ClassAbility.STONE_SKIN)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", StoneSkin::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.POLISHED_ANDESITE))
+			.descriptions(StoneSkin::getDescription, MAX_RARITY);
 
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.STONE_SKIN;
+	public StoneSkin(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action trigger) {
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
+		}
 		putOnCooldown();
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (mPlayer == null) {
-					return;
-				}
 				World world = mPlayer.getWorld();
 				Location loc = mPlayer.getLocation();
 				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.2, 0, 0.2, 0.25);
@@ -63,23 +67,10 @@ public class StoneSkin extends DepthsAbility {
 
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && mPlayer.isSneaking() && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Right click while sneaking to gain " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance and +" + DepthsUtils.getRarityColor(rarity) + (int) (DepthsUtils.roundPercent(KNOCKBACK_RESISTANCE[rarity - 1]) / 10) + ChatColor.WHITE + " knockback resistance for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.EARTHBOUND;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_RIGHT_CLICK;
-	}
 }

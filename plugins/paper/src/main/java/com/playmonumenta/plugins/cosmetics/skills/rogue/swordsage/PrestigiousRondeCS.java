@@ -52,8 +52,8 @@ public class PrestigiousRondeCS extends DeadlyRondeCS implements PrestigeCS {
 	}
 
 	@Override
-	public boolean isUnlocked(Player mPlayer) {
-		return mPlayer != null;
+	public boolean isUnlocked(Player player) {
+		return player != null;
 	}
 
 	@Override

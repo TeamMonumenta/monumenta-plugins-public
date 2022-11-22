@@ -2,14 +2,14 @@ package com.playmonumenta.plugins.classes;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import java.util.ArrayList;
 import javax.annotation.Nullable;
 import org.bukkit.inventory.ItemStack;
 
 
 public class PlayerSpec {
-	public ArrayList<Ability> mAbilities = new ArrayList<Ability>();
+	public ArrayList<AbilityInfo<?>> mAbilities = new ArrayList<>();
 
 	public @Nullable String mSpecQuestScoreboard;
 
@@ -20,9 +20,9 @@ public class PlayerSpec {
 
 	public JsonObject toJson() {
 		JsonArray abilities = new JsonArray();
-		for (Ability ability : mAbilities) {
+		for (AbilityInfo<?> ability : mAbilities) {
 			if (ability != null) {
-				abilities.add(ability.getInfo().toJson());
+				abilities.add(ability.toJson());
 			}
 		}
 

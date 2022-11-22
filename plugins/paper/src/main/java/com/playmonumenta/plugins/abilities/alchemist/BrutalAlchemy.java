@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.SpreadEffectOnDeath;
@@ -31,20 +32,23 @@ public class BrutalAlchemy extends PotionAbility {
 	public static final String CHARM_RADIUS = "Brutal Alchemy Spread Radius";
 	public static final String CHARM_MULTIPLIER = "Brutal Alchemy Potion Damage Multiplier";
 
+	public static final AbilityInfo<BrutalAlchemy> INFO =
+		new AbilityInfo<>(BrutalAlchemy.class, "Brutal Alchemy", BrutalAlchemy::new)
+			.linkedSpell(ClassAbility.BRUTAL_ALCHEMY)
+			.scoreboardId("BrutalAlchemy")
+			.shorthandName("BA")
+			.descriptions(
+				"Your Brutal Alchemist's Potions deal +1 damage and apply 1 damage every 2 seconds for 8 seconds.",
+				"Your Brutal Alchemist's Potions now deal +2 damage and apply 1 damage every second instead.",
+				"Your Brutal Alchemist's Potions now also set enemies on fire for its duration, and the damage over time effect is increased by 30% of your base potion damage. Additionally, when a mob inflicted with this damage over time effect dies, the effect (along with any Inferno applied) spreads to all mobs in a 3 block radius around it.")
+			.displayItem(new ItemStack(Material.REDSTONE, 1));
+
 	private final int mPeriod;
 	private final double mDOTDamage;
 	private @Nullable AlchemistPotions mAlchemistPotions;
 
-	public BrutalAlchemy(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Brutal Alchemy", CharmManager.calculateFlatAndPercentValue(player, CHARM_POTION_DAMAGE, BRUTAL_ALCHEMY_1_DAMAGE), CharmManager.calculateFlatAndPercentValue(player, CHARM_POTION_DAMAGE, BRUTAL_ALCHEMY_2_DAMAGE));
-		mInfo.mLinkedSpell = ClassAbility.BRUTAL_ALCHEMY;
-		mInfo.mScoreboardId = "BrutalAlchemy";
-		mInfo.mShorthandName = "BA";
-		mInfo.mDescriptions.add("Your Brutal Alchemist's Potions deal +1 damage and apply 1 damage every 2 seconds for 8 seconds.");
-		mInfo.mDescriptions.add("Your Brutal Alchemist's Potions now deal +2 damage and apply 1 damage every second instead.");
-		mInfo.mDescriptions.add("Your Brutal Alchemist's Potions damage over time effect is increased by 30% of your base potion damage. Additionally, when a mob inflicted with this damage over time effect dies, the effect spreads to all mobs in a 3 block radius around it.");
-		mDisplayItem = new ItemStack(Material.REDSTONE, 1);
-
+	public BrutalAlchemy(Plugin plugin, Player player) {
+		super(plugin, player, INFO, CharmManager.calculateFlatAndPercentValue(player, CHARM_POTION_DAMAGE, BRUTAL_ALCHEMY_1_DAMAGE), CharmManager.calculateFlatAndPercentValue(player, CHARM_POTION_DAMAGE, BRUTAL_ALCHEMY_2_DAMAGE));
 		mPeriod = isLevelOne() ? BRUTAL_ALCHEMY_1_PERIOD : BRUTAL_ALCHEMY_2_PERIOD;
 		mDOTDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT_DAMAGE, BRUTAL_ALCHEMY_DOT_DAMAGE);
 
@@ -62,7 +66,7 @@ public class BrutalAlchemy extends PotionAbility {
 			if (isEnhanced() && mAlchemistPotions != null) {
 				damage += mAlchemistPotions.getDamage() * (BRUTAL_ALCHEMY_ENHANCEMENT_DAMAGE_POTION + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_MULTIPLIER));
 			}
-			mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, new CustomDamageOverTime(duration, damage, mPeriod, mPlayer, mInfo.mLinkedSpell));
+			mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, new CustomDamageOverTime(duration, damage, mPeriod, mPlayer, mInfo.getLinkedSpell()));
 			if (isEnhanced()) {
 				mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_SPREAD_EFFECT_NAME, new SpreadEffectOnDeath(duration, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, CharmManager.getRadius(mPlayer, CHARM_RADIUS, BRUTAL_ALCHEMY_ENHANCEMENT_RANGE), duration, true));
 			}

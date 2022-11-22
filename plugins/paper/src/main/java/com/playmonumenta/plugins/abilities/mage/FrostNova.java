@@ -3,9 +3,10 @@ package com.playmonumenta.plugins.abilities.mage;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
@@ -14,11 +15,9 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,7 +26,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -55,61 +53,56 @@ public class FrostNova extends Ability {
 	public static final String CHARM_DURATION = "Frost Nova Slowness Duration";
 	public static final String CHARM_FROZEN = "Frost Nova Frozen Duration";
 
+	public static final AbilityInfo<FrostNova> INFO =
+		new AbilityInfo<>(FrostNova.class, NAME, FrostNova::new)
+			.linkedSpell(ABILITY)
+			.scoreboardId("FrostNova")
+			.shorthandName("FN")
+			.descriptions(
+				String.format(
+					"While sneaking, left-clicking with a wand unleashes a frost nova," +
+						" dealing %s ice magic damage to all enemies in a %s-block sphere around you," +
+						" afflicting them with %s%% slowness for %ss, and extinguishing them if they're on fire." +
+						" Slowness is reduced by %s%% on elites and bosses, and all players in the nova are also extinguished." +
+						" The damage ignores iframes. Cooldown: %ss.",
+					DAMAGE_1,
+					SIZE,
+					StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_1),
+					StringUtils.ticksToSeconds(DURATION_TICKS),
+					StringUtils.multiplierToPercentage(ELITE_SLOW_MULTIPLIER_REDUCTION),
+					StringUtils.ticksToSeconds(COOLDOWN_TICKS)
+				),
+				String.format(
+					"Damage is increased from %s to %s. Base slowness is increased from %s%% to %s%%.",
+					DAMAGE_1,
+					DAMAGE_2,
+					StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_1),
+					StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_2)
+				),
+				String.format(
+					"Damage is increased by %s%% and cooldown is reduced to %ss. Non elites and bosses are frozen for %ss, having their AI and gravity removed.",
+					StringUtils.multiplierToPercentage(ENHANCED_DAMAGE_MODIFIER - 1),
+					ENHANCED_COOLDOWN_TICKS / 20,
+					StringUtils.ticksToSeconds(ENHANCED_FROZEN_DURATION)
+				)
+			)
+			.cooldown(COOLDOWN_TICKS, COOLDOWN_TICKS, ENHANCED_COOLDOWN_TICKS, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FrostNova::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
+				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
+			.displayItem(new ItemStack(Material.ICE, 1));
+
 	private final float mLevelDamage;
 	private final double mLevelSlowMultiplier;
 
-	public FrostNova(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = ABILITY;
-
-		mInfo.mScoreboardId = "FrostNova";
-		mInfo.mShorthandName = "FN";
-		mInfo.mDescriptions.add(
-			String.format(
-				"While sneaking, left-clicking with a wand unleashes a frost nova," +
-					" dealing %s ice magic damage to all enemies in a %s-block sphere around you," +
-					" afflicting them with %s%% slowness for %ss, and extinguishing them if they're on fire." +
-					" Slowness is reduced by %s%% on elites and bosses, and all players in the nova are also extinguished." +
-					" The damage ignores iframes. Cooldown: %ss.",
-				DAMAGE_1,
-				SIZE,
-				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_1),
-				StringUtils.ticksToSeconds(DURATION_TICKS),
-				StringUtils.multiplierToPercentage(ELITE_SLOW_MULTIPLIER_REDUCTION),
-				StringUtils.ticksToSeconds(COOLDOWN_TICKS)
-			)
-		);
-		mInfo.mDescriptions.add(
-			String.format(
-				"Damage is increased from %s to %s. Base slowness is increased from %s%% to %s%%.",
-				DAMAGE_1,
-				DAMAGE_2,
-				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_1),
-				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_2)
-			)
-		);
-		mInfo.mDescriptions.add(
-			String.format(
-				"Damage is increased by %s%% and cooldown is reduced to %ss. Non elites and bosses are frozen for %ss, having their AI and gravity removed.",
-				StringUtils.multiplierToPercentage(ENHANCED_DAMAGE_MODIFIER - 1),
-				ENHANCED_COOLDOWN_TICKS / 20,
-				StringUtils.ticksToSeconds(ENHANCED_FROZEN_DURATION)
-			)
-		);
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isEnhanced() ? ENHANCED_COOLDOWN_TICKS : COOLDOWN_TICKS);
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDisplayItem = new ItemStack(Material.ICE, 1);
-
+	public FrostNova(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		int damage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isEnhanced() ? (int) (damage * ENHANCED_DAMAGE_MODIFIER) : damage);
 		mLevelSlowMultiplier = (isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SLOW);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (!(mPlayer != null
-			      && mPlayer.isSneaking()
-			      && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0)) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 		putOnCooldown();
@@ -139,7 +132,7 @@ public class FrostNova extends Ability {
 					}
 				}
 			}
-			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);
 
 			if (mob.getFireTicks() > 1) {
 				mob.setFireTicks(1);
@@ -178,14 +171,6 @@ public class FrostNova extends Ability {
 		new PartialParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.35).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SPIT, loc, 35, 0, 0, 0, 0.45).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1f);
-	}
-
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
-			cast(Action.LEFT_CLICK_AIR);
-		}
-		return false;
 	}
 
 }

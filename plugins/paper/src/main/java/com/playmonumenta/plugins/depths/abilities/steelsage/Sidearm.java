@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -20,7 +22,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -34,18 +36,21 @@ public class Sidearm extends DepthsAbility {
 
 	private static final Particle.DustOptions SIDEARM_COLOR = new Particle.DustOptions(Color.fromRGB(130, 130, 130), 1.0f);
 
+	public static final DepthsAbilityInfo<Sidearm> INFO =
+		new DepthsAbilityInfo<>(Sidearm.class, ABILITY_NAME, Sidearm::new, DepthsTree.METALLIC, DepthsTrigger.RIGHT_CLICK)
+			.linkedSpell(ClassAbility.SIDEARM)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Sidearm::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.CROSSBOW))
+			.descriptions(Sidearm::getDescription, MAX_RARITY);
+
 	public Sidearm(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.SIDEARM;
-		mDisplayMaterial = Material.CROSSBOW;
-		mTree = DepthsTree.METALLIC;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action trigger) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 		putOnCooldown();
@@ -73,9 +78,9 @@ public class Sidearm extends DepthsAbility {
 			}
 			for (LivingEntity mob : mobs) {
 				if (box.overlaps(mob.getBoundingBox())) {
-					DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
+					DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
 					if (mob.isDead() || mob.getHealth() <= 0) {
-						mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, getModifiedCooldown(COOLDOWN - KILL_COOLDOWN_REDUCTION));
+						mPlugin.mTimers.addCooldown(mPlayer, mInfo.getLinkedSpell(), getModifiedCooldown(COOLDOWN - KILL_COOLDOWN_REDUCTION));
 					}
 
 					mob.setVelocity(new Vector(0, 0, 0));
@@ -95,23 +100,7 @@ public class Sidearm extends DepthsAbility {
 
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && !mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Right click while holding a weapon to fire a short range flintlock shot that goes up to " + RANGE + " blocks, stopping at the first enemy hit, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " projectile damage. If it kills a mob, the cooldown is reduced by " + KILL_COOLDOWN_REDUCTION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.RIGHT_CLICK;
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.METALLIC;
 	}
 }

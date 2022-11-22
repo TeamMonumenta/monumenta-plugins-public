@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -245,11 +245,11 @@ public class YellowTesseractOverride extends BaseOverride {
 		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(SPECL_STR + (totalSpec - specLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(ENHANCE_STR + (totalEnhance - enhanceLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 
-		MonumentaClasses mClasses = new MonumentaClasses(Plugin.getInstance(), null);
-		List<Ability> allAbilities = mClasses.mClasses.stream()
-			                             .flatMap(x -> Stream.concat(x.mAbilities.stream(), Stream.concat(x.mSpecOne.mAbilities.stream(), x.mSpecTwo.mAbilities.stream())))
-			                             .toList();
-		for (Ability reference : allAbilities) {
+		MonumentaClasses mClasses = new MonumentaClasses();
+		List<AbilityInfo<?>> allAbilities = mClasses.mClasses.stream()
+			                                    .flatMap(x -> Stream.concat(x.mAbilities.stream(), Stream.concat(x.mSpecOne.mAbilities.stream(), x.mSpecTwo.mAbilities.stream())))
+			                                    .toList();
+		for (AbilityInfo<?> reference : allAbilities) {
 			if (reference.getDisplayName() != null && reference.getScoreboard() != null) {
 				int value = ScoreboardUtils.getScoreboardValue(player, reference.getScoreboard()).orElse(0);
 				if (value > 0) {
@@ -309,12 +309,12 @@ public class YellowTesseractOverride extends BaseOverride {
 			}
 		}
 
-		MonumentaClasses classes = new MonumentaClasses(Plugin.getInstance(), null);
-		List<Ability> allAbilities = classes.mClasses.stream()
-			                             .flatMap(c -> Stream.concat(c.mAbilities.stream(), Stream.concat(c.mSpecOne.mAbilities.stream(), c.mSpecTwo.mAbilities.stream())))
-			                             .toList();
+		MonumentaClasses classes = new MonumentaClasses();
+		List<AbilityInfo<?>> allAbilities = classes.mClasses.stream()
+			                                    .flatMap(c -> Stream.concat(c.mAbilities.stream(), Stream.concat(c.mSpecOne.mAbilities.stream(), c.mSpecTwo.mAbilities.stream())))
+			                                    .toList();
 		/* Remove all the player's current skills */
-		for (Ability reference : allAbilities) {
+		for (AbilityInfo<?> reference : allAbilities) {
 			if (reference.getScoreboard() != null) {
 				ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), 0);
 			}
@@ -326,18 +326,18 @@ public class YellowTesseractOverride extends BaseOverride {
 		// We want to separate different points here because of fast track, since people with fast track can cheese the skill cap otherwise
 		// Check all abilities of the selected class + spec for matches
 		int finalClassVal = classVal;
-		List<Ability> classAbilities = classes.mClasses.stream()
-			                               .filter(c -> c.mClass == finalClassVal)
-			                               .flatMap(x -> x.mAbilities.stream())
-			                               .toList();
+		List<AbilityInfo<?>> classAbilities = classes.mClasses.stream()
+			                                      .filter(c -> c.mClass == finalClassVal)
+			                                      .flatMap(x -> x.mAbilities.stream())
+			                                      .toList();
 		int finalSpecVal = specVal;
-		List<Ability> specAbilities = classes.mClasses.stream()
-			                              .filter(c -> c.mClass == finalClassVal)
-			                              .flatMap(c -> Stream.of(c.mSpecOne, c.mSpecTwo))
-			                              .filter(spec -> spec.mSpecialization == finalSpecVal)
-			                              .flatMap(spec -> spec.mAbilities.stream())
-			                              .toList();
-		for (Ability reference : classAbilities) {
+		List<AbilityInfo<?>> specAbilities = classes.mClasses.stream()
+			                                     .filter(c -> c.mClass == finalClassVal)
+			                                     .flatMap(c -> Stream.of(c.mSpecOne, c.mSpecTwo))
+			                                     .filter(spec -> spec.mSpecialization == finalSpecVal)
+			                                     .flatMap(spec -> spec.mAbilities.stream())
+			                                     .toList();
+		for (AbilityInfo<?> reference : classAbilities) {
 			@Nullable Integer level = targetSkills.get(reference.getDisplayName());
 			if (level != null) {
 				String scoreboard = reference.getScoreboard();
@@ -352,7 +352,7 @@ public class YellowTesseractOverride extends BaseOverride {
 				}
 			}
 		}
-		for (Ability reference : specAbilities) {
+		for (AbilityInfo<?> reference : specAbilities) {
 			@Nullable Integer level = targetSkills.get(reference.getDisplayName());
 			if (level != null) {
 				String scoreboard = reference.getScoreboard();

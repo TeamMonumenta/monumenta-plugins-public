@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -23,7 +25,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -40,39 +42,27 @@ public class DepthsWindWalk extends DepthsAbility {
 	private static final double WIND_WALK_Y_VELOCITY_MULTIPLIER = 0.2;
 	private static final double WIND_WALK_VELOCITY_BONUS = 1.5;
 
+	public static final DepthsAbilityInfo<DepthsWindWalk> INFO =
+		new DepthsAbilityInfo<>(DepthsWindWalk.class, "Wind Walk", DepthsWindWalk::new, DepthsTree.WINDWALKER, DepthsTrigger.SHIFT_RIGHT_CLICK)
+			.linkedSpell(ClassAbility.WIND_WALK)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsWindWalk::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.WHITE_DYE))
+			.descriptions(DepthsWindWalk::getDescription, MAX_RARITY);
+
 	private boolean mIsWalking = false;
 
-	public DepthsWindWalk(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Wind Walk");
-		mInfo.mLinkedSpell = ClassAbility.WIND_WALK;
-		if (mRarity > 0) {
-			mInfo.mCooldown = COOLDOWN[mRarity - 1];
-		} else {
-			mInfo.mCooldown = COOLDOWN[0];
-		}
-		mInfo.mIgnoreCooldown = true;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mTree = DepthsTree.WINDWALKER;
-		mDisplayMaterial = Material.WHITE_DYE;
-
+	public DepthsWindWalk(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action trigger) {
-
-		if (isTimerActive()) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 		putOnCooldown();
-		walk();
-	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
-
-	public void walk() {
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1.75f);
@@ -147,26 +137,15 @@ public class DepthsWindWalk extends DepthsAbility {
 	//Cancel melee damage within 10 ticks of casting
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (mPlayer != null
-			    && source != null
+		if (source != null
 			    && (event.getType() == DamageEvent.DamageType.MELEE)
 			    && mIsWalking) {
 			event.setCancelled(true);
 		}
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.WINDWALKER;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_RIGHT_CLICK;
-	}
-
-	@Override
-	public String getDescription(int rarity) {
-			return "Right click while sneaking to dash in the target direction, applying " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for 5 seconds to all enemies dashed through, and apply Levitation I to non-elites dashed through for 2 seconds. Gain immunity to melee damage for half a second when triggered. Cooldown: " + DepthsUtils.getRarityColor(rarity) + (COOLDOWN[rarity - 1] / 20) + "s" + ChatColor.WHITE + ".";
+	private static String getDescription(int rarity) {
+		return "Right click while sneaking to dash in the target direction, applying " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for 5 seconds to all enemies dashed through, and apply Levitation I to non-elites dashed through for 2 seconds. Gain immunity to melee damage for half a second when triggered. Cooldown: " + DepthsUtils.getRarityColor(rarity) + (COOLDOWN[rarity - 1] / 20) + "s" + ChatColor.WHITE + ".";
 	}
 }

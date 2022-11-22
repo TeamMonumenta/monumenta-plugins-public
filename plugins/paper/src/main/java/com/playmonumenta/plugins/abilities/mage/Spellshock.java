@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NavigableSet;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -63,49 +63,44 @@ public class Spellshock extends Ability {
 	public static final String CHARM_DETONATION_DAMAGE = "Spellshock Detonation Damage";
 	public static final String CHARM_DETONATION_RADIUS = "Spellshock Detonation Radius";
 
+	public static final AbilityInfo<Spellshock> INFO =
+		new AbilityInfo<>(Spellshock.class, NAME, Spellshock::new)
+			.linkedSpell(ABILITY)
+			.scoreboardId("SpellShock")
+			.shorthandName("SS")
+			.descriptions(
+				String.format("Hitting an enemy with a spell inflicts static for %s seconds." +
+					              " If an enemy with static is hit by another spell, a spellshock centered on the enemy deals %s%% of the triggering spell's damage to all mobs in a %s block radius." +
+					              " Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick." +
+					              " If a static mob is struck by a melee attack, it takes %s%% more damage on the hit and is slowed by %s%% for %s seconds, clearing the static.",
+					DURATION_TICKS / 20,
+					(int) (DAMAGE_1 * 100),
+					SIZE,
+					(int) (MELEE_BONUS_1 * 100),
+					(int) (-SLOW_MULTIPLIER * 100),
+					SLOW_DURATION / 20.0),
+				String.format("Damage is increased to %s%% for spells and %s%% for melee. Additionally, gain +%s%% speed for 2 seconds whenever a spellshock is triggered.",
+					(int) (DAMAGE_2 * 100),
+					(int) (MELEE_BONUS_2 * 100),
+					(int) (SPEED_MULTIPLIER * 100)),
+				String.format("When an enemy that had ever had static applied dies, they explode, dealing %s damage to enemies in a %s block radius.",
+					ENHANCEMENT_DAMAGE,
+					ENHANCEMENT_RADIUS))
+			.displayItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
+
 	private final float mLevelDamage;
 	private final float mMeleeBonus;
 
-	public Spellshock(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = ABILITY;
-
-		mInfo.mScoreboardId = "SpellShock";
-		mInfo.mShorthandName = "SS";
-		mInfo.mDescriptions.add(
-			String.format("Hitting an enemy with a spell inflicts static for %s seconds." +
-			                        " If an enemy with static is hit by another spell, a spellshock centered on the enemy deals %s%% of the triggering spell's damage to all mobs in a %s block radius." +
-			                        " Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick." +
-			                        " If a static mob is struck by a melee attack, it takes %s%% more damage on the hit and is slowed by %s%% for %s seconds, clearing the static.",
-				DURATION_TICKS / 20,
-				(int)(DAMAGE_1 * 100),
-				SIZE,
-				(int)(MELEE_BONUS_1 * 100),
-				(int)(-SLOW_MULTIPLIER * 100),
-				SLOW_DURATION / 20.0));
-		mInfo.mDescriptions.add(
-			String.format("Damage is increased to %s%% for spells and %s%% for melee. Additionally, gain +%s%% speed for 2 seconds whenever a spellshock is triggered.",
-				(int)(DAMAGE_2 * 100),
-				(int)(MELEE_BONUS_2 * 100),
-				(int)(SPEED_MULTIPLIER * 100)));
-		mInfo.mDescriptions.add(
-			String.format("When an enemy that had ever had static applied dies, they explode, dealing %s damage to enemies in a %s block radius.",
-				ENHANCEMENT_DAMAGE,
-				ENHANCEMENT_RADIUS));
-		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
-
+	public Spellshock(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mLevelDamage = (isLevelOne() ? DAMAGE_1 : DAMAGE_2) + (float) CharmManager.getLevelPercentDecimal(player, CHARM_SPELL);
 		mMeleeBonus = (isLevelOne() ? MELEE_BONUS_1 : MELEE_BONUS_2) + (float) CharmManager.getLevelPercentDecimal(player, CHARM_MELEE);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer == null
-			    || mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) <= 0) {
-			return false;
-		}
-
-		if (event.getType() == DamageType.MELEE) {
+		if (event.getType() == DamageType.MELEE
+			    && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0) {
 			NavigableSet<Effect> effectGroupOriginal = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
 			if (effectGroupOriginal != null) {
 				event.setDamage(event.getDamage() * (1 + mMeleeBonus));
@@ -114,7 +109,11 @@ public class Spellshock extends Ability {
 					e.clearEffect();
 				}
 			}
-		} else if (event.getAbility() != null && event.getAbility() != ClassAbility.BLIZZARD && event.getAbility() != ClassAbility.ARCANE_STRIKE && event.getAbility() != ClassAbility.ARCANE_STRIKE_ENHANCED && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
+		} else if (event.getAbility() != null
+			           && event.getAbility() != ClassAbility.BLIZZARD
+			           && event.getAbility() != ClassAbility.ARCANE_STRIKE
+			           && event.getAbility() != ClassAbility.ARCANE_STRIKE_ENHANCED
+			           && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
 			// Check if the mob has static, and trigger it if possible; otherwise, apply/refresh it
 			NavigableSet<Effect> effectGroupOriginal = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
 			if (effectGroupOriginal != null) {
@@ -141,7 +140,7 @@ public class Spellshock extends Ability {
 					triggeredMobs.add(enemy);
 
 					// spellshock triggering other spellshocks propagates the damage at 100%
-					double spellShockDamage = event.getAbility() == mInfo.mLinkedSpell ? event.getDamage() : event.getDamage() * mLevelDamage;
+					double spellShockDamage = event.getAbility() == mInfo.getLinkedSpell() ? event.getDamage() : event.getDamage() * mLevelDamage;
 
 					/*
 					 * Loop through triggeredMobs, and check distances to each in nearbyMobs. If in range,
@@ -164,7 +163,7 @@ public class Spellshock extends Ability {
 								if (nearbyMob.getLocation().distanceSquared(triggeredMob.getLocation()) < (SIZE * SIZE)) {
 									// Only damage a mob once per tick
 									if (MetadataUtils.checkOnceThisTick(mPlugin, nearbyMob, DAMAGED_THIS_TICK_METAKEY)) {
-										DamageUtils.damage(mPlayer, nearbyMob, DamageType.OTHER, spellShockDamage, mInfo.mLinkedSpell, true);
+										DamageUtils.damage(mPlayer, nearbyMob, DamageType.OTHER, spellShockDamage, mInfo.getLinkedSpell(), true);
 									}
 
 									NavigableSet<Effect> effectGroup = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
@@ -185,7 +184,7 @@ public class Spellshock extends Ability {
 					}
 				}
 			}
-			if (event.getAbility() != null && event.getAbility() != mInfo.mLinkedSpell) {
+			if (event.getAbility() != null && event.getAbility() != mInfo.getLinkedSpell()) {
 				NavigableSet<Effect> effectGroup = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
 				if (effectGroup != null) {
 					SpellShockStatic effect = (SpellShockStatic) effectGroup.last();

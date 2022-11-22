@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -33,27 +34,31 @@ public class SwiftCuts extends Ability {
 	public static final String CHARM_SWEEP_DAMAGE = "Swift Cuts Sweep Damage";
 	public static final String CHARM_RADIUS = "Swift Cuts Radius";
 
+	public static final AbilityInfo<SwiftCuts> INFO =
+		new AbilityInfo<>(SwiftCuts.class, "Swift Cuts", SwiftCuts::new)
+			.scoreboardId("SwiftCuts")
+			.shorthandName("SC")
+			.descriptions(
+				String.format("If you perform a melee attack on the same mob 2 or more times in a row, each hit after the first does +%d%% damage and deals %d%% of the damage to all other mobs in a %s block radius.", (int) (CONSECUTIVE_PERCENT_DAMAGE_1 * 100), (int) (PERCENT_AOE_DAMAGE_1 * 100), SWEEP_RADIUS),
+				String.format("Bonus damage increased to +%d%%, sweep damage increased to %d%%.", (int) (CONSECUTIVE_PERCENT_DAMAGE_2 * 100), (int) (PERCENT_AOE_DAMAGE_2 * 100)),
+				"Every third fully charged melee attack in a row against the same mob deals " + (int) (ENHANCEMENT_DAMAGE_PERCENT * 100) + "% more damage.")
+			.displayItem(new ItemStack(Material.STONE_SWORD, 1));
+
 	private final double mConsecutivePercentDamage;
 	private final double mPercentAoEDamage;
 
 	private @Nullable LivingEntity mLastTarget = null;
 	private int mEnhancementHits = 0;
 
-	public SwiftCuts(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Swift Cuts");
-		mInfo.mScoreboardId = "SwiftCuts";
-		mInfo.mShorthandName = "SC";
-		mInfo.mDescriptions.add(String.format("If you perform a melee attack on the same mob 2 or more times in a row, each hit after the first does +%d%% damage and deals %d%% of the damage to all other mobs in a %s block radius.", (int)(CONSECUTIVE_PERCENT_DAMAGE_1 * 100), (int)(PERCENT_AOE_DAMAGE_1 * 100), SWEEP_RADIUS));
-		mInfo.mDescriptions.add(String.format("Bonus damage increased to +%d%%, sweep damage increased to %d%%.", (int)(CONSECUTIVE_PERCENT_DAMAGE_2 * 100), (int)(PERCENT_AOE_DAMAGE_2 * 100)));
-		mInfo.mDescriptions.add("Every third fully charged melee attack in a row against the same mob deals " + (int)(ENHANCEMENT_DAMAGE_PERCENT * 100) + "% more damage.");
-		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
+	public SwiftCuts(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mConsecutivePercentDamage = (isLevelOne() ? CONSECUTIVE_PERCENT_DAMAGE_1 : CONSECUTIVE_PERCENT_DAMAGE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mPercentAoEDamage = isLevelOne() ? PERCENT_AOE_DAMAGE_1 : PERCENT_AOE_DAMAGE_2;
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer != null && event.getType() == DamageType.MELEE) {
+		if (event.getType() == DamageType.MELEE) {
 			if (enemy.equals(mLastTarget)) {
 				Location loc = enemy.getLocation();
 				World world = mPlayer.getWorld();
@@ -76,7 +81,7 @@ public class SwiftCuts extends Ability {
 				}
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, SWEEP_RADIUS), enemy)) {
-					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, sweepDamage, mInfo.mLinkedSpell, true, true);
+					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, sweepDamage, mInfo.getLinkedSpell(), true, true);
 				}
 
 				if (isEnhanced()) {

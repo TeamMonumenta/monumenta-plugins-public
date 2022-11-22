@@ -255,7 +255,7 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		mPlugin.mAbilityManager.playerInteractEvent(player, action, mat);
+		mPlugin.mAbilityManager.playerInteractEvent(event, mat);
 		mPlugin.mItemStatManager.onPlayerInteract(mPlugin, player, event);
 
 		// Overrides

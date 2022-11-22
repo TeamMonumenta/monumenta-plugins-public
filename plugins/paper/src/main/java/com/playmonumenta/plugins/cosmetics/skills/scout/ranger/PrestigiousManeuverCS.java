@@ -50,8 +50,8 @@ public class PrestigiousManeuverCS extends TacticalManeuverCS implements Prestig
 	}
 
 	@Override
-	public boolean isUnlocked(Player mPlayer) {
-		return mPlayer != null;
+	public boolean isUnlocked(Player player) {
+		return player != null;
 	}
 
 	@Override

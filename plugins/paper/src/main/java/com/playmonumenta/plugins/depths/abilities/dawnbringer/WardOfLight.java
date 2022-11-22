@@ -3,10 +3,12 @@ package com.playmonumenta.plugins.depths.abilities.dawnbringer;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -18,7 +20,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -30,18 +31,21 @@ public class WardOfLight extends DepthsAbility {
 	private static final double HEALING_DOT_ANGLE = 0.33;
 	private static final int COOLDOWN = 12 * 20;
 
+	public static final DepthsAbilityInfo<WardOfLight> INFO =
+		new DepthsAbilityInfo<>(WardOfLight.class, ABILITY_NAME, WardOfLight::new, DepthsTree.SUNLIGHT, DepthsTrigger.RIGHT_CLICK)
+			.linkedSpell(ClassAbility.WARD_OF_LIGHT)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WardOfLight::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.LANTERN))
+			.descriptions(WardOfLight::getDescription, MAX_RARITY);
+
 	public WardOfLight(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.LANTERN;
-		mTree = DepthsTree.SUNLIGHT;
-		mInfo.mLinkedSpell = ClassAbility.WARD_OF_LIGHT;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 
@@ -82,28 +86,9 @@ public class WardOfLight extends DepthsAbility {
 		}
 	}
 
-	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return DepthsUtils.isWeaponItem(mainHand) && !mPlayer.isSneaking();
-	}
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Right click while holding a weapon and not sneaking to heal nearby players within " + HEALING_RADIUS + " blocks in front of you for " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(HEAL[rarity - 1]) + "%" + ChatColor.WHITE + " of their max health. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.SUNLIGHT;
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.RIGHT_CLICK;
-	}
 }
 

@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
@@ -15,7 +17,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,7 +32,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Trident;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
@@ -54,67 +54,65 @@ public class PredatorStrike extends Ability {
 	public static final String CHARM_DAMAGE = "Predator Strike Damage";
 	public static final String CHARM_RADIUS = "Predator Strike Radius";
 
+	public static final AbilityInfo<PredatorStrike> INFO =
+		new AbilityInfo<>(PredatorStrike.class, "Predator Strike", PredatorStrike::new)
+			.linkedSpell(ClassAbility.PREDATOR_STRIKE)
+			.scoreboardId("PredatorStrike")
+			.shorthandName("PrS")
+			.descriptions(
+				String.format("Left-clicking with a projectile weapon while not sneaking will prime a Predator Strike that unprimes after 5s. " +
+					              "When you fire a critical projectile, it will instantaneously travel in a straight line " +
+					              "for up to %d blocks or until it hits an enemy or block and damages enemies in a %s block radius. " +
+					              "This ability deals 100%% of your projectile base damage increased by %d%% for every block of distance from you and the target " +
+					              "(up to %d blocks, or %d%% total). Cooldown: %ds.",
+					MAX_RANGE, EXPLODE_RADIUS, (int) (DISTANCE_SCALE_1 * 100), MAX_DAMAGE_RANGE, MAX_DAMAGE_RANGE * (int) (DISTANCE_SCALE_1 * 100) + 100, COOLDOWN_1 / 20),
+				String.format("Damage now increases %d%% for each block of distance (up to %d%%). Cooldown: %ds.", (int) (DISTANCE_SCALE_2 * 100), MAX_DAMAGE_RANGE * (int) (DISTANCE_SCALE_2 * 100) + 100, COOLDOWN_2 / 20))
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", PredatorStrike::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false),
+				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.SPECTRAL_ARROW, 1));
+
 	private boolean mActive = false;
 	private final double mDistanceScale;
 	private final double mExplodeRadius;
 
 	private final PredatorStrikeCS mCosmetic;
 
-	public PredatorStrike(Plugin plugin, @Nullable Player mPlayer) {
-		super(plugin, mPlayer, "Predator Strike");
-		mInfo.mLinkedSpell = ClassAbility.PREDATOR_STRIKE;
-		mInfo.mScoreboardId = "PredatorStrike";
-		mInfo.mShorthandName = "PrS";
-		mInfo.mDescriptions.add(String.format("Left-clicking with a projectile weapon while not sneaking will prime a Predator Strike that unprimes after 5s. " +
-			                                      "When you fire a critical projectile, it will instantaneously travel in a straight line " +
-			                                      "for up to %d blocks or until it hits an enemy or block and damages enemies in a %s block radius. " +
-			                                      "This ability deals 100%% of your projectile base damage increased by %d%% for every block of distance from you and the target " +
-			                                      "(up to %d blocks, or %d%% total). Cooldown: %ds.",
-			MAX_RANGE, EXPLODE_RADIUS, (int) (DISTANCE_SCALE_1 * 100), MAX_DAMAGE_RANGE, MAX_DAMAGE_RANGE * (int) (DISTANCE_SCALE_1 * 100) + 100, COOLDOWN_1 / 20));
-		mInfo.mDescriptions.add(String.format("Damage now increases %d%% for each block of distance (up to %d%%). Cooldown: %ds.", (int) (DISTANCE_SCALE_2 * 100), MAX_DAMAGE_RANGE * (int) (DISTANCE_SCALE_2 * 100) + 100, COOLDOWN_2 / 20));
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.SPECTRAL_ARROW, 1);
-
+	public PredatorStrike(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDistanceScale = isLevelOne() ? DISTANCE_SCALE_1 : DISTANCE_SCALE_2;
-		mExplodeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EXPLODE_RADIUS);
+		mExplodeRadius = CharmManager.getRadius(player, CHARM_RADIUS, EXPLODE_RADIUS);
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new PredatorStrikeCS(), PredatorStrikeCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PredatorStrikeCS(), PredatorStrikeCS.SKIN_LIST);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer != null && !mPlayer.isSneaking() && !mActive && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (ItemUtils.isProjectileWeapon(mainHand)) {
-				mActive = true;
-				ClientModHandler.updateAbility(mPlayer, this);
-				World world = mPlayer.getWorld();
-
-				mCosmetic.strikeSoundReady(world, mPlayer);
-				new BukkitRunnable() {
-					int mTicks = 0;
-
-					@Override
-					public void run() {
-						mTicks++;
-						mCosmetic.strikeTick(mPlayer, mTicks);
-
-						if (!mActive || mTicks >= 20 * 5) {
-							mActive = false;
-							this.cancel();
-							ClientModHandler.updateAbility(mPlayer, PredatorStrike.this);
-						}
-					}
-				}.runTaskTimer(mPlugin, 0, 1);
-			}
+	public void cast() {
+		if (mActive || isOnCooldown()) {
+			return;
 		}
+		mActive = true;
+		ClientModHandler.updateAbility(mPlayer, this);
+		mCosmetic.strikeSoundReady(mPlayer.getWorld(), mPlayer);
+		new BukkitRunnable() {
+			int mTicks = 0;
+
+			@Override
+			public void run() {
+				mTicks++;
+				mCosmetic.strikeTick(mPlayer, mTicks);
+
+				if (!mActive || mTicks >= 20 * 5) {
+					mActive = false;
+					this.cancel();
+					ClientModHandler.updateAbility(mPlayer, PredatorStrike.this);
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mPlayer != null && mActive && ((projectile instanceof AbstractArrow arrow && arrow.isCritical()) || projectile instanceof Trident || projectile instanceof Snowball)) {
+		if (mActive && ((projectile instanceof AbstractArrow arrow && arrow.isCritical()) || projectile instanceof Trident || projectile instanceof Snowball)) {
 			mActive = false;
 			putOnCooldown();
 			projectile.remove();
@@ -129,7 +127,7 @@ public class PredatorStrike extends Ability {
 			World world = mPlayer.getWorld();
 			mCosmetic.strikeLaunch(world, mPlayer);
 
-			Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(loc, MAX_RANGE));
+			Set<LivingEntity> nearbyMobs = new HashSet<>(EntityUtils.getNearbyMobs(loc, MAX_RANGE));
 
 			boolean hit = false;
 			for (double r = 0; r < MAX_RANGE; r += HITBOX_LENGTH) {
@@ -171,16 +169,12 @@ public class PredatorStrike extends Ability {
 	}
 
 	private void explode(Location loc) {
-		if (mPlayer == null) {
-			return;
-		}
-
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE)));
 
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mExplodeRadius);
 		for (LivingEntity mob : hitbox.getHitMobs()) {
 			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
-			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, damage, mInfo.mLinkedSpell, true);
+			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true);
 		}
 
 		//Visual feedback

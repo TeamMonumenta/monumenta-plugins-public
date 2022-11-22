@@ -2,29 +2,27 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
-import javax.annotation.Nullable;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public abstract class PotionAbility extends Ability {
 
+	public static final AbilityTriggerInfo.TriggerRestriction HOLDING_ALCHEMIST_BAG_RESTRICTION =
+		new AbilityTriggerInfo.TriggerRestriction("holding an Alchemist's Bag", player -> ItemUtils.isAlchemistItem(player.getInventory().getItemInMainHand()));
+
 	private double mDamage;
 
-	public PotionAbility(Plugin plugin, @Nullable Player player,
-	                     String displayName, double damage1, double damage2) {
-		super(plugin, player, displayName);
+	public PotionAbility(Plugin plugin, Player player,
+	                     AbilityInfo<? extends PotionAbility> info, double damage1, double damage2) {
+		super(plugin, player, info);
 
-		// getAbilityScore() doesn't work until we set the mInfo.mScoreboard in the child class
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				mDamage = isLevelOne() ? damage1 : damage2;
-			}
-		}.runTaskLater(mPlugin, 1);
+		mDamage = isLevelOne() ? damage1 : damage2;
 	}
 
 	public void apply(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {

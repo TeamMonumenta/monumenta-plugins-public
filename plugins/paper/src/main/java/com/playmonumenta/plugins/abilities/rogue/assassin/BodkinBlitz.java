@@ -1,9 +1,10 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.assassin.BodkinBlitzCS;
@@ -13,7 +14,6 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -25,7 +25,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -52,6 +51,29 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	public static final String CHARM_STEALTH = "Bodkin Blitz Stealth Duration";
 	public static final String CHARM_DISTANCE = "Bodkin Blitz Distance";
 
+	public static final AbilityInfo<BodkinBlitz> INFO =
+		new AbilityInfo<>(BodkinBlitz.class, "Bodkin Blitz", BodkinBlitz::new)
+			.linkedSpell(ClassAbility.BODKIN_BLITZ)
+			.scoreboardId("BodkinBlitz")
+			.shorthandName("BB")
+			.descriptions(
+				String.format("Sneak right click while holding two swords to teleport %s blocks forwards. Gain %s second of Stealth upon teleporting. Upon teleporting, your next melee attack deals %s bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: %ss. Charges: %s.",
+					DISTANCE_1,
+					STEALTH_DURATION_1 / 20,
+					BONUS_DMG_1,
+					COOLDOWN_1 / 20,
+					MAX_CHARGES
+				),
+				String.format("Range increased to %s blocks, Stealth increased to %s seconds. Upon teleporting, your next melee attack deals %s bonus damage if your target is not focused on you. Cooldown: %ss.",
+					DISTANCE_2,
+					STEALTH_DURATION_2 / 20.0,
+					BONUS_DMG_2,
+					COOLDOWN_2 / 20))
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BodkinBlitz::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true),
+				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
+			.displayItem(new ItemStack(Material.BLAZE_POWDER, 1));
+
 	private final int mStealthDuration;
 	private final double mBonusDmg;
 
@@ -59,59 +81,28 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	private boolean mTeleporting = false;
 	private int mTicks;
 
-	private boolean mHasSmokescreen = false;
 	private int mLastCastTicks = 0;
 	private final BodkinBlitzCS mCosmetic;
 
-	public BodkinBlitz(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Bodkin Blitz");
-		mInfo.mLinkedSpell = ClassAbility.BODKIN_BLITZ;
-		mInfo.mScoreboardId = "BodkinBlitz";
-		mInfo.mShorthandName = "BB";
-		mInfo.mDescriptions.add(
-			String.format("Sneak right click while holding two swords to teleport %s blocks forwards. Gain %s second of Stealth upon teleporting. Upon teleporting, your next melee attack deals %s bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: %ss. Charges: %s.",
-				DISTANCE_1,
-				STEALTH_DURATION_1 / 20,
-				BONUS_DMG_1,
-				COOLDOWN_1 / 20,
-				MAX_CHARGES
-				));
-		mInfo.mDescriptions.add(
-			String.format("Range increased to %s blocks, Stealth increased to %s seconds. Upon teleporting, your next melee attack deals %s bonus damage if your target is not focused on you. Cooldown: %ss.",
-				DISTANCE_2,
-				STEALTH_DURATION_2 / 20.0,
-				BONUS_DMG_2,
-				COOLDOWN_2 / 20));
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
+	public BodkinBlitz(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mMaxCharges = MAX_CHARGES + (int) CharmManager.getLevel(player, CHARM_CHARGE);
 		mCharges = getTrackedCharges();
 
 		mStealthDuration = (isLevelOne() ? STEALTH_DURATION_1 : STEALTH_DURATION_2) + CharmManager.getExtraDuration(player, CHARM_STEALTH);
 		mBonusDmg = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? BONUS_DMG_1 : BONUS_DMG_2);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BodkinBlitzCS(), BodkinBlitzCS.SKIN_LIST);
-
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			mHasSmokescreen = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Smokescreen.class) != null;
-		});
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null || mTeleporting || !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-			|| !InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
+	public void cast() {
+		if (mTeleporting
+			    || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return;
 		}
 
 		Location loc = mPlayer.getLocation();
-		// Smokescreen trigger conflict
-		if (mHasSmokescreen && loc.getPitch() > 50) {
-			return;
-		}
 
-		int ticks = mPlayer.getTicksLived();
+		int ticks = Bukkit.getServer().getCurrentTick();
 		// Prevent double casting on accident
 		if (ticks - mLastCastTicks <= 4 || !consumeCharge()) {
 			return;
@@ -126,7 +117,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		new BukkitRunnable() {
 			final BoundingBox mPlayerBox = mPlayer.getBoundingBox();
 			final Vector mDirection = mPlayer.getLocation().getDirection().normalize();
-			double mDistance = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
+			final double mDistance = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
 			final double mDistancePerTick = mDistance / TELEPORT_TICKS;
 			int mTick = 0;
 			Location mLastTpLoc = mPlayer.getLocation();
@@ -209,7 +200,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 					World world = entityLoc.getWorld();
 					mCosmetic.blitzOnDamage(world, mPlayer, entityLoc);
 
-					DamageUtils.damage(mPlayer, m, DamageType.MELEE_SKILL, mBonusDmg, mInfo.mLinkedSpell, true);
+					DamageUtils.damage(mPlayer, m, DamageType.MELEE_SKILL, mBonusDmg, mInfo.getLinkedSpell(), true);
 				}
 			}
 		}

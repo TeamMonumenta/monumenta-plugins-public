@@ -1,11 +1,14 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -16,7 +19,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -32,45 +35,44 @@ public class HowlingWinds extends DepthsAbility {
 	public static final double PULL_VELOCITY = 0.6;
 	public static final double BASE_RATIO = 0.15;
 
+	public static final DepthsAbilityInfo<HowlingWinds> INFO =
+		new DepthsAbilityInfo<>(HowlingWinds.class, ABILITY_NAME, HowlingWinds::new, DepthsTree.WINDWALKER, DepthsTrigger.SWAP)
+			.linkedSpell(ClassAbility.HOWLINGWINDS)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HowlingWinds::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.HOPPER))
+			.descriptions(HowlingWinds::getDescription, MAX_RARITY);
+
 	public HowlingWinds(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.HOPPER;
-		mTree = DepthsTree.WINDWALKER;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mIgnoreCooldown = true;
-		mInfo.mLinkedSpell = ClassAbility.HOWLINGWINDS;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		event.setCancelled(true);
-		if (mPlayer != null && !isTimerActive() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
-			putOnCooldown();
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
+		}
+		putOnCooldown();
 
-			Location loc = mPlayer.getEyeLocation();
-			World world = mPlayer.getWorld();
-			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 0.8f, 0.25f);
-			world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1.0f, 1.2f);
-			world.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f);
-			Vector dir = loc.getDirection().normalize();
-			for (int i = 0; i < DISTANCE; i++) {
-				loc.add(dir);
+		Location loc = mPlayer.getEyeLocation();
+		World world = mPlayer.getWorld();
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 0.8f, 0.25f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1.0f, 1.2f);
+		world.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f);
+		Vector dir = loc.getDirection().normalize();
+		for (int i = 0; i < DISTANCE; i++) {
+			loc.add(dir);
 
-				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 5, 0.1, 0.1, 0.1, 0.1);
-				world.spawnParticle(Particle.CLOUD, loc, 5, 0.1, 0.1, 0.1, 0.1);
-				int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
-				if (loc.getBlock().getType().isSolid() || i >= DISTANCE - 1 || size > 0) {
-					explode(loc);
-					break;
-				}
+			world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 5, 0.1, 0.1, 0.1, 0.1);
+			world.spawnParticle(Particle.CLOUD, loc, 5, 0.1, 0.1, 0.1, 0.1);
+			int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
+			if (loc.getBlock().getType().isSolid() || i >= DISTANCE - 1 || size > 0) {
+				explode(loc);
+				break;
 			}
 		}
 	}
 
 	private void explode(Location loc) {
-		if (mPlayer == null) {
-			return;
-		}
 		World world = mPlayer.getWorld();
 		world.spawnParticle(Particle.CLOUD, loc, 35, 4, 4, 4, 0.125);
 		world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 25, 2, 2, 2, 0.125);
@@ -104,19 +106,10 @@ public class HowlingWinds extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Swap hands to summon a hurricane that lasts " + DURATION_TICKS / 20 + " seconds at the location you are looking at, up to " + DISTANCE + " blocks away. The hurricane pulls enemies within " + PULL_RADIUS + " blocks towards its center every " + DepthsUtils.getRarityColor(rarity) + PULL_INTERVAL[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.WINDWALKER;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SWAP;
-	}
 }
 

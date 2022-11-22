@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -13,7 +15,6 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -29,7 +30,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
@@ -63,20 +63,27 @@ public class Panacea extends Ability {
 	public static final String CHARM_SLOW_DURATION = "Panacea Slow Duration";
 	public static final String CHARM_COOLDOWN = "Panacea Cooldown";
 
+	public static final AbilityInfo<Panacea> INFO =
+		new AbilityInfo<>(Panacea.class, "Panacea", Panacea::new)
+			.linkedSpell(ClassAbility.PANACEA)
+			.scoreboardId("Panacea")
+			.shorthandName("Pn")
+			.descriptions(
+				"Shift left click with a projectile weapon to shoot a mixture that deals 60% of your potion damage and applies 100% Slow for 1.5s to every enemy touched " +
+					"and adds 2 absorption health to other players, lasting 24 seconds, maximum 16. " +
+					"After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 20s.",
+				"Absorption health added is increased to 4, and Slow duration is increased to 2s.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Panacea::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
+				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.PURPLE_CONCRETE_POWDER, 1));
+
 	private final double mShield;
 	private final int mSlowTicks;
 	private @Nullable AlchemistPotions mAlchemistPotions;
 
-	public Panacea(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Panacea");
-		mInfo.mScoreboardId = "Panacea";
-		mInfo.mShorthandName = "Pn";
-		mInfo.mDescriptions.add("Shift left click with a projectile weapon to shoot a mixture that deals 60% of your potion damage and applies 100% Slow for 1.5s to every enemy touched and adds 2 absorption health to other players, lasting 24 seconds, maximum 16. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Absorption health added is increased to 4, and Slow duration is increased to 2s.");
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mLinkedSpell = ClassAbility.PANACEA;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDisplayItem = new ItemStack(Material.PURPLE_CONCRETE_POWDER, 1);
+	public Panacea(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mSlowTicks = (isLevelOne() ? PANACEA_1_SLOW_TICKS : PANACEA_2_SLOW_TICKS) + CharmManager.getExtraDuration(mPlayer, CHARM_SLOW_DURATION);
 		mShield = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, isLevelOne() ? PANACEA_1_SHIELD : PANACEA_2_SHIELD);
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -84,9 +91,8 @@ public class Panacea extends Ability {
 		});
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 		World world = mPlayer.getWorld();
@@ -132,7 +138,7 @@ public class Panacea extends Ability {
 					while (mobIter.hasNext()) {
 						LivingEntity mob = mobIter.next();
 						if (mBox.overlaps(mob.getBoundingBox())) {
-							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage, true, true, false);
+							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, true, false);
 
 							if (!EntityUtils.isBoss(mob)) {
 								EntityUtils.applySlow(mPlugin, mSlowTicks, 1, mob);
@@ -210,12 +216,4 @@ public class Panacea extends Ability {
 		}
 	}
 
-	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSneaking() && ItemUtils.isProjectileWeapon(inMainHand);
-	}
 }

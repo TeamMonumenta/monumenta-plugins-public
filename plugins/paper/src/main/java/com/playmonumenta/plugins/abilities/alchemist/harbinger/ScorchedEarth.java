@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -52,6 +53,18 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	public static final String CHARM_RADIUS = "Scorched Earth Radius";
 	public static final String CHARM_DAMAGE = "Scorched Earth Damage";
 
+	public static final AbilityInfo<ScorchedEarth> INFO =
+		new AbilityInfo<>(ScorchedEarth.class, "Scorched Earth", ScorchedEarth::new)
+			.linkedSpell(ClassAbility.SCORCHED_EARTH)
+			.scoreboardId("ScorchedEarth")
+			.shorthandName("SE")
+			.descriptions(
+				"Sneak while trowing an Alchemist's Potion to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. " +
+					"Mobs in this zone are dealt 25% of your potion's damage extra whenever taking damage of types other than ailment or fire. Cooldown: 30s.",
+				"Cooldown reduced to 25s, and two charges of this ability can be stored at once.")
+			.cooldown(SCORCHED_EARTH_1_COOLDOWN, SCORCHED_EARTH_2_COOLDOWN, CHARM_COOLDOWN)
+			.displayItem(new ItemStack(Material.BROWN_DYE, 1));
+
 	private final int mDuration;
 	private final double mRadius;
 
@@ -59,17 +72,8 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	private int mLastCastTicks = 0;
 	private @Nullable AlchemistPotions mAlchemistPotions;
 
-	public ScorchedEarth(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Scorched Earth");
-		mInfo.mLinkedSpell = ClassAbility.SCORCHED_EARTH;
-		mInfo.mScoreboardId = "ScorchedEarth";
-		mInfo.mShorthandName = "SE";
-		mInfo.mDescriptions.add("Shift right click while holding an Alchemist's Bag to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. " +
-			                        "Mobs in this zone are dealt 25% of your potion's damage extra whenever taking damage of types other than ailment or fire. Cooldown: 30s.");
-		mInfo.mDescriptions.add("Cooldown reduced to 25s, and two charges of this ability can be stored at once.");
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, isLevelOne() ? SCORCHED_EARTH_1_COOLDOWN : SCORCHED_EARTH_2_COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.BROWN_DYE, 1);
+	public ScorchedEarth(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mMaxCharges = (isLevelOne() ? SCORCHED_EARTH_1_CHARGES : SCORCHED_EARTH_2_CHARGES) + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
 		mDuration = SCORCHED_EARTH_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
@@ -121,7 +125,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (mPlayer != null && mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
 			int ticks = mPlayer.getTicksLived();
 			// Prevent double casting on accident
 			if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
@@ -135,7 +139,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
-		if (mPlayer != null && potion.hasMetadata(SCORCHED_EARTH_POTION_METAKEY)) {
+		if (potion.hasMetadata(SCORCHED_EARTH_POTION_METAKEY)) {
 			Location loc = potion.getLocation();
 			World world = mPlayer.getWorld();
 			new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 2.1, 0.5, 2.1, 0.1).spawnAsPlayerActive(mPlayer);

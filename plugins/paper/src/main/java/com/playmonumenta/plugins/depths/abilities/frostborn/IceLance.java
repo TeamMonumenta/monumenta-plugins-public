@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.frostborn;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -23,7 +25,7 @@ import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -40,17 +42,23 @@ public class IceLance extends DepthsAbility {
 	private static final double HITBOX_SIZE = 0.75;
 	public static final int ICE_TICKS = 6 * 20;
 
+	public static final DepthsAbilityInfo<IceLance> INFO =
+		new DepthsAbilityInfo<>(IceLance.class, ABILITY_NAME, IceLance::new, DepthsTree.FROSTBORN, DepthsTrigger.RIGHT_CLICK)
+			.linkedSpell(ClassAbility.ICE_LANCE)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", IceLance::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.SNOWBALL))
+			.descriptions(IceLance::getDescription, MAX_RARITY);
+
 	public IceLance(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.SNOWBALL;
-		mTree = DepthsTree.FROSTBORN;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.ICE_LANCE;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action trigger) {
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
+		}
 		putOnCooldown();
 
 		Location loc = mPlayer.getEyeLocation();
@@ -78,7 +86,7 @@ public class IceLance extends DepthsAbility {
 			while (iter.hasNext()) {
 				LivingEntity mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
-					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
+					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
 					EntityUtils.applySlow(mPlugin, DURATION, AMPLIFIER, mob);
 					EntityUtils.applyWeaken(mPlugin, DURATION, AMPLIFIER, mob);
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f, true);
@@ -106,24 +114,9 @@ public class IceLance extends DepthsAbility {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 2.0f);
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Right click to shoot an ice lance that travels " + RANGE + " blocks and pierces through mobs, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and applying " + (int) DepthsUtils.roundPercent(AMPLIFIER) + "% slowness and weaken for " + DURATION / 20 + " seconds. If the lance kills a mob, the floor under it will be frozen for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && !mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FROSTBORN;
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.RIGHT_CLICK;
-	}
 }
 

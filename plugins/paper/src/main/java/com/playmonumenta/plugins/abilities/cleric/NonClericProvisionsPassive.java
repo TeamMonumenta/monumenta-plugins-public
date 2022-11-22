@@ -2,11 +2,11 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Sound;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
@@ -18,13 +18,12 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 
 public class NonClericProvisionsPassive extends Ability {
 
-	public NonClericProvisionsPassive(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, null);
-	}
+	public static final AbilityInfo<NonClericProvisionsPassive> INFO =
+		new AbilityInfo<>(NonClericProvisionsPassive.class, null, NonClericProvisionsPassive::new)
+			.canUse(player -> true);
 
-	@Override
-	public boolean canUse(Player player) {
-		return true;
+	public NonClericProvisionsPassive(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 	}
 
 	public static boolean testRandomChance(Player player) {
@@ -55,7 +54,7 @@ public class NonClericProvisionsPassive extends Ability {
 
 	@Override
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
-		if (mPlayer != null && testRandomChance(mPlayer)) {
+		if (testRandomChance(mPlayer)) {
 			event.setReplacement(event.getItem());
 			sacredProvisionsSound(mPlayer);
 		}
@@ -63,14 +62,14 @@ public class NonClericProvisionsPassive extends Ability {
 
 	@Override
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
-		if (mPlayer != null && testRandomChance(mPlayer)) {
+		if (testRandomChance(mPlayer)) {
 			event.setDamage(0);
 		}
 	}
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mPlayer != null && projectile instanceof AbstractArrow arrow && testRandomChance(mPlayer)) {
+		if (projectile instanceof AbstractArrow arrow && testRandomChance(mPlayer)) {
 			AbilityUtils.refundArrow(mPlayer, arrow);
 		}
 		return true;
@@ -78,7 +77,7 @@ public class NonClericProvisionsPassive extends Ability {
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (mPlayer != null && testRandomChance(mPlayer)) {
+		if (testRandomChance(mPlayer)) {
 			if (AbilityUtils.refundPotion(mPlayer, potion)) {
 				sacredProvisionsSound(mPlayer);
 			}
@@ -88,7 +87,7 @@ public class NonClericProvisionsPassive extends Ability {
 
 	@Override
 	public boolean playerThrewLingeringPotionEvent(ThrownPotion potion) {
-		if (mPlayer != null && testRandomChance(mPlayer)) {
+		if (testRandomChance(mPlayer)) {
 			if (AbilityUtils.refundPotion(mPlayer, potion)) {
 				sacredProvisionsSound(mPlayer);
 			}

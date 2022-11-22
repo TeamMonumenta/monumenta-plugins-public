@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
@@ -18,7 +19,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -55,25 +55,35 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(255, 195, 0), 1.0f);
 
+	public static final AbilityInfo<ThuribleProcession> INFO =
+		new AbilityInfo<>(ThuribleProcession.class, "Thurible Procession", ThuribleProcession::new)
+			.linkedSpell(ClassAbility.THURIBLE_PROCESSION)
+			.scoreboardId("Thurible")
+			.shorthandName("TP")
+			.descriptions(
+				"The Hierophant passively builds up buffs when other players are within 30 blocks, which are applied to all players in the radius. " +
+					"Buffs end and the buildup resets upon taking damage that causes you to drop below 60% of your max health, unless the full set of buffs have been obtained. " +
+					"Then all players (including the Hierophant) get 8 seconds of all built-up buffs. After these 8 seconds the timer resets and the Procession begins anew. " +
+					"Progression - +10% Attack Speed (after 4s of no health threshold reached), " +
+					"+10% Speed (after 8s of no health threshold reached), " +
+					"+10% Attack and Projectile Damage (after 12s of no health threshold reached), " +
+					"Cleric's passive heal is doubled, to 10% of max health every 5s (after 16s of no health threshold reached)",
+				"Progression - +15% Attack Speed (after 4s of no health threshold reached), " +
+					"+15% Speed (after 8s of no health threshold reached), " +
+					"+15% Attack and Projectile Damage (after 12s of no health threshold reached), " +
+					"Cleric's passive heal is tripled, to 15% of max health every 5s (after 16s of no health threshold reached)")
+			.cooldown(THURIBLE_COOLDOWN, CHARM_COOLDOWN)
+			.displayItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
+
 	private int mSeconds = 0;
 	private int mBuffs = 0;
 
-	public ThuribleProcession(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Thurible Procession");
-		mInfo.mScoreboardId = "Thurible";
-		mInfo.mShorthandName = "TP";
-		mInfo.mDescriptions.add("The Hierophant passively builds up buffs when other players are within 30 blocks, which are applied to all players in the radius. Buffs end and the buildup resets upon taking damage that causes you to drop below 60% of your max health, unless the full set of buffs have been obtained. Then all players (including the Hierophant) get 8 seconds of all built-up buffs. After these 8 seconds the timer resets and the Procession begins anew. Progression - +10% Attack Speed (after 4s of no health threshold reached), +10% Speed (after 8s of no health threshold reached), +10% Attack and Projectile Damage (after 12s of no health threshold reached), Cleric's passive heal is doubled, to 10% of max health every 5s (after 16s of no health threshold reached)");
-		mInfo.mDescriptions.add("Progression - +15% Attack Speed (after 4s of no health threshold reached), +15% Speed (after 8s of no health threshold reached), +15% Attack and Projectile Damage (after 12s of no health threshold reached), Cleric's passive heal is tripled, to 15% of max health every 5s (after 16s of no health threshold reached)");
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, THURIBLE_COOLDOWN);
-		mInfo.mLinkedSpell = ClassAbility.THURIBLE_PROCESSION;
-		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
+	public ThuribleProcession(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public void onHurt(DamageEvent event, Entity damager, LivingEntity source) {
-		if (mPlayer == null) {
-			return;
-		}
 		if (mBuffs > 0 && mPlayer.getHealth() - event.getFinalDamage(true) <= EntityUtils.getMaxHealth(mPlayer) * DAMAGE_BREAK_PERCENT) {
 			updateBuffs();
 
@@ -94,30 +104,24 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mPlayer == null) {
+		if (isOnCooldown()) {
 			return;
 		}
-		List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
-		if (!canCast()) {
-			return;
+		if (twoHertz && mBuffs > 0) {
+			new PartialParticle(Particle.REDSTONE, mPlayer.getLocation(), 10, 0.4, 0.4, 0.4, COLOR).spawnAsPlayerPassive(mPlayer);
 		}
-		if (players.size() > 1) {
-			if (oneSecond) {
+		if (oneSecond) {
+			List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
+			if (players.size() > 1) {
 				mSeconds++;
 				updateBuffs();
 				applyBuffs(PASSIVE_DURATION);
-			}
-			if (twoHertz) {
-				new PartialParticle(Particle.REDSTONE, mPlayer.getLocation(), 10, 0.4, 0.4, 0.4, COLOR).spawnAsPlayerBuff(mPlayer);
 			}
 		}
 	}
 
 	//Recounts number of buffs and applies the passive ones
 	private void updateBuffs() {
-		if (mPlayer == null) {
-			return;
-		}
 		int previousBuffs = mBuffs;
 
 		//Convert time into number of buffs and cap to maximum effect index for that level
@@ -135,9 +139,6 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 
 	//Applies built up buffs to all around them and themselves, take the duration as parameter (passive/built-up)
 	private void applyBuffs(int duration) {
-		if (mPlayer == null) {
-			return;
-		}
 		//Give everyone buffs from the array
 		List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
 		if (players.size() > 1) {
@@ -152,8 +153,14 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 
 	private Effect[] getEffectArray(int duration) {
 		return isLevelOne()
-				? new Effect[] {new PercentAttackSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK) + EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED) + EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + EFFECT_PERCENT_1, AFFECTED_DAMAGE_TYPES), new ThuribleBonusHealing(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + EFFECT_PERCENT_1)}
-				: new Effect[] {new PercentAttackSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK) + EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED) + EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + EFFECT_PERCENT_2, AFFECTED_DAMAGE_TYPES), new ThuribleBonusHealing(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + EFFECT_PERCENT_2)};
+			       ? new Effect[] {new PercentAttackSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK) + EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME),
+			                       new PercentSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED) + EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME),
+			                       new PercentDamageDealt(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + EFFECT_PERCENT_1, AFFECTED_DAMAGE_TYPES),
+			                       new ThuribleBonusHealing(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + EFFECT_PERCENT_1)}
+			       : new Effect[] {new PercentAttackSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK) + EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME),
+			                       new PercentSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED) + EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME),
+			                       new PercentDamageDealt(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + EFFECT_PERCENT_2, AFFECTED_DAMAGE_TYPES),
+			                       new ThuribleBonusHealing(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + EFFECT_PERCENT_2)};
 	}
 
 	@Override

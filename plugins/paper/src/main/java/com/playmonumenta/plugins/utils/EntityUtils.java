@@ -340,22 +340,23 @@ public class EntityUtils {
 		if (entity == null) {
 			return false;
 		}
-		if (!entity.getScoreboardTags().contains("SkillImmune")) {
-			if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear
-				|| entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
-				|| entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant
-				|| entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
-				return true;
-			} else if (entity instanceof Wolf) {
-				return (((Wolf) entity).isAngry() && ((Wolf) entity).getOwner() != null) || entity.getScoreboardTags().contains("boss_targetplayer");
-			} else if (entity instanceof Rabbit) {
-				return ((Rabbit) entity).getRabbitType().equals(Rabbit.Type.THE_KILLER_BUNNY);
-			} else if (entity instanceof Player) {
-				return AbilityManager.getManager().isPvPEnabled((Player) entity);
-			} else if (entity instanceof Mob) {
-				LivingEntity target = ((Mob) entity).getTarget();
-				return (target != null && target instanceof Player) || entity.getScoreboardTags().contains("boss_targetplayer") || entity.getScoreboardTags().contains("boss_hostile") || entity.getScoreboardTags().contains("Hostile");
-			}
+		if (entity.getScoreboardTags().contains("SkillImmune")) {
+			return false;
+		}
+		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear
+			    || entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
+			    || entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant
+			    || entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
+			return true;
+		} else if (entity instanceof Wolf) {
+			return (((Wolf) entity).isAngry() && ((Wolf) entity).getOwner() != null) || entity.getScoreboardTags().contains("boss_targetplayer");
+		} else if (entity instanceof Rabbit) {
+			return ((Rabbit) entity).getRabbitType().equals(Rabbit.Type.THE_KILLER_BUNNY);
+		} else if (entity instanceof Player) {
+			return AbilityManager.getManager().isPvPEnabled((Player) entity);
+		} else if (entity instanceof Mob) {
+			LivingEntity target = ((Mob) entity).getTarget();
+			return (target != null && target instanceof Player) || entity.getScoreboardTags().contains("boss_targetplayer") || entity.getScoreboardTags().contains("boss_hostile") || entity.getScoreboardTags().contains("Hostile");
 		}
 
 		return false;

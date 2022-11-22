@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -11,21 +13,19 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
 
 public class ManaLance extends MultipleChargeAbility {
 
@@ -40,48 +40,44 @@ public class ManaLance extends MultipleChargeAbility {
 	public static final String CHARM_RANGE = "Mana Lance Range";
 	public static final String CHARM_CHARGES = "Mana Lance Charge";
 
-	private float mDamage;
+	public static final AbilityInfo<ManaLance> INFO =
+		new AbilityInfo<>(ManaLance.class, "Mana Lance", ManaLance::new)
+			.linkedSpell(ClassAbility.MANA_LANCE)
+			.scoreboardId("ManaLance")
+			.shorthandName("ML")
+			.descriptions(
+				String.format("Right clicking with a wand fires forth a piercing beam of Mana going %s blocks, dealing %s arcane magic damage to enemies in the path of the beam. " +
+					              "This beam will not go through solid blocks. Cooldown: %ss.",
+					RANGE,
+					(int) DAMAGE_1,
+					COOLDOWN_1 / 20
+				),
+				String.format("The beam instead deals %s damage. Cooldown: %ss.",
+					(int) DAMAGE_2,
+					COOLDOWN_2 / 20),
+				"Mana lance now has two charges.")
+			.cooldown(COOLDOWN_1, COOLDOWN_2)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ManaLance::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
+				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
+			.displayItem(new ItemStack(Material.TRIDENT, 1));
+
+	private final float mDamage;
 	private int mLastCastTicks = 0;
 
 	private final ManaLanceCS mCosmetic;
 
 	public ManaLance(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Mana Lance");
-		mInfo.mLinkedSpell = ClassAbility.MANA_LANCE;
-		mInfo.mScoreboardId = "ManaLance";
-		mInfo.mShorthandName = "ML";
-		mInfo.mDescriptions.add(
-			String.format("Right clicking with a wand fires forth a piercing beam of Mana going %s blocks, dealing %s arcane magic damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: %ss.",
-				RANGE,
-				(int) DAMAGE_1,
-				COOLDOWN_1 / 20
-			));
-		mInfo.mDescriptions.add(
-			String.format("The beam instead deals %s damage. Cooldown: %ss.",
-				(int) DAMAGE_2,
-				COOLDOWN_2 / 20));
-		mInfo.mDescriptions.add("Mana lance now has two charges.");
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? COOLDOWN_1 : COOLDOWN_2);
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mDisplayItem = new ItemStack(Material.TRIDENT, 1);
+		super(plugin, player, INFO);
 
 		mMaxCharges = (isEnhanced() ? 2 : 1) + (int) CharmManager.getLevel(player, CHARM_CHARGES);
-		mInfo.mIgnoreCooldown = true;
 		mCharges = getTrackedCharges();
 		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ManaLanceCS(), ManaLanceCS.SKIN_LIST);
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null
-			    || mPlayer.isSneaking()
-			    || mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) <= 0) {
-			return;
-		}
-
-		int ticks = mPlayer.getTicksLived();
+	public void cast() {
+		int ticks = Bukkit.getServer().getCurrentTick();
 		// Prevent double casting on accident
 		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
 			return;
@@ -117,7 +113,7 @@ public class ManaLance extends MultipleChargeAbility {
 			while (iter.hasNext()) {
 				LivingEntity mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
-					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true);
+					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f, true);
 					iter.remove();
 					if (!hit) {
@@ -133,8 +129,4 @@ public class ManaLance extends MultipleChargeAbility {
 		mCosmetic.lanceSound(world, mPlayer);
 	}
 
-	@Override
-	public boolean incrementCharge() {
-		return super.incrementCharge();
-	}
 }

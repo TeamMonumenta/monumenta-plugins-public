@@ -2,8 +2,10 @@ package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -24,7 +26,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
@@ -50,70 +51,65 @@ public class LuminousInfusion extends Ability {
 	public static final String CHARM_COOLDOWN = "Luminous Infusion Cooldown";
 	public static final String CHARM_RADIUS = "Luminous Infusion Radius";
 
+	public static final AbilityInfo<LuminousInfusion> INFO =
+		new AbilityInfo<>(LuminousInfusion.class, "Luminous Infusion", LuminousInfusion::new)
+			.linkedSpell(ClassAbility.LUMINOUS_INFUSION)
+			.scoreboardId("LuminousInfusion")
+			.shorthandName("LI")
+			.descriptions(
+				"While sneaking, pressing the swap key charges your hands with holy light. " +
+					"The next time you damage an undead enemy, your attack is infused with explosive power, " +
+					"dealing 20 magic damage to it and all enemies in a 4 block radius around it, or 10 against non-undead, " +
+					"and knocking other enemies away from it. Cooldown: 12s.",
+				"Your melee attacks now passively deal 15% magic damage to undead enemies, " +
+					"and Divine Justice now passively deals 15% more total damage. " +
+					"Damaging an undead enemy now passively sets it on fire for 3s.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", LuminousInfusion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
+			.displayItem(new ItemStack(Material.BLAZE_POWDER, 1));
+
 	private boolean mActive = false;
 	private final LuminousInfusionCS mCosmetic;
 
 	private @Nullable Crusade mCrusade;
 
-	public LuminousInfusion(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Luminous Infusion");
-		mInfo.mLinkedSpell = ClassAbility.LUMINOUS_INFUSION;
-		mInfo.mScoreboardId = "LuminousInfusion";
-		mInfo.mShorthandName = "LI";
-		mInfo.mDescriptions.add("While sneaking, pressing the swap key charges your hands with holy light. " +
-			                        "The next time you damage an undead enemy, your attack is infused with explosive power, " +
-			                        "dealing 20 magic damage to it and all enemies in a 4 block radius around it, or 10 against non-undead, " +
-			                        "and knocking other enemies away from it. Cooldown: 12s.");
-		mInfo.mDescriptions.add("Your melee attacks now passively deal 15% magic damage to undead enemies, " +
-			                        "and Divine Justice now passively deals 15% more total damage. " +
-			                        "Damaging an undead enemy now passively sets it on fire for 3s.");
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
-
+	public LuminousInfusion(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDoMultiplierAndFire = isLevelTwo();
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new LuminousInfusionCS(), LuminousInfusionCS.SKIN_LIST);
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
+		});
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		event.setCancelled(true);
-
-		if (
-			!isTimerActive()
-			&& mPlayer.isSneaking()
-		) {
-			mActive = true;
-			putOnCooldown();
-
-			World world = mPlayer.getWorld();
-			mCosmetic.infusionStartEffect(world, mPlayer);
-
-			new BukkitRunnable() {
-				int mT = 0;
-
-				@Override
-				public void run() {
-					mT++;
-					mCosmetic.infusionTickEffect(mPlayer, mT);
-					if (mT >= COOLDOWN || !mActive) {
-						mActive = false;
-						if (mT >= COOLDOWN) {
-							mCosmetic.infusionExpireMsg(mPlayer);
-							ClientModHandler.updateAbility(mPlayer, LuminousInfusion.this);
-						}
-						this.cancel();
-					}
-				}
-			}.runTaskTimer(Plugin.getInstance(), 1, 1);
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
 		}
+		mActive = true;
+		putOnCooldown();
+
+		World world = mPlayer.getWorld();
+		mCosmetic.infusionStartEffect(world, mPlayer);
+
+		new BukkitRunnable() {
+			int mT = 0;
+
+			@Override
+			public void run() {
+				mT++;
+				mCosmetic.infusionTickEffect(mPlayer, mT);
+				if (mT >= COOLDOWN || !mActive) {
+					mActive = false;
+					if (mT >= COOLDOWN) {
+						mCosmetic.infusionExpireMsg(mPlayer);
+						ClientModHandler.updateAbility(mPlayer, LuminousInfusion.this);
+					}
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(Plugin.getInstance(), 1, 1);
 	}
 
 	@Override
@@ -142,7 +138,7 @@ public class LuminousInfusion extends Ability {
 			// the custom damage event will fire including this raw damage,
 			// then event processing runs for it from there
 			mLastPassiveMeleeDamage = originalDamage * DAMAGE_MULTIPLIER_2;
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveMeleeDamage, mInfo.mLinkedSpell, true);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveMeleeDamage, mInfo.getLinkedSpell(), true);
 		}
 		return false;
 	}
@@ -151,7 +147,7 @@ public class LuminousInfusion extends Ability {
 		mActive = false;
 		ClientModHandler.updateAbility(mPlayer, this);
 
-		DamageUtils.damage(mPlayer, damagee, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_UNDEAD_1), mInfo.mLinkedSpell);
+		DamageUtils.damage(mPlayer, damagee, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_UNDEAD_1), mInfo.getLinkedSpell());
 
 		Location loc = damagee.getLocation();
 		World world = mPlayer.getWorld();
@@ -181,9 +177,9 @@ public class LuminousInfusion extends Ability {
 				if (mDoMultiplierAndFire) {
 					EntityUtils.applyFire(Plugin.getInstance(), FIRE_DURATION_2, e, mPlayer);
 				}
-				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_UNDEAD_1), mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_UNDEAD_1), mInfo.getLinkedSpell());
 			} else {
-				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_1), mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_1), mInfo.getLinkedSpell());
 				if (Crusade.applyCrusadeToSlayer(e, mCrusade)) {
 					mPlugin.mEffectManager.addEffect(e, "CrusadeSlayerTag", new CrusadeEnhancementTag(mCrusade.getEnhancementDuration()));
 				}

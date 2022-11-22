@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -19,6 +20,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class FlameSpirit extends DepthsAbility {
@@ -30,10 +32,13 @@ public class FlameSpirit extends DepthsAbility {
 	public static final int FIRE_TICKS = 2 * 20;
 	public static final int RADIUS = 4;
 
+	public static final DepthsAbilityInfo<FlameSpirit> INFO =
+		new DepthsAbilityInfo<>(FlameSpirit.class, ABILITY_NAME, FlameSpirit::new, DepthsTree.FLAMECALLER, DepthsTrigger.SPAWNER)
+			.displayItem(new ItemStack(Material.SOUL_CAMPFIRE))
+			.descriptions(FlameSpirit::getDescription, MAX_RARITY);
+
 	public FlameSpirit(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.SOUL_CAMPFIRE;
-		mTree = DepthsTree.FLAMECALLER;
+		super(plugin, player, INFO);
 	}
 
 	@Override
@@ -53,7 +58,7 @@ public class FlameSpirit extends DepthsAbility {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(centerLoc, RADIUS)) {
 						if (!(mob == null)) {
 							EntityUtils.applyFire(mPlugin, FIRE_TICKS, mob, mPlayer);
-							DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true, false);
+							DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true, false);
 						}
 					}
 
@@ -103,18 +108,9 @@ public class FlameSpirit extends DepthsAbility {
 		return true;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Breaking a spawner summons a spirit that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + RADIUS + " block radius every second for " + DAMAGE_COUNT + " seconds and sets affected mobs on fire for " + FIRE_TICKS / 20 + " seconds.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FLAMECALLER;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SPAWNER;
-	}
 }

@@ -1,10 +1,13 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -19,7 +22,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -31,43 +34,41 @@ public class VolcanicMeteor extends DepthsAbility {
 	public static final int SIZE = 6;
 	public static final int FIRE_TICKS = 3 * 20;
 
+	public static final DepthsAbilityInfo<VolcanicMeteor> INFO =
+		new DepthsAbilityInfo<>(VolcanicMeteor.class, ABILITY_NAME, VolcanicMeteor::new, DepthsTree.FLAMECALLER, DepthsTrigger.SWAP)
+			.linkedSpell(ClassAbility.VOLCANIC_METEOR)
+			.cooldown(COOLDOWN_TICKS)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", VolcanicMeteor::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.MAGMA_BLOCK))
+			.descriptions(VolcanicMeteor::getDescription, MAX_RARITY);
+
 	public VolcanicMeteor(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mInfo.mCooldown = COOLDOWN_TICKS;
-		mInfo.mIgnoreCooldown = true;
-		mInfo.mLinkedSpell = ClassAbility.VOLCANIC_METEOR;
-		mTree = DepthsTree.FLAMECALLER;
-		mDisplayMaterial = Material.MAGMA_BLOCK;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
-		//sets swap event to cancelled so this doesn't become annoying
-		event.setCancelled(true);
-		if (!isTimerActive()) {
-			putOnCooldown();
+		putOnCooldown();
 
-			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
-			Location loc = mPlayer.getEyeLocation();
-			World world = mPlayer.getWorld();
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
-			world.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f);
-			world.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
-			world.spawnParticle(Particle.SOUL_FIRE_FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
-			Vector dir = loc.getDirection().normalize();
-			for (int i = 0; i < DISTANCE; i++) {
-				loc.add(dir);
+		Location loc = mPlayer.getEyeLocation();
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
+		world.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f);
+		world.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
+		world.spawnParticle(Particle.SOUL_FIRE_FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
+		Vector dir = loc.getDirection().normalize();
+		for (int i = 0; i < DISTANCE; i++) {
+			loc.add(dir);
 
-				mPlayer.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0);
-				int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
-				if (loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
-					launchMeteor(loc, playerItemStats);
-					break;
-				}
+			mPlayer.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0);
+			int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
+			if (loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
+				launchMeteor(loc, playerItemStats);
+				break;
 			}
 		}
 	}
@@ -80,9 +81,6 @@ public class VolcanicMeteor extends DepthsAbility {
 			double mT = 0;
 			@Override
 			public void run() {
-				if (mPlayer == null) {
-					return;
-				}
 				mT += 1;
 				World world = mPlayer.getWorld();
 				for (int i = 0; i < 8; i++) {
@@ -105,7 +103,7 @@ public class VolcanicMeteor extends DepthsAbility {
 								double mult = Math.min(Math.max(0, (6 - distance) / 4), 1);
 
 								EntityUtils.applyFire(mPlugin, FIRE_TICKS, e, mPlayer, playerItemStats);
-								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), damage * mult, false, true, false);
+								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage * mult, false, true, false);
 							}
 							break;
 						}
@@ -123,24 +121,9 @@ public class VolcanicMeteor extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Swap hands to summon a falling meteor location where you are looking, up to " + DISTANCE + " blocks away. When the meteor lands, it deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + SIZE + " block radius and apply fire for " + (FIRE_TICKS / 20) + "s, but the damage is reduced depending on the distance from the center. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FLAMECALLER;
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SWAP;
-	}
-
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
 }
 

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.mage.arcanist;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.AstralOmenArcaneStacks;
 import com.playmonumenta.plugins.effects.AstralOmenBonusDamage;
@@ -24,7 +25,6 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -62,6 +62,32 @@ public class AstralOmen extends Ability {
 
 	private static final Map<ClassAbility, Type> mElementClassification;
 
+	public static final AbilityInfo<AstralOmen> INFO =
+		new AbilityInfo<>(AstralOmen.class, NAME, AstralOmen::new)
+			.linkedSpell(ABILITY)
+			.scoreboardId("AstralOmen")
+			.shorthandName("AO")
+			.descriptions(
+				String.format(
+					"Dealing spell damage to an enemy marks its fate, giving it an omen based on the spell type (Arcane, Fire, Ice, Thunder). " +
+						"If an enemy hits %s omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, " +
+						"dealing %s magic damage to it and all enemies within %s blocks. " +
+						"An enemy loses all its omens after %ss of it not gaining another omen. " +
+						"That implosion's damage ignores iframes and itself cannot apply omens. " +
+						"Omens cannot be applied or sealed by Elemental Arrows.",
+					STACK_THRESHOLD,
+					DAMAGE,
+					RADIUS,
+					StringUtils.ticksToSeconds(STACK_TICKS)
+				),
+				String.format(
+					"The implosion now pulls all enemies inwards. Enemies hit by the implosion now take %s%% more damage from you for %ss.",
+					StringUtils.multiplierToPercentage(BONUS_MULTIPLIER),
+					StringUtils.ticksToSeconds(BONUS_TICKS)
+				)
+			)
+			.displayItem(new ItemStack(Material.NETHER_STAR, 1));
+
 	static {
 		mElementClassification = new HashMap<>();
 		// Arcane Types
@@ -93,40 +119,14 @@ public class AstralOmen extends Ability {
 		}
 	}
 
-	public AstralOmen(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = ABILITY;
-
-		mInfo.mScoreboardId = "AstralOmen";
-		mInfo.mShorthandName = "AO";
-		mInfo.mDescriptions.add(
-			String.format(
-				"Dealing spell damage to an enemy marks its fate, giving it an omen based on the spell type (Arcane, Fire, Ice, Thunder). " +
-					"If an enemy hits %s omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, " +
-					"dealing %s magic damage to it and all enemies within %s blocks. " +
-					"An enemy loses all its omens after %ss of it not gaining another omen. " +
-					"That implosion's damage ignores iframes and itself cannot apply omens. " +
-					"Omens cannot be applied or sealed by Elemental Arrows.",
-				STACK_THRESHOLD,
-				DAMAGE,
-				RADIUS,
-				StringUtils.ticksToSeconds(STACK_TICKS)
-			)
-		);
-		mInfo.mDescriptions.add(
-			String.format(
-				"The implosion now pulls all enemies inwards. Enemies hit by the implosion now take %s%% more damage from you for %ss.",
-				StringUtils.multiplierToPercentage(BONUS_MULTIPLIER),
-				StringUtils.ticksToSeconds(BONUS_TICKS)
-			)
-		);
-		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
+	public AstralOmen(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mLevelBonusMultiplier = (isLevelTwo() ? BONUS_MULTIPLIER : 0) + CharmManager.getLevelPercentDecimal(player, CHARM_MODIFIER);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer == null || event.getAbility() == null || event.getAbility() == mInfo.mLinkedSpell || event.getAbility() == ClassAbility.SPELLSHOCK) {
+		if (event.getAbility() == null || event.getAbility() == mInfo.getLinkedSpell() || event.getAbility() == ClassAbility.SPELLSHOCK) {
 			return false;
 		}
 
@@ -161,7 +161,7 @@ public class AstralOmen extends Ability {
 			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS));
 			for (LivingEntity mob : hitbox.getHitMobs()) {
 				if (MetadataUtils.checkOnceThisTick(mPlugin, mob, DAMAGED_THIS_TICK_METAKEY)) {
-					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, spellDamage, mInfo.mLinkedSpell, true);
+					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, spellDamage, mInfo.getLinkedSpell(), true);
 					if (isLevelTwo()) {
 						MovementUtils.pullTowards(enemy, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_SPEED));
 					}

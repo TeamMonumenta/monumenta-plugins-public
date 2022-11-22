@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -15,6 +16,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class DepthsRejuvenation extends DepthsAbility {
 
@@ -25,18 +27,21 @@ public class DepthsRejuvenation extends DepthsAbility {
 
 	private static final Map<UUID, Integer> LAST_HEAL_TICK = new HashMap<>();
 
+	public static final DepthsAbilityInfo<DepthsRejuvenation> INFO =
+		new DepthsAbilityInfo<>(DepthsRejuvenation.class, ABILITY_NAME, DepthsRejuvenation::new, DepthsTree.SUNLIGHT, DepthsTrigger.PASSIVE)
+			.displayItem(new ItemStack(Material.NETHER_STAR))
+			.descriptions(DepthsRejuvenation::getDescription, MAX_RARITY);
+
 	private int mTimer = 0;
 
 	public DepthsRejuvenation(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.NETHER_STAR;
-		mTree = DepthsTree.SUNLIGHT;
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		int healInterval = HEAL_INTERVAL[mRarity - 1];
-		if (mPlayer != null && oneSecond && !mPlayer.isDead()) {
+		if (oneSecond && !mPlayer.isDead()) {
 			mTimer += 20;
 			if (mTimer % healInterval == 0) {
 				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true)) {
@@ -66,19 +71,9 @@ public class DepthsRejuvenation extends DepthsAbility {
 		}
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "All players within " + RADIUS + " blocks of you (including yourself) heal " + (int) DepthsUtils.roundPercent(PERCENT_HEAL) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + HEAL_INTERVAL[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. A given player will only be healed by the highest Rejuvenation that affects them.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.SUNLIGHT;
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.PASSIVE;
-	}
 }
 

@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import java.util.Collection;
@@ -24,6 +26,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
@@ -32,15 +35,17 @@ public class DepthsDodging extends DepthsAbility {
 	public static final String ABILITY_NAME = "Dodging";
 	public static final int[] COOLDOWN = {20 * 16, 20 * 14, 20 * 12, 20 * 10, 20 * 8, 20 * 5};
 
+	public static final DepthsAbilityInfo<DepthsDodging> INFO =
+		new DepthsAbilityInfo<>(DepthsDodging.class, ABILITY_NAME, DepthsDodging::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
+			.linkedSpell(ClassAbility.DODGING)
+			.cooldown(COOLDOWN)
+			.displayItem(new ItemStack(Material.COBWEB))
+			.descriptions(DepthsDodging::getDescription, MAX_RARITY);
+
 	private int mTriggerTick = 0;
 
 	public DepthsDodging(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.COBWEB;
-		mTree = DepthsTree.WINDWALKER;
-		mInfo.mLinkedSpell = ClassAbility.DODGING;
-		mInfo.mIgnoreCooldown = true;
-		mInfo.mCooldown = (mRarity == 0) ? 20 * 16 : COOLDOWN[mRarity - 1];
+		super(plugin, player, INFO);
 	}
 
 	@Override
@@ -69,9 +74,6 @@ public class DepthsDodging extends DepthsAbility {
 
 	@Override
 	public boolean playerHitByProjectileEvent(ProjectileHitEvent event) {
-		if (mPlayer == null) {
-			return false;
-		}
 		Projectile proj = event.getEntity();
 		// See if we should dodge. If false, allow the event to proceed normally
 		// This probably doesn't properly check for blocking whereas the other method does
@@ -103,12 +105,6 @@ public class DepthsDodging extends DepthsAbility {
 	}
 
 	private boolean dodge() {
-		if (mPlayer == null) {
-			return false;
-		}
-		//Update cooldown here
-		mInfo.mCooldown = COOLDOWN[mRarity - 1];
-
 		if (mTriggerTick == mPlayer.getTicksLived()) {
 			// Dodging was activated this tick - allow it
 			return true;
@@ -118,7 +114,7 @@ public class DepthsDodging extends DepthsAbility {
 		 * Must check with cooldown timers directly because isAbilityOnCooldown always returns
 		 * false (because ignoreCooldown is true)
 		 */
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (isOnCooldown()) {
 			/*
 			 * This ability is actually on cooldown (and was not triggered this tick)
 			 * Don't process dodging
@@ -141,14 +137,8 @@ public class DepthsDodging extends DepthsAbility {
 		return true;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "You dodge the next projectile or potion attack that would have hit you, nullifying the damage. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.WINDWALKER;
 	}
 }
 

@@ -2,26 +2,24 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.EagleEyeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -45,28 +43,32 @@ public class EagleEye extends Ability {
 	public static final String CHARM_RADIUS = "Eagle Eye Radius";
 	public static final String CHARM_REFRESH = "Eagle Eye Refresh";
 
+	public static final AbilityInfo<EagleEye> INFO =
+		new AbilityInfo<>(EagleEye.class, "Eagle Eye", EagleEye::new)
+			.linkedSpell(ClassAbility.EAGLE_EYE)
+			.scoreboardId("Tinkering")
+			.shorthandName("EE")
+			.descriptions(
+				String.format("When you left-click while sneaking you reveal all enemies in a %d block radius, " +
+					              "giving them the glowing effect for %d seconds. Affected enemies have %d%% Vulnerability. " +
+					              "If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by %d seconds. " +
+					              "This skill can not be activated if you have a pickaxe in your mainhand. Cooldown: %ds.",
+					EAGLE_EYE_RADIUS, EAGLE_EYE_DURATION / 20, (int) (EAGLE_EYE_1_VULN_LEVEL * 100), EAGLE_EYE_REFRESH / 20, EAGLE_EYE_COOLDOWN / 20),
+				String.format("The effect is increased to %d%% Vulnerability.", (int) (EAGLE_EYE_2_VULN_LEVEL * 100)),
+				"Your first attack against every enemy affected by this ability will deal " + (int) (ENHANCEMENT_DAMAGE_PERCENT * 100) + "% extra damage.")
+			.cooldown(EAGLE_EYE_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EagleEye::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true)
+				                                                                     .keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
+			.displayItem(new ItemStack(Material.ENDER_EYE, 1));
+
 	private final double mVulnLevel;
-	private Team mEagleEyeTeam = null;
+	private final Team mEagleEyeTeam;
 	private List<LivingEntity> mEntitiesAffected = new ArrayList<>(); // Used for tracking Entities on a first hit.
 	private final EagleEyeCS mCosmetic;
 
-	public EagleEye(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Eagle Eye");
-		mInfo.mLinkedSpell = ClassAbility.EAGLE_EYE;
-		mInfo.mScoreboardId = "Tinkering"; // lmao
-		mInfo.mShorthandName = "EE";
-		mInfo.mDescriptions.add(String.format("When you left-click while sneaking you reveal all enemies in a %d block radius, " +
-			                                      "giving them the glowing effect for %d seconds. Affected enemies have %d%% Vulnerability. " +
-			                                      "If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by %d seconds. " +
-			                                      "This skill can not be activated if you have a pickaxe in your mainhand. Cooldown: %ds.",
-			EAGLE_EYE_RADIUS, EAGLE_EYE_DURATION / 20, (int) (EAGLE_EYE_1_VULN_LEVEL * 100), EAGLE_EYE_REFRESH / 20, EAGLE_EYE_COOLDOWN / 20));
-		mInfo.mDescriptions.add(String.format("The effect is increased to %d%% Vulnerability.", (int) (EAGLE_EYE_2_VULN_LEVEL * 100)));
-		mInfo.mDescriptions.add("Your first attack against every enemy affected by this ability will deal " + (int) (ENHANCEMENT_DAMAGE_PERCENT * 100) + "% extra damage.");
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, EAGLE_EYE_COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
-		mInfo.mIgnoreCooldown = true;
-
+	public EagleEye(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
+		// lmao
 		mVulnLevel = (isLevelOne() ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EagleEyeCS(), EagleEyeCS.SKIN_LIST);
 		mEagleEyeTeam = mCosmetic.createTeams();
@@ -74,17 +76,15 @@ public class EagleEye extends Ability {
 	}
 
 
-	@Override
-	public void cast(Action action) {
-		Player player = mPlayer;
-		if (player == null || isTimerActive() || !mPlayer.isSneaking()) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 
-		World world = player.getWorld();
+		World world = mPlayer.getWorld();
 		mCosmetic.eyeStart(world, mPlayer);
 
-		mEntitiesAffected = new Hitbox.SphereHitbox(player.getEyeLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, EAGLE_EYE_RADIUS)).getHitMobs();
+		mEntitiesAffected = new Hitbox.SphereHitbox(mPlayer.getEyeLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, EAGLE_EYE_RADIUS)).getHitMobs();
 
 		for (LivingEntity mob : mEntitiesAffected) {
 			// Don't apply vulnerability to arena mobs
@@ -133,10 +133,6 @@ public class EagleEye extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && mPlayer.isSneaking()) {
-			cast(Action.LEFT_CLICK_AIR);
-		}
-
 		if (isEnhanced() && mEntitiesAffected.contains(enemy)) {
 			event.setDamage(event.getDamage() * (1 + ENHANCEMENT_DAMAGE_PERCENT));
 			mEntitiesAffected.remove(enemy);
@@ -149,15 +145,6 @@ public class EagleEye extends Ability {
 		}
 
 		return false;
-	}
-
-	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		return !ItemUtils.isPickaxe(inMainHand) && inMainHand.getType() != Material.HEART_OF_THE_SEA;
 	}
 
 }

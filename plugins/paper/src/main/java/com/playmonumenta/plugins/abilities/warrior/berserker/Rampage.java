@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.warrior.berserker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
@@ -16,7 +18,6 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -29,7 +30,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
 public class Rampage extends Ability implements AbilityWithChargesOrStacks {
@@ -55,6 +55,26 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	public static final String CHARM_REDUCTION_PER_STACK = "Rampage Resistance Per Stack";
 	public static final String CHARM_HEALING = "Rampage Healing";
 
+	public static final AbilityInfo<Rampage> INFO =
+		new AbilityInfo<>(Rampage.class, "Rampage", Rampage::new)
+			.linkedSpell(ClassAbility.RAMPAGE)
+			.scoreboardId("Rampage")
+			.shorthandName("Rmp")
+			.descriptions(
+				("Gain a stack of rage for each %s melee damage dealt (50%% more in region 3). Stacks decay by 1 every %s seconds of not dealing melee damage and cap at %s. " +
+					 "Passively gain %s%% damage resistance for each stack. " +
+					 "When at %s or more stacks, right click while looking down to consume all stacks and damage mobs " +
+					 "in a %s block radius by %s times the number of stacks consumed. For the next (stacks consumed / 2) seconds, " +
+					 "heal %s%% of max health per second and keep your passive damage reduction.")
+					.formatted(RAMPAGE_1_DAMAGE_PER_STACK, StringUtils.ticksToSeconds(RAMPAGE_STACK_DECAY_TIME), RAMPAGE_1_STACK_LIMIT,
+						StringUtils.multiplierToPercentage(RAMPAGE_DAMAGE_RESISTANCE_PER_STACK), ACTIVE_MIN_STACKS, RAMPAGE_RADIUS, RAMPAGE_STACK_PERCENTAGE,
+						StringUtils.multiplierToPercentage(HEAL_PERCENT)),
+				"Gain a stack of rage for each %s melee damage dealt, with stacks capping at %s."
+					.formatted(RAMPAGE_2_DAMAGE_PER_STACK, RAMPAGE_2_STACK_LIMIT))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Rampage::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).lookDirections(AbilityTrigger.LookDirection.DOWN)
+				                                                                    .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+			.displayItem(new ItemStack(Material.BLAZE_POWDER, 1));
+
 	private final double mDamagePerStack;
 	private final int mStackLimit;
 
@@ -62,36 +82,13 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	private double mRemainderDamage = 0;
 	private int mTimeToStackDecay = 0;
 
-	public Rampage(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Rampage");
-		mInfo.mLinkedSpell = ClassAbility.RAMPAGE;
-		mInfo.mCooldown = 0;
-		mInfo.mScoreboardId = "Rampage";
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mShorthandName = "Rmp";
-		mInfo.mDescriptions.add(("Gain a stack of rage for each %s melee damage dealt (50%% more in region 3). Stacks decay by 1 every %s seconds of not dealing melee damage and cap at %s. " +
-			                         "Passively gain %s%% damage resistance for each stack. " +
-			                         "When at %s or more stacks, right click while looking down to consume all stacks and damage mobs " +
-			                         "in a %s block radius by %s times the number of stacks consumed. For the next (stacks consumed / 2) seconds, " +
-			                         "heal %s%% of max health per second and keep your passive damage reduction.")
-			                        .formatted(RAMPAGE_1_DAMAGE_PER_STACK, StringUtils.ticksToSeconds(RAMPAGE_STACK_DECAY_TIME), RAMPAGE_1_STACK_LIMIT,
-				                        StringUtils.multiplierToPercentage(RAMPAGE_DAMAGE_RESISTANCE_PER_STACK), ACTIVE_MIN_STACKS, RAMPAGE_RADIUS, RAMPAGE_STACK_PERCENTAGE,
-				                        StringUtils.multiplierToPercentage(HEAL_PERCENT)));
-		mInfo.mDescriptions.add("Gain a stack of rage for each %s melee damage dealt, with stacks capping at %s."
-			                        .formatted(RAMPAGE_2_DAMAGE_PER_STACK, RAMPAGE_2_STACK_LIMIT));
-		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
+	public Rampage(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDamagePerStack = ((isLevelOne() ? RAMPAGE_1_DAMAGE_PER_STACK : RAMPAGE_2_DAMAGE_PER_STACK) + CharmManager.getLevel(mPlayer, CHARM_THRESHOLD)) * (ServerProperties.getAbilityEnhancementsEnabled() ? R3_DAMAGE_PER_STACK_MULTIPLIER : 1);
 		mStackLimit = (isLevelOne() ? RAMPAGE_1_STACK_LIMIT : RAMPAGE_2_STACK_LIMIT) + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 	}
 
-	@Override
-	public void cast(Action action) {
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (ItemUtils.isShootableItem(inMainHand) || ItemUtils.isSomePotion(inMainHand) || inMainHand.getType().isBlock()
-				|| inMainHand.getType().isEdible()) {
-			return;
-		}
-
+	public void cast() {
 		Location loc = mPlayer.getLocation();
 
 		if (mStacks >= ACTIVE_MIN_STACKS && loc.getPitch() > 70) {
@@ -99,7 +96,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mStacks * RAMPAGE_STACK_PERCENTAGE);
 			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), CharmManager.getRadius(mPlayer, CHARM_RADIUS, RAMPAGE_RADIUS));
 			for (LivingEntity mob : hitbox.getHitMobs()) {
-				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.getLinkedSpell());
 				new PartialParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
 			}
 

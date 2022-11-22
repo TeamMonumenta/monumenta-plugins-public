@@ -5,13 +5,12 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 
 public class Shielding implements Enchantment {
 
@@ -48,7 +47,7 @@ public class Shielding implements Enchantment {
 		Plugin plugin = Plugin.getInstance();
 		if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SHIELDING) > 0 && !MetadataUtils.happenedInRecentTicks(player, DISABLE_METAKEY, DISABLE_DURATION)) {
 			player.playSound(player.getLocation(), Sound.ITEM_SHIELD_BREAK, 0.75f, 0.5f);
-			player.setMetadata(DISABLE_METAKEY, new FixedMetadataValue(plugin, player.getTicksLived()));
+			MetadataUtils.markThisTick(plugin, player, DISABLE_METAKEY);
 		}
 	}
 

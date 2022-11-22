@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class Permafrost extends DepthsAbility {
 
@@ -21,17 +23,17 @@ public class Permafrost extends DepthsAbility {
 	public static final int[] ICE_BONUS_DURATION_SECONDS = {2, 3, 4, 5, 6, 8};
 	public static final Material PERMAFROST_ICE_MATERIAL = Material.PACKED_ICE;
 
+	public static final DepthsAbilityInfo<Permafrost> INFO =
+		new DepthsAbilityInfo<>(Permafrost.class, ABILITY_NAME, Permafrost::new, DepthsTree.FROSTBORN, DepthsTrigger.SPAWNER)
+			.displayItem(new ItemStack(Material.QUARTZ))
+			.descriptions(Permafrost::getDescription, MAX_RARITY);
+
 	public Permafrost(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.QUARTZ;
-		mTree = DepthsTree.FROSTBORN;
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public boolean blockBreakEvent(BlockBreakEvent event) {
-		if (mPlayer == null) {
-			return true;
-		}
 		//If we break a spawner with a pickaxe
 		if (ItemUtils.isPickaxe(event.getPlayer().getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
 			ArrayList<Block> blocksToIce = new ArrayList<>();
@@ -59,22 +61,13 @@ public class Permafrost extends DepthsAbility {
 		return true;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		if (rarity >= 6) {
 			return "Breaking a spawner spawns ice around it that lasts for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. All ice you place with abilities lasts " + DepthsUtils.getRarityColor(rarity) + ICE_BONUS_DURATION_SECONDS[rarity - 1] + ChatColor.WHITE + " seconds longer." + DepthsUtils.getRarityColor(rarity) + " Additionally, all ice you place is packed ice, which when Avalanched becomes normal ice.";
 		}
 		return "Breaking a spawner spawns ice around it that lasts for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. All ice you place with abilities lasts " + DepthsUtils.getRarityColor(rarity) + ICE_BONUS_DURATION_SECONDS[rarity - 1] + ChatColor.WHITE + " seconds longer.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FROSTBORN;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SPAWNER;
-	}
 }
 

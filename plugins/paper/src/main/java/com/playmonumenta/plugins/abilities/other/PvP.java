@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.other;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import javax.annotation.Nullable;
@@ -28,8 +29,12 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class PvP extends Ability {
 
-	public PvP(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, null);
+	public static final AbilityInfo<PvP> INFO =
+		new AbilityInfo<>(PvP.class, null, PvP::new)
+			.canUse(player -> player.getScoreboardTags().contains("pvp"));
+
+	public PvP(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 
 		if (player != null) {
 			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
@@ -82,8 +87,4 @@ public class PvP extends Ability {
 		}
 	}
 
-	@Override
-	public boolean canUse(Player player) {
-		return player.getScoreboardTags().contains("pvp");
-	}
 }

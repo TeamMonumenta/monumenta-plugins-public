@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -16,6 +17,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -28,12 +30,15 @@ public class SoothingCombos extends DepthsAbility {
 	public static final double[] DURATION = {2.0, 2.5, 3.0, 3.5, 4.0, 6.0}; //seconds
 	public static final int RANGE = 12;
 
+	public static final DepthsAbilityInfo<SoothingCombos> INFO =
+		new DepthsAbilityInfo<>(SoothingCombos.class, ABILITY_NAME, SoothingCombos::new, DepthsTree.SUNLIGHT, DepthsTrigger.COMBO)
+			.displayItem(new ItemStack(Material.HONEYCOMB))
+			.descriptions(SoothingCombos::getDescription, MAX_RARITY);
+
 	private int mComboCount = 0;
 
 	public SoothingCombos(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.HONEYCOMB;
-		mTree = DepthsTree.SUNLIGHT;
+		super(plugin, player, INFO);
 	}
 
 	@Override
@@ -68,22 +73,13 @@ public class SoothingCombos extends DepthsAbility {
 		return false;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		if (rarity == 6) {
 			return "Every third melee attack applies " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED_PERCENT[rarity - 1]) + "%" + ChatColor.WHITE + " speed and Haste " + DepthsUtils.getRarityColor(rarity) + "II" + ChatColor.WHITE + " for " + DepthsUtils.getRarityColor(rarity) + (int) DURATION[rarity - 1] + ChatColor.WHITE + " seconds to players within " + RANGE + " blocks, including the user.";
 		}
 		return "Every third melee attack applies " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED_PERCENT[rarity - 1]) + "%" + ChatColor.WHITE + " speed and Haste I for " + DepthsUtils.getRarityColor(rarity) + (int) DURATION[rarity - 1] + ChatColor.WHITE + " seconds to players within " + RANGE + " blocks, including the user.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.SUNLIGHT;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.COMBO;
-	}
 }
 

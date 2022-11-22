@@ -2,12 +2,12 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import javax.annotation.Nullable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -16,27 +16,20 @@ public class Channeling extends Ability {
 
 	public static final double PERCENT_MELEE_INCREASE = 0.2;
 
+	public static final AbilityInfo<Channeling> INFO =
+		new AbilityInfo<>(Channeling.class, null, Channeling::new)
+			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 1)
+			.priorityAmount(999);
+
 	private boolean mCast = false;
 
-	public Channeling(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, null);
-	}
-
-	@Override
-	public double getPriorityAmount() {
-		return 999;
-	}
-
-	@Override
-	public boolean canUse(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 1;
+	public Channeling(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
-		if (!mCast) {
-			mCast = true;
-		}
+		mCast = true;
 		return true;
 	}
 

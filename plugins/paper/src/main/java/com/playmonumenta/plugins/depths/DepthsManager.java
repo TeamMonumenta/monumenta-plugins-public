@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.aspects.AxeAspect;
@@ -444,117 +444,117 @@ public class DepthsManager {
 
 	/**
 	 * The list of all depths abilities, to be added into the general ability manager so players can trigger their events on the depths shard
+	 *
 	 * @return list of depths abilities
 	 */
-	public static Collection<? extends DepthsAbility> getAbilities() {
+	public static Collection<DepthsAbilityInfo<?>> getAbilities() {
 
-		Plugin plugin = Plugin.getInstance();
-
-		return Arrays.asList(
+		return List.of(
 
 			//Weapon aspects
-			new AxeAspect(plugin, null),
-			new RandomAspect(plugin, null),
-			new ScytheAspect(plugin, null),
-			new SwordAspect(plugin, null),
-			new WandAspect(plugin, null),
-			new BowAspect(plugin, null),
+			AxeAspect.INFO,
+			RandomAspect.INFO,
+			ScytheAspect.INFO,
+			SwordAspect.INFO,
+			WandAspect.INFO,
+			BowAspect.INFO,
 
 			//Steelsage abilities
-			new FireworkBlast(plugin, null),
-			new FocusedCombos(plugin, null),
-			new Metalmancy(plugin, null),
-			new ProjectileMastery(plugin, null),
-			new RapidFire(plugin, null),
-			new Scrapshot(plugin, null),
-			new Sidearm(plugin, null),
-			new SteelStallion(plugin, null),
-			new DepthsSharpshooter(plugin, null),
-			new DepthsSplitArrow(plugin, null),
-			new DepthsVolley(plugin, null),
+			FireworkBlast.INFO,
+			FocusedCombos.INFO,
+			Metalmancy.INFO,
+			ProjectileMastery.INFO,
+			RapidFire.INFO,
+			Scrapshot.INFO,
+			Sidearm.INFO,
+			SteelStallion.INFO,
+			DepthsSharpshooter.INFO,
+			DepthsSplitArrow.INFO,
+			DepthsVolley.INFO,
 
 			//Windwalker abilities
-			new Aeromancy(plugin, null),
-			new DepthsDodging(plugin, null),
-			new GuardingBolt(plugin, null),
-			new HowlingWinds(plugin, null),
-			new LastBreath(plugin, null),
-			new OneWithTheWind(plugin, null),
-			new RestoringDraft(plugin, null),
-			new Skyhook(plugin, null),
-			new Slipstream(plugin, null),
-			new DepthsWindWalk(plugin, null),
-			new Whirlwind(plugin, null),
+			Aeromancy.INFO,
+			DepthsDodging.INFO,
+			GuardingBolt.INFO,
+			HowlingWinds.INFO,
+			LastBreath.INFO,
+			OneWithTheWind.INFO,
+			RestoringDraft.INFO,
+			Skyhook.INFO,
+			Slipstream.INFO,
+			DepthsWindWalk.INFO,
+			Whirlwind.INFO,
 
 			//Shadow abilities
-			new DepthsAdvancingShadows(plugin, null),
-			new BladeFlurry(plugin, null),
-			new Brutalize(plugin, null),
-			new ChaosDagger(plugin, null),
-			new DarkCombos(plugin, null),
-			new DeadlyStrike(plugin, null),
-			new DepthsDethroner(plugin, null),
-			new DummyDecoy(plugin, null),
-			new CloakOfShadows(plugin, null),
-			new ShadowSlam(plugin, null),
+			DepthsAdvancingShadows.INFO,
+			BladeFlurry.INFO,
+			Brutalize.INFO,
+			ChaosDagger.INFO,
+			DarkCombos.INFO,
+			DeadlyStrike.INFO,
+			DepthsDethroner.INFO,
+			DummyDecoy.INFO,
+			CloakOfShadows.INFO,
+			ShadowSlam.INFO,
 
 			//Dawnbringer abilities
-			new BottledSunlight(plugin, null),
-			new Enlightenment(plugin, null),
-			new LightningBottle(plugin, null),
-			new RadiantBlessing(plugin, null),
-			new DepthsRejuvenation(plugin, null),
-			new SoothingCombos(plugin, null),
-			new Sundrops(plugin, null),
-			new TotemOfSalvation(plugin, null),
-			new WardOfLight(plugin, null),
+			BottledSunlight.INFO,
+			Enlightenment.INFO,
+			LightningBottle.INFO,
+			RadiantBlessing.INFO,
+			DepthsRejuvenation.INFO,
+			SoothingCombos.INFO,
+			Sundrops.INFO,
+			TotemOfSalvation.INFO,
+			WardOfLight.INFO,
 
 			//Flamecaller abilities
-			new Apocalypse(plugin, null),
-			new Detonation(plugin, null),
-			new Fireball(plugin, null),
-			new FlameSpirit(plugin, null),
-			new Flamestrike(plugin, null),
-			new PrimordialMastery(plugin, null),
-			new Pyroblast(plugin, null),
-			new Pyromania(plugin, null),
-			new RingOfFlames(plugin, null),
-			new VolcanicCombos(plugin, null),
-			new VolcanicMeteor(plugin, null),
+			Apocalypse.INFO,
+			Detonation.INFO,
+			Fireball.INFO,
+			FlameSpirit.INFO,
+			Flamestrike.INFO,
+			PrimordialMastery.INFO,
+			Pyroblast.INFO,
+			Pyromania.INFO,
+			RingOfFlames.INFO,
+			VolcanicCombos.INFO,
+			VolcanicMeteor.INFO,
 
 			// Frostborn abilities
-			new Avalanche(plugin, null),
-			new Cryobox(plugin, null),
-			new FrigidCombos(plugin, null),
-			new DepthsFrostNova(plugin, null),
-			new FrozenDomain(plugin, null),
-			new IceBarrier(plugin, null),
-			new Icebreaker(plugin, null),
-			new IceLance(plugin, null),
-			new Permafrost(plugin, null),
-			new PiercingCold(plugin, null),
+			Avalanche.INFO,
+			Cryobox.INFO,
+			FrigidCombos.INFO,
+			DepthsFrostNova.INFO,
+			FrozenDomain.INFO,
+			IceBarrier.INFO,
+			Icebreaker.INFO,
+			IceLance.INFO,
+			Permafrost.INFO,
+			PiercingCold.INFO,
 
 			// Earthbound abilities
-			new BrambleShell(plugin, null),
-			new Bulwark(plugin, null),
-			new CrushingEarth(plugin, null),
-			new DepthsToughness(plugin, null),
-			new EarthenCombos(plugin, null),
-			new EarthenWrath(plugin, null),
-			new Earthquake(plugin, null),
-			new Entrench(plugin, null),
-			new StoneSkin(plugin, null),
-			new Taunt(plugin, null));
+			BrambleShell.INFO,
+			Bulwark.INFO,
+			CrushingEarth.INFO,
+			DepthsToughness.INFO,
+			EarthenCombos.INFO,
+			EarthenWrath.INFO,
+			Earthquake.INFO,
+			Entrench.INFO,
+			StoneSkin.INFO,
+			Taunt.INFO);
 	}
 
 	/**
 	 * Returns a list of depth abilities filtered by certain trees
+	 *
 	 * @param filter the valid trees to filter by
 	 * @return list of filtered abilities
 	 */
-	public static List<DepthsAbility> getFilteredAbilities(List<DepthsTree> filter) {
-		List<DepthsAbility> filteredList = new ArrayList<>();
-		for (DepthsAbility da : getAbilities()) {
+	public static List<DepthsAbilityInfo<?>> getFilteredAbilities(List<DepthsTree> filter) {
+		List<DepthsAbilityInfo<?>> filteredList = new ArrayList<>();
+		for (DepthsAbilityInfo<?> da : getAbilities()) {
 			if (filter.contains(da.getDepthsTree())) {
 				filteredList.add(da);
 			}
@@ -562,24 +562,24 @@ public class DepthsManager {
 		return filteredList;
 	}
 
-	public static List<DepthsAbility> getMutatedAbilities(List<DepthsTree> filter, DepthsTrigger trigger) {
-		List<DepthsAbility> filteredList = new ArrayList<>();
-		for (DepthsAbility da : getAbilities()) {
-			if (filter.contains(da.getDepthsTree()) && da.getTrigger() == trigger) {
+	public static List<DepthsAbilityInfo<?>> getMutatedAbilities(List<DepthsTree> filter, DepthsTrigger trigger) {
+		List<DepthsAbilityInfo<?>> filteredList = new ArrayList<>();
+		for (DepthsAbilityInfo<?> da : getAbilities()) {
+			if (filter.contains(da.getDepthsTree()) && da.getDepthsTrigger() == trigger) {
 				filteredList.add(da);
 			}
 		}
 		return filteredList;
 	}
 
-	public static List<WeaponAspectDepthsAbility> getWeaponAspects() {
+	public static List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> getWeaponAspects() {
 		return Arrays.asList(
-			new AxeAspect(mPlugin, null),
-			new RandomAspect(mPlugin, null),
-			new ScytheAspect(mPlugin, null),
-			new SwordAspect(mPlugin, null),
-			new WandAspect(mPlugin, null),
-			new BowAspect(mPlugin, null));
+			AxeAspect.INFO,
+			RandomAspect.INFO,
+			ScytheAspect.INFO,
+			SwordAspect.INFO,
+			WandAspect.INFO,
+			BowAspect.INFO);
 	}
 
 	/**
@@ -590,7 +590,7 @@ public class DepthsManager {
 	private void initItems(List<DepthsTree> filter, boolean isElite, Player p) {
 		// Replace this with a dedicated place later
 		mItems.clear();
-		for (DepthsAbility da : getFilteredAbilities(filter)) {
+		for (DepthsAbilityInfo<?> da : getFilteredAbilities(filter)) {
 			// Get a number 1 to 100
 			int roll = mRandom.nextInt(100) + 1;
 			DepthsAbilityItem item = null;
@@ -666,7 +666,7 @@ public class DepthsManager {
 
 		// Return 3 choices of items
 		List<String> allowedAbilities = new ArrayList<>();
-		for (DepthsAbility da : getAbilities()) {
+		for (DepthsAbilityInfo<?> da : getAbilities()) {
 			if (da.canBeOffered(p)) {
 				allowedAbilities.add(da.getDisplayName());
 			}
@@ -726,11 +726,11 @@ public class DepthsManager {
 			return;
 		}
 
-		List<WeaponAspectDepthsAbility> options = dp.mWeaponOfferings;
+		List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> options = dp.mWeaponOfferings;
 		if (options == null) {
 			return;
 		}
-		WeaponAspectDepthsAbility choice = options.get(slot);
+		DepthsAbilityInfo<? extends WeaponAspectDepthsAbility> choice = options.get(slot);
 		if (choice == null) {
 			return;
 		}
@@ -794,10 +794,10 @@ public class DepthsManager {
 
 		// For each ability they have a score for, return the item that says what that ability does
 
-		for (DepthsAbility da : getAbilities()) {
-			Integer rarity = dp.mAbilities.get(da.getDisplayName());
-			if (rarity != null && rarity.intValue() > 0) {
-				abilities.add(da.getAbilityItem(rarity.intValue()));
+		for (DepthsAbilityInfo<?> da : getAbilities()) {
+			Integer rarity = dp.mAbilities.getOrDefault(da.getDisplayName(), 0);
+			if (rarity > 0) {
+				abilities.add(da.getAbilityItem(rarity));
 			}
 		}
 
@@ -810,7 +810,7 @@ public class DepthsManager {
 	 * @param p the player to look up
 	 * @return all their active abilities (rarity > 0)
 	 */
-	public @Nullable List<DepthsAbility> getPlayerAbilities(Player p) {
+	public @Nullable List<DepthsAbilityInfo<?>> getPlayerAbilities(Player p) {
 
 		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
 
@@ -819,13 +819,13 @@ public class DepthsManager {
 			return null;
 		}
 
-		List<DepthsAbility> abilities = new ArrayList<>();
+		List<DepthsAbilityInfo<?>> abilities = new ArrayList<>();
 
 		// For each ability they have a score for, return the item that says what that ability does
 
-		for (DepthsAbility da : getAbilities()) {
-			Integer rarity = dp.mAbilities.get(da.getDisplayName());
-			if (rarity != null && rarity.intValue() > 0) {
+		for (DepthsAbilityInfo<?> da : getAbilities()) {
+			Integer rarity = dp.mAbilities.getOrDefault(da.getDisplayName(), 0);
+			if (rarity > 0) {
 				abilities.add(da);
 			}
 		}
@@ -835,11 +835,7 @@ public class DepthsManager {
 
 	//Simple boolean check to see if the player is already in the depths system
 	public boolean isInSystem(Player p) {
-		if (mPlayers.get(p.getUniqueId()) == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return mPlayers.get(p.getUniqueId()) != null;
 	}
 
 	// Tells us when a player in the system broke a spawner so we can track their progress
@@ -1166,17 +1162,17 @@ public class DepthsManager {
 			return null;
 		}
 		// Return up to 3 random choices of items that are one level above the current level
-		ArrayList<? extends DepthsAbility> abilities = new ArrayList<>(getAbilities());
+		ArrayList<DepthsAbilityInfo<?>> abilities = new ArrayList<>(getAbilities());
 		Collections.shuffle(abilities);
 		offeredItems = new ArrayList<>();
 
 		// Loop through all possible abilities and show random ones they have at a higher rarity
-		for (DepthsAbility da : abilities) {
+		for (DepthsAbilityInfo<?> da : abilities) {
 			if (offeredItems.size() >= 3) {
 				break;
 			}
 			int level = getPlayerLevelInAbility(da.getDisplayName(), p);
-			if (level == 0 || (level >= 5 && !(dp.mEarnedRewards.peek() == DepthsRewardType.TWISTED)) || level >= 6 || da instanceof WeaponAspectDepthsAbility) {
+			if (level == 0 || (level >= 5 && !(dp.mEarnedRewards.peek() == DepthsRewardType.TWISTED)) || level >= 6 || WeaponAspectDepthsAbility.class.isAssignableFrom(da.getAbilityClass())) {
 				continue;
 			} else {
 				DepthsAbilityItem item;
@@ -1239,7 +1235,7 @@ public class DepthsManager {
 			}
 			index++;
 		}
-		for (DepthsAbility da : getAbilities()) {
+		for (DepthsAbilityInfo<?> da : getAbilities()) {
 			if (da.getDisplayName().equals(removedAbility)) {
 				if (!dp.mEligibleTrees.contains(da.getDepthsTree())) {
 					isMutated = true;
@@ -1252,7 +1248,7 @@ public class DepthsManager {
 
 		//Give 2 random abilities that aren't the one we just removed
 		for (int i = 0; i < 2; i++) {
-			List<DepthsAbility> abilities = getFilteredAbilities(dp.mEligibleTrees);
+			List<DepthsAbilityInfo<?>> abilities = getFilteredAbilities(dp.mEligibleTrees);
 			if (isMutated) {
 				List<DepthsTree> validTrees = new ArrayList<>();
 				for (DepthsTree tree : DepthsTree.values()) {
@@ -1275,11 +1271,11 @@ public class DepthsManager {
 					}
 				}
 
-				abilities.removeIf(ability -> blockedTriggers.contains(ability.getTrigger()));
+				abilities.removeIf(ability -> blockedTriggers.contains(ability.getDepthsTrigger()));
 			}
 
 			Collections.shuffle(abilities);
-			for (DepthsAbility da : abilities) {
+			for (DepthsAbilityInfo<?> da : abilities) {
 				if (da.canBeOffered(p) && !da.getDisplayName().equals(removedAbility)) {
 					setPlayerLevelInAbility(da.getDisplayName(), p, removedLevel);
 					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Gained ability: " + da.getDisplayName());
@@ -1484,7 +1480,7 @@ public class DepthsManager {
 	 */
 	public void getRandomAbility(Player p, DepthsPlayer dp, int[] chances) {
 		//Give random ability
-		List<DepthsAbility> abilities = getFilteredAbilities(dp.mEligibleTrees);
+		List<DepthsAbilityInfo<?>> abilities = getFilteredAbilities(dp.mEligibleTrees);
 
 		//Do not give any abilities that have the same trigger as abilities that are currently offered in an ability reward
 		//This is needed because players can open up an ability reward, not choose anything, then take mystery box or chaos and end up with two abilities on a trigger
@@ -1498,11 +1494,11 @@ public class DepthsManager {
 				}
 			}
 
-			abilities.removeIf(ability -> blockedTriggers.contains(ability.getTrigger()));
+			abilities.removeIf(ability -> blockedTriggers.contains(ability.getDepthsTrigger()));
 		}
 
 		Collections.shuffle(abilities);
-		for (DepthsAbility da : abilities) {
+		for (DepthsAbilityInfo<?> da : abilities) {
 			if (da.canBeOffered(p)) {
 				int roll = mRandom.nextInt(100) + 1;
 				if (roll < addUpChances(0, chances)) {
@@ -1534,7 +1530,7 @@ public class DepthsManager {
 				validTrees.add(tree);
 			}
 		}
-		List<DepthsAbility> abilities = getMutatedAbilities(validTrees, trigger);
+		List<DepthsAbilityInfo<?>> abilities = getMutatedAbilities(validTrees, trigger);
 
 		//Clear any upgrades the player may have for the ability they are mutating
 		List<DepthsAbilityItem> upgradeOffering = mUpgradeOfferings.get(p.getUniqueId());

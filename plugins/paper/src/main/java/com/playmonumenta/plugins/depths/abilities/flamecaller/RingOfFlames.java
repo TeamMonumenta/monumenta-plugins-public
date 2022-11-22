@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -26,7 +28,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
@@ -39,18 +41,21 @@ public class RingOfFlames extends DepthsAbility {
 	private static final int EFFECT_DURATION = 4 * 20;
 	private static final double BLEED_AMOUNT = 0.2;
 
+	public static final DepthsAbilityInfo<RingOfFlames> INFO =
+		new DepthsAbilityInfo<>(RingOfFlames.class, ABILITY_NAME, RingOfFlames::new, DepthsTree.FLAMECALLER, DepthsTrigger.SHIFT_LEFT_CLICK)
+			.linkedSpell(ClassAbility.RING_OF_FLAMES)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RingOfFlames::cast,
+				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.BLAZE_POWDER))
+			.descriptions(RingOfFlames::getDescription, MAX_RARITY);
+
 	public RingOfFlames(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.RING_OF_FLAMES;
-		mDisplayMaterial = Material.BLAZE_POWDER;
-		mTree = DepthsTree.FLAMECALLER;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action trigger) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 		putOnCooldown();
@@ -117,7 +122,7 @@ public class RingOfFlames extends DepthsAbility {
 								EntityUtils.applyFire(mPlugin, EFFECT_DURATION, e, mPlayer, playerItemStats);
 								EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, BLEED_AMOUNT, e);
 
-								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false);
+								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], false, true, false);
 
 								mobsHitThisTick++;
 							}
@@ -130,31 +135,8 @@ public class RingOfFlames extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
-			cast(Action.LEFT_CLICK_AIR);
-		}
-		return false;
-	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Left click while sneaking and holding a weapon to summon a ring of flames around you that lasts for " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Enemies on the flame perimeter are dealt " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage every second, and they are inflicted with " + DepthsUtils.roundPercent(BLEED_AMOUNT) + "% Bleed and set on fire for " + EFFECT_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_LEFT_CLICK;
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FLAMECALLER;
 	}
 }

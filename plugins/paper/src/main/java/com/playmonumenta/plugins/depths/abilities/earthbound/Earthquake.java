@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -29,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -43,15 +45,17 @@ public class Earthquake extends DepthsAbility {
 	public static final int MAX_TICKS = 4 * 20;
 	public static final String EARTHQUAKE_ARROW_METADATA = "EarthquakeArrow";
 
+	public static final DepthsAbilityInfo<Earthquake> INFO =
+		new DepthsAbilityInfo<>(Earthquake.class, ABILITY_NAME, Earthquake::new, DepthsTree.EARTHBOUND, DepthsTrigger.SHIFT_BOW)
+			.linkedSpell(ClassAbility.EARTHQUAKE)
+			.cooldown(COOLDOWN)
+			.displayItem(new ItemStack(Material.COARSE_DIRT))
+			.descriptions(Earthquake::getDescription, MAX_RARITY);
+
 	private WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public Earthquake(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.COARSE_DIRT;
-		mTree = DepthsTree.EARTHBOUND;
-		mInfo.mLinkedSpell = ClassAbility.EARTHQUAKE;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mIgnoreCooldown = true;
+		super(plugin, player, INFO);
 		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
@@ -67,7 +71,7 @@ public class Earthquake extends DepthsAbility {
 	// Since Snowballs disappear after landing, we need an extra detection for when it hits the ground.
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (mPlayer != null && proj instanceof Snowball && mPlayerItemStatsMap.containsKey(proj)) {
+		if (proj instanceof Snowball && mPlayerItemStatsMap.containsKey(proj)) {
 			quake(proj, proj.getLocation());
 		}
 	}
@@ -88,7 +92,7 @@ public class Earthquake extends DepthsAbility {
 								knockup(mob);
 							}
 
-							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false);
+							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], false, true, false);
 
 							if (!EntityUtils.isBoss(mob)) {
 								EntityUtils.applySilence(mPlugin, SILENCE_DURATION[mRarity - 1], mob);
@@ -127,13 +131,12 @@ public class Earthquake extends DepthsAbility {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (isOnCooldown()) {
 			return true;
 		}
 
 		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
-			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
-			putOnCooldown();
+			putOnCooldown(getModifiedCooldown((int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer))));
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.BLOCK_CAMPFIRE_CRACKLE, 2, 1.0f);
 
@@ -172,18 +175,9 @@ public class Earthquake extends DepthsAbility {
 		return true;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Shooting a projectile while sneaking causes an earthquake " + EARTHQUAKE_TIME / 20 + " second after impact. The earthquake deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to mobs in a " + (int) RADIUS + " block radius, silencing for " + DepthsUtils.getRarityColor(rarity) + (float) SILENCE_DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds and knocking upward. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.EARTHBOUND;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_BOW;
-	}
 }

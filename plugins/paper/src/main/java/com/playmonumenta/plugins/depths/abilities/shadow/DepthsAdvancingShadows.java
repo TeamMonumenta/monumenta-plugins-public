@@ -3,10 +3,12 @@ package com.playmonumenta.plugins.depths.abilities.shadow;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.FlatDamageDealt;
@@ -17,8 +19,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.EnumSet;
-import java.util.List;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,7 +27,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class DepthsAdvancingShadows extends DepthsAbility {
@@ -40,22 +40,38 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	private static final int COOLDOWN = 18 * 20;
 	private static final int DAMAGE_DURATION = 5 * 20;
 
-	private @Nullable LivingEntity mTarget = null;
+	public static final DepthsAbilityInfo<DepthsAdvancingShadows> INFO =
+		new DepthsAbilityInfo<>(DepthsAdvancingShadows.class, ABILITY_NAME, DepthsAdvancingShadows::new, DepthsTree.SHADOWS, DepthsTrigger.RIGHT_CLICK)
+			.linkedSpell(ClassAbility.ADVANCING_SHADOWS)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsAdvancingShadows::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.WITHER_SKELETON_SKULL))
+			.descriptions(DepthsAdvancingShadows::getDescription, MAX_RARITY);
 
 	public DepthsAdvancingShadows(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.WITHER_SKELETON_SKULL;
-		mTree = DepthsTree.SHADOWS;
-		mInfo.mLinkedSpell = ClassAbility.ADVANCING_SHADOWS;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action action) {
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
+		}
 
-		LivingEntity entity = mTarget;
-		if (entity == null || mPlayer == null) {
+		// Basically makes sure if the target is in LoS and if there is a path.
+		Location eyeLoc = mPlayer.getEyeLocation();
+		Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), ADVANCING_SHADOWS_RANGE);
+		ray.mThroughBlocks = false;
+		ray.mThroughNonOccluding = false;
+		ray.mTargetPlayers = AbilityManager.getManager().isPvPEnabled(mPlayer);
+
+		RaycastData data = ray.shootRaycast();
+
+		LivingEntity entity = data.getEntities().stream()
+			                      .filter(t -> t != mPlayer && t.isValid() && EntityUtils.isHostileMob(t))
+			                      .findFirst()
+			                      .orElse(null);
+		if (entity == null) {
 			return;
 		}
 
@@ -133,57 +149,14 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			world.spawnParticle(Particle.SPELL_WITCH, playerLoc.clone().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
 			world.spawnParticle(Particle.SMOKE_LARGE, playerLoc.clone().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
 			world.playSound(playerLoc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
-			mTarget = null;
 			putOnCooldown();
 		}
 	}
 
-
-	@Override
-	public boolean runCheck() {
-
-		if (mPlayer != null && !mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
-
-			// Basically makes sure if the target is in LoS and if there is
-			// a path.
-			Location eyeLoc = mPlayer.getEyeLocation();
-			Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), ADVANCING_SHADOWS_RANGE);
-			ray.mThroughBlocks = false;
-			ray.mThroughNonOccluding = false;
-			if (AbilityManager.getManager().isPvPEnabled(mPlayer)) {
-				ray.mTargetPlayers = true;
-			}
-
-			RaycastData data = ray.shootRaycast();
-
-			List<LivingEntity> rayEntities = data.getEntities();
-			if (rayEntities != null && !rayEntities.isEmpty()) {
-				for (LivingEntity t : rayEntities) {
-					if (!t.getUniqueId().equals(mPlayer.getUniqueId()) && t.isValid() && !t.isDead() && EntityUtils.isHostileMob(t)) {
-						mTarget = t;
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
-	}
-
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Right click and holding a weapon to teleport to the target hostile enemy within " + ADVANCING_SHADOWS_RANGE + " blocks and your melee attack damage will be increased by " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " finally, for " + DAMAGE_DURATION / 20 + " seconds. If you are holding a shield in your offhand, you will gain the attack damage but not be teleported. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.SHADOWS;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.RIGHT_CLICK;
-	}
 }
 

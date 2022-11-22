@@ -1,11 +1,14 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -28,7 +31,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -47,99 +50,101 @@ public class Metalmancy extends DepthsAbility {
 	public static final int TICK_INTERVAL = 5;
 	private static final double MAX_TARGET_Y = 4;
 
+	public static final DepthsAbilityInfo<Metalmancy> INFO =
+		new DepthsAbilityInfo<>(Metalmancy.class, ABILITY_NAME, Metalmancy::new, DepthsTree.METALLIC, DepthsTrigger.SWAP)
+			.linkedSpell(ClassAbility.METALMANCY)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Metalmancy::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.IRON_BLOCK))
+			.descriptions(Metalmancy::getDescription, MAX_RARITY);
+
 	private @Nullable Mob mGolem;
 	private @Nullable LivingEntity mTarget;
 
 	public Metalmancy(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.IRON_BLOCK;
-		mTree = DepthsTree.METALLIC;
-		mInfo.mLinkedSpell = ClassAbility.METALMANCY;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mIgnoreCooldown = true;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-
-		event.setCancelled(true);
-
-		if (!isTimerActive() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
-			putOnCooldown();
-
-			if (mGolem != null) {
-				mGolem.remove();
-				mGolem = null;
-			}
-
-			World world = mPlayer.getWorld();
-			Location loc = mPlayer.getLocation();
-			Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
-			mGolem = (Mob) LibraryOfSoulsIntegration.summon(mPlayer.getLocation().add(facingDirection).add(0, 1, 0), GOLEM_NAME);
-			if (mGolem == null) {
-				return;
-			}
-			mGolem.setVelocity(facingDirection.multiply(VELOCITY));
-
-			MetalmancyBoss metalmancyBoss = BossUtils.getBossOfClass(mGolem, MetalmancyBoss.class);
-			if (metalmancyBoss == null) {
-				MMLog.warning("Failed to get MetalamcnyBoss");
-				return;
-			}
-
-			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-			metalmancyBoss.spawn(mPlayer, DAMAGE[mRarity - 1], playerItemStats);
-
-			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, 1.0f, 1.0f);
-			world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, 1.0f, 1.0f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f);
-
-			new BukkitRunnable() {
-				int mTicksElapsed = 0;
-				@Override
-				public void run() {
-					boolean isOutOfTime = mTicksElapsed >= DURATION[mRarity - 1];
-					if (isOutOfTime || mGolem == null) {
-						if (isOutOfTime && mGolem != null) {
-							Location golemLoc = mGolem.getLocation();
-							world.playSound(golemLoc, Sound.ENTITY_IRON_GOLEM_DEATH, 0.8f, 1.0f);
-							world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, golemLoc, 15);
-							world.spawnParticle(Particle.SMOKE_NORMAL, golemLoc, 20);
-						}
-						if (!(mTarget == null)) {
-							mTarget.removePotionEffect(PotionEffectType.GLOWING);
-							mTarget = null;
-						}
-						if (mGolem != null) {
-							mGolem.remove();
-							mGolem = null;
-						}
-						this.cancel();
-					}
-
-					if (!(mTarget == null || mTarget.isDead() || mTarget.getHealth() <= 0)) {
-						if (mTarget == mGolem) {
-							mTarget = null;
-						} else {
-							mGolem.setTarget(mTarget);
-						}
-					}
-
-					if (mGolem != null && (mGolem.getTarget() == null || mGolem.getTarget().isDead() || mGolem.getTarget().getHealth() <= 0) && mTicksElapsed >= TICK_INTERVAL * 2) {
-						Location golemLoc = mGolem.getLocation();
-						List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(golemLoc, DETECTION_RANGE, mGolem);
-						nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) || mob.isInvulnerable());
-						nearbyMobs.removeIf((mob) -> Math.abs(mob.getLocation().getY() - golemLoc.getY()) > MAX_TARGET_Y);
-						LivingEntity nearestMob = EntityUtils.getNearestMob(golemLoc, nearbyMobs);
-						if (nearestMob != null) {
-							mGolem.setTarget(nearestMob);
-						}
-					}
-
-					mTicksElapsed += TICK_INTERVAL;
-				}
-			}.runTaskTimer(mPlugin, 0, TICK_INTERVAL);
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
 		}
+
+		putOnCooldown();
+
+		if (mGolem != null) {
+			mGolem.remove();
+			mGolem = null;
+		}
+
+		World world = mPlayer.getWorld();
+		Location loc = mPlayer.getLocation();
+		Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
+		mGolem = (Mob) LibraryOfSoulsIntegration.summon(mPlayer.getLocation().add(facingDirection).add(0, 1, 0), GOLEM_NAME);
+		if (mGolem == null) {
+			return;
+		}
+		mGolem.setVelocity(facingDirection.multiply(VELOCITY));
+
+		MetalmancyBoss metalmancyBoss = BossUtils.getBossOfClass(mGolem, MetalmancyBoss.class);
+		if (metalmancyBoss == null) {
+			MMLog.warning("Failed to get MetalamcnyBoss");
+			return;
+		}
+
+		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+		metalmancyBoss.spawn(mPlayer, DAMAGE[mRarity - 1], playerItemStats);
+
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, 1.0f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f);
+
+		new BukkitRunnable() {
+			int mTicksElapsed = 0;
+
+			@Override
+			public void run() {
+				boolean isOutOfTime = mTicksElapsed >= DURATION[mRarity - 1];
+				if (isOutOfTime || mGolem == null) {
+					if (isOutOfTime && mGolem != null) {
+						Location golemLoc = mGolem.getLocation();
+						world.playSound(golemLoc, Sound.ENTITY_IRON_GOLEM_DEATH, 0.8f, 1.0f);
+						world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, golemLoc, 15);
+						world.spawnParticle(Particle.SMOKE_NORMAL, golemLoc, 20);
+					}
+					if (!(mTarget == null)) {
+						mTarget.removePotionEffect(PotionEffectType.GLOWING);
+						mTarget = null;
+					}
+					if (mGolem != null) {
+						mGolem.remove();
+						mGolem = null;
+					}
+					this.cancel();
+				}
+
+				if (!(mTarget == null || mTarget.isDead() || mTarget.getHealth() <= 0)) {
+					if (mTarget == mGolem) {
+						mTarget = null;
+					} else {
+						mGolem.setTarget(mTarget);
+					}
+				}
+
+				if (mGolem != null && (mGolem.getTarget() == null || mGolem.getTarget().isDead() || mGolem.getTarget().getHealth() <= 0) && mTicksElapsed >= TICK_INTERVAL * 2) {
+					Location golemLoc = mGolem.getLocation();
+					List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(golemLoc, DETECTION_RANGE, mGolem);
+					nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) || mob.isInvulnerable());
+					nearbyMobs.removeIf((mob) -> Math.abs(mob.getLocation().getY() - golemLoc.getY()) > MAX_TARGET_Y);
+					LivingEntity nearestMob = EntityUtils.getNearestMob(golemLoc, nearbyMobs);
+					if (nearestMob != null) {
+						mGolem.setTarget(nearestMob);
+					}
+				}
+
+				mTicksElapsed += TICK_INTERVAL;
+			}
+		}.runTaskTimer(mPlugin, 0, TICK_INTERVAL);
 	}
 
 	@Override
@@ -164,18 +169,9 @@ public class Metalmancy extends DepthsAbility {
 		}
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Swap hands while holding a weapon to summon an invulnerable steel construct. The Construct attacks the nearest mob within " + DETECTION_RANGE + " blocks. The Construct prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The Construct deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " projectile damage and taunts non-boss enemies it hits. The Construct disappears after " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.METALLIC;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SWAP;
-	}
 }

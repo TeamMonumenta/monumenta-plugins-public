@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -25,8 +27,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,18 +47,21 @@ public class FireworkBlast extends DepthsAbility {
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(244, 56, 0), 1.0f);
 	private static final Particle.DustOptions ORANGE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 127, 20), 1.0f);
 
+	public static final DepthsAbilityInfo<FireworkBlast> INFO =
+		new DepthsAbilityInfo<>(FireworkBlast.class, ABILITY_NAME, FireworkBlast::new, DepthsTree.METALLIC, DepthsTrigger.SHIFT_RIGHT_CLICK)
+			.linkedSpell(ClassAbility.FIREWORKBLAST)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FireworkBlast::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.FIREWORK_ROCKET))
+			.descriptions(FireworkBlast::getDescription, MAX_RARITY);
+
 	public FireworkBlast(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.FIREWORKBLAST;
-		mDisplayMaterial = Material.FIREWORK_ROCKET;
-		mTree = DepthsTree.METALLIC;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action trigger) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 		putOnCooldown();
@@ -98,7 +103,7 @@ public class FireworkBlast extends DepthsAbility {
 						double damage = (mPlayer.getLocation().distance(loc) * DAMAGE_INCREASE_PER_BLOCK + 1) * DAMAGE[mRarity - 1];
 
 						//Max damage cap from array
-						DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, playerItemStats), Math.min(damage, DAMAGE_CAP[mRarity - 1]), false, true, false);
+						DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.getLinkedSpell(), playerItemStats), Math.min(damage, DAMAGE_CAP[mRarity - 1]), false, true, false);
 
 						world.spawnParticle(Particle.SMOKE_LARGE, e.getLocation(), 20, 0, 0, 0, 0.2);
 						world.spawnParticle(Particle.REDSTONE, e.getLocation(), 10, 0.25, 0.25, 0.25, GRAY_COLOR);
@@ -117,23 +122,7 @@ public class FireworkBlast extends DepthsAbility {
 		return fw.hasMetadata(ABILITY_METAKEY);
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Right click while sneaking and holding a weapon to shoot a firework that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " projectile damage to enemies within " + RADIUS + " blocks of its explosion. The damage is increased by " + (int) DepthsUtils.roundPercent(DAMAGE_INCREASE_PER_BLOCK) + "% for every block the firework travels, up to " + DepthsUtils.getRarityColor(rarity) + DAMAGE_CAP[rarity - 1] + ChatColor.WHITE + " damage. Cooldown: " + COOLDOWN / 20 + "s.";
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_RIGHT_CLICK;
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.METALLIC;
 	}
 }

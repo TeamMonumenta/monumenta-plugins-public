@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 
 public interface LockableCS {
 
-	boolean isUnlocked(Player mPlayer);
+	boolean isUnlocked(Player player);
 
 	String[] getLockDesc();
 

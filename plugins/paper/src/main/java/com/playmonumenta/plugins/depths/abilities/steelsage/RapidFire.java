@@ -2,10 +2,13 @@ package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -26,7 +29,6 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -40,29 +42,31 @@ public class RapidFire extends DepthsAbility {
 	public static final int COOLDOWN = 18 * 20;
 	public static final String META_DATA_TAG = "RapidFireArrow";
 
+	public static final DepthsAbilityInfo<RapidFire> INFO =
+		new DepthsAbilityInfo<>(RapidFire.class, ABILITY_NAME, RapidFire::new, DepthsTree.METALLIC, DepthsTrigger.PASSIVE)
+			.linkedSpell(ClassAbility.RAPIDFIRE)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RapidFire::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false),
+				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.REPEATER))
+			.descriptions(RapidFire::getDescription, MAX_RARITY);
+
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public RapidFire(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.REPEATER;
-		mInfo.mLinkedSpell = ClassAbility.RAPIDFIRE;
-		mTree = DepthsTree.METALLIC;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mIgnoreCooldown = true;
+		super(plugin, player, INFO);
 		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
-	@Override
-	public void cast(Action action) {
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!ItemUtils.isProjectileWeapon(inMainHand) || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 
 		World world = mPlayer.getWorld();
 		new BukkitRunnable() {
 			int mCount = 0;
+
 			@Override
 			public void run() {
 
@@ -103,15 +107,10 @@ public class RapidFire extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
-			cast(Action.LEFT_CLICK_AIR);
-			return false;
-		}
-
 		if (event.getDamager() instanceof Projectile proj) {
 			ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(proj);
 			if (playerItemStats != null) {
-				DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, playerItemStats), DAMAGE, true, true, false);
+				DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.getLinkedSpell(), playerItemStats), DAMAGE, true, true, false);
 				event.setCancelled(true);
 				proj.remove();
 			}
@@ -119,14 +118,8 @@ public class RapidFire extends DepthsAbility {
 		return false; // prevents multiple calls itself
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Left clicking with a projectile weapon shoots a flurry of " + DepthsUtils.getRarityColor(rarity) + ARROWS[rarity - 1] + ChatColor.WHITE + " projectiles in the direction that you are looking that deal " + DAMAGE + " projectile damage, bypassing iframes. Cooldown: " + COOLDOWN / 20 + "s.";
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.METALLIC;
 	}
 }
 

@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.frostborn;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
@@ -33,25 +35,27 @@ public class IceBarrier extends DepthsAbility {
 	public static final int[] MAX_LENGTH = {20, 25, 30, 35, 40, 50};
 	public static final int CAST_TIME = 5 * 20;
 
+	public static final DepthsAbilityInfo<IceBarrier> INFO =
+		new DepthsAbilityInfo<>(IceBarrier.class, ABILITY_NAME, IceBarrier::new, DepthsTree.FROSTBORN, DepthsTrigger.SHIFT_RIGHT_CLICK)
+			.linkedSpell(ClassAbility.ICE_BARRIER)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", IceBarrier::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.PRISMARINE_WALL))
+			.descriptions(IceBarrier::getDescription, MAX_RARITY);
+
 	public boolean mIsPrimed;
 	public @Nullable Location mPrimedLoc;
 
 	public IceBarrier(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.PRISMARINE_WALL;
-		mTree = DepthsTree.FROSTBORN;
-		mInfo.mCooldown = (mRarity == 0) ? 20 * 20 : COOLDOWN[mRarity - 1];
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mLinkedSpell = ClassAbility.ICE_BARRIER;
-		mInfo.mIgnoreCooldown = true;
+		super(plugin, player, INFO);
 		mIsPrimed = false;
 		mPrimedLoc = null;
 	}
 
-	@Override
-	public void cast(Action action) {
+	public void cast() {
 
-		if (mPlayer == null || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (isOnCooldown()) {
 			return;
 		}
 
@@ -77,12 +81,12 @@ public class IceBarrier extends DepthsAbility {
 
 					@Override
 					public void run() {
-						if (mPlayer != null && mIsPrimed && mPrimedLoc != null) {
+						if (mIsPrimed && mPrimedLoc != null) {
 							mIsPrimed = false;
 							mPrimedLoc = null;
 							world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 2.0f, 0.5f);
 							//Reset cd
-							mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, 0);
+							mPlugin.mTimers.addCooldown(mPlayer, mInfo.getLinkedSpell(), 0);
 						}
 					}
 
@@ -115,25 +119,10 @@ public class IceBarrier extends DepthsAbility {
 		}
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Right clicking while sneaking and holding a weapon to place an ice marker up to " + CAST_RANGE + " blocks away. Placing a second marker within " + CAST_TIME / 20 + " seconds and within " + DepthsUtils.getRarityColor(rarity) + MAX_LENGTH[rarity - 1] + ChatColor.WHITE + " blocks of the first marker forms a wall of ice connecting the two points, lasting for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Mobs that break the barrier are stunned for 2s. Cooldown is refunded if no second marker is placed. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FROSTBORN;
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_RIGHT_CLICK;
-	}
 
 	@Override
 	public @Nullable String getMode() {

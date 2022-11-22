@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.scout.hunter.PredatorStrike;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
@@ -15,7 +16,6 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -36,28 +36,30 @@ public class Agility extends Ability {
 	public static final String CHARM_HASTE = "Agility Haste Amplifier";
 
 	private final int mHasteAmplifier;
+
+	public static final AbilityInfo<Agility> INFO =
+		new AbilityInfo<>(Agility.class, "Agility", Agility::new)
+			.scoreboardId("Agility")
+			.shorthandName("Agl")
+			.descriptions(
+				String.format("You gain permanent Haste %s. Your melee attacks deal +%d extra damage.", StringUtils.toRoman(AGILITY_1_EFFECT_LVL + 1), AGILITY_BONUS_DAMAGE),
+				String.format("You gain permanent Haste %s. Increase melee damage by +%d plus %d%% of final damage done.", StringUtils.toRoman(AGILITY_2_EFFECT_LVL + 1), AGILITY_BONUS_DAMAGE, (int) (SCALING_DAMAGE * 100)),
+				String.format("Breaking a spawner refreshes the cooldown of all your skills by %s%%.",
+					StringUtils.multiplierToPercentage(ENHANCEMENT_COOLDOWN_REFRESH)))
+			.displayItem(new ItemStack(Material.GOLDEN_PICKAXE, 1));
+
 	private Ability[] mScoutAbilities = {};
 
-	public Agility(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Agility");
-		mInfo.mScoreboardId = "Agility";
-		mInfo.mShorthandName = "Agl";
-		mInfo.mDescriptions.add(String.format("You gain permanent Haste %s. Your melee attacks deal +%d extra damage.", StringUtils.toRoman(AGILITY_1_EFFECT_LVL + 1), AGILITY_BONUS_DAMAGE));
-		mInfo.mDescriptions.add(String.format("You gain permanent Haste %s. Increase melee damage by +%d plus %d%% of final damage done.", StringUtils.toRoman(AGILITY_2_EFFECT_LVL + 1), AGILITY_BONUS_DAMAGE, (int)(SCALING_DAMAGE * 100)));
-		mInfo.mDescriptions.add(
-			String.format("Breaking a spawner refreshes the cooldown of all your skills by %s%%.",
-				StringUtils.multiplierToPercentage(ENHANCEMENT_COOLDOWN_REFRESH)));
-		mDisplayItem = new ItemStack(Material.GOLDEN_PICKAXE, 1);
-
+	public Agility(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mHasteAmplifier = (isLevelOne() ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL) + (int) CharmManager.getLevel(mPlayer, CHARM_HASTE);
-
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			AbilityManager abilityManager = mPlugin.mAbilityManager;
 			mScoutAbilities = Stream.of(WindBomb.class, Volley.class, HuntingCompanion.class, EagleEye.class,
 					WhirlingBlade.class, TacticalManeuver.class, Quickdraw.class, PredatorStrike.class)
-				.map(c -> abilityManager.getPlayerAbilityIgnoringSilence(player, c))
-				.filter(Objects::nonNull)
-				.toArray(Ability[]::new);
+				                  .map(c -> abilityManager.getPlayerAbilityIgnoringSilence(player, c))
+				                  .filter(Objects::nonNull)
+				                  .toArray(Ability[]::new);
 		});
 	}
 
@@ -75,12 +77,12 @@ public class Agility extends Ability {
 
 	@Override
 	public boolean blockBreakEvent(BlockBreakEvent event) {
-		if (mPlayer != null && isEnhanced() && event.getBlock().getType() == Material.SPAWNER) {
+		if (isEnhanced() && event.getBlock().getType() == Material.SPAWNER) {
 			UUID uuid = mPlayer.getUniqueId();
 			for (Ability ability : mScoutAbilities) {
-				if (mPlugin.mTimers.isAbilityOnCooldown(uuid, ability.mInfo.mLinkedSpell)) {
+				if (mPlugin.mTimers.isAbilityOnCooldown(uuid, ability.getInfo().getLinkedSpell())) {
 					int cooldownRefresh = (int) (ability.getModifiedCooldown() * ENHANCEMENT_COOLDOWN_REFRESH);
-					mPlugin.mTimers.updateCooldown(mPlayer, ability.mInfo.mLinkedSpell, cooldownRefresh);
+					mPlugin.mTimers.updateCooldown(mPlayer, ability.getInfo().getLinkedSpell(), cooldownRefresh);
 				}
 			}
 		}

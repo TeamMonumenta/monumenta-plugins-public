@@ -519,7 +519,7 @@ public class Plugin extends JavaPlugin {
 		// Export class/skill info
 		try {
 			String skillExportPath = getDataFolder() + File.separator + "exported_skills.json";
-			MonumentaClasses classes = new MonumentaClasses(this, (Player) null);
+			MonumentaClasses classes = new MonumentaClasses();
 			FileUtils.writeJson(skillExportPath, classes.toJson());
 		} catch (Exception e) {
 			// Failed to export skills to json, non-critical error.

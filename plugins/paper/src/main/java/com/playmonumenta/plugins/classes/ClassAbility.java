@@ -14,8 +14,6 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-
-// TODO perhaps simply pass around class literals instead of maintaining this?
 /*
  * Order does not matter here, it is simply alphebetical.
  * Where order matters for what runs first is in AbilityManager.
@@ -87,6 +85,7 @@ public enum ClassAbility {
 	VOLLEY("Volley"),
 	WIND_BOMB("Wind Bomb"),
 	HUNTING_COMPANION("Hunting Companion"),
+	SWIFTNESS("Swiftness"),
 
 	// Hunter
 	PREDATOR_STRIKE("Predator Strike"),

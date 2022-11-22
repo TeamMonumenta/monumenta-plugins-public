@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -44,21 +46,24 @@ public class LightningBottle extends DepthsAbility {
 	public static final int DURATION = 3 * 20;
 	public static final int DEATH_RADIUS = 32;
 
-	private WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	public static final DepthsAbilityInfo<LightningBottle> INFO =
+		new DepthsAbilityInfo<>(LightningBottle.class, ABILITY_NAME, LightningBottle::new, DepthsTree.SUNLIGHT, DepthsTrigger.PASSIVE)
+			.linkedSpell(ClassAbility.LIGHTNING_BOTTLE)
+			.displayItem(new ItemStack(Material.BREWING_STAND))
+			.descriptions(LightningBottle::getDescription, MAX_RARITY);
+
+	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	private int mCount = 0;
 
 	public LightningBottle(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.BREWING_STAND;
-		mInfo.mLinkedSpell = ClassAbility.LIGHTNING_BOTTLE;
-		mTree = DepthsTree.SUNLIGHT;
+		super(plugin, player, INFO);
 		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (mPlayer != null && InventoryUtils.testForItemWithName(potion.getItem(), POTION_NAME)) {
+		if (InventoryUtils.testForItemWithName(potion.getItem(), POTION_NAME)) {
 			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.SPELL);
 			mPlayerItemStatsMap.put(potion, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 		}
@@ -69,10 +74,10 @@ public class LightningBottle extends DepthsAbility {
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(potion);
-		if (mPlayer != null && playerItemStats != null) {
+		if (playerItemStats != null) {
 			for (LivingEntity entity : affectedEntities) {
 				if (EntityUtils.isHostileMob(entity)) {
-					DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), DAMAGE[mRarity - 1], false, true, false);
+					DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], false, true, false);
 
 					EntityUtils.applyVulnerability(mPlugin, DURATION, VULNERABILITY[mRarity - 1], entity);
 					EntityUtils.applySlow(mPlugin, DURATION, SLOWNESS, entity);
@@ -85,9 +90,6 @@ public class LightningBottle extends DepthsAbility {
 
 	@Override
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (mPlayer == null) {
-			return;
-		}
 		mCount++;
 		if (mCount >= KILLS_PER) {
 			mCount = 0;
@@ -129,8 +131,7 @@ public class LightningBottle extends DepthsAbility {
 		potionMeta.setBasePotionData(new PotionData(PotionType.MUNDANE));
 		potionMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS); // Hide "No Effects" vanilla potion effect lore
 		potionMeta.setColor(Color.YELLOW);
-		String plainName = POTION_NAME;
-		potionMeta.setDisplayName(ChatColor.AQUA + plainName); // OG Alchemist's Potion item name colour of &b
+		potionMeta.setDisplayName(ChatColor.AQUA + POTION_NAME); // OG Alchemist's Potion item name colour of &b
 
 		List<String> loreList = Arrays.asList(
 			ChatColor.DARK_GRAY + "A unique potion used by Dawnbringers." // Standard Monumenta lore text colour of &8
@@ -142,13 +143,8 @@ public class LightningBottle extends DepthsAbility {
 		return itemStack;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
-		return "For every " + KILLS_PER + " mobs that die within " + DEATH_RADIUS + " blocks of you, you gain a lightning bottle, which stack up to " + MAX_STACK + ". Throwing a lightning bottle deals " + DepthsUtils.getRarityColor(rarity) + (float)DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and applies " + (int) DepthsUtils.roundPercent(SLOWNESS) + "% slowness and " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for " + DURATION / 20 + " seconds.";
+	private static String getDescription(int rarity) {
+		return "For every " + KILLS_PER + " mobs that die within " + DEATH_RADIUS + " blocks of you, you gain a lightning bottle, which stack up to " + MAX_STACK + ". Throwing a lightning bottle deals " + DepthsUtils.getRarityColor(rarity) + (float) DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and applies " + (int) DepthsUtils.roundPercent(SLOWNESS) + "% slowness and " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for " + DURATION / 20 + " seconds.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.SUNLIGHT;
-	}
 }

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -10,7 +11,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -42,32 +42,31 @@ public class CoupDeGrace extends Ability {
 	public static final String CHARM_NORMAL = "Coup de Grace Normal Enemy Threshold";
 	public static final String CHARM_ELITE = "Coup de Grace Elite Threshold";
 
-	public CoupDeGrace(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Coup de Grace");
-		mInfo.mScoreboardId = "CoupDeGrace";
-		mInfo.mShorthandName = "CdG";
-		mInfo.mDescriptions.add(
-			String.format("If melee damage you deal brings a normal mob under %s%% health, they die instantly. The threshold for elites is %s%% health.",
-				(int)(COUP_1_NORMAL_THRESHOLD * 100),
-				(int)(COUP_1_ELITE_THRESHOLD * 100)));
-		mInfo.mDescriptions.add(
-			String.format("The health threshold is increased to %s%% for normal enemies and %s%% for elites.",
-				(int)(COUP_2_NORMAL_THRESHOLD * 100),
-				(int)(COUP_2_ELITE_THRESHOLD * 100)));
-		mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
+	public static final AbilityInfo<CoupDeGrace> INFO =
+		new AbilityInfo<>(CoupDeGrace.class, "Coup de Grace", CoupDeGrace::new)
+			.scoreboardId("CoupDeGrace")
+			.shorthandName("CdG")
+			.descriptions(
+				String.format("If melee damage you deal brings a normal mob under %s%% health, they die instantly. The threshold for elites is %s%% health.",
+					(int) (COUP_1_NORMAL_THRESHOLD * 100),
+					(int) (COUP_1_ELITE_THRESHOLD * 100)),
+				String.format("The health threshold is increased to %s%% for normal enemies and %s%% for elites.",
+					(int) (COUP_2_NORMAL_THRESHOLD * 100),
+					(int) (COUP_2_ELITE_THRESHOLD * 100)))
+			.displayItem(new ItemStack(Material.WITHER_SKELETON_SKULL, 1))
+			.priorityAmount(5000); // after all damage modifiers to get the proper final damage
+
+	public CoupDeGrace(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		double sharedThreshold = CharmManager.getLevelPercentDecimal(player, CHARM_THRESHOLD);
 		mNormalThreshold = (isLevelOne() ? COUP_1_NORMAL_THRESHOLD : COUP_2_NORMAL_THRESHOLD) + CharmManager.getLevelPercentDecimal(player, CHARM_NORMAL) + sharedThreshold;
 		mEliteThreshold = (isLevelOne() ? COUP_1_ELITE_THRESHOLD : COUP_2_ELITE_THRESHOLD) + CharmManager.getLevelPercentDecimal(player, CHARM_ELITE) + sharedThreshold;
 	}
 
 	@Override
-	public double getPriorityAmount() {
-		return 5000; // after all damage modifiers to get the proper final damage
-	}
-
-	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH || event.getAbility() == ClassAbility.QUAKE) {
+		if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)
+			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH || event.getAbility() == ClassAbility.QUAKE)) {
 			for (PotionEffect effect : enemy.getActivePotionEffects()) {
 				if (effect.getType().equals(PotionEffectType.DAMAGE_RESISTANCE) && effect.getAmplifier() >= 4) {
 					return false;
@@ -100,8 +99,4 @@ public class CoupDeGrace extends Ability {
 		}
 	}
 
-	@Override
-	public boolean runCheck() {
-		return InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer);
-	}
 }

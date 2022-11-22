@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.rogue;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -13,6 +14,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
 import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -65,26 +67,27 @@ public class Dodging extends Ability {
 	public static final String CHARM_COOLDOWN = "Dodging Cooldown";
 	public static final String CHARM_SPEED = "Dodging Speed Amplifier";
 
+	public static final AbilityInfo<Dodging> INFO =
+		new AbilityInfo<>(Dodging.class, "Dodging", Dodging::new)
+			.linkedSpell(ClassAbility.DODGING)
+			.scoreboardId("Dodging")
+			.shorthandName("Dg")
+			.descriptions(
+				String.format("Blocks an arrow, thrown potion, blaze fireball, or snowball that would have hit you. Cooldown: %ss.",
+					DODGING_COOLDOWN_1 / 20),
+				String.format("The cooldown is reduced to %s s. When this ability is triggered, you gain +%s%% Speed for %ss.",
+					DODGING_COOLDOWN_2 / 20,
+					(int) (PERCENT_SPEED * 100),
+					DODGING_SPEED_EFFECT_DURATION / 20),
+				"The projectile you dodged is now reflected back to the enemy at 3x damage.")
+			.cooldown(DODGING_COOLDOWN_1, DODGING_COOLDOWN_2, CHARM_COOLDOWN)
+			.displayItem(new ItemStack(Material.SHIELD, 1));
+
 	private int mTriggerTick = 0;
 
-	public Dodging(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Dodging");
-		mInfo.mLinkedSpell = ClassAbility.DODGING;
-		mInfo.mScoreboardId = "Dodging";
-		mInfo.mShorthandName = "Dg";
-		mInfo.mDescriptions.add(
-			String.format("Blocks an arrow, thrown potion, blaze fireball, or snowball that would have hit you. Cooldown: %ss.",
-				DODGING_COOLDOWN_1 / 20));
-		mInfo.mDescriptions.add(
-			String.format("The cooldown is reduced to %s s. When this ability is triggered, you gain +%s%% Speed for %ss.",
-				DODGING_COOLDOWN_2 / 20,
-				(int)(PERCENT_SPEED * 100),
-				DODGING_SPEED_EFFECT_DURATION / 20));
-		mInfo.mDescriptions.add("The projectile you dodged is now reflected back to the enemy at 3x damage.");
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2);
+	public Dodging(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		// NOTE: This skill will get events even when it is on cooldown!
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 	}
 
 	@Override
@@ -111,7 +114,7 @@ public class Dodging extends Ability {
 				if (source != null) {
 					deflectParticles(source);
 
-					DamageUtils.damage(mPlayer, source, DamageType.PROJECTILE_SKILL, event.getOriginalDamage() * ENHANCMENT_DAMAGE, mInfo.mLinkedSpell, true);
+					DamageUtils.damage(mPlayer, source, DamageType.PROJECTILE_SKILL, event.getOriginalDamage() * ENHANCMENT_DAMAGE, mInfo.getLinkedSpell(), true);
 					// mPlayer.sendMessage(source.getName() + " HP: " + source.getHealth() + " / " + source.getMaxHealth() + " (-" + event.getOriginalDamage() + ")");
 
 					// If applicable (either arrow or trident), apply knockback
@@ -132,12 +135,8 @@ public class Dodging extends Ability {
 		}
 	}
 
-
 	@Override
 	public boolean playerHitByProjectileEvent(ProjectileHitEvent event) {
-		if (mPlayer == null) {
-			return true;
-		}
 		Projectile proj = event.getEntity();
 		// See if we should dodge. If false, allow the event to proceed normally
 		if (proj.getShooter() instanceof Player) {
@@ -195,7 +194,7 @@ public class Dodging extends Ability {
 			// (I am pretty sure the only potion throwers are in fact, witches)
 			// (But for a more general case, I will default use the enemy's attack damage stat, like how witches do.)
 			double damage = EntityUtils.getAttributeOrDefault(enemy, Attribute.GENERIC_ATTACK_DAMAGE, 1);
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage * ENHANCMENT_DAMAGE, mInfo.mLinkedSpell, true);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage * ENHANCMENT_DAMAGE, mInfo.getLinkedSpell(), true);
 
 			for (PotionEffect potionEffect : potion.getEffects()) {
 				PotionUtils.applyPotion(mPlayer, enemy, potionEffect);
@@ -208,10 +207,7 @@ public class Dodging extends Ability {
 	}
 
 	private boolean dodge() {
-		if (mPlayer == null) {
-			return false;
-		}
-		if (mTriggerTick == mPlayer.getTicksLived()) {
+		if (mTriggerTick == Bukkit.getServer().getCurrentTick()) {
 			// Dodging was activated this tick - allow it
 			return true;
 		}
@@ -220,7 +216,7 @@ public class Dodging extends Ability {
 		 * Must check with cooldown timers directly because isAbilityOnCooldown always returns
 		 * false (because ignoreCooldown is true)
 		 */
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (isOnCooldown()) {
 			/*
 			 * This ability is actually on cooldown (and was not triggered this tick)
 			 * Don't process dodging
@@ -233,7 +229,7 @@ public class Dodging extends Ability {
 		 * Make note of which tick this triggered on so that any other event that triggers this
 		 * tick will also be dodged
 		 */
-		mTriggerTick = mPlayer.getTicksLived();
+		mTriggerTick = Bukkit.getServer().getCurrentTick();
 		putOnCooldown();
 
 		Location loc = mPlayer.getLocation().add(0, 1, 0);

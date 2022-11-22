@@ -2,16 +2,19 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,7 +23,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -28,7 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Slipstream extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Slipstream";
-	public static final int[] COOLDOWN = {16, 14, 12, 10, 8, 6};
+	public static final int[] COOLDOWN = {16 * 20, 14 * 20, 12 * 20, 10 * 20, 8 * 20, 6 * 20};
 	private static final int DURATION = 8 * 20;
 	private static final double SPEED_AMPLIFIER = 0.2;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "SlipstreamSpeedEffect";
@@ -36,17 +39,23 @@ public class Slipstream extends DepthsAbility {
 	private static final int RADIUS = 4;
 	private static final float KNOCKBACK_SPEED = 0.9f;
 
+	public static final DepthsAbilityInfo<Slipstream> INFO =
+		new DepthsAbilityInfo<>(Slipstream.class, ABILITY_NAME, Slipstream::new, DepthsTree.WINDWALKER, DepthsTrigger.RIGHT_CLICK)
+			.linkedSpell(ClassAbility.SLIPSTREAM)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Slipstream::cast,
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.PHANTOM_MEMBRANE))
+			.descriptions(Slipstream::getDescription, MAX_RARITY);
+
 	public Slipstream(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.PHANTOM_MEMBRANE;
-		mTree = DepthsTree.WINDWALKER;
-		mInfo.mCooldown = (mRarity == 0) ? 16 * 20 : COOLDOWN[mRarity - 1] * 20;
-		mInfo.mLinkedSpell = ClassAbility.SLIPSTREAM;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action trigger) {
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
+		}
 		putOnCooldown();
 
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, SPEED_AMPLIFIER, PERCENT_SPEED_EFFECT_NAME));
@@ -86,27 +95,12 @@ public class Slipstream extends DepthsAbility {
 		}
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		if (rarity == 6) {
-			return "Right click to knock all enemies within " + RADIUS + " blocks away from you and gain Jump Boost " + DepthsUtils.getRarityColor(rarity) + "IV" + ChatColor.WHITE + " and " + (int) DepthsUtils.roundPercent(SPEED_AMPLIFIER) + "% speed for " + DURATION / 20 + " seconds. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] + "s" + ChatColor.WHITE + ".";
+			return "Right click to knock all enemies within " + RADIUS + " blocks away from you and gain Jump Boost " + DepthsUtils.getRarityColor(rarity) + "IV" + ChatColor.WHITE + " and " + (int) DepthsUtils.roundPercent(SPEED_AMPLIFIER) + "% speed for " + DURATION / 20 + " seconds. Cooldown: " + DepthsUtils.getRarityColor(rarity) + StringUtils.ticksToSeconds(COOLDOWN[rarity - 1]) + "s" + ChatColor.WHITE + ".";
 		}
-		return "Right click to knock all enemies within " + RADIUS + " blocks away from you and gain Jump Boost " + (JUMP_AMPLIFIER + 1) + " and " + (int) DepthsUtils.roundPercent(SPEED_AMPLIFIER) + "% speed for " + DURATION / 20 + " seconds. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] + "s" + ChatColor.WHITE + ".";
+		return "Right click to knock all enemies within " + RADIUS + " blocks away from you and gain Jump Boost " + (JUMP_AMPLIFIER + 1) + " and " + (int) DepthsUtils.roundPercent(SPEED_AMPLIFIER) + "% speed for " + DURATION / 20 + " seconds. Cooldown: " + DepthsUtils.getRarityColor(rarity) + StringUtils.ticksToSeconds(COOLDOWN[rarity - 1]) + "s" + ChatColor.WHITE + ".";
 	}
 
-	@Override
-	public boolean runCheck() {
-		return (!mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.WINDWALKER;
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.RIGHT_CLICK;
-	}
 }
 

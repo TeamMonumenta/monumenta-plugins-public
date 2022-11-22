@@ -13,17 +13,16 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collection;
+import java.util.List;
 import java.util.NavigableSet;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -36,39 +35,23 @@ import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.ItemStack;
 
 public abstract class Ability {
 	protected final Plugin mPlugin;
-	public final AbilityInfo mInfo;
-	protected final @Nullable Player mPlayer;
+	protected final AbilityInfo<?> mInfo;
+	protected final Player mPlayer;
 	private @Nullable Integer mScore = null;
-	public ItemStack mDisplayItem;
 
-	public Ability(Plugin plugin, @Nullable Player player, @Nullable String displayName) {
+	protected List<? extends AbilityTriggerInfo<?>> mCustomTriggers;
+
+	public Ability(Plugin plugin, Player player, AbilityInfo<?> info) {
 		mPlugin = plugin;
 		mPlayer = player;
-		mInfo = new AbilityInfo();
-		mInfo.mDisplayName = displayName;
-	}
-
-	public @Nullable String getDisplayName() {
-		return mInfo.mDisplayName;
-	}
-
-	public @Nullable String getScoreboard() {
-		return mInfo.mScoreboardId;
-	}
-
-	/**
-	 * This is used when the ability is casted manually when its
-	 * AbilityTrigger (Right Click/Left Click), along with whatever
-	 * runCheck() may contain, is correct.
-	 */
-	public void cast(Action trigger) {
-
+		mInfo = info;
+		mCustomTriggers = info.getTriggers().stream()
+			                  .map(ti -> ti.withCustomTrigger(info, player))
+			                  .toList();
 	}
 
 	/**
@@ -76,60 +59,27 @@ public abstract class Ability {
 	 *
 	 * @return the AbilityInfo object. Never null.
 	 */
-	public AbilityInfo getInfo() {
+	public AbilityInfo<?> getInfo() {
 		return mInfo;
 	}
 
-	/**
-	 * A custom check if additional checks are needed. For example, if you need to check if a player is looking up or down.
-	 *
-	 * @return true or false
-	 */
-	public boolean runCheck() {
-		return true;
-	}
-
-	/**
-	 * Priority order in event handling, with lower values being handled earlier than higher ones.
-	 * <p>
-	 * Some references:
-	 * <ul>
-	 * <li>Default is 1000
-	 * <li>Delve modifiers are around 2000
-	 * <li>Abilities that need a final damage amount are around 5000
-	 * <li>Lifeline abilities are around 10000
-	 * </ul>
-	 *
-	 * @return the priority order
-	 */
-	public double getPriorityAmount() {
-		return 1000;
+	public List<? extends AbilityTriggerInfo<?>> getCustomTriggers() {
+		return mCustomTriggers;
 	}
 
 	public boolean isOnCooldown() {
-		AbilityInfo abilityInfo = getInfo();
-		if (!abilityInfo.mIgnoreCooldown) {
-			// If not ignoring cooldowns, go by timer
-			return isTimerActive();
-		}
-		// Otherwise, never say on cooldown
-		return false;
-	}
-
-	// Whether skill is on cooldown, without factoring in mIgnoreCooldown
-	public boolean isTimerActive() {
-		@Nullable AbilityInfo abilityInfo = getInfo();
+		@Nullable AbilityInfo<?> abilityInfo = getInfo();
 		if (abilityInfo != null) {
-			@Nullable ClassAbility spell = abilityInfo.mLinkedSpell;
+			@Nullable ClassAbility spell = abilityInfo.getLinkedSpell();
 			if (spell != null) {
-				return isTimerActive(spell);
+				return isOnCooldown(spell);
 			}
 		}
 		return false;
 	}
 
-	public boolean isTimerActive(ClassAbility spell) {
-		return mPlayer != null && mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), spell);
+	private boolean isOnCooldown(ClassAbility spell) {
+		return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), spell);
 	}
 
 	public int getModifiedCooldown(int baseCooldown) {
@@ -168,7 +118,7 @@ public abstract class Ability {
 	 * This ability's cooldown modified by enchantments of items worn by the player
 	 */
 	public int getModifiedCooldown() {
-		return getModifiedCooldown(getInfo().mCooldown);
+		return getModifiedCooldown(getInfo().getModifiedCooldown(mPlayer, getAbilityScore()));
 	}
 
 	public void putOnCooldown() {
@@ -176,25 +126,13 @@ public abstract class Ability {
 	}
 
 	public void putOnCooldown(int cooldown) {
-		if (mPlayer == null) {
-			return;
-		}
-		AbilityInfo info = getInfo();
-		if (info.mLinkedSpell != null) {
-			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.mLinkedSpell)) {
-				mPlugin.mTimers.addCooldown(mPlayer, info.mLinkedSpell, cooldown);
-				PlayerUtils.callAbilityCastEvent(mPlayer, info.mLinkedSpell);
+		AbilityInfo<?> info = getInfo();
+		if (info.getLinkedSpell() != null) {
+			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.getLinkedSpell())) {
+				mPlugin.mTimers.addCooldown(mPlayer, info.getLinkedSpell(), cooldown);
+				PlayerUtils.callAbilityCastEvent(mPlayer, info.getLinkedSpell());
 			}
 		}
-	}
-
-	/**
-	 * A combination of both runCheck and isOnCooldown.
-	 *
-	 * @return true or false
-	 */
-	public final boolean canCast() {
-		return mPlayer != null && runCheck() && !isOnCooldown() && mPlayer.getGameMode() != GameMode.SPECTATOR;
 	}
 
 	//Events
@@ -273,10 +211,7 @@ public abstract class Ability {
 	}
 
 	public @Nullable Location entityDeathRadiusCenterLocation() {
-		if (mPlayer != null) {
-			return mPlayer.getLocation();
-		}
-		return null;
+		return mPlayer.getLocation();
 	}
 
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
@@ -288,11 +223,6 @@ public abstract class Ability {
 	}
 
 	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
-
-	}
-
-	// Do not use this for regular abilities
-	public void playerDealtUnregisteredCustomDamageEvent(DamageEvent event) {
 
 	}
 
@@ -316,10 +246,6 @@ public abstract class Ability {
 
 	}
 
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-
-	}
-
 	public void playerRegainHealthEvent(EntityRegainHealthEvent event) {
 
 	}
@@ -329,6 +255,10 @@ public abstract class Ability {
 	}
 
 	public void playerTeleportEvent(PlayerTeleportEvent event) {
+
+	}
+
+	public void blockWithShieldEvent() {
 
 	}
 
@@ -347,22 +277,15 @@ public abstract class Ability {
 	}
 
 	//---------------------------------------------------------------------------------------------------------------
-	/*
-	 * By default, players can only use abilities if the ability has a scoreboard defined and it is nonzero
-	 * For different conditions, an ability must override this method
-	 */
-	public boolean canUse(Player player) {
-		return mInfo.mScoreboardId != null && ScoreboardUtils.getScoreboardValue(player, mInfo.mScoreboardId).orElse(0) > 0;
-	}
 
 	/*
 	 * For performance, this caches the first scoreboard lookup for future use
 	 */
 	public int getAbilityScore(Ability this) {
-		AbilityInfo info = mInfo;
-		if (mPlayer != null && info.mScoreboardId != null) {
+		AbilityInfo<?> info = mInfo;
+		if (info.getScoreboard() != null) {
 			if (mScore == null) {
-				mScore = ScoreboardUtils.getScoreboardValue(mPlayer, info.mScoreboardId).orElse(0);
+				mScore = ScoreboardUtils.getScoreboardValue(mPlayer, info.getScoreboard()).orElse(0);
 			}
 			return mScore;
 		}

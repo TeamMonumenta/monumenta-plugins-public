@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.depths.abilities.earthbound;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
@@ -9,6 +11,7 @@ import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -28,7 +31,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -41,23 +44,25 @@ public class EarthenWrath extends DepthsAbility {
 	private static final int DURATION = 6 * 20;
 	private static final int DAMAGE_RADIUS = 6;
 
+	public static final DepthsAbilityInfo<EarthenWrath> INFO =
+		new DepthsAbilityInfo<>(EarthenWrath.class, ABILITY_NAME, EarthenWrath::new, DepthsTree.EARTHBOUND, DepthsTrigger.SWAP)
+			.linkedSpell(ClassAbility.EARTHEN_WRATH)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EarthenWrath::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.TURTLE_HELMET))
+			.descriptions(EarthenWrath::getDescription, MAX_RARITY);
+
 	public boolean mAbsorbDamage = false;
 	private double mDamageAbsorbed;
 
 	public EarthenWrath(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.TURTLE_HELMET;
-		mTree = DepthsTree.EARTHBOUND;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.EARTHEN_WRATH;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
-		event.setCancelled(true);
 		putOnCooldown();
 		mDamageAbsorbed = 0;
 
@@ -111,7 +116,7 @@ public class EarthenWrath extends DepthsAbility {
 
 					if (mDamageAbsorbed > 0) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, DAMAGE_RADIUS)) {
-							DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamageAbsorbed * PERCENT_DAMAGE_REFLECTED[mRarity - 1], mInfo.mLinkedSpell);
+							DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamageAbsorbed * PERCENT_DAMAGE_REFLECTED[mRarity - 1], mInfo.getLinkedSpell());
 						}
 
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
@@ -215,23 +220,9 @@ public class EarthenWrath extends DepthsAbility {
 		mAbsorbDamage = false;
 	}
 
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Swap while holding a weapon to redirect all damage allies take from mobs (excluding percent health damage) to you at a " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REDUCTION[rarity - 1]) + "%" + ChatColor.WHITE + " damage reduction for " + DURATION / 20 + " seconds, then do a burst damage in a " + DAMAGE_RADIUS + " block radius around you, dealing " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(PERCENT_DAMAGE_REFLECTED[rarity - 1]) + "%" + ChatColor.WHITE + " of original damage absorbed as melee damage. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.EARTHBOUND;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SWAP;
-	}
 }

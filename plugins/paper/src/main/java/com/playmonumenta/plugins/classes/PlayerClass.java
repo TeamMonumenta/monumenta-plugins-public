@@ -1,8 +1,9 @@
 package com.playmonumenta.plugins.classes;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import javax.annotation.Nullable;
@@ -14,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class PlayerClass {
 
-	public ArrayList<Ability> mAbilities = new ArrayList<Ability>();
+	public ArrayList<AbilityInfo<?>> mAbilities = new ArrayList<>();
 	public int mClass;
 	public @Nullable String mClassName;
 	public @Nullable NamedTextColor mClassColor;
@@ -29,6 +30,8 @@ public class PlayerClass {
 	public PlayerSpec mSpecOne = new PlayerSpec();
 	public PlayerSpec mSpecTwo = new PlayerSpec();
 
+	public ImmutableList<AbilityInfo<?>> mTriggerOrder;
+
 	public Boolean getClassAccessPerms(Player player) {
 		return true;
 	}
@@ -37,27 +40,21 @@ public class PlayerClass {
 		int specQuestReq = ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard).orElse(0);
 		int specClassReq = ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0);
 		int specSpecReq = ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0);
-		if (specQuestReq >= 100 && specClassReq == mClass && specSpecReq == 0) {
-			return true;
-		}
-		return false;
+		return specQuestReq >= 100 && specClassReq == mClass && specSpecReq == 0;
 	}
 
 	public Boolean getSpecAccessToChange(Player player, PlayerSpec spec) {
 		int specQuestReq = ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard).orElse(0);
 		int specClassReq = ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0);
 		int specSpecReq = ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0);
-		if (specQuestReq >= 100 && specClassReq == mClass && specSpecReq == spec.mSpecialization) {
-			return true;
-		}
-		return false;
+		return specQuestReq >= 100 && specClassReq == mClass && specSpecReq == spec.mSpecialization;
 	}
 
 	public JsonObject toJson() {
 		JsonArray abilities = new JsonArray();
-		for (Ability ability : mAbilities) {
+		for (AbilityInfo<?> ability : mAbilities) {
 			if (ability != null) {
-				abilities.add(ability.getInfo().toJson());
+				abilities.add(ability.toJson());
 			}
 		}
 

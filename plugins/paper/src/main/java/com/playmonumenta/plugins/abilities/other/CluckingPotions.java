@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.other;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -10,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -27,13 +27,13 @@ import org.bukkit.metadata.FixedMetadataValue;
  * into something like EntityListener
  */
 public class CluckingPotions extends Ability {
-	public CluckingPotions(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, null);
-	}
 
-	@Override
-	public boolean canUse(Player player) {
-		return true;
+	public static final AbilityInfo<CluckingPotions> INFO =
+		new AbilityInfo<>(CluckingPotions.class, null, CluckingPotions::new)
+			.canUse(player -> true);
+
+	public CluckingPotions(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 	}
 
 	@Override

@@ -2,9 +2,10 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -13,15 +14,12 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.WeakHashMap;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -34,7 +32,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -66,57 +63,57 @@ public class GraspingClaws extends Ability {
 	public static final String CHARM_PROJ_SPEED = "Grasping Claws Projectile Speed";
 	public static final String CHARM_CAGE_RADIUS = "Grasping Claws Cage Radius";
 
+	public static final AbilityInfo<GraspingClaws> INFO =
+		new AbilityInfo<>(GraspingClaws.class, "Grasping Claws", GraspingClaws::new)
+			.linkedSpell(ClassAbility.GRASPING_CLAWS)
+			.scoreboardId("GraspingClaws")
+			.shorthandName("GC")
+			.descriptions(
+				"Left-clicking while shifted while holding a projectile weapon fires an arrow " +
+					"that pulls nearby enemies towards your arrow once it makes contact with a mob or block. " +
+					"Mobs caught in the arrow's 8 block radius are given 20% Slowness for 8 seconds and take 3 magic damage. Cooldown: 16s.",
+				"The pulled enemies now take 8 damage, and their Slowness is increased to 30%.",
+				"At the location that the arrow lands, summon an impenetrable cage. " +
+					"Non-boss mobs within a 6 block radius of the location cannot enter or exit the cage, " +
+					"and players within the cage are granted 5% max health healing every 2 seconds. " +
+					"The cage disappears after 6 seconds. Mobs that are immune to crowd control cannot be trapped.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GraspingClaws::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
+				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.BOW, 1));
+
 	private final double mAmplifier;
 	private final double mDamage;
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
-	public GraspingClaws(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Grasping Claws");
-		mInfo.mScoreboardId = "GraspingClaws";
-		mInfo.mShorthandName = "GC";
-		mInfo.mDescriptions.add("Left-clicking while shifted while holding a projectile weapon fires an arrow " +
-			                        "that pulls nearby enemies towards your arrow once it makes contact with a mob or block. " +
-			                        "Mobs caught in the arrow's 8 block radius are given 20% Slowness for 8 seconds and take 3 magic damage. Cooldown: 16s.");
-		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, and their Slowness is increased to 30%.");
-		mInfo.mDescriptions.add("At the location that the arrow lands, summon an impenetrable cage. " +
-			                        "Non-boss mobs within a 6 block radius of the location cannot enter or exit the cage, " +
-			                        "and players within the cage are granted 5% max health healing every 2 seconds. " +
-			                        "The cage disappears after 6 seconds. Mobs that are immune to crowd control cannot be trapped.");
-		mInfo.mLinkedSpell = ClassAbility.GRASPING_CLAWS;
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.BOW, 1);
+	public GraspingClaws(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mAmplifier = CharmManager.getLevelPercentDecimal(player, CHARM_SLOW) + (isLevelOne() ? AMPLIFIER_1 : AMPLIFIER_2);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && ItemUtils.isProjectileWeapon(inMainHand)) {
-			World world = mPlayer.getWorld();
-			Location eyeLoc = mPlayer.getEyeLocation();
-			Vector direction = mPlayer.getLocation().getDirection();
-			float speed = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PROJ_SPEED, 1.5);
-			Snowball proj = world.spawn(eyeLoc, Snowball.class);
-			proj.setVelocity(direction.normalize().multiply(speed));
-			proj.setShooter(mPlayer);
-			proj.setCustomName("Grasping Claws Projectile");
-			mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SPELL_WITCH);
-			mPlayerItemStatsMap.put(proj, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
-			putOnCooldown();
-		}
+		World world = mPlayer.getWorld();
+		Location eyeLoc = mPlayer.getEyeLocation();
+		Vector direction = mPlayer.getLocation().getDirection();
+		float speed = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PROJ_SPEED, 1.5);
+		Snowball proj = world.spawn(eyeLoc, Snowball.class);
+		proj.setVelocity(direction.normalize().multiply(speed));
+		proj.setShooter(mPlayer);
+		proj.setCustomName("Grasping Claws Projectile");
+		mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SPELL_WITCH);
+		mPlayerItemStatsMap.put(proj, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+		putOnCooldown();
 	}
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
 		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(proj);
-		if (mPlayer != null && playerItemStats != null) {
+		if (playerItemStats != null) {
 			Location loc = proj.getLocation();
 			World world = proj.getWorld();
 
@@ -129,7 +126,7 @@ public class GraspingClaws extends Ability {
 			new PartialParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, CHAIN_PARTICLE).spawnAsPlayerActive(mPlayer);
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), mPlayer)) {
-				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.mLinkedSpell, playerItemStats), mDamage, true, true, false);
+				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage, true, true, false);
 				MovementUtils.pullTowards(proj, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_SPEED));
 				EntityUtils.applySlow(mPlugin, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mAmplifier, mob);
 			}

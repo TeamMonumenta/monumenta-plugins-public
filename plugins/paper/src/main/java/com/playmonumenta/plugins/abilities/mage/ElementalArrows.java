@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.mage;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -51,45 +52,44 @@ public class ElementalArrows extends Ability {
 	public static final String CHARM_RANGE = "Elemental Arrows Range";
 	public static final String CHARM_THUNDER_COOLDOWN = "Elemental Arrows Thunder Arrow Cooldown";
 
+	public static final AbilityInfo<ElementalArrows> INFO =
+		new AbilityInfo<>(ElementalArrows.class, NAME, ElementalArrows::new)
+			.linkedSpell(ABILITY)
+			.scoreboardId("Elemental")
+			.shorthandName("EA")
+			.descriptions(
+				String.format("Your fully drawn projectiles are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with %s%% Slowness for %s seconds. " +
+					              "Projectiles shot this way are magically infused, scaling off of magic damage instead of projectile damage. Ice arrows deal %s extra damage to Blazes. " +
+					              "Fire arrows deal %s extra damage to strays. This skill can not apply Spellshock.",
+					(int) (SLOW_AMPLIFIER * 100),
+					ELEMENTAL_ARROWS_DURATION / 20,
+					ELEMENTAL_ARROWS_BONUS_DAMAGE,
+					ELEMENTAL_ARROWS_BONUS_DAMAGE
+				),
+				String.format("Your fire arrows also set nearby enemies within a radius of %s blocks on fire when they hit a target. " +
+					              "Your ice arrows also slow nearby enemies within a radius of %s blocks when they hit a target. " +
+					              "Both area of effect effects do %s%% bow damage to all targets affected.",
+					(int) ELEMENTAL_ARROWS_RADIUS,
+					(int) ELEMENTAL_ARROWS_RADIUS,
+					(int) (AOE_DAMAGE_MULTIPLIER * 100)
+				),
+				String.format("Your next elemental arrow every %ss stuns non elite enemies hit for %ss and deals an extra %s%% bow damage to affected enemies.",
+					ENHANCED_ARROW_COOLDOWN / 20,
+					ENHANCED_ARROW_STUN_DURATION / 20,
+					(int) (ENHANCED_DAMAGE_MULTIPLIER * 100)
+				))
+			.cooldown(0, 0, ENHANCED_ARROW_COOLDOWN, CHARM_THUNDER_COOLDOWN)
+			.displayItem(new ItemStack(Material.SPECTRAL_ARROW, 1));
+
 	private double mLastDamage = 0;
 
-	public ElementalArrows(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = ABILITY;
-
-		mInfo.mScoreboardId = "Elemental";
-		mInfo.mShorthandName = "EA";
-		mInfo.mDescriptions.add(
-			String.format("Your fully drawn projectiles are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with %s%% Slowness for %s seconds. " +
-				              "Projectiles shot this way are magically infused, scaling off of magic damage instead of projectile damage. Ice arrows deal %s extra damage to Blazes. " +
-				              "Fire arrows deal %s extra damage to strays. This skill can not apply Spellshock.",
-				(int) (SLOW_AMPLIFIER * 100),
-				ELEMENTAL_ARROWS_DURATION / 20,
-				ELEMENTAL_ARROWS_BONUS_DAMAGE,
-				ELEMENTAL_ARROWS_BONUS_DAMAGE
-			));
-		mInfo.mDescriptions.add(
-			String.format("Your fire arrows also set nearby enemies within a radius of %s blocks on fire when they hit a target. " +
-				              "Your ice arrows also slow nearby enemies within a radius of %s blocks when they hit a target. " +
-				              "Both area of effect effects do %s%% bow damage to all targets affected.",
-				(int) ELEMENTAL_ARROWS_RADIUS,
-				(int) ELEMENTAL_ARROWS_RADIUS,
-				(int) (AOE_DAMAGE_MULTIPLIER * 100)
-			));
-		mInfo.mDescriptions.add(
-			String.format("Your next elemental arrow every %ss stuns non elite enemies hit for %ss and deals an extra %s%% bow damage to affected enemies.",
-				ENHANCED_ARROW_COOLDOWN / 20,
-				ENHANCED_ARROW_STUN_DURATION / 20,
-				(int) (ENHANCED_DAMAGE_MULTIPLIER * 100)
-			));
-		mDisplayItem = new ItemStack(Material.SPECTRAL_ARROW, 1);
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_THUNDER_COOLDOWN, ENHANCED_ARROW_COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
+	public ElementalArrows(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer == null || !(event.getDamager() instanceof Projectile proj) || !EntityUtils.isAbilityTriggeringProjectile(proj, true)) {
+		if (!(event.getDamager() instanceof Projectile proj) || !EntityUtils.isAbilityTriggeringProjectile(proj, true)) {
 			return false;
 		}
 		ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(proj);
@@ -146,11 +146,8 @@ public class ElementalArrows extends Ability {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mPlayer == null) {
-			return true;
-		}
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
-			if (isEnhanced() && !isTimerActive()) {
+			if (isEnhanced() && !isOnCooldown()) {
 				projectile.setMetadata("ElementalArrowsThunderArrow", new FixedMetadataValue(mPlugin, 0));
 				mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.END_ROD);
 			} else if (mPlayer.isSneaking()) {

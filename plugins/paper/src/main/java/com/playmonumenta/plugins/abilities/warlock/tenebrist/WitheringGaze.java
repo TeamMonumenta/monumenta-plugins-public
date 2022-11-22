@@ -2,8 +2,10 @@ package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -11,10 +13,8 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -22,7 +22,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -48,32 +47,36 @@ public class WitheringGaze extends Ability {
 	public static final String CHARM_DOT = "Withering Gaze Dot Duration";
 	public static final String CHARM_DAMAGE = "Withering Gaze Damage";
 
+	public static final AbilityInfo<WitheringGaze> INFO =
+		new AbilityInfo<>(WitheringGaze.class, "Withering Gaze", WitheringGaze::new)
+			.linkedSpell(ClassAbility.WITHERING_GAZE)
+			.scoreboardId("WitheringGaze")
+			.shorthandName("WG")
+			.descriptions(
+				"Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. " +
+					"Enemies in its path are stunned for 3 seconds (elites and bosses are given 100% Slowness instead) " +
+					"and dealt 1 damage every half second for 6 seconds. Cooldown: 30s.",
+				"Your damage over time lasts for 8 seconds. Cooldown: 20s.")
+			.cooldown(WITHERING_GAZE_1_COOLDOWN, WITHERING_GAZE_2_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WitheringGaze::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sprinting(true),
+				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+			.displayItem(new ItemStack(Material.WITHER_ROSE, 1));
+
 	private final int mDOTDuration;
 
-	public WitheringGaze(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Withering Gaze");
-		mInfo.mScoreboardId = "WitheringGaze";
-		mInfo.mShorthandName = "WG";
-		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. " +
-			                        "Enemies in its path are stunned for 3 seconds (elites and bosses are given 100% Slowness instead) " +
-			                        "and dealt 1 damage every half second for 6 seconds. Cooldown: 30s.");
-		mInfo.mDescriptions.add("Your damage over time lasts for 8 seconds. Cooldown: 20s.");
-		mInfo.mLinkedSpell = ClassAbility.WITHERING_GAZE;
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, isLevelOne() ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDisplayItem = new ItemStack(Material.WITHER_ROSE, 1);
+	public WitheringGaze(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDOTDuration = CharmManager.getExtraDuration(player, CHARM_DOT) + (isLevelOne() ? WITHERING_GAZE_DOT_DURATION_1 : WITHERING_GAZE_DOT_DURATION_2);
 	}
 
-	@Override
-	public void cast(Action action) {
-		Player player = mPlayer;
-		if (player == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
-		Location loc = player.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by half slabs
+		putOnCooldown();
+		Location loc = mPlayer.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by half slabs
 		Vector direction = loc.getDirection().setY(0).normalize();
-		World world = player.getWorld();
+		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1f, 0.4f);
 		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f);
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RANGE, WITHERING_GAZE_RANGE);
@@ -97,7 +100,7 @@ public class WitheringGaze extends Ability {
 				}
 				mR += 0.55;
 
-				Hitbox hitbox = Hitbox.approximateCylinderSegment(LocationUtils.getHalfHeightLocation(player).add(0, -mDamageRange, 0), 2 * mDamageRange, mDamageRange, Math.toRadians(ANGLE));
+				Hitbox hitbox = Hitbox.approximateCylinderSegment(LocationUtils.getHalfHeightLocation(mPlayer).add(0, -mDamageRange, 0), 2 * mDamageRange, mDamageRange, Math.toRadians(ANGLE));
 				for (LivingEntity e : hitbox.getHitMobs()) {
 					if (EntityUtils.isElite(e) || EntityUtils.isBoss(e) || ((e instanceof Player p) && AbilityManager.getManager().isPvPEnabled(p))) {
 						EntityUtils.applySlow(mPlugin, WITHERING_GAZE_STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), 1.0, e);
@@ -119,16 +122,6 @@ public class WitheringGaze extends Ability {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
-
-		putOnCooldown();
 	}
 
-	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSprinting() && ItemUtils.isHoe(mHand);
-	}
 }

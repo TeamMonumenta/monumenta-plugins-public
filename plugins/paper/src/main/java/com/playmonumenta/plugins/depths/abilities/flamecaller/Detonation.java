@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -19,6 +21,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class Detonation extends DepthsAbility {
 
@@ -27,17 +30,17 @@ public class Detonation extends DepthsAbility {
 	public static final int DEATH_RADIUS = 8;
 	public static final int DAMAGE_RADIUS = 2;
 
+	public static final DepthsAbilityInfo<Detonation> INFO =
+		new DepthsAbilityInfo<>(Detonation.class, ABILITY_NAME, Detonation::new, DepthsTree.FLAMECALLER, DepthsTrigger.PASSIVE)
+			.displayItem(new ItemStack(Material.TNT))
+			.descriptions(Detonation::getDescription, MAX_RARITY);
+
 	public Detonation(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.TNT;
-		mTree = DepthsTree.FLAMECALLER;
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (mPlayer == null) {
-			return;
-		}
 		Entity entity = event.getEntity();
 		if (entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) && !DummyDecoy.DUMMY_NAME.equals(entity.getName())) {
 			return;
@@ -46,7 +49,7 @@ public class Detonation extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(location, DAMAGE_RADIUS)) {
 			world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mob.getLocation().add(0, 1, 0), 2);
-			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true, false);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true, false);
 		}
 		world.spawnParticle(Particle.EXPLOSION_LARGE, location.add(0, 0.5, 0), 1);
 		world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, location.add(0, 1, 0), 3);
@@ -58,13 +61,7 @@ public class Detonation extends DepthsAbility {
 		return DEATH_RADIUS;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "If an enemy dies within " + DEATH_RADIUS + " blocks of you it explodes, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + DAMAGE_RADIUS + " block radius to other enemies. Bypasses iframes, and deaths from Detonation can trigger Detonation again.";
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FLAMECALLER;
 	}
 }

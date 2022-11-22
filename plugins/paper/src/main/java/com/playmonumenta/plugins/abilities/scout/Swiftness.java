@@ -2,6 +2,10 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
@@ -9,7 +13,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -25,7 +28,6 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -41,17 +43,25 @@ public class Swiftness extends Ability {
 	public static final String CHARM_JUMP_BOOST = "Swiftness Jump Boost Amplifier";
 	public static final String CHARM_DODGE = "Swiftness Dodge Chance";
 
+	public static final AbilityInfo<Swiftness> INFO =
+		new AbilityInfo<>(Swiftness.class, "Swiftness", Swiftness::new)
+			.linkedSpell(ClassAbility.SWIFTNESS)
+			.scoreboardId("Swiftness")
+			.shorthandName("Swf")
+			.descriptions(
+				String.format("Gain +%d%% Speed when you are not inside a town.", (int) (SWIFTNESS_SPEED_BONUS * 100)),
+				String.format("In addition, gain Jump Boost %s when you are not inside a town. " +
+					              "Swap hands looking up, not sneaking, and not holding a projectile weapon to toggle the Jump Boost.", StringUtils.toRoman(SWIFTNESS_EFFECT_JUMP_LVL + 1)),
+				String.format("You now have a %d%% chance to dodge any projectile or melee attack.", (int) (DODGE_CHANCE * 100)))
+			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle jump boost", Swiftness::toggleJumpBoost, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false).lookDirections(AbilityTrigger.LookDirection.UP),
+				AbilityTriggerInfo.NOT_HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.RABBIT_FOOT, 1));
+
 	private boolean mWasInNoMobilityZone = false;
 	private boolean mJumpBoost = true;
 
-	public Swiftness(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Swiftness");
-		mInfo.mScoreboardId = "Swiftness";
-		mInfo.mShorthandName = "Swf";
-		mInfo.mDescriptions.add(String.format("Gain +%d%% Speed when you are not inside a town.", (int)(SWIFTNESS_SPEED_BONUS * 100)));
-		mInfo.mDescriptions.add(String.format("In addition, gain Jump Boost %s when you are not inside a town. Swap hands looking up, not sneaking, and not holding a projectile weapon to toggle the Jump Boost.", StringUtils.toRoman(SWIFTNESS_EFFECT_JUMP_LVL + 1)));
-		mInfo.mDescriptions.add(String.format("You now have a %d%% chance to dodge any projectile or melee attack.", (int)(DODGE_CHANCE * 100)));
-		mDisplayItem = new ItemStack(Material.RABBIT_FOOT, 1);
+	public Swiftness(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		if (player != null) {
 			addModifier(player);
 		}
@@ -86,15 +96,8 @@ public class Swiftness extends Ability {
 		}
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+	public void toggleJumpBoost() {
 		if (isLevelOne()) {
-			return;
-		}
-
-		event.setCancelled(true);
-
-		if (mPlayer.isSneaking() || mPlayer.getLocation().getPitch() >= -45 || ItemUtils.isProjectileWeapon(mPlayer.getInventory().getItemInMainHand())) {
 			return;
 		}
 

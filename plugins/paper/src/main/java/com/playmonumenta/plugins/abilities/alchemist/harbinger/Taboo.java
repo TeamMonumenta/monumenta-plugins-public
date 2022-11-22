@@ -2,8 +2,12 @@ package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
+import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -21,7 +25,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,6 +46,35 @@ public class Taboo extends Ability {
 	public static final String CHARM_HEALING = "Taboo Healing";
 	public static final String CHARM_RECHARGE = "Taboo Potion Recharge Rate";
 
+	public static final AbilityInfo<Taboo> INFO =
+		new AbilityInfo<>(Taboo.class, "Taboo", Taboo::new)
+			.linkedSpell(ClassAbility.TABOO)
+			.scoreboardId("Taboo")
+			.shorthandName("Tb")
+			.descriptions(
+				"Swap hands while sneaking and holding an Alchemist's Bag to drink a potion. Drinking the potion causes you to recharge potions 0.5s faster and deal +15% magic damage. " +
+					"However, you lose 5% of your health per second, which bypasses resistances and absorption, but cannot kill you. " +
+					"Swapping hands while sneaking and holding an Alchemist's Bag disables the effect. " +
+					"Taboo can also be toggled by sneaking and swapping hands while holding a bow, crossbow, or trident while Alchemical Artillery is active.",
+				"Extra magic damage increased to 25%. Additionally, while the effect is active, swap hands while looking down, sneaking, and holding an Alchemist's Bag " +
+					"to consume 2 potions and heal 20% of your health. This healing has a 5s cooldown.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("heal", "heal", Taboo::heal, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
+				                                                                  .lookDirections(AbilityTrigger.LookDirection.DOWN),
+				new AbilityTriggerInfo.TriggerRestriction("holding an Alchemist's Bag and Taboo is active",
+					player -> {
+						if (!ItemUtils.isAlchemistItem(player.getInventory().getItemInMainHand())) {
+							return false;
+						}
+						Taboo taboo = Plugin.getInstance().mAbilityManager.getPlayerAbilities(player).getAbilityIgnoringSilence(Taboo.class);
+						return taboo != null && taboo.isLevelTwo() && taboo.mActive;
+					})))
+			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", Taboo::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
+				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("toggleWithAA", "toggle with AA", Taboo::toggleWithAA, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
+				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.HONEY_BOTTLE, 1));
+
 	private final double mMagicDamageIncrease;
 	private final int mRechargeRateDecrease;
 
@@ -51,17 +83,9 @@ public class Taboo extends Ability {
 
 	private boolean mActive;
 
-	public Taboo(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Taboo");
-		mInfo.mLinkedSpell = ClassAbility.TABOO;
-		mInfo.mScoreboardId = "Taboo";
-		mInfo.mShorthandName = "Tb";
-		mInfo.mDescriptions.add("Swap hands while sneaking and holding an Alchemist's Bag to drink a potion. Drinking the potion causes you to recharge potions 0.5s faster and deal +15% magic damage. However, you lose 5% of your health per second, which bypasses resistances and absorption, but cannot kill you. Swapping hands while sneaking and holding an Alchemist's Bag disables the effect. Taboo can also be toggled by sneaking and swapping hands while holding a bow, crossbow, or trident while Alchemical Artillery is active.");
-		mInfo.mDescriptions.add("Extra magic damage increased to 25%. Additionally, while the effect is active, swap hands while looking down, sneaking, and holding an Alchemist's Bag to consume 2 potions and heal 20% of your health. This healing has a 5s cooldown.");
-		mInfo.mCooldown = CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.HONEY_BOTTLE, 1);
-
+	public Taboo(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
+		mActive = false;
 		mMagicDamageIncrease = (isLevelOne() ? MAGIC_DAMAGE_INCREASE_1 : MAGIC_DAMAGE_INCREASE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mRechargeRateDecrease = CHARGE_TIME_REDUCTION + CharmManager.getExtraDuration(mPlayer, CHARM_RECHARGE);
 
@@ -73,28 +97,14 @@ public class Taboo extends Ability {
 		});
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		event.setCancelled(true);
-
-		if (mPlayer != null && mPlayer.isSneaking() && mAlchemistPotions != null && (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) || (mAlchemicalArtillery != null && mAlchemicalArtillery.isActive() && ItemUtils.isProjectileWeapon(mPlayer.getInventory().getItemInMainHand())))) {
+	public void toggle() {
+		if (mAlchemistPotions != null) {
 			World world = mPlayer.getWorld();
 			if (mActive) {
-				if (mPlayer.getLocation().getPitch() > 50 && isLevelTwo()) {
-					if (mAlchemistPotions.getCharges() >= 2 && !isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-						putOnCooldown();
-						mAlchemistPotions.decrementCharge();
-						mAlchemistPotions.decrementCharge();
-						PlayerUtils.healPlayer(mPlugin, mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, EntityUtils.getMaxHealth(mPlayer) * PERCENT_HEALTH_HEALING), mPlayer);
-						world.playSound(mPlayer.getLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, 1, 1.2f);
-						new PartialParticle(Particle.HEART, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(mPlayer);
-					}
-				} else {
-					mAlchemistPotions.increaseChargeTime(mRechargeRateDecrease);
-					mActive = false;
-					world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_BURP, 0.8f, 1.2f);
-					ClientModHandler.updateAbility(mPlayer, this);
-				}
+				mAlchemistPotions.increaseChargeTime(mRechargeRateDecrease);
+				mActive = false;
+				world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_BURP, 0.8f, 1.2f);
+				ClientModHandler.updateAbility(mPlayer, this);
 			} else if (mAlchemistPotions.decrementCharge()) {
 				mAlchemistPotions.reduceChargeTime(mRechargeRateDecrease);
 				mActive = true;
@@ -104,9 +114,27 @@ public class Taboo extends Ability {
 		}
 	}
 
+	public void toggleWithAA() {
+		if (mAlchemicalArtillery != null
+			    && mAlchemicalArtillery.isActive()) {
+			toggle();
+		}
+	}
+
+	public void heal() {
+		if (!isOnCooldown()
+			    && mAlchemistPotions != null
+			    && mAlchemistPotions.decrementCharges(2)) {
+			putOnCooldown();
+			PlayerUtils.healPlayer(mPlugin, mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, EntityUtils.getMaxHealth(mPlayer) * PERCENT_HEALTH_HEALING), mPlayer);
+			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, 1, 1.2f);
+			new PartialParticle(Particle.HEART, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(mPlayer);
+		}
+	}
+
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mActive && mPlayer != null) {
+		if (mActive) {
 			if (oneSecond) {
 				double selfDamage = EntityUtils.getMaxHealth(mPlayer) * (PERCENT_HEALTH_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SELF_DAMAGE));
 				if (mPlayer.getHealth() > selfDamage) {

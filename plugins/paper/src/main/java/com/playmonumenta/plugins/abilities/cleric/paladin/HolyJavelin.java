@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -13,7 +15,6 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -26,7 +27,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -52,20 +52,29 @@ public class HolyJavelin extends Ability {
 	public static final String CHARM_COOLDOWN = "Holy Javelin Cooldown";
 	public static final String CHARM_RANGE = "Holy Javelin Range";
 
+	public static final AbilityInfo<HolyJavelin> INFO =
+		new AbilityInfo<>(HolyJavelin.class, "Holy Javelin", HolyJavelin::new)
+			.linkedSpell(ClassAbility.HOLY_JAVELIN)
+			.scoreboardId("HolyJavelin")
+			.shorthandName("HJ")
+			.descriptions(
+				"While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to 12 blocks or until it hits a solid block. " +
+					"It deals 18 magic damage to all enemies in a 0.75-block cube around it along its path, or 9 magic damage to non-undead, and sets them all on fire for 5s. Cooldown: 10s.",
+				"Attacking an undead enemy with that left-click now transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. " +
+					"Damage is increased from 18 to 32, and from 9 to 18 against non-undead.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HolyJavelin::cast,
+				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false).sprinting(true)
+					.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
+			.displayItem(new ItemStack(Material.TRIDENT, 1))
+			.priorityAmount(1001); // shortly after divine justice and luminous infusion
+
 	private @Nullable Crusade mCrusade;
 	private @Nullable DivineJustice mDivineJustice;
 	private @Nullable LuminousInfusion mLuminousInfusion;
 
-	public HolyJavelin(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Holy Javelin");
-		mInfo.mLinkedSpell = ClassAbility.HOLY_JAVELIN;
-		mInfo.mScoreboardId = "HolyJavelin";
-		mInfo.mShorthandName = "HJ";
-		mInfo.mDescriptions.add("While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to 12 blocks or until it hits a solid block. It deals 18 magic damage to all enemies in a 0.75-block cube around it along its path, or 9 magic damage to non-undead, and sets them all on fire for 5s. Cooldown: 10s.");
-		mInfo.mDescriptions.add("Attacking an undead enemy with that left-click now transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. Damage is increased from 18 to 32, and from 9 to 18 against non-undead.");
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDisplayItem = new ItemStack(Material.TRIDENT, 1);
+	public HolyJavelin(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mUndeadDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2);
 
@@ -76,23 +85,14 @@ public class HolyJavelin extends Ability {
 		});
 	}
 
-	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSprinting() && !mPlayer.isSneaking() && !ItemUtils.isPickaxe(mainHand);
-	}
-
-	@Override
-	public void cast(Action action) {
+	public void cast() {
 		execute(0, null);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
+		if (event.getType() == DamageType.MELEE
+			    && mCustomTriggers.get(0).check(mPlayer, AbilityTrigger.Key.LEFT_CLICK)) {
 			double sharedPassiveDamage = 0;
 			if (mLuminousInfusion != null) {
 				sharedPassiveDamage += mLuminousInfusion.mLastPassiveMeleeDamage;
@@ -109,11 +109,9 @@ public class HolyJavelin extends Ability {
 		return false;
 	}
 
-	public void execute(
-		double bonusDamage,
-		@Nullable LivingEntity triggeringEnemy
-	) {
-		if (mPlayer == null) {
+	public void execute(double bonusDamage,
+	                    @Nullable LivingEntity triggeringEnemy) {
+		if (isOnCooldown()) {
 			return;
 		}
 		putOnCooldown();
@@ -151,7 +149,7 @@ public class HolyJavelin extends Ability {
 						damage += bonusDamage;
 					}
 					EntityUtils.applyFire(mPlugin, FIRE_DURATION, enemy, mPlayer);
-					DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true);
+					DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
 					if (Crusade.applyCrusadeToSlayer(enemy, mCrusade)) {
 						mPlugin.mEffectManager.addEffect(enemy, "CrusadeSlayerTag", new CrusadeEnhancementTag(mCrusade.getEnhancementDuration()));
 					}

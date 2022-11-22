@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -22,6 +23,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class Cryobox extends DepthsAbility {
 
@@ -35,22 +37,21 @@ public class Cryobox extends DepthsAbility {
 	private static final int DURATION = 12 * 20;
 	private static final int ICE_DURATION = 15 * 20;
 
-	public Cryobox(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.GHAST_TEAR;
-		mTree = DepthsTree.FROSTBORN;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.CRYOBOX;
-	}
+	public static final DepthsAbilityInfo<Cryobox> INFO =
+		new DepthsAbilityInfo<>(Cryobox.class, ABILITY_NAME, Cryobox::new, DepthsTree.FROSTBORN, DepthsTrigger.LIFELINE)
+			.linkedSpell(ClassAbility.CRYOBOX)
+			.cooldown(COOLDOWN)
+			.displayItem(new ItemStack(Material.GHAST_TEAR))
+			.descriptions(Cryobox::getDescription, MAX_RARITY)
+			.priorityAmount(10000);
 
-	@Override
-	public double getPriorityAmount() {
-		return 10000;
+	public Cryobox(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (event.isBlocked() || mPlayer == null) {
+		if (event.isBlocked()) {
 			return;
 		}
 
@@ -127,19 +128,10 @@ public class Cryobox extends DepthsAbility {
 		onHurt(event, null, null);
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, gain " + DepthsUtils.getRarityColor(rarity) + (ABSORPTION_HEALTH[rarity - 1] / 2) + ChatColor.WHITE + " absorption hearts for " + DURATION / 20 + " seconds, knock enemies away, and encase yourself in a cage of ice for " + ICE_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FROSTBORN;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.LIFELINE;
-	}
 }
 

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -36,19 +37,23 @@ public class WeaponMastery extends Ability {
 	public static final String CHARM_DURATION = "Weapon Mastery Duration";
 	public static final String CHARM_SPEED = "Weapon Mastery Speed";
 
+	public static final AbilityInfo<WeaponMastery> INFO =
+		new AbilityInfo<>(WeaponMastery.class, "Weapon Mastery", WeaponMastery::new)
+			.scoreboardId("WeaponMastery")
+			.shorthandName("WM")
+			.descriptions(
+				"You gain 10% damage resistance while holding a sword. Additionally, your axe damage is increased by +2 plus 5% of final damage done.",
+				"Increase axe damage by +4 plus 10% of final damage done and increase sword damage by +1 plus 10% of final damage done.",
+				"Deal +10% final damage when using either an axe or a sword. Gain +15% speed when using an axe. Apply 10% weaken for 4s when using a sword.")
+			.displayItem(new ItemStack(Material.STONE_SWORD, 1));
+
 	private final double mDamageBonusAxeFlat;
 	private final double mDamageBonusSwordFlat;
 	private final double mDamageBonusAxe;
 	private final double mDamageBonusSword;
 
-	public WeaponMastery(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Weapon Mastery");
-		mInfo.mScoreboardId = "WeaponMastery";
-		mInfo.mShorthandName = "WM";
-		mInfo.mDescriptions.add("You gain 10% damage resistance while holding a sword. Additionally, your axe damage is increased by +2 plus 5% of final damage done.");
-		mInfo.mDescriptions.add("Increase axe damage by +4 plus 10% of final damage done and increase sword damage by +1 plus 10% of final damage done.");
-		mInfo.mDescriptions.add("Deal +10% final damage when using either an axe or a sword. Gain +15% speed when using an axe. Apply 10% weaken for 4s when using a sword.");
-		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
+	public WeaponMastery(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mDamageBonusAxeFlat = isLevelOne() ? AXE_1_DAMAGE_FLAT : AXE_2_DAMAGE_FLAT;
 		mDamageBonusSwordFlat = isLevelOne() ? 0 : SWORD_2_DAMAGE_FLAT;
 		double enhancementDamage = (isEnhanced() ? ENHANCED_DAMAGE : 0);
@@ -74,14 +79,14 @@ public class WeaponMastery extends Ability {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (isEnhanced() && mPlayer != null && ItemUtils.isAxe(mPlayer.getInventory().getItemInMainHand())) {
+		if (isEnhanced() && ItemUtils.isAxe(mPlayer.getInventory().getItemInMainHand())) {
 			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT, new PercentSpeed(6, AXE_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), SPEED_EFFECT).displaysTime(false));
 		}
 	}
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (mPlayer != null && ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
+		if (ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(event.getDamage() * (1 - (WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION))));
 		}
 	}

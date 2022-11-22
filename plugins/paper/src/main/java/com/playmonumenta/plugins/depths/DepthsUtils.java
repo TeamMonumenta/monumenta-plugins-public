@@ -127,6 +127,8 @@ public class DepthsUtils {
 			loreLine = loreLine.append(Component.text("Shadowdancer", TextColor.color(SHADOWS)));
 		} else if (tree == DepthsTree.FLAMECALLER) {
 			loreLine = loreLine.append(Component.text("Flamecaller", TextColor.color(FLAMECALLER)));
+		} else {
+			return null;
 		}
 
 		loreLine = loreLine.append(Component.text(" : ", NamedTextColor.DARK_GRAY));

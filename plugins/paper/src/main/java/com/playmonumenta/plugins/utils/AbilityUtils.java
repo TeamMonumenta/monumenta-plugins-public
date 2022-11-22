@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
@@ -537,20 +537,20 @@ public class AbilityUtils {
 	public static void ensureSkillAlignmentWithClassAndSpec(Player player) {
 		int playerClass = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0);
 		int playerSpec = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_SPEC_NAME).orElse(0);
-		MonumentaClasses mClasses = new MonumentaClasses(Plugin.getInstance(), null);
+		MonumentaClasses mClasses = new MonumentaClasses();
 		for (PlayerClass mClass: mClasses.mClasses) {
 			if (playerClass != mClass.mClass) {
-				for (Ability ability : mClass.mAbilities) {
+				for (AbilityInfo<?> ability : mClass.mAbilities) {
 					ScoreboardUtils.setScoreboardValue(player, ability.getScoreboard(), 0);
 				}
 			}
 			if (playerSpec != mClass.mSpecOne.mSpecialization) {
-				for (Ability ability : mClass.mSpecOne.mAbilities) {
+				for (AbilityInfo<?> ability : mClass.mSpecOne.mAbilities) {
 					ScoreboardUtils.setScoreboardValue(player, ability.getScoreboard(), 0);
 				}
 			}
 			if (playerSpec != mClass.mSpecTwo.mSpecialization) {
-				for (Ability ability : mClass.mSpecTwo.mAbilities) {
+				for (AbilityInfo<?> ability : mClass.mSpecTwo.mAbilities) {
 					ScoreboardUtils.setScoreboardValue(player, ability.getScoreboard(), 0);
 				}
 			}
@@ -585,14 +585,14 @@ public class AbilityUtils {
 		int skill = 0;
 		int spec = 0;
 		int enhance = 0;
-		MonumentaClasses mClasses = new MonumentaClasses(Plugin.getInstance(), null);
+		MonumentaClasses mClasses = new MonumentaClasses();
 		for (PlayerClass mClass: mClasses.mClasses) {
 			if (mClass.mClass == ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0)) {
-				List<Ability> abilities = mClass.mAbilities;
-				List<Ability> specAbilities = mClass.mSpecOne.mAbilities;
+				List<AbilityInfo<?>> abilities = mClass.mAbilities;
+				List<AbilityInfo<?>> specAbilities = mClass.mSpecOne.mAbilities;
 				specAbilities.addAll(mClass.mSpecTwo.mAbilities);
 				// Loop over base abilities
-				for (Ability ability : abilities) {
+				for (AbilityInfo<?> ability : abilities) {
 					// Enhanced ability
 					if (ScoreboardUtils.getScoreboardValue(player, ability.getScoreboard()).orElse(0) > 2) {
 						enhance++;
@@ -602,7 +602,7 @@ public class AbilityUtils {
 					}
 				}
 				// Loop over specs
-				for (Ability specAbility : specAbilities) {
+				for (AbilityInfo<?> specAbility : specAbilities) {
 					spec += ScoreboardUtils.getScoreboardValue(player, specAbility.getScoreboard()).orElse(0);
 				}
 			}

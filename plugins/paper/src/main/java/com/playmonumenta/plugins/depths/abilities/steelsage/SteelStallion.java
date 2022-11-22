@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -25,6 +26,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SteelStallion extends DepthsAbility {
@@ -37,20 +39,18 @@ public class SteelStallion extends DepthsAbility {
 	public static final int[] DURATION = {10 * 20, 11 * 20, 12 * 20, 13 * 20, 14 * 20, 18 * 20};
 	public static final int TICK_INTERVAL = 5;
 
+	public static final DepthsAbilityInfo<SteelStallion> INFO =
+		new DepthsAbilityInfo<>(SteelStallion.class, ABILITY_NAME, SteelStallion::new, DepthsTree.METALLIC, DepthsTrigger.LIFELINE)
+			.linkedSpell(ClassAbility.STEEL_STALLION)
+			.cooldown(COOLDOWN)
+			.displayItem(new ItemStack(Material.IRON_HORSE_ARMOR))
+			.descriptions(SteelStallion::getDescription, MAX_RARITY)
+			.priorityAmount(10000);
+
 	private @Nullable Mob mHorse;
 
 	public SteelStallion(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.IRON_HORSE_ARMOR;
-		mTree = DepthsTree.METALLIC;
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.STEEL_STALLION;
-		mInfo.mIgnoreCooldown = true;
-	}
-
-	@Override
-	public double getPriorityAmount() {
-		return 10000;
+		super(plugin, player, INFO);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class SteelStallion extends DepthsAbility {
 	}
 
 	private void execute(DamageEvent event) {
-		if (mPlayer == null || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (isOnCooldown()) {
 			return;
 		}
 
@@ -148,18 +148,9 @@ public class SteelStallion extends DepthsAbility {
 		return entity instanceof Horse && ABILITY_NAME.equals(entity.getName());
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, summon and ride a horse with " + DepthsUtils.getRarityColor(rarity) + HEALTH[rarity - 1] + ChatColor.WHITE + " health that disappears after " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. While you are riding the horse, all damage you receive is redirected to the horse, including the damage that triggered this ability. The horse has a speed of " + DepthsUtils.getRarityColor(rarity) + SPEED[rarity - 1] + ChatColor.WHITE + " and a jump strength of " + DepthsUtils.getRarityColor(rarity) + JUMP_STRENGTH[rarity - 1] + ChatColor.WHITE + ". Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.METALLIC;
-	}
 
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.LIFELINE;
-	}
 }

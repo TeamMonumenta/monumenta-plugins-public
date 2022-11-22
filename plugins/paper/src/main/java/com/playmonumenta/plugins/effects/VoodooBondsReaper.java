@@ -110,9 +110,6 @@ public class VoodooBondsReaper extends Effect {
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
-		if (mPlayer == null) {
-			return;
-		}
 		if (oneHertz) {
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, 0.5f);
 		}

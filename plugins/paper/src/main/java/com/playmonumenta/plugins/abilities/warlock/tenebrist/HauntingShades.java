@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist.HauntingShadesCS;
@@ -11,20 +13,16 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -51,87 +49,71 @@ public class HauntingShades extends Ability {
 	public static final String CHARM_RADIUS = "Haunting Shades Radius";
 	public static final String CHARM_DURATION = "Haunting Shades Duration";
 
+	public static final AbilityInfo<HauntingShades> INFO =
+		new AbilityInfo<>(HauntingShades.class, "Haunting Shades", HauntingShades::new)
+			.linkedSpell(ClassAbility.HAUNTING_SHADES)
+			.scoreboardId("HauntingShades")
+			.shorthandName("HS")
+			.descriptions(
+				"Press the swap key while not sneaking with a scythe to conjure a Shade at the target block or mob location. " +
+					"Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability. A Shade fades back into darkness after 7 seconds. Cooldown: 10s.",
+				"Players within 6 blocks of the shade are given 10% damage dealt and gain a custom healing effect that regenerates 2.5% of max health every second for 1 second. " +
+					"Effects do not stack with other Tenebrists.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HauntingShades::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
+				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+			.displayItem(new ItemStack(Material.SKELETON_SKULL, 1));
+
 	private final HauntingShadesCS mCosmetic;
 
-	public HauntingShades(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Haunting Shades");
-		mInfo.mLinkedSpell = ClassAbility.HAUNTING_SHADES;
-		mInfo.mScoreboardId = "HauntingShades";
-		mInfo.mShorthandName = "HS";
-		mInfo.mDescriptions.add("Press the swap key while not sneaking with a scythe to conjure a Shade at the target block or mob location. Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability. A Shade fades back into darkness after 7 seconds. Cooldown: 10s.");
-		mInfo.mDescriptions.add("Players within 6 blocks of the shade are given 10% damage dealt and gain a custom healing effect that regenerates 2.5% of max health every second for 1 second. Effects do not stack with other Tenebrists.");
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mTrigger = AbilityTrigger.ALL;
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
+	public HauntingShades(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HauntingShadesCS(), HauntingShadesCS.SKIN_LIST);
 	}
 
-	@Override
-	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		return ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand());
-	}
-
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
-		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
-		if (ItemUtils.isHoe(mainHandItem)) {
-			event.setCancelled(true);
-			// TODO - Turn into boolean in constructor -or- look at changing trigger entirely
-			if (isTimerActive() || mPlayer.isSneaking()) {
-				return;
-			}
-			putOnCooldown();
+		putOnCooldown();
 
-			Location loc = mPlayer.getEyeLocation();
-			Vector direction = loc.getDirection();
-			Vector shift = direction.normalize().multiply(HITBOX_LENGTH);
-			BoundingBox box = BoundingBox.of(loc, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
-			box.shift(direction);
+		Location loc = mPlayer.getEyeLocation();
+		Vector direction = loc.getDirection();
+		Vector shift = direction.normalize().multiply(HITBOX_LENGTH);
+		BoundingBox box = BoundingBox.of(loc, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
+		box.shift(direction);
 
-			World world = mPlayer.getWorld();
-			mCosmetic.shadesStartSound(world, mPlayer);
+		World world = mPlayer.getWorld();
+		mCosmetic.shadesStartSound(world, mPlayer);
 
-			Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(loc, RANGE));
+		Set<LivingEntity> nearbyMobs = new HashSet<>(EntityUtils.getNearbyMobs(loc, RANGE));
 
-			for (double r = 0; r < RANGE; r += HITBOX_LENGTH) {
-				Location bLoc = box.getCenter().toLocation(world);
+		for (double r = 0; r < RANGE; r += HITBOX_LENGTH) {
+			Location bLoc = box.getCenter().toLocation(world);
 
-				mCosmetic.shadesTrailParticle(mPlayer, bLoc, direction, r);
+			mCosmetic.shadesTrailParticle(mPlayer, bLoc, direction, r);
 
-				Iterator<LivingEntity> iter = nearbyMobs.iterator();
-				while (iter.hasNext()) {
-					LivingEntity mob = iter.next();
-					if (mob.getBoundingBox().overlaps(box)) {
-						if (EntityUtils.isHostileMob(mob)) {
-							placeShade(bLoc);
-							return;
-						}
+			for (LivingEntity mob : nearbyMobs) {
+				if (mob.getBoundingBox().overlaps(box)) {
+					if (EntityUtils.isHostileMob(mob)) {
+						placeShade(bLoc);
+						return;
 					}
 				}
-
-				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
-					bLoc.subtract(direction.multiply(0.5));
-					placeShade(bLoc);
-					return;
-				}
-
-				box.shift(shift);
 			}
-			placeShade(box.getCenter().toLocation(world));
+
+			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
+				bLoc.subtract(direction.multiply(0.5));
+				placeShade(bLoc);
+				return;
+			}
+
+			box.shift(shift);
 		}
+		placeShade(box.getCenter().toLocation(world));
 	}
 
 	private void placeShade(Location bLoc) {
-		if (mPlayer == null) {
-			return;
-		}
 		World world = mPlayer.getWorld();
 		bLoc.setDirection(mPlayer.getLocation().toVector().subtract(bLoc.toVector()).normalize());
 		ArmorStand stand = (ArmorStand) LibraryOfSoulsIntegration.summon(bLoc, mCosmetic.getAsName());
@@ -148,7 +130,7 @@ public class HauntingShades extends Ability {
 		stand.setCustomNameVisible(false);
 
 		new BukkitRunnable() {
-			double mAoeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
+			final double mAoeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 			int mT = 0;
 			@Override
 			public void run() {

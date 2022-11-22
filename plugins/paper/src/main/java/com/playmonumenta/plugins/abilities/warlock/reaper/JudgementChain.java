@@ -2,6 +2,9 @@ package com.playmonumenta.plugins.abilities.warlock.reaper;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
@@ -17,10 +20,11 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -40,12 +44,10 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -88,50 +90,50 @@ public class JudgementChain extends Ability {
 	public static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(217, 217, 217), 1.0f);
 	public static final Particle.DustOptions DARK_COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
+	public static final AbilityInfo<JudgementChain> INFO =
+		new AbilityInfo<>(JudgementChain.class, "Judgement Chain", JudgementChain::new)
+			.linkedSpell(ClassAbility.JUDGEMENT_CHAIN)
+			.scoreboardId("JudgementChain")
+			.shorthandName("JC")
+			.descriptions(
+				"Press the swap key while not sneaking targeting a non-boss hostile mob to conjure an unbreakable chain, linking the Reaper and the mob. " +
+					"For the next 20s, long as another mob is within 8 blocks, the mob becomes immortal and can only target or damage the Reaper, is slowed by 25%, and deals 50% less damage. " +
+					"All damage taken by the chained mob is passed to the nearest mob in 8 blocks. " +
+					"All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at 10%. " +
+					"Pressing swap while a mob is already chained will pull it towards you, dealing 20 magic damage and breaking the chain. " +
+					"Walking 16+ blocks away will deal damage but not pull the mob. Cooldown: 25s.",
+				"While a mob is chained, the reaper gains 10% damage resistance. " +
+					"When breaking the chain, apply all the positively inverted debuffs to other players and all debuffs (capped at 10%) to other mobs in an 8 block radius of the player for 10s. " +
+					"Additionally, deal 20 magic damage to all mobs in a 4 block radius of the player.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", JudgementChain::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
+				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+			.displayItem(new ItemStack(Material.CHAIN, 1));
+
 	private final double mAmplifier;
-	private HashMap<Player, HashMap<ClassAbility, List<DamageEvent>>> mDamageInTick = new HashMap<>();
+	private final HashMap<Player, HashMap<ClassAbility, List<DamageEvent>>> mDamageInTick = new HashMap<>();
 	private boolean mRunDamageNextTick = false;
 
 	private @Nullable LivingEntity mTarget = null;
 	private boolean mChainActive = false;
-	private boolean mHasPact;
 
-	public JudgementChain(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Judgement Chain");
-		mInfo.mLinkedSpell = ClassAbility.JUDGEMENT_CHAIN;
-		mInfo.mScoreboardId = "JudgementChain";
-		mInfo.mShorthandName = "JC";
-		mInfo.mDescriptions.add("Press the swap key while not sneaking targeting a non-boss hostile mob to conjure an unbreakable chain, linking the Reaper and the mob. For the next 20s, long as another mob is within 8 blocks, the mob becomes immortal and can only target or damage the Reaper, is slowed by 25%, and deals 50% less damage. All damage taken by the chained mob is passed to the nearest mob in 8 blocks. All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at 10%. Pressing swap while a mob is already chained will pull it towards you, dealing 20 magic damage and breaking the chain. Walking 16+ blocks away will deal damage but not pull the mob. Cooldown: 25s.");
-		mInfo.mDescriptions.add("While a mob is chained, the reaper gains 10% damage resistance. When breaking the chain, apply all the positively inverted debuffs to other players and all debuffs (capped at 10%) to other mobs in an 8 block radius of the player for 10s. Additionally, deal 20 magic damage to all mobs in a 4 block radius of the player.");
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
-		mInfo.mIgnoreCooldown = true;
-		mDisplayItem = new ItemStack(Material.CHAIN, 1);
+	public JudgementChain(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mAmplifier = BUFF_AMOUNT;
-		mHasPact = false;
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mHasPact = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, DarkPact.class) != null;
-		});
 	}
 
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer == null) {
-			return;
-		}
-		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
-		if (ItemUtils.isHoe(mainHandItem)) {
-			event.setCancelled(true);
-			if (!mPlayer.isSneaking() && (mPlayer.isOnGround() || !mHasPact)) {
-				if (mChainActive) {
-					mChainActive = false;
-					breakChain(true, true);
-					mTarget = null;
-					ClientModHandler.updateAbility(mPlayer, this);
-				} else {
-					summonChain();
-					mChainActive = true;
-				}
+	public void cast() {
+		if (mChainActive) {
+			mChainActive = false;
+			breakChain(true, true);
+			mTarget = null;
+			ClientModHandler.updateAbility(mPlayer, this);
+		} else {
+			if (isOnCooldown()) {
+				return;
 			}
+			summonChain();
+			mChainActive = true;
 		}
 	}
 
@@ -189,10 +191,6 @@ public class JudgementChain extends Ability {
 	}
 
 	public void summonChain() {
-		if (mPlayer == null || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			return;
-		}
-
 		Location loc = mPlayer.getEyeLocation();
 		World world = mPlayer.getWorld();
 
@@ -212,30 +210,18 @@ public class JudgementChain extends Ability {
 
 				@Override
 				public void run() {
-					if (mPlayer == null) {
-						return;
-					}
-					Location l = mPlayer.getEyeLocation();
+					Location l = LocationUtils.getHalfHeightLocation(mPlayer);
 					mT++;
 					if (mTarget != null) {
 						Location mLoc = mTarget.getLocation().add(0, mTarget.getHeight() / 2, 0);
 						Vector chainVector = new Vector(mLoc.getX() - l.getX(), mLoc.getY() - l.getY(), mLoc.getZ() - l.getZ()).normalize().multiply(0.5);
-						Vector shift = chainVector.normalize().multiply(HITBOX_LENGTH);
-						BoundingBox box = BoundingBox.of(l, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
-						box.shift(chainVector);
 
 						new PartialParticle(Particle.REDSTONE, mLoc, 1, mWidth, mWidth, mWidth, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.REDSTONE, mLoc, 1, mWidth, mWidth, mWidth, 0, DARK_COLOR).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.CRIT, mLoc, 1, mWidth, mWidth, mWidth, 0).spawnAsPlayerActive(mPlayer);
-						int particleReduce = 0;
-						for (double r = 0; r <= l.distance(mLoc); r += HITBOX_LENGTH) {
-							Location bLoc = box.getCenter().toLocation(world);
-							if (particleReduce % 2 == 0) {
-								new PartialParticle(Particle.REDSTONE, bLoc, 1, 0.05, 0.05, 0.05, 0.075, DARK_COLOR).spawnAsPlayerActive(mPlayer);
-							}
-							box.shift(shift);
-							particleReduce++;
-						}
+
+						// actual chain - 1 particle per meter, and particles slowly inch towards the player
+						new PPLine(Particle.REDSTONE, l, mLoc).shift((20 - (mT % 20)) / 20.0).countPerMeter(1).delta(0.05).extra(0.075).data(DARK_COLOR).spawnAsPlayerActive(mPlayer);
 
 						List<LivingEntity> hostiles = new ArrayList<>();
 						List<Player> players = new ArrayList<>();
@@ -276,7 +262,7 @@ public class JudgementChain extends Ability {
 	}
 
 	public void breakChain(boolean doDamage, boolean doPull) {
-		if (mTarget != null && mPlayer != null) {
+		if (mTarget != null) {
 			mPlugin.mEffectManager.clearEffects(mTarget, EFFECT_NAME);
 
 			Location loc = mPlayer.getEyeLocation();
@@ -308,11 +294,11 @@ public class JudgementChain extends Ability {
 			}
 
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, CHAIN_BREAK_DAMAGE);
-			DamageUtils.damage(mPlayer, mTarget, DamageType.MAGIC, damage, mInfo.mLinkedSpell, false, false);
+			DamageUtils.damage(mPlayer, mTarget, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), false, false);
 
 			if (doDamage && isLevelTwo()) {
 				for (LivingEntity m : EntityUtils.getNearbyMobs(loc, damageRadius, mTarget)) {
-					DamageUtils.damage(mPlayer, m, DamageType.MAGIC, damage, mInfo.mLinkedSpell);
+					DamageUtils.damage(mPlayer, m, DamageType.MAGIC, damage, mInfo.getLinkedSpell());
 				}
 			}
 		}
@@ -398,7 +384,7 @@ public class JudgementChain extends Ability {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mChainActive && mPlayer != null) {
+		if (mChainActive) {
 			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), 36, false)) {
 				mPlugin.mEffectManager.addEffect(p, "JudgementChainPlayerEffectBy" + mPlayer.getName(), new JudgementChainPlayerEffect(20, mPlayer));
 			}

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -12,7 +13,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.AbstractArrow;
@@ -35,19 +35,22 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	public static final String CHARM_RETRIEVAL = "Sharpshooter Arrow Save Chance";
 	public static final String CHARM_DECAY = "Sharpshooter Stack Decay Time";
 
+	public static final AbilityInfo<Sharpshooter> INFO =
+		new AbilityInfo<>(Sharpshooter.class, "Sharpshooter", Sharpshooter::new)
+			.scoreboardId("Sharpshooter")
+			.shorthandName("Ss")
+			.descriptions(
+				String.format("Your projectiles deal %d%% more damage.", (int) (PERCENT_BASE_DAMAGE * 100)),
+				String.format("Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to %d. Stacks decay after %d seconds of not gaining a stack. Each stack makes your projectiles deal an additional +%d%% damage. Additionally, passively gain a %d%% chance to not consume arrows when shot.",
+					MAX_STACKS, SHARPSHOOTER_DECAY_TIMER / 20, (int) (PERCENT_DAMAGE_PER_STACK * 100), (int) (ARROW_SAVE_CHANCE * 100)),
+				String.format("Your projectiles deal an extra %s%% damage per block of distance between you and the target, up to %s blocks.", DAMAGE_PER_BLOCK * 100, (int) MAX_DISTANCE))
+			.displayItem(new ItemStack(Material.TARGET, 1));
+
 	private final int mMaxStacks;
 	private final int mDecayTime;
 
-	public Sharpshooter(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Sharpshooter");
-		mInfo.mScoreboardId = "Sharpshooter";
-		mInfo.mShorthandName = "Ss";
-		mInfo.mDescriptions.add(String.format("Your projectiles deal %d%% more damage.", (int)(PERCENT_BASE_DAMAGE * 100)));
-		mInfo.mDescriptions.add(String.format("Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to %d. Stacks decay after %d seconds of not gaining a stack. Each stack makes your projectiles deal an additional +%d%% damage. Additionally, passively gain a %d%% chance to not consume arrows when shot.",
-			MAX_STACKS, SHARPSHOOTER_DECAY_TIMER / 20, (int)(PERCENT_DAMAGE_PER_STACK * 100), (int)(ARROW_SAVE_CHANCE * 100)));
-		mInfo.mDescriptions.add(String.format("Your projectiles deal an extra %s%% damage per block of distance between you and the target, up to %s blocks.", DAMAGE_PER_BLOCK * 100, (int)MAX_DISTANCE));
-		mDisplayItem = new ItemStack(Material.TARGET, 1);
-
+	public Sharpshooter(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 		mMaxStacks = MAX_STACKS + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 		mDecayTime = SHARPSHOOTER_DECAY_TIMER + CharmManager.getExtraDuration(mPlayer, CHARM_DECAY);
 	}
@@ -84,9 +87,6 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mPlayer == null) {
-			return;
-		}
 		if (mStacks > 0) {
 			mTicksToStackDecay -= 5;
 
@@ -102,8 +102,8 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (isLevelTwo()
-			&& mPlayer != null && projectile instanceof AbstractArrow arrow
-			&& FastUtils.RANDOM.nextDouble() < ARROW_SAVE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RETRIEVAL)) {
+			    && projectile instanceof AbstractArrow arrow
+			    && FastUtils.RANDOM.nextDouble() < ARROW_SAVE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RETRIEVAL)) {
 			boolean refunded = AbilityUtils.refundArrow(mPlayer, arrow);
 			if (refunded) {
 				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);

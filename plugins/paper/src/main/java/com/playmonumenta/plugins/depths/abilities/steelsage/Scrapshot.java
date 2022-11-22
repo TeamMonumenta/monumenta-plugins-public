@@ -2,12 +2,13 @@ package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -23,7 +24,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -37,18 +38,21 @@ public class Scrapshot extends DepthsAbility {
 
 	private static final Particle.DustOptions SCRAPSHOT_COLOR = new Particle.DustOptions(Color.fromRGB(130, 130, 130), 1.0f);
 
+	public static final DepthsAbilityInfo<Scrapshot> INFO =
+		new DepthsAbilityInfo<>(Scrapshot.class, ABILITY_NAME, Scrapshot::new, DepthsTree.METALLIC, DepthsTrigger.SHIFT_LEFT_CLICK)
+			.linkedSpell(ClassAbility.SCRAPSHOT)
+			.cooldown(COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Scrapshot::cast,
+				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
+			.displayItem(new ItemStack(Material.NETHERITE_SCRAP))
+			.descriptions(Scrapshot::getDescription, MAX_RARITY);
+
 	public Scrapshot(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.SCRAPSHOT;
-		mDisplayMaterial = Material.NETHERITE_SCRAP;
-		mTree = DepthsTree.METALLIC;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		super(plugin, player, INFO);
 	}
 
-	@Override
-	public void cast(Action trigger) {
-		if (mPlayer == null) {
+	public void cast() {
+		if (isOnCooldown()) {
 			return;
 		}
 		putOnCooldown();
@@ -98,7 +102,7 @@ public class Scrapshot extends DepthsAbility {
 					while (iter.hasNext()) {
 						LivingEntity mob = iter.next();
 						if (box.overlaps(mob.getBoundingBox())) {
-							DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, DISTANCE_MULTIPLIER[i] * DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
+							DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, DISTANCE_MULTIPLIER[i] * DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
 
 							mob.setVelocity(new Vector(0, 0, 0));
 							iter.remove();
@@ -115,31 +119,7 @@ public class Scrapshot extends DepthsAbility {
 		}
 	}
 
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
-			cast(Action.LEFT_CLICK_AIR);
-		}
-		return false;
-	}
-
-	@Override
-	public boolean runCheck() {
-		return mPlayer != null && mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
-	}
-
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		return "Left click while sneaking and holding a weapon to fire a blunderbuss shot that goes up to " + RANGE + " blocks, in a cone that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " projectile damage and knocks you backward. Damage is decreased for every block of distance after the first 4 blocks. Cooldown: " + COOLDOWN / 20 + "s.";
-	}
-
-	@Override
-	public DepthsTrigger getTrigger() {
-		return DepthsTrigger.SHIFT_LEFT_CLICK;
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.METALLIC;
 	}
 }

@@ -3,40 +3,29 @@ package com.playmonumenta.plugins.abilities.other;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
 
 public abstract class PatronParticles extends Ability {
+
 	private final Particle mParticle;
 	private final Object mParticleData;
-	private final String mParticleObjectiveName;
-	private final int mMinimumPatreonScore;
-
-	// Skip particle data
-	public PatronParticles(Plugin plugin, @Nullable Player player, Particle particle, String particleObjectiveName, int minimumPatreonScore) {
-		this(plugin, player, particle, null, particleObjectiveName, minimumPatreonScore);
-	}
 
 	public PatronParticles(
 		Plugin plugin,
-		@Nullable Player player,
+		Player player,
 		Particle particle,
 		@Nullable Object particleData,
-		String particleObjectiveName,
-		int minimumPatreonScore
+		AbilityInfo<? extends PatronParticles> info
 	) {
-		super(plugin, player, null);
-
+		super(plugin, player, info);
 		mParticle = particle;
-		mParticleObjectiveName = particleObjectiveName;
-		mMinimumPatreonScore = minimumPatreonScore;
 		mParticleData = particleData;
 	}
 
@@ -58,20 +47,4 @@ public abstract class PatronParticles extends Ability {
 		).spawnAsPlayerPassive(mPlayer);
 	}
 
-	// AbilityManager creates Ability objects in a specific order with player as null, just for reference.
-	// It then uses those objects to test if specific passed in players canUse().
-	// If so, only then does it construct a new Ability object for that player and go from there
-	//
-	// TODO This would make more sense to be static perhaps?
-	// But a new AbilityInfo is created per Ability & the default canUse() implementation needs that .mInfo for scoreboard name
-	@Override
-	public boolean canUse(Player player) {
-		// Changing to different coloured particles also refreshes class, meaning canUse() will function fine just checking once
-		int particleScore = ScoreboardUtils.getScoreboardValue(player, mParticleObjectiveName).orElse(0);
-		return (
-			particleScore > 0
-				&& PlayerData.getPatreonDollars(player) >= mMinimumPatreonScore
-				&& !PremiumVanishIntegration.isInvisibleOrSpectator(player)
-		);
-	}
 }

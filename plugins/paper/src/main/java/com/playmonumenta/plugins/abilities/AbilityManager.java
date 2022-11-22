@@ -122,6 +122,7 @@ import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorUtils;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -148,6 +149,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -174,6 +176,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -189,13 +192,16 @@ public class AbilityManager {
 	private static @Nullable AbilityManager mManager = null;
 
 	private final Plugin mPlugin;
-	private final List<Ability> mReferenceAbilities;
-	private final List<Ability> mDisabledAbilities;
+	private final List<AbilityInfo<?>> mReferenceAbilities;
+	private final List<AbilityInfo<?>> mDisabledAbilities;
 	private final Map<UUID, AbilityCollection> mAbilities = new HashMap<>();
 
 	//Only used for MultipleChargeAbilities
 	private final Map<UUID, HashMap<ClassAbility, Integer>> mChargeTracker = new HashMap<>();
-	private static final String KEY_PLUGIN_DATA = "AbilityCharges";
+	private static final String KEY_CHARGES_PLUGIN_DATA = "AbilityCharges";
+
+	private final Map<UUID, Map<String, AbilityTrigger>> mCustomTriggers = new HashMap<>();
+	private static final String KEY_TRIGGERS_PLUGIN_DATA = "AbilityTriggers";
 
 	//Public manager methods
 	//---------------------------------------------------------------------------------------------------------------
@@ -209,188 +215,188 @@ public class AbilityManager {
 
 		mReferenceAbilities.addAll(Arrays.asList(
 			// ALL (CLUCKING POTIONS)
-			new CluckingPotions(mPlugin, null),
+			CluckingPotions.INFO,
 
 			// ALL PLAYERS (but technically for Cleric)
-			new NonClericProvisionsPassive(mPlugin, null),
+			NonClericProvisionsPassive.INFO,
 
 			// ALL Attriba
-			new AttribaAttackDamage(mPlugin, null),
-			new AttribaAttackSpeed(mPlugin, null),
-			new AttribaKnockbackResistance(mPlugin, null),
-			new AttribaMaxHealth(mPlugin, null),
-			new AttribaMovementSpeed(mPlugin, null),
+			AttribaAttackDamage.INFO,
+			AttribaAttackSpeed.INFO,
+			AttribaKnockbackResistance.INFO,
+			AttribaMaxHealth.INFO,
+			AttribaMovementSpeed.INFO,
 
 			// All other non-class abilities
-			new PvP(mPlugin, null),
-			new PatronWhite(mPlugin, null),
-			new PatronGreen(mPlugin, null),
-			new PatronPurple(mPlugin, null),
-			new PatronRed(mPlugin, null)
+			PvP.INFO,
+			PatronWhite.INFO,
+			PatronGreen.INFO,
+			PatronPurple.INFO,
+			PatronRed.INFO
 		));
 
-		List<Ability> classAbilities = Arrays.asList(
+		List<AbilityInfo<?>> classAbilities = Arrays.asList(
 
 			//********** MAGE **********//
-			new ArcaneStrike(mPlugin, null),
-			new ThunderStep(mPlugin, null),
-			new ElementalArrows(mPlugin, null),
-			new FrostNova(mPlugin, null),
-			new Channeling(mPlugin, null),
-			new MagmaShield(mPlugin, null),
-			new ManaLance(mPlugin, null),
-			new Spellshock(mPlugin, null),
-			new PrismaticShield(mPlugin, null),
+			ArcaneStrike.INFO,
+			ThunderStep.INFO,
+			ElementalArrows.INFO,
+			FrostNova.INFO,
+			Channeling.INFO,
+			MagmaShield.INFO,
+			ManaLance.INFO,
+			Spellshock.INFO,
+			PrismaticShield.INFO,
 
 			//********** ROGUE **********//
-			new AdvancingShadows(mPlugin, null),
-			new ByMyBlade(mPlugin, null),
-			new DaggerThrow(mPlugin, null),
-			new Dodging(mPlugin, null),
-			new Dethroner(mPlugin, null),
-			new Smokescreen(mPlugin, null),
-			new ViciousCombos(mPlugin, null),
-			new Skirmisher(mPlugin, null),
-			new EscapeDeath(mPlugin, null),
+			AdvancingShadows.INFO,
+			ByMyBlade.INFO,
+			DaggerThrow.INFO,
+			Dodging.INFO,
+			Dethroner.INFO,
+			Smokescreen.INFO,
+			ViciousCombos.INFO,
+			Skirmisher.INFO,
+			EscapeDeath.INFO,
 
 			//********** SCOUT **********//
-			new Agility(mPlugin, null),
-			new HuntingCompanion(mPlugin, null),
-			new Volley(mPlugin, null),
-			new Swiftness(mPlugin, null),
-			new EagleEye(mPlugin, null),
-			new Versatile(mPlugin, null),
-			new SwiftCuts(mPlugin, null),
-			new Sharpshooter(mPlugin, null),
-			new WindBomb(mPlugin, null),
+			Agility.INFO,
+			HuntingCompanion.INFO,
+			Volley.INFO,
+			Swiftness.INFO,
+			EagleEye.INFO,
+			Versatile.INFO,
+			SwiftCuts.INFO,
+			Sharpshooter.INFO,
+			WindBomb.INFO,
 
 			//********** WARRIOR **********//
-			new CounterStrike(mPlugin, null),
-			new DefensiveLine(mPlugin, null),
-			new Frenzy(mPlugin, null),
-			new Riposte(mPlugin, null),
-			new ShieldBash(mPlugin, null),
-			new Toughness(mPlugin, null),
-			new Formidable(mPlugin, null),
-			new WeaponMastery(mPlugin, null),
-			new BruteForce(mPlugin, null),
+			CounterStrike.INFO,
+			DefensiveLine.INFO,
+			Frenzy.INFO,
+			Riposte.INFO,
+			ShieldBash.INFO,
+			Toughness.INFO,
+			Formidable.INFO,
+			WeaponMastery.INFO,
+			BruteForce.INFO,
 
 			//********** CLERIC **********//
-			new CelestialBlessing(mPlugin, null),
-			new CleansingRain(mPlugin, null),
-			new HandOfLight(mPlugin, null),
-			new Rejuvenation(mPlugin, null),
-			new DivineJustice(mPlugin, null),
-			new HeavenlyBoon(mPlugin, null),
-			new Crusade(mPlugin, null),
-			new SanctifiedArmor(mPlugin, null),
-			new SacredProvisions(mPlugin, null),
+			CelestialBlessing.INFO,
+			CleansingRain.INFO,
+			HandOfLight.INFO,
+			Rejuvenation.INFO,
+			DivineJustice.INFO,
+			HeavenlyBoon.INFO,
+			Crusade.INFO,
+			SanctifiedArmor.INFO,
+			SacredProvisions.INFO,
 
 			//********** WARLOCK **********//
-			new AmplifyingHex(mPlugin, null),
-			new PhlegmaticResolve(mPlugin, null),
-			new CholericFlames(mPlugin, null),
-			new CursedWound(mPlugin, null),
-			new GraspingClaws(mPlugin, null),
-			new Culling(mPlugin, null),
-			new SanguineHarvest(mPlugin, null),
-			new SoulRend(mPlugin, null),
-			new MelancholicLament(mPlugin, null),
+			AmplifyingHex.INFO,
+			PhlegmaticResolve.INFO,
+			CholericFlames.INFO,
+			CursedWound.INFO,
+			GraspingClaws.INFO,
+			Culling.INFO,
+			SanguineHarvest.INFO,
+			SoulRend.INFO,
+			MelancholicLament.INFO,
 
 			//********** ALCHEMIST **********//
-			new Bezoar(mPlugin, null),
-			new AlchemicalArtillery(mPlugin, null),
-			new EmpoweringOdor(mPlugin, null),
-			new UnstableAmalgam(mPlugin, null),
-			new IronTincture(mPlugin, null),
-			new GruesomeAlchemy(mPlugin, null),
-			new BrutalAlchemy(mPlugin, null),
-			new EnergizingElixir(mPlugin, null),
-			new AlchemistPotions(mPlugin, null)
+			Bezoar.INFO,
+			AlchemicalArtillery.INFO,
+			EmpoweringOdor.INFO,
+			UnstableAmalgam.INFO,
+			IronTincture.INFO,
+			GruesomeAlchemy.INFO,
+			BrutalAlchemy.INFO,
+			EnergizingElixir.INFO,
+			AlchemistPotions.INFO
 		);
 
-		List<Ability> specAbilities = Arrays.asList(
+		List<AbilityInfo<?>> specAbilities = Arrays.asList(
 			//********** MAGE **********//
 			// ELEMENTALIST
-			new ElementalSpiritFire(mPlugin, null),
-			new ElementalSpiritIce(mPlugin, null),
-			new Blizzard(mPlugin, null),
-			new Starfall(mPlugin, null),
+			ElementalSpiritFire.INFO,
+			ElementalSpiritIce.INFO,
+			Blizzard.INFO,
+			Starfall.INFO,
 
 			// ARCANIST
-			new CosmicMoonblade(mPlugin, null),
-			new AstralOmen(mPlugin, null),
-			new SagesInsight(mPlugin, null),
+			CosmicMoonblade.INFO,
+			AstralOmen.INFO,
+			SagesInsight.INFO,
 
 			//********** ROGUE **********//
 			// SWORDSAGE
-			new WindWalk(mPlugin, null),
-			new BladeDance(mPlugin, null),
-			new DeadlyRonde(mPlugin, null),
+			WindWalk.INFO,
+			BladeDance.INFO,
+			DeadlyRonde.INFO,
 
 			// ASSASSIN
-			new BodkinBlitz(mPlugin, null),
-			new CloakAndDagger(mPlugin, null),
-			new CoupDeGrace(mPlugin, null),
+			BodkinBlitz.INFO,
+			CloakAndDagger.INFO,
+			CoupDeGrace.INFO,
 
 			//********** SCOUT **********//
 			// RANGER
-			new TacticalManeuver(mPlugin, null),
-			new WhirlingBlade(mPlugin, null),
-			new Quickdraw(mPlugin, null),
+			TacticalManeuver.INFO,
+			WhirlingBlade.INFO,
+			Quickdraw.INFO,
 
 			// HUNTER
-			new PinningShot(mPlugin, null),
-			new SplitArrow(mPlugin, null),
-			new PredatorStrike(mPlugin, null),
+			PinningShot.INFO,
+			SplitArrow.INFO,
+			PredatorStrike.INFO,
 
 			//********** WARRIOR **********//
 			// BERSERKER
-			new MeteorSlam(mPlugin, null),
-			new Rampage(mPlugin, null),
-			new GloriousBattle(mPlugin, null),
+			MeteorSlam.INFO,
+			Rampage.INFO,
+			GloriousBattle.INFO,
 
 			// GUARDIAN
-			new ShieldWall(mPlugin, null),
-			new Challenge(mPlugin, null),
-			new Bodyguard(mPlugin, null),
+			ShieldWall.INFO,
+			Challenge.INFO,
+			Bodyguard.INFO,
 
 			//********** CLERIC **********//
 			// PALADIN
 			// LI needs to run first to process its passive melee damage
-			new LuminousInfusion(mPlugin, null),
+			LuminousInfusion.INFO,
 			// HJ runs afterwards and can use that value in the same event,
 			// sharing it to its Javelin AoE
-			new HolyJavelin(mPlugin, null),
+			HolyJavelin.INFO,
 
-			new ChoirBells(mPlugin, null),
+			ChoirBells.INFO,
 
 			// HIEROPHANT
-			new EnchantedPrayer(mPlugin, null),
-			new HallowedBeam(mPlugin, null),
-			new ThuribleProcession(mPlugin, null),
+			EnchantedPrayer.INFO,
+			HallowedBeam.INFO,
+			ThuribleProcession.INFO,
 
 			//********** WARLOCK **********//
 			// REAPER
-			new JudgementChain(mPlugin, null),
-			new VoodooBonds(mPlugin, null),
-			new DarkPact(mPlugin, null),
+			JudgementChain.INFO,
+			VoodooBonds.INFO,
+			DarkPact.INFO,
 
 			// TENEBRIST
-			new WitheringGaze(mPlugin, null),
-			new HauntingShades(mPlugin, null),
-			new RestlessSouls(mPlugin, null),
+			WitheringGaze.INFO,
+			HauntingShades.INFO,
+			RestlessSouls.INFO,
 
 			//********** ALCHEMIST **********//
 			// HARBINGER
-			new ScorchedEarth(mPlugin, null),
-			new EsotericEnhancements(mPlugin, null),
-			new Taboo(mPlugin, null),
+			ScorchedEarth.INFO,
+			EsotericEnhancements.INFO,
+			Taboo.INFO,
 
 			// APOTHECARY
-			new Panacea(mPlugin, null),
-			new TransmutationRing(mPlugin, null),
-			new WardingRemedy(mPlugin, null)
+			Panacea.INFO,
+			TransmutationRing.INFO,
+			WardingRemedy.INFO
 		);
 
 		if (ServerProperties.getShardName().contains("depths") || ServerProperties.getShardName().contains("dev")) {
@@ -408,7 +414,7 @@ public class AbilityManager {
 			}
 		}
 
-		mReferenceAbilities.sort(Comparator.comparingDouble(Ability::getPriorityAmount));
+		mReferenceAbilities.sort(Comparator.comparingDouble(AbilityInfo::getPriorityAmount));
 	}
 
 	public static AbilityManager getManager() {
@@ -506,8 +512,8 @@ public class AbilityManager {
 		}
 
 		// Removes things like attributes/tags applied by abilities
-		for (Ability ability : mReferenceAbilities) {
-			ability.remove(player);
+		for (AbilityInfo<?> ability : mReferenceAbilities) {
+			ability.onRemove(player);
 		}
 
 		List<Ability> abilities = new ArrayList<>();
@@ -519,19 +525,11 @@ public class AbilityManager {
 			return collection;
 		}
 
-		try {
-			for (Ability ab : mReferenceAbilities) {
-				if (ab.canUse(player)) {
-					Class<?>[] constructorTypes = new Class[2];
-					constructorTypes[0] = Plugin.class;
-					constructorTypes[1] = Player.class;
-
-					Ability newAbility = ab.getClass().getDeclaredConstructor(constructorTypes).newInstance(mPlugin, player);
-					abilities.add(newAbility);
-				}
+		for (AbilityInfo<?> ability : mReferenceAbilities) {
+			if (ability.testCanUse(player)) {
+				Ability newAbility = ability.newInstance(mPlugin, player);
+				abilities.add(newAbility);
 			}
-		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | java.lang.reflect.InvocationTargetException e) {
-			e.printStackTrace();
 		}
 
 		AbilityCollection collection = new AbilityCollection(abilities);
@@ -567,13 +565,13 @@ public class AbilityManager {
 	}
 
 	/* Do not modify the returned data! */
-	public List<Ability> getReferenceAbilities() {
+	public List<AbilityInfo<?>> getReferenceAbilities() {
 		return mReferenceAbilities;
 	}
 
 	// This is for things that care about currently disabled abilities. (ex. Specs in R1)
 	/* Do not modify the returned data! */
-	public List<Ability> getDisabledAbilities() {
+	public List<AbilityInfo<?>> getDisabledAbilities() {
 		return mDisabledAbilities;
 	}
 
@@ -591,10 +589,8 @@ public class AbilityManager {
 
 	public boolean abilityCastEvent(Player player, AbilityCastEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				if (!abil.abilityCastEvent(event)) {
-					return false;
-				}
+			if (!abil.abilityCastEvent(event)) {
+				return false;
 			}
 		}
 		return true;
@@ -605,20 +601,24 @@ public class AbilityManager {
 	}
 
 	public void onDamage(Player player, DamageEvent event, LivingEntity enemy) {
-		if (!EntityUtils.isHostileMob(enemy)) {
-			return;
-		}
-
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (event.isCancelled()) {
-				return;
-			}
-			String metaKey = "LastDamageTick_" + abil.getClass().getCanonicalName();
-			if (abil.canCast() && !MetadataUtils.happenedThisTick(player, metaKey)) {
-				if (abil.onDamage(event, enemy)) {
-					MetadataUtils.checkOnceThisTick(mPlugin, player, metaKey);
+		if (EntityUtils.isHostileMob(enemy)) {
+			for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+				if (event.isCancelled()) {
+					break;
+				}
+				String metaKey = "LastDamageTick_" + abil.getClass().getCanonicalName();
+				if (!MetadataUtils.happenedThisTick(player, metaKey)) {
+					if (abil.onDamage(event, enemy)) {
+						MetadataUtils.checkOnceThisTick(mPlugin, player, metaKey);
+					}
 				}
 			}
+		}
+
+		// after the damage event, as HolyJavelin casts itself on melee attacks with added functionality
+		if (event.getType() == DamageEvent.DamageType.MELEE
+			    && MetadataUtils.checkOnceInRecentTicks(mPlugin, player, CLICK_TICK_METAKEY, 1)) {
+			checkTrigger(player, AbilityTrigger.Key.LEFT_CLICK);
 		}
 	}
 
@@ -633,19 +633,21 @@ public class AbilityManager {
 	}
 
 	private void conditionalCast(Player player, CastArgumentNoReturn func) {
+		if (player.getGameMode() == GameMode.SPECTATOR) {
+			return;
+		}
 		for (Ability ability : getPlayerAbilities(player).getAbilities()) {
-			if (ability.canCast()) {
-				func.run(ability);
-			}
+			func.run(ability);
 		}
 	}
 
 	private boolean conditionalCastCancellable(Player player, CastArgumentWithReturn func) {
+		if (player.getGameMode() == GameMode.SPECTATOR) {
+			return true;
+		}
 		for (Ability ability : getPlayerAbilities(player).getAbilities()) {
-			if (ability.canCast()) {
-				if (!func.run(ability)) {
-					return false;
-				}
+			if (!func.run(ability)) {
+				return false;
 			}
 		}
 		return true;
@@ -656,9 +658,7 @@ public class AbilityManager {
 			if (event.isCancelled()) {
 				return;
 			}
-			if (abil.canCast()) {
 				abil.onHurt(event, damager, source);
-			}
 		}
 	}
 
@@ -667,9 +667,7 @@ public class AbilityManager {
 			if (event.isCancelled() || event.getFinalDamage(true) < player.getHealth()) {
 				return;
 			}
-			if (abil.canCast()) {
-				abil.onHurtFatal(event);
-			}
+			abil.onHurtFatal(event);
 		}
 	}
 
@@ -741,16 +739,6 @@ public class AbilityManager {
 		conditionalCast(player, (ability) -> ability.periodicTrigger(twoHertz, oneSecond, ticks));
 	}
 
-	/*
-	 * EntityUtils.damageEntity() does not trigger the EntityDamageByEntityEvent, and it may not
-	 * trigger the CustomDamageEvent either if the flag is set to such. Since we need to attach an
-	 * event to ALL damage dealt (currently, for delves to work), we need to trigger a dummy event
-	 * for this express purpose that isn't used in things like regular abilities.
-	 */
-	public void playerDealtUnregisteredCustomDamageEvent(Player player, DamageEvent event) {
-		conditionalCast(player, (ability) -> ability.playerDealtUnregisteredCustomDamageEvent(event));
-	}
-
 	public void entityTargetLivingEntityEvent(Player player, EntityTargetLivingEntityEvent event) {
 		conditionalCast(player, (ability) -> ability.entityTargetLivingEntityEvent(event));
 	}
@@ -764,11 +752,17 @@ public class AbilityManager {
 	}
 
 	public void playerAnimationEvent(Player player, PlayerAnimationEvent event) {
+		if (MetadataUtils.checkOnceInRecentTicks(mPlugin, player, CLICK_TICK_METAKEY, 2)) {
+			checkTrigger(player, AbilityTrigger.Key.LEFT_CLICK);
+		}
+
 		conditionalCast(player, (ability) -> ability.playerAnimationEvent(event));
 	}
 
 	public void playerSwapHandItemsEvent(Player player, PlayerSwapHandItemsEvent event) {
-		conditionalCast(player, (ability) -> ability.playerSwapHandItemsEvent(event));
+		if (checkTrigger(player, AbilityTrigger.Key.SWAP)) {
+			event.setCancelled(true);
+		}
 	}
 
 	public void playerRegainHealthEvent(Player player, EntityRegainHealthEvent event) {
@@ -782,9 +776,12 @@ public class AbilityManager {
 	public void playerQuitEvent(Player player, PlayerQuitEvent event) {
 		conditionalCast(player, (ability) -> ability.playerQuitEvent(event));
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			UUID uuid = player.getUniqueId();
-			mAbilities.remove(uuid);
-			mChargeTracker.remove(uuid);
+			if (!player.isOnline()) {
+				UUID uuid = player.getUniqueId();
+				mAbilities.remove(uuid);
+				mChargeTracker.remove(uuid);
+				mCustomTriggers.remove(uuid);
+			}
 		}, 5);
 	}
 
@@ -795,8 +792,18 @@ public class AbilityManager {
 			for (Map.Entry<ClassAbility, Integer> entry : charges.entrySet()) {
 				data.addProperty(entry.getKey().getName(), entry.getValue());
 			}
-			event.setPluginData(KEY_PLUGIN_DATA, data);
+			event.setPluginData(KEY_CHARGES_PLUGIN_DATA, data);
 		}
+
+		Map<String, AbilityTrigger> customTriggers = mCustomTriggers.get(player.getUniqueId());
+		if (customTriggers != null) {
+			JsonObject data = new JsonObject();
+			for (Map.Entry<String, AbilityTrigger> entry : customTriggers.entrySet()) {
+				data.add(entry.getKey(), entry.getValue().toJson());
+			}
+			event.setPluginData(KEY_TRIGGERS_PLUGIN_DATA, data);
+		}
+
 	}
 
 	public void playerJoinEvent(Player player, PlayerJoinEvent event) {
@@ -813,7 +820,7 @@ public class AbilityManager {
 			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
 		}
 		UUID uuid = player.getUniqueId();
-		JsonObject chargesData = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_PLUGIN_DATA);
+		JsonObject chargesData = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_CHARGES_PLUGIN_DATA);
 		if (chargesData != null) {
 			HashMap<ClassAbility, Integer> chargeMap = new HashMap<>();
 			for (Map.Entry<String, JsonElement> entry : chargesData.entrySet()) {
@@ -832,52 +839,57 @@ public class AbilityManager {
 				mChargeTracker.put(uuid, chargeMap);
 			}
 		}
+
+		JsonObject triggerData = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_TRIGGERS_PLUGIN_DATA);
+		if (triggerData != null) {
+			Map<String, AbilityTrigger> customTriggers = new HashMap<>();
+			for (Map.Entry<String, JsonElement> entry : triggerData.entrySet()) {
+				AbilityTrigger trigger = AbilityTrigger.fromJson(entry.getValue().getAsJsonObject());
+				if (trigger != null) {
+					customTriggers.put(entry.getKey(), trigger);
+				}
+			}
+			mCustomTriggers.put(uuid, customTriggers);
+		}
 	}
 
-	public void playerInteractEvent(Player player, Action action, Material blockClicked) {
-		// Right clicking sometimes counts as two clicks, so make sure this can only be triggered once per tick
-		if (MetadataUtils.checkOnceThisTick(mPlugin, player, CLICK_TICK_METAKEY)) {
-			for (Ability ability : getPlayerAbilities(player).getAbilities()) {
-				AbilityInfo abilityInfo = ability.getInfo();
-				if (abilityInfo.mTrigger != null) {
-					if (abilityInfo.mTrigger == AbilityTrigger.LEFT_CLICK) {
-						if (
-							action == Action.LEFT_CLICK_AIR
-								|| action == Action.LEFT_CLICK_BLOCK
-						) {
-							if (ability.canCast()) {
-								ability.cast(action);
-							}
-						}
-					} else if (abilityInfo.mTrigger == AbilityTrigger.RIGHT_CLICK) {
-						if (
-							action == Action.RIGHT_CLICK_AIR
-								|| (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked))
-						) {
-							if (ability.canCast()) {
-								ability.cast(action);
-							}
-						}
-					} else if (abilityInfo.mTrigger == AbilityTrigger.LEFT_CLICK_AIR) {
-						if (action == Action.LEFT_CLICK_AIR) {
-							if (ability.canCast()) {
-								ability.cast(action);
-							}
-						}
-					} else if (abilityInfo.mTrigger == AbilityTrigger.RIGHT_CLICK_AIR) {
-						if (action == Action.RIGHT_CLICK_AIR) {
-							if (ability.canCast()) {
-								ability.cast(action);
-							}
-						}
-					} else if (abilityInfo.mTrigger == AbilityTrigger.ALL) {
-						if (ability.canCast()) {
-							ability.cast(action);
-						}
-					}
+	public void playerInteractEvent(PlayerInteractEvent event, Material blockClicked) {
+		Player player = event.getPlayer();
+		Action action = event.getAction();
+		// Right-clicking sometimes counts as two clicks, so make sure this can only be triggered once per tick
+		// Right clicks also sometimes create an additional left click up to 2 ticks later, thus check within the past 2 ticks.
+		if (MetadataUtils.checkOnceInRecentTicks(mPlugin, player, CLICK_TICK_METAKEY, 2)) {
+			if (action == Action.LEFT_CLICK_AIR
+				    || action == Action.LEFT_CLICK_BLOCK) {
+				checkTrigger(player, AbilityTrigger.Key.LEFT_CLICK);
+			} else if (action == Action.RIGHT_CLICK_AIR
+				           || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked) && blockClicked != Material.AIR)) {
+				checkTrigger(player, AbilityTrigger.Key.RIGHT_CLICK);
+				if (player.getInventory().getItem(event.getHand()).getType() == Material.SHIELD) {
+					conditionalCast(player, Ability::blockWithShieldEvent);
 				}
 			}
 		}
+	}
+
+	public boolean checkTrigger(Player player, AbilityTrigger.Key key) {
+		// Disable sneak+left click abilities when using an Experiencinator/Crystallizer
+		// TODO would be nice if all SQ interactibles would prevent skill activation - but how to do that in general?
+		// Cancelling events cannot be used, as that is used to prevent vanilla actions from occurring. Some custom way to annotate an event as handled by SQ would be needed.
+		if (key == AbilityTrigger.Key.LEFT_CLICK
+			    && player.isSneaking()
+			    && ExperiencinatorUtils.getConfig(player.getLocation(), false).getExperiencinator(player.getInventory().getItemInMainHand()) != null) {
+			return false;
+		}
+		for (Ability ability : getPlayerAbilities(player).getAbilitiesInTriggerOrder()) {
+			for (AbilityTriggerInfo<?> triggerInfo : ability.mCustomTriggers) {
+				if (triggerInfo.check(player, key)) {
+					((Consumer<Ability>) triggerInfo.getAction()).accept(ability);
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	//---------------------------------------------------------------------------------------------------------------
@@ -893,14 +905,14 @@ public class AbilityManager {
 
 	public void resetPlayerAbilities(Player player) {
 		// Clear all Reference Abilities from player
-		for (Ability ref : mReferenceAbilities) {
+		for (AbilityInfo<?> ref : mReferenceAbilities) {
 			String scoreboard = ref.getScoreboard();
 			if (scoreboard != null) {
 				ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
 			}
 		}
 		// Clear all Disabled Abilities from player
-		for (Ability dRef : mDisabledAbilities) {
+		for (AbilityInfo<?> dRef : mDisabledAbilities) {
 			String scoreboard = dRef.getScoreboard();
 			if (scoreboard != null) {
 				ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
@@ -919,24 +931,43 @@ public class AbilityManager {
 	}
 
 	public void trackCharges(Player player, ClassAbility ability, int charges) {
-		UUID uuid = player.getUniqueId();
-		HashMap<ClassAbility, Integer> playerCharges = mChargeTracker.get(uuid);
-		if (playerCharges == null) {
-			playerCharges = new HashMap<>();
-		}
-		playerCharges.put(ability, charges);
-		mChargeTracker.put(uuid, playerCharges);
+		mChargeTracker.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>())
+			.put(ability, charges);
 	}
 
 	public int getTrackedCharges(Player player, ClassAbility ability) {
 		HashMap<ClassAbility, Integer> playerCharges = mChargeTracker.get(player.getUniqueId());
 		if (playerCharges != null) {
-			Integer charges = playerCharges.get(ability);
-			if (charges != null) {
-				return charges.intValue();
-			}
+			return playerCharges.getOrDefault(ability, 0);
 		}
 		return 0;
+	}
+
+	public int getNumberOfCustomTriggers(Player player) {
+		Map<String, AbilityTrigger> triggerMap = mCustomTriggers.get(player.getUniqueId());
+		return triggerMap == null ? 0 : triggerMap.size();
+	}
+
+	public @Nullable AbilityTrigger getCustomTrigger(Player player, AbilityInfo<?> ability, String triggerId) {
+		Map<String, AbilityTrigger> triggerMap = mCustomTriggers.get(player.getUniqueId());
+		if (triggerMap == null) {
+			return null;
+		}
+		return triggerMap.get(ability.getLinkedSpell().name() + "_" + triggerId);
+	}
+
+	public void setCustomTrigger(Player player, AbilityInfo<?> ability, String triggerId, @Nullable AbilityTrigger trigger) {
+		Map<String, AbilityTrigger> triggerMap = mCustomTriggers.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>());
+		String key = ability.getLinkedSpell().name() + "_" + triggerId;
+		if (trigger == null) {
+			triggerMap.remove(key);
+		} else {
+			triggerMap.put(key, trigger);
+		}
+	}
+
+	public void clearCustomTriggers(Player player) {
+		mCustomTriggers.remove(player.getUniqueId());
 	}
 
 	//---------------------------------------------------------------------------------------------------------------

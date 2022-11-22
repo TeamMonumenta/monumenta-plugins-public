@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
@@ -23,116 +23,7 @@ import com.playmonumenta.plugins.itemstats.attributes.ProjectileSpeed;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.itemstats.attributes.ThornsDamage;
 import com.playmonumenta.plugins.itemstats.attributes.ThrowRate;
-import com.playmonumenta.plugins.itemstats.enchantments.Abyssal;
-import com.playmonumenta.plugins.itemstats.enchantments.Adaptability;
-import com.playmonumenta.plugins.itemstats.enchantments.Adrenaline;
-import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
-import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
-import com.playmonumenta.plugins.itemstats.enchantments.ArcaneThrust;
-import com.playmonumenta.plugins.itemstats.enchantments.AshesOfEternity;
-import com.playmonumenta.plugins.itemstats.enchantments.Baaing;
-import com.playmonumenta.plugins.itemstats.enchantments.BlastFragility;
-import com.playmonumenta.plugins.itemstats.enchantments.BlastProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.Bleeding;
-import com.playmonumenta.plugins.itemstats.enchantments.Broomstick;
-import com.playmonumenta.plugins.itemstats.enchantments.Chaotic;
-import com.playmonumenta.plugins.itemstats.enchantments.Cloaked;
-import com.playmonumenta.plugins.itemstats.enchantments.Clucking;
-import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfAnemia;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfCorruption;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfCrippling;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfInstability;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfIrreparability;
-import com.playmonumenta.plugins.itemstats.enchantments.CurseOfShrapnel;
-import com.playmonumenta.plugins.itemstats.enchantments.Darksight;
-import com.playmonumenta.plugins.itemstats.enchantments.Decay;
-import com.playmonumenta.plugins.itemstats.enchantments.DivineAura;
-import com.playmonumenta.plugins.itemstats.enchantments.Duelist;
-import com.playmonumenta.plugins.itemstats.enchantments.EarthAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.Eruption;
-import com.playmonumenta.plugins.itemstats.enchantments.Ethereal;
-import com.playmonumenta.plugins.itemstats.enchantments.Evasion;
-import com.playmonumenta.plugins.itemstats.enchantments.Excavator;
-import com.playmonumenta.plugins.itemstats.enchantments.Explosive;
-import com.playmonumenta.plugins.itemstats.enchantments.FallFragility;
-import com.playmonumenta.plugins.itemstats.enchantments.FeatherFalling;
-import com.playmonumenta.plugins.itemstats.enchantments.Festive;
-import com.playmonumenta.plugins.itemstats.enchantments.FireAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.FireFragility;
-import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.FirstStrike;
-import com.playmonumenta.plugins.itemstats.enchantments.Gilded;
-import com.playmonumenta.plugins.itemstats.enchantments.Gills;
-import com.playmonumenta.plugins.itemstats.enchantments.Guard;
-import com.playmonumenta.plugins.itemstats.enchantments.HexEater;
-import com.playmonumenta.plugins.itemstats.enchantments.HideAttributes;
-import com.playmonumenta.plugins.itemstats.enchantments.HideEnchants;
-import com.playmonumenta.plugins.itemstats.enchantments.HideInfo;
-import com.playmonumenta.plugins.itemstats.enchantments.IceAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.Ineptitude;
-import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
-import com.playmonumenta.plugins.itemstats.enchantments.InstantDrink;
-import com.playmonumenta.plugins.itemstats.enchantments.IntoxicatingWarmth;
-import com.playmonumenta.plugins.itemstats.enchantments.Intuition;
-import com.playmonumenta.plugins.itemstats.enchantments.Inure;
-import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
-import com.playmonumenta.plugins.itemstats.enchantments.LifeDrain;
-import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
-import com.playmonumenta.plugins.itemstats.enchantments.MagicFragility;
-import com.playmonumenta.plugins.itemstats.enchantments.MagicProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.MagicWandEnch;
-import com.playmonumenta.plugins.itemstats.enchantments.MainhandOffhandDisable;
-import com.playmonumenta.plugins.itemstats.enchantments.MaterialEnch;
-import com.playmonumenta.plugins.itemstats.enchantments.MeleeFragility;
-import com.playmonumenta.plugins.itemstats.enchantments.MeleeProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.Multiload;
-import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
-import com.playmonumenta.plugins.itemstats.enchantments.NoGlint;
-import com.playmonumenta.plugins.itemstats.enchantments.OffhandMainhandDisable;
-import com.playmonumenta.plugins.itemstats.enchantments.Oinking;
-import com.playmonumenta.plugins.itemstats.enchantments.PestilenceTesseract;
-import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
-import com.playmonumenta.plugins.itemstats.enchantments.Poise;
-import com.playmonumenta.plugins.itemstats.enchantments.ProjectileFragility;
-import com.playmonumenta.plugins.itemstats.enchantments.ProjectileProtection;
-import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheDepths;
-import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheWorld;
-import com.playmonumenta.plugins.itemstats.enchantments.Quake;
-import com.playmonumenta.plugins.itemstats.enchantments.Radiant;
-import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
-import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
-import com.playmonumenta.plugins.itemstats.enchantments.Reflexes;
-import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
-import com.playmonumenta.plugins.itemstats.enchantments.Regicide;
-import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
-import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken;
-import com.playmonumenta.plugins.itemstats.enchantments.Resurrection;
-import com.playmonumenta.plugins.itemstats.enchantments.Retrieval;
-import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageDealt;
-import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageTaken;
-import com.playmonumenta.plugins.itemstats.enchantments.Sapper;
-import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
-import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
-import com.playmonumenta.plugins.itemstats.enchantments.Slayer;
-import com.playmonumenta.plugins.itemstats.enchantments.Smite;
-import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
-import com.playmonumenta.plugins.itemstats.enchantments.Stamina;
-import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
-import com.playmonumenta.plugins.itemstats.enchantments.Steadfast;
-import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
-import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
-import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
-import com.playmonumenta.plugins.itemstats.enchantments.Tempo;
-import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
-import com.playmonumenta.plugins.itemstats.enchantments.ThrowingKnife;
-import com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect;
-import com.playmonumenta.plugins.itemstats.enchantments.Triage;
-import com.playmonumenta.plugins.itemstats.enchantments.Trivium;
-import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
-import com.playmonumenta.plugins.itemstats.enchantments.Weightless;
-import com.playmonumenta.plugins.itemstats.enchantments.WindAspect;
+import com.playmonumenta.plugins.itemstats.enchantments.*;
 import com.playmonumenta.plugins.itemstats.infusions.*;
 import com.playmonumenta.plugins.listeners.QuiverListener;
 import de.tr7zw.nbtapi.NBTCompound;
@@ -1464,68 +1355,68 @@ public class ItemStatUtils {
 	}
 
 	public static Component getCharmClass(NBTList<String> charmLore) {
-		MonumentaClasses classes = new MonumentaClasses(Plugin.getInstance(), null);
+		MonumentaClasses classes = new MonumentaClasses();
 
-		ArrayList<Ability> alchSkills = classes.getClassAtIndex(0).mAbilities;
+		ArrayList<AbilityInfo<?>> alchSkills = classes.getClassAtIndex(0).mAbilities;
 		alchSkills.addAll(classes.getClassAtIndex(0).mSpecOne.mAbilities);
 		alchSkills.addAll(classes.getClassAtIndex(0).mSpecTwo.mAbilities);
 
-		ArrayList<Ability> clericSkills = classes.getClassAtIndex(1).mAbilities;
+		ArrayList<AbilityInfo<?>> clericSkills = classes.getClassAtIndex(1).mAbilities;
 		clericSkills.addAll(classes.getClassAtIndex(1).mSpecOne.mAbilities);
 		clericSkills.addAll(classes.getClassAtIndex(1).mSpecTwo.mAbilities);
 
-		ArrayList<Ability> mageSkills = classes.getClassAtIndex(2).mAbilities;
+		ArrayList<AbilityInfo<?>> mageSkills = classes.getClassAtIndex(2).mAbilities;
 		mageSkills.addAll(classes.getClassAtIndex(2).mSpecOne.mAbilities);
 		mageSkills.addAll(classes.getClassAtIndex(2).mSpecTwo.mAbilities);
 
-		ArrayList<Ability> rogueSkills = classes.getClassAtIndex(3).mAbilities;
+		ArrayList<AbilityInfo<?>> rogueSkills = classes.getClassAtIndex(3).mAbilities;
 		rogueSkills.addAll(classes.getClassAtIndex(3).mSpecOne.mAbilities);
 		rogueSkills.addAll(classes.getClassAtIndex(3).mSpecTwo.mAbilities);
 
-		ArrayList<Ability> scoutSkills = classes.getClassAtIndex(4).mAbilities;
+		ArrayList<AbilityInfo<?>> scoutSkills = classes.getClassAtIndex(4).mAbilities;
 		scoutSkills.addAll(classes.getClassAtIndex(4).mSpecOne.mAbilities);
 		scoutSkills.addAll(classes.getClassAtIndex(4).mSpecTwo.mAbilities);
 
-		ArrayList<Ability> warlockSkills = classes.getClassAtIndex(5).mAbilities;
+		ArrayList<AbilityInfo<?>> warlockSkills = classes.getClassAtIndex(5).mAbilities;
 		warlockSkills.addAll(classes.getClassAtIndex(5).mSpecOne.mAbilities);
 		warlockSkills.addAll(classes.getClassAtIndex(5).mSpecTwo.mAbilities);
 
-		ArrayList<Ability> warriorSkills = classes.getClassAtIndex(6).mAbilities;
+		ArrayList<AbilityInfo<?>> warriorSkills = classes.getClassAtIndex(6).mAbilities;
 		warriorSkills.addAll(classes.getClassAtIndex(6).mSpecOne.mAbilities);
 		warriorSkills.addAll(classes.getClassAtIndex(6).mSpecTwo.mAbilities);
 
 		for (String line : charmLore) {
-			for (Ability skill : alchSkills) {
+			for (AbilityInfo<?> skill : alchSkills) {
 				if (line.contains(skill.getDisplayName()) || line.contains("Alchemist Potion")) {
 					return Component.text("Alchemist", TextColor.fromHexString("#5FAA19")).decoration(TextDecoration.ITALIC, false);
 				}
 			}
-			for (Ability skill : clericSkills) {
+			for (AbilityInfo<?> skill : clericSkills) {
 				if (line.contains(skill.getDisplayName()) || line.contains("Rejuvination")) {
 					return Component.text("Cleric", TextColor.fromHexString("#FFC644")).decoration(TextDecoration.ITALIC, false);
 				}
 			}
-			for (Ability skill : mageSkills) {
+			for (AbilityInfo<?> skill : mageSkills) {
 				if (line.contains(skill.getDisplayName()) || line.contains("Channeling")) {
 					return Component.text("Mage", TextColor.fromHexString("#A31ECE")).decoration(TextDecoration.ITALIC, false);
 				}
 			}
-			for (Ability skill : rogueSkills) {
+			for (AbilityInfo<?> skill : rogueSkills) {
 				if (line.contains(skill.getDisplayName()) || line.contains("Dethroner")) {
 					return Component.text("Rogue", TextColor.fromHexString("#36393D")).decoration(TextDecoration.ITALIC, false);
 				}
 			}
-			for (Ability skill : scoutSkills) {
+			for (AbilityInfo<?> skill : scoutSkills) {
 				if (line.contains(skill.getDisplayName()) || line.contains("Versatile")) {
 					return Component.text("Scout", TextColor.fromHexString("#248AC8")).decoration(TextDecoration.ITALIC, false);
 				}
 			}
-			for (Ability skill : warlockSkills) {
+			for (AbilityInfo<?> skill : warlockSkills) {
 				if (line.contains(skill.getDisplayName()) || line.contains("Culling")) {
 					return Component.text("Warlock", TextColor.fromHexString("#C724B9")).decoration(TextDecoration.ITALIC, false);
 				}
 			}
-			for (Ability skill : warriorSkills) {
+			for (AbilityInfo<?> skill : warriorSkills) {
 				if (line.contains(skill.getDisplayName()) || line.contains("Formidable")) {
 					return Component.text("Warrior", TextColor.fromHexString("#DE2446")).decoration(TextDecoration.ITALIC, false);
 				}

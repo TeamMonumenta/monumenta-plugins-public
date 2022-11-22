@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.rogue;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -47,48 +48,44 @@ public class EscapeDeath extends Ability {
 	public static final String CHARM_COOLDOWN = "Escape Death Cooldown";
 	public static final String CHARM_STUN_DURATION = "Escape Death Stun Duration";
 
-	public EscapeDeath(Plugin plugin, @Nullable Player player) {
-		super(plugin, player, "Escape Death");
-		mInfo.mLinkedSpell = ClassAbility.ESCAPE_DEATH;
-		mInfo.mScoreboardId = "EscapeDeath";
-		mInfo.mShorthandName = "ED";
-		mInfo.mIgnoreCooldown = true;
-		mInfo.mDescriptions.add(
-			String.format("When taking damage from a mob leaves you below %s hearts, throw a paralyzing grenade that stuns all enemies within %s blocks for %s seconds. Cooldown: %ss.",
-				(int)TRIGGER_THRESHOLD_HEALTH / 2,
-				RANGE,
-				STUN_DURATION / 20,
-				COOLDOWN / 20));
-		mInfo.mDescriptions.add(
-			String.format("When this skill is triggered, also gain %s Absorption hearts for %s seconds, %s%% Speed, and Jump Boost %s. If damage taken would kill you but could have been prevented by this skill it will instead do so.",
-				ABSORPTION_HEALTH / 2,
-				BUFF_DURATION / 20,
-				(int)(SPEED_PERCENT * 100),
-				StringUtils.toRoman(JUMP_BOOST_AMPLIFIER + 1)));
-		mInfo.mDescriptions.add(
-			String.format("When this skill is triggered, gain a regenerating effect that heals you for %s%% hp every second for %ss. The effect is canceled if you take damage from an enemy.",
-				(int)(ENHANCEMENT_HEAL_PERCENT * 100),
-				ENHANCEMENT_DURATION / 20));
-		mInfo.mCooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, COOLDOWN);
-		mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
-	}
+	public static final AbilityInfo<EscapeDeath> INFO =
+		new AbilityInfo<>(EscapeDeath.class, "Escape Death", EscapeDeath::new)
+			.linkedSpell(ClassAbility.ESCAPE_DEATH)
+			.scoreboardId("EscapeDeath")
+			.shorthandName("ED")
+			.descriptions(
+				String.format("When taking damage from a mob leaves you below %s hearts, throw a paralyzing grenade that stuns all enemies within %s blocks for %s seconds. Cooldown: %ss.",
+					(int) TRIGGER_THRESHOLD_HEALTH / 2,
+					RANGE,
+					STUN_DURATION / 20,
+					COOLDOWN / 20),
+				String.format("When this skill is triggered, also gain %s Absorption hearts for %s seconds, %s%% Speed, and Jump Boost %s. If damage taken would kill you but could have been prevented by this skill it will instead do so.",
+					ABSORPTION_HEALTH / 2,
+					BUFF_DURATION / 20,
+					(int) (SPEED_PERCENT * 100),
+					StringUtils.toRoman(JUMP_BOOST_AMPLIFIER + 1)),
+				String.format("When this skill is triggered, gain a regenerating effect that heals you for %s%% hp every second for %ss. The effect is canceled if you take damage from an enemy.",
+					(int) (ENHANCEMENT_HEAL_PERCENT * 100),
+					ENHANCEMENT_DURATION / 20))
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.displayItem(new ItemStack(Material.DRAGON_BREATH, 1))
+			.priorityAmount(10000);
 
-	@Override
-	public double getPriorityAmount() {
-		return 10000;
+	public EscapeDeath(Plugin plugin, Player player) {
+		super(plugin, player, INFO);
 	}
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (mPlugin.mEffectManager.hasEffect(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN)
-			&& !event.isBlocked()
-			&& event.getSource() != null
-			&& EntityUtils.isHostileMob(event.getSource())) {
+			    && !event.isBlocked()
+			    && event.getSource() != null
+			    && EntityUtils.isHostileMob(event.getSource())) {
 			mPlugin.mEffectManager.clearEffects(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN);
 		}
 
 		double absorptionHealth = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, ABSORPTION_HEALTH);
-		if (!event.isBlocked() && !isTimerActive()) {
+		if (!event.isBlocked() && !isOnCooldown()) {
 			double newHealth = mPlayer.getHealth() - event.getFinalDamage(true);
 			boolean dealDamageLater = newHealth < 0 && newHealth > -absorptionHealth && isLevelTwo();
 			if (newHealth <= TRIGGER_THRESHOLD_HEALTH && (newHealth > 0 || dealDamageLater)) {

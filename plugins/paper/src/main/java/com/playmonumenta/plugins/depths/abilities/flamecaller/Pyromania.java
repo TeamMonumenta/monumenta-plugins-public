@@ -4,12 +4,15 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class Pyromania extends DepthsAbility {
 
@@ -18,10 +21,13 @@ public class Pyromania extends DepthsAbility {
 	public static final int RADIUS = 6;
 	public static final int TWISTED_RADIUS = 8;
 
+	public static final DepthsAbilityInfo<Pyromania> INFO =
+		new DepthsAbilityInfo<>(Pyromania.class, ABILITY_NAME, Pyromania::new, DepthsTree.FLAMECALLER, DepthsTrigger.PASSIVE)
+			.displayItem(new ItemStack(Material.CAMPFIRE))
+			.descriptions(Pyromania::getDescription, MAX_RARITY);
+
 	public Pyromania(Plugin plugin, Player player) {
-		super(plugin, player, ABILITY_NAME);
-		mDisplayMaterial = Material.CAMPFIRE;
-		mTree = DepthsTree.FLAMECALLER;
+		super(plugin, player, INFO);
 	}
 
 	@Override
@@ -40,18 +46,12 @@ public class Pyromania extends DepthsAbility {
 		return false;
 	}
 
-	@Override
-	public String getDescription(int rarity) {
+	private static String getDescription(int rarity) {
 		if (rarity == 6) {
 			return "For every mob on fire within " + DepthsUtils.getRarityColor(rarity) + TWISTED_RADIUS + ChatColor.WHITE + " blocks of you, gain " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " increased damage.";
 		} else {
 			return "For every mob on fire within " + RADIUS + " blocks of you, gain " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " increased damage.";
 		}
-	}
-
-	@Override
-	public DepthsTree getDepthsTree() {
-		return DepthsTree.FLAMECALLER;
 	}
 }
 
