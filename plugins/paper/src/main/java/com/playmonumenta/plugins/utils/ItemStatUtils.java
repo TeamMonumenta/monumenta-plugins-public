@@ -2347,12 +2347,12 @@ public class ItemStatUtils {
 
 				if (slot == Slot.MAINHAND) {
 					boolean needsAttackSpeed = false;
-					int atksIndex = 0;
+					int attackSpeedIndex = 0;
 					for (String name : AttributeType.getMainhandAttributeNames()) {
 						for (NBTListCompound attribute : mainhandAttributes) {
 							if (name.equals(attribute.getString(ATTRIBUTE_NAME_KEY)) && name.equals("Attack Damage Add")) {
 								needsAttackSpeed = true;
-								atksIndex = lore.size() + 1;
+								attackSpeedIndex = lore.size() + 1;
 							}
 							if (name.equals(attribute.getString(ATTRIBUTE_NAME_KEY)) && !lore.contains(AttributeType.getDisplay(name, attribute.getDouble(AMOUNT_KEY), Slot.getSlot(attribute.getString(Slot.KEY)), Operation.getOperation(attribute.getString(Operation.KEY))))) {
 								lore.add(AttributeType.getDisplay(name, attribute.getDouble(AMOUNT_KEY), Slot.getSlot(attribute.getString(Slot.KEY)), Operation.getOperation(attribute.getString(Operation.KEY))));
@@ -2363,7 +2363,7 @@ public class ItemStatUtils {
 						}
 					}
 					if (needsAttackSpeed) {
-						lore.add(atksIndex, AttributeType.getDisplay("Attack Speed", 0, Slot.MAINHAND, Operation.ADD));
+						lore.add(attackSpeedIndex, AttributeType.getDisplay("Attack Speed", 0, Slot.MAINHAND, Operation.ADD));
 					}
 				}
 

@@ -69,8 +69,7 @@ public class ChestSortIntegration implements Listener {
 		if (!isPresent()) {
 			return;
 		}
-		if (event.getWhoClicked() instanceof Player) {
-			Player player = (Player) event.getWhoClicked();
+		if (event.getWhoClicked() instanceof Player player) {
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 			Inventory inventory = event.getClickedInventory();
 			if (inventory == null) {
@@ -82,13 +81,12 @@ public class ChestSortIntegration implements Listener {
 				return;
 			}
 
-			if (event.getClick() != null
-				&& event.getClick().equals(ClickType.RIGHT)
+			if (event.getClick().equals(ClickType.RIGHT)
 				&& inventory.getItem(event.getSlot()) == null
 				&& event.getAction().equals(InventoryAction.NOTHING)
 				&& event.getSlotType() != InventoryType.SlotType.CRAFTING) {
 
-				// Player right clicked a non-crafting empty space and nothing happened
+				// Player right-clicked a non-crafting empty space and nothing happened
 				// Check if the last thing the player did was also the same thing.
 				// If so, sort the chest
 				if (mClicked.contains(player.getUniqueId())) {
@@ -99,7 +97,7 @@ public class ChestSortIntegration implements Listener {
 					// Just in case we sorted an item on top of where the player was clicking
 					event.setCancelled(true);
 				} else {
-					// Mark the player as having right clicked an empty slot
+					// Mark the player as having right-clicked an empty slot
 					mClicked.add(player.getUniqueId());
 				}
 			} else {
@@ -127,7 +125,7 @@ public class ChestSortIntegration implements Listener {
 		}
 
 		InventoryHolder holder = event.getInventory().getHolder();
-		if (holder != null && holder instanceof Player) {
+		if (holder instanceof Player) {
 			mClicked.remove(((Player) holder).getUniqueId());
 		}
 	}
@@ -158,7 +156,15 @@ public class ChestSortIntegration implements Listener {
 			if (region != null) {
 				int ordinal = region.ordinal();
 				String name = region.toString();
-				strRegion = Integer.toString(ordinal) + "_" + name;
+				strRegion = ordinal + "_" + name;
+			}
+
+			String strLocation = "~location~"; // Missing values start with ~ and wind up at the end
+			ItemStatUtils.Location location = ItemStatUtils.getLocation(item);
+			if (location != null) {
+				int ordinal = location.ordinal();
+				String name = location.toString();
+				strLocation = String.format("%03d_%s", ordinal, name);
 			}
 
 			String strTier = "~tier~";
@@ -190,6 +196,7 @@ public class ChestSortIntegration implements Listener {
 
 			sortMap.put("{count}", strCount);
 			sortMap.put("{region}", strRegion);
+			sortMap.put("{location}", strLocation);
 			sortMap.put("{tier}", strTier);
 			sortMap.put("{quest}", strQuest);
 			sortMap.put("{bookTitle}", strBookTitle);
