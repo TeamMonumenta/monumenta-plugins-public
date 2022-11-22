@@ -39,7 +39,7 @@ public class RejuvenationBoss extends BossAbilityGroup {
 		public boolean OVERHEAL = true;
 
 		@BossParam(help = "Targets of this spell")
-		public EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET;
+		public EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET.clone().setOptional(false);
 
 
 		public ParticlesList PARTICLE_CHARGE_AIR = ParticlesList.fromString("[(SPELL_INSTANT,3)]");
