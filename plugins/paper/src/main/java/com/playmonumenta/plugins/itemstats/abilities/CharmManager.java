@@ -971,7 +971,7 @@ public class CharmManager {
 		mPlayerCharmEffectMap.put(p.getUniqueId(), allEffects);
 
 		//Refresh class of player
-		AbilityManager.getManager().updatePlayerAbilities(p, false);
+		AbilityManager.getManager().updatePlayerAbilities(p, true);
 	}
 
 	//Helper method to parse item for charm effects
