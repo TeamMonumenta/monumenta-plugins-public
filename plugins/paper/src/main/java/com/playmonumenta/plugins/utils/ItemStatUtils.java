@@ -342,6 +342,7 @@ public class ItemStatUtils {
 		SOULTHREAD("soul", Component.text("Soulwoven", TextColor.fromHexString("#7FFFD4")).decoration(TextDecoration.ITALIC, false)),
 		SCIENCE("science", Component.text("P.O.R.T.A.L.", TextColor.fromHexString("#DCE8E3")).decoration(TextDecoration.ITALIC, false)),
 		BLUESTRIKE("bluestrike", Component.text("Masquerader’s Ruin", TextColor.fromHexString("#326DA8")).decoration(TextDecoration.ITALIC, false)),
+		GODSPORE("godspore", Component.text("The Godspore's Domain", TextColor.fromHexString("#426B29")).decoration(TextDecoration.ITALIC, false)),
 		GALLERYOFFEAR("gallerybase", Component.text("Gallery of Fear", TextColor.fromHexString("#39B14E")).decoration(TextDecoration.ITALIC, false)),
 		GOFMAPONE("gallery1", Component.text("Sanguine Halls", TextColor.fromHexString("#AB0000")).decoration(TextDecoration.ITALIC, false)),
 		FALLENSTAR("fallenstar", Component.text("Shadow of a Fallen Star", TextColor.fromHexString("#00C0A3")).decoration(TextDecoration.ITALIC, false)),
