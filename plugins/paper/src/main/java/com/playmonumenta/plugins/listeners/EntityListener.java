@@ -83,6 +83,7 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -188,6 +189,8 @@ public class EntityListener implements Listener {
 	public static final String INVISIBLE_ITEM_FRAME_NAME = "Invisible Item Frame";
 	public static final String BEES_BLOCK_HIVE_ENTER_EVENT = "BeeNoHive";
 	private static final NamespacedKey INVISIBLE_ITEM_FRAME_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/invisible_item_frame");
+
+	private static final String FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY = "MonumentaFallingBlockAdventureMode";
 
 	Plugin mPlugin;
 	AbilityManager mAbilities;
@@ -945,6 +948,17 @@ public class EntityListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
+
+		// Prevent falling blocks forming into real blocks inside adventure mode areas if they come from outside
+		// Note that this event is also called when the block starts to fall, thus a missing metadata on the block is assumed to be that start event and thus allowed
+		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneProperty.ADVENTURE_MODE)
+			    && event.getEntity() instanceof FallingBlock fallingBlock
+			    && !MetadataUtils.getMetadata(fallingBlock, FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, true)) {
+			fallingBlock.getWorld().dropItemNaturally(fallingBlock.getLocation(), new ItemStack(fallingBlock.getBlockData().getMaterial()));
+			fallingBlock.remove();
+			event.setCancelled(true);
+			return;
+		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -1056,6 +1070,8 @@ public class EntityListener implements Listener {
 		} else if (event.getEntity().getScoreboardTags().contains("REMOVE_ON_UNLOAD") && event.getEntity().getTicksLived() > 20) {
 			// This is a jank fix to make sure entities that is supposed to be removed on unload, if it gets loaded (and isn't spawned this tick), remove it.
 			event.getEntity().remove();
+		} else if (event.getEntity() instanceof FallingBlock fallingBlock) {
+			fallingBlock.setMetadata(FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, new FixedMetadataValue(mPlugin, ZoneUtils.hasZoneProperty(fallingBlock.getLocation(), ZoneProperty.ADVENTURE_MODE)));
 		}
 	}
 
