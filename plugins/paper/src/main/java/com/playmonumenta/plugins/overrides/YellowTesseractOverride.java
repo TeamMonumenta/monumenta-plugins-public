@@ -135,7 +135,9 @@ public class YellowTesseractOverride extends BaseOverride {
 				}
 				// If the CD hasn't hit 0, tell the player and exit.
 				if (cd != 0) {
-					player.sendMessage(Component.text("The Tesseract is on cooldown!", NamedTextColor.RED));
+					player.sendMessage(Component.text("The Tesseract is still on cooldown! You have ", NamedTextColor.RED)
+						                   .append(Component.text(cd, NamedTextColor.RED).decorate(TextDecoration.BOLD))
+						                   .append(Component.text(" minute" + (cd == 1 ? "" : "s") + " remaining until you can use it again.", NamedTextColor.RED)));
 					return false;
 				}
 				// If there's a mob in range and the player isn't in a safezone,
