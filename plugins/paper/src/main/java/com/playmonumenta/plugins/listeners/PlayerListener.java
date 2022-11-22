@@ -558,11 +558,13 @@ public class PlayerListener implements Listener {
 			event.setCancelled(true);
 		}
 
-		// If right clicking charm, open GUI
-		if (event.getClick() == ClickType.RIGHT && ItemStatUtils.isCharm(item)) {
-			if (item.getAmount() == 1) {
-				new CharmsGUI(player).openInventory(player, mPlugin);
-			}
+		// If right-clicking charm, open GUI
+		if (event.getClick() == ClickType.RIGHT
+			    && item != null
+			    && ItemStatUtils.isCharm(item)
+			    && item.getAmount() == 1
+			    && ItemUtils.isNullOrAir(event.getCursor())) {
+			new CharmsGUI(player).openInventory(player, mPlugin);
 		}
 	}
 
