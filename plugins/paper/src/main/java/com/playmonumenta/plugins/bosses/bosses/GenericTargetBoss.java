@@ -19,7 +19,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_generictarget";
 
 	public static class Parameters extends BossParameters {
-		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.clone().setOptional(false);
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
