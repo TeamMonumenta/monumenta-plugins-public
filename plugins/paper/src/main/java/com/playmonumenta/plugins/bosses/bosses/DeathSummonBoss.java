@@ -58,6 +58,7 @@ public class DeathSummonBoss extends BossAbilityGroup {
 		for (int i = 0; i < mParam.MOB_COUNT; i++) {
 			Entity entity = mParam.POOL.spawn(mBoss.getLocation());
 			if (entity instanceof LivingEntity livingEntity) {
+				livingEntity.teleport(mBoss.getLocation()); //to fix Yaw and Pitch location
 				livingEntity.setAI(false);
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 					livingEntity.setAI(true);
