@@ -292,6 +292,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(BlueStrikeTargetNPCBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeTargetNPCBoss(p, e));
 		mStatelessBosses.put(BlueStrikeTurretBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeTurretBoss(p, e));
 		mStatelessBosses.put(LavaCannonBoss.identityTag, (Plugin p, LivingEntity e) -> new LavaCannonBoss(p, e));
+		mStatelessBosses.put(SoundBoss.identityTag, (Plugin p, LivingEntity e) -> new SoundBoss(p, e));
 
 		mStatelessBosses.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> new LichMageBoss(p, e));
 		mStatelessBosses.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> new LichRogueBoss(p, e));
@@ -547,6 +548,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(BlueStrikeTargetNPCBoss.identityTag, (Plugin p, LivingEntity e) -> BlueStrikeTargetNPCBoss.deserialize(p, e));
 		mBossDeserializers.put(BlueStrikeTurretBoss.identityTag, (Plugin p, LivingEntity e) -> BlueStrikeTurretBoss.deserialize(p, e));
 		mBossDeserializers.put(LavaCannonBoss.identityTag, (Plugin p, LivingEntity e) -> LavaCannonBoss.deserialize(p, e));
+		mBossDeserializers.put(SoundBoss.identityTag, (Plugin p, LivingEntity e) -> SoundBoss.deserialize(p, e));
 
 		mBossDeserializers.put(Lich.identityTag, (Plugin p, LivingEntity e) -> Lich.deserialize(p, e));
 		mBossDeserializers.put(LichAlchBoss.identityTag, (Plugin p, LivingEntity e) -> LichAlchBoss.deserialize(p, e));

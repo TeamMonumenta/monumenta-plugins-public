@@ -111,6 +111,10 @@ public class SoundsList {
 		}
 	}
 
+	public boolean isEmpty() {
+		return mSoundsList.isEmpty();
+	}
+
 	@Override
 	public String toString() {
 		String msg = "[";
