@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellMobEffect;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -22,10 +21,10 @@ public class FireResistantBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		// Immediately apply the effect, don't wait
-		Spell fireresist = new SpellMobEffect(boss, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 600, 0, false, false));
+		Spell fireresist = new SpellMobEffect(boss, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20, 0, false, false));
 		fireresist.run();
 
-		List<Spell> passiveSpells = Arrays.asList(fireresist);
+		List<Spell> passiveSpells = List.of(fireresist);
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
