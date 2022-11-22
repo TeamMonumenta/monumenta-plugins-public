@@ -35,13 +35,13 @@ import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 /**
  * Listens to ScriptedQuest's TradeWindowOpenEvent to dynamically change shown trades.
  * <ul>
  *     <li>Adds new trades for "re-skin" trades that match existing items in a player's inventory to allow re-skinning of items with infusions and other modifiers.
+ *     <li>Adds a reduced version of the above for other trades that only keeps infusions whose price is constant (delve infusions, Locked, Hope, etc.)
  *     <li>Add new trades for modified shulker box, leather armor, and shield (dyed, different banner pattern) (except for Arena or Terth trades)
  * </ul>
  * Also prevents doing trades with filled shulker boxes to prevent deleting their contents
@@ -52,6 +52,19 @@ public class TradeListener implements Listener {
 	private static final ImmutableSet<ImmutableSet<String>> SKIP_STAT_CHECK_TRADES = ImmutableSet.of(
 		ImmutableSet.of("King's Warden", "Queen's Warden", "Kaul's Warden"),
 		ImmutableSet.of("Frost Giant's Greatsword", "Frost Giant's Crusher", "Frost Giant's Staff", "Frost Giant's Crescent"));
+
+	// Infusions whose cost depends on item tier and/or region. These can only be moved in re-skin trades.
+	private static final ItemStatUtils.InfusionType[] VARYING_COST_INFUSIONS = {
+		ItemStatUtils.InfusionType.ACUMEN,
+		ItemStatUtils.InfusionType.FOCUS,
+		ItemStatUtils.InfusionType.PERSPICACITY,
+		ItemStatUtils.InfusionType.TENACITY,
+		ItemStatUtils.InfusionType.VIGOR,
+		ItemStatUtils.InfusionType.VITALITY,
+
+		// not quite a "varying cost infusion", but still prevent this from being moved to other items unless it's a re-skin trade
+		ItemStatUtils.InfusionType.SOULBOUND
+	};
 
 	// Items for which to completely disable reskin/dye trades
 	private static final ImmutableSet<String> DISABLED_ITEMS = ImmutableSet.of("Soulsinger");
@@ -84,6 +97,7 @@ public class TradeListener implements Listener {
 			// - same enchantments (both vanilla and custom)
 			// - same attributes (both vanilla and custom)
 			// some items, like Kaul's Warden, skip some of these checks, while others, like Soulsinger, have any reskins disabled
+			// if it's not a re-skin trade, continue on, but only consider player items that have no infusions whose cost is region or tier-dependent
 			ItemStack source = recipe.getIngredients().get(slot);
 			ItemStack result = recipe.getResult();
 			if (source.getAmount() != 1 || result.getAmount() != 1) {
@@ -93,19 +107,22 @@ public class TradeListener implements Listener {
 				    || DISABLED_ITEMS.contains(ItemUtils.getPlainNameIfExists(result))) {
 				continue;
 			}
+			// only consider trades with "Monumenta items" - these should all have a region
 			if (ItemStatUtils.getRegion(source) == ItemStatUtils.Region.NONE
-				    || ItemStatUtils.getRegion(source) != ItemStatUtils.getRegion(result)
-				    || InfusionUtils.getCostMultiplier(source) <= 0
-				    || InfusionUtils.getCostMultiplier(source) != InfusionUtils.getCostMultiplier(result)
-				    || !haveSameStats(source, result)) {
-				continue;
+				    || ItemStatUtils.getRegion(result) == ItemStatUtils.Region.NONE) {
+				return;
 			}
+			boolean carryOverVaryingCostInfusions = ItemStatUtils.getRegion(source) == ItemStatUtils.getRegion(result)
+				                                        && InfusionUtils.getCostMultiplier(source) > 0
+				                                        && InfusionUtils.getCostMultiplier(source) == InfusionUtils.getCostMultiplier(result)
+				                                        && haveSameStats(source, result);
 
 			// Items for which we made trades already (for the current original trade).
 			// Used to not create duplicate trades if the player for some reason has multiple identical items.
 			List<ItemStack> createdTrades = new ArrayList<>();
 
 			// Current trade is a re-skin trade, check if the player has matching source items and add new trades if so
+			playerItemLoop:
 			for (ItemStack playerItem : player.getInventory().getContents()) {
 				// Skip over empty slots, and skip over items that already match an existing trade exactly
 				if (playerItem == null
@@ -120,6 +137,14 @@ public class TradeListener implements Listener {
 				if (!(source.getType() == playerItem.getType() || (ItemUtils.isShulkerBox(source.getType()) && ItemUtils.isShulkerBox(playerItem.getType())))
 					    || !Objects.equals(ItemUtils.getPlainNameIfExists(source), ItemUtils.getPlainNameIfExists(playerItem))) {
 					continue;
+				}
+				// if not a re-skin trade, do not allow moving varying cost infusions
+				if (!carryOverVaryingCostInfusions) {
+					for (ItemStatUtils.InfusionType varyingCostInfusion : VARYING_COST_INFUSIONS) {
+						if (ItemStatUtils.getInfusionLevel(playerItem, varyingCostInfusion) > 0) {
+							continue playerItemLoop;
+						}
+					}
 				}
 
 				// Shulkers with contents are janky - the trades work, but the trades without contents work on them as well, clearing any content.
@@ -145,10 +170,10 @@ public class TradeListener implements Listener {
 
 				ItemStatUtils.generateItemStats(newResult);
 
-				// Carry over the durability to not make the trade repair items (a possible shattered state is copied via lore)
+				// Carry over the durability to not make the trade repair items (a possible shattered state is copied via playerModified tag)
 				if (newResult.getItemMeta() instanceof Damageable newResultMeta && playerItem.getItemMeta() instanceof Damageable playerItemMeta) {
 					newResultMeta.setDamage(playerItemMeta.getDamage());
-					newResult.setItemMeta((ItemMeta) newResultMeta);
+					newResult.setItemMeta(newResultMeta);
 				}
 
 				// Carry over the current arrow of a crossbow if the player item has an arrow but the result item doesn't have one
