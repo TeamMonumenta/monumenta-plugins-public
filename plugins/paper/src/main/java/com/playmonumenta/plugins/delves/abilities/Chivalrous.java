@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.delves.abilities;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.EnumSet;
@@ -65,6 +66,7 @@ public class Chivalrous {
 				&& FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE[level - 1]) {
 			Entity mount = LibraryOfSoulsIntegration.summon(mob.getLocation(), MOUNTS[FastUtils.RANDOM.nextInt(MOUNTS.length)]);
 			if (mount != null) {
+				mount.addScoreboardTag(EntityListener.BEES_BLOCK_HIVE_ENTER_EVENT);
 				mount.addPassenger(mob);
 
 				if (mob instanceof Creeper creeper) {

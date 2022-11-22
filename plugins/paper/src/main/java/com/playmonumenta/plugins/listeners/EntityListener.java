@@ -65,6 +65,7 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityEnterBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
@@ -185,6 +186,7 @@ public class EntityListener implements Listener {
 	public static final int MAX_ANIMALS_IN_PLAYER_PLOT = 80;
 
 	public static final String INVISIBLE_ITEM_FRAME_NAME = "Invisible Item Frame";
+	public static final String BEES_BLOCK_HIVE_ENTER_EVENT = "BeeNoHive";
 	private static final NamespacedKey INVISIBLE_ITEM_FRAME_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/invisible_item_frame");
 
 	Plugin mPlugin;
@@ -942,6 +944,14 @@ public class EntityListener implements Listener {
 		if (event.getEntity() instanceof Sheep && !ZoneUtils.isInPlot(event.getBlock().getLocation())) {
 			event.setCancelled(true);
 			return;
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void entityEnterBlockEvent(EntityEnterBlockEvent event) {
+		//for the moment this event is used only for bees but for future proofing check for only bees
+		if (event.getEntity() instanceof Bee bee && bee.getScoreboardTags().contains(BEES_BLOCK_HIVE_ENTER_EVENT)) {
+			event.setCancelled(true);
 		}
 	}
 
