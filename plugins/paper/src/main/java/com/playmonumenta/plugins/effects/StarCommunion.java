@@ -29,7 +29,7 @@ public class StarCommunion extends ZeroArgumentEffect {
 
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
-		if (entity instanceof Player player) {
+		if (entity instanceof Player player && event.getDamage() > 0) {
 			if (player.getHealth() / EntityUtils.getMaxHealth(player) >= HEALTH_THRESHOLD) {
 				Plugin plugin = Plugin.getInstance();
 				EntityUtils.applySlow(plugin, ON_HIT_DURATION, SLOW_AMOUNT, enemy);
