@@ -47,8 +47,7 @@ public class CholericFlames extends Ability {
 	public static final String CHARM_DAMAGE = "Choleric Flames Damage";
 	public static final String CHARM_RANGE = "Choleric Flames Range";
 	public static final String CHARM_COOLDOWN = "Choleric Flames Cooldown";
-	public static final String CHARM_FIRE = "Choleric Flames Fire Duration";
-	public static final String CHARM_HUNGER = "Choleric Flames Hunger Duration";
+	public static final String CHARM_DURATION = "Choleric Flames Duration";
 	public static final String CHARM_KNOCKBACK = "Choleric Flames Knockback";
 	public static final String CHARM_INFERNO_CAP = "Choleric Flames Inferno Cap";
 	public static final String CHARM_ENHANCEMENT_RADIUS = "Choleric Flames Enhancement Radius";
@@ -106,10 +105,11 @@ public class CholericFlames extends Ability {
 				}
 				mPlugin.mEffectManager.addEffect(mob, SPREAD_EFFECT_ON_DEATH_EFFECT, new SpreadEffectOnDeath(SPREAD_EFFECT_DURATION, Inferno.INFERNO_EFFECT_NAME, spreadRadius, SPREAD_EFFECT_DURATION_APPLIED, false));
 			}
-			EntityUtils.applyFire(mPlugin, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_FIRE), mob, mPlayer, playerItemStats);
 
+			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+			EntityUtils.applyFire(mPlugin, duration, mob, mPlayer, playerItemStats);
 			if (isLevelTwo()) {
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_HUNGER), 0, false, true));
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true));
 			}
 		}
 
