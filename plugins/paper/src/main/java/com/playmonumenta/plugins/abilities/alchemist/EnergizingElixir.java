@@ -98,8 +98,8 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		if (isEnhanced()) {
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME)) {
 				mStacks = Math.min(mMaxStacks, mStacks + 1);
-				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME, new EnergizingElixirStacks(DURATION,
-					mStacks));
+				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME,
+					new EnergizingElixirStacks(DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mStacks));
 			}
 		}
 
@@ -132,7 +132,8 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		if (mStacks > 0 && !mPlugin.mEffectManager.hasEffect(mPlayer, EnergizingElixirStacks.class)) {
 			mStacks--;
 			if (mStacks > 0) {
-				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME, new EnergizingElixirStacks(DURATION, mStacks));
+				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME,
+					new EnergizingElixirStacks(DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mStacks));
 			}
 			applyEffects();
 			ClientModHandler.updateAbility(mPlayer, this);
