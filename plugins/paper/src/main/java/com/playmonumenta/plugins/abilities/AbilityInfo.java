@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.ArrayList;
@@ -243,36 +244,39 @@ public class AbilityInfo<T extends Ability> {
 		return mDescriptions.get(level - 1);
 	}
 
-	public Component getFormattedDescription(int skillLevel) throws IndexOutOfBoundsException {
+	public Component getFormattedDescription(int skillLevel, boolean enabled) throws IndexOutOfBoundsException {
 		String strDescription = mDescriptions.get(skillLevel - 1);
 		if (strDescription == null) {
 			strDescription = "NULL! Set description properly!";
 		}
 
+		boolean coloured = enabled;
+
 		String skillHeader;
 		if (skillLevel <= 2) {
 			skillHeader = "[" + mDisplayName.toUpperCase() + " Level " + skillLevel + "] : ";
 		} else {
-			skillHeader = "[" + mDisplayName.toUpperCase() + " Enhancement] : ";
+			coloured &= ServerProperties.getAbilityEnhancementsEnabled();
+			skillHeader = "[" + mDisplayName.toUpperCase() + " Enhancement] " + (enabled && !ServerProperties.getAbilityEnhancementsEnabled() ? "(disabled in this region) " : "") + ": ";
 		}
 
 		return Component.text("")
-			.append(Component.text(skillHeader, NamedTextColor.GREEN, TextDecoration.BOLD))
-			.append(Component.text(strDescription, NamedTextColor.YELLOW));
+			       .append(Component.text(skillHeader, coloured ? NamedTextColor.GREEN : NamedTextColor.GRAY, TextDecoration.BOLD))
+			       .append(Component.text(strDescription, coloured ? NamedTextColor.YELLOW : NamedTextColor.GRAY));
 	}
 
-	public Component getFormattedDescriptions(int level, boolean isEnhanced) {
+	public Component getFormattedDescriptions(int level, boolean isEnhanced, boolean enabled) {
 		if (mDescriptions.size() == 0) {
 			return Component.text("No descriptions found for " + mDisplayName + "!", NamedTextColor.RED);
 		}
 
 		Component component = Component.text("");
-		component = component.append(getFormattedDescription(1));
+		component = component.append(getFormattedDescription(1, enabled));
 		if (level > 1) {
-			component = component.append(Component.newline()).append(getFormattedDescription(2));
+			component = component.append(Component.newline()).append(getFormattedDescription(2, enabled));
 		}
 		if (isEnhanced) {
-			component = component.append(Component.newline()).append(getFormattedDescription(3));
+			component = component.append(Component.newline()).append(getFormattedDescription(3, enabled));
 		}
 		return component;
 	}
@@ -280,7 +284,7 @@ public class AbilityInfo<T extends Ability> {
 	/*
 	 * Returns null if a hover message could not be created
 	 */
-	public @Nullable Component getLevelHover(int skillLevel, boolean useShorthand) {
+	public @Nullable Component getLevelHover(int skillLevel, boolean useShorthand, boolean enabled) {
 		int level = skillLevel;
 		boolean isEnhanced = false;
 		if (skillLevel > 2) {
@@ -304,11 +308,11 @@ public class AbilityInfo<T extends Ability> {
 			hoverableString += "*";
 		}
 		return Component.text(hoverableString, NamedTextColor.YELLOW)
-			.hoverEvent(getFormattedDescriptions(level, isEnhanced));
+			       .hoverEvent(getFormattedDescriptions(level, isEnhanced, enabled));
 	}
 
 	public void sendDescriptions(CommandSender sender) {
-		sender.sendMessage(getFormattedDescriptions(2, false));
+		sender.sendMessage(getFormattedDescriptions(2, false, true));
 	}
 
 	public JsonObject toJson() {

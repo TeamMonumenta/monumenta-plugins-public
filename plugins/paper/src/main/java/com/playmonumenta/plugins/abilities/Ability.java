@@ -305,7 +305,7 @@ public abstract class Ability {
 	}
 
 	public @Nullable Component getLevelHover(boolean useShorthand) {
-		return mInfo.getLevelHover(getAbilityScore(), useShorthand);
+		return mInfo.getLevelHover(getAbilityScore(), useShorthand, true);
 	}
 
 	@Override
