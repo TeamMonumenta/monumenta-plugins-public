@@ -63,7 +63,7 @@ public class PhlegmaticResolve extends Ability {
 	public PhlegmaticResolve(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mPercentDamageResist = (isLevelOne() ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2) - CharmManager.getLevelPercentDecimal(player, CHARM_RESIST);
-		mKBR = (CharmManager.getLevelPercentDecimal(player, CHARM_KBR) + PERCENT_KNOCKBACK_RESIST);
+		mKBR = CharmManager.getLevel(player, CHARM_KBR) / 10 + PERCENT_KNOCKBACK_RESIST;
 	}
 
 	@Override
