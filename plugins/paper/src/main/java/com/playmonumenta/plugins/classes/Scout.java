@@ -68,7 +68,7 @@ public class Scout extends PlayerClass {
 
 			PredatorStrike.INFO,
 
-			Quickdraw.INFO,
+			Quickdraw.INFO, // after eagle eye
 			TacticalManeuver.INFO,
 			WhirlingBlade.INFO // after wind bomb
 		);

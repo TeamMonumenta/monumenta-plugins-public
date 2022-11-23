@@ -49,7 +49,8 @@ public class AbilityTriggersGui extends Gui {
 			setItem(4, createBasicItem(Material.OAK_SIGN, "Help", NamedTextColor.WHITE, false,
 				"Click on a trigger to change it.\n" +
 					"Triggers are shown in the order they are handled. Whenever a key is pressed, the top-left trigger is checked first if it matches. " +
-					"If not, the next trigger is checked, and so forth until a trigger matches and casts its ability.", ChatColor.GRAY));
+					"If not, the next trigger is checked, and so forth until a trigger matches and casts its ability.\n" +
+					"Eagle Eye is an exception: it allows other abilities to trigger after it.", ChatColor.GRAY));
 
 			// trigger icons
 			int i = 0;

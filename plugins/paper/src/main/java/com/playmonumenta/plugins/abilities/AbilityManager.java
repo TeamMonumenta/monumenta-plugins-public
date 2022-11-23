@@ -885,7 +885,9 @@ public class AbilityManager {
 			for (AbilityTriggerInfo<?> triggerInfo : ability.mCustomTriggers) {
 				if (triggerInfo.check(player, key)) {
 					((Consumer<Ability>) triggerInfo.getAction()).accept(ability);
-					return true;
+					if (!(ability instanceof EagleEye)) { // hardcoded exception for eagle eye to keep triggering other abilities
+						return true;
+					}
 				}
 			}
 		}
