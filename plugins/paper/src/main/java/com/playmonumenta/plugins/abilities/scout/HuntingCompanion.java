@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -112,7 +111,6 @@ public class HuntingCompanion extends Ability {
 	private final int mBleedDuration;
 	private final double mBleedAmount;
 	private final double mHealingPercent;
-	private boolean mHasWindBomb;
 	private @Nullable BukkitRunnable mRunnable;
 
 	private final HuntingCompanionCS mCosmetic;
@@ -128,10 +126,6 @@ public class HuntingCompanion extends Ability {
 		mRunnable = null;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HuntingCompanionCS(), HuntingCompanionCS.SKIN_LIST);
-
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mHasWindBomb = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, WindBomb.class) != null;
-		});
 	}
 
 	public void cast() {
@@ -277,7 +271,7 @@ public class HuntingCompanion extends Ability {
 		}
 	}
 
-	// Relies on mobs from the LoS. These mobs must have the tags UNPUSHABLE, boss_ccimmune, and summon_ignore and must be invulnerable and have 0 attack damage.
+	// Relies on mobs from the LoS. These mobs must have the tags UNPUSHABLE, boss_ccimmune, boss_canceldamage, and summon_ignore and must be invulnerable
 	private void summon(String name, double damage, ItemStatManager.PlayerItemStats playerItemStats, boolean eagle) {
 		Location loc = mPlayer.getLocation();
 		Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
@@ -300,30 +294,31 @@ public class HuntingCompanion extends Ability {
 		summon.teleport(summon.getLocation().setDirection(facingDirection));
 
 		List<UUID> stunnedMobs = new ArrayList<>();
-		try {
-			NmsUtils.getVersionAdapter().setHuntingCompanion(summon, target -> {
-				DamageUtils.damage(mPlayer, target, new DamageEvent.Metadata(DamageType.MELEE_SKILL, ClassAbility.HUNTING_COMPANION, playerItemStats), damage, true, true, false);
+		if (damage > 0) {
+			try {
+				NmsUtils.getVersionAdapter().setHuntingCompanion(summon, target -> {
+					DamageUtils.damage(mPlayer, target, new DamageEvent.Metadata(DamageType.MELEE_SKILL, ClassAbility.HUNTING_COMPANION, playerItemStats), damage, true, true, false);
 
-				if (!eagle) {
-					UUID uuid = target.getUniqueId();
-					if (!stunnedMobs.contains(uuid)) {
-						EntityUtils.applyStun(mPlugin, mStunDuration, target);
-						stunnedMobs.add(uuid);
+					if (!eagle) {
+						UUID uuid = target.getUniqueId();
+						if (!stunnedMobs.contains(uuid)) {
+							EntityUtils.applyStun(mPlugin, mStunDuration, target);
+							stunnedMobs.add(uuid);
+						}
 					}
-				}
 
-				if (eagle) {
-					EntityUtils.applyBleed(mPlugin, mBleedDuration, mBleedAmount, target);
-				}
+					if (eagle) {
+						EntityUtils.applyBleed(mPlugin, mBleedDuration, mBleedAmount, target);
+					}
 
-				mPlugin.mEffectManager.addEffect(target, HEAL_EFFECT, new HealPlayerOnDeath(60 * 20, EntityUtils.getMaxHealth(mPlayer) * mHealingPercent, mPlayer));
+					mPlugin.mEffectManager.addEffect(target, HEAL_EFFECT, new HealPlayerOnDeath(60 * 20, EntityUtils.getMaxHealth(mPlayer) * mHealingPercent, mPlayer));
 
-				mCosmetic.onAttack(summon.getWorld(), summon.getLocation(), summon);
-			}, 4);
-
-		} catch (Exception e) {
-			MMLog.warning("Catch an exception while creating " + name + ". Reason: " + e.getMessage());
-			e.printStackTrace();
+					mCosmetic.onAttack(summon.getWorld(), summon.getLocation(), summon);
+				}, 4);
+			} catch (Exception e) {
+				MMLog.warning("Catch an exception while creating " + name + ". Reason: " + e.getMessage());
+				e.printStackTrace();
+			}
 		}
 
 		if (summon instanceof Fox fox && LocationUtils.isInSnowyBiome(loc)) {
