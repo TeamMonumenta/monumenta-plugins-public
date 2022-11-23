@@ -275,7 +275,6 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(SpectralSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new SpectralSummonBoss(p, e));
 		mStatelessBosses.put(DreadfulSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new DreadfulSummonBoss(p, e));
 		mStatelessBosses.put(FriendlyBoss.identityTag, (Plugin p, LivingEntity e) -> new FriendlyBoss(p, e));
-		mStatelessBosses.put(ScoutVolleyBoss.identityTag, (Plugin p, LivingEntity e) -> new ScoutVolleyBoss(p, e));
 		mStatelessBosses.put(MageCosmicMoonbladeBoss.identityTag, (Plugin p, LivingEntity e) -> new MageCosmicMoonbladeBoss(p, e));
 		mStatelessBosses.put(WarriorShieldWallBoss.identityTag, (Plugin p, LivingEntity e) -> new WarriorShieldWallBoss(p, e));
 		mStatelessBosses.put(DodgeBoss.identityTag, (Plugin p, LivingEntity e) -> new DodgeBoss(p, e));
@@ -293,6 +292,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(BlueStrikeTurretBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeTurretBoss(p, e));
 		mStatelessBosses.put(LavaCannonBoss.identityTag, (Plugin p, LivingEntity e) -> new LavaCannonBoss(p, e));
 		mStatelessBosses.put(SoundBoss.identityTag, (Plugin p, LivingEntity e) -> new SoundBoss(p, e));
+		mStatelessBosses.put(RedstoneBoss.identityTag, (Plugin p, LivingEntity e) -> new RedstoneBoss(p, e));
 
 		mStatelessBosses.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> new LichMageBoss(p, e));
 		mStatelessBosses.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> new LichRogueBoss(p, e));
@@ -550,6 +550,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(BlueStrikeTurretBoss.identityTag, (Plugin p, LivingEntity e) -> BlueStrikeTurretBoss.deserialize(p, e));
 		mBossDeserializers.put(LavaCannonBoss.identityTag, (Plugin p, LivingEntity e) -> LavaCannonBoss.deserialize(p, e));
 		mBossDeserializers.put(SoundBoss.identityTag, (Plugin p, LivingEntity e) -> SoundBoss.deserialize(p, e));
+		mBossDeserializers.put(RedstoneBoss.identityTag, (Plugin p, LivingEntity e) -> RedstoneBoss.deserialize(p, e));
 
 		mBossDeserializers.put(Lich.identityTag, (Plugin p, LivingEntity e) -> Lich.deserialize(p, e));
 		mBossDeserializers.put(LichAlchBoss.identityTag, (Plugin p, LivingEntity e) -> LichAlchBoss.deserialize(p, e));
@@ -647,7 +648,6 @@ public class BossManager implements Listener {
 		mBossParameters.put(WarriorShieldWallBoss.identityTag, new WarriorShieldWallBoss.Parameters());
 		mBossParameters.put(WarlockAmpHexBoss.identityTag, new WarlockAmpHexBoss.Parameters());
 		mBossParameters.put(DodgeBoss.identityTag, new DodgeBoss.Parameters());
-		mBossParameters.put(GenericBoss.identityTag, new GenericBoss.Parameters());
 		mBossParameters.put(PotionThrowBoss.identityTag, new PotionThrowBoss.Parameters());
 		mBossParameters.put(GenericTargetBoss.identityTag, new GenericTargetBoss.Parameters());
 		mBossParameters.put(LimitedLifespanBoss.identityTag, new LimitedLifespanBoss.Parameters());
@@ -657,6 +657,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(BrownNegativeBoss.identityTag, new BrownNegativeBoss.Parameters());
 		mBossParameters.put(MusicBoss.identityTag, new MusicBoss.Parameters());
 		mBossParameters.put(TagScalingBoss.identityTag, new TagScalingBoss.Parameters());
+		mBossParameters.put(RedstoneBoss.identityTag, new RedstoneBoss.Parameters());
 
 	}
 
