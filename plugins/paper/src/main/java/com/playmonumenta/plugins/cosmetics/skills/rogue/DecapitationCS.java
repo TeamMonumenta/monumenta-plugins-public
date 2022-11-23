@@ -73,7 +73,7 @@ public class DecapitationCS extends ByMyBladeCS implements GalleryCS {
 
 	@Override
 	public String[] getLockDesc() {
-		return List.of("LOCKED").toArray(new String[0]);
+		return List.of("Complete Sanguine Halls to unlock!").toArray(new String[0]);
 	}
 
 	@Override
