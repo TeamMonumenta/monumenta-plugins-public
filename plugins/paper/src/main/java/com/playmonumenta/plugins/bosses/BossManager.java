@@ -656,6 +656,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(BrownPositiveBoss.identityTag, new BrownPositiveBoss.Parameters());
 		mBossParameters.put(BrownNegativeBoss.identityTag, new BrownNegativeBoss.Parameters());
 		mBossParameters.put(MusicBoss.identityTag, new MusicBoss.Parameters());
+		mBossParameters.put(SoundBoss.identityTag, new SoundBoss.Parameters());
 		mBossParameters.put(TagScalingBoss.identityTag, new TagScalingBoss.Parameters());
 		mBossParameters.put(RedstoneBoss.identityTag, new RedstoneBoss.Parameters());
 
