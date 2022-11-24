@@ -5,8 +5,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,6 +20,9 @@ public class AbilityCollection {
 	// This map contains all abilities, including delve modifiers
 	// LinkedHashMap to preserve ordering
 	private final Map<Class<? extends Ability>, Ability> mAbilities = new LinkedHashMap<>();
+
+	// Abilities that are still active when silenced
+	private final Map<Class<? extends Ability>, Ability> mSilenceAbilities = new LinkedHashMap<>();
 
 	private final ImmutableList<Ability> mAbilitiesInTriggerOrder;
 
@@ -35,6 +38,12 @@ public class AbilityCollection {
 	public AbilityCollection(List<Ability> abilities) {
 		for (Ability ability : abilities) {
 			mAbilities.put(ability.getClass(), ability);
+			if (ability.getInfo().doesIgnoreSilence()) {
+				mSilenceAbilities.put(ability.getClass(), ability);
+				if (!ability.getInfo().getTriggers().isEmpty()) {
+					MMLog.warning("Ability with a trigger is set to ignore silence - it won't actually run! " + ability.getInfo().getAbilityClass());
+				}
+			}
 		}
 		mAbilitiesInTriggerOrder =
 			abilities.stream()
@@ -47,7 +56,7 @@ public class AbilityCollection {
 		if (!mIsSilenced) {
 			return mAbilities.values();
 		}
-		return Collections.emptySet();
+		return mSilenceAbilities.values();
 	}
 
 	public ImmutableList<Ability> getAbilitiesInTriggerOrder() {

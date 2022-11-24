@@ -14,7 +14,8 @@ public class AttribaKnockbackResistance extends Ability {
 
 	public static final AbilityInfo<AttribaKnockbackResistance> INFO =
 		new AbilityInfo<>(AttribaKnockbackResistance.class, null, AttribaKnockbackResistance::new)
-			.canUse(player -> player != null && player.getScoreboardTags().contains(MODIFIER_NAME));
+			.canUse(player -> player != null && player.getScoreboardTags().contains(MODIFIER_NAME))
+			.ignoresSilence(true);
 
 	public AttribaKnockbackResistance(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

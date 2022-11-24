@@ -31,7 +31,8 @@ public class PvP extends Ability {
 
 	public static final AbilityInfo<PvP> INFO =
 		new AbilityInfo<>(PvP.class, null, PvP::new)
-			.canUse(player -> player.getScoreboardTags().contains("pvp"));
+			.canUse(player -> player.getScoreboardTags().contains("pvp"))
+			.ignoresSilence(true);
 
 	public PvP(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

@@ -50,6 +50,8 @@ public class AbilityInfo<T extends Ability> {
 
 	private double mPriorityAmount = 1000;
 
+	private boolean mIgnoresSilence = false;
+
 	//This is in ticks; order: [level 1, level 2, level 1 enhanced, level 2 enhanced]; for depths this is one entry per rarity (so 6 in total)
 	private @Nullable List<Integer> mCooldowns;
 	private @Nullable String mCharmCooldown;
@@ -161,6 +163,11 @@ public class AbilityInfo<T extends Ability> {
 		return this;
 	}
 
+	public AbilityInfo<T> ignoresSilence(boolean ignoresSilence) {
+		mIgnoresSilence = ignoresSilence;
+		return this;
+	}
+
 	/**
 	 * By default, players can only use abilities if the ability has a scoreboard defined and their value is nonzero.
 	 * For different conditions, provide a predicate here.
@@ -222,6 +229,10 @@ public class AbilityInfo<T extends Ability> {
 
 	public @Nullable AbilityTriggerInfo<T> getTrigger(String id) {
 		return mTriggers.stream().filter(t -> t.getId().equals(id)).findFirst().orElse(null);
+	}
+
+	public boolean doesIgnoreSilence() {
+		return mIgnoresSilence;
 	}
 
 	public boolean testCanUse(Player player) {

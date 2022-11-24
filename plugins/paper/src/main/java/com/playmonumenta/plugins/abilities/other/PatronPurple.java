@@ -22,7 +22,8 @@ public class PatronPurple extends PatronParticles {
 						&& PlayerData.getPatreonDollars(player) >= Constants.PATREON_TIER_3
 						&& !PremiumVanishIntegration.isInvisibleOrSpectator(player)
 				);
-			});
+			})
+			.ignoresSilence(true);
 
 	public PatronPurple(Plugin plugin, @Nullable Player player) {
 		super(

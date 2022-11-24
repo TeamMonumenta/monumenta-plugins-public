@@ -14,7 +14,8 @@ public class AttribaMovementSpeed extends Ability {
 
 	public static final AbilityInfo<AttribaMovementSpeed> INFO =
 		new AbilityInfo<>(AttribaMovementSpeed.class, null, AttribaMovementSpeed::new)
-			.canUse(player -> player != null && player.getScoreboardTags().contains(MODIFIER_NAME));
+			.canUse(player -> player != null && player.getScoreboardTags().contains(MODIFIER_NAME))
+			.ignoresSilence(true);
 
 	public AttribaMovementSpeed(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

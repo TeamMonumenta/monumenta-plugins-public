@@ -23,7 +23,8 @@ public class PatronRed extends PatronParticles {
 						&& PlayerData.getPatreonDollars(player) >= Constants.PATREON_TIER_5
 						&& !PremiumVanishIntegration.isInvisibleOrSpectator(player)
 				);
-			});
+			})
+			.ignoresSilence(true);
 
 	public PatronRed(Plugin plugin, @Nullable Player player) {
 		super(

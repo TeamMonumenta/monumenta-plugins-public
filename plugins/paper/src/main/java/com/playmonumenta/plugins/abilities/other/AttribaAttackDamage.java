@@ -14,7 +14,8 @@ public class AttribaAttackDamage extends Ability {
 
 	public static final AbilityInfo<AttribaAttackDamage> INFO =
 		new AbilityInfo<>(AttribaAttackDamage.class, null, AttribaAttackDamage::new)
-			.canUse(player -> player != null && player.getScoreboardTags().contains(MODIFIER_NAME));
+			.canUse(player -> player != null && player.getScoreboardTags().contains(MODIFIER_NAME))
+			.ignoresSilence(true);
 
 	public AttribaAttackDamage(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

@@ -30,7 +30,8 @@ public class CluckingPotions extends Ability {
 
 	public static final AbilityInfo<CluckingPotions> INFO =
 		new AbilityInfo<>(CluckingPotions.class, null, CluckingPotions::new)
-			.canUse(player -> true);
+			.canUse(player -> true)
+			.ignoresSilence(true);
 
 	public CluckingPotions(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

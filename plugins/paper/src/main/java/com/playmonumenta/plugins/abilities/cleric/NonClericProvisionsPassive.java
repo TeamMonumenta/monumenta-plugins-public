@@ -20,7 +20,8 @@ public class NonClericProvisionsPassive extends Ability {
 
 	public static final AbilityInfo<NonClericProvisionsPassive> INFO =
 		new AbilityInfo<>(NonClericProvisionsPassive.class, null, NonClericProvisionsPassive::new)
-			.canUse(player -> true);
+			.canUse(player -> true)
+			.ignoresSilence(true); // checks for Sacred Provisions on nearby players, which may be silenced and then affect this ability
 
 	public NonClericProvisionsPassive(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

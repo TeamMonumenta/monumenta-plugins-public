@@ -22,7 +22,8 @@ public class PatronWhite extends PatronParticles {
 						&& PlayerData.getPatreonDollars(player) >= Constants.PATREON_TIER_2
 						&& !PremiumVanishIntegration.isInvisibleOrSpectator(player)
 				);
-			});
+			})
+			.ignoresSilence(true);
 
 	public PatronWhite(Plugin plugin, Player player) {
 		super(

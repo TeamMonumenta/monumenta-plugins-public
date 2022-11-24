@@ -868,7 +868,14 @@ public class AbilityManager {
 			    && ExperiencinatorUtils.getConfig(player.getLocation(), false).getExperiencinator(player.getInventory().getItemInMainHand()) != null) {
 			return false;
 		}
-		for (Ability ability : getPlayerAbilities(player).getAbilitiesInTriggerOrder()) {
+		AbilityCollection playerAbilities = getPlayerAbilities(player);
+		if (playerAbilities.isSilenced()) {
+			// if silenced, just return if any trigger matches (to cancel the swap event properly)
+			return playerAbilities.getAbilitiesIgnoringSilence().stream()
+				       .flatMap(a -> a.mCustomTriggers.stream())
+				       .anyMatch(t -> t.check(player, key));
+		}
+		for (Ability ability : playerAbilities.getAbilitiesInTriggerOrder()) {
 			for (AbilityTriggerInfo<?> triggerInfo : ability.mCustomTriggers) {
 				if (triggerInfo.check(player, key)) {
 					((Consumer<Ability>) triggerInfo.getAction()).accept(ability);
