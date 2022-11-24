@@ -44,7 +44,7 @@ public class BottledSunlight extends DepthsAbility {
 	private static final int EFFECT_DURATION_REDUCTION = 10 * 20;
 
 	public static final DepthsAbilityInfo<BottledSunlight> INFO =
-		new DepthsAbilityInfo<>(BottledSunlight.class, ABILITY_NAME, BottledSunlight::new, DepthsTree.SUNLIGHT, DepthsTrigger.SHIFT_RIGHT_CLICK)
+		new DepthsAbilityInfo<>(BottledSunlight.class, ABILITY_NAME, BottledSunlight::new, DepthsTree.DAWNBRINGER, DepthsTrigger.SHIFT_RIGHT_CLICK)
 			.linkedSpell(ClassAbility.BOTTLED_SUNLIGHT)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BottledSunlight::cast,

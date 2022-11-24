@@ -47,7 +47,7 @@ public class LightningBottle extends DepthsAbility {
 	public static final int DEATH_RADIUS = 32;
 
 	public static final DepthsAbilityInfo<LightningBottle> INFO =
-		new DepthsAbilityInfo<>(LightningBottle.class, ABILITY_NAME, LightningBottle::new, DepthsTree.SUNLIGHT, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(LightningBottle.class, ABILITY_NAME, LightningBottle::new, DepthsTree.DAWNBRINGER, DepthsTrigger.PASSIVE)
 			.linkedSpell(ClassAbility.LIGHTNING_BOTTLE)
 			.displayItem(new ItemStack(Material.BREWING_STAND))
 			.descriptions(LightningBottle::getDescription, MAX_RARITY);

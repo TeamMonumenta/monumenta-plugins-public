@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Entity;
@@ -53,41 +54,44 @@ public class DepthsListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
 		Player player = event.getPlayer();
+		DepthsManager dm = DepthsManager.getInstance();
 
-		if (player == null) {
+		if (!dm.isInSystem(player)) {
 			return;
 		}
 
+		Block block = event.getBlock();
+		Material type = block.getType();
+
 		//Spawner break message
-		if (DepthsManager.getInstance().isInSystem(player) && event.getBlock().getType() == Material.SPAWNER) {
-			DepthsManager.getInstance().playerBrokeSpawner(player, event.getBlock().getLocation());
+		if (type == Material.SPAWNER) {
+			dm.playerBrokeSpawner(player, block.getLocation());
 
 			//Sundrops logic
 			//Check if anyone in their party has sundrops levels
-			DepthsParty party = DepthsManager.getInstance().getPartyFromId(DepthsManager.getInstance().mPlayers.get(player.getUniqueId()));
+			DepthsParty party = dm.getDepthsParty(player);
 			int totalChance = 0;
 			for (DepthsPlayer dp : party.mPlayersInParty) {
-				if (dp == null || dp.mAbilities == null || dp.mAbilities.size() == 0) {
+				if (dp == null || dp.mAbilities == null || dp.mAbilities.isEmpty()) {
 					continue;
 				}
 				Integer sundropsLevel = dp.mAbilities.get(Sundrops.ABILITY_NAME);
-				if (sundropsLevel != null && sundropsLevel.intValue() > 0) {
-					totalChance += Sundrops.DROP_CHANCE[sundropsLevel.intValue() - 1];
+				if (sundropsLevel != null && sundropsLevel > 0) {
+					totalChance += Sundrops.DROP_CHANCE[sundropsLevel - 1];
 				}
 			}
 			if (totalChance >= 100) {
-				Sundrops.summonSundrop(event.getBlock().getLocation().add(0.5, 0, 0.5));
+				Sundrops.summonSundrop(block);
 			} else if (totalChance > 0) {
 				//Do the random roll
 				Random r = new Random();
 				int roll = r.nextInt(100) + 1;
 				if (roll < totalChance) {
-					Sundrops.summonSundrop(event.getBlock().getLocation().add(0.5, 0, 0.5));
+					Sundrops.summonSundrop(block);
 				}
 			}
 
-
-		} else if (DepthsManager.getInstance().isInSystem(player) && event.getBlock().getType() == Material.CHEST) {
+		} else if (type == Material.CHEST) {
 			//Player's can't break chests themselves
 			event.setCancelled(true);
 		}
@@ -97,20 +101,21 @@ public class DepthsListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerExpChangeEvent(PlayerExpChangeEvent event) {
 		Player player = event.getPlayer();
-		if (DepthsManager.getInstance().isInSystem(player)) {
+		DepthsManager dm = DepthsManager.getInstance();
+		if (dm.isInSystem(player)) {
 			double xpFactor = 1;
 
 			//Check if anyone in their party has enlightenment levels
-			DepthsParty party = DepthsManager.getInstance().getPartyFromId(DepthsManager.getInstance().mPlayers.get(player.getUniqueId()));
+			DepthsParty party = dm.getDepthsParty(player);
 			int highestLevel = 0;
 
 			for (DepthsPlayer dp : party.mPlayersInParty) {
-				if (dp == null || dp.mAbilities == null || dp.mAbilities.size() == 0) {
+				if (dp == null || dp.mAbilities == null || dp.mAbilities.isEmpty()) {
 					continue;
 				}
 				Integer enlightenmentLevel = dp.mAbilities.get(Enlightenment.ABILITY_NAME);
-				if (enlightenmentLevel != null && enlightenmentLevel.intValue() > highestLevel) {
-					highestLevel = enlightenmentLevel.intValue();
+				if (enlightenmentLevel != null && enlightenmentLevel > highestLevel) {
+					highestLevel = enlightenmentLevel;
 				}
 			}
 			if (highestLevel > 0) {
@@ -130,14 +135,12 @@ public class DepthsListener implements Listener {
 	//Logic to replace chest opening with a ability selection gui, if applicable
 	@EventHandler(ignoreCancelled = true)
 	public void onInventoryOpenEvent(InventoryOpenEvent e) {
-	   Player p = (Player) e.getPlayer();
-	   if (e.getInventory().getHolder() instanceof Chest || e.getInventory().getHolder() instanceof DoubleChest) {
-		   Boolean guiLoaded = DepthsManager.getInstance().getRoomReward(p, e.getInventory().getLocation());
-		   if (guiLoaded == false) {
-			   return;
-		   }
-		   e.setCancelled(true);
-	   }
+		Player p = (Player) e.getPlayer();
+		if (e.getInventory().getHolder() instanceof Chest || e.getInventory().getHolder() instanceof DoubleChest) {
+			if (DepthsManager.getInstance().getRoomReward(p, e.getInventory().getLocation())) {
+				e.setCancelled(true);
+			}
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -188,10 +191,11 @@ public class DepthsListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		//Set treasure score at death time, so they can't just wait around in death screen for party to get more rewards
-		DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(event.getEntity().getUniqueId());
+		DepthsManager dm = DepthsManager.getInstance();
+		DepthsPlayer dp = dm.getDepthsPlayer(event.getPlayer());
 
 		if (dp != null) {
-			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp);
+			DepthsParty party = dm.getPartyFromId(dp);
 			if (party != null) {
 				dp.mFinalTreasureScore = party.mTreasureScore;
 				dp.setDeathRoom(party.getRoomNumber());
@@ -213,14 +217,13 @@ public class DepthsListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerPostRespawnEvent(PlayerPostRespawnEvent event) {
 		//Tp player to loot room when they respawn
-		DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(event.getPlayer().getUniqueId());
+		DepthsManager dm = DepthsManager.getInstance();
+		Player player = event.getPlayer();
+		DepthsPlayer dp = dm.getDepthsPlayer(player);
 		DepthsUtils.storetoFile(dp, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats"); //Save the player's stats
-		if (dp != null && DepthsManager.getInstance().getPartyFromId(dp) != null) {
-			if (DepthsManager.getInstance().getPartyFromId(dp).mEndlessMode && DepthsManager.getInstance().getPartyFromId(dp).mRoomNumber > 30) {
-				DepthsManager.getInstance().getPartyFromId(dp).populateLootRoom(event.getPlayer(), true);
-			} else {
-				DepthsManager.getInstance().getPartyFromId(dp).populateLootRoom(event.getPlayer(), false);
-			}
+		if (dp != null && dm.getPartyFromId(dp) != null) {
+			DepthsParty party = dm.getPartyFromId(dp);
+			party.populateLootRoom(player, party.mEndlessMode && party.mRoomNumber > 30);
 		}
 	}
 
@@ -246,7 +249,7 @@ public class DepthsListener implements Listener {
 		}
 
 		event.blockList().removeIf(block -> block.getType().equals(Material.CHEST));
-		event.blockList().removeIf(block -> block.getType().equals(Material.STONE_BUTTON) && block.getLocation().add(1, 0, 0).getBlock().getType() == Material.OBSIDIAN);
+		event.blockList().removeIf(block -> block.getType().equals(Material.STONE_BUTTON) && block.getRelative(BlockFace.EAST).getType() == Material.OBSIDIAN);
 		if (entityType == EntityType.PRIMED_TNT) {
 			event.blockList().removeIf(block -> block.getType().equals(Material.SPAWNER));
 		}
@@ -255,13 +258,11 @@ public class DepthsListener implements Listener {
 			Material mat = b.getType();
 			Location loc = b.getLocation();
 
+			DepthsManager dm = DepthsManager.getInstance();
 			Player p = EntityUtils.getNearestPlayer(loc, 100);
-			if (p != null && DepthsManager.getInstance().isInSystem(p)) {
+			if (p != null && dm.isInSystem(p)) {
 				if (mat == Material.SPAWNER) { // count spawners exploded by creepers
-					if (p == null || !DepthsManager.getInstance().isInSystem(p)) {
-						return;
-					}
-					DepthsManager.getInstance().playerBrokeSpawner(p, loc);
+					dm.playerBrokeSpawner(p, loc);
 				}
 			}
 		}
@@ -269,12 +270,9 @@ public class DepthsListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
-		DepthsManager manager = DepthsManager.getInstance();
-		if (manager.isInSystem(event.getPlayer())) {
-			DepthsPlayer dp = manager.mPlayers.get(event.getPlayer().getUniqueId());
-			if (manager.getPartyFromId(dp).getRoomNumber() % 10 == 0) {
-				event.setCancelled(true);
-			}
+		DepthsParty party = DepthsManager.getInstance().getDepthsParty(event.getPlayer());
+		if (party != null && party.getRoomNumber() % 10 == 0) {
+			event.setCancelled(true);
 		}
 	}
 
@@ -282,8 +280,8 @@ public class DepthsListener implements Listener {
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		DepthsManager manager = DepthsManager.getInstance();
-		if (manager.isInSystem(player)) {
-			DepthsPlayer dp = manager.mPlayers.get(event.getPlayer().getUniqueId());
+		DepthsPlayer dp = manager.getDepthsPlayer(player);
+		if (dp != null) {
 			DepthsParty party = manager.getPartyFromId(dp);
 			if (party != null) {
 				Map<DelvesModifier, Integer> delvePointsForParty = party.mDelveModifiers;

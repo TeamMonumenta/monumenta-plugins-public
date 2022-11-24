@@ -29,7 +29,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 	private static final int MAX_STACKS = 8;
 
 	public static final DepthsAbilityInfo<DepthsSharpshooter> INFO =
-		new DepthsAbilityInfo<>(DepthsSharpshooter.class, ABILITY_NAME, DepthsSharpshooter::new, DepthsTree.METALLIC, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(DepthsSharpshooter.class, ABILITY_NAME, DepthsSharpshooter::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.TARGET))
 			.descriptions(DepthsSharpshooter::getDescription, MAX_RARITY);
 

@@ -20,7 +20,7 @@ public class ProjectileMastery extends DepthsAbility {
 	public static final double[] SPELL_MOD = {1.1, 1.125, 1.15, 1.175, 1.2, 1.25};
 
 	public static final DepthsAbilityInfo<ProjectileMastery> INFO =
-		new DepthsAbilityInfo<>(ProjectileMastery.class, ABILITY_NAME, ProjectileMastery::new, DepthsTree.METALLIC, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(ProjectileMastery.class, ABILITY_NAME, ProjectileMastery::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.BOW))
 			.descriptions(ProjectileMastery::getDescription, MAX_RARITY);
 

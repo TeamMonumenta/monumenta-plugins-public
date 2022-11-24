@@ -20,7 +20,7 @@ public class Enlightenment extends DepthsAbility {
 	public static final int[] RARITY_INCREASE = {3, 4, 5, 6, 7, 30};
 
 	public static final DepthsAbilityInfo<Enlightenment> INFO =
-		new DepthsAbilityInfo<>(Enlightenment.class, ABILITY_NAME, Enlightenment::new, DepthsTree.SUNLIGHT, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(Enlightenment.class, ABILITY_NAME, Enlightenment::new, DepthsTree.DAWNBRINGER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.EXPERIENCE_BOTTLE))
 			.descriptions(Enlightenment::getDescription, MAX_RARITY);
 

@@ -28,7 +28,7 @@ public class DepthsRejuvenation extends DepthsAbility {
 	private static final Map<UUID, Integer> LAST_HEAL_TICK = new HashMap<>();
 
 	public static final DepthsAbilityInfo<DepthsRejuvenation> INFO =
-		new DepthsAbilityInfo<>(DepthsRejuvenation.class, ABILITY_NAME, DepthsRejuvenation::new, DepthsTree.SUNLIGHT, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(DepthsRejuvenation.class, ABILITY_NAME, DepthsRejuvenation::new, DepthsTree.DAWNBRINGER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.NETHER_STAR))
 			.descriptions(DepthsRejuvenation::getDescription, MAX_RARITY);
 

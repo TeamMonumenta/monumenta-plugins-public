@@ -40,7 +40,7 @@ public class SteelStallion extends DepthsAbility {
 	public static final int TICK_INTERVAL = 5;
 
 	public static final DepthsAbilityInfo<SteelStallion> INFO =
-		new DepthsAbilityInfo<>(SteelStallion.class, ABILITY_NAME, SteelStallion::new, DepthsTree.METALLIC, DepthsTrigger.LIFELINE)
+		new DepthsAbilityInfo<>(SteelStallion.class, ABILITY_NAME, SteelStallion::new, DepthsTree.STEELSAGE, DepthsTrigger.LIFELINE)
 			.linkedSpell(ClassAbility.STEEL_STALLION)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.IRON_HORSE_ARMOR))

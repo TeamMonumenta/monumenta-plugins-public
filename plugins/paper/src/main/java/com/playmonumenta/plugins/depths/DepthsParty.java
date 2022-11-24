@@ -247,7 +247,7 @@ public class DepthsParty {
 		}
 	}
 
-	public void giveTreasureReward(Location l, int score) {
+	public void giveTreasureReward(@Nullable Location l, int score) {
 
 		mTreasureScore += score;
 		mCanGetTreasureReward = false;
@@ -368,7 +368,7 @@ public class DepthsParty {
 		for (DepthsPlayer dp : mPlayersInParty) {
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
 			if (p != null) {
-				p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Spawned new " + DepthsUtils.roomString(room.mRoomType) + " room!");
+				p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Spawned new " + room.mRoomType.getRoomString() + " room!");
 			}
 		}
 

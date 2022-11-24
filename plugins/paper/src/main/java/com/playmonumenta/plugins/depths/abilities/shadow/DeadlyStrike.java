@@ -20,7 +20,7 @@ public class DeadlyStrike extends DepthsAbility {
 	public static final double[] DAMAGE = {1.10, 1.125, 1.15, 1.175, 1.2, 1.25};
 
 	public static final DepthsAbilityInfo<DeadlyStrike> INFO =
-		new DepthsAbilityInfo<>(DeadlyStrike.class, ABILITY_NAME, DeadlyStrike::new, DepthsTree.SHADOWS, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(DeadlyStrike.class, ABILITY_NAME, DeadlyStrike::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.BLACK_CONCRETE_POWDER))
 			.descriptions(DeadlyStrike::getDescription, MAX_RARITY);
 

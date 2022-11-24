@@ -36,7 +36,7 @@ public final class ShadowSlam extends DepthsAbility {
 	public static final int AUTOMATIC_THRESHOLD = 3;
 
 	public static final DepthsAbilityInfo<ShadowSlam> INFO =
-		new DepthsAbilityInfo<>(ShadowSlam.class, ABILITY_NAME, ShadowSlam::new, DepthsTree.SHADOWS, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(ShadowSlam.class, ABILITY_NAME, ShadowSlam::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.ANVIL))
 			.descriptions(ShadowSlam::getDescription, MAX_RARITY); // Minimum fall distance for landing to automatically trigger slam attack
 

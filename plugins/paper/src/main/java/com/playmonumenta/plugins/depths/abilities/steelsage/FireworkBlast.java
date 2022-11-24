@@ -48,7 +48,7 @@ public class FireworkBlast extends DepthsAbility {
 	private static final Particle.DustOptions ORANGE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 127, 20), 1.0f);
 
 	public static final DepthsAbilityInfo<FireworkBlast> INFO =
-		new DepthsAbilityInfo<>(FireworkBlast.class, ABILITY_NAME, FireworkBlast::new, DepthsTree.METALLIC, DepthsTrigger.SHIFT_RIGHT_CLICK)
+		new DepthsAbilityInfo<>(FireworkBlast.class, ABILITY_NAME, FireworkBlast::new, DepthsTree.STEELSAGE, DepthsTrigger.SHIFT_RIGHT_CLICK)
 			.linkedSpell(ClassAbility.FIREWORKBLAST)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FireworkBlast::cast,

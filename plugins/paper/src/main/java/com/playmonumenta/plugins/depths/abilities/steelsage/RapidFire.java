@@ -43,7 +43,7 @@ public class RapidFire extends DepthsAbility {
 	public static final String META_DATA_TAG = "RapidFireArrow";
 
 	public static final DepthsAbilityInfo<RapidFire> INFO =
-		new DepthsAbilityInfo<>(RapidFire.class, ABILITY_NAME, RapidFire::new, DepthsTree.METALLIC, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(RapidFire.class, ABILITY_NAME, RapidFire::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
 			.linkedSpell(ClassAbility.RAPIDFIRE)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RapidFire::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false),

@@ -51,7 +51,7 @@ public class Metalmancy extends DepthsAbility {
 	private static final double MAX_TARGET_Y = 4;
 
 	public static final DepthsAbilityInfo<Metalmancy> INFO =
-		new DepthsAbilityInfo<>(Metalmancy.class, ABILITY_NAME, Metalmancy::new, DepthsTree.METALLIC, DepthsTrigger.SWAP)
+		new DepthsAbilityInfo<>(Metalmancy.class, ABILITY_NAME, Metalmancy::new, DepthsTree.STEELSAGE, DepthsTrigger.SWAP)
 			.linkedSpell(ClassAbility.METALMANCY)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Metalmancy::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))

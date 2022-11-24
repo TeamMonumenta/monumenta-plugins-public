@@ -21,7 +21,7 @@ public class DepthsDethroner extends DepthsAbility {
 	public static final double[] BOSS_DAMAGE = {1.1, 1.125, 1.15, 1.175, 1.2, 1.25};
 
 	public static final DepthsAbilityInfo<DepthsDethroner> INFO =
-		new DepthsAbilityInfo<>(DepthsDethroner.class, ABILITY_NAME, DepthsDethroner::new, DepthsTree.SHADOWS, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(DepthsDethroner.class, ABILITY_NAME, DepthsDethroner::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.DRAGON_HEAD))
 			.descriptions(DepthsDethroner::getDescription, MAX_RARITY);
 

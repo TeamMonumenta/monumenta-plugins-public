@@ -31,7 +31,7 @@ public class SoothingCombos extends DepthsAbility {
 	public static final int RANGE = 12;
 
 	public static final DepthsAbilityInfo<SoothingCombos> INFO =
-		new DepthsAbilityInfo<>(SoothingCombos.class, ABILITY_NAME, SoothingCombos::new, DepthsTree.SUNLIGHT, DepthsTrigger.COMBO)
+		new DepthsAbilityInfo<>(SoothingCombos.class, ABILITY_NAME, SoothingCombos::new, DepthsTree.DAWNBRINGER, DepthsTrigger.COMBO)
 			.displayItem(new ItemStack(Material.HONEYCOMB))
 			.descriptions(SoothingCombos::getDescription, MAX_RARITY);
 

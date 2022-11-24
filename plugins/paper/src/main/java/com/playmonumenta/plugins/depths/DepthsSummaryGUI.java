@@ -187,7 +187,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 			DepthsTree playerTree;
 			for (int i = 0; i < 4; i++) {
 				playerTree = playerInstance.mEligibleTrees.get(i);
-				mInventory.setItem(TREE_LOCATIONS.get(i), DepthsUtils.getTreeItem(playerTree));
+				mInventory.setItem(TREE_LOCATIONS.get(i), playerTree.createItem());
 			}
 		}
 

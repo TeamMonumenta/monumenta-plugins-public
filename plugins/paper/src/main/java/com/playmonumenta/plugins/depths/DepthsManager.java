@@ -334,12 +334,12 @@ public class DepthsManager {
 			return 0;
 		}
 
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		DepthsPlayer dp = getDepthsPlayer(p);
 
 		if (dp != null) {
 			Integer i = dp.mAbilities.get(name);
 			if (i != null) {
-				return i.intValue();
+				return i;
 			}
 		}
 		return 0;
@@ -371,17 +371,17 @@ public class DepthsManager {
 		List<DepthsPlayer> depthsPlayers = new ArrayList<>();
 		DepthsParty partyToAdd = null;
 		for (Player p : nearbyPlayers) {
-			if (mPlayers.get(p.getUniqueId()) == null) {
+			if (!isInSystem(p)) {
 				DepthsPlayer dp = new DepthsPlayer(p);
 				mPlayers.put(p.getUniqueId(), dp);
 			}
 
 			// Add the players to the new party if they don't already have one
-			if (getPartyFromId(mPlayers.get(p.getUniqueId())) == null) {
+			if (getDepthsParty(p) == null) {
 				depthsPlayers.add(mPlayers.get(p.getUniqueId()));
 			} else {
 				//Add the new players to the current party
-				partyToAdd = getPartyFromId(mPlayers.get(p.getUniqueId()));
+				partyToAdd = getDepthsParty(p);
 			}
 		}
 		// If the players need a new party, create one
@@ -403,7 +403,7 @@ public class DepthsManager {
 	 * @param level the rarity level of the ability
 	 */
 	public void setPlayerLevelInAbility(String name, Player p, int level) {
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp != null) {
 			dp.mAbilities.put(name, level);
 		}
@@ -414,14 +414,16 @@ public class DepthsManager {
 				party.mHasAtLeastOneAbility = true;
 			}
 			try {
-				for (DepthsPlayer otherPlayer : getPartyFromId(dp).mPlayersInParty) {
+				for (DepthsPlayer otherPlayer : party.mPlayersInParty) {
 					Player newPlayer = Bukkit.getPlayer(otherPlayer.mPlayerId);
-					if (newPlayer != null && !newPlayer.equals(p) && level > 0 && level < 6) {
-						newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " now has ability: " + name + " at " + DepthsUtils.getRarityText(level) + " level!");
-					} else if (newPlayer != null && !newPlayer.equals(p) && level == 6) {
-						newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " now has ability: " + name + " at " + ChatColor.MAGIC + DepthsUtils.getRarityText(level) + ChatColor.RESET + ChatColor.LIGHT_PURPLE + " level!");
-					} else if (newPlayer != null && !newPlayer.equals(p) && level == 0) {
-						newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has lost ability: " + name + "!");
+					if (newPlayer != null && !newPlayer.equals(p)) {
+						if (level > 0 && level < 6) {
+							newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " now has ability: " + name + " at " + DepthsUtils.getRarityText(level) + " level!");
+						} else if (level == 6) {
+							newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " now has ability: " + name + " at " + ChatColor.MAGIC + DepthsUtils.getRarityText(level) + ChatColor.RESET + ChatColor.LIGHT_PURPLE + " level!");
+						} else if (level == 0) {
+							newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has lost ability: " + name + "!");
+						}
 					}
 				}
 			} catch (Exception e) {
@@ -431,11 +433,13 @@ public class DepthsManager {
 		} else {
 			for (DepthsPlayer otherPlayer : getPartyFromId(dp).mPlayersInParty) {
 				Player newPlayer = Bukkit.getPlayer(otherPlayer.mPlayerId);
-				if (newPlayer != null && !newPlayer.equals(p) && level == 1) {
-					newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has selected " + name + " as their aspect!");
-				} else if (newPlayer != null && !newPlayer.equals(p) && level == 2) {
-					// Aspect is being transformed from mystery box
-					newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has had their mystery box transform into " + name + "!");
+				if (newPlayer != null && !newPlayer.equals(p)) {
+					if (level == 1) {
+						newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has selected " + name + " as their aspect!");
+					} else if (level == 2) {
+						// Aspect is being transformed from mystery box
+						newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has had their mystery box transform into " + name + "!");
+					}
 				}
 			}
 		}
@@ -646,7 +650,7 @@ public class DepthsManager {
 	 */
 	public @Nullable List<DepthsAbilityItem> getAbilityUnlocks(Player p) {
 
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		DepthsPlayer dp = getDepthsPlayer(p);
 
 		if (dp == null) {
 			return null;
@@ -704,7 +708,7 @@ public class DepthsManager {
 		}
 		setPlayerLevelInAbility(choice.mAbility, p, choice.mRarity);
 		mAbilityOfferings.remove(p.getUniqueId());
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp != null) {
 			dp.mEarnedRewards.poll();
 			p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.0f, 1.0f);
@@ -718,7 +722,7 @@ public class DepthsManager {
 	 */
 	public void playerChoseWeaponAspect(Player p, int slot) {
 
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp != null) {
 			dp.mHasWeaponAspect = true;
 			p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.0f, 1.0f);
@@ -749,25 +753,25 @@ public class DepthsManager {
 	 * @param p the player to remove
 	 */
 	public void deletePlayer(Player p) {
+		UUID uuid = p.getUniqueId();
 
 		// Remove from party
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		DepthsPlayer dp = getDepthsPlayer(uuid);
 
 		if (dp != null) {
 			DepthsParty party = getPartyFromId(dp);
 			party.mPlayersInParty.remove(dp);
 
 			//Delete the party if no players are left
-			if (party.mPlayersInParty.size() == 0) {
+			if (party.mPlayersInParty.isEmpty()) {
 				mParties.remove(party);
 			}
 		}
 
 		// If the player is in the system
-		if (mPlayers.get(p.getUniqueId()) != null) {
-			mPlayers.remove(p.getUniqueId());
-			mAbilityOfferings.remove(p.getUniqueId());
-			mUpgradeOfferings.remove(p.getUniqueId());
+		if (mPlayers.remove(uuid) != null) {
+			mAbilityOfferings.remove(uuid);
+			mUpgradeOfferings.remove(uuid);
 
 			AbilityManager.getManager().updatePlayerAbilities(p, true);
 			//Reset delve player info
@@ -783,7 +787,7 @@ public class DepthsManager {
 	 */
 	public @Nullable List<DepthsAbilityItem> getPlayerAbilitySummary(Player p) {
 
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		DepthsPlayer dp = getDepthsPlayer(p);
 
 		// Check if they're in the system
 		if (dp == null) {
@@ -812,7 +816,7 @@ public class DepthsManager {
 	 */
 	public @Nullable List<DepthsAbilityInfo<?>> getPlayerAbilities(Player p) {
 
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		DepthsPlayer dp = getDepthsPlayer(p);
 
 		// Check if they're in the system
 		if (dp == null) {
@@ -835,17 +839,14 @@ public class DepthsManager {
 
 	//Simple boolean check to see if the player is already in the depths system
 	public boolean isInSystem(Player p) {
-		return mPlayers.get(p.getUniqueId()) != null;
+		return getDepthsPlayer(p) != null;
 	}
 
 	// Tells us when a player in the system broke a spawner so we can track their progress
 	public void playerBrokeSpawner(Player p, Location l) {
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
-		if (dp != null) {
-			DepthsParty party = getPartyFromId(dp);
-			if (party != null && l.getX() >= party.getRoomX()) {
-				getPartyFromId(dp).partyBrokeSpawner(l);
-			}
+		DepthsParty party = getDepthsParty(p);
+		if (party != null && l.getX() >= party.getRoomX()) {
+			party.partyBrokeSpawner(l);
 		}
 	}
 
@@ -880,8 +881,7 @@ public class DepthsManager {
 		// Roll for how many options the party gets
 		//Will roll between 2 and 4 times
 		int choices = mRandom.nextInt(3) + 2;
-		ArrayList<DepthsRoomType> values = new ArrayList<>();
-		values.addAll(Arrays.asList(DepthsRoomType.values()));
+		ArrayList<DepthsRoomType> values = new ArrayList<>(Arrays.asList(DepthsRoomType.values()));
 		values.remove(DepthsRoomType.BOSS);
 		values.remove(DepthsRoomType.TWISTED);
 		//if the party has not selected any abilities yet, do not let them get an upgrade reward!
@@ -897,10 +897,7 @@ public class DepthsManager {
 		}
 
 		//Roll chance for twisted room - 1.5% per room selection
-		boolean twisted = false;
-		if (mRandom.nextInt(100) < 2 && !party.mTwistedThisFloor) {
-			twisted = true;
-		}
+		boolean twisted = mRandom.nextInt(100) < 2 && !party.mTwistedThisFloor;
 
 		//Pull 4 room types at random. They may or may not be the same, so it is skewed towards fewer options atm.
 		DepthsRoomType e1 = values.get(mRandom.nextInt(values.size()));
@@ -947,10 +944,9 @@ public class DepthsManager {
 	 * @return available room choices for the party
 	 */
 	public @Nullable EnumSet<DepthsRoomType> generateRoomOptions(Player p) {
-
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
-		if (dp != null && getPartyFromId(dp) != null) {
-			return generateRoomOptions(getPartyFromId(dp));
+		DepthsParty party = getDepthsParty(p);
+		if (party != null) {
+			return generateRoomOptions(party);
 		} else {
 			return null;
 		}
@@ -963,14 +959,8 @@ public class DepthsManager {
 	 * @param player the player that selected the room
 	 */
 	public void playerSelectedRoom(DepthsRoomType roomType, Player player) {
-		// Get the player
-		DepthsPlayer dp = mPlayers.get(player.getUniqueId());
-		if (dp == null) {
-			return;
-		}
-
-		DepthsParty party = getPartyFromId(dp);
-		if (party == null || party.mNextRoomChoices == null || party.mNextRoomChoices.size() == 0) {
+		DepthsParty party = getDepthsParty(player);
+		if (party == null || party.mNextRoomChoices == null || party.mNextRoomChoices.isEmpty()) {
 			return;
 		}
 		party.mNextRoomChoices.clear();
@@ -981,10 +971,11 @@ public class DepthsManager {
 			roomType = DepthsRoomType.BOSS;
 		}
 
-		removeNearbyButton(party.mRoomSpawnerLocation, player.getWorld());
+		World world = player.getWorld();
+		removeNearbyButton(party.mRoomSpawnerLocation, world);
 		//Remove the button later in case of structure bug
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			removeNearbyButton(party.mRoomSpawnerLocation, player.getWorld());
+			removeNearbyButton(party.mRoomSpawnerLocation, world);
 		}, 10);
 
 		// Generate the room
@@ -993,7 +984,7 @@ public class DepthsManager {
 		}
 
 		// Summon the new room and give it to the party
-		Location l = new Location(player.getWorld(), party.mRoomSpawnerLocation.getX(), party.mRoomSpawnerLocation.getY(), party.mRoomSpawnerLocation.getZ());
+		Location l = new Location(world, party.mRoomSpawnerLocation.getX(), party.mRoomSpawnerLocation.getY(), party.mRoomSpawnerLocation.getZ());
 		party.setNewRoom(mRoomRepository.summonRoom(l, roomType, party));
 	}
 
@@ -1016,9 +1007,9 @@ public class DepthsManager {
 	 * @return a string containing the party summary
 	 */
 	public String getPartySummary(Player p) {
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
-		if (dp != null && getPartyFromId(dp) != null) {
-			return getPartyFromId(dp).getSummaryString();
+		DepthsParty party = getDepthsParty(p);
+		if (party != null) {
+			return party.getSummaryString();
 		} else {
 			return "You are not currently in a depths party!";
 		}
@@ -1031,29 +1022,30 @@ public class DepthsManager {
 	 * @param l the location to spawn the next room at, in order to line up with the door
 	 */
 	public void gotRoomEndpoint(Player p, Location l) {
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		DepthsPlayer dp = getDepthsPlayer(p);
 
 		if (dp == null || getPartyFromId(dp) == null) {
 			//Will be the main way players init their party, spawning the first room
 			init(p);
 		}
 
-		if (dp != null && getPartyFromId(dp) != null) {
+		DepthsParty party = getPartyFromId(dp);
+		if (dp != null && party != null) {
 
 			// Check that spawner count is zero
-			if (getPartyFromId(dp).mSpawnersToBreak > 0) {
-				if (getPartyFromId(dp).mSpawnersToBreak == 1) {
-					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "There is still " + getPartyFromId(dp).mSpawnersToBreak + " spawner left to break!");
+			if (party.mSpawnersToBreak > 0) {
+				if (party.mSpawnersToBreak == 1) {
+					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "There is still " + party.mSpawnersToBreak + " spawner left to break!");
 				} else {
-					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "There are still " + getPartyFromId(dp).mSpawnersToBreak + " spawners left to break!");
+					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "There are still " + party.mSpawnersToBreak + " spawners left to break!");
 				}
 				return;
 			}
 
 			// Store the location to spawn the next room from
-			getPartyFromId(dp).mRoomSpawnerLocation = new Vector(l.getX(), l.getY(), l.getZ());
+			party.mRoomSpawnerLocation = l.toVector();
 			//Let the player select the room
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "opendepthsgui roomchoice " + p.getName());
+			DepthsGUICommands.roomchoice(Plugin.getInstance(), p);
 		}
 	}
 
@@ -1063,15 +1055,11 @@ public class DepthsManager {
 	 * @param p player whose party to increase
 	 * @param score amount to increase treasure score
 	 */
-	public void incrementTreasure(Location l, Player p, int score) {
-		if (p == null || mPlayers.get(p.getUniqueId()) == null) {
-			return;
+	public void incrementTreasure(@Nullable Location l, Player p, int score) {
+		DepthsParty party = getDepthsParty(p);
+		if (party != null) {
+			party.giveTreasureReward(l, score);
 		}
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
-
-		DepthsParty party = getPartyFromId(dp);
-
-		party.giveTreasureReward(l, score);
 	}
 
 	/**
@@ -1082,22 +1070,24 @@ public class DepthsManager {
 	 * @return the appropriate GUI to open for their current room reward
 	 */
 	public Boolean getRoomReward(Player p, Location l) {
-		if (p == null || mPlayers.get(p.getUniqueId()) == null) {
+		DepthsPlayer dp = getDepthsPlayer(p);
+		if (dp == null) {
 			return false;
 		}
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
 
 		DepthsParty party = getPartyFromId(dp);
+		if (party == null) {
+			return false;
+		}
 
 		//First- check if the player has any rewards to open
-		if (dp.mEarnedRewards.size() > 0) {
-			if (dp.mEarnedRewards.peek() == DepthsRewardType.ABILITY || dp.mEarnedRewards.peek() == DepthsRewardType.ABILITY_ELITE) {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "opendepthsgui ability " + p.getName());
-
+		if (!dp.mEarnedRewards.isEmpty()) {
+			DepthsRewardType reward = dp.mEarnedRewards.peek();
+			if (reward == DepthsRewardType.ABILITY || reward == DepthsRewardType.ABILITY_ELITE) {
+				DepthsGUICommands.ability(Plugin.getInstance(), p);
 				return true;
-			} else if (dp.mEarnedRewards.peek() == DepthsRewardType.UPGRADE || dp.mEarnedRewards.peek() == DepthsRewardType.UPGRADE_ELITE || dp.mEarnedRewards.peek() == DepthsRewardType.TWISTED) {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "opendepthsgui upgrade " + p.getName());
-
+			} else if (reward == DepthsRewardType.UPGRADE || reward == DepthsRewardType.UPGRADE_ELITE || reward == DepthsRewardType.TWISTED) {
+				DepthsGUICommands.upgrade(Plugin.getInstance(), p);
 				return true;
 			}
 		}
@@ -1126,7 +1116,8 @@ public class DepthsManager {
 	 * @param slot the index of which item they selected in their offering array
 	 */
 	public void playerUpgradedItem(Player p, int slot) {
-		List<DepthsAbilityItem> itemChoices = mUpgradeOfferings.get(p.getUniqueId());
+		UUID uuid = p.getUniqueId();
+		List<DepthsAbilityItem> itemChoices = mUpgradeOfferings.get(uuid);
 		if (itemChoices == null) {
 			return;
 		}
@@ -1135,8 +1126,8 @@ public class DepthsManager {
 		}
 		DepthsAbilityItem choice = itemChoices.get(slot);
 		setPlayerLevelInAbility(choice.mAbility, p, choice.mRarity);
-		mUpgradeOfferings.remove(p.getUniqueId());
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		mUpgradeOfferings.remove(uuid);
+		DepthsPlayer dp = getDepthsPlayer(uuid);
 		if (dp != null) {
 			dp.mEarnedRewards.poll();
 			p.getWorld().playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.0f);
@@ -1150,14 +1141,13 @@ public class DepthsManager {
 	 * @return the items for the available upgrades
 	 */
 	public @Nullable List<DepthsAbilityItem> getAbilityUpgradeOptions(Player p) {
-		// Move this later
-
-		List<DepthsAbilityItem> offeredItems = mUpgradeOfferings.get(p.getUniqueId());
-		if (offeredItems != null && offeredItems.size() > 0) {
+		UUID uuid = p.getUniqueId();
+		List<DepthsAbilityItem> offeredItems = mUpgradeOfferings.get(uuid);
+		if (offeredItems != null && !offeredItems.isEmpty()) {
 			return offeredItems;
 		}
 
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		DepthsPlayer dp = getDepthsPlayer(uuid);
 		if (dp == null) {
 			return null;
 		}
@@ -1189,7 +1179,7 @@ public class DepthsManager {
 			}
 		}
 
-		mUpgradeOfferings.put(p.getUniqueId(), offeredItems);
+		mUpgradeOfferings.put(uuid, offeredItems);
 
 		return offeredItems;
 	}
@@ -1201,7 +1191,7 @@ public class DepthsManager {
 	 */
 	public void chaos(Player p) {
 
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp == null) {
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
 			return;
@@ -1291,13 +1281,13 @@ public class DepthsManager {
 	 * @param p player - get their party and send them to next floor
 	 */
 	public void goToNextFloor(Player p) {
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
-		DepthsParty party = getPartyFromId(dp);
-		int partyFloor = party.getFloor();
+		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp == null || getPartyFromId(dp) == null) {
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
 			return;
 		}
+		DepthsParty party = getPartyFromId(dp);
+		int partyFloor = party.getFloor();
 		int treasureScoreIncrease = TREASURE_PER_FLOOR * partyFloor + 2;
 		party.mTreasureScore += treasureScoreIncrease;
 
@@ -1368,8 +1358,8 @@ public class DepthsManager {
 		if (mRoomRepository == null) {
 			mRoomRepository = new DepthsRoomRepository();
 		}
-		mRoomRepository.goToNextFloor(getPartyFromId(dp), treasureScoreIncrease);
-		getPartyFromId(dp).mBeatBoss = true;
+		mRoomRepository.goToNextFloor(party, treasureScoreIncrease);
+		party.mBeatBoss = true;
 	}
 
 	/**
@@ -1379,25 +1369,10 @@ public class DepthsManager {
 	 */
 	private void transformMysteryBox(Player player) {
 		setPlayerLevelInAbility(RandomAspect.ABILITY_NAME, player, 0);
-		switch (mRandom.nextInt(5)) {
-			case 0:
-				setPlayerLevelInAbility(SwordAspect.ABILITY_NAME, player, 2);
-				break;
-			case 1:
-				setPlayerLevelInAbility(AxeAspect.ABILITY_NAME, player, 2);
-				break;
-			case 2:
-				setPlayerLevelInAbility(ScytheAspect.ABILITY_NAME, player, 2);
-				break;
-			case 3:
-				setPlayerLevelInAbility(WandAspect.ABILITY_NAME, player, 2);
-				break;
-			case 4:
-				setPlayerLevelInAbility(BowAspect.ABILITY_NAME, player, 2);
-				break;
-			default:
-				return;
-		}
+		List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> aspects = new ArrayList<>(getWeaponAspects());
+		aspects.remove(RandomAspect.INFO);
+		Collections.shuffle(aspects);
+		setPlayerLevelInAbility(aspects.get(0).getDisplayName(), player, 2);
 	}
 
 	/**
@@ -1408,15 +1383,12 @@ public class DepthsManager {
 	 */
 	public void startBossFight(Player p, Location l) {
 		//Check the player is in the system
-		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
-		DepthsParty depthsParty = null;
-		if (dp != null) {
-			depthsParty = getPartyFromId(dp);
-		}
-		if (depthsParty == null) {
+		DepthsPlayer dp = getDepthsPlayer(p);
+		if (dp == null || getPartyFromId(dp) == null) {
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
 			return;
 		}
+		DepthsParty depthsParty = getPartyFromId(dp);
 		//Teleport all players in party to the player activating the fight
 		for (DepthsPlayer dpInParty : depthsParty.mPlayersInParty) {
 			try {
@@ -1450,8 +1422,8 @@ public class DepthsManager {
 
 		try {
 			Entity entity = LibraryOfSoulsIntegration.summon(l, losName);
-			if (entity instanceof LivingEntity) {
-				BossManager.createBoss(null, (LivingEntity)entity, bossTag, l.clone().add(0, -2, 0));
+			if (entity instanceof LivingEntity boss) {
+				BossManager.createBoss(null, boss, bossTag, l.clone().add(0, -2, 0));
 			} else {
 				Plugin.getInstance().getLogger().severe("Failed to summon depths boss " + bossTag);
 			}
@@ -1501,21 +1473,12 @@ public class DepthsManager {
 		for (DepthsAbilityInfo<?> da : abilities) {
 			if (da.canBeOffered(p)) {
 				int roll = mRandom.nextInt(100) + 1;
-				if (roll < addUpChances(0, chances)) {
-					setPlayerLevelInAbility(da.getDisplayName(), p, 1);
-					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + da.getDisplayName() + " at " + DepthsUtils.getRarityText(1) + " level!");
-				} else if (roll < addUpChances(1, chances)) {
-					setPlayerLevelInAbility(da.getDisplayName(), p, 2);
-					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + da.getDisplayName() + " at " + DepthsUtils.getRarityText(2) + " level!");
-				} else if (roll < addUpChances(2, chances)) {
-					setPlayerLevelInAbility(da.getDisplayName(), p, 3);
-					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + da.getDisplayName() + " at " + DepthsUtils.getRarityText(3) + " level!");
-				} else if (roll < addUpChances(3, chances)) {
-					setPlayerLevelInAbility(da.getDisplayName(), p, 4);
-					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + da.getDisplayName() + " at " + DepthsUtils.getRarityText(4) + " level!");
-				} else {
-					setPlayerLevelInAbility(da.getDisplayName(), p, 5);
-					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + da.getDisplayName() + " at " + DepthsUtils.getRarityText(5) + " level!");
+				for (int i = 0; i < 5; i++) {
+					if (roll < addUpChances(i, chances)) {
+						setPlayerLevelInAbility(da.getDisplayName(), p, i + 1);
+						p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + da.getDisplayName() + " at " + DepthsUtils.getRarityText(i + 1) + " level!");
+						break;
+					}
 				}
 				break;
 			}
@@ -1547,7 +1510,7 @@ public class DepthsManager {
 		if (currentAbility.equals(abilities.get(0).getDisplayName()) && abilities.size() > 1) {
 			setPlayerLevelInAbility(abilities.get(1).getDisplayName(), p, 1);
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + abilities.get(1).getDisplayName() + " at " + DepthsUtils.getRarityText(1) + " level!");
-		} else if (abilities.size() > 0) {
+		} else if (!abilities.isEmpty()) {
 			setPlayerLevelInAbility(abilities.get(0).getDisplayName(), p, 1);
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + abilities.get(0).getDisplayName() + " at " + DepthsUtils.getRarityText(1) + " level!");
 		}
@@ -1560,15 +1523,27 @@ public class DepthsManager {
 	 * @param number room number to set
 	 */
 	public void setRoomDebug(Player player, int number) {
-		DepthsPlayer dp = mPlayers.get(player.getUniqueId());
-		DepthsParty depthsParty = null;
-		if (dp != null) {
-			depthsParty = getPartyFromId(dp);
-		}
+		DepthsParty depthsParty = getDepthsParty(player);
 		if (depthsParty == null) {
 			player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
 			return;
 		}
 		depthsParty.mRoomNumber = number;
+	}
+
+	public @Nullable DepthsPlayer getDepthsPlayer(UUID uuid) {
+		return mPlayers.get(uuid);
+	}
+
+	public @Nullable DepthsPlayer getDepthsPlayer(Player player) {
+		return getDepthsPlayer(player.getUniqueId());
+	}
+
+	public @Nullable DepthsParty getDepthsParty(Player player) {
+		DepthsPlayer dp = getDepthsPlayer(player);
+		if (dp != null) {
+			return getPartyFromId(dp);
+		}
+		return null;
 	}
 }

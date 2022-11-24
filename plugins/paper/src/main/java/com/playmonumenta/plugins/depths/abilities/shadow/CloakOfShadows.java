@@ -45,7 +45,7 @@ public class CloakOfShadows extends DepthsAbility {
 	private static final int RADIUS = 5;
 
 	public static final DepthsAbilityInfo<CloakOfShadows> INFO =
-		new DepthsAbilityInfo<>(CloakOfShadows.class, ABILITY_NAME, CloakOfShadows::new, DepthsTree.SHADOWS, DepthsTrigger.SHIFT_LEFT_CLICK)
+		new DepthsAbilityInfo<>(CloakOfShadows.class, ABILITY_NAME, CloakOfShadows::new, DepthsTree.SHADOWDANCER, DepthsTrigger.SHIFT_LEFT_CLICK)
 			.linkedSpell(ClassAbility.CLOAK_OF_SHADOWS)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CloakOfShadows::cast,

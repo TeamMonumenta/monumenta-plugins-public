@@ -19,6 +19,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -39,7 +40,7 @@ public class Sundrops extends DepthsAbility {
 	private static final double PERCENT_DAMAGE_RECEIVED = -0.2;
 
 	public static final DepthsAbilityInfo<Sundrops> INFO =
-		new DepthsAbilityInfo<>(Sundrops.class, ABILITY_NAME, Sundrops::new, DepthsTree.SUNLIGHT, DepthsTrigger.SPAWNER)
+		new DepthsAbilityInfo<>(Sundrops.class, ABILITY_NAME, Sundrops::new, DepthsTree.DAWNBRINGER, DepthsTrigger.SPAWNER)
 			.displayItem(new ItemStack(Material.HONEYCOMB_BLOCK))
 			.descriptions(Sundrops::getDescription, MAX_RARITY);
 
@@ -47,7 +48,8 @@ public class Sundrops extends DepthsAbility {
 		super(plugin, player, INFO);
 	}
 
-	public static void summonSundrop(Location loc) {
+	public static void summonSundrop(Block block) {
+		Location loc = block.getLocation().toCenterLocation();
 		World world = loc.getWorld();
 		ItemStack itemStack = new ItemStack(Material.HONEYCOMB_BLOCK);
 		ItemUtils.setPlainName(itemStack, "Sundrop");

@@ -35,7 +35,7 @@ public class BladeFlurry extends DepthsAbility {
 	public static final int[] SILENCE_DURATION = {20, 25, 30, 35, 40, 50};
 
 	public static final DepthsAbilityInfo<BladeFlurry> INFO =
-		new DepthsAbilityInfo<>(BladeFlurry.class, ABILITY_NAME, BladeFlurry::new, DepthsTree.SHADOWS, DepthsTrigger.SHIFT_RIGHT_CLICK)
+		new DepthsAbilityInfo<>(BladeFlurry.class, ABILITY_NAME, BladeFlurry::new, DepthsTree.SHADOWDANCER, DepthsTrigger.SHIFT_RIGHT_CLICK)
 			.linkedSpell(ClassAbility.BLADE_FLURRY)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BladeFlurry::cast,

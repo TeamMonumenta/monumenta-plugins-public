@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
-import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -29,7 +28,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -46,44 +44,22 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class DepthsUtils {
 
 	//Tree colors
-	public static final int FROSTBORN = 0xa3cbe1;
-	public static final int METALLIC = 0x929292;
-	public static final int SUNLIGHT = 0xf0b326;
+	public static final int DAWNBRINGER = 0xf0b326;
 	public static final int EARTHBOUND = 0x6b3d2d;
 	public static final int FLAMECALLER = 0xf04e21;
+	public static final int FROSTBORN = 0xa3cbe1;
+	public static final int STEELSAGE = 0x929292;
+	public static final int SHADOWDANCER = 0x7948af;
 	public static final int WINDWALKER = 0xc0dea9;
-	public static final int SHADOWS = 0x7948af;
 
 	public static final int LEVELSIX = 0x703663;
-
-	public static final DepthsTree[] TREES = {
-			DepthsTree.SUNLIGHT,
-			DepthsTree.EARTHBOUND,
-			DepthsTree.FLAMECALLER,
-			DepthsTree.FROSTBORN,
-			DepthsTree.SHADOWS,
-			DepthsTree.METALLIC,
-			DepthsTree.WINDWALKER
-	};
-
-	public static final String[] TREE_NAMES = {
-			"Dawnbringer",
-			"Earthbound",
-			"Flamecaller",
-			"Frostborn",
-			"Shadowdancer",
-			"Steelsage",
-			"Windwalker"
-	};
 
 	//Text that gets displayed by players getting messages
 	public static final String DEPTHS_MESSAGE_PREFIX = ChatColor.DARK_PURPLE + "[Depths Party] " + ChatColor.LIGHT_PURPLE;
@@ -113,23 +89,7 @@ public class DepthsUtils {
 
 	public static Component getLoreForItem(DepthsTree tree, int rarity) {
 		TextComponent loreLine = Component.text("");
-		if (tree == DepthsTree.EARTHBOUND) {
-			loreLine = loreLine.append(Component.text("Earthbound", TextColor.color(EARTHBOUND)));
-		} else if (tree == DepthsTree.SUNLIGHT) {
-			loreLine = loreLine.append(Component.text("Dawnbringer", TextColor.color(SUNLIGHT)));
-		} else if (tree == DepthsTree.METALLIC) {
-			loreLine = loreLine.append(Component.text("Steelsage", TextColor.color(METALLIC)));
-		} else if (tree == DepthsTree.WINDWALKER) {
-			loreLine = loreLine.append(Component.text("Windwalker", TextColor.color(WINDWALKER)));
-		} else if (tree == DepthsTree.FROSTBORN) {
-			loreLine = loreLine.append(Component.text("Frostborn", TextColor.color(FROSTBORN)));
-		} else if (tree == DepthsTree.SHADOWS) {
-			loreLine = loreLine.append(Component.text("Shadowdancer", TextColor.color(SHADOWS)));
-		} else if (tree == DepthsTree.FLAMECALLER) {
-			loreLine = loreLine.append(Component.text("Flamecaller", TextColor.color(FLAMECALLER)));
-		} else {
-			return null;
-		}
+		loreLine = loreLine.append(tree.getNameComponent());
 
 		loreLine = loreLine.append(Component.text(" : ", NamedTextColor.DARK_GRAY));
 		TextComponent rarityText = Component.text(getRarityColor(rarity) + getRarityText(rarity));
@@ -163,92 +123,6 @@ public class DepthsUtils {
 				ChatColor.DARK_PURPLE
 		};
 		return colors[rarity - 1];
-	}
-
-	public static ItemStack getTreeItem(DepthsTree tree) {
-		ItemMeta buildMeta;
-		Material itemMat;
-		Component name;
-		String description;
-
-		if (tree == DepthsTree.EARTHBOUND) {
-			itemMat = Material.LEATHER_CHESTPLATE;
-			name = Component.text("Earthbound", getTreeColor(tree))
-					.decoration(TextDecoration.ITALIC, false)
-					.decoration(TextDecoration.BOLD, true);
-			description = "Resolute tank with capabilities of taking aggro and granting resistance to self, armed with minor crowd control.";
-		} else if (tree == DepthsTree.SUNLIGHT) {
-			itemMat = Material.SUNFLOWER;
-			name = Component.text("Dawnbringer", getTreeColor(tree))
-					.decoration(TextDecoration.ITALIC, false)
-					.decoration(TextDecoration.BOLD, true);
-			description = "Bestows passive and active buffs to allies including speed, damage, resistance, and healing.";
-		} else if (tree == DepthsTree.METALLIC) {
-			itemMat = Material.CROSSBOW;
-			name = Component.text("Steelsage", getTreeColor(tree))
-					.decoration(TextDecoration.ITALIC, false)
-					.decoration(TextDecoration.BOLD, true);
-			description = "Master of ranged abilities with dual AOE and single target damage capabilities.";
-		} else if (tree == DepthsTree.WINDWALKER) {
-			itemMat = Material.FEATHER;
-			name = Component.text("Windwalker", getTreeColor(tree))
-					.decoration(TextDecoration.ITALIC, false)
-					.decoration(TextDecoration.BOLD, true);
-			description = "An arsenal of movement abilities and crowd control, allowing precise maneuvers and quick escapes.";
-		} else if (tree == DepthsTree.FROSTBORN) {
-			itemMat = Material.ICE;
-			name = Component.text("Frostborn", getTreeColor(tree))
-					.decoration(TextDecoration.ITALIC, false)
-					.decoration(TextDecoration.BOLD, true);
-			description = "Manipulates the flow of combat by debuffing enemies with ice generating abilities and high damage potential.";
-		} else if (tree == DepthsTree.SHADOWS) {
-			itemMat = Material.IRON_SWORD;
-			name = Component.text("Shadowdancer", getTreeColor(tree))
-					.decoration(TextDecoration.ITALIC, false)
-					.decoration(TextDecoration.BOLD, true);
-			description = "Skilled in single target melee damage, especially against bosses and elites.";
-		} else if (tree == DepthsTree.FLAMECALLER) {
-			itemMat = Material.FIRE_CHARGE;
-			name = Component.text("Flamecaller", getTreeColor(tree))
-					.decoration(TextDecoration.ITALIC, false)
-					.decoration(TextDecoration.BOLD, true);
-			description = "Caster of strong burst AOE abilities and potent damage over time.";
-		} else {
-			itemMat = Material.RED_STAINED_GLASS_PANE;
-			name = Component.text("Invalid Tree", NamedTextColor.RED)
-					.decoration(TextDecoration.ITALIC, false)
-					.decoration(TextDecoration.BOLD, true);
-			description = "Please report this item's existence to a moderator.";
-		}
-		ItemStack buildItem = new ItemStack(itemMat, 1);
-		buildMeta = buildItem.getItemMeta();
-		buildMeta.displayName(name);
-		buildMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		GUIUtils.splitLoreLine(buildMeta, description, 30, ChatColor.GRAY, true);
-		buildItem.setItemMeta(buildMeta);
-		ItemUtils.setPlainName(buildItem);
-
-		return buildItem;
-	}
-
-	public static TextColor getTreeColor(DepthsTree tree) {
-
-		if (tree == DepthsTree.EARTHBOUND) {
-			return TextColor.color(EARTHBOUND);
-		} else if (tree == DepthsTree.SUNLIGHT) {
-			return TextColor.color(SUNLIGHT);
-		} else if (tree == DepthsTree.METALLIC) {
-			return TextColor.color(METALLIC);
-		} else if (tree == DepthsTree.WINDWALKER) {
-			return TextColor.color(WINDWALKER);
-		} else if (tree == DepthsTree.FROSTBORN) {
-			return TextColor.color(FROSTBORN);
-		} else if (tree == DepthsTree.SHADOWS) {
-			return TextColor.color(SHADOWS);
-		} else if (tree == DepthsTree.FLAMECALLER) {
-			return TextColor.color(FLAMECALLER);
-		}
-		return NamedTextColor.WHITE;
 	}
 
 	public static void spawnIceTerrain(Location l, int ticks, Player p) {
@@ -326,15 +200,16 @@ public class DepthsUtils {
 
 		List<Player> players = PlayerUtils.playersInRange(l, 30.0, true);
 
-		if (players == null || players.size() == 0) {
+		if (players.isEmpty()) {
 			return null;
 		}
 
+		DepthsManager dm = DepthsManager.getInstance();
 		for (Player p : players) {
-			DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(p.getUniqueId());
-			if (dp != null && DepthsManager.getInstance().getPartyFromId(dp) != null) {
-				//Just return the first party we find
-				return DepthsManager.getInstance().getPartyFromId(dp);
+			DepthsParty party = dm.getDepthsParty(p);
+			//Return the first party found
+			if (party != null) {
+				return party;
 			}
 		}
 
@@ -365,45 +240,15 @@ public class DepthsUtils {
 	}
 
 	public static @Nullable DepthsRewardType rewardFromRoom(@Nullable DepthsRoomType roomType) {
-		if (roomType == DepthsRoomType.ABILITY) {
-			return DepthsRewardType.ABILITY;
-		} else if (roomType == DepthsRoomType.ABILITY_ELITE) {
-			return DepthsRewardType.ABILITY_ELITE;
-		} else if (roomType == DepthsRoomType.UPGRADE) {
-			return DepthsRewardType.UPGRADE;
-		} else if (roomType == DepthsRoomType.UPGRADE_ELITE) {
-			return DepthsRewardType.UPGRADE_ELITE;
-		} else if (roomType == DepthsRoomType.TWISTED) {
-			return DepthsRewardType.TWISTED;
+		if (roomType != null) {
+			return roomType.getRewardType();
 		}
 		return null;
 	}
 
 	public static String rewardString(@Nullable DepthsRoomType roomType) {
-		if (roomType == DepthsRoomType.ABILITY || roomType == DepthsRoomType.ABILITY_ELITE) {
-			return "Ability";
-		} else if (roomType == DepthsRoomType.UPGRADE || roomType == DepthsRoomType.UPGRADE_ELITE) {
-			return "Upgrade";
-		} else if (roomType == DepthsRoomType.TREASURE || roomType == DepthsRoomType.TREASURE_ELITE) {
-			return "Treasure";
-		} else if (roomType == DepthsRoomType.TWISTED) {
-			return ChatColor.MAGIC + "XXXXXX" + ChatColor.LIGHT_PURPLE;
-		}
-		return "";
-	}
-
-	public static String roomString(DepthsRoomType roomType) {
-		String reward = rewardString(roomType);
-		if (roomType == DepthsRoomType.ABILITY || roomType == DepthsRoomType.UPGRADE || roomType == DepthsRoomType.TREASURE) {
-			return reward;
-		} else if (roomType == DepthsRoomType.ABILITY_ELITE || roomType == DepthsRoomType.UPGRADE_ELITE || roomType == DepthsRoomType.TREASURE_ELITE) {
-			return "Elite " + reward;
-		} else if (roomType == DepthsRoomType.UTILITY) {
-			return "Utility";
-		} else if (roomType == DepthsRoomType.BOSS) {
-			return "Boss";
-		} else if (roomType == DepthsRoomType.TWISTED) {
-			return ChatColor.MAGIC + "XXXXXX" + ChatColor.LIGHT_PURPLE;
+		if (roomType != null) {
+			return roomType.getRewardString();
 		}
 		return "";
 	}
@@ -421,7 +266,7 @@ public class DepthsUtils {
 
 	public static void explodeEvent(EntityExplodeEvent event) {
 		// Check location of blocks to see if they were ice barrier placed
-		if (event.getEntity() == null || event.getEntity().isDead() || !(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof AbstractHorse) {
+		if (event.getEntity().isDead() || !(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof AbstractHorse) {
 			return;
 		}
 		List<Block> blocks = event.blockList();
@@ -438,7 +283,7 @@ public class DepthsUtils {
 	public static boolean isPlant(Entity entity) {
 		if (entity != null) {
 			String name = entity.getName();
-			if (name != null && name.contains("Dionaea")) {
+			if (name.contains("Dionaea")) {
 				List<String> plantNames = new ArrayList<>();
 				plantNames.add("Spore Dionaea");
 				plantNames.add("Vampiric Dionaea");

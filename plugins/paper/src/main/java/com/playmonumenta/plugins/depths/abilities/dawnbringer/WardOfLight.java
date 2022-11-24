@@ -32,7 +32,7 @@ public class WardOfLight extends DepthsAbility {
 	private static final int COOLDOWN = 12 * 20;
 
 	public static final DepthsAbilityInfo<WardOfLight> INFO =
-		new DepthsAbilityInfo<>(WardOfLight.class, ABILITY_NAME, WardOfLight::new, DepthsTree.SUNLIGHT, DepthsTrigger.RIGHT_CLICK)
+		new DepthsAbilityInfo<>(WardOfLight.class, ABILITY_NAME, WardOfLight::new, DepthsTree.DAWNBRINGER, DepthsTrigger.RIGHT_CLICK)
 			.linkedSpell(ClassAbility.WARD_OF_LIGHT)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WardOfLight::cast,

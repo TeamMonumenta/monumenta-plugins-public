@@ -26,7 +26,7 @@ public class FocusedCombos extends DepthsAbility {
 	public static final int BLEED_DURATION = 20 * 3;
 
 	public static final DepthsAbilityInfo<FocusedCombos> INFO =
-		new DepthsAbilityInfo<>(FocusedCombos.class, ABILITY_NAME, FocusedCombos::new, DepthsTree.METALLIC, DepthsTrigger.COMBO)
+		new DepthsAbilityInfo<>(FocusedCombos.class, ABILITY_NAME, FocusedCombos::new, DepthsTree.STEELSAGE, DepthsTrigger.COMBO)
 			.displayItem(new ItemStack(Material.SPECTRAL_ARROW))
 			.descriptions(FocusedCombos::getDescription, MAX_RARITY);
 

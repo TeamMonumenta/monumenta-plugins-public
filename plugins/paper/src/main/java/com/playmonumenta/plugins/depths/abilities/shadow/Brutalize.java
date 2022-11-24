@@ -28,7 +28,7 @@ public class Brutalize extends DepthsAbility {
 	public static final int RADIUS = 2;
 
 	public static final DepthsAbilityInfo<Brutalize> INFO =
-		new DepthsAbilityInfo<>(Brutalize.class, ABILITY_NAME, Brutalize::new, DepthsTree.SHADOWS, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(Brutalize.class, ABILITY_NAME, Brutalize::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.STONE_SWORD))
 			.descriptions(Brutalize::getDescription, MAX_RARITY);
 

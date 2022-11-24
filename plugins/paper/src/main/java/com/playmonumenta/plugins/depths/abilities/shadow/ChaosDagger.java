@@ -48,7 +48,7 @@ public class ChaosDagger extends DepthsAbility {
 	private static final int STEALTH_DURATION = 30;
 
 	public static final DepthsAbilityInfo<ChaosDagger> INFO =
-		new DepthsAbilityInfo<>(ChaosDagger.class, ABILITY_NAME, ChaosDagger::new, DepthsTree.SHADOWS, DepthsTrigger.SWAP)
+		new DepthsAbilityInfo<>(ChaosDagger.class, ABILITY_NAME, ChaosDagger::new, DepthsTree.SHADOWDANCER, DepthsTrigger.SWAP)
 			.linkedSpell(ClassAbility.CHAOS_DAGGER)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ChaosDagger::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))

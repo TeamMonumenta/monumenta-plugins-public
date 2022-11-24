@@ -51,7 +51,7 @@ public class TotemOfSalvation extends DepthsAbility {
 	private static final Particle.DustOptions PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(254, 212, 38), 1.0f);
 
 	public static final DepthsAbilityInfo<TotemOfSalvation> INFO =
-		new DepthsAbilityInfo<>(TotemOfSalvation.class, ABILITY_NAME, TotemOfSalvation::new, DepthsTree.SUNLIGHT, DepthsTrigger.SWAP)
+		new DepthsAbilityInfo<>(TotemOfSalvation.class, ABILITY_NAME, TotemOfSalvation::new, DepthsTree.DAWNBRINGER, DepthsTrigger.SWAP)
 			.linkedSpell(ClassAbility.TOTEM_OF_SALVATION)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", TotemOfSalvation::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))

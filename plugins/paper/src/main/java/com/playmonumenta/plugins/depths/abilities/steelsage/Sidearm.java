@@ -37,7 +37,7 @@ public class Sidearm extends DepthsAbility {
 	private static final Particle.DustOptions SIDEARM_COLOR = new Particle.DustOptions(Color.fromRGB(130, 130, 130), 1.0f);
 
 	public static final DepthsAbilityInfo<Sidearm> INFO =
-		new DepthsAbilityInfo<>(Sidearm.class, ABILITY_NAME, Sidearm::new, DepthsTree.METALLIC, DepthsTrigger.RIGHT_CLICK)
+		new DepthsAbilityInfo<>(Sidearm.class, ABILITY_NAME, Sidearm::new, DepthsTree.STEELSAGE, DepthsTrigger.RIGHT_CLICK)
 			.linkedSpell(ClassAbility.SIDEARM)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Sidearm::cast,

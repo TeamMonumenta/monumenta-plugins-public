@@ -161,9 +161,9 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			ItemStack stack = getDisplayItem();
 			ItemMeta meta = stack.getItemMeta();
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			meta.displayName(Component.text("" + ChatColor.BOLD + getDisplayName(), DepthsUtils.getTreeColor(mDepthsTree)).decoration(TextDecoration.ITALIC, false));
+			meta.displayName(Component.text("" + ChatColor.BOLD + getDisplayName(), mDepthsTree.getColor()).decoration(TextDecoration.ITALIC, false));
 			List<Component> lore = new ArrayList<>();
-			if (rarity > 0 && mDepthsTree != null) {
+			if (rarity > 0) {
 				lore.add(DepthsUtils.getLoreForItem(mDepthsTree, rarity));
 			}
 			meta.lore(lore);

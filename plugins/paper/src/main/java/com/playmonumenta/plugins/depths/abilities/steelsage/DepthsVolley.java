@@ -44,7 +44,7 @@ public class DepthsVolley extends DepthsAbility {
 	private static final double[] DAMAGE_MULTIPLIER = {1.4, 1.5, 1.6, 1.7, 1.8, 2.0};
 
 	public static final DepthsAbilityInfo<DepthsVolley> INFO =
-		new DepthsAbilityInfo<>(DepthsVolley.class, ABILITY_NAME, DepthsVolley::new, DepthsTree.METALLIC, DepthsTrigger.SHIFT_BOW)
+		new DepthsAbilityInfo<>(DepthsVolley.class, ABILITY_NAME, DepthsVolley::new, DepthsTree.STEELSAGE, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.VOLLEY)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.ARROW))

@@ -91,7 +91,7 @@ public class DepthsPlayer {
 
 	public List<DepthsTree> initTrees(Player player) {
 		int talismanScore = ScoreboardUtils.getScoreboardValue(player, "DDTalisman").orElse(0);
-		if (0 < talismanScore && talismanScore <= DepthsUtils.TREES.length) {
+		if (0 < talismanScore && talismanScore <= DepthsTree.values().length) {
 			double chance = 1;
 			if (player.getScoreboardTags().contains(DepthsManager.ENDLESS_MODE_STRING) && !player.getScoreboardTags().contains(DepthsManager.RIGGED_STRING)) {
 				chance = 0.75;
@@ -103,13 +103,13 @@ public class DepthsPlayer {
 				return initTreesWithGuarantee(talismanScore);
 			} else if (rand < chance) {
 				//The Talisman granted them the tree when it wouldn't normally
-				player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Due to your Talisman, you have become a " + DepthsUtils.TREE_NAMES[talismanScore - 1] + " when you would not have otherwise!");
+				player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Due to your Talisman, you have become a " + DepthsTree.values()[talismanScore - 1].getDisplayName() + " when you would not have otherwise!");
 				return initTreesWithGuarantee(talismanScore);
 			} else {
 				//They failed both the usual random chance of the tree and the Talisman chance
 				List<DepthsTree> randomTrees = new ArrayList<>();
 
-				DepthsTree talismanTree = DepthsUtils.TREES[talismanScore - 1];
+				DepthsTree talismanTree = DepthsTree.values()[talismanScore - 1];
 
 				List<DepthsTree> allTrees = new ArrayList<>();
 				//Get all possible trees and shuffle them
@@ -150,7 +150,7 @@ public class DepthsPlayer {
 	public List<DepthsTree> initTreesWithGuarantee(int talismanScore) {
 		List<DepthsTree> randomTrees = new ArrayList<>();
 
-		DepthsTree talismanTree = DepthsUtils.TREES[talismanScore - 1];
+		DepthsTree talismanTree = DepthsTree.values()[talismanScore - 1];
 		randomTrees.add(talismanTree);
 
 		List<DepthsTree> allTrees = new ArrayList<>();

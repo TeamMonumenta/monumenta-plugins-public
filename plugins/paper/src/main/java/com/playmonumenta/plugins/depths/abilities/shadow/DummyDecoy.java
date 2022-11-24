@@ -50,7 +50,7 @@ public class DummyDecoy extends DepthsAbility {
 	public static final String DUMMY_DECOY_ARROW_METADATA = "DummyDecoyArrow";
 
 	public static final DepthsAbilityInfo<DummyDecoy> INFO =
-		new DepthsAbilityInfo<>(DummyDecoy.class, ABILITY_NAME, DummyDecoy::new, DepthsTree.SHADOWS, DepthsTrigger.SHIFT_BOW)
+		new DepthsAbilityInfo<>(DummyDecoy.class, ABILITY_NAME, DummyDecoy::new, DepthsTree.SHADOWDANCER, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.DUMMY_DECOY)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.ARMOR_STAND))

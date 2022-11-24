@@ -37,7 +37,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 	private static final int IFRAMES = 10;
 
 	public static final DepthsAbilityInfo<DepthsSplitArrow> INFO =
-		new DepthsAbilityInfo<>(DepthsSplitArrow.class, ABILITY_NAME, DepthsSplitArrow::new, DepthsTree.METALLIC, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(DepthsSplitArrow.class, ABILITY_NAME, DepthsSplitArrow::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.CHAIN))
 			.descriptions(DepthsSplitArrow::getDescription, MAX_RARITY);
 

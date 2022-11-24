@@ -32,7 +32,7 @@ public class RadiantBlessing extends DepthsAbility {
 	private static final double PERCENT_DAMAGE_RECEIVED = -0.2;
 
 	public static final DepthsAbilityInfo<RadiantBlessing> INFO =
-		new DepthsAbilityInfo<>(RadiantBlessing.class, ABILITY_NAME, RadiantBlessing::new, DepthsTree.SUNLIGHT, DepthsTrigger.SHIFT_LEFT_CLICK)
+		new DepthsAbilityInfo<>(RadiantBlessing.class, ABILITY_NAME, RadiantBlessing::new, DepthsTree.DAWNBRINGER, DepthsTrigger.SHIFT_LEFT_CLICK)
 			.linkedSpell(ClassAbility.RADIANT_BLESSING)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RadiantBlessing::cast,

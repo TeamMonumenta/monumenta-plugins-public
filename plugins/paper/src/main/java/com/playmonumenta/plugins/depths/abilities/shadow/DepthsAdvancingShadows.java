@@ -41,7 +41,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	private static final int DAMAGE_DURATION = 5 * 20;
 
 	public static final DepthsAbilityInfo<DepthsAdvancingShadows> INFO =
-		new DepthsAbilityInfo<>(DepthsAdvancingShadows.class, ABILITY_NAME, DepthsAdvancingShadows::new, DepthsTree.SHADOWS, DepthsTrigger.RIGHT_CLICK)
+		new DepthsAbilityInfo<>(DepthsAdvancingShadows.class, ABILITY_NAME, DepthsAdvancingShadows::new, DepthsTree.SHADOWDANCER, DepthsTrigger.RIGHT_CLICK)
 			.linkedSpell(ClassAbility.ADVANCING_SHADOWS)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsAdvancingShadows::cast,

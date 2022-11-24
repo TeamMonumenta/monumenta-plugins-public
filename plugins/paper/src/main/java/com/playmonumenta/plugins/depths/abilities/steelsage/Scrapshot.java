@@ -39,7 +39,7 @@ public class Scrapshot extends DepthsAbility {
 	private static final Particle.DustOptions SCRAPSHOT_COLOR = new Particle.DustOptions(Color.fromRGB(130, 130, 130), 1.0f);
 
 	public static final DepthsAbilityInfo<Scrapshot> INFO =
-		new DepthsAbilityInfo<>(Scrapshot.class, ABILITY_NAME, Scrapshot::new, DepthsTree.METALLIC, DepthsTrigger.SHIFT_LEFT_CLICK)
+		new DepthsAbilityInfo<>(Scrapshot.class, ABILITY_NAME, Scrapshot::new, DepthsTree.STEELSAGE, DepthsTrigger.SHIFT_LEFT_CLICK)
 			.linkedSpell(ClassAbility.SCRAPSHOT)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Scrapshot::cast,

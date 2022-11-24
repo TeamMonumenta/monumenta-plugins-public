@@ -27,7 +27,7 @@ public class DarkCombos extends DepthsAbility {
 	public static final int DURATION = 20 * 3;
 
 	public static final DepthsAbilityInfo<DarkCombos> INFO =
-		new DepthsAbilityInfo<>(DarkCombos.class, ABILITY_NAME, DarkCombos::new, DepthsTree.SHADOWS, DepthsTrigger.COMBO)
+		new DepthsAbilityInfo<>(DarkCombos.class, ABILITY_NAME, DarkCombos::new, DepthsTree.SHADOWDANCER, DepthsTrigger.COMBO)
 			.displayItem(new ItemStack(Material.FLINT))
 			.descriptions(DarkCombos::getDescription, MAX_RARITY);
 
