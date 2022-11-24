@@ -66,7 +66,7 @@ public class CoupDeGrace extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)
-			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH || event.getAbility() == ClassAbility.QUAKE)) {
+			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH || event.getAbility() == ClassAbility.QUAKE || event.getAbility() == ClassAbility.QUAKE)) {
 			for (PotionEffect effect : enemy.getActivePotionEffects()) {
 				if (effect.getType().equals(PotionEffectType.DAMAGE_RESISTANCE) && effect.getAmplifier() >= 4) {
 					return false;

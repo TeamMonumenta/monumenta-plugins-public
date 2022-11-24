@@ -57,7 +57,7 @@ public class WeaponMastery extends Ability {
 		mDamageBonusAxeFlat = isLevelOne() ? AXE_1_DAMAGE_FLAT : AXE_2_DAMAGE_FLAT;
 		mDamageBonusSwordFlat = isLevelOne() ? 0 : SWORD_2_DAMAGE_FLAT;
 		double enhancementDamage = (isEnhanced() ? ENHANCED_DAMAGE : 0);
-		mDamageBonusAxe = isLevelOne() ? AXE_1_DAMAGE : AXE_2_DAMAGE;
+		mDamageBonusAxe = (isLevelOne() ? AXE_1_DAMAGE : AXE_2_DAMAGE) + enhancementDamage;
 		mDamageBonusSword = (isLevelOne() ? 0 : SWORD_2_DAMAGE) + enhancementDamage;
 	}
 

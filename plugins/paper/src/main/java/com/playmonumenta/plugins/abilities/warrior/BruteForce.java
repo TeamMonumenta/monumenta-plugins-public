@@ -131,9 +131,6 @@ public class BruteForce extends Ability {
 		Location loc = target.getLocation().add(0, 0.75, 0);
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BRUTE_FORCE_RADIUS);
 		List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, radius).getHitMobs();
-		if (mobs.isEmpty()) {
-			return;
-		}
 
 		mCosmetic.bruteOnDamage(mPlayer, loc, radius, mComboNumber);
 
