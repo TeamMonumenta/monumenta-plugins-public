@@ -37,6 +37,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.LivingEntity;
@@ -401,8 +402,11 @@ public class HuntingCompanion extends Ability {
 
 		if (summon instanceof Fox || summon instanceof Strider) {
 			nearbyMobs.removeIf(mob -> Math.abs(mob.getLocation().getY() - summonLoc.getY()) > MAX_TARGET_Y);
-			nearbyMobs.removeIf(EntityUtils::isFlyingMob);
+			nearbyMobs.removeIf(EntityUtils::isFlyingMobOrRidingFlyingMob);
+		} else if (summon instanceof Axolotl || summon instanceof Dolphin) {
+			nearbyMobs.removeIf(mob -> !EntityUtils.isInWater(mob));
 		}
+
 		for (Mob otherSummon : mSummons.keySet()) {
 			LivingEntity otherTarget = otherSummon.getTarget();
 			if (otherTarget != null) {
