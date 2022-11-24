@@ -237,6 +237,7 @@ public class Plugin extends JavaPlugin {
 		ScanChests.register();
 		AbsorptionCommand.register();
 		SetActivity.register(this);
+		SetMasterwork.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

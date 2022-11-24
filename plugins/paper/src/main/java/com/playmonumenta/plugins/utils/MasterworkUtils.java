@@ -14,16 +14,18 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class MasterworkUtils {
@@ -291,23 +293,6 @@ public class MasterworkUtils {
 		return false;
 	}
 
-	public static String getItemPath(ItemStack item) {
-		String path = "epic:r3/masterwork";
-
-		Masterwork m = ItemStatUtils.getMasterwork(item);
-		if (m == Masterwork.ERROR || m == Masterwork.NONE || ItemStatUtils.getRegion(item) != Region.RING) {
-			path += "/invalid_masterwork_selection";
-		} else if (m == Masterwork.ZERO) {
-			path += "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/"
-				+ toCleanPathName(ItemUtils.getPlainName(item));
-		} else {
-			path += "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/" +
-				toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + m.getName();
-		}
-
-		return path;
-	}
-
 	public static List<ItemStack> getAllMasterworks(ItemStack item, Player p) {
 		String basePath = "epic:r3/masterwork/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/" + toCleanPathName(ItemUtils.getPlainName(item));
 		ArrayList<String> paths = new ArrayList<>();
@@ -333,14 +318,13 @@ public class MasterworkUtils {
 	}
 
 	public static String getNextItemPath(ItemStack item) {
-		String path = "epic:r3/masterwork";
-
+		Masterwork nextM;
 		Masterwork m = ItemStatUtils.getMasterwork(item);
 		if (m == Masterwork.ERROR || m == Masterwork.NONE || ItemStatUtils.getRegion(item) != Region.RING
-			|| m == Masterwork.VIIA || m == Masterwork.VIIB || m == Masterwork.VIIC || m == Masterwork.VI) {
-			path += "/invalid_masterwork_selection";
+			    || m == Masterwork.VIIA || m == Masterwork.VIIB || m == Masterwork.VIIC || m == Masterwork.VI) {
+			nextM = Masterwork.ERROR;
 		} else {
-			Masterwork nextM = switch (Objects.requireNonNull(m)) {
+			nextM = switch (Objects.requireNonNull(m)) {
 				case ZERO -> Masterwork.I;
 				case I -> Masterwork.II;
 				case II -> Masterwork.III;
@@ -349,8 +333,30 @@ public class MasterworkUtils {
 				case V -> Masterwork.VI;
 				default -> Masterwork.I;
 			};
+		}
+		return getItemPath(item, nextM);
+	}
+
+	public static String getItemPath(ItemStack item, Masterwork masterwork) {
+		if (masterwork == Masterwork.ERROR) {
+			return "epic:r3/masterwork/invalid_masterwork_selection";
+		}
+		return "epic:r3/masterwork" + "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/"
+			       + toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + masterwork.getName();
+	}
+
+	public static String getItemPath(ItemStack item) {
+		String path = "epic:r3/masterwork";
+
+		Masterwork m = ItemStatUtils.getMasterwork(item);
+		if (m == Masterwork.ERROR || m == Masterwork.NONE || ItemStatUtils.getRegion(item) != Region.RING) {
+			path += "/invalid_masterwork_selection";
+		} else if (m == Masterwork.ZERO) {
 			path += "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/"
-				+ toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + nextM.getName();
+				        + toCleanPathName(ItemUtils.getPlainName(item));
+		} else {
+			path += "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/" +
+				        toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + m.getName();
 		}
 
 		return path;
@@ -364,7 +370,7 @@ public class MasterworkUtils {
 			path += "/invalid_masterwork_selection";
 		} else {
 			path += "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/"
-				+ toCleanPathName(ItemUtils.getPlainName(item)) + "_m6";
+				        + toCleanPathName(ItemUtils.getPlainName(item)) + "_m6";
 		}
 
 		return path;
@@ -446,13 +452,26 @@ public class MasterworkUtils {
 		// Carry over the durability to not make the trade repair items (a possible shattered state is copied via lore)
 		if (newUpgrade.getItemMeta() instanceof Damageable newResultMeta && base.getItemMeta() instanceof Damageable playerItemMeta) {
 			newResultMeta.setDamage(playerItemMeta.getDamage());
-			newUpgrade.setItemMeta((ItemMeta) newResultMeta);
+			newUpgrade.setItemMeta(newResultMeta);
 		}
 
 		// Carry over the current arrow of a crossbow if the player item has an arrow but the result item doesn't have one
 		if (newUpgrade.getItemMeta() instanceof CrossbowMeta newResultMeta && base.getItemMeta() instanceof CrossbowMeta playerItemMeta
-			&& !newResultMeta.hasChargedProjectiles() && playerItemMeta.hasChargedProjectiles()) {
+			    && !newResultMeta.hasChargedProjectiles() && playerItemMeta.hasChargedProjectiles()) {
 			newResultMeta.setChargedProjectiles(playerItemMeta.getChargedProjectiles());
+			newUpgrade.setItemMeta(newResultMeta);
+		}
+
+		// Carry over leather armor dye
+		if (newUpgrade.getItemMeta() instanceof LeatherArmorMeta newResultMeta && base.getItemMeta() instanceof LeatherArmorMeta playerItemMeta) {
+			newResultMeta.setColor(playerItemMeta.getColor());
+			newUpgrade.setItemMeta(newResultMeta);
+		}
+
+		// Carry over shield pattern
+		if (base.getType() == Material.SHIELD && upgrade.getType() == Material.SHIELD
+			    && newUpgrade.getItemMeta() instanceof BlockStateMeta newResultMeta && base.getItemMeta() instanceof BlockStateMeta playerItemMeta) {
+			newResultMeta.setBlockState(playerItemMeta.getBlockState());
 			newUpgrade.setItemMeta(newResultMeta);
 		}
 

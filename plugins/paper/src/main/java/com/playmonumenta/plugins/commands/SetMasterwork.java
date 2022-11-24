@@ -3,10 +3,8 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Masterwork;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MasterworkUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTItem;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -19,9 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.CrossbowMeta;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class SetMasterwork extends GenericCommand {
 	public static void register() {
@@ -74,37 +69,15 @@ public class SetMasterwork extends GenericCommand {
 			CommandAPI.fail("Player must have a valid item in their main hand!");
 		}
 
-		String itemName = ItemUtils.getPlainName(item).toLowerCase();
-		itemName = itemName.replaceAll("[\\W]+", "");
-
-		ItemStack newItem = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r3/items/masterwork/" + itemName + "/" + itemName + "_" + level.getName()));
+		MasterworkUtils.getItemPath(item, level);
+		ItemStack newItem = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(MasterworkUtils.getItemPath(item, level)));
 		if (newItem == null) {
 			CommandAPI.fail("Invalid loot table found! Please submit a bug report.");
 		}
 
-		// Modify the result item to carry over player modifications (infusions etc.)
-		NBTItem playerItemNbt = new NBTItem(item);
-		NBTItem newItemNbt = new NBTItem(newItem);
-		NBTCompound playerModified = ItemStatUtils.getPlayerModified(playerItemNbt);
+		newItem = MasterworkUtils.preserveModified(item, newItem);
+		item.setItemMeta(newItem.getItemMeta());
 
-		ItemStatUtils.addPlayerModified(newItemNbt).mergeCompound(playerModified);
-		newItem = newItemNbt.getItem();
-
-		// Carry over the durability
-		if (newItem.getItemMeta() instanceof Damageable newResultMeta && item.getItemMeta() instanceof Damageable playerItemMeta) {
-			newResultMeta.setDamage(playerItemMeta.getDamage());
-			newItem.setItemMeta((ItemMeta) newResultMeta);
-		}
-
-		// Carry over the current arrow of a crossbow if the player item has an arrow
-		if (newItem.getItemMeta() instanceof CrossbowMeta newResultMeta && item.getItemMeta() instanceof CrossbowMeta playerItemMeta
-			&& !newResultMeta.hasChargedProjectiles() && playerItemMeta.hasChargedProjectiles()) {
-			newResultMeta.setChargedProjectiles(playerItemMeta.getChargedProjectiles());
-			newItem.setItemMeta(newResultMeta);
-		}
-
-		ItemStatUtils.generateItemStats(newItem);
-		player.getInventory().setItemInHand(newItem);
 		player.updateInventory();
 	}
 
