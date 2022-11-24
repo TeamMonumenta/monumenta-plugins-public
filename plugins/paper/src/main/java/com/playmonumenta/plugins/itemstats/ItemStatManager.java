@@ -194,7 +194,7 @@ public class ItemStatManager implements Listener {
 			if (checkHealth) {
 				Bukkit.getScheduler().runTaskLater(plugin, () -> {
 					if (Math.abs(priorHealth - EntityUtils.getMaxHealth(player)) > 0.01) {
-						Plugin.getInstance().mEffectManager.clearEffects(player, EffectType.ABSORPTION.getName());
+						player.setAbsorptionAmount(0);
 						Plugin.getInstance().mEffectManager.clearEffects(player, EffectType.MAX_HEALTH_INCREASE.getName());
 					}
 				}, 1);
