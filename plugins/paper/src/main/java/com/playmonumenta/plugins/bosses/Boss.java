@@ -294,6 +294,19 @@ public class Boss {
 		}
 	}
 
+	public void removeAbility(String identityTag) {
+		for (BossAbilityGroup abilityGroup : getAbilities()) {
+			if (abilityGroup.getIdentityTag().equals(identityTag)) {
+				abilityGroup.unload();
+				mAbilities.remove(abilityGroup);
+			}
+		}
+
+		if (mAbilities.isEmpty()) {
+			BossManager.getInstance().unload(this, false);
+		}
+	}
+
 	public void death(EntityDeathEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.mDead = true;

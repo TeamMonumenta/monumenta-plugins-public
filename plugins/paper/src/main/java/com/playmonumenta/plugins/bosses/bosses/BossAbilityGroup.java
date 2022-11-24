@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
@@ -175,7 +176,7 @@ public abstract class BossAbilityGroup {
 					// The event goes after the spell casts because Kaul's abilities take place where he previously was.
 					Spell spell = mActiveSpells.getLastCastedSpell();
 					if (spell != null) {
-						SpellCastEvent event = new SpellCastEvent(mBoss, spell);
+						SpellCastEvent event = new SpellCastEvent(mBoss, BossAbilityGroup.this, spell);
 						Bukkit.getPluginManager().callEvent(event);
 					}
 				}
@@ -184,11 +185,19 @@ public abstract class BossAbilityGroup {
 		mTaskActive.runTaskTimer(mPlugin, spellDelay, 2L);
 	}
 
+	public void forceCastRandomSpell() {
+		List<Spell> spells = mActiveSpells.getSpells();
+		if (!spells.isEmpty()) {
+			Spell spell = spells.get(FastUtils.RANDOM.nextInt(spells.size()));
+			forceCastSpell(spell.getClass());
+		}
+	}
+
 	public void forceCastSpell(Class<? extends Spell> spell) {
 		mNextActiveTimer = mActiveSpells.forceCastSpell(spell);
 		Spell sp = mActiveSpells.getLastCastedSpell();
 		if (sp != null) {
-			SpellCastEvent event = new SpellCastEvent(mBoss, sp);
+			SpellCastEvent event = new SpellCastEvent(mBoss, this, sp);
 			Bukkit.getPluginManager().callEvent(event);
 		} else {
 			mPlugin.getLogger().severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() + "' but boss does not have this spell!");

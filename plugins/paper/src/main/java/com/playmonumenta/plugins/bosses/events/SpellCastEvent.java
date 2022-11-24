@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.events;
 
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
@@ -8,16 +9,22 @@ import org.bukkit.event.HandlerList;
 public class SpellCastEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
-	private LivingEntity mBoss;
-	private Spell mSpell;
+	private final LivingEntity mBoss;
+	private final BossAbilityGroup mBossAbilityGroup;
+	private final Spell mSpell;
 
-	public SpellCastEvent(LivingEntity boss, Spell spell) {
+	public SpellCastEvent(LivingEntity boss, BossAbilityGroup bossAbilityGroup, Spell spell) {
 		mBoss = boss;
+		mBossAbilityGroup = bossAbilityGroup;
 		mSpell = spell;
 	}
 
 	public LivingEntity getBoss() {
 		return mBoss;
+	}
+
+	public BossAbilityGroup getBossAbilityGroup() {
+		return mBossAbilityGroup;
 	}
 
 	public Spell getSpell() {

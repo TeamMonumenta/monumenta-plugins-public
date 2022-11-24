@@ -291,8 +291,10 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(BlueStrikeTargetNPCBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeTargetNPCBoss(p, e));
 		mStatelessBosses.put(BlueStrikeTurretBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeTurretBoss(p, e));
 		mStatelessBosses.put(LavaCannonBoss.identityTag, (Plugin p, LivingEntity e) -> new LavaCannonBoss(p, e));
+		mStatelessBosses.put(PhasesManagerBoss.identityTag, (Plugin p, LivingEntity e) -> new PhasesManagerBoss(p, e));
 		mStatelessBosses.put(SoundBoss.identityTag, (Plugin p, LivingEntity e) -> new SoundBoss(p, e));
 		mStatelessBosses.put(RedstoneBoss.identityTag, (Plugin p, LivingEntity e) -> new RedstoneBoss(p, e));
+
 
 		mStatelessBosses.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> new LichMageBoss(p, e));
 		mStatelessBosses.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> new LichRogueBoss(p, e));
@@ -549,6 +551,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(BlueStrikeTargetNPCBoss.identityTag, (Plugin p, LivingEntity e) -> BlueStrikeTargetNPCBoss.deserialize(p, e));
 		mBossDeserializers.put(BlueStrikeTurretBoss.identityTag, (Plugin p, LivingEntity e) -> BlueStrikeTurretBoss.deserialize(p, e));
 		mBossDeserializers.put(LavaCannonBoss.identityTag, (Plugin p, LivingEntity e) -> LavaCannonBoss.deserialize(p, e));
+		mBossDeserializers.put(PhasesManagerBoss.identityTag, (Plugin p, LivingEntity e) -> PhasesManagerBoss.deserialize(p, e));
 		mBossDeserializers.put(SoundBoss.identityTag, (Plugin p, LivingEntity e) -> SoundBoss.deserialize(p, e));
 		mBossDeserializers.put(RedstoneBoss.identityTag, (Plugin p, LivingEntity e) -> RedstoneBoss.deserialize(p, e));
 
@@ -1108,7 +1111,7 @@ public class BossManager implements Listener {
 	 * Every way to unload a boss needs to bounce through this function to ensure
 	 * state is updated correctly!
 	 */
-	private void unload(Boss boss, boolean shuttingDown) {
+	public void unload(Boss boss, boolean shuttingDown) {
 		if (!shuttingDown) {
 			checkDisablePerformanceEvents(boss);
 		}
@@ -1127,6 +1130,13 @@ public class BossManager implements Listener {
 			unload(entry.getValue(), shuttingDown);
 		}
 		mBosses.clear();
+	}
+
+	public void removeAbility(LivingEntity entity, String identityTag) {
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss != null) {
+			boss.removeAbility(identityTag);
+		}
 	}
 
 	public static void createBoss(@Nullable CommandSender sender, LivingEntity targetEntity, String requestedTag) throws Exception {

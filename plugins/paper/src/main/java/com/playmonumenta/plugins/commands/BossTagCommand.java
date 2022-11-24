@@ -8,7 +8,9 @@ import com.playmonumenta.libraryofsouls.Soul;
 import com.playmonumenta.libraryofsouls.SoulsDatabase;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.BossParameters;
+import com.playmonumenta.plugins.bosses.bosses.PhasesManagerBoss;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.BossPhasesList;
 import com.playmonumenta.plugins.bosses.parameters.ParseResult;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -18,6 +20,8 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.SuggestionInfo;
 import dev.jorel.commandapi.Tooltip;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.BooleanArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
@@ -25,6 +29,7 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -41,6 +46,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -171,6 +177,72 @@ public class BossTagCommand {
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
 				helpBossTags(player);
+			})
+			.register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("phase"));
+		arguments.add(new MultiLiteralArgument("add"));
+		arguments.add(new StringArgument("PhaseName"));
+		arguments.add(new BooleanArgument("reusable"));
+		arguments.add(new GreedyStringArgument("PhaseExpression").replaceWithSafeSuggestionsT(BossPhasesList::suggestionPhases));
+		new CommandAPICommand(COMMAND)
+			.withPermission("monumenta.bosstag.Phase")
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				String phaseName = (String) args[2];
+				boolean reusable = (boolean) args[3];
+				String phaseString = (String) args[4];
+
+				BookOfSouls bos = getBos(player);
+				ListVariable tags = (ListVariable) bos.getEntityNBT().getVariable("Tags");
+				NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
+
+				boolean foundBaseTag = false;
+				if (nbtTagsList != null && nbtTagsList.size() > 0) {
+					for (Object object : nbtTagsList.getAsArray()) {
+						if (object.toString().contains(PhasesManagerBoss.identityTag)) {
+							foundBaseTag = true;
+							break;
+						}
+					}
+				}
+
+				if (!foundBaseTag) {
+					tags.add(PhasesManagerBoss.identityTag, player);
+					bos.saveBook();
+				}
+
+				String newTag = PhasesManagerBoss.identityTag + "[phases=[(" + phaseName + "," + reusable + "," + phaseString + ")]]";
+
+				player.sendMessage(Component.empty()
+					.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					.append(Component.text(newTag, NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+				tags.add(newTag, player);
+				bos.saveBook();
+
+			})
+			.register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("phase"));
+		arguments.add(new MultiLiteralArgument("trigger"));
+		arguments.add(new EntitySelectorArgument("bosses", EntitySelectorArgument.EntitySelector.MANY_ENTITIES));
+		arguments.add(new GreedyStringArgument("triggerKey"));
+		new CommandAPICommand(COMMAND)
+			.withPermission("monumenta.bosstag.Phase")
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				String triggerKey = (String) args[3];
+				BossManager bossManager = BossManager.getInstance();
+				PhasesManagerBoss boss;
+				for (Entity entity : (Collection<Entity>) args[2]) {
+					boss = bossManager.getBoss(entity, PhasesManagerBoss.class);
+					if (boss != null) {
+						boss.onCustomTrigger(triggerKey);
+					}
+				}
+
 			})
 			.register();
 	}

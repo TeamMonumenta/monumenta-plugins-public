@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.BossPhasesList;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
@@ -286,6 +286,12 @@ public abstract class BossParameters {
 							return ParseResult.of(result.getTooltip());
 						}
 						validType.getField().set(parameters, result.getResult());
+					} else if (validTypeClass == BossPhasesList.class) {
+						ParseResult<BossPhasesList> result = BossPhasesList.fromReader(reader);
+						if (result.getTooltip() != null) {
+							return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "USE: /bosstag phase add ---", "DUMP")));
+						}
+						((BossPhasesList) validType.getField().get(parameters)).addBossPhases(result.getResult());
 					} else if (Enum.class.isAssignableFrom(validTypeClass)) {
 						Object val = reader.readEnum(((Class<? extends Enum>) validTypeClass).getEnumConstants());
 						if (val == null) {
@@ -306,7 +312,11 @@ public abstract class BossParameters {
 					usedParams.add(validKey);
 				}
 			} catch (IllegalAccessException e) {
-				Plugin.getInstance().getLogger().severe("Somehow got ILlegalAccessException parsing boss tag: " + e.getMessage());
+				MMLog.severe("[BossParameters] Somehow got IllegalAccessException parsing boss tag: " + e.getMessage());
+				e.printStackTrace();
+				return ParseResult.of(Tooltip.arrayOf());
+			} catch (Exception e) {
+				MMLog.severe("[BossParameters] Somehow got " + e.getClass().getSimpleName() + " parsing boss tag: " + e.getMessage());
 				e.printStackTrace();
 				return ParseResult.of(Tooltip.arrayOf());
 			}
