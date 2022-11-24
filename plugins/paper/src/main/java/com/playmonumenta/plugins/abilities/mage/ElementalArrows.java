@@ -41,7 +41,7 @@ public class ElementalArrows extends Ability {
 	public static final int ELEMENTAL_ARROWS_DURATION = 20 * 6;
 	public static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
 	public static final double SLOW_AMPLIFIER = 0.2;
-	public static final int ENHANCED_ARROW_COOLDOWN = 10 * Constants.TICKS_PER_SECOND;
+	public static final int ENHANCED_ARROW_COOLDOWN = 8 * Constants.TICKS_PER_SECOND;
 	public static final int ENHANCED_ARROW_STUN_DURATION = 1 * Constants.TICKS_PER_SECOND;
 
 	public static final String CHARM_DAMAGE = "Elemental Arrows Damage";

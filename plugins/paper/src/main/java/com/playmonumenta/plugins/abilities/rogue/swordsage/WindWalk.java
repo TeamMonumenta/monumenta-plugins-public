@@ -30,14 +30,15 @@ import org.bukkit.util.Vector;
 
 public class WindWalk extends MultipleChargeAbility {
 
-	private static final int WIND_WALK_COOLDOWN = 20 * 25;
+	private static final int WIND_WALK_1_COOLDOWN = 25 * 20;
+	private static final int WIND_WALK_2_COOLDOWN = 20 * 20;
 	private static final int WIND_WALK_MAX_CHARGES = 2;
 	private static final int WIND_WALK_DURATION = 20 * 2;
 	private static final int WIND_WALK_RADIUS = 3;
 	private static final double WIND_WALK_Y_VELOCITY = 0.2;
 	private static final double WIND_WALK_Y_VELOCITY_MULTIPLIER = 0.2;
 	private static final double WIND_WALK_VELOCITY_BONUS = 1.5;
-	private static final int WIND_WALK_CDR = 20 * 2;
+	private static final int WIND_WALK_CDR = 20 * 3;
 
 	public static final String CHARM_COOLDOWN = "Wind Walk Cooldown";
 	public static final String CHARM_CHARGE = "Wind Walk Charge";
@@ -52,12 +53,13 @@ public class WindWalk extends MultipleChargeAbility {
 				String.format("Press the swap key while holding two swords to dash in the target direction, stunning and levitating enemies for %s seconds. " +
 					              "Elites are not levitated. Cooldown: %ss. Charges: %s.",
 					WIND_WALK_DURATION / 20,
-					WIND_WALK_COOLDOWN / 20,
+					WIND_WALK_1_COOLDOWN / 20,
 					WIND_WALK_MAX_CHARGES
 				),
-				String.format("Casting this ability reduces the cooldown of all other abilities by %s seconds.",
-					WIND_WALK_CDR / 20))
-			.cooldown(WIND_WALK_COOLDOWN, CHARM_COOLDOWN)
+				String.format("Casting this ability reduces the cooldown of all other abilities by %s seconds. Cooldown: %ss.",
+					WIND_WALK_CDR / 20,
+					WIND_WALK_2_COOLDOWN / 20))
+			.cooldown(WIND_WALK_1_COOLDOWN, WIND_WALK_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WindWalk::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
 			.displayItem(new ItemStack(Material.QUARTZ, 1));
