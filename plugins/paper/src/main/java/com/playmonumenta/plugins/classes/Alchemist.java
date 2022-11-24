@@ -25,6 +25,10 @@ import org.bukkit.inventory.ItemStack;
 
 public class Alchemist extends PlayerClass {
 
+	public static final int CLASS_ID = 5;
+	public static final int HARBINGER_SPEC_ID = 9;
+	public static final int APOTHECARY_SPEC_ID = 10;
+
 	Alchemist() {
 		mAbilities.add(GruesomeAlchemy.INFO);
 		mAbilities.add(BrutalAlchemy.INFO);
@@ -34,7 +38,7 @@ public class Alchemist extends PlayerClass {
 		mAbilities.add(UnstableAmalgam.INFO);
 		mAbilities.add(EnergizingElixir.INFO);
 		mAbilities.add(Bezoar.INFO);
-		mClass = 5;
+		mClass = CLASS_ID;
 		mClassName = "Alchemist";
 		mClassColor = NamedTextColor.GREEN;
 		mChatColor = ChatColor.GREEN;
@@ -50,7 +54,7 @@ public class Alchemist extends PlayerClass {
 		mSpecOne.mAbilities.add(ScorchedEarth.INFO);
 		mSpecOne.mAbilities.add(EsotericEnhancements.INFO);
 		mSpecOne.mSpecQuestScoreboard = "Quest103m";
-		mSpecOne.mSpecialization = 9;
+		mSpecOne.mSpecialization = HARBINGER_SPEC_ID;
 		mSpecOne.mSpecName = "Harbinger";
 		mSpecOne.mDisplayItem = new ItemStack(Material.DEAD_BUSH, 1);
 		mSpecOne.mDescription = "Harbingers use special potions to weaken and destroy their enemies. Harbingers prefer slinging deadly potions and using strategy.";
@@ -59,7 +63,7 @@ public class Alchemist extends PlayerClass {
 		mSpecTwo.mAbilities.add(TransmutationRing.INFO);
 		mSpecTwo.mAbilities.add(WardingRemedy.INFO);
 		mSpecTwo.mSpecQuestScoreboard = "Quest103f";
-		mSpecTwo.mSpecialization = 10;
+		mSpecTwo.mSpecialization = APOTHECARY_SPEC_ID;
 		mSpecTwo.mSpecName = "Apothecary";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.BLUE_ORCHID, 1);
 		mSpecTwo.mDescription = "Apothecaries employ magic potions to weaken enemies and support friends.";

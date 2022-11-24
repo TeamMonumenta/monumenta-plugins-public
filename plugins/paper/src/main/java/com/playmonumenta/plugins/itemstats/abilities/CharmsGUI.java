@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.itemstats.abilities;
 
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -7,7 +8,6 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -106,15 +106,7 @@ public class CharmsGUI extends CustomInventory {
 
 	public void setCharms() {
 		List<ItemStack> items = CharmManager.getInstance().mPlayerCharms.get(mTargetPlayer.getUniqueId());
-		Optional<Integer> optionalBudget = ScoreboardUtils.getScoreboardValue(mTargetPlayer, "CharmPower");
-		int totalBudget = 0;
-		if (optionalBudget.isPresent()) {
-			totalBudget = optionalBudget.get();
-		}
-		if (totalBudget == 0) {
-			totalBudget = 15;
-		}
-
+		int totalBudget = ScoreboardUtils.getScoreboardValue(mTargetPlayer, AbilityUtils.CHARM_POWER).orElse(0);
 
 		for (int i = 0; i < 54; i++) {
 			mInventory.setItem(i, new ItemStack(FILLER, 1));

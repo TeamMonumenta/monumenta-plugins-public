@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.warrior;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.classes.Warrior;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -14,7 +16,7 @@ public class Formidable extends Ability {
 
 	public static final AbilityInfo<Formidable> INFO =
 		new AbilityInfo<>(Formidable.class, null, Formidable::new)
-			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 2);
+			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Warrior.CLASS_ID);
 
 	public Formidable(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

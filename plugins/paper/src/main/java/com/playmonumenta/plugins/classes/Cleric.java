@@ -23,6 +23,10 @@ import org.bukkit.inventory.ItemStack;
 
 public class Cleric extends PlayerClass {
 
+	public static final int CLASS_ID = 3;
+	public static final int PALADIN_SPEC_ID = 5;
+	public static final int HIEROPHANT_SPEC_ID = 6;
+
 	Cleric() {
 		mAbilities.add(CelestialBlessing.INFO);
 		mAbilities.add(CleansingRain.INFO);
@@ -32,7 +36,7 @@ public class Cleric extends PlayerClass {
 		mAbilities.add(Crusade.INFO);
 		mAbilities.add(SacredProvisions.INFO);
 		mAbilities.add(SanctifiedArmor.INFO);
-		mClass = 3;
+		mClass = CLASS_ID;
 		mClassName = "Cleric";
 		mClassColor = NamedTextColor.YELLOW;
 		mChatColor = ChatColor.YELLOW;
@@ -45,7 +49,7 @@ public class Cleric extends PlayerClass {
 		mSpecOne.mAbilities.add(ChoirBells.INFO);
 		mSpecOne.mAbilities.add(LuminousInfusion.INFO);
 		mSpecOne.mSpecQuestScoreboard = "Quest103d";
-		mSpecOne.mSpecialization = 5;
+		mSpecOne.mSpecialization = PALADIN_SPEC_ID;
 		mSpecOne.mSpecName = "Paladin";
 		mSpecOne.mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
 		mSpecOne.mDescription = "Paladins are mighty healers that have mastered combating undead foes. They will make sure the dead stay dead.";
@@ -54,7 +58,7 @@ public class Cleric extends PlayerClass {
 		mSpecTwo.mAbilities.add(ThuribleProcession.INFO);
 		mSpecTwo.mAbilities.add(HallowedBeam.INFO);
 		mSpecTwo.mSpecQuestScoreboard = "Quest103k";
-		mSpecTwo.mSpecialization = 6;
+		mSpecTwo.mSpecialization = HIEROPHANT_SPEC_ID;
 		mSpecTwo.mSpecName = "Hierophant";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
 		mSpecTwo.mDescription = "Hierophants specialize in support and have mastered healing. They will make sure the living stay living.";

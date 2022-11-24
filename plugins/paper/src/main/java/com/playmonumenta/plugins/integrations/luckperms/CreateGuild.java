@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
@@ -74,7 +75,7 @@ public class CreateGuild {
 				inGuildAlready = true;
 			}
 
-			int level = ScoreboardUtils.getScoreboardValue(founder, "TotalLevel").orElse(0);
+			int level = ScoreboardUtils.getScoreboardValue(founder, AbilityUtils.TOTAL_LEVEL).orElse(0);
 			if (level < 5) {
 				sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "The minimal level for "
 					                   + founder.getName() + " is not reached ("

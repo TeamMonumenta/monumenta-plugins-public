@@ -25,6 +25,10 @@ import org.bukkit.inventory.ItemStack;
 
 public class Warlock extends PlayerClass {
 
+	public static final int CLASS_ID = 7;
+	public static final int REAPER_SPEC_ID = 13;
+	public static final int TENEBRIST_SPEC_ID = 14;
+
 	Warlock() {
 		mAbilities.add(AmplifyingHex.INFO);
 		mAbilities.add(PhlegmaticResolve.INFO);
@@ -34,7 +38,7 @@ public class Warlock extends PlayerClass {
 		mAbilities.add(GraspingClaws.INFO);
 		mAbilities.add(SanguineHarvest.INFO);
 		mAbilities.add(SoulRend.INFO);
-		mClass = 7;
+		mClass = CLASS_ID;
 		mClassName = "Warlock";
 		mClassColor = NamedTextColor.DARK_PURPLE;
 		mChatColor = ChatColor.DARK_PURPLE;
@@ -49,7 +53,7 @@ public class Warlock extends PlayerClass {
 		mSpecOne.mAbilities.add(JudgementChain.INFO);
 		mSpecOne.mAbilities.add(VoodooBonds.INFO);
 		mSpecOne.mSpecQuestScoreboard = "Quest103n";
-		mSpecOne.mSpecialization = 13;
+		mSpecOne.mSpecialization = REAPER_SPEC_ID;
 		mSpecOne.mSpecName = "Reaper";
 		mSpecOne.mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
 		mSpecOne.mDescription = "Reapers use scythes in combination with dark magic to bring death to their enemies. They specialize in melee combat.";
@@ -58,7 +62,7 @@ public class Warlock extends PlayerClass {
 		mSpecTwo.mAbilities.add(RestlessSouls.INFO);
 		mSpecTwo.mAbilities.add(WitheringGaze.INFO);
 		mSpecTwo.mSpecQuestScoreboard = "Quest103g";
-		mSpecTwo.mSpecialization = 14;
+		mSpecTwo.mSpecialization = TENEBRIST_SPEC_ID;
 		mSpecTwo.mSpecName = "Tenebrist";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.CRIMSON_NYLIUM, 1);
 		mSpecTwo.mDescription = "Tenebrists use scythes in combination with dark magic to bring suffering to their enemies. They specialize in curses and status effects.";

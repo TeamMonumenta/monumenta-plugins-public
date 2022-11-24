@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -152,7 +153,7 @@ public class EntityTargets implements Cloneable {
 		IS_CLASSLESS {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
-				return ScoreboardUtils.getScoreboardValue((Player) entity, "Class").get() == 0;
+				return ScoreboardUtils.getScoreboardValue(entity, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == 0;
 			}
 		},
 		IS_MAGE {

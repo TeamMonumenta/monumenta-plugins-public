@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
+import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.GruesomeAlchemyCS;
@@ -20,6 +21,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -96,7 +98,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	public static final AbilityInfo<AlchemistPotions> INFO =
 		new AbilityInfo<>(AlchemistPotions.class, null, AlchemistPotions::new)
 			.linkedSpell(ClassAbility.ALCHEMIST_POTION)
-			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 5);
+			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Alchemist.CLASS_ID);
 
 	private GruesomeAlchemyCS mCosmetic;
 

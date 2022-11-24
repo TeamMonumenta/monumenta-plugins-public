@@ -77,9 +77,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 	private MinionSpawn mSpawner;
 	private SpellFloor mFloor;
 	private SpellSlice mSlice;
-	private SpellSteelboreSpread mSpread;
-	private SpellSteelboreSpread mSpread2;
-	private SpellSteelboreSpread mSpreadSmall;
 	private String mEncounterType;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -147,9 +144,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 			mSpawner = new MinionSpawn(boss, mCurrentLoc, 20 * 8, 2);
 			mFloor = new SpellFloor(plugin, boss, 5, mCurrentLoc);
 			mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
-			mSpread = new SpellSteelboreSpread(plugin, boss, 11, mSpawnLoc, 40, 1);
-			mSpread2 = new SpellSteelboreSpread(plugin, boss, 11, mPhase2Loc, 40, 1);
-			mSpreadSmall = new SpellSteelboreSpread(plugin, boss, 6, mPhase3Loc, 40, 1);
 
 			SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
 				// Active Spell List
@@ -324,9 +318,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 			mSpawner = new MinionSpawn(boss, mCurrentLoc, 20 * 8, 2);
 			mFloor = new SpellFloor(plugin, boss, 5, mCurrentLoc);
 			mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
-			mSpread = new SpellSteelboreSpread(plugin, boss, 7, mSpawnLoc, 40, 0.6);
-			mSpread2 = new SpellSteelboreSpread(plugin, boss, 7, mPhase2Loc, 40, 0.6);
-			mSpreadSmall = new SpellSteelboreSpread(plugin, boss, 3, mPhase3Loc, 40, 0.6);
 
 			SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
 				// Active Spell List

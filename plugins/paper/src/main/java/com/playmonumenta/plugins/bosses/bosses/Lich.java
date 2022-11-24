@@ -1294,7 +1294,7 @@ public final class Lich extends BossAbilityGroup {
 
 	public static void cursePlayer(Plugin plugin, Player p, int time) {
 		// Add to scoreboard for AccursedOne scoreboard.
-		int score = ScoreboardUtils.getScoreboardValue(p, "LichAccursedOne").isPresent() ? ScoreboardUtils.getScoreboardValue(p, "LichAccursedOne").get() : 0;
+		int score = ScoreboardUtils.getScoreboardValue(p, "LichAccursedOne").orElse(0);
 		ScoreboardUtils.setScoreboardValue(p, "LichAccursedOne", score + 1);
 
 		//don't add repeat instances of cursed players

@@ -50,10 +50,6 @@ public class YellowTesseractOverride extends BaseOverride {
 	private static final String CLASSL_STR = "Class Level: ";
 	private static final String SPECL_STR = "Specialization Level: ";
 	private static final String ENHANCE_STR = "Enhancement Level: ";
-	private static final String TOTAL_LEVEL = "TotalLevel";
-	private static final String TOTAL_SPEC = "TotalSpec";
-	private static final String LEVEL = "Skill";
-	private static final String SPEC_LEVEL = "SkillSpec";
 
 	private static final double MOB_RANGE = 20;
 
@@ -225,12 +221,12 @@ public class YellowTesseractOverride extends BaseOverride {
 	// Returns an ItemMeta containing the lore based of Player's currently equipped skills.
 	public static ItemMeta generateAbilityLore(Player player, ItemStack item) {
 		// Prepare lore first.
-		Integer classLevel = ScoreboardUtils.getScoreboardValue(player, LEVEL).orElse(0);
-		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
-		Integer specLevel = ScoreboardUtils.getScoreboardValue(player, SPEC_LEVEL).orElse(0);
-		Integer totalSpec = ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
-		Integer enhanceLevel = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE).orElse(0);
-		Integer totalEnhance = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
+		int classLevel = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SKILL).orElse(0);
+		int totalLevel = AbilityUtils.getEffectiveTotalSkillPoints(player);
+		int specLevel = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SPEC).orElse(0);
+		int totalSpec = AbilityUtils.getEffectiveTotalSpecPoints(player);
+		int enhanceLevel = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE).orElse(0);
+		int totalEnhance = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
 
 		NBTItem nbt = new NBTItem(item);
 		ItemStack copyItem = item.clone();
@@ -283,8 +279,8 @@ public class YellowTesseractOverride extends BaseOverride {
 		Map<String, Integer> targetSkills = new HashMap<>();
 		int classVal = 0;
 		int specVal = 0;
-		int totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
-		int totalSpec = ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
+		int totalLevel = AbilityUtils.getEffectiveTotalSkillPoints(player);
+		int totalSpec = AbilityUtils.getEffectiveTotalSpecPoints(player);
 		int totalEnhancement = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
 
 		/* Get all the target skills */
@@ -292,10 +288,10 @@ public class YellowTesseractOverride extends BaseOverride {
 			String str = MessagingUtils.plainText(comp);
 			if (str.startsWith(CLASS_STR)) {
 				classVal = AbilityUtils.getClass(str.substring(CLASS_STR.length()));
-				ScoreboardUtils.setScoreboardValue(player, "Class", classVal);
+				ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME, classVal);
 			} else if (str.startsWith(SPEC_STR)) {
 				specVal = AbilityUtils.getSpec(str.substring(SPEC_STR.length()));
-				ScoreboardUtils.setScoreboardValue(player, "Specialization", specVal);
+				ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME, specVal);
 			} else if (str.startsWith(PREFIX)) {
 				boolean enhanced = false;
 				if (str.endsWith("*")) {
@@ -373,8 +369,8 @@ public class YellowTesseractOverride extends BaseOverride {
 			return false;
 		}
 
-		ScoreboardUtils.setScoreboardValue(player, LEVEL, totalLevel - totalSkillsAdded);
-		ScoreboardUtils.setScoreboardValue(player, SPEC_LEVEL, totalSpec - totalSpecAdded);
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SKILL, totalLevel - totalSkillsAdded);
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SPEC, totalSpec - totalSpecAdded);
 		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE, totalEnhancement - totalEnhancementsAdded);
 		if (totalSkillsAdded < totalLevel || totalSpecAdded < totalSpec || totalEnhancementsAdded < totalEnhancement) {
 			player.sendMessage(Component.text("You have additional skill points to spend!", NamedTextColor.YELLOW));

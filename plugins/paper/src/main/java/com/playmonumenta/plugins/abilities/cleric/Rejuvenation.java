@@ -3,10 +3,12 @@ package com.playmonumenta.plugins.abilities.cleric;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -35,7 +37,7 @@ public class Rejuvenation extends Ability {
 
 	public static final AbilityInfo<Rejuvenation> INFO =
 		new AbilityInfo<>(Rejuvenation.class, null, Rejuvenation::new)
-			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 3);
+			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Cleric.CLASS_ID);
 
 	private int mTimer = 0;
 

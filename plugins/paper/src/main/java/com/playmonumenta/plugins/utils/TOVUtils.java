@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
-import java.util.Optional;
+import java.util.OptionalInt;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -65,10 +65,10 @@ public class TOVUtils {
 			return true;
 		}
 
-		Optional<Integer> counter = ScoreboardUtils.getScoreboardValue(COUNTER_NAME, CACHE_COUNTER_SCORE);
+		OptionalInt counter = ScoreboardUtils.getScoreboardValue(COUNTER_NAME, CACHE_COUNTER_SCORE);
 		if (counter.isPresent()) {
 			// can only open one cache per spawn
-			int cycleCounter = counter.get();
+			int cycleCounter = counter.getAsInt();
 			if (cycleCounter == ScoreboardUtils.getScoreboardValue(player, CACHE_COUNTER_SCORE).orElse(0)) {
 				MessagingUtils.sendActionBarMessage(player, "You cannot open more than 1 cache per spawn.");
 				Bukkit.getScheduler().runTaskLater(plugin, () -> player.closeInventory(), 1);

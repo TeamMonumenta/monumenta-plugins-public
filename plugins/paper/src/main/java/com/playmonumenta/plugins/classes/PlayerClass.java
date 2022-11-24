@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import javax.annotation.Nullable;
@@ -38,15 +39,15 @@ public class PlayerClass {
 
 	public Boolean getSpecAccessToChoose(Player player, PlayerSpec spec) {
 		int specQuestReq = ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard).orElse(0);
-		int specClassReq = ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0);
-		int specSpecReq = ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0);
+		int specClassReq = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0);
+		int specSpecReq = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0);
 		return specQuestReq >= 100 && specClassReq == mClass && specSpecReq == 0;
 	}
 
 	public Boolean getSpecAccessToChange(Player player, PlayerSpec spec) {
 		int specQuestReq = ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard).orElse(0);
-		int specClassReq = ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0);
-		int specSpecReq = ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0);
+		int specClassReq = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0);
+		int specSpecReq = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0);
 		return specQuestReq >= 100 && specClassReq == mClass && specSpecReq == spec.mSpecialization;
 	}
 

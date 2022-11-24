@@ -95,11 +95,11 @@ public class AmplifyingHex extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				int charmPower = ScoreboardUtils.getScoreboardValue(player, "CharmPower").orElse(0);
+				int charmPower = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.CHARM_POWER).orElse(0);
 				charmPower = (charmPower > 0) ? (charmPower / 3) - 2 : 0;
-				int totalLevel = ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0) +
-					                 ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0) +
-					                 ScoreboardUtils.getScoreboardValue(player, "TotalEnhance").orElse(0) +
+				int totalLevel = AbilityUtils.getEffectiveTotalSkillPoints(player) +
+					                 AbilityUtils.getEffectiveTotalSpecPoints(player) +
+					                 ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
 					                 charmPower;
 				mDamage = DAMAGE_PER_SKILL_POINT * totalLevel;
 			});

@@ -133,6 +133,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
 import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
 import com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
@@ -145,7 +146,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -890,15 +890,7 @@ public class CharmManager {
 					powerBudget += ItemStatUtils.getCharmPower(c);
 				}
 				//Check to see if adding the extra charm would exceed budget
-				Optional<Integer> optionalBudget = ScoreboardUtils.getScoreboardValue(p, "CharmPower");
-				int totalBudget = 0;
-				if (optionalBudget.isPresent()) {
-					totalBudget = optionalBudget.get();
-				}
-				if (totalBudget == 0) {
-					//Default case for testing- later will be set by mechs for all r3 players
-					totalBudget = 15;
-				}
+				int totalBudget = ScoreboardUtils.getScoreboardValue(p, AbilityUtils.CHARM_POWER).orElse(0);
 				if (powerBudget + charmPower > totalBudget) {
 					return false;
 				}

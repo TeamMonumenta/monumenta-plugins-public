@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -52,9 +52,9 @@ public class GetScoreCommand {
 	}
 
 	private static void run(CommandSender sender, String name, String objectiveName) {
-		Optional<Integer> scoreValue = ScoreboardUtils.getScoreboardValue(name, objectiveName);
+		OptionalInt scoreValue = ScoreboardUtils.getScoreboardValue(name, objectiveName);
 		if (scoreValue.isPresent()) {
-			sender.sendMessage(ChatColor.AQUA + "Score for " + ChatColor.GOLD + name + ChatColor.AQUA + " in " + ChatColor.GOLD + objectiveName + ChatColor.AQUA + ": " + ChatColor.GOLD + scoreValue.get());
+			sender.sendMessage(ChatColor.AQUA + "Score for " + ChatColor.GOLD + name + ChatColor.AQUA + " in " + ChatColor.GOLD + objectiveName + ChatColor.AQUA + ": " + ChatColor.GOLD + scoreValue.getAsInt());
 		} else {
 			sender.sendMessage(ChatColor.AQUA + "Score for " + ChatColor.GOLD + name + ChatColor.AQUA + " in " + ChatColor.GOLD + objectiveName + ChatColor.AQUA + ": " + ChatColor.GOLD + "not set");
 		}

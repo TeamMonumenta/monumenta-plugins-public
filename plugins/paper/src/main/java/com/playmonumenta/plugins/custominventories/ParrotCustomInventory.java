@@ -250,7 +250,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		ItemStack spawnParrot = buildItem(Material.ARMOR_STAND, "Place Parrots", List.of());
 		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 3, spawnParrot,
 			(player, inv) -> ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.PLOT)
-				                 && ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.CURRENT_PLOT).orElse(-1).equals(ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(-2)),
+				                 && ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.CURRENT_PLOT).orElse(-1) == ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(-2),
 			(player, inv) -> {
 				mSelectedAction = ParrotAction.PLACE;
 				return true;

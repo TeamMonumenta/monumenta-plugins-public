@@ -23,6 +23,10 @@ import org.bukkit.inventory.ItemStack;
 
 public class Mage extends PlayerClass {
 
+	public static final int CLASS_ID = 1;
+	public static final int ARCANIST_SPEC_ID = 1;
+	public static final int ELEMENTALIST_SPEC_ID = 2;
+
 	Mage() {
 		mAbilities.add(ArcaneStrike.INFO);
 		mAbilities.add(ElementalArrows.INFO);
@@ -32,7 +36,7 @@ public class Mage extends PlayerClass {
 		mAbilities.add(Spellshock.INFO);
 		mAbilities.add(ThunderStep.INFO);
 		mAbilities.add(PrismaticShield.INFO);
-		mClass = 1;
+		mClass = CLASS_ID;
 		mClassName = "Mage";
 		mClassColor = NamedTextColor.LIGHT_PURPLE;
 		mChatColor = ChatColor.LIGHT_PURPLE;
@@ -45,7 +49,7 @@ public class Mage extends PlayerClass {
 		mSpecOne.mAbilities.add(CosmicMoonblade.INFO);
 		mSpecOne.mAbilities.add(SagesInsight.INFO);
 		mSpecOne.mSpecQuestScoreboard = "Quest103i";
-		mSpecOne.mSpecialization = 1;
+		mSpecOne.mSpecialization = ARCANIST_SPEC_ID;
 		mSpecOne.mSpecName = "Arcanist";
 		mSpecOne.mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
 		mSpecOne.mDescription = "Arcanists are mages that specialize at controlling their skill cooldowns and getting up close.";
@@ -54,7 +58,7 @@ public class Mage extends PlayerClass {
 		mSpecTwo.mAbilities.add(ElementalSpiritFire.INFO);
 		mSpecTwo.mAbilities.add(Starfall.INFO);
 		mSpecTwo.mSpecQuestScoreboard = "Quest103b";
-		mSpecTwo.mSpecialization = 2;
+		mSpecTwo.mSpecialization = ELEMENTALIST_SPEC_ID;
 		mSpecTwo.mSpecName = "Elementalist";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 		mSpecTwo.mDescription = "Elementalists are the undisputed masters of the elements. They excel at zoning and crowd control.";

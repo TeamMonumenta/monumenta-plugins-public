@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.player.PlayerInventoryManager;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -114,7 +115,7 @@ public class PlayerTracking implements EntityTracking {
 						} else if (mode == GameMode.ADVENTURE
 							           && isInPlot
 							           && loc.mY > ServerProperties.getPlotSurvivalMinHeight()
-							           && ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0) >= 5) {
+							           && ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_LEVEL).orElse(0) >= 5) {
 							player.setGameMode(GameMode.SURVIVAL);
 						}
 					}

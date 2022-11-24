@@ -24,6 +24,10 @@ import org.bukkit.inventory.ItemStack;
 
 public class Rogue extends PlayerClass {
 
+	public static final int CLASS_ID = 4;
+	public static final int SWORDSAGE_SPEC_ID = 7;
+	public static final int ASSASSIN_SPEC_ID = 8;
+
 	Rogue() {
 		mAbilities.add(AdvancingShadows.INFO);
 		mAbilities.add(ByMyBlade.INFO);
@@ -33,7 +37,7 @@ public class Rogue extends PlayerClass {
 		mAbilities.add(Skirmisher.INFO);
 		mAbilities.add(Smokescreen.INFO);
 		mAbilities.add(ViciousCombos.INFO);
-		mClass = 4;
+		mClass = CLASS_ID;
 		mClassName = "Rogue";
 		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
 		mClassDescription = "Rogues excel in one-on-one battles, using precise strikes to bring down dangerous elite enemies.";
@@ -44,7 +48,7 @@ public class Rogue extends PlayerClass {
 		mSpecOne.mAbilities.add(DeadlyRonde.INFO);
 		mSpecOne.mAbilities.add(WindWalk.INFO);
 		mSpecOne.mSpecQuestScoreboard = "Quest103c";
-		mSpecOne.mSpecialization = 7;
+		mSpecOne.mSpecialization = SWORDSAGE_SPEC_ID;
 		mClassColor = NamedTextColor.WHITE;
 		mChatColor = ChatColor.WHITE;
 		mSpecOne.mSpecName = "Swordsage";
@@ -55,7 +59,7 @@ public class Rogue extends PlayerClass {
 		mSpecTwo.mAbilities.add(CloakAndDagger.INFO);
 		mSpecTwo.mAbilities.add(CoupDeGrace.INFO);
 		mSpecTwo.mSpecQuestScoreboard = "Quest103j";
-		mSpecTwo.mSpecialization = 8;
+		mSpecTwo.mSpecialization = ASSASSIN_SPEC_ID;
 		mSpecTwo.mSpecName = "Assassin";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.WITHER_ROSE, 1);
 		mSpecTwo.mDescription = "Assassins excel in precise strikes and deception to devastate their enemies.";

@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Optional;
+import java.util.OptionalInt;
 import org.bukkit.entity.Player;
 
 /**
@@ -25,10 +25,10 @@ public final class ExperiencinatorSettings {
 		mPlayer = player;
 		boolean hadScoreboadValues = false;
 		for (Map.Entry<Region, String> entry : scoreboardConfig.getObjectives().entrySet()) {
-			Optional<Integer> scoreboardValue = ScoreboardUtils.getScoreboardValue(player, entry.getValue());
+			OptionalInt scoreboardValue = ScoreboardUtils.getScoreboardValue(player, entry.getValue());
 			if (scoreboardValue.isPresent()) {
 				hadScoreboadValues = true;
-				mPacked.put(entry.getKey(), scoreboardValue.get());
+				mPacked.put(entry.getKey(), scoreboardValue.getAsInt());
 			} else {
 				mPacked.put(entry.getKey(), 0);
 			}

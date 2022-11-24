@@ -151,9 +151,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -808,17 +805,7 @@ public class AbilityManager {
 
 	public void playerJoinEvent(Player player, PlayerJoinEvent event) {
 		// Anticheat for skills
-		AbilityUtils.ensureSkillAlignmentWithClassAndSpec(player);
-		int skillDifference = AbilityUtils.skillDiff(player);
-		if (skillDifference > 0) {
-			player.sendMessage(Component.text("You had more skills than expected. Available skills have been reset.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
-			AbilityManager.getManager().resetPlayerAbilities(player);
-			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
-		} else if (skillDifference < 0) {
-			player.sendMessage(Component.text("You had less skills than expected. Available skills may have been updated.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
-			AbilityManager.getManager().resetPlayerAbilities(player);
-			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
-		}
+		AbilityUtils.updateAbilityScores(player);
 		UUID uuid = player.getUniqueId();
 		JsonObject chargesData = MonumentaRedisSyncAPI.getPlayerPluginData(uuid, KEY_CHARGES_PLUGIN_DATA);
 		if (chargesData != null) {
@@ -906,27 +893,9 @@ public class AbilityManager {
 	}
 
 	public void resetPlayerAbilities(Player player) {
-		// Clear all Reference Abilities from player
-		for (AbilityInfo<?> ref : mReferenceAbilities) {
-			String scoreboard = ref.getScoreboard();
-			if (scoreboard != null) {
-				ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
-			}
-		}
-		// Clear all Disabled Abilities from player
-		for (AbilityInfo<?> dRef : mDisabledAbilities) {
-			String scoreboard = dRef.getScoreboard();
-			if (scoreboard != null) {
-				ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
-			}
-		}
-		// Reset Skill and SkillSpec and Enhancements
-		int skill = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_LEVEL).orElse(0);
-		int spec = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_SPEC).orElse(0);
-		int enhance = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
-		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SKILL, skill);
-		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SPEC, spec);
-		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE, enhance);
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME, 0);
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME, 0);
+		AbilityUtils.updateAbilityScores(player);
 
 		// Run updatePlayerAbilities to clear existing ability effects.
 		updatePlayerAbilities(player, true);

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.effects.DisplayableEffect;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -70,38 +71,16 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 
 		// %monumenta_class%
 		if (identifier.equalsIgnoreCase("class")) {
-			// TODO: This really should use the standard thing in Plugin.java... but it's
-			// currently a pile of crap and this is actually less awful
-			switch (ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0)) {
-			case 0:
-				return "No class";
-			case 1:
-				return "Mage";
-			case 2:
-				return "Warrior";
-			case 3:
-				return "Cleric";
-			case 4:
-				return "Rogue";
-			case 5:
-				return "Alchemist";
-			case 6:
-				return "Scout";
-			case 7:
-				return "Warlock";
-			default:
-				return "Unknown class";
-
-			}
+			return AbilityUtils.getClass(player);
 		}
 
 		// %monumenta_level%
 		if (identifier.equalsIgnoreCase("level")) {
-			int charmPower = ScoreboardUtils.getScoreboardValue(player, "CharmPower").orElse(0);
+			int charmPower = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.CHARM_POWER).orElse(0);
 			charmPower = (charmPower > 0) ? (charmPower / 3) - 2 : 0;
-			return Integer.toString(ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0) +
-				                        ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0) +
-				                        ScoreboardUtils.getScoreboardValue(player, "TotalEnhance").orElse(0) +
+			return Integer.toString(AbilityUtils.getEffectiveTotalSkillPoints(player) +
+				                        AbilityUtils.getEffectiveTotalSpecPoints(player) +
+				                        ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
 				                        charmPower);
 		}
 

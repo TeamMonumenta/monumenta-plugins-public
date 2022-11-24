@@ -14,7 +14,7 @@ public class RocketJump {
 			.withPermission("monumenta.rocketjump")
 			.withAliases("rj")
 			.executesPlayer((player, args) -> {
-				if (ScoreboardUtils.getScoreboardValue(player, SCB_NAME).get() == 0) {
+				if (ScoreboardUtils.getScoreboardValue(player, SCB_NAME).orElse(0) == 0) {
 					ScoreboardUtils.setScoreboardValue(player, SCB_NAME, 1);
 					player.sendMessage(ChatColor.GOLD + "Rocket jump: " + ChatColor.AQUA + "Enable yours");
 				} else {

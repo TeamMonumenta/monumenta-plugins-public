@@ -45,12 +45,8 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 	public static final ArrayList<Integer> P4_SPEC_LOCS = new ArrayList<>(Arrays.asList(20, 30, 40));
 	private static final MonumentaClasses mClasses = new MonumentaClasses();
-	private static final String ABILITY_SKILLCOUNT = "Skill";
-	private static final String SPEC_SKILLCOUNT = "SkillSpec";
-
 	public static final String R3_UNLOCK_SCOREBOARD = "R3Access";
 	private static final int R3_UNLOCK_SCORE = 1;
-	private static final String R3_ENHANCE_CURRENT = "Enhancements";
 
 	private int mCurrentPage = 1;
 
@@ -90,7 +86,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			if (chosenSlot >= P1_CLASS_START_LOC && chosenSlot <= P1_CLASS_START_LOC + 6) {
 				for (PlayerClass oneClass : mClasses.mClasses) {
 					if (oneClass.mDisplayItem != null && clickedItem.getType() == oneClass.mDisplayItem.getType()) {
-						ScoreboardUtils.setScoreboardValue(player, "Class", oneClass.mClass);
+						ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME, oneClass.mClass);
 						makeSkillSelectPage(oneClass, player);
 						break;
 					}
@@ -123,17 +119,17 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			} else if (SKILL_PAGE_SPEC_LOCS.contains(chosenSlot)) {
 				//assign spec, make pg 3
 				for (PlayerClass oneClass : mClasses.mClasses) {
-					if (ScoreboardUtils.getScoreboardValue(player, "Class") == oneClass.mClass) {
+					if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
 						int specIndex = SKILL_PAGE_SPEC_LOCS.indexOf(chosenSlot);
 						PlayerSpec chosenSpec = (specIndex == 0) ? oneClass.mSpecOne : oneClass.mSpecTwo;
-						ScoreboardUtils.setScoreboardValue(player, "Specialization", chosenSpec.mSpecialization);
+						ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME, chosenSpec.mSpecialization);
 						makeSpecPage(oneClass, chosenSpec, player);
 					}
 				}
 			} else if (chosenSlot == SKILL_PAGE_RESET_SPEC_LOC) {
-				AbilityUtils.resetSpec(player, false);
+				AbilityUtils.resetSpec(player);
 				for (PlayerClass oneClass : mClasses.mClasses) {
-					if (ScoreboardUtils.getScoreboardValue(player, "Class") == oneClass.mClass) {
+					if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
 						makeSkillSelectPage(oneClass, player);
 					}
 				}
@@ -160,17 +156,17 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			} else if (SKILL_PAGE_SPEC_LOCS.contains(chosenSlot)) {
 				//assign spec, make pg 3
 				for (PlayerClass oneClass : mClasses.mClasses) {
-					if (ScoreboardUtils.getScoreboardValue(player, "Class") == oneClass.mClass) {
+					if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
 						int specIndex = SKILL_PAGE_SPEC_LOCS.indexOf(chosenSlot);
 						PlayerSpec chosenSpec = (specIndex == 0) ? oneClass.mSpecOne : oneClass.mSpecTwo;
-						ScoreboardUtils.setScoreboardValue(player, "Specialization", chosenSpec.mSpecialization);
+						ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME, chosenSpec.mSpecialization);
 						makeSpecPage(oneClass, chosenSpec, player);
 					}
 				}
 			} else if (chosenSlot == SKILL_PAGE_RESET_SPEC_LOC) {
-				AbilityUtils.resetSpec(player, false);
+				AbilityUtils.resetSpec(player);
 				for (PlayerClass oneClass : mClasses.mClasses) {
-					if (ScoreboardUtils.getScoreboardValue(player, "Class") == oneClass.mClass) {
+					if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
 						makeSkillSelectPage(oneClass, player);
 					}
 				}
@@ -190,7 +186,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			} else if (chosenSlot == COMMON_BACK_LOC) {
 				//back to page two
 				for (PlayerClass oneClass : mClasses.mClasses) {
-					if (ScoreboardUtils.getScoreboardValue(player, "Class") == oneClass.mClass) {
+					if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
 						makeSkillSelectPage(oneClass, player);
 						break;
 					}
@@ -208,7 +204,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		mInventory.clear();
 		mCurrentPage = 1;
 		//Get the current class, if they have one.
-		int currentClass = ScoreboardUtils.getScoreboardValue(player, "Class");
+		int currentClass = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
 		PlayerClass playerClass = null;
 		for (PlayerClass oneClass : mClasses.mClasses) {
 			if (currentClass == oneClass.mClass) {
@@ -231,14 +227,14 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				"Pick a class to view abilities within that class. You can reset your class at any time, with no consequences.", ChatColor.LIGHT_PURPLE);
 		mInventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
 
-		if (ScoreboardUtils.getScoreboardValue(player, "Class") != 0) {
+		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) != 0) {
 			ItemStack resetItem = createBasicItem(Material.CYAN_BED, "Reset Your Class", NamedTextColor.WHITE, false,
 				"Click here to reset your class, allowing access to other choices.", ChatColor.LIGHT_PURPLE);
 			mInventory.setItem(P1_RESET_CLASS_LOC, resetItem);
 		}
 
 		//possibly create reset spec item
-		if (ScoreboardUtils.getScoreboardValue(player, "Specialization") != 0) {
+		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) != 0) {
 			ItemStack specItem = createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization, allowing access to choose either specialization.", ChatColor.LIGHT_PURPLE);
 			mInventory.setItem(P1_RESET_SPEC_LOC, specItem);
@@ -292,9 +288,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 
 		//possibly create reset spec item
-		if (ScoreboardUtils.getScoreboardValue(player, "Specialization") != 0) {
+		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) != 0) {
 			ItemStack specItem = createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
-					"Click here to reset your specialization to select a new one.", ChatColor.LIGHT_PURPLE);
+				"Click here to reset your specialization to select a new one.", ChatColor.LIGHT_PURPLE);
 			mInventory.setItem(SKILL_PAGE_RESET_SPEC_LOC, specItem);
 		}
 
@@ -337,7 +333,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 
 		//possibly create reset spec item
-		if (ScoreboardUtils.getScoreboardValue(player, "Specialization") != 0) {
+		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) != 0) {
 			ItemStack specItem = createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization to select a new one.", ChatColor.LIGHT_PURPLE);
 			mInventory.setItem(SKILL_PAGE_RESET_SPEC_LOC, specItem);
@@ -384,7 +380,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			currentLocations = P2_ABILITY_LOCS;
 		}
 		for (PlayerClass oneClass : mClasses.mClasses) {
-			if (ScoreboardUtils.getScoreboardValue(player, "Class") == oneClass.mClass) {
+			if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
 				//found class, find ability
 				int abilityIndex = currentLocations.indexOf(chosenSlot);
 				AbilityInfo<?> selectedAbility = oneClass.mAbilities.get(abilityIndex);
@@ -396,23 +392,23 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 					// remove the ability
 					if (currentLevel > 2) {
 						// remove the enhancement
-						int currentEnhancement = ScoreboardUtils.getScoreboardValue(player, R3_ENHANCE_CURRENT);
-						ScoreboardUtils.setScoreboardValue(player, R3_ENHANCE_CURRENT, currentEnhancement + 1);
+						int currentEnhancement = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE);
+						ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE, currentEnhancement + 1);
 					}
 					ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), 0);
-					int currentCount = ScoreboardUtils.getScoreboardValue(player, ABILITY_SKILLCOUNT);
-					ScoreboardUtils.setScoreboardValue(player, ABILITY_SKILLCOUNT, currentCount + (actualCurrentLevel - level));
+					int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SKILL);
+					ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SKILL, currentCount + (actualCurrentLevel - level));
 				} else if (level < actualCurrentLevel) {
 					//level clicked is lower than level existing - remove levels down to clicked level
 					ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), skillOffset + level);
-					int currentCount = ScoreboardUtils.getScoreboardValue(player, ABILITY_SKILLCOUNT);
-					ScoreboardUtils.setScoreboardValue(player, ABILITY_SKILLCOUNT, currentCount + (actualCurrentLevel - level));
+					int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SKILL);
+					ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SKILL, currentCount + (actualCurrentLevel - level));
 				} else if (level > actualCurrentLevel) {
 					//level clicked is higher than level existing - upgrade to clicked level if enough points
-					int currentCount = ScoreboardUtils.getScoreboardValue(player, ABILITY_SKILLCOUNT);
+					int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SKILL);
 					if (currentCount >= level - actualCurrentLevel) {
 						// can upgrade
-						ScoreboardUtils.setScoreboardValue(player, ABILITY_SKILLCOUNT, currentCount - (level - actualCurrentLevel));
+						ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SKILL, currentCount - (level - actualCurrentLevel));
 						ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), skillOffset + level);
 					} else {
 						player.sendMessage("You don't have enough skill points to select this skill!");
@@ -431,11 +427,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		PlayerClass theClass = null;
 		PlayerSpec spec = null;
 		for (PlayerClass oneClass : mClasses.mClasses) {
-			if (ScoreboardUtils.getScoreboardValue(player, "Class") == oneClass.mClass) {
+			if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
 				theClass = oneClass;
-				if (ScoreboardUtils.getScoreboardValue(player, "Specialization") == oneClass.mSpecOne.mSpecialization) {
+				if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == oneClass.mSpecOne.mSpecialization) {
 					spec = oneClass.mSpecOne;
-				} else if (ScoreboardUtils.getScoreboardValue(player, "Specialization") == oneClass.mSpecTwo.mSpecialization) {
+				} else if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == oneClass.mSpecTwo.mSpecialization) {
 					spec = oneClass.mSpecTwo;
 				}
 				break;
@@ -449,13 +445,13 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			if (level - currentLevel < 0) {
 				//level clicked is lower than level existing
 				ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), level);
-				int currentCount = ScoreboardUtils.getScoreboardValue(player, SPEC_SKILLCOUNT);
-				ScoreboardUtils.setScoreboardValue(player, SPEC_SKILLCOUNT, currentCount + (currentLevel - level));
+				int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SPEC);
+				ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SPEC, currentCount + (currentLevel - level));
 			} else if (level - currentLevel > 0) {
 				//level clicked is higher than level existing
-				int currentCount = ScoreboardUtils.getScoreboardValue(player, SPEC_SKILLCOUNT);
+				int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SPEC);
 				if (currentCount >= level - currentLevel) {
-					ScoreboardUtils.setScoreboardValue(player, SPEC_SKILLCOUNT, currentCount - (level - currentLevel));
+					ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SPEC, currentCount - (level - currentLevel));
 					ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), level);
 				} else {
 					player.sendMessage("You don't have enough specialization points to select this skill!");
@@ -470,17 +466,17 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 	public void applyEnhancementChosen(int chosenSlot, Player player, boolean add) {
 		for (PlayerClass oneClass : mClasses.mClasses) {
-			if (ScoreboardUtils.getScoreboardValue(player, "Class") == oneClass.mClass) {
+			if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
 				//found class, find ability
 				int abilityIndex = P3_ABILITY_LOCS.indexOf(chosenSlot);
 				AbilityInfo<?> selectedAbility = oneClass.mAbilities.get(abilityIndex);
 				int currentLevel = ScoreboardUtils.getScoreboardValue(player, selectedAbility.getScoreboard());
 				if (add) {
 					//clear ability data
-					int currentCount = ScoreboardUtils.getScoreboardValue(player, R3_ENHANCE_CURRENT);
+					int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE);
 					// don't want to assign ability if we don't have points
 					if (currentCount > 0) {
-						ScoreboardUtils.setScoreboardValue(player, R3_ENHANCE_CURRENT, currentCount - 1);
+						ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE, currentCount - 1);
 						ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), currentLevel + 2);
 					} else {
 						player.sendMessage("You don't have enough enhancement points to select this enhancement!");
@@ -488,8 +484,8 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				} else {
 					//level clicked is lower than level existing
 					ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), currentLevel - 2);
-					int currentCount = ScoreboardUtils.getScoreboardValue(player, R3_ENHANCE_CURRENT);
-					ScoreboardUtils.setScoreboardValue(player, R3_ENHANCE_CURRENT, currentCount + 1);
+					int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE);
+					ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE, currentCount + 1);
 				}
 				makeSkillSelectPage(oneClass, player);
 				if (AbilityManager.getManager() != null) {
@@ -507,22 +503,22 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		if (ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard) < 100) {
 			//not unlocked
 			ItemStack specItem = createBasicItem(Material.BARRIER, "Unknown", NamedTextColor.RED, false,
-					"You haven't unlocked this specialization yet.", ChatColor.WHITE);
+				"You haven't unlocked this specialization yet.", ChatColor.WHITE);
 			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
-		} else if (ScoreboardUtils.getScoreboardValue(player, "Specialization") == otherSpec.mSpecialization) {
+		} else if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == otherSpec.mSpecialization) {
 			//unlocked, but using other spec
 			ItemStack specItem = createBasicItem(Material.BARRIER, spec.mSpecName, NamedTextColor.RED, false,
-					"Reset your specialization to select a new one.", ChatColor.WHITE);
+				"Reset your specialization to select a new one.", ChatColor.WHITE);
 			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
-		} else if (ScoreboardUtils.getScoreboardValue(player, "Specialization") == spec.mSpecialization) {
+		} else if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == spec.mSpecialization) {
 			//unlocked and already using this spec
 			ItemStack specItem = createBasicItem(spec.mDisplayItem.getType(), spec.mSpecName, NamedTextColor.RED, false,
-					"Click to view your specialization skills.", ChatColor.WHITE);
+				"Click to view your specialization skills.", ChatColor.WHITE);
 			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
-		} else if (ScoreboardUtils.getScoreboardValue(player, "Specialization") == 0) {
+		} else if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == 0) {
 			//unlocked and no spec selected
 			ItemStack specItem = createBasicItem(spec.mDisplayItem.getType(), spec.mSpecName, NamedTextColor.RED, false,
-					"Click to choose this specialization!", ChatColor.GRAY);
+				"Click to choose this specialization!", ChatColor.GRAY);
 			if (spec.mDescription != null) {
 				ItemMeta newMeta = specItem.getItemMeta();
 				GUIUtils.splitLoreLine(newMeta, "Description: " + spec.mDescription, 30, ChatColor.YELLOW, false);
@@ -619,22 +615,22 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 	public void makeRemainingCountItems(Player player) {
 		if (ScoreboardUtils.getScoreboardValue(player, R3_UNLOCK_SCOREBOARD) >= R3_UNLOCK_SCORE) {
-			int currentEnhanceCount = ScoreboardUtils.getScoreboardValue(player, R3_ENHANCE_CURRENT);
+			int currentEnhanceCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE);
 			ItemStack summaryItem = createBasicItem(currentEnhanceCount == 0 ? Material.BARRIER : Material.ENCHANTING_TABLE, "Enhancement Points", NamedTextColor.WHITE, false,
-				"You have " + currentEnhanceCount + " enhancement points remaining.", ChatColor.LIGHT_PURPLE);
+				"You have " + currentEnhanceCount + " enhancement point" + (currentEnhanceCount == 1 ? "" : "s") + " remaining.", ChatColor.LIGHT_PURPLE);
 			summaryItem.setAmount(currentEnhanceCount > 0 ? currentEnhanceCount : 1);
 			mInventory.setItem(COMMON_REMAINING_ENHANCEMENTS_LOC, summaryItem);
 		}
 		if (ScoreboardUtils.getScoreboardValue(player, UNLOCK_SPECS) >= UNLOCK_SPECS_MIN) {
-			int currentSpecCount = ScoreboardUtils.getScoreboardValue(player, SPEC_SKILLCOUNT);
+			int currentSpecCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SPEC);
 			ItemStack summaryItem = createBasicItem(currentSpecCount == 0 ? Material.BARRIER : Material.SAND, "Specialization Points", NamedTextColor.WHITE, false,
-					"You have " + currentSpecCount + " specialization points remaining.", ChatColor.LIGHT_PURPLE);
+				"You have " + currentSpecCount + " specialization point" + (currentSpecCount == 1 ? "" : "s") + " remaining.", ChatColor.LIGHT_PURPLE);
 			summaryItem.setAmount(currentSpecCount > 0 ? currentSpecCount : 1);
 			mInventory.setItem(COMMON_REMAINING_SPEC_LOC, summaryItem);
 		}
-		int currentSkillCount = ScoreboardUtils.getScoreboardValue(player, ABILITY_SKILLCOUNT);
+		int currentSkillCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SKILL);
 		ItemStack summaryItem = createBasicItem(currentSkillCount == 0 ? Material.BARRIER : Material.GRASS_BLOCK, "Skill Points", NamedTextColor.WHITE, false,
-			"You have " + currentSkillCount + " skill points remaining.", ChatColor.LIGHT_PURPLE);
+			"You have " + currentSkillCount + " skill point" + (currentSkillCount == 1 ? "" : "s") + " remaining.", ChatColor.LIGHT_PURPLE);
 		summaryItem.setAmount(currentSkillCount > 0 ? currentSkillCount : 1);
 		mInventory.setItem(COMMON_REMAINING_SKILL_LOC, summaryItem);
 	}

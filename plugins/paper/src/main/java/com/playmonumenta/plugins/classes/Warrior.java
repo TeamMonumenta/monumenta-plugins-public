@@ -23,6 +23,10 @@ import org.bukkit.inventory.ItemStack;
 
 public class Warrior extends PlayerClass {
 
+	public static final int CLASS_ID = 2;
+	public static final int BERSERKER_SPEC_ID = 3;
+	public static final int GUARDIAN_SPEC_ID = 4;
+
 	Warrior() {
 		mAbilities.add(BruteForce.INFO);
 		mAbilities.add(CounterStrike.INFO);
@@ -32,7 +36,7 @@ public class Warrior extends PlayerClass {
 		mAbilities.add(ShieldBash.INFO);
 		mAbilities.add(Toughness.INFO);
 		mAbilities.add(WeaponMastery.INFO);
-		mClass = 2;
+		mClass = CLASS_ID;
 		mClassName = "Warrior";
 		mClassColor = NamedTextColor.RED;
 		mChatColor = ChatColor.RED;
@@ -45,7 +49,7 @@ public class Warrior extends PlayerClass {
 		mSpecOne.mAbilities.add(MeteorSlam.INFO);
 		mSpecOne.mAbilities.add(Rampage.INFO);
 		mSpecOne.mSpecQuestScoreboard = "Quest103a";
-		mSpecOne.mSpecialization = 3;
+		mSpecOne.mSpecialization = BERSERKER_SPEC_ID;
 		mSpecOne.mSpecName = "Berserker";
 		mSpecOne.mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
 		mSpecOne.mDescription = "Berserkers specialize in melee combat. They thrive in the heart of battle taking heavy risks for great rewards.";
@@ -54,7 +58,7 @@ public class Warrior extends PlayerClass {
 		mSpecTwo.mAbilities.add(Challenge.INFO);
 		mSpecTwo.mAbilities.add(ShieldWall.INFO);
 		mSpecTwo.mSpecQuestScoreboard = "Quest103h";
-		mSpecTwo.mSpecialization = 4;
+		mSpecTwo.mSpecialization = GUARDIAN_SPEC_ID;
 		mSpecTwo.mSpecName = "Guardian";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.SHIELD, 1);
 		mSpecTwo.mDescription = "Guardians specialize in melee combat. Their skills are focused on taking heavy damage and drawing enemy attacks to themselves.";

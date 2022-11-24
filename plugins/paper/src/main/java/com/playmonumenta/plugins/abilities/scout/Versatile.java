@@ -4,7 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Scout;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.entity.LivingEntity;
@@ -17,7 +19,7 @@ public class Versatile extends Ability {
 
 	public static final AbilityInfo<Versatile> INFO =
 		new AbilityInfo<>(Versatile.class, null, Versatile::new)
-			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 6);
+			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Scout.CLASS_ID);
 
 	public Versatile(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

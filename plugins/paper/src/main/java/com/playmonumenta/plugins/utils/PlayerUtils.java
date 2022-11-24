@@ -3,7 +3,14 @@ package com.playmonumenta.plugins.utils;
 import com.destroystokyo.paper.MaterialSetTag;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
+import com.playmonumenta.plugins.classes.Mage;
+import com.playmonumenta.plugins.classes.Rogue;
+import com.playmonumenta.plugins.classes.Scout;
+import com.playmonumenta.plugins.classes.Warlock;
+import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
@@ -17,7 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.NavigableSet;
-import java.util.Optional;
+import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -439,38 +446,38 @@ public class PlayerUtils {
 	}
 
 	public static boolean isMage(Player player) {
-		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
-		return opt.orElse(0) == 1;
+		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
+		return opt.orElse(0) == Mage.CLASS_ID;
 	}
 
 	public static boolean isWarrior(Player player) {
-		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
-		return opt.orElse(0) == 2;
+		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
+		return opt.orElse(0) == Warrior.CLASS_ID;
 	}
 
 	public static boolean isCleric(Player player) {
-		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
-		return opt.orElse(0) == 3;
+		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
+		return opt.orElse(0) == Cleric.CLASS_ID;
 	}
 
 	public static boolean isRogue(Player player) {
-		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
-		return opt.orElse(0) == 4;
+		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
+		return opt.orElse(0) == Rogue.CLASS_ID;
 	}
 
 	public static boolean isAlchemist(Player player) {
-		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
-		return opt.orElse(0) == 5;
+		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
+		return opt.orElse(0) == Alchemist.CLASS_ID;
 	}
 
 	public static boolean isScout(Player player) {
-		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
-		return opt.orElse(0) == 6;
+		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
+		return opt.orElse(0) == Scout.CLASS_ID;
 	}
 
 	public static boolean isWarlock(Player player) {
-		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
-		return opt.orElse(0) == 7;
+		OptionalInt opt = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME);
+		return opt.orElse(0) == Warlock.CLASS_ID;
 	}
 
 	public static void resetAttackCooldown(Player player) {

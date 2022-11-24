@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import java.util.Optional;
+import java.util.OptionalInt;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -12,28 +11,20 @@ import org.bukkit.scoreboard.Team;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ScoreboardUtils {
-	public static Optional<Integer> getScoreboardValue(String scoreHolder, String objectiveName) {
-		Optional<Integer> scoreValue = Optional.empty();
+	public static OptionalInt getScoreboardValue(String scoreHolder, String objectiveName) {
+		OptionalInt scoreValue = OptionalInt.empty();
 		Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(objectiveName);
-		// Fast track applies
-		if (ServerProperties.getAbilityEnhancementsEnabled() && !ServerProperties.getShardName().contains("plots")) {
-			if (objectiveName.equals(AbilityUtils.TOTAL_LEVEL)) {
-				return Optional.of(AbilityUtils.MAX_SKILL_POINTS);
-			} else if (objectiveName.equals(AbilityUtils.TOTAL_SPEC)) {
-				return Optional.of(AbilityUtils.MAX_SPEC_POINTS);
-			}
-		}
 		if (objective != null) {
 			Score score = objective.getScore(scoreHolder);
 			if (score.isScoreSet()) {
-				scoreValue = Optional.of(score.getScore());
+				scoreValue = OptionalInt.of(score.getScore());
 			}
 		}
 
 		return scoreValue;
 	}
 
-	public static Optional<Integer> getScoreboardValue(Entity entity, String objectiveName) {
+	public static OptionalInt getScoreboardValue(Entity entity, String objectiveName) {
 		if (entity instanceof Player) {
 			return getScoreboardValue(entity.getName(), objectiveName);
 		} else {
@@ -124,10 +115,11 @@ public class ScoreboardUtils {
 	}
 
 	public static boolean addScore(Entity entity, String objectiveName, int add) {
-		if (!getScoreboardValue(entity, objectiveName).isPresent()) {
+		OptionalInt scoreboardValue = getScoreboardValue(entity, objectiveName);
+		if (scoreboardValue.isEmpty()) {
 			return false;
 		}
-		setScoreboardValue(entity, objectiveName, getScoreboardValue(entity, objectiveName).get() + add);
+		setScoreboardValue(entity, objectiveName, scoreboardValue.getAsInt() + add);
 		return true;
 	}
 }

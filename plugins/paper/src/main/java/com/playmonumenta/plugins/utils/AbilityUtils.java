@@ -1,11 +1,19 @@
 package com.playmonumenta.plugins.utils;
 
+import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
+import com.playmonumenta.plugins.classes.Rogue;
+import com.playmonumenta.plugins.classes.Scout;
+import com.playmonumenta.plugins.classes.Warlock;
+import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -13,8 +21,8 @@ import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,6 +62,8 @@ public class AbilityUtils {
 	public static final String TOTAL_ENHANCE = "TotalEnhance";
 	public static final String REMAINING_SKILL = "Skill";
 	public static final String REMAINING_SPEC = "SkillSpec";
+
+	public static final String CHARM_POWER = "CharmPower";
 	public static final String REMAINING_ENHANCE = "Enhancements";
 	public static final String SCOREBOARD_CLASS_NAME = "Class";
 	public static final String SCOREBOARD_SPEC_NAME = "Specialization";
@@ -317,120 +327,73 @@ public class AbilityUtils {
 	}
 
 	public static String getClass(Player player) {
-		int classVal = ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0);
-		switch (classVal) {
-		case 1:
-			return "Mage";
-		case 2:
-			return "Warrior";
-		case 3:
-			return "Cleric";
-		case 4:
-			return "Rogue";
-		case 5:
-			return "Alchemist";
-		case 6:
-			return "Scout";
-		case 7:
-			return "Warlock";
-		default:
-			return "No Class";
-		}
+		return switch (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0)) {
+			case Mage.CLASS_ID -> "Mage";
+			case Warrior.CLASS_ID -> "Warrior";
+			case Cleric.CLASS_ID -> "Cleric";
+			case Rogue.CLASS_ID -> "Rogue";
+			case Alchemist.CLASS_ID -> "Alchemist";
+			case Scout.CLASS_ID -> "Scout";
+			case Warlock.CLASS_ID -> "Warlock";
+			default -> "No Class";
+		};
 	}
 
 	public static int getClass(String str) {
-		switch (str) {
-		case "Mage":
-			return 1;
-		case "Warrior":
-			return 2;
-		case "Cleric":
-			return 3;
-		case "Rogue":
-			return 4;
-		case "Alchemist":
-			return 5;
-		case "Scout":
-			return 6;
-		case "Warlock":
-			return 7;
-		default:
-			return 0;
-		}
+		return switch (str) {
+			case "Mage" -> Mage.CLASS_ID;
+			case "Warrior" -> Warrior.CLASS_ID;
+			case "Cleric" -> Cleric.CLASS_ID;
+			case "Rogue" -> Rogue.CLASS_ID;
+			case "Alchemist" -> Alchemist.CLASS_ID;
+			case "Scout" -> Scout.CLASS_ID;
+			case "Warlock" -> Warlock.CLASS_ID;
+			default -> 0;
+		};
 	}
 
 	public static String getSpec(Player player) {
-		int classVal = ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0);
-		switch (classVal) {
-		case 1:
-			return "Arcanist";
-		case 2:
-			return "Elementalist";
-		case 3:
-			return "Berserker";
-		case 4:
-			return "Guardian";
-		case 5:
-			return "Paladin";
-		case 6:
-			return "Hierophant";
-		case 7:
-			return "Swordsage";
-		case 8:
-			return "Assassin";
-		case 9:
-			return "Harbinger";
-		case 10:
-			return "Apothecary";
-		case 11:
-			return "Ranger";
-		case 12:
-			return "Hunter";
-		case 13:
-			return "Reaper";
-		case 14:
-			return "Tenebrist";
-		default:
-			return "No Spec";
-		}
+		int classVal = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0);
+		return switch (classVal) {
+			case Mage.ARCANIST_SPEC_ID -> "Arcanist";
+			case Mage.ELEMENTALIST_SPEC_ID -> "Elementalist";
+			case Warrior.BERSERKER_SPEC_ID -> "Berserker";
+			case Warrior.GUARDIAN_SPEC_ID -> "Guardian";
+			case Cleric.PALADIN_SPEC_ID -> "Paladin";
+			case Cleric.HIEROPHANT_SPEC_ID -> "Hierophant";
+			case Rogue.SWORDSAGE_SPEC_ID -> "Swordsage";
+			case Rogue.ASSASSIN_SPEC_ID -> "Assassin";
+			case Alchemist.HARBINGER_SPEC_ID -> "Harbinger";
+			case Alchemist.APOTHECARY_SPEC_ID -> "Apothecary";
+			case Scout.RANGER_SPEC_ID -> "Ranger";
+			case Scout.HUNTER_SPEC_ID -> "Hunter";
+			case Warlock.REAPER_SPEC_ID -> "Reaper";
+			case Warlock.TENEBRIST_SPEC_ID -> "Tenebrist";
+			default -> "No Spec";
+		};
 	}
 
 	public static int getSpec(String str) {
-		switch (str) {
-		case "Arcanist":
-			return 1;
-		case "Elementalist":
-			return 2;
-		case "Berserker":
-			return 3;
-		case "Guardian":
-			return 4;
-		case "Paladin":
-			return 5;
-		case "Hierophant":
-			return 6;
-		case "Swordsage":
-			return 7;
-		case "Assassin":
-			return 8;
-		case "Harbinger":
-			return 9;
-		case "Apothecary":
-			return 10;
-		case "Ranger":
-			return 11;
-		case "Hunter":
-			return 12;
-		case "Reaper":
-			return 13;
-		case "Tenebrist":
-			return 14;
-		default:
-			return 0;
-		}
+		return switch (str) {
+			case "Arcanist" -> Mage.ARCANIST_SPEC_ID;
+			case "Elementalist" -> Mage.ELEMENTALIST_SPEC_ID;
+			case "Berserker" -> Warrior.BERSERKER_SPEC_ID;
+			case "Guardian" -> Warrior.GUARDIAN_SPEC_ID;
+			case "Paladin" -> Cleric.PALADIN_SPEC_ID;
+			case "Hierophant" -> Cleric.HIEROPHANT_SPEC_ID;
+			case "Swordsage" -> Rogue.SWORDSAGE_SPEC_ID;
+			case "Assassin" -> Rogue.ASSASSIN_SPEC_ID;
+			case "Harbinger" -> Alchemist.HARBINGER_SPEC_ID;
+			case "Apothecary" -> Alchemist.APOTHECARY_SPEC_ID;
+			case "Ranger" -> Scout.RANGER_SPEC_ID;
+			case "Hunter" -> Scout.HUNTER_SPEC_ID;
+			case "Reaper" -> Warlock.REAPER_SPEC_ID;
+			case "Tenebrist" -> Warlock.TENEBRIST_SPEC_ID;
+			default -> 0;
+		};
 	}
 
-	public static final List<PotionEffectType> DEBUFFS = Arrays.asList(
+	public static final ImmutableSet<PotionEffectType> DEBUFFS = ImmutableSet.of(
 		PotionEffectType.WITHER,
 		PotionEffectType.SLOW,
 		PotionEffectType.SLOW_DIGGING,
@@ -492,40 +455,47 @@ public class AbilityUtils {
 		return debuffCount;
 	}
 
+	public static int getEffectiveTotalSkillPoints(Player player) {
+		// fast track: full skill and spec points in R3; and also in plots if having been to R3 at least once
+		if (ServerProperties.getAbilityEnhancementsEnabled()
+			    && ScoreboardUtils.getScoreboardValue(player, "R3Access").orElse(0) > 0) {
+			return MAX_SKILL_POINTS;
+		}
+		return ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
+	}
+
+	public static int getEffectiveTotalSpecPoints(Player player) {
+		// fast track: full skill and spec points in R3; and also in plots if having been to R3 at least once
+		if (ServerProperties.getAbilityEnhancementsEnabled()
+			    && ScoreboardUtils.getScoreboardValue(player, "R3Access").orElse(0) > 0) {
+			return MAX_SPEC_POINTS;
+		}
+		return ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
+	}
+
 	public static void resetClass(Player player) {
 		if (ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0) == 0) {
 			player.sendMessage(Component.text("You do not have a class.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
 			return;
 		}
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_CLASS_NAME, 0);
-		ensureSkillAlignmentWithClassAndSpec(player);
-		ScoreboardUtils.setScoreboardValue(player, REMAINING_SKILL, ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0));
-		ScoreboardUtils.setScoreboardValue(player, REMAINING_ENHANCE, ScoreboardUtils.getScoreboardValue(player, TOTAL_ENHANCE).orElse(0));
+		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_SPEC_NAME, 0);
+		updateAbilityScores(player);
 		player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.7f);
 		player.sendMessage(Component.text("Your skill points have been reset. You can pick a new class now.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
-		if (ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_SPEC_NAME).orElse(0) != 0) {
-			resetSpec(player, true);
-		}
 		refreshClass(player);
 	}
 
 	public static void resetSpec(Player player) {
-		resetSpec(player, false);
-	}
-
-	public static void resetSpec(Player player, boolean fromResetClass) {
 		if (ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_SPEC_NAME).orElse(0) == 0) {
 			player.sendMessage(Component.text("You do not have a specialization.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
 			return;
 		}
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_SPEC_NAME, 0);
-		ensureSkillAlignmentWithClassAndSpec(player);
-		ScoreboardUtils.setScoreboardValue(player, REMAINING_SPEC, ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0));
-		if (!fromResetClass) {
-			player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.7f);
-			player.sendMessage(Component.text("Your specialization points have been reset. You can pick a new specialization now.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
-			refreshClass(player);
-		}
+		updateAbilityScores(player);
+		player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.7f);
+		player.sendMessage(Component.text("Your specialization points have been reset. You can pick a new specialization now.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
+		refreshClass(player);
 	}
 
 	public static void refreshClass(Player player) {
@@ -534,11 +504,14 @@ public class AbilityUtils {
 		Bukkit.getConsoleSender().sendMessage(ChatColor.GOLD + "Refreshed class for player '" + player.getName() + "'");
 	}
 
-	public static void ensureSkillAlignmentWithClassAndSpec(Player player) {
+	public static void updateAbilityScores(Player player) {
+
+		// Remove any skills from other classes (this is also used to clear skills by first clearing selected class and/or spec)
+
 		int playerClass = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0);
 		int playerSpec = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_SPEC_NAME).orElse(0);
 		MonumentaClasses mClasses = new MonumentaClasses();
-		for (PlayerClass mClass: mClasses.mClasses) {
+		for (PlayerClass mClass : mClasses.mClasses) {
 			if (playerClass != mClass.mClass) {
 				for (AbilityInfo<?> ability : mClass.mAbilities) {
 					ScoreboardUtils.setScoreboardValue(player, ability.getScoreboard(), 0);
@@ -555,38 +528,13 @@ public class AbilityUtils {
 				}
 			}
 		}
-	}
 
-	public static int skillDiff(Player player) {
-		Map<String, Integer> unassignedPoints = getUnassignedAbilityPoints(player);
-		Map<String, Integer> assignedPoints = getAssignedAbilityPoints(player);
-		Map<String, Integer> totalPoints = getTotalAbilityPoints(player);
-		Map<String, Integer> diffs = Map.of(
-			"Skill", unassignedPoints.get("Skill") + assignedPoints.get("Skill") - totalPoints.get("Skill"),
-			"Spec", unassignedPoints.get("Spec") + assignedPoints.get("Spec") - totalPoints.get("Spec"),
-			"Enhance", unassignedPoints.get("Enhance") + assignedPoints.get("Enhance") - totalPoints.get("Enhance")
-		);
-		if (diffs.get("Skill") > 0 || diffs.get("Spec") > 0 || diffs.get("Enhance") > 0) {
-			return 1;
-		} else if (diffs.get("Skill") < 0 || diffs.get("Spec") < 0 || diffs.get("Enhance") < 0) {
-			return -1;
-		}
-		return 0;
-	}
+		// Update remaining skill point scores (and reset class if more skills are assigned than total skill points are available)
 
-	public static Map<String, Integer> getUnassignedAbilityPoints(Player player) {
-		return Map.of(
-			"Skill", ScoreboardUtils.getScoreboardValue(player, REMAINING_SKILL).orElse(0),
-			"Spec", ScoreboardUtils.getScoreboardValue(player, REMAINING_SPEC).orElse(0),
-			"Enhance", ScoreboardUtils.getScoreboardValue(player, REMAINING_ENHANCE).orElse(0));
-	}
-
-	public static Map<String, Integer> getAssignedAbilityPoints(Player player) {
-		int skill = 0;
-		int spec = 0;
-		int enhance = 0;
-		MonumentaClasses mClasses = new MonumentaClasses();
-		for (PlayerClass mClass: mClasses.mClasses) {
+		int remainingSkillPoints = getEffectiveTotalSkillPoints(player);
+		int remainingSpecPoints = getEffectiveTotalSpecPoints(player);
+		int remainingEnhancementPoints = ScoreboardUtils.getScoreboardValue(player, TOTAL_ENHANCE).orElse(0);
+		for (PlayerClass mClass : mClasses.mClasses) {
 			if (mClass.mClass == ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0)) {
 				List<AbilityInfo<?>> abilities = mClass.mAbilities;
 				List<AbilityInfo<?>> specAbilities = mClass.mSpecOne.mAbilities;
@@ -594,30 +542,30 @@ public class AbilityUtils {
 				// Loop over base abilities
 				for (AbilityInfo<?> ability : abilities) {
 					// Enhanced ability
-					if (ScoreboardUtils.getScoreboardValue(player, ability.getScoreboard()).orElse(0) > 2) {
-						enhance++;
-						skill += ScoreboardUtils.getScoreboardValue(player, ability.getScoreboard()).orElse(0) - 2;
+					int score = ScoreboardUtils.getScoreboardValue(player, ability.getScoreboard()).orElse(0);
+					if (score > 2) {
+						remainingEnhancementPoints--;
+						remainingSkillPoints -= score - 2;
 					} else {
-						skill += ScoreboardUtils.getScoreboardValue(player, ability.getScoreboard()).orElse(0);
+						remainingSkillPoints -= score;
 					}
 				}
 				// Loop over specs
 				for (AbilityInfo<?> specAbility : specAbilities) {
-					spec += ScoreboardUtils.getScoreboardValue(player, specAbility.getScoreboard()).orElse(0);
+					remainingSpecPoints -= ScoreboardUtils.getScoreboardValue(player, specAbility.getScoreboard()).orElse(0);
 				}
 			}
 		}
-		return Map.of(
-			"Skill", skill,
-			"Spec", spec,
-			"Enhance", enhance);
-	}
 
-	public static Map<String, Integer> getTotalAbilityPoints(Player player) {
-		return Map.of(
-			"Skill", ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0),
-			"Spec", ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0),
-			"Enhance", ScoreboardUtils.getScoreboardValue(player, TOTAL_ENHANCE).orElse(0));
+		if (remainingSkillPoints < 0 || remainingSpecPoints < 0 || remainingEnhancementPoints < 0) {
+			player.sendMessage(Component.text("You had more skills than expected. Available skills have been reset.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+			AbilityManager.getManager().resetPlayerAbilities(player);
+			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
+		} else {
+			ScoreboardUtils.setScoreboardValue(player, REMAINING_SKILL, remainingSkillPoints);
+			ScoreboardUtils.setScoreboardValue(player, REMAINING_SPEC, remainingSpecPoints);
+			ScoreboardUtils.setScoreboardValue(player, REMAINING_ENHANCE, remainingEnhancementPoints);
+		}
 	}
 
 	private static final EnumSet<ClassAbility> TRIGGERS_ASPECTS = EnumSet.of(

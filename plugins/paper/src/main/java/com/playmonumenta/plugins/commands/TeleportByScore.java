@@ -13,6 +13,7 @@ import dev.jorel.commandapi.arguments.ObjectiveArgument;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -71,13 +72,13 @@ public class TeleportByScore extends GenericCommand {
 			.register();
 	}
 
-	private static @Nullable
-	Integer getValue(Entity entity, @Nullable String obj) {
+	private static @Nullable Integer getValue(Entity entity, @Nullable String obj) {
 		if (obj == null || obj.equals("~")) {
 			return null;
 		}
 
-		return ScoreboardUtils.getScoreboardValue(entity, obj).orElse(null);
+		OptionalInt scoreboardValue = ScoreboardUtils.getScoreboardValue(entity, obj);
+		return scoreboardValue.isPresent() ? scoreboardValue.getAsInt() : null;
 	}
 
 	private static void teleport(CommandSender sender, Entity entity,

@@ -24,6 +24,10 @@ import org.bukkit.inventory.ItemStack;
 
 public class Scout extends PlayerClass {
 
+	public static final int CLASS_ID = 6;
+	public static final int RANGER_SPEC_ID = 11;
+	public static final int HUNTER_SPEC_ID = 12;
+
 	Scout() {
 		mAbilities.add(Agility.INFO);
 		mAbilities.add(HuntingCompanion.INFO);
@@ -33,20 +37,21 @@ public class Scout extends PlayerClass {
 		mAbilities.add(SwiftCuts.INFO);
 		mAbilities.add(Swiftness.INFO);
 		mAbilities.add(Volley.INFO);
-		mClass = 6;
+		mClass = CLASS_ID;
 		mClassName = "Scout";
 		mClassColor = NamedTextColor.AQUA;
 		mChatColor = ChatColor.AQUA;
 		mDisplayItem = new ItemStack(Material.BOW, 1);
 		mClassDescription = "Scouts are agile masters of archery and exploration.";
-		mClassPassiveDescription = String.format("You gain %d%% of your Bow Damage %% as Attack Damage and you gain %d%% of your Attack Damage %% as Bow Damage.", (int) (Versatile.DAMAGE_MULTIPLY_MELEE * 100), (int) (Versatile.DAMAGE_MULTIPLY_PROJ * 100));
+		mClassPassiveDescription = String.format("You gain %d%% of your Bow Damage %% as Attack Damage and you gain %d%% of your Attack Damage %% as Bow Damage.",
+			(int) (Versatile.DAMAGE_MULTIPLY_MELEE * 100), (int) (Versatile.DAMAGE_MULTIPLY_PROJ * 100));
 		mClassPassiveName = "Versatile";
 
 		mSpecOne.mAbilities.add(Quickdraw.INFO);
 		mSpecOne.mAbilities.add(WhirlingBlade.INFO);
 		mSpecOne.mAbilities.add(TacticalManeuver.INFO);
 		mSpecOne.mSpecQuestScoreboard = "Quest103e";
-		mSpecOne.mSpecialization = 11;
+		mSpecOne.mSpecialization = RANGER_SPEC_ID;
 		mSpecOne.mSpecName = "Ranger";
 		mSpecOne.mDisplayItem = new ItemStack(Material.LARGE_FERN, 1);
 		mSpecOne.mDescription = "Rangers are agile masters of archery and that have unparalleled mastery of movement.";
@@ -55,7 +60,7 @@ public class Scout extends PlayerClass {
 		mSpecTwo.mAbilities.add(SplitArrow.INFO);
 		mSpecTwo.mAbilities.add(PredatorStrike.INFO);
 		mSpecTwo.mSpecQuestScoreboard = "Quest103l";
-		mSpecTwo.mSpecialization = 12;
+		mSpecTwo.mSpecialization = HUNTER_SPEC_ID;
 		mSpecTwo.mSpecName = "Hunter";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.LEATHER, 1);
 		mSpecTwo.mDescription = "Hunters are agile masters of exploration that have dedicated their lives to archery.";
