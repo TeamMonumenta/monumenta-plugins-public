@@ -89,9 +89,16 @@ public class EscapeDeath extends Ability {
 			double newHealth = mPlayer.getHealth() - event.getFinalDamage(true);
 			boolean dealDamageLater = newHealth < 0 && newHealth > -absorptionHealth && isLevelTwo();
 			if (newHealth <= TRIGGER_THRESHOLD_HEALTH && (newHealth > 0 || dealDamageLater)) {
+				mPlugin.mEffectManager.damageEvent(event);
+				event.setLifelineCancel(true);
+				if (event.isCancelled() || event.isBlocked()) {
+					return;
+				}
+
 				if (dealDamageLater) {
 					event.setCancelled(true);
 				}
+
 				putOnCooldown();
 
 				int stunDuration = STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN_DURATION);

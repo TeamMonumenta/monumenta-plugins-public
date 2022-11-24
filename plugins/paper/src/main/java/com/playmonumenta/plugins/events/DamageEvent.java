@@ -158,6 +158,7 @@ public class DamageEvent extends Event implements Cancellable {
 	private final EntityDamageEvent mEvent;
 
 	private final Metadata mMetadata;
+	private boolean mLifelineCancel;
 
 	private final double mOriginalDamage;
 
@@ -179,6 +180,7 @@ public class DamageEvent extends Event implements Cancellable {
 		mMetadata = metadata;
 		mOriginalDamage = event.getDamage();
 		mEvent = event;
+		mLifelineCancel = false;
 
 		if (mDamager instanceof Projectile proj) {
 			ProjectileSource source = proj.getShooter();
@@ -272,6 +274,14 @@ public class DamageEvent extends Event implements Cancellable {
 	@Override
 	public void setCancelled(boolean cancelled) {
 		mEvent.setCancelled(cancelled);
+	}
+
+	public void setLifelineCancel(boolean lifelineCancel) {
+		mLifelineCancel = lifelineCancel;
+	}
+
+	public boolean isLifelineCancel() {
+		return mLifelineCancel;
 	}
 
 	public @Nullable ItemStatManager.PlayerItemStats getPlayerItemStats() {

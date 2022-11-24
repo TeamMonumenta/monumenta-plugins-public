@@ -168,7 +168,9 @@ public class DamageListener implements Listener {
 				}
 			}
 		}
-		mPlugin.mEffectManager.damageEvent(event);
+		if (!event.isLifelineCancel()) {
+			mPlugin.mEffectManager.damageEvent(event);
+		}
 	}
 
 	public static @Nullable PlayerItemStats getProjectileItemStats(Projectile proj) {

@@ -66,7 +66,7 @@ public class PrismaticShield extends Ability {
 					(int) RADIUS,
 					COOLDOWN / 20
 				),
-				String.format("The shield is improved to %s Absorption hearts. Enemies within %s blocks are knocked back and stunned for %s s.",
+				String.format("The shield is improved to %s Absorption hearts. Enemies within %s blocks are knocked back and stunned for %ss.",
 					ABSORPTION_HEALTH_2 / 2,
 					(int) RADIUS,
 					STUN_DURATION / 20),
@@ -95,7 +95,7 @@ public class PrismaticShield extends Ability {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (!event.isBlocked() && !isOnCooldown()) {
+		if (!event.isBlocked() && !isOnCooldown() && !event.isCancelled()) {
 			// Calculate whether this effect should not be run based on player health.
 			// It is intentional that Prismatic Shield saves you from death if you take a buttload of damage somehow.
 			double healthRemaining = mPlayer.getHealth() - event.getFinalDamage(true);
@@ -103,39 +103,43 @@ public class PrismaticShield extends Ability {
 			// Health is less than 0 but does not penetrate the absorption shield
 			boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -4 * (mAbsorptionHealth + 1);
 
-
-			if (healthRemaining > CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TRIGGER, TRIGGER_HEALTH)) {
-				return;
-			} else if (dealDamageLater) {
-				// The player has taken fatal damage BUT will be saved by the absorption, so set damage to 0 and compensate later
-				event.setCancelled(true);
-			}
-
-			// Put on cooldown before processing results to prevent infinite recursion
-			putOnCooldown();
-			mLastActivation = Bukkit.getServer().getCurrentTick();
-			mHealedFromAbilitiesThisTick.clear();
-			mHealedFromBlizzard = false;
-
-			// Conditions match - prismatic shield
-			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), RADIUS);
-			for (LivingEntity mob : hitbox.getHitMobs()) {
-				float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK_SPEED);
-				MovementUtils.knockAway(mPlayer, mob, knockback, true);
-				if (isLevelTwo()) {
-					EntityUtils.applyStun(mPlugin, STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), mob);
-					mCosmetic.prismaOnStun(mob, STUN_DURATION, mPlayer);
+			if (healthRemaining <= CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TRIGGER, TRIGGER_HEALTH)) {
+				mPlugin.mEffectManager.damageEvent(event);
+				event.setLifelineCancel(true);
+				if (event.isCancelled() || event.isBlocked()) {
+					return;
 				}
-			}
 
-			AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION));
-			World world = mPlayer.getWorld();
-			mCosmetic.prismaEffect(world, mPlayer, RADIUS);
-			MessagingUtils.sendActionBarMessage(mPlayer, "Prismatic Shield has been activated");
+				if (dealDamageLater) {
+					event.setCancelled(true);
+				}
 
-			if (dealDamageLater) {
-				mPlayer.setHealth(1);
-				AbsorptionUtils.subtractAbsorption(mPlayer, 1 - (float) healthRemaining);
+				// Put on cooldown before processing results to prevent infinite recursion
+				putOnCooldown();
+				mLastActivation = Bukkit.getServer().getCurrentTick();
+				mHealedFromAbilitiesThisTick.clear();
+				mHealedFromBlizzard = false;
+
+				// Conditions match - prismatic shield
+				Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), RADIUS);
+				for (LivingEntity mob : hitbox.getHitMobs()) {
+					float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK_SPEED);
+					MovementUtils.knockAway(mPlayer, mob, knockback, true);
+					if (isLevelTwo()) {
+						EntityUtils.applyStun(mPlugin, STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), mob);
+						mCosmetic.prismaOnStun(mob, STUN_DURATION, mPlayer);
+					}
+				}
+
+				AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION));
+				World world = mPlayer.getWorld();
+				mCosmetic.prismaEffect(world, mPlayer, RADIUS);
+				MessagingUtils.sendActionBarMessage(mPlayer, "Prismatic Shield has been activated");
+
+				if (dealDamageLater) {
+					mPlayer.setHealth(1);
+					AbsorptionUtils.subtractAbsorption(mPlayer, 1 - (float) healthRemaining);
+				}
 			}
 		}
 	}
