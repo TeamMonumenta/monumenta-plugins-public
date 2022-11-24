@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.SpellRemoveLevitation;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBeeBombs;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBurningVengence;
@@ -170,7 +171,8 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 				                                                   b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
 				                                                   b.getLocation().getBlock().getType() == Material.LAVA),
 				new SpellPhantomOfTheOpera(plugin, boss, mSpawnLoc, detectionRange, 20 * 60),
-				new SpellShieldStun(30 * 20)
+				new SpellShieldStun(30 * 20),
+				new SpellRemoveLevitation(mBoss)
 			);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();

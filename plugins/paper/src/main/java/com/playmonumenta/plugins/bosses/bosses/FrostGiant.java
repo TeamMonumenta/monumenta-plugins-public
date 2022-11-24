@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.SpellRemoveLevitation;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.ArmorOfFrost;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.GiantStomp;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.RingOfFrost;
@@ -429,7 +430,8 @@ public class FrostGiant extends BossAbilityGroup {
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
 				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
-				new GiantStomp(mPlugin, mBoss)
+				new GiantStomp(mPlugin, mBoss),
+				new SpellRemoveLevitation(mBoss)
 				);
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
@@ -439,7 +441,8 @@ public class FrostGiant extends BossAbilityGroup {
 				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 				new SpellFrostedIceBreak(mBoss),
-				new GiantStomp(mPlugin, mBoss)
+				new GiantStomp(mPlugin, mBoss),
+				new SpellRemoveLevitation(mBoss)
 				);
 		List<Spell> phase3PassiveSpells = Arrays.asList(
 				new ArmorOfFrost(mPlugin, mBoss, this, 1),
@@ -448,7 +451,8 @@ public class FrostGiant extends BossAbilityGroup {
 				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 				new SpellFrostedIceBreak(mBoss),
-				new GiantStomp(mPlugin, mBoss)
+				new GiantStomp(mPlugin, mBoss),
+				new SpellRemoveLevitation(mBoss)
 				);
 
 		List<Spell> phase4PassiveSpells = Arrays.asList(
@@ -458,7 +462,8 @@ public class FrostGiant extends BossAbilityGroup {
 				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 				new SpellFrostedIceBreak(mBoss),
-				new GiantStomp(mPlugin, mBoss)
+				new GiantStomp(mPlugin, mBoss),
+				new SpellRemoveLevitation(mBoss)
 				);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
