@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import java.util.EnumSet;
@@ -35,17 +36,15 @@ public class ProtectionOfTheWorld implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-
-		double mDamageMultiplier = 1;
-		double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.PROTECTION_OF_THE_WORLD);
-
-		if (ServerProperties.getAbilityEnhancementsEnabled()) {
-			mDamageMultiplier -= DAMAGE_MULTIPLIER_R3 * level;
-		} else if (ServerProperties.getClassSpecializationsEnabled()) {
-			mDamageMultiplier -= DAMAGE_MULTIPLIER_R2 * level;
-		} else {
-			mDamageMultiplier -= DAMAGE_MULTIPLIER_R1 * level;
-		}
-		event.setDamage(event.getDamage() * mDamageMultiplier);
+		event.setDamage(event.getDamage() * getDamageMultiplier(value, ServerProperties.getRegion()));
 	}
+
+	public static double getDamageMultiplier(double level, ItemStatUtils.Region region) {
+		return switch (region) {
+			case RING -> 1 - level * DAMAGE_MULTIPLIER_R3;
+			case ISLES -> 1 - level * DAMAGE_MULTIPLIER_R2;
+			default -> 1 - level * DAMAGE_MULTIPLIER_R1;
+		};
+	}
+
 }

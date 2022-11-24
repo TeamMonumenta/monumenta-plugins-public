@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.protocollib;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
-import com.playmonumenta.plugins.itemstats.PlayerItemStatsGUI;
+import com.playmonumenta.plugins.itemstats.gui.PlayerItemStatsGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;

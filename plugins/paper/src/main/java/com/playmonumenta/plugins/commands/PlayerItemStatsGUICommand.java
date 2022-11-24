@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.itemstats.PlayerItemStatsGUI;
+import com.playmonumenta.plugins.itemstats.gui.PlayerItemStatsGUI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.PlayerArgument;

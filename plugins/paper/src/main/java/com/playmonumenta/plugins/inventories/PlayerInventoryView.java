@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.itemstats.PlayerItemStatsGUI;
+import com.playmonumenta.plugins.itemstats.gui.PlayerItemStatsGUI;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.InventoryUtils;
