@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.PrismaticShieldCS;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
@@ -37,8 +38,10 @@ public class PrismaticShield extends Ability {
 	private static final int COOLDOWN = 90 * 20;
 	private static final float KNOCKBACK_SPEED = 0.7f;
 	private static final int STUN_DURATION = 20;
-	private static final int HEAL_DURATION = 4 * 20;
+	private static final int HEAL_DURATION = 5 * 20;
 	private static final int HEAL_PERCENT = 5;
+	private static final float DAMAGE_BUFF = 0.3f;
+	private static final String DAMAGE_BUFF_NAME = "PrismaticShieldDamageBuff";
 	private static final String HEALED_THIS_TICK_METAKEY = "PrismaticShieldHealedThisTick";
 
 	public static final String CHARM_ABSORPTION = "Prismatic Shield Absorption Health";
@@ -67,8 +70,9 @@ public class PrismaticShield extends Ability {
 					ABSORPTION_HEALTH_2 / 2,
 					(int) RADIUS,
 					STUN_DURATION / 20),
-				String.format("After Prismatic Shield is activated, in the next %ss, every spell that deals damage to at least one enemy will heal you for %s%% of your max health.",
+				String.format("After Prismatic Shield is activated, in the next %ss, you deal %s%% more damage and every spell that deals damage to at least one enemy will heal you for %s%% of your max health.",
 					HEAL_DURATION / 20,
+					DAMAGE_BUFF * 100,
 					HEAL_PERCENT)
 			)
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
@@ -164,6 +168,7 @@ public class PrismaticShield extends Ability {
 				}
 				mHealedFromBlizzard = true;
 			}
+			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_BUFF_NAME, new PercentDamageDealt(HEAL_DURATION, DAMAGE_BUFF));
 			PlayerUtils.healPlayer(mPlugin, mPlayer, HEAL_PERCENT / 100.0 * EntityUtils.getMaxHealth(mPlayer));
 			mCosmetic.prismaOnHeal(mPlayer);
 		}

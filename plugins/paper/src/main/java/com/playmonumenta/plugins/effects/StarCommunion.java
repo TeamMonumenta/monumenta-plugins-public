@@ -18,7 +18,7 @@ public class StarCommunion extends ZeroArgumentEffect {
 
 	public static final double HEALTH_THRESHOLD = 0.9;
 	public static final int ON_HIT_DURATION = 4 * 20;
-	public static final double SLOW_AMOUNT = 0.1;
+	public static final double SLOW_AMOUNT = 0.15;
 
 	private static final Particle.DustOptions DARK_COLOR = new Particle.DustOptions(Color.fromRGB(111, 0, 255), 1.0f);
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(154, 77, 255), 1.0f);
@@ -33,7 +33,6 @@ public class StarCommunion extends ZeroArgumentEffect {
 			if (player.getHealth() / EntityUtils.getMaxHealth(player) >= HEALTH_THRESHOLD) {
 				Plugin plugin = Plugin.getInstance();
 				EntityUtils.applySlow(plugin, ON_HIT_DURATION, SLOW_AMOUNT, enemy);
-				EntityUtils.applyFire(plugin, ON_HIT_DURATION, enemy, player);
 				Location loc = enemy.getLocation().add(0, enemy.getHeight() / 2, 0);
 				new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
 				new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
