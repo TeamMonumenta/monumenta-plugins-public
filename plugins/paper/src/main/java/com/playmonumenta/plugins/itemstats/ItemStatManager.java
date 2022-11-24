@@ -192,15 +192,12 @@ public class ItemStatManager implements Listener {
 
 			// If health changed, wipe Absorption + Max Health
 			if (checkHealth) {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						if (priorHealth != player.getMaxHealth()) {
-							Plugin.getInstance().mEffectManager.clearEffects(player, EffectType.ABSORPTION.getName());
-							Plugin.getInstance().mEffectManager.clearEffects(player, EffectType.MAX_HEALTH_INCREASE.getName());
-						}
+				Bukkit.getScheduler().runTaskLater(plugin, () -> {
+					if (Math.abs(priorHealth - EntityUtils.getMaxHealth(player)) > 0.01) {
+						Plugin.getInstance().mEffectManager.clearEffects(player, EffectType.ABSORPTION.getName());
+						Plugin.getInstance().mEffectManager.clearEffects(player, EffectType.MAX_HEALTH_INCREASE.getName());
 					}
-				}.runTaskLater(plugin, 1);
+				}, 1);
 			}
 
 		}
