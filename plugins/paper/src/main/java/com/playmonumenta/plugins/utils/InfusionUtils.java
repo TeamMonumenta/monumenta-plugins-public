@@ -21,7 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class InfusionUtils {
 
 	/**
-	 * When set to true the refund function will return all the XP used for the infusion, when false only the 50%
+	 * When set to true the refund function will return all the XP used for the infusion, when false only the 75%
 	 */
 	public static final boolean FULL_REFUND = false;
 	public static final String PULSATING_GOLD = "epic:r1/items/currency/pulsating_gold";
@@ -183,7 +183,7 @@ public class InfusionUtils {
 			}
 		}
 
-		refundXP = (FULL_REFUND ? refundXP : refundXP / 2) * item.getAmount();
+		refundXP = (int) ((FULL_REFUND ? refundXP : refundXP * 0.75) * item.getAmount());
 		ExperienceUtils.setTotalExperience(player, xp + refundXP);
 	}
 
