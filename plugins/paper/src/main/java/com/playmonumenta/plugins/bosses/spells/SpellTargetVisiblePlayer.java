@@ -128,4 +128,9 @@ public class SpellTargetVisiblePlayer extends Spell {
 	public int cooldownTicks() {
 		return PERIOD;
 	}
+
+	public void setTarget(Player target) {
+		mLastTarget = target;
+	}
+
 }

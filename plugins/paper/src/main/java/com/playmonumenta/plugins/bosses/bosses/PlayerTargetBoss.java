@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.bosses.spells.SpellTargetVisiblePlayer;
 import java.util.Arrays;
@@ -24,6 +23,8 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 		return new PlayerTargetBoss(plugin, boss);
 	}
 
+	SpellTargetVisiblePlayer mSpellTargetPlayer;
+
 	public PlayerTargetBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 		if (!(boss instanceof Mob)) {
@@ -34,14 +35,14 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 			boss.setRemoveWhenFarAway(true);
 		}
 
-		Spell tgt = new SpellTargetVisiblePlayer((Mob)boss, detectionRange, 60, 160);
+		mSpellTargetPlayer = new SpellTargetVisiblePlayer((Mob)boss, detectionRange, 60, 160);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellRunAction(() -> {
 				if (boss instanceof Wolf && ((Wolf)boss).isTamed()) {
 					((Wolf)boss).setAngry(false);
 				} else {
-					tgt.run();
+					mSpellTargetPlayer.run();
 				}
 			})
 		));
@@ -56,5 +57,11 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 			event.setCancelled(true);
 		}
 	}
+
+	public void setTarget(Player target) {
+		mSpellTargetPlayer.setTarget(target);
+	}
+
+
 }
 

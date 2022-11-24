@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -112,7 +113,7 @@ public class SpellTpBehindPlayer extends Spell {
 							world.spawnParticle(Particle.SMOKE_LARGE, loc, 12, 0, 0.45, 0, 0.125);
 
 							mLauncher.teleport(locTest);
-							if (mLauncher instanceof Mob mob) {
+							if (mLauncher instanceof Mob mob && !AbilityUtils.isStealthed(target)) {
 								mob.setTarget(target);
 								// For some reason just setting the target doesn't seem to be enough, so try again a tick later
 								Bukkit.getScheduler().runTaskLater(mPlugin, () -> {

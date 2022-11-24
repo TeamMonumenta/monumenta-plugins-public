@@ -26,6 +26,8 @@ public class GenericTargetBoss extends BossAbilityGroup {
 		return new GenericTargetBoss(plugin, boss);
 	}
 
+	private LivingEntity mLastTarget = null;
+
 	public GenericTargetBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 		if (!(boss instanceof Mob)) {
@@ -41,7 +43,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 		final Parameters param = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		Spell targetSpell = new Spell() {
-			private LivingEntity mLastTarget = null;
+
 
 			@Override
 			public void run() {
@@ -82,8 +84,11 @@ public class GenericTargetBoss extends BossAbilityGroup {
 
 		};
 
-
 		super.constructBoss(SpellManager.EMPTY, List.of(targetSpell), (int) (param.TARGETS.getRange() * 1.5), null, 10);
+	}
+
+	public void setTarget(LivingEntity target) {
+		mLastTarget = target;
 	}
 
 }

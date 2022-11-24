@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
+import com.playmonumenta.plugins.bosses.bosses.GenericTargetBoss;
+import com.playmonumenta.plugins.bosses.bosses.PlayerTargetBoss;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
@@ -1016,8 +1018,22 @@ public class EntityUtils {
 
 	public static void applyTaunt(Plugin plugin, LivingEntity tauntedEntity, Player targetedPlayer) {
 		if (!tauntedEntity.getScoreboardTags().contains(IGNORE_TAUNT_TAG)) {
+			//TODO - when all the mobs in game use only generic target remove these lines
+			PlayerTargetBoss playerTargetBoss = BossManager.getInstance().getBoss(tauntedEntity, PlayerTargetBoss.class);
+			if (playerTargetBoss != null) {
+				playerTargetBoss.setTarget(targetedPlayer);
+			}
+			//todo end
+
+			GenericTargetBoss boss = BossManager.getInstance().getBoss(tauntedEntity, GenericTargetBoss.class);
+			if (boss != null) {
+				boss.setTarget(targetedPlayer);
+			}
+
+			//vanilla taunt
 			Mob tauntedMob = (Mob) tauntedEntity;
 			tauntedMob.setTarget(targetedPlayer);
+
 			new PartialParticle(Particle.REDSTONE, tauntedEntity.getEyeLocation().add(0, 0.5, 0), 12, 0.4, 0.5, 0.4, TAUNT_COLOR).spawnAsPlayerActive(targetedPlayer);
 
 			// Damage the taunted enemy to keep focus on the player who casted the taunt.

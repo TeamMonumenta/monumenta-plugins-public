@@ -131,7 +131,7 @@ public class ShieldBash extends Ability {
 			EntityUtils.applyStun(mPlugin, duration, le);
 		}
 		if (le instanceof Mob mob) {
-			mob.setTarget(mPlayer);
+			EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
 		}
 	}
 
