@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.itemstats.infusions;
 
-import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.listeners.GraveListener;
 import com.playmonumenta.plugins.potion.PotionManager;
@@ -11,7 +8,6 @@ import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +25,6 @@ public class Phylactery implements Infusion {
 	public static final String GRAVE_XP_SCOREBOARD = "PhylacteryXP";
 
 	private static final HashMap<UUID, HashMap<PotionManager.PotionID, List<PotionUtils.PotionInfo>>> POTION_EFFECTS_MAP = new HashMap<>();
-	private static final HashMap<UUID, List<EffectManager.EffectPair>> CUSTOM_EFFECTS_MAP = new HashMap<>();
 
 	@Override
 	public String getName() {
@@ -83,36 +78,6 @@ public class Phylactery implements Infusion {
 		}
 
 		POTION_EFFECTS_MAP.put(player.getUniqueId(), infoMap);
-
-		// Store Effects into CUSTOM_EFFECTS_MAP
-		List<EffectManager.EffectPair> effectPairs = plugin.mEffectManager.getAllEffectPairs(player);
-
-		if (effectPairs != null) {
-			List<EffectManager.EffectPair> resultEffects = new ArrayList<>();
-			for (EffectManager.EffectPair pair : effectPairs) {
-				Effect effect = pair.mEffect;
-				if (effect.isBuff()) {
-					try {
-						String source = pair.mSource;
-						JsonObject effectObject = effect.serialize();
-						Effect newEffect = EffectManager.getEffectFromJson(effectObject, plugin);
-						if (newEffect != null) {
-							if (source.startsWith("DeathPersistent")) {
-								newEffect.setDuration(effect.getDuration());
-							} else {
-								newEffect.setDuration((int) (effect.getDuration() * value * DURATION_KEPT));
-							}
-							resultEffects.add(new EffectManager.EffectPair(source, newEffect));
-						}
-					} catch (Exception e) {
-						// cry
-						e.printStackTrace();
-					}
-				}
-			}
-			plugin.mEffectManager.clearEffects(player);
-			CUSTOM_EFFECTS_MAP.put(player.getUniqueId(), resultEffects);
-		}
 	}
 
 	//Called when the final item in a grave is picked up or claimed
@@ -132,21 +97,6 @@ public class Phylactery implements Infusion {
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
 				for (PotionManager.PotionID id : potionEffects.keySet()) {
 					plugin.mPotionManager.addPotionInfos(player, id, potionEffects.get(id));
-				}
-			}, 1);
-		}
-
-		List<EffectManager.EffectPair> customEffects = CUSTOM_EFFECTS_MAP.remove(player.getUniqueId());
-		if (customEffects != null) {
-			Bukkit.getScheduler().runTaskLater(plugin, () -> {
-				for (EffectManager.EffectPair pair : customEffects) {
-					String source = pair.mSource;
-					Effect effect = pair.mEffect;
-
-					// Skip Patreon Effects
-					if (!source.startsWith("PatronShrine")) {
-						plugin.mEffectManager.addEffect(player, source, effect);
-					}
 				}
 			}, 1);
 		}

@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -207,8 +209,11 @@ public final class EffectManager implements Listener {
 			for (EffectPriority priority : mPriorityMap.keySet()) {
 				Map<String, NavigableSet<Effect>> sourceMap = mPriorityMap.get(priority);
 				for (String source : sourceMap.keySet()) {
-					if (sourceMap.get(source).contains(effect)) {
-						return source;
+					// manual loop instead of contains() to check for reference equality
+					for (Effect otherEffect : sourceMap.get(source)) {
+						if (effect == otherEffect) {
+							return source;
+						}
 					}
 				}
 			}
@@ -355,7 +360,10 @@ public final class EffectManager implements Listener {
 							// Have to make a copy of the effects to prevent concurrent modification exceptions in case ticking changes the effects :(
 							for (NavigableSet<Effect> effectGroup : new ArrayList<>(priorityEffects.values())) {
 								try {
-									effectGroup.last().entityTickEffect(entry.getKey(), fourHertz, twoHertz, oneHertz);
+									// Only tick when entity is not dead.
+									if (!entry.getKey().isDead()) {
+										effectGroup.last().entityTickEffect(entry.getKey(), fourHertz, twoHertz, oneHertz);
+									}
 								} catch (Exception ex) {
 									Plugin.getInstance().getLogger().severe("Error in effect manager entityTickEffect: " + ex.getMessage());
 									ex.printStackTrace();
@@ -370,7 +378,7 @@ public final class EffectManager implements Listener {
 						Effects effects = entityIter.next();
 						Entity entity = effects.mEntity;
 						if (entity.isDead() || !entity.isValid()) {
-							if (!(entity instanceof Player) || ((Player) entity).isOnline()) {
+							if (!(entity instanceof Player)) {
 								entityIter.remove();
 								continue;
 							}
@@ -742,6 +750,33 @@ public final class EffectManager implements Listener {
 				}
 			}
 		}
+
+		if (killed instanceof Player player) {
+			// Default phylactery level is 10 (should already be accounted for).
+			double phylactery = Plugin.getInstance().mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.PHYLACTERY);
+
+			// Set durations of Custom Effects for all player effects (including hidden ones)
+			List<EffectManager.EffectPair> effectPairs = getAllEffectPairs(player);
+
+			if (effectPairs != null) {
+				for (EffectManager.EffectPair pair : effectPairs) {
+					Effect effect = pair.mEffect;
+					String source = pair.mSource;
+
+					if (source.startsWith("DeathPersistent")) {
+						// Don't alter duration for these effects.
+						continue;
+					} else if (effect.isBuff() && !source.startsWith("PatronShrine")) {
+						// Effect is Buff, set duration based on Phylactery value.
+						effect.setDuration((int) (effect.getDuration() * phylactery * Phylactery.DURATION_KEPT));
+						effect.entityLoseEffect(player);
+					} else {
+						// Effect is Debuff (or not stated), set duration to 0.
+						effect.setDuration(0);
+					}
+				}
+			}
+		}
 	}
 
 	//Called in DamageListener
@@ -839,5 +874,29 @@ public final class EffectManager implements Listener {
 		// TODO: There is nothing that actually stores the player's effects before they log out.
 		// The above code is NOT the reason that a player can log out and back in to clear their effects
 		// Fixing this will require serializing the Effects to plugindata, then restoring them on player join
+	}
+
+	public void applyEffectsOnRespawn(Plugin plugin, Player player) {
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			List<Effect> activeEffects = getAllEffects(player);
+			if (activeEffects != null) {
+				for (Effect effect : activeEffects) {
+					String source = getSource(player, effect);
+					// Recall Effect Gain Function to regain buffs one tick later.
+					effect.entityLoseEffect(player);
+					Bukkit.getScheduler().runTaskLater(plugin, () -> {
+						NavigableSet<Effect> effectsInSource = getEffects(player, source);
+						// Ensure that:
+						// Effect is still top priority
+						// Effect duration has not run out.
+						// Only then do we re-apply the gain effect (things like speed attribute)
+						// Really, it's more insurance to ensure we don't have another bug in our hands due to all the delay stuff.
+						if (effectsInSource != null && effectsInSource.last() == effect && effectsInSource.last().getDuration() == effect.getDuration() && effect.getDuration() > 0) {
+							effect.entityGainEffect(player);
+						}
+					}, 1);
+				}
+			}
+		}, 1);
 	}
 }

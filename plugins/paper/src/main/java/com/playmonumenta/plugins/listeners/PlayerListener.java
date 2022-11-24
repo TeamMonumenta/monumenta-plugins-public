@@ -756,6 +756,7 @@ public class PlayerListener implements Listener {
 		}, 0);
 
 		Phylactery.applyStoredEffects(mPlugin, player);
+		mPlugin.mEffectManager.applyEffectsOnRespawn(mPlugin, player);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
