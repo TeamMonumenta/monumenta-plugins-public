@@ -1230,18 +1230,17 @@ public class ItemStatUtils {
 		}
 
 		if (lore.isEmpty()) {
-			clearLore(nbt);
+			clearLore(item);
 		}
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
 	}
 
 	public static void clearLore(final ItemStack item) {
-		clearLore(new NBTItem(item));
-	}
-
-	public static void clearLore(NBTItem nbt) {
-		nbt.addCompound(MONUMENTA_KEY).removeKey(LORE_KEY);
+		NBTItem nbt = new NBTItem(item);
+		nbt.getCompound(MONUMENTA_KEY).removeKey(LORE_KEY);
+		item.setItemMeta(nbt.getItem().getItemMeta());
+		item.lore(Collections.emptyList());
 	}
 
 	public static List<Component> getLore(final ItemStack item) {
@@ -3108,12 +3107,9 @@ public class ItemStatUtils {
 				return;
 			}
 
+			// remove all enchantments and attributes even though we clear everything later because some use vanilla mechanics that persist
 			for (EnchantmentType ench : EnchantmentType.values()) {
 				removeEnchantment(item, ench);
-			}
-
-			for (InfusionType infusion : InfusionType.values()) {
-				removeInfusion(item, infusion);
 			}
 
 			for (AttributeType attr : AttributeType.values()) {
@@ -3124,15 +3120,11 @@ public class ItemStatUtils {
 				}
 			}
 
-			for (EffectType eff : EffectType.values()) {
-				removeConsumeEffect(item, eff);
-			}
+			NBTItem nbt = new NBTItem(item);
+			nbt.removeKey(MONUMENTA_KEY);
+			item.setItemMeta(nbt.getItem().getItemMeta());
+			item.lore(Collections.emptyList());
 
-			editItemInfo(item, Region.NONE, Tier.NONE, Masterwork.NONE, Location.NONE);
-
-			clearLore(item);
-
-			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
 				playerItemStats.updateStats(player, true, player.getMaxHealth(), true);
