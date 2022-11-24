@@ -64,7 +64,7 @@ public class SpellParadoxSwap extends Spell {
 	}
 
 	private void deployEffect(Player damager) {
-		PlayerUtils.playersInRange(damager.getLocation(), 50, true).forEach(player -> player.sendMessage(ChatColor.GOLD + "[Temporal Exchanger]" + ChatColor.WHITE + " TEMPOARL ANOMALY TRANSFERRED - ENTERING TEMPORARY ENERGY REGENERATION STATE"));
+		PlayerUtils.playersInRange(damager.getLocation(), 50, true).forEach(player -> player.sendMessage(ChatColor.GOLD + "[Temporal Exchanger]" + ChatColor.WHITE + " TEMPORAL ANOMALY TRANSFERRED - ENTERING TEMPORARY ENERGY REGENERATION STATE"));
 		List<Player> nearbyPlayers = EntityUtils.getNearestPlayers(mBoss.getLocation(), mRange);
 		Collections.reverse(nearbyPlayers);
 		nearbyPlayers.remove((Player) damager);

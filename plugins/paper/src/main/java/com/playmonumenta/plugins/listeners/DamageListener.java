@@ -14,11 +14,14 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Wither;
+import org.bukkit.entity.WitherSkull;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -48,6 +51,10 @@ public class DamageListener implements Listener {
 				if (damager instanceof Creeper creeper) {
 					event.setDamage(EntityUtils.calculateCreeperExplosionDamage(creeper, le, event.getDamage()));
 				}
+			}
+			if (entityDamageByEntityEvent.getDamager() instanceof WitherSkull witherSkull
+				    && witherSkull.getShooter() instanceof Wither wither) {
+				event.setDamage(EntityUtils.getAttributeOrDefault(wither, Attribute.GENERIC_ATTACK_DAMAGE, event.getDamage()));
 			}
 
 			if (event.getEntity() instanceof LivingEntity mob) {

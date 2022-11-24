@@ -22,12 +22,15 @@ import net.minecraft.world.damagesource.EntityDamageSource;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
+import net.minecraft.world.entity.ai.goal.LeapAtTargetGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NonTameRandomTargetGoal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.item.ItemStack;
@@ -61,6 +64,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Spider;
+import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.entity.Wolf;
 import org.bukkit.plugin.Plugin;
@@ -405,6 +410,13 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		return (Class<?>) getFieldValue(targetTypeField, goal);
 	}
 
+	private static final Field WITHER_TARGETING_CONDITIONS = getField(WitherBoss.class, "cg"); // unobfuscated field name: TARGETING_CONDITIONS
+
+	static {
+		// make withers only attack players and not other mobs
+		((TargetingConditions) getFieldValue(WITHER_TARGETING_CONDITIONS, null)).selector(le -> le instanceof Player);
+	}
+
 	@Override
 	public void mobAIChanges(Mob mob) {
 		Set<WrappedGoal> availableGoals = ((CraftMob) mob).getHandle().goalSelector.availableGoals;
@@ -414,17 +426,17 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 			availableGoals.removeIf(goal -> goal.getGoal() instanceof AvoidEntityGoal);
 			if (mob instanceof WitherSkeleton) {
 				// prevent wither skeletons from attacking piglins
-				availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
+				availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
 					                                      && AbstractPiglin.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
 			}
 		} else if (mob instanceof IronGolem) {
 			// prevent iron golems defending villages and attacking mobs
 			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof DefendVillageTargetGoal);
-			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
+			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
 				                                      && getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.Mob.class);
 		} else if (mob instanceof Drowned) {
 			// prevent drowneds from attacking mobs
-			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
+			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
 				                                      && net.minecraft.world.entity.Mob.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
 		} else if (mob instanceof Evoker) {
 			// disable vexes and fangs on evokers with the proper tags
@@ -436,16 +448,31 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 			}
 		} else if (mob instanceof Wolf) {
 			// prevent wolves from attacking animals and skeletons
-			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
+			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
 				                                      && net.minecraft.world.entity.monster.AbstractSkeleton.class.isAssignableFrom(getNearestAttackableTargetGoalTargetType(natg)));
 			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NonTameRandomTargetGoal);
+			// disable panicking and avoiding llamas
+			availableGoals.removeIf(goal -> goal.getGoal().getClass().getDeclaringClass() == net.minecraft.world.entity.animal.Wolf.class);
 		} else if (mob instanceof Enderman) {
 			// remove all special enderman goals (freeze when looked at, attack staring player, take/drop block)
 			availableGoals.removeIf(goal -> goal.getGoal().getClass().getDeclaringClass() == EnderMan.class);
 			availableTargetGoals.removeIf(goal -> goal.getGoal().getClass().getDeclaringClass() == EnderMan.class);
+		} else if (mob instanceof Wither) {
+			// make withers only attack players and not other mobs
+			availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal);
+			availableTargetGoals.add(new WrappedGoal(2, new NearestAttackableTargetGoal<>(((CraftMob) mob).getHandle(), net.minecraft.world.entity.player.Player.class, false, false)));
+		} else if (mob instanceof Spider) {
+			// allow spiders to target and attack even with something riding them or if it's too bright
+			availableGoals.removeIf(goal -> goal.getGoal().getClass().getDeclaringClass() == net.minecraft.world.entity.monster.Spider.class);
+			availableGoals.add(new WrappedGoal(4, new MeleeAttackGoal((PathfinderMob) ((CraftMob) mob).getHandle(), 1.0D, true)));
+			availableTargetGoals.add(new WrappedGoal(2, new NearestAttackableTargetGoal<>(((CraftMob) mob).getHandle(), net.minecraft.world.entity.player.Player.class, false, false)));
+			// disable leaping if desired
+			if (mob.getScoreboardTags().contains("boss_spider_no_leap")) {
+				availableGoals.removeIf(goal -> goal.getGoal() instanceof LeapAtTargetGoal);
+			}
 		}
 		// prevent all mobs from attacking iron golems and turtles
-		availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal natg
+		availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
 			                                      && (getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.IronGolem.class
 				                                          || getNearestAttackableTargetGoalTargetType(natg) == net.minecraft.world.entity.animal.Turtle.class));
 	}

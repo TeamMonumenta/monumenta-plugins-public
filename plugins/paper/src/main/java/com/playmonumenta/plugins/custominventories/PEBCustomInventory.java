@@ -406,7 +406,7 @@ public class PEBCustomInventory extends CustomInventory {
 				"Toggle glowing for mobs.", ChatColor.LIGHT_PURPLE,
 				Material.ZOMBIE_HEAD, false).playerCommand("glowing toggle mobs"),
 			new PebItem(31, "Bosses",
-				"Toggle glowing for bosses. Note that pretty much all bosses are mobs, soa re affected by that option as well.", ChatColor.LIGHT_PURPLE,
+				"Toggle glowing for bosses. Note that pretty much all bosses are mobs, so are affected by that option as well.", ChatColor.LIGHT_PURPLE,
 				Material.DRAGON_HEAD, false).playerCommand("glowing toggle bosses"),
 			new PebItem(32, "Invisible Entities",
 				"Toggle glowing for invisible entities.", ChatColor.LIGHT_PURPLE,
