@@ -90,6 +90,7 @@ public class DelveCustomInventory extends CustomInventory {
 		DUNGEON_FUNCTION_MAPPINGS.put("ruin", "function monumenta:lobbies/dmas/new");
 		DUNGEON_FUNCTION_MAPPINGS.put("portal", "function monumenta:lobbies/dps/new");
 		DUNGEON_FUNCTION_MAPPINGS.put("blue", "function monumenta:lobbies/d12/new");
+		DUNGEON_FUNCTION_MAPPINGS.put("brown", "function monumenta:lobbies/d13/new");
 	}
 
 	private static final int[] DELVE_MOD_ITEM_SLOTS = {

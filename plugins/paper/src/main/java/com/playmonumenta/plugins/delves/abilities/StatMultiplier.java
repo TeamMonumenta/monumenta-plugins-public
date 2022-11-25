@@ -58,6 +58,7 @@ public class StatMultiplier {
 
 		//r3 shards
 		STAT_COMPENSATION_MAPPINGS.put("blue", 1.2);
+		STAT_COMPENSATION_MAPPINGS.put("brown", 1.2);
 		STAT_COMPENSATION_MAPPINGS.put("ruin", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("portal", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("skt", 1.0);
