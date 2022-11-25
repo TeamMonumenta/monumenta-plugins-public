@@ -114,7 +114,7 @@ public class ElementalSpiritFire extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		ClassAbility ability = event.getAbility();
-		if (ability != null && (ability.equals(ClassAbility.ELEMENTAL_ARROWS_FIRE) || ability.equals(ClassAbility.STARFALL) || ability.equals(ClassAbility.MAGMA_SHIELD))) {
+		if (ability != null && !isOnCooldown() && (ability.equals(ClassAbility.ELEMENTAL_ARROWS_FIRE) || ability.equals(ClassAbility.STARFALL) || ability.equals(ClassAbility.MAGMA_SHIELD))) {
 			mEnemiesAffected.add(event.getDamagee());
 			// 1 runnable processes everything 1 tick later, so all enemies to affect are in
 			if (mEnemiesAffectedProcessor == null) {

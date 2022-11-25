@@ -73,7 +73,7 @@ public class ElementalSpiritIce extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		ClassAbility ability = event.getAbility();
-		if (ability != null && (ability.equals(ClassAbility.ELEMENTAL_ARROWS_ICE) || ability.equals(ClassAbility.BLIZZARD) || ability.equals(ClassAbility.FROST_NOVA))) {
+		if (ability != null && !isOnCooldown() && (ability.equals(ClassAbility.ELEMENTAL_ARROWS_ICE) || ability.equals(ClassAbility.BLIZZARD) || ability.equals(ClassAbility.FROST_NOVA))) {
 			mEnemiesAffected.add(event.getDamagee());
 			if (mEnemiesAffectedProcessor == null) {
 				mEnemiesAffectedProcessor = new BukkitRunnable() {
