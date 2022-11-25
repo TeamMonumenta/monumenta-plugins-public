@@ -66,8 +66,16 @@ public class Taboo extends Ability {
 						if (!ItemUtils.isAlchemistItem(player.getInventory().getItemInMainHand())) {
 							return false;
 						}
-						Taboo taboo = Plugin.getInstance().mAbilityManager.getPlayerAbilities(player).getAbilityIgnoringSilence(Taboo.class);
-						return taboo != null && taboo.isLevelTwo() && taboo.mActive;
+						return isTabooUpgradedAndActive(player);
+					})))
+			.addTrigger(new AbilityTriggerInfo<>("healWithAA", "heal with AA", Taboo::healWithAA, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
+				.lookDirections(AbilityTrigger.LookDirection.DOWN),
+				new AbilityTriggerInfo.TriggerRestriction("holding a projectile weapon and Taboo is active",
+					player -> {
+						if (!ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand())) {
+							return false;
+						}
+						return isTabooUpgradedAndActive(player);
 					})))
 			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", Taboo::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
@@ -115,8 +123,7 @@ public class Taboo extends Ability {
 	}
 
 	public void toggleWithAA() {
-		if (mAlchemicalArtillery != null
-			    && mAlchemicalArtillery.isActive()) {
+		if (isAAActive()) {
 			toggle();
 		}
 	}
@@ -130,6 +137,16 @@ public class Taboo extends Ability {
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, 1, 1.2f);
 			new PartialParticle(Particle.HEART, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(mPlayer);
 		}
+	}
+
+	public void healWithAA() {
+		if (isAAActive()) {
+			heal();
+		}
+	}
+
+	private boolean isAAActive() {
+		return mAlchemicalArtillery != null&& mAlchemicalArtillery.isActive();
 	}
 
 	@Override
@@ -160,5 +177,10 @@ public class Taboo extends Ability {
 	@Override
 	public @Nullable String getMode() {
 		return mActive ? "active" : null;
+	}
+
+	private static boolean isTabooUpgradedAndActive(Player player) {
+		Taboo taboo = Plugin.getInstance().mAbilityManager.getPlayerAbilities(player).getAbilityIgnoringSilence(Taboo.class);
+		return taboo != null && taboo.isLevelTwo() && taboo.mActive;
 	}
 }

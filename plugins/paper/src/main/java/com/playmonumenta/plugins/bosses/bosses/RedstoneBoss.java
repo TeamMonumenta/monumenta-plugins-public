@@ -28,7 +28,7 @@ public class RedstoneBoss extends BossAbilityGroup {
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new CyanSummonBoss(plugin, boss);
+		return new RedstoneBoss(plugin, boss);
 	}
 
 	private final Location mLocation;
@@ -46,6 +46,6 @@ public class RedstoneBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		mLocation.getWorld().setBlockData(mLocation, mMaterial.createBlockData());
+		mLocation.getBlock().setType(mMaterial);
 	}
 }
