@@ -146,7 +146,7 @@ public class Taboo extends Ability {
 	}
 
 	private boolean isAAActive() {
-		return mAlchemicalArtillery != null&& mAlchemicalArtillery.isActive();
+		return mAlchemicalArtillery != null && mAlchemicalArtillery.isActive();
 	}
 
 	@Override
