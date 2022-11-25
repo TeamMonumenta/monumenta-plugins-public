@@ -214,6 +214,7 @@ public class AbilityTrigger {
 			trigger.mSneaking = BinaryOption.valueOf(json.get("sneaking").getAsString());
 			trigger.mSprinting = BinaryOption.valueOf(json.get("sprinting").getAsString());
 			trigger.mOnGround = BinaryOption.valueOf(json.get("onGround").getAsString());
+			trigger.mLookDirections.clear();
 			for (JsonElement lookDirection : json.get("lookDirections").getAsJsonArray()) {
 				trigger.mLookDirections.add(LookDirection.valueOf(lookDirection.getAsString()));
 			}
