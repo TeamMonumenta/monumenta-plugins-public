@@ -33,11 +33,11 @@ public class POIManager implements Listener {
 	public static final String KEY_PLUGIN_DATA = "POI";
 	public static final String KEY_POI = "poi";
 
-	public static POIManager mInstance;
+	private static POIManager mInstance;
 
 	public Map<UUID, List<POICompletion>> mPlayerPOI;
 
-	public POIManager() {
+	private POIManager() {
 		mPlayerPOI = new HashMap<>();
 	}
 
@@ -52,14 +52,10 @@ public class POIManager implements Listener {
 		List<POICompletion> pois = mPlayerPOI.get(player.getUniqueId());
 		for (POICompletion poi : pois) {
 			if (poi.getPOI().getName().equals(poiName) && !poi.isCompleted()) {
+				poi.complete();
+
 				// Grab POI data
 				POI finalPOI = poi.getPOI();
-
-				// Run replacements in POI manager to update on completion
-				POICompletion replacePOI = new POICompletion(POI.getPOI(poiName), true);
-				pois.remove(poi);
-				pois.add(replacePOI);
-				mPlayerPOI.put(player.getUniqueId(), pois);
 
 				// Generate loot chest
 				List<Component> loreList = new ArrayList<>();
@@ -91,7 +87,7 @@ public class POIManager implements Listener {
 			LocalDateTime lastPlayedDate = DateUtils.localDateTime(playerLastDailyVersion);
 			int lastPlayedWeek = seasonalPass.getWeekOfPass(lastPlayedDate);
 			if (lastPlayedWeek != currentPassWeek) {
-				mInstance.resetWeeklyClears(p);
+				getInstance().resetWeeklyClears(p);
 			}
 		}
 	}

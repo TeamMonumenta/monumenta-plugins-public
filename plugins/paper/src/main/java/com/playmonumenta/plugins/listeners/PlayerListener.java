@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.ParticleCategory;
+import com.playmonumenta.plugins.poi.POIManager;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.protocollib.VirtualItemsReplacer;
@@ -162,7 +163,7 @@ public class PlayerListener implements Listener {
 
 		mPlugin.mTrackingManager.addEntity(player);
 		mPlugin.mCosmeticsManager.playerJoinEvent(event);
-		mPlugin.mPOIManager.playerJoinEvent(event);
+		POIManager.getInstance().playerJoinEvent(event);
 		mPlugin.mAbilityManager.playerJoinEvent(player, event);
 
 		DailyReset.handle(mPlugin, player);

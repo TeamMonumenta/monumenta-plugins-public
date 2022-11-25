@@ -17,4 +17,8 @@ public class POICompletion {
 	public boolean isCompleted() {
 		return mIsCompleted;
 	}
+
+	public void complete() {
+		mIsCompleted = true;
+	}
 }

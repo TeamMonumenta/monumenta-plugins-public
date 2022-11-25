@@ -131,7 +131,6 @@ public class Plugin extends JavaPlugin {
 	public CosmeticsManager mCosmeticsManager;
 	public SeasonalEventManager mSeasonalEventManager;
 	public VanityManager mVanityManager;
-	public POIManager mPOIManager;
 	private @Nullable CustomLogger mLogger = null;
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
@@ -222,7 +221,7 @@ public class Plugin extends JavaPlugin {
 		Eggify.register();
 		SeasonalEventCommand.register(this);
 		CosmeticsCommand.register(this);
-		POICommands.register(this);
+		POICommands.register();
 		NameMCVerify.register(this);
 		TellMiniMessage.register();
 		RunWithPlaceholdersCommand.register();
@@ -312,7 +311,6 @@ public class Plugin extends JavaPlugin {
 		mSeasonalEventManager = new SeasonalEventManager();
 		mActivityManager = new ActivityManager(this);
 		mVanityManager = new VanityManager();
-		mPOIManager = new POIManager();
 
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();
@@ -390,7 +388,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new QuiverListener(), this);
 		manager.registerEvents(new ToggleTrail(), this);
 		manager.registerEvents(mVanityManager, this);
-		manager.registerEvents(mPOIManager.getInstance(), this);
+		manager.registerEvents(POIManager.getInstance(), this);
 		manager.registerEvents(new BrokenEquipmentListener(), this);
 		manager.registerEvents(PortalManager.getInstance(), this);
 		manager.registerEvents(new LootingLimiter(), this);
