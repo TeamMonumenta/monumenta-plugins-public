@@ -82,6 +82,7 @@ public class ArcaneStrike extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE
+			    && !isOnCooldown()
 			    && mPlayer.getCooledAttackStrength(0) == 1
 			    && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0) {
 			putOnCooldown();

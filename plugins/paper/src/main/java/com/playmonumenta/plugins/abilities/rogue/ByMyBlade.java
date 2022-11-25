@@ -81,6 +81,7 @@ public class ByMyBlade extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE
+			    && !isOnCooldown()
 			    && PlayerUtils.isFallingAttack(mPlayer)
 			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 

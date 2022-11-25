@@ -159,7 +159,7 @@ public class DelveInfusionUtils {
 
 		int xp = ExperienceUtils.getTotalExperience(player);
 		for (int i = 0; i <= levelXp; i++) {
-			xp += (FULL_REFUND ? XP_COST_PER_LEVEL[i] : XP_COST_PER_LEVEL[i] * 0.75) * item.getAmount();
+			xp += (int) ((FULL_REFUND ? XP_COST_PER_LEVEL[i] : XP_COST_PER_LEVEL[i] * 0.75) * item.getAmount());
 		}
 		ExperienceUtils.setTotalExperience(player, xp);
 	}

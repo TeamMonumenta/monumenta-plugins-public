@@ -852,7 +852,7 @@ public class AbilityManager {
 			} else if (action == Action.RIGHT_CLICK_AIR
 				           || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked) && blockClicked != Material.AIR)) {
 				checkTrigger(player, AbilityTrigger.Key.RIGHT_CLICK);
-				if (player.getInventory().getItem(event.getHand()).getType() == Material.SHIELD) {
+				if (player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD) {
 					conditionalCast(player, Ability::blockWithShieldEvent);
 				}
 			}

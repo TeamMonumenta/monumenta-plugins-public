@@ -25,7 +25,7 @@ public class EntityNameReplacer extends PacketAdapter {
 	public void onPacketSending(PacketEvent event) {
 		PacketContainer packet = event.getPacket();
 		Entity entity = packet.getEntityModifier(event).read(0);
-		if (entity.getScoreboardTags().contains("boss_upside_down")) {
+		if (entity != null && entity.getScoreboardTags().contains("boss_upside_down")) {
 			PacketPlayOutEntityMetadataHandle handle = PacketPlayOutEntityMetadataHandle.createHandle(packet.getHandle());
 			for (DataWatcher.Item<Object> metadataItem : handle.getMetadataItems()) {
 				if (EntityHandle.DATA_CUSTOM_NAME.equals(metadataItem.getKey())) {

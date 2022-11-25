@@ -10,7 +10,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 
 public class RedstoneBoss extends BossAbilityGroup {
-	public static final String identityTag = "boss_redtone";
+	public static final String identityTag = "boss_redstone";
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "x coordinate for redstone block")

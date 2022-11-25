@@ -23,7 +23,7 @@ public class AbilityTriggerInfo<T extends Ability> {
 	public static final TriggerRestriction HOLDING_PROJECTILE_WEAPON_RESTRICTION =
 		new TriggerRestriction("holding a projectile weapon", player -> ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()));
 	public static final TriggerRestriction NOT_HOLDING_PROJECTILE_WEAPON_RESTRICTION =
-		new TriggerRestriction("hot holding a projectile weapon", player -> !ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()));
+		new TriggerRestriction("not holding a projectile weapon", player -> !ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()));
 
 	public static final TriggerRestriction HOLDING_MAGIC_WAND_RESTRICTION =
 		new TriggerRestriction("holding a wand", player -> Plugin.getInstance().mItemStatManager.getPlayerItemStats(player).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0);
