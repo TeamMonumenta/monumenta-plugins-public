@@ -18,6 +18,8 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
@@ -28,10 +30,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 
 	private final DepthsTrigger mDepthsTrigger;
-	private final DepthsTree mDepthsTree;
+	private final @Nullable DepthsTree mDepthsTree;
 
 	public DepthsAbilityInfo(Class<T> abilityClass, String displayName, BiFunction<Plugin, Player, T> constructor,
-	                         DepthsTree depthsTree, DepthsTrigger depthsTrigger) {
+	                         @Nullable DepthsTree depthsTree, DepthsTrigger depthsTrigger) {
 		super(abilityClass, displayName, constructor);
 		mDepthsTree = depthsTree;
 		mDepthsTrigger = depthsTrigger;
@@ -161,9 +163,10 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			ItemStack stack = getDisplayItem();
 			ItemMeta meta = stack.getItemMeta();
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			meta.displayName(Component.text("" + ChatColor.BOLD + getDisplayName(), mDepthsTree.getColor()).decoration(TextDecoration.ITALIC, false));
+			TextColor color = mDepthsTree == null ? NamedTextColor.WHITE : mDepthsTree.getColor();
+			meta.displayName(Component.text("" + ChatColor.BOLD + getDisplayName(), color).decoration(TextDecoration.ITALIC, false));
 			List<Component> lore = new ArrayList<>();
-			if (rarity > 0) {
+			if (rarity > 0 && mDepthsTree != null) {
 				lore.add(DepthsUtils.getLoreForItem(mDepthsTree, rarity));
 			}
 			meta.lore(lore);
@@ -173,6 +176,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			item.mItem = stack;
 		} catch (Exception e) {
 			Plugin.getInstance().getLogger().info("Invalid depths ability item: " + getDisplayName());
+			e.printStackTrace();
 		}
 		return item;
 	}

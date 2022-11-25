@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -46,7 +47,7 @@ public enum DepthsTree {
 	public ItemStack createItem() {
 		ItemStack buildItem = new ItemStack(mMaterial, 1);
 		ItemMeta buildMeta = buildItem.getItemMeta();
-		buildMeta.displayName(getNameComponent());
+		buildMeta.displayName(getNameComponent().decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 		buildMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		GUIUtils.splitLoreLine(buildMeta, mDescription, 30, ChatColor.GRAY, true);
 		buildItem.setItemMeta(buildMeta);
