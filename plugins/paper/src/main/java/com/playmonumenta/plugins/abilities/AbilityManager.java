@@ -852,10 +852,13 @@ public class AbilityManager {
 			} else if (action == Action.RIGHT_CLICK_AIR
 				           || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked) && blockClicked != Material.AIR)) {
 				checkTrigger(player, AbilityTrigger.Key.RIGHT_CLICK);
-				if (player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD) {
-					conditionalCast(player, Ability::blockWithShieldEvent);
-				}
 			}
+		}
+		// When blocking with an offhand shield, the client first sends a mainhand click, then an offhand click,
+		// thus we have to ignore the usual click limiter here.
+		if (player.getInventory().getItem(event.getHand()).getType() == Material.SHIELD
+			    && MetadataUtils.checkOnceThisTick(mPlugin, player, "BlockTrigger")) {
+			conditionalCast(player, Ability::blockWithShieldEvent);
 		}
 	}
 
