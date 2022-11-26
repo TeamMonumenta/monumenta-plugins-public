@@ -54,7 +54,7 @@ public class PiercingCold extends DepthsAbility {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false) && !isOnCooldown()) {
 			projectile.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(projectile);
 			putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
