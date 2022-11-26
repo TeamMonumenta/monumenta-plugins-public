@@ -40,7 +40,7 @@ public class PrismaticShield extends Ability {
 	private static final int STUN_DURATION = 20;
 	private static final int HEAL_DURATION = 5 * 20;
 	private static final int HEAL_PERCENT = 5;
-	private static final float DAMAGE_BUFF = 0.3f;
+	private static final float DAMAGE_BUFF_PERCENT = 30;
 	private static final String DAMAGE_BUFF_NAME = "PrismaticShieldDamageBuff";
 	private static final String HEALED_THIS_TICK_METAKEY = "PrismaticShieldHealedThisTick";
 
@@ -72,7 +72,7 @@ public class PrismaticShield extends Ability {
 					STUN_DURATION / 20),
 				String.format("After Prismatic Shield is activated, in the next %ss, you deal %s%% more damage and every spell that deals damage to at least one enemy will heal you for %s%% of your max health.",
 					HEAL_DURATION / 20,
-					DAMAGE_BUFF * 100,
+					DAMAGE_BUFF_PERCENT,
 					HEAL_PERCENT)
 			)
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
@@ -172,7 +172,7 @@ public class PrismaticShield extends Ability {
 				}
 				mHealedFromBlizzard = true;
 			}
-			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_BUFF_NAME, new PercentDamageDealt(HEAL_DURATION, DAMAGE_BUFF));
+			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_BUFF_NAME, new PercentDamageDealt(HEAL_DURATION, DAMAGE_BUFF_PERCENT / 100));
 			PlayerUtils.healPlayer(mPlugin, mPlayer, HEAL_PERCENT / 100.0 * EntityUtils.getMaxHealth(mPlayer));
 			mCosmetic.prismaOnHeal(mPlayer);
 		}
