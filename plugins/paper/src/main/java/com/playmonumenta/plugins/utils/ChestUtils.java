@@ -151,6 +151,13 @@ public class ChestUtils {
 
 				// Put the remainder of the loot in the original container
 				ChestUtils.generateLootInventory(itemsForOrigContainer, inventory, player, true);
+
+				// warning on build server
+				if (!Plugin.IS_PLAY_SERVER) {
+					player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, SoundCategory.MASTER, 1, 1);
+					player.sendMessage(Component.text("Loot table rolled!", NamedTextColor.RED).decorate(TextDecoration.BOLD)
+						                   .append(Component.text(" (this message is only shown on the build server)", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+				}
 			}
 		}
 	}
