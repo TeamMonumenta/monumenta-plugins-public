@@ -14,11 +14,6 @@ public class AbilityCooldownDecrease extends SingleArgumentEffect {
 	}
 
 	@Override
-	public double getMagnitude() {
-		return -1 * mAmount;
-	}
-
-	@Override
 	public @Nullable String getSpecificDisplay() {
 		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Ability Cooldown Decrease";
 	}

@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.abilities;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.AbilityCooldownDecrease;
+import com.playmonumenta.plugins.effects.AbilityCooldownIncrease;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -92,23 +94,16 @@ public abstract class Ability {
 		//Potion effects
 		double effectPercent = 0;
 
-		NavigableSet<Effect> effInc = Plugin.getInstance().mEffectManager.getEffects(mPlayer, "AbilityCooldownIncrease");
-		if (effInc != null) {
+		NavigableSet<AbilityCooldownIncrease> effInc = Plugin.getInstance().mEffectManager.getEffects(mPlayer, AbilityCooldownIncrease.class);
+		if (effInc != null && !effInc.isEmpty()) {
 			Effect inc = effInc.last();
 			effectPercent += inc.getMagnitude(); // this is always positive
 		}
 
-		NavigableSet<Effect> effDec = Plugin.getInstance().mEffectManager.getEffects(mPlayer, "AbilityCooldownDecrease");
-		if (effDec != null) {
+		NavigableSet<AbilityCooldownDecrease> effDec = Plugin.getInstance().mEffectManager.getEffects(mPlayer, AbilityCooldownDecrease.class);
+		if (effDec != null && !effDec.isEmpty()) {
 			Effect dec = effDec.last();
-			effectPercent += dec.getMagnitude(); // this is always negative
-		}
-
-		NavigableSet<Effect> effGallery = Plugin.getInstance().mEffectManager.getEffects(mPlayer, "GalleryEnlightenmentEffect");
-		if (effGallery != null) {
-			//it should be way faster to add this check on each shard instead of doing a shard check each time
-			Effect dec = effGallery.last();
-			effectPercent += dec.getMagnitude(); // this is always positive
+			effectPercent -= dec.getMagnitude(); // this is always positive
 		}
 
 		return (int) (baseCooldown * (1 + epochPercent) * (1 + aptitudePercent) * (1 + ineptitudePercent) * (1 + effectPercent));
