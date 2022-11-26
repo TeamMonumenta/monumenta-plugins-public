@@ -53,7 +53,7 @@ public class LastBreath extends DepthsAbility {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (event.isBlocked()) {
+		if (event.isBlocked() || isOnCooldown()) {
 			return;
 		}
 
