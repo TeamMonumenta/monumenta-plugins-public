@@ -59,6 +59,12 @@ public final class NovaBoss extends BossAbilityGroup {
 		@BossParam(help = "Sound used when charging the ability")
 		public Sound SOUND_CHARGE = Sound.ENTITY_WITCH_CELEBRATE;
 
+		@BossParam(help = "Volume for sound used when charging the ability")
+		public float SOUND_CHARGE_VOLUME = 1.0f;
+
+		@BossParam(help = "timer for sound charge")
+		public int SOUND_CHARGE_DENSITY = 1;
+
 		@BossParam(help = "Particle summon arround the boss when loading the spell")
 		public ParticlesList PARTICLE_LOAD = ParticlesList.fromString("[(CRIT,1)]");
 
@@ -89,7 +95,7 @@ public final class NovaBoss extends BossAbilityGroup {
 			p.NEED_LINE_OF_SIGHT = false;
 		}
 		SpellManager activeSpells = new SpellManager(List.of(
-			new SpellBaseAoE(plugin, boss, (int) p.TARGETS.getRange(), p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE) {
+			new SpellBaseAoE(plugin, boss, (int) p.TARGETS.getRange(), p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE, p.SOUND_CHARGE_VOLUME, p.SOUND_CHARGE_DENSITY) {
 				@Override
 				protected void chargeAuraAction(Location loc) {
 					p.PARTICLE_AIR.spawn(boss, loc, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, 0.05);
