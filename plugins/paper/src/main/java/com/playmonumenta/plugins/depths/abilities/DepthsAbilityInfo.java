@@ -60,7 +60,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 
 	@Override
 	public DepthsAbilityInfo<T> cooldown(int cooldown) {
-		super.cooldown(cooldown);
+		super.cooldown(cooldown, cooldown, cooldown, cooldown, cooldown, cooldown);
 		return this;
 	}
 

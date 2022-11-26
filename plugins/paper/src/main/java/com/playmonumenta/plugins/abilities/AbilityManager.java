@@ -396,7 +396,7 @@ public class AbilityManager {
 			WardingRemedy.INFO
 		);
 
-		if (ServerProperties.getShardName().contains("depths") || ServerProperties.getShardName().contains("dev")) {
+		if (ServerProperties.getDepthsEnabled()) {
 			//Depths abilities
 			mReferenceAbilities.addAll(DepthsManager.getAbilities());
 		}

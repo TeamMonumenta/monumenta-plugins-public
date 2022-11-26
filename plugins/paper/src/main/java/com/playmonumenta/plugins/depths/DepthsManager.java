@@ -352,6 +352,9 @@ public class DepthsManager {
 	 * @return party object of associated player
 	 */
 	public @Nullable DepthsParty getPartyFromId(DepthsPlayer dp) {
+		if (dp == null) {
+			return null;
+		}
 		for (DepthsParty party : mParties) {
 			if (party.mPartyNum == dp.mPartyNum) {
 				return party;

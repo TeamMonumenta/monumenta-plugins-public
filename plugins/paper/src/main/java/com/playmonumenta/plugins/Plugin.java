@@ -526,9 +526,7 @@ public class Plugin extends JavaPlugin {
 		}
 
 		/* If this is the depths shard, enable depths manager */
-		if (ServerProperties.getShardName().contains("depths")
-			|| ServerProperties.getShardName().equals("mobs")
-			|| ServerProperties.getShardName().startsWith("dev")) {
+		if (ServerProperties.getDepthsEnabled()) {
 			new DepthsManager(this, getLogger(), getDataFolder() + File.separator + "depths");
 			DepthsCommand.register(this);
 			DepthsGUICommands.register(this);

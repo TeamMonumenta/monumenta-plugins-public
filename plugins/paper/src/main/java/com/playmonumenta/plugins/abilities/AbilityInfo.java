@@ -188,7 +188,7 @@ public class AbilityInfo<T extends Ability> {
 	// other methods
 
 	public int getBaseCooldown(int score) {
-		return mCooldowns == null ? 0 : mCooldowns.get(score - 1);
+		return mCooldowns == null ? 0 : mCooldowns.get(Math.min(score - 1, mCooldowns.size() - 1));
 	}
 
 	public int getModifiedCooldown(Player player, int score) {
