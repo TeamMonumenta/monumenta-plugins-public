@@ -864,7 +864,9 @@ public class EntityListener implements Listener {
 			mPlugin.mItemStatManager.onProjectileHit(mPlugin, (Player) source, event, proj);
 		}
 
-		mPlugin.mProjectileEffectTimers.removeEntity(proj);
+		if (!event.isCancelled()) {
+			mPlugin.mProjectileEffectTimers.removeEntity(proj);
+		}
 	}
 
 	private void removePotionDataFromArrow(Arrow arrow) {

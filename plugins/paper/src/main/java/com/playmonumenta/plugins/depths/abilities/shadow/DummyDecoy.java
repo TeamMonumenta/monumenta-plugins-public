@@ -147,14 +147,13 @@ public class DummyDecoy extends DepthsAbility {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (isOnCooldown()) {
+		if (isOnCooldown()
+			    || !mPlayer.isSneaking()
+			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			return true;
 		}
-
-		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
-			putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
-			execute(projectile);
-		}
+		putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
+		execute(projectile);
 
 		return true;
 	}

@@ -117,46 +117,46 @@ public class Skyhook extends DepthsAbility {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (isOnCooldown() || projectile.hasMetadata(RapidFire.META_DATA_TAG)) {
+		if (isOnCooldown()
+			    || projectile.hasMetadata(RapidFire.META_DATA_TAG)
+			    || !mPlayer.isSneaking()
+			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			return true;
 		}
+		putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
+		World world = mPlayer.getWorld();
+		Location loc = mPlayer.getLocation();
+		world.playSound(loc, Sound.ITEM_CROSSBOW_QUICK_CHARGE_3, 1, 1.0f);
 
-		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
-			putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
-			World world = mPlayer.getWorld();
-			Location loc = mPlayer.getLocation();
-			world.playSound(loc, Sound.ITEM_CROSSBOW_QUICK_CHARGE_3, 1, 1.0f);
+		if (projectile instanceof AbstractArrow arrow) {
+			arrow.setPierceLevel(0);
+			arrow.setCritical(true);
+			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+		}
+		projectile.setMetadata(SKYHOOK_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
 
-			if (projectile instanceof AbstractArrow arrow) {
-				arrow.setPierceLevel(0);
-				arrow.setCritical(true);
-				arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-			}
-			projectile.setMetadata(SKYHOOK_ARROW_METADATA, new FixedMetadataValue(mPlugin, 0));
+		mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.FIREWORKS_SPARK);
 
-			mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.FIREWORKS_SPARK);
+		new BukkitRunnable() {
+			int mT = 0;
 
-			new BukkitRunnable() {
-				int mT = 0;
-
-				@Override
-				public void run() {
-					if (mT > MAX_TICKS) {
-						mPlugin.mProjectileEffectTimers.removeEntity(projectile);
-						projectile.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
-						projectile.remove();
-						this.cancel();
-					}
-
-					if (projectile.getVelocity().length() < .05 || projectile.isOnGround()) {
-						hook(projectile);
-						this.cancel();
-					}
-					mT++;
+			@Override
+			public void run() {
+				if (mT > MAX_TICKS) {
+					mPlugin.mProjectileEffectTimers.removeEntity(projectile);
+					projectile.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
+					projectile.remove();
+					this.cancel();
 				}
 
-			}.runTaskTimer(mPlugin, 0, 1);
-		}
+				if (projectile.getVelocity().length() < .05 || projectile.isOnGround()) {
+					hook(projectile);
+					this.cancel();
+				}
+				mT++;
+			}
+
+		}.runTaskTimer(mPlugin, 0, 1);
 
 		return true;
 	}

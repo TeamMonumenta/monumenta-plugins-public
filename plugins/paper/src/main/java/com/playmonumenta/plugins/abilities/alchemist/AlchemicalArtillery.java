@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.List;
@@ -87,60 +88,58 @@ public class AlchemicalArtillery extends PotionAbility {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mAlchemistPotions != null
-			    && mActive
-			    && EntityUtils.isAbilityTriggeringProjectile(projectile, true)
-			    && mAlchemistPotions.decrementCharge()) {
-			ThrownPotion pot = mPlayer.getWorld().spawn(projectile.getLocation(), ThrownPotion.class);
-			Vector velocity = projectile.getVelocity();
-			double speed = velocity.length();
-			if (speed > 5) { // fast potions tend to explode in your face, so limit speed to some acceptable value
-				velocity = velocity.normalize().multiply(5);
-			}
-			pot.setVelocity(velocity);
-			pot.setShooter(mPlayer);
-			mAlchemistPotions.setPotionToAlchemistPotion(pot);
+		if (mAlchemistPotions == null
+			    || !mActive
+			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, true)
+			    || !mAlchemistPotions.decrementCharge()) {
+			return true;
+		}
+		Vector direction = NmsUtils.getVersionAdapter().getActualDirection(mPlayer);
+		Location location = mPlayer.getEyeLocation().add(direction.clone().multiply(0.2));
+		ThrownPotion pot = mPlayer.getWorld().spawn(location, ThrownPotion.class);
+		Vector velocity = direction.clone().multiply(Math.min(projectile.getVelocity().length(), 5));
+		pot.setVelocity(velocity);
+		pot.setShooter(mPlayer);
+		mAlchemistPotions.setPotionToAlchemistPotion(pot);
 
-			projectile.remove();
-			mPlugin.mProjectileEffectTimers.removeEntity(projectile);
+		projectile.remove();
+		mPlugin.mProjectileEffectTimers.removeEntity(projectile);
 
-			// give back a normal arrow when a crossbow is shot
-			if (mPlayer.getInventory().getItemInMainHand().getType() == Material.CROSSBOW
-				    && mPlayer.getGameMode() != GameMode.CREATIVE
-					&& projectile instanceof AbstractArrow arrow
-				    && arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
-				InventoryUtils.giveItem(mPlayer, new ItemStack(Material.ARROW), true);
-			}
-
-			double bownus = 0;
-			if (isLevelTwo()) {
-				PlayerInventory inv = mPlayer.getInventory();
-				bownus = (BOW_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_MULTIPLIER)) * ItemStatUtils.getAttributeAmount(inv.getItemInMainHand(), AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
-				double multiply = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
-				if (multiply != 0) {
-					bownus *= multiply;
-				}
-			}
-
-			pot.setMetadata(ARTILLERY_POTION_TAG, new FixedMetadataValue(mPlugin, bownus));
-
-			ItemStack item = mPlayer.getInventory().getItemInMainHand();
-			double recoil = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RECOIL);
-			if (recoil > 0) {
-				if (mPlayer.isSneaking()) {
-					Material type = item.getType();
-					if (mPlayer.getCooldown(type) < 10) {
-						mPlayer.setCooldown(type, 10);
-					}
-				} else if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
-					Recoil.applyRecoil(mPlayer, recoil);
-				}
-			}
-
-			return false;
+		// give back a normal arrow when a crossbow is shot
+		if (mPlayer.getInventory().getItemInMainHand().getType() == Material.CROSSBOW
+			    && mPlayer.getGameMode() != GameMode.CREATIVE
+			    && projectile instanceof AbstractArrow arrow
+			    && arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
+			InventoryUtils.giveItem(mPlayer, new ItemStack(Material.ARROW), true);
 		}
 
-		return true;
+		double bownus = 0;
+		if (isLevelTwo()) {
+			PlayerInventory inv = mPlayer.getInventory();
+			bownus = (BOW_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_MULTIPLIER)) * ItemStatUtils.getAttributeAmount(inv.getItemInMainHand(), AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
+			double multiply = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
+			if (multiply != 0) {
+				bownus *= multiply;
+			}
+		}
+
+		pot.setMetadata(ARTILLERY_POTION_TAG, new FixedMetadataValue(mPlugin, bownus));
+
+		ItemStack item = mPlayer.getInventory().getItemInMainHand();
+		double recoil = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RECOIL);
+		if (recoil > 0) {
+			if (mPlayer.isSneaking()) {
+				Material type = item.getType();
+				if (mPlayer.getCooldown(type) < 10) {
+					mPlayer.setCooldown(type, 10);
+				}
+			} else if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
+				Recoil.applyRecoil(mPlayer, recoil);
+			}
+		}
+
+		return false;
+
 	}
 
 	public void toggle() {

@@ -91,47 +91,46 @@ public class Pyroblast extends DepthsAbility {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (isOnCooldown()) {
+		if (isOnCooldown()
+			    || !mPlayer.isSneaking()
+			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			return true;
 		}
+		putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.4f);
 
-		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
-			putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
-			World world = mPlayer.getWorld();
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.4f);
+		if (projectile instanceof AbstractArrow arrow) {
+			arrow.setPierceLevel(0);
+			arrow.setCritical(true);
+			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+		}
 
-			if (projectile instanceof AbstractArrow arrow) {
-				arrow.setPierceLevel(0);
-				arrow.setCritical(true);
-				arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+		mPlayerItemStatsMap.put(projectile, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+
+		mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.SOUL_FIRE_FLAME);
+		mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.CAMPFIRE_SIGNAL_SMOKE);
+
+		new BukkitRunnable() {
+			int mT = 0;
+
+			@Override
+			public void run() {
+
+				if (mT > COOLDOWN || !mPlayerItemStatsMap.containsKey(projectile)) {
+					projectile.remove();
+
+					this.cancel();
+				}
+				if (projectile.getVelocity().length() < .05 || projectile.isOnGround()) {
+					explode(projectile, projectile.getLocation());
+
+					this.cancel();
+				}
+				mT++;
 			}
 
-			mPlayerItemStatsMap.put(projectile, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
-
-			mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.SOUL_FIRE_FLAME);
-			mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.CAMPFIRE_SIGNAL_SMOKE);
-
-			new BukkitRunnable() {
-				int mT = 0;
-
-				@Override
-				public void run() {
-
-					if (mT > COOLDOWN || !mPlayerItemStatsMap.containsKey(projectile)) {
-						projectile.remove();
-
-						this.cancel();
-					}
-					if (projectile.getVelocity().length() < .05 || projectile.isOnGround()) {
-						explode(projectile, projectile.getLocation());
-
-						this.cancel();
-					}
-					mT++;
-				}
-
-			}.runTaskTimer(mPlugin, 0, 1);
-		}
+		}.runTaskTimer(mPlugin, 0, 1);
 		return true;
 	}
 

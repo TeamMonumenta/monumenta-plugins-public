@@ -26,12 +26,9 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
-import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
@@ -112,57 +109,59 @@ public class PredatorStrike extends Ability {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mActive && ((projectile instanceof AbstractArrow arrow && arrow.isCritical()) || projectile instanceof Trident || projectile instanceof Snowball)) {
-			mActive = false;
-			putOnCooldown();
-			projectile.remove();
-			mPlugin.mProjectileEffectTimers.removeEntity(projectile);
+		if (!mActive
+			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			return true;
+		}
+		mActive = false;
+		putOnCooldown();
+		projectile.remove();
+		mPlugin.mProjectileEffectTimers.removeEntity(projectile);
 
-			Location loc = mPlayer.getEyeLocation();
-			Vector direction = loc.getDirection();
-			Vector shift = direction.normalize().multiply(HITBOX_LENGTH);
-			BoundingBox box = BoundingBox.of(loc, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
-			box.shift(direction);
+		Location loc = mPlayer.getEyeLocation();
+		Vector direction = loc.getDirection();
+		Vector shift = direction.normalize().multiply(HITBOX_LENGTH);
+		BoundingBox box = BoundingBox.of(loc, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
+		box.shift(direction);
 
-			World world = mPlayer.getWorld();
-			mCosmetic.strikeLaunch(world, mPlayer);
+		World world = mPlayer.getWorld();
+		mCosmetic.strikeLaunch(world, mPlayer);
 
-			Set<LivingEntity> nearbyMobs = new HashSet<>(EntityUtils.getNearbyMobs(loc, MAX_RANGE));
+		Set<LivingEntity> nearbyMobs = new HashSet<>(EntityUtils.getNearbyMobs(loc, MAX_RANGE));
 
-			boolean hit = false;
-			for (double r = 0; r < MAX_RANGE; r += HITBOX_LENGTH) {
-				Location bLoc = box.getCenter().toLocation(world);
-				mCosmetic.strikeParticleProjectile(mPlayer, bLoc);
+		boolean hit = false;
+		for (double r = 0; r < MAX_RANGE; r += HITBOX_LENGTH) {
+			Location bLoc = box.getCenter().toLocation(world);
+			mCosmetic.strikeParticleProjectile(mPlayer, bLoc);
 
-				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
-					bLoc.subtract(direction.multiply(0.5));
-					mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, mExplodeRadius), bLoc, mPlayer);
-					explode(bLoc);
-					hit = true;
-					break;
-				}
+			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
+				bLoc.subtract(direction.multiply(0.5));
+				mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, mExplodeRadius), bLoc, mPlayer);
+				explode(bLoc);
+				hit = true;
+				break;
+			}
 
-				for (LivingEntity mob : nearbyMobs) {
-					if (mob.getBoundingBox().overlaps(box)) {
-						if (EntityUtils.isHostileMob(mob)) {
-							mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, mExplodeRadius), bLoc, mPlayer);
-							explode(bLoc);
-							hit = true;
-							break;
-						}
+			for (LivingEntity mob : nearbyMobs) {
+				if (mob.getBoundingBox().overlaps(box)) {
+					if (EntityUtils.isHostileMob(mob)) {
+						mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, mExplodeRadius), bLoc, mPlayer);
+						explode(bLoc);
+						hit = true;
+						break;
 					}
 				}
-
-				if (hit) {
-					break;
-				}
-				box.shift(shift);
 			}
-			if (!hit) {
-				Location bLoc = box.getCenter().toLocation(world);
-				if (mCosmetic instanceof FireworkStrikeCS) {
-					mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, mExplodeRadius), bLoc, mPlayer);
-				}
+
+			if (hit) {
+				break;
+			}
+			box.shift(shift);
+		}
+		if (!hit) {
+			Location bLoc = box.getCenter().toLocation(world);
+			if (mCosmetic instanceof FireworkStrikeCS) {
+				mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, mExplodeRadius), bLoc, mPlayer);
 			}
 		}
 		return true;

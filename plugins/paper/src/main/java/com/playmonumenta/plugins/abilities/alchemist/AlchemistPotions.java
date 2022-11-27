@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -47,14 +48,17 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 /*
@@ -250,11 +254,33 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		potion.setItem(item);
 	}
 
+	private ProjectileHitEvent mLastHitEvent;
+
+	@Override
+	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
+		// Prevent the potion from splashing on players, summons, and other non-hostile mobs
+		// Most importantly, this prevents the potion from instantly splashing on the throwing player with certain combinations of projectile speed and throw direction when using Alchemical Artillery.
+		if (proj instanceof ThrownPotion potion
+			    && mPlayerItemStatsMap.containsKey(potion)
+			    && event.getHitEntity() != null
+			    && !EntityUtils.isHostileMob(event.getHitEntity())) {
+			event.setCancelled(true);
+		}
+		mLastHitEvent = event;
+	}
+
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(potion);
 		if (playerItemStats != null) {
-			Location loc = potion.getLocation();
+			// Get the real splash location of the potion, which is ahead of where it currently is.
+			// While a PotionSplashEvent is also a ProjectileHitEvent, it does not have all the data of that event, so cannot be relied upon.
+			// Thus, we store the last ProjectileHitEvent and use that if possible.
+			Location loc = mLastHitEvent != null && mLastHitEvent.getEntity() == potion ? EntityUtils.getProjectileHitLocation(mLastHitEvent) : potion.getLocation();
+
+			// Sometimes, the potion just randomly splashes several blocks away from where it actually lands. Force it to splash at the correct location.
+			potion.teleport(loc.clone().add(0, 0.25, 0));
+			potion.setVelocity(new Vector(0, 0, 0));
 
 			createAura(loc, potion, playerItemStats);
 
@@ -266,7 +292,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				apply(entity, potion, isGruesome, playerItemStats);
 			}
 
-			mCosmetic.particlesOnSplash(mPlayer, potion, isGruesome);
+			mCosmetic.particlesOnSplash(mPlayer, loc, isGruesome);
 
 			List<Player> players = PlayerUtils.playersInRange(loc, radius, true);
 			players.remove(mPlayer);

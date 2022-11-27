@@ -1395,7 +1395,9 @@ public class EntityUtils {
 			} else if (arrow instanceof Trident) {
 				return true;
 			}
-		} else if (proj instanceof Snowball && DamageListener.getProjectileItemStats(proj) != null) {
+		} else if (proj instanceof Snowball
+			           && DamageListener.getProjectileItemStats(proj) != null
+			           && DamageListener.getProjectileItemStats(proj).getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat(), 0) > 0) {
 			return true;
 		}
 		return false;

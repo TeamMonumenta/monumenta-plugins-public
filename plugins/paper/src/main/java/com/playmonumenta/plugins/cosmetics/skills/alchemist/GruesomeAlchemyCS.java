@@ -5,11 +5,11 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
 
 
 public class GruesomeAlchemyCS implements CosmeticSkill {
@@ -46,7 +46,7 @@ public class GruesomeAlchemyCS implements CosmeticSkill {
 		}
 	}
 
-	public void particlesOnSplash(Player mPlayer, ThrownPotion mPotion, boolean isGruesome) {
+	public void particlesOnSplash(Player mPlayer, Location loc, boolean isGruesome) {
 
 	}
 

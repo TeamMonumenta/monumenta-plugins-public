@@ -80,7 +80,8 @@ public class Volley extends Ability {
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (!mPlayer.isSneaking()
-			    || isOnCooldown()) {
+			    || isOnCooldown()
+			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			return true;
 		}
 

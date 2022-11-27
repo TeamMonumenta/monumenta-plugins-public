@@ -961,7 +961,9 @@ public class ItemUtils {
 
 	public static boolean isProjectileWeapon(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			return isBowOrTrident(itemStack) || (itemStack.getType() == Material.SNOWBALL && ItemStatUtils.getAttributeAmount(itemStack, ItemStatUtils.AttributeType.THROW_RATE, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) > 0);
+			return isBowOrTrident(itemStack)
+				       || (itemStack.getType() == Material.SNOWBALL
+					           && ItemStatUtils.getAttributeAmount(itemStack, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) > 0);
 		} else {
 			return false;
 		}

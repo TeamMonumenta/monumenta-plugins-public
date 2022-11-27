@@ -7,9 +7,14 @@ import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import org.apache.commons.math3.util.FastMath;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -63,8 +68,8 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 	}
 
 	@Override
-	public void particlesOnSplash(Player mPlayer, ThrownPotion mPotion, boolean isGruesome) {
-		Location loc = mPotion.getLocation().add(0, 0.1, 0);
+	public void particlesOnSplash(Player mPlayer, Location loc, boolean isGruesome) {
+		loc = loc.clone().add(0, 0.1, 0);
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.ENTITY_HUSK_STEP, SoundCategory.PLAYERS, 1f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_HUSK_STEP, SoundCategory.PLAYERS, 1f, 0.5f);

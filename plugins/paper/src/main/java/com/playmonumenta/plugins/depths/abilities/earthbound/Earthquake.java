@@ -131,46 +131,45 @@ public class Earthquake extends DepthsAbility {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (isOnCooldown()) {
+		if (isOnCooldown()
+			    || !mPlayer.isSneaking()
+			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			return true;
 		}
+		putOnCooldown(getModifiedCooldown((int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer))));
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_CAMPFIRE_CRACKLE, 2, 1.0f);
 
-		if (mPlayer.isSneaking() && EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
-			putOnCooldown(getModifiedCooldown((int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer))));
-			World world = mPlayer.getWorld();
-			world.playSound(mPlayer.getLocation(), Sound.BLOCK_CAMPFIRE_CRACKLE, 2, 1.0f);
+		if (projectile instanceof AbstractArrow arrow) {
+			arrow.setPierceLevel(0);
+			arrow.setCritical(true);
+			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+		}
 
-			if (projectile instanceof AbstractArrow arrow) {
-				arrow.setPierceLevel(0);
-				arrow.setCritical(true);
-				arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-			}
+		mPlayerItemStatsMap.put(projectile, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 
-			mPlayerItemStatsMap.put(projectile, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+		mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.LAVA);
 
-			mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.LAVA);
+		new BukkitRunnable() {
+			int mT = 0;
 
-			new BukkitRunnable() {
-				int mT = 0;
+			@Override
+			public void run() {
+				if (mT > COOLDOWN || !mPlayerItemStatsMap.containsKey(projectile)) {
+					projectile.remove();
 
-				@Override
-				public void run() {
-					if (mT > COOLDOWN || !mPlayerItemStatsMap.containsKey(projectile)) {
-						projectile.remove();
-
-						this.cancel();
-					}
-
-					if (projectile.getVelocity().length() < .05 || projectile.isOnGround()) {
-						quake(projectile, projectile.getLocation());
-
-						this.cancel();
-					}
-					mT++;
+					this.cancel();
 				}
 
-			}.runTaskTimer(mPlugin, 0, 1);
-		}
+				if (projectile.getVelocity().length() < .05 || projectile.isOnGround()) {
+					quake(projectile, projectile.getLocation());
+
+					this.cancel();
+				}
+				mT++;
+			}
+
+		}.runTaskTimer(mPlugin, 0, 1);
 
 		return true;
 	}
