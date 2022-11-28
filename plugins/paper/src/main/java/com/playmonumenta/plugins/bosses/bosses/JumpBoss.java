@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -28,7 +29,7 @@ public class JumpBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public int DETECTION = 32;
 		@BossParam(help = "not written")
-		public int JUMP_HEIGHT = 1;
+		public double JUMP_HEIGHT = 1.0;
 		@BossParam(help = "not written")
 		public int RUN_DISTANCE = 0;
 		@BossParam(help = "not written")
@@ -66,7 +67,7 @@ public class JumpBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
+		SpellManager manager = new SpellManager(List.of(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
 				(World world, Location loc) -> {
 					p.SOUND_JUMP.play(loc);
 					p.PARTICLE_START.spawn(boss, loc, 1, 0, 1);

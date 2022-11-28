@@ -28,11 +28,16 @@ public class NearbyPlayersTrigger extends Trigger {
 	}
 
 	@Override public boolean tick(LivingEntity boss, int ticks) {
-		return testPlayersInRange(boss.getLocation());
+		return testPlayersInRangeWithNegation(boss.getLocation());
 	}
 
 	@Override public void reset(LivingEntity boss) {
 
+	}
+
+	private boolean testPlayersInRangeWithNegation(Location loc) {
+		boolean result = testPlayersInRange(loc);
+		return (result && !isNegated()) || (!result && isNegated());
 	}
 
 	private boolean testPlayersInRange(Location loc) {

@@ -19,7 +19,7 @@ public class SpellBaseSlam extends SpellBaseLeapAttack {
 	 * @param leapingAesthetic    Called each tick at boss location during leap
 	 * @param hitAction           Called when the boss intersects a player or lands
 	 */
-	public SpellBaseSlam(Plugin plugin, LivingEntity boss, int jumpHeight, int range, int minRange, int runDistance,
+	public SpellBaseSlam(Plugin plugin, LivingEntity boss, double jumpHeight, int range, int minRange, int runDistance,
 	                     int cooldown, double velocityMultiplier, AestheticAction initiateAesthetic,
 	                     AestheticAction leapAesthetic, AestheticAction leapingAesthetic, HitAction hitAction) {
 		super(plugin, boss, range, minRange, runDistance, cooldown,

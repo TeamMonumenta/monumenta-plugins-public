@@ -217,7 +217,7 @@ public class Phase {
 
 
 		ACTION_BUILDER_MAP.put("ADD_ABILITY", AddAbilityAction::fromReader);
-		ACTION_BUILDER_MAP.put("REMOVE_ABILITY", AddAbilityAction::fromReader);
+		ACTION_BUILDER_MAP.put("REMOVE_ABILITY", RemoveAbilityAction::fromReader);
 		ACTION_BUILDER_MAP.put("FORCE_CAST", ForceCastAction::fromReader);
 		ACTION_BUILDER_MAP.put("CUSTOM", CustomTriggerAction::fromReader);
 		ACTION_BUILDER_MAP.put("DELAY_ACTION", DelayAction::fromReader);
