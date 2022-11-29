@@ -65,7 +65,7 @@ public class CursedWound extends Ability {
 			.descriptions(
 				"Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3 block radius around it with 1 damage every second for 6s. " +
 					"Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.",
-				"Critical attacks now also extend all enemies' debuffs (except Stun, Silence, and Paralysis) by 2s. Damage cap is increased from 15% to 30%.",
+				"Damage cap is increased from 15% to 30%.",
 				"When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. " +
 					"Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, " +
 					"as well as 3% of your melee attack's damage as magic damage per effect.")
