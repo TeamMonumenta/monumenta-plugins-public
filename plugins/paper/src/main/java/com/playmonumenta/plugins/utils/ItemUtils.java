@@ -364,6 +364,26 @@ public class ItemUtils {
 		Material.WARPED_WALL_SIGN
 	);
 
+	public static final Set<Material> candles = EnumSet.of(
+		Material.CANDLE,
+		Material.WHITE_CANDLE,
+		Material.LIGHT_GRAY_CANDLE,
+		Material.GRAY_CANDLE,
+		Material.BLACK_CANDLE,
+		Material.BROWN_CANDLE,
+		Material.RED_CANDLE,
+		Material.ORANGE_CANDLE,
+		Material.YELLOW_CANDLE,
+		Material.LIME_CANDLE,
+		Material.GREEN_CANDLE,
+		Material.LIGHT_BLUE_CANDLE,
+		Material.BLUE_CANDLE,
+		Material.CYAN_CANDLE,
+		Material.PURPLE_CANDLE,
+		Material.MAGENTA_CANDLE,
+		Material.PINK_CANDLE
+	);
+
 	// list of blocks that are supposedly used as limits to player movements
 	public static final Set<Material> noPassthrough = EnumSet.of(
 		Material.BARRIER,

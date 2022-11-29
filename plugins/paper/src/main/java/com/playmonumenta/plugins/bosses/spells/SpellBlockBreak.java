@@ -37,10 +37,8 @@ public class SpellBlockBreak extends Spell {
 	private boolean mAdaptToBoundingBox = false;
 
 	public SpellBlockBreak(Entity launcher, boolean adaptboundingbox) {
-		mLauncher = launcher;
+		this(launcher);
 		mAdaptToBoundingBox = adaptboundingbox;
-		mFootLevelBreak = false;
-		mNoBreak = Arrays.asList(Material.AIR);
 	}
 
 	public SpellBlockBreak(Entity launcher) {
@@ -101,7 +99,7 @@ public class SpellBlockBreak extends Spell {
 						}
 					} else if ((y > 0 || (mFootLevelBreak && y >= 0)) &&
 						!BlockUtils.isMechanicalBlock(material) && !mNoBreak.contains(material) &&
-						(material.isSolid() || ItemUtils.carpet.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD)) &&
+						(material.isSolid() || ItemUtils.carpet.contains(material) || ItemUtils.candles.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD)) &&
 						(!(block.getState() instanceof Lootable)
 							|| (!((Lootable) block.getState()).hasLootTable()
 							&& !block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {
