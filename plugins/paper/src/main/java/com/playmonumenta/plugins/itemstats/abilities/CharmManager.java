@@ -602,6 +602,7 @@ public class CharmManager {
 			ScorchedEarth.CHARM_CHARGES,
 			ScorchedEarth.CHARM_RADIUS,
 			ScorchedEarth.CHARM_DURATION,
+			ScorchedEarth.CHARM_FIRE_DURATION,
 			Taboo.CHARM_COOLDOWN,
 			Taboo.CHARM_DAMAGE,
 			Taboo.CHARM_HEALING,
