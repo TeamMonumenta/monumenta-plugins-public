@@ -52,6 +52,7 @@ import org.bukkit.craftbukkit.v1_18_R2.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftParrot;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.AbstractSkeleton;
+import org.bukkit.entity.CaveSpider;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Drowned;
 import org.bukkit.entity.Enderman;
@@ -373,13 +374,14 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		}
 	}
 
-	public void setAttackRange(Creature entity, double attackRange, double attackHeight) {
+	@Override
+	public void setAttackRange(Creature entity, double attackRange) {
 		PathfinderMob mob = ((CraftCreature) entity).getHandle();
 		Optional<WrappedGoal> oldGoal = mob.goalSelector.getAvailableGoals().stream().filter(goal -> goal.getGoal() instanceof MeleeAttackGoal).findFirst();
 		if (oldGoal.isPresent()) {
 			WrappedGoal goal = oldGoal.get();
 			mob.goalSelector.getAvailableGoals().remove(goal);
-			mob.goalSelector.addGoal(goal.getPriority(), new CustomPathfinderGoalMeleeAttack18(mob, 1.0, true, attackRange, attackHeight));
+			mob.goalSelector.addGoal(goal.getPriority(), new CustomPathfinderGoalMeleeAttack18(mob, 1.0, true, attackRange));
 		}
 	}
 
@@ -464,7 +466,8 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		} else if (mob instanceof Spider) {
 			// allow spiders to target and attack even with something riding them or if it's too bright
 			availableGoals.removeIf(goal -> goal.getGoal().getClass().getDeclaringClass() == net.minecraft.world.entity.monster.Spider.class);
-			availableGoals.add(new WrappedGoal(4, new MeleeAttackGoal((PathfinderMob) ((CraftMob) mob).getHandle(), 1.0D, true)));
+			double attackRange = mob instanceof CaveSpider ? 1.5 : 1.8; // lower than vanilla, even lower for cave spiders
+			availableGoals.add(new WrappedGoal(4, new CustomPathfinderGoalMeleeAttack18((PathfinderMob) ((CraftMob) mob).getHandle(), 1.0D, true, attackRange)));
 			availableTargetGoals.add(new WrappedGoal(2, new NearestAttackableTargetGoal<>(((CraftMob) mob).getHandle(), net.minecraft.world.entity.player.Player.class, false, false)));
 			// disable leaping if desired
 			if (mob.getScoreboardTags().contains("boss_spider_no_leap")) {

@@ -102,11 +102,10 @@ public interface VersionAdapter {
 	 * This needs to be verified by looking at the pathfinder goals of the entity.
 	 * This is not persistent and needs to be re-applied whenever the entity is loaded again.
 	 *
-	 * @param entity       The entity whose attack range should be changed
-	 * @param attackRange  Attack range of the entity (calculated from feet to feet)
-	 * @param attackHeight Vertical offset to calculate distance from instead of from the feet
+	 * @param entity      The entity whose attack range should be changed
+	 * @param attackRange Attack range of the entity (calculated from feet to feet)
 	 */
-	void setAttackRange(Creature entity, double attackRange, double attackHeight);
+	void setAttackRange(Creature entity, double attackRange);
 
 	/**
 	 * Returns the NMS class representing a ResourceKey (for use in packet handlers). A resource key is a pair of identifiers,
