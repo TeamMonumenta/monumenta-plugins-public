@@ -29,25 +29,4 @@ public final class DreadlingBoss extends BossAbilityGroup {
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
-
-	@Override
-	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		Location loc = damagee.getLocation();
-
-		LivingEntity dreadnaught = null;
-		double dreadnaughtDistance = Double.POSITIVE_INFINITY;
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 16)) {
-			if (mob.getScoreboardTags().contains(DreadnaughtParticleBoss.identityTag)) {
-				double distance = loc.distance(mob.getLocation());
-				if (distance < dreadnaughtDistance) {
-					dreadnaughtDistance = distance;
-					dreadnaught = mob;
-				}
-			}
-		}
-
-		if (dreadnaught != null) {
-			MovementUtils.pullTowards(dreadnaught, damagee, 0.5f);
-		}
-	}
 }
