@@ -77,21 +77,21 @@ public class ChestUtils {
 				LootTableManager.LootTableEntry lootEntry = LootTableManager.getLootTableEntry(lootTable.getKey());
 				if (lootEntry == null) {
 					// This loot table doesn't exist, likely an error
-					MMLog.severe("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey().toString() + "' which wasn't loaded by LootTableManager");
+					MMLog.severe("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which wasn't loaded by LootTableManager");
 					luckAmount = 0;
 					otherPlayers = Collections.emptyList();
-				} else if (ScoreboardUtils.getScoreboardValue(player, "ChestLuckToggle").orElse(0) <= 0) {
+				} else if (ZoneUtils.hasZoneProperty(inventory.getLocation() != null ? inventory.getLocation() : player.getLocation(), ZoneUtils.ZoneProperty.LOOTROOM)) {
 					// Loot scaling is disabled (dungeon loot rooms)
 					luckAmount = 0;
 					otherPlayers = Collections.emptyList();
-				} else if (lootEntry != null && !lootEntry.hasBonusRolls()) {
+				} else if (!lootEntry.hasBonusRolls()) {
 					// This chest doesn't have bonus rolls, don't apply luck or distribute the chest results
-					MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey().toString() + "' which did not have scaling/lootbox enabled");
+					MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which did not have scaling/lootbox enabled");
 					luckAmount = 0;
 					otherPlayers = Collections.emptyList();
 				} else {
 					// Loot scaling is enabled
-					MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey().toString() + "' which was scaled & distributed");
+					MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which was scaled & distributed");
 
 					// Get all other players in range, excluding the source player
 					otherPlayers = PlayerUtils.playersInLootScalingRange(player, true);

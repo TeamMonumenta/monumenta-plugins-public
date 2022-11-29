@@ -44,7 +44,8 @@ public class ZoneUtils {
 		BLOCKBREAK_DISABLED("Blockbreak Disabled"),
 		BONE_MEAL_DISABLED("Bone Meal Disabled"),
 		LAND_BOAT_POSSIBLE("Land Boat Possible"),
-		NO_QUICK_BUILDING("NoQuickBuilding");
+		NO_QUICK_BUILDING("NoQuickBuilding"),
+		LOOTROOM("Lootroom");
 
 		private final String mPropertyName;
 

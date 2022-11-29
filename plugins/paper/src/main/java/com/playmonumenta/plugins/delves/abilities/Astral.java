@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.ChestLockBoss;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -77,7 +78,7 @@ public class Astral {
 	}
 
 	public static void applyModifiers(Block block, int level) {
-		if (level == 0) {
+		if (level == 0 || ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.LOOTROOM)) {
 			return;
 		}
 		if (!block.hasMetadata("BulletHellChecked")) {

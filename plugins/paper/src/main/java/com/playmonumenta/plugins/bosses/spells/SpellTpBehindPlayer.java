@@ -60,7 +60,7 @@ public class SpellTpBehindPlayer extends Spell {
 				while (!players.isEmpty()) {
 					LivingEntity target = players.get(FastUtils.RANDOM.nextInt(players.size()));
 					/* Do not teleport to players in safezones */
-					if (ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)) {
+					if (ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5) || ZoneUtils.hasZoneProperty(target, ZoneProperty.LOOTROOM)) {
 						/* This player is in a safe area - don't tp to them */
 						players.remove(target);
 					} else {
