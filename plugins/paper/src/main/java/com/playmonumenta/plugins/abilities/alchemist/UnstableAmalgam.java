@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -216,7 +217,9 @@ public class UnstableAmalgam extends Ability {
 
 			applyEffects(mob);
 
-			MovementUtils.knockAwayRealistic(loc, mob, knockback, 2f, true);
+			if (!EntityUtils.isBoss(mob)) {
+				MovementUtils.knockAwayRealistic(loc, mob, knockback, 2f, true);
+			}
 			mAlchemistPotions.incrementCharge();
 		}
 
