@@ -56,7 +56,7 @@ public class ManaLance extends MultipleChargeAbility {
 					(int) DAMAGE_2,
 					COOLDOWN_2 / 20),
 				"Mana lance now has two charges.")
-			.cooldown(COOLDOWN_1, COOLDOWN_2)
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ManaLance::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
 			.displayItem(new ItemStack(Material.TRIDENT, 1));
