@@ -12,6 +12,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
@@ -86,6 +87,9 @@ public class AbilityTrigger {
 		DOWN, LEVEL, UP
 	}
 
+	private static final AtomicInteger mNextMetadataId = new AtomicInteger();
+	private final int mMetedataId = mNextMetadataId.getAndIncrement();
+
 	private Key mKey;
 	private final EnumSet<KeyOptions> mKeyOptions = EnumSet.noneOf(KeyOptions.class);
 
@@ -96,6 +100,7 @@ public class AbilityTrigger {
 	private final EnumSet<LookDirection> mLookDirections = EnumSet.allOf(LookDirection.class);
 
 	private boolean mDoubleClick = false;
+
 
 	// Note: if you add a new field, make sure to update the copy constructor, fromJson, toJson, equals, and hashCode
 
@@ -248,7 +253,6 @@ public class AbilityTrigger {
 		return json;
 	}
 
-
 	public boolean check(Player player, Key key) {
 		if (key != mKey) {
 			return false;
@@ -274,7 +278,7 @@ public class AbilityTrigger {
 			return false;
 		}
 		if (mDoubleClick) {
-			String metadataKey = "DoubleClickCheck_" + key.name();
+			String metadataKey = "DoubleClickCheck_" + mMetedataId;
 			int currentTick = Bukkit.getServer().getCurrentTick();
 			int lastClick = MetadataUtils.getMetadata(player, metadataKey, 0);
 			if (currentTick - lastClick <= 5) {
@@ -285,6 +289,7 @@ public class AbilityTrigger {
 				return false;
 			}
 		}
+		// note: double click check must be last, so add new options above that, not here
 		return true;
 	}
 

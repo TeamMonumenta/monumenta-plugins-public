@@ -950,7 +950,8 @@ public class AbilityManager {
 	}
 
 	public void clearCustomTriggers(Player player) {
-		mCustomTriggers.remove(player.getUniqueId());
+		// Need to explicitly set it to an empty map so that the change is saved
+		mCustomTriggers.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>()).clear();
 	}
 
 	//---------------------------------------------------------------------------------------------------------------

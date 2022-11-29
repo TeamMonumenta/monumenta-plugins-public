@@ -80,64 +80,63 @@ public class Bodyguard extends Ability {
 		World world = mPlayer.getWorld();
 		Location oLoc = mPlayer.getLocation();
 
-		if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
-			Vector dir = oLoc.getDirection();
-			double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
-			List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, range, true);
-			boolean foundPlayer = false;
-			for (int i = 0; i < range; i++) {
-				box.shift(dir);
-				Location bLoc = box.getCenter().toLocation(world);
-				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
+		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
+		Vector dir = oLoc.getDirection();
+		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
+		List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, range, true);
+		boolean foundPlayer = false;
+		for (int i = 0; i < range; i++) {
+			box.shift(dir);
+			Location bLoc = box.getCenter().toLocation(world);
+			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
+				break;
+			}
+
+			for (Player player : players) {
+				// If looking at another player
+				if (player.getBoundingBox().overlaps(box)) {
+					new PPLine(Particle.FLAME, mPlayer.getEyeLocation(), bLoc)
+						.countPerMeter(12)
+						.delta(0.25, 0.25, 0.25)
+						.spawnAsPlayerActive(mPlayer);
+
+					// Flame
+					new PPExplosion(Particle.FLAME, player.getLocation().add(0, 0.15, 0))
+						.flat(true)
+						.speed(1)
+						.count(120)
+						.extraRange(0.1, 0.4)
+						.spawnAsPlayerActive(mPlayer);
+
+					// Explosion_Normal
+					new PPExplosion(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0))
+						.flat(true)
+						.speed(1)
+						.count(60)
+						.extraRange(0.15, 0.5)
+						.spawnAsPlayerActive(mPlayer);
+
+					Location userLoc = mPlayer.getLocation();
+					Location targetLoc = player.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
+
+					world.playSound(targetLoc, Sound.ENTITY_BLAZE_SHOOT, 0.75f, 0.75f);
+					world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.75f, 0.9f);
+
+					giveAbsorption(player);
+
+					if (userLoc.distance(player.getLocation()) > 1
+						    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
+						    && !ZoneUtils.hasZoneProperty(targetLoc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+						mPlayer.teleport(targetLoc);
+					}
+
+					foundPlayer = true;
 					break;
 				}
-
-				for (Player player : players) {
-					// If looking at another player
-					if (player.getBoundingBox().overlaps(box) && !ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-						new PPLine(Particle.FLAME, mPlayer.getEyeLocation(), bLoc)
-							.countPerMeter(12)
-							.delta(0.25, 0.25, 0.25)
-							.spawnAsPlayerActive(mPlayer);
-
-						// Flame
-						new PPExplosion(Particle.FLAME, player.getLocation().add(0, 0.15, 0))
-							.flat(true)
-							.speed(1)
-							.count(120)
-							.extraRange(0.1, 0.4)
-							.spawnAsPlayerActive(mPlayer);
-
-						// Explosion_Normal
-						new PPExplosion(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0))
-							.flat(true)
-							.speed(1)
-							.count(60)
-							.extraRange(0.15, 0.5)
-							.spawnAsPlayerActive(mPlayer);
-
-						Location userLoc = mPlayer.getLocation();
-						Location targetLoc = player.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
-
-						world.playSound(targetLoc, Sound.ENTITY_BLAZE_SHOOT, 0.75f, 0.75f);
-						world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.75f, 0.9f);
-
-						giveAbsorption(player);
-
-						if (userLoc.distance(player.getLocation()) > 1
-							    && !ZoneUtils.hasZoneProperty(targetLoc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-							mPlayer.teleport(targetLoc);
-						}
-
-						foundPlayer = true;
-						break;
-					}
-				}
 			}
-			if (!foundPlayer && !allowSelfCast) {
-				return;
-			}
+		}
+		if (!foundPlayer && !allowSelfCast) {
+			return;
 		}
 
 		putOnCooldown();
