@@ -49,10 +49,10 @@ public class ScoreboardUtils {
 	}
 
 	public static boolean checkTag(
-		Player player,
+		Entity entity,
 		String tag
 	) {
-		return player.getScoreboardTags().contains(tag);
+		return entity.getScoreboardTags().contains(tag);
 	}
 
 	/**

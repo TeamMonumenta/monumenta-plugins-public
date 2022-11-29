@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -127,7 +128,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			e -> e != player
 				     && e instanceof LivingEntity
 				     && ((mMode != Mode.ATTACK && e instanceof Player p && p.getGameMode() != GameMode.SPECTATOR)
-					         || (mMode != Mode.HEALING && EntityUtils.isHostileMob(e)))
+					         || (mMode != Mode.HEALING && EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG)))
 		);
 
 		if (raytrace == null || raytrace.getHitEntity() == null) {
