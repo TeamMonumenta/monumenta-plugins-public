@@ -58,7 +58,7 @@ public class WitheringGaze extends Ability {
 					"and dealt 1 damage every half second for 6 seconds. Cooldown: 30s.",
 				"Your damage over time lasts for 8 seconds. Cooldown: 20s.")
 			.cooldown(WITHERING_GAZE_1_COOLDOWN, WITHERING_GAZE_2_COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WitheringGaze::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sprinting(true),
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WitheringGaze::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false).sprinting(true),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
 			.displayItem(new ItemStack(Material.WITHER_ROSE, 1));
 
