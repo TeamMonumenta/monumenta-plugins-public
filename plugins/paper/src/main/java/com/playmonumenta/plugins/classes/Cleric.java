@@ -15,8 +15,7 @@ import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,8 +37,7 @@ public class Cleric extends PlayerClass {
 		mAbilities.add(SanctifiedArmor.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Cleric";
-		mClassColor = NamedTextColor.YELLOW;
-		mChatColor = ChatColor.YELLOW;
+		mClassColor = TextColor.fromHexString("#FFC644");
 		mDisplayItem = new ItemStack(Material.POPPY, 1);
 		mClassDescription = "Clerics are mighty healers and specialize in fighting the undead.";
 		mClassPassiveDescription = "You and all allies in a 12 block radius heal 5% of max health every 5s while under 50% health.";

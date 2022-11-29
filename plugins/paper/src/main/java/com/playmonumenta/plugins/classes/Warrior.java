@@ -15,8 +15,7 @@ import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,8 +37,7 @@ public class Warrior extends PlayerClass {
 		mAbilities.add(WeaponMastery.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Warrior";
-		mClassColor = NamedTextColor.RED;
-		mChatColor = ChatColor.RED;
+		mClassColor = TextColor.fromHexString("#DE2446");
 		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
 		mClassDescription = "Warriors specialize in melee combat, being able to both deal and survive heavy damage.";
 		mClassPassiveDescription = "Gain a base of 20% Knockback Resistance. This stacks with other skills and items.";

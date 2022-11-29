@@ -571,7 +571,7 @@ public class CosmeticsGUI extends CustomInventory {
 	}
 
 	// Copy from class GUI
-	private ItemStack createBasicItem(Material mat, String name, NamedTextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
+	private ItemStack createBasicItem(Material mat, String name, TextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
 		ItemStack item = new ItemStack(mat, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(Component.text(name, nameColor)

@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
+import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
@@ -1354,75 +1355,36 @@ public class ItemStatUtils {
 		return monumenta.getInteger(CHARM_POWER_KEY);
 	}
 
-	public static Component getCharmClass(NBTList<String> charmLore) {
-		MonumentaClasses classes = new MonumentaClasses();
-
-		ArrayList<AbilityInfo<?>> alchSkills = classes.getClassAtIndex(0).mAbilities;
-		alchSkills.addAll(classes.getClassAtIndex(0).mSpecOne.mAbilities);
-		alchSkills.addAll(classes.getClassAtIndex(0).mSpecTwo.mAbilities);
-
-		ArrayList<AbilityInfo<?>> clericSkills = classes.getClassAtIndex(1).mAbilities;
-		clericSkills.addAll(classes.getClassAtIndex(1).mSpecOne.mAbilities);
-		clericSkills.addAll(classes.getClassAtIndex(1).mSpecTwo.mAbilities);
-
-		ArrayList<AbilityInfo<?>> mageSkills = classes.getClassAtIndex(2).mAbilities;
-		mageSkills.addAll(classes.getClassAtIndex(2).mSpecOne.mAbilities);
-		mageSkills.addAll(classes.getClassAtIndex(2).mSpecTwo.mAbilities);
-
-		ArrayList<AbilityInfo<?>> rogueSkills = classes.getClassAtIndex(3).mAbilities;
-		rogueSkills.addAll(classes.getClassAtIndex(3).mSpecOne.mAbilities);
-		rogueSkills.addAll(classes.getClassAtIndex(3).mSpecTwo.mAbilities);
-
-		ArrayList<AbilityInfo<?>> scoutSkills = classes.getClassAtIndex(4).mAbilities;
-		scoutSkills.addAll(classes.getClassAtIndex(4).mSpecOne.mAbilities);
-		scoutSkills.addAll(classes.getClassAtIndex(4).mSpecTwo.mAbilities);
-
-		ArrayList<AbilityInfo<?>> warlockSkills = classes.getClassAtIndex(5).mAbilities;
-		warlockSkills.addAll(classes.getClassAtIndex(5).mSpecOne.mAbilities);
-		warlockSkills.addAll(classes.getClassAtIndex(5).mSpecTwo.mAbilities);
-
-		ArrayList<AbilityInfo<?>> warriorSkills = classes.getClassAtIndex(6).mAbilities;
-		warriorSkills.addAll(classes.getClassAtIndex(6).mSpecOne.mAbilities);
-		warriorSkills.addAll(classes.getClassAtIndex(6).mSpecTwo.mAbilities);
+	public static @Nullable PlayerClass getCharmClass(NBTList<String> charmLore) {
+		List<PlayerClass> classes = (new MonumentaClasses()).getClasses();
 
 		for (String line : charmLore) {
-			for (AbilityInfo<?> skill : alchSkills) {
-				if (line.contains(skill.getDisplayName()) || line.contains("Alchemist Potion")) {
-					return Component.text("Alchemist", TextColor.fromHexString("#5FAA19")).decoration(TextDecoration.ITALIC, false);
-				}
-			}
-			for (AbilityInfo<?> skill : clericSkills) {
-				if (line.contains(skill.getDisplayName()) || line.contains("Rejuvination")) {
-					return Component.text("Cleric", TextColor.fromHexString("#FFC644")).decoration(TextDecoration.ITALIC, false);
-				}
-			}
-			for (AbilityInfo<?> skill : mageSkills) {
-				if (line.contains(skill.getDisplayName()) || line.contains("Channeling")) {
-					return Component.text("Mage", TextColor.fromHexString("#A31ECE")).decoration(TextDecoration.ITALIC, false);
-				}
-			}
-			for (AbilityInfo<?> skill : rogueSkills) {
-				if (line.contains(skill.getDisplayName()) || line.contains("Dethroner")) {
-					return Component.text("Rogue", TextColor.fromHexString("#36393D")).decoration(TextDecoration.ITALIC, false);
-				}
-			}
-			for (AbilityInfo<?> skill : scoutSkills) {
-				if (line.contains(skill.getDisplayName()) || line.contains("Versatile")) {
-					return Component.text("Scout", TextColor.fromHexString("#248AC8")).decoration(TextDecoration.ITALIC, false);
-				}
-			}
-			for (AbilityInfo<?> skill : warlockSkills) {
-				if (line.contains(skill.getDisplayName()) || line.contains("Culling")) {
-					return Component.text("Warlock", TextColor.fromHexString("#C724B9")).decoration(TextDecoration.ITALIC, false);
-				}
-			}
-			for (AbilityInfo<?> skill : warriorSkills) {
-				if (line.contains(skill.getDisplayName()) || line.contains("Formidable")) {
-					return Component.text("Warrior", TextColor.fromHexString("#DE2446")).decoration(TextDecoration.ITALIC, false);
+			for (PlayerClass playerClass : classes) {
+				List<AbilityInfo<?>> abilities = new ArrayList<>();
+				abilities.addAll(playerClass.mAbilities);
+				abilities.addAll(playerClass.mSpecOne.mAbilities);
+				abilities.addAll(playerClass.mSpecTwo.mAbilities);
+
+				List<String> abilityNames = new ArrayList<>();
+				abilityNames.add(playerClass.mClassPassiveName);
+				abilities.forEach(a -> abilityNames.add(a.getDisplayName()));
+
+				for (String name : abilityNames) {
+					if (line.contains(name)) {
+						return playerClass;
+					}
 				}
 			}
 		}
-		return Component.text("Generalist", TextColor.fromHexString("#9F8F91")).decoration(TextDecoration.ITALIC, false);
+		return null;
+	}
+
+	private static Component getCharmClassComponent(NBTList<String> charmLore) {
+		PlayerClass playerClass = getCharmClass(charmLore);
+		if (playerClass != null) {
+			return Component.text(playerClass.mClassName, playerClass.mClassColor).decoration(TextDecoration.ITALIC, false);
+		}
+		return Component.text("Generalist", TextColor.fromHexString("#9F8F91"));
 	}
 
 	public static void addConsumeEffect(final ItemStack item, final EffectType type, final double strength, final int duration, @Nullable String source) {
@@ -2243,7 +2205,7 @@ public class ItemStatUtils {
 							starString += "★";
 						}
 						lore.add(Component.text("Charm Power : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false))
-							.append(Component.text(" - ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)).append(getCharmClass(monumenta.getStringList(CHARM_KEY))));
+							.append(Component.text(" - ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)).append(getCharmClassComponent(monumenta.getStringList(CHARM_KEY))));
 					}
 				}
 

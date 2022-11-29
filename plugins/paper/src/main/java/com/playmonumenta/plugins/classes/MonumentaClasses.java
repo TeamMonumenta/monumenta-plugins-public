@@ -4,11 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class MonumentaClasses extends ClassList {
-
+public class MonumentaClasses {
+	public ArrayList<PlayerClass> mClasses = new ArrayList<>();
 	public final ImmutableList<AbilityInfo<?>> mTriggerOrder;
 
 	public MonumentaClasses() {
@@ -42,6 +43,10 @@ public class MonumentaClasses extends ClassList {
 		JsonObject obj = new JsonObject();
 		obj.add("classes", classes);
 		return obj;
+	}
+
+	public List<PlayerClass> getClasses() {
+		return new ArrayList<>(mClasses);
 	}
 
 	public PlayerClass getClassAtIndex(int index) {

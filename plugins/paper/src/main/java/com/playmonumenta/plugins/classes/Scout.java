@@ -16,8 +16,7 @@ import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -39,8 +38,7 @@ public class Scout extends PlayerClass {
 		mAbilities.add(Volley.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Scout";
-		mClassColor = NamedTextColor.AQUA;
-		mChatColor = ChatColor.AQUA;
+		mClassColor = TextColor.fromHexString("#248AC8");
 		mDisplayItem = new ItemStack(Material.BOW, 1);
 		mClassDescription = "Scouts are agile masters of archery and exploration.";
 		mClassPassiveDescription = String.format("You gain %d%% of your Bow Damage %% as Attack Damage and you gain %d%% of your Attack Damage %% as Bow Damage.",

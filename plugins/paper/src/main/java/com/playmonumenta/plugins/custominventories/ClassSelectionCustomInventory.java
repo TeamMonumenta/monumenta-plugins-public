@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
@@ -271,8 +272,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 		//specs
 		if (ScoreboardUtils.getScoreboardValue(player, UNLOCK_SPECS) >= UNLOCK_SPECS_MIN) {
-			addSpecItem(userClass.mSpecOne, userClass.mSpecTwo, 1, player);
-			addSpecItem(userClass.mSpecTwo, userClass.mSpecOne, 2, player);
+			addSpecItems(userClass, player);
 		}
 
 		//summary
@@ -316,8 +316,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 		//specs
 		if (ScoreboardUtils.getScoreboardValue(player, UNLOCK_SPECS) >= UNLOCK_SPECS_MIN) {
-			addSpecItem(userClass.mSpecOne, userClass.mSpecTwo, 1, player);
-			addSpecItem(userClass.mSpecTwo, userClass.mSpecOne, 2, player);
+			addSpecItems(userClass, player);
 		}
 
 		//summary
@@ -496,28 +495,33 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 	}
 
-	public void addSpecItem(PlayerSpec spec, PlayerSpec otherSpec, int specNumber, Player player) {
+	public void addSpecItems(PlayerClass playerClass, Player player) {
+		addSpecItem(playerClass, playerClass.mSpecOne, playerClass.mSpecTwo, 1, player);
+		addSpecItem(playerClass, playerClass.mSpecTwo, playerClass.mSpecOne, 2, player);
+	}
+
+	public void addSpecItem(PlayerClass playerClass, PlayerSpec spec, PlayerSpec otherSpec, int specNumber, Player player) {
 		if (spec.mDisplayItem == null) {
 			return;
 		}
 		if (ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard) < 100) {
 			//not unlocked
-			ItemStack specItem = createBasicItem(Material.BARRIER, "Unknown", NamedTextColor.RED, false,
+			ItemStack specItem = createBasicItem(Material.BARRIER, "Unknown", playerClass.mClassColor, false,
 				"You haven't unlocked this specialization yet.", ChatColor.WHITE);
 			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
 		} else if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == otherSpec.mSpecialization) {
 			//unlocked, but using other spec
-			ItemStack specItem = createBasicItem(Material.BARRIER, spec.mSpecName, NamedTextColor.RED, false,
+			ItemStack specItem = createBasicItem(Material.BARRIER, spec.mSpecName, playerClass.mClassColor, false,
 				"Reset your specialization to select a new one.", ChatColor.WHITE);
 			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
 		} else if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == spec.mSpecialization) {
 			//unlocked and already using this spec
-			ItemStack specItem = createBasicItem(spec.mDisplayItem.getType(), spec.mSpecName, NamedTextColor.RED, false,
+			ItemStack specItem = createBasicItem(spec.mDisplayItem.getType(), spec.mSpecName, playerClass.mClassColor, false,
 				"Click to view your specialization skills.", ChatColor.WHITE);
 			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
 		} else if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == 0) {
 			//unlocked and no spec selected
-			ItemStack specItem = createBasicItem(spec.mDisplayItem.getType(), spec.mSpecName, NamedTextColor.RED, false,
+			ItemStack specItem = createBasicItem(spec.mDisplayItem.getType(), spec.mSpecName, playerClass.mClassColor, false,
 				"Click to choose this specialization!", ChatColor.GRAY);
 			if (spec.mDescription != null) {
 				ItemMeta newMeta = specItem.getItemMeta();
@@ -600,7 +604,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		return newItem;
 	}
 
-	public ItemStack createBasicItem(Material mat, String name, NamedTextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
+	public ItemStack createBasicItem(Material mat, String name, TextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
 		ItemStack item = new ItemStack(mat, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(Component.text(name, nameColor)

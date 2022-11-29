@@ -8,25 +8,23 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import javax.annotation.Nullable;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 
-public class PlayerClass {
+public abstract class PlayerClass {
 
 	public ArrayList<AbilityInfo<?>> mAbilities = new ArrayList<>();
 	public int mClass;
-	public @Nullable String mClassName;
-	public @Nullable NamedTextColor mClassColor;
-	public @Nullable ChatColor mChatColor;
+	public String mClassName;
+	public TextColor mClassColor;
 	public ItemStack mDisplayItem;
 	public @Nullable String mQuestReq = null;
 	public int mQuestReqMin;
-	public @Nullable String mClassDescription;
-	public @Nullable String mClassPassiveDescription;
-	public @Nullable String mClassPassiveName;
+	public String mClassDescription;
+	public String mClassPassiveDescription;
+	public String mClassPassiveName;
 
 	public PlayerSpec mSpecOne = new PlayerSpec();
 	public PlayerSpec mSpecTwo = new PlayerSpec();

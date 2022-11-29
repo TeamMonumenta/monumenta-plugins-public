@@ -17,8 +17,7 @@ import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
 import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -49,8 +48,7 @@ public class Rogue extends PlayerClass {
 		mSpecOne.mAbilities.add(WindWalk.INFO);
 		mSpecOne.mSpecQuestScoreboard = "Quest103c";
 		mSpecOne.mSpecialization = SWORDSAGE_SPEC_ID;
-		mClassColor = NamedTextColor.WHITE;
-		mChatColor = ChatColor.WHITE;
+		mClassColor = TextColor.fromHexString("#36393D");
 		mSpecOne.mSpecName = "Swordsage";
 		mSpecOne.mDisplayItem = new ItemStack(Material.IRON_HELMET, 1);
 		mSpecOne.mDescription = "Swordsages specialize in tackling multiple enemies through dexterous movement.";

@@ -17,8 +17,7 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhanceme
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -40,8 +39,7 @@ public class Alchemist extends PlayerClass {
 		mAbilities.add(Bezoar.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Alchemist";
-		mClassColor = NamedTextColor.GREEN;
-		mChatColor = ChatColor.GREEN;
+		mClassColor = TextColor.fromHexString("#5FAA19");
 		mDisplayItem = new ItemStack(Material.POTION, 1);
 		mClassDescription = "Alchemists employ magic potions to weaken and destroy their enemies.";
 		mClassPassiveDescription = ("You gain 1 potion every %s seconds, up to a maximum of %s. Each skill point" +

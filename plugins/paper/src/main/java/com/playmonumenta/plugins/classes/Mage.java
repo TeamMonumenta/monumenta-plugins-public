@@ -16,8 +16,7 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,8 +37,7 @@ public class Mage extends PlayerClass {
 		mAbilities.add(PrismaticShield.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Mage";
-		mClassColor = NamedTextColor.LIGHT_PURPLE;
-		mChatColor = ChatColor.LIGHT_PURPLE;
+		mClassColor = TextColor.fromHexString("#A31ECE");
 		mDisplayItem = new ItemStack(Material.BLAZE_ROD, 1);
 		mClassDescription = "Mages are masters of area control, freezing, wounding, and igniting enemies with their strikes.";
 		mClassPassiveDescription = String.format("After casting a spell, your next melee attack with a wand deals %s%% more damage.", (int) (Channeling.PERCENT_MELEE_INCREASE * 100));
