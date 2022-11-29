@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -9,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -66,6 +68,13 @@ public class VehicleListener implements Listener {
 	public void vehicleEnterEvent(VehicleEnterEvent event) {
 		Entity entity = event.getEntered();
 		Vehicle vehicle = event.getVehicle();
+
+		if ((vehicle instanceof Boat || vehicle instanceof Minecart) && EntityUtils.isBoss(entity)) {
+			Location loc = entity.getLocation();
+			entity.teleport(loc);
+			event.setCancelled(true);
+			return;
+		}
 
 		if (!(vehicle instanceof AbstractHorse) && !(entity instanceof Player) && ZoneUtils.hasZoneProperty(vehicle, ZoneProperty.NO_VEHICLES)) {
 			/*
