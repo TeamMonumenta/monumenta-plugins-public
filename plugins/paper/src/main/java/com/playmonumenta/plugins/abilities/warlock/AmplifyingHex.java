@@ -179,13 +179,14 @@ public class AmplifyingHex extends Ability {
 				PotionEffect effect = mob.getPotionEffect(effectType);
 				if (effect != null) {
 					debuffCount++;
-					amplifierCount += (int) Math.min(mAmplifierCap, effect.getAmplifier());
+					amplifierCount += Math.min(mAmplifierCap, effect.getAmplifier());
 				}
 			}
 
-			if (mob.getFireTicks() > 0) {
+			int inferno = Inferno.getInfernoLevel(mPlugin, mob);
+			if (mob.getFireTicks() > 0 || inferno > 0) {
 				debuffCount++;
-				amplifierCount += (int) Math.min(mAmplifierCap, Inferno.getInfernoLevel(mPlugin, mob));
+				amplifierCount += Math.min(mAmplifierCap, inferno);
 			}
 
 			if (EntityUtils.isStunned(mob)) {
@@ -202,7 +203,7 @@ public class AmplifyingHex extends Ability {
 
 			if (EntityUtils.isBleeding(mPlugin, mob)) {
 				debuffCount++;
-				amplifierCount += (int) Math.min(mAmplifierCap, EntityUtils.getBleedLevel(mPlugin, mob) - 1);
+				amplifierCount += Math.min(mAmplifierCap, EntityUtils.getBleedLevel(mPlugin, mob) - 1);
 			}
 
 			//Custom slow effect interaction
@@ -218,21 +219,21 @@ public class AmplifyingHex extends Ability {
 				debuffCount++;
 				double weakAmp = EntityUtils.getWeakenAmount(mPlugin, mob);
 				int weakLevel = (int) Math.floor(weakAmp * 10);
-				amplifierCount += Math.min((int) mAmplifierCap, Math.max(weakLevel - 1, 0));
+				amplifierCount += Math.min(mAmplifierCap, Math.max(weakLevel - 1, 0));
 			}
 
 			//Custom vuln interaction
 			if (EntityUtils.isVulnerable(mPlugin, mob)) {
 				debuffCount++;
 				double vulnAmp = EntityUtils.getVulnAmount(mPlugin, mob);
-				amplifierCount += (int) Math.min(mAmplifierCap, Math.max((int) Math.floor(vulnAmp * 10) - 1, 0));
+				amplifierCount += Math.min(mAmplifierCap, Math.max((int) Math.floor(vulnAmp * 10) - 1, 0));
 			}
 
 			//Custom DoT interaction
 			if (EntityUtils.hasDamageOverTime(mPlugin, mob)) {
 				debuffCount++;
 				int dotLevel = (int) EntityUtils.getHighestDamageOverTime(mPlugin, mob);
-				amplifierCount += (int) Math.min(mAmplifierCap, dotLevel - 1);
+				amplifierCount += Math.min(mAmplifierCap, dotLevel - 1);
 			}
 
 			if (debuffCount > 0) {
