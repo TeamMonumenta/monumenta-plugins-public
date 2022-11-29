@@ -94,7 +94,12 @@ public class AlchemicalArtillery extends PotionAbility {
 			    || !mAlchemistPotions.decrementCharge()) {
 			return true;
 		}
+		// preferably use the player's real direction for potions over the projectile's direction
 		Vector direction = NmsUtils.getVersionAdapter().getActualDirection(mPlayer);
+		Vector projectileDirection = projectile.getVelocity().normalize();
+		if (projectileDirection.subtract(direction).lengthSquared() > 0.01) {
+			direction = projectileDirection;
+		}
 		Location location = mPlayer.getEyeLocation().add(direction.clone().multiply(0.2));
 		ThrownPotion pot = mPlayer.getWorld().spawn(location, ThrownPotion.class);
 		Vector velocity = direction.clone().multiply(Math.min(projectile.getVelocity().length(), 5));
