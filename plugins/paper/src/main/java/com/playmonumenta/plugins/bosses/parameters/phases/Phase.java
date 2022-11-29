@@ -209,7 +209,7 @@ public class Phase {
 		TRIGGER_BUILDER_MAP.put("ON_SPAWN", OnSpawnTrigger::fromReader);
 		TRIGGER_BUILDER_MAP.put("ON_DEATH", OnDeathTrigger::fromReader);
 		TRIGGER_BUILDER_MAP.put("ON_DAMAGE", OnDamageTrigger::fromReader);
-		TRIGGER_BUILDER_MAP.put("ON_HURT", OnDamageTrigger::fromReader);
+		TRIGGER_BUILDER_MAP.put("ON_HURT", OnHurtTrigger::fromReader);
 		TRIGGER_BUILDER_MAP.put("ON_CAST", BossCastTrigger::fromReader);
 		TRIGGER_BUILDER_MAP.put("NEARBY_PLAYERS", NearbyPlayersTrigger::fromReader);
 		TRIGGER_BUILDER_MAP.put("HEALTH", HealthTrigger::fromReader);
