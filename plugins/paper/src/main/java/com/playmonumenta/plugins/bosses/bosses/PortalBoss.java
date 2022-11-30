@@ -37,6 +37,7 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -304,6 +305,11 @@ public final class PortalBoss extends BossAbilityGroup {
 		//Kill nearby mobs
 		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), 40.0)) {
 			e.damage(10000);
+		}
+
+		//kill all nearby ShulkerBullet
+		for (ShulkerBullet sb : mBoss.getLocation().getNearbyEntitiesByType(ShulkerBullet.class, 40)) {
+			sb.remove();
 		}
 
 		DepthsUtils.animate(mBoss.getLocation());
