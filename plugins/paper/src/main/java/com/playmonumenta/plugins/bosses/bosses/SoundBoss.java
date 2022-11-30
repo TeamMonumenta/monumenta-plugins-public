@@ -5,10 +5,11 @@ import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
-import java.util.Collections;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 
 public class SoundBoss extends BossAbilityGroup {
@@ -33,6 +34,12 @@ public class SoundBoss extends BossAbilityGroup {
 
 		@BossParam(help = "sounds played when hurt by other mobs")
 		public SoundsList MOB_HURT = SoundsList.EMPTY;
+
+		@BossParam(help = "sounds played each time the mobs does a step")
+		public SoundsList STEP_SOUND = SoundsList.EMPTY;
+
+		@BossParam(help = "sounds played when the mob dies")
+		public SoundsList DEATH_SOUND = SoundsList.EMPTY;
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -49,35 +56,39 @@ public class SoundBoss extends BossAbilityGroup {
 		mParams.SPAWN_SOUND.play(mBoss.getLocation());
 
 		List<Spell> spellList;
-		if (!mParams.AMBIENT_SOUND.isEmpty()) {
-			spellList = List.of(new Spell() {
-				int mTimer = 0;
-				@Override public void run() {
-					mTimer += 5;
-					if (mTimer % 10 == 0) {
-						mBoss.removeScoreboardTag("HasDoneSoundThisHalfSecond");
-					}
+		spellList = List.of(new Spell() {
+			final boolean mHasLegs = !(EntityUtils.isFlyingMob(mBoss) || EntityUtils.isWaterMob(mBoss));
+			int mHalfSecondTimer = 0;
+			int mAmbientTimer = 0;
+			@Override public void run() {
+				mHalfSecondTimer++;
+				mAmbientTimer++;
 
-					if (mTimer >= mParams.AMBIENT_SOUND_TIMER) {
-						mTimer = 0;
-						mParams.AMBIENT_SOUND.play(mBoss.getEyeLocation());
-					}
+				if (mHalfSecondTimer % 10 == 0) {
+					mBoss.removeScoreboardTag("HasDoneSoundThisHalfSecond");
 				}
 
-				@Override public int cooldownTicks() {
-					return 5;
+				if (mAmbientTimer >= mParams.AMBIENT_SOUND_TIMER) {
+					mAmbientTimer = 0;
+					mParams.AMBIENT_SOUND.play(mBoss.getEyeLocation());
 				}
-			});
-		} else {
-			spellList = Collections.emptyList();
-		}
 
-		super.constructBoss(SpellManager.EMPTY, spellList, -1, null);
+				if (mHasLegs && !mParams.STEP_SOUND.isEmpty() && mBoss.isOnGround() && !EntityUtils.isInWater(mBoss) && mBoss.getVelocity().length() > 0.079) {
+					mParams.STEP_SOUND.play(mBoss.getLocation(), 0.15F);
+				}
+			}
+
+			@Override public int cooldownTicks() {
+				return 1;
+			}
+		});
+
+		super.constructBoss(SpellManager.EMPTY, spellList, -1, null, 1);
 	}
 
 	@Override public void onHurt(DamageEvent event) {
-		if (event.getFinalDamage(false) <= 0) {
-			//no sound when no damage
+		if (event.getFinalDamage(false) <= 0 || event.getFinalDamage(true) >= mBoss.getHealth()) {
+			//no sound when no damage or on death
 			return;
 		}
 		//simple way to don't spam sound when the boss get hit multiple time
@@ -97,5 +108,9 @@ public class SoundBoss extends BossAbilityGroup {
 			mParams.AMBIENT_HURT.play(mBoss.getLocation());
 		}
 		mBoss.addScoreboardTag("HasDoneSoundThisHalfSecond");
+	}
+
+	@Override public void death(EntityDeathEvent event) {
+		mParams.DEATH_SOUND.play(mBoss.getLocation());
 	}
 }
