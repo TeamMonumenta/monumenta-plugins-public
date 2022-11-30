@@ -51,7 +51,8 @@ public class ZoneListener implements Listener {
 		if (event.getEntity().getShooter() instanceof Player player) {
 			if (event.getEntityType() == EntityType.SNOWBALL && event.getEntity() instanceof Snowball snowball) {
 				// Only allow winter arena snowballs in the winter arena
-				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.WINTER_SNOWBALLS_ONLY) && !InventoryUtils.testForItemWithLore(snowball.getItem(), "An unusually dense snowball")) {
+				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.WINTER_SNOWBALLS_ONLY)
+					    && !InventoryUtils.testForItemWithName(snowball.getItem(), "Arena Snowball", true)) {
 					event.setCancelled(true);
 					return;
 				}

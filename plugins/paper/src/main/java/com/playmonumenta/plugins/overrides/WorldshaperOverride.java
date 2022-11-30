@@ -341,7 +341,7 @@ public class WorldshaperOverride {
 		List<String> lore = ItemStatUtils.getPlainLore(nbt);
 
 		boolean foundLine = false;
-		if (InventoryUtils.testForItemWithName(item, ITEM_NAME)) {
+		if (InventoryUtils.testForItemWithName(item, ITEM_NAME, true)) {
 			for (int i = 0; i < lore.size(); ++i) {
 				String line = lore.get(i);
 				if (!reverse) {
@@ -424,12 +424,11 @@ public class WorldshaperOverride {
 
 	public static boolean isWorldshaperItem(ItemStack item) {
 		return item != null &&
-			item.getType() != null &&
-			// (InventoryUtils.testForItemWithName(item, ITEM_NAME) || InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME)) - Commented out for now, re-add this for delve skin
-			InventoryUtils.testForItemWithName(item, ITEM_NAME) &&
-			// (InventoryUtils.testForItemWithLore(item, "City of Shifting Waters") || InventoryUtils.testForItemWithLore(item, "Mythic Reliquary")) && - Also re-add this later.
-			ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
-			ItemUtils.isShulkerBox(item.getType());
+			       item.getType() != null &&
+			       // (InventoryUtils.testForItemWithName(item, ITEM_NAME) || InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME)) - Commented out for now, re-add this for delve skin
+			       InventoryUtils.testForItemWithName(item, ITEM_NAME, true) &&
+			       ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
+			       ItemUtils.isShulkerBox(item.getType());
 	}
 
 	public static Mode getMode(ItemStack item) {

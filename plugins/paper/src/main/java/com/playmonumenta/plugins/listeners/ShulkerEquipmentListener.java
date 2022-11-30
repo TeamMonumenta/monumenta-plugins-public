@@ -495,6 +495,6 @@ public class ShulkerEquipmentListener implements Listener {
 			       ItemUtils.isShulkerBox(item.getType()) &&
 			       item.hasItemMeta() &&
 			       item.getItemMeta().hasLore() &&
-			(InventoryUtils.testForItemWithName(item, "Potion Injector") || InventoryUtils.testForItemWithName(item, "Iridium Injector"));
+			       (InventoryUtils.testForItemWithName(item, "Potion Injector", true) || InventoryUtils.testForItemWithName(item, "Iridium Injector", true));
 	}
 }

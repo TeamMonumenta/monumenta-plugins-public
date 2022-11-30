@@ -32,22 +32,22 @@ import org.bukkit.inventory.PlayerInventory;
 
 public class PlayerInventoryView implements Listener {
 	private static final String PERMISSION = "monumenta.peb.inventoryview";
-	private static List<Player> mPlayers = new ArrayList<>(10);
-	private static List<Inventory> mInventories = new ArrayList<>(10);
+	private static final List<Player> mPlayers = new ArrayList<>(10);
+	private static final List<Inventory> mInventories = new ArrayList<>(10);
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		if ((event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY)
-				|| (!event.getAction().equals(Action.LEFT_CLICK_AIR) && !event.getAction().equals(Action.LEFT_CLICK_BLOCK))) {
+			    || (!event.getAction().equals(Action.LEFT_CLICK_AIR) && !event.getAction().equals(Action.LEFT_CLICK_BLOCK))) {
 			return;
 		}
 
 		Player player = event.getPlayer();
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		if (mainHand.getType().equals(Material.WRITTEN_BOOK)
-		    && InventoryUtils.testForItemWithLore(mainHand, "Skin :")
-			&& InventoryUtils.testForItemWithLore(mainHand, "Soulbound to")
-			&& player.hasPermission(PERMISSION)) {
+			    && InventoryUtils.testForItemWithName(mainHand, "Personal Enchanted Book", true)
+			    && InventoryUtils.testForItemWithLore(mainHand, "* Skin :")
+			    && player.hasPermission(PERMISSION)) {
 
 			Location eyeLoc = player.getEyeLocation();
 			Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), 3);
@@ -105,7 +105,7 @@ public class PlayerInventoryView implements Listener {
 	}
 
 	public void inventoryView(Player player, Player clickedPlayer) {
-		//Make sure whoever is getting hit with a PEB doesnt have the tag that opts them out of this feature
+		//Make sure whoever is getting hit with a PEB doesn't have the tag that opts them out of this feature
 		if (clickedPlayer.getScoreboardTags().contains("inventoryPrivacy")) {
 			player.sendMessage(ChatColor.RED + "This player has opted out of inventory viewing.");
 			return;

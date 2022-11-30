@@ -76,7 +76,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			return true;
 		}
 
-		if (!InventoryUtils.testForItemWithName(item, TESSERACT_NAME.content()) || InventoryUtils.testForItemWithName(item, "(u)")) {
+		if (!InventoryUtils.testForItemWithName(item, TESSERACT_NAME.content(), false) || InventoryUtils.testForItemWithName(item, "(u)", false)) {
 			return true;
 		}
 
@@ -110,13 +110,13 @@ public class YellowTesseractOverride extends BaseOverride {
 		}
 
 		if (!InventoryUtils.testForItemWithLore(item, CLASS_STR)
-				|| !InventoryUtils.testForItemWithName(item, CONFIGURED.content())) {
+			    || !InventoryUtils.testForItemWithName(item, CONFIGURED.content(), false)) {
 			/* Not active */
 			if (action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK)) {
 				storeSkills(player, item);
 			}
 		} else if (player.isSneaking()
-			    && (action.equals(Action.LEFT_CLICK_AIR) || action.equals(Action.LEFT_CLICK_BLOCK))) {
+			           && (action.equals(Action.LEFT_CLICK_AIR) || action.equals(Action.LEFT_CLICK_BLOCK))) {
 			//Reset Tesseract with shift + left click
 			resetTesseract(player, item);
 		} else if (InventoryUtils.isSoulboundToPlayer(item, player)) {

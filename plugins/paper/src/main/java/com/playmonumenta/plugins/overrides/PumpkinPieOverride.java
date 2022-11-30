@@ -22,13 +22,13 @@ public class PumpkinPieOverride extends BaseOverride {
 	@Override
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity, ItemStack item) {
 		if (player == null
-				|| !ServerProperties.getTrickyCreepersEnabled()
-				|| !(clickedEntity instanceof Creeper)
-				|| !InventoryUtils.testForItemWithName(item, "Creeper's Delight")
-				|| "plots".equals(ServerProperties.getShardName())
-				|| "playerplots".equals(ServerProperties.getShardName())
-				|| clickedEntity.getScoreboardTags().contains("boss_halloween_creeper")
-				|| clickedEntity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+			    || !ServerProperties.getTrickyCreepersEnabled()
+			    || !(clickedEntity instanceof Creeper)
+			    || !InventoryUtils.testForItemWithName(item, "Creeper's Delight", true)
+			    || "plots".equals(ServerProperties.getShardName())
+			    || "playerplots".equals(ServerProperties.getShardName())
+			    || clickedEntity.getScoreboardTags().contains("boss_halloween_creeper")
+			    || clickedEntity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			return true;
 		}
 
@@ -50,7 +50,7 @@ public class PumpkinPieOverride extends BaseOverride {
 
 	@Override
 	public boolean playerItemConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event) {
-		if (player == null || !InventoryUtils.testForItemWithName(event.getItem(), "Creeper's Delight")) {
+		if (player == null || !InventoryUtils.testForItemWithName(event.getItem(), "Creeper's Delight", true)) {
 			return true;
 		}
 

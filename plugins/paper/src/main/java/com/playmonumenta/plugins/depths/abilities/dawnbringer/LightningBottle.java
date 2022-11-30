@@ -63,7 +63,7 @@ public class LightningBottle extends DepthsAbility {
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (InventoryUtils.testForItemWithName(potion.getItem(), POTION_NAME)) {
+		if (InventoryUtils.testForItemWithName(potion.getItem(), POTION_NAME, true)) {
 			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.SPELL);
 			mPlayerItemStatsMap.put(potion, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 		}
@@ -99,7 +99,7 @@ public class LightningBottle extends DepthsAbility {
 			int potCount = 0;
 
 			for (ItemStack item : inv.getContents()) {
-				if (item != null && InventoryUtils.testForItemWithName(item, POTION_NAME)) {
+				if (item != null && InventoryUtils.testForItemWithName(item, POTION_NAME, true)) {
 					if (firstFoundPotStack == null) {
 						firstFoundPotStack = item;
 					}

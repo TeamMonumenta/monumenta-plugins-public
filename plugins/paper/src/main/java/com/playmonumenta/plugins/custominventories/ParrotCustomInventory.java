@@ -551,7 +551,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		List<String> costLore = new ArrayList<>();
 		costLore.add("Click to buy!");
 		for (Map.Entry<ItemStack, Integer> entry : cost.entrySet()) {
-			costLore.add(entry.getValue() + " " + ItemUtils.getPlainName(entry.getKey(), false));
+			costLore.add(entry.getValue() + " " + ItemUtils.getPlainName(entry.getKey()));
 		}
 		ItemStack buyDisplayItem = buildItem(itemMaterial, "Buy " + variant.getName(), costLore);
 		GUI_ITEMS.add(new ParrotGuiItem(page.mNum, slot, buyDisplayItem, cost,

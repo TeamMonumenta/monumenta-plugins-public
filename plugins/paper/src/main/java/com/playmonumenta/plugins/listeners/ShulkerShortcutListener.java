@@ -417,19 +417,15 @@ public class ShulkerShortcutListener implements Listener {
 
 	public static boolean isPurpleTesseractContainer(ItemStack item) {
 		return item != null &&
-			ItemUtils.isShulkerBox(item.getType()) &&
-			item.hasItemMeta() &&
-			item.getItemMeta().hasDisplayName() &&
-			(ItemUtils.getPlainName(item).contains("Carrier of Emotion")
-				|| ItemUtils.getPlainName(item).contains("Carrier of Festivity"));
+			       ItemUtils.isShulkerBox(item.getType()) &&
+			       (InventoryUtils.testForItemWithName(item, "Carrier of Emotion", true)
+				        || InventoryUtils.testForItemWithName(item, "Carrier of Festivity", true));
 	}
 
 	public static boolean isEnderExpansion(ItemStack item) {
 		return item != null &&
-			ItemUtils.isShulkerBox(item.getType()) &&
-			item.hasItemMeta() &&
-			item.getItemMeta().hasDisplayName() &&
-			ItemUtils.getPlainName(item).contains("Ender Chest Expansion");
+			       ItemUtils.isShulkerBox(item.getType()) &&
+			       InventoryUtils.testForItemWithName(item, "Ender Chest Expansion", true);
 	}
 
 	private static boolean acceptsItem(ShulkerInventory shulkerInventory, ItemStack item) {

@@ -93,8 +93,7 @@ public class InventoryUtils {
 		return false;
 	}
 
-	// TODO: This will *not* match items that don't have an NBT name (stick, stone sword, etc.)
-	public static boolean testForItemWithName(final @Nullable ItemStack item, final @Nullable String legacyNameText) {
+	public static boolean testForItemWithName(final @Nullable ItemStack item, final @Nullable String legacyNameText, boolean exact) {
 		// TODO START Remove this block when all legacy text is updated to use Adventure or plain text.
 		if (legacyNameText == null || legacyNameText.isEmpty()) {
 			return true;
@@ -109,9 +108,7 @@ public class InventoryUtils {
 		if (item != null) {
 			final String displayName = ItemUtils.getPlainName(item);
 			if (displayName != null && !displayName.isEmpty()) {
-				if (displayName.contains(nameText)) {
-					return true;
-				}
+				return exact ? displayName.equals(nameText) : displayName.contains(nameText);
 			}
 		}
 
@@ -254,7 +251,7 @@ public class InventoryUtils {
 		for (int i = 0; i < items.length; i++) {
 			ItemStack slot = items[i];
 			if (ItemUtils.getPlainName(slot).equals(itemPlainName) &&
-				isSoulboundToPlayer(slot, player)) {
+				    isSoulboundToPlayer(slot, player)) {
 				total += slot.getAmount();
 				matched.add(i);
 			}

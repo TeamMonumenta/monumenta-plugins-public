@@ -97,7 +97,7 @@ public class FirmamentOverride {
 					&& (InventoryUtils.testForItemWithLore(item, PLAIN_PRISMARINE_ENABLED) || InventoryUtils.testForItemWithLore(item, PLAIN_BLACKSTONE_ENABLED))) {
 					removeItem = false;
 					// Place a prismarine/blackstone block instead of the block from the shulker
-					if (InventoryUtils.testForItemWithName(item, ITEM_NAME)) {
+					if (InventoryUtils.testForItemWithName(item, ITEM_NAME, true)) {
 						blockData = Material.PRISMARINE.createBlockData();
 					} else {
 						blockData = Material.BLACKSTONE.createBlockData();
@@ -161,7 +161,7 @@ public class FirmamentOverride {
 		List<String> lore = ItemStatUtils.getPlainLore(nbt);
 
 		boolean foundLine = false;
-		if (InventoryUtils.testForItemWithName(item, ITEM_NAME)) {
+		if (InventoryUtils.testForItemWithName(item, ITEM_NAME, true)) {
 			for (int i = 0; i < lore.size(); ++i) {
 				String line = lore.get(i);
 				if (line.equals(PLAIN_PRISMARINE_ENABLED) && !foundLine) {
@@ -185,7 +185,7 @@ public class FirmamentOverride {
 				player.sendMessage(PRISMARINE_ENABLED);
 				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
 			}
-		} else if (InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME)) {
+		} else if (InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME, true)) {
 			for (int i = 0; i < lore.size(); ++i) {
 				String line = lore.get(i);
 				if (line.equals(PLAIN_BLACKSTONE_ENABLED) && !foundLine) {
@@ -216,10 +216,9 @@ public class FirmamentOverride {
 
 	public static boolean isFirmamentItem(ItemStack item) {
 		return item != null &&
-			item.getType() != null &&
-			(InventoryUtils.testForItemWithName(item, ITEM_NAME) || InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME)) &&
-			(InventoryUtils.testForItemWithLore(item, "City of Shifting Waters") || InventoryUtils.testForItemWithLore(item, "Mythic Reliquary")) &&
-			ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
-			ItemUtils.isShulkerBox(item.getType());
+			       item.getType() != null &&
+			       (InventoryUtils.testForItemWithName(item, ITEM_NAME, true) || InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME, true)) &&
+			       ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
+			       ItemUtils.isShulkerBox(item.getType());
 	}
 }

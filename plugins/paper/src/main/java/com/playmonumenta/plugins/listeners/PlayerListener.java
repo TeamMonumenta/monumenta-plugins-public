@@ -1327,29 +1327,10 @@ public class PlayerListener implements Listener {
 				Material mat = item.getType();
 				String matStr = mat.getKey().toString();
 
-				if (item.hasItemMeta()) {
-					ItemMeta meta = item.getItemMeta();
-					if (meta.hasLore()) {
-						List<String> lore = ItemUtils.getPlainLore(item);
-						if (lore.contains("Material")) {
-							if (matStr.endsWith("_dye")) {
-								gotDye = true;
-							}
-							if (matStr.endsWith("_banner")) {
-								gotBanner = true;
-							}
-						} else {
-							cancel = true;
-						}
-					} else { // Has no lore
-						if (matStr.endsWith("_dye")) {
-							gotDye = true;
-						}
-						if (matStr.endsWith("_banner")) {
-							gotBanner = true;
-						}
-					}
-				} else { // Has no meta
+				ItemMeta meta = item.getItemMeta();
+				if (meta != null && meta.hasLore() && ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.MATERIAL) == 0) {
+					cancel = true;
+				} else {
 					if (matStr.endsWith("_dye")) {
 						gotDye = true;
 					}

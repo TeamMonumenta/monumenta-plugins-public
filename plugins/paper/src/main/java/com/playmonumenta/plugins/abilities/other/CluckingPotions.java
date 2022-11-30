@@ -39,7 +39,7 @@ public class CluckingPotions extends Ability {
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (InventoryUtils.testForItemWithName(potion.getItem(), "Jar of Clucks")) {
+		if (InventoryUtils.testForItemWithName(potion.getItem(), "Jar of Clucks", true)) {
 			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.CLOUD);
 			potion.setMetadata("CluckingPotion", new FixedMetadataValue(mPlugin, 0));
 		}

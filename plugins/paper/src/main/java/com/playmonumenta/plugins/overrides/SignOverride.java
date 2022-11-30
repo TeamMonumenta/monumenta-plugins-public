@@ -44,7 +44,7 @@ public class SignOverride extends BaseOverride {
 			return true;
 		}
 
-		List<String> loreLines = ItemUtils.getPlainLore(item);
+		List<String> loreLines = ItemUtils.getPlainLoreIfExists(item);
 		if (loreLines.isEmpty()) {
 			return true;
 		}

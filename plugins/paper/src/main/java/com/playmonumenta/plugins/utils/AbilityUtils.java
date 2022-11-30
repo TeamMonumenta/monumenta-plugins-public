@@ -220,7 +220,7 @@ public class AbilityUtils {
 
 		// Make sure the player has enough potions
 		for (ItemStack item : inv.getContents()) {
-			if (item != null && InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
+			if (item != null && InventoryUtils.testForItemWithName(item, "Alchemist's Potion", true)) {
 				potionCount += item.getAmount();
 				potionStacks.add(item);
 				if (potionCount >= numPotionsToRemove) {

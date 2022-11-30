@@ -395,7 +395,7 @@ public class ItemUtils {
 		if (item == null) {
 			return null;
 		}
-		List<String> loreEntries = getPlainLore(item);
+		List<String> loreEntries = getPlainLoreIfExists(item);
 		if (loreEntries == null) {
 			return null;
 		}
@@ -737,15 +737,17 @@ public class ItemUtils {
 	}
 
 	public static String getPlainName(@Nullable ItemStack itemStack) {
-		return getPlainName(itemStack, false);
-	}
-
-	public static String getPlainName(@Nullable ItemStack itemStack, boolean refresh) {
 		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta() || !itemStack.getItemMeta().hasDisplayName()) {
 			return "";
 		}
-		if (refresh || !hasPlainName(itemStack)) {
-			setPlainName(itemStack);
+		if (!hasPlainName(itemStack)) {
+			if (itemStack.hasItemMeta()) {
+				ItemMeta itemMeta = itemStack.getItemMeta();
+				if (itemMeta.hasDisplayName()) {
+					return toPlainTagText(itemMeta.displayName());
+				}
+			}
+			return "";
 		}
 		return getPlainNameIfExists(itemStack);
 	}
@@ -828,17 +830,24 @@ public class ItemUtils {
 	}
 
 	public static List<String> getPlainLore(@Nullable ItemStack itemStack) {
-		return getPlainLore(itemStack, false);
-	}
-
-	public static List<String> getPlainLore(@Nullable ItemStack itemStack, boolean refresh) {
 		if (itemStack == null || !itemStack.hasItemMeta() || !itemStack.getItemMeta().hasLore()) {
 			return new ArrayList<>();
 		}
-		if (refresh || !hasPlainLore(itemStack)) {
-			setPlainLore(itemStack);
+		if (!hasPlainLore(itemStack)) {
+			if (itemStack.hasItemMeta()) {
+				ItemMeta itemMeta = itemStack.getItemMeta();
+				if (itemMeta.hasLore()) {
+					List<String> plainLore = new ArrayList<>();
+					if (itemMeta.lore() == null) {
+						return plainLore;
+					}
+					for (Component loreLine : itemMeta.lore()) {
+						plainLore.add(toPlainTagText(loreLine));
+					}
+				}
+			}
+			return new ArrayList<>();
 		}
-
 		return getPlainLoreIfExists(itemStack);
 	}
 
@@ -1000,31 +1009,12 @@ public class ItemUtils {
 		}
 	}
 
-	/*
-	 * Does not count shattered wands.
-	 */
 	public static boolean isWand(@Nullable ItemStack itemStack) {
-		if (itemStack != null) {
-			List<String> loreLines = getPlainLore(itemStack);
-			for (String loreLine : loreLines) {
-				if (loreLine.contains("* Magic Wand *")) {
-					return true;
-				}
-			}
-		}
-		return false;
+		return ItemStatUtils.getEnchantmentLevel(itemStack, EnchantmentType.MAGIC_WAND) > 0;
 	}
 
 	public static boolean isAlchemistItem(@Nullable ItemStack itemStack) {
-		if (itemStack != null) {
-			List<String> loreLines = getPlainLore(itemStack);
-			for (String loreLine : loreLines) {
-				if (loreLine.contains("* Alchemical Utensil *")) {
-					return true;
-				}
-			}
-		}
-		return false;
+		return ItemStatUtils.getEnchantmentLevel(itemStack, EnchantmentType.ALCHEMICAL_ALEMBIC) > 0;
 	}
 
 	public static boolean isPickaxe(@Nullable ItemStack itemStack) {
@@ -1249,7 +1239,7 @@ public class ItemUtils {
 	 */
 	public static Component getPlainNameComponent(ItemStack item) {
 		if (hasPlainName(item)) {
-			return Component.text(getPlainName(item));
+			return Component.text(getPlainNameIfExists(item));
 		} else {
 			return Component.translatable(item.getType().getTranslationKey());
 		}

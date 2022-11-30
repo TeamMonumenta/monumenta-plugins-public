@@ -2,12 +2,11 @@ package com.playmonumenta.plugins.gallery;
 
 import com.playmonumenta.plugins.gallery.interactables.BaseInteractable;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
@@ -94,7 +93,7 @@ public class GalleryUtils {
 	}
 
 	public static boolean isHoldingTrinket(Player player) {
-		return player != null && player.isOnline() && player.getInventory().getItemInMainHand().getType() != Material.AIR && ItemUtils.getPlainName(player.getInventory().getItemInMainHand()).equals("Gallery Brochure");
+		return player != null && player.isOnline() && InventoryUtils.testForItemWithName(player.getInventory().getItemInMainHand(), "Gallery Brochure", true);
 	}
 
 	public static void printDebugMessage(String message) {

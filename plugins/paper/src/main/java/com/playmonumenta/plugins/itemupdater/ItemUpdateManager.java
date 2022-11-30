@@ -230,7 +230,7 @@ public class ItemUpdateManager implements Listener {
 					}
 				}
 			}
-			if (ItemUtils.getPlainLore(item, false).contains("This is a placeholder item.")) {
+			if (ItemUtils.getPlainLoreIfExists(item).contains("This is a placeholder item.")) {
 				return;
 			}
 

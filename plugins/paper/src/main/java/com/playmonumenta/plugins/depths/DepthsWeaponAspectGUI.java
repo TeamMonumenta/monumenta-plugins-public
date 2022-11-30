@@ -159,7 +159,7 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 				for (Entry<Integer, ? extends ItemStack> set : findItems.entrySet()) {
 					ItemStack testStack = set.getValue().clone();
 					testStack.setAmount(1);
-					if (ItemUtils.getPlainName(testStack).contains(currencyName)) {
+					if (ItemUtils.getPlainName(testStack).equals(currencyName)) {
 						ItemStack foundItem = set.getValue();
 						if (foundItem.getAmount() > totalToRemove) {
 							foundItem.setAmount(foundItem.getAmount() - totalToRemove);

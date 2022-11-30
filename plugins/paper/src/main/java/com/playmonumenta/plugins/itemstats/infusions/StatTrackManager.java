@@ -189,7 +189,7 @@ public class StatTrackManager {
 	}
 
 	/**
-	 *  NOTES: hard coded for "Alchemis's Bag (X)" since the name change base on the numbers of charge.
+	 * NOTES: hard coded for "Alchemist's Bag (X)" since the name change base on the numbers of charge.
 	 * a better solution should be found if other items of this kind are created
 	 */
 	private static String getItemName(ItemStack item) {

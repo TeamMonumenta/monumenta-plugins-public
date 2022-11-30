@@ -59,7 +59,7 @@ public class MapOverride extends BaseOverride {
 			return true;
 		}
 
-		if (InventoryUtils.testForItemWithLore(mapItem, "Official Map")) {
+		if (InventoryUtils.testForItemWithLore(mapItem, "* Official Map *")) {
 			player.sendMessage(ChatColor.RED + "You can not modify official maps");
 			return false;
 		}

@@ -41,7 +41,7 @@ public class FestiveTesseractOverride extends BaseOverride {
 
 	@Override
 	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
-		if (!InventoryUtils.testForItemWithName(item, TESSERACT_NAME)) {
+		if (!InventoryUtils.testForItemWithName(item, TESSERACT_NAME, false)) {
 			return true;
 		}
 
