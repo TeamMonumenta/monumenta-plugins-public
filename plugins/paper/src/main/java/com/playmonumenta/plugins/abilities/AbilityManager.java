@@ -866,6 +866,7 @@ public class AbilityManager {
 		if ((action == Action.RIGHT_CLICK_AIR
 			     || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked) && blockClicked != Material.AIR))
 			    && player.getInventory().getItem(event.getHand()).getType() == Material.SHIELD
+			    && player.getCooldown(Material.SHIELD) == 0
 			    && MetadataUtils.checkOnceThisTick(mPlugin, player, "BlockTrigger")) {
 			conditionalCast(player, Ability::blockWithShieldEvent);
 		}
