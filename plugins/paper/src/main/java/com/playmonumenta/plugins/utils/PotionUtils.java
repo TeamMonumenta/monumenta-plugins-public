@@ -285,11 +285,10 @@ public class PotionUtils {
 				}
 				PotionEffect effect = player.getPotionEffect(type);
 				if (effect != null && effect.getDuration() < Constants.THIRTY_MINUTES) {
-					plugin.mPotionManager.clearPotionEffectType(player, type);
+					plugin.mPotionManager.removePotion(player, PotionID.APPLIED_POTION, type);
 				}
 			}
 		}
-
 	}
 
 	public static void clearNegatives(LivingEntity entity) {
