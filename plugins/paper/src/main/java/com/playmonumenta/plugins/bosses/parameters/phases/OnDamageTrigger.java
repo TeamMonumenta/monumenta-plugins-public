@@ -16,14 +16,12 @@ public class OnDamageTrigger extends Trigger {
 	private double mCurrentDamage = 0;
 
 	public OnDamageTrigger(String name, Long damage) {
-		super();
 		mTotalDamage = damage;
 		mCustomAbilityName = name;
 		mDamageType = null;
 	}
 
 	public OnDamageTrigger(DamageEvent.DamageType type, Long damage) {
-		super();
 		mTotalDamage = damage;
 		mDamageType = type;
 		mCustomAbilityName = null;
@@ -53,7 +51,7 @@ public class OnDamageTrigger extends Trigger {
 		}
 
 		DamageEvent.DamageType type = reader.readEnum(DamageEvent.DamageType.values());
-		String customAbilityName = reader.advance("TOTAL") ? "TOTAL" : null;
+		String customAbilityName = reader.advance("ALL") ? "ALL" : null;
 		if (type == null && customAbilityName == null) {
 			customAbilityName = reader.readString();
 			if (customAbilityName == null) {
@@ -63,7 +61,7 @@ public class OnDamageTrigger extends Trigger {
 				for (DamageEvent.DamageType valid : DamageEvent.DamageType.values()) {
 					suggArgs.add(Tooltip.of(soFar + valid.name(), "Damage type"));
 				}
-				suggArgs.add(Tooltip.of(soFar + "TOTAL", "ALL damage type"));
+				suggArgs.add(Tooltip.of(soFar + "ALL", "ALL damage type"));
 				suggArgs.add(Tooltip.of(soFar + "\"CoolCustomAbility name\"", "custom name"));
 				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 			}

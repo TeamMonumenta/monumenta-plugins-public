@@ -64,7 +64,7 @@ public class OnHurtTrigger extends Trigger {
 
 		ClassAbility classAbility = reader.readEnum(ClassAbility.values());
 		DamageEvent.DamageType type = reader.readEnum(DamageEvent.DamageType.values());
-		String totalDamageType = reader.advance("TOTAL") ? "TOTAL" : null;
+		String totalDamageType = reader.advance("ALL") ? "ALL" : null;
 		if (classAbility == null && totalDamageType == null) {
 			List<Tooltip<String>> suggArgs = new ArrayList<>(ClassAbility.values().length + DamageEvent.DamageType.values().length + 1);
 			String soFar = reader.readSoFar();
@@ -74,7 +74,7 @@ public class OnHurtTrigger extends Trigger {
 			for (DamageEvent.DamageType valid : DamageEvent.DamageType.values()) {
 				suggArgs.add(Tooltip.of(soFar + valid.name(), "Damage type"));
 			}
-			suggArgs.add(Tooltip.of(soFar + "TOTAL", "ALL damage type"));
+			suggArgs.add(Tooltip.of(soFar + "ALL", "ALL damage type"));
 			return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 		}
 
