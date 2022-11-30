@@ -18,11 +18,13 @@ import org.jetbrains.annotations.Nullable;
 
 public class GalleryUtils {
 
+	//TODO - for future me - change this jank to a map inside GalleryMap different for each map.
 	protected static final int GOLD_ROUND_1 = 0;
 	protected static final int GOLD_PER_MOB_AFTER_ROUND_1 = 60;
 	protected static final int STARTING_ROUND_FOR_SCALING = 20;
+	protected static final int STARTING_ROUND_FOR_SCALING_HARDER = 45;
 	private static final double HEALTH_SCALE_PER_ROUND = 0.05;
-	private static final double MAX_HEALTH_SCALE = 9999999; //todo - monarch wanted this hotfix but we need to move all of these inside their own GalleryMap info.
+	private static final double HEALTH_SCALE_PER_ROUND_HARDER = 0.1;
 	private static final double SPEED_SCALE_PER_ROUND = 0.01;
 	private static final double MAX_SPEED_SCALE = 0.15;
 	private static final double[] MOB_COUNT_MULTIPLIER_PER_PLAYER = {1, 1.33, 1.67, 2};
@@ -58,7 +60,12 @@ public class GalleryUtils {
 			return;
 		}
 
-		double healthScale = Math.min(HEALTH_SCALE_PER_ROUND * (round - STARTING_ROUND_FOR_SCALING), MAX_HEALTH_SCALE);
+		double healthScale;
+		if (round <= STARTING_ROUND_FOR_SCALING_HARDER) {
+			healthScale = HEALTH_SCALE_PER_ROUND * (round - STARTING_ROUND_FOR_SCALING);
+		} else {
+			healthScale = HEALTH_SCALE_PER_ROUND * (STARTING_ROUND_FOR_SCALING_HARDER - STARTING_ROUND_FOR_SCALING) + (HEALTH_SCALE_PER_ROUND_HARDER * (round - STARTING_ROUND_FOR_SCALING_HARDER));
+		}
 		double speedScale = Math.min(SPEED_SCALE_PER_ROUND * (round - STARTING_ROUND_FOR_SCALING), MAX_SPEED_SCALE);
 
 		EntityUtils.scaleMaxHealth(mob, healthScale, "GalleryHealthScaleRound");
