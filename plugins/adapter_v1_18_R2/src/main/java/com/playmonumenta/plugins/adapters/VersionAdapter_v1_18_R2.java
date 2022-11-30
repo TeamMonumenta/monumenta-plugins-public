@@ -52,6 +52,7 @@ import org.bukkit.craftbukkit.v1_18_R2.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftParrot;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.AbstractSkeleton;
+import org.bukkit.entity.Bee;
 import org.bukkit.entity.CaveSpider;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Drowned;
@@ -472,6 +473,17 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 			// disable leaping if desired
 			if (mob.getScoreboardTags().contains("boss_spider_no_leap")) {
 				availableGoals.removeIf(goal -> goal.getGoal() instanceof LeapAtTargetGoal);
+			}
+		} else if (mob instanceof Bee) {
+			// for bees used as aggressive mobs, disable the peaceful behaviours of pollination and using bee hives
+			if (mob.getScoreboardTags().contains("boss_targetplayer") || mob.getScoreboardTags().contains("boss_generictarget")) {
+				availableGoals.removeIf(goal -> goal.getGoal().getClass().getSimpleName().equals("d") // BeeEnterHiveGoal
+					                                || goal.getGoal().getClass().getSimpleName().equals("k") // BeePollinateGoal
+					                                || goal.getGoal().getClass().getSimpleName().equals("i") // BeeLocateHiveGoal
+					                                || goal.getGoal().getClass().getSimpleName().equals("e") // BeeGoToHiveGoal
+					                                || goal.getGoal().getClass().getSimpleName().equals("f") // BeeGoToKnownFlowerGoal
+					                                || goal.getGoal().getClass().getSimpleName().equals("g") // BeeGrowCropGoal
+				);
 			}
 		}
 		// prevent all mobs from attacking iron golems and turtles
