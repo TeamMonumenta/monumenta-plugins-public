@@ -40,7 +40,7 @@ public class BrutalAlchemy extends PotionAbility {
 			.descriptions(
 				"Your Brutal Alchemist's Potions deal +1 damage and apply 1 damage every 2 seconds for 8 seconds.",
 				"Your Brutal Alchemist's Potions now deal +2 damage and apply 1 damage every second instead.",
-				"Your Brutal Alchemist's Potions now also set enemies on fire for its duration, and the damage over time effect is increased by 30% of your base potion damage. Additionally, when a mob inflicted with this damage over time effect dies, the effect (along with any Inferno applied) spreads to all mobs in a 3 block radius around it.")
+				"Your Brutal Alchemist's Potions damage over time effect is increased by 30% of your base potion damage. Additionally, when a mob inflicted with this damage over time effect dies, the effect spreads to all mobs in a 3 block radius around it.")
 			.displayItem(new ItemStack(Material.REDSTONE, 1));
 
 	private final int mPeriod;
