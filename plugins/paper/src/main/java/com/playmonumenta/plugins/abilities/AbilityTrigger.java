@@ -19,7 +19,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * Description of an ability trigger - holds key, if sneaking is required, etc.
@@ -32,6 +31,10 @@ public class AbilityTrigger {
 
 	public enum BinaryOption {
 		TRUE, FALSE, EITHER;
+
+		public static BinaryOption ofBoolean(boolean b) {
+			return b ? TRUE : FALSE;
+		}
 	}
 
 	public enum Key {
@@ -51,35 +54,51 @@ public class AbilityTrigger {
 	}
 
 	public enum KeyOptions {
-		NO_USABLE_ITEMS("not holding a potion, projectile weapon, shield, block, etc. in the main hand", player -> {
-			ItemStack mainhand = player.getInventory().getItemInMainHand();
-			return !(ItemUtils.isShootableItem(mainhand, false)
-				         || ItemUtils.isSomePotion(mainhand)
-				         || mainhand.getType().isBlock()
-				         || mainhand.getType().isEdible()
-				         || mainhand.getType() == Material.COMPASS
-				         || mainhand.getType() == Material.SHIELD
-				         || Plugin.getInstance().mItemStatManager.getEnchantmentLevel(player, ItemStatUtils.EnchantmentType.MULTITOOL) > 0);
-		}),
-		NO_PICKAXE("not holding a pickaxe", player -> !ItemUtils.isPickaxe(player.getInventory().getItemInMainHand())),
-		SNEAK_WITH_SHIELD("sneaking if holding a shield", player -> player.isSneaking() || !(player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD));
+		NO_POTION("not holding a potion", "may be holding a potion",
+			player -> !ItemUtils.isSomePotion(player.getInventory().getItemInMainHand())),
+		NO_FOOD("not holding food", "may be holding food",
+			player -> !player.getInventory().getItemInMainHand().getType().isEdible()),
+		NO_PROJECTILE_WEAPON("not holding a projectile weapon", "may be holding a projectile weapon",
+			player -> !ItemUtils.isShootableItem(player.getInventory().getItemInMainHand())),
+		NO_SHIELD("not holding a shield", "may be holding a shield",
+			player -> player.getInventory().getItemInMainHand().getType() != Material.SHIELD),
+		NO_BLOCKS("not holding blocks", "may be holding blocks",
+			player -> !player.getInventory().getItemInMainHand().getType().isBlock()),
+		NO_MISC("not holding a compass or multitool", "may be holding a compass or multitool",
+			player -> player.getInventory().getItemInMainHand().getType() == Material.COMPASS
+				          || Plugin.getInstance().mItemStatManager.getEnchantmentLevel(player, ItemStatUtils.EnchantmentType.MULTITOOL) > 0),
+		NO_PICKAXE("not holding a pickaxe", "may be holding a pickaxe",
+			player -> !ItemUtils.isPickaxe(player.getInventory().getItemInMainHand())),
+		SNEAK_WITH_SHIELD("sneaking if holding a shield", "no sneak requirement if holding a shield",
+			player -> player.isSneaking() || !(player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD));
 
-		private final String mDisplay;
+		public static final KeyOptions[] NO_USABLE_ITEMS = {
+			NO_POTION,
+			NO_FOOD,
+			NO_PROJECTILE_WEAPON,
+			NO_SHIELD,
+			NO_BLOCKS,
+			NO_MISC
+		};
+
+		private final String mEnabledDisplay;
+		private final String mDisabledDisplay;
 
 		private final Predicate<Player> mPredicate;
 
-		KeyOptions(String display, Predicate<Player> predicate) {
-			mDisplay = display;
+		KeyOptions(String enabledDisplay, String disabledDisplay, Predicate<Player> predicate) {
+			mEnabledDisplay = enabledDisplay;
+			mDisabledDisplay = disabledDisplay;
 			mPredicate = predicate;
 		}
 
-		public String getDisplay() {
-			return mDisplay;
+		public String getDisplay(boolean enabled) {
+			return enabled ? mEnabledDisplay : mDisabledDisplay;
 		}
 
 		@Override
 		public String toString() {
-			return mDisplay;
+			return mEnabledDisplay;
 		}
 	}
 
@@ -91,6 +110,9 @@ public class AbilityTrigger {
 	private final int mMetedataId = mNextMetadataId.getAndIncrement();
 
 	private Key mKey;
+
+	private boolean mEnabled = true;
+
 	private final EnumSet<KeyOptions> mKeyOptions = EnumSet.noneOf(KeyOptions.class);
 
 	private BinaryOption mSneaking = BinaryOption.EITHER;
@@ -110,6 +132,7 @@ public class AbilityTrigger {
 
 	public AbilityTrigger(AbilityTrigger original) {
 		mKey = original.mKey;
+		mEnabled = original.mEnabled;
 		mKeyOptions.clear();
 		mKeyOptions.addAll(original.mKeyOptions);
 		mSneaking = original.mSneaking;
@@ -168,6 +191,14 @@ public class AbilityTrigger {
 		this.mKey = key;
 	}
 
+	public boolean isEnabled() {
+		return mEnabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.mEnabled = enabled;
+	}
+
 	public EnumSet<KeyOptions> getKeyOptions() {
 		return mKeyOptions;
 	}
@@ -213,8 +244,15 @@ public class AbilityTrigger {
 	public static AbilityTrigger fromJson(JsonObject json) {
 		try {
 			AbilityTrigger trigger = new AbilityTrigger(Key.valueOf(json.get("key").getAsString()));
+			if (json.has("enabled")) { // old triggers didn't have this
+				trigger.mEnabled = json.get("enabled").getAsBoolean();
+			}
 			for (JsonElement keyOption : json.get("keyOptions").getAsJsonArray()) {
-				trigger.mKeyOptions.add(KeyOptions.valueOf(keyOption.getAsString()));
+				if ("NO_USABLE_ITEMS".equals(keyOption.getAsString())) { // update old triggers
+					trigger.mKeyOptions.addAll(List.of(KeyOptions.NO_USABLE_ITEMS));
+				} else {
+					trigger.mKeyOptions.add(KeyOptions.valueOf(keyOption.getAsString()));
+				}
 			}
 			trigger.mSneaking = BinaryOption.valueOf(json.get("sneaking").getAsString());
 			trigger.mSprinting = BinaryOption.valueOf(json.get("sprinting").getAsString());
@@ -236,6 +274,7 @@ public class AbilityTrigger {
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
 		json.addProperty("key", mKey.name());
+		json.addProperty("enabled", mEnabled);
 		JsonArray keyOptions = new JsonArray();
 		for (KeyOptions keyOption : mKeyOptions) {
 			keyOptions.add(keyOption.name());
@@ -254,6 +293,9 @@ public class AbilityTrigger {
 	}
 
 	public boolean check(Player player, Key key) {
+		if (!mEnabled) {
+			return false;
+		}
 		if (key != mKey) {
 			return false;
 		}
@@ -301,16 +343,19 @@ public class AbilityTrigger {
 		if (!(o instanceof AbilityTrigger that)) {
 			return false;
 		}
-		return mDoubleClick == that.mDoubleClick && mKey == that.mKey && mKeyOptions.equals(that.mKeyOptions) && mSneaking == that.mSneaking
+		return mEnabled == that.mEnabled && mDoubleClick == that.mDoubleClick && mKey == that.mKey && mKeyOptions.equals(that.mKeyOptions) && mSneaking == that.mSneaking
 			       && mSprinting == that.mSprinting && mOnGround == that.mOnGround && mLookDirections.equals(that.mLookDirections);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(mKey, mKeyOptions, mSneaking, mSprinting, mOnGround, mLookDirections, mDoubleClick);
+		return Objects.hash(mEnabled, mKey, mKeyOptions, mSneaking, mSprinting, mOnGround, mLookDirections, mDoubleClick);
 	}
 
 	public String getDescription() {
+		if (!mEnabled) {
+			return ChatColor.RED + "Trigger is disabled!";
+		}
 		StringBuilder description = new StringBuilder(ChatColor.GOLD + mKey.mDisplay + ChatColor.RESET + "\n");
 		if (mDoubleClick) {
 			description.append("- double click\n");
@@ -327,8 +372,13 @@ public class AbilityTrigger {
 		if (mLookDirections.size() < 3) {
 			description.append("- looking ").append(mLookDirections.stream().map(d -> d.name().toLowerCase(Locale.ROOT)).collect(Collectors.joining(" or "))).append("\n");
 		}
-		for (KeyOptions keyOption : mKeyOptions) {
-			description.append("- ").append(keyOption.mDisplay).append("\n");
+		EnumSet<KeyOptions> keyOptions = EnumSet.copyOf(mKeyOptions);
+		if (keyOptions.containsAll(List.of(KeyOptions.NO_USABLE_ITEMS))) {
+			description.append("- not holding a usable item\n");
+			keyOptions.removeAll(List.of(KeyOptions.NO_USABLE_ITEMS));
+		}
+		for (KeyOptions keyOption : keyOptions) {
+			description.append("- ").append(keyOption.mEnabledDisplay).append("\n");
 		}
 		return description.toString();
 	}

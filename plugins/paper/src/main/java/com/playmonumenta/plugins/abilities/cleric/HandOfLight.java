@@ -76,7 +76,7 @@ public class HandOfLight extends Ability {
 				))
 			.cooldown(HEALING_1_COOLDOWN, HEALING_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HandOfLight::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK)
-				                                                                        .keyOptions(AbilityTrigger.KeyOptions.SNEAK_WITH_SHIELD, AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+				                                                                        .keyOptions(AbilityTrigger.KeyOptions.SNEAK_WITH_SHIELD).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.displayItem(new ItemStack(Material.PINK_DYE, 1));
 
 	private final double mRange;

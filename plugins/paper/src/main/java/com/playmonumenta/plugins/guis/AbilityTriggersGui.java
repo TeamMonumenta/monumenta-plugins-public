@@ -89,7 +89,7 @@ public class AbilityTriggersGui extends Gui {
 			}
 		} else {
 			// back icon
-			setItem(0, createBasicItem(Material.ARROW, "Back",
+			setItem(0, 0, createBasicItem(Material.ARROW, "Back",
 				NamedTextColor.GRAY, false, "Return to the trigger selection page.", ChatColor.GRAY))
 				.onLeftClick(() -> {
 					mSelectedAbility = null;
@@ -97,61 +97,47 @@ public class AbilityTriggersGui extends Gui {
 				});
 
 			// summary icon
-			setItem(4, createBasicItem(mSelectedAbility.getDisplayItem().getType(),
+			setItem(0, 4, createBasicItem(mSelectedAbility.getDisplayItem().getType(),
 				mSelectedAbility.getDisplayName() + " - " + mSelectedAbility.getDisplayName(), NamedTextColor.GOLD, false,
 				ChatColor.GRAY + "Trigger summary:\n" + mNewTrigger.getDescription() +
-					(mSelectedTrigger.getRestriction() == null ? "" : ChatColor.RED + "- unchangeable: " + ChatColor.WHITE + mSelectedTrigger.getRestriction().getDisplay()), ChatColor.WHITE));
+					(mSelectedTrigger.getRestriction() == null || !mNewTrigger.isEnabled() ? "" : ChatColor.RED + "- unchangeable: " + ChatColor.WHITE + mSelectedTrigger.getRestriction().getDisplay()), ChatColor.WHITE));
 
 			// options
-			setItem(2, 3, createBasicItem(Material.JIGSAW, "Key: " + mNewTrigger.getKey(), NamedTextColor.WHITE, false,
-				"Click to cycle through main key.\nNote that this also changes the \"extras\" when changed.", ChatColor.GRAY)).onLeftClick(() -> {
+			makeOptionIcons(1, 0, createBasicItem(Material.BARRIER, mNewTrigger.isEnabled() ? "Trigger enabled" : "Trigger disabled", mNewTrigger.isEnabled() ? NamedTextColor.GREEN : NamedTextColor.RED, false,
+				"Click to " + (mNewTrigger.isEnabled() ? "disable" : "enable") + " the trigger", ChatColor.GRAY), mNewTrigger.isEnabled() ? Material.GREEN_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, () -> {
+				mNewTrigger.setEnabled(!mNewTrigger.isEnabled());
+				update();
+			});
+			makeOptionIcons(1, 1, createBasicItem(Material.JIGSAW, "Key: " + mNewTrigger.getKey(), NamedTextColor.WHITE, false,
+				"Click to cycle through main key.\nNote that this also changes the \"extras\" when changed.", ChatColor.GRAY), switch (mNewTrigger.getKey()) {
+				case LEFT_CLICK -> Material.IRON_SWORD;
+				case RIGHT_CLICK -> Material.BOW;
+				case SWAP -> Material.TORCH;
+			}, () -> {
 				mNewTrigger.setKey(AbilityTrigger.Key.values()[(mNewTrigger.getKey().ordinal() + 1) % AbilityTrigger.Key.values().length]);
 				mNewTrigger.getKeyOptions().clear();
 				if (mSelectedTrigger.getRestriction() == null) {
 					if (mNewTrigger.getKey() == AbilityTrigger.Key.LEFT_CLICK) {
 						mNewTrigger.getKeyOptions().add(AbilityTrigger.KeyOptions.NO_PICKAXE);
 					} else if (mNewTrigger.getKey() == AbilityTrigger.Key.RIGHT_CLICK) {
-						mNewTrigger.getKeyOptions().add(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS);
+						mNewTrigger.getKeyOptions().addAll(List.of(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS));
 					}
 				}
 				update();
 			});
-			setItem(2, 5, createBasicItem(Material.SHEARS, "Double Click: " + (mNewTrigger.isDoubleClick() ? "Yes" : "No"), mNewTrigger.isDoubleClick() ? NamedTextColor.GREEN : NamedTextColor.RED, false,
-				"Click to toggle requiring a double click", ChatColor.GRAY)).onLeftClick(() -> {
+			makeOptionIcons(1, 3, createBasicItem(Material.SHEARS, "Double click: " + (mNewTrigger.isDoubleClick() ? "yes" : "no"), mNewTrigger.isDoubleClick() ? NamedTextColor.GREEN : NamedTextColor.GRAY, false,
+				"Click to toggle requiring a double click", ChatColor.GRAY), mNewTrigger.isDoubleClick() ? Material.GREEN_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setDoubleClick(!mNewTrigger.isDoubleClick());
 				update();
 			});
-			makeBinaryOptionIcon(3, 3, Material.FEATHER, "Sneaking", mNewTrigger.getSneaking(), mNewTrigger::setSneaking);
-			makeBinaryOptionIcon(3, 4, Material.LEATHER_BOOTS, "Sprinting", mNewTrigger.getSprinting(), mNewTrigger::setSprinting);
-			makeBinaryOptionIcon(3, 5, Material.GRASS_BLOCK, "On Ground", mNewTrigger.getOnGround(), mNewTrigger::setOnGround);
+			makeBinaryOptionIcon(1, 4, Material.FEATHER, "sneaking", mNewTrigger.getSneaking(), mNewTrigger::setSneaking);
+			makeBinaryOptionIcon(1, 5, Material.LEATHER_BOOTS, "sprinting", mNewTrigger.getSprinting(), mNewTrigger::setSprinting);
+			makeBinaryOptionIcon(1, 6, Material.GRASS_BLOCK, "on ground", mNewTrigger.getOnGround(), mNewTrigger::setOnGround);
 
-			setItem(4, 3, createBasicItem(Material.BOW, "Extras", NamedTextColor.WHITE, false,
-				ChatColor.GRAY + "Click to cycle through some extras.\n"
-					+ ChatColor.GRAY + "When the main key is changed,\n"
-					+ ChatColor.GRAY + "these are set to defaults.\n"
-					+ ChatColor.WHITE + (mNewTrigger.getKeyOptions().isEmpty() ? "- none" :
-						                     "- " + mNewTrigger.getKeyOptions().stream().map(AbilityTrigger.KeyOptions::getDisplay).collect(Collectors.joining("\n- "))), ChatColor.WHITE))
-				.onLeftClick(() -> {
-					// TODO allow choosing multiple options somehow - probably via new GUI?
-					EnumSet<AbilityTrigger.KeyOptions> keyOptions = mNewTrigger.getKeyOptions();
-					AbilityTrigger.KeyOptions[] values = AbilityTrigger.KeyOptions.values();
-					if (keyOptions.size() != 1) {
-						keyOptions.clear();
-						keyOptions.add(values[0]);
-					} else {
-						AbilityTrigger.KeyOptions option = keyOptions.iterator().next();
-						keyOptions.clear();
-						if (option.ordinal() + 1 < values.length) {
-							keyOptions.add(values[option.ordinal() + 1]);
-						}
-					}
-					mNewTrigger.setKey(AbilityTrigger.Key.values()[(mNewTrigger.getKey().ordinal() + 1) % AbilityTrigger.Key.values().length]);
-					update();
-				});
 			String looking = "Looking " + (mNewTrigger.getLookDirections().size() == 3 ? "anywhere"
 				                               : mNewTrigger.getLookDirections().stream().map(d -> d.name().toLowerCase(Locale.ROOT)).collect(Collectors.joining(" or ")));
-			setItem(4, 5, createBasicItem(Material.HEART_OF_THE_SEA, looking, NamedTextColor.WHITE, false,
-				"Click to cycle through look directions", ChatColor.GRAY)).onLeftClick(() -> {
+			makeOptionIcons(1, 7, createBasicItem(Material.HEART_OF_THE_SEA, looking, NamedTextColor.WHITE, false,
+				"Click to cycle through look directions", ChatColor.GRAY), mNewTrigger.getLookDirections().size() == 3 ? Material.GRAY_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, () -> {
 				EnumSet<AbilityTrigger.LookDirection> lookDirections = mNewTrigger.getLookDirections();
 				AbilityTrigger.LookDirection[] values = AbilityTrigger.LookDirection.values();
 				if (lookDirections.size() == 3) {
@@ -177,13 +163,40 @@ public class AbilityTriggersGui extends Gui {
 				update();
 			});
 
+			// extras aka key options
+			setItem(3, 0, createBasicItem(Material.CHAIN_COMMAND_BLOCK, "Extras", NamedTextColor.WHITE, false,
+				"Extra options for held items.\n"
+					+ "When the main key is changed these are set to defaults, unless the trigger has an unchangeable item restriction.", ChatColor.GRAY));
+			int col = 1;
+			for (AbilityTrigger.KeyOptions keyOption : AbilityTrigger.KeyOptions.values()) {
+				Material mat = switch (keyOption) {
+					case NO_POTION -> Material.POTION;
+					case NO_FOOD -> Material.COOKED_BEEF;
+					case NO_PROJECTILE_WEAPON -> Material.CROSSBOW;
+					case NO_SHIELD -> Material.SHIELD;
+					case NO_BLOCKS -> Material.COBBLESTONE;
+					case NO_MISC -> Material.COMPASS;
+					case NO_PICKAXE -> Material.IRON_PICKAXE;
+					case SNEAK_WITH_SHIELD -> Material.SHIELD;
+				};
+				boolean enabled = mNewTrigger.getKeyOptions().contains(keyOption);
+				makeOptionIcons(3, col++, createBasicItem(mat, capitalize(keyOption.getDisplay(enabled)), enabled ? NamedTextColor.RED : NamedTextColor.GRAY, false,
+					"Click to toggle", ChatColor.GRAY), enabled ? Material.RED_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
+					EnumSet<AbilityTrigger.KeyOptions> keyOptions = mNewTrigger.getKeyOptions();
+					if (!keyOptions.remove(keyOption)) {
+						keyOptions.add(keyOption);
+					}
+					update();
+				});
+			}
+
 			// accept/cancel buttons
 			if (!mNewTrigger.equals(mSelectedTrigger.getTrigger())) {
 				{
 					ItemStack confirm = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
 					ItemMeta meta = confirm.getItemMeta();
 					meta.displayName(Component.text("Confirm", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-					meta.lore(List.of(Component.text("Accept trigger changes.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+					meta.lore(List.of(Component.text("Accept trigger changes", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 					confirm.setItemMeta(meta);
 					ItemUtils.setPlainTag(confirm);
 					setItem(5, 2, confirm).onLeftClick(() -> {
@@ -223,15 +236,30 @@ public class AbilityTriggersGui extends Gui {
 		}
 	}
 
+
+	private void makeOptionIcons(int row, int column, ItemStack display, AbilityTrigger.BinaryOption value, Runnable onClick) {
+		Material indicatorMaterial = value == AbilityTrigger.BinaryOption.TRUE ? Material.GREEN_STAINED_GLASS_PANE
+			                             : value == AbilityTrigger.BinaryOption.FALSE ? Material.RED_STAINED_GLASS_PANE
+				                               : Material.GRAY_STAINED_GLASS_PANE;
+		makeOptionIcons(row, column, display, indicatorMaterial, onClick);
+	}
+
+	private void makeOptionIcons(int row, int column, ItemStack display, Material indicatorMaterial, Runnable onClick) {
+		setItem(row, column, display).onLeftClick(onClick);
+		ItemStack indicator = display.clone();
+		indicator.setType(indicatorMaterial);
+		setItem(row + 1, column, indicator).onLeftClick(onClick);
+	}
+
 	private void makeBinaryOptionIcon(int row, int column, Material material, String name, AbilityTrigger.BinaryOption value, Consumer<AbilityTrigger.BinaryOption> setter) {
 		String displayName = value == AbilityTrigger.BinaryOption.TRUE ? "Must be " + name
 			                     : value == AbilityTrigger.BinaryOption.FALSE ? "Not " + name
-				                       : name + " or not " + name;
+				                       : capitalize(name) + " or not " + name;
 		NamedTextColor color = value == AbilityTrigger.BinaryOption.TRUE ? NamedTextColor.GREEN
 			                       : value == AbilityTrigger.BinaryOption.FALSE ? NamedTextColor.RED
 				                         : NamedTextColor.GRAY;
-		setItem(row, column, createBasicItem(material, displayName, color, false,
-			"Click to cycle through options", ChatColor.GRAY)).onLeftClick(() -> {
+		makeOptionIcons(row, column, createBasicItem(material, displayName, color, false,
+			"Click to cycle through options", ChatColor.GRAY), value, () -> {
 			setter.accept(AbilityTrigger.BinaryOption.values()[(value.ordinal() + 1) % AbilityTrigger.BinaryOption.values().length]);
 			update();
 		});
@@ -248,6 +276,10 @@ public class AbilityTriggersGui extends Gui {
 		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		item.setItemMeta(meta);
 		return item;
+	}
+
+	private static String capitalize(String s) {
+		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 
 }

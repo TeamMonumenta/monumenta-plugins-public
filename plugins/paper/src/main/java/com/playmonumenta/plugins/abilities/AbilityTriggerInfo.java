@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -116,7 +117,7 @@ public class AbilityTriggerInfo<T extends Ability> {
 	}
 
 	public String getDescription() {
-		return mTrigger.getDescription() + (mRestriction == null ? "" : "- " + mRestriction.getDisplay());
+		return mTrigger.getDescription() + (mRestriction == null || !mTrigger.isEnabled() ? "" : ChatColor.RED + "- unchangeable: " + ChatColor.WHITE + mRestriction.getDisplay());
 	}
 
 }
