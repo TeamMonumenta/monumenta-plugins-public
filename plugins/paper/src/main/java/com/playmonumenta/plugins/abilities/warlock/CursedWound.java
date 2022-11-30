@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -16,10 +18,12 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -90,9 +94,21 @@ public class CursedWound extends Ability {
 				double damage = event.getDamage() * DAMAGE_PER_EFFECT_RATIO * (mStoredPotionEffects.size() + mStoredCustomEffects.size());
 				double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, CURSED_WOUND_RADIUS);
 				if (damage > 0) {
+					Map<String, JsonObject> serializedEffects = new HashMap<>();
+					mStoredCustomEffects.forEach((source, effect) -> serializedEffects.put(source, effect.serialize()));
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius)) {
 						mStoredPotionEffects.forEach(mob::addPotionEffect);
-						mStoredCustomEffects.forEach((source, effect) -> mPlugin.mEffectManager.addEffect(mob, source, effect));
+						serializedEffects.forEach((source, jsonEffect) -> {
+							try {
+								Effect deserializedEffect = EffectManager.getEffectFromJson(jsonEffect, mPlugin);
+								if (deserializedEffect != null) {
+									mPlugin.mEffectManager.addEffect(mob, source, deserializedEffect);
+								}
+							} catch (Exception e) {
+								MMLog.warning("Caught exception deserializing effect in Cursed Wound:");
+								e.printStackTrace();
+							}
+						});
 						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
 					}
 

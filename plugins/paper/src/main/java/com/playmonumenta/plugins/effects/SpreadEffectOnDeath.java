@@ -39,7 +39,7 @@ public class SpreadEffectOnDeath extends Effect {
 				Location loc = entity.getLocation();
 				List<LivingEntity> mobs = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(entity), mRadius).getHitMobs(entity);
 				for (LivingEntity mob : mobs) {
-					Effect deserializedEffect = manager.getEffectFromJson(serializedEffect, plugin);
+					Effect deserializedEffect = EffectManager.getEffectFromJson(serializedEffect, plugin);
 					if (deserializedEffect != null) {
 						deserializedEffect.setDuration(mNewDuration);
 						manager.addEffect(mob, mSource, deserializedEffect);
