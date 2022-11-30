@@ -122,7 +122,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 					LivingEntity le = EntityUtils.getNearestMob(mPlayer.getLocation(), 2);
 					if (le != null) {
 						DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, TACTICAL_DASH_DAMAGE), mInfo.getLinkedSpell(), true);
-						int duration = TACTICAL_DASH_STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+						int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TACTICAL_DASH_STUN_DURATION);
 						for (LivingEntity e : EntityUtils.getNearbyMobs(le.getLocation(), radius)) {
 							EntityUtils.applyStun(mPlugin, duration, e);
 						}

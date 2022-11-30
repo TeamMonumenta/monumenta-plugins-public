@@ -79,12 +79,13 @@ public class Riposte extends Ability {
 				if (isLevelTwo()) {
 					if (ItemUtils.isSword(mainHand)) {
 						if (mSwordTimer == null) {
+							int duration = CharmManager.getDuration(mPlayer, CHARM_DAMAGE_DURATION, RIPOSTE_SWORD_DURATION);
 							mSwordTimer = new BukkitRunnable() {
 								int mTimer = 0;
 
 								@Override
 								public void run() {
-									if (mTimer >= RIPOSTE_SWORD_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DAMAGE_DURATION)) {
+									if (mTimer >= duration) {
 										this.cancel();
 										mSwordTimer = null;
 										return;
@@ -96,7 +97,7 @@ public class Riposte extends Ability {
 						mSwordTimer.runTaskTimer(mPlugin, 0, 5);
 
 					} else if (ItemUtils.isAxe(mainHand)) {
-						EntityUtils.applyStun(mPlugin, RIPOSTE_AXE_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN_DURATION), source);
+						EntityUtils.applyStun(mPlugin, CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, RIPOSTE_AXE_DURATION), source);
 					}
 				}
 
@@ -114,7 +115,7 @@ public class Riposte extends Ability {
 
 				if (isEnhanced()) {
 					double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ENHANCEMENT_DAMAGE);
-					int duration = ENHANCEMENT_ROOT_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_ROOT_DURATION);
+					int duration = CharmManager.getDuration(mPlayer, CHARM_ROOT_DURATION, ENHANCEMENT_ROOT_DURATION);
 					for (LivingEntity mob : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_RADIUS)).getHitMobs()) {
 						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, ClassAbility.RIPOSTE, true, true);
 						EntityUtils.applySlow(mPlugin, duration, 1.0f, mob);

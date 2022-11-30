@@ -108,13 +108,17 @@ public class MagmaShield extends Ability {
 		double angle = Math.min(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, ANGLE), 180);
 		Hitbox hitbox = Hitbox.approximateCylinderSegment(
 			LocationUtils.getHalfHeightLocation(mPlayer).add(0, -HEIGHT, 0), 2 * HEIGHT, radius, Math.toRadians(angle));
+
+		int fireDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, FIRE_TICKS);
 		for (LivingEntity target : hitbox.getHitMobs()) {
-			EntityUtils.applyFire(mPlugin, FIRE_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), target, mPlayer);
+			EntityUtils.applyFire(mPlugin, fireDuration, target, mPlayer);
 			DamageUtils.damage(mPlayer, target, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);
 			MovementUtils.knockAway(mPlayer, target, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK), true);
 			if (isEnhanced()) {
 				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME,
 					new PercentDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_DAMAGE_BONUS, EnumSet.of(DamageType.FIRE)));
+				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME,
+					new PercentAbilityDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_DAMAGE_BONUS, EnumSet.of(ClassAbility.INFERNO)));
 				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME,
 					new PercentAbilityDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS,
 						EnumSet.of(ClassAbility.MAGMA_SHIELD, ClassAbility.ELEMENTAL_ARROWS_FIRE, ClassAbility.ELEMENTAL_SPIRIT_FIRE,

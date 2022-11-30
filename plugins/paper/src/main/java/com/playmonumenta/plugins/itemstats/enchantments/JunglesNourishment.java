@@ -65,7 +65,7 @@ public class JunglesNourishment implements Enchantment {
 			double healPercent = HEAL_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_HEALTH);
 			PlayerUtils.healPlayer(plugin, player, healPercent * EntityUtils.getMaxHealth(player), player);
 
-			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived((int)((DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION)) * Quench.getDurationScaling(plugin, player)), PERCENT_DAMAGE_RECEIVED - CharmManager.getLevelPercentDecimal(player, CHARM_RESISTANCE)));
+			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived((int) (CharmManager.getDuration(player, CHARM_DURATION, DURATION) * Quench.getDurationScaling(plugin, player)), PERCENT_DAMAGE_RECEIVED - CharmManager.getLevelPercentDecimal(player, CHARM_RESISTANCE)));
 
 			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, Refresh.reduceCooldown(plugin, player, COOLDOWN));
 			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()), new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));

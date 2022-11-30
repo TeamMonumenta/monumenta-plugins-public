@@ -65,6 +65,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 			.displayItem(new ItemStack(Material.RABBIT_FOOT, 1));
 
 	private final double mSpeedAmp;
+	private final int mDuration;
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private int mStacks;
 	private final int mMaxStacks;
@@ -72,6 +73,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 	public EnergizingElixir(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mSpeedAmp = (isLevelOne() ? SPEED_AMPLIFIER_1 : SPEED_AMPLIFIER_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 		mStacks = 0;
 		mMaxStacks = isEnhanced() ? ENHANCED_MAX_STACK + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS) : 0;
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -98,8 +100,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		if (isEnhanced()) {
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME)) {
 				mStacks = Math.min(mMaxStacks, mStacks + 1);
-				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME,
-					new EnergizingElixirStacks(DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mStacks));
+				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME, new EnergizingElixirStacks(mDuration, mStacks));
 			}
 		}
 
@@ -114,7 +115,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 	}
 
 	private void applyEffects() {
-		int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+		int duration = mDuration;
 		if (mStacks > 1) {
 			duration += 10; // to prevent gaps
 		}
@@ -132,8 +133,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		if (mStacks > 0 && !mPlugin.mEffectManager.hasEffect(mPlayer, EnergizingElixirStacks.class)) {
 			mStacks--;
 			if (mStacks > 0) {
-				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME,
-					new EnergizingElixirStacks(DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mStacks));
+				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCED_STACKS_NAME, new EnergizingElixirStacks(mDuration, mStacks));
 			}
 			applyEffects();
 			ClientModHandler.updateAbility(mPlayer, this);

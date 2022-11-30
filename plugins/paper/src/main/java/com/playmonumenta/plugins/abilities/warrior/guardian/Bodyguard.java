@@ -147,7 +147,7 @@ public class Bodyguard extends Ability {
 		giveAbsorption(mPlayer);
 
 		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK);
-		int duration = STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN_DURATION);
+		int duration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, STUN_DURATION);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS))) {
 			MovementUtils.knockAway(mPlayer, mob, knockback, true);
 			if (isLevelTwo()) {
@@ -158,6 +158,6 @@ public class Bodyguard extends Ability {
 	}
 
 	private void giveAbsorption(Player player) {
-		AbsorptionUtils.addAbsorption(player, mAbsorptionHealth, mAbsorptionHealth, BUFF_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_ABSORPTION_DURATION));
+		AbsorptionUtils.addAbsorption(player, mAbsorptionHealth, mAbsorptionHealth, CharmManager.getDuration(mPlayer, CHARM_ABSORPTION_DURATION, BUFF_DURATION));
 	}
 }

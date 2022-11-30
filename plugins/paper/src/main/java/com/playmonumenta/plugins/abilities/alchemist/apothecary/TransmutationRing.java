@@ -102,7 +102,7 @@ public class TransmutationRing extends PotionAbility {
 
 			mCosmetic.ringSoundStart(world, mCenter);
 
-			int duration = TRANSMUTATION_RING_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TRANSMUTATION_RING_DURATION);
 			double amplifier = DAMAGE_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
 			double perKillAmplifier = DAMAGE_PER_DEATH_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_PER_KILL_AMPLIFIER);
 			int maxKills = MAX_KILLS + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_KILLS);

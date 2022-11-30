@@ -90,7 +90,7 @@ public class Bezoar extends Ability {
 
 	public Bezoar(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mLingerTime = LINGER_TIME + CharmManager.getExtraDuration(mPlayer, CHARM_LINGER_TIME);
+		mLingerTime = CharmManager.getDuration(mPlayer, CHARM_LINGER_TIME, LINGER_TIME);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BezoarCS(), BezoarCS.SKIN_LIST);
 
@@ -153,7 +153,7 @@ public class Bezoar extends Ability {
 
 
 	private void applyEffects(Player player) {
-		int debuffReduction = DEBUFF_REDUCTION + CharmManager.getExtraDuration(mPlayer, CHARM_DEBUFF_REDUCTION);
+		int debuffReduction = CharmManager.getDuration(mPlayer, CHARM_DEBUFF_REDUCTION, DEBUFF_REDUCTION);
 		for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, player)) {
 			PotionEffect effect = player.getPotionEffect(effectType);
 			if (effect != null) {
@@ -164,10 +164,10 @@ public class Bezoar extends Ability {
 		}
 
 		double maxHealth = EntityUtils.getMaxHealth(player);
-		mPlugin.mEffectManager.addEffect(player, "BezoarHealing", new CustomRegeneration(HEAL_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_HEAL_DURATION), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, maxHealth * HEAL_PERCENT), mPlayer, mPlugin));
+		mPlugin.mEffectManager.addEffect(player, "BezoarHealing", new CustomRegeneration(CharmManager.getDuration(mPlayer, CHARM_HEAL_DURATION, HEAL_DURATION), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, maxHealth * HEAL_PERCENT), mPlayer, mPlugin));
 
 		if (isLevelTwo()) {
-			mPlugin.mEffectManager.addEffect(player, "BezoarPercentDamageDealtEffect", new PercentDamageDealt(DAMAGE_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DAMAGE_DURATION), DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)));
+			mPlugin.mEffectManager.addEffect(player, "BezoarPercentDamageDealtEffect", new PercentDamageDealt(CharmManager.getDuration(mPlayer, CHARM_DAMAGE_DURATION, DAMAGE_DURATION), DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)));
 		}
 	}
 
@@ -224,7 +224,7 @@ public class Bezoar extends Ability {
 
 	private void applyPhilosopherEffects(Player player) {
 		double absorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, PHILOSOPHER_STONE_ABSORPTION_HEALTH);
-		AbsorptionUtils.addAbsorption(player, absorption, absorption, PHILOSOPHER_STONE_ABSORPTION_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_ABSORPTION_DURATION));
+		AbsorptionUtils.addAbsorption(player, absorption, absorption, CharmManager.getDuration(mPlayer, CHARM_ABSORPTION_DURATION, PHILOSOPHER_STONE_ABSORPTION_DURATION));
 	}
 
 	public boolean shouldDrop() {

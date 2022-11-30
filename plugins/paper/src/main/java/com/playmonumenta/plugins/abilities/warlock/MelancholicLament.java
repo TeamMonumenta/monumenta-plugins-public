@@ -142,7 +142,7 @@ public class MelancholicLament extends Ability {
 		}
 
 		if (isLevelTwo()) {
-			int reductionTime = CLEANSE_REDUCTION + CharmManager.getExtraDuration(mPlayer, CHARM_RECOVERY);
+			int reductionTime = CharmManager.getDuration(mPlayer, CHARM_RECOVERY, CLEANSE_REDUCTION);
 			for (Player player : hitbox.getHitPlayers(true)) {
 				new PartialParticle(Particle.REDSTONE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.ENCHANTMENT_TABLE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125).spawnAsPlayerActive(mPlayer);

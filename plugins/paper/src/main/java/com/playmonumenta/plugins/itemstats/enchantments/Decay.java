@@ -50,6 +50,6 @@ public class Decay implements Enchantment {
 	}
 
 	public static void apply(Plugin plugin, LivingEntity enemy, int duration, int decayLevel, Player player) {
-		plugin.mEffectManager.addEffect(enemy, DOT_EFFECT_NAME, new CustomDamageOverTime(duration + CharmManager.getExtraDuration(player, CHARM_DURATION), CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, 1), 40 / decayLevel, player, null));
+		plugin.mEffectManager.addEffect(enemy, DOT_EFFECT_NAME, new CustomDamageOverTime(CharmManager.getDuration(player, CHARM_DURATION, duration), CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, 1), 40 / decayLevel, player, null));
 	}
 }

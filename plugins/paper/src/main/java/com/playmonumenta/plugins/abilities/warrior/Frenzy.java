@@ -42,13 +42,13 @@ public class Frenzy extends Ability {
 			.displayItem(new ItemStack(Material.FEATHER, 1));
 
 	private final double mPercentAttackSpeedEffect;
+	private final int mDuration;
 	private int mLastKillTick;
-	private int mDuration;
 
 	public Frenzy(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mPercentAttackSpeedEffect = (isLevelOne() ? PERCENT_ATTACK_SPEED_EFFECT_1 : PERCENT_ATTACK_SPEED_EFFECT_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK_SPEED);
-		mDuration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 		mLastKillTick = -1;
 	}
 

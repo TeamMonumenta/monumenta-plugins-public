@@ -32,7 +32,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -183,16 +182,13 @@ public class HallowedBeam extends MultipleChargeAbility {
 			} else {
 				mCosmetic.beamHarm(world, mPlayer, e, dir, CAST_RANGE);
 
-				if (Crusade.enemyTriggersAbilities(targetedEntity, mCrusade)) {
-					EntityUtils.applyStun(mPlugin, HALLOWED_UNDEAD_STUN + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), targetedEntity);
-				} else {
-					EntityUtils.applyStun(mPlugin, HALLOWED_LIVING_STUN + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), targetedEntity);
-				}
+				EntityUtils.applyStun(mPlugin, CharmManager.getDuration(mPlayer, CHARM_STUN, Crusade.enemyTriggersAbilities(targetedEntity, mCrusade) ? HALLOWED_UNDEAD_STUN : HALLOWED_LIVING_STUN), targetedEntity);
+
 				if (Crusade.applyCrusadeToSlayer(targetedEntity, mCrusade)) {
 					mPlugin.mEffectManager.addEffect(targetedEntity, "CrusadeSlayerTag", new CrusadeEnhancementTag(Crusade.getEnhancementDuration()));
 				}
 
-				if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
+				if (ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.FIRE_ASPECT) > 0) {
 					EntityUtils.applyFire(mPlugin, 20 * 15, targetedEntity, player);
 				}
 				Location eLoc = LocationUtils.getHalfHeightLocation(targetedEntity);

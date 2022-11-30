@@ -85,7 +85,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 			mTicksToStackDecay -= 5;
 
 			if (mTicksToStackDecay <= 0) {
-				mTicksToStackDecay = DECAY_TIMER + CharmManager.getExtraDuration(mPlayer, CHARM_DECAY);
+				mTicksToStackDecay = CharmManager.getDuration(mPlayer, CHARM_DECAY, DECAY_TIMER);
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlayer, "Sage's Insight Stacks: " + mStacks);
 				ClientModHandler.updateAbility(mPlayer, this);
@@ -99,7 +99,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 		if (ability == null) {
 			return false;
 		}
-		mTicksToStackDecay = DECAY_TIMER + CharmManager.getExtraDuration(mPlayer, CHARM_DECAY);
+		mTicksToStackDecay = CharmManager.getDuration(mPlayer, CHARM_DECAY, DECAY_TIMER);
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
 		Location locD = event.getDamagee().getLocation().add(0, 1, 0);

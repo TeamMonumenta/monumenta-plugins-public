@@ -99,7 +99,7 @@ public class EagleEye extends Ability {
 				mEagleEyeTeam.addEntry(mob.getUniqueId().toString());
 			}
 
-			int duration = EAGLE_EYE_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, EAGLE_EYE_DURATION);
 			PotionUtils.applyPotion(mPlayer, mob,
 				new PotionEffect(PotionEffectType.GLOWING, duration, EAGLE_EYE_EFFECT_LVL, true, false));
 			EntityUtils.applyVulnerability(mPlugin, duration, mVulnLevel, mob);
@@ -111,7 +111,7 @@ public class EagleEye extends Ability {
 				public void run() {
 					mTicks++;
 					if (mob.isDead() || !mob.isValid()) {
-						mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.EAGLE_EYE, EAGLE_EYE_REFRESH + CharmManager.getExtraDuration(mPlayer, CHARM_REFRESH));
+						mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.EAGLE_EYE, CharmManager.getDuration(mPlayer, CHARM_REFRESH, EAGLE_EYE_REFRESH));
 						this.cancel();
 					}
 					if (mTicks >= EAGLE_EYE_DURATION) {

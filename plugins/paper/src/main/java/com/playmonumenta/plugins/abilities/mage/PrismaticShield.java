@@ -126,12 +126,12 @@ public class PrismaticShield extends Ability {
 					float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK_SPEED);
 					MovementUtils.knockAway(mPlayer, mob, knockback, true);
 					if (isLevelTwo()) {
-						EntityUtils.applyStun(mPlugin, STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), mob);
+						EntityUtils.applyStun(mPlugin, CharmManager.getDuration(mPlayer, CHARM_STUN, STUN_DURATION), mob);
 						mCosmetic.prismaOnStun(mob, STUN_DURATION, mPlayer);
 					}
 				}
 
-				AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION));
+				AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION));
 				World world = mPlayer.getWorld();
 				mCosmetic.prismaEffect(world, mPlayer, RADIUS);
 				MessagingUtils.sendActionBarMessage(mPlayer, "Prismatic Shield has been activated");

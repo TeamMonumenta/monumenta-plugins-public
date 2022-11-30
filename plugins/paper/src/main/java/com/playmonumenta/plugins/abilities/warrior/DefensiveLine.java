@@ -78,8 +78,7 @@ public class DefensiveLine extends Ability {
 		world.playSound(location, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
 		new PartialParticle(Particle.FIREWORKS_SPARK, location, 35, 0.2, 0, 0.2, 0.25).spawnAsPlayerActive(mPlayer);
 
-		int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
-
+		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 
 		List<Player> players = PlayerUtils.playersInRange(location, CharmManager.getRadius(mPlayer, CHARM_RANGE, RADIUS), true);
 		players.removeIf(player -> player.getScoreboardTags().contains("disable_class"));

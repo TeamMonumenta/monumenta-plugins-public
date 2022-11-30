@@ -135,7 +135,7 @@ public class CleansingRain extends Ability {
 				}
 
 				mTicks += CLEANSING_APPLY_PERIOD;
-				if (mTicks > CLEANSING_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION)) {
+				if (mTicks > CharmManager.getDuration(mPlayer, CHARM_DURATION, CLEANSING_DURATION)) {
 					this.cancel();
 				}
 			}

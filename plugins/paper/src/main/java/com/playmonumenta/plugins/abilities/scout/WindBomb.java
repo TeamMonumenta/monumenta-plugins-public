@@ -161,7 +161,7 @@ public class WindBomb extends Ability {
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
 
-			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 			double weaken = WEAKEN_EFFECT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS);
 			// Velocity scales with the square root of the maximum height
 			double velocityMultSquared = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEIGHT, 1);
@@ -188,7 +188,7 @@ public class WindBomb extends Ability {
 
 				double pullVelocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_VELOCITY);
 				double pullRadius = CharmManager.getRadius(mPlayer, CHARM_VORTEX_RADIUS, PULL_RADIUS);
-				int pullDuration = PULL_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_VORTEX_DURATION);
+				int pullDuration = CharmManager.getDuration(mPlayer, CHARM_VORTEX_DURATION, PULL_DURATION);
 				Hitbox pullHitbox = new Hitbox.SphereHitbox(loc, pullRadius);
 
 				new BukkitRunnable() {

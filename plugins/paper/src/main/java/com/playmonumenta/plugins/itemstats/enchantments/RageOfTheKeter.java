@@ -81,7 +81,7 @@ public class RageOfTheKeter implements Enchantment {
 
 			event.setCancelled(true);
 			World world = player.getWorld();
-			int duration = (int)((DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION)) * Quench.getDurationScaling(plugin, player));
+			int duration = (int) ((CharmManager.getDuration(player, CHARM_DURATION, DURATION)) * Quench.getDurationScaling(plugin, player));
 			plugin.mEffectManager.addEffect(player, "KeterExtraDamage", new PercentDamageDealt(duration, DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE), AFFECTED_DAMAGE_TYPES));
 			plugin.mEffectManager.addEffect(player, "KeterExtraSpeed", new PercentSpeed(duration, SPEED_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_SPEED), ATTR_NAME));
 			plugin.mEffectManager.addEffect(player, "KeterParticles", new Aesthetics(duration,

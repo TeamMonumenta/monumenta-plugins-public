@@ -65,7 +65,7 @@ public class IntoxicatingWarmth implements Enchantment {
 				return;
 			}
 
-			int duration = (int)((DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION)) * Quench.getDurationScaling(plugin, player));
+			int duration = (int) (CharmManager.getDuration(player, CHARM_DURATION, DURATION) * Quench.getDurationScaling(plugin, player));
 			double amount = CharmManager.calculateFlatAndPercentValue(player, CHARM_SATURATION, 1);
 
 			plugin.mEffectManager.addEffect(player, WARMTH_EFFECT_SOURCE, new WarmthEffect(duration, (float) amount));

@@ -106,7 +106,7 @@ public class CounterStrike extends Ability {
 	}
 
 	private void clearIfExpired(LivingEntity mob, Integer time) {
-		if (time < Bukkit.getServer().getCurrentTick() - (REDUCTION_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION))) {
+		if (time < Bukkit.getServer().getCurrentTick() - CharmManager.getDuration(mPlayer, CHARM_DURATION, REDUCTION_DURATION)) {
 			mLastDamageTime.remove(mob);
 			mStacks.remove(mob);
 		}

@@ -582,7 +582,7 @@ public class CharmManager {
 			TransmutationRing.CHARM_MAX_KILLS,
 			WardingRemedy.CHARM_COOLDOWN,
 			WardingRemedy.CHARM_PULSES,
-			WardingRemedy.CHARM_FREQUENCY,
+			WardingRemedy.CHARM_DELAY,
 			WardingRemedy.CHARM_RADIUS,
 			WardingRemedy.CHARM_ABSORPTION,
 			WardingRemedy.CHARM_MAX_ABSORPTION,
@@ -806,6 +806,7 @@ public class CharmManager {
 			Panacea.CHARM_COOLDOWN,
 			TransmutationRing.CHARM_COOLDOWN,
 			WardingRemedy.CHARM_COOLDOWN,
+			WardingRemedy.CHARM_DELAY,
 			EsotericEnhancements.CHARM_COOLDOWN,
 			EsotericEnhancements.CHARM_FUSE,
 			ScorchedEarth.CHARM_COOLDOWN,
@@ -1200,19 +1201,18 @@ public class CharmManager {
 		return baseRadius * ((level / 100.0) + 1);
 	}
 
-	public static double getExtraDamage(Player player, String charmEffectName) {
-		double level = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName);
-		return level;
-	}
-
+	// This is still used in two places which do not handle the conversion to getDuration well, so they have been left for now
+	@Deprecated
 	public static int getExtraDuration(Player player, String charmEffectName) {
 		double level = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName);
 		return (int) (level * 20);
 	}
 
-	public static double getExtraPercentDamage(Player player, String charmEffectName, double baseDamage) {
-		double percentage = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
-		return baseDamage * (1 + (percentage / 100.0));
+	public static int getDuration(Player player, String charmEffectName, int baseDuration) {
+		double flatLevel = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName);
+		double percentLevel = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
+
+		return (int) ((baseDuration + flatLevel * 20) * ((percentLevel / 100.0) + 1));
 	}
 
 	public static int getCooldown(Player player, String charmEffectName, int baseCooldown) {
@@ -1224,17 +1224,8 @@ public class CharmManager {
 		return CharmManager.getInstance().getValueOfAttribute(player, charmEffectName);
 	}
 
-	public static double getLevelPercent(Player player, String charmEffectName) {
-		return CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
-	}
-
 	public static double getLevelPercentDecimal(Player player, String charmEffectName) {
 		return CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%") / 100.0;
-	}
-
-	public static double getExtraPercentHealing(Player player, String charmEffectName, double baseHealing) {
-		double percentage = CharmManager.getInstance().getValueOfAttribute(player, charmEffectName + "%");
-		return baseHealing * (1 + (percentage / 100.0));
 	}
 
 	public static double getExtraPercent(Player player, String charmEffectName, double base) {

@@ -70,7 +70,7 @@ public class WeaponMastery extends Ability {
 			} else if (ItemUtils.isSword(mainHand)) {
 				event.setDamage((event.getDamage() + mDamageBonusSwordFlat) * (1 + mDamageBonusSword));
 				if (isEnhanced()) {
-					EntityUtils.applyWeaken(mPlugin, SWORD_WEAKEN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), SWORD_WEAKEN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN), enemy);
+					EntityUtils.applyWeaken(mPlugin, CharmManager.getDuration(mPlayer, CHARM_DURATION, SWORD_WEAKEN_DURATION), SWORD_WEAKEN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN), enemy);
 				}
 			}
 		}

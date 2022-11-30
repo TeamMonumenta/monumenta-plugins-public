@@ -182,7 +182,7 @@ public final class MeteorSlam extends Ability {
 		}
 		putOnCooldown();
 
-		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mLevelJumpAmplifier, true, false));
+		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION_TICKS), mLevelJumpAmplifier, true, false));
 
 		World world = mPlayer.getWorld();
 		Location location = mPlayer.getLocation().add(0, 0.15, 0);

@@ -101,7 +101,7 @@ public class EscapeDeath extends Ability {
 
 				putOnCooldown();
 
-				int stunDuration = STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN_DURATION);
+				int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, STUN_DURATION);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RANGE, mPlayer)) {
 					EntityUtils.applyStun(mPlugin, stunDuration, mob);
 				}

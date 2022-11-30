@@ -124,7 +124,7 @@ public class ShieldBash extends Ability {
 
 	private void bash(LivingEntity le, ClassAbility ca) {
 		DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_BASH_DAMAGE), ca, true, true);
-		int duration = SHIELD_BASH_STUN + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SHIELD_BASH_STUN);
 		if (EntityUtils.isBoss(le) || EntityUtils.isElite(le)) {
 			EntityUtils.applySlow(mPlugin, duration, .99, le);
 		} else {

@@ -87,7 +87,7 @@ public class Challenge extends Ability {
 		Location loc = mPlayer.getLocation();
 		List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, CHALLENGE_RANGE)).getHitMobs();
 		if (!mobs.isEmpty()) {
-			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 			AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionPerMob * mobs.size(), mMaxAbsorption, duration);
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(duration, mPercentDamageDealtEffect, AFFECTED_DAMAGE_TYPES));
 

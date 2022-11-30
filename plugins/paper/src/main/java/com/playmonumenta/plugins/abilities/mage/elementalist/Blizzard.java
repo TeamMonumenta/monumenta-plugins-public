@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -130,8 +129,8 @@ public class Blizzard extends Ability {
 				new PartialParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-				if (mTicks >= DURATION_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION)
-					    || AbilityManager.getManager().getPlayerAbility(mPlayer, Blizzard.class) == null
+				if (mTicks >= CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION_TICKS)
+					    || mPlugin.mAbilityManager.getPlayerAbility(mPlayer, Blizzard.class) == null
 					    || !mPlayer.isValid()) { // Ensure player is not dead, is still online?
 					this.cancel();
 				}

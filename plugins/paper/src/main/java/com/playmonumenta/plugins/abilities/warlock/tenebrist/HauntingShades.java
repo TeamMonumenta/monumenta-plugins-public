@@ -129,6 +129,8 @@ public class HauntingShades extends Ability {
 		stand.setVisible(true);
 		stand.setCustomNameVisible(false);
 
+		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SHADES_DURATION);
+
 		new BukkitRunnable() {
 			final double mAoeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 			int mT = 0;
@@ -153,7 +155,7 @@ public class HauntingShades extends Ability {
 
 				mCosmetic.shadesTickEffect(mPlugin, world, mPlayer, bLoc, mAoeRadius, mT);
 
-				if (mT >= SHADES_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION) || mPlayer.isDead() || !mPlayer.isValid()) {
+				if (mT >= duration || mPlayer.isDead() || !mPlayer.isValid()) {
 					stand.remove();
 					mCosmetic.shadesEndEffect(world, mPlayer, bLoc, mAoeRadius);
 					this.cancel();

@@ -106,7 +106,7 @@ public class CholericFlames extends Ability {
 				mPlugin.mEffectManager.addEffect(mob, SPREAD_EFFECT_ON_DEATH_EFFECT, new SpreadEffectOnDeath(SPREAD_EFFECT_DURATION, Inferno.INFERNO_EFFECT_NAME, spreadRadius, SPREAD_EFFECT_DURATION_APPLIED, false));
 			}
 
-			int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 			EntityUtils.applyFire(mPlugin, duration, mob, mPlayer, playerItemStats);
 			if (isLevelTwo()) {
 				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true));

@@ -97,7 +97,7 @@ public class ViciousCombos extends Ability {
 						MessagingUtils.sendActionBarMessage(mPlayer, "All your cooldowns have been reset");
 
 						if (isLevelTwo()) {
-							int duration = VICIOUS_COMBOS_CRIPPLE_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+							int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, VICIOUS_COMBOS_CRIPPLE_DURATION);
 							double vuln = VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
 							double weaken = VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius, mPlayer)) {

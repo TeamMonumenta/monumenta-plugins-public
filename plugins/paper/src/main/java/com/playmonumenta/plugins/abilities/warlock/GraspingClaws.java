@@ -125,10 +125,11 @@ public class GraspingClaws extends Ability {
 			new PartialParticle(Particle.DRAGON_BREATH, loc, 85, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, CHAIN_PARTICLE).spawnAsPlayerActive(mPlayer);
 
+			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), mPlayer)) {
 				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mDamage, true, true, false);
 				MovementUtils.pullTowards(proj, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_SPEED));
-				EntityUtils.applySlow(mPlugin, DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), mAmplifier, mob);
+				EntityUtils.applySlow(mPlugin, duration, mAmplifier, mob);
 			}
 
 			if (isEnhanced()) {

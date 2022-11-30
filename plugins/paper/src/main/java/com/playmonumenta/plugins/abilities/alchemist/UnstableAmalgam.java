@@ -158,7 +158,7 @@ public class UnstableAmalgam extends Ability {
 
 		mPlayerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
-		int duration = UNSTABLE_AMALGAM_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, UNSTABLE_AMALGAM_DURATION);
 
 		World world = loc.getWorld();
 		Entity e = LibraryOfSoulsIntegration.summon(loc, "UnstableAmalgam");
@@ -224,7 +224,7 @@ public class UnstableAmalgam extends Ability {
 		}
 
 		if (isEnhanced()) {
-			int duration = UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_INSTABILITY_DURATION);
+			int duration = CharmManager.getDuration(mPlayer, CHARM_INSTABILITY_DURATION, UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION);
 
 			if (!mobs.isEmpty()) {
 				unstableMobs(mobs, duration);

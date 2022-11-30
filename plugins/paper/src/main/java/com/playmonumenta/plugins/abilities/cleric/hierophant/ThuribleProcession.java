@@ -142,8 +142,9 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 		//Give everyone buffs from the array
 		List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
 		if (players.size() > 1) {
+			duration = CharmManager.getDuration(mPlayer, CHARM_EFFECT_DURATION, duration);
 			for (Player pl : players) {
-				Effect[] effects = getEffectArray(duration + CharmManager.getExtraDuration(mPlayer, CHARM_EFFECT_DURATION));
+				Effect[] effects = getEffectArray(duration);
 				for (int i = 0; i < mBuffs; i++) {
 					mPlugin.mEffectManager.addEffect(pl, EFFECTS_NAMES[i], effects[i]);
 				}
@@ -152,15 +153,11 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	}
 
 	private Effect[] getEffectArray(int duration) {
-		return isLevelOne()
-			       ? new Effect[] {new PercentAttackSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK) + EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME),
-			                       new PercentSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED) + EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME),
-			                       new PercentDamageDealt(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + EFFECT_PERCENT_1, AFFECTED_DAMAGE_TYPES),
-			                       new ThuribleBonusHealing(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + EFFECT_PERCENT_1)}
-			       : new Effect[] {new PercentAttackSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK) + EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME),
-			                       new PercentSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED) + EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME),
-			                       new PercentDamageDealt(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + EFFECT_PERCENT_2, AFFECTED_DAMAGE_TYPES),
-			                       new ThuribleBonusHealing(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + EFFECT_PERCENT_2)};
+		double effectPercent = isLevelOne() ? EFFECT_PERCENT_1 : EFFECT_PERCENT_2;
+		return new Effect[] {new PercentAttackSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK) + effectPercent, PERCENT_ATTACK_SPEED_EFFECT_NAME),
+		                     new PercentSpeed(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED) + effectPercent, PERCENT_SPEED_EFFECT_NAME),
+		                     new PercentDamageDealt(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + effectPercent, AFFECTED_DAMAGE_TYPES),
+		                     new ThuribleBonusHealing(duration, CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL) + effectPercent)};
 	}
 
 	@Override

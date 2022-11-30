@@ -75,7 +75,7 @@ public class GruesomeAlchemy extends PotionAbility {
 	@Override
 	public void apply(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {
 		if (isGruesome) {
-			int duration = GRUESOME_ALCHEMY_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, GRUESOME_ALCHEMY_DURATION);
 			EntityUtils.applySlow(mPlugin, duration, mSlownessAmount, mob);
 			EntityUtils.applyVulnerability(mPlugin, duration, mVulnerabilityAmount, mob);
 			EntityUtils.applyWeaken(mPlugin, duration, GRUESOME_ALCHEMY_WEAKEN_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN), mob);

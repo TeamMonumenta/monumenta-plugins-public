@@ -107,8 +107,8 @@ public class FrostNova extends Ability {
 		}
 		putOnCooldown();
 		float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-		int duration = CharmManager.getExtraDuration(mPlayer, CHARM_DURATION) + DURATION_TICKS;
-		int frozenDuration = CharmManager.getExtraDuration(mPlayer, CHARM_FROZEN) + ENHANCED_FROZEN_DURATION;
+		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION_TICKS);
+		int frozenDuration = CharmManager.getDuration(mPlayer, CHARM_FROZEN, ENHANCED_FROZEN_DURATION);
 		double size = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE);
 		Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), size);
 		for (LivingEntity mob : hitbox.getHitMobs()) {

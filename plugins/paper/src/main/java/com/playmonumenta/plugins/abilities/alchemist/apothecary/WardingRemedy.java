@@ -37,7 +37,7 @@ public class WardingRemedy extends Ability {
 
 	public static final String CHARM_COOLDOWN = "Warding Remedy Cooldown";
 	public static final String CHARM_PULSES = "Warding Remedy Pulses";
-	public static final String CHARM_FREQUENCY = "Warding Remedy Pulse Frequency";
+	public static final String CHARM_DELAY = "Warding Remedy Pulse Delay";
 	public static final String CHARM_ABSORPTION = "Warding Remedy Absorption Health";
 	public static final String CHARM_MAX_ABSORPTION = "Warding Remedy Max Absorption Health";
 	public static final String CHARM_ABSORPTION_DURATION = "Warding Remedy Absorption Duration";
@@ -74,12 +74,12 @@ public class WardingRemedy extends Ability {
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
 
-		int delay = WARDING_REMEDY_PULSE_DELAY - CharmManager.getExtraDuration(mPlayer, CHARM_FREQUENCY);
+		int delay = CharmManager.getDuration(mPlayer, CHARM_DELAY, WARDING_REMEDY_PULSE_DELAY);
 		int pulses = WARDING_REMEDY_PULSES + (int) CharmManager.getLevel(mPlayer, CHARM_PULSES);
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, WARDING_REMEDY_ACTIVE_RADIUS);
 		double absorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, WARDING_REMEDY_ABSORPTION);
 		double maxAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MAX_ABSORPTION, WARDING_REMEDY_MAX_ABSORPTION);
-		int absorptionDuration = WARDING_REMEDY_ABSORPTION_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_ABSORPTION_DURATION);
+		int absorptionDuration = CharmManager.getDuration(mPlayer, CHARM_ABSORPTION_DURATION, WARDING_REMEDY_ABSORPTION_DURATION);
 
 		mCosmetic.remedyStartEffect(world, loc, mPlayer, radius);
 

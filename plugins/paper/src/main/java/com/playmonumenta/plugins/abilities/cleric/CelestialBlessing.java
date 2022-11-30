@@ -84,7 +84,7 @@ public class CelestialBlessing extends Ability {
 
 	public CelestialBlessing(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDuration = CharmManager.getExtraDuration(player, CHARM_DURATION) + CELESTIAL_DURATION;
+		mDuration = CharmManager.getDuration(player, CHARM_DURATION, CELESTIAL_DURATION);
 		mExtraDamage = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE);
 	}
 

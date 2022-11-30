@@ -160,7 +160,7 @@ public class IronTincture extends Ability {
 	}
 
 	private void execute(Player player) {
-		int duration = IRON_TINCTURE_ABSORPTION_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, IRON_TINCTURE_ABSORPTION_DURATION);
 		AbsorptionUtils.addAbsorption(player, mAbsorption, mAbsorption, duration);
 
 		if (isEnhanced()) {

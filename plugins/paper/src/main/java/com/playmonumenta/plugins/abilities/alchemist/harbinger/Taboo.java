@@ -95,7 +95,7 @@ public class Taboo extends Ability {
 		super(plugin, player, INFO);
 		mActive = false;
 		mMagicDamageIncrease = (isLevelOne() ? MAGIC_DAMAGE_INCREASE_1 : MAGIC_DAMAGE_INCREASE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
-		mRechargeRateDecrease = CHARGE_TIME_REDUCTION + CharmManager.getExtraDuration(mPlayer, CHARM_RECHARGE);
+		mRechargeRateDecrease = CharmManager.getDuration(mPlayer, CHARM_RECHARGE, CHARGE_TIME_REDUCTION);
 
 		mActive = false;
 

@@ -82,7 +82,7 @@ public class SanctifiedArmor extends Ability {
 
 			MovementUtils.knockAway(mPlayer, source, KNOCKBACK_SPEED, KNOCKBACK_SPEED, true);
 			if (isLevelTwo()) {
-				EntityUtils.applySlow(mPlugin, SLOWNESS_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), SLOWNESS_AMPLIFIER_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), source);
+				EntityUtils.applySlow(mPlugin, CharmManager.getDuration(mPlayer, CHARM_DURATION, SLOWNESS_DURATION), SLOWNESS_AMPLIFIER_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), source);
 				mCosmetic.sanctOnTrigger2(world, mPlayer, loc, source);
 			} else {
 				mCosmetic.sanctOnTrigger1(world, mPlayer, loc, source);

@@ -309,7 +309,7 @@ public class JudgementChain extends Ability {
 			return;
 		}
 
-		int duration = BUFF_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, BUFF_DURATION);
 
 		List<BiConsumer<List<LivingEntity>, List<Player>>> effects = new ArrayList<>();
 

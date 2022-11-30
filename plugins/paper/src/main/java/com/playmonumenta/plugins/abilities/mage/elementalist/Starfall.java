@@ -124,8 +124,9 @@ public class Starfall extends Ability {
 							this.cancel();
 
 							Hitbox hitbox = new Hitbox.SphereHitbox(loc, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE));
+							int fireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE, FIRE_TICKS);
 							for (LivingEntity e : hitbox.getHitMobs()) {
-								EntityUtils.applyFire(mPlugin, FIRE_TICKS + CharmManager.getExtraDuration(mPlayer, CHARM_FIRE), e, mPlayer, playerItemStats);
+								EntityUtils.applyFire(mPlugin, fireDuration, e, mPlayer, playerItemStats);
 								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, true, false);
 								MovementUtils.knockAway(loc, e, KNOCKBACK, true);
 							}

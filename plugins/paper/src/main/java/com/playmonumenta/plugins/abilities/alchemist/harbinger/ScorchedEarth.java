@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.ScorchedEarthDamage;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -61,7 +60,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 			.scoreboardId("ScorchedEarth")
 			.shorthandName("SE")
 			.descriptions(
-				"Sneak while trowing an Alchemist's Potion to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. " +
+				"Sneak while throwing an Alchemist's Potion to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. " +
 					"Mobs in this zone are dealt 25% of your potion's damage and set on fire for 4s whenever taking damage of types other than ailment or fire. Cooldown: 30s.",
 				"Cooldown reduced to 25s, and two charges of this ability can be stored at once.")
 			.cooldown(SCORCHED_EARTH_1_COOLDOWN, SCORCHED_EARTH_2_COOLDOWN, CHARM_COOLDOWN)
@@ -78,7 +77,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 		super(plugin, player, INFO);
 		mMaxCharges = (isLevelOne() ? SCORCHED_EARTH_1_CHARGES : SCORCHED_EARTH_2_CHARGES) + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
-		mDuration = SCORCHED_EARTH_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SCORCHED_EARTH_DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, SCORCHED_EARTH_RADIUS);
 		mCenters = new HashMap<>();
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
@@ -117,10 +116,10 @@ public class ScorchedEarth extends MultipleChargeAbility {
 				}
 
 				PlayerItemStats stats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-				int fireDuration = SCORCHED_EARTH_FIRE_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_FIRE_DURATION);
+				int fireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, SCORCHED_EARTH_FIRE_DURATION);
 				Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
 				for (LivingEntity mob : hitbox.getHitMobs()) {
-					EffectManager.getInstance().addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage, mPlayer, stats, fireDuration));
+					mPlugin.mEffectManager.addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage, mPlayer, stats, fireDuration));
 				}
 			}
 		}

@@ -134,6 +134,9 @@ public class RestlessSouls extends Ability {
 
 			mParticle1 = new PartialParticle(Particle.SOUL, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
 			mParticle2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
+
+			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, VEX_DURATION);
+
 			new BukkitRunnable() {
 				int mTicksElapsed = 0;
 				@Nullable LivingEntity mTarget;
@@ -145,7 +148,7 @@ public class RestlessSouls extends Ability {
 					mParticle1.location(loc).spawnAsPlayerActive(mPlayer);
 					mParticle2.location(loc).spawnAsPlayerActive(mPlayer);
 
-					boolean isOutOfTime = mTicksElapsed >= VEX_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+					boolean isOutOfTime = mTicksElapsed >= duration;
 					if (isOutOfTime || !mBoss.isValid()) {
 						if (isOutOfTime && mBoss.isValid()) {
 							Location vexLoc = mBoss.getLocation();

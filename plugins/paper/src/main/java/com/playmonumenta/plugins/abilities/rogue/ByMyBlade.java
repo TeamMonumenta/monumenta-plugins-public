@@ -86,7 +86,7 @@ public class ByMyBlade extends Ability {
 			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-				new PotionEffect(PotionEffectType.FAST_DIGGING, BY_MY_BLADE_HASTE_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_HASTE_DURATION), mHasteAmplifier, false, true));
+				new PotionEffect(PotionEffectType.FAST_DIGGING, CharmManager.getDuration(mPlayer, CHARM_HASTE_DURATION, BY_MY_BLADE_HASTE_DURATION), mHasteAmplifier, false, true));
 
 			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, mDamageBonus, mInfo.getLinkedSpell(), true);
 

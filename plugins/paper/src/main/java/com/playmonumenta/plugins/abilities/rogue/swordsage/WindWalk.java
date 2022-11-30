@@ -91,7 +91,7 @@ public class WindWalk extends MultipleChargeAbility {
 		walk();
 
 		if (isLevelTwo()) {
-			mPlugin.mTimers.updateCooldownsExcept(mPlayer, mInfo.getLinkedSpell(), WIND_WALK_CDR + CharmManager.getExtraDuration(mPlayer, CHARM_COOLDOWN_REDUCTION));
+			mPlugin.mTimers.updateCooldownsExcept(mPlayer, mInfo.getLinkedSpell(), CharmManager.getDuration(mPlayer, CHARM_COOLDOWN_REDUCTION, WIND_WALK_CDR));
 		}
 	}
 

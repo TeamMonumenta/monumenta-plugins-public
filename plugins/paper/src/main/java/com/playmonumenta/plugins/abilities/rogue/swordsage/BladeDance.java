@@ -37,6 +37,7 @@ public class BladeDance extends Ability {
 	private static final int SLOW_DURATION_2 = (int) (2.5 * 20);
 	private static final int DANCE_RADIUS = 5;
 	private static final float DANCE_KNOCKBACK_SPEED = 0.2f;
+	private static final int INVULN_DURATION = 15;
 	private static final int COOLDOWN_1 = 18 * 20;
 	private static final int COOLDOWN_2 = 16 * 20;
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
@@ -78,7 +79,7 @@ public class BladeDance extends Ability {
 	public BladeDance(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DANCE_1_DAMAGE : DANCE_2_DAMAGE);
-		mSlowDuration = (isLevelOne() ? SLOW_DURATION_1 : SLOW_DURATION_2) + CharmManager.getExtraDuration(player, CHARM_ROOT);
+		mSlowDuration = CharmManager.getDuration(player, CHARM_ROOT, (isLevelOne() ? SLOW_DURATION_1 : SLOW_DURATION_2));
 	}
 
 	public void cast() {
@@ -110,7 +111,7 @@ public class BladeDance extends Ability {
 					mPitch += 0.1f;
 				}
 
-				if (mTicks >= 15 + CharmManager.getExtraDuration(mPlayer, CHARM_RESIST)) {
+				if (mTicks >= CharmManager.getDuration(mPlayer, CHARM_RESIST, INVULN_DURATION)) {
 					mPlayer.setInvulnerable(false);
 					world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 2f);

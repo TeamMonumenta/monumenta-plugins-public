@@ -50,7 +50,7 @@ public class EmpoweringOdor extends PotionAbility {
 
 	@Override
 	public void applyToPlayer(Player player, ThrownPotion potion, boolean isGruesome) {
-		int duration = EMPOWERING_ODOR_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, EMPOWERING_ODOR_DURATION);
 		mPlugin.mEffectManager.addEffect(player, EMPOWERING_ODOR_SPEED_EFFECT_NAME, new PercentSpeed(duration, EMPOWERING_ODOR_SPEED_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), EMPOWERING_ODOR_SPEED_EFFECT_NAME));
 		mPlugin.mEffectManager.addEffect(player, EMPOWERING_ODOR_DAMAGE_EFFECT_NAME, new PercentDamageDealt(duration, mDamageAmplifier));
 		if (isEnhanced()) {

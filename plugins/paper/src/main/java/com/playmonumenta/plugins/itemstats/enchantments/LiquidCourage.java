@@ -78,7 +78,7 @@ public class LiquidCourage implements Enchantment {
 
 			event.setCancelled(true);
 
-			int duration = (int)((DURATION + CharmManager.getExtraDuration(player, CHARM_DURATION)) * Quench.getDurationScaling(plugin, player));
+			int duration = (int) (CharmManager.getDuration(player, CHARM_DURATION, DURATION) * Quench.getDurationScaling(plugin, player));
 			plugin.mEffectManager.addEffect(player, COURAGE_EFFECT_SOURCE, new CourageEffect(duration, CharmManager.calculateFlatAndPercentValue(player, CHARM_RESISTANCE, AMOUNT), (int) (CHARGES + CharmManager.getLevel(player, CHARM_CHARGES)), AFFECTED_DAMAGE_TYPES));
 
 			player.setFoodLevel(Math.min(20, player.getFoodLevel() + 8));

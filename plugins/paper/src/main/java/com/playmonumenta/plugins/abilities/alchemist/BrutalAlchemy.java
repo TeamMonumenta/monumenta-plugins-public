@@ -60,7 +60,7 @@ public class BrutalAlchemy extends PotionAbility {
 	@Override
 	public void apply(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {
 		if (!isGruesome) {
-			int duration = BRUTAL_ALCHEMY_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, BRUTAL_ALCHEMY_DURATION);
 
 			double damage = mDOTDamage;
 			if (isEnhanced() && mAlchemistPotions != null) {

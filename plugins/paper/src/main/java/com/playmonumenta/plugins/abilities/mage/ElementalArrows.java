@@ -94,7 +94,7 @@ public class ElementalArrows extends Ability {
 		}
 		ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(proj);
 
-		int duration = ELEMENTAL_ARROWS_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, ELEMENTAL_ARROWS_DURATION);
 
 		if (proj.hasMetadata("ElementalArrowsFireArrow")) {
 			applyArrowEffects(event, enemy, 1, ABILITY_FIRE, playerItemStats, Stray.class, (entity) -> {
@@ -107,7 +107,7 @@ public class ElementalArrows extends Ability {
 			});
 		} else if (proj.hasMetadata("ElementalArrowsThunderArrow")) {
 			putOnCooldown();
-			int stunDuration = ENHANCED_ARROW_STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN_DURATION);
+			int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, ENHANCED_ARROW_STUN_DURATION);
 			applyArrowEffects(event, enemy, 1 + ENHANCED_DAMAGE_MULTIPLIER, ABILITY, playerItemStats, null, (entity) -> {
 				EntityUtils.applyStun(mPlugin, stunDuration, entity);
 			});

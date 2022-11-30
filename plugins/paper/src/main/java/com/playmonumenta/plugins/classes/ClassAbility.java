@@ -212,18 +212,29 @@ public enum ClassAbility {
 
 	// Fake class abilities for some enchantments
 	// Used to trigger other events
-	ERUPTION("Eruption"),
-	QUAKE("Quake"),
-	EXPLOSIVE("Explosive");
+	ERUPTION("Eruption", true),
+	QUAKE("Quake", true),
+	EXPLOSIVE("Explosive", true),
+	INFERNO("Inferno", true);
 
 	private final String mName;
+	private final boolean mFake;
 
 	ClassAbility(String name) {
-		this.mName = name;
+		this(name, false);
+	}
+
+	ClassAbility(String name, boolean fake) {
+		mName = name;
+		mFake = fake;
 	}
 
 	public String getName() {
 		return mName;
+	}
+
+	public boolean isFake() {
+		return mFake;
 	}
 
 	public static @Nullable ClassAbility getAbility(String name) {

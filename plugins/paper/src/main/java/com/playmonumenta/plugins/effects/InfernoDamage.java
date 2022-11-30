@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
@@ -43,9 +42,6 @@ public class InfernoDamage extends Effect {
 			double damage = mLevel;
 			if (mPlayer != null) {
 				damage = CharmManager.calculateFlatAndPercentValue(mPlayer, Inferno.CHARM_DAMAGE, damage);
-			}
-			if (Plugin.getInstance().mEffectManager.hasEffect(entity, MagmaShield.ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME)) {
-				damage *= 1 + MagmaShield.ENHANCEMENT_FIRE_DAMAGE_BONUS;
 			}
 			DamageUtils.damage(mPlayer, le, DamageType.AILMENT, damage, null, true, false);
 			new PartialParticle(Particle.FLAME, le.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05).spawnAsEnemyBuff();

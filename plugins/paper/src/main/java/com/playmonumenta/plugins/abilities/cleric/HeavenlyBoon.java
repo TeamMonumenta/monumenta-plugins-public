@@ -142,7 +142,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 					ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem(), false);
 				}
 
-
 				/* Remove this player from the "usual" application of potion effects */
 				affectedEntities.remove(p);
 			}

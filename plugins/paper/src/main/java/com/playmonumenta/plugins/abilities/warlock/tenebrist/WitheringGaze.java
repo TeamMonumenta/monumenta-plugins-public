@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -66,7 +65,7 @@ public class WitheringGaze extends Ability {
 
 	public WitheringGaze(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDOTDuration = CharmManager.getExtraDuration(player, CHARM_DOT) + (isLevelOne() ? WITHERING_GAZE_DOT_DURATION_1 : WITHERING_GAZE_DOT_DURATION_2);
+		mDOTDuration = CharmManager.getDuration(player, CHARM_DOT, (isLevelOne() ? WITHERING_GAZE_DOT_DURATION_1 : WITHERING_GAZE_DOT_DURATION_2));
 	}
 
 	public void cast() {
@@ -101,11 +100,12 @@ public class WitheringGaze extends Ability {
 				mR += 0.55;
 
 				Hitbox hitbox = Hitbox.approximateCylinderSegment(LocationUtils.getHalfHeightLocation(mPlayer).add(0, -mDamageRange, 0), 2 * mDamageRange, mDamageRange, Math.toRadians(ANGLE));
+				int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN, WITHERING_GAZE_STUN_DURATION);
 				for (LivingEntity e : hitbox.getHitMobs()) {
-					if (EntityUtils.isElite(e) || EntityUtils.isBoss(e) || ((e instanceof Player p) && AbilityManager.getManager().isPvPEnabled(p))) {
-						EntityUtils.applySlow(mPlugin, WITHERING_GAZE_STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), 1.0, e);
+					if (EntityUtils.isElite(e) || EntityUtils.isBoss(e)) {
+						EntityUtils.applySlow(mPlugin, stunDuration, 1.0, e);
 					} else {
-						EntityUtils.applyStun(mPlugin, WITHERING_GAZE_STUN_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STUN), e);
+						EntityUtils.applyStun(mPlugin, stunDuration, e);
 					}
 					mPlugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(mDOTDuration, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, WITHERING_GAZE_DOT_DAMAGE), WITHERING_GAZE_DOT_PERIOD, mPlayer, null));
 				}

@@ -68,7 +68,7 @@ public class VoodooBonds extends Ability {
 
 	public VoodooBonds(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mTransferDuration = CharmManager.getExtraDuration(player, CHARM_TRANSFER_TIME) + (isLevelOne() ? DURATION_1 : DURATION_2);
+		mTransferDuration = CharmManager.getDuration(player, CHARM_TRANSFER_TIME, (isLevelOne() ? DURATION_1 : DURATION_2));
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new VoodooBondsCS(), VoodooBondsCS.SKIN_LIST);
 	}
 

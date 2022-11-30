@@ -119,8 +119,8 @@ public class HuntingCompanion extends Ability {
 	public HuntingCompanion(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamageFraction = isLevelOne() ? DAMAGE_FRACTION_1 : DAMAGE_FRACTION_2;
-		mStunDuration = (isLevelOne() ? STUN_TIME_1 : STUN_TIME_2) + CharmManager.getExtraDuration(mPlayer, CHARM_STUN_DURATION);
-		mBleedDuration = isEnhanced() ? BLEED_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_BLEED_DURATION) : 0;
+		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, (isLevelOne() ? STUN_TIME_1 : STUN_TIME_2));
+		mBleedDuration = isEnhanced() ? CharmManager.getDuration(mPlayer, CHARM_BLEED_DURATION, BLEED_DURATION) : 0;
 		mBleedAmount = isEnhanced() ? BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER) : 0;
 		mHealingPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEALING_PERCENT);
 		mSummons = new HashMap<>();
@@ -189,7 +189,7 @@ public class HuntingCompanion extends Ability {
 		};
 		cosmeticRunnable.runTaskTimer(mPlugin, 0, 1);
 
-		int duration = DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION);
+		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 		World world = mPlayer.getWorld();
 		mRunnable = new BukkitRunnable() {
 			int mTicksElapsed = 0;

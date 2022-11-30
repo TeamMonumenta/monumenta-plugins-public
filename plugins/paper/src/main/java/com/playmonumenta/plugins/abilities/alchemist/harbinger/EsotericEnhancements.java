@@ -93,7 +93,7 @@ public class EsotericEnhancements extends PotionAbility {
 			mAppliedMobs.put(mob, mob.getTicksLived());
 		} else if (!isOnCooldown()) {
 			// Clear out list so it doesn't build up
-			int reactionTime = ABERRATION_SUMMON_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_REACTION_TIME);
+			int reactionTime = CharmManager.getDuration(mPlayer, CHARM_REACTION_TIME, ABERRATION_SUMMON_DURATION);
 			mAppliedMobs.keySet().removeIf((entity) -> (entity.getTicksLived() - mAppliedMobs.get(entity) > reactionTime));
 
 			// If it's still in the list, it was applied recently enough
@@ -118,14 +118,14 @@ public class EsotericEnhancements extends PotionAbility {
 
 			AlchemicalAberrationBoss alchemicalAberrationBoss = BossUtils.getBossOfClass(aberration, AlchemicalAberrationBoss.class);
 			if (alchemicalAberrationBoss == null) {
-				MMLog.warning("Failed to get AlchemicalAberrationBoss for Alchemicalaberration");
+				MMLog.warning("Failed to get AlchemicalAberrationBoss for AlchemicalAberration");
 				return;
 			}
 
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ABERRATION_DAMAGE_RADIUS);
-			alchemicalAberrationBoss.spawn(mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * mDamageMultiplier), radius, ABERRATION_BLEED_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
+			alchemicalAberrationBoss.spawn(mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * mDamageMultiplier), radius, CharmManager.getDuration(mPlayer, CHARM_DURATION, ABERRATION_BLEED_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
 
-			aberration.setMaxFuseTicks(aberration.getMaxFuseTicks() + CharmManager.getExtraDuration(mPlayer, CHARM_FUSE));
+			aberration.setMaxFuseTicks(CharmManager.getDuration(mPlayer, CHARM_FUSE, aberration.getMaxFuseTicks()));
 			aberration.setExplosionRadius((int) radius);
 			EntityUtils.setAttributeBase(aberration, Attribute.GENERIC_MOVEMENT_SPEED, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SPEED, EntityUtils.getAttributeBaseOrDefault(aberration, Attribute.GENERIC_MOVEMENT_SPEED, 0)));
 			if (isLevelTwo()) {

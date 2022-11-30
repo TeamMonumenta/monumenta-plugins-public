@@ -139,7 +139,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 						return;
 					}
 
-					EntityUtils.applyBleed(mPlugin, BLEED_TIME + CharmManager.getExtraDuration(mPlayer, CHARM_BLEED_DURATION), BLEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER), nearest);
+					EntityUtils.applyBleed(mPlugin, CharmManager.getDuration(mPlayer, CHARM_BLEED_DURATION, BLEED_TIME), BLEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER), nearest);
 					DamageUtils.damage(mPlayer, nearest, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage), ClassAbility.GLORIOUS_BATTLE, true);
 					mCosmetic.gloryOnDamage(world, mPlayer, nearest);
 

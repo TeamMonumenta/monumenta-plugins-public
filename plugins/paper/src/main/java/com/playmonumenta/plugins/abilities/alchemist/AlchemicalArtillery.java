@@ -180,7 +180,7 @@ public class AlchemicalArtillery extends PotionAbility {
 					MovementUtils.knockAway(loc, mob, knockback);
 				}
 
-			}, ENHANCEMENT_EXPLOSION_DELAY + CharmManager.getExtraDuration(mPlayer, CHARM_DELAY));
+			}, CharmManager.getDuration(mPlayer, CHARM_DELAY, ENHANCEMENT_EXPLOSION_DELAY));
 		}
 	}
 

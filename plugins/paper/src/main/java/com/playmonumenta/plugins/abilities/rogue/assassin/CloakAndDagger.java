@@ -89,7 +89,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			mCloakOnActivation = mCloak;
 			mCloak = 0;
 			mActive = true;
-			AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION + CharmManager.getExtraDuration(mPlayer, CHARM_STEALTH));
+			AbilityUtils.applyStealth(mPlugin, mPlayer, CharmManager.getDuration(mPlayer, CHARM_STEALTH, STEALTH_DURATION));
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 			new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsPlayerActive(mPlayer);
